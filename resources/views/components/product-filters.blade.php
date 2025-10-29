@@ -157,7 +157,7 @@
 </div>
 
 
-<script nonce="{{ csp_nonce() }}">
+<script>
     function productFilters() {
         return {
             filters: {

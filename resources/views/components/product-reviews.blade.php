@@ -337,7 +337,7 @@
     </div>
 </div>
 
-<script nonce="{{ csp_nonce() }}">
+<script>
     function productReviews() {
         return {
             sortBy: '{{ $sortBy }}',

@@ -19,8 +19,8 @@ use App\Http\Controllers\TestResultsController;
 use App\Models\Discount;
 use Illuminate\Support\Facades\Route;
 
-// Include frontend routes
-require __DIR__ . '/frontend.php';
+// Frontend routes are loaded in bootstrap/app.php
+// require __DIR__ . '/frontend.php';
 
 // Include admin routes
 require __DIR__ . '/admin.php';
@@ -422,16 +422,7 @@ Route::get('/lang/{locale}', LocaleController::class)
     ->where(['locale' => '[A-Za-z\-_]+'])
     ->name('language.switch');
 
-// Root -> redirect to first supported locale home
-Route::get('/', function () {
-    $supported = config('app.supported_locales', 'en');
-    $locales = is_array($supported)
-        ? $supported
-        : array_filter(array_map('trim', explode(',', (string) $supported)));
-    $locale = $locales[0] ?? config('app.locale', 'en');
-
-    return redirect('/' . $locale);
-})->name('home');
+// Root route is handled by routes/frontend.php -> HomeController
 // Backward-compatible redirect
 Route::get('/home', fn () => redirect()->route('home'));
 Route::get('/products', Pages\ProductCatalog::class)->name('products.index');

@@ -88,11 +88,19 @@
              * Convenience wrapper that collapses both result and suggestion dropdowns.
              */
             closeDropdowns() {
-                this.showResults = false;
-                if (typeof this.showSuggestions !== 'undefined') {
-                    this.showSuggestions = false;
+                try {
+                    if (typeof this.showResults !== 'undefined') {
+                        this.showResults = false;
+                    }
+                    if (typeof this.showSuggestions !== 'undefined') {
+                        this.showSuggestions = false;
+                    }
+                    if (typeof this.selectedIndex !== 'undefined') {
+                        this.selectedIndex = -1;
+                    }
+                } catch (error) {
+                    console.warn('Error closing dropdowns:', error);
                 }
-                this.selectedIndex = -1;
             },
             /**
              * Public method used by templates to pick a specific result index when clicking list buttons.

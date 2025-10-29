@@ -181,7 +181,7 @@
     </div>
 </div>
 
-<script nonce="{{ csp_nonce() }}">
+<script>
 function copyCode() {
     const code = '{{ $user->referral_code }}';
     navigator.clipboard.writeText(code).then(function() {

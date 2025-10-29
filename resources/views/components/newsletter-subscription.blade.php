@@ -122,7 +122,7 @@
     </div>
 </div>
 
-<script nonce="{{ csp_nonce() }}">
+<script>
     function newsletterSubscription() {
         return {
             email: '',

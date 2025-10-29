@@ -191,6 +191,6 @@
 
 @if ($jsonLdBlocks->isNotEmpty())
     @foreach ($jsonLdBlocks as $block)
-        <script nonce="{{ csp_nonce() }}" type="application/ld+json">{!! $block !!}</script>
+        <script type="application/ld+json">{!! $block !!}</script>
     @endforeach
 @endif

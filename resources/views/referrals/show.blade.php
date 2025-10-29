@@ -108,7 +108,7 @@
     </div>
 </div>
 
-<script nonce="{{ csp_nonce() }}">
+<script>
 function copyToClipboard(element) {
     element.select();
     element.setSelectionRange(0, 99999);

@@ -37,10 +37,9 @@ final class SecureMediaDownloadController extends Controller
             );
 
             $headers = [
-                'Content-Type'            => $mime,
-                'X-Content-Type-Options'  => 'nosniff',
-                'Content-Security-Policy' => "default-src 'none'; img-src 'self'; media-src 'self'",
-                'Content-Disposition'     => $disposition,
+                'Content-Type'           => $mime,
+                'X-Content-Type-Options' => 'nosniff',
+                'Content-Disposition'    => $disposition,
             ];
 
             if ($request->boolean('download')) {

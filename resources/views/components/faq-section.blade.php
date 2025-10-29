@@ -198,7 +198,7 @@
     </div>
 </div>
 
-<script nonce="{{ csp_nonce() }}">
+<script>
     function faqSection() {
         return {
             openFAQs: [],

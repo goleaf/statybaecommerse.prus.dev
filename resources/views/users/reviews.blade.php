@@ -442,7 +442,7 @@ title(__('users.reviews'));
     </div>
 </div>
 
-<script nonce="{{ csp_nonce() }}">
+<script>
 // Review Modal Functions
 function openReviewModal(reviewId = null) {
     const modal = document.getElementById('review-modal');

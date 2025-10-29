@@ -92,11 +92,10 @@
     <x-shared.notifications />
 
     {{-- Livewire Scripts --}}
-    {{-- Pass the CSP nonce so Livewire's inline boot scripts execute without violations. --}}
-    @livewireScripts(['nonce' => csp_nonce()])
+    @livewireScripts()
 
     {{-- Livewire client hardening: avoid accidental $wire.toJSON() server calls --}}
-    <script nonce="{{ csp_nonce() }}">
+    <script>
         document.addEventListener('livewire:init', () => {
             const patchComponent = (component) => {
                 try {
@@ -134,15 +133,7 @@
     {{-- Additional Scripts --}}
     @stack('scripts')
 
-    {{-- Alpine CSP support (prevents unsafe-eval violations) --}}
-    <script nonce="{{ csp_nonce() }}" defer src="https://unpkg.com/@alpinejs/csp@3.x.x/dist/cdn.min.js"></script>
-    <script nonce="{{ csp_nonce() }}">
-        document.addEventListener('alpine:init', () => {
-            // Register CSP plugin before Alpine starts
-            window.Alpine?.plugin?.(window.csp);
-        });
-    </script>
     {{-- Alpine.js --}}
-    <script nonce="{{ csp_nonce() }}" defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </body>
 </html>

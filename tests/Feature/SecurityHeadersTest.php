@@ -20,27 +20,6 @@ final class SecurityHeadersTest extends TestCase
             $response->assertHeader($name, $value);
         }
 
-        $expectedPolicy = collect((array) config('security.headers.content_security_policy'))
-            ->map(function ($sources, string $directive): ?string {
-                if (! is_string($directive) || $directive === '') {
-                    return null;
-                }
-
-                $sources = is_string($sources) ? [$sources] : (is_array($sources) ? $sources : []);
-                $sources = array_values(array_unique(array_filter($sources, fn ($value): bool => is_string($value) && $value !== '')));
-
-                if ($sources === []) {
-                    return null;
-                }
-
-                return $directive . ' ' . implode(' ', $sources);
-            })
-            ->filter()
-            ->implode('; ');
-
-        if ($expectedPolicy !== '') {
-            $response->assertHeader('Content-Security-Policy', $expectedPolicy);
-        }
     }
 
     public function test_security_headers_can_be_disabled(): void
@@ -55,6 +34,5 @@ final class SecurityHeadersTest extends TestCase
             $response->assertHeaderMissing($name);
         }
 
-        $response->assertHeaderMissing('Content-Security-Policy');
     }
 }

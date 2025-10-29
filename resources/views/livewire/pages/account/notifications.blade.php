@@ -328,7 +328,7 @@ new #[Layout('components.layouts.templates.account')] class extends Component {
 </div>
 
 @push('scripts')
-<script nonce="{{ csp_nonce() }}">
+<script>
     document.addEventListener('livewire:init', () => {
         Livewire.on('notification-marked-read', () => {
             // Optional: Show success message

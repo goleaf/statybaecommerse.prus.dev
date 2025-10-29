@@ -19,7 +19,6 @@ it('serves file inline with correct headers', function (): void {
 
     $response->assertOk();
     $response->assertHeader('X-Content-Type-Options', 'nosniff');
-    $response->assertHeader('Content-Security-Policy');
     $response->assertHeader('Content-Disposition');
 
     // Ensure we do not accidentally inject attachment headers when not requested.

@@ -85,7 +85,7 @@
 </div>
 
 @push('scripts')
-    <script nonce="{{ csp_nonce() }}">
+    <script>
         document.addEventListener('alpine:init', () => {
             Alpine.data('modal', () => ({
                 show: false,

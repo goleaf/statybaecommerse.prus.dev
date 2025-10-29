@@ -185,7 +185,7 @@
     </div>
 </div>
 
-<script nonce="{{ csp_nonce() }}">
+<script>
 document.addEventListener('DOMContentLoaded', function() {
     loadStatistics();
     loadClicks();
