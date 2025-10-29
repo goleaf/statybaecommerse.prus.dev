@@ -16,6 +16,7 @@
 - `Country` exposes relationships to addresses, cities, taxation, and currencies, alongside query scopes for regional filtering and VAT requirements, supporting admin analytics and storefront lookups.【F:app/Models/Country.php†L34-L249】
 - The primary `CountrySeeder` updates or creates entries using translation payloads, but counting the `'cca2'` entries shows only 56 seeded countries, leaving the catalogue well below the desired 195+ world coverage.【F:database/seeders/CountrySeeder.php†L15-L1183】【483c33†L1-L1】
 - Address validation falls back to querying active countries when configuration omits an allow-list, so incomplete seeding directly reduces selectable countries at checkout and in admin forms.【F:app/Http/Requests/Frontend/AddressRequest.php†L102-L123】
+- The Filament country infolist now references the correct schema instance, restoring the admin "view" page that previously crashed because it returned an undefined variable.【F:app/Filament/Resources/CountryResource.php†L244-L291】
 
 ### Regions
 - `RegionSeeder` supplies detailed structures (codes, zone links, localisation) for Baltic states, major EU members, the UK, USA, and Canada, implying expectations for a hierarchical regional catalogue.【F:database/seeders/RegionSeeder.php†L15-L197】
