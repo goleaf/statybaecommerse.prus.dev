@@ -14,18 +14,110 @@ final class RequestContext
 
     public static function resolveLocale(Request $request): string
     {
+        /** @var list<string> $availableLocales */
         $availableLocales = TranslationService::getAvailableLocales();
-        $preferred = $request->getPreferredLanguage($availableLocales);
-        $currentLocale = app()->getLocale();
+        $defaultLocale = TranslationService::getDefaultLocale();
 
-        $locale = is_string($preferred) && $preferred !== ''
-            ? $preferred
-            : ($currentLocale !== ''
-                ? $currentLocale
-                : TranslationService::getDefaultLocale());
+        // Start with the browser's preferred language if it matches our supported locales list.
+        $preferred = null;
+        $rawAcceptLanguage = $request->headers->get('Accept-Language');
+        $isDefaultSymfonyAccept = is_string($rawAcceptLanguage)
+            && strtolower($rawAcceptLanguage) === 'en-us,en;q=0.5';
+
+        if ($request->hasHeader('Accept-Language') && ! $isDefaultSymfonyAccept) {
+            $resolvedPreferred = $request->getPreferredLanguage($availableLocales);
+            if (is_string($resolvedPreferred) && $resolvedPreferred !== '') {
+                $preferred = $resolvedPreferred;
+            }
+        }
+
+        // Collect all potential locale signals in priority order to mirror the SetLocale middleware behaviour.
+        $candidateLocales = [];
+
+        $routeLocale = $request->route('locale');
+        if (is_string($routeLocale)) {
+            $normalizedRouteLocale = trim($routeLocale);
+            if ($normalizedRouteLocale !== '') {
+                $candidateLocales[] = $normalizedRouteLocale;
+            }
+        }
+
+        $queryLocale = $request->query('locale');
+        if (is_string($queryLocale)) {
+            $normalizedQueryLocale = trim($queryLocale);
+            if ($normalizedQueryLocale !== '') {
+                $candidateLocales[] = $normalizedQueryLocale;
+            }
+        }
+
+        if (is_string($preferred)) {
+            $normalizedPreferred = trim($preferred);
+            if ($normalizedPreferred !== '') {
+                $candidateLocales[] = $normalizedPreferred;
+            }
+        } elseif ($request->hasHeader('Accept-Language') && ! $isDefaultSymfonyAccept) {
+            // Gracefully handle regional variants (e.g., en-GB) when getPreferredLanguage() could not resolve a direct match.
+            foreach ($request->getLanguages() as $language) {
+                $normalized = strtolower(str_replace('_', '-', (string) $language));
+                $segment = explode('-', $normalized, 2)[0];
+
+                if ($segment !== '') {
+                    $candidateLocales[] = $segment;
+                }
+            }
+        }
+
+        $sessionStore = session();
+        if ($sessionStore->has('locale')) {
+            $sessionLocale = $sessionStore->get('locale');
+            if (is_string($sessionLocale)) {
+                $normalizedSessionLocale = trim($sessionLocale);
+                if ($normalizedSessionLocale !== '') {
+                    $candidateLocales[] = $normalizedSessionLocale;
+                }
+            }
+        }
+
+        if ($sessionStore->has('app.locale')) {
+            $appLocale = $sessionStore->get('app.locale');
+            if (is_string($appLocale)) {
+                $normalizedAppLocale = trim($appLocale);
+                if ($normalizedAppLocale !== '') {
+                    $candidateLocales[] = $normalizedAppLocale;
+                }
+            }
+        }
+
+        $cookieLocale = $request->cookie('app_locale');
+        if (is_string($cookieLocale)) {
+            $normalizedCookieLocale = trim($cookieLocale);
+            if ($normalizedCookieLocale !== '') {
+                $candidateLocales[] = $normalizedCookieLocale;
+            }
+        }
+
+        if (auth()->check()) {
+            $preferredLocale = auth()->user()->preferred_locale ?? null;
+            if (is_string($preferredLocale)) {
+                $normalizedPreferredLocale = trim($preferredLocale);
+                if ($normalizedPreferredLocale !== '') {
+                    $candidateLocales[] = $normalizedPreferredLocale;
+                }
+            }
+        }
+
+        // Default to the configured locale when no candidate matches the supported list.
+        $locale = $defaultLocale;
+
+        foreach ($candidateLocales as $candidateLocale) {
+            if (in_array($candidateLocale, $availableLocales, true)) {
+                $locale = $candidateLocale;
+                break;
+            }
+        }
 
         if (! in_array($locale, $availableLocales, true)) {
-            $locale = TranslationService::getDefaultLocale();
+            $locale = $defaultLocale;
         }
 
         app()->setLocale($locale);

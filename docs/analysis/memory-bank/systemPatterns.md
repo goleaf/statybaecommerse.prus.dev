@@ -90,6 +90,7 @@
 - Priority-based stacking with exclusivity rules
 - Cached eligibility evaluation
 - Tag-based cache invalidation
+- Query scopes on discount redemptions expose per-discount, per-user, order-specific, and date-filtered analytics for reporting surfaces.【F:app/Models/DiscountRedemption.php†L130-L178】
 
 ### 3. Media Management Architecture
 **Decision:** Spatie Media Library with automatic conversions
@@ -206,6 +207,7 @@
 - **Integration Tests:** End-to-end workflow testing
 - **Browser Tests:** Critical user flow testing with Playwright
 - **Filament snapshots:** Leave Filament's resource auto-discovery enabled in tests so navigation snapshots and resource audits operate on the canonical ordering registered in production.
+- **Environment Guardrails:** The `make test` target now installs Composer dependencies on demand to keep local and CI runs from failing due to missing vendor packages.
 
 ### 2. Code Quality Pattern
 **Pattern:** Automated code quality enforcement
@@ -220,6 +222,12 @@
 - **Asset Compilation:** Vite-based asset compilation
 - **Migration Strategy:** Safe database migrations
 - **Cache Warming:** Post-deployment cache warming
+
+### 4. Data Hygiene Pattern
+**Pattern:** Enum maintenance routines protect integrity while keeping tables lean
+- **Duplicate Safety:** EnumValue duplicates generate collision-resistant keys so repeated clones never violate the unique `(type, key)` index.【F:app/Models/EnumValue.php†L148-L191】
+- **Usage Reset:** Newly duplicated rows zero out usage counters to ensure reporting starts from a clean slate.【F:app/Models/EnumValue.php†L157-L165】
+- **Lifecyle Cleanup:** Stale enum rows are pruned lazily by ID, skipping records with any usage to minimise memory pressure during maintenance tasks.【F:app/Models/EnumValue.php†L248-L271】
 
 ## Filament Integration Patterns
 
@@ -239,6 +247,8 @@
 ### 2. Filament Resource Pattern
 **Pattern:** Standardized Filament resource structure
 - **Form Schemas:** Separate form schema classes for complex forms
+ - **Form Signatures:** Maintain `public static function form(Schema $schema): Schema` and return the provided `$schema` so the
+  Filament upgrade tooling remains compatible
 - **Table Schemas:** Dedicated table schema classes for data display
 - **Page Classes:** Custom page classes for create, edit, and list operations
 - **Navigation Integration:** Proper navigation group and icon assignments
@@ -258,3 +268,5 @@
 - **Process Documentation:** Business workflow documentation
 - **Technical Specifications:** Architecture and integration guides
 - **Troubleshooting Guides:** Common issue resolution
+- **Catalogue Ordering:** Root category navigation relies on `Category::scopeTopLevelVisible()` to filter visible parents and then delegates to the shared `orderedByName` scope for deterministic alphabetical fallbacks.【F:app/Models/Category.php†L254-L267】
+- **Campaign/Channel Listings:** Marketing and system channels normalise ordered views through case-insensitive wrappers around the shared ordering trait so dropdowns stay predictable across database engines.【F:app/Models/Campaign.php†L101-L115】【F:app/Models/Channel.php†L125-L138】

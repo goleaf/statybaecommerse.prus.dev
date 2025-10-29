@@ -95,7 +95,24 @@ final class StockController extends Controller
             $sortDirection = 'desc';
         }
 
-        $query->orderBy($sortColumn, $sortDirection);
+        // Reset any implicit ordering (from scopes or relationship eager loads) before
+        // applying the explicit sort so that fallback logic remains predictable.
+        $query->reorder();
+
+        if ($sortDirection === 'desc') {
+            // Use an explicit descending clause so the database cannot default to
+            // ascending order when the client provides an invalid direction.
+            $query->orderByDesc($sortColumn);
+        } else {
+            $query->orderBy($sortColumn, $sortDirection);
+        }
+
+        // Apply a deterministic tie-breaker on the primary key so inventories created
+        // at the exact same moment still respect the chosen direction consistently.
+        $query->orderBy(
+            'variant_inventories.id',
+            $sortDirection === 'desc' ? 'desc' : 'asc'
+        );
         $stockItems = $query->paginate(20)->withQueryString();
         // Get filter options
         $locations = Location::enabled()->get();
@@ -135,6 +152,7 @@ final class StockController extends Controller
                 $actorId = (int) $actorId;
             }
             $correlationId = Str::uuid()->toString();
+            // Cast optional notes to a string so downstream logging remains consistent.
             $notes = isset($validated['notes']) ? (string) $validated['notes'] : null;
             $quantity = (int) $validated['quantity'];
             $reason = (string) $validated['reason'];
