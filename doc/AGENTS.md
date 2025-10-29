@@ -42,6 +42,8 @@ This repository mixes Laravel 12 and Filament v4 code. Use the following guardra
 - **Example test placeholders**: Keep the placeholder example tests across `tests/Feature`, `tests/Unit`, `tests/Livewire`,
   `tests/Filament`, and `tests/Http` intact. These files fuel the QA dashboards that reference legacy `ExampleTest` identifiers
   and should remain green (skip/incomplete when simulating other states) to avoid breaking monitoring scripts.
+- **Model Pest harness**: When contributing to `tests/Models`, remember to import `Tests\\TestCase` and register it via
+  `uses(TestCase::class);` so the shared SQLite testing harness initialises before factories run.
 
 - After editing PHP or Blade files, run the quick quality loop before committing:
   1. `php -l <file>` to ensure syntax is valid.
