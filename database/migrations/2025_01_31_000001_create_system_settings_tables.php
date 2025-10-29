@@ -50,6 +50,9 @@ return new class extends Migration
             $table->integer('sort_order')->default(0);
             $table->boolean('is_active')->default(true);
             $table->unsignedBigInteger('updated_by')->nullable();
+            // Track who originally introduced the setting so attribution observers
+            // can persist consistent auditing metadata across environments.
+            $table->unsignedBigInteger('created_by')->nullable();
             $table->timestamps();
             $table->softDeletes();
 
@@ -57,9 +60,11 @@ return new class extends Migration
             $table->index(['group', 'is_active']);
             $table->index(['is_public', 'is_active']);
             $table->index('updated_by');
+            $table->index('created_by');
 
             $table->foreign('category_id')->references('id')->on('system_setting_categories')->onDelete('set null');
             $table->foreign('updated_by')->references('id')->on('users')->onDelete('set null');
+            $table->foreign('created_by')->references('id')->on('users')->onDelete('set null');
         });
 
         // System Setting Translations Table
@@ -115,12 +120,21 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('setting_id');
             $table->unsignedBigInteger('depends_on_setting_id');
-            $table->json('condition')->nullable();  // JSON with operator and value
+            // Store the human-readable condition string so scopes can perform
+            // case-insensitive LIKE searches without JSON validation failures.
+            $table->text('condition')->nullable();
+            // Persist the extracted comparison value independently to keep
+            // filtering predictable when the operator expects a scalar input.
+            $table->string('condition_value')->nullable();
             $table->boolean('is_active')->default(true);
+            // Allow tests and admin tooling to stash additional context (e.g.
+            // UI hints or computed evaluation metadata) without schema churn.
+            $table->json('meta')->nullable();
             $table->timestamps();
 
             $table->index(['setting_id', 'is_active']);
             $table->index('depends_on_setting_id');
+            $table->index('condition');
 
             $table->foreign('setting_id')->references('id')->on('system_settings')->onDelete('cascade');
             $table->foreign('depends_on_setting_id')->references('id')->on('system_settings')->onDelete('cascade');
