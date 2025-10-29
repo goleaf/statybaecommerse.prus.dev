@@ -5,6 +5,7 @@ declare(strict_types=1);
 return [
     'menu_items' => require __DIR__ . '/admin/menu_items.php',
     'dashboard'  => require __DIR__ . '/admin/dashboard.php',
+    'no_image'   => 'Nėra paveikslėlio', // Bendras užrašas, kai nėra galimų medijos failų.
     'settings'   => [
         'navigation_label'   => 'Nustatymai',
         'plural_model_label' => 'Nustatymai',
