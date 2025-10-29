@@ -24,56 +24,23 @@ use Tests\TestCase;
 
 uses(TestCase::class);
 
-it('clears the quick action link state and payload when the lookup is emptied', function (): void {
-    [$component, $livewire, $set] = resolveQuickActionComponent();
+// Provide each place where the slider link lookup exists so the shared assertion can exercise all entry points.
+dataset('slider_searchable_input_resolvers', [
+    'quick actions widget' => resolveQuickActionComponent(...),
+    'management page'      => resolveManagementComponent(...),
+    'resource form'        => resolveResourceComponent(...),
+]);
 
+it('clears the slider link lookup state and payload when the search input is emptied', function (SearchableInput $component, DummyLivewireComponent $livewire, RecordingSet $set): void {
+    // Preload the component and Livewire store with a synthetic selection to mirror the persisted state users would have set previously.
     seedButtonSelection($component, $livewire);
 
+    // Resolve the dynamically registered hook and simulate clearing the SearchableInput to trigger the cleanup logic.
     $closure = resolveAfterStateUpdatedHook($component);
     $closure($component, null, $set);
 
-    expect(data_get($livewire, 'button_url'))->toBeNull();
-    expect(data_get($livewire, 'button_url_payload'))->toBe([]);
-    expect($component->getOptions())->toBe([]);
-    if ($component->hasMeta('payload')) {
-        expect($component->getMeta('payload'))->toBe([]);
-    }
-    expect($set->values['button_url_payload'] ?? null)->toBe([]);
-});
-
-it('clears the management form link state and payload when the lookup is emptied', function (): void {
-    [$component, $livewire, $set] = resolveManagementComponent();
-
-    seedButtonSelection($component, $livewire);
-
-    $closure = resolveAfterStateUpdatedHook($component);
-    $closure($component, null, $set);
-
-    expect(data_get($livewire, 'button_url'))->toBeNull();
-    expect(data_get($livewire, 'button_url_payload'))->toBe([]);
-    expect($component->getOptions())->toBe([]);
-    if ($component->hasMeta('payload')) {
-        expect($component->getMeta('payload'))->toBe([]);
-    }
-    expect($set->values['button_url_payload'] ?? null)->toBe([]);
-});
-
-it('clears the resource form link state and payload when the lookup is emptied', function (): void {
-    [$component, $livewire, $set] = resolveResourceComponent();
-
-    seedButtonSelection($component, $livewire);
-
-    $closure = resolveAfterStateUpdatedHook($component);
-    $closure($component, null, $set);
-
-    expect(data_get($livewire, 'button_url'))->toBeNull();
-    expect(data_get($livewire, 'button_url_payload'))->toBe([]);
-    expect($component->getOptions())->toBe([]);
-    if ($component->hasMeta('payload')) {
-        expect($component->getMeta('payload'))->toBe([]);
-    }
-    expect($set->values['button_url_payload'] ?? null)->toBe([]);
-});
+    assertSliderLookupCleared($component, $livewire, $set);
+})->with('slider_searchable_input_resolvers');
 
 /**
  * @return array{SearchableInput, DummyLivewireComponent, RecordingSet}
@@ -117,6 +84,12 @@ function resolveComponentFromAction(Action $action): array
 {
     $livewire = new DummyLivewireComponent;
     $schema = $action->getSchema(Form::make($livewire));
+
+    // Fail fast if the action does not expose a schema instance, mirroring the runtime expectation for Filament actions.
+    if (! $schema instanceof Schema) {
+        throw new RuntimeException('Unable to resolve schema from slider action.');
+    }
+
     $component = resolveSearchableComponent($schema, 'button_url');
 
     return [$component, $livewire, new RecordingSet($component)];
@@ -124,6 +97,7 @@ function resolveComponentFromAction(Action $action): array
 
 function seedButtonSelection(SearchableInput $component, DummyLivewireComponent $livewire): void
 {
+    // Seed both the Livewire backing store and the component so the after-update hook has data to remove.
     data_set($livewire, 'button_url', 'https://example.com');
     data_set($livewire, 'button_url_payload', ['cached' => true]);
 
@@ -135,26 +109,53 @@ function seedButtonSelection(SearchableInput $component, DummyLivewireComponent 
     }
 }
 
+function assertSliderLookupCleared(SearchableInput $component, DummyLivewireComponent $livewire, RecordingSet $set): void
+{
+    // Confirm the Livewire component no longer exposes the stale link selection.
+    expect(data_get($livewire, 'button_url'))->toBeNull();
+    expect(data_get($livewire, 'button_url_payload'))->toBe([]);
+
+    // Ensure the SearchableInput itself drops its cached options and payload metadata.
+    expect($component->getOptions())->toBe([]);
+    if ($component->hasMeta('payload')) {
+        expect($component->getMeta('payload'))->toBe([]);
+    }
+
+    // Verify that Filament's Set helper recorded an empty payload for the field.
+    expect($set->values['button_url_payload'] ?? null)->toBe([]);
+}
+
+/**
+ * @return Closure(SearchableInput, mixed, RecordingSet): mixed
+ */
 function resolveAfterStateUpdatedHook(SearchableInput $component): Closure
 {
     $reflection = new ReflectionClass($component);
     $property = $reflection->getProperty('afterStateUpdated');
     $property->setAccessible(true);
 
-    /** @var array<int, Closure> $callbacks */
+    /** @var array<int, Closure|callable> $callbacks */
     $callbacks = $property->getValue($component);
 
-    return $callbacks[array_key_last($callbacks)];
+    if ($callbacks === []) {
+        throw new RuntimeException('SearchableInput hook stack was empty.');
+    }
+
+    $callback = $callbacks[array_key_last($callbacks)];
+
+    if (! $callback instanceof Closure) {
+        throw new RuntimeException('SearchableInput hook stack contained a non-closure callback.');
+    }
+
+    return $callback;
 }
 
 function resolveSearchableComponent(Schema|Form $schema, string $statePath): SearchableInput
 {
     $components = $schema->getFlatComponents(withActions: false, withHidden: true);
 
-    $component = collect($components)->first(function ($component) use ($statePath): bool {
-        return $component instanceof SearchableInput
-            && $component->getStatePath() === $statePath;
-    });
+    $component = collect($components)->first(fn ($component): bool => $component instanceof SearchableInput
+        && $component->getStatePath() === $statePath);
 
     return $component instanceof SearchableInput
         ? $component
@@ -196,18 +197,27 @@ final class DummyLivewireComponent extends LivewireComponent implements HasSchem
         return null;
     }
 
-    public function render()
+    public function render(): mixed
     {
         return view('filament::components.badge')->with(['badge' => '']);
     }
 
-    public function __set(string $name, mixed $value): void
+    public function __set(mixed $name, mixed $value): void
     {
+        // Ensure array keys remain strings so the fake store mirrors Livewire's property bag behaviour.
+        if (! is_string($name)) {
+            throw new RuntimeException('DummyLivewireComponent expects string property names.');
+        }
+
         $this->store[$name] = $value;
     }
 
-    public function __get(string $name): mixed
+    public function __get(mixed $name): mixed
     {
+        if (! is_string($name)) {
+            throw new RuntimeException('DummyLivewireComponent expects string property names.');
+        }
+
         return $this->store[$name] ?? null;
     }
 }
