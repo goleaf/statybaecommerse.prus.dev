@@ -111,9 +111,10 @@
                 </div>
 
                 <div class="space-y-3">
-                    <x-primary-button type="submit" class="w-full justify-center rounded-2xl px-5 py-3 text-base font-semibold">
+                    {{-- Use the shared buttons.primary component so the template resolves without missing aliases. --}}
+                    <x-buttons.primary type="submit" class="w-full justify-center rounded-2xl px-5 py-3 text-base font-semibold">
                         {{ __('auth.two_factor.submit') }}
-                    </x-primary-button>
+                    </x-buttons.primary>
                     <p class="text-center text-xs text-slate-500">
                         {{ __('auth.two_factor.security_footer') }}
                     </p>
