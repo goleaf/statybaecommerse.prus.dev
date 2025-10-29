@@ -550,10 +550,14 @@ final class CustomerGroup extends Model
 
         $this->attributes['is_active'] = $normalized;
 
-        // Mirror the normalized value onto the legacy column every time so both
-        // toggles stay perfectly aligned regardless of which attribute was
-        // originally persisted.
-        $this->attributes['is_enabled'] = $normalized;
+        // Only mirror when the counterpart is unset or already aligned so callers
+        // can deliberately diverge `is_active` from `is_enabled` without the later
+        // setter overwriting their intent during mass-assignment.
+        $existingEnabled = $this->attributes['is_enabled'] ?? null;
+
+        if ($existingEnabled === null || $this->normalizeBoolean($existingEnabled) === $normalized) {
+            $this->attributes['is_enabled'] = $normalized;
+        }
     }
 
     /**
@@ -567,9 +571,14 @@ final class CustomerGroup extends Model
 
         $this->attributes['is_enabled'] = $normalized;
 
-        // Always sync the modern column as well to prevent stale boolean states
-        // when legacy write paths update only `is_enabled`.
-        $this->attributes['is_active'] = $normalized;
+        // Avoid clobbering explicit `is_active` assignments supplied in the same
+        // payload by only mirroring when no value has been set yet or the values
+        // already match.
+        $existingActive = $this->attributes['is_active'] ?? null;
+
+        if ($existingActive === null || $this->normalizeBoolean($existingActive) === $normalized) {
+            $this->attributes['is_active'] = $normalized;
+        }
     }
 
     /**
