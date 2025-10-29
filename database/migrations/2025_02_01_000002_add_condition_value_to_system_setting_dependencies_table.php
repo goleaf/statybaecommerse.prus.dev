@@ -15,7 +15,19 @@ return new class extends Migration
             return;
         }
 
+        if (
+            Schema::hasColumn('system_setting_dependencies', 'condition_value') ||
+            Schema::hasColumn('system_setting_dependencies', 'condition_operator')
+        ) {
+            // Bail out when a later patch already introduced the new schema columns. Without
+            // this guard SQLite would attempt to add duplicate columns during migrate:fresh,
+            // causing the test harness to drop back to the minimal fallback schema.
+            return;
+        }
+
         Schema::table('system_setting_dependencies', function (Blueprint $table): void {
+            // Promote the parsed operator/value columns so we can migrate any existing JSON
+            // payloads without relying on driver-specific schema diffs.
             $table->string('condition_operator')->nullable()->after('depends_on_setting_id');
             $table->text('condition_value')->nullable()->after('condition_operator');
         });
@@ -25,22 +37,34 @@ return new class extends Migration
             ->orderBy('id')
             ->chunkById(200, function ($dependencies): void {
                 foreach ($dependencies as $dependency) {
+                    /**
+                     * @var object{id:int, condition:mixed|null} $dependency
+                     */
                     $operator = null;
                     $value = null;
 
                     if ($dependency->condition !== null) {
-                        $decoded = json_decode((string) $dependency->condition, true);
-                        $jsonError = json_last_error();
+                        if (is_string($dependency->condition)) {
+                            // Decode the legacy JSON payloads persisted by earlier releases so we can
+                            // split the operator and comparison value into first-class columns.
+                            $decoded = json_decode($dependency->condition, true);
+                            $jsonError = json_last_error();
 
-                        if ($jsonError === JSON_ERROR_NONE) {
-                            if (is_array($decoded)) {
-                                $operator = $decoded['operator'] ?? null;
-                                $value = $decoded['value'] ?? null;
-                            } elseif (is_scalar($decoded)) {
-                                $operator = (string) $decoded;
+                            if ($jsonError === JSON_ERROR_NONE) {
+                                if (is_array($decoded)) {
+                                    $operator = $decoded['operator'] ?? null;
+                                    $value = $decoded['value'] ?? null;
+                                } elseif (is_scalar($decoded)) {
+                                    $operator = (string) $decoded;
+                                }
+                            } else {
+                                $operator = $dependency->condition;
                             }
-                        } elseif (is_string($dependency->condition)) {
-                            $operator = $dependency->condition;
+                        } elseif (is_array($dependency->condition)) {
+                            $operator = $dependency->condition['operator'] ?? null;
+                            $value = $dependency->condition['value'] ?? null;
+                        } elseif (is_scalar($dependency->condition)) {
+                            $operator = (string) $dependency->condition;
                         }
 
                         if (is_array($value) || is_object($value)) {
@@ -57,21 +81,28 @@ return new class extends Migration
                 }
             });
 
-        Schema::table('system_setting_dependencies', function (Blueprint $table): void {
-            $table->dropColumn('condition');
-        });
+        if (Schema::hasColumn('system_setting_dependencies', 'condition')) {
+            Schema::table('system_setting_dependencies', function (Blueprint $table): void {
+                $table->dropColumn('condition');
+            });
+        }
 
-        Schema::table('system_setting_dependencies', function (Blueprint $table): void {
-            $table->string('condition')->nullable()->after('depends_on_setting_id');
-        });
+        if (! Schema::hasColumn('system_setting_dependencies', 'condition')) {
+            Schema::table('system_setting_dependencies', function (Blueprint $table): void {
+                $table->string('condition')->nullable()->after('depends_on_setting_id');
+            });
+        }
 
         DB::table('system_setting_dependencies')->update([
             'condition' => DB::raw('condition_operator'),
         ]);
 
-        Schema::table('system_setting_dependencies', function (Blueprint $table): void {
-            $table->dropColumn('condition_operator');
-        });
+        // @phpstan-ignore-next-line The column is created above when the guard lets execution continue.
+        if (Schema::hasColumn('system_setting_dependencies', 'condition_operator')) {
+            Schema::table('system_setting_dependencies', function (Blueprint $table): void {
+                $table->dropColumn('condition_operator');
+            });
+        }
     }
 
     public function down(): void
@@ -80,15 +111,20 @@ return new class extends Migration
             return;
         }
 
-        Schema::table('system_setting_dependencies', function (Blueprint $table): void {
-            $table->json('condition_json')->nullable()->after('depends_on_setting_id');
-        });
+        if (! Schema::hasColumn('system_setting_dependencies', 'condition_json')) {
+            Schema::table('system_setting_dependencies', function (Blueprint $table): void {
+                $table->json('condition_json')->nullable()->after('depends_on_setting_id');
+            });
+        }
 
         DB::table('system_setting_dependencies')
             ->select(['id', 'condition', 'condition_value'])
             ->orderBy('id')
             ->chunkById(200, function ($dependencies): void {
                 foreach ($dependencies as $dependency) {
+                    /**
+                     * @var object{id:int, condition:mixed|null, condition_value:mixed|null} $dependency
+                     */
                     $value = $dependency->condition_value;
                     $decodedValue = null;
 
@@ -114,21 +150,32 @@ return new class extends Migration
                 }
             });
 
-        Schema::table('system_setting_dependencies', function (Blueprint $table): void {
-            $table->dropColumn('condition');
-        });
+        if (Schema::hasColumn('system_setting_dependencies', 'condition')) {
+            Schema::table('system_setting_dependencies', function (Blueprint $table): void {
+                $table->dropColumn('condition');
+            });
+        }
 
-        Schema::table('system_setting_dependencies', function (Blueprint $table): void {
-            $table->json('condition')->nullable()->after('depends_on_setting_id');
-        });
+        if (! Schema::hasColumn('system_setting_dependencies', 'condition')) {
+            Schema::table('system_setting_dependencies', function (Blueprint $table): void {
+                $table->json('condition')->nullable()->after('depends_on_setting_id');
+            });
+        }
 
         DB::table('system_setting_dependencies')->update([
             'condition' => DB::raw('condition_json'),
         ]);
 
         Schema::table('system_setting_dependencies', function (Blueprint $table): void {
-            $table->dropColumn('condition_json');
-            $table->dropColumn('condition_value');
+            // Drop the temporary JSON payload and restored value column when rolling back the
+            // migration. Individual guards are cheaper than separate table calls.
+            if (Schema::hasColumn('system_setting_dependencies', 'condition_json')) {
+                $table->dropColumn('condition_json');
+            }
+
+            if (Schema::hasColumn('system_setting_dependencies', 'condition_value')) {
+                $table->dropColumn('condition_value');
+            }
         });
     }
 };
