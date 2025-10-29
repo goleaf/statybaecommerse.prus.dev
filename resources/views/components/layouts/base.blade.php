@@ -115,11 +115,10 @@
     <div id="notifications" class="fixed top-4 right-4 z-50 space-y-2"></div>
 
     <!-- Livewire Scripts -->
-    {{-- Pass the CSP nonce so Livewire's inline boot scripts execute without violations. --}}
-    @livewireScripts(['nonce' => csp_nonce()])
+    @livewireScripts()
 
     <!-- Livewire client hardening: avoid accidental $wire.toJSON() server calls -->
-    <script nonce="{{ csp_nonce() }}">
+    <script>
         document.addEventListener('livewire:init', () => {
             const patchComponent = (component) => {
                 try {
@@ -149,7 +148,7 @@
     </script>
 
     <!-- Notification Handler -->
-    <script nonce="{{ csp_nonce() }}">
+    <script>
         const ensureCartUpdater = () => {
             if (typeof window.updateCartCount === 'function') {
                 return window.updateCartCount;
@@ -269,15 +268,8 @@
     {{ $scripts ?? '' }}
     @stack('scripts')
 
-    <!-- Alpine CSP support (prevents unsafe-eval violations) -->
-    <script nonce="{{ csp_nonce() }}" defer src="https://unpkg.com/@alpinejs/csp@3.x.x/dist/cdn.min.js"></script>
-    <script nonce="{{ csp_nonce() }}">
-        document.addEventListener('alpine:init', () => {
-            window.Alpine?.plugin?.(window.csp);
-        });
-    </script>
     <!-- Alpine.js -->
-    <script nonce="{{ csp_nonce() }}" defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </body>
 
 </html>

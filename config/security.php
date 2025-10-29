@@ -37,68 +37,6 @@ return [
             'fullscreen'      => ['self'],
             'display-capture' => [],
         ],
-        'content_security_policy' => [
-            'use_nonce'  => (bool) env('SECURITY_HEADERS_CSP_USE_NONCE', true),
-            'directives' => [
-                'default-src'     => ["'self'"],
-                'base-uri'        => ["'self'"],
-                'form-action'     => ["'self'"],
-                'frame-ancestors' => ["'none'"],
-                'object-src'      => ["'none'"],
-                'script-src'      => [
-                    "'self'",
-                    '@nonce',
-                    'https://unpkg.com',
-                    // Alpine.js and Livewire evaluate expressions dynamically even with the CSP plugin,
-                    // so allow unsafe-eval explicitly while we migrate additional components away from
-                    // runtime string evaluation.
-                    "'unsafe-eval'",
-                ],
-                'script-src-attr' => [
-                    "'unsafe-inline'",
-                ],
-                'style-src' => [
-                    "'self'",
-                    '@nonce',
-                    'https://fonts.bunny.net',
-                    'https://unpkg.com',
-                    // Filament 4 widgets rely on inline CSS variables for responsive grids; permit them
-                    // until we can replace those attributes with utility classes.
-                    "'unsafe-inline'",
-                ],
-                'style-src-attr' => [
-                    "'self'",
-                    "'unsafe-inline'",
-                ],
-                'font-src' => [
-                    "'self'",
-                    'https://fonts.bunny.net',
-                    'data:',
-                ],
-                'img-src' => [
-                    "'self'",
-                    'data:',
-                    'blob:',
-                ],
-                'connect-src' => [
-                    "'self'",
-                ],
-                'frame-src' => [
-                    "'self'",
-                ],
-                'manifest-src' => [
-                    "'self'",
-                ],
-                'media-src' => [
-                    "'self'",
-                ],
-                'worker-src' => [
-                    "'self'",
-                    'blob:',
-                ],
-                'upgrade-insecure-requests' => [],
-            ],
-        ],
     ],
     'rate_limiting' => [
         'defaults' => [

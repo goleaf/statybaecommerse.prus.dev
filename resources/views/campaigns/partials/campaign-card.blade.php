@@ -107,7 +107,7 @@
 </div>
 
 @push('scripts')
-<script nonce="{{ csp_nonce() }}">
+<script>
 function trackCampaignClick(campaignId, type, url) {
     fetch(`/campaigns/${campaignId}/click`, {
         method: 'POST',

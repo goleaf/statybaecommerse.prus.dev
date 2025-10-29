@@ -476,7 +476,7 @@ title(__('users.profile'));
 </div>
 
 <!-- Avatar Upload Script -->
-<script nonce="{{ csp_nonce() }}">
+<script>
 document.getElementById('avatar-upload').addEventListener('change', function(e) {
     const file = e.target.files[0];
     if (file) {
@@ -509,7 +509,7 @@ document.getElementById('avatar-upload').addEventListener('change', function(e) 
 </script>
 
 <!-- Danger Zone Scripts -->
-<script nonce="{{ csp_nonce() }}">
+<script>
 function confirmDeactivate() {
     if (confirm('{{ __("users.confirm_deactivate") }}')) {
         // Show password confirmation modal

@@ -144,7 +144,7 @@
 @endsection
 
 @push('scripts')
-<script nonce="{{ csp_nonce() }}">
+<script>
 document.addEventListener('DOMContentLoaded', function() {
     // Auto-refresh notifications every 30 seconds
     setInterval(function() {

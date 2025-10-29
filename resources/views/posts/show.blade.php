@@ -198,7 +198,7 @@
         </div>
     </div>
 
-    <script nonce="{{ csp_nonce() }}">
+    <script>
         function openImageModal(imageUrl) {
             document.getElementById('modalImage').src = imageUrl;
             document.getElementById('imageModal').classList.remove('hidden');

@@ -241,7 +241,7 @@
 @endsection
 
 @push('scripts')
-    <script nonce="{{ csp_nonce() }}">
+    <script>
         document.addEventListener('DOMContentLoaded', () => {
             // Guard against duplicate submissions by locking the generate button until the request resolves.
             const generateForm = document.getElementById('report-generate-form');

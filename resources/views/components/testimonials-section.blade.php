@@ -225,7 +225,7 @@
     </div>
 </div>
 
-<script nonce="{{ csp_nonce() }}">
+<script>
     function testimonialsSection() {
         return {
             currentSlide: 0,

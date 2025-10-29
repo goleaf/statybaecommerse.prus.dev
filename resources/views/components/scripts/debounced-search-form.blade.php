@@ -1,6 +1,6 @@
 @once
     @push('scripts')
-        <script nonce="{{ csp_nonce() }}">
+        <script>
             document.addEventListener('alpine:init', () => {
                 // Shared Alpine helper that powers debounced search forms across
                 // the storefront. It keeps the sanitisation logic aligned with

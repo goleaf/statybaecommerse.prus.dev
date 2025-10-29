@@ -185,7 +185,7 @@
     </div>
 </div>
 
-<script nonce="{{ csp_nonce() }}">
+<script>
 document.addEventListener('DOMContentLoaded', function() {
     const discountSelect = document.getElementById('discount_id');
     const codeSelect = document.getElementById('code_id');

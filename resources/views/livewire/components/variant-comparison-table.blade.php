@@ -243,7 +243,7 @@
     @endif
 </div>
 
-<script nonce="{{ csp_nonce() }}">
+<script>
 function addToCart(variantId) {
     // Add to cart functionality
     console.log('Adding variant to cart:', variantId);

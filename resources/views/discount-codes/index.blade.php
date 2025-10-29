@@ -71,7 +71,7 @@
 </div>
 
 @push('scripts')
-<script nonce="{{ csp_nonce() }}">
+<script>
 document.addEventListener('DOMContentLoaded', function() {
     const codeSearch = document.getElementById('code-search');
     const validateBtn = document.getElementById('validate-code');

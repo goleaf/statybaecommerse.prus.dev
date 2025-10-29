@@ -167,7 +167,7 @@
     </div>
 </div>
 
-<script nonce="{{ csp_nonce() }}">
+<script>
 document.addEventListener('livewire:init', () => {
     Livewire.on('notificationRead', (notificationId) => {
         // Update UI to show notification as read

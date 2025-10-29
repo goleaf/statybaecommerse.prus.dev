@@ -201,7 +201,7 @@
     </div>
 </div>
 
-<script nonce="{{ csp_nonce() }}">
+<script>
 let currentConditionId = {{ $discountCondition->id }};
 
 function testCondition(conditionId) {

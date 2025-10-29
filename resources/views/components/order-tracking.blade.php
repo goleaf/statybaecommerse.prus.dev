@@ -320,7 +320,7 @@
     </div>
 </div>
 
-<script nonce="{{ csp_nonce() }}">
+<script>
     function orderTracking() {
         return {
             downloadInvoice() {

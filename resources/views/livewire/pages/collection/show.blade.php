@@ -235,7 +235,7 @@
         }
     @endphp
     @if (!empty($elements))
-        <script nonce="{{ csp_nonce() }}" type="application/ld+json">
+        <script type="application/ld+json">
         {!! json_encode(['@context' => 'https://schema.org', '@type' => 'ItemList', 'itemListElement' => $elements], JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE) !!}
         </script>
     @endif

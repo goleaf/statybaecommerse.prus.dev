@@ -34,7 +34,7 @@
         minQueryLength: {{ $minQueryLength }},
     })"
     x-on:keydown="handleKeydown($event)"
-    x-on:click.outside="closeDropdowns()"
+    x-on:click.outside="typeof closeDropdowns === 'function' && closeDropdowns()"
 >
     {{-- Search Input --}}
     <div class="relative">

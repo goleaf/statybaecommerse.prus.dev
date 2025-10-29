@@ -187,7 +187,7 @@
     </div>
 @endif
 
-<script nonce="{{ csp_nonce() }}">
+<script>
     function updateUrlParam(param, value) {
         const url = new URL(window.location);
         if (value) {

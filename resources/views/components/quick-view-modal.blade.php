@@ -296,7 +296,7 @@
     </div>
 </div>
 
-<script nonce="{{ csp_nonce() }}">
+<script>
     function quickViewModal() {
         return {
             show: {{ $show ? 'true' : 'false' }},

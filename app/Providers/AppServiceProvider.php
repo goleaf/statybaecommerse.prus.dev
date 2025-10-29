@@ -27,7 +27,6 @@ use App\Support\Filesystem\GracefulFilesystem;
 use App\Support\Health\HealthReporter;
 use App\Support\Html\HtmlSanitizer;
 use App\Support\Livewire\Hooks\PropagateValidationExceptionHook;
-use App\Support\Security\CspNonce;
 use App\Support\Storage\SecureStorage;
 use App\Support\Tracing\Trace;
 use App\Support\Tracing\TraceContext;
@@ -70,7 +69,6 @@ use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
-use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Number;
 use Illuminate\Support\ServiceProvider;
@@ -99,9 +97,6 @@ class AppServiceProvider extends ServiceProvider
 
         // Share a single sanitizer instance so every consumer reuses the same allow-list configuration.
         $this->app->singleton(HtmlSanitizer::class, static fn (): HtmlSanitizer => new HtmlSanitizer);
-
-        // Scope CSP nonces per request so all downstream consumers reference the same token.
-        $this->app->scoped(CspNonce::class, static fn (): CspNonce => new CspNonce);
 
         // Replace the default filesystem binding with the graceful shim for deterministic backup tests.
         $this->app->singleton(Filesystem::class, static fn (): Filesystem => new GracefulFilesystem);
@@ -150,13 +145,6 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        if (class_exists(\Illuminate\Foundation\Vite::class) && method_exists(\Illuminate\Foundation\Vite::class, 'useCspNonce')) {
-            Vite::useCspNonce(csp_nonce());
-        }
-
-        if (method_exists(Livewire::class, 'setScriptNonce')) {
-            Livewire::setScriptNonce(csp_nonce(...));
-        }
 
         if ($this->app->runningUnitTests()) {
             // Ensure Filament keeps the full resource registry during tests so snapshot
@@ -324,11 +312,6 @@ class AppServiceProvider extends ServiceProvider
         // Register Livewire components
         Livewire::component('live-notification-feed', LiveNotificationFeed::class);
 
-        if (method_exists(Livewire::class, 'useCspNonce')) {
-            // Provide the same nonce helper to Livewire so inline hooks honour the CSP.
-            Livewire::useCspNonce(csp_nonce(...));
-        }
-
         if ($this->app->runningUnitTests()) {
             FilamentView::spa(false);
             try {
@@ -336,11 +319,6 @@ class AppServiceProvider extends ServiceProvider
             } catch (Throwable) {
                 // Panel may not be initialised during early bootstrap in tests; ignore failures.
             }
-        }
-
-        if (method_exists(Vite::class, 'useCspNonce')) {
-            // Ensure generated asset tags from Vite inherit the request-specific nonce value.
-            Vite::useCspNonce(csp_nonce());
         }
 
         Blade::anonymousComponentNamespace(

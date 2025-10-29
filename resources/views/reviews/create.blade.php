@@ -137,7 +137,7 @@
     </div>
 </div>
 
-<script nonce="{{ csp_nonce() }}">
+<script>
 document.addEventListener('DOMContentLoaded', function() {
     const stars = document.querySelectorAll('.rating-star');
     const ratingInput = document.getElementById('rating');

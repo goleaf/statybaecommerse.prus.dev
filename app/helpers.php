@@ -2,18 +2,6 @@
 
 declare(strict_types=1);
 
-use App\Support\Security\CspNonce;
-
-if (! function_exists('csp_nonce')) {
-    /**
-     * Resolve the current request's CSP nonce so Blade templates can opt-in to strict policies.
-     */
-    function csp_nonce(): string
-    {
-        return app(CspNonce::class)->value();
-    }
-}
-
 if (! function_exists('app_setting')) {
     /**
      * Get or set a setting value.
@@ -33,27 +21,6 @@ if (! function_exists('app_setting')) {
             'array', 'json' => safe_json_decode_array($setting->value),
             default => $setting->value,
         };
-    }
-}
-
-if (! function_exists('csp_nonce')) {
-    function csp_nonce(): string
-    {
-        $request = app()->bound('request') ? request() : null;
-
-        if ($request instanceof \Illuminate\Http\Request) {
-            return \App\Support\Security\CspNonce::resolve($request);
-        }
-
-        $current = \App\Support\Security\CspNonce::current();
-        if (is_string($current) && $current !== '') {
-            return $current;
-        }
-
-        $nonce = \App\Support\Security\CspNonce::generate();
-        \App\Support\Security\CspNonce::storeGlobally($nonce);
-
-        return $nonce;
     }
 }
 

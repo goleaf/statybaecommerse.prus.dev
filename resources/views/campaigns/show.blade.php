@@ -351,7 +351,7 @@
 @endsection
 
 @push('scripts')
-    <script nonce="{{ csp_nonce() }}">
+    <script>
         function recordCampaignClick(campaignId, clickType, clickedUrl) {
             fetch('{{ route('frontend.campaigns.click', ':id') }}'.replace(':id', campaignId), {
                 method: 'POST',
