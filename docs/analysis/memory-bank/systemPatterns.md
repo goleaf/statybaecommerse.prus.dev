@@ -147,6 +147,10 @@
   SystemSettingDependency filters lower-case both the stored column values and
   the incoming terms so LIKE comparisons behave consistently across MySQL,
   PostgreSQL, and SQLite when administrators search for dependency conditions.
+  The dependency model now resolves relationships through the
+  `dependsOnSettingRelation` alias, ensuring attribute lookups remain cached
+  even while supporting the legacy scope signature that filters dependencies by
+  their controlling setting.
 
 ## Security Patterns
 

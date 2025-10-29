@@ -107,6 +107,8 @@ final class SystemSettingDependency extends Model
     }
 
     /**
+     * @deprecated Use dependsOnSetting relation instead.
+     *
      * @return BelongsTo<SystemSetting, $this>
      */
     public function dependsOnSettingRelation(): BelongsTo
@@ -117,6 +119,19 @@ final class SystemSettingDependency extends Model
     public function getDependsOnSettingAttribute(): ?SystemSetting
     {
         $relation = $this->getRelationValue('dependsOnSettingRelation');
+
+        if ($relation instanceof SystemSetting) {
+            return $relation;
+        }
+
+        $relation = $this->dependsOnSettingRelation()->getResults();
+
+        if ($relation instanceof SystemSetting) {
+            // Store the hydrated relationship under the canonical key so any
+            // subsequent access during the request cycle reuses the same
+            // instance and avoids duplicate database queries.
+            $this->setRelation('dependsOnSettingRelation', $relation);
+        }
 
         return $relation instanceof SystemSetting ? $relation : null;
     }
@@ -242,6 +257,8 @@ final class SystemSettingDependency extends Model
                         ->whereRaw('LOWER(' . $relation->qualifyColumn('key') . ') LIKE ?', [$pattern])
                         ->orWhereRaw('LOWER(' . $relation->qualifyColumn('name') . ') LIKE ?', [$pattern]);
                 })
+                // Interrogate the legacy dependsOnSettingRelation association so searches work without
+                // invoking the computed dependsOnSetting attribute accessor directly.
                 ->orWhereHas('dependsOnSettingRelation', function (Builder $relation) use ($pattern): void {
                     $relation
                         ->whereRaw('LOWER(' . $relation->qualifyColumn('key') . ') LIKE ?', [$pattern])
@@ -294,6 +311,9 @@ final class SystemSettingDependency extends Model
             $dependsOnSetting = $this->dependsOnSettingRelation()->getResults();
 
             if ($dependsOnSetting instanceof SystemSetting) {
+                // Cache the resolved relation on the canonical key to avoid
+                // redundant database calls when multiple comparisons are
+                // evaluated against the same dependency instance.
                 $this->setRelation('dependsOnSettingRelation', $dependsOnSetting);
             }
         }
