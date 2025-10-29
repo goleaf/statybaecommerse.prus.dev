@@ -10,8 +10,11 @@ use App\Notifications\CouponUsageNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Notification;
+use Tests\TestCase;
 
-uses(RefreshDatabase::class);
+// Boot the full Laravel application context so model factories and database
+// transactions operate as expected during these Pest-powered model checks.
+uses(TestCase::class, RefreshDatabase::class);
 
 describe('CouponUsage model', function (): void {
     it('defines expected fillable attributes', function (): void {

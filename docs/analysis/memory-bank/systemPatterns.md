@@ -206,6 +206,7 @@
 - **Integration Tests:** End-to-end workflow testing
 - **Browser Tests:** Critical user flow testing with Playwright
 - **Filament snapshots:** Leave Filament's resource auto-discovery enabled in tests so navigation snapshots and resource audits operate on the canonical ordering registered in production.
+- **Model Suites:** Pest-powered model specs explicitly declare `uses(Tests\\TestCase::class, RefreshDatabase::class)` (for example, the coupon usage suite) so the full Laravel application boots and factory-backed assertions operate with real database transactions.
 
 ### 2. Code Quality Pattern
 **Pattern:** Automated code quality enforcement
