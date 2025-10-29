@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Collection;
 
 /**
@@ -82,6 +83,34 @@ final class Price extends Model
     }
 
     /**
+     * Expose the owning product when the price record represents a product-specific entry.
+     *
+     * @return BelongsTo<Product, self>
+     */
+    public function product(): BelongsTo
+    {
+        // Scope the relation to product-based prices so variant or service records
+        // do not accidentally hydrate into the same association when traversing data.
+        return $this
+            ->belongsTo(Product::class, 'priceable_id')
+            ->whereIn($this->qualifyColumn('priceable_type'), $this->productMorphTypes());
+    }
+
+    /**
+     * Provide all morph type aliases recognised for product relations.
+     *
+     * @return list<string>
+     */
+    private function productMorphTypes(): array
+    {
+        // Capture potential aliases so legacy seeds that used base class names continue to resolve correctly.
+        $aliases = [Product::class, (new Product)->getMorphClass(), class_basename(Product::class)];
+        $aliases[] = strtolower(end($aliases));
+
+        return array_values(array_unique(array_filter($aliases, static fn (string $value): bool => $value !== '')));
+    }
+
+    /**
      * Handle translations functionality with proper error handling.
      *
      * @return HasMany<PriceTranslation>
@@ -142,6 +171,42 @@ final class Price extends Model
     }
 
     /**
+     * Order price records by their translated name so admin grids remain predictable.
+     *
+     * @param  Builder<self> $query
+     * @return Builder<self>
+     */
+    public function scopeOrderedByName(Builder $query, string $direction = 'asc', ?string $locale = null): Builder
+    {
+        // Normalise the direction for safety and fall back to the current locale when none is supplied.
+        $direction = strtolower($direction) === 'desc' ? 'desc' : 'asc';
+        $locale ??= app()->getLocale();
+
+        $alias = 'price_ordering_translations';
+
+        // Build a sub-query targeting the translated labels once to keep the join concise.
+        $translationQuery = PriceTranslation::query()
+            ->select(['price_id', 'name'])
+            ->where('locale', $locale);
+
+        $model = $query->getModel();
+
+        // Join the translation data so ordering can happen on the localized label without duplicating rows.
+        $query->leftJoinSub(
+            $translationQuery,
+            $alias,
+            function (JoinClause $join) use ($alias, $model): void {
+                $join->on("{$alias}.price_id", '=', $model->qualifyColumn('id'));
+            }
+        );
+
+        return $query
+            ->select($this->qualifyColumn('*'))
+            ->orderBy("{$alias}.name", $direction)
+            ->orderBy($this->qualifyColumn('id'));
+    }
+
+    /**
      * Handle isActive functionality with proper error handling.
      */
     public function isActive(): bool
@@ -153,11 +218,8 @@ final class Price extends Model
         if ($this->starts_at && $this->starts_at->gt($now)) {
             return false;
         }
-        if ($this->ends_at && $this->ends_at->lt($now)) {
-            return false;
-        }
 
-        return true;
+        return ! ($this->ends_at && $this->ends_at->lt($now));
     }
 
     /**
@@ -236,7 +298,7 @@ final class Price extends Model
     {
         $locale = $locale ?: app()->getLocale();
 
-        return $query->with(['translations' => function ($q) use ($locale) {
+        return $query->with(['translations' => function ($q) use ($locale): void {
             $q->where('locale', $locale);
         }]);
     }
@@ -262,8 +324,6 @@ final class Price extends Model
     // Get or create translation for locale
     /**
      * Handle getOrCreateTranslation functionality with proper error handling.
-     *
-     * @return App\Models\Translations\PriceTranslation
      */
     public function getOrCreateTranslation(string $locale): \App\Models\Translations\PriceTranslation
     {
