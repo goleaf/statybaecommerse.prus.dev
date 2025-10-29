@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
+use Throwable;
 
 /**
  * CampaignClick
@@ -78,7 +79,14 @@ final class CampaignClick extends Model
                     return null;
                 }
 
-                return CarbonImmutable::parse((string) $value, config('app.timezone', 'UTC'))
+                // Accept both timezone-aware strings and naive timestamps by attempting a flexible parse first.
+                try {
+                    $parsed = CarbonImmutable::parse((string) $value);
+                } catch (Throwable) {
+                    $parsed = CarbonImmutable::parse((string) $value, config('app.timezone', 'UTC'));
+                }
+
+                return $parsed
                     ->setTimezone('UTC')
                     ->format('Y-m-d H:i:s');
             }
@@ -285,7 +293,8 @@ final class CampaignClick extends Model
      */
     public function getTotalConversionValue(): float
     {
-        return $this->conversions()->sum('conversion_value');
+        // Sum returns a string when using decimal columns, so cast to float for arithmetic helpers/tests.
+        return (float) $this->conversions()->sum('conversion_value');
     }
 
     /**
