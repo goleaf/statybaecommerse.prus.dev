@@ -19,10 +19,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Tabs;
-use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -33,6 +30,9 @@ use Filament\Infolists\Components\Section as InfolistSection;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Schemas\Components\Tabs as SchemaTabs;
+use Filament\Schemas\Components\Tabs\Tab as SchemaTab;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -55,7 +55,7 @@ final class DiscountConditionResource extends Resource
 
     protected static UnitEnum|string|null $navigationGroup = null;
 
-    public static function getNavigationGroup(): UnitEnum|string
+    public static function getNavigationGroup(): string
     {
         return __('discount_conditions.navigation_group');
     }
@@ -79,11 +79,11 @@ final class DiscountConditionResource extends Resource
     {
         return $schema
             ->schema([
-                Tabs::make('discount_condition')
+                SchemaTabs::make('discount_condition')
                     ->tabs([
-                        Tab::make(__('discount_conditions.basic_information'))
+                        SchemaTab::make(__('discount_conditions.basic_information'))
                             ->schema([
-                                Section::make()
+                                SchemaSection::make()
                                     ->columns(2)
                                     ->schema([
                                         Select::make('discount_id')
@@ -109,14 +109,14 @@ final class DiscountConditionResource extends Resource
                                             ->default(true),
                                     ]),
                             ]),
-                        Tab::make(__('discount_conditions.condition_settings'))
+                        SchemaTab::make(__('discount_conditions.condition_settings'))
                             ->schema([
-                                Section::make()
+                                SchemaSection::make()
                                     ->columns(2)
                                     ->schema([
                                         Select::make('type')
                                             ->label(__('discount_conditions.type'))
-                                            ->options(static fn (): array => DiscountCondition::getTypes())
+                                            ->options(DiscountCondition::getTypes(...))
                                             ->required()
                                             ->live(),
                                         // Populate the operator list dynamically based on the selected condition type.
@@ -134,7 +134,7 @@ final class DiscountConditionResource extends Resource
                                             ->afterStateHydrated(static function (Textarea $component, mixed $state): void {
                                                 $component->state(self::encodeValueForTextarea($state));
                                             })
-                                            ->dehydrateStateUsing(static fn (?string $state): mixed => self::decodeValueFromTextarea($state)),
+                                            ->dehydrateStateUsing(self::decodeValueFromTextarea(...)),
                                         Textarea::make('metadata')
                                             ->label(__('discount_conditions.metadata'))
                                             ->rows(4)
@@ -143,12 +143,12 @@ final class DiscountConditionResource extends Resource
                                             ->afterStateHydrated(static function (Textarea $component, mixed $state): void {
                                                 $component->state(self::encodeValueForTextarea($state));
                                             })
-                                            ->dehydrateStateUsing(static fn (?string $state): mixed => self::decodeValueFromTextarea($state)),
+                                            ->dehydrateStateUsing(self::decodeValueFromTextarea(...)),
                                     ]),
                             ]),
-                        Tab::make(__('discount_conditions.targeting'))
+                        SchemaTab::make(__('discount_conditions.targeting'))
                             ->schema([
-                                Section::make()
+                                SchemaSection::make()
                                     ->columns(2)
                                     ->schema([
                                         Combobox::make('products')
@@ -201,7 +201,7 @@ final class DiscountConditionResource extends Resource
                     ->sortable(),
                 TextColumn::make('value')
                     ->label(__('discount_conditions.value'))
-                    ->formatStateUsing(static fn (mixed $state): string => self::formatValueForTable($state))
+                    ->formatStateUsing(self::formatValueForTable(...))
                     ->limit(50)
                     ->toggleable(),
                 TextColumn::make('priority')
@@ -228,7 +228,7 @@ final class DiscountConditionResource extends Resource
             ->filters([
                 SelectFilter::make('type')
                     ->label(__('discount_conditions.type'))
-                    ->options(static fn (): array => DiscountCondition::getTypes())
+                    ->options(DiscountCondition::getTypes(...))
                     ->searchable(),
                 SelectFilter::make('discount_id')
                     ->label(__('discount_conditions.discount'))
@@ -338,11 +338,11 @@ final class DiscountConditionResource extends Resource
                     ->schema([
                         TextEntry::make('value')
                             ->label(__('discount_conditions.value'))
-                            ->formatStateUsing(static fn (mixed $state): string => self::formatValueForTable($state))
+                            ->formatStateUsing(self::formatValueForTable(...))
                             ->columnSpanFull(),
                         TextEntry::make('metadata')
                             ->label(__('discount_conditions.metadata'))
-                            ->formatStateUsing(static fn (mixed $state): string => self::formatValueForTable($state))
+                            ->formatStateUsing(self::formatValueForTable(...))
                             ->columnSpanFull(),
                     ]),
                 InfolistSection::make(__('discount_conditions.targeting'))
@@ -443,7 +443,7 @@ final class DiscountConditionResource extends Resource
         }
 
         if (Str::contains($trimmed, ',')) {
-            return array_map('trim', explode(',', $trimmed));
+            return array_map(trim(...), explode(',', $trimmed));
         }
 
         if (is_numeric($trimmed)) {

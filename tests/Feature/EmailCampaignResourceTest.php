@@ -8,6 +8,10 @@ use App\Enums\NavigationGroup;
 use App\Filament\Resources\EmailCampaignResource;
 use App\Models\EmailCampaign;
 use App\Models\User;
+
+use function assert;
+
+use DateTimeInterface;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use ReflectionClass;
@@ -28,7 +32,11 @@ class EmailCampaignResourceTest extends TestCase
 
     public function test_can_list_email_campaigns(): void
     {
-        $campaigns = EmailCampaign::factory()->count(3)->create();
+        $campaigns = EmailCampaign::factory()
+            ->count(3)
+            // Force the campaigns to be active so the global ActiveScope keeps them visible in assertions.
+            ->state(['is_active' => true])
+            ->create();
 
         Livewire::test(\App\Filament\Resources\EmailCampaignResource\Pages\ListEmailCampaigns::class)
             ->assertCanSeeTableRecords($campaigns);
@@ -36,10 +44,12 @@ class EmailCampaignResourceTest extends TestCase
 
     public function test_can_create_email_campaign(): void
     {
+        // Provide the minimal payload the form expects, including a basic plain-text body.
         $campaignData = [
             'name'         => 'Test Campaign',
             'description'  => 'Test campaign description',
             'subject'      => 'Test Subject',
+            'content'      => 'Test campaign body',
             'from_email'   => 'test@example.com',
             'from_name'    => 'Test Sender',
             'reply_to'     => 'reply@example.com',
@@ -61,7 +71,7 @@ class EmailCampaignResourceTest extends TestCase
 
     public function test_can_edit_email_campaign(): void
     {
-        $campaign = EmailCampaign::factory()->create();
+        $campaign = EmailCampaign::factory()->create(['is_active' => true]);
 
         Livewire::test(\App\Filament\Resources\EmailCampaignResource\Pages\EditEmailCampaign::class, [
             'record' => $campaign->id,
@@ -82,7 +92,7 @@ class EmailCampaignResourceTest extends TestCase
 
     public function test_can_view_email_campaign(): void
     {
-        $campaign = EmailCampaign::factory()->create();
+        $campaign = EmailCampaign::factory()->create(['is_active' => true]);
 
         Livewire::test(\App\Filament\Resources\EmailCampaignResource\Pages\ViewEmailCampaign::class, [
             'record' => $campaign->id,
@@ -92,7 +102,7 @@ class EmailCampaignResourceTest extends TestCase
 
     public function test_can_delete_email_campaign(): void
     {
-        $campaign = EmailCampaign::factory()->create();
+        $campaign = EmailCampaign::factory()->create(['is_active' => true]);
 
         Livewire::test(\App\Filament\Resources\EmailCampaignResource\Pages\ListEmailCampaigns::class)
             ->callTableAction('delete', $campaign)
@@ -129,56 +139,90 @@ class EmailCampaignResourceTest extends TestCase
     public function test_campaign_creator_relationship(): void
     {
         $user = User::factory()->create();
+        /** @var EmailCampaign $campaign */
         $campaign = EmailCampaign::factory()->create(['created_by' => $user->id]);
 
+        $this->assertNotNull($campaign->creator);
+        $this->assertInstanceOf(User::class, $campaign->creator);
         $this->assertEquals($user->id, $campaign->creator->id);
     }
 
     public function test_campaign_template_relationship(): void
     {
         $template = \App\Models\NotificationTemplate::factory()->create();
+        /** @var EmailCampaign $campaign */
         $campaign = EmailCampaign::factory()->create(['template_id' => $template->id]);
 
+        $this->assertNotNull($campaign->template);
+        $this->assertInstanceOf(\App\Models\NotificationTemplate::class, $campaign->template);
         $this->assertEquals($template->id, $campaign->template->id);
     }
 
     public function test_campaign_recipients_relationship(): void
     {
+        /** @var EmailCampaign $campaign */
         $campaign = EmailCampaign::factory()->create();
         $recipient = \App\Models\EmailCampaignRecipient::factory()->create(['email_campaign_id' => $campaign->id]);
 
         $this->assertTrue($campaign->recipients()->exists());
-        $this->assertEquals($recipient->id, $campaign->recipients()->first()->id);
+        $firstRecipient = $campaign->recipients()->first();
+        $this->assertNotNull($firstRecipient);
+        assert($firstRecipient instanceof \App\Models\EmailCampaignRecipient);
+        $this->assertEquals($recipient->id, $firstRecipient->id);
     }
 
     public function test_campaign_scope_active(): void
     {
+        /** @var EmailCampaign $activeCampaign */
         $activeCampaign = EmailCampaign::factory()->create(['is_active' => true]);
-        $inactiveCampaign = EmailCampaign::factory()->create(['is_active' => false]);
+        EmailCampaign::factory()->create(['is_active' => false]);
 
         $activeCampaigns = EmailCampaign::active()->get();
         $this->assertCount(1, $activeCampaigns);
-        $this->assertEquals($activeCampaign->id, $activeCampaigns->first()->id);
+        $firstActive = $activeCampaigns->first();
+        $this->assertNotNull($firstActive);
+        $this->assertInstanceOf(EmailCampaign::class, $firstActive);
+        $this->assertEquals($activeCampaign->id, $firstActive->id);
     }
 
     public function test_campaign_scope_scheduled(): void
     {
-        $scheduledCampaign = EmailCampaign::factory()->create(['status' => 'scheduled']);
-        $sentCampaign = EmailCampaign::factory()->create(['status' => 'sent']);
+        /** @var EmailCampaign $scheduledCampaign */
+        $scheduledCampaign = EmailCampaign::factory()->create([
+            'status'    => 'scheduled',
+            'is_active' => true,
+        ]);
+        EmailCampaign::factory()->create([
+            'status'    => 'sent',
+            'is_active' => true,
+        ]);
 
         $scheduledCampaigns = EmailCampaign::scheduled()->get();
         $this->assertCount(1, $scheduledCampaigns);
-        $this->assertEquals($scheduledCampaign->id, $scheduledCampaigns->first()->id);
+        $firstScheduled = $scheduledCampaigns->first();
+        $this->assertNotNull($firstScheduled);
+        $this->assertInstanceOf(EmailCampaign::class, $firstScheduled);
+        $this->assertEquals($scheduledCampaign->id, $firstScheduled->id);
     }
 
     public function test_campaign_scope_sent(): void
     {
-        $sentCampaign = EmailCampaign::factory()->create(['status' => 'sent']);
-        $scheduledCampaign = EmailCampaign::factory()->create(['status' => 'scheduled']);
+        /** @var EmailCampaign $sentCampaign */
+        $sentCampaign = EmailCampaign::factory()->create([
+            'status'    => 'sent',
+            'is_active' => true,
+        ]);
+        EmailCampaign::factory()->create([
+            'status'    => 'scheduled',
+            'is_active' => true,
+        ]);
 
         $sentCampaigns = EmailCampaign::sent()->get();
         $this->assertCount(1, $sentCampaigns);
-        $this->assertEquals($sentCampaign->id, $sentCampaigns->first()->id);
+        $firstSent = $sentCampaigns->first();
+        $this->assertNotNull($firstSent);
+        $this->assertInstanceOf(EmailCampaign::class, $firstSent);
+        $this->assertEquals($sentCampaign->id, $firstSent->id);
     }
 
     public function test_campaign_is_scheduled(): void
@@ -243,6 +287,10 @@ class EmailCampaignResourceTest extends TestCase
 
     public function test_campaign_fillable_attributes(): void
     {
+        // Seed concrete relations so foreign key constraints remain satisfied during the assertion loop.
+        $template = \App\Models\NotificationTemplate::factory()->create();
+        $user = User::factory()->create();
+
         $data = [
             'name'         => 'Test Campaign',
             'description'  => 'Test description',
@@ -255,8 +303,8 @@ class EmailCampaignResourceTest extends TestCase
             'sent_at'      => now(),
             'is_active'    => true,
             'status'       => 'scheduled',
-            'template_id'  => 1,
-            'created_by'   => 1,
+            'template_id'  => $template->id,
+            'created_by'   => $user->id,
             'settings'     => ['key' => 'value'],
             'metadata'     => ['meta' => 'data'],
         ];
@@ -264,6 +312,15 @@ class EmailCampaignResourceTest extends TestCase
         $campaign = EmailCampaign::create($data);
 
         foreach ($data as $key => $value) {
+            if ($value instanceof DateTimeInterface) {
+                $campaignValue = $campaign->$key;
+
+                $this->assertInstanceOf(DateTimeInterface::class, $campaignValue);
+                $this->assertSame($value->format('Y-m-d H:i:s'), $campaignValue->format('Y-m-d H:i:s'));
+
+                continue;
+            }
+
             $this->assertEquals($value, $campaign->$key);
         }
     }

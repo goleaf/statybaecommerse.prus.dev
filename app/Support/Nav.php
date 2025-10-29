@@ -193,6 +193,19 @@ final class Nav
         }
 
         if (is_string($value) && $value !== '') {
+            // When a resource stores the translated navigation label directly, try to map it back to
+            // the canonical NavigationGroup enum so icon and priority metadata remain available.
+            foreach (NavigationGroup::cases() as $navigationCase) {
+                if ($navigationCase->label() === $value) {
+                    return [
+                        $navigationCase->value,
+                        $navigationCase->label(),
+                        self::normalizeIcon($navigationCase->icon()),
+                        $navigationCase->priority(),
+                    ];
+                }
+            }
+
             $fallback = self::FALLBACK_GROUP_DEFINITIONS[$value] ?? null;
             $label = __($value);
 

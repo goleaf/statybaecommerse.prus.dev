@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Arr;
 use InvalidArgumentException;
 
 /**
@@ -26,6 +27,7 @@ use InvalidArgumentException;
  */
 final class CampaignSchedule extends Model
 {
+    /** @use HasFactory<\Database\Factories\CampaignScheduleFactory> */
     use HasFactory;
 
     public const FILLABLE = [
@@ -43,7 +45,7 @@ final class CampaignSchedule extends Model
      * Define the attributes that are mass assignable so factories and user
      * input can safely persist schedules.
      *
-     * @var array<int, string>
+     * @var list<string>
      */
     protected $fillable = self::FILLABLE;
 
@@ -77,6 +79,10 @@ final class CampaignSchedule extends Model
      * We avoid applying the active scope globally so Filament can manage inactive
      * schedules in the admin UI without silently excluding them from queries.
      */
+    /**
+     * @param  Builder<self> $query
+     * @return Builder<self>
+     */
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true);
@@ -88,6 +94,10 @@ final class CampaignSchedule extends Model
      * We require the schedule to be active, have a planned run timestamp,
      * and ensure the time is in the past (or now) so workers know which jobs
      * to execute next.
+     */
+    /**
+     * @param  Builder<self> $query
+     * @return Builder<self>
      */
     public function scopeDueForExecution(Builder $query): Builder
     {
@@ -104,33 +114,77 @@ final class CampaignSchedule extends Model
      * places where casting has already occurred or where the raw column value
      * is still available (for example, HTTP filters).
      */
-    public function scopeForType(Builder $query, ScheduleType|string $type): Builder
+    /**
+     * @param  Builder<self>                                       $query
+     * @param  ScheduleType|string|array<int, ScheduleType|string> $type
+     * @return Builder<self>
+     */
+    public function scopeForType(Builder $query, ScheduleType|string|array $type): Builder
     {
-        $resolvedType = $type instanceof ScheduleType
-            ? $type
-            : ScheduleType::tryFrom(strtolower(trim((string) $type)));
+        // Normalise the input so callers can pass a single value or an array of
+        // values (enums or raw strings) without worrying about the underlying
+        // storage representation. Wrapping in an array first avoids duplicating
+        // the resolution logic across separate code paths.
+        $requestedTypes = Arr::wrap($type);
+        $validValues = collect(ScheduleType::cases())
+            ->map(static fn (ScheduleType $case): string => $case->value)
+            ->implode(', ');
 
-        if ($resolvedType === null) {
-            $validTypes = implode(', ', array_map(
-                static fn (ScheduleType $case): string => $case->value,
-                ScheduleType::cases(),
-            ));
+        $resolvedTypes = collect($requestedTypes)
+            ->map(static function (mixed $value) use ($validValues): ScheduleType {
+                if ($value instanceof ScheduleType) {
+                    // Developers using enums can pass the backed enum directly;
+                    // we return immediately to avoid unnecessary string work.
+                    return $value;
+                }
 
+                if (! is_string($value)) {
+                    throw new InvalidArgumentException(sprintf(
+                        'Invalid schedule type "%s". Expected one of: %s.',
+                        is_scalar($value) ? (string) $value : gettype($value),
+                        $validValues,
+                    ));
+                }
+
+                $normalised = ScheduleType::tryFrom(strtolower(trim($value)));
+
+                if ($normalised === null) {
+                    throw new InvalidArgumentException(sprintf(
+                        'Invalid schedule type "%s". Expected one of: %s.',
+                        $value,
+                        $validValues,
+                    ));
+                }
+
+                return $normalised;
+            })
+            // Using values ensures the query compares against the stored string
+            // column values regardless of the input format supplied.
+            ->map(static fn (ScheduleType $resolved): string => $resolved->value)
+            ->unique()
+            ->values()
+            ->all();
+
+        if ($resolvedTypes === []) {
             throw new InvalidArgumentException(sprintf(
-                'Invalid schedule type "%s". Expected one of: %s.',
-                $type,
-                $validTypes,
+                'Invalid schedule type input provided. Expected one of: %s.',
+                $validValues,
             ));
         }
 
-        return $query->where('schedule_type', $resolvedType->value);
+        return $query->whereIn('schedule_type', $resolvedTypes);
     }
 
     /**
      * Handle campaign functionality with proper error handling.
+     *
+     * @return BelongsTo<Campaign, CampaignSchedule>
+     *
+     * @phpstan-return BelongsTo<Campaign, CampaignSchedule>
      */
     public function campaign(): BelongsTo
     {
+        // @phpstan-ignore-next-line The base belongsTo helper already constrains the relation to CampaignSchedule.
         return $this->belongsTo(Campaign::class);
     }
 }

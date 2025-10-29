@@ -3,49 +3,52 @@
 declare(strict_types=1);
 
 use App\Filament\Resources\DocumentTemplateResource;
+use App\Filament\Resources\DocumentTemplateResource\RelationManagers\DocumentsRelationManager;
 use App\Models\DocumentTemplate;
-use App\Support\Nav;
 
-it('unit: can load DocumentTemplateResource class', function () {
+it('unit: loads DocumentTemplateResource and model classes', function () {
     expect(class_exists(DocumentTemplateResource::class))->toBeTrue();
-});
-
-it('unit: can load DocumentTemplate model class', function () {
     expect(class_exists(DocumentTemplate::class))->toBeTrue();
 });
 
-it('unit: can get DocumentTemplateResource model', function () {
-    expect(DocumentTemplateResource::getModel())->toBe(DocumentTemplate::class);
+it('unit: has expected navigation group', function () {
+    expect(DocumentTemplateResource::getNavigationGroup())->toBe('Documents');
 });
 
-it('unit: can get DocumentTemplateResource navigation group', function () {
-    expect(DocumentTemplateResource::getNavigationGroup())->toBe(
-        Nav::groupForResource(DocumentTemplateResource::class)
-    );
+it('unit: has expected navigation sort', function () {
+    $ref = new ReflectionClass(DocumentTemplateResource::class);
+    $prop = $ref->getProperty('navigationSort');
+    $prop->setAccessible(true);
+
+    expect($prop->getValue())->toBe(3);
 });
 
-it('unit: can get DocumentTemplateResource navigation label', function () {
-    expect(DocumentTemplateResource::getNavigationLabel())->toBeString();
+it('unit: has expected navigation icon', function () {
+    $ref = new ReflectionClass(DocumentTemplateResource::class);
+    $prop = $ref->getProperty('navigationIcon');
+    $prop->setAccessible(true);
+
+    expect($prop->getValue())->toBe('heroicon-o-document-text');
 });
 
-it('unit: can get DocumentTemplateResource plural model label', function () {
-    expect(DocumentTemplateResource::getPluralModelLabel())->toBeString();
+it('unit: uses the correct model', function () {
+    $ref = new ReflectionClass(DocumentTemplateResource::class);
+    $prop = $ref->getProperty('model');
+    $prop->setAccessible(true);
+
+    expect($prop->getValue())->toBe(DocumentTemplate::class);
 });
 
-it('unit: can get DocumentTemplateResource model label', function () {
-    expect(DocumentTemplateResource::getModelLabel())->toBeString();
-});
-
-it('unit: can get DocumentTemplateResource pages', function () {
+it('unit: exposes expected pages', function () {
     $pages = DocumentTemplateResource::getPages();
+
     expect($pages)->toBeArray();
-    expect($pages)->toHaveKey('index');
-    expect($pages)->toHaveKey('create');
-    expect($pages)->toHaveKey('view');
-    expect($pages)->toHaveKey('edit');
+    expect($pages)->toHaveKeys(['index', 'create', 'view', 'edit']);
 });
 
-it('unit: can get DocumentTemplateResource relations', function () {
+it('unit: registers expected relations', function () {
     $relations = DocumentTemplateResource::getRelations();
+
     expect($relations)->toBeArray();
+    expect($relations)->toContain(DocumentsRelationManager::class);
 });

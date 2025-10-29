@@ -9,15 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
 
 /**
- * UserOwnedScope
- *
- * Eloquent model representing the UserOwnedScope entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
- *
- * @method static \Illuminate\Database\Eloquent\Builder|UserOwnedScope newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|UserOwnedScope newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|UserOwnedScope query()
- *
- * @mixin \Eloquent
+ * Apply automatic user scoping for models that expose owner-style columns.
  */
 final class UserOwnedScope implements Scope
 {
@@ -26,6 +18,13 @@ final class UserOwnedScope implements Scope
      */
     public function apply(Builder $builder, Model $model): void
     {
+        // Bail out early when the connection resolver has not been bootstrapped yet;
+        // Pest unit tests occasionally exercise the model outside a full Laravel
+        // TestCase context, and attempting to touch the schema builder would throw.
+        if ($model::getConnectionResolver() === null) {
+            return;
+        }
+
         // Skip scoping when the application is running in the console so seeders,
         // artisan commands, and automated tests continue to operate on the full
         // dataset without requiring an authenticated context.
@@ -40,14 +39,14 @@ final class UserOwnedScope implements Scope
 
         // Check if the model has user-related columns
         $userColumns = $this->getUserColumns($model);
-        if (! empty($userColumns)) {
+        if ($userColumns !== []) {
             $userId = auth()->id();
 
             if (! $userId) {
                 return;
             }
 
-            $builder->where(function ($query) use ($userColumns, $userId) {
+            $builder->where(function (Builder $query) use ($userColumns, $userId): void {
                 foreach ($userColumns as $column) {
                     $query->orWhere($column, $userId);
                 }
@@ -57,6 +56,8 @@ final class UserOwnedScope implements Scope
 
     /**
      * Handle getUserColumns functionality with proper error handling.
+     *
+     * @return list<string>
      */
     private function getUserColumns(Model $model): array
     {

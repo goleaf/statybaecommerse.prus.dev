@@ -9,6 +9,7 @@ use App\Filament\Resources\VariantCombinationResource\Pages\ViewVariantCombinati
 use App\Http\Controllers\Admin\AttributeValueTranslationController;
 use App\Http\Controllers\Admin\CampaignConversionController;
 use App\Http\Controllers\Admin\DiscountPresetController;
+use App\Http\Controllers\Admin\EnumValueController;
 use App\Http\Controllers\Admin\LocationController as AdminLocationController;
 use App\Models\Inventory;
 use App\Models\NewsImage;
@@ -35,6 +36,22 @@ Route::middleware('auth')->group(function (): void {
 
     Route::get('/admin/variant-combinations/{record}/edit', EditVariantCombination::class)
         ->name('filament.admin.resources.variant-combinations.edit');
+
+    // Enum value helper endpoints used by the legacy HTTP feature tests.
+    Route::post('/admin/enum-values', [EnumValueController::class, 'store'])
+        ->name('admin.enum-values.store');
+
+    Route::match(['put', 'patch'], '/admin/enum-values/{enumValue}', [EnumValueController::class, 'update'])
+        ->name('admin.enum-values.update');
+
+    Route::post('/admin/enum-values/bulk-activate', [EnumValueController::class, 'bulkActivate'])
+        ->name('admin.enum-values.bulk-activate');
+
+    Route::post('/admin/enum-values/bulk-deactivate', [EnumValueController::class, 'bulkDeactivate'])
+        ->name('admin.enum-values.bulk-deactivate');
+
+    Route::post('/admin/enum-values/{enumValue}/set-default', [EnumValueController::class, 'setDefault'])
+        ->name('admin.enum-values.set-default');
 
     Route::prefix('/admin/attribute-values/{attributeValue}/translations')
         ->name('admin.attribute-values.translations.')
