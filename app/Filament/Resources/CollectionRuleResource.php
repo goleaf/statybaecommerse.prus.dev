@@ -7,7 +7,6 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\CollectionRuleResource\Pages;
 use App\Models\CollectionRule;
 use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
-use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -18,11 +17,11 @@ use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Tabs;
-use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -34,11 +33,6 @@ use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 
 final class CollectionRuleResource extends Resource
 {
-    /**
-     * @var string|BackedEnum|null Use the documented property approach so Filament can resolve the navigation icon reliably.
-     */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-cog-6-tooth';
-
     protected static ?string $model = CollectionRule::class;
 
     public static function getNavigationIcon(): string
@@ -77,7 +71,7 @@ final class CollectionRuleResource extends Resource
     public static function form(Schema $form): Schema
     {
         // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        // Expose the schema via the Filament v4 `Form` instance to drop the deprecated array fallback.
+        // Expose the schema via the Filament v4 schema container to drop the deprecated array fallback.
         return $form->schema([
             Tabs::make('collection_rule_tabs')
                 ->tabs([

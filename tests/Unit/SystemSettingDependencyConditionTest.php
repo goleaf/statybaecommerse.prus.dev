@@ -45,6 +45,25 @@ final class SystemSettingDependencyConditionTest extends TestCase
         $this->assertFalse($dependency->isConditionMet());
     }
 
+    public function test_equals_condition_handles_boolean_setting_values(): void
+    {
+        $dependsOnSetting = SystemSetting::factory()
+            ->boolean()
+            ->create([
+                'key'   => 'feature_enabled',
+                'value' => true,
+            ]);
+
+        $dependency = SystemSettingDependency::factory()
+            ->equals('true')
+            ->create(['depends_on_setting_id' => $dependsOnSetting->id]);
+
+        $dependency->load('dependsOnSettingRelation');
+
+        // Boolean-backed settings should evaluate truthy string comparisons correctly.
+        $this->assertTrue($dependency->isConditionMet());
+    }
+
     public function test_not_equals_condition_returns_true_when_values_differ(): void
     {
         $dependsOnSetting = SystemSetting::factory()->create([

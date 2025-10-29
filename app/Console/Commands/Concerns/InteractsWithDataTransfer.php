@@ -19,6 +19,15 @@ trait InteractsWithDataTransfer
         'attributes' => 'attributes',
     ];
 
+    /**
+     * Canonical JSON column map keyed by the destination table so we can re-encode
+     * structured payloads consistently during import (prevents string comparison
+     * drift across storage engines that reorder JSON keys).
+     */
+    private const JSON_COLUMN_MAP = [
+        'attributes' => ['validation_rules', 'meta_data', 'options'],
+    ];
+
     private const NULL_PLACEHOLDER = '__NULL__';
 
     /**
@@ -72,7 +81,7 @@ trait InteractsWithDataTransfer
             return;
         }
 
-        File::ensureDirectoryExists((string) dirname($path));
+        File::ensureDirectoryExists(dirname($path));
     }
 
     /**
@@ -94,7 +103,7 @@ trait InteractsWithDataTransfer
         $count = 0;
         $batch = [];
 
-        foreach ($this->readRows($format, $handle) as $row) {
+        foreach ($this->readRows($format, $handle, $table) as $row) {
             $batch[] = $row;
 
             if (count($batch) >= $chunkSize) {
@@ -196,11 +205,11 @@ trait InteractsWithDataTransfer
      * @param  resource                             $handle
      * @return Generator<int, array<string, mixed>>
      */
-    protected function readRows(string $format, $handle): Generator
+    protected function readRows(string $format, $handle, string $table): Generator
     {
         return match ($format) {
-            'csv'   => $this->readCsv($handle),
-            default => $this->readJson($handle),
+            'csv'   => $this->readCsv($handle, $table),
+            default => $this->readJson($handle, $table),
         };
     }
 
@@ -208,7 +217,7 @@ trait InteractsWithDataTransfer
      * @param  resource                             $handle
      * @return Generator<int, array<string, mixed>>
      */
-    protected function readJson($handle): Generator
+    protected function readJson($handle, string $table): Generator
     {
         while (($line = fgets($handle)) !== false) {
             $line = trim($line);
@@ -224,7 +233,7 @@ trait InteractsWithDataTransfer
             }
 
             /** @var array<string, mixed> $decoded */
-            yield $this->normalizeRow($decoded);
+            yield $this->normalizeRow($decoded, $table);
         }
     }
 
@@ -232,14 +241,14 @@ trait InteractsWithDataTransfer
      * @param  resource                             $handle
      * @return Generator<int, array<string, mixed>>
      */
-    protected function readCsv($handle): Generator
+    protected function readCsv($handle, string $table): Generator
     {
         $headers = null;
 
         while (($row = fgetcsv($handle)) !== false) {
             if ($headers === null) {
                 $headers = array_map(
-                    static fn ($header): string => (string) ($header ?? ''),
+                    static fn ($header): string => $header ?? '',
                     $row,
                 );
 
@@ -262,7 +271,7 @@ trait InteractsWithDataTransfer
                 $data[$header] = $value;
             }
 
-            yield $this->normalizeRow($data);
+            yield $this->normalizeRow($data, $table);
         }
     }
 
@@ -270,13 +279,99 @@ trait InteractsWithDataTransfer
      * @param  array<string, mixed> $row
      * @return array<string, mixed>
      */
-    protected function normalizeRow(array $row): array
+    protected function normalizeRow(array $row, ?string $table = null): array
     {
         if (! array_key_exists('id', $row)) {
             throw new RuntimeException('Cannot import row without an id column.');
         }
 
+        if ($table !== null) {
+            $row = $this->normalizeJsonColumns($table, $row);
+        }
+
         return $row;
+    }
+
+    /**
+     * Apply canonical JSON encoding to configured columns so JSON structures stay
+     * byte-identical after round trips (essential for comparisons in tests).
+     *
+     * @param  array<string, mixed> $row
+     * @return array<string, mixed>
+     */
+    private function normalizeJsonColumns(string $table, array $row): array
+    {
+        foreach ($this->jsonColumnsFor($table) as $column) {
+            if (! array_key_exists($column, $row)) {
+                continue;
+            }
+
+            $row[$column] = $this->canonicalizeJsonValue($row[$column]);
+        }
+
+        return $row;
+    }
+
+    /**
+     * Determine which columns should be treated as JSON structures during import.
+     *
+     * @return array<int, string>
+     */
+    private function jsonColumnsFor(string $table): array
+    {
+        return self::JSON_COLUMN_MAP[$table] ?? [];
+    }
+
+    /**
+     * Convert JSON-encoded payloads (string/array) into canonical strings while
+     * preserving numeric precision and original key ordering.
+     */
+    private function canonicalizeJsonValue(mixed $value): mixed
+    {
+        if ($value === null || $value === self::NULL_PLACEHOLDER) {
+            return null;
+        }
+
+        if (is_string($value)) {
+            $trimmed = trim($value);
+
+            if ($trimmed === '') {
+                return $value;
+            }
+
+            $decoded = json_decode($trimmed, true);
+
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                return $value;
+            }
+
+            if ($decoded === null) {
+                return null;
+            }
+
+            return $this->encodeCanonicalJson($decoded);
+        }
+
+        if (is_array($value)) {
+            return $this->encodeCanonicalJson($value);
+        }
+
+        return $value;
+    }
+
+    /**
+     * Encode JSON payloads using consistent flags to avoid escaping drift while
+     * keeping the original key order intact.
+     */
+    private function encodeCanonicalJson(mixed $data): string
+    {
+        $encoded = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRESERVE_ZERO_FRACTION);
+
+        if ($encoded === false) {
+            throw new RuntimeException('Unable to encode canonical JSON payload.');
+        }
+
+        return $encoded;
     }
 
     /**

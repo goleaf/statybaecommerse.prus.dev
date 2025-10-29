@@ -102,4 +102,41 @@ final class FeatureToggleServiceTest extends TestCase
         // A zero percent rollout should always disable the feature for anonymous traffic.
         self::assertFalse($result);
     }
+
+    #[Test]
+    public function it_refreshes_cached_results_after_feature_flag_changes(): void
+    {
+        // Reset cache state and override configuration so the fallback path returns false.
+        Cache::flush();
+        Config::set('currency.features.zero_decimal_overrides.default_enabled', false);
+        Config::set('currency.features.zero_decimal_overrides.environments.staging', false);
+
+        $service = $this->app->make(FeatureToggleService::class);
+        $user = User::factory()->create();
+
+        // Prime the cache by evaluating the feature before any database flag exists.
+        self::assertFalse($service->isEnabled('currency-zero-decimal-overrides', [
+            'environment' => 'staging',
+            'user'        => $user,
+        ]));
+
+        // Create a staging-scoped flag that should flip the feature on for the same context.
+        FeatureFlag::factory()->create([
+            'name'               => 'Staging Rollout',
+            'key'                => 'currency-zero-decimal-overrides',
+            'environment'        => 'staging',
+            'is_active'          => true,
+            'is_enabled'         => true,
+            'rollout_percentage' => ['percentage' => 100],
+            'conditions'         => null,
+            'starts_at'          => now()->subMinute(),
+            'ends_at'            => now()->addHour(),
+        ]);
+
+        // The cached result should be invalidated automatically and now return true.
+        self::assertTrue($service->isEnabled('currency-zero-decimal-overrides', [
+            'environment' => 'staging',
+            'user'        => $user,
+        ]));
+    }
 }
