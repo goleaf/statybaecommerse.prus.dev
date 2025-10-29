@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 use App\Models\Report;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 // Register the RefreshDatabase trait while the shared Pest bootstrap handles the Laravel TestCase wiring.
 uses(RefreshDatabase::class);
+// Explicitly bind the core Laravel TestCase so factories resolve the shared SQLite connection before executing.
+uses(TestCase::class);
 
 it('orders reports by their english name by default', function (): void {
     // Arrange: create reports with shuffled names to verify alphabetical ordering.
