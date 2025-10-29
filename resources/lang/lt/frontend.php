@@ -230,7 +230,7 @@ return [
         'go_to_search_page'         => 'Eiti į pilną paieškos puslapį',
     ],
     'test_results' => [
-        'title'            => 'Testų rezultatai',
+        'title'            => 'Projekto testų rezultatai',
         'duration_seconds' => ':value s',
         'meta'             => [
             'heading'     => 'Testų vykdymo suvestinė',
@@ -249,11 +249,20 @@ return [
             'created_at'       => 'Sukurta',
             'started_at'       => 'Pradžia',
             'completed_at'     => 'Pabaiga',
+            'running_banner'   => [
+                'title'       => 'Vykdomi testai',
+                'description' => 'Ši suvestinė automatiškai atsinaujina kas penkias sekundes.',
+            ],
         ],
         'summary' => [
             'success_rate' => 'Sėkmės rodiklis',
             'completed'    => ':completed iš :total',
             'total'        => 'Iš viso',
+            'breakdown'    => [
+                'passed'  => 'Sėkmingi: :count',
+                'failed'  => 'Nesėkmingi: :count',
+                'running' => 'Vykdomi: :count',
+            ],
         ],
         'progress' => [
             'title' => 'Bendra eiga',
@@ -275,7 +284,7 @@ return [
         ],
         'empty' => [
             'title'       => 'Rezultatų dar nėra',
-            'description' => 'Paleiskite komandą, kad pradėtumėte suvestį ir stebėtumėte testų eigą realiu laiku.',
+            'description' => 'Paleiskite komandą php artisan project:test, kad užpildytumėte suvestinę.',
         ],
         'table' => [
             'title'      => 'Išsamūs testų duomenys',
@@ -304,7 +313,7 @@ return [
             ],
         ],
         'failed' => [
-            'title' => 'Nepavykę testai',
+            'title' => 'Nepavykusių testų detalės',
             'count' => 'Nepavykę: :count',
             'label' => 'Nepavykęs testas',
             'none'  => 'Nepavykusių testų nėra.',

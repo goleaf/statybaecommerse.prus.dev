@@ -238,7 +238,7 @@ return [
         'go_to_search_page'         => 'Go to Full Search Page',
     ],
     'test_results' => [
-        'title'            => 'Test Results',
+        'title'            => 'Project Test Results',
         'duration_seconds' => ':value s',
         'meta'             => [
             'heading'     => 'Test Execution Overview',
@@ -257,11 +257,20 @@ return [
             'created_at'       => 'Created at',
             'started_at'       => 'Started at',
             'completed_at'     => 'Completed at',
+            'running_banner'   => [
+                'title'       => 'Running Tests',
+                'description' => 'This dashboard refreshes automatically every five seconds.',
+            ],
         ],
         'summary' => [
             'success_rate' => 'Success rate',
             'completed'    => ':completed of :total',
             'total'        => 'Total',
+            'breakdown'    => [
+                'passed'  => 'Passed: :count',
+                'failed'  => 'Failed: :count',
+                'running' => 'Running: :count',
+            ],
         ],
         'progress' => [
             'title' => 'Overall progress',
@@ -283,7 +292,7 @@ return [
         ],
         'empty' => [
             'title'       => 'No results yet',
-            'description' => 'Run the command to start the report and watch progress in real time.',
+            'description' => 'Trigger php artisan project:test to populate the dashboard.',
         ],
         'table' => [
             'title'      => 'Detailed test data',
@@ -312,7 +321,7 @@ return [
             ],
         ],
         'failed' => [
-            'title' => 'Failed tests',
+            'title' => 'Failed test details',
             'count' => 'Failed: :count',
             'label' => 'Failed test',
             'none'  => 'No failed tests recorded.',
