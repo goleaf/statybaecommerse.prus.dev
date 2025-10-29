@@ -29,6 +29,11 @@ The model-focused regression suite is a quick indicator that Eloquent scopes, ca
 - `Tests\\Unit\\SystemSettingDependencyConditionTest` now centralises helper methods (`createSystemSetting`, `createDependency`) that call `createQuietly()` and eagerly load relations, so reuse them when expanding the suite to avoid repeating observer workarounds.
 - Feature flag unit coverage follows a similar pattern: seed an attributed user (or clear the attribution config) before creating `FeatureFlag` factories so the observer can satisfy the `created_by` foreign key on SQLite.
 
+## Schema guard rails for SQLite migrations
+
+- The `2025_02_01_000002` system setting dependency migration now checks for existing columns and drops the legacy `system_setting_dependencies_condition_index` before removing the original JSON payload so `TestingDatabase::migrate()` can run repeatedly without tripping duplicate-column or missing-index errors on SQLite.
+- The `2025_09_09_000000` discounts migration conditionally attaches the `zone_id` foreign key only when the zones table already exists, falling back to an index otherwise, which keeps early schema runs from failing before the zone migrations execute.
+
 ## Dashboard Fixture Placeholders
 
 - The CI dashboards and historical analytics still expect `Tests\Feature\ExampleTest` and
