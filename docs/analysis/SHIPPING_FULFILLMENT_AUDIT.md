@@ -6,6 +6,7 @@
 - Order-shipping records capture tracking numbers, carrier metadata, and lifecycle timestamps while Filament tooling exposes one-click actions to update shipment state or open provider tracking URLs.【F:app/Models/OrderShipping.php†L41-L183】【F:app/Filament/Resources/OrderResource/RelationManagers/OrderShippingRelationManager.php†L246-L415】
 - Storefront checkout surfaces enabled options, applies discount-engine adjustments, and persists the shopper’s selection for downstream totals.【F:app/Livewire/Components/Checkout/Delivery.php†L21-L76】
 - A configurable zone/method matrix governs where methods appear, with Livewire tests verifying state normalisation for complex enablement grids.【F:config/shipping.php†L5-L26】【F:app/Filament/Resources/ShippingOptionResource.php†L160-L206】【F:tests/Feature/ShippingOptionResourceTest.php†L60-L160】
+- Authenticated customers and support agents can now fetch `/api/orders/{order}` for shipping updates; the controller permits completed orders and returns schema-aligned payloads for downstream tracking surfaces.【F:routes/api.php†L72-L83】【F:app/Http/Controllers/Api/OrderController.php†L30-L88】【F:app/Support/Contracts/Entities/OrderContract.php†L53-L101】
 
 ## Multiple Carrier Support
 - `ShippingOption` exposes `carrier_name`, `service_type`, and relations to `zones`, countries, and cities so administrators can register each carrier’s availability footprint while still reusing shared UI sorting and filters.【F:app/Models/ShippingOption.php†L41-L201】

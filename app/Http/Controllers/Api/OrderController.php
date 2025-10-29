@@ -33,10 +33,12 @@ final class OrderController extends Controller
         OrderStatus::PROCESSING->value,
         OrderStatus::SHIPPED->value,
         OrderStatus::DELIVERED->value,
+        OrderStatus::COMPLETED->value, // Completed orders remain visible for customers downloading receipts or invoices.
     ];
 
-    public function show(Request $request, string $orderIdentifier): JsonResponse|View|Response
+    public function show(Request $request, string $order): JsonResponse|View|Response
     {
+        $orderIdentifier = $order; // Normalise the route placeholder so existing contract helpers keep working.
         // Resolve the order lazily so we can tailor error responses and apply
         // additional ownership constraints without relying on implicit binding,
         // which currently collides with the scoped model configuration.
