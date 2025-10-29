@@ -432,9 +432,27 @@ final class VariantImage extends Model implements HasMedia
      */
     public function getImageMetadata(): array
     {
+        $dimensions = $this->dimensions;
+
+        if ($dimensions === null) {
+            // Fall back to the parsed dimensions so callers receive width and height even
+            // when the raw column is empty but the image file exists on disk.
+            $dimensionData = $this->getImageDimensions();
+
+            if (
+                $dimensionData !== null
+                && isset($dimensionData['width'], $dimensionData['height'])
+                && is_int($dimensionData['width'])
+                && is_int($dimensionData['height'])
+            ) {
+                // Build the classic WxH string so downstream consumers can display quick metadata.
+                $dimensions = $dimensionData['width'] . 'x' . $dimensionData['height'];
+            }
+        }
+
         return [
             'file_size'  => $this->getImageFileSize(),
-            'dimensions' => $this->dimensions,
+            'dimensions' => $dimensions,
         ];
     }
 
@@ -447,7 +465,7 @@ final class VariantImage extends Model implements HasMedia
             return null;
         }
 
-        $parts = array_map('trim', explode('x', strtolower((string) $dimensions)));
+        $parts = array_map(trim(...), explode('x', strtolower($dimensions)));
         if (count($parts) !== 2) {
             return null;
         }
