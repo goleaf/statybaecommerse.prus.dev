@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="D:\projects\statybaecommerse.prus.dev\phpunit.xml" tests="2" assertions="17" errors="0" failures="0" skipped="0" time="324.385186">
-    <testsuite name="Unit" tests="2" assertions="17" errors="0" failures="0" skipped="0" time="324.385186">
-      <testsuite name="Tests\Unit\Support\Stats\Series\ProductSeriesTest" file="tests\Unit\Support\Stats\Series\ProductSeriesTest.php" tests="1" assertions="9" errors="0" failures="0" skipped="0" time="322.425004">
-        <testcase name="it daily sales returns expected values and caches result" file="tests\Unit\Support\Stats\Series\ProductSeriesTest.php::it daily sales returns expected values and caches result" class="Tests\Unit\Support\Stats\Series\ProductSeriesTest" classname="Tests.Unit.Support.Stats.Series.ProductSeriesTest" assertions="9" time="322.425004"/>
-      </testsuite>
-      <testsuite name="Tests\Unit\Support\Stats\Inline\ProductSeriesTest" file="tests\Unit\Support\Stats\Inline\ProductSeriesTest.php" tests="1" assertions="8" errors="0" failures="0" skipped="0" time="1.960182">
-        <testcase name="it unit: daily sales returns expected values and caches result" file="tests\Unit\Support\Stats\Inline\ProductSeriesTest.php::it unit: daily sales returns expected values and caches result" class="Tests\Unit\Support\Stats\Inline\ProductSeriesTest" classname="Tests.Unit.Support.Stats.Inline.ProductSeriesTest" assertions="8" time="1.960182"/>
+  <testsuite name="D:\projects\statybaecommerse.prus.dev\phpunit.xml" tests="3" assertions="6" errors="0" failures="0" skipped="0" time="291.549247">
+    <testsuite name="Unit" tests="3" assertions="6" errors="0" failures="0" skipped="0" time="291.549247">
+      <testsuite name="Tests\Unit\BrandModelTest" file="Brand Model (Tests\Unit\BrandModel)" tests="3" assertions="6" errors="0" failures="0" skipped="0" time="291.549247">
+        <testcase name="Social links are normalized and filtered" file="Brand Model (Tests\Unit\BrandModel)::Social links are normalized and filtered" class="Tests\Unit\BrandModelTest" classname="Tests.Unit.BrandModelTest" assertions="1" time="289.906440"/>
+        <testcase name="Premium scope filters records" file="Brand Model (Tests\Unit\BrandModel)::Premium scope filters records" class="Tests\Unit\BrandModelTest" classname="Tests.Unit.BrandModelTest" assertions="2" time="0.925844"/>
+        <testcase name="Complete info includes social and premium metadata" file="Brand Model (Tests\Unit\BrandModel)::Complete info includes social and premium metadata" class="Tests\Unit\BrandModelTest" classname="Tests.Unit.BrandModelTest" assertions="3" time="0.716963"/>
       </testsuite>
     </testsuite>
   </testsuite>

@@ -57,7 +57,8 @@ final class BrandModelTest extends TestCase
             ],
         ]);
 
-        $payload = $brand->getCompleteInfo();
+        // IMPORTANT: read normalized, persisted state (matches the first test’s pattern)
+        $payload = $brand->fresh()->getCompleteInfo();
 
         $this->assertTrue($payload['is_premium']);
         $this->assertSame(1, $payload['social_links_count']);
