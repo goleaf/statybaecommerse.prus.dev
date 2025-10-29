@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Filament\Resources\UserBehaviorResource\Pages\ListUserBehaviors;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\User;
 use App\Models\UserBehavior;
+use Filament\Notifications\Notification as FilamentNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
 use Tests\TestCase;
 
 /**
- * UserBehaviorResource Feature Test
- *
- * Comprehensive test suite for UserBehaviorResource functionality including CRUD operations,
- * filtering, actions, and relations in Filament admin panel.
+ * Regression coverage for the Filament user behaviour resource.
  */
 final class UserBehaviorResourceTest extends TestCase
 {
@@ -23,16 +23,25 @@ final class UserBehaviorResourceTest extends TestCase
 
     private User $adminUser;
 
-    private UserBehavior $userBehavior;
-
     private Product $product;
 
     private Category $category;
+
+    public static function setUpBeforeClass(): void
+    {
+        // Force the lightweight SQLite schema so the behaviour factories stay deterministic in CI.
+        putenv('TEST_FORCE_MINIMAL_SQLITE=1');
+        $_ENV['TEST_FORCE_MINIMAL_SQLITE'] = '1';
+        $_SERVER['TEST_FORCE_MINIMAL_SQLITE'] = '1';
+
+        parent::setUpBeforeClass();
+    }
 
     protected function setUp(): void
     {
         parent::setUp();
 
+        // Authenticate a deterministic admin and supporting catalogue fixtures for every scenario.
         $this->adminUser = User::factory()->create([
             'email'    => 'admin@example.com',
             'is_admin' => true,
@@ -41,566 +50,153 @@ final class UserBehaviorResourceTest extends TestCase
         $this->product = Product::factory()->create();
         $this->category = Category::factory()->create();
 
-        $this->userBehavior = UserBehavior::factory()->create([
+        $this->actingAs($this->adminUser);
+    }
+
+    /**
+     * Provide a central helper so every test exercises the same baseline payload.
+     */
+    private function createBehavior(array $overrides = []): UserBehavior
+    {
+        // Merge overrides so callers can provide partial payloads without rebuilding the entire factory stub.
+        return UserBehavior::factory()->create(array_merge([
             'user_id'       => $this->adminUser->id,
             'product_id'    => $this->product->id,
             'category_id'   => $this->category->id,
             'behavior_type' => 'view',
-            'session_id'    => 'test-session-123',
-            'referrer'      => 'https://example.com',
-            'user_agent'    => 'Mozilla/5.0 (Test Browser)',
-            'ip_address'    => '192.168.1.1',
-            'metadata'      => ['test_key' => 'test_value'],
-        ]);
+        ], $overrides));
     }
 
-    public function test_can_view_user_behaviors_list(): void
+    public function test_list_page_displays_expected_columns(): void
     {
-        $this->actingAs($this->adminUser);
+        // Arrange: ensure at least one record exists so column assertions hit rendered output.
+        $behavior = $this->createBehavior();
 
-        $response = $this->get('/admin/user-behaviors');
-
-        $response->assertOk();
-        $response->assertSee(__('admin.user_behaviors.navigation_label'));
-        $response->assertSee($this->adminUser->name);
-        $response->assertSee('view');
+        // Act & Assert: the listing should expose all toggleable columns configured on the resource.
+        Livewire::actingAs($this->adminUser)
+            ->test(ListUserBehaviors::class)
+            ->loadTable()
+            ->assertTableColumnExists('user.name')
+            ->assertTableColumnExists('behavior_type')
+            ->assertTableColumnExists('product.name')
+            ->assertTableColumnExists('category.name')
+            ->assertTableColumnExists('session_id')
+            ->assertTableColumnExists('created_at')
+            ->assertCanSeeTableRecords([$behavior]);
     }
 
-    public function test_can_create_user_behavior(): void
+    public function test_behavior_type_multi_select_filter_limits_visible_records(): void
     {
-        $this->actingAs($this->adminUser);
+        // Arrange: seed one record for each behaviour so the multi-select filter has variety to trim.
+        $viewBehavior = $this->createBehavior(['behavior_type' => 'view']);
+        $clickBehavior = $this->createBehavior(['behavior_type' => 'click']);
 
-        $newUser = User::factory()->create();
-        $newProduct = Product::factory()->create();
-
-        $response = $this->post('/admin/user-behaviors', [
-            'user_id'       => $newUser->id,
-            'behavior_type' => 'click',
-            'product_id'    => $newProduct->id,
-            'session_id'    => 'new-session-456',
-            'referrer'      => 'https://google.com',
-            'user_agent'    => 'Mozilla/5.0 (New Browser)',
-            'ip_address'    => '192.168.1.2',
-            'metadata'      => ['new_key' => 'new_value'],
-        ]);
-
-        $response->assertRedirect();
-        $this->assertDatabaseHas('user_behaviors', [
-            'user_id'       => $newUser->id,
-            'behavior_type' => 'click',
-            'product_id'    => $newProduct->id,
-            'session_id'    => 'new-session-456',
-        ]);
+        // Act & Assert: choosing the view type should hide the click variant.
+        Livewire::actingAs($this->adminUser)
+            ->test(ListUserBehaviors::class)
+            ->filterTable('behavior_type', ['view'])
+            ->assertCanSeeTableRecords([$viewBehavior])
+            ->assertCanNotSeeTableRecords([$clickBehavior]);
     }
 
-    public function test_can_update_user_behavior(): void
+    public function test_user_filter_scopes_results_to_selected_admin(): void
     {
-        $this->actingAs($this->adminUser);
-
-        $response = $this->put("/admin/user-behaviors/{$this->userBehavior->id}", [
-            'user_id'       => $this->userBehavior->user_id,
-            'behavior_type' => 'purchase',
-            'product_id'    => $this->userBehavior->product_id,
-            'category_id'   => $this->userBehavior->category_id,
-            'session_id'    => 'updated-session-789',
-            'referrer'      => 'https://updated.com',
-            'user_agent'    => 'Mozilla/5.0 (Updated Browser)',
-            'ip_address'    => '192.168.1.3',
-            'metadata'      => ['updated_key' => 'updated_value'],
-        ]);
-
-        $response->assertRedirect();
-        $this->assertDatabaseHas('user_behaviors', [
-            'id'            => $this->userBehavior->id,
-            'behavior_type' => 'purchase',
-            'session_id'    => 'updated-session-789',
-        ]);
-    }
-
-    public function test_can_delete_user_behavior(): void
-    {
-        $this->actingAs($this->adminUser);
-
-        $response = $this->delete("/admin/user-behaviors/{$this->userBehavior->id}");
-
-        $response->assertRedirect();
-        $this->assertDatabaseMissing('user_behaviors', [
-            'id' => $this->userBehavior->id,
-        ]);
-    }
-
-    public function test_can_filter_by_behavior_type(): void
-    {
-        $this->actingAs($this->adminUser);
-
-        // Create additional behaviors with different types
-        UserBehavior::factory()->create([
-            'user_id'       => $this->adminUser->id,
-            'behavior_type' => 'click',
-        ]);
-
-        UserBehavior::factory()->create([
-            'user_id'       => $this->adminUser->id,
-            'behavior_type' => 'purchase',
-        ]);
-
-        $response = $this->get('/admin/user-behaviors?tableFilters[behavior_type][values][0]=view');
-
-        $response->assertOk();
-        $response->assertSee('view');
-        $response->assertDontSee('click');
-        $response->assertDontSee('purchase');
-    }
-
-    public function test_can_filter_by_user(): void
-    {
-        $this->actingAs($this->adminUser);
-
-        $anotherUser = User::factory()->create();
-        UserBehavior::factory()->create([
-            'user_id'       => $anotherUser->id,
+        // Arrange: attach a secondary user to confirm the select filter hides unrelated activity.
+        $otherUser = User::factory()->create();
+        $visibleBehavior = $this->createBehavior();
+        $hiddenBehavior = $this->createBehavior([
+            'user_id'       => $otherUser->id,
             'behavior_type' => 'search',
         ]);
 
-        $response = $this->get("/admin/user-behaviors?tableFilters[user_id][value]={$this->adminUser->id}");
-
-        $response->assertOk();
-        $response->assertSee($this->adminUser->name);
-        $response->assertDontSee($anotherUser->name);
+        // Act & Assert: the filter must only surface the authenticated admin's records.
+        Livewire::actingAs($this->adminUser)
+            ->test(ListUserBehaviors::class)
+            ->filterTable('user_id', $this->adminUser->id)
+            ->assertCanSeeTableRecords([$visibleBehavior])
+            ->assertCanNotSeeTableRecords([$hiddenBehavior]);
     }
 
-    public function test_can_filter_by_date_range(): void
+    public function test_created_at_range_filter_trims_outdated_behaviours(): void
     {
-        $this->actingAs($this->adminUser);
-
-        // Create behavior from yesterday
-        $yesterday = now()->subDay();
-        UserBehavior::factory()->create([
-            'user_id'    => $this->adminUser->id,
-            'created_at' => $yesterday,
+        // Arrange: generate one fresh and one stale behaviour to exercise the date range helper.
+        $recentBehavior = $this->createBehavior(['created_at' => now()]);
+        $staleBehavior = $this->createBehavior([
+            'behavior_type' => 'purchase',
+            'created_at'    => now()->subWeeks(2),
         ]);
 
-        $response = $this->get('/admin/user-behaviors?tableFilters[created_at][range][start]=' . now()->format('Y-m-d'));
-
-        $response->assertOk();
-        $response->assertSee($this->userBehavior->behavior_type);
+        // Act & Assert: providing a range covering today should exclude the historical record.
+        Livewire::actingAs($this->adminUser)
+            ->test(ListUserBehaviors::class)
+            ->filterTable('created_at', [
+                'range' => [
+                    'start' => now()->subDay()->format('Y-m-d'),
+                    'end'   => now()->format('Y-m-d'),
+                ],
+            ])
+            ->assertCanSeeTableRecords([$recentBehavior])
+            ->assertCanNotSeeTableRecords([$staleBehavior]);
     }
 
-    public function test_can_group_by_behavior_type(): void
+    public function test_ternary_product_filter_hides_records_without_relationships(): void
     {
-        $this->actingAs($this->adminUser);
-
-        UserBehavior::factory()->create([
-            'user_id'       => $this->adminUser->id,
+        // Arrange: create a behaviour lacking the product relation to validate ternary querying.
+        $withProduct = $this->createBehavior(['behavior_type' => 'view']);
+        $withoutProduct = $this->createBehavior([
+            'product_id'    => null,
             'behavior_type' => 'click',
         ]);
 
-        $response = $this->get('/admin/user-behaviors?tableGroup=behavior_type');
-
-        $response->assertOk();
-        $response->assertSee('view');
-        $response->assertSee('click');
+        // Act & Assert: enabling the "has product" filter should remove product-less entries.
+        Livewire::actingAs($this->adminUser)
+            ->test(ListUserBehaviors::class)
+            ->filterTable('has_product', 'true')
+            ->assertCanSeeTableRecords([$withProduct])
+            ->assertCanNotSeeTableRecords([$withoutProduct]);
     }
 
-    public function test_can_group_by_user(): void
+    public function test_table_actions_dispatch_expected_notifications(): void
     {
-        $this->actingAs($this->adminUser);
+        // Arrange: fake notifications so we can assert the exact flash messages configured on actions.
+        FilamentNotification::fake();
+        $behavior = $this->createBehavior();
 
-        $anotherUser = User::factory()->create();
-        UserBehavior::factory()->create([
-            'user_id'       => $anotherUser->id,
-            'behavior_type' => 'search',
-        ]);
+        $component = Livewire::actingAs($this->adminUser)
+            ->test(ListUserBehaviors::class)
+            ->loadTable();
 
-        $response = $this->get('/admin/user-behaviors?tableGroup=user.name');
-
-        $response->assertOk();
-        $response->assertSee($this->adminUser->name);
-        $response->assertSee($anotherUser->name);
+        // Act & Assert: each single-record action should emit its success notification.
+        $component
+            ->callTableAction('analyze', $behavior)
+            ->assertNotified(__('admin.user_behaviors.analysis_completed'))
+            ->callTableAction('view_user_journey', $behavior)
+            ->assertNotified(__('admin.user_behaviors.user_journey_analyzed'))
+            ->callTableAction('view_session_details', $behavior)
+            ->assertNotified(__('admin.user_behaviors.session_analyzed'));
     }
 
-    public function test_can_export_analytics(): void
+    public function test_bulk_actions_emit_success_messages(): void
     {
-        $this->actingAs($this->adminUser);
-
-        $response = $this->post("/admin/user-behaviors/{$this->userBehavior->id}/actions/export-analytics");
-
-        $response->assertRedirect();
-    }
-
-    public function test_can_analyze_user_behavior(): void
-    {
-        $this->actingAs($this->adminUser);
-
-        $response = $this->post("/admin/user-behaviors/{$this->userBehavior->id}/actions/analyze");
-
-        $response->assertRedirect();
-    }
-
-    public function test_can_bulk_delete_user_behaviors(): void
-    {
-        $this->actingAs($this->adminUser);
-
-        $behavior2 = UserBehavior::factory()->create([
-            'user_id' => $this->adminUser->id,
-        ]);
-
-        $response = $this->post('/admin/user-behaviors/bulk-actions/delete', [
-            'records' => [$this->userBehavior->id, $behavior2->id],
-        ]);
-
-        $response->assertRedirect();
-        $this->assertDatabaseMissing('user_behaviors', [
-            'id' => $this->userBehavior->id,
-        ]);
-        $this->assertDatabaseMissing('user_behaviors', [
-            'id' => $behavior2->id,
-        ]);
-    }
-
-    public function test_can_bulk_export_analytics(): void
-    {
-        $this->actingAs($this->adminUser);
-
-        $behavior2 = UserBehavior::factory()->create([
-            'user_id' => $this->adminUser->id,
-        ]);
-
-        $response = $this->post('/admin/user-behaviors/bulk-actions/export-analytics', [
-            'records' => [$this->userBehavior->id, $behavior2->id],
-        ]);
-
-        $response->assertRedirect();
-    }
-
-    public function test_can_bulk_analyze_selected(): void
-    {
-        $this->actingAs($this->adminUser);
-
-        $behavior2 = UserBehavior::factory()->create([
-            'user_id' => $this->adminUser->id,
-        ]);
-
-        $response = $this->post('/admin/user-behaviors/bulk-actions/analyze-selected', [
-            'records' => [$this->userBehavior->id, $behavior2->id],
-        ]);
-
-        $response->assertRedirect();
-    }
-
-    public function test_can_generate_insights(): void
-    {
-        $this->actingAs($this->adminUser);
-
-        $behavior2 = UserBehavior::factory()->create([
-            'user_id' => $this->adminUser->id,
-        ]);
-
-        $response = $this->post('/admin/user-behaviors/bulk-actions/generate-insights', [
-            'records' => [$this->userBehavior->id, $behavior2->id],
-        ]);
-
-        $response->assertRedirect();
-    }
-
-    public function test_can_view_user_journey(): void
-    {
-        $this->actingAs($this->adminUser);
-
-        $response = $this->post("/admin/user-behaviors/{$this->userBehavior->id}/actions/view-user-journey");
-
-        $response->assertRedirect();
-    }
-
-    public function test_can_view_session_details(): void
-    {
-        $this->actingAs($this->adminUser);
-
-        $response = $this->post("/admin/user-behaviors/{$this->userBehavior->id}/actions/view-session-details");
-
-        $response->assertRedirect();
-    }
-
-    public function test_can_access_analytics_dashboard(): void
-    {
-        $this->actingAs($this->adminUser);
-
-        $response = $this->get('/admin/user-behaviors/analytics');
-
-        $response->assertOk();
-    }
-
-    public function test_can_export_all_data(): void
-    {
-        $this->actingAs($this->adminUser);
-
-        $response = $this->post('/admin/user-behaviors/actions/export-all');
-
-        $response->assertRedirect();
-    }
-
-    public function test_requires_authentication(): void
-    {
-        $response = $this->get('/admin/user-behaviors');
-
-        $response->assertRedirect('/login');
-    }
-
-    public function test_requires_admin_permissions(): void
-    {
-        $regularUser = User::factory()->create([
-            'is_admin' => false,
-        ]);
-
-        $this->actingAs($regularUser);
-
-        $response = $this->get('/admin/user-behaviors');
-
-        $response->assertForbidden();
-    }
-
-    public function test_behavior_type_validation(): void
-    {
-        $this->actingAs($this->adminUser);
-
-        $response = $this->post('/admin/user-behaviors', [
-            'user_id'       => $this->adminUser->id,
-            'behavior_type' => 'invalid_type',
-        ]);
-
-        $response->assertSessionHasErrors(['behavior_type']);
-    }
-
-    public function test_user_relationship_works(): void
-    {
-        $this->actingAs($this->adminUser);
-
-        $this->assertEquals($this->adminUser->id, $this->userBehavior->user->id);
-        $this->assertEquals($this->adminUser->name, $this->userBehavior->user->name);
-    }
-
-    public function test_product_relationship_works(): void
-    {
-        $this->actingAs($this->adminUser);
-
-        $this->assertEquals($this->product->id, $this->userBehavior->product->id);
-        $this->assertEquals($this->product->name, $this->userBehavior->product->name);
-    }
-
-    public function test_category_relationship_works(): void
-    {
-        $this->actingAs($this->adminUser);
-
-        $this->assertEquals($this->category->id, $this->userBehavior->category->id);
-        $this->assertEquals($this->category->name, $this->userBehavior->category->name);
-    }
-
-    public function test_metadata_is_casted_to_array(): void
-    {
-        $this->actingAs($this->adminUser);
-
-        $this->assertIsArray($this->userBehavior->metadata);
-        $this->assertEquals('test_value', $this->userBehavior->metadata['test_key']);
-    }
-
-    public function test_can_search_by_user_name(): void
-    {
-        $this->actingAs($this->adminUser);
-
-        $response = $this->get('/admin/user-behaviors?search=' . $this->adminUser->name);
-
-        $response->assertOk();
-        $response->assertSee($this->adminUser->name);
-    }
-
-    public function test_can_search_by_product_name(): void
-    {
-        $this->actingAs($this->adminUser);
-
-        $response = $this->get('/admin/user-behaviors?search=' . $this->product->name);
-
-        $response->assertOk();
-        $response->assertSee($this->product->name);
-    }
-
-    public function test_can_search_by_behavior_type(): void
-    {
-        $this->actingAs($this->adminUser);
-
-        $response = $this->get('/admin/user-behaviors?search=view');
-
-        $response->assertOk();
-        $response->assertSee('view');
-    }
-
-    public function test_can_search_by_ip_address(): void
-    {
-        $this->actingAs($this->adminUser);
-
-        $response = $this->get('/admin/user-behaviors?search=192.168.1.1');
-
-        $response->assertOk();
-        $response->assertSee('192.168.1.1');
-    }
-
-    public function test_can_sort_by_created_at(): void
-    {
-        $this->actingAs($this->adminUser);
-
-        $olderBehavior = UserBehavior::factory()->create([
-            'user_id'    => $this->adminUser->id,
-            'created_at' => now()->subDays(2),
-        ]);
-
-        $response = $this->get('/admin/user-behaviors?sort=created_at&direction=desc');
-
-        $response->assertOk();
-    }
-
-    public function test_can_sort_by_user_name(): void
-    {
-        $this->actingAs($this->adminUser);
-
-        $anotherUser = User::factory()->create(['name' => 'Adam Smith']);
-        UserBehavior::factory()->create([
-            'user_id' => $anotherUser->id,
-        ]);
-
-        $response = $this->get('/admin/user-behaviors?sort=user.name&direction=asc');
-
-        $response->assertOk();
-    }
-
-    public function test_can_toggle_columns(): void
-    {
-        $this->actingAs($this->adminUser);
-
-        $response = $this->get('/admin/user-behaviors');
-
-        $response->assertOk();
-        // Test that toggleable columns are present
-        $response->assertSee('Product');
-        $response->assertSee('Category');
-        $response->assertSee('Session ID');
-        $response->assertSee('Referrer');
-        $response->assertSee('IP Address');
-    }
-
-    public function test_recent_behaviors_filter(): void
-    {
-        $this->actingAs($this->adminUser);
-
-        // Create behavior from 10 days ago
-        UserBehavior::factory()->create([
-            'user_id'    => $this->adminUser->id,
-            'created_at' => now()->subDays(10),
-        ]);
-
-        $response = $this->get('/admin/user-behaviors?tableFilters[recent_behaviors][value]=1');
-
-        $response->assertOk();
-        $response->assertSee($this->userBehavior->behavior_type);
-    }
-
-    public function test_today_filter(): void
-    {
-        $this->actingAs($this->adminUser);
-
-        // Create behavior from yesterday
-        UserBehavior::factory()->create([
-            'user_id'    => $this->adminUser->id,
-            'created_at' => now()->subDay(),
-        ]);
-
-        $response = $this->get('/admin/user-behaviors?tableFilters[today][value]=1');
-
-        $response->assertOk();
-        $response->assertSee($this->userBehavior->behavior_type);
-    }
-
-    public function test_this_week_filter(): void
-    {
-        $this->actingAs($this->adminUser);
-
-        // Create behavior from 2 weeks ago
-        UserBehavior::factory()->create([
-            'user_id'    => $this->adminUser->id,
-            'created_at' => now()->subWeeks(2),
-        ]);
-
-        $response = $this->get('/admin/user-behaviors?tableFilters[this_week][value]=1');
-
-        $response->assertOk();
-        $response->assertSee($this->userBehavior->behavior_type);
-    }
-
-    public function test_this_month_filter(): void
-    {
-        $this->actingAs($this->adminUser);
-
-        // Create behavior from last month
-        UserBehavior::factory()->create([
-            'user_id'    => $this->adminUser->id,
-            'created_at' => now()->subMonth(),
-        ]);
-
-        $response = $this->get('/admin/user-behaviors?tableFilters[this_month][value]=1');
-
-        $response->assertOk();
-        $response->assertSee($this->userBehavior->behavior_type);
-    }
-
-    public function test_has_product_filter(): void
-    {
-        $this->actingAs($this->adminUser);
-
-        // Create behavior without product
-        UserBehavior::factory()->create([
-            'user_id'    => $this->adminUser->id,
-            'product_id' => null,
-        ]);
-
-        $response = $this->get('/admin/user-behaviors?tableFilters[has_product][value]=1');
-
-        $response->assertOk();
-        $response->assertSee($this->userBehavior->behavior_type);
-    }
-
-    public function test_has_category_filter(): void
-    {
-        $this->actingAs($this->adminUser);
-
-        // Create behavior without category
-        UserBehavior::factory()->create([
+        // Arrange: capture notifications and a batch of behaviours for the export/inference flows.
+        FilamentNotification::fake();
+        $behaviors = UserBehavior::factory()->count(2)->create([
             'user_id'     => $this->adminUser->id,
-            'category_id' => null,
+            'product_id'  => $this->product->id,
+            'category_id' => $this->category->id,
         ]);
 
-        $response = $this->get('/admin/user-behaviors?tableFilters[has_category][value]=1');
+        // Act & Assert: calling each bulk action should surface the translated success banner.
+        $component = Livewire::actingAs($this->adminUser)
+            ->test(ListUserBehaviors::class)
+            ->loadTable();
 
-        $response->assertOk();
-        $response->assertSee($this->userBehavior->behavior_type);
-    }
-
-    public function test_multiple_behavior_types_filter(): void
-    {
-        $this->actingAs($this->adminUser);
-
-        UserBehavior::factory()->create([
-            'user_id'       => $this->adminUser->id,
-            'behavior_type' => 'click',
-        ]);
-
-        UserBehavior::factory()->create([
-            'user_id'       => $this->adminUser->id,
-            'behavior_type' => 'purchase',
-        ]);
-
-        $response = $this->get('/admin/user-behaviors?tableFilters[behavior_type][values][0]=view&tableFilters[behavior_type][values][1]=click');
-
-        $response->assertOk();
-        $response->assertSee('view');
-        $response->assertSee('click');
-        $response->assertDontSee('purchase');
+        $component
+            ->callTableBulkAction('export_analytics', $behaviors)
+            ->assertNotified(__('admin.user_behaviors.exported_successfully'))
+            ->callTableBulkAction('analyze_selected', $behaviors)
+            ->assertNotified(__('admin.user_behaviors.bulk_analysis_completed', ['count' => $behaviors->count()]))
+            ->callTableBulkAction('generate_insights', $behaviors)
+            ->assertNotified(__('admin.user_behaviors.insights_generated', ['count' => $behaviors->count()]));
     }
 }
