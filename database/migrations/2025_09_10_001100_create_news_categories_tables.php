@@ -29,8 +29,13 @@ return new class extends Migration
             });
         }
 
-        if (! Schema::hasTable('sh_news_category_translations')) {
-            Schema::create('sh_news_category_translations', function (Blueprint $table): void {
+        if (Schema::hasTable('sh_news_category_translations') && ! Schema::hasTable('news_category_translations')) {
+            // Rename the legacy table so the HasTranslations trait aligns with the model expectation.
+            Schema::rename('sh_news_category_translations', 'news_category_translations');
+        }
+
+        if (! Schema::hasTable('news_category_translations')) {
+            Schema::create('news_category_translations', function (Blueprint $table): void {
                 $table->id();
                 $table->unsignedBigInteger('news_category_id');
                 $table->string('locale', 10);
@@ -60,7 +65,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('news_category_pivot');
-        Schema::dropIfExists('sh_news_category_translations');
+        Schema::dropIfExists('news_category_translations');
         Schema::dropIfExists('news_categories');
     }
 };
