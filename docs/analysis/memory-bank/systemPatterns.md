@@ -278,6 +278,8 @@
   handles without tripping the core macro's string signature.【F:app/Providers/AppServiceProvider.php†L304-L314】
 - **Toggle comparisons:** `Slider::$skipFirstIdForTests` temporarily skips the modified record when `Slider::first()` is called
   during feature tests, ensuring the toggle action comparisons evaluate two distinct records.【F:app/Models/Slider.php†L20-L49】
+- **Combobox hydration:** Multi-select combobox fields must opt into dehydration (`->dehydrated(true)`) so Livewire test harnesses
+  can inspect deterministic identifier arrays via `form->getState()` when asserting relationship selections.【F:app/Filament/Resources/RecommendationConfigResourceSimple.php†L129-L173】【F:app/Filament/Resources/RecommendationConfigResourceSimple/Pages/EditRecommendationConfigSimple.php†L19-L95】
 
 ## Documentation Patterns
 

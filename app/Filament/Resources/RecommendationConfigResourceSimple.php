@@ -27,6 +27,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Novadaemon\FilamentCombobox\Combobox;
 
 final class RecommendationConfigResourceSimple extends Resource
@@ -132,8 +133,18 @@ final class RecommendationConfigResourceSimple extends Resource
                                 ->searchable()
                                 ->boxSearchs(true)
                                 ->preload()
-                                ->afterStateHydrated(fn (Combobox $component, ?array $state) => $component->state(collect($state)->filter()->sort()->values()->toArray()))
-                                ->dehydrateStateUsing(fn (?array $state) => collect($state)->filter()->sort()->values()->toArray())
+                                // Ensure the combobox contributes its state to the form payload even when it is configured
+                                // for multiple selections so Livewire assertions can inspect the hydrated identifiers.
+                                ->dehydrated(true)
+                                ->afterStateHydrated(static function (Combobox $component, ?array $state): void {
+                                    // Persist the canonical order immediately so Livewire form state mirrors pivot expectations.
+                                    $component->state(self::normaliseRelationIdentifiers($state));
+                                })
+                                // Normalise pivot identifiers so both the UI and tests receive
+                                // deterministic, scalar product IDs regardless of how the
+                                // relationship payload is hydrated (array, model, or integer).
+                                ->formatStateUsing(self::normaliseRelationIdentifiers(...))
+                                ->dehydrateStateUsing(self::normaliseRelationIdentifiers(...))
                                 ->createOptionForm([
                                     TextInput::make('name')
                                         ->required()
@@ -148,8 +159,18 @@ final class RecommendationConfigResourceSimple extends Resource
                                 ->searchable()
                                 ->boxSearchs(true)
                                 ->preload()
-                                ->afterStateHydrated(fn (Combobox $component, ?array $state) => $component->state(collect($state)->filter()->sort()->values()->toArray()))
-                                ->dehydrateStateUsing(fn (?array $state) => collect($state)->filter()->sort()->values()->toArray())
+                                // Mirror the product combobox dehydration behaviour so the category pivot identifiers appear
+                                // inside the form state for downstream tests and audit tooling.
+                                ->dehydrated(true)
+                                ->afterStateHydrated(static function (Combobox $component, ?array $state): void {
+                                    // Mirror product handling so category selections stay sorted for assertions and pivot syncs.
+                                    $component->state(self::normaliseRelationIdentifiers($state));
+                                })
+                                // Apply the same deterministic sorting and scalar casting for
+                                // category pivots so cached form state matches assertion
+                                // expectations across Livewire tests and Filament reloads.
+                                ->formatStateUsing(self::normaliseRelationIdentifiers(...))
+                                ->dehydrateStateUsing(self::normaliseRelationIdentifiers(...))
                                 ->createOptionForm([
                                     TextInput::make('name')
                                         ->required()
@@ -261,6 +282,46 @@ final class RecommendationConfigResourceSimple extends Resource
                         ->columnSpanFull(),
                 ]),
         ]);
+    }
+
+    /**
+     * Normalise relationship state arrays into sorted string identifiers so Livewire
+     * assertions, pivot syncing, and combobox hydration all agree on a canonical format.
+     *
+     * @param  array<int|string, mixed>|null $state
+     * @return array<int, string>
+     */
+    public static function normaliseRelationIdentifiers(?array $state): array
+    {
+        return collect($state)
+            ->map(static function ($value): ?string {
+                if ($value instanceof Model) {
+                    $key = $value->getKey();
+
+                    return is_string($key) || is_int($key) || is_float($key)
+                        ? (string) $key
+                        : null;
+                }
+
+                if (is_array($value)) {
+                    $identifier = $value['id'] ?? ($value[0] ?? null);
+
+                    return is_string($identifier) || is_int($identifier) || is_float($identifier)
+                        ? (string) $identifier
+                        : null;
+                }
+
+                if (is_string($value) || is_int($value) || is_float($value)) {
+                    return (string) $value;
+                }
+
+                return null;
+            })
+            ->filter()
+            ->unique()
+            ->sort()
+            ->values()
+            ->all();
     }
 
     /**
