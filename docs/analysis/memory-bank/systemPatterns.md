@@ -129,6 +129,9 @@
 - **View Caching:** Blade template caching for static content
 - **Translation Caching:** Cached translation lookups
 - **Discount Caching:** Cached discount eligibility evaluation
+- **System Setting Cache Busting:** `SystemSetting::setValue()` now clears per-setting
+  cache keys even when the array cache driver is active, preventing stale
+  configuration values from persisting between requests.
 
 ### 2. Queue Processing Pattern
 **Pattern:** Background processing for heavy operations
@@ -147,6 +150,10 @@
   SystemSettingDependency filters lower-case both the stored column values and
   the incoming terms so LIKE comparisons behave consistently across MySQL,
   PostgreSQL, and SQLite when administrators search for dependency conditions.
+  The dependency model now resolves relationships through the
+  `dependsOnSettingRelation` alias, ensuring attribute lookups remain cached
+  even while supporting the legacy scope signature that filters dependencies by
+  their controlling setting.
 
 ## Security Patterns
 
@@ -233,6 +240,10 @@
 - **Duplicate Safety:** EnumValue duplicates generate collision-resistant keys so repeated clones never violate the unique `(type, key)` index.【F:app/Models/EnumValue.php†L148-L191】
 - **Usage Reset:** Newly duplicated rows zero out usage counters to ensure reporting starts from a clean slate.【F:app/Models/EnumValue.php†L157-L165】
 - **Lifecyle Cleanup:** Stale enum rows are pruned lazily by ID, skipping records with any usage to minimise memory pressure during maintenance tasks.【F:app/Models/EnumValue.php†L248-L271】
+
+### 5. Analytics Resilience Pattern
+**Pattern:** Stats queries guard against schema drift so dashboards stay accurate
+- **Schema-aware revenue totals:** `ProductSeries::dailySales()` now checks whether the `order_items.total` column exists and falls back to `quantity * unit_price` calculations when older exports omit the denormalised totals, ensuring sparkline revenue values match expectations across migrations and cached datasets.【F:app/Support/Stats/Series/ProductSeries.php†L54-L115】
 
 ## Filament Integration Patterns
 
