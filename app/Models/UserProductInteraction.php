@@ -55,6 +55,38 @@ final class UserProductInteraction extends Model
     ];
 
     /**
+     * Automatically seed the legacy interaction timestamps when callers omit
+     * them so the NOT NULL constraints introduced by the original schema stay
+     * satisfied even when only the modern occurred_at value is provided.
+     */
+    protected static function booted(): void
+    {
+        parent::booted();
+
+        static::creating(function (self $interaction): void {
+            // Resolve the effective occurrence timestamp before mutating the
+            // legacy attributes, allowing fallbacks for inserts that only
+            // specify the modern occurred_at column.
+            $occurredAt = $interaction->occurred_at ?? now();
+
+            if ($interaction->getAttribute('first_interaction') === null) {
+                // Default the first interaction to the resolved occurrence
+                // timestamp so initial inserts respect the historical column
+                // contract without requiring callers to set both values.
+                $interaction->setAttribute('first_interaction', $occurredAt);
+            }
+
+            if ($interaction->getAttribute('last_interaction') === null) {
+                // Mirror the last interaction timestamp as well, keeping the
+                // legacy analytics queries aligned with the most recent event
+                // even when only the consolidated occurred_at value is passed
+                // through the modern API surface.
+                $interaction->setAttribute('last_interaction', $occurredAt);
+            }
+        });
+    }
+
+    /**
      * Normalise legacy payloads before the base fill logic runs so both the
      * new and old attribute names hydrate correctly.
      *
