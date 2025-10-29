@@ -103,6 +103,7 @@ For every file under `app/Filament/**`:
 ## User Behaviour Reference
 
 - When working on preference or interaction tracking, review `docs/analysis/USER_BEHAVIOR_MODELS_UPDATE.md` for the latest aliasing and metadata guidelines introduced after the regression fixes.
+- When seeding multiple `UserPreference` records (especially in tests), vary both the type and key so the composite `(user_id, preference_type, preference_key)` index is respected; follow the ordering pattern in `tests/Unit/UserPreferenceModelTest.php` when asserting minimum-score scopes to avoid SQLite iteration quirks.
 - When persisting `UserPreference` metadata payloads, ensure arrays are JSON-encoded before hitting the database; the model mutators now enforce this for consistency across SQLite and MySQL, so future changes should preserve that contract.
 
 ## Memory Bank Utilities
