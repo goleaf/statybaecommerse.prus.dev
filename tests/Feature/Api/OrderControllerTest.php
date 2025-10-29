@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Api;
 
+use App\Enums\OrderStatus;
 use App\Models\Order;
 use App\Models\User;
 use Database\Seeders\AdminAuthorizationSeeder;
@@ -83,5 +84,24 @@ final class OrderControllerTest extends TestCase
         $response = $this->getJson(route('api.orders.show', ['order' => $restrictedOrder->number]));
 
         $response->assertForbidden();
+    }
+
+    public function test_customer_can_view_completed_order_history(): void
+    {
+        // Create a customer and a completed order so we can verify legacy
+        // lifecycle states remain accessible through the public API.
+        $customer = User::factory()->create();
+        $order = Order::factory()->create([
+            'user_id' => $customer->getKey(),
+            'status'  => OrderStatus::COMPLETED->value,
+        ]);
+
+        // Authenticate as the owning customer before requesting the resource.
+        $this->actingAs($customer);
+
+        $response = $this->getJson(route('api.orders.show', ['order' => $order->number]));
+
+        $response->assertOk()
+            ->assertJsonPath('data.order.status.state', OrderStatus::COMPLETED->value);
     }
 }
