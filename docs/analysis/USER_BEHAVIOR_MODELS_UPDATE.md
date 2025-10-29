@@ -7,6 +7,7 @@
 - Refined `UserProductInteraction` meta handling to accept legacy payload shapes, propagate rating/count columns, and persist arrays directly for the JSON column to stabilise downstream analytics consumers.【F:app/Models/UserProductInteraction.php†L31-L187】
 - Hardened `UserProductInteraction` persistence so array payloads are JSON-encoded before storage, preventing SQLite binding errors during reporting workflows while preserving legacy column mirrors.【F:app/Models/UserProductInteraction.php†L119-L208】
 - Defaulted `UserProductInteraction` timestamps so inserts that only provide the consolidated `occurred_at` value automatically backfill `first_interaction`/`last_interaction`, satisfying the legacy schema constraints without extra caller logic.【F:app/Models/UserProductInteraction.php†L63-L102】
+- Refactored the unit and feature regression suites to share a centralised interaction factory helper and iterate scope expectations, keeping coverage consistent while reducing duplication in upcoming behavioural updates.【F:tests/Feature/UserProductInteractionTest.php†L16-L126】【F:tests/Unit/UserProductInteractionTest.php†L16-L110】
 
 ## Follow-up Ideas
 - Extend model factories with named states that exercise alias-based mass assignment to guard against regressions in the hydrators.
