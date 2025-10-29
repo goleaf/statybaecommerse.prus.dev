@@ -10,6 +10,7 @@ return [
     'basic_information_description' => 'Sukonfigūruokite pagrindinius šios el. pašto kampanijos nustatymus.',
     'name'                          => 'Pavadinimas',
     'description'                   => 'Aprašymas',
+    'content'                       => 'Turinys',
     'subject'                       => 'Tema',
     'from_email'                    => 'Siuntėjo el. paštas',
     'from_name'                     => 'Siuntėjo vardas',

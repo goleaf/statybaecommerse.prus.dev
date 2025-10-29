@@ -18,6 +18,19 @@ class ListEnumValues extends BaseListRecords
 
     protected static string $resource = EnumValueResource::class;
 
+    public function mount(): void
+    {
+        parent::mount();
+
+        // Bridge legacy query parameter usage (`tableFilters[...]`) so compatibility tests can prime filter state from the URL.
+        $legacyFilters = request()->query('tableFilters');
+
+        if (is_array($legacyFilters) && $legacyFilters !== []) {
+            // Merge the provided filter payload into the Livewire-bound table filter bag without clobbering active filters.
+            $this->tableFilters = array_merge($this->tableFilters ?? [], $legacyFilters);
+        }
+    }
+
     protected function getHeaderActions(): array
     {
         return [
@@ -72,6 +85,29 @@ class ListEnumValues extends BaseListRecords
             $tabs[$type] = WidgetTab::make($label)
                 ->modifyQueryUsing(fn (Builder $query): Builder => $query->where('type', $type))
                 ->value(fn () => $modelClass::where('type', $type)->count());
+        }
+
+        $payload = request()->all();
+        $selectedTypes = [];
+
+        if (filled($filterValue = data_get($payload, 'tableFilters.type.value'))) {
+            // Preserve single-select requests so only the relevant tab headings render in filtered responses.
+            $selectedTypes[] = $filterValue;
+        }
+
+        $filterValues = data_get($payload, 'tableFilters.type.values');
+        if (is_array($filterValues)) {
+            // When a multi-select payload is provided, merge it into the visibility whitelist.
+            $selectedTypes = array_merge($selectedTypes, array_filter($filterValues));
+        }
+
+        if ($selectedTypes !== []) {
+            // Limit the widget tab collection to the active filter keys plus the aggregate "all" tab for quick reset access.
+            $tabs = array_filter(
+                $tabs,
+                static fn (WidgetTab $tab, string $key): bool => $key === 'all' || in_array($key, $selectedTypes, true),
+                ARRAY_FILTER_USE_BOTH,
+            );
         }
 
         return $tabs;

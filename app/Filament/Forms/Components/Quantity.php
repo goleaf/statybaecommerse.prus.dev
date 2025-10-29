@@ -24,9 +24,10 @@ final class Quantity extends TextInput
         // behaves like a non-negative integer input across the admin panel.
         return $component
             ->numeric()
-            // Use a nullable integer rule so optional quantity fields can remain empty
-            // while still enforcing whole-number validation when a value is provided.
-            ->rule('nullable|integer')
+            // Split the nullable/integer validation into discrete rules so Laravel's
+            // validator does not attempt to resolve a fictitious "nullable|integer"
+            // extension when Filament serialises the rule set.
+            ->rules(['nullable', 'integer'])
             ->extraAttributes(['inputmode' => 'numeric'])
             ->minValue(0)
             ->step(1);
