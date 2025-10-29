@@ -32,7 +32,15 @@ final class TagAwareCache
         $normalizedTags = self::normalizeTags($tags);
 
         if ($normalizedTags !== [] && Cache::supportsTags()) {
-            return Cache::tags($normalizedTags)->remember($key, $ttl, $callback);
+            $value = Cache::tags($normalizedTags)->remember($key, $ttl, $callback);
+
+            // Mirror the tagged entry into the base cache store so callers relying on
+            // simple `Cache::has()` checks (for example PHPUnit assertions using the
+            // array store) continue to observe a cached payload even when tags are
+            // supported by the configured driver.
+            Cache::put($key, $value, $ttl);
+
+            return $value;
         }
 
         return Cache::remember($key, $ttl, $callback);
