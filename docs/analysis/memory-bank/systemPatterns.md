@@ -234,6 +234,10 @@
 - **Usage Reset:** Newly duplicated rows zero out usage counters to ensure reporting starts from a clean slate.【F:app/Models/EnumValue.php†L157-L165】
 - **Lifecyle Cleanup:** Stale enum rows are pruned lazily by ID, skipping records with any usage to minimise memory pressure during maintenance tasks.【F:app/Models/EnumValue.php†L248-L271】
 
+### 5. Analytics Resilience Pattern
+**Pattern:** Stats queries guard against schema drift so dashboards stay accurate
+- **Schema-aware revenue totals:** `ProductSeries::dailySales()` now checks whether the `order_items.total` column exists and falls back to `quantity * unit_price` calculations when older exports omit the denormalised totals, ensuring sparkline revenue values match expectations across migrations and cached datasets.【F:app/Support/Stats/Series/ProductSeries.php†L54-L115】
+
 ## Filament Integration Patterns
 
 ### 1. Navigation Group Pattern

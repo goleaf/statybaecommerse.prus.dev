@@ -51,6 +51,7 @@ This repository mixes Laravel 12 and Filament v4 code. Use the following guardra
   php artisan config:cache && php artisan route:cache
   ```
 - Prefer documenting any outstanding warnings or skipped checks directly in commit messages or PR descriptions.
+- When tuning analytics or stats queries, mirror the schema-aware fallbacks found in `App\Support\Stats\Series\ProductSeries` so dashboards continue to work for installs where denormalised totals or payment metadata are not yet available.
 
 ## Filament v4 Resource Rules
 
