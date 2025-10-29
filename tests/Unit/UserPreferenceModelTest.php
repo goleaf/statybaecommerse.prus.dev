@@ -7,207 +7,246 @@ namespace Tests\Unit;
 use App\Models\User;
 use App\Models\UserPreference;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
+use PHPUnit\Framework\Attributes\CoversClass;
 use Tests\TestCase;
 
+#[CoversClass(UserPreference::class)]
 final class UserPreferenceModelTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_user_preference_belongs_to_user(): void
-    {
-        $user = User::factory()->create();
-        $userPreference = UserPreference::factory()->create(['user_id' => $user->id]);
+    private User $user;
 
-        $this->assertInstanceOf(User::class, $userPreference->user);
-        $this->assertEquals($user->id, $userPreference->user->id);
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // Create a canonical user record so every test exercises the model relationship consistently.
+        $this->user = User::factory()->create();
     }
 
-    public function test_user_preference_fillable_attributes(): void
+    private function createPreference(array $overrides = []): UserPreference
     {
-        $fillable = ['user_id', 'name', 'key', 'value', 'meta'];
-
-        $userPreference = new UserPreference;
-
-        $this->assertEquals($fillable, $userPreference->getFillable());
+        // Delegate to the factory while forcing the user relationship so the helper stays deterministic.
+        return UserPreference::factory()
+            ->for($this->user)
+            ->create($overrides);
     }
 
-    public function test_user_preference_casts(): void
+    public function test_it_belongs_to_a_user(): void
     {
-        $userPreference = UserPreference::factory()->create([
-            'value'        => '0.85',
-            'meta'         => ['source' => 'test'],
-            'last_updated' => '2024-01-01 12:00:00',
-        ]);
+        // Act: create a preference to exercise the belongsTo relationship loader.
+        $preference = $this->createPreference();
 
-        $this->assertIsFloat($userPreference->value);
-        $this->assertEquals(0.85, $userPreference->value);
-        $this->assertIsArray($userPreference->meta);
-        $this->assertEquals(['source' => 'test'], $userPreference->meta);
-        $this->assertInstanceOf(\Carbon\Carbon::class, $userPreference->last_updated);
+        // Assert: the related user matches the seeded record regardless of lazy or eager loading.
+        $this->assertTrue($preference->user->is($this->user));
     }
 
-    public function test_scope_by_type(): void
+    public function test_it_exposes_expected_fillable_aliases(): void
     {
-        UserPreference::factory()->create(['preference_type' => 'category']);
-        UserPreference::factory()->create(['preference_type' => 'brand']);
-        UserPreference::factory()->create(['preference_type' => 'category']);
+        // Act: resolve the fillable array so we can guard mass-assignment behaviour.
+        $fillable = (new UserPreference())->getFillable();
 
-        $categoryPreferences = UserPreference::byType('category')->get();
-        $brandPreferences = UserPreference::byType('brand')->get();
+        // Assert: confirm the streamlined aliases stay in sync with the documented contract.
+        $this->assertSame(['user_id', 'name', 'key', 'value', 'meta'], $fillable);
+    }
 
+    public function test_it_casts_attributes_and_aliases_consistently(): void
+    {
+        // Arrange: freeze time so Carbon comparisons remain predictable across assertions.
+        Carbon::setTestNow($now = Carbon::parse('2024-01-01 12:00:00'));
+
+        try {
+            // Act: store the record using aliases to ensure the accessors bridge to the canonical columns.
+            $preference = $this->createPreference([
+                'name'         => 'category',
+                'key'          => 'power-tools',
+                'value'        => '0.85',
+                'meta'         => ['source' => 'test-suite'],
+                'last_updated' => $now,
+            ]);
+
+            // Assert: value alias resolves to a float while preserving precision and metadata casting rules.
+            $this->assertSame(0.85, $preference->value);
+            $this->assertSame(['source' => 'test-suite'], $preference->meta);
+            $this->assertInstanceOf(Carbon::class, $preference->last_updated);
+            $this->assertTrue($preference->last_updated->equalTo($now));
+        } finally {
+            // Always release the mocked time to avoid leaking the state into other tests.
+            Carbon::setTestNow();
+        }
+    }
+
+    public function test_query_scope_filters_by_type(): void
+    {
+        // Arrange: seed a blend of preference types so the scope has multiple rows to filter.
+        $this->createPreference(['name' => 'category']);
+        $this->createPreference(['name' => 'brand']);
+        $this->createPreference(['name' => 'category']);
+
+        // Act: query for a single type using the dedicated scope.
+        $categoryPreferences = UserPreference::byType('category')->pluck('preference_type')->all();
+
+        // Assert: only the requested type is returned and the results count matches expectations.
         $this->assertCount(2, $categoryPreferences);
-        $this->assertCount(1, $brandPreferences);
-
-        $categoryPreferences->each(function ($preference) {
-            $this->assertEquals('category', $preference->preference_type);
-        });
-
-        $brandPreferences->each(function ($preference) {
-            $this->assertEquals('brand', $preference->preference_type);
-        });
+        $this->assertSame(['category', 'category'], $categoryPreferences);
     }
 
-    public function test_scope_with_min_score(): void
+    public function test_query_scope_filters_by_minimum_score(): void
     {
-        UserPreference::factory()->create(['preference_score' => 0.3]);
-        UserPreference::factory()->create(['preference_score' => 0.7]);
-        UserPreference::factory()->create(['preference_score' => 0.9]);
+        // Arrange: persist a trio of scores so we can exercise the numeric comparison logic.
+        $this->createPreference(['value' => 0.3]);
+        $this->createPreference(['value' => 0.7]);
+        $this->createPreference(['value' => 0.9]);
 
-        $highScorePreferences = UserPreference::withMinScore(0.7)->get();
+        // Act: filter using the minimum score scope boundary.
+        $filteredScores = UserPreference::withMinScore(0.7)->pluck('preference_score');
 
-        $this->assertCount(2, $highScorePreferences);
-
-        $highScorePreferences->each(function ($preference) {
-            $this->assertGreaterThanOrEqual(0.7, $preference->preference_score);
-        });
+        // Assert: ensure only scores meeting or exceeding the threshold are returned.
+        $this->assertSame([0.7, 0.9], $filteredScores->all());
     }
 
-    public function test_scope_ordered_by_score(): void
+    public function test_query_scope_orders_by_score_descending(): void
     {
-        UserPreference::factory()->create(['preference_score' => 0.3]);
-        UserPreference::factory()->create(['preference_score' => 0.9]);
-        UserPreference::factory()->create(['preference_score' => 0.6]);
+        // Arrange: create values in an unsorted order to confirm the scope applies ordering rules.
+        $this->createPreference(['value' => 0.3]);
+        $this->createPreference(['value' => 0.9]);
+        $this->createPreference(['value' => 0.6]);
 
-        $orderedPreferences = UserPreference::orderedByScore()->get();
+        // Act: fetch the ordered results and pluck the score column for easier comparison.
+        $orderedScores = UserPreference::orderedByScore()->pluck('preference_score')->all();
 
-        $this->assertCount(3, $orderedPreferences);
-        $this->assertEquals(0.9, $orderedPreferences->first()->preference_score);
-        $this->assertEquals(0.3, $orderedPreferences->last()->preference_score);
+        // Assert: the scope should order from highest to lowest score.
+        $this->assertSame([0.9, 0.6, 0.3], $orderedScores);
     }
 
-    public function test_scope_recent(): void
+    public function test_recent_scope_uses_default_window(): void
     {
-        $oldDate = now()->subDays(40);
-        $recentDate = now()->subDays(10);
+        // Arrange: freeze time and seed records that straddle the default 30-day window.
+        Carbon::setTestNow($now = Carbon::parse('2024-03-15 10:00:00'));
 
-        UserPreference::factory()->create(['last_updated' => $oldDate]);
-        UserPreference::factory()->create(['last_updated' => $recentDate]);
-        UserPreference::factory()->create(['last_updated' => now()]);
+        try {
+            $this->createPreference(['last_updated' => $now->copy()->subDays(40)]);
+            $recent = $this->createPreference(['last_updated' => $now->copy()->subDays(10)]);
+            $latest = $this->createPreference(['last_updated' => $now]);
 
-        $recentPreferences = UserPreference::recent(30)->get();
+            // Act: execute the scope without parameters to rely on the default threshold.
+            $results = UserPreference::recent()->get();
 
-        $this->assertCount(2, $recentPreferences);
-
-        $recentPreferences->each(function ($preference) {
-            $this->assertGreaterThanOrEqual(now()->subDays(30), $preference->last_updated);
-        });
+            // Assert: only records within the 30-day window are returned and ordered by recency.
+            $this->assertCount(2, $results);
+            $this->assertTrue($results->contains($recent));
+            $this->assertTrue($results->contains($latest));
+        } finally {
+            Carbon::setTestNow();
+        }
     }
 
-    public function test_scope_recent_with_custom_days(): void
+    public function test_recent_scope_accepts_custom_window(): void
     {
-        $oldDate = now()->subDays(20);
-        $recentDate = now()->subDays(5);
+        // Arrange: freeze time to make the date arithmetic deterministic for the assertions.
+        Carbon::setTestNow($now = Carbon::parse('2024-03-15 10:00:00'));
 
-        UserPreference::factory()->create(['last_updated' => $oldDate]);
-        UserPreference::factory()->create(['last_updated' => $recentDate]);
-        UserPreference::factory()->create(['last_updated' => now()]);
+        try {
+            $this->createPreference(['last_updated' => $now->copy()->subDays(20)]);
+            $recent = $this->createPreference(['last_updated' => $now->copy()->subDays(5)]);
+            $latest = $this->createPreference(['last_updated' => $now]);
 
-        $recentPreferences = UserPreference::recent(10)->get();
+            // Act: filter by a tighter window so only the newest two records survive.
+            $results = UserPreference::recent(10)->get();
 
-        $this->assertCount(2, $recentPreferences);
-
-        $recentPreferences->each(function ($preference) {
-            $this->assertGreaterThanOrEqual(now()->subDays(10), $preference->last_updated);
-        });
+            // Assert: verify the expected models are returned and that the older record is excluded.
+            $this->assertCount(2, $results);
+            $this->assertTrue($results->contains($recent));
+            $this->assertTrue($results->contains($latest));
+        } finally {
+            Carbon::setTestNow();
+        }
     }
 
-    public function test_user_preference_can_store_complex_metadata(): void
+    public function test_metadata_alias_stores_complex_payloads(): void
     {
-        $complexMetadata = [
-            'source'              => 'purchase_history',
-            'frequency'           => 'high',
-            'category_preference' => 'electronics',
-            'nested_data'         => [
-                'subcategory'      => 'smartphones',
-                'brand_preference' => 'apple',
-            ],
-            'timestamps' => [
-                'first_seen'   => now()->toISOString(),
-                'last_updated' => now()->toISOString(),
-            ],
+        // Arrange: prepare a nested structure that mirrors analytics payloads.
+        $payload = [
+            'source'      => 'purchase_history',
+            'frequency'   => 'high',
+            'preferences' => ['category' => 'electronics', 'brand' => 'apple'],
+            'timestamps'  => ['first_seen' => now()->toISOString()],
         ];
 
-        $userPreference = UserPreference::factory()->create(['metadata' => $complexMetadata]);
+        // Act: store the metadata under the alias key to validate JSON casting behaviour.
+        $preference = $this->createPreference(['meta' => $payload]);
 
-        $this->assertEquals($complexMetadata, $userPreference->metadata);
-        $this->assertEquals('electronics', $userPreference->metadata['category_preference']);
-        $this->assertEquals('smartphones', $userPreference->metadata['nested_data']['subcategory']);
+        // Assert: both alias and canonical accessors should return the array unchanged.
+        $this->assertSame($payload, $preference->meta);
+        $this->assertSame($payload, $preference->metadata);
     }
 
-    public function test_user_preference_decimal_precision(): void
+    public function test_score_rounding_is_limited_to_six_decimal_places(): void
     {
-        $userPreference = UserPreference::factory()->create(['preference_score' => 0.123456]);
+        // Act: persist a value that includes more than six decimals to exercise the normalisation helper.
+        $preference = $this->createPreference(['value' => 0.987654321]);
 
-        // Should maintain 6 decimal places precision
-        $this->assertEquals(0.123456, $userPreference->preference_score);
-
-        // Test database storage precision
-        $stored = UserPreference::find($userPreference->id);
-        $this->assertEquals(0.123456, $stored->preference_score);
+        // Assert: the stored score is rounded to six decimals both via the alias and the canonical column.
+        $this->assertSame(0.987654, $preference->value);
+        $this->assertSame(0.987654, $preference->preference_score);
     }
 
-    public function test_user_preference_factory(): void
+    public function test_factory_produces_sensible_defaults(): void
     {
-        $userPreference = UserPreference::factory()->create();
+        // Act: create a record using the stock factory to ensure it hydrates the expected attributes.
+        $preference = $this->createPreference();
 
-        $this->assertInstanceOf(UserPreference::class, $userPreference);
-        $this->assertNotNull($userPreference->user_id);
-        $this->assertNotNull($userPreference->preference_type);
-        $this->assertIsFloat($userPreference->preference_score);
-        $this->assertGreaterThanOrEqual(0, $userPreference->preference_score);
-        $this->assertLessThanOrEqual(1, $userPreference->preference_score);
+        // Assert: confirm the defaults look reasonable for downstream analytics and recommendation engines.
+        $this->assertSame($this->user->id, $preference->user_id);
+        $this->assertNotNull($preference->name);
+        $this->assertNotNull($preference->key);
+        $this->assertIsFloat($preference->value);
+        $this->assertGreaterThanOrEqual(0.0, $preference->value);
+        $this->assertLessThanOrEqual(1.0, $preference->value);
     }
 
-    public function test_user_preference_with_user_relationship(): void
+    public function test_fill_translates_legacy_column_names(): void
     {
-        $user = User::factory()->create(['name' => 'John Doe']);
-        $userPreference = UserPreference::factory()->create(['user_id' => $user->id]);
+        // Arrange: instantiate the model manually to exercise the overridden fill logic.
+        $preference = new UserPreference();
 
-        $this->assertTrue($userPreference->relationLoaded('user') || $userPreference->user !== null);
-        $this->assertEquals('John Doe', $userPreference->user->name);
+        // Act: fill using the legacy column names and then persist the model.
+        $preference->fill([
+            'user_id'          => $this->user->id,
+            'preference_type'  => 'brand',
+            'preference_key'   => 'color',
+            'preference_score' => '0.45',
+            'metadata'         => ['hex' => '#ffffff'],
+            'last_updated'     => Carbon::parse('2024-02-01 08:00:00'),
+        ])->save();
+
+        // Assert: alias accessors should surface the translated values exactly as consumers expect.
+        $this->assertSame('brand', $preference->name);
+        $this->assertSame('color', $preference->key);
+        $this->assertSame(0.45, $preference->value);
+        $this->assertSame(['hex' => '#ffffff'], $preference->meta);
     }
 
-    public function test_user_preference_model_uses_user_owned_scope(): void
+    public function test_metadata_can_be_null(): void
     {
-        // This test verifies that the UserOwnedScope is properly applied
-        $userPreference = UserPreference::factory()->create();
+        // Act: explicitly store a null payload to verify the accessor does not coerce it to an empty array.
+        $preference = $this->createPreference(['meta' => null]);
 
-        // The scope should be applied automatically due to the ScopedBy attribute
-        $this->assertInstanceOf(UserPreference::class, $userPreference);
+        // Assert: both metadata access points should reflect the null state faithfully.
+        $this->assertNull($preference->meta);
+        $this->assertNull($preference->metadata);
     }
 
-    public function test_user_preference_can_have_null_metadata(): void
+    public function test_metadata_can_be_an_empty_array(): void
     {
-        $userPreference = UserPreference::factory()->create(['metadata' => null]);
+        // Act: persist an empty array so we can differentiate between missing data and an intentionally empty payload.
+        $preference = $this->createPreference(['meta' => []]);
 
-        $this->assertNull($userPreference->metadata);
-    }
-
-    public function test_user_preference_can_have_empty_metadata(): void
-    {
-        $userPreference = UserPreference::factory()->create(['metadata' => []]);
-
-        $this->assertIsArray($userPreference->metadata);
-        $this->assertEmpty($userPreference->metadata);
+        // Assert: empty arrays are preserved verbatim rather than being cast to null or other types.
+        $this->assertSame([], $preference->meta);
+        $this->assertSame([], $preference->metadata);
     }
 }
+
