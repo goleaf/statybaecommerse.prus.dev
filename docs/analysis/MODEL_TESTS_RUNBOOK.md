@@ -27,6 +27,7 @@ The model-focused regression suite is a quick indicator that Eloquent scopes, ca
 - The observer registered in `App\Providers\AppServiceProvider` backfills these columns with a “system” account, and without the override SQLite raises foreign key errors because no such user exists inside the in-memory harness.
 - Applying the config override in the test `setUp()` keeps the observer idle while still exercising the same evaluation logic the production code relies on.
 - `Tests\\Unit\\SystemSettingDependencyConditionTest` now centralises helper methods (`createSystemSetting`, `createDependency`) that call `createQuietly()` and eagerly load relations, so reuse them when expanding the suite to avoid repeating observer workarounds.
+- Feature flag unit coverage follows a similar pattern: seed an attributed user (or clear the attribution config) before creating `FeatureFlag` factories so the observer can satisfy the `created_by` foreign key on SQLite.
 
 ## Dashboard Fixture Placeholders
 

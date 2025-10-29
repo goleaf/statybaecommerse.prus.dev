@@ -27,6 +27,10 @@ final class FeatureToggleServiceTest extends TestCase
 
         $user = User::factory()->create();
 
+        // Ensure the attribution observers resolve a valid system user during factory inserts.
+        Config::set('attribution.system_user_id', $user->getKey());
+        Config::set('attribution.system_user_email', $user->email);
+
         // Create a staging-only feature flag with full rollout and no additional conditions.
         FeatureFlag::factory()->create([
             'name'               => 'Zero Decimal Rollout',
@@ -113,6 +117,10 @@ final class FeatureToggleServiceTest extends TestCase
 
         $service = $this->app->make(FeatureToggleService::class);
         $user = User::factory()->create();
+
+        // Align attribution configuration with the freshly created user to satisfy foreign keys.
+        Config::set('attribution.system_user_id', $user->getKey());
+        Config::set('attribution.system_user_email', $user->email);
 
         // Prime the cache by evaluating the feature before any database flag exists.
         self::assertFalse($service->isEnabled('currency-zero-decimal-overrides', [
