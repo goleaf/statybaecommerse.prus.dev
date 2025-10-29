@@ -10,14 +10,11 @@ The model-focused regression suite is a quick indicator that Eloquent scopes, ca
    ```bash
    php artisan test tests/Models
    ```
-   The PHPUnit configuration also exposes the suite directly, so you can trigger it via:
-   ```bash
-   ./vendor/bin/phpunit --testsuite Models
-   ```
-   This mirrors the artisan command without re-running the broader unit suite.
+   The PHPUnit configuration now registers `tests/Models` as its own suite, so invoking the folder (or the `Models` suite) avoids duplicate file discovery warnings during broader runs.
 3. When debugging individual failures, target the specific file for faster feedback. For example:
    ```bash
    php artisan test tests/Models/ActivityLogTest.php
    ```
 4. After the suite succeeds, review `junit.xml`. The tooling will repoint the file to the latest run; restore it if the diff only reflects timing metadata so Git history stays readable.
 5. Capture any non-obvious insights or new invariants in the relevant markdown audits inside `docs/analysis/` so future tasks have the context baked in.
+6. When overriding query builders (for example, removing global scopes in a Filament resource to expose soft-deleted or hidden rows), document the intent with an `@return Builder<Model>` annotation so PHPStan retains its generic context and other engineers remember why moderation tools bypass the storefront defaults.
