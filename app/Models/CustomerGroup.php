@@ -551,10 +551,16 @@ final class CustomerGroup extends Model
         $this->attributes['is_active'] = $normalized;
 
         if ($normalized === false) {
-            // Ensure that disabling the group through the `is_active` toggle always
-            // cascades to the `is_enabled` column so persisted state stays in sync
-            // with the expectations encoded in the Filament resource feature tests.
-            $this->attributes['is_enabled'] = false;
+            // Respect explicit `is_enabled` intents supplied in the same payload while still
+            // syncing legacy single-flag writes. When no `is_enabled` value has been set we
+            // cascade the disable, otherwise we only mirror a falsey counterpart so callers can
+            // intentionally keep `is_enabled` true for scheduled downtime scenarios.
+            $hasExplicitEnabled = array_key_exists('is_enabled', $this->attributes);
+            $existingEnabled = $hasExplicitEnabled ? $this->attributes['is_enabled'] : null;
+
+            if (! $hasExplicitEnabled || $this->normalizeBoolean($existingEnabled) === false) {
+                $this->attributes['is_enabled'] = false;
+            }
 
             return;
         }
@@ -581,10 +587,15 @@ final class CustomerGroup extends Model
         $this->attributes['is_enabled'] = $normalized;
 
         if ($normalized === false) {
-            // Matching the behaviour in the active mutator, enforce that disabling
-            // the group through the `is_enabled` flag also clears the `is_active`
-            // column so downstream queries relying on either attribute stay aligned.
-            $this->attributes['is_active'] = false;
+            // Mirror the active mutator guard so explicit `is_active` overrides remain intact
+            // when both flags are provided. We only cascade the disable when no `is_active`
+            // value has been supplied or when it already evaluates to false.
+            $hasExplicitActive = array_key_exists('is_active', $this->attributes);
+            $existingActive = $hasExplicitActive ? $this->attributes['is_active'] : null;
+
+            if (! $hasExplicitActive || $this->normalizeBoolean($existingActive) === false) {
+                $this->attributes['is_active'] = false;
+            }
 
             return;
         }
