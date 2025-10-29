@@ -40,6 +40,7 @@ final class VariantPricingRule extends Model
     protected $table = 'variant_pricing_rules';
 
     protected $fillable = [
+        'product_id',
         'name',
         'type',
         'value',
@@ -77,6 +78,30 @@ final class VariantPricingRule extends Model
     protected $appends = [
         'is_currently_active',
     ];
+
+    /**
+     * Keep the denormalised product reference synchronised with the selected variant.
+     */
+    protected static function booted(): void
+    {
+        self::saving(function (self $rule): void {
+            // Ensure that all pricing rules point at a concrete product so the foreign key stays valid.
+            if ($rule->product_variant_id === null) {
+                return;
+            }
+
+            $variant = $rule->relationLoaded('productVariant')
+                ? $rule->productVariant
+                : ProductVariant::query()->find($rule->product_variant_id);
+
+            if ($variant === null) {
+                return;
+            }
+
+            // Always mirror the variant's product, even when the variant assignment changes during edits.
+            $rule->product_id = $variant->product_id;
+        });
+    }
 
     /**
      * Handle productVariant functionality with proper error handling.
@@ -117,12 +142,7 @@ final class VariantPricingRule extends Model
         if ($this->valid_from && $this->valid_from->gt($moment)) {
             return false;
         }
-
-        if ($this->valid_until && $this->valid_until->lt($moment)) {
-            return false;
-        }
-
-        return true;
+        return !($this->valid_until && $this->valid_until->lt($moment));
     }
 
     /**
@@ -133,11 +153,11 @@ final class VariantPricingRule extends Model
     public function scopeActive($query)
     {
         return $query->where('is_active', true)
-            ->where(function ($q) {
+            ->where(function ($q): void {
                 $q->whereNull('valid_from')
                     ->orWhere('valid_from', '<=', now());
             })
-            ->where(function ($q) {
+            ->where(function ($q): void {
                 $q->whereNull('valid_until')
                     ->orWhere('valid_until', '>=', now());
             });
@@ -201,8 +221,8 @@ final class VariantPricingRule extends Model
         return match ($this->type) {
             'percentage' => $this->calculatePercentageModifier($variant),
             'fixed'      => (float) $this->value,
-            'tier'       => $this->calculateTierModifier($variant, $quantity),
-            'bulk'       => $this->calculateBulkModifier($variant, $quantity),
+            'tier'       => $this->calculateTierModifier($quantity),
+            'bulk'       => $this->calculateBulkModifier($quantity),
             default      => 0.0,
         };
     }
@@ -219,7 +239,7 @@ final class VariantPricingRule extends Model
     /**
      * Calculate tier-based modifier.
      */
-    private function calculateTierModifier(ProductVariant $variant, int $quantity): float
+    private function calculateTierModifier(int $quantity): float
     {
         // Tier pricing can scale based on configured value while keeping hooks for richer logic later on.
         $base = (float) $this->value;
@@ -236,7 +256,7 @@ final class VariantPricingRule extends Model
     /**
      * Calculate bulk-based modifier.
      */
-    private function calculateBulkModifier(ProductVariant $variant, int $quantity): float
+    private function calculateBulkModifier(int $quantity): float
     {
         // Scale the configured value by the quantity so bulk purchases receive predictable incentives.
         return (float) $this->value * max(1, $quantity);

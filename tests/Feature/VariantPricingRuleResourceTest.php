@@ -275,7 +275,7 @@ final class VariantPricingRuleResourceTest extends TestCase
         $rule3 = VariantPricingRule::factory()->create(['priority' => 2]);
 
         Livewire::test(VariantPricingRuleResource\Pages\ListVariantPricingRules::class)
-            ->sortTable('priority')
+            ->sortTable('priority', 'desc')
             ->assertCanSeeTableRecordsInOrder([$rule2, $rule3, $rule1]);
     }
 
