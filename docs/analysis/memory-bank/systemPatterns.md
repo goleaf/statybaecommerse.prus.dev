@@ -258,3 +258,5 @@
 - **Process Documentation:** Business workflow documentation
 - **Technical Specifications:** Architecture and integration guides
 - **Troubleshooting Guides:** Common issue resolution
+- **Catalogue Ordering:** Root category navigation relies on `Category::scopeTopLevelVisible()` to filter visible parents and then delegates to the shared `orderedByName` scope for deterministic alphabetical fallbacks.【F:app/Models/Category.php†L254-L267】
+- **Campaign/Channel Listings:** Marketing and system channels normalise ordered views through case-insensitive wrappers around the shared ordering trait so dropdowns stay predictable across database engines.【F:app/Models/Campaign.php†L101-L115】【F:app/Models/Channel.php†L125-L138】
