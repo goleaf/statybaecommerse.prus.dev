@@ -6,12 +6,24 @@ namespace Tests\Unit;
 
 use App\Models\SystemSetting;
 use App\Models\SystemSettingDependency;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 final class SystemSettingDependencyConditionTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // Ensure attribution observers skip assigning phantom users so we avoid
+        // foreign key constraint failures when tests create settings in isolation.
+        Config::set('attribution.system_user_id', null);
+        Config::set('attribution.system_user_email', null);
+        Config::set('attribution.system_user_name', null);
+    }
 
     public function test_equals_condition_returns_true_when_values_match(): void
     {
