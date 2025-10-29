@@ -8,11 +8,11 @@ use App\Support\Discounts\DiscountPresetRepository;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use JsonException;
+use PHPUnit\Framework\Attributes\CoversClass;
 use Tests\TestCase;
 
-/**
- * @covers \App\Support\Discounts\DiscountPresetRepository
- */
+// Declare coverage via attribute so PHPUnit 12 migrations remain warning-free.
+#[CoversClass(DiscountPresetRepository::class)]
 final class DiscountPresetRepositoryTest extends TestCase
 {
     public function test_it_seeds_defaults_when_storage_missing(): void
