@@ -40,6 +40,7 @@
 ### Price List Scheduling Windows
 - Legacy schemas that lacked scheduling metadata now receive nullable `starts_at`/`ends_at` timestamps so pricing tests and runtime helpers can evaluate temporal availability without skipping coverage.【F:database/migrations/2025_11_07_000001_add_schedule_columns_to_price_lists_table.php†L1-L47】
 - Active price lists must declare a concrete `starts_at` value to be treated as live, mirroring the behaviour of the `isActive()` helper and avoiding indefinite records from leaking into "currently active" queries.【F:app/Models/PriceList.php†L104-L143】
+- Individual price records now rely on explicit query scopes (`enabled()` and `active()`) instead of implicit globals so analysts can inspect disabled or expired entries without bypassing framework constraints.【F:app/Models/Price.php†L95-L142】【F:config/model-scopes.php†L17-L86】
 
 ### Symbol Position – Before/After Amount
 - `Currency::formatAmount()` switches formatting based on the persisted `symbol_position`, supporting both prefix and suffix layouts depending on business requirements.【F:app/Models/Currency.php†L462-L475】

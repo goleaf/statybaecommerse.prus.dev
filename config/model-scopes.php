@@ -56,7 +56,6 @@ return [
         App\Models\DiscountCode::class,
         App\Models\DiscountCondition::class,
         App\Models\DiscountRedemption::class,
-        App\Models\Price::class,
         App\Models\PriceList::class,
         App\Models\PriceListItem::class,
         App\Models\DocumentTemplate::class,
@@ -114,7 +113,6 @@ return [
         App\Models\Currency::class,
         App\Models\CustomerGroup::class,
         App\Models\PartnerTier::class,
-        App\Models\Price::class,
         App\Models\PriceList::class,
         App\Models\Legal::class,
         App\Models\Location::class,
@@ -173,7 +171,9 @@ return [
 
     DateRangeScope::class => [
         App\Models\DiscountCode::class,
-        App\Models\Price::class,
+        // Price scopes manage enablement and temporal windows manually so they
+        // remain queryable for diagnostics; keep the automated date range
+        // global scope focused on list-level aggregates.
         App\Models\PriceList::class,
         App\Models\PriceListItem::class,
         App\Models\ReferralCampaign::class,
