@@ -20,6 +20,12 @@ The model-focused regression suite is a quick indicator that Eloquent scopes, ca
 6. When overriding query builders (for example, removing global scopes in a Filament resource to expose soft-deleted or hidden rows), document the intent with an `@return Builder<Model>` annotation so PHPStan retains its generic context and other engineers remember why moderation tools bypass the storefront defaults.
 7. Global scopes now re-validate their cached schema metadata after migrations complete, so if a model suddenly surfaces unexpected rows (for example, `CustomerGroup::enabled()` returning disabled fixtures) rerun the test after the migration phase to let the refreshed cache take effect rather than patching around stale `is_active`/`is_enabled` filters.
 
+## System setting attribution safety
+
+- Unit tests that spin up `SystemSetting` records should temporarily blank the attribution configuration keys (`attribution.system_user_id`, `attribution.system_user_email`, and `attribution.system_user_name`).
+- The observer registered in `App\Providers\AppServiceProvider` backfills these columns with a “system” account, and without the override SQLite raises foreign key errors because no such user exists inside the in-memory harness.
+- Applying the config override in the test `setUp()` keeps the observer idle while still exercising the same evaluation logic the production code relies on.
+
 ## Dashboard Fixture Placeholders
 
 - The CI dashboards and historical analytics still expect `Tests\Feature\ExampleTest` and
