@@ -46,7 +46,13 @@ final class EmailCampaign extends Model
      */
     public const SCOPE_COLUMN_HINTS = [
         'is_active' => true,
-        'status'    => true,
+        // Email campaigns cycle through lifecycle states (draft, scheduled, sent, etc.)
+        // that never include the literal "active" marker. Flagging the status column as
+        // available therefore causes the shared ActiveScope helper to filter by a value
+        // that does not exist, effectively hiding every campaign record. Opt out of that
+        // behaviour by leaving the status hint disabled so the global scope only checks
+        // the `is_active` flag and campaigns remain queryable.
+        'status'    => false,
     ];
 
     /**
