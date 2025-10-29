@@ -10,6 +10,7 @@ use App\Models\CartItem;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Models\User;
 use App\Models\UserWishlist;
 use App\Models\WishlistItem;
 use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
@@ -22,6 +23,7 @@ use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkAction as TableBulkAction;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
@@ -30,10 +32,12 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as FormGrid;
 use Filament\Schemas\Components\Section as FormSection;
+use Filament\Schemas\Components\Section as InfolistSection;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
@@ -451,18 +455,28 @@ final class WishlistItemResource extends Resource
                         true: fn (Builder $query) => $query->whereNotNull('variant_id'),
                         false: fn (Builder $query) => $query->whereNull('variant_id'),
                     ),
-                Filter::make('user_id')
-                    ->form([
-                        Select::make('user_id')
-                            ->label(__('admin.wishlist_items.filters.user'))
-                            ->options(\App\Models\User::pluck('name', 'id'))
-                            ->searchable()
-                            ->preload(),
-                    ])
+                SelectFilter::make('user_id')
+                    ->label(__('admin.wishlist_items.filters.user'))
+                    ->options(function (): array {
+                        // Keep the dropdown deterministic by ordering user names, ensuring predictable filter snapshots in docs and tests.
+                        return User::query()
+                            ->orderBy('name')
+                            ->pluck('name', 'id')
+                            ->all();
+                    })
+                    ->searchable()
+                    ->preload()
                     ->query(function (Builder $query, array $data): Builder {
-                        $userId = $data['user_id'] ?? null;
+                        $userId = $data['value'] ?? $data['user_id'] ?? null;
 
-                        return $query->when($userId, fn (Builder $q): Builder => $q->whereHas('wishlist', fn (Builder $w): Builder => $w->where('user_id', $userId)));
+                        // Scope the wishlist listing to the selected owner, tolerating either the raw value or keyed array that Filament may provide.
+                        return $query->when(
+                            $userId,
+                            static fn (Builder $wishlistItemsQuery, string|int $selectedUser): Builder => $wishlistItemsQuery->whereHas(
+                                'wishlist',
+                                static fn (Builder $wishlistQuery): Builder => $wishlistQuery->where('user_id', (int) $selectedUser),
+                            ),
+                        );
                     }),
                 Filter::make('category_id')
                     ->form([
@@ -541,13 +555,16 @@ final class WishlistItemResource extends Resource
                 ActionGroup::make([
                     ViewAction::make(),
                     EditAction::make(),
+                    DeleteAction::make()
+                        // Provide an inline delete control so operators can resolve stale records without leaving the index.
+                        ->requiresConfirmation(),
                     Action::make('move_to_cart')
                         ->label(__('admin.wishlist_items.actions.move_to_cart'))
                         ->icon('heroicon-o-shopping-cart')
                         ->color('success')
                         ->action(function (WishlistItem $record): void {
                             try {
-                                CartItem::create(self::buildCartItemPayload($record));
+                                self::persistCartItemFromWishlist($record);
 
                                 FilamentNotification::make()
                                     ->title(__('admin.wishlist_items.moved_to_cart_successfully'))
@@ -558,6 +575,8 @@ final class WishlistItemResource extends Resource
                                     ->title(__('admin.wishlist_items.move_to_cart_error'))
                                     ->danger()
                                     ->send();
+
+                                throw $e;
                             }
                         })
                         ->requiresConfirmation(),
@@ -586,7 +605,7 @@ final class WishlistItemResource extends Resource
                             try {
                                 $moved = 0;
                                 foreach ($records as $record) {
-                                    CartItem::create(self::buildCartItemPayload($record));
+                                    self::persistCartItemFromWishlist($record);
                                     $moved++;
                                 }
 
@@ -599,6 +618,8 @@ final class WishlistItemResource extends Resource
                                     ->title(__('admin.wishlist_items.bulk_move_to_cart_error'))
                                     ->danger()
                                     ->send();
+
+                                throw $e;
                             }
                         })
                         ->requiresConfirmation(),
@@ -624,6 +645,36 @@ final class WishlistItemResource extends Resource
             ->defaultSort('created_at', 'desc')
             ->striped()
             ->paginated([10, 25, 50, 100]);
+    }
+
+    /**
+     * Configure the infolist that powers the record view page.
+     */
+    public static function infolist(Schema $schema): Schema
+    {
+        return $schema
+            ->schema([
+                InfolistSection::make(__('admin.wishlist_items.sections.basic_info'))
+                    ->schema([
+                        TextEntry::make('product_name')
+                            ->label(__('admin.wishlist_items.fields.product'))
+                            // Surface the product name to satisfy the regression coverage asserting visibility on the view page.
+                            ->state(static fn (WishlistItem $record): string => $record->product?->name ?? '-')
+                            ->placeholder('-'),
+                        TextEntry::make('variant_name')
+                            ->label(__('admin.wishlist_items.fields.variant'))
+                            ->state(static fn (WishlistItem $record): string => $record->variant?->name ?? __('admin.wishlist_items.no_variant'))
+                            ->placeholder(__('admin.wishlist_items.no_variant')),
+                        TextEntry::make('formatted_current_price')
+                            ->label(__('admin.wishlist_items.fields.current_price')),
+                        TextEntry::make('quantity')
+                            ->label(__('admin.wishlist_items.fields.quantity')),
+                        TextEntry::make('notes')
+                            ->label(__('admin.wishlist_items.fields.notes'))
+                            ->columnSpanFull(),
+                    ])
+                    ->columns(2),
+            ]);
     }
 
     /**
@@ -689,6 +740,8 @@ final class WishlistItemResource extends Resource
         ], static fn ($value) => $value !== null);
 
         return [
+            // Generate a unique session key so carts created from the admin retain a deterministic linkage even outside a browser context.
+            'session_id'         => (string) Str::uuid(),
             'user_id'            => $record->wishlist->user_id,
             'product_id'         => $product->getKey(),
             'variant_id'         => $variant?->getKey(),
@@ -700,6 +753,14 @@ final class WishlistItemResource extends Resource
             'price'              => $unitPrice,
             'product_snapshot'   => $productSnapshot,
         ];
+    }
+
+    /**
+     * Persist the cart item using a scope-free builder so admin flows bypass ownership constraints.
+     */
+    private static function persistCartItemFromWishlist(WishlistItem $record): CartItem
+    {
+        return CartItem::withoutGlobalScopes()->create(self::buildCartItemPayload($record));
     }
 
     /**
