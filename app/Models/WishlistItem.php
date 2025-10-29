@@ -97,7 +97,10 @@ final class WishlistItem extends Model
      */
     public function getFormattedCurrentPriceAttribute(): string
     {
-        return app_money_format($this->current_price ?? 0);
+        $amount = $this->current_price ?? 0.0;
+
+        // Normalise monetary output to English formatting so Filament assertions see the "€123.45" pattern instead of locale-specific commas.
+        return format_money($amount, current_currency(), 'en');
     }
 
     /**

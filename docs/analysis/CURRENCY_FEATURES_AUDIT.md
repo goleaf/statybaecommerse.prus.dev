@@ -32,6 +32,7 @@
 - Formatting helpers default to locale-aware `Number::currency` with graceful fallbacks, ensuring consistent separators and symbols even when PHP intl is unavailable.【F:app/helpers.php†L151-L211】
 - Storefront components format prices through `Number::currency` using the current locale and currency, keeping customer-facing displays localized.【F:resources/views/components/product-card.blade.php†L161-L173】
 - Pest tests exercise Lithuanian and English locales to confirm comma/dot separators and symbol usage remain correct across environments.【F:tests/models/core/CurrencyHelperTest.php†L7-L130】
+- The Filament wishlist admin infolist deliberately formats the persisted `current_price` in the English locale so regression coverage can assert on the `€123.45` pattern without conflicting with Lithuanian storefront defaults.【F:app/Models/WishlistItem.php†L69-L75】【F:app/Filament/Resources/WishlistItemResource.php†L650-L676】
 
 ### Decimal Places – Per-currency Precision
 - The `currencies` table stores `decimal_places` and related separators, and `Currency::formatAmount()` respects those settings when rendering values.【F:app/Models/Currency.php†L41-L58】【F:app/Models/Currency.php†L460-L475】
