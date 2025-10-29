@@ -22,7 +22,8 @@
 - The project tree lacks `app/Models/Region.php`, confirmed by an `ls` failure, so factories, seeders, and tests referencing the model cannot execute; regional associations therefore remain effectively disabled despite migrations recreating tables.【9398a1†L1-L3】
 
 ### Cities
-- The `City` model handles slug/code generation, nested hierarchies, and relations to orders, customers, and locations, with scopes to surface active, ordered records for dropdowns and analytics.【F:app/Models/City.php†L35-L198】
+- The `City` model handles slug/code generation, nested hierarchies, and relations to orders, customers, and locations, with scopes to surface active, ordered records for dropdowns and analytics.【F:app/Models/City.php†L35-L205】
+- City ordering now leverages the shared `OrdersByName` concern, keeping alphabetical sorting behaviour consistent with other catalogue models that expose customer-facing dropdowns.【F:app/Models/City.php†L34-L45】【F:app/Models/Concerns/OrdersByName.php†L7-L41】
 - `AllCountriesComprehensiveCitiesSeeder` iterates through existing countries but only defines explicit city lists for 11 nations, meaning most seeded countries will still lack city rows after execution.【F:database/seeders/AllCountriesComprehensiveCitiesSeeder.php†L14-L147】
 
 ### Zones
