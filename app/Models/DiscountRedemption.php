@@ -127,24 +127,33 @@ final class DiscountRedemption extends Model
     /**
      * Scope helper narrowing results to a specific discount identifier.
      */
-    public function scopeForDiscount(Builder $query, int|string $discountId): Builder
+    public function scopeForDiscount(Builder $query, Discount|int|string $discount): Builder
     {
+        // Handle both raw identifiers and model instances so scope consumers remain flexible.
+        $discountId = $discount instanceof Discount ? $discount->getKey() : $discount;
+
         return $query->where('discount_id', $discountId);
     }
 
     /**
      * Scope helper returning redemptions owned by the provided user identifier.
      */
-    public function scopeForUser(Builder $query, int|string $userId): Builder
+    public function scopeForUser(Builder $query, User|int|string $user): Builder
     {
+        // Normalise the user reference while staying tolerant of polymorphic call sites (tests, services, relations).
+        $userId = $user instanceof User ? $user->getKey() : $user;
+
         return $query->where('user_id', $userId);
     }
 
     /**
      * Scope helper limiting results to a specific order identifier.
      */
-    public function scopeForOrder(Builder $query, int|string $orderId): Builder
+    public function scopeForOrder(Builder $query, Order|int|string $order): Builder
     {
+        // Convert order models to their primary key before building the query clause.
+        $orderId = $order instanceof Order ? $order->getKey() : $order;
+
         return $query->where('order_id', $orderId);
     }
 
@@ -156,8 +165,14 @@ final class DiscountRedemption extends Model
         CarbonInterface|string $startDate,
         CarbonInterface|string $endDate,
     ): Builder {
+        // Parse incoming values so consumers can pass strings or Carbon instances interchangeably.
         $start = $startDate instanceof CarbonInterface ? $startDate : Carbon::parse($startDate);
         $end = $endDate instanceof CarbonInterface ? $endDate : Carbon::parse($endDate);
+
+        // Swap bounds when provided out of order to keep the results deterministic.
+        if ($start->greaterThan($end)) {
+            [$start, $end] = [$end, $start];
+        }
 
         return $query->whereBetween('redeemed_at', [$start, $end]);
     }

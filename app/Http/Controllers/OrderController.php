@@ -32,11 +32,20 @@ abstract class OrderController extends Controller
      * @var array<int, string>
      */
     protected const VIEWABLE_STATUS_VALUES = [
+        // Pending orders remain visible so customers can double-check newly
+        // placed purchases before fulfilment begins.
         OrderStatus::PENDING->value,
-        OrderStatus::CONFIRMED->value,
+        // The platform retired the dedicated "confirmed" enum in favour of the
+        // canonical processing state, so we keep processing in the list to
+        // cover the previous lifecycle step without referencing the removed
+        // constant.
         OrderStatus::PROCESSING->value,
+        // Shipments and delivered orders should stay accessible for tracking
+        // links and proof-of-delivery receipts.
         OrderStatus::SHIPPED->value,
         OrderStatus::DELIVERED->value,
+        // Completed captures legacy data rows that predate the delivered
+        // status rename and should still be customer-visible.
         OrderStatus::COMPLETED->value,
     ];
 
@@ -81,11 +90,16 @@ abstract class OrderController extends Controller
      */
     protected function ensureOrderIsViewable(Order $order): void
     {
-        // The status attribute may be an enum instance or raw string depending
-        // on eager loading, so normalise it before the visibility check.
-        $statusValue = $order->status instanceof BackedEnum
-            ? $order->status->value
-            : (string) $order->status;
+        // The status attribute may be materialised as an enum instance (when
+        // coming directly from casts) or downgraded to a scalar string (after
+        // serialization or attribute array access). Use `getAttribute()` to
+        // inspect the raw value so the downstream visibility check can operate
+        // on a consistent scalar representation without upsetting static
+        // analysers.
+        /** @var BackedEnum|string|null $statusAttribute */
+        $statusAttribute = $order->getAttribute('status');
+
+        $statusValue = $statusAttribute instanceof BackedEnum ? $statusAttribute->value : (string) $statusAttribute;
 
         if (! in_array($statusValue, static::VIEWABLE_STATUS_VALUES, true)) {
             abort(404, 'Order is not available.');

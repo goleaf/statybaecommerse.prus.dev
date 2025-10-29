@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Models\Scopes\ActiveScope;
 use Database\Factories\DocumentTemplateFactory;
-use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -28,11 +26,13 @@ use Stringable;
  *
  * @mixin \Eloquent
  */
-#[ScopedBy([ActiveScope::class])]
 final class DocumentTemplate extends Model
 {
     /** @use HasFactory<DocumentTemplateFactory> */
     use HasFactory;
+
+    // Expose both active and inactive templates so admin filters and tests
+    // can evaluate visibility explicitly rather than via a global scope.
 
     protected $fillable = ['name', 'slug', 'description', 'content', 'variables', 'type', 'category', 'settings', 'is_active'];
 
@@ -123,7 +123,7 @@ final class DocumentTemplate extends Model
                 continue;
             }
 
-            $placeholder = '{{' . (string) $key . '}}';
+            $placeholder = '{{' . $key . '}}';
             $content = str_replace($placeholder, (string) $value, $content);
         }
 
@@ -231,9 +231,12 @@ final class DocumentTemplate extends Model
      * @param  Builder<DocumentTemplate> $query
      * @return Builder<DocumentTemplate>
      */
-    public function scopeOrderedByName(Builder $query): Builder
+    public function scopeOrderedByName(Builder $query, string $direction = 'asc'): Builder
     {
-        // Order by the user-facing "name" column so dropdowns remain predictable.
-        return $query->orderBy('name');
+        // Normalise the requested direction so consumers cannot inject arbitrary SQL fragments.
+        $direction = strtolower(trim($direction)) === 'desc' ? 'desc' : 'asc';
+
+        // Explicitly qualify the column to avoid ambiguous references when joins are present.
+        return $query->orderBy($query->qualifyColumn('name'), $direction);
     }
 }

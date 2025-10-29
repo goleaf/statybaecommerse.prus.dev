@@ -384,7 +384,9 @@ final class CampaignConversionResourceTest extends TestCase
     public function test_campaign_conversion_can_calculate_roi(): void
     {
         $roi = $this->campaignConversion->calculateRoi(50.0);
-        $this->assertEquals(1.0, $roi);  // (100.50 - 50) / 50 = 1.0
+
+        // The ROI calculation returns a decimal ratio rounded to two decimal places, so 50.50 / 50 = 1.01.
+        $this->assertEquals(1.01, $roi);
     }
 
     public function test_campaign_conversion_can_calculate_roas(): void

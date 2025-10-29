@@ -32,6 +32,10 @@ seed:
 	@echo "System settings seeded."
 
 test:
+	@# Ensure Composer dependencies are installed before the test suite runs so Laravel can bootstrap correctly.
+	@if [ ! -d vendor ]; then \
+		composer install; \
+	fi
 	php artisan test --parallel --recreate-databases --stop-on-failure
 
 analyse:

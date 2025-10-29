@@ -243,7 +243,10 @@ final class CountryResource extends Resource
 
     public static function infolist(Schema $schema): Schema
     {
-        return $infolist
+        // The infolist must operate on the provided $schema instance to render
+        // details on the view page; returning an undefined variable caused the
+        // Filament view to crash during runtime, so we now build on $schema.
+        return $schema
             ->schema([
                 InfolistSection::make(__('countries.sections.basic_info'))
                     ->schema([

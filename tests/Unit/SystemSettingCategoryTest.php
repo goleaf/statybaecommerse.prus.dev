@@ -280,6 +280,21 @@ class SystemSettingCategoryTest extends TestCase
         $this->assertEquals(2, $child->getDepth());
     }
 
+    public function test_meta_payload_persists_as_json(): void
+    {
+        // Persisting a meta payload should hydrate and cast structured values without manual decoding.
+        $category = SystemSettingCategory::factory()->create([
+            'meta' => ['panel' => 'system', 'badge' => ['color' => 'emerald']],
+        ]);
+
+        $this->assertIsArray($category->meta);
+        $this->assertSame('system', $category->meta['panel']);
+
+        $fresh = SystemSettingCategory::findOrFail($category->getKey());
+        $this->assertIsArray($fresh->meta);
+        $this->assertSame(['color' => 'emerald'], $fresh->meta['badge']);
+    }
+
     public function test_soft_deletes(): void
     {
         $category = SystemSettingCategory::factory()->create();

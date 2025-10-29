@@ -47,11 +47,13 @@ final class ContactMessage extends Model
     ];
 
     /**
-     * Point the shared OrdersByName scope at the subject column for predictable sorting.
+     * Keep alphabetical ordering aligned with the human name instead of the subject
+     * so admin lookups and storefront exports remain intuitive and the shared trait
+     * fulfils the expectations asserted in the model tests.
      */
     protected function getNameColumn(): string
     {
-        return 'subject';
+        return 'name';
     }
 
     /**
