@@ -1,18 +1,16 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Models;
 
 use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 
@@ -35,7 +33,6 @@ final class Coupon extends Model
 {
     /** @use HasFactory<\Database\Factories\CouponFactory> */
     use HasFactory;
-
     use OrdersByName;
     use SoftDeletes;
 
@@ -57,7 +54,7 @@ final class Coupon extends Model
     {
         self::creating(static function (self $coupon): void {
             // Only attempt to backfill the code when one is not already provided.
-            if (! $coupon->code) {
+            if (!$coupon->code) {
                 $coupon->code = self::generateUniqueCode();
             }
         });
@@ -211,7 +208,7 @@ final class Coupon extends Model
      */
     public function isValid(): bool
     {
-        if (! $this->is_active) {
+        if (!$this->is_active) {
             return false;
         }
         if ($this->starts_at && $this->starts_at > now()) {
@@ -248,10 +245,10 @@ final class Coupon extends Model
      */
     public function canBeUsed(float $orderTotal): bool
     {
-        if (! $this->isValid()) {
+        if (!$this->isValid()) {
             return false;
         }
-        if ($this->minimum_amount && $orderTotal < $this->minimum_amount) {
+        if ($this->minimum_amount !== null && $orderTotal < (float) $this->minimum_amount) {
             return false;
         }
 
@@ -263,7 +260,7 @@ final class Coupon extends Model
      */
     public function calculateDiscount(float $orderTotal): float
     {
-        if (! $this->canBeUsed($orderTotal)) {
+        if (!$this->canBeUsed($orderTotal)) {
             return 0;
         }
         // Determine the raw discount value based on the configured coupon type.

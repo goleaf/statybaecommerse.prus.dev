@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 use App\Exceptions\Domain\DomainException;
 use App\Http\Controllers\Api\CategoryController;
@@ -13,9 +11,9 @@ use App\Support\RequestContext;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Validation\Validator as ValidatorContract;
-use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Foundation\Application;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -30,7 +28,7 @@ use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 require_once __DIR__ . '/filament_compat.php';
 
 $providers[] = App\Providers\LocaleServiceProvider::class;
-if (! env('SKIP_FILAMENT_BOOT')) {
+if (!env('SKIP_FILAMENT_BOOT')) {
     $providers[] = App\Providers\Filament\AdminPanelProvider::class;
 }
 $providers[] = SecurityServiceProvider::class;
@@ -66,19 +64,19 @@ $app = Application::configure(basePath: dirname(__DIR__))
         $middleware->throttleApi('api.default');
         // Register Spatie permission middlewares (Laravel 11+/12 style)
         $middleware->alias([
-            'role'                   => Spatie\Permission\Middleware\RoleMiddleware::class,
-            'permission'             => Spatie\Permission\Middleware\PermissionMiddleware::class,
-            'permissions'            => Spatie\Permission\Middleware\PermissionMiddleware::class,
-            'role_or_permission'     => Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
-            'localize'               => App\Http\Middleware\SetLocale::class,
-            'partner.api'            => App\Http\Middleware\PartnerApiAuthenticate::class,
-            'partner.api.auth'       => App\Http\Middleware\EnsurePartnerApiKey::class,
-            'partner.api.scope'      => App\Http\Middleware\EnsurePartnerApiScope::class,
+            'role' => Spatie\Permission\Middleware\RoleMiddleware::class,
+            'permission' => Spatie\Permission\Middleware\PermissionMiddleware::class,
+            'permissions' => Spatie\Permission\Middleware\PermissionMiddleware::class,
+            'role_or_permission' => Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
+            'localize' => App\Http\Middleware\SetLocale::class,
+            'partner.api' => App\Http\Middleware\PartnerApiAuthenticate::class,
+            'partner.api.auth' => App\Http\Middleware\EnsurePartnerApiKey::class,
+            'partner.api.scope' => App\Http\Middleware\EnsurePartnerApiScope::class,
             'partner.api.rate_limit' => App\Http\Middleware\EnsurePartnerApiRateLimit::class,
             // Surface Sanctum's middleware aliases for SPA and token authentication.
             'sanctum.stateful' => Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
-            'abilities'        => Laravel\Sanctum\Http\Middleware\CheckForAnyAbility::class,
-            'ability'          => Laravel\Sanctum\Http\Middleware\CheckForAllAbilities::class,
+            'abilities' => Laravel\Sanctum\Http\Middleware\CheckForAnyAbility::class,
+            'ability' => Laravel\Sanctum\Http\Middleware\CheckForAllAbilities::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
@@ -90,12 +88,12 @@ $app = Application::configure(basePath: dirname(__DIR__))
             return $request->expectsJson() || $request->wantsJson();
         };
 
-        $resolveLocale = static fn (Request $request): string => RequestContext::resolveLocale($request);
-        $resolveTraceId = static fn (Request $request): string => RequestContext::resolveTraceId($request);
-        $resolveCorrelationHeader = static fn (): string => RequestContext::correlationHeader();
+        $resolveLocale = static fn(Request $request): string => RequestContext::resolveLocale($request);
+        $resolveTraceId = static fn(Request $request): string => RequestContext::resolveTraceId($request);
+        $resolveCorrelationHeader = static fn(): string => RequestContext::correlationHeader();
 
         $exceptions->render(function (DomainException $exception, Request $request) {
-            if (! RequestContext::isApiRequest($request) && ! $request->expectsJson() && ! $request->wantsJson()) {
+            if (!RequestContext::isApiRequest($request) && !$request->expectsJson() && !$request->wantsJson()) {
                 return null;
             }
 
@@ -104,12 +102,12 @@ $app = Application::configure(basePath: dirname(__DIR__))
             $errorCode = $exception->errorCode()->value;
 
             Log::warning('Domain exception rendered.', [
-                'exception'       => $exception::class,
-                'status'          => $exception->status(),
+                'exception' => $exception::class,
+                'status' => $exception->status(),
                 'translation_key' => $exception->translationKey(),
-                'context'         => $exception->context(),
-                'locale'          => $locale,
-                'trace_id'        => RequestContext::resolveTraceId($request),
+                'context' => $exception->context(),
+                'locale' => $locale,
+                'trace_id' => RequestContext::resolveTraceId($request),
             ]);
 
             return ApiErrorResponse::problem(
@@ -124,7 +122,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
         });
 
         $exceptions->render(function (ValidationException $exception, Request $request) {
-            if (! RequestContext::isApiRequest($request)) {
+            if (!RequestContext::isApiRequest($request)) {
                 return null;
             }
 
@@ -132,10 +130,10 @@ $app = Application::configure(basePath: dirname(__DIR__))
             $traceId = RequestContext::resolveTraceId($request);
 
             Log::withContext([
-                'trace_id'       => $traceId,
+                'trace_id' => $traceId,
                 'correlation_id' => $traceId,
-                'locale'         => $locale,
-                'request_path'   => $request->path(),
+                'locale' => $locale,
+                'request_path' => $request->path(),
                 'request_method' => $request->method(),
             ]);
 
@@ -242,9 +240,9 @@ $app = Application::configure(basePath: dirname(__DIR__))
                     $fallbackReason = $fallbackMessages[$field][0] ?? ($localizedMessages[0] ?? 'Invalid value.');
 
                     return [
-                        'field'    => $field,
+                        'field' => $field,
                         'messages' => $localizedMessages,
-                        'reason'   => $fallbackReason,
+                        'reason' => $fallbackReason,
                     ];
                 })
                 ->values()
@@ -269,7 +267,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
         });
 
         $exceptions->render(function (AuthenticationException $exception, Request $request) {
-            if (! RequestContext::isApiRequest($request)) {
+            if (!RequestContext::isApiRequest($request)) {
                 if ($request->expectsJson()) {
                     // Preserve JSON semantics for Sanctum guarded routes that hit the admin panel without a browser session.
                     return response()->json(['message' => $exception->getMessage()], 401);
@@ -288,10 +286,10 @@ $app = Application::configure(basePath: dirname(__DIR__))
             $traceId = RequestContext::resolveTraceId($request);
 
             Log::withContext([
-                'trace_id'       => $traceId,
+                'trace_id' => $traceId,
                 'correlation_id' => $traceId,
-                'locale'         => $locale,
-                'request_path'   => $request->path(),
+                'locale' => $locale,
+                'request_path' => $request->path(),
                 'request_method' => $request->method(),
             ]);
 
@@ -323,7 +321,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
         });
 
         $exceptions->render(function (AuthorizationException $exception, Request $request) {
-            if (! RequestContext::isApiRequest($request)) {
+            if (!RequestContext::isApiRequest($request)) {
                 return null;
             }
 
@@ -331,10 +329,10 @@ $app = Application::configure(basePath: dirname(__DIR__))
             $traceId = RequestContext::resolveTraceId($request);
 
             Log::withContext([
-                'trace_id'       => $traceId,
+                'trace_id' => $traceId,
                 'correlation_id' => $traceId,
-                'locale'         => $locale,
-                'request_path'   => $request->path(),
+                'locale' => $locale,
+                'request_path' => $request->path(),
                 'request_method' => $request->method(),
             ]);
 
@@ -366,7 +364,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
         });
 
         $exceptions->render(function (Throwable $throwable, Request $request) use ($shouldRenderJson, $resolveLocale, $resolveTraceId, $resolveCorrelationHeader) {
-            if ($throwable instanceof DomainException || ! $shouldRenderJson($request)) {
+            if ($throwable instanceof DomainException || !$shouldRenderJson($request)) {
                 return null;
             }
 
@@ -375,21 +373,21 @@ $app = Application::configure(basePath: dirname(__DIR__))
             $correlationHeader = $resolveCorrelationHeader();
 
             $errorCode = match (true) {
-                $throwable instanceof ValidationException     => ErrorCode::ValidationFailed,
+                $throwable instanceof ValidationException => ErrorCode::ValidationFailed,
                 $throwable instanceof AuthenticationException => ErrorCode::Unauthorized,
-                $throwable instanceof AuthorizationException  => ErrorCode::Forbidden,
+                $throwable instanceof AuthorizationException => ErrorCode::Forbidden,
                 $throwable instanceof ModelNotFoundException, $throwable instanceof NotFoundHttpException => ErrorCode::NotFound,
                 $throwable instanceof HttpExceptionInterface && $throwable->getStatusCode() === 404 => ErrorCode::NotFound,
                 $throwable instanceof HttpExceptionInterface && $throwable->getStatusCode() === 401 => ErrorCode::Unauthorized,
                 $throwable instanceof HttpExceptionInterface && $throwable->getStatusCode() === 403 => ErrorCode::Forbidden,
                 $throwable instanceof HttpExceptionInterface && $throwable->getStatusCode() === 422 => ErrorCode::ValidationFailed,
-                default                                                                             => ErrorCode::ServerError,
+                default => ErrorCode::ServerError,
             };
 
             $status = match (true) {
-                $throwable instanceof ValidationException    => $throwable->status,
+                $throwable instanceof ValidationException => $throwable->status,
                 $throwable instanceof HttpExceptionInterface => $throwable->getStatusCode(),
-                default                                      => $errorCode->defaultStatus(),
+                default => $errorCode->defaultStatus(),
             };
 
             $details = [
@@ -407,10 +405,10 @@ $app = Application::configure(basePath: dirname(__DIR__))
             $message = TranslationService::get($errorCode->translationKey(), [], $locale);
 
             $context = [
-                'trace_id'       => $traceId,
+                'trace_id' => $traceId,
                 'correlation_id' => $traceId,
-                'locale'         => $locale,
-                'request_path'   => $request->path(),
+                'locale' => $locale,
+                'request_path' => $request->path(),
                 'request_method' => $request->method(),
             ];
 
@@ -451,10 +449,10 @@ $app = Application::configure(basePath: dirname(__DIR__))
                     // Normalise common HTTP status codes to shared API error codes so
                     // integrators can implement consistent handling logic.
                     $code = match ($status) {
-                        401     => ErrorCodes::UNAUTHORIZED,
-                        403     => ErrorCodes::FORBIDDEN,
-                        404     => ErrorCodes::NOT_FOUND,
-                        429     => ErrorCodes::RATE_LIMITED,
+                        401 => ErrorCodes::UNAUTHORIZED,
+                        403 => ErrorCodes::FORBIDDEN,
+                        404 => ErrorCodes::NOT_FOUND,
+                        429 => ErrorCodes::RATE_LIMITED,
                         default => ErrorCodes::SERVER_ERROR,
                     };
 
@@ -462,7 +460,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
                     $sanitizedHeaders = [];
 
                     foreach ($rawHeaders as $headerName => $headerValue) {
-                        if (! is_string($headerName)) {
+                        if (!is_string($headerName)) {
                             continue;
                         }
 
@@ -476,7 +474,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
                         $normalizedValues = [];
 
                         foreach ($values as $value) {
-                            if (! is_scalar($value) && ! (is_object($value) && method_exists($value, '__toString'))) {
+                            if (!is_scalar($value) && !(is_object($value) && method_exists($value, '__toString'))) {
                                 continue;
                             }
 
@@ -501,8 +499,8 @@ $app = Application::configure(basePath: dirname(__DIR__))
 
                     Log::notice('HTTP exception rendered.', [
                         'exception' => $throwable::class,
-                        'status'    => $status,
-                        'headers'   => $sanitizedHeaders,
+                        'status' => $status,
+                        'headers' => $sanitizedHeaders,
                     ]);
 
                     $detail = $throwable->getMessage() !== ''
@@ -542,7 +540,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
 
                 Log::error('Unhandled exception rendered.', [
                     'exception' => $throwable::class,
-                    'message'   => $throwable->getMessage(),
+                    'message' => $throwable->getMessage(),
                 ]);
 
                 $message = ErrorCodes::message(ErrorCodes::SERVER_ERROR, $locale)
@@ -560,12 +558,12 @@ $app = Application::configure(basePath: dirname(__DIR__))
 
             Log::error('Unhandled exception rendered.', [
                 'exception' => $throwable::class,
-                'message'   => $throwable->getMessage(),
+                'message' => $throwable->getMessage(),
             ]);
 
             return response()
                 ->view('errors.unexpected', [
-                    'traceId'       => $traceId,
+                    'traceId' => $traceId,
                     'correlationId' => $traceId,
                 ], 500)
                 ->header($correlationHeader, $traceId)
@@ -589,7 +587,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
     })())
     ->create();
 
-if (! $app->bound('request')) {
+if (!$app->bound('request')) {
     $app->instance('request', Request::createFromGlobals());
 }
 
