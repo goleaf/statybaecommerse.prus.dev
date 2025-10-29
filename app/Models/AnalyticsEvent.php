@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use JsonSerializable;
 use Throwable;
 use Traversable;
 
@@ -135,7 +136,7 @@ final class AnalyticsEvent extends Model
      */
     public function scopeByEventType(Builder $query, string $eventType): Builder
     {
-        return self::withoutOwnershipScope($query)->where('event_type', $eventType);
+        return $this->withoutOwnershipScope($query)->where('event_type', $eventType);
     }
 
     /**
@@ -158,7 +159,7 @@ final class AnalyticsEvent extends Model
      */
     public function scopeBySession(Builder $query, string $sessionId): Builder
     {
-        return self::withoutOwnershipScope($query)->where('session_id', $sessionId);
+        return $this->withoutOwnershipScope($query)->where('session_id', $sessionId);
     }
 
     /**
@@ -166,7 +167,7 @@ final class AnalyticsEvent extends Model
      */
     public function scopeWithValue(Builder $query): Builder
     {
-        return self::withoutOwnershipScope($query)->whereNotNull('value');
+        return $this->withoutOwnershipScope($query)->whereNotNull('value');
     }
 
     /**
@@ -174,7 +175,7 @@ final class AnalyticsEvent extends Model
      */
     public function scopeRegisteredUsers(Builder $query): Builder
     {
-        return self::withoutOwnershipScope($query)->whereNotNull('user_id');
+        return $this->withoutOwnershipScope($query)->whereNotNull('user_id');
     }
 
     /**
@@ -182,7 +183,7 @@ final class AnalyticsEvent extends Model
      */
     public function scopeAnonymousUsers(Builder $query): Builder
     {
-        return self::withoutOwnershipScope($query)->whereNull('user_id');
+        return $this->withoutOwnershipScope($query)->whereNull('user_id');
     }
 
     /**
@@ -190,7 +191,7 @@ final class AnalyticsEvent extends Model
      */
     public function scopeByDeviceType(Builder $query, string $deviceType): Builder
     {
-        return self::withoutOwnershipScope($query)->where('device_type', $deviceType);
+        return $this->withoutOwnershipScope($query)->where('device_type', $deviceType);
     }
 
     /**
@@ -198,7 +199,7 @@ final class AnalyticsEvent extends Model
      */
     public function scopeByBrowser(Builder $query, string $browser): Builder
     {
-        return self::withoutOwnershipScope($query)->where('browser', $browser);
+        return $this->withoutOwnershipScope($query)->where('browser', $browser);
     }
 
     /**
@@ -209,7 +210,7 @@ final class AnalyticsEvent extends Model
         $normalizedNameExpression = "NULLIF(TRIM(event_name), '')";
         $collatedNameExpression = "COALESCE($normalizedNameExpression, '')";
 
-        return self::withoutOwnershipScope($query)
+        return $this->withoutOwnershipScope($query)
             ->orderByRaw("CASE WHEN $normalizedNameExpression IS NULL THEN 1 ELSE 0 END")
             ->orderByRaw("LOWER($collatedNameExpression)")
             ->orderByRaw("$collatedNameExpression");
@@ -220,7 +221,7 @@ final class AnalyticsEvent extends Model
      */
     public function scopeByDateRange(Builder $query, string $startDate, string $endDate): Builder
     {
-        return self::withoutOwnershipScope($query)->whereBetween('created_at', [$startDate, $endDate]);
+        return $this->withoutOwnershipScope($query)->whereBetween('created_at', [$startDate, $endDate]);
     }
 
     /**
@@ -228,7 +229,7 @@ final class AnalyticsEvent extends Model
      */
     public function scopeToday(Builder $query): Builder
     {
-        return self::withoutOwnershipScope($query)->whereDate('created_at', today());
+        return $this->withoutOwnershipScope($query)->whereDate('created_at', today());
     }
 
     /**
@@ -236,7 +237,7 @@ final class AnalyticsEvent extends Model
      */
     public function scopeThisWeek(Builder $query): Builder
     {
-        return self::withoutOwnershipScope($query)->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]);
+        return $this->withoutOwnershipScope($query)->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]);
     }
 
     /**
@@ -244,7 +245,7 @@ final class AnalyticsEvent extends Model
      */
     public function scopeThisMonth(Builder $query): Builder
     {
-        return self::withoutOwnershipScope($query)->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()]);
+        return $this->withoutOwnershipScope($query)->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()]);
     }
 
     /**
@@ -252,7 +253,7 @@ final class AnalyticsEvent extends Model
      */
     public function scopeOfType(Builder $query, string $eventType): Builder
     {
-        return self::withoutOwnershipScope($query)->where('event_type', $eventType);
+        return $this->withoutOwnershipScope($query)->where('event_type', $eventType);
     }
 
     /**
@@ -260,7 +261,7 @@ final class AnalyticsEvent extends Model
      */
     public function scopeForSession(Builder $query, string $sessionId): Builder
     {
-        return self::withoutOwnershipScope($query)->where('session_id', $sessionId);
+        return $this->withoutOwnershipScope($query)->where('session_id', $sessionId);
     }
 
     /**
@@ -268,7 +269,7 @@ final class AnalyticsEvent extends Model
      */
     public function scopeForUser(Builder $query, int $userId): Builder
     {
-        return self::withoutOwnershipScope($query)->where('user_id', $userId);
+        return $this->withoutOwnershipScope($query)->where('user_id', $userId);
     }
 
     /**
@@ -276,11 +277,14 @@ final class AnalyticsEvent extends Model
      */
     public function scopeInDateRange(Builder $query, string $startDate, string $endDate): Builder
     {
-        return self::withoutOwnershipScope($query)->whereBetween('created_at', [$startDate, $endDate]);
+        return $this->withoutOwnershipScope($query)->whereBetween('created_at', [$startDate, $endDate]);
     }
 
     // Accessors & Mutators
 
+    /**
+     * Canonical list of supported analytics event identifiers kept in sync with Filament resources.
+     */
     public const EVENT_TYPES = [
         'page_view',
         'click',
@@ -363,7 +367,7 @@ final class AnalyticsEvent extends Model
         return is_null($this->user_id);
     }
 
-    private static function withoutOwnershipScope(Builder $query): Builder
+    private function withoutOwnershipScope(Builder $query): Builder
     {
         return $query->withoutGlobalScopes([UserOwnedScope::class]);
     }
@@ -380,6 +384,7 @@ final class AnalyticsEvent extends Model
      */
     public static function eventTypeOptions(): array
     {
+        // Translate each identifier once so UI dropdowns and filters stay consistent with locale files.
         return collect(self::EVENT_TYPES)
             ->mapWithKeys(fn (string $type): array => [
                 $type => __('analytics_events.types.' . $type),
@@ -651,7 +656,7 @@ final class AnalyticsEvent extends Model
             $value = $value->toArray();
         } elseif ($value instanceof Traversable) {
             $value = iterator_to_array($value);
-        } elseif ($value instanceof \JsonSerializable) {
+        } elseif ($value instanceof JsonSerializable) {
             $value = $value->jsonSerialize();
         }
 
@@ -674,7 +679,7 @@ final class AnalyticsEvent extends Model
         static $attributeLookup = null;
 
         if ($attributeLookup === null) {
-            $instance = new self();
+            $instance = new self;
             $columns = array_filter(
                 array_merge(
                     $instance->getFillable(),
@@ -684,7 +689,7 @@ final class AnalyticsEvent extends Model
                         $instance->getUpdatedAtColumn(),
                     ]
                 ),
-                static fn ($column) => is_string($column) && $column !== ''
+                static fn ($column): bool => is_string($column) && $column !== ''
             );
             $attributeLookup = array_fill_keys($columns, true);
         }
