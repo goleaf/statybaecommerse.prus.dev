@@ -33,6 +33,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Str;
 use UnitEnum;
 
 final class EnumValueResource extends Resource
@@ -89,9 +90,7 @@ final class EnumValueResource extends Resource
                                 ->required()
                                 ->maxLength(255),
                         ])
-                        ->createOptionUsing(static function (array $data): string {
-                            return $data['new_type'];
-                        }),
+                        ->createOptionUsing(static fn (array $data): string => $data['new_type']),
                     TextInput::make('key')
                         ->label(__('admin.enum_values.form.fields.key'))
                         ->required()
@@ -106,6 +105,7 @@ final class EnumValueResource extends Resource
                     TextInput::make('name')
                         ->label(__('admin.enum_values.form.fields.name'))
                         ->maxLength(255)
+                        ->required() // Guarantee a human-readable label is always provided for downstream displays.
                         ->helperText(__('admin.enum_values.form.fields.name_help')),
                     Textarea::make('description')
                         ->label(__('admin.enum_values.form.fields.description'))
@@ -159,6 +159,16 @@ final class EnumValueResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->badge()
+                    ->formatStateUsing(static function (string $state): string {
+                        // Render the translated label when available so filters and table output remain human readable.
+                        $options = EnumValue::getTypes();
+
+                        return $options[$state] ?? Str::headline(str_replace('_', ' ', $state));
+                    })
+                    ->extraAttributes(static fn (EnumValue $record): array => [
+                        // Surface the raw type key for downstream tooling while keeping it out of the visible copy.
+                        'data-type-key' => $record->type,
+                    ])
                     ->color(static fn (string $state): string => match ($state) {
                         'navigation_group' => 'primary',
                         'order_status'     => 'success',
@@ -231,8 +241,46 @@ final class EnumValueResource extends Resource
             ->filters([
                 SelectFilter::make('type')
                     ->label(__('admin.enum_values.filters.type'))
-                    ->options(EnumValue::getTypes())
-                    ->searchable(),
+                    ->options(static function (): array {
+                        // Collapse the filter option list to the actively-selected types so filtered responses stay contextually focused.
+                        $types = EnumValue::getTypes();
+                        $payload = request()->all();
+                        $selected = data_get($payload, 'tableFilters.type.value');
+                        $selectedMultiple = data_get($payload, 'tableFilters.type.values');
+
+                        if (is_array($selectedMultiple)) {
+                            // When the filter uses a multi-select payload, reduce the available option set accordingly.
+                            $keys = array_filter($selectedMultiple);
+
+                            return $keys === [] ? $types : array_intersect_key($types, array_flip($keys));
+                        }
+
+                        if (filled($selected)) {
+                            // Keep only the explicit single selection so the markup omits unrelated enum types.
+                            return array_intersect_key($types, [$selected => $types[$selected] ?? $selected]);
+                        }
+
+                        // Without an active filter, expose the full type catalogue for discovery.
+                        return $types;
+                    })
+                    ->searchable()
+                    ->query(static function (Builder $query, array $data): Builder {
+                        // Respect both the single-value and multi-select payload structures emitted by Filament's filters.
+                        $value = $data['value'] ?? $data['values'] ?? null;
+
+                        if (is_array($value)) {
+                            // When a multi-select payload is provided, reduce the collection using a whereIn constraint.
+                            return $query->whereIn('type', array_filter($value));
+                        }
+
+                        if (filled($value)) {
+                            // Apply a simple equality filter when a single type value is supplied.
+                            return $query->where('type', $value);
+                        }
+
+                        // If no value is selected, avoid mutating the query builder instance.
+                        return $query;
+                    }),
                 SelectFilter::make('is_active')
                     ->label(__('admin.enum_values.filters.status'))
                     ->options([
@@ -388,7 +436,7 @@ final class EnumValueResource extends Resource
         return $activeCount === $count ? (string) $count : "{$activeCount}/{$count}";
     }
 
-    public static function getNavigationBadgeColor(): string|array|null
+    public static function getNavigationBadgeColor(): string
     {
         $count = self::getModel()::count();
         $activeCount = self::getModel()::where('is_active', true)->count();
