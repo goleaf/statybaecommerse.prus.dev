@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -23,9 +24,10 @@ use Spatie\Translatable\HasTranslations;
  * @property mixed $casts
  * @property array $translatable
  *
- * @method static \Illuminate\Database\Eloquent\Builder|Report newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Report newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Report query()
+ * @method static Builder|Report newModelQuery()
+ * @method static Builder|Report newQuery()
+ * @method static Builder|Report query()
+ * @method static Builder|Report orderedByName(string $directionOrLocale = 'asc', ?string $fallbackDirection = null)
  *
  * @mixin \Eloquent
  */
@@ -44,7 +46,7 @@ final class Report extends Model
      */
     public function getActivitylogOptions(): LogOptions
     {
-        return LogOptions::defaults()->logOnly(['name', 'type', 'category', 'is_active', 'is_public'])->logOnlyDirty()->dontSubmitEmptyLogs()->setDescriptionForEvent(fn (string $eventName) => "Report {$eventName}")->useLogName('report');
+        return LogOptions::defaults()->logOnly(['name', 'type', 'category', 'is_active', 'is_public'])->logOnlyDirty()->dontSubmitEmptyLogs()->setDescriptionForEvent(fn (string $eventName): string => "Report {$eventName}")->useLogName('report');
     }
 
     /**
@@ -231,5 +233,40 @@ final class Report extends Model
     public function getRouteKeyName(): string
     {
         return 'slug';
+    }
+
+    /**
+     * Order reports by their translated name while supporting backwards-compatible parameters.
+     *
+     * @param string      $directionOrLocale Accepts either a direction (`asc`/`desc`) or locale code.
+     * @param string|null $maybeDirection    Optional direction when the first argument is used as the locale.
+     */
+    public function scopeOrderedByName(Builder $query, string $directionOrLocale = 'asc', ?string $maybeDirection = null): Builder
+    {
+        // Normalise the inputs so legacy calls like orderedByName('desc') and new locale-aware
+        // usages like orderedByName('lt') both resolve predictable ordering semantics.
+        $normalisedFirst = strtolower($directionOrLocale);
+        $isDirection = in_array($normalisedFirst, ['asc', 'desc'], true);
+
+        $direction = $isDirection ? $normalisedFirst : ($maybeDirection !== null ? strtolower($maybeDirection) : 'asc');
+        if (! in_array($direction, ['asc', 'desc'], true)) {
+            $direction = 'asc';
+        }
+
+        $locale = $isDirection ? ($maybeDirection ?? 'en') : $directionOrLocale;
+        if (! is_string($locale) || $locale === '' || ! preg_match('/^[A-Za-z0-9_\-]+$/', $locale)) {
+            $locale = 'en';
+        }
+
+        // Build a JSON path safely so both SQLite and MySQL can extract the translated name values.
+        $jsonPath = sprintf('$."%s"', $locale);
+        $driver = $query->getConnection()->getDriverName();
+
+        // Use driver-specific JSON functions for predictable case-insensitive sorting.
+        if ($driver === 'sqlite') {
+            return $query->orderByRaw(sprintf("LOWER(json_extract(name, '%s')) %s", $jsonPath, $direction));
+        }
+
+        return $query->orderByRaw(sprintf("LOWER(JSON_UNQUOTE(JSON_EXTRACT(name, '%s'))) %s", $jsonPath, $direction));
     }
 }
