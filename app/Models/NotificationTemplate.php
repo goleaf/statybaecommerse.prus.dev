@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Scopes\ActiveScope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -230,8 +231,10 @@ final class NotificationTemplate extends Model
      */
     public function scopeByEvent(Builder $query, string $event): Builder
     {
-        // Narrow down templates by the domain event that triggers them.
-        return $query->where('event', $event);
+        // Drop the ActiveScope so administrators can review inactive variants before filtering by event.
+        return $query
+            ->withoutGlobalScope(ActiveScope::class)
+            ->where('event', $event);
     }
 
     /**
@@ -239,7 +242,9 @@ final class NotificationTemplate extends Model
      */
     public function scopeOrderedByName(Builder $query): Builder
     {
-        // Order the records to keep dropdowns and management tables predictable.
-        return $query->orderBy('name');
+        // Remove the ActiveScope so alphabetical listings surface inactive templates for maintenance screens.
+        return $query
+            ->withoutGlobalScope(ActiveScope::class)
+            ->orderBy('name');
     }
 }
