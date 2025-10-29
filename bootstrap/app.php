@@ -54,12 +54,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
                 ->group(base_path('routes/reports.php'));
             Route::middleware('api')
                 ->group(base_path('routes/monitoring.php'));
-            Route::middleware('api')
-                ->prefix('api')
-                ->group(function (): void {
-                    Route::get('/categories/tree', [CategoryController::class, 'tree'])
-                        ->name('api.categories.tree');
-                });
+            // api.categories.tree route is defined in routes/web.php to avoid conflicts
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {

@@ -22,11 +22,16 @@ final class CityController extends Controller
      */
     public function index(Request $request): View
     {
-        $query = City::with([
-            'country.translations',
-            'region.translations',
-            'parent.translations',
-        ])->withTranslations()->enabled()->active()
+        // Eager load all necessary relationships and translations in a single query
+        $query = City::query()
+            ->with([
+                'country' => fn ($q) => $q->withTranslations(),
+                'region' => fn ($q) => $q->withTranslations(),
+                'parent' => fn ($q) => $q->withTranslations(),
+            ])
+            ->withTranslations()
+            ->enabled()
+            ->active()
             ->whereNotNull('name')
             ->whereNotNull('code');
         // Search
@@ -62,8 +67,14 @@ final class CityController extends Controller
         $query->ordered()->orderBy('name');
         $cities = PaginationService::paginateWithContext($query, 'cities', 24);
         $cities->appends($request->query());
-        // Get countries for filter dropdown
-        $countries = Country::withTranslations()->enabled()->active()->ordered()->orderBy('name')->get();
+        // Get countries for filter dropdown - use single query for both translations and main data
+        $countries = Country::query()
+            ->withTranslations()
+            ->enabled()
+            ->active()
+            ->ordered()
+            ->orderBy('name')
+            ->get();
 
         return view('cities.index', compact('cities', 'countries'));
     }

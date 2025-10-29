@@ -12,7 +12,18 @@
 
 @php
     $product = $product ?? new \App\Models\Product();
-    $imageUrl = $product->getFirstMediaUrl('images', 'image-md') ?: $product->getFirstMediaUrl('images');
+    // Use ProductImage model instead of MediaLibrary
+    // Load primaryImage relationship if not already loaded
+    if (!$product->relationLoaded('primaryImage')) {
+        $primaryImage = $product->primaryImage()->first();
+    } else {
+        $primaryImage = $product->primaryImage;
+    }
+    // Fallback to first ordered image if no primary image
+    if (!$primaryImage) {
+        $primaryImage = $product->images()->ordered()->first();
+    }
+    $imageUrl = $primaryImage ? $primaryImage->url : null;
     $isNew = $product->created_at && $product->created_at->diffInDays() < 30;
     $isOnSale = $product->sale_price && $product->sale_price < $product->price;
     $discountPercentage = $isOnSale ? round((($product->price - $product->sale_price) / $product->price) * 100) : 0;

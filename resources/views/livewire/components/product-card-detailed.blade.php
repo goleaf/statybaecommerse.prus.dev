@@ -1,9 +1,19 @@
 <div class="group relative bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 hover:border-gray-200 overflow-hidden">
     {{-- Product Image --}}
     <div class="relative aspect-square overflow-hidden bg-gray-50">
-        @if($product->hasImages())
+        @php
+            // Use ProductImage model instead of MediaLibrary
+            $primaryImage = $product->relationLoaded('primaryImage') 
+                ? $product->primaryImage 
+                : $product->primaryImage()->first();
+            if (!$primaryImage) {
+                $primaryImage = $product->images()->ordered()->first();
+            }
+            $imageUrl = $primaryImage ? $primaryImage->url : null;
+        @endphp
+        @if($imageUrl)
             <img 
-                src="{{ $product->getFirstMediaUrl('images', 'image-md') }}" 
+                src="{{ $imageUrl }}" 
                 alt="{{ $product->name }}"
                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 loading="lazy"
