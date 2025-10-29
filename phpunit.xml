@@ -21,8 +21,9 @@
         <testsuite name="Unit">
             <!-- Keep the unit suite focused on utility and service tests to avoid duplicate class execution. -->
             <directory suffix="Test.php">tests/Unit</directory>
+            <!-- Keep the Unit suite focused on the dedicated Unit directory to avoid duplicate registrations. -->
         </testsuite>
-        <!-- Include dedicated model tests to ensure coverage for Eloquent scopes and helpers without overlapping other suites. -->
+        <!-- Include dedicated model tests to ensure coverage for Eloquent scopes and helpers without clashing with the Unit suite. -->
         <testsuite name="Models">
             <directory suffix="Test.php">tests/Models</directory>
         </testsuite>

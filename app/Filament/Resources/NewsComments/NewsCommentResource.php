@@ -9,19 +9,24 @@ use App\Filament\Resources\NewsComments\Pages\EditNewsComment;
 use App\Filament\Resources\NewsComments\Pages\ListNewsComments;
 use App\Filament\Resources\NewsComments\Schemas\NewsCommentForm;
 use App\Filament\Resources\NewsComments\Tables\NewsCommentsTable;
+use App\Models\NewsComment;
+use App\Models\Scopes\ActiveScope;
+use App\Models\Scopes\ApprovedScope;
+use App\Models\Scopes\VisibleScope;
 use App\Support\Concerns\HasNav;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class NewsCommentResource extends Resource
 {
     use HasNav;
 
     /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations while matching the base resource type.
      */
     protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
@@ -36,8 +41,14 @@ class NewsCommentResource extends Resource
         return NewsCommentsTable::configure($table);
     }
 
+    /**
+     * Provide an unscoped builder so moderation views can inspect every NewsComment record.
+     *
+     * @return Builder<NewsComment>
+     */
     public static function getEloquentQuery(): Builder
     {
+        // Remove the public-facing visibility scopes so administrators can audit every comment record.
         return parent::getEloquentQuery()->withoutGlobalScopes([
             ActiveScope::class,
             ApprovedScope::class,

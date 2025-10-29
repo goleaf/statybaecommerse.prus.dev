@@ -9,11 +9,11 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use Tests\TestCase;
 
-/**
- * @coversNothing
- */
+// Adopt PHPUnit's native attribute syntax so future releases stop flagging deprecated docblock metadata.
+#[CoversNothing]
 final class ExportDownloadControllerTest extends TestCase
 {
     use RefreshDatabase;

@@ -42,6 +42,7 @@ This repository mixes Laravel 12 and Filament v4 code. Use the following guardra
   2. `vendor/bin/pint <file>` to fix style issues (run without `--test` so it can auto-fix).
   3. `vendor/bin/phpstan analyse <file> -c phpstan.neon --memory-limit=1G --no-progress` for static analysis.
   4. `vendor/bin/rector process <file> --ansi --no-progress-bar` to apply automated refactors where appropriate.
+- When adding PHPUnit metadata such as `@covers`, use the native PHP attribute equivalents (for example `#[CoversClass]` or `#[CoversNothing]`) so the suite stays compatible with PHPUnit 12+ now that docblock metadata has been deprecated.
 - When Blade templates change, refresh the cache with `php artisan view:clear` followed by `php artisan view:cache`.
 - If changes touch application logic, run the most relevant `php artisan test --filter=...` target (or the full test suite when in doubt).
 - When configuration or routes change, refresh caches via:

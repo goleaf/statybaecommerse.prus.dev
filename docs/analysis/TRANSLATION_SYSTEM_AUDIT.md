@@ -8,6 +8,7 @@
 ## Database Translations
 - Domain models opt into a reusable `HasTranslations` trait that exposes relation loaders, locale fallbacks, and attribute resolution backed by dedicated translation Eloquent models.【F:app/Traits/HasTranslations.php†L15-L92】【F:app/Models/Translations/ProductTranslation.php†L1-L120】
 - Translation tables enforce locale uniqueness and cascade deletes (for example, product variant translations) while migration scripts backfill legacy columns into new per-locale rows to avoid data loss.【F:database/migrations/2025_11_06_130000_create_product_variant_translations_table.php†L13-L115】
+- Campaign conversion translations keep marketing metadata focused by restricting mass assignment to locale, notes, and JSON-backed attributes while exposing a dedicated locale scope for analytics queries.【F:app/Models/Translations/CampaignConversionTranslation.php†L29-L63】
 - `UiTranslation` provides a centralised repository for admin/UI keys with query scopes, metadata casting, and helper methods to fetch or set values with language fallbacks; the News seeder populates Lithuanian and English variants to guarantee parity.【F:app/Models/UiTranslation.php†L32-L127】【F:database/seeders/NewsTranslationSeeder.php†L10-L84】
 - System setting category translations now persist locale-specific UI metadata through the new `meta` JSON column, keeping administrative tabs and storefront breadcrumbs aligned with structured payloads stored alongside translated copy.【F:database/migrations/2025_01_31_000003_add_meta_columns_to_system_setting_tables.php†L21-L35】
 
