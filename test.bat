@@ -8,6 +8,28 @@ set "RED=[91m"
 set "YELLOW=[93m"
 set "NC=[0m"
 
+:: Default sort order
+set "SORT_ORDER=asc"
+
+:: Parse command line arguments
+:parse_args
+if "%~1"=="" goto end_parse
+if /i "%~1"=="--sort=asc" (
+    set "SORT_ORDER=asc"
+    shift
+    goto parse_args
+)
+if /i "%~1"=="--sort=desc" (
+    set "SORT_ORDER=desc"
+    shift
+    goto parse_args
+)
+echo %RED%Unknown argument: %~1%NC%
+echo %YELLOW%Usage: %~nx0 [--sort=asc^|--sort=desc]%NC%
+exit /b 1
+
+:end_parse
+
 echo %BLUE%========================================%NC%
 echo %BLUE%  Collecting and Running Tests%NC%
 echo %BLUE%========================================%NC%
@@ -25,7 +47,13 @@ set "temp_failed_list=%TEMP%\failed_list_%RANDOM%.txt"
 
 :: Collect all test files
 echo %YELLOW%Collecting test files...%NC%
-dir /b /s tests\*Test.php > "%temp_test_list%"
+if /i "%SORT_ORDER%"=="desc" (
+    echo %YELLOW%Sort order: Descending%NC%
+    dir /b /s /o-n tests\*Test.php > "%temp_test_list%"
+) else (
+    echo %YELLOW%Sort order: Ascending%NC%
+    dir /b /s /on tests\*Test.php > "%temp_test_list%"
+)
 
 :: Count total tests
 for /f %%a in ('type "%temp_test_list%" ^| find /c /v ""') do set total_tests=%%a
