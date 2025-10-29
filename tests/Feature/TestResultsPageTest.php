@@ -39,17 +39,19 @@ it('feature: renders ordered dataset with translated labels', function (): void 
             'is_running'      => true,
             'total'           => 3,
             'completed_total' => 1,
-            'current_test'    => 'Tests\Feature\ExampleTest::test_feature',
+            // Reference the new dashboard placeholder test to keep the JSON
+            // fixture aligned with the renamed class.
+            'current_test'    => 'Tests\Feature\DashboardFixtureTest::it_passes',
             'current_index'   => 2,
             'created_at'      => now()->toIso8601String(),
             'started_at'      => now()->subMinutes(5)->toIso8601String(),
             'last_updated_at' => now()->toIso8601String(),
         ],
         'tests' => [
-            'Tests\Feature\ExampleTest::test_feature' => [
-                'id'                => 'Tests\Feature\ExampleTest::test_feature',
+            'Tests\Feature\DashboardFixtureTest::it_passes' => [
+                'id'                => 'Tests\Feature\DashboardFixtureTest::it_passes',
                 'status'            => 'running',
-                'hash'              => md5('Tests\Feature\ExampleTest::test_feature'),
+                'hash'              => md5('Tests\Feature\DashboardFixtureTest::it_passes'),
                 'groups'            => ['feature', 'smoke'],
                 'output'            => 'Running feature test',
                 'error_output'      => '',
@@ -75,7 +77,7 @@ it('feature: renders ordered dataset with translated labels', function (): void 
             ],
         ],
         'order' => [
-            'Tests\Feature\ExampleTest::test_feature',
+            'Tests\Feature\DashboardFixtureTest::it_passes',
             'Tests\Feature\OtherTest::it_passes',
             'Tests\Feature\FailingTest::it_fails',
         ],
@@ -101,7 +103,7 @@ it('feature: renders ordered dataset with translated labels', function (): void 
 
     $response->assertSuccessful();
     $response->assertSee(__('frontend.test_results.status.running'));
-    $response->assertSee('Tests\Feature\ExampleTest::test_feature');
+    $response->assertSee('Tests\Feature\DashboardFixtureTest::it_passes');
     $response->assertSee('Tests\Feature\FailingTest::it_fails');
     $response->assertSee('Expectation failed');
     $response->assertSee('Failed asserting that false is true.');
