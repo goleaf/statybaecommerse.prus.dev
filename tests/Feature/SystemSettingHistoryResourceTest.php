@@ -15,12 +15,84 @@ use App\Models\SystemSettingHistory;
 use App\Models\User;
 use App\Support\Nav;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Features\SupportTesting\TestableLivewire;
 use Livewire\Livewire;
 use Tests\TestCase;
 
 final class SystemSettingHistoryResourceTest extends TestCase
 {
     use RefreshDatabase;
+
+    /**
+     * Form field keys that should always be available on create/edit forms.
+     * Keeping the list centralised allows the assertions to stay in sync with
+     * the Filament schema while avoiding duplicated arrays across tests.
+     *
+     * @var array<int, string>
+     */
+    private const FORM_FIELD_KEYS = [
+        'system_setting_id',
+        'changed_by',
+        'change_reason',
+        'old_value',
+        'new_value',
+        'ip_address',
+        'user_agent',
+    ];
+
+    /**
+     * Table column identifiers that the listing component must expose.
+     * Centralising the configuration guarantees the table assertions stay
+     * aligned whenever the resource schema evolves.
+     *
+     * @var array<int, string>
+     */
+    private const TABLE_COLUMNS = [
+        'systemSetting.key',
+        'user.name',
+        'change_reason',
+        'old_value',
+        'new_value',
+        'ip_address',
+        'created_at',
+    ];
+
+    /**
+     * Filter handles that the listing resource needs to expose for quick
+     * history lookups. Using a constant helps the tests remain readable when
+     * additional filters arrive later on.
+     *
+     * @var array<int, string>
+     */
+    private const TABLE_FILTERS = [
+        'system_setting_id',
+        'changed_by',
+    ];
+
+    /**
+     * Row-level actions that should be available inside the history listing.
+     * Keeping the identifiers in one place keeps assertions descriptive and
+     * allows follow-up refactors to adjust the behaviour easily.
+     *
+     * @var array<int, string>
+     */
+    private const TABLE_ACTIONS = [
+        'view',
+        'edit',
+        'restore_value',
+    ];
+
+    /**
+     * Bulk actions that must stay available to administrators. The constant
+     * avoids repetition across tests and documents the expectation for future
+     * maintainers.
+     *
+     * @var array<int, string>
+     */
+    private const BULK_ACTIONS = [
+        'delete',
+        'export_history',
+    ];
 
     protected User $adminUser;
 
@@ -32,16 +104,22 @@ final class SystemSettingHistoryResourceTest extends TestCase
     {
         parent::setUp();
 
+        // Create a deterministic administrator so every test reuses the same
+        // authentication context without repeating attribute arrays.
         $this->adminUser = User::factory()->create([
             'email' => 'admin@example.com',
             'name'  => 'Admin User',
         ]);
 
+        // Spawning a real category keeps the downstream factory assignments
+        // intact, mirroring the relationships used by the Filament resource.
         $this->category = SystemSettingCategory::factory()->create([
             'name' => 'Test Category',
             'slug' => 'test-category',
         ]);
 
+        // Provision the canonical system setting that subsequent history
+        // records will be associated with throughout the suite.
         $this->systemSetting = SystemSetting::factory()->create([
             'category_id' => $this->category->id,
             'key'         => 'test_setting',
@@ -52,22 +130,24 @@ final class SystemSettingHistoryResourceTest extends TestCase
 
     public function test_can_list_system_setting_histories(): void
     {
-        SystemSettingHistory::factory()->count(3)->create([
-            'system_setting_id' => $this->systemSetting->id,
-            'changed_by'        => $this->adminUser->id,
-        ]);
+        $histories = SystemSettingHistory::factory()
+            ->count(3)
+            ->create([
+                'system_setting_id' => $this->systemSetting->id,
+                'changed_by'        => $this->adminUser->id,
+            ]);
 
-        $this->actingAs($this->adminUser);
+        $this->actingAsAdmin();
 
-        Livewire::test(ListSystemSettingHistories::class)
-            ->assertCanSeeTableRecords(SystemSettingHistory::all());
+        $this->livewire(ListSystemSettingHistories::class)
+            ->assertCanSeeTableRecords($histories);
     }
 
     public function test_can_create_system_setting_history(): void
     {
-        $this->actingAs($this->adminUser);
+        $this->actingAsAdmin();
 
-        Livewire::test(CreateSystemSettingHistory::class)
+        $this->livewire(CreateSystemSettingHistory::class)
             ->fillForm([
                 'system_setting_id' => $this->systemSetting->id,
                 'changed_by'        => $this->adminUser->id,
@@ -91,15 +171,13 @@ final class SystemSettingHistoryResourceTest extends TestCase
 
     public function test_can_view_system_setting_history(): void
     {
-        $history = SystemSettingHistory::factory()->create([
-            'system_setting_id' => $this->systemSetting->id,
-            'changed_by'        => $this->adminUser->id,
-            'change_reason'     => 'Test change',
+        $history = $this->makeHistory([
+            'change_reason' => 'Test change',
         ]);
 
-        $this->actingAs($this->adminUser);
+        $this->actingAsAdmin();
 
-        Livewire::test(ViewSystemSettingHistory::class, [
+        $this->livewire(ViewSystemSettingHistory::class, [
             'record' => $history->getKey(),
         ])
             ->assertFormSet([
@@ -111,15 +189,13 @@ final class SystemSettingHistoryResourceTest extends TestCase
 
     public function test_can_edit_system_setting_history(): void
     {
-        $history = SystemSettingHistory::factory()->create([
-            'system_setting_id' => $this->systemSetting->id,
-            'changed_by'        => $this->adminUser->id,
-            'change_reason'     => 'Original reason',
+        $history = $this->makeHistory([
+            'change_reason' => 'Original reason',
         ]);
 
-        $this->actingAs($this->adminUser);
+        $this->actingAsAdmin();
 
-        Livewire::test(EditSystemSettingHistory::class, [
+        $this->livewire(EditSystemSettingHistory::class, [
             'record' => $history->getKey(),
         ])
             ->fillForm([
@@ -138,18 +214,13 @@ final class SystemSettingHistoryResourceTest extends TestCase
 
     public function test_can_delete_system_setting_history(): void
     {
-        $history = SystemSettingHistory::factory()->create([
-            'system_setting_id' => $this->systemSetting->id,
-            'changed_by'        => $this->adminUser->id,
-        ]);
+        $history = $this->makeHistory();
 
-        $this->actingAs($this->adminUser);
+        $this->actingAsAdmin();
 
-        Livewire::test(EditSystemSettingHistory::class, [
-            'record' => $history->getKey(),
-        ])
-            ->callAction('delete')
-            ->assertHasNoActionErrors();
+        $this->livewire(ListSystemSettingHistories::class)
+            ->callTableAction('delete', $history)
+            ->assertHasNoTableActionErrors();
 
         $this->assertDatabaseMissing('system_setting_histories', [
             'id' => $history->id,
@@ -158,84 +229,84 @@ final class SystemSettingHistoryResourceTest extends TestCase
 
     public function test_can_filter_by_system_setting(): void
     {
-        $setting2 = SystemSetting::factory()->create([
+        $alternateSetting = SystemSetting::factory()->create([
             'category_id' => $this->category->id,
             'key'         => 'test_setting_2',
         ]);
 
-        SystemSettingHistory::factory()->create([
-            'system_setting_id' => $this->systemSetting->id,
-            'changed_by'        => $this->adminUser->id,
-        ]);
-        SystemSettingHistory::factory()->create([
-            'system_setting_id' => $setting2->id,
-            'changed_by'        => $this->adminUser->id,
+        $matchingHistory = $this->makeHistory();
+        $nonMatchingHistory = $this->makeHistory([
+            'system_setting_id' => $alternateSetting->id,
         ]);
 
-        $this->actingAs($this->adminUser);
+        $this->actingAsAdmin();
 
-        Livewire::test(ListSystemSettingHistories::class)
+        $this->livewire(ListSystemSettingHistories::class)
             ->filterTable('system_setting_id', $this->systemSetting->id)
-            ->assertCanSeeTableRecords(SystemSettingHistory::where('system_setting_id', $this->systemSetting->id)->get())
-            ->assertCanNotSeeTableRecords(SystemSettingHistory::where('system_setting_id', $setting2->id)->get());
+            ->assertCanSeeTableRecords(
+                SystemSettingHistory::query()->whereKey($matchingHistory->getKey())->get()
+            )
+            ->assertCanNotSeeTableRecords(
+                SystemSettingHistory::query()->whereKey($nonMatchingHistory->getKey())->get()
+            );
     }
 
     public function test_can_filter_by_changed_by(): void
     {
-        $user2 = User::factory()->create(['name' => 'User 2']);
-
-        SystemSettingHistory::factory()->create([
-            'system_setting_id' => $this->systemSetting->id,
-            'changed_by'        => $this->adminUser->id,
-        ]);
-        SystemSettingHistory::factory()->create([
-            'system_setting_id' => $this->systemSetting->id,
-            'changed_by'        => $user2->id,
+        $otherUser = User::factory()->create([
+            'name' => 'Other User',
         ]);
 
-        $this->actingAs($this->adminUser);
+        $matchingHistory = $this->makeHistory();
+        $nonMatchingHistory = $this->makeHistory([
+            'changed_by' => $otherUser->id,
+        ]);
 
-        Livewire::test(ListSystemSettingHistories::class)
+        $this->actingAsAdmin();
+
+        $this->livewire(ListSystemSettingHistories::class)
             ->filterTable('changed_by', $this->adminUser->id)
-            ->assertCanSeeTableRecords(SystemSettingHistory::where('changed_by', $this->adminUser->id)->get())
-            ->assertCanNotSeeTableRecords(SystemSettingHistory::where('changed_by', $user2->id)->get());
+            ->assertCanSeeTableRecords(
+                SystemSettingHistory::query()->whereKey($matchingHistory->getKey())->get()
+            )
+            ->assertCanNotSeeTableRecords(
+                SystemSettingHistory::query()->whereKey($nonMatchingHistory->getKey())->get()
+            );
     }
 
     public function test_can_search_system_setting_histories(): void
     {
-        SystemSettingHistory::factory()->create([
-            'system_setting_id' => $this->systemSetting->id,
-            'changed_by'        => $this->adminUser->id,
-            'change_reason'     => 'Test change reason',
+        $matchingHistory = $this->makeHistory([
+            'change_reason' => 'Test change reason',
         ]);
-        SystemSettingHistory::factory()->create([
-            'system_setting_id' => $this->systemSetting->id,
-            'changed_by'        => $this->adminUser->id,
-            'change_reason'     => 'Different reason',
+        $this->makeHistory([
+            'change_reason' => 'Different reason',
         ]);
 
-        $this->actingAs($this->adminUser);
+        $this->actingAsAdmin();
 
-        Livewire::test(ListSystemSettingHistories::class)
+        $this->livewire(ListSystemSettingHistories::class)
             ->searchTable('Test')
-            ->assertCanSeeTableRecords(SystemSettingHistory::where('change_reason', 'like', '%Test%')->get())
-            ->assertCanNotSeeTableRecords(SystemSettingHistory::where('change_reason', 'like', '%Different%')->get());
+            ->assertCanSeeTableRecords(
+                SystemSettingHistory::query()->whereKey($matchingHistory->getKey())->get()
+            )
+            ->assertCanNotSeeTableRecords(
+                SystemSettingHistory::where('change_reason', 'like', '%Different%')->get()
+            );
     }
 
     public function test_can_restore_value_action(): void
     {
-        $history = SystemSettingHistory::factory()->create([
-            'system_setting_id' => $this->systemSetting->id,
-            'changed_by'        => $this->adminUser->id,
-            'old_value'         => 'restore_value',
-            'new_value'         => 'current_value',
+        $history = $this->makeHistory([
+            'old_value' => 'restore_value',
+            'new_value' => 'current_value',
         ]);
 
-        $this->actingAs($this->adminUser);
+        $this->actingAsAdmin();
 
-        Livewire::test(ListSystemSettingHistories::class)
+        $this->livewire(ListSystemSettingHistories::class)
             ->callTableAction('restore_value', $history)
-            ->assertHasNoActionErrors();
+            ->assertHasNoTableActionErrors();
 
         $this->assertDatabaseHas('system_settings', [
             'id'    => $this->systemSetting->id,
@@ -243,25 +314,40 @@ final class SystemSettingHistoryResourceTest extends TestCase
         ]);
     }
 
-    public function test_can_export_history(): void
+    public function test_restore_value_action_requires_old_value(): void
     {
-        SystemSettingHistory::factory()->count(3)->create([
-            'system_setting_id' => $this->systemSetting->id,
-            'changed_by'        => $this->adminUser->id,
+        $history = $this->makeHistory([
+            'old_value' => null,
         ]);
 
-        $this->actingAs($this->adminUser);
+        $this->actingAsAdmin();
 
-        Livewire::test(ListSystemSettingHistories::class)
-            ->callTableBulkAction('export_history', SystemSettingHistory::all())
+        $this->livewire(ListSystemSettingHistories::class)
+            ->callTableAction('restore_value', $history)
+            ->assertHasTableActionErrors(['restore_value']);
+    }
+
+    public function test_can_export_history(): void
+    {
+        $histories = SystemSettingHistory::factory()
+            ->count(3)
+            ->create([
+                'system_setting_id' => $this->systemSetting->id,
+                'changed_by'        => $this->adminUser->id,
+            ]);
+
+        $this->actingAsAdmin();
+
+        $this->livewire(ListSystemSettingHistories::class)
+            ->callTableBulkAction('export_history', $histories)
             ->assertHasNoBulkActionErrors();
     }
 
     public function test_validation_requires_system_setting_id(): void
     {
-        $this->actingAs($this->adminUser);
+        $this->actingAsAdmin();
 
-        Livewire::test(CreateSystemSettingHistory::class)
+        $this->livewire(CreateSystemSettingHistory::class)
             ->fillForm([
                 'changed_by'    => $this->adminUser->id,
                 'change_reason' => 'Test change',
@@ -272,9 +358,9 @@ final class SystemSettingHistoryResourceTest extends TestCase
 
     public function test_validation_requires_changed_by(): void
     {
-        $this->actingAs($this->adminUser);
+        $this->actingAsAdmin();
 
-        Livewire::test(CreateSystemSettingHistory::class)
+        $this->livewire(CreateSystemSettingHistory::class)
             ->fillForm([
                 'system_setting_id' => $this->systemSetting->id,
                 'change_reason'     => 'Test change',
@@ -285,9 +371,9 @@ final class SystemSettingHistoryResourceTest extends TestCase
 
     public function test_validation_accepts_valid_ip_address(): void
     {
-        $this->actingAs($this->adminUser);
+        $this->actingAsAdmin();
 
-        Livewire::test(CreateSystemSettingHistory::class)
+        $this->livewire(CreateSystemSettingHistory::class)
             ->fillForm([
                 'system_setting_id' => $this->systemSetting->id,
                 'changed_by'        => $this->adminUser->id,
@@ -300,9 +386,9 @@ final class SystemSettingHistoryResourceTest extends TestCase
 
     public function test_validation_rejects_invalid_ip_address(): void
     {
-        $this->actingAs($this->adminUser);
+        $this->actingAsAdmin();
 
-        Livewire::test(CreateSystemSettingHistory::class)
+        $this->livewire(CreateSystemSettingHistory::class)
             ->fillForm([
                 'system_setting_id' => $this->systemSetting->id,
                 'changed_by'        => $this->adminUser->id,
@@ -317,7 +403,7 @@ final class SystemSettingHistoryResourceTest extends TestCase
     {
         $this->assertEquals(
             Nav::groupForResource(SystemSettingHistoryResource::class),
-            SystemSettingHistoryResource::getNavigationGroup()
+            SystemSettingHistoryResource::getNavigationGroup(),
         );
     }
 
@@ -325,7 +411,7 @@ final class SystemSettingHistoryResourceTest extends TestCase
     {
         $this->assertEquals(
             __('admin.system_setting_histories.navigation_label'),
-            SystemSettingHistoryResource::getNavigationLabel()
+            SystemSettingHistoryResource::getNavigationLabel(),
         );
     }
 
@@ -333,7 +419,7 @@ final class SystemSettingHistoryResourceTest extends TestCase
     {
         $this->assertEquals(
             __('admin.system_setting_histories.model_label'),
-            SystemSettingHistoryResource::getModelLabel()
+            SystemSettingHistoryResource::getModelLabel(),
         );
     }
 
@@ -341,7 +427,7 @@ final class SystemSettingHistoryResourceTest extends TestCase
     {
         $this->assertEquals(
             __('admin.system_setting_histories.plural_model_label'),
-            SystemSettingHistoryResource::getPluralModelLabel()
+            SystemSettingHistoryResource::getPluralModelLabel(),
         );
     }
 
@@ -354,122 +440,125 @@ final class SystemSettingHistoryResourceTest extends TestCase
     {
         $this->assertEquals(
             Nav::sortForResource(SystemSettingHistoryResource::class),
-            SystemSettingHistoryResource::getNavigationSort()
+            SystemSettingHistoryResource::getNavigationSort(),
         );
     }
 
     public function test_form_sections_are_organized(): void
     {
-        $this->actingAs($this->adminUser);
+        $this->actingAsAdmin();
 
-        Livewire::test(CreateSystemSettingHistory::class)
-            ->assertFormExists()
-            ->assertFormFieldExists('system_setting_id')
-            ->assertFormFieldExists('changed_by')
-            ->assertFormFieldExists('change_reason')
-            ->assertFormFieldExists('old_value')
-            ->assertFormFieldExists('new_value')
-            ->assertFormFieldExists('ip_address')
-            ->assertFormFieldExists('user_agent');
+        $component = $this->livewire(CreateSystemSettingHistory::class)
+            ->assertFormExists();
+
+        foreach (self::FORM_FIELD_KEYS as $fieldKey) {
+            // Each assertion is executed individually so the failing key is
+            // surfaced directly when the schema drifts.
+            $component->assertFormFieldExists($fieldKey);
+        }
     }
 
     public function test_table_columns_are_configured(): void
     {
-        SystemSettingHistory::factory()->create([
-            'system_setting_id' => $this->systemSetting->id,
-            'changed_by'        => $this->adminUser->id,
-        ]);
+        $this->makeHistory();
 
-        $this->actingAs($this->adminUser);
+        $this->actingAsAdmin();
 
-        Livewire::test(ListSystemSettingHistories::class)
-            ->assertCanSeeTableColumns([
-                'systemSetting.key',
-                'user.name',
-                'change_reason',
-                'old_value',
-                'new_value',
-                'ip_address',
-                'created_at',
-            ]);
+        $this->livewire(ListSystemSettingHistories::class)
+            ->assertCanSeeTableColumns(self::TABLE_COLUMNS);
     }
 
     public function test_table_filters_are_configured(): void
     {
-        $this->actingAs($this->adminUser);
+        $this->actingAsAdmin();
 
-        Livewire::test(ListSystemSettingHistories::class)
-            ->assertCanSeeTableFilters([
-                'system_setting_id',
-                'changed_by',
-            ]);
+        $this->livewire(ListSystemSettingHistories::class)
+            ->assertCanSeeTableFilters(self::TABLE_FILTERS);
     }
 
     public function test_table_actions_are_configured(): void
     {
-        $history = SystemSettingHistory::factory()->create([
-            'system_setting_id' => $this->systemSetting->id,
-            'changed_by'        => $this->adminUser->id,
-            'old_value'         => 'restore_value',
+        $this->makeHistory([
+            'old_value' => 'restore_value',
         ]);
 
-        $this->actingAs($this->adminUser);
+        $this->actingAsAdmin();
 
-        Livewire::test(ListSystemSettingHistories::class)
-            ->assertCanSeeTableActions([
-                'view',
-                'edit',
-                'restore_value',
-            ]);
+        $this->livewire(ListSystemSettingHistories::class)
+            ->assertCanSeeTableActions(self::TABLE_ACTIONS);
     }
 
     public function test_bulk_actions_are_configured(): void
     {
-        $this->actingAs($this->adminUser);
+        $this->actingAsAdmin();
 
-        Livewire::test(ListSystemSettingHistories::class)
-            ->assertCanSeeBulkActions([
-                'delete',
-                'export_history',
-            ]);
+        $this->livewire(ListSystemSettingHistories::class)
+            ->assertCanSeeBulkActions(self::BULK_ACTIONS);
     }
 
     public function test_restore_value_action_only_visible_when_old_value_exists(): void
     {
-        $historyWithOldValue = SystemSettingHistory::factory()->create([
-            'system_setting_id' => $this->systemSetting->id,
-            'changed_by'        => $this->adminUser->id,
-            'old_value'         => 'restore_value',
+        $historyWithOldValue = $this->makeHistory([
+            'old_value' => 'restore_value',
         ]);
 
-        $historyWithoutOldValue = SystemSettingHistory::factory()->create([
-            'system_setting_id' => $this->systemSetting->id,
-            'changed_by'        => $this->adminUser->id,
-            'old_value'         => null,
+        $historyWithoutOldValue = $this->makeHistory([
+            'old_value' => null,
         ]);
 
-        $this->actingAs($this->adminUser);
+        $this->actingAsAdmin();
 
-        $component = Livewire::test(ListSystemSettingHistories::class);
+        $component = $this->livewire(ListSystemSettingHistories::class);
 
-        // Should be able to see restore action for record with old value
+        // Should be able to see restore action for record with old value.
         $component->assertCanSeeTableAction('restore_value', $historyWithOldValue);
 
-        // Should not be able to see restore action for record without old value
+        // Should not be able to see restore action for record without old value.
         $component->assertCanNotSeeTableAction('restore_value', $historyWithoutOldValue);
     }
 
     public function test_relationships_work_correctly(): void
     {
-        $history = SystemSettingHistory::factory()->create([
-            'system_setting_id' => $this->systemSetting->id,
-            'changed_by'        => $this->adminUser->id,
-        ]);
+        $history = $this->makeHistory();
 
         $this->assertInstanceOf(SystemSetting::class, $history->systemSetting);
         $this->assertEquals($this->systemSetting->id, $history->systemSetting->id);
 
         $this->assertInstanceOf(User::class, $history->user);
         $this->assertEquals($this->adminUser->id, $history->user->id);
+    }
+
+    /**
+     * Convenience wrapper that signs in the administrator created during setup.
+     * The helper keeps the authentication intent explicit across the suite and
+     * avoids repeating the `actingAs` boilerplate.
+     */
+    private function actingAsAdmin(): void
+    {
+        $this->actingAs($this->adminUser);
+    }
+
+    /**
+     * Spins up a history record that belongs to the default system setting.
+     * Centralising the factory payload ensures every test benefits from the
+     * same baseline attributes while allowing targeted overrides.
+     */
+    private function makeHistory(array $overrides = []): SystemSettingHistory
+    {
+        return SystemSettingHistory::factory()->create($overrides + [
+            'system_setting_id' => $this->systemSetting->id,
+            'changed_by'        => $this->adminUser->id,
+        ]);
+    }
+
+    /**
+     * Small helper that proxies `Livewire::test()` so the return type stays
+     * explicit across assertions. Having a dedicated wrapper makes it easier to
+     * attach additional default parameters—such as locale or panel context—if
+     * future Filament upgrades demand them.
+     */
+    private function livewire(string $component, array $parameters = []): TestableLivewire
+    {
+        return Livewire::test($component, $parameters);
     }
 }
