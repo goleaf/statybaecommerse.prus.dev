@@ -533,7 +533,11 @@ Route::prefix('api')->group(function (): void {
     Route::get('/products/catalog', [App\Http\Controllers\Api\ProductController::class, 'index'])->name('api.products.catalog');
     Route::get('/products/{product:slug}', [App\Http\Controllers\Api\ProductController::class, 'show'])->name('api.products.show');
     Route::get('/categories', [App\Http\Controllers\Api\CategoryController::class, 'index'])->name('api.categories.index');
-    Route::get('/categories/{category:slug}', [App\Http\Controllers\Api\CategoryController::class, 'show'])->name('api.categories.show');
+    Route::get('/categories/{category:slug}', [App\Http\Controllers\Api\CategoryController::class, 'show'])
+        // Reserve the `tree` slug for the dedicated endpoint so implicit model binding does not
+        // swallow the request before it reaches the static route definition below.
+        ->where('category', '^(?!tree$)[A-Za-z0-9\-]+$')
+        ->name('api.categories.show');
     Route::get('/brands', [App\Http\Controllers\Api\BrandController::class, 'index'])->name('api.brands.index');
     Route::get('/brands/{brand:slug}', [App\Http\Controllers\Api\BrandController::class, 'show'])->name('api.brands.show');
     Route::middleware('auth')->get('/orders/{order:number}', [App\Http\Controllers\Api\OrderController::class, 'show'])->name('api.orders.show');
