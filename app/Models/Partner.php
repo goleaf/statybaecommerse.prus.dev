@@ -221,7 +221,21 @@ final class Partner extends Model implements HasMedia
         }
 
         // Attempt to lazy load the relation when a foreign key is present but the relation was not eager loaded.
-        $resolved = $this->tier()->getResults();
+        $relation = $this->tier();
+        $resolved = $relation->getResults();
+        if ($resolved instanceof PartnerTier) {
+            $this->setRelation('tier', $resolved);
+
+            return $resolved;
+        }
+
+        // When global scopes hide disabled or soft-deleted tiers, bypass them so the fallback accessor can still
+        // surface the historic rate associated with the partner record without requiring eager loading beforehand.
+        $resolved = $relation
+            ->withoutGlobalScopes([ActiveScope::class, EnabledScope::class])
+            ->withTrashed()
+            ->first();
+
         if ($resolved instanceof PartnerTier) {
             $this->setRelation('tier', $resolved);
 
