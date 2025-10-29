@@ -15,18 +15,45 @@ return new class extends Migration
             Schema::create('enhanced_settings', function (Blueprint $table): void {
                 $table->id();
                 $table->string('group')->default('general');
-                $table->string('key')->unique();
+                // Store the raw key without a unique constraint so we can scope uniqueness by locale later.
+                $table->string('key');
+                // Track the locale in the primary table so multilingual settings can co-exist without collisions.
+                $table->string('locale', 10)->default('lt')->after('key');
                 $table->json('value')->nullable();
                 $table->string('type')->default('text'); // text, number, boolean, json, array
                 $table->text('description')->nullable();
                 $table->boolean('is_public')->default(false);
                 $table->boolean('is_encrypted')->default(false);
+                // Flag whether the setting is currently active so admin filters can ignore archived rows.
+                $table->boolean('is_active')->default(true);
                 $table->json('validation_rules')->nullable();
                 $table->integer('sort_order')->default(0);
                 $table->timestamps();
 
                 $table->index(['group', 'key']);
                 $table->index(['is_public']);
+                // Speed up locale scoped lookups that power admin filters and tests.
+                $table->index('locale', 'enhanced_settings_locale_index');
+                // Ensure each key is unique per locale to keep translated variants isolated.
+                $table->unique(['key', 'locale'], 'enhanced_settings_key_locale_unique');
+            });
+        }
+
+        if (! Schema::hasTable('enhanced_settings_translations')) {
+            Schema::create('enhanced_settings_translations', function (Blueprint $table): void {
+                $table->id();
+                $table->unsignedBigInteger('enhanced_setting_id');
+                // Mirror the parent locale so translations resolve correctly when eager loading.
+                $table->string('locale', 10);
+                $table->text('description')->nullable();
+                $table->string('display_name')->nullable();
+                $table->text('help_text')->nullable();
+                $table->timestamps();
+
+                $table->index('locale', 'enhanced_settings_translations_locale_index');
+                // Prevent duplicate translations for the same locale on a single setting.
+                $table->unique(['enhanced_setting_id', 'locale'], 'enhanced_settings_translations_setting_locale_unique');
+                $table->foreign('enhanced_setting_id')->references('id')->on('enhanced_settings')->onDelete('cascade');
             });
         }
 
@@ -191,6 +218,8 @@ return new class extends Migration
         Schema::dropIfExists('system_logs');
         Schema::dropIfExists('notification_templates');
         Schema::dropIfExists('media_collections');
+        // Drop translations before the parent table to avoid foreign key complaints during teardown.
+        Schema::dropIfExists('enhanced_settings_translations');
         Schema::dropIfExists('enhanced_settings');
     }
 };
