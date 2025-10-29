@@ -149,20 +149,46 @@ final class EnumValue extends Model
     {
         // Clone the existing model while resetting fields that must remain unique.
         $newEnumValue = $this->replicate();
-        $newEnumValue->key = $this->key . '_copy';
+
+        // Generate a collision-resistant key so repeated duplications never violate the unique constraint.
+        $newEnumValue->key = $this->generateDuplicateKey();
         $newEnumValue->is_default = false;
 
         $metadata = $newEnumValue->metadata;
         if (! is_array($metadata)) {
+            // Normalise malformed metadata payloads before we mutate the usage counter.
             $metadata = [];
         }
 
+        // Reset usage statistics to ensure the duplicate starts from a clean slate.
         $metadata['usage_count'] = 0;
         $newEnumValue->metadata = $metadata;
 
         $newEnumValue->save();
 
         return $newEnumValue;
+    }
+
+    /**
+     * Build a unique key for the duplicated enum value without leaking the original primary key.
+     */
+    private function generateDuplicateKey(): string
+    {
+        // Begin with the conventional “_copy” suffix and increment until the key is unique for the type.
+        $baseKey = $this->key . '_copy';
+        $candidateKey = $baseKey;
+        $suffix = 2;
+
+        while (self::query()
+            ->where('type', $this->type)
+            ->where('key', $candidateKey)
+            ->exists()) {
+            // Append an incrementing suffix when the naive key is already in use.
+            $candidateKey = sprintf('%s_%d', $baseKey, $suffix);
+            $suffix++;
+        }
+
+        return $candidateKey;
     }
 
     // Static methods
@@ -224,21 +250,23 @@ final class EnumValue extends Model
         // Soft delete enum values that have not been used within the retention window.
         $threshold = now()->subMonths(6);
 
-        $candidates = self::query()
-            ->where('created_at', '<', $threshold)
-            ->get();
-
         $deleted = 0;
 
-        foreach ($candidates as $enumValue) {
-            if ($enumValue->getUsageCount() > 0) {
-                continue;
-            }
+        // Iterate lazily to avoid loading large tables into memory during maintenance windows.
+        self::query()
+            ->where('created_at', '<', $threshold)
+            ->lazyById()
+            ->each(function (EnumValue $enumValue) use (&$deleted): void {
+                // Skip records that still have a usage count, even if they are old.
+                if ($enumValue->getUsageCount() > 0) {
+                    return;
+                }
 
-            if ($enumValue->delete()) {
-                $deleted++;
-            }
-        }
+                if ($enumValue->delete()) {
+                    // Track successful deletions for reporting back to the caller.
+                    $deleted++;
+                }
+            });
 
         return $deleted;
     }

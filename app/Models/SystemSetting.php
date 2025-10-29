@@ -51,6 +51,14 @@ final class SystemSetting extends Model implements HasMedia
      */
     protected string $nameColumn = 'key';
 
+    /**
+     * Default cache lifetime (in seconds) when no explicit TTL is stored.
+     *
+     * Keeping this on the model guarantees consistent fallbacks whenever
+     * instance-level caching is enabled but the `cache_ttl` column is null.
+     */
+    private int $defaultCacheTtl = 3600;
+
     protected $fillable = ['category_id', 'key', 'name', 'value', 'type', 'group', 'category', 'unit', 'description', 'help_text', 'is_public', 'is_required', 'is_encrypted', 'is_readonly', 'validation_rules', 'options', 'default_value', 'sort_order', 'is_active', 'updated_by', 'placeholder', 'tooltip', 'metadata', 'meta', 'validation_message', 'is_cacheable', 'cache_ttl', 'cache_key', 'environment', 'tags', 'version', 'access_count', 'last_accessed_at'];
 
     protected $casts = ['is_public' => 'boolean', 'is_required' => 'boolean', 'is_encrypted' => 'boolean', 'is_readonly' => 'boolean', 'is_active' => 'boolean', 'is_cacheable' => 'boolean', 'validation_rules' => 'json', 'options' => 'json', 'metadata' => 'json', 'meta' => 'json', 'tags' => 'json', 'sort_order' => 'integer', 'cache_ttl' => 'integer', 'access_count' => 'integer', 'last_accessed_at' => 'datetime'];
@@ -300,9 +308,18 @@ final class SystemSetting extends Model implements HasMedia
      */
     public static function getValue(string $key, $default = null)
     {
-        $setting = self::where('key', $key)->active()->first();
+        $setting = self::query()
+            ->where('key', $key)
+            ->active()
+            ->first();
 
-        return $setting ? $setting->value : $default;
+        if ($setting === null) {
+            return $default;
+        }
+
+        // Resolve the value via the caching helper so repeated lookups avoid
+        // unnecessary database hits while still respecting cache toggles.
+        return $setting->resolveCachedValue($default);
     }
 
     /**
@@ -337,9 +354,19 @@ final class SystemSetting extends Model implements HasMedia
      */
     public static function getPublic(string $key, $default = null)
     {
-        $setting = self::where('key', $key)->public()->active()->first();
+        $setting = self::query()
+            ->where('key', $key)
+            ->public()
+            ->active()
+            ->first();
 
-        return $setting ? $setting->value : $default;
+        if ($setting === null) {
+            return $default;
+        }
+
+        // Public lookups share the same caching mechanism to keep behaviour
+        // consistent regardless of visibility constraints.
+        return $setting->resolveCachedValue($default);
     }
 
     /**
@@ -650,6 +677,49 @@ final class SystemSetting extends Model implements HasMedia
         }
 
         cache()->forget($this->getCacheKey());
+    }
+
+    /**
+     * Persist the current value in cache (when enabled) and return the result.
+     *
+     * @param mixed $default
+     */
+    private function resolveCachedValue($default = null)
+    {
+        if (! $this->is_cacheable) {
+            return $this->value ?? $default;
+        }
+
+        $cacheKey = $this->getCacheKey();
+        $ttl = $this->getCacheTtlSeconds();
+
+        // Using a closure keeps encryption/decryption logic centralised in the
+        // accessor, so cached data always mirrors the value consumers expect.
+        $callback = function () use ($default) {
+            return $this->value ?? $default;
+        };
+
+        $store = cache()->getStore();
+
+        if ($store instanceof TaggableStore) {
+            return cache()
+                ->tags($this->getCacheTags())
+                ->remember($cacheKey, now()->addSeconds($ttl), $callback);
+        }
+
+        return cache()->remember($cacheKey, now()->addSeconds($ttl), $callback);
+    }
+
+    /**
+     * Determine the cache TTL, ensuring non-positive values fall back safely.
+     */
+    private function getCacheTtlSeconds(): int
+    {
+        if (is_int($this->cache_ttl) && $this->cache_ttl > 0) {
+            return $this->cache_ttl;
+        }
+
+        return $this->defaultCacheTtl;
     }
 
     /**
