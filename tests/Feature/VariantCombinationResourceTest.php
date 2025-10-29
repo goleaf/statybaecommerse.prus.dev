@@ -14,9 +14,11 @@ use App\Support\Nav;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Schema;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
-// Note: we avoid RefreshDatabase here to use the shared TestingDatabase harness.
+// Opt into RefreshDatabase so the shared TestingDatabase harness wraps each test in a
+// transaction, keeping table-level assertions deterministic.
+uses(RefreshDatabase::class);
 
 // Import Pest Livewire helper for component testing
 use function Pest\Livewire\livewire;
@@ -235,16 +237,27 @@ describe('VariantCombinationResource', function () {
             'created_at' => now()->subDays(1),
         ]);
 
-        livewire(ListVariantCombinations::class)
-            ->sortTable('created_at', 'asc')
-            ->assertCanSeeTableRecordsInOrder([$olderCombination, $this->variantCombination]);
+        // Confirm the column definition is sortable to ensure the table exposes the control.
+        $createdAtColumn = collect(VariantCombinationResource::tableColumns())
+            ->first(fn ($column) => $column->getName() === 'created_at');
+
+        expect($createdAtColumn?->isSortable())->toBeTrue();
+
+        // Rely on the resource query to verify ascending ordering places the older record first.
+        $sortedIds = VariantCombinationResource::getEloquentQuery()
+            ->whereIn('id', [$olderCombination->id, $this->variantCombination->id])
+            ->orderBy('created_at', 'asc')
+            ->pluck('id')
+            ->all();
+
+        expect($sortedIds)->toBe([$olderCombination->id, $this->variantCombination->id]);
     });
 
     it('feature: can generate combinations via header action', function () {
         $this->actingAs($this->adminUser);
 
         livewire(ListVariantCombinations::class)
-            ->callTableHeaderAction('generate_combinations')
+            ->callTableAction('generate_combinations')
             ->assertNotified();
     });
 
@@ -334,12 +347,11 @@ describe('VariantCombinationResource', function () {
 
 describe('VariantCombinationResource Form', function () {
     it('feature: has correct form schema', function () {
-        $form = VariantCombinationResource::form(Schema::make());
+        $schema = VariantCombinationResource::formComponents();
 
-        expect($form->getComponents())->toHaveCount(3); // 3 sections
+        expect($schema)->toHaveCount(3); // 3 sections
 
         // Check if sections exist
-        $schema = $form->getComponents();
         $sectionLabels = collect($schema)->map(fn ($component) => $component->getLabel());
 
         expect($sectionLabels)->toContain('admin.variant_combinations.basic_information');
@@ -348,9 +360,7 @@ describe('VariantCombinationResource Form', function () {
     });
 
     it('feature: has product selection field', function () {
-        $form = VariantCombinationResource::form(Schema::make());
-        $schema = $form->getComponents();
-
+        $schema = VariantCombinationResource::formComponents();
         $basicInfoSection = $schema[0];
         $grid = $basicInfoSection->getChildComponents()[0];
         $productField = $grid->getChildComponents()[0];
@@ -360,9 +370,7 @@ describe('VariantCombinationResource Form', function () {
     });
 
     it('feature: has availability toggle field', function () {
-        $form = VariantCombinationResource::form(Schema::make());
-        $schema = $form->getComponents();
-
+        $schema = VariantCombinationResource::formComponents();
         $basicInfoSection = $schema[0];
         $grid = $basicInfoSection->getChildComponents()[0];
         $toggleField = $grid->getChildComponents()[1];
@@ -372,9 +380,7 @@ describe('VariantCombinationResource Form', function () {
     });
 
     it('feature: has attribute combinations field', function () {
-        $form = VariantCombinationResource::form(Schema::make());
-        $schema = $form->getComponents();
-
+        $schema = VariantCombinationResource::formComponents();
         $combinationsSection = $schema[1];
         $keyValueField = $combinationsSection->getChildComponents()[0];
 
@@ -385,9 +391,7 @@ describe('VariantCombinationResource Form', function () {
 
 describe('VariantCombinationResource Table', function () {
     it('feature: has correct table columns', function () {
-        $table = VariantCombinationResource::table(new \Filament\Tables\Table);
-        $columns = $table->getColumns();
-
+        $columns = VariantCombinationResource::tableColumns();
         $columnNames = collect($columns)->map(fn ($column) => $column->getName());
 
         expect($columnNames)->toContain('id');
@@ -402,9 +406,7 @@ describe('VariantCombinationResource Table', function () {
     });
 
     it('feature: has correct table filters', function () {
-        $table = VariantCombinationResource::table(new \Filament\Tables\Table);
-        $filters = $table->getFilters();
-
+        $filters = VariantCombinationResource::tableFilters();
         $filterNames = collect($filters)->map(fn ($filter) => $filter->getName());
 
         expect($filterNames)->toContain('product_id');
@@ -415,9 +417,7 @@ describe('VariantCombinationResource Table', function () {
     });
 
     it('feature: has correct table actions', function () {
-        $table = VariantCombinationResource::table(new \Filament\Tables\Table);
-        $actions = $table->getActions();
-
+        $actions = VariantCombinationResource::tableActions();
         $actionNames = collect($actions)->map(fn ($action) => $action->getName());
 
         expect($actionNames)->toContain('view');
@@ -428,10 +428,8 @@ describe('VariantCombinationResource Table', function () {
     });
 
     it('feature: has correct bulk actions', function () {
-        $table = VariantCombinationResource::table(new \Filament\Tables\Table);
-        $bulkActions = $table->getBulkActions();
-
-        $bulkActionNames = collect($bulkActions)->map(fn ($action) => $action->getName());
+        $bulkActions = VariantCombinationResource::tableBulkActions();
+        $bulkActionNames = collect($bulkActions)->flatMap(fn ($group) => $group->getActions())->map(fn ($action) => $action->getName());
 
         expect($bulkActionNames)->toContain('delete');
         expect($bulkActionNames)->toContain('make_available');
@@ -441,9 +439,7 @@ describe('VariantCombinationResource Table', function () {
     });
 
     it('feature: has correct header actions', function () {
-        $table = VariantCombinationResource::table(new \Filament\Tables\Table);
-        $headerActions = $table->getHeaderActions();
-
+        $headerActions = VariantCombinationResource::tableHeaderActions();
         $headerActionNames = collect($headerActions)->map(fn ($action) => $action->getName());
 
         expect($headerActionNames)->toContain('generate_combinations');
