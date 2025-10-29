@@ -150,7 +150,10 @@
   SystemSettingDependency filters lower-case both the stored column values and
   the incoming terms so LIKE comparisons behave consistently across MySQL,
   PostgreSQL, and SQLite when administrators search for dependency conditions.
-  The dependency model now resolves relationships through the
+  The dependency model now persists the human-readable condition string, the
+  extracted `condition_value`, and a JSON `meta` payload directly on the table
+  so lookups avoid SQLite's `json_valid` constraint while still supporting
+  future evaluation metadata. The relationship continues to resolve through the
   `dependsOnSettingRelation` alias, ensuring attribute lookups remain cached
   even while supporting the legacy scope signature that filters dependencies by
   their controlling setting.
