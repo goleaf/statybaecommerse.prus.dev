@@ -9,8 +9,8 @@ use App\Models\ShippingOption;
 use App\Services\Shipping\ShippingOptionResolver;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 
 uses(RefreshDatabase::class);
@@ -49,21 +49,55 @@ it('filters shipping options by geography and weight constraints', function (): 
 
     $resolver = app(ShippingOptionResolver::class);
 
-    $lithuania = Country::factory()->create([
-        'cca2'          => 'LT',
-        'code'          => 'LT',
-        'currency_code' => 'EUR',
-        'is_active'     => true,
-        'is_enabled'    => true,
-    ]);
+    $lithuania = Country::query()->updateOrCreate(
+        ['cca2' => 'LT'],
+        [
+            // Keep country metadata predictable so resolver filtering stays deterministic across seeded runs.
+            'name'            => 'Lithuania',
+            'name_official'   => 'Republic of Lithuania',
+            'code'            => 'LT',
+            'cca3'            => 'LTU',
+            'currency_code'   => 'EUR',
+            'currency_symbol' => '€',
+            'is_active'       => true,
+            'is_enabled'      => true,
+            'is_eu_member'    => true,
+            'requires_vat'    => true,
+            'region'          => 'Europe',
+            'subregion'       => 'Northern Europe',
+            'timezones'       => ['Europe/Vilnius'],
+            'timezone'        => 'Europe/Vilnius',
+            'languages'       => ['lt' => 'Lithuanian'],
+            'currencies'      => ['EUR' => 'Euro'],
+            'vat_rate'        => 21.0,
+            'sort_order'      => 1,
+        ],
+    );
 
-    $estonia = Country::factory()->create([
-        'cca2'          => 'EE',
-        'code'          => 'EE',
-        'currency_code' => 'EUR',
-        'is_active'     => true,
-        'is_enabled'    => true,
-    ]);
+    $estonia = Country::query()->updateOrCreate(
+        ['cca2' => 'EE'],
+        [
+            // Mirror deterministic fixtures for Estonia so unique constraints remain satisfied when seeds pre-populate records.
+            'name'            => 'Estonia',
+            'name_official'   => 'Republic of Estonia',
+            'code'            => 'EE',
+            'cca3'            => 'EST',
+            'currency_code'   => 'EUR',
+            'currency_symbol' => '€',
+            'is_active'       => true,
+            'is_enabled'      => true,
+            'is_eu_member'    => true,
+            'requires_vat'    => true,
+            'region'          => 'Europe',
+            'subregion'       => 'Northern Europe',
+            'timezones'       => ['Europe/Tallinn'],
+            'timezone'        => 'Europe/Tallinn',
+            'languages'       => ['et' => 'Estonian'],
+            'currencies'      => ['EUR' => 'Euro'],
+            'vat_rate'        => 20.0,
+            'sort_order'      => 2,
+        ],
+    );
 
     $product = Product::factory()->create([
         'weight' => 4.0,
