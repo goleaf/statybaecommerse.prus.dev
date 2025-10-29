@@ -35,6 +35,25 @@ final class SystemSettingTranslation extends Model
     use SoftDeletes;
 
     /**
+     * Hook into the model lifecycle so locale codes are stored in a consistent
+     * lowercase format regardless of how the admin panel or seeders provide
+     * the value. Normalising the attribute here keeps scopes deterministic and
+     * prevents duplicate records caused by mixed-case variants in the database.
+     */
+    protected static function booted(): void
+    {
+        self::saving(function (self $translation): void {
+            // Resolve the raw attribute to keep static analysis satisfied while
+            // guarding against missing array keys on freshly instantiated models.
+            $locale = $translation->getAttribute('locale');
+
+            if (is_string($locale)) {
+                $translation->locale = mb_strtolower($locale);
+            }
+        });
+    }
+
+    /**
      * Sort translations by their name value to keep locale selectors intuitive
      * across the administration experience.
      */
