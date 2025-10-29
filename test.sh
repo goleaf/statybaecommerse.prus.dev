@@ -7,6 +7,28 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
+# Default sort order
+SORT_ORDER="asc"
+
+# Parse command line arguments
+for arg in "$@"; do
+    case $arg in
+        --sort=asc)
+            SORT_ORDER="asc"
+            shift
+            ;;
+        --sort=desc)
+            SORT_ORDER="desc"
+            shift
+            ;;
+        *)
+            echo -e "${RED}Unknown argument: $arg${NC}"
+            echo -e "${YELLOW}Usage: $0 [--sort=asc|--sort=desc]${NC}"
+            exit 1
+            ;;
+    esac
+done
+
 echo -e "${BLUE}========================================${NC}"
 echo -e "${BLUE}  Collecting and Running Tests${NC}"
 echo -e "${BLUE}========================================${NC}"
@@ -14,7 +36,13 @@ echo ""
 
 # Find all test files
 echo -e "${YELLOW}Collecting test files...${NC}"
-test_files=$(find tests -type f -name "*Test.php" | sort)
+if [ "$SORT_ORDER" = "desc" ]; then
+    echo -e "${YELLOW}Sort order: Descending${NC}"
+    test_files=$(find tests -type f -name "*Test.php" | sort -r)
+else
+    echo -e "${YELLOW}Sort order: Ascending${NC}"
+    test_files=$(find tests -type f -name "*Test.php" | sort)
+fi
 
 # Count total tests
 total_tests=$(echo "$test_files" | wc -l)
