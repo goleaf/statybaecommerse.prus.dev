@@ -81,7 +81,10 @@ final class LoginForm extends Form
                 'max_attempts' => $maxAttempts,
             ]);
 
-            if ($attempts >= $maxAttempts) {
+            // Allow the configured number of attempts before enforcing the lockout so the
+            // next call is the one that receives the HTTP 429 response, matching Laravel's
+            // documented throttling behaviour and the expectations baked into the feature tests.
+            if ($attempts > $maxAttempts) {
                 $this->throwRateLimitException(
                     $captchaManager,
                     $monitor,
