@@ -72,6 +72,7 @@ For every file under `app/Filament/**`:
 - Follow PSR-12, enable `declare(strict_types=1);`, and lean on constructor property promotion, typed properties/returns, and Laravel helpers where it improves clarity.
 - Favor Tailwind utility classes in Blade templates and keep business logic inside view models or dedicated classes instead of views.
 - Stick to SOLID design principles: encapsulate domain logic in services/repositories as needed, and avoid duplicating logic across the admin/front-end layers.
+- Prefer the shared `resources/views/components/buttons/*.blade.php` components (e.g., `x-buttons.primary`) when rendering buttons in Blade templates so aliases stay consistent across authentication and storefront flows.【F:resources/views/components/buttons/primary.blade.php†L1-L26】
 
 ## Tooling Notes
 
