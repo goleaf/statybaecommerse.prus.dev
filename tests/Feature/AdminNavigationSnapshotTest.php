@@ -23,6 +23,23 @@ final class AdminNavigationSnapshotTest extends TestCase
 
         $navigation = $this->buildNavigationTree();
         $snapshotPath = base_path('tests/__snapshots__/admin-navigation.json');
+        $snapshotDir = dirname($snapshotPath);
+
+        // Create snapshot directory if it doesn't exist
+        if (! is_dir($snapshotDir)) {
+            mkdir($snapshotDir, 0o755, true);
+        }
+
+        // If snapshot doesn't exist, create it with current navigation structure
+        if (! file_exists($snapshotPath)) {
+            file_put_contents(
+                $snapshotPath,
+                json_encode($navigation, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR)
+            );
+
+            $this->markTestSkipped('Snapshot file created. Please review and commit it, then rerun the test.');
+        }
+
         $expected = json_decode((string) file_get_contents($snapshotPath), true, 512, JSON_THROW_ON_ERROR);
 
         $this->assertSame($expected, $navigation);

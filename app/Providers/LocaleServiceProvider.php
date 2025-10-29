@@ -18,8 +18,9 @@ final class LocaleServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        // Set default locale to Lithuanian
-        App::setLocale('lt');
+        // Set default locale to Lithuanian (from config)
+        $defaultLocale = config('app.locale', 'lt');
+        App::setLocale($defaultLocale);
 
         if (PHP_SAPI === 'cli' || app()->runningInConsole()) {
             return;
@@ -28,7 +29,14 @@ final class LocaleServiceProvider extends ServiceProvider
         try {
             if (Session::has('locale')) {
                 $locale = Session::get('locale');
-                if (in_array($locale, ['lt', 'en'])) {
+                $supportedLocales = config('app.supported_locales', ['lt', 'en']);
+
+                // Normalize supported locales array
+                if (is_string($supportedLocales)) {
+                    $supportedLocales = array_map('trim', explode(',', $supportedLocales));
+                }
+
+                if (is_array($supportedLocales) && in_array($locale, $supportedLocales, true)) {
                     App::setLocale($locale);
                 }
             }
