@@ -101,10 +101,8 @@ final class SimpleJsonSchemaValidator
             }
         }
 
-        if (isset($schema['minimum']) && is_numeric($schema['minimum']) && is_numeric($data)) {
-            if ((float) $data < (float) $schema['minimum']) {
-                $errors[] = sprintf('%s must be greater than or equal to %s.', $path, $schema['minimum']);
-            }
+        if (isset($schema['minimum']) && is_numeric($schema['minimum']) && is_numeric($data) && (float) $data < (float) $schema['minimum']) {
+            $errors[] = sprintf('%s must be greater than or equal to %s.', $path, $schema['minimum']);
         }
 
         if (isset($schema['properties']) && is_array($schema['properties']) && is_array($data)) {
@@ -144,6 +142,35 @@ final class SimpleJsonSchemaValidator
                     $errors,
                     $this->validateAgainstSchema($item, $schema['items'], sprintf('%s[%d]', $path, $index), $rootSchema)
                 );
+            }
+        }
+
+        if (isset($schema['oneOf']) && is_array($schema['oneOf'])) {
+            // Evaluate each schema branch to ensure the payload satisfies exactly one of them.
+            $matchedBranches = 0;
+            $branchErrors = [];
+
+            foreach (array_values($schema['oneOf']) as $index => $oneOfSchema) {
+                $result = $this->validateAgainstSchema($data, (array) $oneOfSchema, $path, $rootSchema);
+
+                if ($result === []) {
+                    $matchedBranches++;
+
+                    continue;
+                }
+
+                $branchErrors[$index] = $result;
+            }
+
+            if ($matchedBranches !== 1) {
+                $errors[] = $matchedBranches === 0
+                    ? sprintf('%s must satisfy at least one oneOf constraint.', $path)
+                    : sprintf('%s must satisfy exactly one oneOf constraint.', $path);
+
+                if ($matchedBranches === 0 && $branchErrors !== []) {
+                    // Surface the first branch error to hint at the offending structure or value.
+                    $errors = array_merge($errors, array_values($branchErrors)[0]);
+                }
             }
         }
 
@@ -207,8 +234,8 @@ final class SimpleJsonSchemaValidator
     private function valueMatchesType(mixed $value, string $type): bool
     {
         return match ($type) {
-            'object'  => is_array($value),
-            'array'   => is_array($value),
+            'object'  => is_array($value) && (! array_is_list($value) || $value === []), // Allow empty arrays to represent JSON objects.
+            'array'   => is_array($value) && array_is_list($value),   // JSON "array" must be a list with sequential integer keys.
             'string'  => is_string($value),
             'integer' => is_int($value),
             'number'  => is_int($value) || is_float($value),

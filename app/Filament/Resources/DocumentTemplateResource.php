@@ -10,7 +10,7 @@ use App\Filament\Resources\DocumentTemplateResource\Pages;
 use App\Filament\Resources\DocumentTemplateResource\RelationManagers\DocumentsRelationManager;
 use App\Models\DocumentTemplate;
 use BackedEnum;
-use Filament\Actions\DeleteAction;
+use Filament\Notifications\Notification;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
@@ -25,11 +25,20 @@ use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Schemas\Components\Tabs as SchemaTabs;
 use Filament\Schemas\Components\Tabs\Tab as SchemaTab;
 use Filament\Schemas\Schema;
+use Filament\Tables\Actions\Action as TableAction;
+use Filament\Tables\Actions\BulkAction as TableBulkAction;
+use Filament\Tables\Actions\BulkActionGroup as TableBulkActionGroup;
+use Filament\Tables\Actions\DeleteAction as TableDeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction as TableDeleteBulkAction;
+use Filament\Tables\Actions\EditAction as TableEditAction;
+use Filament\Tables\Actions\ViewAction as TableViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 
@@ -280,8 +289,9 @@ final class DocumentTemplateResource extends Resource
                     }),
                 TableViewAction::make(),
                 TableEditAction::make(),
-                DeleteAction::make()
-                    ->before(function (DeleteAction $action, DocumentTemplate $record): void {
+                TableDeleteAction::make()
+                    // Warn administrators before deleting templates with linked documents.
+                    ->before(function (TableDeleteAction $action, DocumentTemplate $record): void {
                         if (! $record->documents()->exists()) {
                             return;
                         }

@@ -317,8 +317,11 @@ final class SystemSettingDependency extends Model
             return false;
         }
 
-        $normalizedValue = is_string($dependencyValue) ? trim($dependencyValue) : $dependencyValue;
-        $normalizedExpected = is_string($expectedValue) ? trim($expectedValue) : $expectedValue;
+        // Normalise both the actual value and the expected comparison target so that
+        // downstream comparisons work consistently across strings, numbers, and
+        // boolean-like payloads (e.g. "true", "false", 1, 0).
+        $normalizedValue = $this->normalizeComparableValue($dependencyValue);
+        $normalizedExpected = $this->normalizeComparableValue($expectedValue);
 
         return match ($operator) {
             'equals'            => $this->compareValues($normalizedValue, $normalizedExpected) === 0,
@@ -346,6 +349,12 @@ final class SystemSettingDependency extends Model
      */
     private function compareValues(mixed $actual, mixed $expected): int
     {
+        // Ensure both operands use comparable scalar types so that boolean strings
+        // such as "true" or "false" evaluate predictably when matched against real
+        // boolean values stored in the database.
+        $actual = $this->normalizeComparableValue($actual);
+        $expected = $this->normalizeComparableValue($expected);
+
         if ($actual === null || $expected === null) {
             return $actual === $expected ? 0 : ($actual === null ? -1 : 1);
         }
@@ -375,7 +384,7 @@ final class SystemSettingDependency extends Model
             if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
                 $expected = $decoded;
             } else {
-                $expected = array_map('trim', array_filter(explode(',', $expected), static fn ($item): bool => $item !== ''));
+                $expected = array_map(trim(...), array_filter(explode(',', $expected), static fn ($item): bool => $item !== ''));
             }
         }
 
@@ -383,7 +392,14 @@ final class SystemSettingDependency extends Model
             return false;
         }
 
-        return in_array($actual, $expected, ! is_string($actual));
+        // Align list values with the same normalisation rules used by the primary
+        // comparator so that numeric and boolean entries match consistently.
+        $normalizedExpected = array_map(
+            $this->normalizeComparableValue(...),
+            $expected
+        );
+
+        return in_array($actual, $normalizedExpected, ! is_string($actual));
     }
 
     /**
@@ -400,5 +416,44 @@ final class SystemSettingDependency extends Model
         }
 
         return filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+    }
+
+    /**
+     * Normalise incoming values prior to comparisons so mixed types can be
+     * evaluated with the same semantics (trim strings, decode boolean-like
+     * tokens, and recurse through arrays when required).
+     */
+    private function normalizeComparableValue(mixed $value): mixed
+    {
+        if (is_array($value)) {
+            return array_map(
+                $this->normalizeComparableValue(...),
+                $value
+            );
+        }
+
+        if (! is_string($value)) {
+            return $value;
+        }
+
+        $trimmed = trim($value);
+
+        if ($trimmed === '') {
+            return '';
+        }
+
+        $lowercase = strtolower($trimmed);
+
+        if (in_array($lowercase, ['true', 'false'], true)) {
+            return $lowercase === 'true';
+        }
+
+        if (is_numeric($trimmed)) {
+            // Preserve integer precision where possible while still supporting
+            // decimal comparisons for floating point strings.
+            return str_contains($trimmed, '.') ? (float) $trimmed : (int) $trimmed;
+        }
+
+        return $trimmed;
     }
 }
