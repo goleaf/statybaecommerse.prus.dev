@@ -4,10 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Models\Scopes\DateRangeScope;
-use App\Models\Scopes\EnabledScope;
 use App\Models\Translations\PriceTranslation;
-use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -32,7 +29,6 @@ use Illuminate\Support\Collection;
  *
  * @mixin \Eloquent
  */
-#[ScopedBy([EnabledScope::class, DateRangeScope::class])]
 final class Price extends Model
 {
     use HasFactory, SoftDeletes;
@@ -129,7 +125,9 @@ final class Price extends Model
      */
     public function scopeEnabled(Builder $query): Builder
     {
-        // Filter to prices explicitly flagged as enabled.
+        // Filter to prices explicitly flagged as enabled while leaving time-based
+        // concerns to the dedicated `active()` scope that callers can append as
+        // needed when narrowing to currently valid entries.
         return $query->where('is_enabled', true);
     }
 
@@ -164,7 +162,8 @@ final class Price extends Model
      */
     public function scopeForCurrency(Builder $query, string $currencyCode): Builder
     {
-        // Limit the result set to a specific ISO currency code.
+        // Filter by ISO code without altering other scope combinations so the
+        // caller retains control over enabled or active constraints.
         return $query->whereHas('currency', static function (Builder $builder) use ($currencyCode): void {
             $builder->where('code', $currencyCode);
         });
