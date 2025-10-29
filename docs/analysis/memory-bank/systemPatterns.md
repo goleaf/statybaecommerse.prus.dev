@@ -90,6 +90,7 @@
 - Priority-based stacking with exclusivity rules
 - Cached eligibility evaluation
 - Tag-based cache invalidation
+- Query scopes on discount redemptions expose per-discount, per-user, order-specific, and date-filtered analytics for reporting surfaces.【F:app/Models/DiscountRedemption.php†L130-L178】
 
 ### 3. Media Management Architecture
 **Decision:** Spatie Media Library with automatic conversions
