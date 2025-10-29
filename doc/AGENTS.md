@@ -77,6 +77,7 @@ For every file under `app/Filament/**`:
 - Keep database seeds multilingual (Lithuanian default, with English equivalents) and ensure currency formatting uses euros via `Number::currency` when rendering monetary values.
 - When you add or modify Filament resources or Livewire components, provide or update Pest tests that cover CRUD operations, authorization, and localization behavior.
 - Use factories with descriptive data to keep tests clear.
+- Treat feature toggles as environment-aware: `FeatureToggleService` now reuses a base query and explicitly orders results so scoped flags win over global defaults. Preserve that structure when extending flag evaluation logic so staging-only rollouts remain reliable.【F:app/Services/FeatureToggleService.php†L57-L83】
 
 ## Coding Standards
 
