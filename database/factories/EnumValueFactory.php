@@ -45,9 +45,10 @@ class EnumValueFactory extends Factory
             'name'        => fake()->words(3, true),
             'description' => fake()->sentence(),
             'sort_order'  => fake()->numberBetween(1, 100),
-            'is_active'   => fake()->boolean(80),
-            'is_default'  => fake()->boolean(10),
-            'metadata'    => [
+            // Default to an inactive, non-default record so tests can opt-in explicitly.
+            'is_active'  => false,
+            'is_default' => false,
+            'metadata'   => [
                 'usage_count' => fake()->numberBetween(0, 100),
                 'color'       => fake()->hexColor(),
                 'icon'        => fake()->randomElement(['heroicon-o-star', 'heroicon-o-check', 'heroicon-o-x']),

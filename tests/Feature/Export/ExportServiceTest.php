@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use App\Data\ExportRequestData;
 use App\Enums\ExportStatus;
-use App\Jobs\ProcessExportJob;
+use App\Jobs\ProcessExport;
 use App\Models\Order;
 use App\Models\User;
 use App\Notifications\ExportReadyNotification;
@@ -23,6 +23,8 @@ test('it queues and processes exports', function (): void {
     Notification::fake();
     Bus::fake();
 
+    app()->setLocale('lt');
+
     $user = User::factory()->create();
     $orders = Order::factory()->count(3)->create();
 
@@ -38,9 +40,9 @@ test('it queues and processes exports', function (): void {
 
     $export = $service->queue($request);
 
-    Bus::assertDispatched(ProcessExportJob::class, fn (ProcessExportJob $job): bool => $job->exportId === $export->getKey());
+    Bus::assertDispatched(ProcessExport::class, fn (ProcessExport $job): bool => $job->exportId === $export->getKey());
 
-    (new ProcessExportJob($export->getKey()))->handle($service);
+    (new ProcessExport($export->getKey()))->handle($service);
 
     $export->refresh();
 
@@ -48,7 +50,7 @@ test('it queues and processes exports', function (): void {
         ->and($export->total_rows)->toBe(3)
         ->and(Storage::disk($disk)->exists($export->artifact_path))->toBeTrue();
 
-    Notification::assertSentTo($user, ExportReadyNotification::class, function (ExportReadyNotification $notification) use ($export): bool {
+    Notification::assertSentTo($user, ExportReadyNotification::class, function (ExportReadyNotification $notification) use ($user, $export): bool {
         $data = $notification->toArray($user);
 
         return $data['export_id'] === $export->getKey();
@@ -60,6 +62,8 @@ test('it returns signed download responses', function (): void {
     config()->set('filesystems.default', $disk);
     Storage::fake($disk);
     Notification::fake();
+
+    app()->setLocale('lt');
 
     $user = User::factory()->create();
     $orders = Order::factory()->count(2)->create();
@@ -75,7 +79,7 @@ test('it returns signed download responses', function (): void {
     );
 
     $export = $service->queue($request);
-    (new ProcessExportJob($export->getKey()))->handle($service);
+    (new ProcessExport($export->getKey()))->handle($service);
     $export->refresh();
 
     $url = ExportUrlGenerator::temporarySignedDownloadUrl($export, 5);
@@ -84,5 +88,8 @@ test('it returns signed download responses', function (): void {
 
     $response->assertOk();
     $response->assertHeader('content-disposition');
-    $response->assertSee('number');
+
+    $content = $response->streamedContent();
+
+    expect($content)->toContain(__('orders.fields.order_number', [], 'lt'));
 });
