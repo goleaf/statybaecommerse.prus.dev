@@ -147,6 +147,10 @@
   SystemSettingDependency filters lower-case both the stored column values and
   the incoming terms so LIKE comparisons behave consistently across MySQL,
   PostgreSQL, and SQLite when administrators search for dependency conditions.
+- **Dependency Evaluation Reuse:** SystemSettingDependency caches the
+  normalised comparison outcome before branching through the supported
+  operators so repeated checks (equals, greater than, etc.) avoid redundant
+  conversions and keep the dependency panel snappy even with complex rules.
 
 ## Security Patterns
 
