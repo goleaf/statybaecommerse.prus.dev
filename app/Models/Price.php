@@ -200,9 +200,9 @@ final class Price extends Model
         );
 
         return $query
-            ->select($this->qualifyColumn('*'))
+            ->select($model->getTable() . '.*')
             ->orderBy("{$alias}.name", $direction)
-            ->orderBy($this->qualifyColumn('id'));
+            ->orderBy($model->qualifyColumn('id'));
     }
 
     /**
