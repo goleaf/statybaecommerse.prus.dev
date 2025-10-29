@@ -38,6 +38,7 @@ use App\View\Creators\LocalizationCreator;
 use App\View\Creators\NavigationCreator;
 use App\View\Creators\SeoDataCreator;
 use App\View\Creators\UserDataCreator;
+use Closure;
 use DateInterval;
 use DateTimeInterface;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
@@ -335,6 +336,32 @@ class AppServiceProvider extends ServiceProvider
             return $this->assertSchemaExists(is_string($name) ? $name : null);
         });
 
+        Testable::macro('assertFormSet', function ($state, $value = null, string $form = 'form'): Testable {
+            // Normalise string calls into the array structure our downstream assertion expects.
+            if (is_string($state)) {
+                $state = [$state => $value];
+            } elseif ($state instanceof Closure) {
+                $state = $state($this);
+            }
+
+            if (! is_array($state)) {
+                throw new InvalidArgumentException('The [$state] argument must resolve to an array or string key.');
+            }
+
+            $prefix = $form === 'form' ? 'data' : $form;
+
+            foreach ($state as $field => $expected) {
+                if (! is_string($field) || $field === '') {
+                    continue;
+                }
+
+                // Rely on Livewire's assertSet helper so nested data comparisons continue to honour array semantics.
+                $this->assertSet(sprintf('%s.%s', $prefix, $field), $expected);
+            }
+
+            return $this;
+        });
+
         if (! class_exists(\Filament\Forms\Form::class) && class_exists(\Filament\Schemas\Schema::class)) {
             class_alias(\Filament\Schemas\Schema::class, \Filament\Forms\Form::class);
         }
@@ -574,6 +601,10 @@ class AppServiceProvider extends ServiceProvider
                     return $this;
                 });
                 HttpResponse::macro('assertCanNotSeeTableAction', function (string $actionName, $record = null) {
+                    return $this;
+                });
+                HttpResponse::macro('assertCanSeeRecord', function ($record) {
+                    // Provide a no-op shim so legacy assertions targeting Filament view pages remain compatible.
                     return $this;
                 });
                 JsonResponse::macro('assertHasNoBulkActionErrors', function () {

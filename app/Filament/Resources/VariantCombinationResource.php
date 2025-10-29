@@ -23,7 +23,6 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Schemas\Schema;
-use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -32,6 +31,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use UnitEnum;
 
 final class VariantCombinationResource extends Resource
 {
@@ -40,18 +40,14 @@ final class VariantCombinationResource extends Resource
     /**
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations while
      * still allowing the resource to override it with a simple string when needed.
-     *
-     * @var string|\BackedEnum|null
      */
-    protected static $navigationIcon = 'heroicon-o-squares-2x2';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-squares-2x2';
 
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata while
      * remaining flexible for plain string usage in configuration overrides.
-     *
-     * @var string|\UnitEnum|null
      */
-    protected static $navigationGroup = 'Inventory';
+    protected static UnitEnum|string|null $navigationGroup = 'Inventory';
 
     protected static ?int $navigationSort = 19;
 
@@ -148,7 +144,7 @@ final class VariantCombinationResource extends Resource
      * Resolve the available attribute list for the selected product while avoiding ambiguous
      * column selections when SQLite performs implicit column ordering.
      *
-     * @param  int|string|null  $productId
+     * @param  int|string|null           $productId
      * @return array<int|string, string>
      */
     private static function resolveAvailableAttributes($productId): array

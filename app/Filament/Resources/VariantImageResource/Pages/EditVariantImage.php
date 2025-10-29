@@ -21,6 +21,6 @@ final class EditVariantImage extends EditRecord
 
     protected function mutateFormDataBeforeSave(array $data): array
     {
-        return VariantImageResource::populateFileMetadata($data);
+        return VariantImageResource::populateFileMetadata($data, $this->record);
     }
 }

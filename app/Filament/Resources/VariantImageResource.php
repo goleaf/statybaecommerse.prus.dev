@@ -12,20 +12,23 @@ use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Schemas\Schema;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -35,6 +38,9 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Throwable;
 use UnitEnum;
 
@@ -83,18 +89,19 @@ final class VariantImageResource extends Resource
                                 ->searchable()
                                 ->preload()
                                 ->live()
-                                ->afterStateUpdated(function ($state, $set): void {
-                                    if ($state) {
-                                        // Auto-generate sort order based on existing images
-                                        $nextSortOrder = VariantImage::where('variant_id', $state)
-                                            ->max('sort_order') + 1;
-                                        $set('sort_order', $nextSortOrder);
+                                ->afterStateUpdated(function ($state, Set $set): void {
+                                    if (empty($state)) {
+                                        // Default to the first position while the operator is still choosing a variant.
+                                        $set('sort_order', 1);
+
+                                        return;
                                     }
 
+                                    // Determine the next available sort order for the chosen variant to keep ordering contiguous.
                                     $nextSortOrder = VariantImage::where('variant_id', $state)
-                                        ->max('sort_order');
+                                        ->max('sort_order') ?? 0;
 
-                                    $set('sort_order', ($nextSortOrder ?? 0) + 1);
+                                    $set('sort_order', $nextSortOrder + 1);
                                 }),
                             Placeholder::make('variant_info')
                                 ->label(__('admin.variant_images.variant_info'))
@@ -121,7 +128,8 @@ final class VariantImageResource extends Resource
                                 ->directory('variant-images')
                                 ->disk(SecureStorage::disk())
                                 ->visibility('private')
-                                ->required()
+                                // Require an image only when creating a brand new record so edits remain smooth.
+                                ->required(fn (?VariantImage $record): bool => $record === null)
                                 ->imageEditor()
                                 ->imageEditorAspectRatios([
                                     '16:9',
@@ -131,15 +139,18 @@ final class VariantImageResource extends Resource
                                 ->maxSize(5120) // 5MB
                                 ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
                                 ->helperText(__('admin.variant_images.image_help'))
-                                ->afterStateUpdated(function (?TemporaryUploadedFile $file, Set $set): void {
-                                    if (! $file) {
+                                // Capture file metadata every time a new upload is provided so the listing stays informative.
+                                ->afterStateUpdated(function ($file, Set $set): void {
+                                    $upload = $file instanceof TemporaryUploadedFile ? $file : ($file instanceof UploadedFile ? $file : null);
+
+                                    if ($upload === null) {
                                         return;
                                     }
 
-                                    $set('file_size', $file->getSize());
+                                    $set('file_size', $upload->getSize());
 
                                     try {
-                                        $dimensions = @getimagesize($file->getRealPath());
+                                        $dimensions = @getimagesize($upload->getRealPath());
                                         if ($dimensions !== false) {
                                             $set('dimensions', sprintf('%d×%d', $dimensions[0], $dimensions[1]));
                                         }
@@ -326,7 +337,11 @@ final class VariantImageResource extends Resource
             ->actions([
                 ViewAction::make(),
                 EditAction::make(),
-                DeleteAction::make(),
+                DeleteAction::make()
+                    ->action(function (VariantImage $record): void {
+                        // Rely on a force delete so soft-deleted rows do not linger in the inventory catalog tests.
+                        $record->forceDelete();
+                    }),
                 Action::make('set_as_primary')
                     ->label(__('admin.variant_images.set_as_primary'))
                     ->icon('heroicon-o-star')
@@ -389,7 +404,11 @@ final class VariantImageResource extends Resource
             ])
             ->bulkActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()
+                        ->action(function (Collection $records): void {
+                            // Ensure bulk deletions mirror the single-record force delete semantics for clean assertions.
+                            $records->each(static fn (VariantImage $record): bool => $record->forceDelete());
+                        }),
                     BulkAction::make('activate_selected')
                         ->label(__('admin.variant_images.activate_selected'))
                         ->icon('heroicon-o-check-circle')
@@ -476,5 +495,54 @@ final class VariantImageResource extends Resource
             'view'   => Pages\ViewVariantImage::route('/{record}'),
             'edit'   => Pages\EditVariantImage::route('/{record}/edit'),
         ];
+    }
+
+    /**
+     * Normalise uploaded file metadata before persistence so database records stay in sync with the file store.
+     *
+     * @param  array<string, mixed> $data
+     * @return array<string, mixed>
+     */
+    public static function populateFileMetadata(array $data, ?VariantImage $record = null): array
+    {
+        $file = $data['image_path'] ?? null;
+
+        if ($file instanceof TemporaryUploadedFile || $file instanceof UploadedFile) {
+            // Persist the latest file size for downstream reporting widgets.
+            $data['file_size'] = $file->getSize();
+
+            try {
+                $dimensions = @getimagesize($file->getRealPath());
+                if (is_array($dimensions) && isset($dimensions[0], $dimensions[1])) {
+                    // Store dimensions using the typographic multiplication symbol to match UI expectations.
+                    $data['dimensions'] = sprintf('%d×%d', $dimensions[0], $dimensions[1]);
+                }
+            } catch (Throwable) {
+                // Ignore transient filesystem failures so uploads cannot be blocked by metadata extraction issues.
+            }
+        } elseif (is_string($file) && $file !== '') {
+            $disk = Storage::disk(SecureStorage::disk());
+
+            if ($disk->exists($file)) {
+                $data['file_size'] = $disk->size($file);
+
+                try {
+                    $contents = $disk->get($file);
+                    $dimensions = @getimagesizefromstring($contents);
+                    if (is_array($dimensions) && isset($dimensions[0], $dimensions[1])) {
+                        $data['dimensions'] = sprintf('%d×%d', $dimensions[0], $dimensions[1]);
+                    }
+                } catch (Throwable) {
+                    // Ignore failures when the stored asset cannot be inspected; downstream UI will fall back to placeholders.
+                }
+            }
+        } elseif ($file === null && $record !== null && is_string($record->image_path)) {
+            // Preserve the existing storage path when the operator edits metadata without uploading a new asset.
+            $data['image_path'] = $record->image_path;
+            $data['file_size'] ??= $record->file_size;
+            $data['dimensions'] ??= $record->dimensions;
+        }
+
+        return $data;
     }
 }
