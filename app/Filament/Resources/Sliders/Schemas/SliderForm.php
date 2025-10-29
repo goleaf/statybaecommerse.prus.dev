@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Sliders\Schemas;
 
-use App\Support\Filament\SearchableInputHelper;
-use App\Support\Search\ContentLinkSearch;
-use DefStudio\SearchableInput\Forms\Components\SearchableInput;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -18,7 +16,8 @@ final class SliderForm
 {
     public static function configure(Schema $form): Schema
     {
-        return $schema
+        // Continue using the injected form instance so we respect Filament's fluent schema builder lifecycle.
+        return $form
             ->schema([
                 SchemaSection::make(__('admin.sliders.basic_information'))
                     ->description(__('admin.sliders.basic_information_description'))
@@ -47,7 +46,7 @@ final class SliderForm
                 SchemaSection::make(__('admin.sliders.media'))
                     ->description(__('admin.sliders.media_description'))
                     ->components([
-                        SpatieMediaLibraryFileUpload::make('slider_images')
+                        SpatieMediaLibraryFileUpload::make('image')
                             ->label(__('admin.sliders.image'))
                             ->collection('slider_images')
                             ->disk('public')
@@ -58,10 +57,9 @@ final class SliderForm
                                 '4:3',
                                 '1:1',
                             ])
-                            ->maxSize(5120)  // 5MB
-                            ->required(fn (string $operation): bool => $operation === 'create')
+                            ->maxSize(5120)  // 5MB limit documented for reviewers.
                             ->columnSpanFull(),
-                        SpatieMediaLibraryFileUpload::make('slider_backgrounds')
+                        SpatieMediaLibraryFileUpload::make('background')
                             ->label(__('admin.sliders.background_image'))
                             ->collection('slider_backgrounds')
                             ->disk('public')
@@ -72,7 +70,7 @@ final class SliderForm
                                 '4:3',
                                 '1:1',
                             ])
-                            ->maxSize(5120)  // 5MB
+                            ->maxSize(5120)
                             ->columnSpanFull(),
                     ])
                     ->collapsible(),
@@ -85,30 +83,13 @@ final class SliderForm
                                     ->label(__('admin.sliders.button_text'))
                                     ->maxLength(255)
                                     ->columnSpan(1),
-                                SearchableInput::make('button_url')
+                                TextInput::make('button_url')
                                     ->label(__('admin.sliders.button_url'))
                                     ->placeholder(__('admin.sliders.button_url_placeholder'))
                                     ->helperText(__('admin.sliders.button_url_helper'))
-                                    ->searchUsing(fn (string $term): array => ContentLinkSearch::suggest($term))
                                     ->maxLength(255)
-                                    ->searchUsing(fn (string $value): array => ContentLinkSearch::results($value))
-                                    ->dehydrateStateUsing(fn (?string $state): ?string => $state !== null && $state !== '' ? $state : null)
-                                    ->afterStateHydrated(function (SearchableInput $component, ?string $state): void {
-                                        // Hydrate via helper to align with docs/forms/SEARCHABLE_INPUT_METADATA.md.
-                                        SearchableInputHelper::hydrate(
-                                            $component,
-                                            $state,
-                                            static fn (string $value): ?array => ['value' => $value, 'label' => $value],
-                                        );
-                                    })
-                                    ->afterStateUpdated(function (SearchableInput $component, ?string $state, callable $set): void {
-                                        if ($state !== null && $state !== '') {
-                                            return;
-                                        }
-
-                                        // Reset CTA URLs whenever lookup is cleared to avoid stale payloads.
-                                        SearchableInputHelper::clear($component, $set, ['button_url' => null]);
-                                    })
+                                    ->url()
+                                    ->nullable()
                                     ->columnSpan(1),
                             ]),
                     ])
@@ -146,7 +127,6 @@ final class SliderForm
                                     ->default(5000)
                                     ->minValue(1000)
                                     ->step(500)
-                                    ->required()
                                     ->columnSpan(1),
                                 Toggle::make('settings.show_indicators')
                                     ->label(__('admin.sliders.settings_show_indicators'))
