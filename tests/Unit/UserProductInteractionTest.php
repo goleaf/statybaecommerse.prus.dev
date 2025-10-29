@@ -16,6 +16,15 @@ final class UserProductInteractionTest extends TestCase
     use RefreshDatabase;
 
     /**
+     * Provide a concise way to create interactions with sane defaults across tests.
+     */
+    private function buildInteraction(array $overrides = []): UserProductInteraction
+    {
+        // The factory handles relations; we only supplement overrides when specific attributes matter.
+        return UserProductInteraction::factory()->create($overrides);
+    }
+
+    /**
      * Ensure the modern fillable and casted attributes stay aligned with the
      * schema contract declared in the model.
      */
@@ -44,7 +53,7 @@ final class UserProductInteractionTest extends TestCase
      */
     public function test_meta_accessor_merges_legacy_columns(): void
     {
-        $interaction = UserProductInteraction::factory()->create([
+        $interaction = $this->buildInteraction([
             'meta' => [
                 'rating'            => 4.5,
                 'count'             => 7,
@@ -67,7 +76,7 @@ final class UserProductInteractionTest extends TestCase
      */
     public function test_legacy_interaction_type_alias_remains_available(): void
     {
-        $interaction = UserProductInteraction::factory()->create([
+        $interaction = $this->buildInteraction([
             'event' => 'click',
         ]);
 
@@ -84,7 +93,7 @@ final class UserProductInteractionTest extends TestCase
         $product = Product::factory()->create();
         $variant = ProductVariant::factory()->create(['product_id' => $product->id]);
 
-        $interaction = UserProductInteraction::factory()->create([
+        $interaction = $this->buildInteraction([
             'user_id'            => $user->id,
             'product_id'         => $product->id,
             'product_variant_id' => $variant->id,
@@ -101,8 +110,8 @@ final class UserProductInteractionTest extends TestCase
      */
     public function test_ordered_by_name_scope_sorts_by_event(): void
     {
-        $first = UserProductInteraction::factory()->create(['event' => 'alpha']);
-        $second = UserProductInteraction::factory()->create(['event' => 'zulu']);
+        $first = $this->buildInteraction(['event' => 'alpha']);
+        $second = $this->buildInteraction(['event' => 'zulu']);
 
         $ordered = UserProductInteraction::query()->orderedByName()->pluck('event')->all();
 
@@ -116,11 +125,11 @@ final class UserProductInteractionTest extends TestCase
      */
     public function test_recent_scope_uses_occurred_at(): void
     {
-        $recent = UserProductInteraction::factory()->create([
+        $recent = $this->buildInteraction([
             'occurred_at' => now()->subDay(),
         ]);
 
-        $older = UserProductInteraction::factory()->create([
+        $older = $this->buildInteraction([
             'occurred_at' => now()->subMonths(2),
         ]);
 
