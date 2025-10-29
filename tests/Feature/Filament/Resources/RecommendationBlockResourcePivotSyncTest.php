@@ -20,6 +20,11 @@ final class RecommendationBlockResourcePivotSyncTest extends TestCase
 
     private User $admin;
 
+    /**
+     * Capture the original activity logging configuration for later restoration.
+     */
+    private bool $originalActivityLogEnabled = true;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -27,6 +32,11 @@ final class RecommendationBlockResourcePivotSyncTest extends TestCase
         $this->ensureFilamentPivotTablesMigrated();
         $this->resetFilamentPivotTables();
         $this->resolveAdminPanel();
+
+        // Preserve the incoming activity log toggle so the pivot sync assertions
+        // can disable logging without altering the behaviour observed by later
+        // suites that depend on audit trails.
+        $this->originalActivityLogEnabled = (bool) config('activitylog.enabled', true);
 
         config([
             'app.locale'          => 'en',
@@ -80,6 +90,16 @@ final class RecommendationBlockResourcePivotSyncTest extends TestCase
         ]);
 
         $this->actingAs($this->admin);
+    }
+
+    protected function tearDown(): void
+    {
+        // Re-enable activity logging according to the previously captured state
+        // so the admin-side tests that assert on activity rows continue to see
+        // the expected behaviour.
+        config(['activitylog.enabled' => $this->originalActivityLogEnabled]);
+
+        parent::tearDown();
     }
 
     public function test_it_synchronizes_selected_products_on_create(): void

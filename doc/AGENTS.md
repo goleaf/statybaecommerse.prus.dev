@@ -83,8 +83,9 @@ For every file under `app/Filament/**`:
 - Keep database seeds multilingual (Lithuanian default, with English equivalents) and ensure currency formatting uses euros via `Number::currency` when rendering monetary values.
 - When you add or modify Filament resources or Livewire components, provide or update Pest tests that cover CRUD operations, authorization, and localization behavior.
 - Use factories with descriptive data to keep tests clear.
-- Variant analytics unit tests now centralize deterministic factories via the `createAnalytics` and `createAnalyticsForDate` helpers; reuse them to keep bucket and rate assertions stable across database drivers.
+- When extending the `UserProductInteraction` regression coverage, rely on the shared helper methods inside the feature and unit test suites so new assertions inherit the consistent baseline fixtures without additional setup.【F:tests/Feature/UserProductInteractionTest.php†L16-L47】【F:tests/Unit/UserProductInteractionTest.php†L16-L33】
 - Treat feature toggles as environment-aware: `FeatureToggleService` now reuses a base query and explicitly orders results so scoped flags win over global defaults. Preserve that structure when extending flag evaluation logic so staging-only rollouts remain reliable.【F:app/Services/FeatureToggleService.php†L57-L83】
+- When tests disable framework features (for example setting `config('activitylog.enabled', false)`), capture the existing value and restore it in `tearDown()`/`afterEach` to avoid leaking state into subsequent suites that assert on activity log behaviour.
 
 ## Coding Standards
 
