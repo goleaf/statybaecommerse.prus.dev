@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Models\Scopes\ActiveScope;
 use Database\Factories\DocumentTemplateFactory;
-use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -28,11 +26,13 @@ use Stringable;
  *
  * @mixin \Eloquent
  */
-#[ScopedBy([ActiveScope::class])]
 final class DocumentTemplate extends Model
 {
     /** @use HasFactory<DocumentTemplateFactory> */
     use HasFactory;
+
+    // Expose both active and inactive templates so admin filters and tests
+    // can evaluate visibility explicitly rather than via a global scope.
 
     protected $fillable = ['name', 'slug', 'description', 'content', 'variables', 'type', 'category', 'settings', 'is_active'];
 

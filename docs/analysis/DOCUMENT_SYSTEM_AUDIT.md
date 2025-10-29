@@ -12,7 +12,7 @@ The document platform combines reusable templates, automated generation, variabl
 - `Database\\Seeders\\DocumentSeeder` now loops per record to attach freshly created invoices, receipts, and reports to the latest user fixtures and sampled orders, preventing stray factory-generated relations from drifting outside curated test data.【F:database/seeders/DocumentSeeder.php†L20-L142】
 
 ## Variable Replacement
-- `DocumentService::processTemplate()` normalises arrays, objects, and booleans before performing placeholder substitution, while `DocumentTemplate::render()` supports `{{placeholder}}` tokens—together powering dynamic content injection for generated documents.【F:app/Services/DocumentService.php†L110-L131】【F:app/Models/DocumentTemplate.php†L110-L130】
+- `DocumentService::processTemplate()` normalises arrays, objects, and booleans before performing placeholder substitution, while `DocumentTemplate::render()` supports `{{placeholder}}` tokens—together powering dynamic content injection for generated documents.【F:app/Services/DocumentService.php†L110-L131】【F:app/Models/DocumentTemplate.php†L114-L130】
 - `DocumentService::getAvailableVariables()` exposes cached global keys (order details, customer metadata, etc.), and `extractVariablesFromModel()` maps model attributes (including order-specific overrides) for automatic replacement.【F:app/Services/DocumentService.php†L139-L199】【F:app/Services/DocumentService.php†L205-L226】
 
 ## Document Types
