@@ -18,15 +18,14 @@ use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use UnitEnum;
 
 /**
  * Filament resource that exposes CRUD pages for product collections.
@@ -45,26 +44,26 @@ final class CollectionResource extends Resource
     protected static ?string $model = Collection::class;
 
     /**
-     * Group the resource under the "Products" navigation entry (localized to Lithuanian).
-     * The comprehensive test suite expects the translated label to be stored directly.
+     * Group the resource under the Products navigation entry using the translated label expected by tests.
+     * This keeps Lithuanian back-office terminology consistent while allowing Nav helpers to map metadata.
      */
-    /**
-     * Surface the strongly typed navigation group so Nav utilities can keep translations aligned.
-     */
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Products;
+    protected static ?string $navigationGroup = 'Produktai';
 
     /**
      * Display icon used by Filament's sidebar.
+     *
+     * @var string|BackedEnum|null
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-folder';
+    protected static $navigationIcon = 'heroicon-o-folder';
 
     /**
      * Lightweight form definition that exposes the most important
      * Collection attributes. Additional validation rules can be added
      * later without affecting the expectations covered by the tests.
      */
-    public static function form(Schema $form): Schema
+    public static function form(Form $form): Form
     {
+        // Build the form schema that powers collection management inside the admin panel.
         return $form->schema([
             Tabs::make('collection_management')
                 ->tabs([
