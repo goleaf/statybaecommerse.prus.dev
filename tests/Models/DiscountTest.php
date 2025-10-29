@@ -6,11 +6,11 @@ namespace Tests\Models;
 
 use App\Models\Discount;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\CoversMethod;
 use Tests\TestCase;
 
-/**
- * @covers \App\Models\Discount::scopeOrderedByName
- */
+// Ensure PHPUnit tracks the scope coverage using the modern attribute syntax.
+#[CoversMethod(Discount::class, 'scopeOrderedByName')]
 final class DiscountTest extends TestCase
 {
     use RefreshDatabase;
