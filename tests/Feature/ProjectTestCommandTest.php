@@ -220,9 +220,9 @@ it('feature: test status page displays results when available', function () {
                 'error_output'      => '',
                 'last_run_duration' => 0.123,
             ],
-            'Tests\Feature\ExampleTest::testExample' => [
-                'id'                => 'Tests\Feature\ExampleTest::testExample',
-                'hash'              => md5('Tests\Feature\ExampleTest::testExample'),
+            'Tests\Feature\DashboardFixtureTest::it_passes' => [
+                'id'                => 'Tests\Feature\DashboardFixtureTest::it_passes',
+                'hash'              => md5('Tests\Feature\DashboardFixtureTest::it_passes'),
                 'groups'            => [],
                 'status'            => 'failed',
                 'output'            => '',
@@ -232,7 +232,9 @@ it('feature: test status page displays results when available', function () {
         ],
         'order' => [
             'Tests\Unit\ExampleTest::testExample',
-            'Tests\Feature\ExampleTest::testExample',
+            // Reference the renamed dashboard placeholder so the mocked
+            // ordering mirrors the new class name and method signature.
+            'Tests\Feature\DashboardFixtureTest::it_passes',
         ],
     ];
     File::put($resultsPath, json_encode($mockData));
@@ -241,7 +243,7 @@ it('feature: test status page displays results when available', function () {
 
     $response->assertSuccessful();
     $response->assertSee('Tests\Unit\ExampleTest::testExample');
-    $response->assertSee('Tests\Feature\ExampleTest::testExample');
+    $response->assertSee('Tests\Feature\DashboardFixtureTest::it_passes');
     $response->assertSee(__('frontend.test_results.status.passed'));
     $response->assertSee(__('frontend.test_results.status.failed'));
 });

@@ -47,8 +47,9 @@ The model-focused regression suite is a quick indicator that Eloquent scopes, ca
 
 ## Dashboard Fixture Placeholders
 
-- The CI dashboards and historical analytics still expect `Tests\Feature\ExampleTest` and
-  related suites to exist. Lightweight placeholder files now live in `tests/Feature`,
+- The CI dashboards and historical analytics now expect the renamed placeholder class
+  `Tests\Feature\DashboardFixtureTest` and related suites to exist. Lightweight placeholder
+  files still live in `tests/Feature`,
   `tests/Unit`, `tests/Livewire`, `tests/Filament`, and `tests/Http`. Keep these examples in
   place (and green) so progress reports render without 404s when polling the project-level
   test index.
