@@ -31,6 +31,7 @@ The model-focused regression suite is a quick indicator that Eloquent scopes, ca
    - `Partner::getEffectiveDiscountRateAttribute()` and its commission twin now bypass the active/enabled scopes when lazily resolving a tier so model specs that null out the partner rate still inherit the historical tier values even if factories create a disabled tier record.【F:app/Models/Partner.php†L161-L207】
 10. Customer group activation toggles still mirror `false` assignments across both `is_active` and `is_enabled` when only one value is provided, but the mutators now respect explicit divergence when both flags are supplied (for example `is_enabled = true` with `is_active = false`). Adjust assertions accordingly so factory payloads that deliberately keep a group enabled while marking it inactive continue to pass.【F:app/Models/CustomerGroup.php†L547-L605】
 11. The SQLite fallback schema used by `Tests\\Support\\TestingDatabase` now provisions lightweight `products` and `product_images` tables whenever the full migration stack cannot execute. This keeps the product catalogue factories and `ProductImage` unit coverage operational even when the harness regenerates an abbreviated database, so include those columns in new assertions when expanding the suite.
+12. XML catalogue imports now seed default `status` and `published_at` values so `Product` records remain discoverable through the `ActiveScope` and `PublishedScope` filters during regression runs, preventing soft failures when round-tripping fixture data via `XmlCatalogService`.【F:app/Services/XmlCatalogService.php†L382-L391】
 
 ## System setting attribution safety
 
@@ -47,8 +48,10 @@ The model-focused regression suite is a quick indicator that Eloquent scopes, ca
 
 ## Dashboard Fixture Placeholders
 
-- The CI dashboards and historical analytics still expect `Tests\Feature\ExampleTest` and
-  related suites to exist. Lightweight placeholder files now live in `tests/Feature`,
-  `tests/Unit`, `tests/Livewire`, `tests/Filament`, and `tests/Http`. Keep these examples in
-  place (and green) so progress reports render without 404s when polling the project-level
-  test index.
+- Historical dashboards still surface `Tests\Feature\ExampleTest` identifiers, but the
+  source data now ships exclusively through the JSON fixtures consumed by the test results
+  feature tests. Maintain the mocked payloads in `tests/Feature/TestResults*` so the
+  expected identifiers remain visible even though the dedicated feature test class has been
+  retired. Continue keeping the remaining placeholder files in `tests/Unit`,
+  `tests/Livewire`, `tests/Filament`, and `tests/Http` green so the progress reports stay
+  consistent.
