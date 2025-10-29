@@ -8,6 +8,7 @@ The document platform combines reusable templates, automated generation, variabl
 
 ## Document Generation
 - `DocumentService::generateDocument()` sanitises template HTML, applies variables, persists the draft record, and optionally notifies the initiating user; `generatePdf()` renders the processed HTML into a DomPDF file, applies print settings, saves the asset to secure storage, and publishes the document.【F:app/Services/DocumentService.php†L35-L103】
+- `Database\\Seeders\\DocumentSeeder` now loops per record to attach freshly created invoices, receipts, and reports to the latest user fixtures and sampled orders, preventing stray factory-generated relations from drifting outside curated test data.【F:database/seeders/DocumentSeeder.php†L20-L142】
 
 ## Variable Replacement
 - `DocumentService::processTemplate()` normalises arrays, objects, and booleans before performing placeholder substitution, while `DocumentTemplate::render()` supports `{{placeholder}}` tokens—together powering dynamic content injection for generated documents.【F:app/Services/DocumentService.php†L110-L131】【F:app/Models/DocumentTemplate.php†L110-L130】
