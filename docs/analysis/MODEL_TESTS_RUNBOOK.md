@@ -47,9 +47,10 @@ The model-focused regression suite is a quick indicator that Eloquent scopes, ca
 
 ## Dashboard Fixture Placeholders
 
-- The CI dashboards and historical analytics now expect the renamed placeholder class
-  `Tests\Feature\DashboardFixtureTest` and related suites to exist. Lightweight placeholder
-  files still live in `tests/Feature`,
-  `tests/Unit`, `tests/Livewire`, `tests/Filament`, and `tests/Http`. Keep these examples in
-  place (and green) so progress reports render without 404s when polling the project-level
-  test index.
+- Historical dashboards still surface `Tests\Feature\ExampleTest` identifiers, but the
+  source data now ships exclusively through the JSON fixtures consumed by the test results
+  feature tests. Maintain the mocked payloads in `tests/Feature/TestResults*` so the
+  expected identifiers remain visible even though the dedicated feature test class has been
+  retired. Continue keeping the remaining placeholder files in `tests/Unit`,
+  `tests/Livewire`, `tests/Filament`, and `tests/Http` green so the progress reports stay
+  consistent.
