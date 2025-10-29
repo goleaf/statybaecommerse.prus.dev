@@ -30,13 +30,6 @@ use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 // legacy class aliases are always available during early package discovery.
 require_once __DIR__ . '/filament_compat.php';
 
-$appEnvironment = (string) env('APP_ENV', 'production');
-$queueConnection = (string) env('QUEUE_CONNECTION', 'sync');
-
-if ($appEnvironment !== 'local' || $queueConnection !== 'sync') {
-    $providers[] = App\Providers\HorizonServiceProvider::class;
-}
-
 $providers[] = App\Providers\LocaleServiceProvider::class;
 if (! env('SKIP_FILAMENT_BOOT')) {
     $providers[] = App\Providers\Filament\AdminPanelProvider::class;
@@ -592,13 +585,6 @@ $app = Application::configure(basePath: dirname(__DIR__))
             App\Providers\ApiServiceProvider::class,
             App\Providers\ModelScopeServiceProvider::class,
         ];
-
-        $appEnvironment = (string) env('APP_ENV', 'production');
-        $queueConnection = (string) env('QUEUE_CONNECTION', 'sync');
-
-        if ($appEnvironment !== 'local' || $queueConnection !== 'sync') {
-            $providers[] = App\Providers\HorizonServiceProvider::class;
-        }
 
         $providers[] = App\Providers\LocaleServiceProvider::class;
         $providers[] = App\Providers\Filament\AdminPanelProvider::class;
