@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\VariantPricingRuleResource\Pages;
+use App\Models\Scopes\ActiveScope;
+use App\Models\Scopes\EnabledScope;
 use App\Models\VariantPricingRule;
 use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use Filament\Actions\Action;
@@ -28,6 +30,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Number;
 use UnitEnum;
@@ -61,7 +64,7 @@ final class VariantPricingRuleResource extends Resource
     /**
      * Handle getNavigationGroup functionality with proper error handling.
      */
-    public static function getNavigationGroup(): string|UnitEnum|null
+    public static function getNavigationGroup(): string
     {
         return 'Products';
     }
@@ -214,7 +217,7 @@ final class VariantPricingRuleResource extends Resource
                 TextColumn::make('value')
                     ->label(__('variant_pricing_rules.value'))
                     ->numeric()
-                    ->formatStateUsing(function ($state, VariantPricingRule $record): string {
+                    ->formatStateUsing(function (string $state, VariantPricingRule $record): string {
                         if ($record->type === 'percentage') {
                             return $state . '%';
                         }
@@ -335,6 +338,18 @@ final class VariantPricingRuleResource extends Resource
         return [
             //
         ];
+    }
+
+    /**
+     * Remove storefront global scopes so admins can manage inactive rules too.
+     */
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                ActiveScope::class,
+                EnabledScope::class,
+            ]);
     }
 
     /**
