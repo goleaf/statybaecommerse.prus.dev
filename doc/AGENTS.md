@@ -24,6 +24,7 @@ This repository mixes Laravel 12 and Filament v4 code. Use the following guardra
 - **Customers & Reviews**: domain models `app/Models/Customer*.php`, `app/Models/Review*.php`, recommendation utilities in `app/Services/Recommendations/**`, customer dashboards in `app/Livewire/Pages/Account/**`, and Filament resources grouped beneath `app/Filament/Resources/Customer*` and `app/Filament/Resources/Review*`.
 - **Content & Marketing**: articles and sliders under `app/Models/News*.php` and `app/Models/Slider*.php`, promotion tooling inside `app/Services/Discounts/**`, email automation in `app/Services/EmailMarketingService.php`, seeded fixtures in `database/seeders/News*`, and Filament resources such as `app/Filament/Resources/News*`, `app/Filament/Resources/Slider*`, and `app/Filament/Resources/Campaign*`.
 - **Automation & Analytics**: background orchestration in `app/Console/Commands/**`, event/listener wiring under `app/Listeners/**`, scheduled exports inside `app/Services/Export/**`, diagnostics in `app/Services/Debug/**`, analytics widgets/resources at `app/Filament/Resources/Analytics*`, and telemetry capture in `app/Models/Analytics*.php`.
+- **Inventory & Filtering**: storefront listings handled by `app/Http/Controllers/InventoryController.php` now route all stock-status, brand, category, search, and sorting concerns through dedicated helper methods and sanitise incoming strings before touching the query builder.
 
 ## Workflow Expectations
 
