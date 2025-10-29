@@ -44,6 +44,7 @@
 - `FeatureToggleService` now bakes the most recent feature flag `updated_at` timestamp into cache keys, ensuring evaluations refresh automatically after administrators create or update environment-scoped toggles.【F:app/Services/FeatureToggleService.php†L41-L87】
 - Environment-scoped flags take precedence over global definitions thanks to explicit ordering, so staging rollouts are no longer masked by previously created production toggles.【F:app/Services/FeatureToggleService.php†L57-L83】
 - Regression coverage confirms cached fallback results give way to persisted flags without manual cache clearing, preventing stale toggle states from leaking between test scenarios or queued jobs.【F:tests/Unit/Services/FeatureToggleServiceTest.php†L118-L141】
+- The attribution observer only fills the `*_by_name` columns when the database exposes them as text fields, side-stepping legacy integer columns with foreign keys that would otherwise reject cached names in SQLite-backed test runs.【F:app/Observers/UserAttributionObserver.php†L27-L30】【F:app/Observers/UserAttributionObserver.php†L152-L184】
 
 ## Recommendations
 - Implement a dedicated exchange-rate sync service (API client + scheduler) that respects the `auto_update_rate` toggle and updates records, replacing placeholder notifications with concrete operations.
