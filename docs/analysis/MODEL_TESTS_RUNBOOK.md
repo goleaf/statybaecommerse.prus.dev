@@ -10,6 +10,11 @@ The model-focused regression suite is a quick indicator that Eloquent scopes, ca
    ```bash
    php artisan test tests/Models
    ```
+   The PHPUnit configuration also exposes the suite directly, so you can trigger it via:
+   ```bash
+   ./vendor/bin/phpunit --testsuite Models
+   ```
+   This mirrors the artisan command without re-running the broader unit suite.
 3. When debugging individual failures, target the specific file for faster feedback. For example:
    ```bash
    php artisan test tests/Models/ActivityLogTest.php
