@@ -15,13 +15,13 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid as SchemaGrid;
-use Filament\Schemas\Components\Section as SchemaSection;
-use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
@@ -36,6 +36,9 @@ final class EmailCampaignResource extends Resource
 
     protected static ?int $navigationSort = 4;
 
+    /**
+     * Override the default icon using Filament's expected BackedEnum|string|null signature.
+     */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-envelope';
 
     /**
@@ -58,21 +61,27 @@ final class EmailCampaignResource extends Resource
         return __('admin.email_campaigns.model_label');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
-            SchemaSection::make(__('admin.email_campaigns.basic_information'))
+        // Build the form schema using the Filament v4 Form API to keep resource configuration consistent.
+        return $form->schema([
+            Section::make(__('admin.email_campaigns.basic_information'))
                 ->description(__('admin.email_campaigns.basic_information_description'))
                 ->schema([
                     TextInput::make('name')
                         ->label(__('admin.email_campaigns.name'))
                         ->required()
                         ->maxLength(255),
+                    // Collect the plain-text body so campaigns always ship with content for transactional fallbacks.
+                    Textarea::make('content')
+                        ->label(__('admin.email_campaigns.content'))
+                        ->required()
+                        ->columnSpanFull(),
                     Textarea::make('description')
                         ->label(__('admin.email_campaigns.description'))
                         ->rows(3)
                         ->columnSpanFull(),
-                    SchemaGrid::make(2)
+                    Grid::make(2)
                         ->schema([
                             TextInput::make('subject')
                                 ->label(__('admin.email_campaigns.subject'))
@@ -84,7 +93,7 @@ final class EmailCampaignResource extends Resource
                                 ->required()
                                 ->maxLength(255),
                         ]),
-                    SchemaGrid::make(2)
+                    Grid::make(2)
                         ->schema([
                             TextInput::make('from_name')
                                 ->label(__('admin.email_campaigns.from_name'))
@@ -94,7 +103,7 @@ final class EmailCampaignResource extends Resource
                                 ->email()
                                 ->maxLength(255),
                         ]),
-                    SchemaGrid::make(2)
+                    Grid::make(2)
                         ->schema([
                             SupportFlatpickr::makeDateTime('scheduled_at')
                                 ->label(__('admin.email_campaigns.scheduled_at')),
