@@ -41,9 +41,12 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 #[ScopedBy([ActiveScope::class, StatusScope::class, ActiveCampaignScope::class])]
 final class Campaign extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
     use HasTranslations;
-    use OrdersByName;
+    use OrdersByName {
+        scopeOrderedByName as scopeOrderedByNameBase;
+    }
+    use SoftDeletes;
 
     protected $table = 'discount_campaigns';
 
@@ -94,6 +97,22 @@ final class Campaign extends Model
     public function discounts(): BelongsToMany
     {
         return $this->belongsToMany(Discount::class, 'campaign_discount');
+    }
+
+    /**
+     * Provide a stable alphabetical ordering scope with a deterministic fallback.
+     */
+    public function scopeOrderedByName(Builder $query, string $direction = 'asc'): Builder
+    {
+        // Normalise the requested direction so callers cannot smuggle arbitrary SQL fragments.
+        $direction = strtolower($direction) === 'desc' ? 'desc' : 'asc';
+        $qualifiedColumn = $query->qualifyColumn('name');
+
+        // Apply a case-insensitive sort to keep behaviour consistent across SQLite and MySQL.
+        $query->orderByRaw(sprintf('LOWER(%s) %s', $qualifiedColumn, $direction));
+
+        // Delegate to the shared trait implementation so we retain the defensive column handling.
+        return $this->scopeOrderedByNameBase($query, $direction);
     }
 
     /**

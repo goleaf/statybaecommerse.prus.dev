@@ -26,7 +26,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 final class CampaignCustomerSegment extends Model
 {
+    /** @use HasFactory<CampaignCustomerSegmentFactory> */
     use HasFactory;
+
     use SoftDeletes;
 
     protected $fillable = [
@@ -116,7 +118,10 @@ final class CampaignCustomerSegment extends Model
     public function scopeActive(Builder $query): Builder
     {
         // Relying on a local scope instead of a global scope preserves access to inactive rows for administrative tasks.
-        return $query->where('is_active', true);
+        // Using qualifyColumn prevents ambiguous column names when the scope is chained on joined queries.
+        $column = $query->getModel()->qualifyColumn('is_active');
+
+        return $query->where($column, true);
     }
 
     /**
@@ -128,7 +133,10 @@ final class CampaignCustomerSegment extends Model
     public function scopeInactive(Builder $query): Builder
     {
         // Complementary inactive scope gives tests and UI layers a clear entry point to fetch paused segments.
-        return $query->where('is_active', false);
+        // Matching the qualified column logic from scopeActive keeps SQL consistent across relationships.
+        $column = $query->getModel()->qualifyColumn('is_active');
+
+        return $query->where($column, false);
     }
 
     /**
@@ -137,10 +145,15 @@ final class CampaignCustomerSegment extends Model
      * @param  Builder<CampaignCustomerSegment> $query
      * @return Builder<CampaignCustomerSegment>
      */
-    public function scopeForCampaign(Builder $query, int|string $campaignId): Builder
+    public function scopeForCampaign(Builder $query, Campaign|int|string $campaign): Builder
     {
         // Accepting int|string keeps compatibility with UUIDs or integer identifiers without extra casting.
-        return $query->where('campaign_id', $campaignId);
+        // Allowing the full Campaign model makes it simpler for callers that already have the relation loaded.
+        $campaignId = $campaign instanceof Campaign ? $campaign->getKey() : $campaign;
+
+        $column = $query->getModel()->qualifyColumn('campaign_id');
+
+        return $query->where($column, $campaignId);
     }
 
     /**
@@ -149,10 +162,15 @@ final class CampaignCustomerSegment extends Model
      * @param  Builder<CampaignCustomerSegment> $query
      * @return Builder<CampaignCustomerSegment>
      */
-    public function scopeForCustomerGroup(Builder $query, int|string $customerGroupId): Builder
+    public function scopeForCustomerGroup(Builder $query, CustomerGroup|int|string $customerGroup): Builder
     {
         // Segments often pivot on customer groups; this helper centralises the filter logic for reuse.
-        return $query->where('customer_group_id', $customerGroupId);
+        // Accepting the related model mirrors the behaviour of scopeForCampaign for a consistent developer experience.
+        $customerGroupId = $customerGroup instanceof CustomerGroup ? $customerGroup->getKey() : $customerGroup;
+
+        $column = $query->getModel()->qualifyColumn('customer_group_id');
+
+        return $query->where($column, $customerGroupId);
     }
 
     /**
@@ -164,8 +182,12 @@ final class CampaignCustomerSegment extends Model
     public function scopeOrdered(Builder $query, string $direction = 'asc'): Builder
     {
         // Guard against invalid direction input to avoid malformed SQL while still allowing asc/desc toggles.
-        $sanitisedDirection = strtolower($direction) === 'desc' ? 'desc' : 'asc';
+        $normalisedDirection = strtolower($direction);
+        $sanitisedDirection = $normalisedDirection === 'desc' ? 'desc' : 'asc';
 
-        return $query->orderBy('sort_order', $sanitisedDirection);
+        // Using qualifyColumn ensures the generated ORDER BY works even when other tables supply a sort_order column.
+        $column = $query->getModel()->qualifyColumn('sort_order');
+
+        return $query->orderBy($column, $sanitisedDirection);
     }
 }

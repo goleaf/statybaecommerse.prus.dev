@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
 use App\Models\Scopes\StatusScope;
@@ -33,6 +34,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 final class Channel extends Model
 {
     use HasFactory, SoftDeletes;
+    use OrdersByName {
+        scopeOrderedByName as scopeOrderedByNameBase;
+    }
 
     protected $table = 'channels';
 
@@ -147,13 +151,18 @@ final class Channel extends Model
     }
 
     /**
-     * Order channels alphabetically so dropdowns remain stable.
+     * Order channels alphabetically while tolerating collation differences.
      */
-    public function scopeOrderedByName(Builder $query): Builder
+    public function scopeOrderedByName(Builder $query, string $direction = 'asc'): Builder
     {
-        // Using LOWER keeps ordering deterministic across SQLite, MySQL, and Postgres collations.
-        return $query
-            ->orderByRaw('LOWER(name) ASC')
-            ->orderBy('name');
+        // Keep the direction constrained to ASC/DESC so we never leak arbitrary SQL segments.
+        $direction = strtolower($direction) === 'desc' ? 'desc' : 'asc';
+        $qualifiedColumn = $query->qualifyColumn('name');
+
+        // Apply a case-normalised ordering first to keep outputs deterministic across database engines.
+        $query->orderByRaw(sprintf('LOWER(%s) %s', $qualifiedColumn, $direction));
+
+        // Fall back to the shared trait's deterministic ordering to guarantee a stable tiebreaker.
+        return $this->scopeOrderedByNameBase($query, $direction);
     }
 }
