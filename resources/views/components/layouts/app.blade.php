@@ -64,11 +64,11 @@
     @elseif ($cssFile && $jsFile)
         {{-- Use compiled assets in production --}}
         <link rel="stylesheet" href="{{ asset('build/' . $cssFile) }}">
-        <script src="{{ asset('build/' . $jsFile) }}"></script>
+        <script type="module" src="{{ asset('build/' . $jsFile) }}"></script>
     @else
         {{-- Provide a graceful no-op when the Vite manifest is missing during backend tests. --}}
         <link rel="stylesheet" href="{{ asset('css/app.css') }}">
-        <script src="{{ asset('js/app.js') }}"></script>
+        <script type="module" src="{{ asset('js/app.js') }}"></script>
     @endif
 
     {{-- Livewire Styles --}}
@@ -149,31 +149,79 @@
                 return; // Alpine already loaded
             }
             
+            function checkComponentsReady() {
+                return typeof window.createDesktopSearchComponent !== 'undefined' &&
+                       typeof window.createMobileSearchComponent !== 'undefined' &&
+                       typeof window.createCartButtonComponent !== 'undefined';
+            }
+            
+            function loadAlpine() {
+                if (typeof window.Alpine !== 'undefined') {
+                    return; // Already loaded
+                }
+                
+                const script = document.createElement('script');
+                script.src = 'https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js';
+                script.defer = true;
+                document.head.appendChild(script);
+            }
+            
             function initAlpine() {
                 if (typeof window.Alpine !== 'undefined') {
                     return; // Already initialized
                 }
                 
-                // Check if components are registered (they should be from app.js)
-                const componentsReady = typeof window.createDesktopSearchComponent !== 'undefined' &&
-                                       typeof window.createMobileSearchComponent !== 'undefined' &&
-                                       typeof window.createCartButtonComponent !== 'undefined';
-                
-                if (componentsReady || document.readyState === 'complete') {
-                    const script = document.createElement('script');
-                    script.src = 'https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js';
-                    script.defer = true;
-                    document.head.appendChild(script);
-                } else {
-                    // Wait for scripts to load
-                    setTimeout(initAlpine, 50);
+                // Check if components are ready
+                if (checkComponentsReady()) {
+                    loadAlpine();
+                    return;
                 }
+                
+                // Wait for app.js module to load and register components
+                let attempts = 0;
+                const maxAttempts = 200; // 10 seconds max wait
+                
+                const checkInterval = setInterval(() => {
+                    attempts++;
+                    if (checkComponentsReady()) {
+                        clearInterval(checkInterval);
+                        loadAlpine();
+                    } else if (attempts >= maxAttempts) {
+                        clearInterval(checkInterval);
+                        // Load Alpine anyway - components might be registered later
+                        console.warn('Alpine components not ready after timeout, loading Alpine anyway');
+                        loadAlpine();
+                    }
+                }, 50);
             }
             
+            // Wait for all scripts to load
             if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', initAlpine);
+                document.addEventListener('DOMContentLoaded', () => {
+                    // Wait a bit for module scripts to execute
+                    window.addEventListener('load', initAlpine);
+                    // Also try after a short delay
+                    setTimeout(initAlpine, 200);
+                });
             } else {
-                initAlpine();
+                window.addEventListener('load', initAlpine);
+                setTimeout(initAlpine, 200);
+            }
+        })();
+    </script>
+    
+    {{-- Filament Alpine functions stub for compatibility --}}
+    <script>
+        (function() {
+            if (typeof window.filamentSchema === 'undefined') {
+                window.filamentSchema = function() {
+                    return {};
+                };
+            }
+            if (typeof window.filamentSchemaComponent === 'undefined') {
+                window.filamentSchemaComponent = function() {
+                    return {};
+                };
             }
         })();
     </script>
