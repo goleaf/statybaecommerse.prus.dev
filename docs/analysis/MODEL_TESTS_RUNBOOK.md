@@ -17,6 +17,7 @@ The model-focused regression suite is a quick indicator that Eloquent scopes, ca
    ```
 4. After the suite succeeds, review `junit.xml`. The tooling will repoint the file to the latest run; restore it if the diff only reflects timing metadata so Git history stays readable.
 5. Capture any non-obvious insights or new invariants in the relevant markdown audits inside `docs/analysis/` so future tasks have the context baked in.
+6. Reuse the deterministic helpers introduced in `Tests\\Unit\\VariantAnalyticsTest` (`createAnalytics` and `createAnalyticsForDate`) whenever writing additional analytics-focused tests so metric assertions stay stable across SQLite/MySQL runs.
 6. When overriding query builders (for example, removing global scopes in a Filament resource to expose soft-deleted or hidden rows), document the intent with an `@return Builder<Model>` annotation so PHPStan retains its generic context and other engineers remember why moderation tools bypass the storefront defaults.
 7. Global scopes now re-validate their cached schema metadata after migrations complete, so if a model suddenly surfaces unexpected rows (for example, `CustomerGroup::enabled()` returning disabled fixtures) rerun the test after the migration phase to let the refreshed cache take effect rather than patching around stale `is_active`/`is_enabled` filters.
 
