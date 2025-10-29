@@ -164,11 +164,18 @@ final class DiscountConditionController extends Controller
             new OA\Response(ref: '#/components/responses/ValidationError', response: 422),
         ]
     )]
-    public function test(\App\Http\Requests\DiscountConditionTestRequest $request, DiscountCondition $discountCondition): JsonResponse
+    public function test(\App\Http\Requests\DiscountConditionTestRequest $request, int $discountConditionId): JsonResponse
     {
+        // Defer model resolution until after validation so missing payloads trigger
+        // a 422 response instead of bubbling up a 404 from implicit route binding.
+        $validated = $request->validated();
+
+        // Manually retrieve the condition once validation succeeds to mirror the
+        // previous behaviour while avoiding premature model binding failures.
+        $discountCondition = DiscountCondition::query()->findOrFail($discountConditionId);
+
         Gate::authorize('view', $discountCondition);
 
-        $validated = $request->validated();
         $value = $validated['test_value'];
         $matches = $discountCondition->matches($value);
         $isValid = $discountCondition->isValidForContext([$discountCondition->type => $value]);
