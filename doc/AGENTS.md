@@ -87,6 +87,7 @@ For every file under `app/Filament/**`:
 - When extending the `UserProductInteraction` regression coverage, rely on the shared helper methods inside the feature and unit test suites so new assertions inherit the consistent baseline fixtures without additional setup.【F:tests/Feature/UserProductInteractionTest.php†L16-L47】【F:tests/Unit/UserProductInteractionTest.php†L16-L33】
 - Treat feature toggles as environment-aware: `FeatureToggleService` now reuses a base query and explicitly orders results so scoped flags win over global defaults. Preserve that structure when extending flag evaluation logic so staging-only rollouts remain reliable.【F:app/Services/FeatureToggleService.php†L57-L83】
 - When tests disable framework features (for example setting `config('activitylog.enabled', false)`), capture the existing value and restore it in `tearDown()`/`afterEach` to avoid leaking state into subsequent suites that assert on activity log behaviour.
+- Shipping eligibility unit tests now rely on `Country::updateOrCreate()` to reuse Baltic fixtures; mirror that approach when adding resolver coverage so seeder profiles that pre-populate `countries` records do not trigger unique `cca2` collisions.
 
 ## Coding Standards
 
