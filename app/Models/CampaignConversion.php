@@ -293,11 +293,13 @@ final class CampaignConversion extends Model
      */
     public function scopeOrderedByName(Builder $query): Builder
     {
-        // Always order by the stored campaign_name so marketing tables remain predictable.
+        // Normalise comparisons via LOWER(...) so case-insensitive datasets still sort deterministically.
+        $column = $query->qualifyColumn('campaign_name');
+
         return $query
-            ->orderByRaw('LOWER(campaign_name) ASC')
-            ->orderBy('campaign_name')
-            ->orderBy('id');
+            ->orderByRaw('LOWER(' . $column . ') ASC')
+            ->orderBy($column)
+            ->orderBy($query->qualifyColumn('id'));
     }
 
     /**
