@@ -22,6 +22,7 @@ The model-focused regression suite is a quick indicator that Eloquent scopes, ca
 8. Global scopes now re-validate their cached schema metadata after migrations complete, so if a model suddenly surfaces unexpected rows (for example, `CustomerGroup::enabled()` returning disabled fixtures) rerun the test after the migration phase to let the refreshed cache take effect rather than patching around stale `is_active`/`is_enabled` filters.
 9. Customer group activation toggles now cascade `false` assignments across both `is_active` and `is_enabled`, so factor that into assertions that expect either column to remain partially enabled after a disable operation.【F:app/Models/CustomerGroup.php†L547-L584】
 10. The SQLite fallback schema used by `Tests\Support\TestingDatabase` now provisions lightweight `products` and `product_images` tables whenever the full migration stack cannot execute. This keeps the product catalogue factories and `ProductImage` unit coverage operational even when the harness regenerates an abbreviated database, so include those columns in new assertions when expanding the suite.
+11. The shared `OrdersByName` trait now wraps the configured column through the query grammar before applying an `orderByRaw` clause, ensuring the generated SQL fragments stay sanitised as `"name"` (or the configured alias) even when joins introduce similarly named columns.【F:app/Models/Concerns/OrdersByName.php†L52-L58】
 
 ## System setting attribution safety
 
