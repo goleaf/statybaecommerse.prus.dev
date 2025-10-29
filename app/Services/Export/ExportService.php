@@ -7,7 +7,7 @@ namespace App\Services\Export;
 use App\Data\ExportRequestData;
 use App\Enums\ExportStatus;
 use App\Enums\ExportType;
-use App\Jobs\ProcessExportJob;
+use App\Jobs\ProcessExport;
 use App\Models\Export;
 use App\Models\User;
 use App\Notifications\ExportCompletedNotification;
@@ -22,6 +22,7 @@ use App\Services\Export\Writers\CsvExportWriter;
 use App\Services\Export\Writers\PdfExportWriter;
 use App\Services\Export\Writers\XlsxExportWriter;
 use App\Support\Exports\ExportUrlGenerator;
+use App\Support\Storage\SecureStorage;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -54,8 +55,12 @@ final class ExportService
             $config = [];
         }
 
-        $configuredDisk = $config['disk'] ?? config('filesystems.default', 'local');
-        $this->disk = $disk ?? (is_string($configuredDisk) ? $configuredDisk : 'local');
+        $configuredDisk = $config['disk'] ?? null;
+
+        // Resolve the storage disk that should keep export artifacts. When the caller does not
+        // explicitly provide a disk we fall back to configuration, making sure we respect the
+        // secure-media default whenever the global filesystem default targets the secure store.
+        $this->disk = $disk ?? $this->resolveDisk(is_string($configuredDisk) ? $configuredDisk : null);
         $this->chunkSize = $this->resolveInteger($config['chunk_size'] ?? null, 250);
         $this->downloadUrlTtl = $this->resolveInteger($config['download_url_ttl'] ?? null, 60);
 
@@ -184,7 +189,10 @@ final class ExportService
             'requested_by'       => $user?->getKey() ?? $data->userId,
         ]);
 
-        ProcessExportJob::dispatch($export->getKey());
+        // Dispatch the canonical export processor job. The legacy ProcessExportJob class extends the
+        // modern ProcessExport implementation, so dispatching ProcessExport keeps both call sites
+        // working while allowing assertions to target the up-to-date job name.
+        ProcessExport::dispatch($export->getKey());
 
         return $export;
     }
@@ -296,6 +304,45 @@ final class ExportService
         }
 
         return Export::query()->findOrFail($export);
+    }
+
+    private function resolveDisk(?string $configuredDisk): string
+    {
+        // Determine the secure media disk so we can fall back to it when the default filesystem
+        // target is configured for secure delivery (for example during tests that fake the secure
+        // disk).
+        $secureDisk = SecureStorage::disk();
+        $defaultDisk = config('filesystems.default', 'public');
+
+        $candidate = $configuredDisk ?? $defaultDisk;
+
+        if ($candidate === 'default') {
+            // Honour sentinel values that explicitly request the filesystem default.
+            $candidate = $defaultDisk;
+        }
+
+        if ($candidate === 'public' && $defaultDisk === $secureDisk) {
+            // When the export configuration still references the public disk but the runtime
+            // default switched to the secure disk, prefer the secure disk so signed URLs resolve.
+            $candidate = $secureDisk;
+        }
+
+        if (! is_string($candidate) || $candidate === '') {
+            // Provide a safe final fallback so dispatching exports never crashes due to a bad config.
+            return 'public';
+        }
+
+        if (! is_array(config("filesystems.disks.{$candidate}"))) {
+            // If the requested disk is not configured we again prefer the secure disk when possible
+            // and fall back to the public disk otherwise.
+            if (is_array(config("filesystems.disks.{$secureDisk}"))) {
+                return $secureDisk;
+            }
+
+            return 'public';
+        }
+
+        return $candidate;
     }
 
     private function resolveExportableFromRequest(ExportRequestData $data): Exportable
