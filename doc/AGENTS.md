@@ -43,9 +43,10 @@ This repository mixes Laravel 12 and Filament v4 code. Use the following guardra
 - **Documentation diligence**: After completing fixes or features, review the contents of `docs/` for any references that need
   refreshing (runbooks, audits, closure notes). Update the relevant markdown files to mirror the behaviour you introduced and
   extend agent instructions when new recurring rules emerge.
-- **Example test placeholders**: Keep the placeholder example tests across `tests/Feature`, `tests/Unit`, `tests/Livewire`,
-  `tests/Filament`, and `tests/Http` intact. These files fuel the QA dashboards that reference legacy `ExampleTest` identifiers
-  and should remain green (skip/incomplete when simulating other states) to avoid breaking monitoring scripts.
+- **Example test placeholders**: Synthetic ExampleTest identifiers still drive the QA dashboards. With the feature
+  stub retired, keep the remaining placeholder files across `tests/Unit`, `tests/Livewire`, `tests/Filament`, and `tests/Http`
+  intact (green, or intentionally skipped/incomplete when simulating other states) and update seeded dashboard fixtures when the
+  feature view schema changes so monitoring scripts do not break.
 - **Model Pest harness**: When contributing to `tests/Models`, remember to import `Tests\\TestCase` and register it via
   `uses(TestCase::class);` so the shared SQLite testing harness initialises before factories run.
 
