@@ -59,9 +59,9 @@ final class SystemSetting extends Model implements HasMedia
      */
     private int $defaultCacheTtl = 3600;
 
-    protected $fillable = ['category_id', 'key', 'name', 'value', 'type', 'group', 'category', 'unit', 'description', 'help_text', 'is_public', 'is_required', 'is_encrypted', 'is_readonly', 'validation_rules', 'options', 'default_value', 'sort_order', 'is_active', 'updated_by', 'placeholder', 'tooltip', 'metadata', 'meta', 'validation_message', 'is_cacheable', 'cache_ttl', 'cache_key', 'environment', 'tags', 'version', 'access_count', 'last_accessed_at'];
+    protected $fillable = ['category_id', 'key', 'name', 'value', 'type', 'group', 'category', 'unit', 'description', 'help_text', 'is_public', 'is_required', 'is_encrypted', 'is_readonly', 'validation_rules', 'options', 'default_value', 'sort_order', 'is_active', 'created_by', 'updated_by', 'placeholder', 'tooltip', 'metadata', 'meta', 'validation_message', 'is_cacheable', 'cache_ttl', 'cache_key', 'environment', 'tags', 'version', 'access_count', 'last_accessed_at'];
 
-    protected $casts = ['is_public' => 'boolean', 'is_required' => 'boolean', 'is_encrypted' => 'boolean', 'is_readonly' => 'boolean', 'is_active' => 'boolean', 'is_cacheable' => 'boolean', 'validation_rules' => 'json', 'options' => 'json', 'metadata' => 'json', 'meta' => 'json', 'tags' => 'json', 'sort_order' => 'integer', 'cache_ttl' => 'integer', 'access_count' => 'integer', 'last_accessed_at' => 'datetime'];
+    protected $casts = ['is_public' => 'boolean', 'is_required' => 'boolean', 'is_encrypted' => 'boolean', 'is_readonly' => 'boolean', 'is_active' => 'boolean', 'is_cacheable' => 'boolean', 'validation_rules' => 'json', 'options' => 'json', 'metadata' => 'json', 'meta' => 'json', 'tags' => 'json', 'sort_order' => 'integer', 'cache_ttl' => 'integer', 'created_by' => 'integer', 'access_count' => 'integer', 'last_accessed_at' => 'datetime'];
 
     /**
      * Handle value functionality with proper error handling.
@@ -177,6 +177,15 @@ final class SystemSetting extends Model implements HasMedia
     public function category(): BelongsTo
     {
         return $this->belongsTo(SystemSettingCategory::class, 'category_id');
+    }
+
+    /**
+     * Surface the user who originally authored the setting so moderation tools
+     * can highlight ownership even when activity logs are pruned.
+     */
+    public function createdBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 
     /**
@@ -700,7 +709,7 @@ final class SystemSetting extends Model implements HasMedia
 
         // Using a closure keeps encryption/decryption logic centralised in the
         // accessor, so cached data always mirrors the value consumers expect.
-        $callback = (fn() => $this->value ?? $default);
+        $callback = (fn () => $this->value ?? $default);
 
         $store = cache()->getStore();
 

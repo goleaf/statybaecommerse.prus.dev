@@ -28,6 +28,7 @@ The model-focused regression suite is a quick indicator that Eloquent scopes, ca
 - Applying the config override in the test `setUp()` keeps the observer idle while still exercising the same evaluation logic the production code relies on.
 - `Tests\\Unit\\SystemSettingDependencyConditionTest` now centralises helper methods (`createSystemSetting`, `createDependency`) that call `createQuietly()` and eagerly load relations, so reuse them when expanding the suite to avoid repeating observer workarounds.
 - Feature flag unit coverage follows a similar pattern: seed an attributed user (or clear the attribution config) before creating `FeatureFlag` factories so the observer can satisfy the `created_by` foreign key on SQLite.
+- The base `SystemSetting` migration now exposes a nullable `created_by` foreign key and the factory auto-seeds an active category, so rely on the default factory instead of hard-coding category IDs when spinning up dependencies.
 
 ## Dashboard Fixture Placeholders
 

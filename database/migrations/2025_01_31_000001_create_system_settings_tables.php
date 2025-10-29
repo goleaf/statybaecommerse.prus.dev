@@ -49,6 +49,9 @@ return new class extends Migration
             $table->text('default_value')->nullable();
             $table->integer('sort_order')->default(0);
             $table->boolean('is_active')->default(true);
+            // Track who initially provisioned each setting so audit trails can
+            // surface ownership without relying on activity log joins.
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->unsignedBigInteger('updated_by')->nullable();
             $table->timestamps();
             $table->softDeletes();
@@ -56,6 +59,7 @@ return new class extends Migration
             $table->index(['category_id', 'is_active', 'sort_order']);
             $table->index(['group', 'is_active']);
             $table->index(['is_public', 'is_active']);
+            $table->index('created_by');
             $table->index('updated_by');
 
             $table->foreign('category_id')->references('id')->on('system_setting_categories')->onDelete('set null');
