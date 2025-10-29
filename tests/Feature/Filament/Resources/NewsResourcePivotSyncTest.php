@@ -21,6 +21,11 @@ final class NewsResourcePivotSyncTest extends TestCase
 
     private User $admin;
 
+    /**
+     * Track the incoming activity log toggle so we can restore it later.
+     */
+    private bool $originalActivityLogEnabled = true;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -28,6 +33,11 @@ final class NewsResourcePivotSyncTest extends TestCase
         $this->ensureFilamentPivotTablesMigrated();
         $this->resetFilamentPivotTables();
         $this->resolveAdminPanel();
+
+        // Snapshot the existing activity log configuration before muting it for
+        // these pivot sync interactions. This prevents later suites from
+        // inheriting the disabled state.
+        $this->originalActivityLogEnabled = (bool) config('activitylog.enabled', true);
 
         config([
             'app.locale'                              => 'en',
@@ -115,6 +125,15 @@ final class NewsResourcePivotSyncTest extends TestCase
         ]);
 
         $this->actingAs($this->admin);
+    }
+
+    protected function tearDown(): void
+    {
+        // Reinstate the original activity log state so the subsequent system
+        // setting category tests continue to observe logging behaviour.
+        config(['activitylog.enabled' => $this->originalActivityLogEnabled]);
+
+        parent::tearDown();
     }
 
     public function test_it_synchronizes_categories_and_tags_on_create(): void

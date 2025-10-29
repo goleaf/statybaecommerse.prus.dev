@@ -12,10 +12,20 @@ use Tests\TestCase;
 
 final class AnalyticsEventScopeTest extends TestCase
 {
+    /**
+     * Preserve the original activity log toggle so the scope suite does not leak
+     * its configuration overrides into later tests that assert logging output.
+     */
+    private bool $originalActivityLogEnabled = true;
+
     protected function setUp(): void
     {
         parent::setUp();
 
+        // Snapshot the current activity log state before disabling it for the
+        // analytics scope fixtures. Reapplying the saved value in tearDown keeps
+        // downstream model tests from inheriting the disabled toggle.
+        $this->originalActivityLogEnabled = (bool) config('activitylog.enabled', true);
         config(['activitylog.enabled' => false]);
 
         Schema::dropIfExists('analytics_events');
@@ -71,6 +81,10 @@ final class AnalyticsEventScopeTest extends TestCase
 
     protected function tearDown(): void
     {
+        // Reinstate the original configuration so other tests continue to
+        // interact with the activity log exactly as the application expects.
+        config(['activitylog.enabled' => $this->originalActivityLogEnabled]);
+
         Schema::dropIfExists('analytics_events');
         Schema::dropIfExists('model_has_roles');
         Schema::dropIfExists('roles');
