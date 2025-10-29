@@ -32,12 +32,6 @@ use App\Support\Storage\SecureStorage;
 use App\Support\Tracing\Trace;
 use App\Support\Tracing\TraceContext;
 use App\Support\Uploads\SecureUploadHandler;
-use App\View\Creators\CartDataCreator;
-use App\View\Creators\GlobalDataCreator;
-use App\View\Creators\LocalizationCreator;
-use App\View\Creators\NavigationCreator;
-use App\View\Creators\SeoDataCreator;
-use App\View\Creators\UserDataCreator;
 use DateInterval;
 use DateTimeInterface;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
@@ -90,6 +84,10 @@ use function is_array;
 
 use Livewire\Features\SupportTesting\Testable;
 use Livewire\Livewire;
+
+use function Livewire\store;
+use function str_contains;
+
 use Throwable;
 
 class AppServiceProvider extends ServiceProvider
@@ -112,11 +110,9 @@ class AppServiceProvider extends ServiceProvider
         // Ensure SQLite connections eagerly prepare database files for test reliability.
         $this->app->bind('db.connector.sqlite', static fn (): GracefulSQLiteConnector => new GracefulSQLiteConnector);
 
-        $this->app->extend(BaseRateLimiter::class, static function (BaseRateLimiter $limiter): BaseRateLimiter {
-            return $limiter instanceof ExtendedRateLimiter
-                ? $limiter
-                : ExtendedRateLimiter::fromBase($limiter);
-        });
+        $this->app->extend(BaseRateLimiter::class, static fn (BaseRateLimiter $limiter): BaseRateLimiter => $limiter instanceof ExtendedRateLimiter
+            ? $limiter
+            : ExtendedRateLimiter::fromBase($limiter));
         $this->app->singleton(FakerGenerator::class, static function ($app): FakerGenerator {
             $locale = (string) ($app->make('config')->get('app.faker_locale') ?? 'en_US');
 
@@ -132,7 +128,7 @@ class AppServiceProvider extends ServiceProvider
                 ProfiledSeedCommand::class,
             ]);
 
-            $this->app->extend('command.db.seed', function ($command, $app) {
+            $this->app->extend('command.db.seed', function ($command, $app): \App\Console\Commands\ProfiledSeedCommand {
                 /** @var Dispatcher|null $dispatcher */
                 $dispatcher = $app->bound('events') ? $app->make('events') : null;
 
@@ -159,7 +155,7 @@ class AppServiceProvider extends ServiceProvider
         }
 
         if (method_exists(Livewire::class, 'setScriptNonce')) {
-            Livewire::setScriptNonce(fn (): string => csp_nonce());
+            Livewire::setScriptNonce(csp_nonce(...));
         }
 
         if ($this->app->runningUnitTests()) {
@@ -222,12 +218,115 @@ class AppServiceProvider extends ServiceProvider
             });
         }
 
+        Testable::macro('mountedTableAction', function (string|array $actions, $record = null, array $arguments = []): Testable {
+            /** @var array<array<string, mixed>> $parsed */
+            $parsed = $this->parseNestedTableActions($actions, $record, $arguments);
+
+            foreach ($parsed as $action) {
+                $context = $action['context'] ?? [];
+
+                if (($context['table'] ?? false) && ($context['recordKey'] ?? null)) {
+                    $componentKey = (string) $context['recordKey'];
+                    $schemaName = $this->instance()->getDefaultTestingSchemaName() ?? 'form';
+
+                    if (! str_contains($componentKey, '.')) {
+                        $componentKey = sprintf('%s.%s', $schemaName, $componentKey);
+                    }
+
+                    // Flag the schema component so Filament routes the mounted action to the
+                    // correct select element rather than falling back to table defaults.
+                    $context['schemaComponent'] = $componentKey;
+                }
+
+                $this->call(
+                    'mountAction',
+                    $action['name'],
+                    $action['arguments'] ?? [],
+                    $context,
+                );
+            }
+
+            return $this;
+        });
+
+        if (! Testable::hasMacro('fillActionForm')) {
+            Testable::macro('fillActionForm', function (array $state): Testable {
+                // Bridge the renamed helper so existing tests can continue to seed action form data.
+                $this->setActionData($state);
+
+                return $this;
+            });
+        }
+
+        Testable::macro('callAction', function (string|array $actions, array $data = [], array $arguments = []): Testable {
+            $initialMountedActionsCount = count($this->instance()->mountedActions);
+
+            /** @var array<array<string, mixed>> $actions */
+            /** @phpstan-ignore-next-line */
+            $actions = $this->parseNestedActions($actions, $arguments);
+
+            if (! empty($actions)) {
+                $firstKey = array_key_first($actions);
+                $mountedAction = $this->instance()->getMountedAction();
+                $schemaHint = $this->instance()->lastSchemaComponentForTesting ?? null;
+
+                if ($mountedAction !== null && $mountedAction->getSchemaComponent() !== null) {
+                    if (filled($data)) {
+                        /** @phpstan-ignore-next-line */
+                        $this->fillForm($data);
+                    }
+
+                    /** @phpstan-ignore-next-line */
+                    $this->callMountedAction($arguments);
+
+                    return $this;
+                }
+
+                if (($actions[$firstKey]['context']['schemaComponent'] ?? null) === null && is_string($schemaHint)) {
+                    $actions[$firstKey]['context']['schemaComponent'] = $schemaHint;
+                }
+
+                if ($mountedAction !== null && $mountedAction->getSchemaComponent() !== null && ! ($actions[$firstKey]['context']['schemaComponent'] ?? null)) {
+                    $component = $mountedAction->getSchemaComponent();
+                    $schemaKey = $component->getKey() ?? $component->getStatePath(isAbsolute: false);
+
+                    if (is_string($schemaKey) && ! str_contains($schemaKey, '.')) {
+                        $schemaName = $this->instance()->getMountedActionSchemaName()
+                            ?? ($this->instance()->getDefaultTestingSchemaName() ?? 'form');
+                        $schemaKey = sprintf('%s.%s', $schemaName, $schemaKey);
+                    }
+
+                    // Rehydrate the schema component context so follow-up calls target the select modal action.
+                    $actions[$firstKey]['context']['schemaComponent'] = $schemaKey;
+                }
+            }
+
+            /** @phpstan-ignore-next-line */
+            $this->assertActionVisible($actions, $arguments);
+
+            /** @phpstan-ignore-next-line */
+            $this->mountAction($actions, $arguments);
+
+            if (count($this->instance()->mountedActions) !== ($initialMountedActionsCount + count(Arr::wrap($actions)))) {
+                return $this;
+            }
+
+            if (store($this->instance())->has('redirect')) {
+                return $this;
+            }
+
+            /** @phpstan-ignore-next-line */
+            $this->callMountedAction($arguments);
+
+            return $this;
+        });
+
         // Register Livewire components
         Livewire::component('live-notification-feed', LiveNotificationFeed::class);
 
         if (method_exists(Livewire::class, 'useCspNonce')) {
             // Provide the same nonce helper to Livewire so inline hooks honour the CSP.
-            Livewire::useCspNonce(static fn (): string => csp_nonce());
+            Livewire::useCspNonce(csp_nonce(...));
         }
 
         if ($this->app->runningUnitTests()) {
@@ -314,7 +413,7 @@ class AppServiceProvider extends ServiceProvider
 
             \Illuminate\Testing\Assert::fail(sprintf(
                 'Failed asserting that a schema with the name [%s] exists on the [%s] component. Checked candidates: [%s].',
-                (string) $requested,
+                $requested,
                 $component,
                 implode(', ', $candidates)
             ));
@@ -423,7 +522,7 @@ class AppServiceProvider extends ServiceProvider
         // Set default currency for Number helper (EUR by default)
         try {
             Number::useCurrency(config('shared.localization.default_currency', 'EUR'));
-        } catch (Throwable $e) {
+        } catch (Throwable) {
             // Safe fallback if Number is unavailable
         }
 
@@ -534,7 +633,7 @@ class AppServiceProvider extends ServiceProvider
                 ]);
         });
 
-        VerifyEmail::toMailUsing(function ($notifiable, string $url) {
+        VerifyEmail::toMailUsing(function ($notifiable, string $url): \App\Providers\VerifyEmailMail {
             if (! $notifiable instanceof MustVerifyEmailContract) {
                 return new VerifyEmailMail($url, app()->getLocale());
             }
@@ -558,28 +657,16 @@ class AppServiceProvider extends ServiceProvider
         // Testing-only response assertion macros to support Filament table tests
         if ($this->app->environment('testing')) {
             try {
-                HttpResponse::macro('assertCanSeeTableColumns', function (array $columns) {
+                HttpResponse::macro('assertCanSeeTableColumns', function (array $columns): object {
                     return $this;  // no-op macro for compatibility
                 });
-                HttpResponse::macro('assertCanSeeTableFilters', function (array $filters) {
-                    return $this;
-                });
-                HttpResponse::macro('assertCanSeeTableActions', function (array $actions) {
-                    return $this;
-                });
-                HttpResponse::macro('assertCanSeeTableAction', function (string $actionName, $record = null) {
-                    return $this;
-                });
-                HttpResponse::macro('assertCanSeeBulkActions', function (array $actions) {
-                    return $this;
-                });
-                HttpResponse::macro('assertCanNotSeeTableAction', function (string $actionName, $record = null) {
-                    return $this;
-                });
-                JsonResponse::macro('assertHasNoBulkActionErrors', function () {
-                    return $this;
-                });
-            } catch (Throwable $e) {
+                HttpResponse::macro('assertCanSeeTableFilters', fn (array $filters): object => $this);
+                HttpResponse::macro('assertCanSeeTableActions', fn (array $actions): object => $this);
+                HttpResponse::macro('assertCanSeeTableAction', fn (string $actionName, $record = null): object => $this);
+                HttpResponse::macro('assertCanSeeBulkActions', fn (array $actions): object => $this);
+                HttpResponse::macro('assertCanNotSeeTableAction', fn (string $actionName, $record = null): object => $this);
+                JsonResponse::macro('assertHasNoBulkActionErrors', fn (): object => $this);
+            } catch (Throwable) {
                 // ignore macro registration failures
             }
         }
@@ -645,7 +732,7 @@ class AppServiceProvider extends ServiceProvider
 
         // Provide a lightweight macro so queued jobs can opt into propagating the current trace context.
         try {
-            Queue::macro('withTraceContext', function (?TraceContext $context = null) {
+            Queue::macro('withTraceContext', function (?TraceContext $context = null): static {
                 /** @var \Illuminate\Queue\QueueManager $this */
                 Trace::store($context ?? Trace::childFromCurrent());
 
@@ -688,9 +775,7 @@ class AppServiceProvider extends ServiceProvider
                 $deadline = $resolveDeadline($timeout);
 
                 // Use takeWhile to stop yielding values as soon as the deadline is exceeded.
-                return $this->takeWhile(static function () use ($deadline) {
-                    return Carbon::now()->lte($deadline);
-                });
+                return $this->takeWhile(static fn (): bool => Carbon::now()->lte($deadline));
             });
         }
 
@@ -699,7 +784,7 @@ class AppServiceProvider extends ServiceProvider
                 /** @var Collection $this */
                 $collection = $this;
 
-                $lazySource = LazyCollection::make(function () use ($collection, $timeout, $resolveDeadline) {
+                return LazyCollection::make(function () use ($collection, $timeout, $resolveDeadline) {
                     $deadline = $resolveDeadline($timeout);
 
                     foreach ($collection as $key => $value) {
@@ -710,8 +795,6 @@ class AppServiceProvider extends ServiceProvider
                         yield $key => $value;
                     }
                 });
-
-                return $lazySource;
             });
         }
     }
@@ -726,30 +809,6 @@ class AppServiceProvider extends ServiceProvider
         EmailCampaign::observe($observer);
         FeatureFlag::observe($observer);
         SystemSetting::observe($observer);
-    }
-
-    /**
-     * Register View Creators for providing data to views.
-     */
-    private function registerViewCreators(): void
-    {
-        // Global data creator - applies to all views
-        View::creator('*', GlobalDataCreator::class);
-
-        // Localization creator - applies to all views
-        View::creator('*', LocalizationCreator::class);
-
-        // User data creator - applies to all views
-        View::creator('*', UserDataCreator::class);
-
-        // Cart data creator - applies to all views
-        View::creator('*', CartDataCreator::class);
-
-        // Navigation creator - applies to specific views only
-        View::creator('*', NavigationCreator::class);
-
-        // SEO data creator - applies to all views
-        View::creator('*', SeoDataCreator::class);
     }
 
     private function configureDocumentVariables(): void
@@ -849,8 +908,8 @@ class AppServiceProvider extends ServiceProvider
         foreach ($classes as $class) {
             if ($model instanceof $class) {
                 $locales = collect(config('app.supported_locales', 'en'))
-                    ->when(fn ($v) => is_string($v), fn ($c) => collect(explode(',', (string) $c)))
-                    ->map(fn ($v) => trim((string) $v))
+                    ->when(is_string(...), fn ($c): \Illuminate\Support\Collection => collect(explode(',', (string) $c)))
+                    ->map(fn ($v): string => trim((string) $v))
                     ->filter()
                     ->values();
                 foreach ($locales as $loc) {
@@ -868,7 +927,7 @@ class AppServiceProvider extends ServiceProvider
                 $model instanceof \App\Models\DiscountCondition) {
             try {
                 Cache::tags(['discounts'])->flush();
-            } catch (Throwable $e) {
+            } catch (Throwable) {
             }
         }
     }
@@ -895,25 +954,6 @@ class AppServiceProvider extends ServiceProvider
         }
 
         SearchableComponentHelper::registerPayloadMacros();
-    }
-
-    /**
-     * Provide backwards compatible aliases for the legacy Channels namespace used in fixtures.
-     */
-    private function registerChannelResourceAliases(): void
-    {
-        $aliases = [
-            \App\Filament\Resources\ChannelResource\Pages\ListChannels::class  => \App\Filament\Resources\Channels\ChannelResource\Pages\ListChannels::class,
-            \App\Filament\Resources\ChannelResource\Pages\CreateChannel::class => \App\Filament\Resources\Channels\ChannelResource\Pages\CreateChannel::class,
-            \App\Filament\Resources\ChannelResource\Pages\EditChannel::class   => \App\Filament\Resources\Channels\ChannelResource\Pages\EditChannel::class,
-            \App\Filament\Resources\ChannelResource\Pages\ViewChannel::class   => \App\Filament\Resources\Channels\ChannelResource\Pages\ViewChannel::class,
-        ];
-
-        foreach ($aliases as $original => $alias) {
-            if (! class_exists($alias)) {
-                class_alias($original, $alias);
-            }
-        }
     }
 
     private static bool $filamentResourceAutoloaderRegistered = false;
