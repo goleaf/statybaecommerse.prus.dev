@@ -26,6 +26,7 @@ The model-focused regression suite is a quick indicator that Eloquent scopes, ca
 - Unit tests that spin up `SystemSetting` records should temporarily blank the attribution configuration keys (`attribution.system_user_id`, `attribution.system_user_email`, and `attribution.system_user_name`).
 - The observer registered in `App\Providers\AppServiceProvider` backfills these columns with a “system” account, and without the override SQLite raises foreign key errors because no such user exists inside the in-memory harness.
 - Applying the config override in the test `setUp()` keeps the observer idle while still exercising the same evaluation logic the production code relies on.
+- `Tests\\Unit\\SystemSettingDependencyConditionTest` now centralises helper methods (`createSystemSetting`, `createDependency`) that call `createQuietly()` and eagerly load relations, so reuse them when expanding the suite to avoid repeating observer workarounds.
 
 ## Dashboard Fixture Placeholders
 
