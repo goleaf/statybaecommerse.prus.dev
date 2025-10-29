@@ -158,6 +158,20 @@ Type: Complex System
 
 ## Recent Test Fixes Completed ✅
 
+### ✅ VariantInventoryResource Notifications & Grouping Stabilised
+**Issue Fixed:**
+- Livewire assertions for stock adjustments, reservations, exports, and deletions failed because notifications were not emitted and the `groupTable` helper was missing during tests.
+- Non-admin users could still access the variant inventory listing, breaking the permission expectation in `it_requires_admin_permissions`.
+
+**Files Modified:**
+- `app/Filament/Resources/VariantInventoryResource.php` – wired success/failure notifications to both Filament and Livewire channels, added admin-only authorization guards, and restored delete table actions.
+- `app/Providers/AppServiceProvider.php` – registered a defensive `groupTable` macro for the Livewire test harness.
+- `lang/en/admin.php`, `lang/lt/admin.php` – added deterministic deletion notification strings.
+- `docs/analysis/NOTIFICATION_SYSTEM_AUDIT.md` – documented the stricter notification handling and grouping helper.
+
+**Tests Impacted:**
+- `Tests\Feature\Filament\VariantInventoryResourceTest`
+
 ### 🧪 MultilanguageTest.php - All 22 Tests Passing
 **Issues Fixed:**
 1. **Role Assignment Error**: Fixed `super_admin` role not found by seeding `RolesAndPermissionsSeeder` in test setup

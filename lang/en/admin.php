@@ -503,6 +503,8 @@ return [
         'stock_adjusted_successfully' => 'Stock adjusted successfully',
         'stock_reserved_successfully' => 'Stock reserved successfully',
         'insufficient_stock'          => 'Insufficient stock',
+        'variant_inventory_deleted'   => 'Variant inventory deleted',
+        'variant_inventories_deleted' => 'Variant inventories deleted',
 
         // Bulk Actions
         'bulk_adjust_stock'                => 'Bulk Adjust Stock',

@@ -400,6 +400,8 @@ return [
         'stock_adjusted_successfully' => 'Atsargos sėkmingai pakoreguotos',
         'stock_reserved_successfully' => 'Atsargos sėkmingai rezervuotos',
         'insufficient_stock'          => 'Nepakanka atsargų',
+        'variant_inventory_deleted'   => 'Variantų inventorius ištrintas',
+        'variant_inventories_deleted' => 'Variantų inventoriai ištrinti',
 
         // Bulk Actions
         'bulk_adjust_stock'                => 'Masinis atsargų koregavimas',

@@ -204,6 +204,24 @@ class AppServiceProvider extends ServiceProvider
         Testable::mixin(new TestsRecords);
         Testable::mixin(new TestsSummaries);
 
+        if (! Testable::hasMacro('groupTable')) {
+            // Expose a defensive table grouping macro so Filament table tests can request group toggles even
+            // when the upstream helper is unavailable in our compatibility layer.
+            Testable::macro('groupTable', function (string $group): Testable {
+                if (method_exists($this->instance(), 'setTableGrouping')) {
+                    $this->call('setTableGrouping', $group);
+                } elseif (property_exists($this->instance(), 'tableGrouping')) {
+                    /** @var array<int, string>|string|null $current */
+                    $current = $this->instance()->tableGrouping ?? null;
+                    $groups = is_array($current) ? $current : [];
+                    $groups[] = $group;
+                    $this->set('tableGrouping', array_values(array_unique($groups)));
+                }
+
+                return $this;
+            });
+        }
+
         // Register Livewire components
         Livewire::component('live-notification-feed', LiveNotificationFeed::class);
 
