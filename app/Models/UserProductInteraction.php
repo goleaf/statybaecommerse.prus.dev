@@ -6,12 +6,15 @@ namespace App\Models;
 
 use App\Models\Concerns\OrdersByName;
 use DateTimeInterface;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
 use JsonException;
+use JsonSerializable;
+use Traversable;
 
 /**
  * UserProductInteraction
@@ -157,15 +160,16 @@ final class UserProductInteraction extends Model
                 return $decoded;
             },
             set: function ($value): array {
-                $metaArray = is_array($value) ? $value : [];
+                // Convert various inputs into a pure array so the JSON column stores a predictable payload.
+                $metaArray = match (true) {
+                    is_array($value) => $value,
+                    $value instanceof Arrayable => $value->toArray(),
+                    $value instanceof JsonSerializable => (array) $value->jsonSerialize(),
+                    $value instanceof \Traversable => iterator_to_array($value),
+                    default => [],
+                };
 
-                try {
-                    $encoded = $metaArray === [] ? null : json_encode($metaArray, JSON_THROW_ON_ERROR);
-                } catch (JsonException $exception) {
-                    $encoded = json_encode($metaArray);
-                }
-
-                $payload = ['meta' => $encoded];
+                $payload = ['meta' => $metaArray === [] ? [] : $metaArray];
 
                 foreach (['rating', 'count', 'first_interaction', 'last_interaction', 'notes', 'is_anonymous', 'ip_address'] as $legacyKey) {
                     if (! array_key_exists($legacyKey, $metaArray)) {

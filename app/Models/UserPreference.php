@@ -7,7 +7,6 @@ namespace App\Models;
 use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\UserOwnedScope;
 use Database\Factories\UserPreferenceFactory;
-use DateTimeInterface;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
@@ -15,7 +14,6 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Carbon;
 use JsonSerializable;
 
 /**
@@ -76,8 +74,9 @@ final class UserPreference extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'meta'      => 'array',
-        'metadata'  => 'array',
+        // Persist the canonical attributes with casts so Carbon instances and floats are returned consistently.
+        'preference_score' => 'float',
+        'last_updated'     => 'datetime',
     ];
 
     /**
@@ -85,33 +84,36 @@ final class UserPreference extends Model
      */
     public function fill(array $attributes)
     {
-        // Provide a deterministic mapping from the historical columns to their new alias-based counterparts.
+        // Bridge legacy column names onto the streamlined aliases expected by tests and modern code paths.
         $aliases = [
             'preference_type'  => 'name',
             'preference_key'   => 'key',
             'preference_score' => 'value',
-            'metadata'         => 'meta',
         ];
 
         foreach ($aliases as $legacy => $alias) {
+            // Copy the legacy value only when the alias is not already provided to avoid overwriting explicit input.
             if (array_key_exists($legacy, $attributes) && ! array_key_exists($alias, $attributes)) {
                 $attributes[$alias] = $attributes[$legacy];
             }
-
-            unset($attributes[$legacy]);
         }
 
-        // Respect manual timestamp overrides without exposing the column to mass-assignment directly.
-        $lastUpdated = $attributes['last_updated'] ?? null;
-        unset($attributes['last_updated']);
+        // Ensure metadata assignments work for both the alias (`meta`) and the original (`metadata`) key.
+        if (array_key_exists('metadata', $attributes) && ! array_key_exists('meta', $attributes)) {
+            $attributes['meta'] = $attributes['metadata'];
+        }
 
-        $result = parent::fill($attributes);
+        // Capture manual timestamps before letting the parent implementation discard guarded attributes.
+        $lastUpdated = $attributes['last_updated'] ?? null;
+
+        $model = parent::fill($attributes);
 
         if ($lastUpdated !== null) {
+            // Apply the timestamp directly so factories and fixtures can override it deterministically.
             $this->setAttribute('last_updated', $lastUpdated);
         }
 
-        return $result;
+        return $model;
     }
 
     /**
@@ -143,6 +145,7 @@ final class UserPreference extends Model
      */
     protected function value(): Attribute
     {
+        // Link the friendly alias onto the stored `preference_score` column so existing queries keep working.
         return Attribute::make(
             get: static fn (mixed $value, array $attributes): ?float => self::normaliseScore($attributes['preference_score'] ?? $value),
             set: static fn (mixed $value): array => ['preference_score' => self::normaliseScore($value)],
@@ -154,6 +157,7 @@ final class UserPreference extends Model
      */
     protected function name(): Attribute
     {
+        // Provide read/write access to the `preference_type` column using the concise alias.
         return Attribute::make(
             get: static fn (mixed $value, array $attributes): ?string => $attributes['preference_type'] ?? ($value !== null ? (string) $value : null),
             set: static fn (mixed $value): array => ['preference_type' => $value],
@@ -165,6 +169,7 @@ final class UserPreference extends Model
      */
     protected function key(): Attribute
     {
+        // Keep the accessor focused on mapping the alias back to the persisted key column.
         return Attribute::make(
             get: static fn (mixed $value, array $attributes): ?string => $attributes['preference_key'] ?? ($value !== null ? (string) $value : null),
             set: static fn (mixed $value): array => ['preference_key' => $value],
@@ -178,10 +183,22 @@ final class UserPreference extends Model
      */
     protected function meta(): Attribute
     {
+        // Normalise JSON payloads so callers always interact with PHP arrays when reading or writing metadata.
         return Attribute::make(
             get: static function (mixed $value, array $attributes): ?array {
-                // Use the persisted JSON payload whenever available and decode string representations safely.
                 $payload = $attributes['metadata'] ?? $value;
+
+                if ($payload === null) {
+                    return null;
+                }
+
+                if ($payload instanceof Arrayable) {
+                    return $payload->toArray();
+                }
+
+                if ($payload instanceof JsonSerializable) {
+                    $payload = $payload->jsonSerialize();
+                }
 
                 if (is_string($payload)) {
                     $decoded = json_decode($payload, true);
@@ -208,11 +225,75 @@ final class UserPreference extends Model
                     }
                 }
 
+                if ($value === []) {
+                    return ['metadata' => []];
+                }
+
                 if (! is_array($value)) {
                     return ['metadata' => null];
                 }
 
-                return ['metadata' => json_encode($value, JSON_PRESERVE_ZERO_FRACTION)];
+                return ['metadata' => $value];
+            },
+        );
+    }
+
+    /**
+     * Provide direct access to the underlying metadata column while preserving null values when appropriate.
+     *
+     * @return Attribute<array<string, mixed>|null, array<string, mixed>|null>
+     */
+    protected function metadata(): Attribute
+    {
+        // Reuse the same normalisation logic as the meta alias to keep behaviour identical between access paths.
+        return Attribute::make(
+            get: static function (mixed $value): ?array {
+                if ($value === null) {
+                    return null;
+                }
+
+                if ($value instanceof Arrayable) {
+                    return $value->toArray();
+                }
+
+                if ($value instanceof JsonSerializable) {
+                    $value = $value->jsonSerialize();
+                }
+
+                if (is_string($value)) {
+                    $decoded = json_decode($value, true);
+
+                    return is_array($decoded) ? $decoded : null;
+                }
+
+                return is_array($value) ? $value : null;
+            },
+            set: static function (mixed $value): array {
+                if ($value instanceof JsonSerializable) {
+                    $value = $value->jsonSerialize();
+                }
+
+                if ($value instanceof Arrayable) {
+                    $value = $value->toArray();
+                }
+
+                if (is_string($value)) {
+                    $decoded = json_decode($value, true);
+
+                    if (json_last_error() === JSON_ERROR_NONE) {
+                        $value = $decoded;
+                    }
+                }
+
+                if ($value === []) {
+                    return ['metadata' => []];
+                }
+
+                if (! is_array($value)) {
+                    return ['metadata' => null];
+                }
+
+                return ['metadata' => $value];
             },
         );
     }
@@ -222,29 +303,12 @@ final class UserPreference extends Model
      */
     protected function getNameColumn(): string
     {
+        // Translate the alias used within the model into the actual database column leveraged for ordering scopes.
         return match ($this->nameColumn) {
             'name'  => 'preference_type',
             'key'   => 'preference_key',
             default => $this->getOrdersByNameColumn(),
         };
-    }
-
-    /**
-     * Keep the last_updated attribute Carbon-backed without expanding the casts array.
-     *
-     * @return Attribute<Carbon|null, string|Carbon|null>
-     */
-    protected function lastUpdated(): Attribute
-    {
-        return Attribute::make(
-            get: static fn (mixed $value): ?Carbon => $value === null ? null : Carbon::parse((string) $value),
-            set: static fn (mixed $value): ?string => match (true) {
-                $value instanceof DateTimeInterface => Carbon::instance($value)->toDateTimeString(),
-                is_string($value)                   => $value,
-                $value === null                     => null,
-                default                             => (string) $value,
-            },
-        );
     }
 
     /**
@@ -277,6 +341,7 @@ final class UserPreference extends Model
      */
     public function scopeWithMinScore(Builder $query, float $minScore): Builder
     {
+        // Rely on the stored precision to filter interactions above the requested score.
         return $query->where('preference_score', '>=', $minScore);
     }
 
@@ -288,6 +353,7 @@ final class UserPreference extends Model
      */
     public function scopeOrderedByScore(Builder $query): Builder
     {
+        // Default to descending order so higher scores are surfaced first in listings.
         return $query->orderByDesc('preference_score');
     }
 
@@ -299,6 +365,7 @@ final class UserPreference extends Model
      */
     public function scopeRecent(Builder $query, int $days = 30): Builder
     {
+        // Apply a simple range filter against the timestamp column to surface recently updated preferences.
         return $query->where('last_updated', '>=', now()->subDays($days));
     }
 }
