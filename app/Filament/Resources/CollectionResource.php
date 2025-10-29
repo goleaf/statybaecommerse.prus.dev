@@ -9,6 +9,7 @@ use App\Filament\Resources\CollectionResource\Pages;
 use App\Models\Collection;
 use App\Support\Concerns\HasNav;
 use BackedEnum;
+use UnitEnum;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -42,19 +43,6 @@ final class CollectionResource extends Resource
      * Underlying model for the resource.
      */
     protected static ?string $model = Collection::class;
-
-    /**
-     * Group the resource under the Products navigation entry using the translated label expected by tests.
-     * This keeps Lithuanian back-office terminology consistent while allowing Nav helpers to map metadata.
-     */
-    protected static ?string $navigationGroup = 'Produktai';
-
-    /**
-     * Display icon used by Filament's sidebar.
-     *
-     * @var string|BackedEnum|null
-     */
-    protected static $navigationIcon = 'heroicon-o-folder';
 
     /**
      * Lightweight form definition that exposes the most important

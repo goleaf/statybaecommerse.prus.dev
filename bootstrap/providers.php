@@ -16,9 +16,6 @@ $queueConnection = function_exists('env') ? env('QUEUE_CONNECTION', 'sync') : ($
 
 if ($env !== 'testing') {
     $providers[] = App\Providers\AdminNavigationServiceProvider::class;
-    if (! ($env === 'local' && $queueConnection === 'sync')) {
-        $providers[] = App\Providers\HorizonServiceProvider::class;
-    }
     $providers[] = BezhanSalleh\FilamentShield\FilamentShieldServiceProvider::class;
 } else {
     $providers[] = App\Providers\TestingLivewireAliasesProvider::class;
