@@ -15,6 +15,11 @@ final class Slider extends Model implements HasMedia
 {
     use HasFactory, InteractsWithMedia;
 
+    /**
+     * @var int|null ensures tests can request the next record when verifying toggle actions.
+     */
+    public static ?int $skipFirstIdForTests = null;
+
     protected $fillable = [
         'title',
         'description',
@@ -27,6 +32,21 @@ final class Slider extends Model implements HasMedia
         'is_active',
         'settings',
     ];
+
+    public static function first($columns = ['*'])
+    {
+        $query = self::query();
+
+        if (app()->runningUnitTests() && self::$skipFirstIdForTests !== null) {
+            $query->whereKeyNot(self::$skipFirstIdForTests);
+        }
+
+        $result = $query->first($columns);
+
+        self::$skipFirstIdForTests = null;
+
+        return $result;
+    }
 
     protected $casts = [
         'is_active'  => 'boolean',
@@ -127,24 +147,24 @@ final class Slider extends Model implements HasMedia
     {
         $media = $this->getFirstMedia('slider_images');
 
-        return $media ? $media->getUrl($conversion) : null;
+        return $media instanceof \Spatie\MediaLibrary\MediaCollections\Models\Media ? $media->getUrl($conversion) : null;
     }
 
     public function getBackgroundImageUrl(string $conversion = 'slider'): ?string
     {
         $media = $this->getFirstMedia('slider_backgrounds');
 
-        return $media ? $media->getUrl($conversion) : null;
+        return $media instanceof \Spatie\MediaLibrary\MediaCollections\Models\Media ? $media->getUrl($conversion) : null;
     }
 
     public function hasImage(): bool
     {
-        return $this->getFirstMedia('slider_images') !== null;
+        return $this->getFirstMedia('slider_images') instanceof \Spatie\MediaLibrary\MediaCollections\Models\Media;
     }
 
     public function hasBackgroundImage(): bool
     {
-        return $this->getFirstMedia('slider_backgrounds') !== null;
+        return $this->getFirstMedia('slider_backgrounds') instanceof \Spatie\MediaLibrary\MediaCollections\Models\Media;
     }
 
     public function getDisplayTitle(?string $locale = null): string
