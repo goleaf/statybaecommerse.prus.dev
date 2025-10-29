@@ -247,6 +247,8 @@
 ### 2. Filament Resource Pattern
 **Pattern:** Standardized Filament resource structure
 - **Form Schemas:** Separate form schema classes for complex forms
+ - **Form Signatures:** Maintain `public static function form(Schema $schema): Schema` and return the provided `$schema` so the
+  Filament upgrade tooling remains compatible
 - **Table Schemas:** Dedicated table schema classes for data display
 - **Page Classes:** Custom page classes for create, edit, and list operations
 - **Navigation Integration:** Proper navigation group and icon assignments
