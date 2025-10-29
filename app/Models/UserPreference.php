@@ -77,6 +77,8 @@ final class UserPreference extends Model
         // Persist the canonical attributes with casts so Carbon instances and floats are returned consistently.
         'preference_score' => 'float',
         'last_updated'     => 'datetime',
+        // Treat metadata as JSON so arrays are serialised correctly instead of triggering SQLite array-to-string errors.
+        'metadata' => 'array',
     ];
 
     /**
@@ -133,8 +135,8 @@ final class UserPreference extends Model
     protected function preferenceScore(): Attribute
     {
         return Attribute::make(
-            get: static fn (mixed $value): ?float => self::normaliseScore($value),
-            set: static fn (mixed $value): ?float => self::normaliseScore($value),
+            get: self::normaliseScore(...),
+            set: self::normaliseScore(...),
         );
     }
 
@@ -155,24 +157,42 @@ final class UserPreference extends Model
     /**
      * Map the shorthand name alias onto the persisted preference_type column.
      */
+    /**
+     * @return Attribute<string|null, array<string, string|null>>
+     */
     protected function name(): Attribute
     {
-        // Provide read/write access to the `preference_type` column using the concise alias.
+        // Provide read/write access to the `preference_type` column using the concise alias while guarding the string cast for static analysis.
         return Attribute::make(
-            get: static fn (mixed $value, array $attributes): ?string => $attributes['preference_type'] ?? ($value !== null ? (string) $value : null),
-            set: static fn (mixed $value): array => ['preference_type' => $value],
+            /** @return string|null */
+            get: static function (mixed $value, array $attributes): ?string {
+                $resolved = $attributes['preference_type'] ?? $value;
+
+                return is_string($resolved) ? $resolved : null;
+            },
+            /** @return array<string, string|null> */
+            set: static fn (mixed $value): array => ['preference_type' => is_string($value) ? $value : null],
         );
     }
 
     /**
      * Map the shorthand key alias onto the persisted preference_key column.
      */
+    /**
+     * @return Attribute<string|null, array<string, string|null>>
+     */
     protected function key(): Attribute
     {
-        // Keep the accessor focused on mapping the alias back to the persisted key column.
+        // Keep the accessor focused on mapping the alias back to the persisted key column while validating the resolved payload.
         return Attribute::make(
-            get: static fn (mixed $value, array $attributes): ?string => $attributes['preference_key'] ?? ($value !== null ? (string) $value : null),
-            set: static fn (mixed $value): array => ['preference_key' => $value],
+            /** @return string|null */
+            get: static function (mixed $value, array $attributes): ?string {
+                $resolved = $attributes['preference_key'] ?? $value;
+
+                return is_string($resolved) ? $resolved : null;
+            },
+            /** @return array<string, string|null> */
+            set: static fn (mixed $value): array => ['preference_key' => is_string($value) ? $value : null],
         );
     }
 
@@ -226,74 +246,16 @@ final class UserPreference extends Model
                 }
 
                 if ($value === []) {
-                    return ['metadata' => []];
+                    // Encode empty arrays explicitly so SQLite bindings receive a JSON string rather than a bare array.
+                    return ['metadata' => json_encode([], JSON_THROW_ON_ERROR)];
                 }
 
                 if (! is_array($value)) {
                     return ['metadata' => null];
                 }
 
-                return ['metadata' => $value];
-            },
-        );
-    }
-
-    /**
-     * Provide direct access to the underlying metadata column while preserving null values when appropriate.
-     *
-     * @return Attribute<array<string, mixed>|null, array<string, mixed>|null>
-     */
-    protected function metadata(): Attribute
-    {
-        // Reuse the same normalisation logic as the meta alias to keep behaviour identical between access paths.
-        return Attribute::make(
-            get: static function (mixed $value): ?array {
-                if ($value === null) {
-                    return null;
-                }
-
-                if ($value instanceof Arrayable) {
-                    return $value->toArray();
-                }
-
-                if ($value instanceof JsonSerializable) {
-                    $value = $value->jsonSerialize();
-                }
-
-                if (is_string($value)) {
-                    $decoded = json_decode($value, true);
-
-                    return is_array($decoded) ? $decoded : null;
-                }
-
-                return is_array($value) ? $value : null;
-            },
-            set: static function (mixed $value): array {
-                if ($value instanceof JsonSerializable) {
-                    $value = $value->jsonSerialize();
-                }
-
-                if ($value instanceof Arrayable) {
-                    $value = $value->toArray();
-                }
-
-                if (is_string($value)) {
-                    $decoded = json_decode($value, true);
-
-                    if (json_last_error() === JSON_ERROR_NONE) {
-                        $value = $decoded;
-                    }
-                }
-
-                if ($value === []) {
-                    return ['metadata' => []];
-                }
-
-                if (! is_array($value)) {
-                    return ['metadata' => null];
-                }
-
-                return ['metadata' => $value];
+                // Encode structured arrays to JSON strings to keep the database payload compliant across drivers.
+                return ['metadata' => json_encode($value, JSON_THROW_ON_ERROR)];
             },
         );
     }
