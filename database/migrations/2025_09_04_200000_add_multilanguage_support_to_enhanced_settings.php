@@ -30,30 +30,66 @@ return new class extends Migration
         // Add locale column to enhanced_settings table if it doesn't exist
         if (! Schema::hasColumn('enhanced_settings', 'locale')) {
             Schema::table('enhanced_settings', function (Blueprint $table): void {
+                // Add the locale column with an explicit index so lookups stay fast on multilingual installs.
                 $table->string('locale', 10)->default('lt')->after('key');
-                $table->index('locale');
+                $table->index('locale', 'enhanced_settings_locale_index');
             });
+        } else {
+            // If earlier migrations already introduced the column, ensure the supporting index exists.
+            try {
+                Schema::table('enhanced_settings', function (Blueprint $table): void {
+                    $table->index('locale', 'enhanced_settings_locale_index');
+                });
+            } catch (\Throwable) {
+                // Ignore duplicate index errors because some environments already applied the optimisation.
+            }
         }
 
         // Update the unique constraint to include locale
-        Schema::table('enhanced_settings', function (Blueprint $table): void {
-            $table->dropUnique(['key']);
-            $table->unique(['key', 'locale']);
-        });
+        try {
+            Schema::table('enhanced_settings', function (Blueprint $table): void {
+                $table->dropUnique('enhanced_settings_key_unique');
+            });
+        } catch (\Throwable) {
+            // Some fresh databases never created the legacy unique index, so dropping it is optional.
+        }
+
+        try {
+            Schema::table('enhanced_settings', function (Blueprint $table): void {
+                $table->unique(['key', 'locale'], 'enhanced_settings_key_locale_unique');
+            });
+        } catch (\Throwable) {
+            // Ignore duplicate creation attempts when the composite index already exists.
+        }
     }
 
     public function down(): void
     {
         // Restore original unique constraint
-        Schema::table('enhanced_settings', function (Blueprint $table): void {
-            $table->dropUnique(['key', 'locale']);
-            $table->unique(['key']);
-        });
+        try {
+            Schema::table('enhanced_settings', function (Blueprint $table): void {
+                $table->dropUnique('enhanced_settings_key_locale_unique');
+            });
+        } catch (\Throwable) {
+            // Ignore missing composite indexes because some environments may have already reverted them.
+        }
+
+        try {
+            Schema::table('enhanced_settings', function (Blueprint $table): void {
+                $table->unique('key', 'enhanced_settings_key_unique');
+            });
+        } catch (\Throwable) {
+            // Ignore duplicate creation errors when the legacy index is already present.
+        }
 
         // Remove locale column
         if (Schema::hasColumn('enhanced_settings', 'locale')) {
             Schema::table('enhanced_settings', function (Blueprint $table): void {
-                $table->dropIndex(['locale']);
+                try {
+                    $table->dropIndex('enhanced_settings_locale_index');
+                } catch (\Throwable) {
+                    // Ignore missing index failures so the column drop can continue safely.
+                }
                 $table->dropColumn('locale');
             });
         }
