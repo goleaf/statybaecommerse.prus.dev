@@ -330,9 +330,19 @@ final class Category extends Model implements HasMedia
         ]);
     }
 
+    /**
+     * Restrict the query to visible root categories ordered for navigation menus.
+     */
     public function scopeTopLevelVisible(Builder $query): Builder
     {
-        return $query->visible()->roots()->ordered();
+        // Make the filter conditions explicit so the scope works even when global scopes are bypassed in diagnostics.
+        $query
+            ->whereNull($query->qualifyColumn('parent_id'))
+            ->where($query->qualifyColumn('is_visible'), true)
+            ->orderBy($query->qualifyColumn('sort_order'));
+
+        // Delegate alphabetical ordering to the shared trait for a predictable fallback order.
+        return $query->orderedByName();
     }
 
     /**

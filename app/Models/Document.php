@@ -166,21 +166,25 @@ final class Document extends Model
     /**
      * Expose a chronological audit trail so the UI and API can surface changes.
      *
-     * @return MorphMany<AuditLog, Document>
+     * @return MorphMany<AuditLog, self>
      */
     public function auditLogs(): MorphMany
     {
-        return $this->morphMany(AuditLog::class, 'entity')->latest('created_at');
+        /** @var MorphMany<AuditLog, self> $relation */
+        $relation = $this->morphMany(AuditLog::class, 'entity')->latest('created_at');
+
+        return $relation;
     }
 
     /**
      * Handle getVariablesUsed functionality with proper error handling.
      *
-     * @return array<string, mixed>
+     * @return array<array-key, mixed>
      */
     public function getVariablesUsed(): array
     {
-        return $this->variables ?? [];
+        // Guarantee an array is returned even when the underlying cast resolves to null.
+        return is_array($this->variables) ? $this->variables : [];
     }
 
     /**
@@ -201,9 +205,13 @@ final class Document extends Model
             return null;
         }
 
+        // Normalise the configured lifetime to an integer so PHPStan recognises the type.
+        $lifetime = config('media-security.url_lifetime', 30);
+        $minutes = is_numeric($lifetime) ? (int) $lifetime : 30;
+
         return SecureStorage::temporarySignedUrl(
             $this->file_path,
-            now()->addMinutes((int) config('media-security.url_lifetime', 30)),
+            now()->addMinutes($minutes),
             true
         );
     }
@@ -309,11 +317,15 @@ final class Document extends Model
      */
     public function scopeOrderedByName(Builder $query): Builder
     {
+        // Normalise whitespace-heavy names so that "   " behaves the same as a
+        // genuinely empty value, ensuring the title fallback logic always kicks in.
+        $orderExpression = "COALESCE(NULLIF(TRIM(name), ''), title)";
+
         return $query
-            // Prefer the custom name when present but gracefully fall back to the title.
-            ->orderByRaw("COALESCE(NULLIF(name, ''), title) ASC")
-            // A deterministic second sort keeps pagination stable across inserts.
-            ->orderBy($this->qualifyColumn($this->getKeyName()));
+            ->orderByRaw("{$orderExpression} ASC")
+            // A deterministic second sort keeps pagination stable across inserts while
+            // avoiding direct references to \$this inside the scope context.
+            ->orderBy($query->qualifyColumn($query->getModel()->getKeyName()));
     }
 
     /**

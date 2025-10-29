@@ -9,10 +9,10 @@ use App\Models\CampaignView;
 use App\Support\Concerns\HasNav;
 use App\Support\Filament\Components\Flatpickr;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Tabs;
-use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Tabs as SchemaTabs;
+use Filament\Schemas\Components\Tabs\Tab as SchemaTab;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -45,11 +45,12 @@ final class CampaignViewResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $form
+        // Wire the form schema using the provided Schema contract to avoid undefined variable issues.
+        return $schema
             ->schema([
-                Tabs::make(__('campaign_views.section_title'))
+                SchemaTabs::make(__('campaign_views.section_title'))
                     ->tabs([
-                        Tab::make(__('campaign_views.tabs.basic_information'))
+                        SchemaTab::make(__('campaign_views.tabs.basic_information'))
                             ->icon('heroicon-o-information-circle')
                             ->schema([
                                 Select::make('campaign_id')

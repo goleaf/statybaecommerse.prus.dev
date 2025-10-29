@@ -11,7 +11,9 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Notification;
 
-uses(RefreshDatabase::class);
+// Explicitly bind the base Laravel TestCase so database transactions and model factories
+// remain available when this suite runs in isolation via targeted filters.
+uses(Tests\TestCase::class, RefreshDatabase::class);
 
 describe('CouponUsage model', function (): void {
     it('defines expected fillable attributes', function (): void {
@@ -82,7 +84,9 @@ describe('CouponUsage model', function (): void {
 
         // Assert: only the usage created today should be returned.
         expect($results)->toHaveCount(1);
-        expect($results->first()->is($todayUsage))->toBeTrue();
+        // `sole()` communicates intent to both phpstan and fellow readers that exactly
+        // one record should exist, avoiding nullable `first()` handling noise.
+        expect($results->sole()->is($todayUsage))->toBeTrue();
         Carbon::setTestNow();
     });
 
@@ -97,7 +101,7 @@ describe('CouponUsage model', function (): void {
 
         // Assert: confirm only the qualifying usage is retrieved.
         expect($results)->toHaveCount(1);
-        expect($results->first()->is($withinWeek))->toBeTrue();
+        expect($results->sole()->is($withinWeek))->toBeTrue();
         Carbon::setTestNow();
     });
 
@@ -112,7 +116,7 @@ describe('CouponUsage model', function (): void {
 
         // Assert: verify only the recent usage appears in the result set.
         expect($results)->toHaveCount(1);
-        expect($results->first()->is($withinMonth))->toBeTrue();
+        expect($results->sole()->is($withinMonth))->toBeTrue();
         Carbon::setTestNow();
     });
 
@@ -127,7 +131,7 @@ describe('CouponUsage model', function (): void {
 
         // Assert: ensure only the usage within the five day window is returned.
         expect($results)->toHaveCount(1);
-        expect($results->first()->is($recent))->toBeTrue();
+        expect($results->sole()->is($recent))->toBeTrue();
         Carbon::setTestNow();
     });
 

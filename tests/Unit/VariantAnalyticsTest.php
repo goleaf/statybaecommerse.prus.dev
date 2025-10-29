@@ -305,6 +305,37 @@ final class VariantAnalyticsTest extends TestCase
         $this->assertDatabaseCount('variant_analytics', 1);
     }
 
+    public function test_record_analytics_recalculates_conversion_rate_when_metrics_change(): void
+    {
+        // Arrange
+        $variant = ProductVariant::factory()->create();
+        $date = '2025-12-26';
+
+        VariantAnalytics::factory()
+            ->withVariant($variant)
+            ->forDate($date)
+            ->create([
+                'views'           => 50,
+                'purchases'       => 5,
+                'conversion_rate' => 10.0,
+            ]);
+
+        // Act
+        $analytics = VariantAnalytics::recordAnalytics(
+            $variant->id,
+            $date,
+            [
+                'views'     => 100,
+                'purchases' => 5,
+            ]
+        );
+
+        // Assert
+        $this->assertEquals(150, $analytics->views);
+        $this->assertEquals(10, $analytics->purchases);
+        $this->assertEqualsWithDelta(6.6667, (float) $analytics->conversion_rate, 0.0001);
+    }
+
     public function test_increment_metric_updates_correctly(): void
     {
         // Arrange

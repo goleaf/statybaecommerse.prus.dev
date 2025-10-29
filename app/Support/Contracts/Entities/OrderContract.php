@@ -41,7 +41,7 @@ final class OrderContract
     public static function forCollection(iterable $orders, array $meta = []): array
     {
         $items = Collection::make($orders)
-            ->map(fn (Order $order): array => self::mapOrder($order))
+            ->map(self::mapOrder(...))
             ->values()
             ->all();
 
@@ -81,6 +81,7 @@ final class OrderContract
             'shipping_address' => is_array($order->shipping_address) ? $order->shipping_address : [],
             'placed_at'        => $order->created_at?->toISOString(),
             'links'            => [
+                // Mirror the public API route signature so hypermedia references stay consistent across clients.
                 'self' => route('api.orders.show', ['order' => $order->number]),
             ],
         ];
