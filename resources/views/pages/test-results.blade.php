@@ -39,6 +39,20 @@
                     </div>
                 </div>
 
+                @if ($viewModel->meta['is_running'])
+                    {{-- Surface a live-run banner so CI operators immediately see that the job is still executing. --}}
+                    <div class="rounded-3xl border border-amber-500/30 bg-amber-500/10 px-6 py-4 text-amber-100">
+                        <div class="flex flex-col gap-1 text-center">
+                            <span class="text-sm font-semibold uppercase tracking-wider">
+                                {{ __('frontend.test_results.meta.running_banner.title') }}
+                            </span>
+                            <p class="text-xs text-amber-200">
+                                {{ __('frontend.test_results.meta.running_banner.description') }}
+                            </p>
+                        </div>
+                    </div>
+                @endif
+
                 <div class="grid gap-6 lg:grid-cols-3">
                     <div class="lg:col-span-2" data-test="summary-panel">
                         <div
@@ -89,6 +103,12 @@
                                         </dd>
                                     </div>
                                 </dl>
+                                {{-- Provide an accessible textual breakdown for quick scanning in logs and tests. --}}
+                                <ul class="mt-4 flex flex-wrap items-center gap-3 text-xs font-semibold uppercase tracking-wide text-slate-300">
+                                    <li>{{ __('frontend.test_results.summary.breakdown.passed', ['count' => $viewModel->summary['passed']]) }}</li>
+                                    <li>{{ __('frontend.test_results.summary.breakdown.failed', ['count' => $viewModel->summary['failed']]) }}</li>
+                                    <li>{{ __('frontend.test_results.summary.breakdown.running', ['count' => $viewModel->summary['running']]) }}</li>
+                                </ul>
                                 <div class="mt-6 grid gap-2 sm:grid-cols-2">
                                     <div
                                          class="rounded-2xl bg-slate-900 px-4 py-4 text-sm text-slate-300 ring-1 ring-white/5">
