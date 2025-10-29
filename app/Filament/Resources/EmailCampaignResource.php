@@ -20,8 +20,8 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
@@ -61,10 +61,10 @@ final class EmailCampaignResource extends Resource
         return __('admin.email_campaigns.model_label');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
         // Build the form schema using the Filament v4 Form API to keep resource configuration consistent.
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('admin.email_campaigns.basic_information'))
                 ->description(__('admin.email_campaigns.basic_information_description'))
                 ->schema([
