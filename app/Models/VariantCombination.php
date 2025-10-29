@@ -8,6 +8,7 @@ use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
 use App\Models\Scopes\VisibleScope;
 use Database\Factories\VariantCombinationFactory;
+use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
@@ -15,6 +16,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\SQLiteConnection;
 use JsonException;
 
 /**
@@ -230,8 +232,39 @@ final class VariantCombination extends Model
      */
     public function scopeByCombination(Builder $query, array $combinations): Builder
     {
-        foreach ($combinations as $attribute => $value) {
+        // Normalise incoming payloads so hash comparisons and JSON filters reuse the
+        // deterministic ordering applied during persistence.
+        $normalised = self::normaliseCombination($combinations);
+
+        $productFilter = $this->detectProductFilter($query);
+
+        if ($productFilter !== null) {
+            // When a product constraint is present we can jump straight to the
+            // precomputed hash, guaranteeing exact-match lookups without iterating
+            // through JSON clauses that might accidentally match supersets.
+            $hash = self::deterministicHashFor($normalised, $productFilter);
+
+            return $query->where('combination_hash', $hash);
+        }
+
+        foreach ($normalised as $attribute => $value) {
             $query->whereJsonContains('attribute_combinations->' . $attribute, $value);
+        }
+
+        // Match against the JSON object length to exclude supersets, falling back to a
+        // driver-specific expression because SQLite lacks a native JSON_LENGTH helper.
+        /** @var Connection $connection */
+        $connection = $query->getConnection();
+        $grammar = $connection->getQueryGrammar();
+        $wrappedColumn = $grammar->wrap('attribute_combinations');
+        $attributeCount = count($normalised);
+
+        if ($connection instanceof SQLiteConnection) {
+            $expression = sprintf('SELECT COUNT(*) FROM json_each(%s)', $wrappedColumn);
+
+            $query->whereRaw('(' . $expression . ') = ?', [$attributeCount]);
+        } else {
+            $query->whereRaw(sprintf('JSON_LENGTH(%s) = ?', $wrappedColumn), [$attributeCount]);
         }
 
         return $query;
@@ -510,6 +543,38 @@ final class VariantCombination extends Model
         }
 
         return hash('sha256', json_encode($combination, JSON_THROW_ON_ERROR));
+    }
+
+    /**
+     * Inspect the base query for an existing product constraint to assist hash lookups.
+     *
+     * @param Builder<self> $query
+     */
+    private function detectProductFilter(Builder $query): int|string|null
+    {
+        $baseQuery = $query->getQuery();
+
+        /** @var mixed $wheresProperty */
+        $wheresProperty = $baseQuery->wheres;
+
+        /** @var array<int, mixed> $wheres */
+        $wheres = is_array($wheresProperty) ? $wheresProperty : [];
+
+        foreach ($wheres as $where) {
+            if (! is_array($where)) {
+                continue;
+            }
+
+            if (($where['column'] ?? null) === 'product_id' && array_key_exists('value', $where)) {
+                $value = $where['value'];
+
+                if (is_int($value) || is_string($value)) {
+                    return $value;
+                }
+            }
+        }
+
+        return null;
     }
 
     /**

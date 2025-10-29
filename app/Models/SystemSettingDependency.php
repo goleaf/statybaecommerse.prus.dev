@@ -107,6 +107,8 @@ final class SystemSettingDependency extends Model
     }
 
     /**
+     * @deprecated Use dependsOnSetting relation instead.
+     *
      * @return BelongsTo<SystemSetting, $this>
      */
     public function dependsOnSettingRelation(): BelongsTo
@@ -117,6 +119,19 @@ final class SystemSettingDependency extends Model
     public function getDependsOnSettingAttribute(): ?SystemSetting
     {
         $relation = $this->getRelationValue('dependsOnSettingRelation');
+
+        if ($relation instanceof SystemSetting) {
+            return $relation;
+        }
+
+        $relation = $this->dependsOnSettingRelation()->getResults();
+
+        if ($relation instanceof SystemSetting) {
+            // Store the hydrated relationship under the canonical key so any
+            // subsequent access during the request cycle reuses the same
+            // instance and avoids duplicate database queries.
+            $this->setRelation('dependsOnSettingRelation', $relation);
+        }
 
         return $relation instanceof SystemSetting ? $relation : null;
     }
@@ -242,6 +257,8 @@ final class SystemSettingDependency extends Model
                         ->whereRaw('LOWER(' . $relation->qualifyColumn('key') . ') LIKE ?', [$pattern])
                         ->orWhereRaw('LOWER(' . $relation->qualifyColumn('name') . ') LIKE ?', [$pattern]);
                 })
+                // Interrogate the legacy dependsOnSettingRelation association so searches work without
+                // invoking the computed dependsOnSetting attribute accessor directly.
                 ->orWhereHas('dependsOnSettingRelation', function (Builder $relation) use ($pattern): void {
                     $relation
                         ->whereRaw('LOWER(' . $relation->qualifyColumn('key') . ') LIKE ?', [$pattern])
@@ -294,6 +311,9 @@ final class SystemSettingDependency extends Model
             $dependsOnSetting = $this->dependsOnSettingRelation()->getResults();
 
             if ($dependsOnSetting instanceof SystemSetting) {
+                // Cache the resolved relation on the canonical key to avoid
+                // redundant database calls when multiple comparisons are
+                // evaluated against the same dependency instance.
                 $this->setRelation('dependsOnSettingRelation', $dependsOnSetting);
             }
         }
@@ -337,13 +357,31 @@ final class SystemSettingDependency extends Model
         $normalizedValue = $this->normalizeComparableValue($dependencyValue);
         $normalizedExpected = $this->normalizeComparableValue($expectedValue);
 
+        $comparisonOperators = [
+            'equals',
+            'not_equals',
+            'greater_than',
+            'greater_or_equals',
+            'less_than',
+            'less_or_equals',
+        ];
+
+        $comparisonResult = null;
+
+        if (in_array($operator, $comparisonOperators, true)) {
+            // Cache the comparison once so subsequent checks re-use the same
+            // normalised evaluation instead of repeating the work for every
+            // branch in the match expression below.
+            $comparisonResult = $this->compareValues($normalizedValue, $normalizedExpected);
+        }
+
         return match ($operator) {
-            'equals'            => $this->compareValues($normalizedValue, $normalizedExpected) === 0,
-            'not_equals'        => $this->compareValues($normalizedValue, $normalizedExpected) !== 0,
-            'greater_than'      => $this->compareValues($normalizedValue, $normalizedExpected) === 1,
-            'greater_or_equals' => $this->compareValues($normalizedValue, $normalizedExpected) >= 0,
-            'less_than'         => $this->compareValues($normalizedValue, $normalizedExpected) === -1,
-            'less_or_equals'    => $this->compareValues($normalizedValue, $normalizedExpected) <= 0,
+            'equals'            => $comparisonResult === 0,
+            'not_equals'        => $comparisonResult !== 0,
+            'greater_than'      => $comparisonResult === 1,
+            'greater_or_equals' => $comparisonResult >= 0,
+            'less_than'         => $comparisonResult === -1,
+            'less_or_equals'    => $comparisonResult <= 0,
             'contains'          => is_string($normalizedValue) && is_string($normalizedExpected) && str_contains($normalizedValue, $normalizedExpected),
             'not_contains'      => is_string($normalizedValue) && is_string($normalizedExpected) && ! str_contains($normalizedValue, $normalizedExpected),
             'starts_with'       => is_string($normalizedValue) && is_string($normalizedExpected) && str_starts_with($normalizedValue, $normalizedExpected),

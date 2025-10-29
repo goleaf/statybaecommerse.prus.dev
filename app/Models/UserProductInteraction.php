@@ -55,6 +55,38 @@ final class UserProductInteraction extends Model
     ];
 
     /**
+     * Automatically seed the legacy interaction timestamps when callers omit
+     * them so the NOT NULL constraints introduced by the original schema stay
+     * satisfied even when only the modern occurred_at value is provided.
+     */
+    protected static function booted(): void
+    {
+        parent::booted();
+
+        static::creating(function (self $interaction): void {
+            // Resolve the effective occurrence timestamp before mutating the
+            // legacy attributes, allowing fallbacks for inserts that only
+            // specify the modern occurred_at column.
+            $occurredAt = $interaction->occurred_at ?? now();
+
+            if ($interaction->getAttribute('first_interaction') === null) {
+                // Default the first interaction to the resolved occurrence
+                // timestamp so initial inserts respect the historical column
+                // contract without requiring callers to set both values.
+                $interaction->setAttribute('first_interaction', $occurredAt);
+            }
+
+            if ($interaction->getAttribute('last_interaction') === null) {
+                // Mirror the last interaction timestamp as well, keeping the
+                // legacy analytics queries aligned with the most recent event
+                // even when only the consolidated occurred_at value is passed
+                // through the modern API surface.
+                $interaction->setAttribute('last_interaction', $occurredAt);
+            }
+        });
+    }
+
+    /**
      * Normalise legacy payloads before the base fill logic runs so both the
      * new and old attribute names hydrate correctly.
      *
@@ -140,7 +172,7 @@ final class UserProductInteraction extends Model
                 if (is_string($value) && $value !== '') {
                     try {
                         $decoded = json_decode($value, true, 512, JSON_THROW_ON_ERROR) ?: [];
-                    } catch (JsonException $exception) {
+                    } catch (JsonException) {
                         $decoded = [];
                     }
                 } elseif (is_array($value)) {
@@ -162,14 +194,25 @@ final class UserProductInteraction extends Model
             set: function ($value): array {
                 // Convert various inputs into a pure array so the JSON column stores a predictable payload.
                 $metaArray = match (true) {
-                    is_array($value) => $value,
-                    $value instanceof Arrayable => $value->toArray(),
+                    is_array($value)                   => $value,
+                    $value instanceof Arrayable        => $value->toArray(),
                     $value instanceof JsonSerializable => (array) $value->jsonSerialize(),
-                    $value instanceof \Traversable => iterator_to_array($value),
-                    default => [],
+                    $value instanceof Traversable      => iterator_to_array($value),
+                    default                            => [],
                 };
 
-                $payload = ['meta' => $metaArray === [] ? [] : $metaArray];
+                // Encode the meta payload ahead of persistence to avoid SQLite array binding errors while keeping
+                // downstream getters JSON aware. When encoding fails we intentionally fall back to an empty payload so
+                // report generation can proceed without throwing QueryExceptions.
+                try {
+                    $encodedMeta = $metaArray === []
+                        ? null
+                        : json_encode($metaArray, JSON_THROW_ON_ERROR);
+                } catch (JsonException) {
+                    $encodedMeta = null;
+                }
+
+                $payload = ['meta' => $encodedMeta];
 
                 foreach (['rating', 'count', 'first_interaction', 'last_interaction', 'notes', 'is_anonymous', 'ip_address'] as $legacyKey) {
                     if (! array_key_exists($legacyKey, $metaArray)) {
@@ -220,10 +263,10 @@ final class UserProductInteraction extends Model
             },
             set: static function ($value): array {
                 $carbon = match (true) {
-                    $value instanceof Carbon => $value,
+                    $value instanceof Carbon            => $value,
                     $value instanceof DateTimeInterface => Carbon::instance($value),
-                    $value === null || $value === '' => null,
-                    default => Carbon::make($value) ?? Carbon::parse((string) $value),
+                    $value === null || $value === ''    => null,
+                    default                             => Carbon::make($value) ?? Carbon::parse((string) $value),
                 };
 
                 return [
