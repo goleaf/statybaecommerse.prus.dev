@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Schema;
 use RuntimeException;
 use Tests\Support\TestingDatabase;
 use Throwable;
+use Traversable;
 
 abstract class TestCase extends BaseTestCase
 {
@@ -122,6 +123,15 @@ abstract class TestCase extends BaseTestCase
     }
 
     /**
+     * Provide a backwards-compatible assertion shim expected by legacy feature tests.
+     */
+    protected function assertStringContains(string $needle, string $haystack, string $message = ''): void
+    {
+        // Delegate to PHPUnit's native implementation so future upgrades remain aligned.
+        self::assertStringContainsString($needle, $haystack, $message);
+    }
+
+    /**
      * Override the default database refresh cycle to lean on the shared
      * TestingDatabase helper. Laravel's RefreshDatabase trait will
      * call this method for every test that uses the trait, so we
@@ -208,7 +218,7 @@ abstract class TestCase extends BaseTestCase
      */
     private function canonicalizeValue(mixed $value): mixed
     {
-        if ($value instanceof \Traversable) {
+        if ($value instanceof Traversable) {
             $value = iterator_to_array($value, false);
         }
 
