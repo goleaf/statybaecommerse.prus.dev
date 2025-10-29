@@ -5,6 +5,7 @@ The document platform combines reusable templates, automated generation, variabl
 
 ## Document Templates
 - `DocumentTemplate` stores editable HTML bodies, variable definitions, categorisation, and print settings while auto-generating slugs and exposing historic documents for the template, enabling reusable layouts for downstream generation.【F:app/Models/DocumentTemplate.php†L31-L199】
+- Alphabetical pickers stay predictable thanks to the hardened `DocumentTemplate::orderedByName()` scope, which normalises direction input before applying qualified ordering clauses for complex joins.【F:app/Models/DocumentTemplate.php†L234-L240】
 
 ## Document Generation
 - `DocumentService::generateDocument()` sanitises template HTML, applies variables, persists the draft record, and optionally notifies the initiating user; `generatePdf()` renders the processed HTML into a DomPDF file, applies print settings, saves the asset to secure storage, and publishes the document.【F:app/Services/DocumentService.php†L35-L103】
