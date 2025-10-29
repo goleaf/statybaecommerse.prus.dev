@@ -4,12 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
 use App\Filament\Resources\CollectionResource\Pages;
 use App\Models\Collection;
 use App\Support\Concerns\HasNav;
-use BackedEnum;
-use UnitEnum;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
