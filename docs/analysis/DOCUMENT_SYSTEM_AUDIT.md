@@ -4,13 +4,13 @@
 The document platform combines reusable templates, automated generation, variable substitution, typed classifications, guarded access, and lifecycle tracking to support invoices, receipts, and internal reports across the storefront and admin panels.
 
 ## Document Templates
-- `DocumentTemplate` stores editable HTML bodies, variable definitions, categorisation, and print settings while auto-generating slugs and exposing historic documents for the template, enabling reusable layouts for downstream generation.【F:app/Models/DocumentTemplate.php†L31-L199】
+- `DocumentTemplate` stores editable HTML bodies, variable definitions, categorisation, and print settings while auto-generating slugs and exposing historic documents for the template, enabling reusable layouts for downstream generation.【F:app/Models/DocumentTemplate.php†L29-L199】
 
 ## Document Generation
 - `DocumentService::generateDocument()` sanitises template HTML, applies variables, persists the draft record, and optionally notifies the initiating user; `generatePdf()` renders the processed HTML into a DomPDF file, applies print settings, saves the asset to secure storage, and publishes the document.【F:app/Services/DocumentService.php†L35-L103】
 
 ## Variable Replacement
-- `DocumentService::processTemplate()` normalises arrays, objects, and booleans before performing placeholder substitution, while `DocumentTemplate::render()` supports `{{placeholder}}` tokens—together powering dynamic content injection for generated documents.【F:app/Services/DocumentService.php†L110-L131】【F:app/Models/DocumentTemplate.php†L110-L130】
+- `DocumentService::processTemplate()` normalises arrays, objects, and booleans before performing placeholder substitution, while `DocumentTemplate::render()` supports `{{placeholder}}` tokens—together powering dynamic content injection for generated documents.【F:app/Services/DocumentService.php†L110-L131】【F:app/Models/DocumentTemplate.php†L114-L130】
 - `DocumentService::getAvailableVariables()` exposes cached global keys (order details, customer metadata, etc.), and `extractVariablesFromModel()` maps model attributes (including order-specific overrides) for automatic replacement.【F:app/Services/DocumentService.php†L139-L199】【F:app/Services/DocumentService.php†L205-L226】
 
 ## Document Types
