@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Sliders;
 
+use App\Enums\NavigationGroup;
 use App\Filament\Resources\Sliders\Pages\CreateSlider;
 use App\Filament\Resources\Sliders\Pages\EditSlider;
 use App\Filament\Resources\Sliders\Pages\ListSliders;
@@ -13,7 +14,6 @@ use App\Support\Concerns\HasNav;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use UnitEnum;
 
@@ -22,9 +22,9 @@ final class SliderResource extends Resource
     use HasNav;
 
     /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations while exposing a stable string for tests.
      */
-    protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
@@ -32,7 +32,7 @@ final class SliderResource extends Resource
     protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Content->value;
 
     /**
-     * @var UnitEnum|string|null
+     * @var int|null provides explicit typing for the navigation sorting priority.
      */
     protected static ?int $navigationSort = 1;
 

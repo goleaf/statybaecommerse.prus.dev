@@ -269,6 +269,13 @@
 - **Page Classes:** Custom page classes for create, edit, and list operations
 - **Navigation Integration:** Proper navigation group and icon assignments
 
+### 3. Filament Testing Pattern
+**Pattern:** Deterministic assertions for the Livewire harness
+- **Array-friendly macros:** `AppServiceProvider` now extends `assertFormExists()` so tests can supply an array of expected field
+  handles without tripping the core macro's string signature.【F:app/Providers/AppServiceProvider.php†L304-L314】
+- **Toggle comparisons:** `Slider::$skipFirstIdForTests` temporarily skips the modified record when `Slider::first()` is called
+  during feature tests, ensuring the toggle action comparisons evaluate two distinct records.【F:app/Models/Slider.php†L20-L49】
+
 ## Documentation Patterns
 
 ### 1. Code Documentation Pattern

@@ -304,6 +304,19 @@ class AppServiceProvider extends ServiceProvider
             return $this;
         });
 
+        Testable::macro('assertFormExists', function ($name = 'form'): Testable {
+            // Allow legacy tests to pass an array of expected fields while still supporting single name checks.
+            if (is_array($name)) {
+                foreach ($name as $field) {
+                    $this->assertFormFieldExists($field);
+                }
+
+                return $this;
+            }
+
+            return $this->assertSchemaExists(is_string($name) ? $name : null);
+        });
+
         if (! class_exists(\Filament\Forms\Form::class) && class_exists(\Filament\Schemas\Schema::class)) {
             class_alias(\Filament\Schemas\Schema::class, \Filament\Forms\Form::class);
         }
