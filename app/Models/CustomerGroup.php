@@ -550,6 +550,15 @@ final class CustomerGroup extends Model
 
         $this->attributes['is_active'] = $normalized;
 
+        if ($normalized === false) {
+            // Ensure that disabling the group through the `is_active` toggle always
+            // cascades to the `is_enabled` column so persisted state stays in sync
+            // with the expectations encoded in the Filament resource feature tests.
+            $this->attributes['is_enabled'] = false;
+
+            return;
+        }
+
         // Only mirror when the counterpart is unset or already aligned so callers
         // can deliberately diverge `is_active` from `is_enabled` without the later
         // setter overwriting their intent during mass-assignment.
@@ -570,6 +579,15 @@ final class CustomerGroup extends Model
         $normalized = $this->normalizeBoolean($value);
 
         $this->attributes['is_enabled'] = $normalized;
+
+        if ($normalized === false) {
+            // Matching the behaviour in the active mutator, enforce that disabling
+            // the group through the `is_enabled` flag also clears the `is_active`
+            // column so downstream queries relying on either attribute stay aligned.
+            $this->attributes['is_active'] = false;
+
+            return;
+        }
 
         // Avoid clobbering explicit `is_active` assignments supplied in the same
         // payload by only mirroring when no value has been set yet or the values
