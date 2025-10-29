@@ -20,6 +20,7 @@ The model-focused regression suite is a quick indicator that Eloquent scopes, ca
 6. Capture any non-obvious insights or new invariants in the relevant markdown audits inside `docs/analysis/` so future tasks have the context baked in.
 7. When overriding query builders (for example, removing global scopes in a Filament resource to expose soft-deleted or hidden rows), document the intent with an `@return Builder<Model>` annotation so PHPStan retains its generic context and other engineers remember why moderation tools bypass the storefront defaults.
 8. Global scopes now re-validate their cached schema metadata after migrations complete, so if a model suddenly surfaces unexpected rows (for example, `CustomerGroup::enabled()` returning disabled fixtures) rerun the test after the migration phase to let the refreshed cache take effect rather than patching around stale `is_active`/`is_enabled` filters.
+9. The SQLite fallback schema used by `Tests\Support\TestingDatabase` now provisions lightweight `products` and `product_images` tables whenever the full migration stack cannot execute. This keeps the product catalogue factories and `ProductImage` unit coverage operational even when the harness regenerates an abbreviated database, so include those columns in new assertions when expanding the suite.
 
 ## System setting attribution safety
 
