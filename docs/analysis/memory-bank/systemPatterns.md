@@ -157,6 +157,10 @@
   `dependsOnSettingRelation` alias, ensuring attribute lookups remain cached
   even while supporting the legacy scope signature that filters dependencies by
   their controlling setting.
+  - Fresh installs and CI refreshes now drop the legacy `condition` index before
+    rebuilding the column schema, preventing SQLite from erroring on duplicate
+    `condition_value` fields during repeated migrations and keeping the
+    dependency scopes available for test harnesses.
 
 ## Security Patterns
 
