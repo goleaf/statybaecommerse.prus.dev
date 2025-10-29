@@ -43,6 +43,9 @@ This repository mixes Laravel 12 and Filament v4 code. Use the following guardra
 - **Documentation diligence**: After completing fixes or features, review the contents of `docs/` for any references that need
   refreshing (runbooks, audits, closure notes). Update the relevant markdown files to mirror the behaviour you introduced and
   extend agent instructions when new recurring rules emerge.
+- **Product media parity**: When modifying product image components, keep the shared `admin.no_image` translation in sync across
+  languages and continue exposing the original storage path via a `data-original-src` attribute so QA tooling can locate assets
+  without dereferencing signed URLs.
 - **Example test placeholders**: Keep the placeholder example tests across `tests/Feature`, `tests/Unit`, `tests/Livewire`,
   `tests/Filament`, and `tests/Http` intact. These files fuel the QA dashboards that reference legacy `ExampleTest` identifiers
   and should remain green (skip/incomplete when simulating other states) to avoid breaking monitoring scripts.
