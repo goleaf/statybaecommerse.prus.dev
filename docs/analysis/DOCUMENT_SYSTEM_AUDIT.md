@@ -18,6 +18,7 @@ The document platform combines reusable templates, automated generation, variabl
 
 ## Access Control & Distribution
 - `Document` records default to private, downloadable assets, exposing convenience checks (e.g., `isPublic`, `isDownloadable`) and generating temporary signed URLs via secure storage for gated delivery.【F:app/Models/Document.php†L66-L210】【F:app/Models/Document.php†L244-L258】
+- Ordering scopes trim whitespace-only names before deferring to the title, keeping admin dropdowns stable even when legacy records contain padded values.【F:app/Models/Document.php†L304-L320】
 - `DocumentGenerated` notifications respect authorisation gates before surfacing view links and only attach PDFs when secure files exist, ensuring notifications honour per-document permissions.【F:app/Notifications/DocumentGenerated.php†L18-L103】
 
 ## Versioning & Lifecycle Management
