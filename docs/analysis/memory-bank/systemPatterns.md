@@ -92,6 +92,7 @@
 - Cached eligibility evaluation
 - Tag-based cache invalidation
 - Query scopes on discount redemptions expose per-discount, per-user, order-specific, and date-filtered analytics for reporting surfaces.【F:app/Models/DiscountRedemption.php†L130-L178】
+- Diagnostic tooling for the discount engine now resolves conditions after request validation so empty payload checks return the expected 422 errors instead of being masked by early 404 bindings in tests.【F:app/Http/Controllers/DiscountConditionController.php†L167-L192】
 
 ### 3. Media Management Architecture
 **Decision:** Spatie Media Library with automatic conversions
