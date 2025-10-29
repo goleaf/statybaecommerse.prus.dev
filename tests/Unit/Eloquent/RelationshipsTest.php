@@ -9,6 +9,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -46,7 +47,9 @@ final class RelationshipsTest extends TestCase
 
     public function test_order_relationships_work(): void
     {
-        $order = Order::factory()->create();
+        // Ensure the user() belongsTo relation has a real parent
+        $user  = User::factory()->create();
+        $order = Order::factory()->for($user, 'user')->create();
 
         // BelongsTo: user
         $this->assertInstanceOf(BelongsTo::class, $order->user());
@@ -57,7 +60,7 @@ final class RelationshipsTest extends TestCase
         $this->assertInstanceOf(HasMany::class, $order->items());
         $this->assertNotNull($order->items()->first());
 
-        // HasOne: shipping relation type
+        // HasOne: shipping relation type (only asserting relation type here)
         $this->assertInstanceOf(HasOne::class, $order->shipping());
     }
 }
