@@ -7,7 +7,7 @@ namespace App\Services\Export;
 use App\Data\ExportRequestData;
 use App\Enums\ExportStatus;
 use App\Enums\ExportType;
-use App\Jobs\ProcessExport;
+use App\Jobs\ProcessExportJob;
 use App\Models\Export;
 use App\Models\User;
 use App\Notifications\ExportCompletedNotification;
@@ -189,10 +189,10 @@ final class ExportService
             'requested_by'       => $user?->getKey() ?? $data->userId,
         ]);
 
-        // Dispatch the canonical export processor job. The legacy ProcessExportJob class extends the
-        // modern ProcessExport implementation, so dispatching ProcessExport keeps both call sites
-        // working while allowing assertions to target the up-to-date job name.
-        ProcessExport::dispatch($export->getKey());
+        // Dispatch the backwards-compatible job alias so legacy assertions and integrations that
+        // still reference ProcessExportJob observe the queue activity while the modern job logic
+        // lives in the shared ProcessExport handler it extends.
+        ProcessExportJob::dispatch($export->getKey());
 
         return $export;
     }
