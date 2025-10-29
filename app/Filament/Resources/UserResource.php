@@ -6,6 +6,7 @@ namespace App\Filament\Resources;
 
 use App\Data\ExportRequestData;
 use App\Filament\Resources\UserResource\Pages;
+use App\Models\Scopes\ActiveScope;
 use App\Models\User;
 use App\Services\Export\Contracts\DefinesExportColumns;
 use App\Services\Export\ExportColumn;
@@ -36,6 +37,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Hash;
@@ -180,6 +182,17 @@ final class UserResource extends Resource implements DefinesExportColumns
                                     ->email()
                                     ->required()
                                     ->unique(ignoreRecord: true)
+                                    ->maxLength(255),
+                            ]),
+                        SchemaGrid::make(2)
+                            ->schema([
+                                // Store the name fragments directly on the model so factories and login flows stay simple.
+                                TextInput::make('first_name')
+                                    ->label(__('users.fields.first_name'))
+                                    ->maxLength(255),
+                                // Maintain symmetry with first name handling for consistent serialization.
+                                TextInput::make('last_name')
+                                    ->label(__('users.fields.last_name'))
                                     ->maxLength(255),
                             ]),
                         TextInput::make('password')
@@ -394,5 +407,14 @@ final class UserResource extends Resource implements DefinesExportColumns
             'view'   => Pages\ViewUser::route('/{record}'),
             'edit'   => Pages\EditUser::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        /** @var Builder<User> $query */
+        $query = parent::getEloquentQuery();
+
+        // Remove the ActiveScope so administrators can review and toggle inactive accounts directly from the grid.
+        return $query->withoutGlobalScopes([ActiveScope::class]);
     }
 }

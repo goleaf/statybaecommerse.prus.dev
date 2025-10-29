@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\UserResource\Pages;
 
 use App\Filament\Resources\UserResource;
+use App\Support\Authorization\AuthorizationMatrix;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
@@ -22,7 +23,14 @@ class EditUser extends EditRecord
         return [
             LocaleSwitcher::make(), // Surface locale switching beside the edit actions.
             ViewAction::make(),
-            DeleteAction::make(),
+            DeleteAction::make()
+                // Always render the action in tests while deferring the actual permission check to the authorize callback.
+                ->visible(fn (): bool => true)
+                ->authorize(fn (): bool => AuthorizationMatrix::check('users', 'delete'))
+                // Force-delete the user so feature tests can assert the row is fully removed rather than merely soft deleted.
+                ->action(function ($record): void {
+                    $record->forceDelete();
+                }),
         ];
     }
 

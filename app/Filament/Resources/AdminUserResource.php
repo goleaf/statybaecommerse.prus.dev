@@ -92,8 +92,9 @@ final class AdminUserResource extends Resource
                                 ->password()
                                 ->required(fn (string $context): bool => $context === 'create')
                                 ->minLength(8)
-                                // Use the first-class filled() helper so the dehydration guard remains obvious during reviews.
-                                ->dehydrated(filled(...))
+                                // Guard dehydration with an explicit closure so blank updates never clobber the stored hash.
+                                ->dehydrated(fn (?string $state): bool => filled($state))
+                                // Hash the provided password before persistence to keep the admin login secure.
                                 ->dehydrateStateUsing(fn (?string $state): ?string => filled($state) ? bcrypt($state) : null)
                                 ->columnSpan(1),
                             TextInput::make('password_confirmation')
