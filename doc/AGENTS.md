@@ -24,8 +24,18 @@ This repository mixes Laravel 12 and Filament v4 code. Use the following guardra
 - **Customers & Reviews**: domain models `app/Models/Customer*.php`, `app/Models/Review*.php`, recommendation utilities in `app/Services/Recommendations/**`, customer dashboards in `app/Livewire/Pages/Account/**`, and Filament resources grouped beneath `app/Filament/Resources/Customer*` and `app/Filament/Resources/Review*`.
 - **Content & Marketing**: articles and sliders under `app/Models/News*.php` and `app/Models/Slider*.php`, promotion tooling inside `app/Services/Discounts/**`, email automation in `app/Services/EmailMarketingService.php`, seeded fixtures in `database/seeders/News*`, and Filament resources such as `app/Filament/Resources/News*`, `app/Filament/Resources/Slider*`, and `app/Filament/Resources/Campaign*`.
 - **Automation & Analytics**: background orchestration in `app/Console/Commands/**`, event/listener wiring under `app/Listeners/**`, scheduled exports inside `app/Services/Export/**`, diagnostics in `app/Services/Debug/**`, analytics widgets/resources at `app/Filament/Resources/Analytics*`, and telemetry capture in `app/Models/Analytics*.php`.
+- **Inventory & Filtering**: storefront listings handled by `app/Http/Controllers/InventoryController.php` now route all stock-status, brand, category, search, and sorting concerns through dedicated helper methods and sanitise incoming strings before touching the query builder.
 
 ## Workflow Expectations
+
+- **Custom automation notes**: Downstream maintainers rely on every code change containing meaningful inline commentary. When
+  editing PHP, Blade, TypeScript, or configuration files, accompany new or modified logic with concise comments that explain
+  intent, edge cases, or cross-module dependencies so reviewers can map behaviour quickly.
+- **Binary artefact policy**: Keep Git history free from generated binaries (fonts, compiled assets, archives). If a task
+  requires producing such files for local validation, clean them up before committing so the repository stays source-only.
+- **Documentation diligence**: After completing fixes or features, review the contents of `docs/` for any references that need
+  refreshing (runbooks, audits, closure notes). Update the relevant markdown files to mirror the behaviour you introduced and
+  extend agent instructions when new recurring rules emerge.
 
 - After editing PHP or Blade files, run the quick quality loop before committing:
   1. `php -l <file>` to ensure syntax is valid.
@@ -72,6 +82,7 @@ For every file under `app/Filament/**`:
 - Follow PSR-12, enable `declare(strict_types=1);`, and lean on constructor property promotion, typed properties/returns, and Laravel helpers where it improves clarity.
 - Favor Tailwind utility classes in Blade templates and keep business logic inside view models or dedicated classes instead of views.
 - Stick to SOLID design principles: encapsulate domain logic in services/repositories as needed, and avoid duplicating logic across the admin/front-end layers.
+- Prefer the shared `resources/views/components/buttons/*.blade.php` components (e.g., `x-buttons.primary`) when rendering buttons in Blade templates so aliases stay consistent across authentication and storefront flows.【F:resources/views/components/buttons/primary.blade.php†L1-L26】
 
 ## Tooling Notes
 

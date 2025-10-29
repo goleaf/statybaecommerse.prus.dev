@@ -10,6 +10,7 @@ return [
     'basic_information_description' => 'Configure the core settings for this email campaign.',
     'name'                          => 'Name',
     'description'                   => 'Description',
+    'content'                       => 'Content',
     'subject'                       => 'Subject',
     'from_email'                    => 'From Email',
     'from_name'                     => 'From Name',

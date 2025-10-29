@@ -32,7 +32,6 @@
         "lara-zeus/matrix-choice": "*",
         "lara-zeus/spatie-translatable": "*",
         "laravel/framework": "^12.0",
-        "laravel/horizon": "^5.33",
         "laravel/sanctum": "^4.0",
         "laravel/scout": "^10.19",
         "laravel/tinker": "^2.10.1",

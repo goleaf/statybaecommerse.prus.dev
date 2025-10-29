@@ -266,8 +266,8 @@ final class CampaignCustomerSegmentResource extends Resource
 
     public static function infolist(Schema $schema): Schema
     {
-        // Provide the infolist schema using the Filament v4 return type.
-        return $infolist
+        // Use the schema instance provided by Filament so we avoid referencing undefined variables during rendering.
+        return $schema
             ->schema([
                 InfolistSection::make(__('campaign_customer_segments.tabs.basic_information'))
                     ->schema([

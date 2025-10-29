@@ -97,6 +97,9 @@ final class CampaignScheduleTest extends TestCase
 
     public function test_for_type_scope_accepts_enum_and_string_values(): void
     {
+        // Ensure factories skip cascading relationships so we have deterministic counts.
+        config()->set('factory.seed_campaign_relations', false);
+
         // Arrange: create schedules across multiple schedule types.
         $dailySchedule = CampaignSchedule::factory()->create([
             'schedule_type' => ScheduleType::DAILY->value,
@@ -114,6 +117,37 @@ final class CampaignScheduleTest extends TestCase
         $this->assertTrue($fromEnum->contains(fn (CampaignSchedule $schedule) => $schedule->is($dailySchedule)));
         $this->assertTrue($fromString->every(fn (CampaignSchedule $schedule) => $schedule->schedule_type === ScheduleType::DAILY));
         $this->assertTrue($fromString->contains(fn (CampaignSchedule $schedule) => $schedule->is($dailySchedule)));
+    }
+
+    public function test_for_type_scope_accepts_multiple_values_at_once(): void
+    {
+        // Disable cascading relation seeding to focus on the explicit schedules we create.
+        config()->set('factory.seed_campaign_relations', false);
+
+        // Arrange: persist one schedule per type so the scope has diverse data.
+        $dailySchedule = CampaignSchedule::factory()->create([
+            'schedule_type' => ScheduleType::DAILY->value,
+        ]);
+        $monthlySchedule = CampaignSchedule::factory()->create([
+            'schedule_type' => ScheduleType::MONTHLY->value,
+        ]);
+        CampaignSchedule::factory()->create([
+            'schedule_type' => ScheduleType::CUSTOM->value,
+        ]);
+
+        // Act: request both enum and string based filters to make sure the scope
+        // merges the results correctly without duplicating ids or missing options.
+        $results = CampaignSchedule::forType([
+            ScheduleType::DAILY,
+            'monthly',
+        ])->pluck('id')->all();
+
+        // Assert: only the matching schedule ids are returned and order is not significant.
+        sort($results);
+        $this->assertSame([
+            $dailySchedule->id,
+            $monthlySchedule->id,
+        ], $results);
     }
 
     public function test_campaign_relationship_returns_parent_campaign(): void

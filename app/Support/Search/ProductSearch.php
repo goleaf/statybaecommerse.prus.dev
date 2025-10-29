@@ -162,9 +162,14 @@ final class ProductSearch
                 return;
             }
 
+            $validJsonConstraint = "json_valid({$column})";
+
+            // Guard JSON extraction behind json_valid so legacy rows that still store
+            // plain strings inside the name column do not trigger "malformed JSON"
+            // errors when the SQLite JSON1 extension is present.
             $query
-                ->orWhereRaw("json_extract({$column}, '$.en') LIKE ?", [$like])
-                ->orWhereRaw("json_extract({$column}, '$.lt') LIKE ?", [$like]);
+                ->orWhereRaw("{$validJsonConstraint} AND json_extract({$column}, '$.en') LIKE ?", [$like])
+                ->orWhereRaw("{$validJsonConstraint} AND json_extract({$column}, '$.lt') LIKE ?", [$like]);
         }
 
         $query->orWhere($column, $fallbackOperator, $like);

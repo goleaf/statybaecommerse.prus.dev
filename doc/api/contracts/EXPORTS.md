@@ -4,7 +4,12 @@ The export subsystem produces CSV, XLSX, and PDF artifacts for the Orders, Produ
 
 ## Common guarantees
 
-- Files are written to `storage/app/exports/{entity}/{yyyy-mm-dd}/` with a unique timestamped filename.
+- Files are written to the configured export filesystem disk (defaulting to the secure-media store)
+  at `exports/{export_uuid}.{extension}` with filenames mirrored in the database for downstream
+  presentation.
+- When `config('export.disk')` is not set the service automatically falls back to the current
+  `filesystems.default` value, preferring the secure-media disk whenever it is the active default so
+  signed download routes remain valid in every environment.
 - Signed download URLs are created with the `api.exports.download` route and expire after `config('exports.ttl_minutes')` minutes (24 hours by default).
 - All date and time values are rendered in the timezone requested when the export was queued.
 - Currency fields are emitted with two decimal places using the `.` decimal separator.

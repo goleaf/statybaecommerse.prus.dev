@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuites>
-  <testsuite name="Tests\frontend\features\NavigationLocalizationTest" file="tests/frontend/features/NavigationLocalizationTest.php" tests="1" assertions="209" errors="0" failures="0" skipped="0" time="28.393114">
-    <testcase name="key storefront pages render without missing navigation translations for every supported locale" file="tests/frontend/features/NavigationLocalizationTest.php::key storefront pages render without missing navigation translations for every supported locale" class="Tests\frontend\features\NavigationLocalizationTest" classname="Tests.frontend.features.NavigationLocalizationTest" assertions="209" time="28.393114"/>
-  </testsuite>
-</testsuites>
