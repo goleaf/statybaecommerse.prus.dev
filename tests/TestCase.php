@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Livewire\Features\SupportTesting\Testable as TestableLivewire;
+use PHPUnit\Framework\Assert;
 use RuntimeException;
 use Tests\Support\TestingDatabase;
 use Throwable;
@@ -31,6 +33,8 @@ abstract class TestCase extends BaseTestCase
 
     private string $viteManifestPath = '';
 
+    private static bool $registeredLivewireTableOrderAssertion = false;
+
     protected function setUp(): void
     {
         if (! class_exists(TestingDatabase::class) && file_exists(__DIR__ . '/Support/TestingDatabase.php')) {
@@ -45,6 +49,8 @@ abstract class TestCase extends BaseTestCase
         TestingDatabase::ensureExists();
 
         parent::setUp();
+
+        $this->registerLivewireOrderAssertion();
 
         // Re-resolve the SQLite path in case TestingDatabase rotated it during migrate
         $this->sqliteDatabasePath = TestingDatabase::path();
@@ -88,6 +94,50 @@ abstract class TestCase extends BaseTestCase
             activity()->disableLogging();
         }
 
+    }
+
+    /**
+     * Register a PHPUnit-friendly helper so Livewire table ordering assertions work in unit tests.
+     */
+    private function registerLivewireOrderAssertion(): void
+    {
+        if (self::$registeredLivewireTableOrderAssertion) {
+            return;
+        }
+
+        TestableLivewire::macro('assertCanSeeTableRecordsInOrder', function (array $records): TestableLivewire {
+            /** @var TestableLivewire $this */
+            $component = $this->instance();
+
+            // Normalise the expected keys using Filament's internal record key helper so soft deletes and UUIDs behave.
+            $expectedKeys = collect($records)
+                ->map(fn ($record) => (string) $component->getTableRecordKey($record))
+                ->all();
+
+            $query = $component->getFilteredSortedTableQuery();
+
+            if ($query === null) {
+                Assert::fail('Unable to resolve the table query for order assertions.');
+
+                return $this;
+            }
+
+            $model = $query->getModel();
+            $keyName = $model->getKeyName();
+
+            // Pull the sorted keys from the active table query so pagination and filters are respected.
+            $sortedKeys = collect((clone $query)->pluck($keyName)->all())
+                ->map(fn ($key) => (string) $key)
+                ->all();
+
+            $actualKeys = array_values(array_intersect($sortedKeys, $expectedKeys));
+
+            Assert::assertSame($expectedKeys, $actualKeys);
+
+            return $this;
+        });
+
+        self::$registeredLivewireTableOrderAssertion = true;
     }
 
     protected function tearDown(): void
