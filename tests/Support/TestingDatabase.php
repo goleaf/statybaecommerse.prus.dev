@@ -255,6 +255,8 @@ final class TestingDatabase
                     self::provisionFallbackSchema();
                 }
 
+                self::ensureProductTestingTables();
+
                 RefreshDatabaseState::$migrated = true;
                 self::$migrationsRan = true;
                 self::$sqliteRetryAttempts = 0;
@@ -428,6 +430,45 @@ final class TestingDatabase
         $connection = config('database.default', 'sqlite');
         $schema = Schema::connection($connection);
 
+        if (! $schema->hasTable('countries')) {
+            $schema->create('countries', function (Blueprint $table): void {
+                // Bootstrap the geographic reference tables so the shipping fallback schema
+                // can register foreign key constraints without raising SQLite errors.
+                $table->id();
+                $table->string('name');
+                $table->string('code', 3)->nullable();
+                $table->timestamps();
+            });
+        }
+
+        if (! $schema->hasTable('zones')) {
+            $schema->create('zones', function (Blueprint $table): void {
+                $table->id();
+                $table->string('name');
+                $table->foreignId('country_id')->nullable()->constrained('countries')->nullOnDelete();
+                $table->timestamps();
+            });
+        }
+
+        if (! $schema->hasTable('cities')) {
+            $schema->create('cities', function (Blueprint $table): void {
+                $table->id();
+                $table->string('name');
+                $table->foreignId('country_id')->nullable()->constrained('countries')->nullOnDelete();
+                $table->foreignId('zone_id')->nullable()->constrained('zones')->nullOnDelete();
+                $table->timestamps();
+            });
+        }
+
+        if (! $schema->hasTable('companies')) {
+            $schema->create('companies', function (Blueprint $table): void {
+                $table->id();
+                $table->string('name');
+                $table->string('registration_code')->nullable();
+                $table->timestamps();
+            });
+        }
+
         if (! $schema->hasTable('shipping_options')) {
             $schema->create('shipping_options', function (Blueprint $table): void {
                 $table->id();
@@ -479,25 +520,7 @@ final class TestingDatabase
             });
         }
 
-        if (! $schema->hasTable('enum_values')) {
-            $schema->create('enum_values', function (Blueprint $table): void {
-                $table->id();
-                $table->string('type');
-                $table->string('key');
-                $table->string('value');
-                $table->string('name');
-                $table->text('description')->nullable();
-                $table->integer('sort_order')->default(0);
-                $table->boolean('is_active')->default(true);
-                $table->boolean('is_default')->default(false);
-                $table->json('metadata')->nullable();
-                $table->timestamps();
-
-                $table->unique(['type', 'key']);
-                $table->index(['type', 'is_active']);
-                $table->index(['type', 'is_default']);
-            });
-        }
+        self::ensureProductTestingTables();
 
         if (! $schema->hasTable('users')) {
             $schema->create('users', function (Blueprint $table): void {
@@ -983,6 +1006,68 @@ final class TestingDatabase
                 $table->softDeletes();
 
                 $table->index(['system_setting_id', 'locale'], 'system_setting_locale_index');
+            });
+        }
+    }
+
+    /**
+     * Create the product tables required by catalogue tests when they are missing.
+     */
+    private static function ensureProductTestingTables(): void
+    {
+        $schema = Schema::connection('sqlite');
+
+        if (! $schema->hasTable('products')) {
+            $schema->create('products', function (Blueprint $table): void {
+                // Provide the minimal catalogue columns our factories depend on so unit tests
+                // can still persist products when the full migration stack cannot execute.
+                $table->id();
+                $table->string('type')->default('simple');
+                $table->string('name');
+                $table->string('slug')->nullable();
+                $table->string('sku')->nullable();
+                $table->text('description')->nullable();
+                $table->text('short_description')->nullable();
+                $table->decimal('price', 10, 2)->nullable();
+                $table->decimal('sale_price', 10, 2)->nullable();
+                $table->unsignedBigInteger('brand_id')->nullable();
+                $table->integer('stock_quantity')->default(0);
+                $table->integer('low_stock_threshold')->default(0);
+                $table->decimal('weight', 8, 2)->nullable();
+                $table->decimal('length', 8, 2)->nullable();
+                $table->decimal('width', 8, 2)->nullable();
+                $table->decimal('height', 8, 2)->nullable();
+                $table->boolean('is_active')->default(true);
+                $table->boolean('is_visible')->default(true);
+                $table->boolean('is_enabled')->default(true);
+                $table->boolean('is_featured')->default(false);
+                $table->boolean('manage_stock')->default(false);
+                $table->string('status')->default('draft');
+                $table->string('seo_title')->nullable();
+                $table->text('seo_description')->nullable();
+                $table->timestamp('published_at')->nullable();
+                $table->timestamps();
+                $table->softDeletes();
+
+                $table->index(['is_visible', 'status']);
+                $table->index(['brand_id']);
+            });
+        }
+
+        if (! $schema->hasTable('product_images')) {
+            $schema->create('product_images', function (Blueprint $table): void {
+                // Mirror the relationship and ordering fields used by ProductImageTest so
+                // SQLite fallback databases keep exercising the same behaviour.
+                $table->id();
+                $table->foreignId('product_id')->constrained('products')->cascadeOnDelete();
+                $table->string('path');
+                $table->string('alt_text')->nullable();
+                $table->integer('sort_order')->default(0);
+                $table->boolean('is_active')->default(true);
+                $table->timestamps();
+
+                $table->index(['product_id', 'sort_order']);
+                $table->index(['is_active']);
             });
         }
     }
