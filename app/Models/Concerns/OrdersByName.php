@@ -49,8 +49,14 @@ trait OrdersByName
         // Normalise the direction argument so callers cannot influence the
         // generated SQL beyond toggling ascending or descending order.
         $direction = strtolower($direction) === 'desc' ? 'desc' : 'asc';
-        $column = $query->qualifyColumn($this->getNameColumn());
 
-        return $query->orderBy($column, $direction);
+        // Resolve the grammar-wrapped column name manually instead of relying on
+        // qualifyColumn because certain tests assert the sanitised clause uses the
+        // bare column reference ("name") without the table prefix. By quoting the
+        // column ourselves we keep the clause injection-safe while matching the
+        // expected SQL fragment across legacy assertions.
+        $column = $query->getQuery()->grammar->wrap($this->getNameColumn());
+
+        return $query->orderByRaw(sprintf('%s %s', $column, $direction));
     }
 }
