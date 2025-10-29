@@ -532,17 +532,25 @@ Route::prefix('api')->group(function (): void {
     Route::get('/products/search', [App\Http\Controllers\Api\ProductController::class, 'search'])->name('api.products.search');
     Route::get('/products/catalog', [App\Http\Controllers\Api\ProductController::class, 'index'])->name('api.products.catalog');
     Route::get('/products/{product:slug}', [App\Http\Controllers\Api\ProductController::class, 'show'])->name('api.products.show');
-    Route::get('/categories', [App\Http\Controllers\Api\CategoryController::class, 'index'])->name('api.categories.index');
-    Route::get('/categories/{category:slug}', [App\Http\Controllers\Api\CategoryController::class, 'show'])->name('api.categories.show');
+    Route::prefix('categories')->name('api.categories.')->group(function (): void {
+        Route::get('/', [App\Http\Controllers\Api\CategoryController::class, 'index'])->name('index');
+
+        Route::get('tree', [App\Http\Controllers\Api\CategoryController::class, 'tree'])
+            // Ensure the tree endpoint is resolved before the slug route so contract tests reach the
+            // dedicated handler instead of falling through to model binding on the show action.
+            ->name('tree');
+
+        Route::get('{category:slug}', [App\Http\Controllers\Api\CategoryController::class, 'show'])
+            // Guard against future collisions with reserved keywords such as "tree" by excluding them
+            // from the slug matcher, keeping the explicit tree endpoint stable even if route order shifts.
+            ->where('category', '^(?!tree$)[A-Za-z0-9\-_/]+$')
+            ->name('show');
+    });
     Route::get('/brands', [App\Http\Controllers\Api\BrandController::class, 'index'])->name('api.brands.index');
     Route::get('/brands/{brand:slug}', [App\Http\Controllers\Api\BrandController::class, 'show'])->name('api.brands.show');
     Route::middleware('auth')->get('/orders/{order:number}', [App\Http\Controllers\Api\OrderController::class, 'show'])->name('api.orders.show');
     Route::middleware('auth')->get('/user/profile', [App\Http\Controllers\Api\UserProfileController::class, '__invoke'])->name('api.user.profile');
 });
-
-// API routes registered separately to ensure proper name
-Route::get('/api/categories/tree', [App\Http\Controllers\Api\CategoryController::class, 'tree'])
-    ->name('api.categories.tree');
 
 // Public utility endpoints
 Route::get('/robots.txt', App\Http\Controllers\RobotsController::class)->name('robots');

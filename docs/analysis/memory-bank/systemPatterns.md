@@ -299,5 +299,6 @@
 - **Technical Specifications:** Architecture and integration guides
 - **Troubleshooting Guides:** Common issue resolution
 - **Catalogue Ordering:** Root category navigation relies on `Category::scopeTopLevelVisible()` to filter visible parents and then delegates to the shared `orderedByName` scope for deterministic alphabetical fallbacks.【F:app/Models/Category.php†L254-L267】
+  - API consumers should continue hitting the dedicated `api.categories.tree` route, which now lives inside the grouped category API routes with an explicit slug guard so reserved keywords like `tree` never collide with the single-category endpoint again.【F:routes/web.php†L536-L552】
 - **Campaign/Channel Listings:** Marketing and system channels normalise ordered views through case-insensitive wrappers around the shared ordering trait so dropdowns stay predictable across database engines.【F:app/Models/Campaign.php†L101-L115】【F:app/Models/Channel.php†L125-L138】
 - **Campaign Click Metrics:** Click tracking mutators standardise timestamps to UTC while helper methods return float-safe conversion totals for analytics dashboards.【F:app/Models/CampaignClick.php†L61-L94】【F:app/Models/CampaignClick.php†L292-L297】
