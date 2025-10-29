@@ -40,6 +40,10 @@
 ### Symbol Position – Before/After Amount
 - `Currency::formatAmount()` switches formatting based on the persisted `symbol_position`, supporting both prefix and suffix layouts depending on business requirements.【F:app/Models/Currency.php†L462-L475】
 
+### Feature Toggle Cache Resilience
+- `FeatureToggleService` now bakes the most recent feature flag `updated_at` timestamp into cache keys, ensuring evaluations refresh automatically after administrators create or update environment-scoped toggles.【F:app/Services/FeatureToggleService.php†L41-L87】
+- Regression coverage confirms cached fallback results give way to persisted flags without manual cache clearing, preventing stale toggle states from leaking between test scenarios or queued jobs.【F:tests/Unit/Services/FeatureToggleServiceTest.php†L118-L141】
+
 ## Recommendations
 - Implement a dedicated exchange-rate sync service (API client + scheduler) that respects the `auto_update_rate` toggle and updates records, replacing placeholder notifications with concrete operations.
 - Introduce a conversion helper/service that applies stored exchange rates for on-the-fly conversions, especially for presenting multi-currency prices when source data is only in EUR.
