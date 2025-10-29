@@ -34,6 +34,7 @@ This repository mixes Laravel 12 and Filament v4 code. Use the following guardra
 - **Custom automation notes**: Downstream maintainers rely on every code change containing meaningful inline commentary. When
   editing PHP, Blade, TypeScript, or configuration files, accompany new or modified logic with concise comments that explain
   intent, edge cases, or cross-module dependencies so reviewers can map behaviour quickly.
+- **Moderation scope awareness**: Post approval relationships intentionally bypass global scopes so draft and archived posts remain reachable from the moderation log; preserve that behaviour when extending review tooling or adding new assertions.
 - **Binary artefact policy**: Keep Git history free from generated binaries (fonts, compiled assets, archives). If a task
   requires producing such files for local validation, clean them up before committing so the repository stays source-only.
 - **Documentation diligence**: After completing fixes or features, review the contents of `docs/` for any references that need
