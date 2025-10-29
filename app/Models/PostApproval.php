@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 final class PostApproval extends Model
 {
+    /** @use HasFactory<\Database\Factories\PostApprovalFactory> */
     use HasFactory;
 
     // Guarded attributes are explicitly enumerated to avoid accidental mass-assignment.
@@ -38,8 +39,12 @@ final class PostApproval extends Model
      */
     public function post(): BelongsTo
     {
-        // The approval belongs to the marketing post it moderates.
-        return $this->belongsTo(Post::class);
+        // The approval belongs to the marketing post it moderates and we bypass global scopes so
+        // moderation history stays accessible even for drafts or archived records awaiting review.
+        /** @var BelongsTo<Post, PostApproval> $relation */
+        $relation = $this->belongsTo(Post::class)->withoutGlobalScopes();
+
+        return $relation;
     }
 
     /**
@@ -48,6 +53,9 @@ final class PostApproval extends Model
     public function user(): BelongsTo
     {
         // Track the moderator that recorded the decision.
-        return $this->belongsTo(User::class);
+        /** @var BelongsTo<User, PostApproval> $relation */
+        $relation = $this->belongsTo(User::class);
+
+        return $relation;
     }
 }
