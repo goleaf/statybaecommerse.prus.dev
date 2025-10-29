@@ -222,6 +222,12 @@
 - **Migration Strategy:** Safe database migrations
 - **Cache Warming:** Post-deployment cache warming
 
+### 4. Data Hygiene Pattern
+**Pattern:** Enum maintenance routines protect integrity while keeping tables lean
+- **Duplicate Safety:** EnumValue duplicates generate collision-resistant keys so repeated clones never violate the unique `(type, key)` index.【F:app/Models/EnumValue.php†L148-L191】
+- **Usage Reset:** Newly duplicated rows zero out usage counters to ensure reporting starts from a clean slate.【F:app/Models/EnumValue.php†L157-L165】
+- **Lifecyle Cleanup:** Stale enum rows are pruned lazily by ID, skipping records with any usage to minimise memory pressure during maintenance tasks.【F:app/Models/EnumValue.php†L248-L271】
+
 ## Filament Integration Patterns
 
 ### 1. Navigation Group Pattern
