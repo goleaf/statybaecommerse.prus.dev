@@ -4,10 +4,12 @@
 The document platform combines reusable templates, automated generation, variable substitution, typed classifications, guarded access, and lifecycle tracking to support invoices, receipts, and internal reports across the storefront and admin panels.
 
 ## Document Templates
-- `DocumentTemplate` stores editable HTML bodies, variable definitions, categorisation, and print settings while auto-generating slugs and exposing historic documents for the template, enabling reusable layouts for downstream generation.【F:app/Models/DocumentTemplate.php†L29-L199】
+- `DocumentTemplate` stores editable HTML bodies, variable definitions, categorisation, and print settings while auto-generating slugs and exposing historic documents for the template, enabling reusable layouts for downstream generation.【F:app/Models/DocumentTemplate.php†L31-L199】
+- Alphabetical pickers stay predictable thanks to the hardened `DocumentTemplate::orderedByName()` scope, which normalises direction input before applying qualified ordering clauses for complex joins.【F:app/Models/DocumentTemplate.php†L234-L240】
 
 ## Document Generation
 - `DocumentService::generateDocument()` sanitises template HTML, applies variables, persists the draft record, and optionally notifies the initiating user; `generatePdf()` renders the processed HTML into a DomPDF file, applies print settings, saves the asset to secure storage, and publishes the document.【F:app/Services/DocumentService.php†L35-L103】
+- `Database\\Seeders\\DocumentSeeder` now loops per record to attach freshly created invoices, receipts, and reports to the latest user fixtures and sampled orders, preventing stray factory-generated relations from drifting outside curated test data.【F:database/seeders/DocumentSeeder.php†L20-L142】
 
 ## Variable Replacement
 - `DocumentService::processTemplate()` normalises arrays, objects, and booleans before performing placeholder substitution, while `DocumentTemplate::render()` supports `{{placeholder}}` tokens—together powering dynamic content injection for generated documents.【F:app/Services/DocumentService.php†L110-L131】【F:app/Models/DocumentTemplate.php†L114-L130】
@@ -18,6 +20,7 @@ The document platform combines reusable templates, automated generation, variabl
 
 ## Access Control & Distribution
 - `Document` records default to private, downloadable assets, exposing convenience checks (e.g., `isPublic`, `isDownloadable`) and generating temporary signed URLs via secure storage for gated delivery.【F:app/Models/Document.php†L66-L210】【F:app/Models/Document.php†L244-L258】
+- Ordering scopes trim whitespace-only names before deferring to the title, keeping admin dropdowns stable even when legacy records contain padded values.【F:app/Models/Document.php†L304-L320】
 - `DocumentGenerated` notifications respect authorisation gates before surfacing view links and only attach PDFs when secure files exist, ensuring notifications honour per-document permissions.【F:app/Notifications/DocumentGenerated.php†L18-L103】
 
 ## Versioning & Lifecycle Management

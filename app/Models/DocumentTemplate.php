@@ -123,7 +123,7 @@ final class DocumentTemplate extends Model
                 continue;
             }
 
-            $placeholder = '{{' . (string) $key . '}}';
+            $placeholder = '{{' . $key . '}}';
             $content = str_replace($placeholder, (string) $value, $content);
         }
 
@@ -231,9 +231,12 @@ final class DocumentTemplate extends Model
      * @param  Builder<DocumentTemplate> $query
      * @return Builder<DocumentTemplate>
      */
-    public function scopeOrderedByName(Builder $query): Builder
+    public function scopeOrderedByName(Builder $query, string $direction = 'asc'): Builder
     {
-        // Order by the user-facing "name" column so dropdowns remain predictable.
-        return $query->orderBy('name');
+        // Normalise the requested direction so consumers cannot inject arbitrary SQL fragments.
+        $direction = strtolower(trim($direction)) === 'desc' ? 'desc' : 'asc';
+
+        // Explicitly qualify the column to avoid ambiguous references when joins are present.
+        return $query->orderBy($query->qualifyColumn('name'), $direction);
     }
 }

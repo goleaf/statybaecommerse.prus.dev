@@ -550,9 +550,10 @@ final class CustomerGroup extends Model
 
         $this->attributes['is_active'] = $normalized;
 
-        if (! array_key_exists('is_enabled', $this->attributes) || $this->attributes['is_enabled'] === null) {
-            $this->attributes['is_enabled'] = $normalized;
-        }
+        // Mirror the normalized value onto the legacy column every time so both
+        // toggles stay perfectly aligned regardless of which attribute was
+        // originally persisted.
+        $this->attributes['is_enabled'] = $normalized;
     }
 
     /**
@@ -566,9 +567,9 @@ final class CustomerGroup extends Model
 
         $this->attributes['is_enabled'] = $normalized;
 
-        if (! array_key_exists('is_active', $this->attributes) || $this->attributes['is_active'] === null) {
-            $this->attributes['is_active'] = $normalized;
-        }
+        // Always sync the modern column as well to prevent stale boolean states
+        // when legacy write paths update only `is_enabled`.
+        $this->attributes['is_active'] = $normalized;
     }
 
     /**
