@@ -44,6 +44,92 @@ Exceeding a limit yields `429 Too Many Requests` responses with retry guidance (
 
 ## Example Requests and Responses
 
+### Partner Inventory Snapshot
+
+Partners can request a condensed inventory snapshot that surfaces product-level summaries alongside targeted low and out-of-stock queues.
+
+**Request**
+
+```http
+GET /partner/api/inventory?limit=5 HTTP/1.1
+Host: api.partner.example.com
+X-Partner-Key: {{production_key}}
+Accept: application/json
+```
+
+**Successful Response**
+
+```json
+{
+  "data": {
+    "inventory": {
+      "summary": {
+        "total_products": 4,
+        "tracked_products": 3,
+        "in_stock": 1,
+        "low_stock": 1,
+        "out_of_stock": 1,
+        "not_tracked": 1
+      },
+      "low_stock": [
+        {
+          "id": 42,
+          "sku": "PARTNER-SAW",
+          "name": "Partner Saw",
+          "inventory": {
+            "manage_stock": true,
+            "stock_quantity": 3,
+            "low_stock_threshold": 5,
+            "available_quantity": 3,
+            "is_in_stock": true,
+            "is_low_stock": true,
+            "is_out_of_stock": false
+          },
+          "updated_at": "2025-01-11T09:42:05+00:00"
+        }
+      ],
+      "out_of_stock": [
+        {
+          "id": 43,
+          "sku": "PARTNER-GRINDER",
+          "name": "Partner Grinder",
+          "inventory": {
+            "manage_stock": true,
+            "stock_quantity": 0,
+            "low_stock_threshold": 2,
+            "available_quantity": 0,
+            "is_in_stock": false,
+            "is_low_stock": false,
+            "is_out_of_stock": true
+          },
+          "updated_at": "2025-01-11T09:31:18+00:00"
+        }
+      ]
+    }
+  },
+  "meta": {
+    "filters": {
+      "limit": 5
+    },
+    "pagination": {
+      "per_page": 5,
+      "current_page": 1,
+      "last_page": 1,
+      "total": 4,
+      "from": 1,
+      "to": 4,
+      "links": {
+        "next": null,
+        "prev": null
+      }
+    },
+    "scopes": [
+      "inventory.read"
+    ]
+  }
+}
+```
+
 ### Fetch Catalog Item
 
 **Request**

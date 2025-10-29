@@ -4,88 +4,98 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\Partner;
 
-use App\Models\Location;
 use App\Models\Product;
-use App\Models\ProductVariant;
-use App\Models\VariantInventory;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use DateTimeInterface;
 
 final class InventoryController
 {
     public function __invoke(Request $request): JsonResponse
     {
-        $perPage = (int) $request->integer('per_page', 50);
-        $perPage = max(1, min($perPage, 100));
+        $limit = $this->resolveLimit($request);
 
         $filters = [
             'sku'           => $this->resolveSkuFilter($request),
             'updated_since' => $this->resolveUpdatedSinceFilter($request),
         ];
 
-        $query = VariantInventory::query()
-            ->with([
-                'variant' => static fn ($builder) => $builder->select([
-                    'id',
-                    'product_id',
-                    'sku',
-                    'name',
-                ]),
-                'variant.product' => static fn ($builder) => $builder->select([
-                    'id',
-                    'sku',
-                    'name',
-                ]),
-                'location' => static fn ($builder) => $builder->select([
-                    'id',
-                    'name',
-                    'code',
-                ]),
+        $query = Product::query()
+            ->select([
+                'id',
+                'name',
+                'sku',
+                'manage_stock',
+                'stock_quantity',
+                'low_stock_threshold',
+                'updated_at',
+                'created_at',
             ])
             ->orderBy('id');
 
         if (is_string($filters['sku'])) {
-            $query->where(static function (Builder $builder) use ($filters): void {
-                $builder
-                    ->whereHas('variant', static function (Builder $variantQuery) use ($filters): void {
-                        $variantQuery->where('sku', $filters['sku']);
-                    })
-                    ->orWhereHas('variant.product', static function (Builder $productQuery) use ($filters): void {
-                        $productQuery->where('sku', $filters['sku']);
-                    });
-            });
+            // Direct SKU filtering allows partners to scope the summary to a single product.
+            $query->where('sku', $filters['sku']);
         }
 
         if ($filters['updated_since'] instanceof CarbonImmutable) {
             $query->where('updated_at', '>=', $filters['updated_since']);
         }
 
-        /** @var LengthAwarePaginator $paginator */
-        $paginator = $query->paginate($perPage)->appends($request->query());
+        /** @var Collection<int, Product> $products */
+        $products = $query->get();
 
-        $inventory = $paginator->getCollection()
-            ->map(fn (VariantInventory $inventory): array => $this->transformInventory($inventory))
-            ->values()
-            ->all();
+        // Build the grouped response so partners can quickly identify low or out-of-stock items
+        // alongside aggregate visibility for dashboards without additional pagination requests.
+        $summary = $this->buildSummary($products);
+        $lowStockProducts = $this->transformProducts(
+            $products
+                ->filter(static fn (Product $product): bool => $product->manage_stock && ! $product->isOutOfStock() && $product->isLowStock())
+                ->take($limit)
+        );
+        $outOfStockProducts = $this->transformProducts(
+            $products
+                ->filter(static fn (Product $product): bool => $product->manage_stock && $product->isOutOfStock())
+                ->take($limit)
+        );
 
         $abilities = Arr::wrap($request->attributes->get('partner_api_abilities', []));
 
         return response()->json([
             'data' => [
-                'inventory' => $inventory,
+                'inventory' => [
+                    'summary'      => $summary,
+                    'low_stock'    => $lowStockProducts,
+                    'out_of_stock' => $outOfStockProducts,
+                ],
             ],
             'meta' => [
-                'filters'    => $this->formatFiltersForResponse($filters),
-                'pagination' => $this->formatPagination($paginator),
+                'filters'    => $this->formatFiltersForResponse($filters, $limit),
+                'pagination' => $this->formatPaginationSummary($products, $limit),
                 'scopes'     => $abilities,
             ],
         ]);
+    }
+
+    private function resolveLimit(Request $request): int
+    {
+        $value = $request->integer('limit');
+
+        if ($value === null) {
+            // Preserve backwards compatibility with historical `per_page` requests.
+            $value = $request->integer('per_page');
+        }
+
+        if ($value === null) {
+            $value = 25;
+        }
+
+        // Clamp the limit to a sane range so partners cannot overload the endpoint with massive payloads.
+        return max(1, min((int) $value, 50));
     }
 
     private function resolveSkuFilter(Request $request): ?string
@@ -119,31 +129,32 @@ final class InventoryController
     /**
      * @return array<string, mixed>
      */
-    private function formatFiltersForResponse(array $filters): array
+    private function formatFiltersForResponse(array $filters, int $limit): array
     {
         return array_filter([
             'sku'           => $filters['sku'] ?? null,
             'updated_since' => isset($filters['updated_since']) && $filters['updated_since'] instanceof CarbonImmutable
                 ? $filters['updated_since']->toAtomString()
                 : null,
+            'limit'         => $limit,
         ], static fn ($value): bool => $value !== null);
     }
 
-    /**
-     * @return array<string, mixed>
-     */
-    private function formatPagination(LengthAwarePaginator $paginator): array
+    private function formatPaginationSummary(Collection $products, int $limit): array
     {
+        $total = $products->count();
+
+        // Compute a faux pagination payload so legacy consumers relying on pagination keys continue to function.
         return [
-            'per_page'      => $paginator->perPage(),
-            'current_page'  => $paginator->currentPage(),
-            'last_page'     => $paginator->lastPage(),
-            'total'         => $paginator->total(),
-            'from'          => $paginator->firstItem(),
-            'to'            => $paginator->lastItem(),
-            'links'         => [
-                'next' => $paginator->nextPageUrl(),
-                'prev' => $paginator->previousPageUrl(),
+            'per_page'     => $limit,
+            'current_page' => 1,
+            'last_page'    => 1,
+            'total'        => $total,
+            'from'         => $total > 0 ? 1 : 0,
+            'to'           => $total > 0 ? min($limit, $total) : 0,
+            'links'        => [
+                'next' => null,
+                'prev' => null,
             ],
         ];
     }
@@ -151,44 +162,64 @@ final class InventoryController
     /**
      * @return array<string, mixed>
      */
-    private function transformInventory(VariantInventory $inventory): array
+    private function transformProduct(Product $product): array
     {
-        $variant = $inventory->variant;
-        $product = $variant?->product;
-        $location = $inventory->location;
+        return [
+            'id'   => $product->getKey(),
+            'sku'  => $product->sku,
+            'name' => $product->name,
+            'inventory' => [
+                'manage_stock'        => (bool) $product->manage_stock,
+                'stock_quantity'      => (int) ($product->stock_quantity ?? 0),
+                'low_stock_threshold' => (int) ($product->low_stock_threshold ?? 0),
+                'available_quantity'  => $product->availableQuantity(),
+                'is_in_stock'         => $product->manage_stock ? $product->isInStock() : false,
+                'is_low_stock'        => $product->manage_stock ? $product->isLowStock() : false,
+                'is_out_of_stock'     => $product->manage_stock ? $product->isOutOfStock() : false,
+            ],
+            'updated_at' => $this->formatDateTime($product->updated_at),
+        ];
+    }
+
+    /**
+     * @param Collection<int, Product> $products
+     * @return array<int, array<string, mixed>>
+     */
+    private function transformProducts(Collection $products): array
+    {
+        // Map each product into the lightweight structure expected by the partner contract.
+        return $products
+            ->sortBy(static fn (Product $product): int => $product->getKey())
+            ->values()
+            ->map(fn (Product $product): array => $this->transformProduct($product))
+            ->all();
+    }
+
+    /**
+     * @param Collection<int, Product> $products
+     * @return array<string, int>
+     */
+    private function buildSummary(Collection $products): array
+    {
+        $totalProducts = $products->count();
+        $trackedProducts = $products->filter(static fn (Product $product): bool => (bool) $product->manage_stock);
+
+        // Separate tracked products into availability buckets so partners see a concise breakdown.
+        $outOfStockCount = $trackedProducts->filter(static fn (Product $product): bool => $product->isOutOfStock())->count();
+        $lowStockCount = $trackedProducts
+            ->filter(static fn (Product $product): bool => ! $product->isOutOfStock() && $product->isLowStock())
+            ->count();
+        $inStockCount = $trackedProducts
+            ->filter(static fn (Product $product): bool => ! $product->isLowStock() && ! $product->isOutOfStock())
+            ->count();
 
         return [
-            'id'            => $inventory->getKey(),
-            'product_id'    => $product?->getKey(),
-            'product_sku'   => $product instanceof Product ? $product->sku : null,
-            'product_name'  => $product instanceof Product ? $product->name : null,
-            'variant_id'    => $variant?->getKey(),
-            'variant_sku'   => $variant instanceof ProductVariant ? $variant->sku : null,
-            'variant_name'  => $variant instanceof ProductVariant ? $variant->name : null,
-            'location'      => [
-                'id'   => $location?->getKey(),
-                'code' => $location instanceof Location ? $location->code : null,
-                'name' => $location instanceof Location ? $location->name : null,
-            ],
-            'warehouse_code'   => $inventory->warehouse_code,
-            'stock'            => (int) $inventory->stock,
-            'reserved'         => (int) $inventory->reserved,
-            'available'        => (int) $inventory->available,
-            'incoming'         => $inventory->incoming !== null ? (int) $inventory->incoming : null,
-            'threshold'        => $inventory->threshold !== null ? (int) $inventory->threshold : null,
-            'reorder_point'    => $inventory->reorder_point !== null ? (int) $inventory->reorder_point : null,
-            'reorder_quantity' => $inventory->reorder_quantity !== null ? (int) $inventory->reorder_quantity : null,
-            'max_stock_level'  => $inventory->max_stock_level !== null ? (int) $inventory->max_stock_level : null,
-            'status'           => [
-                'code'  => $inventory->stock_status,
-                'label' => method_exists($inventory, 'getStockStatusLabelAttribute')
-                    ? $inventory->stock_status_label
-                    : ucfirst(str_replace('_', ' ', (string) $inventory->stock_status)),
-            ],
-            'last_restocked_at' => $this->formatDateTime($inventory->last_restocked_at),
-            'last_sold_at'      => $this->formatDateTime($inventory->last_sold_at),
-            'created_at'        => $this->formatDateTime($inventory->created_at),
-            'updated_at'        => $this->formatDateTime($inventory->updated_at),
+            'total_products'   => $totalProducts,
+            'tracked_products' => $trackedProducts->count(),
+            'in_stock'         => $inStockCount,
+            'low_stock'        => $lowStockCount,
+            'out_of_stock'     => $outOfStockCount,
+            'not_tracked'      => $totalProducts - $trackedProducts->count(),
         ];
     }
 
