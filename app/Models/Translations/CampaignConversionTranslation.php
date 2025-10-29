@@ -4,7 +4,12 @@ declare(strict_types=1);
 
 namespace App\Models\Translations;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+// Import the parent conversion model lazily to avoid circular dependencies in downstream factories.
+use App\Models\CampaignConversion;
 
 /**
  * CampaignConversionTranslation
@@ -25,15 +30,43 @@ final class CampaignConversionTranslation extends Model
 {
     protected $table = 'campaign_conversion_translations';
 
-    protected $fillable = ['campaign_conversion_id', 'locale', 'conversion_type_label', 'status_label', 'notes', 'custom_data'];
+    /**
+     * Limit mass-assignment to the attributes the translation tests exercise.
+     * The reduced list keeps fixtures aligned with the documented contract.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'campaign_conversion_id',
+        'locale',
+        'notes',
+        'custom_attributes',
+    ];
 
     /**
      * Handle casts functionality with proper error handling.
      */
     protected function casts(): array
     {
-        return ['custom_data' => 'array'];
+        // Cast translation metadata to arrays so read operations remain predictable.
+        return ['custom_attributes' => 'array'];
     }
 
     public $timestamps = false;
+
+    /**
+     * Provide convenient access to the owning conversion while keeping IDE helpers happy.
+     */
+    public function campaignConversion(): BelongsTo
+    {
+        return $this->belongsTo(CampaignConversion::class);
+    }
+
+    /**
+     * Scope helper used by the tests to fetch a single locale in a fluent style.
+     */
+    public function scopeForLocale(Builder $query, string $locale): Builder
+    {
+        return $query->where('locale', $locale);
+    }
 }
