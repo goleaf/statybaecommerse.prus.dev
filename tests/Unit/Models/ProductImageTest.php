@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\ProductImage;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
 final class ProductImageTest extends TestCase
@@ -20,6 +21,8 @@ final class ProductImageTest extends TestCase
     {
         parent::setUp();
 
+        $this->ensureProductTables();
+
         $this->product = Product::factory()->create([
             'name'         => 'Test Product',
             'status'       => 'published',
@@ -28,6 +31,79 @@ final class ProductImageTest extends TestCase
         ]);
 
         Storage::fake('public');
+    }
+
+    private function ensureProductTables(): void
+    {
+        $schema = Schema::connection('sqlite');
+
+        if (! $schema->hasTable('products')) {
+            $schema->create('products', static function ($table): void {
+                // Provide only the columns exercised by the factories so SQLite runs remain stable.
+                $table->id();
+                $table->string('type')->default('simple');
+                $table->string('name');
+                $table->string('slug')->nullable();
+                $table->string('sku')->nullable();
+                $table->text('description')->nullable();
+                $table->text('short_description')->nullable();
+                $table->decimal('price', 10, 2)->nullable();
+                $table->decimal('sale_price', 10, 2)->nullable();
+                $table->unsignedBigInteger('brand_id')->nullable();
+                $table->integer('stock_quantity')->default(0);
+                $table->integer('low_stock_threshold')->default(0);
+                $table->decimal('weight', 8, 2)->nullable();
+                $table->decimal('length', 8, 2)->nullable();
+                $table->decimal('width', 8, 2)->nullable();
+                $table->decimal('height', 8, 2)->nullable();
+                $table->boolean('is_active')->default(true);
+                $table->boolean('is_visible')->default(true);
+                $table->boolean('is_enabled')->default(true);
+                $table->boolean('is_featured')->default(false);
+                $table->boolean('manage_stock')->default(false);
+                $table->string('status')->default('draft');
+                $table->string('seo_title')->nullable();
+                $table->text('seo_description')->nullable();
+                $table->timestamp('published_at')->nullable();
+                $table->timestamps();
+                $table->softDeletes();
+            });
+        }
+
+        if (! $schema->hasTable('product_images')) {
+            $schema->create('product_images', static function ($table): void {
+                $table->id();
+                $table->foreignId('product_id')->constrained('products')->cascadeOnDelete();
+                $table->string('path');
+                $table->string('alt_text')->nullable();
+                $table->integer('sort_order')->default(0);
+                $table->boolean('is_active')->default(true);
+                $table->timestamps();
+            });
+        }
+
+        if (! $schema->hasTable('media')) {
+            $schema->create('media', static function ($table): void {
+                // Provide the minimal Spatie Media Library columns referenced by the Product model.
+                $table->id();
+                $table->uuid('uuid')->nullable();
+                $table->string('model_type');
+                $table->unsignedBigInteger('model_id');
+                $table->string('collection_name');
+                $table->string('name');
+                $table->string('file_name');
+                $table->string('mime_type')->nullable();
+                $table->string('disk');
+                $table->string('conversions_disk')->nullable();
+                $table->unsignedBigInteger('size');
+                $table->json('manipulations')->nullable();
+                $table->json('custom_properties')->nullable();
+                $table->json('generated_conversions')->nullable();
+                $table->json('responsive_images')->nullable();
+                $table->unsignedInteger('order_column')->nullable();
+                $table->timestamps();
+            });
+        }
     }
 
     public function test_product_image_can_be_created(): void
