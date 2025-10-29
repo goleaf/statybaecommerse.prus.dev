@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Str;
 
 /**
  * SystemSettingDependency
@@ -58,8 +59,8 @@ final class SystemSettingDependency extends Model
     }
 
     /**
-     * @param mixed $method
-     * @param mixed $parameters
+     * @param string                  $method     Forwarded dynamic method call name.
+     * @param array<array-key, mixed> $parameters Forwarded arguments from the caller.
      */
     public function __call($method, $parameters): mixed
     {
@@ -162,12 +163,24 @@ final class SystemSettingDependency extends Model
      */
     public function scopeWithCondition(Builder $query, string $condition): Builder
     {
-        $like = '%' . $condition . '%';
+        // Normalise whitespace so callers can pass a loosely formatted string
+        // (for example " enabled ") without impacting query results.
+        $condition = trim($condition);
 
-        return $query->where(function (Builder $builder) use ($like): void {
+        if ($condition === '') {
+            return $query;
+        }
+
+        // Use a lower-cased pattern to keep lookups database agnostic – SQLite,
+        // MySQL and Postgres handle LIKE/ILIKE comparisons differently, so we
+        // apply LOWER() consistently to both the database column and the
+        // comparison value.
+        $pattern = '%' . Str::lower($condition) . '%';
+
+        return $query->where(function (Builder $builder) use ($pattern): void {
             $builder
-                ->where('condition', 'like', $like)
-                ->orWhere('condition_value', 'like', $like);
+                ->whereRaw('LOWER(' . $builder->qualifyColumn('condition') . ') LIKE ?', [$pattern])
+                ->orWhereRaw('LOWER(' . $builder->qualifyColumn('condition_value') . ') LIKE ?', [$pattern]);
         });
     }
 
@@ -216,22 +229,23 @@ final class SystemSettingDependency extends Model
             return $query;
         }
 
-        $like = '%' . $search . '%';
+        $pattern = '%' . Str::lower($search) . '%';
 
-        return $query->where(function (Builder $builder) use ($like): void {
+        return $query->where(function (Builder $builder) use ($pattern): void {
             $builder
-                ->where('condition', 'like', $like)
-                ->orWhere('condition_value', 'like', $like)
-                ->orWhereHas('setting', function (Builder $relation) use ($like): void {
+                // Ensure all comparisons share the same normalisation approach so
+                // the search scope behaves consistently across supported drivers.
+                ->whereRaw('LOWER(' . $builder->qualifyColumn('condition') . ') LIKE ?', [$pattern])
+                ->orWhereRaw('LOWER(' . $builder->qualifyColumn('condition_value') . ') LIKE ?', [$pattern])
+                ->orWhereHas('setting', function (Builder $relation) use ($pattern): void {
                     $relation
-                        ->where('key', 'like', $like)
-                        ->orWhere('name', 'like', $like);
+                        ->whereRaw('LOWER(' . $relation->qualifyColumn('key') . ') LIKE ?', [$pattern])
+                        ->orWhereRaw('LOWER(' . $relation->qualifyColumn('name') . ') LIKE ?', [$pattern]);
                 })
-                /** @phpstan-ignore larastan.relationExistence */
-                ->orWhereHas('dependsOnSetting', function (Builder $relation) use ($like): void {
+                ->orWhereHas('dependsOnSettingRelation', function (Builder $relation) use ($pattern): void {
                     $relation
-                        ->where('key', 'like', $like)
-                        ->orWhere('name', 'like', $like);
+                        ->whereRaw('LOWER(' . $relation->qualifyColumn('key') . ') LIKE ?', [$pattern])
+                        ->orWhereRaw('LOWER(' . $relation->qualifyColumn('name') . ') LIKE ?', [$pattern]);
                 });
         });
     }
