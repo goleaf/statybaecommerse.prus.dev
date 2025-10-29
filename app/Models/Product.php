@@ -78,15 +78,15 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 final class Product extends Model implements HasMedia, TranslatableRecord
 {
     use HasFactory;
+    use HasProductPricing;
+    use HasTranslations;
+    use InteractsWithMedia;
+    use LogsActivity;
     use OrdersByName;
     use Searchable {
         Searchable::bootSearchable as scoutBootSearchable;
     }
     use SoftDeletes;
-    use HasProductPricing;
-    use HasTranslations;
-    use InteractsWithMedia;
-    use LogsActivity;
 
     public const SCOPE_COLUMN_HINTS = [
         'is_active'    => false,
@@ -171,6 +171,20 @@ final class Product extends Model implements HasMedia, TranslatableRecord
                 }
             }
         });
+
+        self::deleting(static function (Product $product): void {
+            if (! $product->isForceDeleting()) {
+                return;
+            }
+
+            // Manually remove related images during force deletes so SQLite-based
+            // test runs mimic the foreign key cascades enforced in production.
+            foreach ($product->images()->withoutGlobalScopes()->get() as $image) {
+                if ($image instanceof ProductImage) {
+                    $image->delete();
+                }
+            }
+        });
     }
 
     public static function bootSearchable(): void
@@ -181,7 +195,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
             return;
         }
 
-        static::scoutBootSearchable();
+        self::scoutBootSearchable();
     }
 
     /**
