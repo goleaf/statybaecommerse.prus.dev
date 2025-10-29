@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\AuthenticatedUserController;
 use App\Http\Controllers\Api\AutocompleteSearchController;
 use App\Http\Controllers\Api\ExportDownloadController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ProductHistoryController as ApiProductHistoryController;
 use App\Http\Controllers\Api\V1\HealthController;
@@ -60,6 +61,18 @@ Route::prefix('products')
 
         Route::get('{product:slug}', [ProductController::class, 'show'])
             ->middleware('throttle:api.read')
+            ->name('show');
+    });
+
+Route::prefix('orders')
+    ->middleware(['auth:sanctum,web', 'throttle:api.read'])
+    ->as('api.orders.')
+    ->group(function (): void {
+        Route::get('{order}', [OrderController::class, 'show'])
+            // Accept both numeric identifiers and order numbers with dashes so
+            // the JSON contract tests exercise the same lookup path as the
+            // storefront and partner applications.
+            ->where('order', '[A-Za-z0-9\-]+')
             ->name('show');
     });
 
