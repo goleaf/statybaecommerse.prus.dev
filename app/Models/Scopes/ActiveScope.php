@@ -120,11 +120,36 @@ final class ActiveScope implements Scope
             ];
         }
 
-        if (! array_key_exists($cacheKey, self::$tableMetadataCache)) {
-            self::$tableMetadataCache[$cacheKey] = $this->introspectTable($connection, $model->getTable());
+        $table = $model->getTable();
+
+        $shouldRefresh = ! array_key_exists($cacheKey, self::$tableMetadataCache);
+
+        if (! $shouldRefresh) {
+            $cached = self::$tableMetadataCache[$cacheKey];
+
+            if ($cached['exists'] === false) {
+                try {
+                    $schema = $connection->getSchemaBuilder();
+
+                    if ($schema->hasTable($table)) {
+                        $shouldRefresh = true;
+                    }
+                } catch (Throwable) {
+                    // Swallow schema introspection errors so test environments that rebuild
+                    // SQLite databases mid-request retain the previous cached value until the
+                    // next query attempt.
+                }
+            }
         }
 
-        return self::$tableMetadataCache[$cacheKey];
+        if ($shouldRefresh) {
+            // Re-introspect the table once it becomes available so global scopes keep
+            // honouring freshly migrated columns during test runs that boot before
+            // `RefreshDatabase` provisions schema state.
+            self::$tableMetadataCache[$cacheKey] = $this->introspectTable($connection, $table);
+        }
+
+        return self::$tableMetadataCache[$cacheKey] ?? ['exists' => false, 'columns' => []];
     }
 
     /**

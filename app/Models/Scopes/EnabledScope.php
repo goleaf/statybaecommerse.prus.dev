@@ -47,15 +47,35 @@ final class EnabledScope implements Scope
         $table = $model->getTable();
         $cacheKey = sprintf('%s::%s', $connection->getName() ?: 'default', $table);
 
-        if (! array_key_exists($cacheKey, self::$columnPresence)) {
+        $shouldRefresh = ! array_key_exists($cacheKey, self::$columnPresence);
+
+        if (! $shouldRefresh && self::$columnPresence[$cacheKey] === false) {
             try {
-                self::$columnPresence[$cacheKey] = $connection->getSchemaBuilder()->hasColumn($table, 'is_enabled');
+                $schema = $connection->getSchemaBuilder();
+
+                if ($schema->hasTable($table)) {
+                    $shouldRefresh = true;
+                }
+            } catch (Throwable) {
+                // Ignore transient schema errors so caches stay stable until the
+                // next request, which mirrors the behaviour in ActiveScope.
+            }
+        }
+
+        if ($shouldRefresh) {
+            try {
+                $schema = $connection->getSchemaBuilder();
+                $hasColumn = $schema->hasTable($table) && $schema->hasColumn($table, 'is_enabled');
+
+                // Cache the refreshed lookup so subsequent queries avoid redundant
+                // schema introspection after migrations bring the table online.
+                self::$columnPresence[$cacheKey] = $hasColumn;
             } catch (Throwable) {
                 self::$columnPresence[$cacheKey] = false;
             }
         }
 
-        if (self::$columnPresence[$cacheKey]) {
+        if (self::$columnPresence[$cacheKey] ?? false) {
             $builder->where('is_enabled', true);
         }
     }
