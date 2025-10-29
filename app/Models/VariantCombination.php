@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use JsonException;
 
 /**
  * VariantCombination
@@ -261,16 +262,16 @@ final class VariantCombination extends Model
                 ->variants()
                 ->with('attributes.attribute')
                 ->get()
-                ->map(static function ($variant) {
+                ->map(static function ($variant): array {
                     if ($variant instanceof ProductVariant) {
                         return $variant->getVariantAttributes();
                     }
 
                     return [];
                 })
-                ->filter(static fn ($combination) => $combination !== [])
+                ->filter(static fn ($combination): bool => $combination !== [])
                 /** @phpstan-ignore-next-line Type narrowing issue */
-                ->map(static fn ($combination) => is_array($combination) ? self::normaliseCombination($combination) : [])
+                ->map(static fn ($combination): array => is_array($combination) ? self::normaliseCombination($combination) : [])
                 ->unique()
                 ->values()
                 ->all();
@@ -294,7 +295,7 @@ final class VariantCombination extends Model
 
         $combinations = self::generateCombinationsRecursive($attributeValues);
 
-        return array_map(static fn (array $combination): array => self::normaliseCombination($combination), $combinations);
+        return array_map(self::normaliseCombination(...), $combinations);
     }
 
     /**
@@ -434,7 +435,55 @@ final class VariantCombination extends Model
     {
         ksort($combination);
 
+        foreach ($combination as $attribute => $value) {
+            // Normalise each value recursively so nested arrays are consistently ordered for deterministic hashing.
+            $combination[$attribute] = self::normaliseCombinationValue($value);
+        }
+
         return $combination;
+    }
+
+    /**
+     * Normalise a combination value recursively to guarantee deterministic hashing and comparisons.
+     */
+    private static function normaliseCombinationValue(mixed $value): mixed
+    {
+        if (! is_array($value)) {
+            return $value;
+        }
+
+        $normalised = array_map(
+            self::normaliseCombinationValue(...),
+            $value
+        );
+
+        if (array_is_list($normalised)) {
+            // Sort list values to avoid hash mismatches when the same selections arrive in different orders.
+            usort(
+                $normalised,
+                static fn (mixed $left, mixed $right): int => self::serialiseForSorting($left) <=> self::serialiseForSorting($right)
+            );
+
+            return $normalised;
+        }
+
+        ksort($normalised);
+
+        return $normalised;
+    }
+
+    /**
+     * Convert a combination fragment into a deterministic string for list sorting.
+     */
+    private static function serialiseForSorting(mixed $value): string
+    {
+        try {
+            // Prefer JSON for human-readable ordering so alphabetical comparisons behave as expected.
+            return json_encode($value, JSON_THROW_ON_ERROR);
+        } catch (JsonException) {
+            // Fall back to PHP's serialize when JSON encoding fails (e.g. on resources).
+            return serialize($value);
+        }
     }
 
     /**
