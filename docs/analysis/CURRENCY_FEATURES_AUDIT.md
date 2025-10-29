@@ -37,6 +37,9 @@
 - The `currencies` table stores `decimal_places` and related separators, and `Currency::formatAmount()` respects those settings when rendering values.【F:app/Models/Currency.php†L41-L58】【F:app/Models/Currency.php†L460-L475】
 - `CurrencyEnum::getDecimalPlaces()` attempts to provide zero-decimal overrides, but it references an undefined `KRW` case, so calling it will raise an error and indicates the helper needs alignment with the enum definition.【F:app/Enums/CurrencyEnum.php†L82-L87】
 
+### Variant Price Change Reporting
+- Variant price history percentages are now rounded to two decimal places before being exposed to tables or exports, keeping UI badges consistent with regression suite expectations.【F:app/Models/VariantPriceHistory.php†L70-L116】
+
 ### Price List Scheduling Windows
 - Legacy schemas that lacked scheduling metadata now receive nullable `starts_at`/`ends_at` timestamps so pricing tests and runtime helpers can evaluate temporal availability without skipping coverage.【F:database/migrations/2025_11_07_000001_add_schedule_columns_to_price_lists_table.php†L1-L47】
 - Active price lists must declare a concrete `starts_at` value to be treated as live, mirroring the behaviour of the `isActive()` helper and avoiding indefinite records from leaking into "currently active" queries.【F:app/Models/PriceList.php†L104-L143】
