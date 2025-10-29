@@ -230,7 +230,7 @@ final class CalendarWidget extends FullCalendarWidget
     {
         return [
             Actions\CreateAction::make()
-                ->mountUsing(function (?Form $schema, array $arguments = []): void {
+                ->mountUsing(function (?Schema $schema, array $arguments = []): void {
                     if (! $schema) {
                         return;
                     }
@@ -265,7 +265,7 @@ final class CalendarWidget extends FullCalendarWidget
     {
         return [
             Actions\EditAction::make()
-                ->mountUsing(function (?Form $schema, array $arguments = []): void {
+                ->mountUsing(function (?Schema $schema, array $arguments = []): void {
                     if (! $schema) {
                         return;
                     }
@@ -384,7 +384,7 @@ final class CalendarWidget extends FullCalendarWidget
     /**
      * @return array<string, mixed>
      */
-    private function normaliseFormState(Form $schema): array
+    private function normaliseFormState(Schema $schema): array
     {
         $state = $schema->getRawState();
 
