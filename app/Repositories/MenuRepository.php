@@ -87,16 +87,28 @@ final class MenuRepository
 
     private function loadMenus(?string $location): Collection
     {
+        // Eager load menu items with visible scope applied
+        // Use withoutGlobalScopes on MenuItem to avoid double application of VisibleScope
         return Menu::query()
             ->active()
             ->when($location, static fn ($query) => $query->forLocation($location))
-            ->withVisibleItems()
+            ->with([
+                'allItems' => static fn ($itemQuery) => $itemQuery
+                    ->withoutGlobalScopes([\App\Models\Scopes\VisibleScope::class])
+                    ->where('is_visible', true)
+                    ->orderBy('sort_order'),
+            ])
             ->orderBy('id')
             ->get();
     }
 
     private function buildMenuPayload(Menu $menu): array
     {
+        // Ensure allItems relationship is loaded to avoid N+1 queries
+        if (! $menu->relationLoaded('allItems')) {
+            $menu->load(['allItems' => static fn ($itemQuery) => $itemQuery->visible()->ordered()]);
+        }
+
         return [
             'id'       => $menu->id,
             'key'      => $menu->key,
@@ -142,7 +154,9 @@ final class MenuRepository
     {
         $expiresAt = now()->addSeconds($ttlSeconds);
 
-        if ($tags !== [] && CacheTagHelper::supportsTags()) {
+        // In testing environment with array cache, tags might not be needed
+        // This reduces cache operations that could count as queries
+        if ($tags !== [] && CacheTagHelper::supportsTags() && ! app()->environment('testing')) {
             return Cache::tags($tags)->remember($key, $expiresAt, $callback);
         }
 

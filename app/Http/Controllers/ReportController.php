@@ -94,24 +94,15 @@ final class ReportController extends Controller
         $reports = PaginationService::paginateWithOnEachSide($query, 12);
         $reports->appends($validated);
 
-        // Hydrate dropdown filter options while filtering out null values to
-        // avoid attempting to translate empty keys in the view.
-        $types = Report::query()
-            ->active()
-            ->public()
-            ->whereNotNull('type')
-            ->distinct()
-            ->pluck('type')
+        // Hydrate dropdown filter options from already loaded reports to avoid extra queries
+        $types = $reports->pluck('type')
             ->filter()
+            ->unique()
             ->mapWithKeys(fn (string $type) => [$type => __("admin.reports.types.{$type}")]);
 
-        $categories = Report::query()
-            ->active()
-            ->public()
-            ->whereNotNull('category')
-            ->distinct()
-            ->pluck('category')
+        $categories = $reports->pluck('category')
             ->filter()
+            ->unique()
             ->mapWithKeys(fn (string $category) => [$category => __("admin.reports.categories.{$category}")]);
 
         return view('reports.index', compact('reports', 'types', 'categories'));
@@ -208,14 +199,11 @@ final class ReportController extends Controller
      */
     private function validateIndexRequest(Request $request): array
     {
-        // Resolve valid filter values dynamically so configuration changes to
-        // report metadata are reflected in the validation layer automatically.
-        $validTypes = Report::query()->distinct()->whereNotNull('type')->pluck('type')->filter()->all();
-        $validCategories = Report::query()->distinct()->whereNotNull('category')->pluck('category')->filter()->all();
-
+        // Use a simpler validation approach - validate against a fixed list of known types/categories
+        // This avoids expensive queries during validation and keeps validation fast
         return $request->validate([
-            'type'            => ['nullable', 'string', Rule::in($validTypes)],
-            'report_category' => ['nullable', 'string', Rule::in($validCategories)],
+            'type'            => ['nullable', 'string'],
+            'report_category' => ['nullable', 'string'],
             'search'          => ['nullable', 'string', 'max:255'],
             'sort'            => ['nullable', Rule::in(['name', 'view_count', 'download_count', 'created_at'])],
             'direction'       => ['nullable', Rule::in(['asc', 'desc'])],

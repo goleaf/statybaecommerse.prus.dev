@@ -50,12 +50,10 @@ trait OrdersByName
         // generated SQL beyond toggling ascending or descending order.
         $direction = strtolower($direction) === 'desc' ? 'desc' : 'asc';
 
-        // Resolve the grammar-wrapped column name manually instead of relying on
-        // qualifyColumn because certain tests assert the sanitised clause uses the
-        // bare column reference ("name") without the table prefix. By quoting the
-        // column ourselves we keep the clause injection-safe while matching the
-        // expected SQL fragment across legacy assertions.
-        $column = $query->getQuery()->grammar->wrap($this->getNameColumn());
+        // Qualify the column with the table name to ensure explicit table qualification
+        // in generated SQL queries, which is important for joins and test assertions.
+        $qualifiedColumn = $query->qualifyColumn($this->getNameColumn());
+        $column = $query->getQuery()->grammar->wrap($qualifiedColumn);
 
         return $query->orderByRaw(sprintf('%s %s', $column, $direction));
     }

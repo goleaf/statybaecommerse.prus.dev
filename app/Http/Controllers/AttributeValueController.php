@@ -23,7 +23,12 @@ final class AttributeValueController extends Controller
      */
     public function index(Request $request): View
     {
-        $query = AttributeValue::with(['attribute.translations', 'translations'])
+        // Eager load all relationships to avoid N+1 queries
+        $query = AttributeValue::query()
+            ->with([
+                'attribute' => fn ($q) => $q->with('translations'),
+                'translations',
+            ])
             ->withCount(['products', 'variants'])
             ->enabled()
             ->ordered()
@@ -56,7 +61,11 @@ final class AttributeValueController extends Controller
         }
         $attributeValues = PaginationService::paginateWithOnEachSide($query, 20);
         $attributeValues->appends($request->query());
-        $attributes = Attribute::enabled()->ordered()->get();
+        $attributes = Attribute::query()
+            ->enabled()
+            ->ordered()
+            ->with('translations')
+            ->get();
 
         return view('attribute-values.index', compact('attributeValues', 'attributes'));
     }

@@ -61,6 +61,9 @@ test('reports index maintains a stable query count', function (): void {
 });
 
 test('menu repository by key avoids n+1 queries', function (): void {
+    // Delete any existing menu with this key to avoid unique constraint violation
+    Menu::where('key', 'main_header')->delete();
+
     $menu = Menu::factory()->active()->create([
         'key'      => 'main_header',
         'location' => 'header',

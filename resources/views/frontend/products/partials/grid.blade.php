@@ -11,9 +11,14 @@
     <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         @foreach($products as $product)
             @php
-                $imageUrl = $product->getFirstMediaUrl('images', 'medium')
-                    ?: $product->getFirstMediaUrl('images')
-                    ?: asset('images/placeholder-product.png');
+                // Use ProductImage model instead of MediaLibrary
+                $primaryImage = $product->relationLoaded('primaryImage') 
+                    ? $product->primaryImage 
+                    : $product->primaryImage()->first();
+                if (!$primaryImage) {
+                    $primaryImage = $product->images()->ordered()->first();
+                }
+                $imageUrl = $primaryImage ? $primaryImage->url : asset('images/placeholder-product.png');
                 $priceRecord = $product->prices->first();
                 $priceAmount = $priceRecord->amount ?? $product->price;
                 $currencySymbol = $priceRecord?->currency?->symbol ?? $priceRecord?->currency?->code ?? '€';

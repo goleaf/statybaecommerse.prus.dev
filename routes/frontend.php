@@ -153,7 +153,7 @@ Route::middleware(['web'])->group(function () {
 
     // API Routes for AJAX
     Route::prefix('api')->name('frontend.api.')->group(function () {
-        Route::get('/categories/tree', [App\Http\Controllers\Frontend\ApiController::class, 'getCategoryTree'])->name('categories.tree');
+        // Categories tree route is defined in routes/web.php to avoid conflicts
         Route::get('/cart/count', [App\Http\Controllers\Frontend\ApiController::class, 'getCartCount'])->name('cart.count');
         Route::get('/wishlist/count', [App\Http\Controllers\Frontend\ApiController::class, 'getWishlistCount'])->name('wishlist.count');
         Route::post('/wishlist/toggle', [App\Http\Controllers\Frontend\ApiController::class, 'toggleWishlist'])->name('wishlist.toggle');

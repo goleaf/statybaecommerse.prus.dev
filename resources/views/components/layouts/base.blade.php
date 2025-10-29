@@ -76,12 +76,24 @@
         }
     @endphp
 
-    @if ($shouldLoadViteAssets)
+    @php
+        $manifestPath = public_path('build/manifest.json');
+        $manifest = file_exists($manifestPath) ? json_decode(file_get_contents($manifestPath), true) : null;
+        $cssFile = $manifest['resources/css/app.scss']['file'] ?? null;
+        $jsFile = $manifest['resources/js/app.js']['file'] ?? null;
+        $useViteDev = app()->environment('local') && $shouldLoadViteAssets;
+    @endphp
+    
+    @if ($useViteDev)
         @vite(['resources/css/app.scss', 'resources/js/app.js'])
+    @elseif ($cssFile && $jsFile)
+        {{-- Use compiled assets in production --}}
+        <link rel="stylesheet" href="{{ asset('build/' . $cssFile) }}">
+        <script src="{{ asset('build/' . $jsFile) }}"></script>
     @else
-        {{-- Fall back to the precompiled asset pipeline when Vite has not built a manifest yet. --}}
+        {{-- Fallback to legacy assets --}}
         <link rel="stylesheet" href="{{ asset('css/app.css') }}">
-        <script src="{{ asset('js/app.js') }}" defer></script>
+        <script src="{{ asset('js/app.js') }}"></script>
     @endif
 
     <!-- Livewire Styles -->
@@ -268,8 +280,42 @@
     {{ $scripts ?? '' }}
     @stack('scripts')
 
-    <!-- Alpine.js -->
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <!-- Alpine.js - Load after app.js to ensure Alpine components are registered -->
+    <script>
+        // Ensure Alpine loads only once and after app.js components are registered
+        (function() {
+            if (typeof window.Alpine !== 'undefined') {
+                return; // Alpine already loaded
+            }
+            
+            function initAlpine() {
+                if (typeof window.Alpine !== 'undefined') {
+                    return; // Already initialized
+                }
+                
+                // Check if components are registered (they should be from app.js)
+                const componentsReady = typeof window.createDesktopSearchComponent !== 'undefined' &&
+                                       typeof window.createMobileSearchComponent !== 'undefined' &&
+                                       typeof window.createCartButtonComponent !== 'undefined';
+                
+                if (componentsReady || document.readyState === 'complete') {
+                    const script = document.createElement('script');
+                    script.src = 'https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js';
+                    script.defer = true;
+                    document.head.appendChild(script);
+                } else {
+                    // Wait for scripts to load
+                    setTimeout(initAlpine, 50);
+                }
+            }
+            
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initAlpine);
+            } else {
+                initAlpine();
+            }
+        })();
+    </script>
 </body>
 
 </html>
