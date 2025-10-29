@@ -140,7 +140,7 @@ final class UserProductInteraction extends Model
                 if (is_string($value) && $value !== '') {
                     try {
                         $decoded = json_decode($value, true, 512, JSON_THROW_ON_ERROR) ?: [];
-                    } catch (JsonException $exception) {
+                    } catch (JsonException) {
                         $decoded = [];
                     }
                 } elseif (is_array($value)) {
@@ -162,14 +162,25 @@ final class UserProductInteraction extends Model
             set: function ($value): array {
                 // Convert various inputs into a pure array so the JSON column stores a predictable payload.
                 $metaArray = match (true) {
-                    is_array($value) => $value,
-                    $value instanceof Arrayable => $value->toArray(),
+                    is_array($value)                   => $value,
+                    $value instanceof Arrayable        => $value->toArray(),
                     $value instanceof JsonSerializable => (array) $value->jsonSerialize(),
-                    $value instanceof \Traversable => iterator_to_array($value),
-                    default => [],
+                    $value instanceof Traversable      => iterator_to_array($value),
+                    default                            => [],
                 };
 
-                $payload = ['meta' => $metaArray === [] ? [] : $metaArray];
+                // Encode the meta payload ahead of persistence to avoid SQLite array binding errors while keeping
+                // downstream getters JSON aware. When encoding fails we intentionally fall back to an empty payload so
+                // report generation can proceed without throwing QueryExceptions.
+                try {
+                    $encodedMeta = $metaArray === []
+                        ? null
+                        : json_encode($metaArray, JSON_THROW_ON_ERROR);
+                } catch (JsonException) {
+                    $encodedMeta = null;
+                }
+
+                $payload = ['meta' => $encodedMeta];
 
                 foreach (['rating', 'count', 'first_interaction', 'last_interaction', 'notes', 'is_anonymous', 'ip_address'] as $legacyKey) {
                     if (! array_key_exists($legacyKey, $metaArray)) {
@@ -220,10 +231,10 @@ final class UserProductInteraction extends Model
             },
             set: static function ($value): array {
                 $carbon = match (true) {
-                    $value instanceof Carbon => $value,
+                    $value instanceof Carbon            => $value,
                     $value instanceof DateTimeInterface => Carbon::instance($value),
-                    $value === null || $value === '' => null,
-                    default => Carbon::make($value) ?? Carbon::parse((string) $value),
+                    $value === null || $value === ''    => null,
+                    default                             => Carbon::make($value) ?? Carbon::parse((string) $value),
                 };
 
                 return [
