@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Schema\ColumnDefinition;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
@@ -13,8 +14,26 @@ return new class extends Migration
     {
         // Ensure the categories table exposes a JSON meta column for structured configuration payloads.
         if (! Schema::hasColumn('system_setting_categories', 'meta')) {
-            Schema::table('system_setting_categories', function (Blueprint $table): void {
-                $table->json('meta')->nullable()->after('metadata')->comment('Arbitrary structured metadata for category-specific UI tweaks');
+            // Determine a reliable anchor column that exists on both brand-new and legacy installs.
+            $afterColumn = null;
+
+            if (Schema::hasColumn('system_setting_categories', 'metadata')) {
+                $afterColumn = 'metadata';
+            } elseif (Schema::hasColumn('system_setting_categories', 'sort_order')) {
+                // Falling back to the existing sort metadata keeps column ordering predictable during fresh installs.
+                $afterColumn = 'sort_order';
+            }
+
+            Schema::table('system_setting_categories', function (Blueprint $table) use ($afterColumn): void {
+                /** @var ColumnDefinition $column */
+                $column = $table->json('meta')
+                    ->nullable()
+                    ->comment('Arbitrary structured metadata for category-specific UI tweaks');
+
+                // Only apply the AFTER clause when the referenced column is guaranteed to exist.
+                if ($afterColumn !== null) {
+                    $column->after($afterColumn);
+                }
             });
         }
 
@@ -42,8 +61,12 @@ return new class extends Migration
     {
         // Recreate the legacy metadata column so down migrations retain any stored payloads.
         if (! Schema::hasColumn('system_setting_categories', 'metadata')) {
+            // Mirror the forward migration by inserting the legacy column near the sorting metadata.
             Schema::table('system_setting_categories', function (Blueprint $table): void {
-                $table->json('metadata')->nullable()->after('template')->comment('Legacy metadata payload retained for rollbacks');
+                $table->json('metadata')
+                    ->nullable()
+                    ->after('sort_order')
+                    ->comment('Legacy metadata payload retained for rollbacks');
             });
         }
 
