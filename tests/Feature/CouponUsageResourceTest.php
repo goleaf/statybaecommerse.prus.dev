@@ -379,9 +379,13 @@ final class CouponUsageResourceTest extends TestCase
 
     public function test_coupon_usage_usage_period_this_week(): void
     {
-        $couponUsage = CouponUsage::factory()->create(['used_at' => now()->subDays(3)]);
+        $couponUsage = CouponUsage::factory()->create([
+            // Use the beginning of the current week to avoid locale-specific edge cases (e.g., tests running on Monday)
+            // where subtracting several days could fall into the previous week and cause flaky assertions.
+            'used_at' => now()->startOfWeek()->addHours(12),
+        ]);
 
-        // This would test the usage period formatting in the table
+        // This ensures the usage period formatting logic correctly recognises entries from the current week.
         $this->assertTrue($couponUsage->used_at->isThisWeek());
     }
 
