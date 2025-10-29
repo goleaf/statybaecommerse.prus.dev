@@ -5,6 +5,7 @@
 - A dedicated resolver harmonises disparate notification hints (payload fields and class names) into the standard categories for analytics and filtering.【F:app/Support/Notifications/NotificationCategoryResolver.php†L7-L86】
 - Unit coverage verifies canonical category resolution and ensures existing context/metadata accessors continue to behave as expected.【F:tests/Unit/Data/Notifications/NotificationPayloadDataTest.php†L13-L54】【F:tests/Unit/Notifications/NotificationDataTest.php†L15-L57】
 - Storefront notification toasts and cart badges now use CSP-compliant utility classes instead of inline styles, eliminating browser `style-src` violations while keeping transitions intact for shoppers.【F:resources/js/app.js†L1-L214】【F:resources/js/shared/utilities.js†L1-L214】【F:resources/js/livewire-bridge.js†L1-L166】【F:resources/css/app.scss†L4985-L5120】
+- Filament marketing segmentation detail views now reuse the injected schema instance so viewing a campaign customer segment no longer throws runtime errors for merchandising teams reviewing targeting metadata.【F:app/Filament/Resources/CampaignCustomerSegmentResource.php†L267-L315】
 - The Filament email campaign editor has been upgraded to the v4 form API and now requires a plain-text body alongside scheduling metadata, keeping generated payloads consistent for transactional fallbacks.【F:app/Filament/Resources/EmailCampaignResource.php†L15-L118】
 
 ## Category Normalisation
