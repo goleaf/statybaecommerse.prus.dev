@@ -9,8 +9,10 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Schema;
 use Tests\Support\AssertsRelations;
+use Tests\TestCase;
 
-uses(RefreshDatabase::class);
+// Boot the full Laravel test case so schema and configuration facades resolve during model assertions.
+uses(TestCase::class, RefreshDatabase::class);
 
 it('orders users alphabetically when the name column exists', function (): void {
     // Skip when the backing schema does not expose a name column for the user table.
@@ -23,7 +25,7 @@ it('orders users alphabetically when the name column exists', function (): void 
     try {
         User::factory()->create(['name' => 'Zoe']);
         User::factory()->create(['name' => 'Anna']);
-    } catch (Throwable $exception) {
+    } catch (Throwable) {
         // Provide a guarded fallback when factories are disabled in the project configuration.
         User::query()->create(['name' => 'Zoe', 'email' => 'zoe@example.test', 'password' => bcrypt('secret')]);
         User::query()->create(['name' => 'Anna', 'email' => 'anna@example.test', 'password' => bcrypt('secret')]);
