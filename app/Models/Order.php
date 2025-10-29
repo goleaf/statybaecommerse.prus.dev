@@ -614,6 +614,14 @@ final class Order extends Model
             return self::$createdAtIndexAvailable[$cacheKey] = false;
         }
 
+        if (! method_exists($schema, 'hasIndex')) {
+            // Older or lightweight schema builders (such as the in-memory SQLite
+            // adapter used by some test environments) omit the hasIndex helper.
+            // Returning false instead of calling the missing method keeps the
+            // analytics helpers functional without triggering fatal errors.
+            return self::$createdAtIndexAvailable[$cacheKey] = false;
+        }
+
         return self::$createdAtIndexAvailable[$cacheKey] = $schema->hasIndex($table, 'orders_created_at_index');
     }
 
