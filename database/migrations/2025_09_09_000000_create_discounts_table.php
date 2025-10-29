@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Schema\ForeignIdColumnDefinition;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -26,7 +27,24 @@ return new class extends Migration
             $table->foreignId('channel_id')->nullable()->index();
             $table->decimal('minimum_amount', 10, 2)->nullable();
             $table->decimal('maximum_amount', 10, 2)->nullable();
-            $table->foreignId('zone_id')->nullable()->constrained('zones')->nullOnDelete();
+            $table->foreignId('zone_id')->nullable()
+                // Guard the foreign key so SQLite migrations do not fail when the
+                // zones table has not been created yet during `migrate:fresh`
+                // calls in the test harness. Once the zones table exists the
+                // follow-up constraint ensures referential integrity.
+                ->when(
+                    Schema::hasTable('zones'),
+                    static function (ForeignIdColumnDefinition $column, bool $shouldAttach): void {
+                        // Attach the foreign key relationship when the zones table
+                        // is available, matching the production schema.
+                        $column->constrained('zones')->nullOnDelete();
+                    },
+                    static function (ForeignIdColumnDefinition $column, bool $shouldAttach): void {
+                        // Fall back to an index when the zones table is unavailable so
+                        // migrations still succeed during isolated unit test execution.
+                        $column->index();
+                    }
+                );
             // Optional fields referenced by model
             $table->string('status')->nullable();
             $table->json('scope')->nullable();
