@@ -1,29 +1,27 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\CollectionResource\Pages;
 use App\Models\Collection;
 use App\Support\Concerns\HasNav;
+use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Tabs;
-use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Tables;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Filament\Tables;
 
 /**
  * Filament resource that exposes CRUD pages for product collections.
@@ -106,8 +104,8 @@ final class CollectionResource extends Resource
                                             Select::make('display_type')
                                                 ->label(__('admin.collections.fields.display_type'))
                                                 ->options([
-                                                    'grid'     => __('admin.collections.display_types.grid'),
-                                                    'list'     => __('admin.collections.display_types.list'),
+                                                    'grid' => __('admin.collections.display_types.grid'),
+                                                    'list' => __('admin.collections.display_types.list'),
                                                     'carousel' => __('admin.collections.display_types.carousel'),
                                                 ])
                                                 ->default('grid')
@@ -192,14 +190,14 @@ final class CollectionResource extends Resource
                     ->label(__('admin.collections.table.display_type'))
                     ->colors([
                         'primary' => 'grid',
-                        'info'    => 'list',
+                        'info' => 'list',
                         'warning' => 'carousel',
                     ])
-                    ->formatStateUsing(fn (?string $state): string => match ($state) {
-                        'grid'     => __('admin.collections.display_types.grid'),
-                        'list'     => __('admin.collections.display_types.list'),
+                    ->formatStateUsing(fn(?string $state): string => match ($state) {
+                        'grid' => __('admin.collections.display_types.grid'),
+                        'list' => __('admin.collections.display_types.list'),
                         'carousel' => __('admin.collections.display_types.carousel'),
-                        default    => (string) ($state ?? __('admin.collections.display_types.grid')),
+                        default => (string) ($state ?? __('admin.collections.display_types.grid')),
                     }),
                 TextColumn::make('products_count')
                     ->label(__('admin.collections.table.products_count'))
@@ -207,12 +205,12 @@ final class CollectionResource extends Resource
                 // Quickly distinguish between static (manual) and dynamic (rule-driven) collections.
                 BadgeColumn::make('is_automatic')
                     ->label(__('admin.collections.table.is_automatic'))
-                    ->formatStateUsing(fn (bool $state): string => $state
+                    ->formatStateUsing(fn(bool $state): string => $state
                         ? __('admin.collections.types.automatic')
                         : __('admin.collections.types.manual'))
                     ->colors([
                         'success' => true,
-                        'gray'    => false,
+                        'gray' => false,
                     ]),
                 Tables\Columns\IconColumn::make('is_active')
                     ->label(__('collections.is_active'))
@@ -236,8 +234,8 @@ final class CollectionResource extends Resource
                 SelectFilter::make('display_type')
                     ->label(__('admin.collections.filters.display_type'))
                     ->options([
-                        'grid'     => __('admin.collections.display_types.grid'),
-                        'list'     => __('admin.collections.display_types.list'),
+                        'grid' => __('admin.collections.display_types.grid'),
+                        'list' => __('admin.collections.display_types.list'),
                         'carousel' => __('admin.collections.display_types.carousel'),
                     ]),
                 TernaryFilter::make('is_visible')
@@ -263,10 +261,10 @@ final class CollectionResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index'  => Pages\ListCollections::route('/'),
+            'index' => Pages\ListCollections::route('/'),
             'create' => Pages\CreateCollection::route('/create'),
-            'view'   => Pages\ViewCollection::route('/{record}'),
-            'edit'   => Pages\EditCollection::route('/{record}/edit'),
+            'view' => Pages\ViewCollection::route('/{record}'),
+            'edit' => Pages\EditCollection::route('/{record}/edit'),
         ];
     }
 
