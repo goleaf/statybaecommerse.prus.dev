@@ -273,8 +273,8 @@ final class XmlCatalogService
                         'seo_title'         => trim((string) ($t->seo_title ?? '')),
                         'seo_description'   => trim((string) ($t->seo_description ?? '')),
                     ];
-                    $trPayload = array_filter($trPayload, fn ($v) => $v !== '' && $v !== null);
-                    if (! empty($trPayload)) {
+                    $trPayload = array_filter($trPayload, fn (string $v): bool => $v !== '' && $v !== null);
+                    if ($trPayload !== []) {
                         $category->updateTranslation($locale, $trPayload);
                     }
                 }
@@ -379,6 +379,18 @@ final class XmlCatalogService
 
             $payload = $this->filterExistingColumns('products', $payload);
 
+            // Ensure catalog imports keep products visible through global scopes by
+            // backfilling publication metadata whenever the XML payload omits it.
+            if (! array_key_exists('status', $payload) && Schema::hasColumn('products', 'status')) {
+                $payload['status'] = 'active';
+            }
+
+            // Products filtered by PublishedScope require a non-null published_at, so
+            // default to the current timestamp when it is missing from the source feed.
+            if (! array_key_exists('published_at', $payload) && Schema::hasColumn('products', 'published_at')) {
+                $payload['published_at'] = now();
+            }
+
             if ($product) {
                 if (method_exists($product, 'trashed') && $product->trashed()) {
                     $product->restore();
@@ -437,7 +449,7 @@ final class XmlCatalogService
                         $slugs[] = $s;
                     }
                 }
-                if (! empty($slugs)) {
+                if ($slugs !== []) {
                     $categoryIds = Category::query()->withoutGlobalScopes()->withTrashed()->whereIn('slug', array_values(array_unique($slugs)))->pluck('id')->all();
                     if (! empty($categoryIds)) {
                         $product->categories()->syncWithoutDetaching($categoryIds);
@@ -457,8 +469,8 @@ final class XmlCatalogService
                         'seo_title'         => trim((string) ($t->seo_title ?? '')),
                         'seo_description'   => trim((string) ($t->seo_description ?? '')),
                     ];
-                    $trPayload = array_filter($trPayload, fn ($v) => $v !== '' && $v !== null);
-                    if (! empty($trPayload)) {
+                    $trPayload = array_filter($trPayload, fn (string $v): bool => $v !== '' && $v !== null);
+                    if ($trPayload !== []) {
                         $product->updateTranslation($locale, $trPayload);
                     }
                 }
@@ -568,13 +580,13 @@ final class XmlCatalogService
             if (! $contents) {
                 return '';
             }
-            $dir = 'product-images/' . (string) $product->id;
+            $dir = 'product-images/' . $product->id;
             $filename = 'image-' . $index . '-' . Str::random(8) . '.' . $extension;
             $path = $dir . '/' . $filename;
             Storage::disk(SecureStorage::disk())->put($path, $contents);
 
             return SecureStorage::temporarySignedUrl($path);
-        } catch (Throwable $e) {
+        } catch (Throwable) {
             return '';
         }
     }
