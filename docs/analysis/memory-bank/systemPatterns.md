@@ -129,6 +129,9 @@
 - **View Caching:** Blade template caching for static content
 - **Translation Caching:** Cached translation lookups
 - **Discount Caching:** Cached discount eligibility evaluation
+- **System Setting Cache Busting:** `SystemSetting::setValue()` now clears per-setting
+  cache keys even when the array cache driver is active, preventing stale
+  configuration values from persisting between requests.
 
 ### 2. Queue Processing Pattern
 **Pattern:** Background processing for heavy operations

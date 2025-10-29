@@ -73,7 +73,7 @@ final class SystemSetting extends Model implements HasMedia
                 if ($this->is_encrypted && $value) {
                     try {
                         $value = decrypt($value);
-                    } catch (Exception $e) {
+                    } catch (Exception) {
                         // If decryption fails, return the original value.
                     }
                 }
@@ -94,7 +94,7 @@ final class SystemSetting extends Model implements HasMedia
                     default => $value,
                 };
             },
-            set: function ($value, array $attributes) {
+            set: function ($value, array $attributes): ?string {
                 $type = $attributes['type'] ?? $this->type ?? 'string';
 
                 return $this->normalizeValueForStorage($value, $type);
@@ -168,7 +168,7 @@ final class SystemSetting extends Model implements HasMedia
      */
     public function getActivitylogOptions(): LogOptions
     {
-        return LogOptions::defaults()->logOnly(['key', 'name', 'value', 'type', 'group', 'is_active'])->logOnlyDirty()->dontSubmitEmptyLogs()->setDescriptionForEvent(fn (string $eventName) => "System Setting {$eventName}")->useLogName('system_settings');
+        return LogOptions::defaults()->logOnly(['key', 'name', 'value', 'type', 'group', 'is_active'])->logOnlyDirty()->dontSubmitEmptyLogs()->setDescriptionForEvent(fn (string $eventName): string => "System Setting {$eventName}")->useLogName('system_settings');
     }
 
     /**
@@ -236,7 +236,7 @@ final class SystemSetting extends Model implements HasMedia
      */
     public function scopeByCategory(Builder $query, string $category): Builder
     {
-        return $query->whereHas('category', function ($q) use ($category) {
+        return $query->whereHas('category', function ($q) use ($category): void {
             $q->where('slug', $category);
         });
     }
@@ -278,7 +278,7 @@ final class SystemSetting extends Model implements HasMedia
      */
     public function scopeSearchable(Builder $query, string $search): Builder
     {
-        return $query->where(function ($q) use ($search) {
+        return $query->where(function ($q) use ($search): void {
             $q->where('key', 'like', "%{$search}%")->orWhere('name', 'like', "%{$search}%")->orWhere('description', 'like', "%{$search}%");
         });
     }
@@ -344,7 +344,12 @@ final class SystemSetting extends Model implements HasMedia
             'value'      => $value,
             'updated_by' => auth()->id(),
         ]);
-        self::updateOrCreate(['key' => $key], $data);
+        $setting = self::updateOrCreate(['key' => $key], $data);
+
+        // Proactively invalidate any cached value so subsequent reads
+        // immediately return the freshly persisted configuration payload.
+        $setting->clearInstanceCache();
+        self::clearCache();
     }
 
     /**
@@ -374,7 +379,7 @@ final class SystemSetting extends Model implements HasMedia
      */
     public function getTranslatedName(?string $locale = null): string
     {
-        $locale = $locale ?? app()->getLocale();
+        $locale ??= app()->getLocale();
         $translation = $this->translations()->where('locale', $locale)->first();
 
         return $translation?->name ?? $this->name;
@@ -385,7 +390,7 @@ final class SystemSetting extends Model implements HasMedia
      */
     public function getTranslatedDescription(?string $locale = null): ?string
     {
-        $locale = $locale ?? app()->getLocale();
+        $locale ??= app()->getLocale();
         $translation = $this->translations()->where('locale', $locale)->first();
 
         return $translation?->description ?? $this->description;
@@ -396,7 +401,7 @@ final class SystemSetting extends Model implements HasMedia
      */
     public function getTranslatedHelpText(?string $locale = null): ?string
     {
-        $locale = $locale ?? app()->getLocale();
+        $locale ??= app()->getLocale();
         $translation = $this->translations()->where('locale', $locale)->first();
 
         return $translation?->help_text ?? $this->help_text;
@@ -607,7 +612,7 @@ final class SystemSetting extends Model implements HasMedia
     public function validateValue($value): bool
     {
         $rules = $this->getValidationRulesForForm();
-        if (empty($rules)) {
+        if ($rules === []) {
             return true;
         }
         $validator = validator([$this->key => $value], [$this->key => $rules]);
@@ -623,7 +628,7 @@ final class SystemSetting extends Model implements HasMedia
     public function getValidationErrors($value): array
     {
         $rules = $this->getValidationRulesForForm();
-        if (empty($rules)) {
+        if ($rules === []) {
             return [];
         }
         $validator = validator([$this->key => $value], [$this->key => $rules]);
@@ -695,9 +700,7 @@ final class SystemSetting extends Model implements HasMedia
 
         // Using a closure keeps encryption/decryption logic centralised in the
         // accessor, so cached data always mirrors the value consumers expect.
-        $callback = function () use ($default) {
-            return $this->value ?? $default;
-        };
+        $callback = (fn() => $this->value ?? $default);
 
         $store = cache()->getStore();
 
@@ -736,7 +739,7 @@ final class SystemSetting extends Model implements HasMedia
     protected static function boot(): void
     {
         parent::boot();
-        self::saving(function (SystemSetting $setting) {
+        self::saving(function (SystemSetting $setting): void {
             $type = $setting->type ?? 'string';
             $normalizedValue = $setting->normalizeValueForStorage($setting->value, $type);
 
@@ -746,10 +749,16 @@ final class SystemSetting extends Model implements HasMedia
                 $setting->attributes['value'] = $normalizedValue;
             }
         });
-        self::updating(function (SystemSetting $setting) {
+        self::updating(function (SystemSetting $setting): void {
+            // Updating should purge the specific cache entry and the broader
+            // cache tag to stop stale configuration data leaking to callers.
+            $setting->clearInstanceCache();
             $setting->clearCache();
         });
-        self::deleting(function (SystemSetting $setting) {
+        self::deleting(function (SystemSetting $setting): void {
+            // Removing a setting requires the same invalidation to avoid
+            // dangling caches referencing a non-existent configuration.
+            $setting->clearInstanceCache();
             $setting->clearCache();
         });
     }

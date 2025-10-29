@@ -71,7 +71,7 @@ final class SystemSettingTest extends TestCase
 
     public function test_system_setting_model_static_methods(): void
     {
-        $setting = SystemSetting::factory()->create([
+        SystemSetting::factory()->create([
             'key'   => 'test_static_method',
             'value' => 'test_value',
         ]);
@@ -82,7 +82,7 @@ final class SystemSettingTest extends TestCase
 
     public function test_system_setting_model_public_methods(): void
     {
-        $setting = SystemSetting::factory()->public()->create([
+        SystemSetting::factory()->public()->create([
             'key'   => 'test_public_method',
             'value' => 'public_value',
             'type'  => 'string',  // Ensure type is string to get string value
@@ -267,7 +267,7 @@ final class SystemSettingTest extends TestCase
 
     public function test_system_setting_model_history_methods(): void
     {
-        $setting = SystemSetting::factory()->create();
+        SystemSetting::factory()->create();
 
         // Skip history test as the SystemSettingHistory model and table don't exist
         $this->assertTrue(true); // Placeholder test
@@ -379,7 +379,7 @@ final class SystemSettingTest extends TestCase
     public function test_system_setting_model_scope_by_group(): void
     {
         $setting1 = SystemSetting::factory()->create(['group' => 'test_group']);
-        $setting2 = SystemSetting::factory()->create(['group' => 'other_group']);
+        SystemSetting::factory()->create(['group' => 'other_group']);
 
         $testGroupSettings = SystemSetting::byGroup('test_group')->get();
         $this->assertCount(1, $testGroupSettings);
@@ -392,7 +392,7 @@ final class SystemSettingTest extends TestCase
         $category2 = SystemSettingCategory::factory()->create(['slug' => 'category2']);
 
         $setting1 = SystemSetting::factory()->create(['category_id' => $category1->id]);
-        $setting2 = SystemSetting::factory()->create(['category_id' => $category2->id]);
+        SystemSetting::factory()->create(['category_id' => $category2->id]);
 
         $category1Settings = SystemSetting::byCategory('category1')->get();
         $this->assertCount(1, $category1Settings);
@@ -402,7 +402,7 @@ final class SystemSettingTest extends TestCase
     public function test_system_setting_model_scope_public(): void
     {
         $publicSetting = SystemSetting::factory()->public()->create();
-        $privateSetting = SystemSetting::factory()->private()->create();
+        SystemSetting::factory()->private()->create();
 
         $publicSettings = SystemSetting::public()->get();
         $this->assertCount(1, $publicSettings);
@@ -412,7 +412,7 @@ final class SystemSettingTest extends TestCase
     public function test_system_setting_model_scope_active(): void
     {
         $activeSetting = SystemSetting::factory()->active()->create();
-        $inactiveSetting = SystemSetting::factory()->inactive()->create();
+        SystemSetting::factory()->inactive()->create();
 
         $activeSettings = SystemSetting::active()->get();
         $this->assertCount(1, $activeSettings);
@@ -432,7 +432,7 @@ final class SystemSettingTest extends TestCase
     public function test_system_setting_model_scope_searchable(): void
     {
         $setting1 = SystemSetting::factory()->create(['name' => 'Test Setting']);
-        $setting2 = SystemSetting::factory()->create(['name' => 'Other Setting']);
+        SystemSetting::factory()->create(['name' => 'Other Setting']);
 
         $searchResults = SystemSetting::searchable('Test')->get();
         $this->assertCount(1, $searchResults);
@@ -453,9 +453,28 @@ final class SystemSettingTest extends TestCase
         $this->assertTrue($setting->is_public);
     }
 
+    public function test_system_setting_model_set_value_refreshes_cache(): void
+    {
+        SystemSetting::setValue('cached_key', 'first_value', [
+            'type'         => 'string',
+            'is_cacheable' => true,
+        ]);
+
+        // Prime the cache so we can prove later updates bust the stale entry.
+        $this->assertSame('first_value', SystemSetting::getValue('cached_key'));
+
+        SystemSetting::setValue('cached_key', 'second_value', [
+            'type'         => 'string',
+            'is_cacheable' => true,
+        ]);
+
+        // After the update the cached getter should expose the new value.
+        $this->assertSame('second_value', SystemSetting::getValue('cached_key'));
+    }
+
     public function test_system_setting_model_get_value(): void
     {
-        $setting = SystemSetting::factory()->create([
+        SystemSetting::factory()->create([
             'key'   => 'test_get_value',
             'value' => 'test_value',
         ]);
@@ -466,7 +485,7 @@ final class SystemSettingTest extends TestCase
 
     public function test_system_setting_model_get_public(): void
     {
-        $setting = SystemSetting::factory()->public()->create([
+        SystemSetting::factory()->public()->create([
             'key'   => 'test_get_public',
             'value' => 'public_value',
         ]);
