@@ -9,9 +9,9 @@ use App\Models\VariantAnalytics;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
-use Filament\Schemas\Components\TextEntry;
 use Filament\Schemas\Schema;
 
 final class ViewVariantAnalytics extends ViewRecord
@@ -80,7 +80,10 @@ final class ViewVariantAnalytics extends ViewRecord
 
                                 TextEntry::make('conversion_rate')
                                     ->label(__('admin.variant_analytics.conversion_rate'))
-                                    ->formatStateUsing(fn ($state) => number_format($state, 2) . '%')
+                                    ->formatStateUsing(static function ($state): string {
+                                        // Mirror the resource helper so the detail view and table exports align on formatting.
+                                        return VariantAnalyticsResource::formatPercentage($state);
+                                    })
                                     ->columnSpan(1),
                             ]),
                     ]),
@@ -91,20 +94,29 @@ final class ViewVariantAnalytics extends ViewRecord
                             ->schema([
                                 TextEntry::make('click_through_rate')
                                     ->label(__('admin.variant_analytics.ctr'))
-                                    ->getStateUsing(fn ($record) => $record->click_through_rate)
-                                    ->formatStateUsing(fn ($state) => number_format($state, 2) . '%')
+                                    ->getStateUsing(static fn ($record) => $record->click_through_rate)
+                                    ->formatStateUsing(static function ($state): string {
+                                        // Mirror the resource helper so the detail view and table exports align on formatting.
+                                        return VariantAnalyticsResource::formatPercentage($state);
+                                    })
                                     ->columnSpan(1),
 
                                 TextEntry::make('add_to_cart_rate')
                                     ->label(__('admin.variant_analytics.atc_rate'))
-                                    ->getStateUsing(fn ($record) => $record->add_to_cart_rate)
-                                    ->formatStateUsing(fn ($state) => number_format($state, 2) . '%')
+                                    ->getStateUsing(static fn ($record) => $record->add_to_cart_rate)
+                                    ->formatStateUsing(static function ($state): string {
+                                        // Mirror the resource helper so the detail view and table exports align on formatting.
+                                        return VariantAnalyticsResource::formatPercentage($state);
+                                    })
                                     ->columnSpan(1),
 
                                 TextEntry::make('purchase_rate')
                                     ->label(__('admin.variant_analytics.purchase_rate'))
-                                    ->getStateUsing(fn ($record) => $record->purchase_rate)
-                                    ->formatStateUsing(fn ($state) => number_format($state, 2) . '%')
+                                    ->getStateUsing(static fn ($record) => $record->purchase_rate)
+                                    ->formatStateUsing(static function ($state): string {
+                                        // Mirror the resource helper so the detail view and table exports align on formatting.
+                                        return VariantAnalyticsResource::formatPercentage($state);
+                                    })
                                     ->columnSpan(1),
 
                                 TextEntry::make('average_revenue_per_purchase')

@@ -247,6 +247,7 @@
 ### 5. Analytics Resilience Pattern
 **Pattern:** Stats queries guard against schema drift so dashboards stay accurate
 - **Schema-aware revenue totals:** `ProductSeries::dailySales()` now checks whether the `order_items.total` column exists and falls back to `quantity * unit_price` calculations when older exports omit the denormalised totals, ensuring sparkline revenue values match expectations across migrations and cached datasets.【F:app/Support/Stats/Series/ProductSeries.php†L54-L115】
+- **Unified percentage formatting:** Variant analytics metrics route through `VariantAnalyticsResource::formatPercentage()` so form placeholders, table badges, and infolist entries reuse one helper instead of missing Filament facade classes when rendering percentage values in tests or exports.【F:app/Filament/Resources/VariantAnalyticsResource.php†L298-L414】【F:app/Filament/Resources/VariantAnalyticsResource/Pages/ViewVariantAnalytics.php†L61-L114】
 
 ## Filament Integration Patterns
 
