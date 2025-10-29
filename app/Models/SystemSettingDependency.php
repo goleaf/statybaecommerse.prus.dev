@@ -357,13 +357,31 @@ final class SystemSettingDependency extends Model
         $normalizedValue = $this->normalizeComparableValue($dependencyValue);
         $normalizedExpected = $this->normalizeComparableValue($expectedValue);
 
+        $comparisonOperators = [
+            'equals',
+            'not_equals',
+            'greater_than',
+            'greater_or_equals',
+            'less_than',
+            'less_or_equals',
+        ];
+
+        $comparisonResult = null;
+
+        if (in_array($operator, $comparisonOperators, true)) {
+            // Cache the comparison once so subsequent checks re-use the same
+            // normalised evaluation instead of repeating the work for every
+            // branch in the match expression below.
+            $comparisonResult = $this->compareValues($normalizedValue, $normalizedExpected);
+        }
+
         return match ($operator) {
-            'equals'            => $this->compareValues($normalizedValue, $normalizedExpected) === 0,
-            'not_equals'        => $this->compareValues($normalizedValue, $normalizedExpected) !== 0,
-            'greater_than'      => $this->compareValues($normalizedValue, $normalizedExpected) === 1,
-            'greater_or_equals' => $this->compareValues($normalizedValue, $normalizedExpected) >= 0,
-            'less_than'         => $this->compareValues($normalizedValue, $normalizedExpected) === -1,
-            'less_or_equals'    => $this->compareValues($normalizedValue, $normalizedExpected) <= 0,
+            'equals'            => $comparisonResult === 0,
+            'not_equals'        => $comparisonResult !== 0,
+            'greater_than'      => $comparisonResult === 1,
+            'greater_or_equals' => $comparisonResult >= 0,
+            'less_than'         => $comparisonResult === -1,
+            'less_or_equals'    => $comparisonResult <= 0,
             'contains'          => is_string($normalizedValue) && is_string($normalizedExpected) && str_contains($normalizedValue, $normalizedExpected),
             'not_contains'      => is_string($normalizedValue) && is_string($normalizedExpected) && ! str_contains($normalizedValue, $normalizedExpected),
             'starts_with'       => is_string($normalizedValue) && is_string($normalizedExpected) && str_starts_with($normalizedValue, $normalizedExpected),
