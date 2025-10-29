@@ -42,16 +42,17 @@ final class FeatureToggleService
         $user = $this->resolveUser($context);
         $environment = $context['environment'] ?? app()->environment();
 
-        // Capture the latest update timestamp for any matching feature flags so cache
-        // entries automatically roll when administrators create or edit toggles.
-        $latestFlagUpdate = FeatureFlag::query()
-            ->select('updated_at')
+        // Build the base query once so we can reuse it for timestamp detection and the
+        // actual lookup without accidentally diverging filtering rules between calls.
+        $flagQuery = FeatureFlag::query()
             ->where('key', $featureKey)
             ->where(function ($query) use ($environment): void {
                 $query->whereNull('environment')->orWhere('environment', $environment);
-            })
-            ->latest('updated_at')
-            ->value('updated_at');
+            });
+
+        // Capture the latest update timestamp for any matching feature flags so cache
+        // entries automatically roll when administrators create or edit toggles.
+        $latestFlagUpdate = (clone $flagQuery)->max('updated_at');
 
         $cacheVersion = $latestFlagUpdate !== null
             ? Carbon::parse($latestFlagUpdate)->format('YmdHisu')
@@ -67,12 +68,13 @@ final class FeatureToggleService
             $cacheVersion,
         );
 
-        $enabled = Cache::remember($cacheKey, now()->addSeconds(30), function () use ($featureKey, $environment, $user, $context): bool {
-            $flag = FeatureFlag::query()
-                ->where('key', $featureKey)
-                ->where(function ($query) use ($environment): void {
-                    $query->whereNull('environment')->orWhere('environment', $environment);
-                })
+        $enabled = Cache::remember($cacheKey, now()->addSeconds(30), function () use ($flagQuery, $featureKey, $environment, $user, $context): bool {
+            $flag = (clone $flagQuery)
+                // Prioritise environment-specific flags so staging or review toggles do not
+                // get overshadowed by global records that may have been inserted earlier.
+                ->orderByRaw('CASE WHEN environment = ? THEN 0 WHEN environment IS NULL THEN 1 ELSE 2 END', [$environment])
+                ->orderByDesc('priority')
+                ->latest('updated_at')
                 ->first();
 
             if ($flag !== null) {
