@@ -23,6 +23,13 @@ final class ViewDocument extends ViewRecord
 {
     protected static string $resource = DocumentResource::class;
 
+    /**
+     * Cache the audit log payload so multiple infolist callbacks do not trigger duplicate queries.
+     *
+     * @var array<int, array<string, mixed>>|null
+     */
+    private ?array $cachedAuditLogState = null;
+
     protected function getHeaderActions(): array
     {
         return [
@@ -33,21 +40,25 @@ final class ViewDocument extends ViewRecord
     public function infolist(Schema $schema): Schema
     {
         return $schema->schema([
-            InfolistSection::make(__('admin.documents.form.sections.basic_information'))
+            InfolistSection::make($this->translate('admin.documents.form.sections.basic_information', 'Document Details'))
                 ->schema([
                     InfolistTextEntry::make('name')
-                        ->label(__('admin.documents.name'))
+                        // Surface a clear label even when translations are missing.
+                        ->label($this->translate('admin.documents.fields.name', 'Name'))
                         ->weight('bold'),
                     InfolistTextEntry::make('title')
-                        ->label(__('admin.documents.title_label'))
+                        // Keep the label aligned with the form schema wording.
+                        ->label($this->translate('admin.documents.form.fields.title', 'Title'))
                         ->placeholder('-'),
                     InfolistTextEntry::make('type')
-                        ->label(__('admin.documents.type'))
+                        // Use a fallback to avoid passing translation arrays to the label API.
+                        ->label($this->translate('admin.documents.fields.type', 'Type'))
                         ->badge()
                         ->color('primary')
                         ->formatStateUsing(fn (?string $state): ?string => $state ? Str::upper($state) : null),
                     InfolistTextEntry::make('status')
-                        ->label(__('admin.documents.status'))
+                        // Reference the reusable status translation for consistency with filters.
+                        ->label($this->translate('admin.documents.form.fields.status', 'Status'))
                         ->badge()
                         ->color(fn (?string $state): string => match ($state) {
                             'draft'     => 'gray',
@@ -57,32 +68,39 @@ final class ViewDocument extends ViewRecord
                             default     => 'primary',
                         }),
                     InfolistTextEntry::make('format')
-                        ->label(__('admin.documents.format'))
+                        // Match the schema form label so administrators see familiar copy.
+                        ->label($this->translate('admin.documents.form.fields.format', 'Format'))
                         ->badge(),
                     InfolistTextEntry::make('description')
-                        ->label(__('admin.documents.description'))
+                        // Provide a human-readable fallback to avoid empty labels on missing locales.
+                        ->label($this->translate('admin.documents.fields.description', 'Description'))
                         ->markdown()
                         ->placeholder('-'),
                 ])
                 ->columns(2),
-            InfolistSection::make(__('admin.documents.form.sections.organization'))
+            InfolistSection::make($this->translate('admin.documents.form.sections.organization', 'Organization'))
                 ->schema([
                     InfolistTextEntry::make('documentable_type')
-                        ->label(__('admin.documents.documentable_type'))
+                        // Ensure the polymorphic type displays with a predictable caption.
+                        ->label($this->translate('admin.documents.form.fields.documentable_type', 'Related Type'))
                         ->placeholder('-'),
                     InfolistTextEntry::make('documentable_id')
-                        ->label(__('admin.documents.documentable_id'))
+                        // Provide a consistent ID label for the related model reference.
+                        ->label($this->translate('admin.documents.form.fields.documentable_id', 'Related ID'))
                         ->placeholder('-'),
                     InfolistTextEntry::make('creator.name')
-                        ->label(__('admin.documents.created_by'))
+                        // Reuse the creator label from the form schema.
+                        ->label($this->translate('admin.documents.form.fields.created_by', 'Created By'))
                         ->state(fn (): string => $this->resolveActorName($this->record->creator))
-                        ->placeholder(__('admin.documents.audit.system')),
+                        ->placeholder($this->translate('admin.documents.audit.system', 'System')),
                     InfolistTextEntry::make('generated_at')
-                        ->label(__('admin.documents.generated_at'))
+                        // Maintain parity with generated timestamp wording in the create/edit form.
+                        ->label($this->translate('admin.documents.form.fields.generated_at', 'Generated At'))
                         ->dateTime()
                         ->placeholder('-'),
                     InfolistTextEntry::make('expires_at')
-                        ->label(__('admin.documents.expires_at'))
+                        // Provide an explicit fallback because expiry copy is optional in translations.
+                        ->label($this->translate('admin.documents.form.fields.expires_at', 'Expires At'))
                         ->dateTime()
                         ->placeholder('-'),
                     InfolistTextEntry::make('created_at')
@@ -93,30 +111,35 @@ final class ViewDocument extends ViewRecord
                         ->dateTime(),
                 ])
                 ->columns(2),
-            InfolistSection::make(__('admin.documents.variables'))
+            InfolistSection::make($this->translate('admin.documents.variables', 'Variables'))
                 ->schema([
                     KeyValueEntry::make('variables')
-                        ->label(__('admin.documents.variables'))
-                        ->keyLabel(__('admin.documents.variable_name'))
-                        ->valueLabel(__('admin.documents.variable_value'))
+                        // Keep variable metadata readable even if translator entries are absent.
+                        ->label($this->translate('admin.documents.variables', 'Variables'))
+                        ->keyLabel($this->translate('admin.documents.variable_name', 'Variable Name'))
+                        ->valueLabel($this->translate('admin.documents.variable_value', 'Variable Value'))
                         ->visible(fn () => ! empty($this->record->variables ?? []))
-                        ->placeholder(__('admin.documents.audit.empty')),
+                        ->placeholder($this->translate('admin.documents.audit.empty', 'No entries recorded')),
                 ])
                 ->visible(fn () => ! empty($this->record->variables ?? [])),
-            InfolistSection::make(__('admin.documents.audit.title'))
+            InfolistSection::make($this->translate('admin.documents.audit.title', 'Audit Trail'))
                 ->schema([
                     RepeatableEntry::make('audit_logs')
-                        ->label(__('admin.documents.audit.title'))
+                        // Align the audit block label for each log entry.
+                        ->label($this->translate('admin.documents.audit.title', 'Audit Trail'))
                         ->state(fn (): array => $this->getAuditLogState())
                         ->schema([
                             InfolistTextEntry::make('logged_at')
-                                ->label(__('admin.documents.audit.logged_at'))
+                                // Guarantee a friendly timestamp caption when translations are missing.
+                                ->label($this->translate('admin.documents.audit.logged_at', 'Logged At'))
                                 ->badge()
                                 ->color('gray'),
                             InfolistTextEntry::make('performed_by')
-                                ->label(__('admin.documents.audit.performed_by')),
+                                // Highlight which user performed the action with a stable label.
+                                ->label($this->translate('admin.documents.audit.performed_by', 'Performed By')),
                             InfolistTextEntry::make('action_label')
-                                ->label(__('admin.documents.audit.action'))
+                                // Ensure the action label itself is translated or gracefully defaulted.
+                                ->label($this->translate('admin.documents.audit.action', 'Action'))
                                 ->badge()
                                 ->color(fn (string $state): string => match ($state) {
                                     __('admin.documents.audit_actions.created')  => 'success',
@@ -126,17 +149,20 @@ final class ViewDocument extends ViewRecord
                                     default                                      => 'secondary',
                                 }),
                             KeyValueEntry::make('before')
-                                ->label(__('admin.documents.audit.before'))
-                                ->visible(fn (array $state): bool => $state !== [])
-                                ->placeholder(__('admin.documents.audit.empty')),
+                                // Provide context when showing the previous state snapshot.
+                                ->label($this->translate('admin.documents.audit.before', 'Before'))
+                                ->visible(fn (?array $state): bool => ! empty($state))
+                                ->placeholder($this->translate('admin.documents.audit.empty', 'No entries recorded')),
                             KeyValueEntry::make('after')
-                                ->label(__('admin.documents.audit.after'))
-                                ->visible(fn (array $state): bool => $state !== [])
-                                ->placeholder(__('admin.documents.audit.empty')),
+                                // Provide context when showing the updated state snapshot.
+                                ->label($this->translate('admin.documents.audit.after', 'After'))
+                                ->visible(fn (?array $state): bool => ! empty($state))
+                                ->placeholder($this->translate('admin.documents.audit.empty', 'No entries recorded')),
                         ])
-                        ->columns(1)
-                        ->emptyLabel(__('admin.documents.audit.empty')),
+                        ->columns(1),
                 ])
+                // Hide the audit section entirely when there are no log entries to render.
+                ->visible(fn (): bool => $this->getAuditLogState() !== [])
                 ->collapsible(),
         ]);
     }
@@ -146,7 +172,11 @@ final class ViewDocument extends ViewRecord
      */
     private function getAuditLogState(): array
     {
-        return $this->record->auditLogs()
+        if ($this->cachedAuditLogState !== null) {
+            return $this->cachedAuditLogState;
+        }
+
+        $this->cachedAuditLogState = $this->record->auditLogs()
             ->with('user')
             ->limit(20)
             ->get()
@@ -168,12 +198,15 @@ final class ViewDocument extends ViewRecord
                 ];
             })
             ->toArray();
+
+        return $this->cachedAuditLogState;
     }
 
     private function resolveActorName(?User $user): string
     {
         if ($user === null) {
-            return __('admin.documents.audit.system');
+            // Default anonymous events to the system label while respecting translation fallbacks.
+            return $this->translate('admin.documents.audit.system', 'System');
         }
 
         $name = $user->getAttribute('name');
@@ -186,7 +219,7 @@ final class ViewDocument extends ViewRecord
 
         return is_string($email) && $email !== ''
             ? $email
-            : __('admin.documents.audit.system');
+            : $this->translate('admin.documents.audit.system', 'System');
     }
 
     private function translateAuditAction(string $action): string
@@ -231,5 +264,17 @@ final class ViewDocument extends ViewRecord
         $encoded = json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
         return $encoded === false ? get_debug_type($value) : $encoded;
+    }
+
+    private function translate(string $key, string $fallback): string
+    {
+        // Guard against array responses from nested translation groups and always provide a string for Filament components.
+        $translation = __($key);
+
+        if (is_string($translation)) {
+            return $translation;
+        }
+
+        return $fallback;
     }
 }
