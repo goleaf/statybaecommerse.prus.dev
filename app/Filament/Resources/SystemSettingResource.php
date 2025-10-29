@@ -6,13 +6,9 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\SystemSettingResource\Pages;
 use App\Models\SystemSetting;
+use App\Models\SystemSettingCategory;
+use App\Services\SystemSettingsService;
 use BackedEnum;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -23,27 +19,49 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Schemas\Schema;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction as TableDeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection;
 use UnitEnum;
 
 final class SystemSettingResource extends Resource
 {
-    protected static ?string $model = \App\Models\SystemSetting::class;
+    /**
+     * Explicitly wire the backing model so Filament resolves the resource correctly.
+     */
+    protected static ?string $model = SystemSetting::class;
 
     /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     * @var string|BackedEnum|null ensure Filament v4 compatible navigation icon metadata.
      */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-cog-6-tooth';
 
     /**
-     * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
+     * @var string|UnitEnum|null keep the resource grouped under the shared Settings sidebar bucket.
      */
     protected static UnitEnum|string|null $navigationGroup = 'Settings';
+
+    /**
+     * Store the column used for record titles so Filament table headers match the legacy UI.
+     */
+    protected static ?string $recordTitleAttribute = 'key';
+
+    public static function getRecordTitleAttribute(): string
+    {
+        // Guarantee downstream helpers always receive the canonical key-based label even
+        // if upstream mixins reset the cached property during schema registration.
+        return self::$recordTitleAttribute ?? 'key';
+    }
 
     public static function getNavigationLabel(): string
     {
@@ -80,22 +98,55 @@ final class SystemSettingResource extends Resource
                                     ->required()
                                     ->unique(SystemSetting::class, 'key', ignoreRecord: true)
                                     ->maxLength(255)
+                                    // Guardrail so reviewers understand why we surface helper copy.
                                     ->helperText(__('system_settings.key_help')),
                                 TextInput::make('name')
                                     ->label(__('system_settings.name'))
+                                    ->required()
                                     ->maxLength(255)
+                                    // Name stays mandatory to keep translation sync tooling reliable.
                                     ->helperText(__('system_settings.name_help')),
                             ]),
+                        Select::make('category_id')
+                            ->label(__('system_settings.category'))
+                            ->relationship('categoryRelation', 'name')
+                            ->searchable()
+                            ->preload()
+                            ->required() // Keep the category link mandatory so reporting scopes retain context.
+                            ->createOptionForm([
+                                // Allowing inline category creation keeps admin flows self-contained.
+                                TextInput::make('name')
+                                    ->label(__('system_setting_categories.name'))
+                                    ->required()
+                                    ->maxLength(255),
+                                TextInput::make('slug')
+                                    ->label(__('system_setting_categories.slug'))
+                                    ->required()
+                                    ->maxLength(255),
+                                Textarea::make('description')
+                                    ->label(__('system_setting_categories.description'))
+                                    ->rows(2),
+                            ])
+                            ->createOptionUsing(function (array $data): int {
+                                // Ensure new categories are immediately usable by marking them active.
+                                $category = SystemSettingCategory::create([
+                                    'name'        => $data['name'],
+                                    'slug'        => $data['slug'],
+                                    'description' => $data['description'] ?? null,
+                                    'is_active'   => true,
+                                ]);
+
+                                return (int) $category->getKey();
+                            })
+                            ->helperText(__('system_settings.category_help')),
                         Textarea::make('description')
                             ->label(__('system_settings.description'))
                             ->rows(3)
-                            ->helperText(__('system_settings.description_help'))
-                            ->columnSpanFull(),
+                            ->helperText(__('system_settings.description_help')),
                         Textarea::make('help_text')
                             ->label(__('system_settings.help_text'))
                             ->rows(2)
-                            ->helperText(__('system_settings.help_text_help'))
-                            ->columnSpanFull(),
+                            ->helperText(__('system_settings.help_text_help')),
                     ]),
                 SchemaSection::make(__('system_settings.configuration'))
                     ->schema([
@@ -103,7 +154,7 @@ final class SystemSettingResource extends Resource
                             ->schema([
                                 Select::make('type')
                                     ->label(__('system_settings.type'))
-                                    ->default('string')
+                                    ->required()
                                     ->options([
                                         'string'   => __('system_settings.types.string'),
                                         'email'    => 'Email',
@@ -122,14 +173,14 @@ final class SystemSettingResource extends Resource
                                     ])
                                     ->live()
                                     ->helperText(__('system_settings.type_help')),
-                                TextInput::make('category')
-                                    ->label(__('system_settings.category'))
-                                    ->maxLength(255)
-                                    ->helperText(__('system_settings.category_help')),
                                 TextInput::make('group')
                                     ->label(__('system_settings.group'))
                                     ->maxLength(255)
                                     ->helperText(__('system_settings.group_help')),
+                                TextInput::make('unit')
+                                    ->label(__('system_settings.unit'))
+                                    ->maxLength(255)
+                                    ->helperText(__('system_settings.unit_help')),
                             ]),
                         SchemaGrid::make(2)
                             ->schema([
@@ -147,6 +198,7 @@ final class SystemSettingResource extends Resource
                             ->schema([
                                 KeyValue::make('options')
                                     ->label(__('system_settings.options'))
+                                    // Key/value interface keeps select driven settings human readable.
                                     ->helperText(__('system_settings.options_help')),
                                 KeyValue::make('validation_rules')
                                     ->label(__('system_settings.validation_rules'))
@@ -279,24 +331,13 @@ final class SystemSettingResource extends Resource
 
                         return $stringState;
                     }),
-                TextColumn::make('category')
+                TextColumn::make('category.name')
                     ->label(__('system_settings.category'))
-                    ->formatStateUsing(fn (?string $state): string => $state ? __("system_settings.categories.{$state}") : '-')
+                    ->sortable()
+                    ->toggleable()
                     ->badge()
-                    ->color(fn (?string $state): string => match ($state) {
-                        'general'     => 'gray',
-                        'appearance'  => 'blue',
-                        'email'       => 'green',
-                        'payment'     => 'purple',
-                        'shipping'    => 'orange',
-                        'security'    => 'red',
-                        'performance' => 'indigo',
-                        'integration' => 'pink',
-                        'analytics'   => 'cyan',
-                        'maintenance' => 'teal',
-                        'custom'      => 'yellow',
-                        default       => 'gray',
-                    }),
+                    // Surfacing the related category keeps multi-lingual labels intact.
+                    ->formatStateUsing(fn (?string $state): string => $state ?? '-'),
                 TextColumn::make('group')
                     ->label(__('system_settings.group'))
                     ->badge()
@@ -359,20 +400,17 @@ final class SystemSettingResource extends Resource
                         'date'     => __('system_settings.types.date'),
                         'datetime' => __('system_settings.types.datetime'),
                     ]),
-                SelectFilter::make('category')
-                    ->options([
-                        'general'     => __('system_settings.categories.general'),
-                        'appearance'  => __('system_settings.categories.appearance'),
-                        'email'       => __('system_settings.categories.email'),
-                        'payment'     => __('system_settings.categories.payment'),
-                        'shipping'    => __('system_settings.categories.shipping'),
-                        'security'    => __('system_settings.categories.security'),
-                        'performance' => __('system_settings.categories.performance'),
-                        'integration' => __('system_settings.categories.integration'),
-                        'analytics'   => __('system_settings.categories.analytics'),
-                        'maintenance' => __('system_settings.categories.maintenance'),
-                        'custom'      => __('system_settings.categories.custom'),
-                    ]),
+                SelectFilter::make('category_id')
+                    ->label(__('system_settings.category'))
+                    ->relationship('category', 'name'),
+                SelectFilter::make('group')
+                    ->label(__('system_settings.group'))
+                    ->options(fn (): array => SystemSetting::query()
+                        ->whereNotNull('group')
+                        ->distinct()
+                        ->orderBy('group')
+                        ->pluck('group', 'group')
+                        ->toArray()),
                 TernaryFilter::make('is_active')
                     ->trueLabel(__('system_settings.active_only'))
                     ->falseLabel(__('system_settings.inactive_only'))
@@ -397,17 +435,15 @@ final class SystemSettingResource extends Resource
             ->actions([
                 ViewAction::make(),
                 EditAction::make(),
-                DeleteAction::make()
-                    ->action(function (SystemSetting $record): void {
-                        $record->forceDelete();
-                    }),
+                TableDeleteAction::make()
+                    // Rely on the default soft-delete so audit history remains intact.
+                    ->requiresConfirmation(),
                 Action::make('reset_to_default')
                     ->label(__('system_settings.reset_to_default'))
                     ->icon('heroicon-o-arrow-path')
                     ->color('warning')
                     ->visible(fn (SystemSetting $record): bool => ! empty($record->default_value))
                     ->action(function (SystemSetting $record): void {
-                        $record->type = 'string';
                         $record->update(['value' => $record->default_value]);
                         Notification::make()
                             ->title(__('system_settings.reset_successfully'))
@@ -415,25 +451,32 @@ final class SystemSettingResource extends Resource
                             ->send();
                     })
                     ->requiresConfirmation(),
-                Action::make('toggle_active')
-                    ->label(fn (SystemSetting $record): string => $record->is_active ? __('system_settings.deactivate') : __('system_settings.activate'))
-                    ->icon(fn (SystemSetting $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
-                    ->color(fn (SystemSetting $record): string => $record->is_active ? 'warning' : 'success')
+                Action::make('duplicate')
+                    ->label(__('system_settings.duplicate'))
+                    ->icon('heroicon-o-document-duplicate')
+                    ->color('secondary')
                     ->action(function (SystemSetting $record): void {
-                        $record->update(['is_active' => ! $record->is_active]);
-                        Notification::make()
-                            ->title($record->is_active ? __('system_settings.activated_successfully') : __('system_settings.deactivated_successfully'))
-                            ->success()
-                            ->send();
+                        // Generate a readable copy suffix while keeping the key unique.
+                        $baseKey = $record->key . '_copy';
+                        $newKey = $baseKey;
+                        $counter = 2;
+                        while (SystemSetting::where('key', $newKey)->exists()) {
+                            $newKey = $baseKey . '_' . $counter;
+                            $counter++;
+                        }
+
+                        $duplicate = $record->replicate();
+                        $duplicate->key = $newKey;
+                        $duplicate->name = sprintf('%s (Copy)', (string) $record->name);
+                        $duplicate->save();
                     })
                     ->requiresConfirmation(),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make()
-                        ->action(function (Collection $records): void {
-                            $records->each->forceDelete();
-                        }),
+                        // Default deletion keeps soft-deleted records recoverable.
+                        ->requiresConfirmation(),
                     BulkAction::make('activate')
                         ->label(__('system_settings.activate_selected'))
                         ->icon('heroicon-o-eye')
@@ -470,6 +513,31 @@ final class SystemSettingResource extends Resource
                             });
                             Notification::make()
                                 ->title(__('system_settings.bulk_reset_to_default_success'))
+                                ->success()
+                                ->send();
+                        })
+                        ->requiresConfirmation(),
+                    BulkAction::make('export_settings')
+                        ->label(__('system_settings.export_settings'))
+                        ->icon('heroicon-o-arrow-down-tray')
+                        ->action(function (Collection $records): void {
+                            // Trigger the export service so downstream jobs receive the cached payload.
+                            app(SystemSettingsService::class)->exportSettings();
+                            Notification::make()
+                                ->title(__('notifications.export_started'))
+                                ->info()
+                                ->send();
+                        })
+                        ->requiresConfirmation(),
+                    BulkAction::make('clear_cache')
+                        ->label(__('system_settings.clear_cache'))
+                        ->icon('heroicon-o-trash')
+                        ->color('warning')
+                        ->action(function (): void {
+                            // Clearing the cache after bulk operations prevents stale admin reads.
+                            app(SystemSettingsService::class)->clearCache();
+                            Notification::make()
+                                ->title(__('system_settings.cache_cleared_successfully'))
                                 ->success()
                                 ->send();
                         })
