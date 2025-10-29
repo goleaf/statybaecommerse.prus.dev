@@ -558,7 +558,14 @@ final class CustomerGroup extends Model
             $hasExplicitEnabled = array_key_exists('is_enabled', $this->attributes);
             $existingEnabled = $hasExplicitEnabled ? $this->attributes['is_enabled'] : null;
 
-            if (! $hasExplicitEnabled || $this->normalizeBoolean($existingEnabled) === false) {
+            if (
+                ! $hasExplicitEnabled
+                || ! $this->isDirty('is_enabled')
+                || $this->normalizeBoolean($existingEnabled) === false
+            ) {
+                // Allow single-flag updates (where callers only touch `is_active`) to cascade
+                // the disable, but keep divergent payloads intact when an explicit `is_enabled`
+                // value has been provided in the same request lifecycle.
                 $this->attributes['is_enabled'] = false;
             }
 
@@ -593,7 +600,14 @@ final class CustomerGroup extends Model
             $hasExplicitActive = array_key_exists('is_active', $this->attributes);
             $existingActive = $hasExplicitActive ? $this->attributes['is_active'] : null;
 
-            if (! $hasExplicitActive || $this->normalizeBoolean($existingActive) === false) {
+            if (
+                ! $hasExplicitActive
+                || ! $this->isDirty('is_active')
+                || $this->normalizeBoolean($existingActive) === false
+            ) {
+                // Keep the mirrored behaviour symmetrical so that single-flag updates continue
+                // disabling both columns while preserving deliberate divergence during combined
+                // mass-assignment operations handled by tests and Filament resources.
                 $this->attributes['is_active'] = false;
             }
 

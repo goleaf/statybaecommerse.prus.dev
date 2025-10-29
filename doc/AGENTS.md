@@ -96,7 +96,7 @@ For every file under `app/Filament/**`:
 - Treat feature toggles as environment-aware: `FeatureToggleService` now reuses a base query and explicitly orders results so scoped flags win over global defaults. Preserve that structure when extending flag evaluation logic so staging-only rollouts remain reliable.【F:app/Services/FeatureToggleService.php†L57-L83】
 - When tests disable framework features (for example setting `config('activitylog.enabled', false)`), capture the existing value and restore it in `tearDown()`/`afterEach` to avoid leaking state into subsequent suites that assert on activity log behaviour.
 - Shipping eligibility unit tests now rely on `Country::updateOrCreate()` to reuse Baltic fixtures; mirror that approach when adding resolver coverage so seeder profiles that pre-populate `countries` records do not trigger unique `cca2` collisions.
-- Customer group activation tests expect the model mutators to respect explicit divergence between `is_enabled` and `is_active`; only single-flag payloads cascade `false` assignments across both columns now, so seed data that keeps groups enabled while marking them inactive should persist without additional overrides.【F:app/Models/CustomerGroup.php†L547-L605】
+- Customer group activation tests expect the model mutators to respect explicit divergence between `is_enabled` and `is_active`; only single-flag payloads cascade `false` assignments across both columns now, and the setters consult the dirty state to detect whether a counterpart flag was explicitly set in the same payload. Seed data that keeps groups enabled while marking them inactive should persist without additional overrides.【F:app/Models/CustomerGroup.php†L545-L612】
 
 ## Coding Standards
 
