@@ -40,8 +40,8 @@ use Throwable;
 #[ScopedBy([ActiveScope::class])]
 final class SystemSettingCategory extends Model
 {
-    use LaravelHasFactory;
     use HasSlug;
+    use LaravelHasFactory;
     use LogsActivity;
     use OrdersByName;
     use SoftDeletes;
@@ -132,7 +132,7 @@ final class SystemSettingCategory extends Model
      */
     public function getActivitylogOptions(): LogOptions
     {
-        return LogOptions::defaults()->logOnly(['name', 'slug', 'description', 'is_active', 'sort_order'])->logOnlyDirty()->dontSubmitEmptyLogs()->setDescriptionForEvent(fn (string $eventName) => "System Setting Category {$eventName}")->useLogName('system_setting_categories');
+        return LogOptions::defaults()->logOnly(['name', 'slug', 'description', 'is_active', 'sort_order'])->logOnlyDirty()->dontSubmitEmptyLogs()->setDescriptionForEvent(fn (string $eventName): string => "System Setting Category {$eventName}")->useLogName('system_setting_categories');
     }
 
     /**
@@ -204,7 +204,7 @@ final class SystemSettingCategory extends Model
      */
     public function scopeWithSettings(Builder $query): Builder
     {
-        return $query->with(['settings' => function ($q) {
+        return $query->with(['settings' => function ($q): void {
             $q->active()->ordered();
         }]);
     }
@@ -214,8 +214,14 @@ final class SystemSettingCategory extends Model
      */
     public function getTranslatedName(?string $locale = null): string
     {
-        $locale = $locale ?? app()->getLocale();
-        $translation = $this->translations()->where('locale', $locale)->first();
+        // Normalise the locale so helper calls from queued jobs or artisan commands
+        // never fall back to a null locale that would bypass translation lookups.
+        $locale ??= app()->getLocale();
+
+        // Reuse a shared resolver that respects eager-loaded relations to avoid
+        // triggering redundant queries whenever the admin panels preload
+        // translations for tabbed editing experiences.
+        $translation = $this->resolveTranslationForLocale($locale);
 
         return $translation?->name ?? $this->name;
     }
@@ -225,10 +231,30 @@ final class SystemSettingCategory extends Model
      */
     public function getTranslatedDescription(?string $locale = null): ?string
     {
-        $locale = $locale ?? app()->getLocale();
-        $translation = $this->translations()->where('locale', $locale)->first();
+        // Mirror the locale resolution logic from the name helper so downstream
+        // callers experience identical fallbacks regardless of which accessor is
+        // used for rendering storefront or admin copy.
+        $locale ??= app()->getLocale();
+
+        $translation = $this->resolveTranslationForLocale($locale);
 
         return $translation?->description ?? $this->description;
+    }
+
+    /**
+     * Locate the translation for the provided locale while reusing already-loaded
+     * collections so repeated attribute reads stay free of N+1 database queries.
+     */
+    private function resolveTranslationForLocale(string $locale): ?SystemSettingCategoryTranslation
+    {
+        if ($this->relationLoaded('translations')) {
+            /** @var \Illuminate\Database\Eloquent\Collection<int, SystemSettingCategoryTranslation> $translations */
+            $translations = $this->getRelation('translations');
+
+            return $translations->firstWhere('locale', $locale);
+        }
+
+        return $this->translations()->where('locale', $locale)->first();
     }
 
     /**
@@ -305,8 +331,6 @@ final class SystemSettingCategory extends Model
 
     /**
      * Handle getSettingsByGroup functionality with proper error handling.
-     *
-     * @return Illuminate\Database\Eloquent\Collection
      */
     public function getSettingsByGroup(): \Illuminate\Database\Eloquent\Collection
     {
@@ -331,8 +355,6 @@ final class SystemSettingCategory extends Model
 
     /**
      * Handle getChildren functionality with proper error handling.
-     *
-     * @return Illuminate\Database\Eloquent\Collection
      */
     public function getChildren(): \Illuminate\Database\Eloquent\Collection
     {
@@ -341,8 +363,6 @@ final class SystemSettingCategory extends Model
 
     /**
      * Handle getAllChildren functionality with proper error handling.
-     *
-     * @return Illuminate\Database\Eloquent\Collection
      */
     public function getAllChildren(): \Illuminate\Database\Eloquent\Collection
     {

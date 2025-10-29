@@ -19,6 +19,7 @@ This repository mixes Laravel 12 and Filament v4 code. Use the following guardra
 ## Domain reference map
 
 - **Settings & System Configuration**: models such as `app/Models/SystemSetting*.php`, service logic in `app/Services/SystemSettingsService.php`, seeded via `database/seeders/SystemSetting*.php`, and panels in `app/Filament/Resources/SystemSetting*` plus `app/Filament/Resources/NormalSetting*`.
+  - When touching `SystemSettingDependency`, keep the canonical relation method named `dependsOnSettingRelation()` so query scopes can continue exposing the legacy `dependsOnSetting` builder macro without colliding with the relationship method name.
 - **Catalog & Merchandising**: core entities `app/Models/Product.php`, `app/Models/ProductVariant.php`, `app/Models/Brand.php`, `app/Models/Category.php`, supporting data transfer objects like `app/Data/ProductRequestData.php` and `app/Data/CatalogIntegrityReport.php`, importer/exporters under `app/Services/ImportExport/**`, pricing helpers in `app/Services/Pricing/**`, and admin resources like `app/Filament/Resources/Product*` and `app/Filament/Resources/Collection*`.
 - **Commerce & Orders**: order aggregates in `app/Models/Order*.php`, cart and checkout services under `app/Services/Cart/**` and `app/Services/Payments/**`, Livewire flows within `app/Livewire/Pages/Checkout*.php`, and Filament management screens in `app/Filament/Resources/Order*`.
 - **Customers & Reviews**: domain models `app/Models/Customer*.php`, `app/Models/Review*.php`, recommendation utilities in `app/Services/Recommendations/**`, customer dashboards in `app/Livewire/Pages/Account/**`, and Filament resources grouped beneath `app/Filament/Resources/Customer*` and `app/Filament/Resources/Review*`.
@@ -36,6 +37,9 @@ This repository mixes Laravel 12 and Filament v4 code. Use the following guardra
 - **Documentation diligence**: After completing fixes or features, review the contents of `docs/` for any references that need
   refreshing (runbooks, audits, closure notes). Update the relevant markdown files to mirror the behaviour you introduced and
   extend agent instructions when new recurring rules emerge.
+- **Example test placeholders**: Keep the placeholder example tests across `tests/Feature`, `tests/Unit`, `tests/Livewire`,
+  `tests/Filament`, and `tests/Http` intact. These files fuel the QA dashboards that reference legacy `ExampleTest` identifiers
+  and should remain green (skip/incomplete when simulating other states) to avoid breaking monitoring scripts.
 
 - After editing PHP or Blade files, run the quick quality loop before committing:
   1. `php -l <file>` to ensure syntax is valid.
@@ -77,6 +81,7 @@ For every file under `app/Filament/**`:
 - Keep database seeds multilingual (Lithuanian default, with English equivalents) and ensure currency formatting uses euros via `Number::currency` when rendering monetary values.
 - When you add or modify Filament resources or Livewire components, provide or update Pest tests that cover CRUD operations, authorization, and localization behavior.
 - Use factories with descriptive data to keep tests clear.
+- Treat feature toggles as environment-aware: `FeatureToggleService` now reuses a base query and explicitly orders results so scoped flags win over global defaults. Preserve that structure when extending flag evaluation logic so staging-only rollouts remain reliable.【F:app/Services/FeatureToggleService.php†L57-L83】
 
 ## Coding Standards
 
@@ -94,6 +99,7 @@ For every file under `app/Filament/**`:
 ## User Behaviour Reference
 
 - When working on preference or interaction tracking, review `docs/analysis/USER_BEHAVIOR_MODELS_UPDATE.md` for the latest aliasing and metadata guidelines introduced after the regression fixes.
+- When persisting `UserPreference` metadata payloads, ensure arrays are JSON-encoded before hitting the database; the model mutators now enforce this for consistency across SQLite and MySQL, so future changes should preserve that contract.
 
 ## Memory Bank Utilities
 

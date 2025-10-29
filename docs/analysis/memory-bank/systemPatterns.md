@@ -129,6 +129,9 @@
 - **View Caching:** Blade template caching for static content
 - **Translation Caching:** Cached translation lookups
 - **Discount Caching:** Cached discount eligibility evaluation
+- **System Setting Cache Busting:** `SystemSetting::setValue()` now clears per-setting
+  cache keys even when the array cache driver is active, preventing stale
+  configuration values from persisting between requests.
 
 ### 2. Queue Processing Pattern
 **Pattern:** Background processing for heavy operations
@@ -147,10 +150,10 @@
   SystemSettingDependency filters lower-case both the stored column values and
   the incoming terms so LIKE comparisons behave consistently across MySQL,
   PostgreSQL, and SQLite when administrators search for dependency conditions.
-- **Dependency Evaluation Reuse:** SystemSettingDependency caches the
-  normalised comparison outcome before branching through the supported
-  operators so repeated checks (equals, greater than, etc.) avoid redundant
-  conversions and keep the dependency panel snappy even with complex rules.
+  The dependency model now resolves relationships through the
+  `dependsOnSettingRelation` alias, ensuring attribute lookups remain cached
+  even while supporting the legacy scope signature that filters dependencies by
+  their controlling setting.
 
 ## Security Patterns
 
