@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Models\Concerns\OrdersByName;
+use Database\Factories\UserProductInteractionFactory;
 use DateTimeInterface;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -22,10 +24,16 @@ use Traversable;
  * Bridges legacy analytics attributes (rating/count/interaction timestamps)
  * with the newer event/meta schema so both generations of code continue to
  * operate without surprises.
+ *
+ * @use HasFactory<UserProductInteractionFactory>
+ *
+ * @phpstan-use HasFactory<UserProductInteractionFactory>
  */
 final class UserProductInteraction extends Model
 {
+    /** @phpstan-use HasFactory<UserProductInteractionFactory> */
     use HasFactory;
+
     use OrdersByName;
 
     /**
@@ -50,8 +58,12 @@ final class UserProductInteraction extends Model
      * Attribute casting rules for the consolidated payload fields.
      */
     protected $casts = [
-        'meta'        => 'array',
-        'occurred_at' => 'datetime',
+        'meta'              => 'array',
+        'occurred_at'       => 'datetime',
+        'first_interaction' => 'datetime',
+        'last_interaction'  => 'datetime',
+        'rating'            => 'float',
+        'count'             => 'integer',
     ];
 
     /**
@@ -118,11 +130,29 @@ final class UserProductInteraction extends Model
     /**
      * Provide a clean interface for the event column, while falling back to the
      * legacy interaction_type attribute if a migration has not been executed yet.
+     *
+     * @return Attribute<?string, array{event: ?string}>
      */
     protected function event(): Attribute
     {
         return Attribute::make(
-            get: static fn ($value, array $attributes): ?string => $value ?? $attributes['interaction_type'] ?? null,
+            get: static function ($value, array $attributes): ?string {
+                $event = $value ?? ($attributes['interaction_type'] ?? null);
+
+                if ($event === null) {
+                    return null;
+                }
+
+                if (is_string($event)) {
+                    return $event;
+                }
+
+                if (is_numeric($event)) {
+                    return (string) $event;
+                }
+
+                return null;
+            },
             set: static fn (?string $value): array => ['event' => $value],
         );
     }
@@ -130,6 +160,8 @@ final class UserProductInteraction extends Model
     /**
      * Synchronise the JSON meta payload with the legacy scalar columns to keep
      * historical analytics logic functioning.
+     *
+     * @return Attribute<array<string, mixed>, array<string, mixed>>
      */
     protected function meta(): Attribute
     {
@@ -140,12 +172,15 @@ final class UserProductInteraction extends Model
                 if (is_string($value) && $value !== '') {
                     try {
                         $decoded = json_decode($value, true, 512, JSON_THROW_ON_ERROR) ?: [];
-                    } catch (JsonException $exception) {
+                    } catch (JsonException) {
                         $decoded = [];
                     }
                 } elseif (is_array($value)) {
                     $decoded = $value;
                 }
+
+                /** @var array<string, mixed> $decoded */
+                $decoded = is_array($decoded) ? $decoded : [];
 
                 foreach (['rating', 'count', 'first_interaction', 'last_interaction', 'notes', 'is_anonymous', 'ip_address'] as $legacyKey) {
                     if (! array_key_exists($legacyKey, $decoded) && array_key_exists($legacyKey, $attributes)) {
@@ -157,19 +192,41 @@ final class UserProductInteraction extends Model
                     $decoded['occurred_at'] = $attributes['occurred_at'];
                 }
 
+                if (array_key_exists('rating', $decoded) && $decoded['rating'] !== null) {
+                    // Ensure the rating remains a float regardless of whether it came from JSON
+                    // decoding or the legacy scalar columns.
+                    $decoded['rating'] = is_numeric($decoded['rating'])
+                        ? (float) $decoded['rating']
+                        : null;
+                }
+
+                if (array_key_exists('count', $decoded) && $decoded['count'] !== null) {
+                    $decoded['count'] = is_numeric($decoded['count'])
+                        ? (int) $decoded['count']
+                        : null;
+                }
+
+                if (array_key_exists('is_anonymous', $decoded)) {
+                    $decoded['is_anonymous'] = (bool) $decoded['is_anonymous'];
+                }
+
                 return $decoded;
             },
             set: function ($value): array {
-                // Convert various inputs into a pure array so the JSON column stores a predictable payload.
-                $metaArray = match (true) {
-                    is_array($value) => $value,
-                    $value instanceof Arrayable => $value->toArray(),
-                    $value instanceof JsonSerializable => (array) $value->jsonSerialize(),
-                    $value instanceof \Traversable => iterator_to_array($value),
-                    default => [],
-                };
+                // Convert the provided value into a simple array so we can safely encode
+                // it to JSON before persisting it to the database.
+                $metaArray = $this->resolveMetaArray($value);
 
-                $payload = ['meta' => $metaArray === [] ? [] : $metaArray];
+                try {
+                    // Encode to JSON so SQLite/MySQL receive a string payload instead of a raw array.
+                    $encodedMeta = json_encode($metaArray, JSON_THROW_ON_ERROR);
+                } catch (JsonException) {
+                    // Fall back to an empty JSON object if encoding fails; this prevents
+                    // database binding errors while keeping the attribute predictable.
+                    $encodedMeta = json_encode([], JSON_THROW_ON_ERROR);
+                }
+
+                $payload = ['meta' => $encodedMeta];
 
                 foreach (['rating', 'count', 'first_interaction', 'last_interaction', 'notes', 'is_anonymous', 'ip_address'] as $legacyKey) {
                     if (! array_key_exists($legacyKey, $metaArray)) {
@@ -179,11 +236,11 @@ final class UserProductInteraction extends Model
                     $value = $metaArray[$legacyKey];
 
                     if ($legacyKey === 'rating' && $value !== null) {
-                        $value = (float) $value;
+                        $value = is_numeric($value) ? (float) $value : null;
                     }
 
                     if ($legacyKey === 'count' && $value !== null) {
-                        $value = (int) $value;
+                        $value = is_numeric($value) ? (int) $value : null;
                     }
 
                     if ($legacyKey === 'is_anonymous') {
@@ -193,9 +250,35 @@ final class UserProductInteraction extends Model
                     $payload[$legacyKey] = $value;
                 }
 
-                if (array_key_exists('occurred_at', $metaArray)) {
-                    $payload['occurred_at'] = $metaArray['occurred_at'];
+                $existingOccurredAt = $this->prepareTemporalValue($this->getAttribute('occurred_at'));
+                $existingFirstInteraction = $this->prepareTemporalValue($this->getAttribute('first_interaction'));
+                $existingLastInteraction = $this->prepareTemporalValue($this->getAttribute('last_interaction'));
+
+                $metaOccurredAt = $this->prepareTemporalValue($metaArray['occurred_at'] ?? null);
+                $metaFirstInteraction = $this->prepareTemporalValue($metaArray['first_interaction'] ?? null);
+                $metaLastInteraction = $this->prepareTemporalValue($metaArray['last_interaction'] ?? null);
+
+                $occurredAtFromMeta = $metaOccurredAt !== null
+                    ? $this->normaliseTimestamp($metaOccurredAt)
+                    : ($existingOccurredAt !== null ? $this->normaliseTimestamp($existingOccurredAt) : null);
+
+                if ($occurredAtFromMeta instanceof \Illuminate\Support\Carbon) {
+                    $payload['occurred_at'] = $occurredAtFromMeta;
                 }
+
+                $firstInteractionSource = $metaFirstInteraction
+                    ?? $existingFirstInteraction
+                    ?? $metaOccurredAt
+                    ?? $existingLastInteraction
+                    ?? now();
+
+                $lastInteractionSource = $metaLastInteraction
+                    ?? $existingLastInteraction
+                    ?? $metaOccurredAt
+                    ?? $firstInteractionSource;
+
+                $payload['first_interaction'] = $this->normaliseTimestamp($firstInteractionSource);
+                $payload['last_interaction'] = $this->normaliseTimestamp($lastInteractionSource);
 
                 return $payload;
             }
@@ -206,25 +289,25 @@ final class UserProductInteraction extends Model
      * Keep the occurred_at attribute aligned with the legacy last_interaction
      * timestamp so chronological reports remain accurate.
      */
+    /**
+     * @return Attribute<?Carbon, array{occurred_at: ?Carbon, last_interaction: ?Carbon}>
+     */
     protected function occurredAt(): Attribute
     {
         return Attribute::make(
-            get: static function ($value, array $attributes): ?Carbon {
+            get: function ($value, array $attributes): ?Carbon {
                 $raw = $value ?? $attributes['last_interaction'] ?? null;
 
-                if ($raw === null) {
+                $temporal = $this->prepareTemporalValue($raw);
+
+                if ($temporal === null) {
                     return null;
                 }
 
-                return $raw instanceof Carbon ? $raw : Carbon::parse($raw);
+                return $this->normaliseTimestamp($temporal);
             },
-            set: static function ($value): array {
-                $carbon = match (true) {
-                    $value instanceof Carbon => $value,
-                    $value instanceof DateTimeInterface => Carbon::instance($value),
-                    $value === null || $value === '' => null,
-                    default => Carbon::make($value) ?? Carbon::parse((string) $value),
-                };
+            set: function ($value): array {
+                $carbon = $this->normaliseTimestamp($this->prepareTemporalValue($value));
 
                 return [
                     'occurred_at'      => $carbon,
@@ -235,11 +318,117 @@ final class UserProductInteraction extends Model
     }
 
     /**
+     * Helper to coerce various datetime inputs into Carbon instances so the
+     * timestamp columns stay consistent regardless of caller payload shape.
+     */
+    private function normaliseTimestamp(DateTimeInterface|float|int|string|null $value): ?Carbon
+    {
+        if ($value instanceof Carbon) {
+            return $value;
+        }
+
+        if ($value instanceof DateTimeInterface) {
+            return Carbon::instance($value);
+        }
+
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        $date = Carbon::make($value);
+
+        if ($date instanceof Carbon) {
+            return $date;
+        }
+
+        if (is_int($value) || is_float($value)) {
+            return Carbon::createFromTimestamp((int) $value);
+        }
+
+        return Carbon::parse($value);
+    }
+
+    /**
+     * Normalise arbitrary temporal values to a subset that Carbon can parse reliably.
+     */
+    private function prepareTemporalValue(mixed $value): DateTimeInterface|float|int|string|null
+    {
+        if ($value instanceof DateTimeInterface) {
+            return $value;
+        }
+
+        if (is_int($value) || is_float($value) || is_string($value)) {
+            return $value;
+        }
+
+        return null;
+    }
+
+    /**
+     * Convert incoming meta payloads into a consistent array structure.
+     *
+     * @return array<string, mixed>
+     */
+    private function resolveMetaArray(mixed $value): array
+    {
+        if (is_array($value)) {
+            return $this->stringifyKeys($value);
+        }
+
+        if ($value instanceof Arrayable) {
+            return $this->stringifyKeys($value->toArray());
+        }
+
+        if ($value instanceof JsonSerializable) {
+            $serialised = $value->jsonSerialize();
+
+            return $this->stringifyKeys(is_array($serialised) ? $serialised : (array) $serialised);
+        }
+
+        if ($value instanceof Traversable) {
+            return $this->stringifyKeys(iterator_to_array($value));
+        }
+
+        return [];
+    }
+
+    /**
+     * Ensure array keys are consistently strings for downstream casting helpers.
+     *
+     * @param  array<mixed, mixed>  $payload
+     * @return array<string, mixed>
+     */
+    private function stringifyKeys(array $payload): array
+    {
+        $normalised = [];
+
+        foreach ($payload as $key => $item) {
+            $normalised[(string) $key] = $item;
+        }
+
+        return $normalised;
+    }
+
+    /**
      * Backwards-compatible accessor for the legacy interaction_type attribute.
      */
     public function getInteractionTypeAttribute(): ?string
     {
-        return $this->event;
+        $event = $this->getAttributeValue('event');
+
+        if ($event === null) {
+            return null;
+        }
+
+        if (is_string($event)) {
+            return $event;
+        }
+
+        if (is_numeric($event)) {
+            return (string) $event;
+        }
+
+        return null;
     }
 
     /**
@@ -252,36 +441,61 @@ final class UserProductInteraction extends Model
 
     /**
      * Relationship: the user associated with the interaction.
+     *
+     * @return BelongsTo<User, self>
+     *
+     * @phpstan-return BelongsTo<User, UserProductInteraction>
      */
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        /** @var BelongsTo<User, UserProductInteraction> $relation */
+        $relation = $this->belongsTo(User::class);
+
+        return $relation;
     }
 
     /**
      * Relationship: the product that was interacted with.
+     *
+     * @return BelongsTo<Product, self>
+     *
+     * @phpstan-return BelongsTo<Product, UserProductInteraction>
      */
     public function product(): BelongsTo
     {
-        return $this->belongsTo(Product::class)->withoutGlobalScopes([
+        /** @var BelongsTo<Product, UserProductInteraction> $relation */
+        $relation = $this->belongsTo(Product::class)->withoutGlobalScopes([
             Scopes\ActiveScope::class,
             Scopes\PublishedScope::class,
             Scopes\VisibleScope::class,
         ]);
+
+        return $relation;
     }
 
     /**
      * Relationship: the specific product variant when available.
+     *
+     * @return BelongsTo<ProductVariant, self>
+     *
+     * @phpstan-return BelongsTo<ProductVariant, UserProductInteraction>
      */
     public function variant(): BelongsTo
     {
-        return $this->belongsTo(ProductVariant::class, 'product_variant_id');
+        /** @var BelongsTo<ProductVariant, UserProductInteraction> $relation */
+        $relation = $this->belongsTo(ProductVariant::class, 'product_variant_id');
+
+        return $relation;
     }
 
     /**
      * Scope helper: limit results to a specific event name.
      */
-    public function scopeByType($query, string $event)
+    /**
+     * @param  Builder<UserProductInteraction> $query
+     * @return Builder<UserProductInteraction>
+     */
+    public function scopeByType(Builder $query, string $event): Builder
     {
         return $query->where('event', $event);
     }
@@ -289,7 +503,11 @@ final class UserProductInteraction extends Model
     /**
      * Scope helper: filter interactions by user.
      */
-    public function scopeByUser($query, int $userId)
+    /**
+     * @param  Builder<UserProductInteraction> $query
+     * @return Builder<UserProductInteraction>
+     */
+    public function scopeByUser(Builder $query, int $userId): Builder
     {
         return $query->where('user_id', $userId);
     }
@@ -297,7 +515,11 @@ final class UserProductInteraction extends Model
     /**
      * Scope helper: filter interactions by product.
      */
-    public function scopeByProduct($query, int $productId)
+    /**
+     * @param  Builder<UserProductInteraction> $query
+     * @return Builder<UserProductInteraction>
+     */
+    public function scopeByProduct(Builder $query, int $productId): Builder
     {
         return $query->where('product_id', $productId);
     }
@@ -305,7 +527,11 @@ final class UserProductInteraction extends Model
     /**
      * Scope helper: ensure interactions meet the minimum count requirement.
      */
-    public function scopeWithMinCount($query, int $minCount)
+    /**
+     * @param  Builder<UserProductInteraction> $query
+     * @return Builder<UserProductInteraction>
+     */
+    public function scopeWithMinCount(Builder $query, int $minCount): Builder
     {
         return $query->where('count', '>=', $minCount);
     }
@@ -313,7 +539,11 @@ final class UserProductInteraction extends Model
     /**
      * Scope helper: limit to interactions at or above the requested rating.
      */
-    public function scopeWithMinRating($query, float $minRating)
+    /**
+     * @param  Builder<UserProductInteraction> $query
+     * @return Builder<UserProductInteraction>
+     */
+    public function scopeWithMinRating(Builder $query, float $minRating): Builder
     {
         return $query->where('rating', '>=', $minRating);
     }
@@ -322,7 +552,11 @@ final class UserProductInteraction extends Model
      * Scope helper: limit to interactions occurring on or after the provided
      * threshold.
      */
-    public function scopeRecent($query, int $days = 30)
+    /**
+     * @param  Builder<UserProductInteraction> $query
+     * @return Builder<UserProductInteraction>
+     */
+    public function scopeRecent(Builder $query, int $days = 30): Builder
     {
         return $query->whereDate('occurred_at', '>=', now()->subDays($days));
     }
@@ -333,17 +567,20 @@ final class UserProductInteraction extends Model
      */
     public function incrementInteraction(?float $rating = null): void
     {
-        $this->increment('count');
+        $newCount = ((int) $this->count) + 1;
 
+        /** @var array<string, mixed> $meta */
         $meta = $this->meta;
         $meta['rating'] = $rating ?? $this->rating;
+        $meta['count'] = $newCount;
         $meta['last_interaction'] = now();
 
         $this->update([
-            'occurred_at'      => now(),
-            'meta'             => $meta,
+            'count'            => $newCount,
             'rating'           => $meta['rating'],
             'last_interaction' => $meta['last_interaction'],
+            'occurred_at'      => $meta['last_interaction'],
+            'meta'             => $meta,
         ]);
     }
 }
