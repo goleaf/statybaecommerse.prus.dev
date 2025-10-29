@@ -69,7 +69,7 @@
         @vite(['resources/css/app.scss', 'resources/js/app.js'])
     @else
         <link rel="stylesheet" href="{{ asset('css/app.css') }}">
-        <script src="{{ asset('js/app.js') }}" defer></script>
+        <script type="module" src="{{ asset('js/app.js') }}" defer></script>
     @endif
 
     @stack('styles')
