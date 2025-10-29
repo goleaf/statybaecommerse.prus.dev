@@ -50,6 +50,8 @@ final class UserProductInteraction extends Model
      * Attribute casting rules for the consolidated payload fields.
      */
     protected $casts = [
+        // Cast rating to float so incremental updates preserve decimal precision for analytics.
+        'rating'      => 'float',
         'meta'        => 'array',
         'occurred_at' => 'datetime',
     ];
@@ -63,7 +65,7 @@ final class UserProductInteraction extends Model
     {
         parent::booted();
 
-        static::creating(function (self $interaction): void {
+        self::creating(function (self $interaction): void {
             // Resolve the effective occurrence timestamp before mutating the
             // legacy attributes, allowing fallbacks for inserts that only
             // specify the modern occurred_at column.
@@ -187,6 +189,15 @@ final class UserProductInteraction extends Model
 
                 if (! array_key_exists('occurred_at', $decoded) && array_key_exists('occurred_at', $attributes)) {
                     $decoded['occurred_at'] = $attributes['occurred_at'];
+                }
+
+                // Normalise numeric fields so downstream comparisons do not break due to JSON encoding quirks.
+                if (array_key_exists('rating', $decoded) && is_numeric($decoded['rating'])) {
+                    $decoded['rating'] = (float) $decoded['rating'];
+                }
+
+                if (array_key_exists('count', $decoded) && is_numeric($decoded['count'])) {
+                    $decoded['count'] = (int) $decoded['count'];
                 }
 
                 return $decoded;
@@ -376,17 +387,32 @@ final class UserProductInteraction extends Model
      */
     public function incrementInteraction(?float $rating = null): void
     {
+        // Compute the next counter value locally so the JSON meta payload can
+        // stay in sync with the atomic increment executed against the table.
+        $nextCount = (int) $this->count + 1;
+
+        // Bump the persisted counter column first, ensuring concurrent updates
+        // do not lose the legacy `count` value that downstream reports expect.
         $this->increment('count');
 
+        // Rebuild the consolidated meta structure with the refreshed counter,
+        // rating information, and interaction timestamp mirror.
         $meta = $this->meta;
-        $meta['rating'] = $rating ?? $this->rating;
+        $meta['count'] = $nextCount;
+
+        $resolvedRating = $rating ?? ($meta['rating'] ?? $this->rating);
+        $meta['rating'] = $resolvedRating !== null ? (float) $resolvedRating : null;
+
         $meta['last_interaction'] = now();
 
-        $this->update([
-            'occurred_at'      => now(),
+        // Force fill the legacy columns so fillable restrictions do not block
+        // the synchronous update of the mirrored analytics fields.
+        $this->forceFill([
+            'count'            => $nextCount,
+            'occurred_at'      => $meta['last_interaction'],
+            'last_interaction' => $meta['last_interaction'],
             'meta'             => $meta,
             'rating'           => $meta['rating'],
-            'last_interaction' => $meta['last_interaction'],
-        ]);
+        ])->save();
     }
 }
