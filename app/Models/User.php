@@ -74,7 +74,9 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
         });
     }
 
-    public array $translatable = ['first_name', 'last_name', 'bio', 'company', 'position', 'website'];
+    // Restrict translations to profile fields that genuinely need locale-specific content to
+    // keep core identity columns (first/last name) stored as simple strings for authentication flows.
+    public array $translatable = ['bio', 'company', 'position', 'website'];
 
     protected $fillable = ['name', 'email', 'password', 'preferred_locale', 'preferred_currency', 'newsletter_subscription', 'sms_notifications', 'email_verified_at', 'first_name', 'last_name', 'gender', 'phone_number', 'birth_date', 'timezone', 'opt_in', 'phone', 'date_of_birth', 'is_active', 'accepts_marketing', 'two_factor_enabled', 'last_login_at', 'preferences', 'avatar_url', 'last_login_ip', 'is_admin', 'is_verified', 'company', 'job_title', 'bio', 'company', 'position', 'website', 'social_links', 'notification_preferences', 'privacy_settings', 'marketing_preferences', 'permissions_matrix', 'login_count', 'last_activity_at', 'email_verified_at', 'phone_verified_at', 'two_factor_secret', 'two_factor_recovery_codes', 'two_factor_confirmed_at', 'remember_token', 'api_token', 'stripe_customer_id', 'stripe_account_id', 'subscription_status', 'subscription_plan', 'subscription_ends_at', 'trial_ends_at', 'status', 'verification_token', 'password_reset_token', 'password_reset_expires_at', 'referral_code', 'referral_code_generated_at', 'referral_settings'];
 
