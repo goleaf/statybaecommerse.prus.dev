@@ -21,7 +21,6 @@ final class CartItemFactory extends Factory
     {
         $quantity = $this->faker->numberBetween(1, 5);
         $unitPrice = $this->faker->randomFloat(2, 10, 500);
-        $totalPrice = $quantity * $unitPrice;
 
         return [
             'session_id'       => $this->faker->uuid(),
@@ -32,9 +31,30 @@ final class CartItemFactory extends Factory
             'minimum_quantity' => 1,
             'unit_price'       => $unitPrice,
             // Seed a nominal discount so calculations that rely on the column remain realistic.
-            'discount_amount'  => 0.0,
-            'price'            => $unitPrice,  // Add the missing price field
-            'total_price'      => $totalPrice,
+            'discount_amount' => 0.0,
+            // Keep the "price" column in sync with the resolved unit price so downstream
+            // calculations stay deterministic even when factories override the unit price.
+            'price' => static function (array $attributes): float {
+                // Default to the resolved unit price so overriding either attribute keeps
+                // the persisted values synchronised for pricing calculations.
+                /** @var mixed $rawUnitPrice */
+                $rawUnitPrice = $attributes['unit_price'] ?? 0.0;
+
+                return is_numeric($rawUnitPrice) ? (float) $rawUnitPrice : 0.0;
+            },
+            // Mirror the derived subtotal based on whichever quantity/unit price combo the
+            // caller finalises, allowing test overrides to remain authoritative.
+            'total_price' => static function (array $attributes) use ($quantity): float {
+                /** @var mixed $rawUnitPrice */
+                $rawUnitPrice = $attributes['unit_price'] ?? 0.0;
+                /** @var mixed $rawQuantity */
+                $rawQuantity = $attributes['quantity'] ?? $quantity;
+
+                $resolvedUnitPrice = is_numeric($rawUnitPrice) ? (float) $rawUnitPrice : 0.0;
+                $resolvedQuantity = is_numeric($rawQuantity) ? (int) $rawQuantity : $quantity;
+
+                return $resolvedUnitPrice * $resolvedQuantity;
+            },
             'product_snapshot' => [
                 'name'        => $this->faker->words(3, true),
                 'price'       => $unitPrice,
@@ -63,7 +83,7 @@ final class CartItemFactory extends Factory
      */
     public function guest(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'user_id'    => null,
             'session_id' => 'guest-' . $this->faker->uuid(),
         ]);
@@ -74,16 +94,24 @@ final class CartItemFactory extends Factory
      */
     public function withVariant(): static
     {
-        return $this->state(function (array $attributes) {
+        return $this->state(function (array $attributes): array {
             $variant = ProductVariant::factory()->create([
                 'product_id' => $attributes['product_id'] ?? Product::factory(),
             ]);
 
+            /** @var mixed $rawUnitPrice */
+            $rawUnitPrice = $attributes['unit_price'] ?? 0.0;
+            /** @var mixed $rawQuantity */
+            $rawQuantity = $attributes['quantity'] ?? 1;
+
+            $resolvedUnitPrice = $variant->price ?? (is_numeric($rawUnitPrice) ? (float) $rawUnitPrice : 0.0);
+            $resolvedQuantity = is_numeric($rawQuantity) ? (int) $rawQuantity : 1;
+
             return [
                 'variant_id'  => $variant->id,
                 'product_id'  => $variant->product_id,
-                'unit_price'  => $variant->price ?? $attributes['unit_price'],
-                'total_price' => ($variant->price ?? $attributes['unit_price']) * $attributes['quantity'],
+                'unit_price'  => $resolvedUnitPrice,
+                'total_price' => $resolvedUnitPrice * $resolvedQuantity,
             ];
         });
     }
@@ -93,12 +121,17 @@ final class CartItemFactory extends Factory
      */
     public function highQuantity(): static
     {
-        return $this->state(function (array $attributes) {
+        return $this->state(function (array $attributes): array {
             $quantity = $this->faker->numberBetween(10, 50);
+
+            /** @var mixed $rawUnitPrice */
+            $rawUnitPrice = $attributes['unit_price'] ?? 0.0;
+
+            $resolvedUnitPrice = is_numeric($rawUnitPrice) ? (float) $rawUnitPrice : 0.0;
 
             return [
                 'quantity'    => $quantity,
-                'total_price' => $attributes['unit_price'] * $quantity,
+                'total_price' => $resolvedUnitPrice * $quantity,
             ];
         });
     }
@@ -108,13 +141,20 @@ final class CartItemFactory extends Factory
      */
     public function expensive(): static
     {
-        return $this->state(function (array $attributes) {
+        return $this->state(function (array $attributes): array {
             $unitPrice = $this->faker->randomFloat(2, 500, 2000);
+
+            /** @var mixed $rawQuantity */
+            $rawQuantity = $attributes['quantity'] ?? 1;
+            $resolvedQuantity = is_numeric($rawQuantity) ? (int) $rawQuantity : 1;
+
+            $existingSnapshot = $attributes['product_snapshot'] ?? [];
+            $snapshot = is_array($existingSnapshot) ? $existingSnapshot : [];
 
             return [
                 'unit_price'       => $unitPrice,
-                'total_price'      => $unitPrice * $attributes['quantity'],
-                'product_snapshot' => array_merge($attributes['product_snapshot'] ?? [], [
+                'total_price'      => $unitPrice * $resolvedQuantity,
+                'product_snapshot' => array_merge($snapshot, [
                     'price'    => $unitPrice,
                     'category' => 'Premium',
                 ]),
@@ -127,7 +167,7 @@ final class CartItemFactory extends Factory
      */
     public function forSession(string $sessionId): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'session_id' => $sessionId,
         ]);
     }
@@ -137,7 +177,7 @@ final class CartItemFactory extends Factory
      */
     public function forUser(User $user): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'user_id' => $user->id,
         ]);
     }
@@ -147,12 +187,25 @@ final class CartItemFactory extends Factory
      */
     public function forProduct(Product $product): static
     {
-        return $this->state(function (array $attributes) use ($product) {
+        return $this->state(function (array $attributes) use ($product): array {
+            /** @var mixed $rawUnitPrice */
+            $rawUnitPrice = $attributes['unit_price'] ?? 0.0;
+            /** @var mixed $rawQuantity */
+            $rawQuantity = $attributes['quantity'] ?? 1;
+
+            $resolvedUnitPrice = is_numeric($product->price)
+                ? (float) $product->price
+                : (is_numeric($rawUnitPrice) ? (float) $rawUnitPrice : 0.0);
+            $resolvedQuantity = is_numeric($rawQuantity) ? (int) $rawQuantity : 1;
+
+            $existingSnapshot = $attributes['product_snapshot'] ?? [];
+            $snapshot = is_array($existingSnapshot) ? $existingSnapshot : [];
+
             return [
                 'product_id'       => $product->id,
-                'unit_price'       => $product->price ?? $attributes['unit_price'],
-                'total_price'      => ($product->price ?? $attributes['unit_price']) * $attributes['quantity'],
-                'product_snapshot' => array_merge($attributes['product_snapshot'] ?? [], [
+                'unit_price'       => $resolvedUnitPrice,
+                'total_price'      => $resolvedUnitPrice * $resolvedQuantity,
+                'product_snapshot' => array_merge($snapshot, [
                     'name'        => $product->name,
                     'price'       => $product->price,
                     'sku'         => $product->sku,
@@ -167,7 +220,7 @@ final class CartItemFactory extends Factory
      */
     public function old(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'created_at' => $this->faker->dateTimeBetween('-30 days', '-8 days'),
             'updated_at' => $this->faker->dateTimeBetween('-30 days', '-8 days'),
         ]);
@@ -178,7 +231,7 @@ final class CartItemFactory extends Factory
      */
     public function recent(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'created_at' => $this->faker->dateTimeBetween('-1 day', 'now'),
             'updated_at' => $this->faker->dateTimeBetween('-1 day', 'now'),
         ]);
@@ -189,7 +242,7 @@ final class CartItemFactory extends Factory
      */
     public function minimalSnapshot(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'product_snapshot' => [
                 'name'  => $this->faker->words(2, true),
                 'price' => $attributes['unit_price'],
