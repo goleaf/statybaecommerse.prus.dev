@@ -238,7 +238,20 @@ final class TestingDatabase
                     ]);
                 }
 
-                if (! Schema::connection('sqlite')->hasTable('users')) {
+                $schema = Schema::connection('sqlite');
+
+                if (! $schema->hasTable('users')) {
+                    self::provisionFallbackSchema();
+                } elseif (
+                    ! $schema->hasTable('system_setting_categories') ||
+                    ! $schema->hasTable('system_setting_category_translations') ||
+                    ! $schema->hasTable('system_settings') ||
+                    ! $schema->hasTable('system_setting_translations')
+                ) {
+                    // When test processes run in parallel the underlying SQLite file can
+                    // momentarily disappear between migration calls. Ensuring the system
+                    // setting tables exist after the primary migration keeps factories and
+                    // resource tests stable even if another worker refreshed the schema.
                     self::provisionFallbackSchema();
                 }
 
@@ -512,11 +525,47 @@ final class TestingDatabase
                 $table->integer('sort_order')->default(0);
                 $table->boolean('is_active')->default(true);
                 $table->unsignedBigInteger('parent_id')->nullable();
+                $table->string('template')->nullable();
+                $table->json('metadata')->nullable();
+                $table->boolean('is_collapsible')->default(true);
+                $table->boolean('show_in_sidebar')->default(true);
+                $table->string('permission')->nullable();
+                $table->json('tags')->nullable();
                 $table->timestamps();
                 $table->softDeletes();
 
                 $table->index(['is_active', 'sort_order']);
                 $table->index('parent_id');
+                $table->index(['is_collapsible', 'is_active']);
+                $table->index(['show_in_sidebar', 'is_active']);
+                $table->index('permission');
+            });
+        } else {
+            $schema->table('system_setting_categories', function (Blueprint $table) use ($schema): void {
+                // Backfill the enhanced schema if an earlier fallback created a slim table.
+                if (! $schema->hasColumn('system_setting_categories', 'template')) {
+                    $table->string('template')->nullable()->after('color');
+                }
+
+                if (! $schema->hasColumn('system_setting_categories', 'metadata')) {
+                    $table->json('metadata')->nullable()->after('template');
+                }
+
+                if (! $schema->hasColumn('system_setting_categories', 'is_collapsible')) {
+                    $table->boolean('is_collapsible')->default(true)->after('metadata');
+                }
+
+                if (! $schema->hasColumn('system_setting_categories', 'show_in_sidebar')) {
+                    $table->boolean('show_in_sidebar')->default(true)->after('is_collapsible');
+                }
+
+                if (! $schema->hasColumn('system_setting_categories', 'permission')) {
+                    $table->string('permission')->nullable()->after('show_in_sidebar');
+                }
+
+                if (! $schema->hasColumn('system_setting_categories', 'tags')) {
+                    $table->json('tags')->nullable()->after('permission');
+                }
             });
         }
 
@@ -536,6 +585,7 @@ final class TestingDatabase
                 $table->boolean('is_encrypted')->default(false);
                 $table->boolean('is_readonly')->default(false);
                 $table->json('validation_rules')->nullable();
+                $table->string('validation_message')->nullable();
                 $table->json('options')->nullable();
                 $table->text('default_value')->nullable();
                 $table->integer('sort_order')->default(0);
@@ -566,6 +616,29 @@ final class TestingDatabase
                 $table->index(['group', 'is_active']);
                 $table->index(['is_public', 'is_active']);
                 $table->index('updated_by');
+            });
+        } else {
+            $schema->table('system_settings', function (Blueprint $table) use ($schema): void {
+                if (! $schema->hasColumn('system_settings', 'validation_message')) {
+                    // Ensure fallback schemas expose the validation_message column expected by
+                    // the production migrations so DTO factories remain consistent.
+                    $table->string('validation_message')->nullable()->after('validation_rules');
+                }
+            });
+        }
+
+        // Guard translation tables so localized factories succeed even if migrations
+        // were interrupted by a parallel worker resetting the SQLite datastore.
+        if (! $schema->hasTable('system_setting_category_translations')) {
+            $schema->create('system_setting_category_translations', function (Blueprint $table): void {
+                $table->id();
+                $table->unsignedBigInteger('system_setting_category_id');
+                $table->string('locale', 5);
+                $table->string('name');
+                $table->text('description')->nullable();
+                $table->timestamps();
+
+                $table->unique(['system_setting_category_id', 'locale'], 'system_setting_cat_locale_unique');
             });
         }
 
