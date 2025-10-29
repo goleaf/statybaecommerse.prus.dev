@@ -141,6 +141,10 @@
 - **Translation Indexes:** Locale-based content retrieval
 - **Pricing Indexes:** Currency and zone-based pricing lookups
 - **Performance Monitoring:** Query optimization with Laravel Telescope
+- **Case-insensitive Search Normalisation:** Query scopes such as the
+  SystemSettingDependency filters lower-case both the stored column values and
+  the incoming terms so LIKE comparisons behave consistently across MySQL,
+  PostgreSQL, and SQLite when administrators search for dependency conditions.
 
 ## Security Patterns
 
