@@ -8,12 +8,17 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Schema;
 
 class NewsCommentForm
 {
-    public static function configure(Form $form): Form
+    /**
+     * Build the News Comment authoring schema so Filament renders a consistent admin form layout.
+     */
+    public static function configure(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 SchemaGrid::make()
                     ->schema([
