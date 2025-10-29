@@ -21,6 +21,7 @@
 - **TaxCalculator:** Geographic tax calculation service
 - **DocumentService:** Template processing and PDF generation
 - **SimpleJsonSchemaValidator:** Schema enforcement utility with `oneOf`/array handling to keep public contracts aligned with published specs.
+- **ExportService:** Dispatches the `ProcessExportJob` alias so legacy queue assertions still detect export scheduling while the modern `ProcessExport` handler provides the shared execution path.【F:app/Services/Export/ExportService.php†L189-L204】
 
 ### 4. Action Pattern
 **Implementation:** Complex operations as single-purpose action classes
