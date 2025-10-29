@@ -94,7 +94,11 @@ final class VariantPriceHistory extends Model
             return 0;
         }
 
-        return (($this->new_price - $this->old_price) / $this->old_price) * 100;
+        $percentageChange = (($this->new_price - $this->old_price) / $this->old_price) * 100;
+
+        // Always present the percentage change rounded to two decimal places so UI badges
+        // and analytics exports share the exact value expected by regression tests.
+        return round($percentageChange, 2);
     }
 
     /**
