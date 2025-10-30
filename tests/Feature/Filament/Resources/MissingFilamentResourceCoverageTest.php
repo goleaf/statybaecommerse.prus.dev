@@ -136,6 +136,8 @@ final class MissingFilamentResourceCoverageTest extends TestCase
             'product variants'          => [ListProductVariants::class, 'createProductVariantRecord'],
             'recommendation analytics'  => [ListRecommendationAnalytics::class, 'createRecommendationAnalyticsRecord'],
             'referral campaigns'        => [ListReferralCampaigns::class, 'createReferralCampaignRecord'],
+            'referral code usage logs'  => [ListReferralCodeUsageLogs::class, 'createReferralCodeUsageLogRecord'],
+            'referral reward logs'      => [ListReferralRewardLogs::class, 'createReferralRewardLogRecord'],
             'slider translations'       => [ListSliderTranslations::class, 'createSliderTranslationRecord'],
             'system setting categories' => [ListSystemSettingCategories::class, 'createSystemSettingCategoryRecord'],
             'system setting category translations' => [ListSystemSettingCategoryTranslations::class, 'createSystemSettingCategoryTranslationRecord'],
