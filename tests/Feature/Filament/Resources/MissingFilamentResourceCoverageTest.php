@@ -24,6 +24,7 @@ use App\Filament\Resources\PriceListItemResource\Pages\ListPriceListItems;
 use App\Filament\Resources\PriceListResource\Pages\ListPriceLists;
 use App\Filament\Resources\PriceResource\Pages\ListPrices;
 use App\Filament\Resources\ProductVariantResource\Pages\ListProductVariants;
+use App\Filament\Resources\ReferralCodeUsageLogResource\Pages\ListReferralCodeUsageLogs;
 use App\Filament\Resources\RecommendationAnalyticsResource\Pages\ListRecommendationAnalytics;
 use App\Filament\Resources\RecommendationConfigResourceSimple\Pages\ListRecommendationConfigSimples;
 use App\Filament\Resources\ReferralCampaignResource\Pages\ListReferralCampaigns;
@@ -158,6 +159,7 @@ final class MissingFilamentResourceCoverageTest extends TestCase
             'normal setting translations' => [ListNormalSettingTranslations::class, 'createNormalSettingTranslationRecord'],
             'posts'                     => [ListPosts::class, 'createPostRecord'],
             'product variants'          => [ListProductVariants::class, 'createProductVariantRecord'],
+            'referral code usage logs'  => [ListReferralCodeUsageLogs::class, 'createReferralCodeUsageLogRecord'],
             'recommendation analytics'  => [ListRecommendationAnalytics::class, 'createRecommendationAnalyticsRecord'],
             'recommendation simple list'    => [ListRecommendationConfigResourceSimples::class, 'createRecommendationConfigSimpleRecord'],
             'recommendation simple alias'   => [ListRecommendationConfigSimples::class, 'createRecommendationConfigSimpleRecord'],
