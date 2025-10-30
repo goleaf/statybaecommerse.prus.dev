@@ -22,14 +22,37 @@ use App\Policies\RolePolicy;
 use App\Policies\SystemSettingPolicy;
 use App\Policies\UserPolicy;
 use App\Support\Authorization\AuthorizationMatrix;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Gate;
 use Spatie\Permission\PermissionRegistrar;
 
 beforeEach(function (): void {
+    // Ensure policy checks exercise the configured matrix instead of
+    // short-circuiting through the testing bypass toggle.
+    Config::set('authorization.testing.skip_checks', false);
+
+    // Reset the global gate bypass that the AuthServiceProvider enables
+    // during unit tests so individual policy evaluations rely solely on
+    // configured permissions.
+    $gate = Gate::getFacadeRoot();
+
+    if ($gate !== null) {
+        $reflection = new \ReflectionClass($gate);
+
+        if ($reflection->hasProperty('beforeCallbacks')) {
+            $property = $reflection->getProperty('beforeCallbacks');
+            $property->setAccessible(true);
+            $property->setValue($gate, []);
+        }
+    }
+
     app(PermissionRegistrar::class)->forgetCachedPermissions();
 });
 
 function policyUser(string $role): User
 {
+    // Construct an in-memory user instance with the desired role to ensure
+    // matrix evaluations remain independent of persisted permissions.
     $user = User::factory()->make([
         'id' => random_int(1, PHP_INT_MAX),
     ]);
