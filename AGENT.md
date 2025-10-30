@@ -49,6 +49,7 @@ This application is a Laravel application and its main Laravel ecosystems packag
 - You must only create documentation files if explicitly requested by the user.
 - Canonical admin login for Filament remains `admin@example.com` with the password `admin123`; remove or avoid seeding extra
   administrator accounts so automated browser checks stay reliable.
+- Recommendation configuration combobox helpers now have dedicated coverage in `tests/Filament/RecommendationConfigResourceSimpleHelperTest.php`; keep those tests aligned when changing Filament schemas so follow-up tasks inherit the same invariants.
 
 
 === boost rules ===
