@@ -37,6 +37,9 @@ abstract class TestCase extends BaseTestCase
 
     protected function setUp(): void
     {
+        // Increase the memory limit for the feature-rich Filament panel tests so resource discovery doesn't exhaust CLI limits.
+        ini_set('memory_limit', '1024M');
+
         if (! class_exists(TestingDatabase::class) && file_exists(__DIR__ . '/Support/TestingDatabase.php')) {
             require_once __DIR__ . '/Support/TestingDatabase.php';
         }

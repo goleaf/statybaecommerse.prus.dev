@@ -83,10 +83,28 @@ final class Nav
         if (app()->environment('testing')) {
             $shouldDiscover = (bool) config('filament.testing.autodiscover_resources', true);
 
+            $envAutodiscover = getenv('FILAMENT_TESTING_AUTODISCOVER');
+            if ($envAutodiscover !== false) {
+                // Honour per-suite environment overrides so memory-constrained tests can cap resource discovery.
+                $shouldDiscover = filter_var($envAutodiscover, FILTER_VALIDATE_BOOL, [
+                    'options' => ['default' => true],
+                ]);
+            }
+
             if (! $shouldDiscover) {
+                $configuredResources = (array) config('filament.testing.resources', []);
+
+                $envResources = getenv('FILAMENT_TESTING_RESOURCES');
+                if ($envResources !== false) {
+                    $configuredResources = array_merge(
+                        $configuredResources,
+                        array_filter(array_map('trim', explode(',', $envResources))),
+                    );
+                }
+
                 /** @var array<class-string<resource>> $configured */
                 $configured = array_values(array_filter(
-                    (array) config('filament.testing.resources', []),
+                    $configuredResources,
                     static fn (mixed $resource): bool => is_string($resource) &&
                         class_exists($resource) &&
                         is_subclass_of($resource, Resource::class),
