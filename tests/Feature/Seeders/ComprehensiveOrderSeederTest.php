@@ -9,7 +9,6 @@ use App\Models\OrderItem;
 use App\Models\OrderShipping;
 use App\Models\Product;
 use App\Models\User;
-use App\Models\Zone;
 use Database\Seeders\ComprehensiveOrderSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -19,8 +18,6 @@ it('feature: creates orders using factory relationships', function () {
     // Create prerequisite data
     User::factory(10)->create();
     Product::factory(5)->create();
-    Zone::factory()->create(['is_default' => true]);
-
     $seeder = new ComprehensiveOrderSeeder;
     $seeder->run();
 
@@ -40,8 +37,6 @@ it('feature: creates orders using factory relationships', function () {
 it('feature: creates order items using factory relationships', function () {
     User::factory(5)->create();
     Product::factory(3)->create();
-    Zone::factory()->create(['is_default' => true]);
-
     $seeder = new ComprehensiveOrderSeeder;
     $seeder->run();
 
@@ -59,8 +54,6 @@ it('feature: creates order items using factory relationships', function () {
 it('feature: creates order shipping using factory relationships', function () {
     User::factory(5)->create();
     Product::factory(3)->create();
-    Zone::factory()->create(['is_default' => true]);
-
     $seeder = new ComprehensiveOrderSeeder;
     $seeder->run();
 
@@ -77,8 +70,6 @@ it('feature: creates order shipping using factory relationships', function () {
 it('feature: creates documents using factory relationships when templates exist', function () {
     User::factory(5)->create();
     Product::factory(3)->create();
-    Zone::factory()->create(['is_default' => true]);
-
     // Create document templates
     DocumentTemplate::factory()->create(['type' => 'invoice']);
     DocumentTemplate::factory()->create(['type' => 'receipt']);
@@ -107,14 +98,11 @@ it('feature: ensures required data is created when missing', function () {
     // Verify prerequisite data was created
     expect(User::count())->toBeGreaterThanOrEqual(50);
     expect(Product::count())->toBeGreaterThanOrEqual(20);
-    expect(Zone::count())->toBeGreaterThan(0);
 });
 
 it('feature: creates orders for specified time periods', function () {
     User::factory(10)->create();
     Product::factory(5)->create();
-    Zone::factory()->create(['is_default' => true]);
-
     $seeder = new ComprehensiveOrderSeeder;
     $seeder->run();
 
@@ -139,8 +127,6 @@ it('feature: creates orders for specified time periods', function () {
 it('feature: maintains proper order status and payment status relationships', function () {
     User::factory(10)->create();
     Product::factory(5)->create();
-    Zone::factory()->create(['is_default' => true]);
-
     $seeder = new ComprehensiveOrderSeeder;
     $seeder->run();
 
@@ -161,8 +147,6 @@ it('feature: maintains proper order status and payment status relationships', fu
 it('feature: creates proper order item relationships without duplicates', function () {
     User::factory(5)->create();
     Product::factory(3)->create();
-    Zone::factory()->create(['is_default' => true]);
-
     $seeder = new ComprehensiveOrderSeeder;
     $seeder->run();
 
