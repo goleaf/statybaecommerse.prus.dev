@@ -7,7 +7,11 @@ namespace Tests\Feature\Filament\Resources;
 use App\Filament\Resources\ActivityLogResource\Pages\ListActivityLogs;
 use App\Filament\Resources\AuditTrailResource\Pages\ListAuditTrails;
 use App\Filament\Resources\BrandResource\Pages\ListBrands;
+use App\Filament\Resources\CampaignConversionResource\Pages\ListCampaignConversions;
 use App\Filament\Resources\CampaignResource\Pages\ListCampaigns;
+use App\Filament\Resources\CampaignScheduleResource\Pages\ListCampaignSchedules;
+use App\Filament\Resources\CampaignViewResource\Pages\ListCampaignViews;
+use App\Filament\Resources\CartItemResource\Pages\ListCartItems;
 use App\Filament\Resources\CityResource\Pages\ListCities;
 use App\Filament\Resources\CollectionResource\Pages\ListCollections;
 use App\Filament\Resources\CollectionRuleResource\Pages\ListCollectionRules;
@@ -16,8 +20,12 @@ use App\Filament\Resources\DocumentTemplateResource\Pages\ListDocumentTemplates;
 use App\Filament\Resources\EnumManagementResource\Pages\ListEnumManagement;
 use App\Filament\Resources\NormalSettingTranslationResource\Pages\ListNormalSettingTranslations;
 use App\Filament\Resources\PostResource\Pages\ListPosts;
+use App\Filament\Resources\PriceListItemResource\Pages\ListPriceListItems;
+use App\Filament\Resources\PriceListResource\Pages\ListPriceLists;
+use App\Filament\Resources\PriceResource\Pages\ListPrices;
 use App\Filament\Resources\ProductVariantResource\Pages\ListProductVariants;
 use App\Filament\Resources\RecommendationAnalyticsResource\Pages\ListRecommendationAnalytics;
+use App\Filament\Resources\RecommendationConfigResourceSimple\Pages\ListRecommendationConfigSimples;
 use App\Filament\Resources\ReferralCampaignResource\Pages\ListReferralCampaigns;
 use App\Filament\Resources\VariantCombinationResource\Pages\ListVariantCombinations;
 use App\Filament\Resources\SliderTranslationResource\Pages\ListSliderTranslations;
@@ -30,11 +38,16 @@ use App\Filament\Resources\SystemSettingTranslationResource\Pages\ListSystemSett
 use App\Filament\Resources\SystemSettingsResource\Pages\ListSystemSettings as PanelListSystemSettings;
 use App\Filament\Resources\UserManagementResource\Pages\ListUsers;
 use App\Filament\Resources\UserPreferenceResource\Pages\ListUserPreferences;
+use App\Filament\Resources\UserWishlistResource\Pages\ListUserWishlists;
 use App\Filament\Resources\VariantStockResource\Pages\ListVariantStocks;
 use App\Models\ActivityLog;
 use App\Models\AuditTrail;
 use App\Models\Brand;
 use App\Models\Campaign;
+use App\Models\CampaignConversion;
+use App\Models\CampaignSchedule;
+use App\Models\CampaignView;
+use App\Models\CartItem;
 use App\Models\City;
 use App\Models\Collection;
 use App\Models\CollectionRule;
@@ -48,7 +61,10 @@ use App\Models\Post;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\RecommendationAnalytics;
+use App\Models\RecommendationConfigSimple;
+use App\Models\Referral;
 use App\Models\ReferralCampaign;
+use App\Models\Role;
 use App\Models\SliderTranslation;
 use App\Models\SystemSetting;
 use App\Models\SystemSettingCategory;
@@ -200,6 +216,53 @@ final class MissingFilamentResourceCoverageTest extends TestCase
         ]);
     }
 
+    private function createCampaignConversionRecord(): CampaignConversion
+    {
+        // Seed a conversion with deterministic values so the listing highlights a completed purchase.
+        return CampaignConversion::factory()->create([
+            'conversion_type'  => 'purchase',
+            'conversion_value' => 199.99,
+            'status'           => 'completed',
+            'source'           => 'google',
+            'medium'           => 'cpc',
+        ]);
+    }
+
+    private function createCampaignScheduleRecord(): CampaignSchedule
+    {
+        // Create a one-off schedule to confirm the timeline columns render predictable data.
+        return CampaignSchedule::factory()->create([
+            'schedule_type'   => 'once',
+            'schedule_config' => [
+                'time'      => '09:00',
+                'timezone'  => 'UTC',
+                'frequency' => 'one_time',
+            ],
+            'next_run_at' => now()->addDay(),
+            'last_run_at' => now()->subDay(),
+            'is_active'   => true,
+        ]);
+    }
+
+    private function createCampaignViewRecord(): CampaignView
+    {
+        // Log a view event tied to a campaign so visitor analytics populate the Filament table.
+        return CampaignView::factory()->create([
+            'referer'   => 'https://example.com/landing',
+            'user_agent' => 'Mozilla/5.0 FilamentCoverage',
+            'viewed_at'  => now(),
+        ]);
+    }
+
+    private function createCartItemRecord(): CartItem
+    {
+        // Persist a cart line with a known quantity and price to exercise subtotal calculations.
+        return CartItem::factory()->create([
+            'quantity'   => 2,
+            'unit_price' => 45.50,
+        ]);
+    }
+
     private function createCityRecord(): City
     {
         // Attach the city to a country so dependent table columns (country name/code) render correctly.
@@ -339,6 +402,17 @@ final class MissingFilamentResourceCoverageTest extends TestCase
         ]);
     }
 
+    private function createRecommendationConfigSimpleRecord(): RecommendationConfigSimple
+    {
+        // Build a lightweight recommendation configuration to ensure the simplified config grid renders entries.
+        return RecommendationConfigSimple::factory()->create([
+            'name'           => 'Coverage Recommendations',
+            'code'           => 'coverage-config',
+            'algorithm_type' => 'collaborative',
+            'is_active'      => true,
+        ]);
+    }
+
     private function createReferralCampaignRecord(): ReferralCampaign
     {
         // Create a bilingual referral campaign so localized columns render deterministic strings.
@@ -348,6 +422,24 @@ final class MissingFilamentResourceCoverageTest extends TestCase
                 'lt' => 'Draudimo referral kampanija',
             ],
             'is_active' => true,
+        ]);
+    }
+
+    private function createReferralRecord(): Referral
+    {
+        // Seed a completed referral so lifecycle badges in the listing showcase a positive state.
+        return Referral::factory()->create([
+            'status'        => 'completed',
+            'referral_code' => 'COVERAGE',
+        ]);
+    }
+
+    private function createRoleRecord(): Role
+    {
+        // Provision a custom role so the authorization tables expose additional entries beyond defaults.
+        return Role::factory()->create([
+            'name'       => 'coverage_manager',
+            'guard_name' => 'web',
         ]);
     }
 
