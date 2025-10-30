@@ -1,17 +1,14 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     public function up(): void
     {
-        if (! Schema::hasTable('system_setting_dependencies')) {
+        if (!Schema::hasTable('system_setting_dependencies')) {
             return;
         }
 
@@ -26,13 +23,13 @@ return new class extends Migration
         }
 
         Schema::table('system_setting_dependencies', function (Blueprint $table): void {
-            if (! Schema::hasColumn('system_setting_dependencies', 'condition_operator')) {
+            if (!Schema::hasColumn('system_setting_dependencies', 'condition_operator')) {
                 // Guard the operator column so repeated migrate:fresh cycles in tests
                 // do not attempt to add it twice when SQLite snapshots linger.
                 $table->string('condition_operator')->nullable()->after('depends_on_setting_id');
             }
 
-            if (! Schema::hasColumn('system_setting_dependencies', 'condition_value')) {
+            if (!Schema::hasColumn('system_setting_dependencies', 'condition_value')) {
                 // Apply the same protection to the value column to keep the migration
                 // idempotent across partially upgraded environments.
                 $table->text('condition_value')->nullable()->after('condition_operator');
@@ -59,21 +56,15 @@ return new class extends Migration
 
                         $jsonError = json_last_error();
 
-                            if ($jsonError === JSON_ERROR_NONE) {
-                                if (is_array($decoded)) {
-                                    $operator = $decoded['operator'] ?? null;
-                                    $value = $decoded['value'] ?? null;
-                                } elseif (is_scalar($decoded)) {
-                                    $operator = (string) $decoded;
-                                }
-                            } else {
-                                $operator = $dependency->condition;
+                        if ($jsonError === JSON_ERROR_NONE) {
+                            if (is_array($decoded)) {
+                                $operator = $decoded['operator'] ?? null;
+                                $value = $decoded['value'] ?? null;
+                            } elseif (is_scalar($decoded)) {
+                                $operator = (string) $decoded;
                             }
-                        } elseif (is_string($dependency->condition)) {
+                        } else {
                             $operator = $dependency->condition;
-                        } elseif (is_numeric($dependency->condition) || is_bool($dependency->condition)) {
-                            // Handle numeric and boolean fallbacks without forcing a JSON decode.
-                            $operator = (string) $dependency->condition;
                         }
 
                         if (is_array($value) || is_object($value)) {
@@ -85,7 +76,7 @@ return new class extends Migration
                         ->where('id', $dependency->id)
                         ->update([
                             'condition_operator' => $operator,
-                            'condition_value'    => $value,
+                            'condition_value' => $value,
                         ]);
                 }
             });
@@ -100,7 +91,7 @@ return new class extends Migration
         });
 
         Schema::table('system_setting_dependencies', function (Blueprint $table): void {
-            if (! Schema::hasColumn('system_setting_dependencies', 'condition')) {
+            if (!Schema::hasColumn('system_setting_dependencies', 'condition')) {
                 // Recreate the normalised string column when required so the schema
                 // matches production after the data backfill completes.
                 $table->string('condition')->nullable()->after('depends_on_setting_id');
@@ -122,12 +113,12 @@ return new class extends Migration
 
     public function down(): void
     {
-        if (! Schema::hasTable('system_setting_dependencies')) {
+        if (!Schema::hasTable('system_setting_dependencies')) {
             return;
         }
 
         Schema::table('system_setting_dependencies', function (Blueprint $table): void {
-            if (! Schema::hasColumn('system_setting_dependencies', 'condition_json')) {
+            if (!Schema::hasColumn('system_setting_dependencies', 'condition_json')) {
                 // Mirror the guard in the `up` path so rolling back remains safe
                 // for partially migrated databases.
                 $table->json('condition_json')->nullable()->after('depends_on_setting_id');
@@ -154,7 +145,7 @@ return new class extends Migration
 
                     $payload = [
                         'operator' => $dependency->condition,
-                        'value'    => $decodedValue,
+                        'value' => $decodedValue,
                     ];
 
                     DB::table('system_setting_dependencies')
@@ -173,7 +164,7 @@ return new class extends Migration
         });
 
         Schema::table('system_setting_dependencies', function (Blueprint $table): void {
-            if (! Schema::hasColumn('system_setting_dependencies', 'condition')) {
+            if (!Schema::hasColumn('system_setting_dependencies', 'condition')) {
                 $table->json('condition')->nullable()->after('depends_on_setting_id');
             }
         });
