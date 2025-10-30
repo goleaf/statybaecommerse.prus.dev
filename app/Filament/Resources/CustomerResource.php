@@ -17,17 +17,17 @@ use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use App\Support\FilamentCompat\Schemas\Components\Grid as SchemaGrid;
+use App\Support\FilamentCompat\Schemas\Components\Section as SchemaSection;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ViewColumn;
@@ -52,9 +52,11 @@ final class CustomerResource extends Resource
     /**
      * Icon displayed in the navigation menu for Filament navigation lists.
      *
-     * @var string|BackedEnum|null
+     * Declaring the type keeps the property compatible with Filament's base
+     * resource signature and avoids PHP fatal errors when the parent expects a
+     * typed union.
      */
-    protected static $navigationIcon = 'heroicon-o-users';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-users';
 
     protected static ?string $model = Customer::class;
 
@@ -97,14 +99,14 @@ final class CustomerResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            // Adopt the Filament v4 fluent builder so form hydration matches the resource defaults across Livewire tests.
+        return $schema
+            // Adopt the Filament v4 schema builder so component hydration matches the resource defaults across Livewire tests.
             ->schema([
-            Section::make(__('customers.basic_information'))
+            SchemaSection::make(__('customers.basic_information'))
                 ->schema([
-                    Grid::make()->schema([
+                    SchemaGrid::make(2)->schema([
                         TextInput::make('name')
                             ->label(__('customers.name'))
                             ->required()
@@ -116,7 +118,7 @@ final class CustomerResource extends Resource
                             ->maxLength(255)
                             ->unique(ignoreRecord: true),
                     ])->columns(2),
-                    Grid::make()->schema([
+                    SchemaGrid::make(2)->schema([
                         TextInput::make('phone')
                             ->label(__('customers.phone'))
                             ->tel()
@@ -131,9 +133,9 @@ final class CustomerResource extends Resource
                         ->maxLength(1000)
                         ->columnSpanFull(),
                 ]),
-            Section::make(__('customers.location'))
+            SchemaSection::make(__('customers.location'))
                 ->schema([
-                    Grid::make()->schema([
+                    SchemaGrid::make(3)->schema([
                         Select::make('country_id')
                             ->label(__('customers.country'))
                             ->relationship('country', 'name')
@@ -175,9 +177,9 @@ final class CustomerResource extends Resource
                         TextInput::make('postal_code')
                             ->label(__('customers.postal_code'))
                             ->maxLength(20),
-                    ])->columns(3),
+                    ]),
                 ]),
-            Section::make(__('customers.company'))
+            SchemaSection::make(__('customers.company'))
                 ->schema([
                     Select::make('company_id')
                         ->label(__('customers.company'))
@@ -186,7 +188,7 @@ final class CustomerResource extends Resource
                         ->preload()
                         ->nullable(),
                 ]),
-            Section::make(__('customers.settings'))
+            SchemaSection::make(__('customers.settings'))
                 ->schema([
                     Toggle::make('is_active')
                         ->label(__('customers.is_active'))
