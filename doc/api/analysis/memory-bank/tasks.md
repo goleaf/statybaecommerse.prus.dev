@@ -186,7 +186,7 @@ Type: Complex System
    - [x] Implement feature tests for 21 controllers
    - [x] Add component tests for 24 Livewire components
    - [x] Browser tests for critical e-commerce flows
-   - [x] Fixed ExampleTest redirect assertion (changed from /home to /lt)
+   - [x] Fixed BaselinePlaceholderTest redirect assertion (changed from /home to /lt)
    - [x] Fixed Brand/Show.php mount method void return issue
    - [x] Fixed CouponResource uppercase() method (replaced with transform)
    - [x] Fixed DocumentService renderTemplate method
@@ -634,7 +634,7 @@ Type: Complex System
   - Fixed missing pages references by removing non-existent page routes
   - Fixed NotificationFeedPage $navigationIcon property type declaration
   - All CollectionResource type errors resolved
-  - **Status:** CollectionResource type errors fixed, AdminPanelTest and ExampleTest now passing
+  - **Status:** CollectionResource type errors fixed, AdminPanelTest and BaselinePlaceholderTest now passing
 - 🔄 **AdvancedAdminFeaturesTest:** Fixed table action mounting issues
   - Fixed UserImpersonation page table action calls from callTableAction to mountTableAction + callMountedTableAction
   - Fixed test user setup to use 'administrator' role and is_admin = true for proper access
