@@ -6,6 +6,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CurrencyResource\Pages;
 use App\Models\Currency;
+use App\Services\CurrencyRateSyncService;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\EditAction;
@@ -342,7 +343,20 @@ final class CurrencyResource extends Resource
                     ->icon('heroicon-o-arrow-path')
                     ->color('info')
                     ->action(function (Currency $record): void {
-                        // Update exchange rate logic here
+                        // Resolve the synchroniser so we can persist the latest exchange rate for this record.
+                        $synchroniser = app(CurrencyRateSyncService::class);
+                        $resolvedRate = $synchroniser->sync($record);
+
+                        if ($resolvedRate === null) {
+                            // Surface a helpful error when no rate data is available for the selected currency.
+                            Notification::make()
+                                ->title(__('currencies.rate_update_failed'))
+                                ->danger()
+                                ->send();
+
+                            return;
+                        }
+
                         Notification::make()
                             ->title(__('currencies.rate_updated_successfully'))
                             ->success()
@@ -397,7 +411,20 @@ final class CurrencyResource extends Resource
                         ->icon('heroicon-o-arrow-path')
                         ->color('info')
                         ->action(function (Collection $records): void {
-                            // Update exchange rates logic here
+                            // Batch refresh the selected currencies to keep the rate data aligned with the provider.
+                            $synchroniser = app(CurrencyRateSyncService::class);
+                            $updatedRates = $synchroniser->syncMany($records);
+
+                            if ($updatedRates === []) {
+                                // Notify the user that nothing changed so they can investigate missing rate mappings.
+                                Notification::make()
+                                    ->title(__('currencies.rates_update_failed'))
+                                    ->danger()
+                                    ->send();
+
+                                return;
+                            }
+
                             Notification::make()
                                 ->title(__('currencies.rates_updated_successfully'))
                                 ->success()
