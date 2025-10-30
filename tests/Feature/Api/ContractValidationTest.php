@@ -92,6 +92,28 @@ final class ContractValidationTest extends TestCase
         $this->assertSame([], $this->validator->validate($payload, CategoryContract::schemaPath()));
     }
 
+    public function test_category_tree_route_skips_reserved_slug_binding(): void
+    {
+        Category::factory()->create([
+            'is_visible' => true,
+            // Explicitly reuse the reserved slug so we confirm the API call still resolves
+            // the collection payload rather than hitting implicit model binding.
+            'slug'       => 'tree',
+        ]);
+
+        $root = Category::factory()->create(['is_visible' => true]);
+        Category::factory()->create([
+            'is_visible' => true,
+            'parent_id'  => $root->getKey(),
+        ]);
+
+        $response = $this->getJson('/api/categories/tree');
+        $response->assertOk();
+
+        $payload = $response->json();
+        $this->assertSame([], $this->validator->validate($payload, CategoryContract::schemaPath()));
+    }
+
     public function test_brand_index_payload_matches_contract(): void
     {
         Brand::factory()->count(2)->create(['is_visible' => true]);
