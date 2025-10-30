@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages\SliderAnalytics\Widgets;
 
+use App\Filament\Pages\SliderAnalytics\Concerns\ResolvesPageFilters;
 use App\Models\Slider;
 use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Filament\Widgets\Widget;
@@ -12,6 +13,7 @@ use Illuminate\Database\Eloquent\Builder;
 final class SliderRecommendations extends Widget
 {
     use InteractsWithPageFilters;
+    use ResolvesPageFilters;
 
     protected string $view = 'filament.pages.slider-analytics.widgets.slider-recommendations';
 
@@ -21,10 +23,11 @@ final class SliderRecommendations extends Widget
 
     public function getViewData(): array
     {
-        $startDate = $this->pageFilters['startDate'] ?? now()->subDays(30);
-        $endDate = $this->pageFilters['endDate'] ?? now();
-        $sliderId = $this->pageFilters['sliderId'] ?? null;
-        $status = $this->pageFilters['status'] ?? 'all';
+        // Resolve filter values upfront so the recommendation copy mirrors the
+        // same slider pool and timeframe as the rest of the dashboard.
+        [$startDate, $endDate] = $this->resolveDateRange();
+        $sliderId = $this->resolveFilterValue('sliderId');
+        $status = $this->resolveFilterValue('status', 'all');
 
         $query = Slider::query()
             ->when($startDate, fn (Builder $query) => $query->whereDate('created_at', '>=', $startDate))

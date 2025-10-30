@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages\SliderAnalytics\Widgets;
 
+use App\Filament\Pages\SliderAnalytics\Concerns\ResolvesPageFilters;
 use App\Models\Slider;
 use Filament\Widgets\ChartWidget;
 use Filament\Widgets\Concerns\InteractsWithPageFilters;
@@ -12,6 +13,7 @@ use Illuminate\Database\Eloquent\Builder;
 final class SliderPerformanceChart extends ChartWidget
 {
     use InteractsWithPageFilters;
+    use ResolvesPageFilters;
 
     protected ?string $heading = 'Slider Performance Over Time';
 
@@ -24,10 +26,12 @@ final class SliderPerformanceChart extends ChartWidget
 
     protected function getData(): array
     {
-        $startDate = $this->pageFilters['startDate'] ?? now()->subDays(30);
-        $endDate = $this->pageFilters['endDate'] ?? now();
-        $sliderId = $this->pageFilters['sliderId'] ?? null;
-        $status = $this->pageFilters['status'] ?? 'all';
+        // Align the chart query with the shared filter helpers so the dataset is
+        // always scoped to the same slider selection and reporting window as the
+        // surrounding widgets.
+        [$startDate, $endDate] = $this->resolveDateRange();
+        $sliderId = $this->resolveFilterValue('sliderId');
+        $status = $this->resolveFilterValue('status', 'all');
 
         $query = Slider::query()
             ->when($startDate, fn (Builder $query) => $query->whereDate('created_at', '>=', $startDate))
@@ -46,12 +50,12 @@ final class SliderPerformanceChart extends ChartWidget
 
             $weeks[] = $weekStart->format('M d');
 
-            $activeCount = $query
+            $activeCount = (clone $query)
                 ->where('is_active', true)
                 ->whereBetween('created_at', [$weekStart, $weekEnd])
                 ->count();
 
-            $inactiveCount = $query
+            $inactiveCount = (clone $query)
                 ->where('is_active', false)
                 ->whereBetween('created_at', [$weekStart, $weekEnd])
                 ->count();
