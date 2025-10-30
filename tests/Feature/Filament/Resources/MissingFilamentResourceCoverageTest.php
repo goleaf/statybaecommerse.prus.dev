@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Filament\Resources;
 
+use App\Filament\Resources\ActivityLogResource\Pages\ListActivityLogs;
+use App\Filament\Resources\AnalyticsEventResource\Pages\ListAnalyticsEvents;
 use App\Filament\Resources\AuditTrailResource\Pages\ListAuditTrails;
 use App\Filament\Resources\BrandResource\Pages\ListBrands;
 use App\Filament\Resources\CampaignResource\Pages\ListCampaigns;
@@ -15,11 +17,15 @@ use App\Filament\Resources\PostResource\Pages\ListPosts;
 use App\Filament\Resources\ProductVariantResource\Pages\ListProductVariants;
 use App\Filament\Resources\RecommendationAnalyticsResource\Pages\ListRecommendationAnalytics;
 use App\Filament\Resources\ReferralCampaignResource\Pages\ListReferralCampaigns;
+use App\Filament\Resources\ReferralRewardLogResource\Pages\ListReferralRewardLogs;
+use App\Filament\Resources\ReferralStatisticsResource\Pages\ListReferralStatistics;
 use App\Filament\Resources\SliderTranslationResource\Pages\ListSliderTranslations;
 use App\Filament\Resources\SystemSettingResource\Pages\ListSystemSettings;
 use App\Filament\Resources\UserManagementResource\Pages\ListUsers;
 use App\Filament\Resources\UserPreferenceResource\Pages\ListUserPreferences;
 use App\Filament\Resources\VariantStockResource\Pages\ListVariantStocks;
+use App\Models\ActivityLog;
+use App\Models\AnalyticsEvent;
 use App\Models\AuditTrail;
 use App\Models\Brand;
 use App\Models\Campaign;
@@ -32,6 +38,9 @@ use App\Models\Post;
 use App\Models\ProductVariant;
 use App\Models\RecommendationAnalytics;
 use App\Models\ReferralCampaign;
+use App\Models\ReferralReward;
+use App\Models\ReferralRewardLog;
+use App\Models\ReferralStatistics;
 use App\Models\SliderTranslation;
 use App\Models\SystemSetting;
 use App\Models\User;
@@ -81,6 +90,8 @@ final class MissingFilamentResourceCoverageTest extends TestCase
     {
         // Map each resource list page to the helper responsible for creating a visible record.
         return [
+            'activity logs'            => [ListActivityLogs::class, 'createActivityLogRecord'],
+            'analytics events'         => [ListAnalyticsEvents::class, 'createAnalyticsEventRecord'],
             'audit trails'              => [ListAuditTrails::class, 'createAuditTrailRecord'],
             'brands'                    => [ListBrands::class, 'createBrandRecord'],
             'campaigns'                 => [ListCampaigns::class, 'createCampaignRecord'],
@@ -92,6 +103,8 @@ final class MissingFilamentResourceCoverageTest extends TestCase
             'product variants'          => [ListProductVariants::class, 'createProductVariantRecord'],
             'recommendation analytics'  => [ListRecommendationAnalytics::class, 'createRecommendationAnalyticsRecord'],
             'referral campaigns'        => [ListReferralCampaigns::class, 'createReferralCampaignRecord'],
+            'referral reward logs'      => [ListReferralRewardLogs::class, 'createReferralRewardLogRecord'],
+            'referral statistics'       => [ListReferralStatistics::class, 'createReferralStatisticsRecord'],
             'slider translations'       => [ListSliderTranslations::class, 'createSliderTranslationRecord'],
             'system settings'           => [ListSystemSettings::class, 'createSystemSettingRecord'],
             'user management'           => [ListUsers::class, 'createUserManagementRecord'],
@@ -135,6 +148,28 @@ final class MissingFilamentResourceCoverageTest extends TestCase
                     'current'  => 'New Name',
                 ],
             ],
+        ]);
+    }
+
+    private function createActivityLogRecord(): ActivityLog
+    {
+        // Create a subject user so the morph relationship renders a friendly display name in the table.
+        $subject = User::factory()->create(['name' => 'Tracked Coverage User']);
+
+        // Seed a deterministic activity log entry so the Filament listing can surface a predictable badge row.
+        return ActivityLog::query()->create([
+            'log_name'      => 'coverage-activity-log',
+            'description'   => 'Coverage activity entry',
+            'event'         => 'login',
+            'subject_type'  => $subject->getMorphClass(),
+            'subject_id'    => $subject->getKey(),
+            'causer_type'   => $this->admin->getMorphClass(),
+            'causer_id'     => $this->admin->getKey(),
+            'properties'    => ['ip' => '127.0.0.1'],
+            'is_important'  => true,
+            'is_system'     => false,
+            'severity'      => 'low',
+            'category'      => 'authentication',
         ]);
     }
 
@@ -204,6 +239,18 @@ final class MissingFilamentResourceCoverageTest extends TestCase
         ]);
     }
 
+    private function createAnalyticsEventRecord(): AnalyticsEvent
+    {
+        // Seed a page view event attributed to the admin so analytics tabs and filters resolve a concrete record.
+        return AnalyticsEvent::factory()->create([
+            'event_name' => 'Coverage Page View',
+            'event_type' => 'page_view',
+            'session_id' => 'coverage-session',
+            'user_id'    => $this->admin->getKey(),
+            'url'        => 'https://example.com/coverage',
+        ]);
+    }
+
     private function createPostRecord(): Post
     {
         // Seed a published post entry to exercise the marketing/content management listings.
@@ -239,6 +286,45 @@ final class MissingFilamentResourceCoverageTest extends TestCase
                 'lt' => 'Draudimo referral kampanija',
             ],
             'is_active' => true,
+        ]);
+    }
+
+    private function createReferralRewardLogRecord(): ReferralRewardLog
+    {
+        // Prepare a referral reward owned by the admin so the log record can reference an existing incentive.
+        $reward = ReferralReward::factory()->forUser($this->admin)->create([
+            'title' => [
+                'en' => 'Coverage Reward',
+                'lt' => 'Padengimo atlygis',
+            ],
+            'status' => 'pending',
+        ]);
+
+        // Persist a log entry describing an earned reward to hydrate the analytics-focused table.
+        return ReferralRewardLog::factory()
+            ->for($reward, 'referralReward')
+            ->create([
+                'user_id' => $this->admin->getKey(),
+                'action'  => ReferralRewardLog::ACTION_EARNED,
+                'data'    => [
+                    'amount'      => 25.50,
+                    'currency'    => 'EUR',
+                    'reward_type' => 'discount',
+                ],
+            ]);
+    }
+
+    private function createReferralStatisticsRecord(): ReferralStatistics
+    {
+        // Seed aggregated referral metrics for the admin so the statistics grid renders meaningful values.
+        return ReferralStatistics::factory()->for($this->admin, 'user')->create([
+            'date'                  => now()->toDateString(),
+            'total_referrals'       => 3,
+            'completed_referrals'   => 2,
+            'pending_referrals'     => 1,
+            'total_rewards_earned'  => 45.75,
+            'total_discounts_given' => 30.40,
+            'metadata'              => ['source' => 'coverage-test'],
         ]);
     }
 
