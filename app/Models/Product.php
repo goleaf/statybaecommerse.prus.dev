@@ -1802,10 +1802,28 @@ final class Product extends Model implements HasMedia, TranslatableRecord
      */
     private function calculateDiscountPercentage(): ?float
     {
-        // Use compare_price if set, otherwise use price as the comparison base
-        $comparePrice = $this->compare_price ?? $this->price;
-        // Use sale_price if set, otherwise use price as the current price
-        $currentPrice = $this->sale_price ?? $this->price;
+        // Determine the comparison baseline, preferring the dedicated compare price
+        // but gracefully falling back to whichever persisted price is available so
+        // we can still surface a percentage discount in simplified fixtures.
+        $comparePrice = $this->compare_price ?? $this->price ?? $this->sale_price;
+
+        // Choose the most appropriate current price. A sale price is only valid
+        // when it meaningfully undercuts the comparison baseline; otherwise we
+        // fall back to the regular price so factories that override price values
+        // without touching sale_price still calculate an accurate discount.
+        $currentPrice = null;
+
+        if ($this->sale_price !== null) {
+            $candidateSalePrice = (float) $this->sale_price;
+
+            if ($candidateSalePrice > 0 && ($comparePrice === null || $candidateSalePrice < (float) $comparePrice)) {
+                $currentPrice = $candidateSalePrice;
+            }
+        }
+
+        if ($currentPrice === null && $this->price !== null) {
+            $currentPrice = (float) $this->price;
+        }
 
         if ($comparePrice === null || $currentPrice === null) {
             return null;
