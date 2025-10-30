@@ -40,12 +40,13 @@ use App\Models\SystemSetting;
 use App\Models\User;
 use App\Models\UserPreference;
 use App\Models\VariantInventory;
+use Filament\Resources\Resource;
 use Filament\Schemas\Components\Tabs\Tab as SchemaTabComponent;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
-use Filament\Resources\Resource;
 use Livewire\Livewire;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 final class MissingResourceSmokeTest extends TestCase
@@ -231,9 +232,7 @@ final class MissingResourceSmokeTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider resourceDataProvider
-     */
+    #[DataProvider('resourceDataProvider')]
     public function test_missing_resource_lists_render_records(string $resourceClass, string $pageClass, callable $factory): void
     {
         // Confirm the supplied class really is a Filament resource so accidental typos fail fast.

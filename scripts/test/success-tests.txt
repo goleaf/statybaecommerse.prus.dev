@@ -270,3 +270,6 @@ tests/Feature/DomainExceptionResponseTest.php
 tests/Feature/Errors/ApiErrorFormatTest.php
 tests/Unit/Support/Filament/SchemaComponentBridgeTest.php
 tests/Feature/AdminPanelTest.php
+tests/Admin/CustomerResourceTest.php
+tests/Feature/ActivityLogResourceTest.php
+tests/Feature/AddressResourceTest.php
