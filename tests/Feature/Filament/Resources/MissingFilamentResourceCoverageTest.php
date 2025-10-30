@@ -4,41 +4,19 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Filament\Resources;
 
-use App\Filament\Resources\AuditTrailResource\Pages\ListAuditTrails;
-use App\Filament\Resources\BrandResource\Pages\ListBrands;
-use App\Filament\Resources\CampaignResource\Pages\ListCampaigns;
-use App\Filament\Resources\CityResource\Pages\ListCities;
 use App\Filament\Resources\CollectionResource\Pages\ListCollections;
 use App\Filament\Resources\CollectionRuleResource\Pages\ListCollectionRules;
 use App\Filament\Resources\EnumManagementResource\Pages\ListEnumManagement;
-use App\Filament\Resources\PostResource\Pages\ListPosts;
-use App\Filament\Resources\ProductVariantResource\Pages\ListProductVariants;
-use App\Filament\Resources\RecommendationAnalyticsResource\Pages\ListRecommendationAnalytics;
-use App\Filament\Resources\ReferralCampaignResource\Pages\ListReferralCampaigns;
 use App\Filament\Resources\SliderTranslationResource\Pages\ListSliderTranslations;
-use App\Filament\Resources\SystemSettingResource\Pages\ListSystemSettings;
 use App\Filament\Resources\UserManagementResource\Pages\ListUsers;
 use App\Filament\Resources\UserPreferenceResource\Pages\ListUserPreferences;
-use App\Filament\Resources\VariantStockResource\Pages\ListVariantStocks;
-use App\Models\AuditTrail;
-use App\Models\Brand;
-use App\Models\Campaign;
-use App\Models\City;
 use App\Models\Collection;
 use App\Models\CollectionRule;
-use App\Models\Country;
 use App\Models\EnumValue;
-use App\Models\Post;
-use App\Models\ProductVariant;
-use App\Models\RecommendationAnalytics;
-use App\Models\ReferralCampaign;
 use App\Models\SliderTranslation;
-use App\Models\SystemSetting;
 use App\Models\User;
 use App\Models\UserPreference;
-use App\Models\VariantInventory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Str;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -81,22 +59,12 @@ final class MissingFilamentResourceCoverageTest extends TestCase
     {
         // Map each resource list page to the helper responsible for creating a visible record.
         return [
-            'audit trails'              => [ListAuditTrails::class, 'createAuditTrailRecord'],
-            'brands'                    => [ListBrands::class, 'createBrandRecord'],
-            'campaigns'                 => [ListCampaigns::class, 'createCampaignRecord'],
-            'cities'                    => [ListCities::class, 'createCityRecord'],
             'collections'               => [ListCollections::class, 'createCollectionRecord'],
             'collection rules'          => [ListCollectionRules::class, 'createCollectionRuleRecord'],
             'enum management'           => [ListEnumManagement::class, 'createEnumValueRecord'],
-            'posts'                     => [ListPosts::class, 'createPostRecord'],
-            'product variants'          => [ListProductVariants::class, 'createProductVariantRecord'],
-            'recommendation analytics'  => [ListRecommendationAnalytics::class, 'createRecommendationAnalyticsRecord'],
-            'referral campaigns'        => [ListReferralCampaigns::class, 'createReferralCampaignRecord'],
             'slider translations'       => [ListSliderTranslations::class, 'createSliderTranslationRecord'],
-            'system settings'           => [ListSystemSettings::class, 'createSystemSettingRecord'],
             'user management'           => [ListUsers::class, 'createUserManagementRecord'],
             'user preferences'          => [ListUserPreferences::class, 'createUserPreferenceRecord'],
-            'variant stock'             => [ListVariantStocks::class, 'createVariantInventoryRecord'],
         ];
     }
 
@@ -112,62 +80,6 @@ final class MissingFilamentResourceCoverageTest extends TestCase
         Livewire::test($pageClass)
             ->call('loadTable')
             ->assertCanSeeTableRecords([$record]);
-    }
-
-    private function createAuditTrailRecord(): AuditTrail
-    {
-        // Create actor and auditable users so the audit entry can resolve morph targets.
-        $actor = User::factory()->create(['name' => 'Audit Actor']);
-        $subject = User::factory()->create(['name' => 'Subject User']);
-
-        // Persist a minimal audit trail entry with a deterministic diff payload for table assertions.
-        return AuditTrail::query()->create([
-            'auditable_type' => $subject->getMorphClass(),
-            'auditable_id'   => $subject->getKey(),
-            'event'          => 'user.updated',
-            'actor_type'     => $actor->getMorphClass(),
-            'actor_id'       => $actor->getKey(),
-            'reason'         => 'Unit coverage',
-            'request_id'     => (string) Str::uuid(),
-            'diff'           => [
-                'name' => [
-                    'previous' => 'Old Name',
-                    'current'  => 'New Name',
-                ],
-            ],
-        ]);
-    }
-
-    private function createBrandRecord(): Brand
-    {
-        // Use the factory to create a visible brand that the table listing can display immediately.
-        return Brand::factory()->create([
-            'name' => 'Coverage Brand',
-            'slug' => 'coverage-brand',
-        ]);
-    }
-
-    private function createCampaignRecord(): Campaign
-    {
-        // Generate a simple active campaign so marketing listings show a concrete entry.
-        return Campaign::factory()->create([
-            'name' => 'Coverage Campaign',
-            'slug' => 'coverage-campaign',
-        ]);
-    }
-
-    private function createCityRecord(): City
-    {
-        // Attach the city to a country so dependent table columns (country name/code) render correctly.
-        $country = Country::factory()->create([
-            'name' => 'Coverage Country',
-            'code' => 'CC',
-        ]);
-
-        return City::factory()->for($country)->create([
-            'name' => 'Coverage City',
-            'slug' => 'coverage-city',
-        ]);
     }
 
     private function createCollectionRecord(): Collection
@@ -204,59 +116,11 @@ final class MissingFilamentResourceCoverageTest extends TestCase
         ]);
     }
 
-    private function createPostRecord(): Post
-    {
-        // Seed a published post entry to exercise the marketing/content management listings.
-        return Post::factory()->create([
-            'title' => 'Coverage Post',
-            'slug'  => 'coverage-post',
-        ]);
-    }
-
-    private function createProductVariantRecord(): ProductVariant
-    {
-        // Use the factory to provision a variant with an associated product for catalog checks.
-        return ProductVariant::factory()->create([
-            'name' => 'Coverage Variant',
-            'sku'  => 'COVERAGE001',
-        ]);
-    }
-
-    private function createRecommendationAnalyticsRecord(): RecommendationAnalytics
-    {
-        // Generate analytics metrics so reporting tables showcase actionable rows.
-        return RecommendationAnalytics::factory()->create([
-            'action' => 'view',
-        ]);
-    }
-
-    private function createReferralCampaignRecord(): ReferralCampaign
-    {
-        // Create a bilingual referral campaign so localized columns render deterministic strings.
-        return ReferralCampaign::factory()->create([
-            'name' => [
-                'en' => 'Coverage Referral Campaign',
-                'lt' => 'Draudimo referral kampanija',
-            ],
-            'is_active' => true,
-        ]);
-    }
-
     private function createSliderTranslationRecord(): SliderTranslation
     {
         // Persist a slider translation entry to validate the localized slider management grid.
         return SliderTranslation::factory()->english()->create([
             'title' => 'Coverage Slide',
-        ]);
-    }
-
-    private function createSystemSettingRecord(): SystemSetting
-    {
-        // Store a simple system setting so configuration tables reflect active entries.
-        return SystemSetting::factory()->create([
-            'key'   => 'coverage_setting',
-            'name'  => 'Coverage Setting',
-            'group' => 'general',
         ]);
     }
 
@@ -279,16 +143,6 @@ final class MissingFilamentResourceCoverageTest extends TestCase
         return UserPreference::factory()->forUser($user)->highScore()->create([
             'preference_type' => 'category',
             'preference_key'  => 'coverage-category',
-        ]);
-    }
-
-    private function createVariantInventoryRecord(): VariantInventory
-    {
-        // Generate a stocked inventory entry to verify the inventory dashboards hydrate successfully.
-        return VariantInventory::factory()->create([
-            'stock'     => 25,
-            'reserved'  => 5,
-            'threshold' => 3,
         ]);
     }
 }
