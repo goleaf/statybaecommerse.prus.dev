@@ -58,6 +58,7 @@ The model-focused regression suite is a quick indicator that Eloquent scopes, ca
 
 - The `2025_02_01_000002` system setting dependency migration now checks for existing columns and drops the legacy `system_setting_dependencies_condition_index` before removing the original JSON payload so `TestingDatabase::migrate()` can run repeatedly without tripping duplicate-column or missing-index errors on SQLite.
 - The `2025_09_09_000000` discounts migration conditionally attaches the `zone_id` foreign key only when the zones table already exists, falling back to an index otherwise, which keeps early schema runs from failing before the zone migrations execute.
+- Recommendation analytics snapshots now coerce the persisted `date` column into an ISO `Y-m-d` string during mutation so SQLite-backed `assertDatabaseHas` checks no longer trip over `00:00:00` suffixes while still returning Carbon instances at runtime.【F:app/Models/RecommendationAnalytics.php†L8-L26】【F:app/Models/RecommendationAnalytics.php†L41-L54】
 
 ## Dashboard Fixture Placeholders
 

@@ -28,12 +28,12 @@ final class RecommendationAnalyticsResource extends Resource
 
     protected static ?int $navigationSort = 8;
 
-    protected static ?string $recordTitleAttribute = 'action';
+    /**
+     * Keep the legacy namespace resource aligned with the shared Analytics navigation section.
+     */
+    protected static UnitEnum|string|null $navigationGroup = 'Analytics';
 
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'Analytics';
-    }
+    protected static ?string $recordTitleAttribute = 'action';
 
     public static function getNavigationLabel(): string
     {
