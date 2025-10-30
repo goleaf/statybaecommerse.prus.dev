@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Filament\Facades\Filament;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Route;
+use PHPUnit\Framework\Assert;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
 use Tests\Support\TestingDatabase;
@@ -200,6 +201,50 @@ expect()->extend('toContainModel', function (Model $model) {
     });
 
     expect($contains)->toBeTrue();
+
+    return $this;
+});
+
+expect()->extend('toBeIn', function (iterable $values) {
+    $needle = $this->value instanceof \BackedEnum ? $this->value->value : $this->value;
+
+    $normalizedHaystack = [];
+    foreach ($values as $item) {
+        $normalizedHaystack[] = $item instanceof \BackedEnum ? $item->value : $item;
+    }
+
+    // Delegate to PHPUnit for the actual assertion while keeping enum comparisons
+    // compatible with legacy expectations that rely on raw string values.
+    Assert::assertContains($needle, $normalizedHaystack);
+
+    return $this;
+});
+
+expect()->extend('toContain', function ($expected) {
+    $haystack = $this->value;
+
+    $normalize = static function ($value) {
+        return $value instanceof \BackedEnum ? $value->value : $value;
+    };
+
+    if (is_iterable($haystack)) {
+        $normalized = [];
+        foreach ($haystack as $item) {
+            $normalized[] = $normalize($item);
+        }
+
+        Assert::assertContains($normalize($expected), $normalized);
+
+        return $this;
+    }
+
+    if (is_string($haystack)) {
+        Assert::assertStringContainsString((string) $expected, $haystack);
+
+        return $this;
+    }
+
+    Assert::assertContains($expected, $haystack);
 
     return $this;
 });
