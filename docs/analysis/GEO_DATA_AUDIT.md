@@ -3,7 +3,7 @@
 ## Summary
 | Capability | Status | Notes |
 | --- | --- | --- |
-| Countries catalogue | ⚠️ Partial | Country model offers rich relationships and scopes, but the primary seeder only provisions 56 records, far short of the stated 195+ catalogue.【F:app/Models/Country.php†L34-L249】【F:database/seeders/CountrySeeder.php†L15-L1183】【483c33†L1-L1】 |
+| Countries catalogue | ⚠️ Partial | Country model offers rich relationships and scopes, and the primary seeder now provisions 47 European countries with Lithuanian, English, German, and Russian translations, but still omits the rest of the world.【F:app/Models/Country.php†L34-L249】【F:database/seeders/CountrySeeder.php†L15-L326】【483c33†L1-L1】 |
 | Regions coverage | ❌ Missing pieces | Region seeders enumerate Baltic, Western European, UK, US, and Canadian entries yet the `App\\Models\\Region` class is absent, so nothing can consume or persist those records safely.【F:database/seeders/RegionSeeder.php†L15-L197】【9398a1†L1-L3】 |
 | Cities dataset | ⚠️ Partial | Cities include comprehensive relationships and scoped queries, but the “all countries” seeder only defines curated lists for 11 countries, leaving most of the world without city data.【F:app/Models/City.php†L35-L198】【F:database/seeders/AllCountriesComprehensiveCitiesSeeder.php†L14-L147】 |
 | Shipping zones | ⚠️ Partial | Zone model remains available while geography seeders still provision EU/NA/UK/Baltic entries, but the comprehensive order seeder no longer hydrates any zone records and configuration leaves rate matrices largely blank, limiting runtime differentiation.【F:app/Models/Zone.php†L11-L45】【F:database/seeders/ComprehensiveMultilanguageSeeder.php†L98-L116】【F:database/seeders/ComprehensiveOrderSeeder.php†L100-L155】【F:config/shipping.php†L5-L26】 |
@@ -14,8 +14,8 @@
 
 ### Countries
 - `Country` exposes relationships to addresses, cities, taxation, and currencies, alongside query scopes for regional filtering and VAT requirements, supporting admin analytics and storefront lookups.【F:app/Models/Country.php†L34-L249】
-- The primary `CountrySeeder` updates or creates entries using translation payloads, but counting the `'cca2'` entries shows only 56 seeded countries, leaving the catalogue well below the desired 195+ world coverage.【F:database/seeders/CountrySeeder.php†L15-L1183】【483c33†L1-L1】
-- Address validation falls back to querying active countries when configuration omits an allow-list, so incomplete seeding directly reduces selectable countries at checkout and in admin forms.【F:app/Http/Requests/Frontend/AddressRequest.php†L102-L123】
+- The refreshed `CountrySeeder` now provisions 47 European countries and synchronises Lithuanian, English, German, and Russian translations for each entry, but the catalogue still lacks coverage for other continents.【F:database/seeders/CountrySeeder.php†L15-L326】【483c33†L1-L1】
+- Address validation falls back to querying active countries when configuration omits an allow-list, so the absence of non-European records still reduces selectable countries at checkout and in admin forms.【F:app/Http/Requests/Frontend/AddressRequest.php†L102-L123】
 - The Filament country infolist now references the correct schema instance, restoring the admin "view" page that previously crashed because it returned an undefined variable.【F:app/Filament/Resources/CountryResource.php†L244-L291】
 
 ### Regions
@@ -37,7 +37,7 @@
 - Current configuration declares only Lithuanian regions and postal-code patterns, while the sanitizer exclusively reinstates Lithuanian formats, so addresses for the other 55 seeded countries cannot pass validation without custom overrides.【F:config/addresses.php†L5-L42】【F:app/Support/Address/AddressDataSanitizer.php†L138-L166】
 
 ## Recommendations
-1. **Expand country dataset**: Import a full ISO-3166 catalogue (195+ entries) and ensure translations exist for required locales to meet global coverage claims.【F:database/seeders/CountrySeeder.php†L15-L1183】
+1. **Expand country dataset**: Import a full ISO-3166 catalogue (195+ entries) and ensure translations exist for required locales to meet global coverage claims.【F:database/seeders/CountrySeeder.php†L15-L326】
 2. **Restore the Region model**: Reintroduce `App\\Models\\Region` with translation support so existing factories, migrations, and seeders can persist and query hierarchical regions.【F:database/seeders/RegionSeeder.php†L15-L197】【9398a1†L1-L3】
 3. **Broaden city coverage**: Augment the “all countries” city seeder to ingest larger datasets or external APIs, ensuring every seeded country receives representative metropolitan entries.【F:database/seeders/AllCountriesComprehensiveCitiesSeeder.php†L14-L147】
 4. **Wire zone-specific pricing**: Populate `config/shipping.php` and `config/tax.php` with meaningful per-zone rates and ensure shipping options inherit those adjustments to justify the zone scaffolding.【F:config/shipping.php†L5-L26】【F:config/tax.php†L5-L13】
