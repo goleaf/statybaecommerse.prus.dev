@@ -20,6 +20,8 @@ Navigate to: **`/admin/recommendation-system-management`**
 - 📊 Configure performance thresholds
 - 💾 Manage cache settings
 - 🔄 Set cleanup intervals
+- 🧰 Use bulk actions to activate or deactivate multiple configs at once
+- 🛡️ Enforce unique configuration names to avoid duplicate algorithm setups
 
 ### Recommendation Blocks Management
 **Location**: `/admin/recommendation-blocks`
