@@ -256,3 +256,13 @@ tests/Feature/UserBehaviorResourceSimpleTest.php
 tests/Feature/TestResultsPageTest.php
 tests/Feature/TestResultsDashboardTest.php
 tests/Feature/SystemSettingTranslationResourceTest.php
+tests/Feature/SystemSettingDependencyResourceTest.php
+tests/Feature/SystemSettingControllerTest.php
+tests/Feature/SystemSettingCategoryResourceTest.php
+tests/Feature/SubscriberResourceTest.php
+tests/Feature/StockMovementResourceTest.php
+tests/Feature/SliderViewsTimelineWidgetTest.php
+tests/Feature/SliderRouteTest.php
+tests/Feature/SliderResourceTest.php
+tests/Feature/SimpleDocumentTest.php
+tests/Feature/Seeders/PartnerSeederTest.php
