@@ -7,6 +7,7 @@ namespace Tests\Feature;
 use App\Models\ProductVariant;
 use App\Models\User;
 use App\Models\VariantAnalytics;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 
@@ -56,7 +57,10 @@ final class VariantAnalyticsResourceTest extends TestCase
             ->assertHasNoFormErrors();
 
         // Assert
-        $this->assertDatabaseHas('variant_analytics', $data);
+        $expectedDatabaseState = $data;
+        // Align the assertion with the database column storing full timestamps instead of plain dates.
+        $expectedDatabaseState['date'] = Carbon::parse($data['date'])->toDateTimeString();
+        $this->assertDatabaseHas('variant_analytics', $expectedDatabaseState);
     }
 
     public function test_can_edit_variant_analytics(): void
@@ -237,6 +241,8 @@ final class VariantAnalyticsResourceTest extends TestCase
         Livewire::test(\App\Filament\Resources\VariantAnalyticsResource\Pages\CreateVariantAnalytics::class)
             ->fillForm([
                 'variant_id' => $variant->id,
+                // Explicitly nullify the date so we bypass the default value supplied by the form component.
+                'date'       => null,
                 'views'      => 100,
             ])
             ->call('create')
@@ -291,8 +297,11 @@ final class VariantAnalyticsResourceTest extends TestCase
 
         // Act & Assert
         $component = Livewire::test(\App\Filament\Resources\VariantAnalyticsResource\Pages\ListVariantAnalytics::class);
+        // Trigger the helper hook that hydrates the records collection for compatibility-focused tests.
+        $component->call('loadTable');
 
-        $records = $component->get('tableRecords');
+        // Inspect the resolved records to verify the latest analytics entry loads first.
+        $records = $component->instance()->getTableRecords();
         $this->assertEquals($newAnalytics->id, $records->first()->id);
         $this->assertEquals($oldAnalytics->id, $records->last()->id);
     }
