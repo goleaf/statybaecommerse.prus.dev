@@ -65,6 +65,33 @@ trait CreatesApplication
 
         $app = require __DIR__ . '/../bootstrap/app.php';
 
+        $filamentAutodiscoverEnv = getenv('FILAMENT_TESTING_AUTODISCOVER');
+        $filamentResourcesEnv = getenv('FILAMENT_TESTING_RESOURCES');
+
+        $configureFilamentTesting = function (\Illuminate\Contracts\Config\Repository $config) use ($filamentAutodiscoverEnv, $filamentResourcesEnv): void {
+            if ($filamentAutodiscoverEnv !== false) {
+                // Allow individual test cases to shrink the Filament resource bootstrap footprint when necessary.
+                $shouldAutodiscover = filter_var($filamentAutodiscoverEnv, FILTER_VALIDATE_BOOL, [
+                    'options' => ['default' => true],
+                ]);
+                $config->set('filament.testing.autodiscover_resources', (bool) $shouldAutodiscover);
+            }
+
+            if ($filamentResourcesEnv !== false) {
+                // Parse the comma-separated resource list so targeted tests only register the relevant panel classes.
+                $resources = array_values(array_filter(array_map('trim', explode(',', $filamentResourcesEnv))));
+                $config->set('filament.testing.resources', $resources);
+            }
+        };
+
+        if ($app->resolved('config')) {
+            /** @var \Illuminate\Contracts\Config\Repository $resolvedConfig */
+            $resolvedConfig = $app->make('config');
+            $configureFilamentTesting($resolvedConfig);
+        } else {
+            $app->resolving('config', $configureFilamentTesting);
+        }
+
         $app->make(Kernel::class)->bootstrap();
 
         // Align Laravel's runtime configuration and run migrations once for the
