@@ -36,8 +36,9 @@ catalog records, and viewers have read-only access.
 ## Seeding
 
 `database/seeders/RolesAndPermissionsSeeder.php` reads the configuration matrix, creates any
-missing roles/permissions, and aligns aliases. `database/seeders/AdminUserSeeder.php` provisions
-`superuser@example.com` with the `admin` and `administrator` roles for initial access.
+missing roles/permissions, and aligns aliases. `database/seeders/AdminUserSeeder.php` provisions the
+canonical `admin@example.com` account with comprehensive admin roles for initial access while
+removing legacy credentials during reseeds.
 
 ## Filament Behaviour
 
