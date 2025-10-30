@@ -239,3 +239,7 @@ tests/Feature/Validation/ReferralCodeRequestTest.php
 tests/Feature/Validation/OrderRequestTest.php
 tests/Feature/Validation/DiscountRedemptionRequestTest.php
 tests/Feature/Validation/DiscountConditionTestRequestTest.php
+tests/Feature/UserWishlistResourceTest.php
+tests/Feature/UserResourceTest.php
+tests/Feature/UserProductInteractionTest.php
+tests/Feature/UserProductInteractionResourceTest.php
