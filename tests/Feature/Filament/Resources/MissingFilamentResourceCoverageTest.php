@@ -17,6 +17,7 @@ use App\Filament\Resources\RecommendationAnalyticsResource\Pages\ListRecommendat
 use App\Filament\Resources\ReferralCampaignResource\Pages\ListReferralCampaigns;
 use App\Filament\Resources\SliderTranslationResource\Pages\ListSliderTranslations;
 use App\Filament\Resources\SystemSettingResource\Pages\ListSystemSettings;
+use App\Filament\Resources\UserProductInteractions\Pages\ListUserProductInteractions;
 use App\Filament\Resources\UserManagementResource\Pages\ListUsers;
 use App\Filament\Resources\UserPreferenceResource\Pages\ListUserPreferences;
 use App\Filament\Resources\VariantStockResource\Pages\ListVariantStocks;
@@ -36,6 +37,7 @@ use App\Models\SliderTranslation;
 use App\Models\SystemSetting;
 use App\Models\User;
 use App\Models\UserPreference;
+use App\Models\UserProductInteraction;
 use App\Models\VariantInventory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
@@ -96,6 +98,7 @@ final class MissingFilamentResourceCoverageTest extends TestCase
             'system settings'           => [ListSystemSettings::class, 'createSystemSettingRecord'],
             'user management'           => [ListUsers::class, 'createUserManagementRecord'],
             'user preferences'          => [ListUserPreferences::class, 'createUserPreferenceRecord'],
+            'user product interactions' => [ListUserProductInteractions::class, 'createUserProductInteractionRecord'],
             'variant stock'             => [ListVariantStocks::class, 'createVariantInventoryRecord'],
         ];
     }
@@ -279,6 +282,15 @@ final class MissingFilamentResourceCoverageTest extends TestCase
         return UserPreference::factory()->forUser($user)->highScore()->create([
             'preference_type' => 'category',
             'preference_key'  => 'coverage-category',
+        ]);
+    }
+
+    private function createUserProductInteractionRecord(): UserProductInteraction
+    {
+        // Create an interaction linked to concrete user/product records for table relationship columns.
+        return UserProductInteraction::factory()->create([
+            'event' => 'coverage-event',
+            'meta'  => ['rating' => 3, 'notes' => 'Coverage note'],
         ]);
     }
 
