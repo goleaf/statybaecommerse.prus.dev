@@ -6,6 +6,8 @@ namespace Database\Factories;
 
 use App\Models\RecommendationBlock;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\Schema;
+use Throwable;
 
 /**
  * @extends Factory<RecommendationBlock>
@@ -16,7 +18,7 @@ final class RecommendationBlockFactory extends Factory
 
     public function definition(): array
     {
-        return [
+        $state = [
             'name'             => $this->faker->unique()->slug(),
             'title'            => $this->faker->sentence(3),
             'description'      => $this->faker->optional()->paragraph(),
@@ -28,7 +30,27 @@ final class RecommendationBlockFactory extends Factory
                 'layout'  => $this->faker->randomElement(['grid', 'list']),
                 'columns' => $this->faker->numberBetween(2, 6),
             ],
-            'meta' => [],
         ];
+
+        // Guard optional columns so SQLite-driven suites avoid touching fields that
+        // have not landed in the lightweight schema snapshots yet.
+        if ($this->tableHasColumn('recommendation_blocks', 'meta')) {
+            $state['meta'] = [];
+        }
+
+        return $state;
+    }
+
+    /**
+     * Determine if the current connection exposes the requested column before
+     * trying to include it in the factory payload.
+     */
+    private function tableHasColumn(string $table, string $column): bool
+    {
+        try {
+            return Schema::hasColumn($table, $column);
+        } catch (Throwable) {
+            return false;
+        }
     }
 }

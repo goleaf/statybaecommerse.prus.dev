@@ -32,7 +32,10 @@ final class EditLegal extends EditRecord
                 ->label(__('legal.actions.publish'))
                 ->icon('heroicon-o-eye')
                 ->color('success')
-                ->visible(fn (): bool => ! $this->record->published_at)
+                ->visible(function (): bool {
+                    // Return a strict boolean so PHP's return type hint stays satisfied during template evaluation.
+                    return $this->record->published_at === null;
+                })
                 ->action(function (): void {
                     $this->record->publish();
                     Notification::make()
@@ -44,7 +47,10 @@ final class EditLegal extends EditRecord
                 ->label(__('legal.actions.unpublish'))
                 ->icon('heroicon-o-eye-slash')
                 ->color('warning')
-                ->visible(fn (): bool => $this->record->published_at)
+                ->visible(function (): bool {
+                    // Mirror the strict boolean conversion so the Livewire action visibility never returns a Carbon instance.
+                    return $this->record->published_at !== null;
+                })
                 ->action(function (): void {
                     $this->record->unpublish();
                     Notification::make()

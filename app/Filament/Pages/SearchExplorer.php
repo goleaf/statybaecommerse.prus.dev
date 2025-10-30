@@ -78,10 +78,12 @@ final class SearchExplorer extends Page
             return false;
         }
 
-        if (method_exists($user, 'hasAnyRole')) {
-            return $user->hasAnyRole(['super_admin', 'admin', 'administrator']);
+        if (method_exists($user, 'hasAnyRole') && $user->hasAnyRole(['super_admin', 'admin', 'administrator'])) {
+            return true;
         }
 
+        // Honour legacy admin toggles so environments without role seeding can
+        // still surface the search diagnostics tooling.
         return (bool) ($user->is_admin ?? false);
     }
 

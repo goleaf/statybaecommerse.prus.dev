@@ -4,10 +4,15 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Filament\Resources\CampaignConversionResource\Pages\CreateCampaignConversion;
+use App\Filament\Resources\CampaignConversionResource\Pages\EditCampaignConversion;
+use App\Filament\Resources\CampaignConversionResource\Pages\ListCampaignConversions;
+use App\Filament\Resources\CampaignConversionResource\Pages\ViewCampaignConversion;
 use App\Models\Campaign;
 use App\Models\CampaignConversion;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
 use Tests\TestCase;
 
 final class CampaignConversionResourceTest extends TestCase
@@ -18,8 +23,14 @@ final class CampaignConversionResourceTest extends TestCase
     {
         parent::setUp();
 
-        // Create test data
-        $this->user = User::factory()->create();
+        // Resolve the Filament admin panel so Livewire page classes can boot correctly during tests.
+        $this->resolveAdminPanel();
+
+        // Create an administrator to satisfy resource authorization requirements and reuse across assertions.
+        $this->user = User::factory()->create([
+            'email'    => 'admin@example.com',
+            'is_admin' => true,
+        ]);
         $this->campaign = Campaign::factory()->create();
         $this->campaignConversion = CampaignConversion::factory()->create([
             'campaign_id' => $this->campaign->id,
@@ -29,60 +40,59 @@ final class CampaignConversionResourceTest extends TestCase
 
     public function test_can_list_campaign_conversions(): void
     {
-        $this->actingAs($this->user);
-
-        $response = $this->get('/admin/campaign-conversions');
-
-        $response->assertOk();
-        $response->assertSee($this->campaignConversion->campaign_name);
+        // Hydrate the Livewire table to confirm the seeded conversion appears in the listing.
+        Livewire::actingAs($this->user)
+            ->test(ListCampaignConversions::class)
+            ->call('loadTable')
+            ->assertCanSeeTableRecords([$this->campaignConversion]);
     }
 
     public function test_can_view_campaign_conversion(): void
     {
-        $this->actingAs($this->user);
-
-        $response = $this->get("/admin/campaign-conversions/{$this->campaignConversion->id}");
-
-        $response->assertOk();
-        $response->assertSee($this->campaignConversion->campaign_name);
+        // Render the infolist to verify that conversion metadata surfaces for administrators.
+        Livewire::actingAs($this->user)
+            ->test(ViewCampaignConversion::class, ['record' => $this->campaignConversion->getRouteKey()])
+            ->assertSee($this->campaignConversion->campaign_name)
+            ->assertSee((string) $this->campaignConversion->conversion_value);
     }
 
     public function test_can_create_campaign_conversion(): void
     {
-        $this->actingAs($this->user);
-
-        $data = [
+        $payload = [
             'campaign_id'      => $this->campaign->id,
             'customer_id'      => $this->user->id,
-            'conversion_type'  => 'purchase',
+            'conversion_type'  => 'signup',
             'conversion_value' => 100.5,
             'status'           => 'completed',
-            'converted_at'     => now(),
+            'converted_at'     => now()->toDateTimeString(),
         ];
 
-        $response = $this->post('/admin/campaign-conversions', $data);
+        Livewire::actingAs($this->user)
+            ->test(CreateCampaignConversion::class)
+            ->fillForm($payload)
+            ->call('create')
+            ->assertHasNoFormErrors();
 
-        $response->assertRedirect();
         $this->assertDatabaseHas('campaign_conversions', [
             'campaign_id'      => $this->campaign->id,
             'customer_id'      => $this->user->id,
-            'conversion_type'  => 'purchase',
+            'conversion_type'  => 'signup',
             'conversion_value' => 100.5,
         ]);
     }
 
     public function test_can_edit_campaign_conversion(): void
     {
-        $this->actingAs($this->user);
-
-        $data = [
+        $payload = [
             'conversion_value' => 200.75,
             'status'           => 'confirmed',
         ];
 
-        $response = $this->put("/admin/campaign-conversions/{$this->campaignConversion->id}", $data);
-
-        $response->assertRedirect();
+        Livewire::actingAs($this->user)
+            ->test(EditCampaignConversion::class, ['record' => $this->campaignConversion->getRouteKey()])
+            ->fillForm($payload)
+            ->call('save')
+            ->assertHasNoFormErrors();
         $this->assertDatabaseHas('campaign_conversions', [
             'id'               => $this->campaignConversion->id,
             'conversion_value' => 200.75,
@@ -92,11 +102,12 @@ final class CampaignConversionResourceTest extends TestCase
 
     public function test_can_delete_campaign_conversion(): void
     {
-        $this->actingAs($this->user);
+        Livewire::actingAs($this->user)
+            ->test(ListCampaignConversions::class)
+            ->call('loadTable')
+            ->callTableAction('delete', $this->campaignConversion)
+            ->assertHasNoTableActionErrors();
 
-        $response = $this->delete("/admin/campaign-conversions/{$this->campaignConversion->id}");
-
-        $response->assertRedirect();
         $this->assertDatabaseMissing('campaign_conversions', [
             'id' => $this->campaignConversion->id,
         ]);
@@ -104,22 +115,31 @@ final class CampaignConversionResourceTest extends TestCase
 
     public function test_can_filter_by_campaign(): void
     {
-        $this->actingAs($this->user);
+        $otherCampaign = Campaign::factory()->create(['name' => 'Secondary Campaign']);
+        $hiddenConversion = CampaignConversion::factory()->create([
+            'campaign_id' => $otherCampaign->id,
+        ]);
 
-        $response = $this->get("/admin/campaign-conversions?campaign_id={$this->campaign->id}");
-
-        $response->assertOk();
-        $response->assertSee($this->campaignConversion->campaign_name);
+        Livewire::actingAs($this->user)
+            ->test(ListCampaignConversions::class)
+            ->call('loadTable')
+            ->filterTable('campaign_id', $this->campaign->id)
+            ->assertCanSeeTableRecords([$this->campaignConversion])
+            ->assertCanNotSeeTableRecords([$hiddenConversion]);
     }
 
     public function test_can_filter_by_conversion_type(): void
     {
-        $this->actingAs($this->user);
+        $signupConversion = CampaignConversion::factory()->create([
+            'conversion_type' => 'signup',
+        ]);
 
-        $response = $this->get('/admin/campaign-conversions?conversion_type=purchase');
-
-        $response->assertOk();
-        $response->assertSee($this->campaignConversion->campaign_name);
+        Livewire::actingAs($this->user)
+            ->test(ListCampaignConversions::class)
+            ->call('loadTable')
+            ->filterTable('conversion_type', 'signup')
+            ->assertCanSeeTableRecords([$signupConversion])
+            ->assertCanNotSeeTableRecords([$this->campaignConversion]);
     }
 
     public function test_can_filter_by_status(): void

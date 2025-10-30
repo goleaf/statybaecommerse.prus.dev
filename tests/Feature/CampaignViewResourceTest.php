@@ -4,18 +4,16 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use App\Filament\Resources\CampaignViewResource;
+use App\Filament\Resources\CampaignViewResource\Pages\ListCampaignViews;
+use App\Filament\Resources\CampaignViewResource\Pages\ViewCampaignView;
 use App\Models\Campaign;
 use App\Models\CampaignView;
 use App\Models\User;
-use Filament\Resources\Pages\ListRecords;
-use Filament\Resources\Pages\ViewRecord;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
+use Tests\TestCase;
 
-// Use fully-qualified base TestCase to avoid alias conflicts
-
-final class CampaignViewResourceTest extends \Tests\TestCase
+final class CampaignViewResourceTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -24,6 +22,9 @@ final class CampaignViewResourceTest extends \Tests\TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        // Ensure the Filament admin panel is registered so Livewire pages resolve dependencies during tests.
+        $this->resolveAdminPanel();
 
         $this->adminUser = User::factory()->create([
             'email'    => 'admin@example.com',
@@ -52,11 +53,9 @@ final class CampaignViewResourceTest extends \Tests\TestCase
             'user_agent'  => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
         ]);
 
-        $this->actingAs($this->adminUser);
-
-        Livewire::test(ListRecords::class, [
-            'resource' => CampaignViewResource::class,
-        ])
+        Livewire::actingAs($this->adminUser)
+            ->test(ListCampaignViews::class)
+            ->call('loadTable')
             ->assertCanSeeTableRecords(CampaignView::all())
             ->assertCanSeeTableColumns([
                 'campaign.name',
@@ -82,12 +81,8 @@ final class CampaignViewResourceTest extends \Tests\TestCase
             'session_id'  => 'session_456',
         ]);
 
-        $this->actingAs($this->adminUser);
-
-        Livewire::test(ViewRecord::class, [
-            'resource' => CampaignViewResource::class,
-            'record'   => $view->id,
-        ])
+        Livewire::actingAs($this->adminUser)
+            ->test(ViewCampaignView::class, ['record' => $view->getRouteKey()])
             ->assertCanSeeTableRecords([$view]);
     }
 
@@ -106,11 +101,9 @@ final class CampaignViewResourceTest extends \Tests\TestCase
             'ip_address'  => '192.168.1.2',
         ]);
 
-        $this->actingAs($this->adminUser);
-
-        Livewire::test(ListRecords::class, [
-            'resource' => CampaignViewResource::class,
-        ])
+        Livewire::actingAs($this->adminUser)
+            ->test(ListCampaignViews::class)
+            ->call('loadTable')
             ->filterTable('campaign_id', $campaign1->id)
             ->assertCanSeeTableRecords([$view1])
             ->assertCanNotSeeTableRecords([$view2]);
@@ -134,11 +127,9 @@ final class CampaignViewResourceTest extends \Tests\TestCase
             'ip_address'  => '192.168.1.2',
         ]);
 
-        $this->actingAs($this->adminUser);
-
-        Livewire::test(ListRecords::class, [
-            'resource' => CampaignViewResource::class,
-        ])
+        Livewire::actingAs($this->adminUser)
+            ->test(ListCampaignViews::class)
+            ->call('loadTable')
             ->filterTable('customer_id', $customer1->id)
             ->assertCanSeeTableRecords([$view1])
             ->assertCanNotSeeTableRecords([$view2]);
@@ -158,11 +149,9 @@ final class CampaignViewResourceTest extends \Tests\TestCase
             'ip_address'  => '192.168.1.200',
         ]);
 
-        $this->actingAs($this->adminUser);
-
-        Livewire::test(ListRecords::class, [
-            'resource' => CampaignViewResource::class,
-        ])
+        Livewire::actingAs($this->adminUser)
+            ->test(ListCampaignViews::class)
+            ->call('loadTable')
             ->filterTable('ip_address', '192.168.1.100')
             ->assertCanSeeTableRecords([$view1])
             ->assertCanNotSeeTableRecords([$view2]);
@@ -178,11 +167,9 @@ final class CampaignViewResourceTest extends \Tests\TestCase
             'ip_address'  => '192.168.1.1',
         ]);
 
-        $this->actingAs($this->adminUser);
-
-        Livewire::test(ListRecords::class, [
-            'resource' => CampaignViewResource::class,
-        ])
+        Livewire::actingAs($this->adminUser)
+            ->test(ListCampaignViews::class)
+            ->call('loadTable')
             ->assertCanSeeTableRecords([$guestView]);
     }
 
@@ -197,11 +184,9 @@ final class CampaignViewResourceTest extends \Tests\TestCase
             'ip_address'  => '192.168.1.1',
         ]);
 
-        $this->actingAs($this->adminUser);
-
-        Livewire::test(ListRecords::class, [
-            'resource' => CampaignViewResource::class,
-        ])
+        Livewire::actingAs($this->adminUser)
+            ->test(ListCampaignViews::class)
+            ->call('loadTable')
             ->assertCanSeeTableRecords([$view]);
     }
 
@@ -216,11 +201,9 @@ final class CampaignViewResourceTest extends \Tests\TestCase
             'ip_address'  => '192.168.1.1',
         ]);
 
-        $this->actingAs($this->adminUser);
-
-        Livewire::test(ListRecords::class, [
-            'resource' => CampaignViewResource::class,
-        ])
+        Livewire::actingAs($this->adminUser)
+            ->test(ListCampaignViews::class)
+            ->call('loadTable')
             ->assertCanSeeTableRecords([$view]);
     }
 
@@ -232,11 +215,9 @@ final class CampaignViewResourceTest extends \Tests\TestCase
             'ip_address'  => '192.168.1.1',
         ]);
 
-        $this->actingAs($this->adminUser);
-
-        Livewire::test(ListRecords::class, [
-            'resource' => CampaignViewResource::class,
-        ])
+        Livewire::actingAs($this->adminUser)
+            ->test(ListCampaignViews::class)
+            ->call('loadTable')
             ->assertCanSeeTableRecords([$view]);
     }
 
@@ -251,19 +232,15 @@ final class CampaignViewResourceTest extends \Tests\TestCase
             'ip_address'  => '192.168.1.1',
         ]);
 
-        $this->actingAs($this->adminUser);
-
-        Livewire::test(ListRecords::class, [
-            'resource' => CampaignViewResource::class,
-        ])
+        Livewire::actingAs($this->adminUser)
+            ->test(ListCampaignViews::class)
+            ->call('loadTable')
             ->assertCanSeeTableRecords([$view]);
     }
 
     public function test_ip_address_validation(): void
     {
         $campaign = Campaign::factory()->create();
-
-        $this->actingAs($this->adminUser);
 
         // Test with valid IP
         $validView = CampaignView::factory()->create([
@@ -361,11 +338,9 @@ final class CampaignViewResourceTest extends \Tests\TestCase
             'customer_id' => $customer->id,
         ]);
 
-        $this->actingAs($this->adminUser);
-
-        Livewire::test(ListRecords::class, [
-            'resource' => CampaignViewResource::class,
-        ])
+        Livewire::actingAs($this->adminUser)
+            ->test(ListCampaignViews::class)
+            ->call('loadTable')
             ->assertCanSeeTableRecords($views);
     }
 
@@ -380,11 +355,9 @@ final class CampaignViewResourceTest extends \Tests\TestCase
             'ip_address'  => '192.168.1.1',
         ]);
 
-        $this->actingAs($this->adminUser);
-
-        Livewire::test(ListRecords::class, [
-            'resource' => CampaignViewResource::class,
-        ])
+        Livewire::actingAs($this->adminUser)
+            ->test(ListCampaignViews::class)
+            ->call('loadTable')
             ->searchTable('Searchable')
             ->assertCanSeeTableRecords([$view]);
     }
@@ -405,11 +378,9 @@ final class CampaignViewResourceTest extends \Tests\TestCase
             'viewed_at'   => now(),
         ]);
 
-        $this->actingAs($this->adminUser);
-
-        Livewire::test(ListRecords::class, [
-            'resource' => CampaignViewResource::class,
-        ])
+        Livewire::actingAs($this->adminUser)
+            ->test(ListCampaignViews::class)
+            ->call('loadTable')
             ->sortTable('viewed_at', 'desc')
             ->assertCanSeeTableRecords([$view2, $view1]);
     }
@@ -422,11 +393,9 @@ final class CampaignViewResourceTest extends \Tests\TestCase
             'ip_address'  => '192.168.1.1',
         ]);
 
-        $this->actingAs($this->adminUser);
-
-        Livewire::test(ListRecords::class, [
-            'resource' => CampaignViewResource::class,
-        ])
+        Livewire::actingAs($this->adminUser)
+            ->test(ListCampaignViews::class)
+            ->call('loadTable')
             ->assertCanSeeTableRecords([$view]);
     }
 }
