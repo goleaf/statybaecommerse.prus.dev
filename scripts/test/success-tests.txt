@@ -76,7 +76,7 @@ tests/Unit/Filament/Actions/VariantBulkPriceUpdateUnitTest.php
 tests/Unit/Filament/Actions/DocumentActionUnitTest.php
 tests/Unit/Filament/Actions/DiscountCodeDocumentActionUnitTest.php
 tests/Unit/Factories/EnumFactoryTest.php
-tests/Unit/ExampleTest.php
+tests/Unit/BaselinePlaceholderTest.php
 tests/Unit/Enums/EnumsTest.php
 tests/Unit/Enums/CurrencyEnumTest.php
 tests/Unit/Eloquent/RelationshipsTest.php

@@ -12,9 +12,9 @@ uses(TestCase::class);
 
 /**
  * Ensure the Livewire testing helpers stay operational even when only the
- * lightweight example placeholder component is available.
+ * lightweight placeholder component is available for smoke coverage.
  */
-it('renders and updates the example Livewire placeholder component', function (): void {
+it('renders and updates the Livewire placeholder component', function (): void {
     $componentClass = new class extends Component
     {
         public int $count = 0;

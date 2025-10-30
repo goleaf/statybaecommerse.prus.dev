@@ -9,10 +9,10 @@ use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 /**
- * Provide a lightweight HTTP smoke test so tooling that expects an ExampleTest
- * entry within the HTTP suite can rely on a deterministic response payload.
+ * Provide a lightweight HTTP smoke test so tooling can rely on a
+ * deterministic response payload from the public health endpoint.
  */
-final class ExampleTest extends TestCase
+final class HealthEndpointSmokeTest extends TestCase
 {
     use RefreshDatabase;
 
