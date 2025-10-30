@@ -16,9 +16,9 @@ final class ObservabilityDashboard extends Page
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations while surfacing
      * the accepted union type for static analyzers.
      */
-//    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar';
+    //    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar';
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    public static function getNavigationIcon(): string
     {
         return 'heroicon-o-chart-bar';
     }
@@ -142,7 +142,7 @@ final class ObservabilityDashboard extends Page
             ],
             [
                 'number'      => 1518,
-                'title'       => 'Content-based recommendations telemetry',
+                'title'       => 'Content-based recommendations monitoring',
                 'description' => 'Capture behaviour logging events from the UI, covering click and seen actions.',
                 'status'      => 'watching',
                 'url'         => 'https://github.com/prus-dev/statybaecommerse.prus.dev/pull/1518',

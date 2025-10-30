@@ -6,9 +6,7 @@ namespace App\Services\Recommendations;
 
 use App\Models\Product;
 use App\Models\User;
-use App\Support\Telemetry\TelemetryManager;
 use Illuminate\Database\Eloquent\Collection;
-use OpenTelemetry\API\Trace\SpanInterface;
 
 /**
  * PopularityRecommendation
@@ -38,31 +36,22 @@ final class PopularityRecommendation extends BaseRecommendation
      */
     public function getRecommendations(?User $user = null, ?Product $product = null, array $context = []): Collection
     {
-        /** @var TelemetryManager $telemetry */
-        $telemetry = app(TelemetryManager::class);
+        $startTime = microtime(true);
+        $cacheKey = $this->generateCacheKey('popularity', $user, $product, $context);
+        $cached = $this->getCachedResult($cacheKey);
+        if ($cached instanceof Collection) {
+            return $cached;
+        }
 
-        return $telemetry->inSpan('recommendations.popularity.generate', function (?SpanInterface $span) use ($user, $product, $context): Collection {
-            $startTime = microtime(true);
-            $cacheKey = $this->generateCacheKey('popularity', $user, $product, $context);
-            $cached = $this->getCachedResult($cacheKey);
-            if ($cached) {
-                $span?->setAttribute('recommendations.cache_hit', true);
+        $recommendations = $this->calculatePopularityRecommendations($user, $product);
+        $duration = microtime(true) - $startTime;
 
-                return $cached;
-            }
+        // Record timing so future audits retain visibility despite the lack of tracing spans.
+        $this->logPerformance('popularity', $duration, $recommendations->count());
+        // Persist behavioural tracking so downstream analytics remain populated.
+        $this->trackRecommendation('popularity', $user, $product, $recommendations->toArray());
 
-            $recommendations = $this->calculatePopularityRecommendations($user, $product);
-            $duration = microtime(true) - $startTime;
-            $span?->setAttribute('recommendations.count', $recommendations->count());
-            $span?->setAttribute('recommendations.duration', $duration);
-
-            $this->logPerformance('popularity', $duration, $recommendations->count());
-            $this->trackRecommendation('popularity', $user, $product, $recommendations->toArray());
-
-            return $this->cacheResult($cacheKey, $recommendations, $this->config['cache_ttl'] ?? 1800);
-        }, [
-            'recommendations.strategy' => 'popularity',
-        ]);
+        return $this->cacheResult($cacheKey, $recommendations, $this->config['cache_ttl'] ?? 1800);
     }
 
     /**
@@ -74,7 +63,7 @@ final class PopularityRecommendation extends BaseRecommendation
         $weights = $this->config['popularity_weights'];
         $query = Product::query()->with(['media', 'brand', 'categories'])->where('is_visible', true);
         // Exclude current product if provided
-        if ($product) {
+        if ($product instanceof \App\Models\Product) {
             $query->where('id', '!=', $product->id);
         }
         // Apply filters
@@ -114,20 +103,16 @@ final class PopularityRecommendation extends BaseRecommendation
 
     /**
      * Handle getSalesSubquery functionality with proper error handling.
-     *
-     * @return Illuminate\Database\Eloquent\Builder
      */
     private function getSalesSubquery(int $timeWindow): \Illuminate\Database\Eloquent\Builder
     {
-        return \App\Models\OrderItem::query()->selectRaw('product_id, COUNT(*) as sales_count')->whereHas('order', function ($query) use ($timeWindow) {
+        return \App\Models\OrderItem::query()->selectRaw('product_id, COUNT(*) as sales_count')->whereHas('order', function ($query) use ($timeWindow): void {
             $query->whereIn('status', ['completed', 'delivered'])->where('created_at', '>=', now()->subDays($timeWindow));
         })->groupBy('product_id');
     }
 
     /**
      * Handle getViewsSubquery functionality with proper error handling.
-     *
-     * @return Illuminate\Database\Eloquent\Builder
      */
     private function getViewsSubquery(int $timeWindow): \Illuminate\Database\Eloquent\Builder
     {
@@ -141,8 +126,6 @@ final class PopularityRecommendation extends BaseRecommendation
 
     /**
      * Handle getReviewsSubquery functionality with proper error handling.
-     *
-     * @return Illuminate\Database\Eloquent\Builder
      */
     private function getReviewsSubquery(int $timeWindow): \Illuminate\Database\Eloquent\Builder
     {
@@ -151,8 +134,6 @@ final class PopularityRecommendation extends BaseRecommendation
 
     /**
      * Handle getWishlistSubquery functionality with proper error handling.
-     *
-     * @return Illuminate\Database\Eloquent\Builder
      */
     private function getWishlistSubquery(int $timeWindow): \Illuminate\Database\Eloquent\Builder
     {
