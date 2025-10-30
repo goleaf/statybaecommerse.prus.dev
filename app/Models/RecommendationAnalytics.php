@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Models\Scopes\UserOwnedScope;
+use Carbon\CarbonImmutable;
+use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -33,6 +36,25 @@ final class RecommendationAnalytics extends Model
     protected $fillable = ['block_id', 'config_id', 'user_id', 'product_id', 'action', 'ctr', 'conversion_rate', 'metrics', 'date'];
 
     protected $casts = ['ctr' => 'decimal:4', 'conversion_rate' => 'decimal:4', 'metrics' => 'array', 'date' => 'date'];
+
+    /**
+     * Normalise the persisted date to an ISO string so SQLite comparisons stay deterministic.
+     */
+    protected function date(): Attribute
+    {
+        return Attribute::make(
+            set: static function (CarbonInterface|string|null $value): ?string {
+                // Guard against empty payloads so the column can remain nullable when omitted.
+                if ($value === null || $value === '') {
+                    return null;
+                }
+
+                return $value instanceof CarbonInterface
+                    ? $value->toDateString()
+                    : CarbonImmutable::parse($value)->toDateString();
+            },
+        );
+    }
 
     /**
      * Handle block functionality with proper error handling.

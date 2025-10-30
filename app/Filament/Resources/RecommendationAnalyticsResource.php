@@ -46,12 +46,12 @@ final class RecommendationAnalyticsResource extends Resource
 
     protected static ?int $navigationSort = 8;
 
-    protected static ?string $recordTitleAttribute = 'action';
+    /**
+     * Anchor the resource under the shared Analytics navigation bucket used across the admin panel.
+     */
+    protected static UnitEnum|string|null $navigationGroup = 'Analytics';
 
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'Analytics';
-    }
+    protected static ?string $recordTitleAttribute = 'action';
 
     public static function getNavigationLabel(): string
     {
