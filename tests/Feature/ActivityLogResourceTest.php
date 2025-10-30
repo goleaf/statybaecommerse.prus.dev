@@ -15,8 +15,14 @@ final class ActivityLogResourceTest extends TestCase
 {
     use RefreshDatabase;
 
+    /**
+     * Hold the authenticated admin user for reuse across individual scenarios.
+     */
+    private User $adminUser;
+
     public static function setUpBeforeClass(): void
     {
+        // Force the lightweight SQLite schema so the activity log factories remain deterministic.
         putenv('TEST_FORCE_MINIMAL_SQLITE=1');
         $_ENV['TEST_FORCE_MINIMAL_SQLITE'] = '1';
         $_SERVER['TEST_FORCE_MINIMAL_SQLITE'] = '1';

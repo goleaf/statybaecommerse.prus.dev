@@ -32,6 +32,12 @@ abstract class BaseListRecords extends ListRecords
      */
     public function loadTable(): void
     {
+        if (! isset($this->table)) {
+            // Manually bootstrap the table when tests or early lifecycle hooks call loadTable()
+            // before Livewire runs the trait's bootedInteractsWithTable lifecycle hook.
+            $this->bootedInteractsWithTable();
+        }
+
         // Touch the table records collection so Livewire interactions behave like Filament v3.
         $this->getTableRecords();
     }
