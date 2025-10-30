@@ -35,7 +35,7 @@ final class CampaignClickController extends Controller
         tags: ['Campaign Clicks'],
         parameters: [
             new OA\QueryParameter(name: 'page', description: 'Page number to retrieve.', in: 'query', schema: new OA\Schema(type: 'integer', minimum: 1)),
-            new OA\QueryParameter(name: 'per_page', description: 'Items per page (1-100).', in: 'query', schema: new OA\Schema(type: 'integer', minimum: 1, maximum: 100)),
+            new OA\QueryParameter(name: 'per_page', description: 'Items per page (1-100).', in: 'query', schema: new OA\Schema(type: 'integer', maximum: 100, minimum: 1)),
             new OA\QueryParameter(name: 'sort', description: 'Sort definition, e.g. `-clicked_at` or `conversion_value`.', in: 'query', schema: new OA\Schema(type: 'string')),
             new OA\QueryParameter(name: 'campaign_id', description: 'Filter clicks by campaign identifier.', in: 'query', schema: new OA\Schema(type: 'integer', format: 'int64')),
             new OA\QueryParameter(name: 'click_type', description: 'Filter by click type (cta, banner, link, button, image).', in: 'query', schema: new OA\Schema(type: 'string')),
@@ -126,7 +126,7 @@ final class CampaignClickController extends Controller
     #[OA\Post(
         path: '/campaign-clicks',
         summary: 'Record a campaign click',
-        description: 'Create a campaign click entry from storefront or partner telemetry.',
+        description: 'Create a campaign click entry sourced from storefront or partner analytics events.',
         tags: ['Campaign Clicks'],
         requestBody: new OA\RequestBody(
             required: true,
@@ -359,7 +359,7 @@ final class CampaignClickController extends Controller
         // Build a shared query that applies the caller scope and trailing-day filter.
         $baseQuery = CampaignClick::query();
 
-        // For authenticated users, only include their own click telemetry in analytics.
+        // For authenticated users, only include their own click analytics in aggregate responses.
         if (Auth::check()) {
             $baseQuery->where('customer_id', Auth::id());
         }
@@ -473,7 +473,6 @@ final class CampaignClickController extends Controller
      * Handle exportCsv functionality with proper error handling.
      *
      * @param  mixed                                             $clicks
-     * @return Symfony\Component\HttpFoundation\StreamedResponse
      */
     private function exportCsv($clicks, string $filename): \Symfony\Component\HttpFoundation\StreamedResponse
     {

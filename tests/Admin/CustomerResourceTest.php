@@ -12,11 +12,9 @@ use App\Models\Company;
 use App\Models\Country;
 use App\Models\Customer;
 use App\Models\User;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Str;
 use Livewire\Livewire;
+use Spatie\Permission\Models\Permission;
 use Tests\TestCase;
 
 final class CustomerResourceTest extends TestCase
@@ -29,153 +27,35 @@ final class CustomerResourceTest extends TestCase
     {
         parent::setUp();
 
-        $this->ensureTestTables();
-
+        // Ensure the Filament admin panel and routes are registered before exercising Livewire components.
         $this->resolveAdminPanel();
 
+        // Seed a deterministic admin user so policies and audit columns resolve consistently across test runs.
         $this->admin = User::factory()->admin()->create([
             'email' => 'admin@example.test',
         ]);
 
+        // Grant the explicit customer permissions required by the policy layer to interact with the resource during tests.
+        $this->grantCustomerPermissions($this->admin);
+
         $this->actingAs($this->admin);
-    }
-
-    private function ensureTestTables(): void
-    {
-        Schema::disableForeignKeyConstraints();
-
-        if (! Schema::hasTable('countries')) {
-            Schema::create('countries', function (Blueprint $table): void {
-                $table->id();
-                $table->string('name');
-                $table->string('name_official')->nullable();
-                $table->string('description')->nullable();
-                $table->string('cca2', 2)->nullable();
-                $table->string('cca3', 3)->nullable();
-                $table->string('ccn3', 3)->nullable();
-                $table->string('code')->nullable();
-                $table->string('iso_code')->nullable();
-                $table->string('currency_code', 3)->nullable();
-                $table->string('currency_symbol', 5)->nullable();
-                $table->string('phone_code', 10)->nullable();
-                $table->string('phone_calling_code', 10)->nullable();
-                $table->string('flag')->nullable();
-                $table->string('svg_flag')->nullable();
-                $table->string('region')->nullable();
-                $table->string('subregion')->nullable();
-                $table->decimal('latitude', 10, 7)->nullable();
-                $table->decimal('longitude', 10, 7)->nullable();
-                $table->json('currencies')->nullable();
-                $table->json('languages')->nullable();
-                $table->json('timezones')->nullable();
-                $table->string('timezone')->nullable();
-                $table->boolean('is_active')->default(true);
-                $table->boolean('is_enabled')->default(true);
-                $table->boolean('is_eu_member')->default(false);
-                $table->boolean('requires_vat')->default(false);
-                $table->decimal('vat_rate', 5, 2)->nullable();
-                $table->json('metadata')->nullable();
-                $table->unsignedInteger('sort_order')->default(0);
-                $table->softDeletes();
-                $table->timestamps();
-            });
-        }
-
-        if (! Schema::hasTable('companies')) {
-            Schema::create('companies', function (Blueprint $table): void {
-                $table->id();
-                $table->string('name');
-                $table->string('email')->nullable();
-                $table->string('phone')->nullable();
-                $table->string('address')->nullable();
-                $table->string('website')->nullable();
-                $table->string('industry')->nullable();
-                $table->string('size')->nullable();
-                $table->text('description')->nullable();
-                $table->boolean('is_active')->default(true);
-                $table->json('metadata')->nullable();
-                $table->timestamps();
-                $table->softDeletes();
-            });
-        }
-
-        if (! Schema::hasTable('cities')) {
-            Schema::create('cities', function (Blueprint $table): void {
-                $table->id();
-                $table->string('name');
-                $table->string('slug')->unique();
-                $table->string('code')->nullable();
-                $table->text('description')->nullable();
-                $table->boolean('is_enabled')->default(true);
-                $table->boolean('is_default')->default(false);
-                $table->boolean('is_capital')->default(false);
-                $table->unsignedBigInteger('country_id')->nullable();
-                $table->unsignedBigInteger('parent_id')->nullable();
-                $table->unsignedSmallInteger('level')->default(0);
-                $table->decimal('latitude', 10, 7)->nullable();
-                $table->decimal('longitude', 10, 7)->nullable();
-                $table->unsignedBigInteger('population')->nullable();
-                $table->json('postal_codes')->nullable();
-                $table->json('metadata')->nullable();
-                $table->unsignedInteger('sort_order')->default(0);
-                $table->boolean('is_active')->default(true);
-                $table->timestamps();
-                $table->softDeletes();
-            });
-        }
-
-        if (! Schema::hasTable('customers')) {
-            Schema::create('customers', function (Blueprint $table): void {
-                $table->id();
-                $table->string('name');
-                $table->string('email')->unique();
-                $table->string('phone')->nullable();
-                $table->string('address')->nullable();
-                $table->unsignedBigInteger('country_id')->nullable();
-                $table->unsignedBigInteger('city_id')->nullable();
-                $table->string('postal_code')->nullable();
-                $table->unsignedBigInteger('company_id')->nullable();
-                $table->boolean('is_active')->default(true);
-                $table->json('metadata')->nullable();
-                $table->timestamps();
-                $table->softDeletes();
-            });
-        }
-
-        if (! Schema::hasTable('orders')) {
-            Schema::create('orders', function (Blueprint $table): void {
-                $table->id();
-                $table->unsignedBigInteger('customer_id')->nullable();
-                $table->string('status')->default('pending');
-                $table->timestamps();
-                $table->softDeletes();
-            });
-        } else {
-            Schema::table('orders', function (Blueprint $table): void {
-                if (! Schema::hasColumn('orders', 'customer_id')) {
-                    $table->unsignedBigInteger('customer_id')->nullable()->after('user_id');
-                }
-
-                if (! Schema::hasColumn('orders', 'status')) {
-                    $table->string('status')->default('pending');
-                }
-            });
-        }
-
-        Schema::enableForeignKeyConstraints();
     }
 
     public function test_list_page_displays_customers_and_supports_filters(): void
     {
         $country = Country::factory()->create(['name' => 'Lithuania']);
-        $city = $this->createCity($country, 'Vilnius');
+        $city = City::factory()->forCountry($country)->create([
+            'name' => 'Vilnius',
+        ]);
         $company = Company::factory()->create([
             'name'      => 'Acme Builders',
             'is_active' => true,
         ]);
 
         $otherCountry = Country::factory()->create(['name' => 'Latvia']);
-        $otherCity = $this->createCity($otherCountry, 'Riga');
+        $otherCity = City::factory()->forCountry($otherCountry)->create([
+            'name' => 'Riga',
+        ]);
         $otherCompany = Company::factory()->create([
             'name'      => 'Baltic Logistics',
             'is_active' => true,
@@ -226,7 +106,9 @@ final class CustomerResourceTest extends TestCase
     public function test_can_create_customer_via_filament_form(): void
     {
         $country = Country::factory()->create(['name' => 'Lithuania']);
-        $city = $this->createCity($country, 'Kaunas');
+        $city = City::factory()->forCountry($country)->create([
+            'name' => 'Kaunas',
+        ]);
         $company = Company::factory()->create([
             'name'      => 'Statyba UAB',
             'is_active' => true,
@@ -262,7 +144,9 @@ final class CustomerResourceTest extends TestCase
     public function test_can_edit_customer_via_filament_form(): void
     {
         $country = Country::factory()->create(['name' => 'Lithuania']);
-        $initialCity = $this->createCity($country, 'Vilnius');
+        $initialCity = City::factory()->forCountry($country)->create([
+            'name' => 'Vilnius',
+        ]);
         $initialCompany = Company::factory()->create([
             'name'      => 'Original Co',
             'is_active' => true,
@@ -278,7 +162,9 @@ final class CustomerResourceTest extends TestCase
             'is_active'  => true,
         ]);
 
-        $updatedCity = $this->createCity($country, 'Kaunas');
+        $updatedCity = City::factory()->forCountry($country)->create([
+            'name' => 'Kaunas',
+        ]);
         $updatedCompany = Company::factory()->create([
             'name'      => 'Updated Co',
             'is_active' => true,
@@ -310,8 +196,12 @@ final class CustomerResourceTest extends TestCase
     public function test_can_toggle_active_status_from_table_action(): void
     {
         $country = Country::factory()->create();
-        $city = $this->createCity($country, 'Klaipeda');
-        $company = Company::factory()->create(['is_active' => true]);
+        $city = City::factory()->forCountry($country)->create([
+            'name' => 'Klaipeda',
+        ]);
+        $company = Company::factory()->create([
+            'is_active' => true,
+        ]);
 
         $customer = Customer::factory()->create([
             'country_id' => $country->id,
@@ -335,8 +225,12 @@ final class CustomerResourceTest extends TestCase
     public function test_can_bulk_activate_and_deactivate_customers(): void
     {
         $country = Country::factory()->create();
-        $city = $this->createCity($country, 'Panevezys');
-        $company = Company::factory()->create(['is_active' => true]);
+        $city = City::factory()->forCountry($country)->create([
+            'name' => 'Panevezys',
+        ]);
+        $company = Company::factory()->create([
+            'is_active' => true,
+        ]);
 
         $activeCustomers = Customer::factory()->count(2)->create([
             'country_id' => $country->id,
@@ -356,7 +250,7 @@ final class CustomerResourceTest extends TestCase
 
         $component
             ->call('loadTable')
-            ->callTableBulkAction('deactivate', $activeCustomers->pluck('id')->all())
+            ->callTableBulkAction('deactivate', $activeCustomers)
             ->assertHasNoTableBulkActionErrors();
 
         foreach ($activeCustomers as $customer) {
@@ -367,7 +261,7 @@ final class CustomerResourceTest extends TestCase
         }
 
         $component
-            ->callTableBulkAction('activate', $inactiveCustomers->pluck('id')->all())
+            ->callTableBulkAction('activate', $inactiveCustomers)
             ->assertHasNoTableBulkActionErrors();
 
         foreach ($inactiveCustomers as $customer) {
@@ -378,25 +272,22 @@ final class CustomerResourceTest extends TestCase
         }
     }
 
-    private function createCity(Country $country, string $name): City
+    /**
+     * Provision the set of permissions expected by the CustomerPolicy during Filament interactions.
+     */
+    private function grantCustomerPermissions(User $user): void
     {
-        return City::query()->create([
-            'name'         => $name,
-            'slug'         => Str::slug($name . '-' . Str::random(5)),
-            'code'         => strtoupper(Str::random(2)) . '-' . Str::random(3),
-            'is_enabled'   => true,
-            'is_default'   => false,
-            'is_capital'   => false,
-            'country_id'   => $country->id,
-            'parent_id'    => null,
-            'level'        => 0,
-            'latitude'     => null,
-            'longitude'    => null,
-            'population'   => null,
-            'postal_codes' => ['00000'],
-            'sort_order'   => 0,
-            'metadata'     => [],
-            'is_active'    => true,
-        ]);
+        $permissions = [
+            'view_customers',
+            'create_customers',
+            'edit_customers',
+            'delete_customers',
+        ];
+
+        foreach ($permissions as $permission) {
+            Permission::findOrCreate($permission);
+        }
+
+        $user->syncPermissions($permissions);
     }
 }
