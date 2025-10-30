@@ -80,10 +80,12 @@ final class ObservabilityDashboard extends Page
             return false;
         }
 
-        if (method_exists($user, 'hasAnyRole')) { // @phpstan-ignore-line Intentionally guard dynamic guard methods surfaced via traits.
-            return $user->hasAnyRole(['super_admin', 'admin', 'administrator']);
+        if (method_exists($user, 'hasAnyRole') && $user->hasAnyRole(['super_admin', 'admin', 'administrator'])) { // @phpstan-ignore-line Intentionally guard dynamic guard methods surfaced via traits.
+            return true;
         }
 
+        // Honour the legacy is_admin flag so installs that have not migrated to
+        // role-based permissions still reach the observability tooling.
         return (bool) ($user->is_admin ?? false);
     }
 
