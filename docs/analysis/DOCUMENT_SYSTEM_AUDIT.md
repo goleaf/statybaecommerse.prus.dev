@@ -6,6 +6,8 @@ The document platform combines reusable templates, automated generation, variabl
 ## Document Templates
 - `DocumentTemplate` stores editable HTML bodies, variable definitions, categorisation, and print settings while auto-generating slugs and exposing historic documents for the template, enabling reusable layouts for downstream generation.【F:app/Models/DocumentTemplate.php†L31-L199】
 - Alphabetical pickers stay predictable thanks to the hardened `DocumentTemplate::orderedByName()` scope, which normalises direction input before applying qualified ordering clauses for complex joins.【F:app/Models/DocumentTemplate.php†L234-L240】
+- Filament regression tests now exercise the document template table actions and relation manager, covering duplicate handling, preview rendering, deactivate bulk workflows, and status filtering to ensure the v4 UI remains stable.【F:tests/Feature/Filament/Resources/DocumentTemplateResourceTableTest.php†L16-L159】
+- Template duplication and bulk activation/deactivation guard against derived attributes and mixed selection payloads, unsetting the `documents_count` aggregate before cloning and resolving record IDs prior to set-based updates so the actions succeed regardless of how records are provided.【F:app/Filament/Resources/DocumentTemplateResource.php†L315-L338】【F:app/Filament/Resources/DocumentTemplateResource.php†L350-L358】
 
 ## Document Generation
 - `DocumentService::generateDocument()` sanitises template HTML, applies variables, persists the draft record, and optionally notifies the initiating user; `generatePdf()` renders the processed HTML into a DomPDF file, applies print settings, saves the asset to secure storage, and publishes the document.【F:app/Services/DocumentService.php†L35-L103】
