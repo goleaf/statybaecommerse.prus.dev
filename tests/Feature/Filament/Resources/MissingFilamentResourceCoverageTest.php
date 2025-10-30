@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Filament\Resources;
 
+use App\Filament\Resources\ActivityLogResource\Pages\ListActivityLogs;
 use App\Filament\Resources\AuditTrailResource\Pages\ListAuditTrails;
 use App\Filament\Resources\BrandResource\Pages\ListBrands;
 use App\Filament\Resources\CampaignResource\Pages\ListCampaigns;
@@ -11,6 +12,8 @@ use App\Filament\Resources\CityResource\Pages\ListCities;
 use App\Filament\Resources\CollectionResource\Pages\ListCollections;
 use App\Filament\Resources\CollectionRuleResource\Pages\ListCollectionRules;
 use App\Filament\Resources\EnumManagementResource\Pages\ListEnumManagement;
+use App\Filament\Resources\LegalResource\Pages\ListLegals;
+use App\Filament\Resources\LocationResource\Pages\ListLocations;
 use App\Filament\Resources\PostResource\Pages\ListPosts;
 use App\Filament\Resources\ProductVariantResource\Pages\ListProductVariants;
 use App\Filament\Resources\RecommendationAnalyticsResource\Pages\ListRecommendationAnalytics;
@@ -20,6 +23,7 @@ use App\Filament\Resources\SystemSettingResource\Pages\ListSystemSettings;
 use App\Filament\Resources\UserManagementResource\Pages\ListUsers;
 use App\Filament\Resources\UserPreferenceResource\Pages\ListUserPreferences;
 use App\Filament\Resources\VariantStockResource\Pages\ListVariantStocks;
+use App\Models\ActivityLog;
 use App\Models\AuditTrail;
 use App\Models\Brand;
 use App\Models\Campaign;
@@ -27,6 +31,8 @@ use App\Models\City;
 use App\Models\Collection;
 use App\Models\CollectionRule;
 use App\Models\Country;
+use App\Models\Legal;
+use App\Models\Location;
 use App\Models\EnumValue;
 use App\Models\Post;
 use App\Models\ProductVariant;
@@ -81,6 +87,7 @@ final class MissingFilamentResourceCoverageTest extends TestCase
     {
         // Map each resource list page to the helper responsible for creating a visible record.
         return [
+            'activity logs'             => [ListActivityLogs::class, 'createActivityLogRecord'],
             'audit trails'              => [ListAuditTrails::class, 'createAuditTrailRecord'],
             'brands'                    => [ListBrands::class, 'createBrandRecord'],
             'campaigns'                 => [ListCampaigns::class, 'createCampaignRecord'],
@@ -88,6 +95,8 @@ final class MissingFilamentResourceCoverageTest extends TestCase
             'collections'               => [ListCollections::class, 'createCollectionRecord'],
             'collection rules'          => [ListCollectionRules::class, 'createCollectionRuleRecord'],
             'enum management'           => [ListEnumManagement::class, 'createEnumValueRecord'],
+            'legal documents'           => [ListLegals::class, 'createLegalRecord'],
+            'locations'                 => [ListLocations::class, 'createLocationRecord'],
             'posts'                     => [ListPosts::class, 'createPostRecord'],
             'product variants'          => [ListProductVariants::class, 'createProductVariantRecord'],
             'recommendation analytics'  => [ListRecommendationAnalytics::class, 'createRecommendationAnalyticsRecord'],
@@ -112,6 +121,31 @@ final class MissingFilamentResourceCoverageTest extends TestCase
         Livewire::test($pageClass)
             ->call('loadTable')
             ->assertCanSeeTableRecords([$record]);
+    }
+
+    private function createActivityLogRecord(): ActivityLog
+    {
+        // Provision users to act as both the actor and subject so relationship columns resolve gracefully.
+        $actor = User::factory()->create([
+            'name'  => 'Activity Actor',
+            'email' => 'activity.actor@example.com',
+        ]);
+        $subject = User::factory()->create([
+            'name'  => 'Activity Subject',
+            'email' => 'activity.subject@example.com',
+        ]);
+
+        // Seed a deterministic activity entry to guarantee the listing exposes a concrete record.
+        return ActivityLog::factory()
+            ->forUser($actor)
+            ->create([
+                'log_name'     => 'coverage-log',
+                'description'  => 'Coverage activity log entry',
+                'event'        => 'updated',
+                'subject_type' => $subject->getMorphClass(),
+                'subject_id'   => $subject->getKey(),
+                'created_at'   => now()->subDay(),
+            ]);
     }
 
     private function createAuditTrailRecord(): AuditTrail
@@ -202,6 +236,79 @@ final class MissingFilamentResourceCoverageTest extends TestCase
             'key'   => 'coverage',
             'value' => 'Coverage',
         ]);
+    }
+
+    private function createLegalRecord(): Legal
+    {
+        // Create a published legal document so widget tabs and filters surface a tangible entry.
+        $legal = Legal::factory()
+            ->enabled()
+            ->published()
+            ->create([
+                'key'         => 'coverage-legal',
+                'type'        => 'privacy_policy',
+                'is_required' => true,
+                'sort_order'  => 5,
+                'meta_data'   => [
+                    'version' => '1.0.0',
+                ],
+                'published_at' => now()->subDay(),
+            ]);
+
+        // Attach an English translation to emulate the localized content the resource expects to render.
+        $legal->translations()->create([
+            'locale'          => 'en',
+            'title'           => 'Coverage Legal Document',
+            'slug'            => 'coverage-legal-entry',
+            'content'         => '<p>Coverage legal content.</p>',
+            'seo_title'       => 'Coverage Legal Title',
+            'seo_description' => 'Coverage legal description',
+        ]);
+
+        return $legal->fresh();
+    }
+
+    private function createLocationRecord(): Location
+    {
+        // Establish supporting geography so relationship-driven columns (country/city) resolve cleanly.
+        $country = Country::factory()->create([
+            'name' => 'Coverage Location Country',
+        ]);
+
+        $city = City::factory()
+            ->forCountry($country)
+            ->create([
+                'name' => 'Coverage Location City',
+                'slug' => 'coverage-location-city',
+                'code' => 'CLC-001',
+            ]);
+
+        // Seed a warehouse-style location entry with predictable contact metadata for the listing.
+        $location = Location::factory()->create([
+            'name'          => 'Coverage Warehouse',
+            'slug'          => 'coverage-warehouse',
+            'code'          => 'COV-WH',
+            'type'          => 'warehouse',
+            'country_code'  => $country->cca2,
+            'city'          => $city->name,
+            'phone'         => '+37060000000',
+            'email'         => 'warehouse@example.com',
+            'is_enabled'    => true,
+            'is_default'    => false,
+            'opening_hours' => [
+                ['day' => 'monday', 'open_time' => '09:00', 'close_time' => '17:00', 'is_closed' => false],
+            ],
+            'contact_info' => [
+                'manager' => 'Coverage Manager',
+            ],
+            'sort_order' => 10,
+        ]);
+
+        // Associate the generated city so relationship columns display the expected reference values.
+        $location->city()->associate($city);
+        $location->save();
+
+        return $location->fresh();
     }
 
     private function createPostRecord(): Post
