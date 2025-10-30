@@ -17,7 +17,7 @@ final class ReferralCodeUsageLogForm
 {
     public static function configure(Schema $form): Schema
     {
-        return $schema
+        return $form
             ->schema([
                 SchemaSection::make(__('admin.referral_code_usage_logs.basic_information'))
                     ->schema([
