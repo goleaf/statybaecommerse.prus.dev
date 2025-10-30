@@ -8,6 +8,7 @@ use App\Enums\ModerationState;
 use App\Filament\Resources\PostResource\Pages;
 use App\Filament\Resources\PostResource\RelationManagers;
 use App\Models\Post;
+use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\PublishedScope;
 use App\Support\Concerns\HasNav;
 use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
@@ -684,8 +685,8 @@ final class PostResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
-            // Remove the published scope so editors can manage drafts and archived articles inside Filament.
-            ->withoutGlobalScopes([PublishedScope::class])
+            // Remove storefront-facing scopes so editors can manage drafts and archived articles inside Filament.
+            ->withoutGlobalScopes([ActiveScope::class, PublishedScope::class])
             ->with(['user:id,name']);
     }
 
