@@ -21,6 +21,8 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Schemas\Components\Tabs as SchemaTabs;
+use Filament\Schemas\Components\Tabs\Tab as SchemaTab;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -59,18 +61,32 @@ final class ReferralCodeResource extends Resource
                             ->required()
                             ->maxLength(255)
                             ->unique(ignoreRecord: true),
-                        LanguageTabs::make([
-                            TextInput::make('title')
-                                ->label(__('referral.form.title'))
-                                ->required()
-                                ->maxLength(255)
-                                ->translatable(),
-                            Textarea::make('description')
-                                ->label(__('referral.form.description'))
-                                ->maxLength(65535)
-                                ->nullable()
-                                ->translatable(),
-                        ])->columnSpanFull(),
+                        SchemaTabs::make('referral_code_translations')
+                            ->tabs(
+                                collect(config('filament-language-tabs.default_locales', ['lt', 'en']))
+                                    ->filter()
+                                    ->unique()
+                                    ->values()
+                                    ->map(function (string $locale): SchemaTab {
+                                        $localeUpper = strtoupper($locale);
+                                        $isRequired = in_array($locale, config('filament-language-tabs.required_locales', []), true);
+
+                                        return SchemaTab::make($localeUpper)
+                                            ->schema([
+                                                // Mirror the array-based translation payload expected by the resource tests.
+                                                TextInput::make("title.{$locale}")
+                                                    ->label(sprintf('%s (%s)', __('referral.form.title'), $localeUpper))
+                                                    ->required($isRequired)
+                                                    ->maxLength(255),
+                                                Textarea::make("description.{$locale}")
+                                                    ->label(sprintf('%s (%s)', __('referral.form.description'), $localeUpper))
+                                                    ->maxLength(65535)
+                                                    ->nullable(),
+                                            ]);
+                                    })
+                                    ->all()
+                            )
+                            ->columnSpanFull(),
                         Toggle::make('is_active')
                             ->label(__('referral.form.is_active'))
                             ->inline(false)
