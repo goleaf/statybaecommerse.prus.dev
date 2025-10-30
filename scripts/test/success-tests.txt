@@ -236,3 +236,6 @@ tests/Feature/Validation/VariantStockCheckAvailabilityRequestTest.php
 tests/Feature/Validation/StoreReferralRequestTest.php
 tests/Feature/Validation/StockRequestTest.php
 tests/Feature/Validation/ReferralCodeRequestTest.php
+tests/Feature/Validation/OrderRequestTest.php
+tests/Feature/Validation/DiscountRedemptionRequestTest.php
+tests/Feature/Validation/DiscountConditionTestRequestTest.php

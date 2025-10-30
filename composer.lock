@@ -2718,16 +2718,16 @@
         },
         {
             "name": "encoredigitalgroup/stdlib",
-            "version": "v2.14.3",
+            "version": "v2.15.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/EncoreDigitalGroup/stdlib.git",
-                "reference": "5f7382809a1897341fd5957f5d2b735026e141a6"
+                "reference": "436e2938f5c14a1cdd650b6e255b6349684edade"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/EncoreDigitalGroup/stdlib/zipball/5f7382809a1897341fd5957f5d2b735026e141a6",
-                "reference": "5f7382809a1897341fd5957f5d2b735026e141a6",
+                "url": "https://api.github.com/repos/EncoreDigitalGroup/stdlib/zipball/436e2938f5c14a1cdd650b6e255b6349684edade",
+                "reference": "436e2938f5c14a1cdd650b6e255b6349684edade",
                 "shasum": ""
             },
             "require": {
@@ -2770,9 +2770,9 @@
             "description": "A collection of standard library classes and functions for PHP.",
             "support": {
                 "issues": "https://github.com/EncoreDigitalGroup/stdlib/issues",
-                "source": "https://github.com/EncoreDigitalGroup/stdlib/tree/v2.14.3"
+                "source": "https://github.com/EncoreDigitalGroup/stdlib/tree/v2.15.0"
             },
-            "time": "2025-10-01T15:13:57+00:00"
+            "time": "2025-10-29T16:59:37+00:00"
         },
         {
             "name": "ezyang/htmlpurifier",
@@ -6802,21 +6802,21 @@
         },
         {
             "name": "livewire/volt",
-            "version": "v1.7.2",
+            "version": "v1.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/livewire/volt.git",
-                "reference": "91ba934e72bbd162442840862959ade24dbe728a"
+                "reference": "2d9783a340d612d32f4ffd38070780ca7d7e9205"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/livewire/volt/zipball/91ba934e72bbd162442840862959ade24dbe728a",
-                "reference": "91ba934e72bbd162442840862959ade24dbe728a",
+                "url": "https://api.github.com/repos/livewire/volt/zipball/2d9783a340d612d32f4ffd38070780ca7d7e9205",
+                "reference": "2d9783a340d612d32f4ffd38070780ca7d7e9205",
                 "shasum": ""
             },
             "require": {
                 "laravel/framework": "^10.38.2|^11.0|^12.0",
-                "livewire/livewire": "^3.6.1",
+                "livewire/livewire": "^3.6.1|^4.0",
                 "php": "^8.1"
             },
             "require-dev": {
@@ -6870,7 +6870,7 @@
                 "issues": "https://github.com/livewire/volt/issues",
                 "source": "https://github.com/livewire/volt"
             },
-            "time": "2025-08-06T15:40:50+00:00"
+            "time": "2025-10-29T15:52:35+00:00"
         },
         {
             "name": "maatwebsite/excel",
@@ -8387,7 +8387,7 @@
         },
         {
             "name": "phpgenesis/common",
-            "version": "v1.6.0",
+            "version": "v1.6.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPGenesis/Common.git",
@@ -8426,7 +8426,7 @@
             ],
             "description": "Shared Functionality for PHPGenesis",
             "support": {
-                "source": "https://github.com/PHPGenesis/Common/tree/v1.6.0"
+                "source": "https://github.com/PHPGenesis/Common/tree/v1.6.1"
             },
             "time": "2025-10-26T16:19:08+00:00"
         },
@@ -14919,16 +14919,16 @@
         },
         {
             "name": "webmozart/assert",
-            "version": "1.12.0",
+            "version": "1.12.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webmozarts/assert.git",
-                "reference": "541057574806f942c94662b817a50f63f7345360"
+                "reference": "9be6926d8b485f55b9229203f962b51ed377ba68"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webmozarts/assert/zipball/541057574806f942c94662b817a50f63f7345360",
-                "reference": "541057574806f942c94662b817a50f63f7345360",
+                "url": "https://api.github.com/repos/webmozarts/assert/zipball/9be6926d8b485f55b9229203f962b51ed377ba68",
+                "reference": "9be6926d8b485f55b9229203f962b51ed377ba68",
                 "shasum": ""
             },
             "require": {
@@ -14971,9 +14971,9 @@
             ],
             "support": {
                 "issues": "https://github.com/webmozarts/assert/issues",
-                "source": "https://github.com/webmozarts/assert/tree/1.12.0"
+                "source": "https://github.com/webmozarts/assert/tree/1.12.1"
             },
-            "time": "2025-10-20T12:43:39+00:00"
+            "time": "2025-10-29T15:56:20+00:00"
         },
         {
             "name": "zvizvi/relation-manager-repeater",
