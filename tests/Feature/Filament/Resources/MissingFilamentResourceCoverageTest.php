@@ -608,6 +608,15 @@ final class MissingFilamentResourceCoverageTest extends TestCase
         ]);
     }
 
+    private function createRecommendationConfigSimpleRecord(): RecommendationConfigSimple
+    {
+        // Craft a streamlined recommendation config so simplified resource variants render populated cards.
+        return RecommendationConfigSimple::factory()->create([
+            'name' => 'Coverage Config',
+            'code' => 'coverage-config',
+        ]);
+    }
+
     private function createReferralCampaignRecord(): ReferralCampaign
     {
         // Create a bilingual referral campaign so localized columns render deterministic strings.
