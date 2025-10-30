@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Data\ExportRequestData;
 use App\Enums\ExportStatus;
 use App\Jobs\ProcessExport;
+use App\Jobs\ProcessExportJob;
 use App\Models\Order;
 use App\Models\User;
 use App\Notifications\ExportReadyNotification;
@@ -40,7 +41,8 @@ test('it queues and processes exports', function (): void {
 
     $export = $service->queue($request);
 
-    Bus::assertDispatched(ProcessExport::class, fn (ProcessExport $job): bool => $job->exportId === $export->getKey());
+    // Assert the legacy alias is queued for backwards compatibility so external queue monitors continue to detect export jobs.
+    Bus::assertDispatched(ProcessExportJob::class, fn (ProcessExportJob $job): bool => $job->exportId === $export->getKey());
 
     (new ProcessExport($export->getKey()))->handle($service);
 
