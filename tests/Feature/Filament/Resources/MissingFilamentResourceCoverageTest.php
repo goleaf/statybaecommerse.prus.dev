@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Filament\Resources;
 
+use App\Filament\Resources\ActivityLogResource\Pages\ListActivityLogs;
 use App\Filament\Resources\AuditTrailResource\Pages\ListAuditTrails;
 use App\Filament\Resources\BrandResource\Pages\ListBrands;
 use App\Filament\Resources\CampaignResource\Pages\ListCampaigns;
@@ -22,6 +23,7 @@ use App\Filament\Resources\SystemSettingResource\Pages\ListSystemSettings;
 use App\Filament\Resources\UserManagementResource\Pages\ListUsers;
 use App\Filament\Resources\UserPreferenceResource\Pages\ListUserPreferences;
 use App\Filament\Resources\VariantStockResource\Pages\ListVariantStocks;
+use App\Models\ActivityLog;
 use App\Models\AuditTrail;
 use App\Models\Brand;
 use App\Models\Campaign;
@@ -87,6 +89,7 @@ final class MissingFilamentResourceCoverageTest extends TestCase
     {
         // Map each resource list page to the helper responsible for creating a visible record.
         return [
+            'activity logs'             => [ListActivityLogs::class, 'createActivityLogRecord'],
             'audit trails'              => [ListAuditTrails::class, 'createAuditTrailRecord'],
             'brands'                    => [ListBrands::class, 'createBrandRecord'],
             'campaigns'                 => [ListCampaigns::class, 'createCampaignRecord'],
@@ -120,6 +123,15 @@ final class MissingFilamentResourceCoverageTest extends TestCase
         Livewire::test($pageClass)
             ->call('loadTable')
             ->assertCanSeeTableRecords([$record]);
+    }
+
+    private function createActivityLogRecord(): ActivityLog
+    {
+        // Persist a system activity entry so the audit-style listing resolves a populated row.
+        return ActivityLog::factory()->create([
+            'log_name'    => 'system',
+            'description' => 'Coverage activity log',
+        ]);
     }
 
     private function createAuditTrailRecord(): AuditTrail
