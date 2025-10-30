@@ -6,11 +6,19 @@ namespace Database\Seeders;
 
 use App\Models\Product;
 use App\Models\ProductImage;
+use App\Services\Images\LocalImageGeneratorService;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Collection;
+use Throwable;
 
 final class ProductImageSeeder extends Seeder
 {
+    private const FALLBACK_PIXEL = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO2aXhQAAAAASUVORK5CYII=';
+
+    public function __construct(private readonly LocalImageGeneratorService $imageGenerator)
+    {
+    }
+
     /**
      * Run the database seeds.
      */
@@ -115,7 +123,12 @@ final class ProductImageSeeder extends Seeder
                 'xlarge' => [1200, 1200],
                 default  => [600, 600],
             };
-            $this->createPlaceholderImage($path, $dimensions[0], $dimensions[1]);
+            $this->createPlaceholderImage(
+                path: $path,
+                width: $dimensions[0],
+                height: $dimensions[1],
+                label: sprintf('%s %s', $product->name, ucfirst($size)),
+            );
 
             if (ProductImage::query()->where('product_id', $product->id)->where('path', $path)->doesntExist()) {
                 ProductImage::factory()
@@ -137,7 +150,12 @@ final class ProductImageSeeder extends Seeder
         $imagePath = $this->generateImagePath($product, $type, $sortOrder);
 
         // Ensure a physical placeholder exists for the generated path
-        $this->createPlaceholderImage($imagePath, 800, 800);
+        $this->createPlaceholderImage(
+            path: $imagePath,
+            width: 800,
+            height: 800,
+            label: sprintf('%s %s', $product->name, ucfirst($type)),
+        );
 
         // Skip creating duplicate entries when the seeder is executed multiple times for smoke testing.
         if (ProductImage::query()->where('product_id', $product->id)->where('path', $imagePath)->exists()) {
@@ -205,8 +223,13 @@ final class ProductImageSeeder extends Seeder
             foreach ($sizes as $sizeName => $dimensions) {
                 $imagePath = "{$basePath}/{$sizeName}-image.jpg";
 
-                // Create a simple placeholder image
-                $this->createPlaceholderImage($imagePath, $dimensions[0], $dimensions[1]);
+                // Create a placeholder for each responsive size using the image generator service.
+                $this->createPlaceholderImage(
+                    path: $imagePath,
+                    width: $dimensions[0],
+                    height: $dimensions[1],
+                    label: sprintf('%s %s', $product->name, ucfirst($sizeName)),
+                );
             }
         }
     }
@@ -214,40 +237,42 @@ final class ProductImageSeeder extends Seeder
     /**
      * Create a placeholder image file
      */
-    private function createPlaceholderImage(string $path, int $width, int $height): void
+    private function createPlaceholderImage(string $path, int $width, int $height, string $label): void
     {
-        // Create a simple colored rectangle as placeholder, or fallback to an empty file if GD is unavailable
+        // Produce descriptive text so generated placeholders remain meaningful in demos.
+        $label = trim($label) !== '' ? $label : sprintf('%dx%d', $width, $height);
+
         $fullPath = storage_path("app/public/{$path}");
-        $directory = dirname($fullPath);
-        if (! is_dir($directory)) {
-            @mkdir($directory, 0755, true);
+
+        if (file_exists($fullPath)) {
+            return;
         }
 
-        if (function_exists('imagecreate') && function_exists('imagejpeg') && function_exists('imagecolorallocate')) {
-            $image = imagecreate($width, $height);
-            if ($image !== false) {
-                $backgroundColor = imagecolorallocate($image, rand(100, 255), rand(100, 255), rand(100, 255));
-                imagefill($image, 0, 0, $backgroundColor);
+        try {
+            $this->imageGenerator->generatePlaceholderImageFile(
+                text: $label,
+                width: $width,
+                height: $height,
+                targetPath: $fullPath,
+            );
+        } catch (Throwable $exception) {
+            // Defer to a 1px placeholder so broken image icons are avoided in constrained environments.
+            $this->writePixelFallback($fullPath);
 
-                $textColor = imagecolorallocate($image, 255, 255, 255);
-                $text = "{$width}x{$height}";
-                $x = max(5, (int) ($width / 2 - strlen($text) * 3));
-                $y = max(5, (int) ($height / 2 - 7));
-                @imagestring($image, 3, $x, $y, $text, $textColor);
-
-                @imagejpeg($image, $fullPath, 80);
-                @imagedestroy($image);
-
-                return;
-            }
+            return;
         }
 
-        // Fallback: embed a 1x1 PNG so the storefront always receives a valid image payload even without GD.
         if (! file_exists($fullPath)) {
-            $placeholderPixel = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO2aXhQAAAAASUVORK5CYII=');
-
-            // Persist the decoded PNG bytes; even though tiny, it prevents broken image icons during local testing.
-            @file_put_contents($fullPath, $placeholderPixel !== false ? $placeholderPixel : '');
+            $this->writePixelFallback($fullPath);
         }
+    }
+
+    /**
+     * Persist a deterministic pixel fallback when dynamic generation fails.
+     */
+    private function writePixelFallback(string $fullPath): void
+    {
+        $pixel = base64_decode(self::FALLBACK_PIXEL);
+        @file_put_contents($fullPath, $pixel !== false ? $pixel : '');
     }
 }
