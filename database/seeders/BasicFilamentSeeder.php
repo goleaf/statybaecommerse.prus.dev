@@ -16,6 +16,15 @@ final class BasicFilamentSeeder extends Seeder
 {
     public function run(): void
     {
+        // Resolve the default application guard so permissions and roles align with the
+        // models we are about to seed. Guard mismatches would trigger Spatie exceptions
+        // when syncing permissions, so we explicitly target the configured default.
+        $guard = config('auth.defaults.guard', 'web');
+
+        if (! is_string($guard) || $guard === '') {
+            $guard = 'web';
+        }
+
         $permissions = collect([
             'view_products',
             'create_products',
@@ -51,15 +60,30 @@ final class BasicFilamentSeeder extends Seeder
             'manage_roles',
         ]);
 
-        $permissions->each(fn (string $name) => Permission::query()->firstOrCreate(['name' => $name]));
+        $permissions->each(function (string $name) use ($guard): void {
+            // Persist each permission under the resolved guard to keep lookups deterministic.
+            Permission::query()->firstOrCreate([
+                'name'       => $name,
+                'guard_name' => $guard,
+            ]);
+        });
 
-        $superAdmin = Role::query()->firstOrCreate(['name' => 'super_admin']);
+        $superAdmin = Role::query()->firstOrCreate([
+            'name'       => 'super_admin',
+            'guard_name' => $guard,
+        ]);
         $superAdmin->syncPermissions($permissions);
 
-        $admin = Role::query()->firstOrCreate(['name' => 'admin']);
+        $admin = Role::query()->firstOrCreate([
+            'name'       => 'admin',
+            'guard_name' => $guard,
+        ]);
         $admin->syncPermissions($permissions->except(['delete_orders', 'delete_customers', 'manage_roles']));
 
-        $manager = Role::query()->firstOrCreate(['name' => 'manager']);
+        $manager = Role::query()->firstOrCreate([
+            'name'       => 'manager',
+            'guard_name' => $guard,
+        ]);
         $manager->syncPermissions([
             'view_products',
             'edit_products',
@@ -75,7 +99,10 @@ final class BasicFilamentSeeder extends Seeder
             'view_dashboard_stats',
         ]);
 
-        $editor = Role::query()->firstOrCreate(['name' => 'editor']);
+        $editor = Role::query()->firstOrCreate([
+            'name'       => 'editor',
+            'guard_name' => $guard,
+        ]);
         $editor->syncPermissions([
             'view_products',
             'create_products',

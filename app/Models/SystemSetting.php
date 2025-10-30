@@ -180,6 +180,18 @@ final class SystemSetting extends Model implements HasMedia
     }
 
     /**
+     * Provide a relationship alias used by Filament select components.
+     *
+     * Maintaining the legacy "categoryRelation" accessor keeps the admin forms
+     * compatible after the underlying Eloquent relation was shortened to
+     * "category", preventing runtime exceptions in v4 resource schemas.
+     */
+    public function categoryRelation(): BelongsTo
+    {
+        return $this->category();
+    }
+
+    /**
      * Handle updatedBy functionality with proper error handling.
      */
     public function updatedBy(): BelongsTo

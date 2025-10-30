@@ -10,7 +10,7 @@ use App\Models\SystemSettingCategory;
 use App\Models\User;
 use App\Support\Nav;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Livewire\Features\SupportTesting\TestableLivewire;
+use Livewire\Features\SupportTesting\Testable as TestableLivewire;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -534,8 +534,7 @@ final class SystemSettingsResourceTest extends TestCase
     {
         $this->createSetting();
 
-        $component = $this->listComponent()
-            ->call('loadTable');
+        $component = $this->listComponent();
 
         // Assert each configured column remains available on the listing.
         $component->assertCanSeeTableColumns(self::TABLE_COLUMNS);
