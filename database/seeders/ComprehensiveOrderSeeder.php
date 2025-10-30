@@ -11,7 +11,6 @@ use App\Models\OrderItem;
 use App\Models\OrderShipping;
 use App\Models\Product;
 use App\Models\User;
-use App\Models\Zone;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Database\Seeder;
@@ -68,12 +67,6 @@ final class ComprehensiveOrderSeeder extends Seeder
         // Create currencies if needed
         $this->ensureCurrencies();
 
-        // Create zones if needed
-        if (Zone::count() === 0) {
-            $this->command->info('Creating zones...');
-            $this->createZones();
-        }
-
         // Skip channels and partners as they don't exist in current schema
 
         // Ensure document templates exist
@@ -104,31 +97,10 @@ final class ComprehensiveOrderSeeder extends Seeder
         }
     }
 
-    private function createZones(): void
-    {
-        $zonesData = [
-            ['name' => 'European Union', 'code' => 'EU'],
-            ['name' => 'North America', 'code' => 'NA'],
-            ['name' => 'United Kingdom', 'code' => 'UK'],
-        ];
-
-        foreach ($zonesData as $data) {
-            if (! Zone::where('code', $data['code'])->exists()) {
-                Zone::factory()->create([
-                    'name'       => $data['name'],
-                    'code'       => $data['code'],
-                    'is_enabled' => true,
-                ]);
-            }
-        }
-    }
-
     private function generateOrdersForPeriod(Carbon $startDate, Carbon $endDate, int $count): void
     {
         $users = User::all();
         $products = Product::all();
-        $zones = Zone::all();
-
         $invoiceTemplate = DocumentTemplate::where('type', 'invoice')->first();
         $receiptTemplate = DocumentTemplate::where('type', 'receipt')->first();
 
@@ -180,56 +152,7 @@ final class ComprehensiveOrderSeeder extends Seeder
         }
     }
 
-    private function createOrder(Carbon $orderDate, $users, $zones): Order
-    {
-        $status = fake()->randomElement($this->orderStatuses);
-        $paymentStatus = $this->getPaymentStatusForOrderStatus($status);
-        $currency = 'EUR';
-
-        $zoneId = optional($zones->firstWhere('is_default', true))->id
-            ?? optional($zones->first())->id;
-
-        // Calculate amounts
-        $subtotal = fake()->randomFloat(2, 10, 500);
-        $taxRate = 0.21;  // 21% VAT
-        $taxAmount = round($subtotal * $taxRate, 2);
-        $shippingAmount = fake()->randomFloat(2, 0, 25);
-        $discountAmount = fake()->optional(0.3)->randomFloat(2, 0, $subtotal * 0.2) ?? 0;
-        $total = $subtotal + $taxAmount + $shippingAmount - $discountAmount;
-
-        $order = Order::create([
-            'number'           => $this->generateOrderNumber(),
-            'user_id'          => $users->random()->id,
-            'status'           => $status,
-            'subtotal'         => $subtotal,
-            'tax_amount'       => $taxAmount,
-            'shipping_amount'  => $shippingAmount,
-            'discount_amount'  => $discountAmount,
-            'total'            => $total,
-            'currency'         => $currency,
-            'billing_address'  => json_encode($this->generateAddress()),
-            'shipping_address' => fake()->boolean(80) ? json_encode($this->generateAddress()) : null,
-            'notes'            => fake()->optional(0.3)->sentence(),
-            'shipped_at'       => $this->getShippedDate($status, $orderDate),
-            'delivered_at'     => $this->getDeliveredDate($status, $orderDate),
-            // Temporarily avoid FK issues after sh_* table renames
-            'zone_id'            => null,
-            'payment_status'     => $paymentStatus,
-            'payment_method'     => fake()->randomElement($this->paymentMethods),
-            'payment_reference'  => fake()->optional(0.8)->uuid(),
-            'tracking_number'    => $this->generateTrackingNumber('DPD'),
-            'estimated_delivery' => $this->getShippedDate($status, $orderDate)?->addDays(fake()->numberBetween(1, 7)),
-            'priority'           => fake()->randomElement(['low', 'normal', 'high', 'urgent']),
-            'metadata'           => json_encode($this->generateTimeline($status, $orderDate)),
-            'locale'             => 'lt',
-            'weight'             => fake()->randomFloat(2, 0.5, 25.0),
-            'fulfillment_status' => $this->getFulfillmentStatus($status),
-            'created_at'         => $orderDate,
-            'updated_at'         => $orderDate->copy()->addMinutes(fake()->numberBetween(1, 1440)),
-        ]);
-
-        return $order;
-    }
+    // Zones were removed from the project, so helper methods tied to zone creation were deleted.
 
     private function createOrderItems(Order $order, $products): void
     {
