@@ -26,7 +26,7 @@ it('calculates progress and status from partial snapshot data', function (): voi
         'passed_tests'    => 3,
         'failed_tests'    => 1,
         'tests'           => [
-            ['file' => 'tests/Feature/ExampleTest.php', 'status' => 'passed', 'run_at' => '2025-10-24 12:00:00', 'output' => 'ok'],
+            ['file' => 'tests/Feature/DashboardFixtureTest.php', 'status' => 'passed', 'run_at' => '2025-10-24 12:00:00', 'output' => 'ok'],
         ],
         'errors' => [],
     ]));
@@ -35,7 +35,7 @@ it('calculates progress and status from partial snapshot data', function (): voi
         ->assertSet('isRunning', true)
         ->assertSet('progress', 40)
         ->assertSee(Lang::get('frontend.test_results.progress.completed', ['completed' => 4, 'total' => 10]))
-        ->assertSee('ExampleTest.php')
+        ->assertSee('DashboardFixtureTest.php')
         ->assertStatus(200);
 });
 
