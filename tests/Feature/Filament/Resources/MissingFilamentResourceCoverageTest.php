@@ -15,6 +15,7 @@ use App\Filament\Resources\PostResource\Pages\ListPosts;
 use App\Filament\Resources\ProductVariantResource\Pages\ListProductVariants;
 use App\Filament\Resources\RecommendationAnalyticsResource\Pages\ListRecommendationAnalytics;
 use App\Filament\Resources\ReferralCampaignResource\Pages\ListReferralCampaigns;
+use App\Filament\Resources\Settings\Pages\ListSettings;
 use App\Filament\Resources\SliderTranslationResource\Pages\ListSliderTranslations;
 use App\Filament\Resources\SystemSettingResource\Pages\ListSystemSettings;
 use App\Filament\Resources\UserManagementResource\Pages\ListUsers;
@@ -32,6 +33,7 @@ use App\Models\Post;
 use App\Models\ProductVariant;
 use App\Models\RecommendationAnalytics;
 use App\Models\ReferralCampaign;
+use App\Models\Setting;
 use App\Models\SliderTranslation;
 use App\Models\SystemSetting;
 use App\Models\User;
@@ -92,6 +94,7 @@ final class MissingFilamentResourceCoverageTest extends TestCase
             'product variants'          => [ListProductVariants::class, 'createProductVariantRecord'],
             'recommendation analytics'  => [ListRecommendationAnalytics::class, 'createRecommendationAnalyticsRecord'],
             'referral campaigns'        => [ListReferralCampaigns::class, 'createReferralCampaignRecord'],
+            'settings'                  => [ListSettings::class, 'createSettingRecord'],
             'slider translations'       => [ListSliderTranslations::class, 'createSliderTranslationRecord'],
             'system settings'           => [ListSystemSettings::class, 'createSystemSettingRecord'],
             'user management'           => [ListUsers::class, 'createUserManagementRecord'],
@@ -247,6 +250,15 @@ final class MissingFilamentResourceCoverageTest extends TestCase
         // Persist a slider translation entry to validate the localized slider management grid.
         return SliderTranslation::factory()->english()->create([
             'title' => 'Coverage Slide',
+        ]);
+    }
+
+    private function createSettingRecord(): Setting
+    {
+        // Store a lightweight setting so the Filament list page has a deterministic row to render.
+        return Setting::factory()->create([
+            'key'   => 'coverage_setting_key',
+            'value' => 'Coverage value',
         ]);
     }
 
