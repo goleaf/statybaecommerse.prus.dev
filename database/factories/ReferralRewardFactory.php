@@ -21,6 +21,12 @@ final class ReferralRewardFactory extends Factory
         $types = ['discount', 'credit'];
         $type = fake()->randomElement($types);
 
+        $additionalRewardData = fake()->optional(0.4)->randomElements([
+            'discount_percentage' => fake()->numberBetween(5, 25),
+            'free_shipping'       => fake()->boolean(),
+            'bonus_points'        => fake()->numberBetween(100, 1000),
+        ], fake()->numberBetween(1, 3));
+
         return [
             'referral_id' => null,
             'user_id'     => User::factory(),
@@ -56,11 +62,7 @@ final class ReferralRewardFactory extends Factory
             'reward_data' => array_merge([
                 // Seed the logical category so API responses remain consistent with runtime rewards.
                 'category' => $type === 'discount' ? 'discount' : 'credit',
-            ], fake()->optional(0.4)->randomElements([
-                'discount_percentage' => fake()->numberBetween(5, 25),
-                'free_shipping'       => fake()->boolean(),
-                'bonus_points'        => fake()->numberBetween(100, 1000),
-            ])),
+            ], is_array($additionalRewardData) ? $additionalRewardData : []),
         ];
     }
 
