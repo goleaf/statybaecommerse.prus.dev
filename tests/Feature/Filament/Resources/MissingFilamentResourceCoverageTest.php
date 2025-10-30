@@ -333,6 +333,36 @@ final class MissingFilamentResourceCoverageTest extends TestCase
         ]);
     }
 
+    private function createCampaignConversionRecord(): CampaignConversion
+    {
+        // Generate a verified conversion so analytics tables display actionable attribution details.
+        return CampaignConversion::factory()
+            ->verified()
+            ->create([
+                'conversion_type' => 'purchase',
+            ]);
+    }
+
+    private function createCampaignScheduleRecord(): CampaignSchedule
+    {
+        // Persist a daily campaign schedule to confirm scheduling grids hydrate upcoming runs.
+        return CampaignSchedule::factory()->daily()->create();
+    }
+
+    private function createCampaignViewRecord(): CampaignView
+    {
+        // Record a recent campaign view so engagement listings expose fresh session metrics.
+        return CampaignView::factory()->recent()->create();
+    }
+
+    private function createCartItemRecord(): CartItem
+    {
+        // Seed a cart item with a predictable quantity for merchandising visibility checks.
+        return CartItem::factory()->create([
+            'quantity' => 3,
+        ]);
+    }
+
     private function createCityRecord(): City
     {
         // Attach the city to a country so dependent table columns (country name/code) render correctly.
@@ -566,6 +596,15 @@ final class MissingFilamentResourceCoverageTest extends TestCase
             'algorithm_type' => 'collaborative',
             'is_active'      => true,
             'sort_order'     => 1,
+        ]);
+    }
+
+    private function createRecommendationConfigSimpleRecord(): RecommendationConfigSimple
+    {
+        // Create a minimal recommendation config to keep algorithm configuration listings populated.
+        return RecommendationConfigSimple::factory()->create([
+            'name' => 'Coverage Recommendations',
+            'code' => 'coverage-recs',
         ]);
     }
 
