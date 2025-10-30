@@ -17,18 +17,26 @@ use App\Models\Translations\CategoryTranslation;
 use App\Models\Translations\ProductTranslation;
 use App\Models\User;
 use App\Models\Zone;
+use App\Services\Images\LocalImageGeneratorService;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use RuntimeException;
+use Throwable;
 
 final class DemoStoreSeeder extends Seeder
 {
+    private const FALLBACK_PIXEL = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO2aXhQAAAAASUVORK5CYII=';
+
     private const LOCALES = ['en', 'lt', 'lv'];
 
     private const DEFAULT_LOCALE = 'en';
+
+    public function __construct(private readonly LocalImageGeneratorService $imageGenerator)
+    {
+    }
 
     public function run(): void
     {
@@ -891,7 +899,51 @@ final class DemoStoreSeeder extends Seeder
                 'alt_text'   => $data['alt'],
                 'sort_order' => $index + 1,
             ]);
+
+            $this->ensureProductImageAsset(
+                product: $product,
+                relativePath: $data['path'],
+                label: $data['alt'],
+            );
         }
+    }
+
+    /**
+     * Guarantee that seeded product image records have a matching on-disk asset.
+     */
+    private function ensureProductImageAsset(Product $product, string $relativePath, string $label): void
+    {
+        $fullPath = storage_path('app/public/' . $relativePath);
+
+        if (file_exists($fullPath)) {
+            return;
+        }
+
+        try {
+            $this->imageGenerator->generatePlaceholderImageFile(
+                text: $label !== '' ? $label : $product->name,
+                width: 1200,
+                height: 800,
+                targetPath: $fullPath,
+            );
+        } catch (Throwable $exception) {
+            $this->persistFallbackPixel($fullPath);
+
+            return;
+        }
+
+        if (! file_exists($fullPath)) {
+            $this->persistFallbackPixel($fullPath);
+        }
+    }
+
+    /**
+     * Write a single-pixel PNG when generator backends are not available.
+     */
+    private function persistFallbackPixel(string $fullPath): void
+    {
+        $pixel = base64_decode(self::FALLBACK_PIXEL);
+        @file_put_contents($fullPath, $pixel !== false ? $pixel : '');
     }
 
     /**
