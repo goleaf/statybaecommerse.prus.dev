@@ -1,7 +1,6 @@
 tests/Performance/QueryPerformanceTest.php
-tests/Models/PartnerTierTest.php
-tests/Filament/VariantInventoryResourceTest.php
 tests/Feature/VariantImageResourceTest.php
 tests/Feature/VariantCombinationResourceTest.php
 tests/Feature/VariantAttributeValueResourceTest.php
 tests/Feature/VariantAnalyticsResourceTest.php
+tests/Feature/UserBehaviorResourceTest.php

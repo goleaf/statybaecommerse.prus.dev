@@ -243,3 +243,16 @@ tests/Feature/UserWishlistResourceTest.php
 tests/Feature/UserResourceTest.php
 tests/Feature/UserProductInteractionTest.php
 tests/Feature/UserProductInteractionResourceTest.php
+tests/Filament/VariantInventoryResourceTest.php
+tests/Models/PartnerTierTest.php
+tests/Livewire/LivewirePlaceholderComponentTest.php
+tests/Http/HealthEndpointSmokeTest.php
+tests/Filament/AdminPanelBootstrapTest.php
+tests/Feature/Validation/DiscountCodeRequestTest.php
+tests/Feature/Validation/DiscountApplyCouponRequestTest.php
+tests/Feature/Validation/CartAddItemRequestTest.php
+tests/Feature/UserPreferenceTest.php
+tests/Feature/UserBehaviorResourceSimpleTest.php
+tests/Feature/TestResultsPageTest.php
+tests/Feature/TestResultsDashboardTest.php
+tests/Feature/SystemSettingTranslationResourceTest.php
