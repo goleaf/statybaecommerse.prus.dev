@@ -266,3 +266,7 @@ tests/Feature/SliderRouteTest.php
 tests/Feature/SliderResourceTest.php
 tests/Feature/SimpleDocumentTest.php
 tests/Feature/Seeders/PartnerSeederTest.php
+tests/Feature/DomainExceptionResponseTest.php
+tests/Feature/Errors/ApiErrorFormatTest.php
+tests/Unit/Support/Filament/SchemaComponentBridgeTest.php
+tests/Feature/AdminPanelTest.php
