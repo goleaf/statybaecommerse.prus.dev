@@ -20,6 +20,7 @@ use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -237,7 +238,8 @@ final class RecommendationAnalyticsResource extends Resource
                 Filter::make('date')
                     ->label(__('admin.recommendation_analytics.date'))
                     ->form([
-                        SupportSupportFlatpickr::makeDate('value')->label(__('admin.recommendation_analytics.date')),
+                        // Use the shared Flatpickr helper to keep date filtering identical to other resources.
+                        SupportFlatpickr::makeDate('value')->label(__('admin.recommendation_analytics.date')),
                     ])
                     ->query(fn (Builder $query, array $data): Builder => $query->when(
                         $data['value'] ?? null,

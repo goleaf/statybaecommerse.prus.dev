@@ -16,6 +16,7 @@
 - System setting category translations now persist locale-specific UI metadata through the new `meta` JSON column, keeping administrative tabs and storefront breadcrumbs aligned with structured payloads stored alongside translated copy while anchoring the column after existing sort metadata to avoid MySQL install issues.【F:database/migrations/2025_01_31_000003_add_meta_columns_to_system_setting_tables.php†L15-L50】
 - System setting factories now attach active categories via factory relationships instead of ad-hoc identifiers so SQLite-based
   suites never trip foreign key constraints when generating translated settings during regression runs.【F:database/factories/SystemSettingFactory.php†L27-L35】
+- Slider translation administration now ships with a dedicated Filament v4 feature suite that exercises creation, editing, and filtering so locale dropdowns and relationship queries stay reliable in CI.【F:tests/Feature/SliderTranslationResourceTest.php†L1-L158】
 - The base enhanced settings migration now seeds the `locale` column, an `is_active` flag, and the companion translations table so localized settings and activation scopes exist even before later patch migrations execute.【F:database/migrations/2025_01_28_000001_create_enhanced_filament_system_tables.php†L15-L129】
 
 ## JSON & PHP Language Files
