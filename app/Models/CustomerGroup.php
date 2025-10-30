@@ -291,7 +291,12 @@ final class CustomerGroup extends Model
     public function users(): BelongsToMany
     {
         /** @var BelongsToMany<User, CustomerGroup> $relation */
-        $relation = $this->belongsToMany(User::class, 'customer_group_user', 'customer_group_id', 'user_id')->withTimestamps();
+        $relation = $this
+            ->belongsToMany(User::class, 'customer_group_user', 'customer_group_id', 'user_id')
+            ->withPivot('assigned_at')
+            // Retain the default pivot timestamps alongside the custom assignment
+            // marker so auditing remains comprehensive for customer segmentation.
+            ->withTimestamps();
 
         return $relation;
     }
@@ -304,7 +309,10 @@ final class CustomerGroup extends Model
     public function customers(): BelongsToMany
     {
         /** @var BelongsToMany<User, CustomerGroup> $relation */
-        $relation = $this->belongsToMany(User::class, 'customer_group_user', 'customer_group_id', 'user_id')->withTimestamps();
+        $relation = $this
+            ->belongsToMany(User::class, 'customer_group_user', 'customer_group_id', 'user_id')
+            ->withPivot('assigned_at')
+            ->withTimestamps();
 
         return $relation;
     }

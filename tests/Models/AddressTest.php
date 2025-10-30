@@ -38,7 +38,7 @@ final class AddressTest extends TestCase
             'is_billing'  => 'boolean',
             'is_shipping' => 'boolean',
             'is_active'   => 'boolean',
-            'type'        => AddressType::class,
+            'type'        => 'string',
         ] as $attribute => $cast) {
             // Each expected cast should exist with the proper configuration value.
             $this->assertArrayHasKey($attribute, $model->getCasts());
@@ -80,6 +80,6 @@ final class AddressTest extends TestCase
 
         // Assert: the resulting collection should contain only billing addresses.
         $this->assertCount(1, $filtered);
-        $this->assertTrue($filtered->first()->type === AddressType::BILLING);
+        $this->assertTrue($filtered->first()->type_enum === AddressType::BILLING);
     }
 }
