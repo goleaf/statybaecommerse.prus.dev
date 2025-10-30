@@ -117,3 +117,7 @@ Top 10 controller issues to investigate:
 8. app/Http/Controllers/Frontend/CampaignConversionController.php — Handles Request without explicit validation. Mutation method without clear authorization.
 9. app/Http/Controllers/Frontend/CheckoutController.php — Handles Request without explicit validation. Listing method without pagination detection. Sensitive endpoint missing throttle middleware.
 10. app/Http/Controllers/Frontend/DataPrivacyController.php — Handles Request without explicit validation. Mutation method without clear authorization.
+
+## Coverage Notes
+- Added feature coverage for the documentation landing page via `tests/Feature/Controllers/ApiDocsControllerTest.php`, ensuring the `docs.api` route continues returning the expected view payload.【F:tests/Feature/Controllers/ApiDocsControllerTest.php†L1-L20】
+- Introduced `tests/Feature/Controllers/TestResultsControllerTest.php` to validate the CI dashboard enforces the fallback locale while supplying a populated view model from fixture data, guarding future regressions in locale handling and data hydration.【F:tests/Feature/Controllers/TestResultsControllerTest.php†L1-L52】
