@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests;
 
 use Filament\Facades\Filament;
+use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Panel;
 use Illuminate\Contracts\Translation\Loader as TranslationLoader;
 use Illuminate\Contracts\Translation\Translator as TranslatorContract;
@@ -35,6 +36,11 @@ abstract class TestCase extends BaseTestCase
 
     private static bool $registeredLivewireTableOrderAssertion = false;
 
+    /**
+     * Ensure Filament notification testing macros are only registered once during the test process lifecycle.
+     */
+    private static bool $registeredFilamentNotificationTestHelpers = false;
+
     protected function setUp(): void
     {
         if (! class_exists(TestingDatabase::class) && file_exists(__DIR__ . '/Support/TestingDatabase.php')) {
@@ -49,6 +55,9 @@ abstract class TestCase extends BaseTestCase
         TestingDatabase::ensureExists();
 
         parent::setUp();
+
+        // Prepare Filament-specific test helpers so feature tests can call Notification::fake().
+        $this->registerFilamentNotificationTestHelpers();
 
         $this->registerLivewireOrderAssertion();
 
@@ -138,6 +147,28 @@ abstract class TestCase extends BaseTestCase
         });
 
         self::$registeredLivewireTableOrderAssertion = true;
+    }
+
+    /**
+     * Register a macro that mimics Notification::fake() for Filament v4's testing expectations.
+     */
+    private function registerFilamentNotificationTestHelpers(): void
+    {
+        if (self::$registeredFilamentNotificationTestHelpers) {
+            return;
+        }
+
+        if (! FilamentNotification::hasMacro('fake')) {
+            FilamentNotification::macro(
+                'fake',
+                static function (): void {
+                    // Flush any queued Filament notifications so assertions start from a clean session state.
+                    session()->forget('filament.notifications');
+                }
+            );
+        }
+
+        self::$registeredFilamentNotificationTestHelpers = true;
     }
 
     protected function tearDown(): void
