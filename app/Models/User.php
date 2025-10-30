@@ -437,7 +437,12 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
      */
     public function customerGroups(): BelongsToMany
     {
-        return $this->belongsToMany(CustomerGroup::class, 'customer_group_user', 'user_id', 'customer_group_id')->withoutGlobalScopes();
+        return $this
+            ->belongsToMany(CustomerGroup::class, 'customer_group_user', 'user_id', 'customer_group_id')
+            // Expose the assignment timestamp so reporting layers and tests can
+            // verify when a user joined a specific segment without issuing extra queries.
+            ->withPivot('assigned_at')
+            ->withoutGlobalScopes();
     }
 
     /**

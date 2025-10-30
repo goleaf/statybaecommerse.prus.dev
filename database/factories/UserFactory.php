@@ -41,6 +41,10 @@ class UserFactory extends Factory
 
         $state = [
             'name'              => $firstName . ' ' . $lastName,
+            // Store decomposed name parts so seeders and UI components can reuse
+            // deterministic values without re-parsing the combined name.
+            'first_name'        => $firstName,
+            'last_name'         => $lastName,
             'email'             => $email,
             'email_verified_at' => now(),
             'password'          => static::$password ??= Hash::make('password'),
@@ -99,6 +103,9 @@ class UserFactory extends Factory
     {
         return $this->hasAddresses(1, fn (): array => [
             'type'           => AddressType::BILLING,
+            // Ensure billing addresses do not unintentionally become the
+            // customer's default entry because factories rely on null defaults.
+            'is_default'     => false,
             'is_billing'     => true,
             'country_code'   => 'LT',
             'city'           => 'Vilnius',

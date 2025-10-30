@@ -34,10 +34,10 @@
                             @endif
                             
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
-                                @if($address->type->value === 'shipping') bg-blue-100 text-blue-800
-                                @elseif($address->type->value === 'billing') bg-green-100 text-green-800
-                                @elseif($address->type->value === 'home') bg-purple-100 text-purple-800
-                                @elseif($address->type->value === 'work') bg-orange-100 text-orange-800
+                                @if($address->type === 'shipping') bg-blue-100 text-blue-800
+                                @elseif($address->type === 'billing') bg-green-100 text-green-800
+                                @elseif($address->type === 'home') bg-purple-100 text-purple-800
+                                @elseif($address->type === 'work') bg-orange-100 text-orange-800
                                 @else bg-gray-100 text-gray-800 @endif">
                                 {{ $address->type_label }}
                             </span>

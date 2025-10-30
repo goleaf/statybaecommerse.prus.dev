@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Models\Address;
 use App\Models\CustomerGroup;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Sequence;
@@ -26,21 +27,48 @@ final class BulkCustomerSeeder extends Seeder
 
         $defaultGroup = $this->resolveDefaultGroup();
 
-        $localeCycle = new Sequence(
-            ['preferred_locale' => 'lt'],
-            ['preferred_locale' => 'en']
-        );
+        $existingCustomerIndex = $this->resolveHighestCustomerIndex();
+
+        $localizedSequence = new Sequence(function (Sequence $sequence) use ($existingCustomerIndex): array {
+            $runningIndex = $existingCustomerIndex + $sequence->index + 1;
+            $formattedIndex = str_pad((string) $runningIndex, 5, '0', STR_PAD_LEFT);
+
+            // Prefix generated customers with a deterministic label so the feature
+            // tests can make stable assertions without relying on faker output.
+            $displayName = "Customer {$formattedIndex}";
+
+            return [
+                'name'             => $displayName,
+                'first_name'       => 'Customer',
+                'last_name'        => $formattedIndex,
+                'email'            => "customer{$formattedIndex}@example.com",
+                'preferred_locale' => $sequence->index % 2 === 0 ? 'lt' : 'en',
+            ];
+        });
 
         User::factory()
             ->count($remaining)
-            ->state($localeCycle)
+            ->state($localizedSequence)
             ->shippingAddress()
             ->billingAddress()
             ->afterCreating(function (User $user) use ($defaultGroup): void {
+                // Keep the generated address names aligned with the owning customer so
+                // downstream UI components show consistent personalisation.
+                $user->addresses
+                    ->each(function (Address $address) use ($user): void {
+                        $address->update([
+                            'first_name' => $user->first_name,
+                            'last_name'  => $user->last_name,
+                            'email'      => $user->email,
+                        ]);
+                    });
+
                 if ($defaultGroup === null) {
                     return;
                 }
 
+                // Capture an assignment timestamp alongside the default pivot timestamps
+                // so audit trails and analytics can track when the user joined the group.
                 $user->customerGroups()->syncWithoutDetaching([
                     $defaultGroup->getKey() => [
                         'assigned_at' => now(),
@@ -74,5 +102,22 @@ final class BulkCustomerSeeder extends Seeder
             'discount_percentage' => 0,
             'metadata'            => ['type' => 'regular'],
         ]);
+    }
+
+    private function resolveHighestCustomerIndex(): int
+    {
+        // Parse existing deterministic emails so rerunning the seeder never collides
+        // with pre-seeded customer accounts that already follow the convention.
+        return User::query()
+            ->where('email', 'like', 'customer%@example.com')
+            ->pluck('email')
+            ->map(static function (string $email): int {
+                if (preg_match('/^customer(\d{5})@example\.com$/', $email, $matches) === 1) {
+                    return (int) $matches[1];
+                }
+
+                return 0;
+            })
+            ->max() ?? 0;
     }
 }

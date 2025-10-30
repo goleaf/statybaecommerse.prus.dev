@@ -7,6 +7,7 @@ namespace App\Models;
 use App\Enums\AddressType;
 use App\Models\Scopes\UserOwnedScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -76,7 +77,27 @@ final class Address extends Model
      */
     protected function casts(): array
     {
-        return ['is_default' => 'boolean', 'is_billing' => 'boolean', 'is_shipping' => 'boolean', 'is_active' => 'boolean', 'type' => AddressType::class];
+        return ['is_default' => 'boolean', 'is_billing' => 'boolean', 'is_shipping' => 'boolean', 'is_active' => 'boolean', 'type' => 'string'];
+    }
+
+    protected function type(): Attribute
+    {
+        return Attribute::make(
+            get: static fn ($value): string => match (true) {
+                $value instanceof AddressType => $value->value,
+                default                       => strtolower((string) $value),
+            },
+            // Normalise persisted values so callers can continue providing either
+            // native enum cases or raw string literals without duplicating logic.
+            set: static fn ($value): string => $value instanceof AddressType ? $value->value : strtolower((string) $value),
+        );
+    }
+
+    public function getTypeEnumAttribute(): AddressType
+    {
+        // Leverage the stored string to hydrate the enum lazily for callers that
+        // still prefer working with typed cases (e.g. Filament column formatters).
+        return AddressType::from($this->attributes['type'] ?? AddressType::SHIPPING->value);
     }
 
     protected static function booted(): void
@@ -370,7 +391,7 @@ final class Address extends Model
      */
     public function getTypeLabelAttribute(): string
     {
-        return $this->type->label();
+        return $this->type_enum->label();
     }
 
     /**
@@ -378,7 +399,7 @@ final class Address extends Model
      */
     public function getTypeIconAttribute(): string
     {
-        return $this->type->icon();
+        return $this->type_enum->icon();
     }
 
     /**
@@ -386,7 +407,7 @@ final class Address extends Model
      */
     public function getTypeColorAttribute(): string
     {
-        return $this->type->color();
+        return $this->type_enum->color();
     }
 
     /**
@@ -394,7 +415,7 @@ final class Address extends Model
      */
     public function isBilling(): bool
     {
-        return $this->is_billing || $this->type === AddressType::BILLING;
+        return $this->is_billing || $this->type_enum === AddressType::BILLING;
     }
 
     /**
@@ -402,7 +423,7 @@ final class Address extends Model
      */
     public function isShipping(): bool
     {
-        return $this->is_shipping || $this->type === AddressType::SHIPPING;
+        return $this->is_shipping || $this->type_enum === AddressType::SHIPPING;
     }
 
     /**

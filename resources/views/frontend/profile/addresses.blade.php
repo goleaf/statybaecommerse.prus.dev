@@ -89,7 +89,7 @@
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="type-{{ $address->id }}">{{ __('Type') }}</label>
                             <select id="type-{{ $address->id }}" name="type" class="mt-1 block w-full rounded-lg border-gray-300 dark:border-white/10 bg-gray-50 dark:bg-gray-800">
                                 @foreach ($types as $type)
-                                    <option value="{{ $type->value }}" @selected($address->type === $type)>{{ $type->label() }}</option>
+                                    <option value="{{ $type->value }}" @selected($address->type === $type->value)>{{ $type->label() }}</option>
                                 @endforeach
                             </select>
                         </div>

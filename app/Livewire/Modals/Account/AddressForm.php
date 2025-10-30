@@ -94,7 +94,9 @@ class AddressForm extends ModalComponent
             $this->postal_code = $this->address->postal_code;
             $this->country_code = $this->address->country_code;
             $this->phone_number = $this->address->phone;
-            $this->type = $this->address->type->value;
+            // Default the select field to the persisted string while keeping enum
+            // access available through the dedicated accessor for complex workflows.
+            $this->type = $this->address->type;
         } else {
             $this->address = new Address;
         }
