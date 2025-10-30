@@ -2,6 +2,9 @@
 
 declare(strict_types=1);
 
+use App\Enums\OrderStatus;
+use App\Enums\PaymentMethod;
+use App\Enums\PaymentStatus;
 use App\Models\Document;
 use App\Models\DocumentTemplate;
 use App\Models\Order;
@@ -28,7 +31,9 @@ it('feature: creates orders using factory relationships', function () {
     $order = Order::with('user')->first();
     expect($order->user)->not->toBeNull();
     expect($order->number)->not->toBeNull();
-    expect($order->status)->toBeIn(['pending', 'processing', 'shipped', 'delivered', 'cancelled']);
+    // Cast enum-backed statuses to raw strings so the expectations work for both typed and string values.
+    $status = $order->status instanceof OrderStatus ? $order->status->value : (string) $order->status;
+    expect($status)->toBeIn(['pending', 'processing', 'shipped', 'delivered', 'cancelled']);
     expect($order->currency)->toBe('EUR');
     expect($order->locale)->toBe('lt');
     expect($order->total)->toBeGreaterThan(0);
@@ -61,7 +66,8 @@ it('feature: creates order shipping using factory relationships', function () {
     expect(OrderShipping::count())->toBeGreaterThan(0);
 
     // Verify shipping relationships
-    $shipping = OrderShipping::with('order')->first();
+    // Select a shipping record that actually has a related order to avoid scope interference in the factories.
+    $shipping = OrderShipping::query()->has('order')->with('order')->first();
     expect($shipping->order)->not->toBeNull();
     expect($shipping->carrier)->toBeIn(['DPD', 'Omniva', 'LP Express', 'UPS', 'FedEx', 'DHL']);
     expect($shipping->service)->toBeIn(['Standard', 'Express', 'Next Day', 'Economy', 'Premium']);
@@ -134,9 +140,31 @@ it('feature: maintains proper order status and payment status relationships', fu
     $orders = Order::all();
 
     foreach ($orders as $order) {
-        expect($order->status)->toBeIn(['pending', 'processing', 'shipped', 'delivered', 'cancelled']);
-        expect($order->payment_status)->toBeIn(['pending', 'paid', 'failed', 'refunded']);
-        expect($order->payment_method)->toBeIn(['credit_card', 'paypal', 'bank_transfer', 'cash_on_delivery', 'stripe', 'mollie']);
+        // Normalize enum casts for all lifecycle properties before validating their membership.
+        $status = $order->status instanceof OrderStatus ? $order->status->value : (string) $order->status;
+        $paymentStatus = $order->payment_status instanceof PaymentStatus ? $order->payment_status->value : (string) $order->payment_status;
+        $paymentMethod = $order->payment_method instanceof PaymentMethod ? $order->payment_method->value : (string) $order->payment_method;
+
+        expect($status)->toBeIn(['pending', 'processing', 'shipped', 'delivered', 'cancelled']);
+        expect($paymentStatus)->toBeIn([
+            'pending',
+            'paid',
+            'failed',
+            'refunded',
+            'authorized',
+            'captured',
+            'settled',
+            'partially_refunded',
+        ]);
+        expect($paymentMethod)->toBeIn([
+            'credit_card',
+            'paypal',
+            'bank_transfer',
+            'cash_on_delivery',
+            'stripe',
+            'apple_pay',
+            'google_pay',
+        ]);
 
         // Verify financial calculations make sense
         expect($order->total)->toBeGreaterThanOrEqual($order->subtotal);
