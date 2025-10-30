@@ -7,6 +7,7 @@ namespace Tests\Feature;
 use App\Filament\Resources\CurrencyResource;
 use App\Models\Currency;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -195,13 +196,22 @@ final class CurrencyResourceTest extends TestCase
 
     public function test_can_update_currency_rate(): void
     {
-        $currency = Currency::factory()->create();
+        // Configure a deterministic rate so the synchroniser resolves a predictable value.
+        config()->set('currency.static_rates.USD', 1.2345);
+
+        $currency = Currency::factory()->create([
+            'code'          => 'USD',
+            'base_currency' => 'EUR',
+            'exchange_rate' => 1.10,
+        ]);
 
         Livewire::test(CurrencyResource\Pages\ListCurrencies::class)
-            ->callTableAction('update_rate', $currency);
+            ->call('loadTable')
+            ->callTableAction('update_rate', $currency)
+            ->assertHasNoTableActionErrors();
 
-        // This would test the rate update functionality
-        $this->assertTrue(true);  // Placeholder for actual rate update test
+        $currency->refresh();
+        $this->assertSame(1.2345, $currency->exchange_rate);
     }
 
     public function test_can_bulk_activate_currencies(): void
@@ -232,13 +242,27 @@ final class CurrencyResourceTest extends TestCase
 
     public function test_can_bulk_update_rates(): void
     {
-        $currencies = Currency::factory()->count(3)->create();
+        // Define multiple static rates to ensure each selected currency is refreshed correctly.
+        config()->set('currency.static_rates', [
+            'USD' => 1.1111,
+            'GBP' => 0.7777,
+            'SEK' => 10.9999,
+        ]);
+
+        $currencies = Currency::factory()->count(3)->state(new Sequence(
+            ['code' => 'USD', 'base_currency' => 'EUR', 'exchange_rate' => 1.0],
+            ['code' => 'GBP', 'base_currency' => 'EUR', 'exchange_rate' => 1.0],
+            ['code' => 'SEK', 'base_currency' => 'EUR', 'exchange_rate' => 1.0],
+        ))->create();
 
         Livewire::test(CurrencyResource\Pages\ListCurrencies::class)
-            ->callTableBulkAction('update_rates', $currencies);
+            ->call('loadTable')
+            ->callTableBulkAction('update_rates', $currencies)
+            ->assertHasNoTableBulkActionErrors();
 
-        // This would test the bulk rate update functionality
-        $this->assertTrue(true);  // Placeholder for actual bulk rate update test
+        $this->assertDatabaseHas('currencies', ['id' => $currencies[0]->id, 'exchange_rate' => 1.1111]);
+        $this->assertDatabaseHas('currencies', ['id' => $currencies[1]->id, 'exchange_rate' => 0.7777]);
+        $this->assertDatabaseHas('currencies', ['id' => $currencies[2]->id, 'exchange_rate' => 10.9999]);
     }
 
     public function test_currency_validation_requires_name(): void

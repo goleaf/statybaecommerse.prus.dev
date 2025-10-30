@@ -58,6 +58,7 @@ return [
     'set_as_default_successfully' => 'Währung wurde erfolgreich als Standard festgelegt.',
     'update_rate'                 => 'Kurs aktualisieren',
     'rate_updated_successfully'   => 'Währungskurs wurde erfolgreich aktualisiert.',
+    'rate_update_failed'          => 'Der Wechselkurs konnte nicht aktualisiert werden.',
 
     'activate_selected'          => 'Auswahl aktivieren',
     'deactivate_selected'        => 'Auswahl deaktivieren',
@@ -65,4 +66,5 @@ return [
     'bulk_deactivated_success'   => 'Ausgewählte Währungen wurden erfolgreich deaktiviert.',
     'update_rates'               => 'Kurse aktualisieren',
     'rates_updated_successfully' => 'Wechselkurse wurden erfolgreich aktualisiert.',
+    'rates_update_failed'        => 'Es wurden keine Wechselkurse aktualisiert. Bitte Konfiguration prüfen.',
 ];
