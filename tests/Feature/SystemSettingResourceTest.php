@@ -56,8 +56,14 @@ final class SystemSettingResourceTest extends TestCase
         $primaryCategory = SystemSettingCategory::factory()->create(['name' => 'Primary', 'slug' => 'primary']);
         $secondaryCategory = SystemSettingCategory::factory()->create(['name' => 'Secondary', 'slug' => 'secondary']);
 
-        $primarySetting = SystemSetting::factory()->for($primaryCategory, 'categoryRelation')->create();
-        $secondarySetting = SystemSetting::factory()->for($secondaryCategory, 'categoryRelation')->create();
+        $primarySetting = SystemSetting::factory()
+            // Associate via the real category relation to mirror the resource configuration.
+            ->for($primaryCategory, 'category')
+            ->create();
+        $secondarySetting = SystemSetting::factory()
+            // Matching relation name keeps the secondary setting tied to its fixture category.
+            ->for($secondaryCategory, 'category')
+            ->create();
 
         Livewire::actingAs($this->adminUser)
             ->test(ListSystemSettings::class)
