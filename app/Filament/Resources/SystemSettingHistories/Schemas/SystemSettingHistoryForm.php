@@ -9,12 +9,16 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Schemas\Schema;
 
 final class SystemSettingHistoryForm
 {
-    public static function configure(Form $form): Form
+    public static function configure(Schema $schema): Schema
     {
-        return $form
+        // The schema helper keeps the resource aligned with Filament's schema-based
+        // APIs, so we decorate the provided schema instance instead of rebuilding
+        // the form definition from scratch each time the resource boots.
+        return $schema
             ->schema([
                 SchemaSection::make(__('admin.system_setting_histories.basic_information'))
                     ->schema([
