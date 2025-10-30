@@ -15,6 +15,30 @@
  | their utility classes are preserved in production builds.
  */
 
-:root {
-    /* Reserved for future design tokens specific to the admin panel. */
+@layer base {
+    :root {
+        /* Define reusable surface colors so the Filament admin UI shares a cohesive background. */
+        --filament-admin-surface: #f8fafc;
+        /* Establish a neutral card surface that keeps forms legible against the light background. */
+        --filament-admin-card: #ffffff;
+        /* Provide a subtle border color for cards and inputs to avoid harsh separators. */
+        --filament-admin-border: rgba(15, 23, 42, 0.08);
+        /* Store a muted accent used for hover states and dividers in light mode. */
+        --filament-admin-muted: rgba(148, 163, 184, 0.18);
+        /* Capture the RGB tuple that powers the primary ring highlight during focus events. */
+        --filament-admin-ring: 59 130 246;
+    }
+
+    [data-theme='dark'] {
+        /* Mirror the surface tokens for dark mode so panels adapt without duplicating selectors. */
+        --filament-admin-surface: #0f172a;
+        /* Slightly lighten the card background to preserve contrast with form controls. */
+        --filament-admin-card: #111827;
+        /* Increase border opacity in dark mode to keep edges perceptible. */
+        --filament-admin-border: rgba(148, 163, 184, 0.24);
+        /* Dark mode hover layers rely on a cooler muted tone to avoid muddy grays. */
+        --filament-admin-muted: rgba(71, 85, 105, 0.42);
+        /* Use a softer ring accent that still reads as branded blue in dark contexts. */
+        --filament-admin-ring: 96 165 250;
+    }
 }
