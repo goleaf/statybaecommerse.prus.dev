@@ -307,29 +307,39 @@ final class DocumentTemplateResource extends Resource
             ])
             ->bulkActions([
                 TableBulkActionGroup::make([
-                    TableBulkAction::make('activate')
-                        ->label(__('document_templates.actions.activate'))
-                        ->color('success')
-                        ->requiresConfirmation()
-                        ->action(function (EloquentCollection $records): void {
-                            $records->each->update(['is_active' => true]);
+                TableBulkAction::make('activate')
+                    ->label(__('document_templates.actions.activate'))
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->action(function (EloquentCollection $records): void {
+                        // Persist the activation toggle in bulk to avoid mutating relation-loaded models in memory.
+                        $recordIds = $records->map(static function ($record): int {
+                            return $record instanceof DocumentTemplate ? $record->getKey() : (int) $record;
+                        });
 
-                            Notification::make()
-                                ->success()
-                                ->title(__('document_templates.notifications.activated'))
-                                ->send();
-                        }),
-                    TableBulkAction::make('deactivate')
-                        ->label(__('document_templates.actions.deactivate'))
-                        ->color('gray')
-                        ->requiresConfirmation()
-                        ->action(function (EloquentCollection $records): void {
-                            $records->each->update(['is_active' => false]);
+                        DocumentTemplate::query()->whereKey($recordIds)->update(['is_active' => true]);
 
-                            Notification::make()
-                                ->success()
-                                ->title(__('document_templates.notifications.deactivated'))
-                                ->send();
+                        Notification::make()
+                            ->success()
+                            ->title(__('document_templates.notifications.activated'))
+                            ->send();
+                    }),
+                TableBulkAction::make('deactivate')
+                    ->label(__('document_templates.actions.deactivate'))
+                    ->color('gray')
+                    ->requiresConfirmation()
+                    ->action(function (EloquentCollection $records): void {
+                        // Mirror the activation flow by issuing a set-based update for deactivation as well.
+                        $recordIds = $records->map(static function ($record): int {
+                            return $record instanceof DocumentTemplate ? $record->getKey() : (int) $record;
+                        });
+
+                        DocumentTemplate::query()->whereKey($recordIds)->update(['is_active' => false]);
+
+                        Notification::make()
+                            ->success()
+                            ->title(__('document_templates.notifications.deactivated'))
+                            ->send();
                         }),
                     TableDeleteBulkAction::make(),
                 ]),
@@ -340,6 +350,12 @@ final class DocumentTemplateResource extends Resource
     public static function duplicateTemplate(DocumentTemplate $template): DocumentTemplate
     {
         $duplicate = $template->replicate();
+
+        // Remove derived attributes seeded by withCount() so the insert payload only includes real columns.
+        unset($duplicate['documents_count']);
+
+        // Clear eager-loaded relations so the clone persists a clean record without unintended cascades.
+        $duplicate->unsetRelation('documents');
 
         $duplicate->name = self::generateDuplicateName($template->name);
         $duplicate->slug = self::generateUniqueSlug($template->slug);
