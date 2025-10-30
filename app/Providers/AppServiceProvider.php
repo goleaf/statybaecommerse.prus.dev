@@ -34,6 +34,7 @@ use App\Support\Storage\SecureStorage;
 use App\Support\Tracing\Trace;
 use App\Support\Tracing\TraceContext;
 use App\Support\Uploads\SecureUploadHandler;
+use Closure;
 use DateInterval;
 use DateTimeInterface;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
@@ -425,6 +426,15 @@ class AppServiceProvider extends ServiceProvider
             }
 
             return $this->assertSchemaExists(is_string($name) ? $name : null);
+        });
+
+        Testable::macro('assertFormSet', function ($state, $value = null, string $form = 'form'): Testable {
+            // Provide flexible handling so legacy tests can specify a single field name or a keyed array payload.
+            $payload = $state instanceof Closure || is_array($state)
+                ? $state
+                : [$state => $value];
+
+            return $this->assertSchemaStateSet($payload, $form);
         });
 
         if (! class_exists(\Filament\Forms\Form::class) && class_exists(\Filament\Schemas\Schema::class)) {

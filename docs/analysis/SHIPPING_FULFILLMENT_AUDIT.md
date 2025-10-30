@@ -6,7 +6,7 @@
 - Order-shipping records capture tracking numbers, carrier metadata, and lifecycle timestamps while Filament tooling exposes one-click actions to update shipment state or open provider tracking URLs.【F:app/Models/OrderShipping.php†L41-L183】【F:app/Filament/Resources/OrderResource/RelationManagers/OrderShippingRelationManager.php†L246-L415】
 - Orders expose a lean `zone()` relationship so fulfilment tooling and seeders can join the assigned delivery zone without bespoke query logic.【F:app/Models/Order.php†L9-L76】【F:app/Models/Order.php†L226-L235】
 - Storefront checkout surfaces enabled options, applies discount-engine adjustments, and persists the shopper’s selection for downstream totals.【F:app/Livewire/Components/Checkout/Delivery.php†L21-L76】
-- A configurable zone/method matrix governs where methods appear, with Livewire tests verifying state normalisation for complex enablement grids.【F:config/shipping.php†L5-L26】【F:app/Filament/Resources/ShippingOptionResource.php†L160-L206】【F:tests/Feature/ShippingOptionResourceTest.php†L60-L160】
+- A configurable zone/method matrix governs where methods appear, now backed by a bespoke boolean matrix component that normalises Livewire state while tests verify complex enablement grids remain stable.【F:config/shipping.php†L5-L26】【F:app/Support/Forms/Components/BooleanMatrix.php†L9-L27】【F:app/Support/Forms/MatrixFactory.php†L121-L148】【F:app/Filament/Resources/ShippingOptionResource.php†L225-L235】【F:tests/Feature/ShippingOptionResourceTest.php†L42-L165】
 - The public order detail endpoint now keeps `completed` lifecycle states visible so fulfilment teams can audit closed shipments without relying on admin-only tooling.【F:app/Http/Controllers/Api/OrderController.php†L39-L86】【F:tests/Feature/Api/OrderControllerTest.php†L92-L120】
 - Resolver unit coverage now reuses seeded Baltic country fixtures with `updateOrCreate` so duplicate `cca2` values from parallel seed profiles no longer trip SQLite unique constraints during shipping eligibility tests.【F:tests/Unit/Services/ShippingOptionResolverTest.php†L45-L74】
 
@@ -27,8 +27,8 @@
 
 ## Estimated Delivery Windows
 - Shipping options capture `estimated_days_min`/`max` and expose a helper that renders either a single-day commitment or a ranged window for storefront use.【F:app/Models/ShippingOption.php†L59-L242】
-- Admin forms require these values alongside pricing, ensuring each carrier record surfaces a projected delivery window in management tables and Livewire components that read the appended `estimated_delivery_text` attribute.【F:app/Filament/Resources/ShippingOptionResource.php†L120-L206】
+- Admin forms require these values alongside pricing, ensuring each carrier record surfaces a projected delivery window in management tables and Livewire components that read the appended `estimated_delivery_text` attribute.【F:app/Filament/Resources/ShippingOptionResource.php†L120-L171】
 
 ## Shipping Matrix & Availability Rules
-- The shipping configuration lists canonical zones and fulfilment methods, feeding the Filament matrix widget that lets admins toggle carrier availability per zone without custom coding.【F:config/shipping.php†L5-L26】【F:app/Filament/Resources/ShippingOptionResource.php†L160-L206】
-- Feature tests assert matrix data is normalised on create/edit and that partially blank rows collapse to empty arrays, preventing stale toggles from leaking into storefront eligibility checks.【F:tests/Feature/ShippingOptionResourceTest.php†L60-L164】
+- The shipping configuration lists canonical zones and fulfilment methods, feeding the Filament matrix widget that lets admins toggle carrier availability per zone without custom coding.【F:config/shipping.php†L5-L26】【F:app/Filament/Resources/ShippingOptionResource.php†L225-L235】
+- Feature tests assert matrix data is normalised on create/edit and that partially blank rows collapse to empty arrays, preventing stale toggles from leaking into storefront eligibility checks.【F:tests/Feature/ShippingOptionResourceTest.php†L42-L165】

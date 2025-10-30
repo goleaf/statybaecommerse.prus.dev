@@ -6,8 +6,10 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ShippingOptionResource\Pages;
 use App\Models\City;
+use App\Models\Zone;
 use App\Models\ShippingOption;
 use App\Support\Concerns\HasNav;
+use App\Support\Forms\Casts\MatrixBooleanStateCast;
 use App\Support\Forms\MatrixFactory;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
@@ -30,6 +32,8 @@ use Filament\Tables\Table;
 use Illuminate\Support\Number;
 use Illuminate\Support\Str;
 use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
+
+use function in_array;
 
 /**
  * ShippingOptionResource
@@ -61,6 +65,53 @@ final class ShippingOptionResource extends Resource
         return __('admin.shipping_options.model_label');
     }
 
+    /**
+     * Normalise the matrix payload into a row/column boolean grid for persistence.
+     *
+     * @return array<string, array<string, bool>>
+     */
+    public static function normalizeMatrixState(mixed $state): array
+    {
+        $rows = array_keys((array) config('shipping.matrix.zones', []));
+        $columns = array_keys((array) config('shipping.matrix.methods', []));
+
+        $cast = new MatrixBooleanStateCast($rows, $columns);
+
+        return $cast->set($state);
+    }
+
+    /**
+     * Resolve a safe service type value while enforcing the supported enum list.
+     */
+    public static function resolveServiceType(?string $serviceType): string
+    {
+        $allowed = ['standard', 'express', 'overnight', 'economy'];
+
+        if (in_array($serviceType, $allowed, true)) {
+            return $serviceType;
+        }
+
+        return 'standard';
+    }
+
+    public static function resolveZoneId(?int $zoneId): int
+    {
+        if ($zoneId !== null) {
+            return $zoneId;
+        }
+
+        $zones = (array) config('shipping.matrix.zones', []);
+        $fallbackCode = array_key_first($zones) ?? 'default';
+        $fallbackName = $zones[$fallbackCode] ?? 'Default Zone';
+
+        $zone = Zone::query()->firstOrCreate(
+            ['code' => $fallbackCode],
+            ['name' => $fallbackName, 'is_enabled' => true],
+        );
+
+        return $zone->getKey();
+    }
+
     public static function form(Schema $schema): Schema
     {
         return $schema
@@ -88,11 +139,12 @@ final class ShippingOptionResource extends Resource
                                 Select::make('country_id')
                                     ->label(__('admin.shipping_options.country'))
                                     ->relationship('country', 'name')
-                                    ->required()
                                     ->preload()
                                     ->searchable()
                                     ->reactive()
                                     ->afterStateUpdated(fn (callable $set) => $set('city_id', null))
+                                    // Keep the association optional so generic shipping options remain valid.
+                                    ->nullable()
                                     ->helperText(__('admin.shipping_options.country_help')),
                                 Select::make('city_id')
                                     ->label(__('admin.shipping_options.city'))
@@ -100,6 +152,12 @@ final class ShippingOptionResource extends Resource
                                     ->searchable()
                                     ->preload()
                                     ->disabled(fn (Get $get): bool => blank($get('country_id')))
+                                    ->nullable()
+                                    // Prevent validation from flagging the field when blank so optional
+                                    // shipping options do not require a specific city association.
+                                    ->rules(['nullable'])
+                                    ->dehydrated(false)
+                                    ->validatedWhenNotDehydrated(false)
                                     ->helperText(__('admin.shipping_options.city_help')),
                                 Select::make('service_type')
                                     ->label(__('admin.shipping_options.service_type'))
@@ -109,7 +167,9 @@ final class ShippingOptionResource extends Resource
                                         'overnight' => __('admin.shipping_options.service_types.overnight'),
                                         'economy'   => __('admin.shipping_options.service_types.economy'),
                                     ])
-                                    ->required()
+                                    // Dehydrate manually so edits that only touch the matrix do not fail validation.
+                                    ->dehydrated(false)
+                                    ->validatedWhenNotDehydrated(false)
                                     ->default('standard'),
                             ]),
                         Textarea::make('description')
