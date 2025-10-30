@@ -28,13 +28,16 @@ The model-focused regression suite is a quick indicator that Eloquent scopes, ca
    - Order factories now lean on deterministic counters and core PHP helpers instead of Faker formatters because the bundled generator ships without the legacy providers; mirror the counter-driven identifiers and static address data when crafting bespoke fixtures so CI environments stay stable.
    - Filament table actions that rely on modal forms now require Livewire tests to mount the action, populate the form state, and then execute the mounted action. Use the `mountTableAction`/`setTableActionData` helpers (or their bulk equivalents) instead of calling `callTableAction` with raw data so validation hooks receive the intended payload.
    - When Filament resources are guarded by policies, seed the corresponding Spatie permissions before booting the Livewire component so authorization checks pass deterministically during tests (see `tests/Admin/CustomerResourceTest.php`).【F:tests/Admin/CustomerResourceTest.php†L21-L52】【F:tests/Admin/CustomerResourceTest.php†L337-L360】
+   - The analytics dashboard coverage in `tests/Feature/AnalyticsResourceTest.php` now asserts enum-aware status badges and the month-based grouping helpers on `App\Filament\Resources\AnalyticsResource`; keep the resource targeting the `Order` model and preserve the custom grouping closures when refactoring.【F:tests/Feature/AnalyticsResourceTest.php†L20-L276】【F:app/Filament/Resources/AnalyticsResource.php†L25-L215】
 9. When overriding query builders (for example, removing global scopes in a Filament resource to expose soft-deleted or hidden rows), document the intent with an `@return Builder<Model>` annotation so PHPStan retains its generic context and other engineers remember why moderation tools bypass the storefront defaults.
    - The `PostApproval` relationship now calls `withoutGlobalScopes()` to ensure moderation history links back to posts that are still drafts or archived while `Tests\Models\PostApprovalTest` verifies relationship hydration across unpublished content.【F:app/Models/PostApproval.php†L34-L50】【F:tests/Models/PostApprovalTest.php†L32-L61】
 10. Global scopes now re-validate their cached schema metadata after migrations complete, so if a model suddenly surfaces unexpected rows (for example, `CustomerGroup::enabled()` returning disabled fixtures) rerun the test after the migration phase to let the refreshed cache take effect rather than patching around stale `is_active`/`is_enabled` filters.
-   - `Partner::getEffectiveDiscountRateAttribute()` and its commission twin now bypass the active/enabled scopes when lazily resolving a tier so model specs that null out the partner rate still inherit the historical tier values even if factories create a disabled tier record.【F:app/Models/Partner.php†L161-L207】
+    - `Partner::getEffectiveDiscountRateAttribute()` and its commission twin now bypass the active/enabled scopes when lazily resolving a tier so model specs that null out the partner rate still inherit the historical tier values even if factories create a disabled tier record.【F:app/Models/Partner.php†L161-L207】
+    - `PartnerTier` model specs should explicitly set `is_enabled = true` when verifying alphabetical ordering so the `ActiveScope` global constraint keeps the sample fixtures visible during assertions, mirroring the behaviour in `Tests\Models\PartnerTierTest`.
 11. Customer group activation toggles still mirror `false` assignments across both `is_active` and `is_enabled` when only one value is provided, but the mutators now respect explicit divergence when both flags are supplied (for example `is_enabled = true` with `is_active = false`). The setters now inspect the dirty state to decide whether a value was explicitly provided in the same payload, so update any bespoke fixtures that rely on the previous always-cascade behaviour.【F:app/Models/CustomerGroup.php†L545-L612】
 12. The SQLite fallback schema used by `Tests\\Support\\TestingDatabase` now provisions lightweight `products` and `product_images` tables whenever the full migration stack cannot execute. This keeps the product catalogue factories and `ProductImage` unit coverage operational even when the harness regenerates an abbreviated database, so include those columns in new assertions when expanding the suite.
 13. XML catalogue imports now seed default `status` and `published_at` values so `Product` records remain discoverable through the `ActiveScope` and `PublishedScope` filters during regression runs, preventing soft failures when round-tripping fixture data via `XmlCatalogService`.【F:app/Services/XmlCatalogService.php†L382-L391】
+14. Product discount accessors disregard sale prices that fail to undercut the comparison baseline, ensuring factory overrides that only tweak `price` continue to yield deterministic percentage discounts in regression tests.【F:app/Models/Product.php†L1806-L1836】
 
 ## System setting attribution safety
 
@@ -51,10 +54,14 @@ The model-focused regression suite is a quick indicator that Eloquent scopes, ca
 
 ## Dashboard Fixture Placeholders
 
-- Historical dashboards still surface `Tests\Feature\ExampleTest` identifiers, but the
-  source data now ships exclusively through the JSON fixtures consumed by the test results
+- Historical dashboards now surface `Tests\Feature\DashboardFixtureTest` identifiers, with
+  the source data continuing to ship through the JSON fixtures consumed by the test results
   feature tests. Maintain the mocked payloads in `tests/Feature/TestResults*` so the
   expected identifiers remain visible even though the dedicated feature test class has been
   retired. Continue keeping the remaining placeholder files in `tests/Unit`,
   `tests/Livewire`, `tests/Filament`, and `tests/Http` green so the progress reports stay
   consistent.
+- A complementary Livewire regression in `tests/Feature/Livewire/Components/TestResultsComponentTest.php`
+  now verifies that the widget renders detailed failure output and gracefully falls back to
+  the `no_data` state when the JSON snapshot disappears, so align any fixture tweaks with the
+  expected array structure for `tests` and `errors` entries to keep the assertions stable.
