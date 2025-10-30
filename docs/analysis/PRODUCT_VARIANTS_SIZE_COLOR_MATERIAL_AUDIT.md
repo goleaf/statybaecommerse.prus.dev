@@ -18,6 +18,7 @@
 ## Synchronization & Runtime Selection
 - `ProductVariantAttributeMatrixService::sync` reconciles stored matrix payloads with pivot tables and denormalized `variant_attribute_values`, including locale-aware copies of attribute labels so downstream analytics remain human-readable.【F:app/Services/ProductVariantAttributeMatrixService.php†L11-L185】
 - The storefront selector loads attribute lists scoped to the current product, applies the matrix to filter available values, and dispatches variant selection events, keeping customer interactions constrained to valid size/color/material permutations.【F:app/Livewire/ProductVariantSelector.php†L31-L214】【F:app/Livewire/ProductVariantSelector.php†L216-L337】
+- Feature coverage on the SingleProduct Livewire page now asserts that variant selection events recalculate pricing, inventory summaries, and stock messaging using deterministic inventory fixtures so storefront handlers stay in sync with tracked quantities.【F:tests/Feature/Livewire/SingleProductVariantSelectionTest.php†L1-L78】
 - Combination lookups now favour the deterministic `combination_hash` when a product filter is present, preventing JSON supersets from leaking into strict comparisons while still falling back to scoped JSON queries when the product context is missing.【F:app/Models/VariantCombination.php†L236-L276】
 
 ## Admin Experience & Testing
