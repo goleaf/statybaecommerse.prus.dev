@@ -16,7 +16,13 @@ use App\Filament\Resources\ProductVariantResource\Pages\ListProductVariants;
 use App\Filament\Resources\RecommendationAnalyticsResource\Pages\ListRecommendationAnalytics;
 use App\Filament\Resources\ReferralCampaignResource\Pages\ListReferralCampaigns;
 use App\Filament\Resources\SliderTranslationResource\Pages\ListSliderTranslations;
+use App\Filament\Resources\SystemSettingCategoryResource\Pages\ListSystemSettingCategories;
+use App\Filament\Resources\SystemSettingCategoryTranslationResource\Pages\ListSystemSettingCategoryTranslations;
+use App\Filament\Resources\SystemSettingDependencyResource\Pages\ListSystemSettingDependencies;
+use App\Filament\Resources\SystemSettingHistoryResource\Pages\ListSystemSettingHistories;
 use App\Filament\Resources\SystemSettingResource\Pages\ListSystemSettings;
+use App\Filament\Resources\SystemSettingTranslationResource\Pages\ListSystemSettingTranslations;
+use App\Filament\Resources\SystemSettingsResource\Pages\ListSystemSettings as PanelListSystemSettings;
 use App\Filament\Resources\UserManagementResource\Pages\ListUsers;
 use App\Filament\Resources\UserPreferenceResource\Pages\ListUserPreferences;
 use App\Filament\Resources\VariantStockResource\Pages\ListVariantStocks;
@@ -34,6 +40,11 @@ use App\Models\RecommendationAnalytics;
 use App\Models\ReferralCampaign;
 use App\Models\SliderTranslation;
 use App\Models\SystemSetting;
+use App\Models\SystemSettingCategory;
+use App\Models\SystemSettingCategoryTranslation;
+use App\Models\SystemSettingDependency;
+use App\Models\SystemSettingHistory;
+use App\Models\SystemSettingTranslation;
 use App\Models\User;
 use App\Models\UserPreference;
 use App\Models\VariantInventory;
@@ -93,7 +104,13 @@ final class MissingFilamentResourceCoverageTest extends TestCase
             'recommendation analytics'  => [ListRecommendationAnalytics::class, 'createRecommendationAnalyticsRecord'],
             'referral campaigns'        => [ListReferralCampaigns::class, 'createReferralCampaignRecord'],
             'slider translations'       => [ListSliderTranslations::class, 'createSliderTranslationRecord'],
+            'system setting categories' => [ListSystemSettingCategories::class, 'createSystemSettingCategoryRecord'],
+            'system setting category translations' => [ListSystemSettingCategoryTranslations::class, 'createSystemSettingCategoryTranslationRecord'],
+            'system setting dependencies' => [ListSystemSettingDependencies::class, 'createSystemSettingDependencyRecord'],
+            'system setting histories'  => [ListSystemSettingHistories::class, 'createSystemSettingHistoryRecord'],
             'system settings'           => [ListSystemSettings::class, 'createSystemSettingRecord'],
+            'system settings panel alias' => [PanelListSystemSettings::class, 'createSystemSettingRecord'],
+            'system setting translations' => [ListSystemSettingTranslations::class, 'createSystemSettingTranslationRecord'],
             'user management'           => [ListUsers::class, 'createUserManagementRecord'],
             'user preferences'          => [ListUserPreferences::class, 'createUserPreferenceRecord'],
             'variant stock'             => [ListVariantStocks::class, 'createVariantInventoryRecord'],
@@ -250,6 +267,75 @@ final class MissingFilamentResourceCoverageTest extends TestCase
         ]);
     }
 
+    private function createSystemSettingCategoryRecord(): SystemSettingCategory
+    {
+        // Create a root category so both navigation grouping and table filters have a tangible record to display.
+        return SystemSettingCategory::factory()->create([
+            'name' => 'Coverage Settings Category',
+            'slug' => 'coverage-settings-category',
+        ]);
+    }
+
+    private function createSystemSettingCategoryTranslationRecord(): SystemSettingCategoryTranslation
+    {
+        // Translate an existing category to confirm localized management tables hydrate their relationships correctly.
+        $category = SystemSettingCategory::factory()->create([
+            'name' => 'Translatable Settings Category',
+            'slug' => 'translatable-settings-category',
+        ]);
+
+        return SystemSettingCategoryTranslation::factory()
+            ->for($category, 'systemSettingCategory')
+            ->english()
+            ->create([
+                'name' => 'Coverage Category Translation',
+            ]);
+    }
+
+    private function createSystemSettingDependencyRecord(): SystemSettingDependency
+    {
+        // Establish a dependency between two deterministic settings so the table highlights both the source and prerequisite keys.
+        $setting = SystemSetting::factory()->create([
+            'key'  => 'coverage-setting-primary',
+            'name' => 'Coverage Setting Primary',
+        ]);
+
+        $dependsOn = SystemSetting::factory()->create([
+            'key'  => 'coverage-setting-prerequisite',
+            'name' => 'Coverage Setting Prerequisite',
+        ]);
+
+        return SystemSettingDependency::factory()
+            ->between($setting, $dependsOn)
+            ->equals('enabled')
+            ->create([
+                'is_active' => true,
+            ]);
+    }
+
+    private function createSystemSettingHistoryRecord(): SystemSettingHistory
+    {
+        // Record a history entry against a setting to exercise the audit log columns rendered by the resource.
+        $setting = SystemSetting::factory()->create([
+            'key'  => 'coverage-setting-historic',
+            'name' => 'Coverage Setting Historic',
+        ]);
+
+        $admin = User::factory()->create([
+            'name'  => 'History Admin',
+            'email' => 'history.admin@example.com',
+        ]);
+
+        return SystemSettingHistory::factory()
+            ->forSetting($setting)
+            ->byUser($admin)
+            ->withReason('Coverage change verification')
+            ->create([
+                'old_value' => 'old coverage value',
+                'new_value' => 'new coverage value',
+            ]);
+    }
+
     private function createSystemSettingRecord(): SystemSetting
     {
         // Store a simple system setting so configuration tables reflect active entries.
@@ -258,6 +344,22 @@ final class MissingFilamentResourceCoverageTest extends TestCase
             'name'  => 'Coverage Setting',
             'group' => 'general',
         ]);
+    }
+
+    private function createSystemSettingTranslationRecord(): SystemSettingTranslation
+    {
+        // Provide an English translation for a tracked setting to confirm localized columns render deterministic strings.
+        $setting = SystemSetting::factory()->create([
+            'key'  => 'coverage-setting-translation',
+            'name' => 'Coverage Setting Translation',
+        ]);
+
+        return SystemSettingTranslation::factory()
+            ->for($setting, 'systemSetting')
+            ->english()
+            ->create([
+                'name' => 'Coverage Setting English Translation',
+            ]);
     }
 
     private function createUserManagementRecord(): User
