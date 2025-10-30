@@ -9,6 +9,8 @@ use App\Models\RecommendationBlock;
 use App\Models\RecommendationCache;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\Schema;
+use Throwable;
 
 /**
  * @extends Factory<RecommendationCache>
@@ -19,7 +21,7 @@ class RecommendationCacheFactory extends Factory
 
     public function definition(): array
     {
-        return [
+        $state = [
             'cache_key'       => $this->faker->unique()->uuid(),
             'block_id'        => RecommendationBlock::factory(),
             'user_id'         => User::factory(),
@@ -31,7 +33,27 @@ class RecommendationCacheFactory extends Factory
             ],
             'hit_count'  => 0,
             'expires_at' => now()->addHours(24),
-            'meta'       => [],
         ];
+
+        // Match the active schema so SQLite snapshots without the meta column
+        // continue to operate when the factory creates cache rows for tests.
+        if ($this->tableHasColumn('recommendation_cache', 'meta')) {
+            $state['meta'] = [];
+        }
+
+        return $state;
+    }
+
+    /**
+     * Verify column availability at runtime before including optional payload
+     * fragments that are absent from pared-down database snapshots.
+     */
+    private function tableHasColumn(string $table, string $column): bool
+    {
+        try {
+            return Schema::hasColumn($table, $column);
+        } catch (Throwable) {
+            return false;
+        }
     }
 }

@@ -6,7 +6,7 @@ namespace App\Support\Monitoring;
 
 use function collect;
 
-use Illuminate\Contracts\Database\ConnectionResolverInterface;
+use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\QueryException;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Support\Facades\Log;
