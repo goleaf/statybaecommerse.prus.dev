@@ -1,0 +1,2 @@
+tests/Unit/VariantStockHistoryModelTest.php
+tests/Unit/VariantImageTest.php
