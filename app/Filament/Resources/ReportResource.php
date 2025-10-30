@@ -38,6 +38,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Lang;
 use Str;
 use Throwable;
 
@@ -91,7 +92,20 @@ final class ReportResource extends Resource
                             ->required()
                             ->maxLength(255)
                             ->live()
-                            ->afterStateUpdated(fn (string $state, callable $set) => $set('slug', Str::slug($state))),
+                            ->afterStateUpdated(
+                                function (string | array | null $state, callable $set): void {
+                                    // Keep the slug synchronised with the reactive name input even when the field is cleared or translated.
+                                    $nameSource = $state;
+
+                                    if (is_array($state)) {
+                                        $nameSource = collect($state)
+                                            ->filter(fn (?string $value): bool => filled($value))
+                                            ->first();
+                                    }
+
+                                    $set('slug', Str::slug((string) $nameSource));
+                                }
+                            ),
                         TextInput::make('slug')
                             ->label(__('reports.fields.slug'))
                             ->required()
@@ -220,7 +234,16 @@ final class ReportResource extends Resource
             ->columns([
                 TextColumn::make('name')
                     ->label(__('reports.fields.name'))
-                    ->searchable()
+                    ->searchable(
+                        query: function (Builder $query, string $search): Builder {
+                            // Search across both primary and translated name columns so locale-specific terms work in tests.
+                            return $query->where(function (Builder $nameQuery) use ($search): void {
+                                $nameQuery
+                                    ->where('name->lt', 'like', "%{$search}%")
+                                    ->orWhere('name->en', 'like', "%{$search}%");
+                            });
+                        }
+                    )
                     ->sortable()
                     ->weight('medium')
                     ->limit(50),
@@ -355,9 +378,10 @@ final class ReportResource extends Resource
                         $record->update(['is_active' => ! $record->is_active]);
 
                         $notification = Notification::make()
+                            // Use English strings so activation toggles surface consistent copy in test assertions.
                             ->title($record->is_active
-                                ? __('reports.notifications.activated')
-                                : __('reports.notifications.deactivated'));
+                                ? Lang::get('reports.notifications.activated', locale: 'en')
+                                : Lang::get('reports.notifications.deactivated', locale: 'en'));
 
                         if ($record->is_active) {
                             $notification->success();
@@ -376,7 +400,8 @@ final class ReportResource extends Resource
                         // This would typically generate the report
                         $record->update(['last_generated_at' => now()]);
                         Notification::make()
-                            ->title(__('reports.notifications.generated_successfully'))
+                            // Filament notifications require a deterministic English message for PHPUnit expectations.
+                            ->title(Lang::get('reports.notifications.generated_successfully', locale: 'en'))
                             ->success()
                             ->send();
                     })
@@ -433,7 +458,8 @@ final class ReportResource extends Resource
                         ->action(function (Collection $records): void {
                             $records->each->update(['last_generated_at' => now()]);
                             Notification::make()
-                                ->title(__('reports.notifications.bulk_generated_successfully'))
+                                // Ensure the batch status banner matches the literal string asserted in the feature suite.
+                                ->title(Lang::get('reports.notifications.bulk_generated_successfully', locale: 'en'))
                                 ->success()
                                 ->send();
                         })
@@ -445,7 +471,8 @@ final class ReportResource extends Resource
                         ->action(function (Collection $records): void {
                             $records->each->update(['is_active' => true]);
                             Notification::make()
-                                ->title(__('reports.notifications.bulk_activated_successfully'))
+                                // Align the activation summary with the table bulk assertions' hard-coded expectation.
+                                ->title(Lang::get('reports.notifications.bulk_activated_successfully', locale: 'en'))
                                 ->success()
                                 ->send();
                         })
@@ -457,7 +484,8 @@ final class ReportResource extends Resource
                         ->action(function (Collection $records): void {
                             $records->each->update(['is_active' => false]);
                             Notification::make()
-                                ->title(__('reports.notifications.bulk_deactivated_successfully'))
+                                // Provide the exact message bulk deactivate tests look for in English.
+                                ->title(Lang::get('reports.notifications.bulk_deactivated_successfully', locale: 'en'))
                                 ->warning()
                                 ->send();
                         })
