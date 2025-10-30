@@ -7,7 +7,7 @@ namespace Database\Seeders;
 use App\Models\Product;
 use App\Models\ProductImage;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Collection;
 
 final class ProductImageSeeder extends Seeder
 {
@@ -16,77 +16,81 @@ final class ProductImageSeeder extends Seeder
      */
     public function run(): void
     {
-        $products = Product::limit(20)->get();
-
-        if ($products->isEmpty()) {
+        if (! Product::query()->exists()) {
             $this->command->warn('No products found. Please run ProductSeeder first.');
 
             return;
         }
 
-        // Create images for different product types
-        $this->createProductImages($products);
-        $this->createImageVariations($products);
+        Product::query()
+            ->orderBy('id')
+            ->chunkById(50, function (Collection $products): void {
+                // Process each chunk to keep memory usage predictable while ensuring every product receives images.
+                $this->seedImagesForProducts($products);
+            });
     }
 
     /**
      * Create main product images
      */
-    private function createProductImages($products): void
+    private function seedImagesForProducts(Collection $products): void
     {
-        $imageTypes = [
-            'main'      => ['main', 'primary', 'hero'],
-            'gallery'   => ['gallery', 'detail', 'close-up', 'angle'],
-            'lifestyle' => ['lifestyle', 'in-use', 'context'],
-            'technical' => ['technical', 'specification', 'diagram'],
-        ];
-
+        // Iterate each product inside the chunk so we can attach individual image sets and derived variations per product.
         foreach ($products as $product) {
-            $imageCount = rand(3, 8);  // Each product gets 3-8 images
-            $createdImages = 0;
+            $this->createProductImages($product);
+            $this->createImageVariations($product);
+        }
+    }
 
-            // Main product image
-            $this->createImageForProduct($product, 'main', 'Main product image', 1);
+    /**
+     * Create main product images
+     */
+    private function createProductImages(Product $product): void
+    {
+        $imageCount = rand(3, 8);  // Each product gets 3-8 images
+        $createdImages = 0;
+
+        // Main product image
+        $this->createImageForProduct($product, 'main', 'Main product image', 1);
+        $createdImages++;
+
+        // Gallery images
+        $galleryCount = min(rand(2, 4), $imageCount - $createdImages);
+        for ($i = 0; $i < $galleryCount; $i++) {
+            $this->createImageForProduct(
+                $product,
+                'gallery',
+                'Gallery image ' . ($i + 1),
+                $i + 2
+            );
             $createdImages++;
+        }
 
-            // Gallery images
-            $galleryCount = min(rand(2, 4), $imageCount - $createdImages);
-            for ($i = 0; $i < $galleryCount; $i++) {
+        // Lifestyle images (if space allows)
+        if ($createdImages < $imageCount) {
+            $lifestyleCount = min(rand(1, 2), $imageCount - $createdImages);
+            for ($i = 0; $i < $lifestyleCount; $i++) {
                 $this->createImageForProduct(
                     $product,
-                    'gallery',
-                    'Gallery image ' . ($i + 1),
-                    $i + 2
+                    'lifestyle',
+                    'Lifestyle image ' . ($i + 1),
+                    $createdImages + $i + 1
                 );
                 $createdImages++;
             }
+        }
 
-            // Lifestyle images (if space allows)
-            if ($createdImages < $imageCount) {
-                $lifestyleCount = min(rand(1, 2), $imageCount - $createdImages);
-                for ($i = 0; $i < $lifestyleCount; $i++) {
-                    $this->createImageForProduct(
-                        $product,
-                        'lifestyle',
-                        'Lifestyle image ' . ($i + 1),
-                        $createdImages + $i + 1
-                    );
-                    $createdImages++;
-                }
-            }
-
-            // Technical images (if space allows)
-            if ($createdImages < $imageCount) {
-                $technicalCount = min(rand(1, 2), $imageCount - $createdImages);
-                for ($i = 0; $i < $technicalCount; $i++) {
-                    $this->createImageForProduct(
-                        $product,
-                        'technical',
-                        'Technical image ' . ($i + 1),
-                        $createdImages + $i + 1
-                    );
-                    $createdImages++;
-                }
+        // Technical images (if space allows)
+        if ($createdImages < $imageCount) {
+            $technicalCount = min(rand(1, 2), $imageCount - $createdImages);
+            for ($i = 0; $i < $technicalCount; $i++) {
+                $this->createImageForProduct(
+                    $product,
+                    'technical',
+                    'Technical image ' . ($i + 1),
+                    $createdImages + $i + 1
+                );
+                $createdImages++;
             }
         }
     }
@@ -94,26 +98,26 @@ final class ProductImageSeeder extends Seeder
     /**
      * Create image variations for products
      */
-    private function createImageVariations($products): void
+    private function createImageVariations(Product $product): void
     {
-        foreach ($products->take(5) as $product) {
-            // Create different size variations for main images
-            $sizes = ['thumb', 'small', 'medium', 'large', 'xlarge'];
+        // Create different size variations for main images so responsive breakpoints have assets to render.
+        $sizes = ['thumb', 'small', 'medium', 'large', 'xlarge'];
 
-            foreach ($sizes as $size) {
-                $path = "product-images/{$product->id}/{$size}-image.jpg";
+        foreach ($sizes as $size) {
+            $path = "product-images/{$product->id}/{$size}-image.jpg";
 
-                // Create a physical placeholder for this variation so URLs resolve
-                $dimensions = match ($size) {
-                    'thumb'  => [200, 200],
-                    'small'  => [400, 400],
-                    'medium' => [600, 600],
-                    'large'  => [800, 800],
-                    'xlarge' => [1200, 1200],
-                    default  => [600, 600],
-                };
-                $this->createPlaceholderImage($path, $dimensions[0], $dimensions[1]);
+            // Create a physical placeholder for this variation so URLs resolve
+            $dimensions = match ($size) {
+                'thumb'  => [200, 200],
+                'small'  => [400, 400],
+                'medium' => [600, 600],
+                'large'  => [800, 800],
+                'xlarge' => [1200, 1200],
+                default  => [600, 600],
+            };
+            $this->createPlaceholderImage($path, $dimensions[0], $dimensions[1]);
 
+            if (ProductImage::query()->where('product_id', $product->id)->where('path', $path)->doesntExist()) {
                 ProductImage::factory()
                     ->for($product)
                     ->create([
@@ -134,6 +138,11 @@ final class ProductImageSeeder extends Seeder
 
         // Ensure a physical placeholder exists for the generated path
         $this->createPlaceholderImage($imagePath, 800, 800);
+
+        // Skip creating duplicate entries when the seeder is executed multiple times for smoke testing.
+        if (ProductImage::query()->where('product_id', $product->id)->where('path', $imagePath)->exists()) {
+            return;
+        }
 
         ProductImage::factory()
             ->for($product)
@@ -233,9 +242,12 @@ final class ProductImageSeeder extends Seeder
             }
         }
 
-        // Fallback: write an empty file to avoid 404s if image generation failed
+        // Fallback: embed a 1x1 PNG so the storefront always receives a valid image payload even without GD.
         if (! file_exists($fullPath)) {
-            @file_put_contents($fullPath, '');
+            $placeholderPixel = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO2aXhQAAAAASUVORK5CYII=');
+
+            // Persist the decoded PNG bytes; even though tiny, it prevents broken image icons during local testing.
+            @file_put_contents($fullPath, $placeholderPixel !== false ? $placeholderPixel : '');
         }
     }
 }
