@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Console\Commands\ProfiledSeedCommand;
+use App\Contracts\CurrencyRateProvider;
 use App\Contracts\DocumentServiceContract;
 use App\Contracts\HealthReporter as HealthReporterContract;
 use App\Database\Connectors\GracefulSQLiteConnector;
@@ -20,7 +21,9 @@ use App\Models\FeatureFlag;
 use App\Models\SystemSetting;
 use App\Observers\UserAttributionObserver;
 use App\Services\CacheInvalidationService;
+use App\Services\CurrencyRateSyncService;
 use App\Services\DocumentService;
+use App\Services\StaticCurrencyRateProvider;
 use App\Support\Cache\RateLimiter as ExtendedRateLimiter;
 use App\Support\Filament\SearchableComponentHelper;
 use App\Support\Filesystem\GracefulFilesystem;
@@ -133,6 +136,18 @@ class AppServiceProvider extends ServiceProvider
 
         // Bind the domain-level product repository to its Eloquent implementation.
         $this->app->bind(ProductRepositoryInterface::class, EloquentProductRepository::class);
+
+        // Provide a lightweight static exchange rate provider that can be swapped in tests.
+        $this->app->singleton(CurrencyRateProvider::class, static fn (): CurrencyRateProvider => new StaticCurrencyRateProvider);
+
+        // Expose the synchroniser so Filament actions can request up-to-date currency rates.
+        $this->app->singleton(
+            CurrencyRateSyncService::class,
+            static fn ($app): CurrencyRateSyncService => new CurrencyRateSyncService(
+                $app->make(CurrencyRateProvider::class),
+                (string) config('currency.base_currency', 'EUR'),
+            ),
+        );
 
         $this->registerFilamentResourceAutoloader();
 
