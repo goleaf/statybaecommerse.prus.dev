@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Tests\\Feature\\Filament\\Resources;
+namespace Tests\Feature\Filament\Resources;
 
-use App\\Filament\\Resources\\EnumValueResource\\Pages\\ListEnumValues;
-use App\\Models\\EnumValue;
-use App\\Models\\User;
-use Illuminate\\Foundation\\Testing\\RefreshDatabase;
-use Livewire\\Livewire;
-use Tests\\TestCase;
+use App\Filament\Resources\EnumValueResource\Pages\ListEnumValues;
+use App\Models\EnumValue;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
+use Tests\TestCase;
 
 final class EnumValueResourceTest extends TestCase
 {
