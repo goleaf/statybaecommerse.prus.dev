@@ -77,6 +77,13 @@ final class UserBehaviorModelTest extends TestCase
         Schema::dropIfExists('products');
         Schema::dropIfExists('brands');
         Schema::dropIfExists('categories');
+        // Drop permission tables in reverse dependency order to keep
+        // foreign key constraints satisfied during teardown.
+        Schema::dropIfExists('role_has_permissions');
+        Schema::dropIfExists('model_has_permissions');
+        Schema::dropIfExists('model_has_roles');
+        Schema::dropIfExists('permissions');
+        Schema::dropIfExists('roles');
         Schema::dropIfExists('users');
 
         DB::disconnect('sqlite');
@@ -93,6 +100,10 @@ final class UserBehaviorModelTest extends TestCase
         Schema::create('users', function (Blueprint $table): void {
             $table->id();
             $table->string('name')->nullable();
+            // Store decomposed name parts to mirror the production schema so
+            // the model factory can persist deterministic first/last names.
+            $table->string('first_name')->nullable();
+            $table->string('last_name')->nullable();
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
@@ -102,6 +113,54 @@ final class UserBehaviorModelTest extends TestCase
             $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();
+        });
+
+        Schema::create('roles', function (Blueprint $table): void {
+            // Minimal role schema satisfies the Spatie permission hooks that
+            // auto-assign the super_admin role during unit tests.
+            $table->id();
+            $table->string('name');
+            $table->string('guard_name');
+            $table->timestamps();
+            $table->unique(['name', 'guard_name']);
+        });
+
+        Schema::create('permissions', function (Blueprint $table): void {
+            // Provide a lean permission table so cache warmups do not fail
+            // when the registrar inspects configured permissions.
+            $table->id();
+            $table->string('name');
+            $table->string('guard_name');
+            $table->timestamps();
+            $table->unique(['name', 'guard_name']);
+        });
+
+        Schema::create('model_has_roles', function (Blueprint $table): void {
+            // Pivot table mirrors the package definition allowing syncRoles()
+            // to persist assignments against the temporary SQLite schema.
+            $table->foreignId('role_id')->constrained('roles')->cascadeOnDelete();
+            $table->unsignedBigInteger('model_id');
+            $table->string('model_type');
+            $table->index(['model_id', 'model_type']);
+            $table->primary(['role_id', 'model_id', 'model_type']);
+        });
+
+        Schema::create('model_has_permissions', function (Blueprint $table): void {
+            // Companion pivot keeps permission lookups working when the
+            // registrar attempts to hydrate cached relationships.
+            $table->foreignId('permission_id')->constrained('permissions')->cascadeOnDelete();
+            $table->unsignedBigInteger('model_id');
+            $table->string('model_type');
+            $table->index(['model_id', 'model_type']);
+            $table->primary(['permission_id', 'model_id', 'model_type']);
+        });
+
+        Schema::create('role_has_permissions', function (Blueprint $table): void {
+            // Bridge roles to permissions so the simplified schema stays
+            // compatible with the permission registrar expectations.
+            $table->foreignId('permission_id')->constrained('permissions')->cascadeOnDelete();
+            $table->foreignId('role_id')->constrained('roles')->cascadeOnDelete();
+            $table->primary(['permission_id', 'role_id']);
         });
 
         Schema::create('brands', function (Blueprint $table): void {
