@@ -7,13 +7,15 @@ namespace App\Filament\Resources\ReferralRewardLogs\Schemas;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Schema;
 
 class ReferralRewardLogForm
 {
-    public static function configure(Form $form): Form
+    public static function configure(Schema $schema): Schema
     {
-        return $form
-            ->components([
+        // Return the configured schema instance so Filament can build the component tree for v4 resources.
+        return $schema
+            ->schema([
                 Select::make('referral_reward_id')
                     ->relationship('referralReward', 'title')
                     ->searchable()
