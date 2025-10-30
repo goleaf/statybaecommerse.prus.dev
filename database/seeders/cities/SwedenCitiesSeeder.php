@@ -4,21 +4,24 @@ declare(strict_types=1);
 
 namespace Database\Seeders\Cities;
 
-use App\Models\City;
-use App\Models\Country;
-use App\Models\Translations\CityTranslation;
-use App\Models\Zone;
+use App\Support\Locales;
 use Illuminate\Database\Seeder;
-use Str;
 
 final class SwedenCitiesSeeder extends Seeder
 {
-    public function run(): void
+    public static function iso2(): string
     {
-        $sweden = Country::where('cca2', 'SE')->first();
-        $euZone = Zone::where('code', 'EU')->first();
+        // Expose the ISO2 country code so the city toolkit can resolve the related country record.
+        return 'SE';
+    }
 
-        $cities = [
+    /**
+     * @return iterable<array<string, mixed>>
+     */
+    public static function data(): iterable
+    {
+        // The dataset is preserved verbatim from the legacy seeder to keep curated ordering intact.
+        return [
             // Stockholm
             [
                 'name'         => 'Stockholm',
@@ -366,40 +369,13 @@ final class SwedenCitiesSeeder extends Seeder
                 ],
             ],
         ];
+    }
 
-        foreach ($cities as $cityData) {
-            $city = City::updateOrCreate(
-                ['code' => $cityData['code']],
-                [
-                    'name'         => $cityData['name'],
-                    'slug'         => Str::slug($cityData['name'] . '-' . $cityData['code']),
-                    'is_enabled'   => true,
-                    'is_default'   => $cityData['is_default'] ?? false,
-                    'is_capital'   => $cityData['is_capital'] ?? false,
-                    'country_id'   => $sweden->id,
-                    'zone_id'      => $euZone?->id,
-                    'level'        => 1,
-                    'latitude'     => $cityData['latitude'],
-                    'longitude'    => $cityData['longitude'],
-                    'population'   => $cityData['population'],
-                    'postal_codes' => $cityData['postal_codes'],
-                    'sort_order'   => 0,
-                ]
-            );
+    public function run(): void
+    {
+        $locales = Locales::supported();
 
-            // Create translations
-            foreach ($cityData['translations'] as $locale => $translation) {
-                CityTranslation::updateOrCreate(
-                    [
-                        'city_id' => $city->id,
-                        'locale'  => $locale,
-                    ],
-                    [
-                        'name'        => $translation['name'],
-                        'description' => $translation['description'],
-                    ]
-                );
-            }
-        }
+        // Centralise insert/update logic through the shared toolkit for consistency across countries.
+        CitySeederToolkit::upsertForCountry(self::iso2(), self::data(), $locales);
     }
 }

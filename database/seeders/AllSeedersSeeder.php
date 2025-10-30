@@ -9,6 +9,8 @@ use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use SplFileInfo;
 
+use function str_starts_with;
+
 /**
  * Seeder that automatically executes every seeder class found in the database/seeders directory.
  */
@@ -20,6 +22,8 @@ final class AllSeedersSeeder extends Seeder
      * @var array<int, class-string<Seeder>>
      */
     private const PRIORITY_SEEDERS = [
+        CountrySeeder::class,
+        \Database\Seeders\Cities\CitiesMergedSeeder::class,
         CurrencySeeder::class,
         AttributeSeeder::class,
         AttributeValueSeeder::class,
@@ -78,6 +82,13 @@ final class AllSeedersSeeder extends Seeder
 
             if ($className === self::class || $className === DatabaseSeeder::class) {
                 // Skip the aggregator itself and the DatabaseSeeder to avoid recursion.
+                continue;
+            }
+
+            if (str_starts_with($className, 'Database\\Seeders\\Cities\\')
+                && $className !== \Database\Seeders\Cities\CitiesMergedSeeder::class) {
+                // Per-country city seeders are orchestrated via CitiesMergedSeeder; running
+                // them individually would duplicate work and break the consolidated flow.
                 continue;
             }
 
