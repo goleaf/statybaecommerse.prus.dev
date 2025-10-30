@@ -34,4 +34,14 @@ final class ListCustomers extends BaseListRecords
             CustomerGrowthChart::class,
         ];
     }
+
+    /**
+     * Explicitly expose the `loadTable` hook so Livewire tests that call the
+     * method directly can hydrate the deferred table without relying on parent
+     * reflection quirks introduced in newer Livewire releases.
+     */
+    public function loadTable(): void
+    {
+        parent::loadTable();
+    }
 }
