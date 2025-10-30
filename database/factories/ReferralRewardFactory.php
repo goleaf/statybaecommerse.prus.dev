@@ -66,7 +66,7 @@ final class ReferralRewardFactory extends Factory
                 'discount_percentage' => fake()->numberBetween(5, 25),
                 'free_shipping'       => fake()->boolean(),
                 'bonus_points'        => fake()->numberBetween(100, 1000),
-            ])),
+            ]) ?? []),
         ];
     }
 

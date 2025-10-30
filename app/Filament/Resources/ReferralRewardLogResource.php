@@ -23,6 +23,8 @@ use Filament\Tables\Actions\ViewAction as TableViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Filament\Tables\Actions\EditAction as TableEditAction;
+use Filament\Tables\Actions\ViewAction as TableViewAction;
 use UnitEnum;
 
 /**
