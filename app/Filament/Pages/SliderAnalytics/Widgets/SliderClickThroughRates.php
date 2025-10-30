@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages\SliderAnalytics\Widgets;
 
+use App\Filament\Pages\SliderAnalytics\Concerns\ResolvesPageFilters;
 use App\Models\Slider;
 use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
@@ -13,6 +14,7 @@ use Illuminate\Database\Eloquent\Builder;
 final class SliderClickThroughRates extends BaseWidget
 {
     use InteractsWithPageFilters;
+    use ResolvesPageFilters;
 
     protected ?string $heading = 'Click-Through Rate Analysis';
 
@@ -25,10 +27,11 @@ final class SliderClickThroughRates extends BaseWidget
 
     public function getStats(): array
     {
-        $startDate = $this->pageFilters['startDate'] ?? now()->subDays(30);
-        $endDate = $this->pageFilters['endDate'] ?? now();
-        $sliderId = $this->pageFilters['sliderId'] ?? null;
-        $status = $this->pageFilters['status'] ?? 'all';
+        // Share the same filter resolution path so CTR metrics reflect the
+        // precise slider cohort and time range selected on the page.
+        [$startDate, $endDate] = $this->resolveDateRange();
+        $sliderId = $this->resolveFilterValue('sliderId');
+        $status = $this->resolveFilterValue('status', 'all');
 
         $query = Slider::query()
             ->when($startDate, fn (Builder $query) => $query->whereDate('created_at', '>=', $startDate))
@@ -36,20 +39,22 @@ final class SliderClickThroughRates extends BaseWidget
             ->when($sliderId, fn (Builder $query) => $query->where('id', $sliderId))
             ->when($status !== 'all', fn (Builder $query) => $query->where('is_active', $status === 'active'));
 
-        $totalSliders = $query->count();
-        $slidersWithButtons = $query
+        // Each metric uses a cloned builder to avoid stacking button-specific
+        // constraints on subsequent calculations.
+        $totalSliders = (clone $query)->count();
+        $slidersWithButtons = (clone $query)
             ->whereNotNull('button_text')
             ->whereNotNull('button_url')
             ->where('button_text', '!=', '')
             ->where('button_url', '!=', '')
             ->count();
 
-        $slidersWithExternalLinks = $query
+        $slidersWithExternalLinks = (clone $query)
             ->whereNotNull('button_url')
             ->where('button_url', 'like', 'http%')
             ->count();
 
-        $slidersWithInternalLinks = $query
+        $slidersWithInternalLinks = (clone $query)
             ->whereNotNull('button_url')
             ->where('button_url', 'not like', 'http%')
             ->count();
