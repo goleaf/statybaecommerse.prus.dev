@@ -24,6 +24,7 @@
 
 ## Admin Experience & Testing
 - Filament form tests confirm that creating or editing a variant stores metadata such as size/color pairs and that matrix changes update the `product_variant_attributes` pivot, preventing desynchronization between admin selections and storefront availability.【F:tests/admin/resources/ProductVariantResourceTest.php†L31-L172】
+- A complementary Filament smoke test now asserts that the variant listings and stock dashboards mount without errors, guarding against table refactors that might otherwise go unnoticed.【F:tests/Filament/MissingResourceSmokeTest.php†L91-L108】
 
 ## Observations & Risks
 - The baseline `ProductVariantSeeder` assigns a random color value when building the matrix but never associates materials, so environments relying solely on this seeder will lack material coverage until `ComprehensiveProductVariantSeeder` (or similar) is executed.【F:database/seeders/ProductVariantSeeder.php†L281-L312】
