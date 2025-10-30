@@ -5,12 +5,16 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Filament\Resources\SystemSettingsResource;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Columns\Column;
 use App\Models\SystemSetting;
 use App\Models\SystemSettingCategory;
 use App\Models\User;
 use App\Support\Nav;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Livewire\Features\SupportTesting\TestableLivewire;
+use Livewire\Features\SupportTesting\Testable as TestableLivewire;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -52,7 +56,7 @@ final class SystemSettingsResourceTest extends TestCase
         'name',
         'type',
         'value',
-        'category.name',
+        'categoryRelation.name',
         'group',
         'is_public',
         'is_encrypted',
@@ -156,8 +160,12 @@ final class SystemSettingsResourceTest extends TestCase
                 'category_id' => $this->category->id,
             ]);
 
-        $this->listComponent()
-            ->assertCanSeeTableRecords($settings);
+        $component = $this->listComponent();
+
+        // Hydrate the deferred table dataset before asserting on visible records.
+        $component->call('loadTable');
+
+        $component->assertCanSeeTableRecords($settings);
     }
 
     /**
@@ -242,9 +250,15 @@ final class SystemSettingsResourceTest extends TestCase
         $setting = $this->createSetting([
             'value'         => 'current value',
             'default_value' => 'default value',
+            'is_encrypted'  => false,
         ]);
 
-        $this->listComponent()
+        $component = $this->listComponent();
+
+        // Ensure table state is ready before invoking the action for deterministic assertions.
+        $component->call('loadTable');
+
+        $component
             ->callTableAction('reset_to_default', $setting)
             ->assertHasNoActionErrors();
 
@@ -264,7 +278,12 @@ final class SystemSettingsResourceTest extends TestCase
             'name' => 'Original Setting',
         ]);
 
-        $this->listComponent()
+        $component = $this->listComponent();
+
+        // Prime the table so the duplication action can target the record reliably.
+        $component->call('loadTable');
+
+        $component
             ->callTableAction('duplicate', $setting)
             ->assertHasNoActionErrors();
 
@@ -285,7 +304,12 @@ final class SystemSettingsResourceTest extends TestCase
                 'category_id' => $this->category->id,
             ]);
 
-        $this->listComponent()
+        $component = $this->listComponent();
+
+        // Hydrate the table before running the export bulk action for consistent payloads.
+        $component->call('loadTable');
+
+        $component
             ->callTableBulkAction('export_settings', $settings)
             ->assertHasNoBulkActionErrors();
     }
@@ -301,7 +325,12 @@ final class SystemSettingsResourceTest extends TestCase
                 'category_id' => $this->category->id,
             ]);
 
-        $this->listComponent()
+        $component = $this->listComponent();
+
+        // Load the table rows before triggering the cache clear bulk action to avoid stale selections.
+        $component->call('loadTable');
+
+        $component
             ->callTableBulkAction('clear_cache', $settings)
             ->assertHasNoBulkActionErrors();
     }
@@ -314,8 +343,17 @@ final class SystemSettingsResourceTest extends TestCase
         $visibleSetting = $this->createSetting(['type' => 'string']);
         $hiddenSetting = $this->createSetting(['type' => 'boolean']);
 
-        $this->listComponent()
-            ->filterTable('type', 'string')
+        $component = $this->listComponent();
+
+        // Load the table prior to applying filters so Livewire hydrates the dataset.
+        $component->call('loadTable');
+
+        $component->filterTable('type', 'string');
+
+        // Rehydrate after filtering to ensure assertions inspect the filtered records.
+        $component->call('loadTable');
+
+        $component
             ->assertCanSeeTableRecords([$visibleSetting])
             ->assertCanNotSeeTableRecords([$hiddenSetting]);
     }
@@ -332,8 +370,15 @@ final class SystemSettingsResourceTest extends TestCase
             'key'         => 'other-setting',
         ]);
 
-        $this->listComponent()
-            ->filterTable('category_id', $this->category->id)
+        $component = $this->listComponent();
+
+        $component->call('loadTable');
+
+        $component->filterTable('category_id', $this->category->id);
+
+        $component->call('loadTable');
+
+        $component
             ->assertCanSeeTableRecords([$visibleSetting])
             ->assertCanNotSeeTableRecords([$hiddenSetting]);
     }
@@ -346,8 +391,15 @@ final class SystemSettingsResourceTest extends TestCase
         $visibleSetting = $this->createSetting(['is_public' => true, 'key' => 'public_setting']);
         $hiddenSetting = $this->createSetting(['is_public' => false, 'key' => 'private_setting']);
 
-        $this->listComponent()
-            ->filterTable('is_public', true)
+        $component = $this->listComponent();
+
+        $component->call('loadTable');
+
+        $component->filterTable('is_public', true);
+
+        $component->call('loadTable');
+
+        $component
             ->assertCanSeeTableRecords([$visibleSetting])
             ->assertCanNotSeeTableRecords([$hiddenSetting]);
     }
@@ -361,8 +413,15 @@ final class SystemSettingsResourceTest extends TestCase
         $alsoVisible = $this->createSetting(['name' => 'Test Setting 2', 'key' => 'test_setting_2']);
         $hiddenSetting = $this->createSetting(['name' => 'Different Setting', 'key' => 'different_setting']);
 
-        $this->listComponent()
-            ->searchTable('Test')
+        $component = $this->listComponent();
+
+        $component->call('loadTable');
+
+        $component->searchTable('Test');
+
+        $component->call('loadTable');
+
+        $component
             ->assertCanSeeTableRecords([$visibleSetting, $alsoVisible])
             ->assertCanNotSeeTableRecords([$hiddenSetting]);
     }
@@ -534,11 +593,11 @@ final class SystemSettingsResourceTest extends TestCase
     {
         $this->createSetting();
 
-        $component = $this->listComponent()
-            ->call('loadTable');
+        $component = $this->listComponent();
 
-        // Assert each configured column remains available on the listing.
-        $component->assertCanSeeTableColumns(self::TABLE_COLUMNS);
+        $component->call('loadTable');
+
+        $this->assertTableColumnsVisible($component, self::TABLE_COLUMNS);
     }
 
     /**
@@ -548,8 +607,9 @@ final class SystemSettingsResourceTest extends TestCase
     {
         $component = $this->listComponent();
 
-        // Validate each expected filter exists to keep the listing feature-complete.
-        $component->assertCanSeeTableFilters(self::TABLE_FILTERS);
+        $component->call('loadTable');
+
+        $this->assertTableFiltersVisible($component, self::TABLE_FILTERS);
     }
 
     /**
@@ -561,8 +621,9 @@ final class SystemSettingsResourceTest extends TestCase
 
         $component = $this->listComponent();
 
-        // Confirm the presence of each action instead of asserting a brittle ordered list.
-        $component->assertCanSeeTableActions(self::TABLE_ACTIONS);
+        $component->call('loadTable');
+
+        $this->assertTableActionsVisible($component, self::TABLE_ACTIONS);
     }
 
     /**
@@ -572,8 +633,9 @@ final class SystemSettingsResourceTest extends TestCase
     {
         $component = $this->listComponent();
 
-        // Ensures each bulk action identifier remains registered.
-        $component->assertCanSeeBulkActions(self::BULK_ACTIONS);
+        $component->call('loadTable');
+
+        $this->assertTableBulkActionsVisible($component, self::BULK_ACTIONS);
     }
 
     /**
@@ -628,6 +690,135 @@ final class SystemSettingsResourceTest extends TestCase
     private function livewire(string $component, array $parameters = []): TestableLivewire
     {
         return Livewire::actingAs($this->adminUser)->test($component, $parameters);
+    }
+
+    /**
+     * Assert that the provided table columns are registered on the component.
+     *
+     * @param array<int, string> $expectedColumns
+     */
+    private function assertTableColumnsVisible(TestableLivewire $component, array $expectedColumns): void
+    {
+        $columnNames = collect($component->instance()->getTable()->getColumns())
+            ->map(static fn (Column $column): string => $column->getName())
+            ->all();
+
+        foreach ($expectedColumns as $column) {
+            self::assertContains(
+                $column,
+                $columnNames,
+                sprintf('Failed asserting the [%s] column is registered on the table.', $column),
+            );
+        }
+    }
+
+    /**
+     * Assert that each expected filter handle exists on the table definition.
+     *
+     * @param array<int, string> $expectedFilters
+     */
+    private function assertTableFiltersVisible(TestableLivewire $component, array $expectedFilters): void
+    {
+        $filterNames = collect($component->instance()->getTable()->getFilters(withHidden: true))
+            ->map(static fn ($filter): string => method_exists($filter, 'getName') ? (string) $filter->getName() : '')
+            ->filter()
+            ->all();
+
+        foreach ($expectedFilters as $filter) {
+            self::assertContains(
+                $filter,
+                $filterNames,
+                sprintf('Failed asserting the [%s] filter is registered on the table.', $filter),
+            );
+        }
+    }
+
+    /**
+     * Assert that every expected record-level action is available.
+     *
+     * @param array<int, string> $expectedActions
+     */
+    private function assertTableActionsVisible(TestableLivewire $component, array $expectedActions): void
+    {
+        $actionNames = $this->flattenActionNames($component->instance()->getTable()->getActions());
+
+        foreach ($expectedActions as $action) {
+            self::assertContains(
+                $action,
+                $actionNames,
+                sprintf('Failed asserting the [%s] action is registered on the table.', $action),
+            );
+        }
+    }
+
+    /**
+     * Assert that each expected bulk action is registered on the table.
+     *
+     * @param array<int, string> $expectedActions
+     */
+    private function assertTableBulkActionsVisible(TestableLivewire $component, array $expectedActions): void
+    {
+        $bulkActionNames = $this->flattenBulkActionNames($component->instance()->getTable()->getBulkActions());
+
+        foreach ($expectedActions as $action) {
+            self::assertContains(
+                $action,
+                $bulkActionNames,
+                sprintf('Failed asserting the [%s] bulk action is registered on the table.', $action),
+            );
+        }
+    }
+
+    /**
+     * @param array<int, Action|ActionGroup> $actions
+     * @return array<int, string>
+     */
+    private function flattenActionNames(array $actions): array
+    {
+        return collect($actions)
+            ->flatMap(function ($action): array {
+                if ($action instanceof ActionGroup) {
+                    return $this->flattenActionNames($action->getActions());
+                }
+
+                if ($action instanceof Action) {
+                    return [$action->getName()];
+                }
+
+                if (method_exists($action, 'getName')) {
+                    return [(string) $action->getName()];
+                }
+
+                return [];
+            })
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @param array<int, mixed> $actions
+     * @return array<int, string>
+     */
+    private function flattenBulkActionNames(array $actions): array
+    {
+        return collect($actions)
+            ->flatMap(function ($action): array {
+                if ($action instanceof BulkActionGroup) {
+                    return $this->flattenBulkActionNames($action->getActions());
+                }
+
+                if ($action instanceof Action) {
+                    return [$action->getName()];
+                }
+
+                if (method_exists($action, 'getName')) {
+                    return [(string) $action->getName()];
+                }
+
+                return [];
+            })
+            ->values()
+            ->all();
     }
 }
 

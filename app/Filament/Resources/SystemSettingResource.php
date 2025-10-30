@@ -109,8 +109,8 @@ final class SystemSettingResource extends Resource
                             ]),
                         Select::make('category_id')
                             ->label(__('system_settings.category'))
-                            // Use the canonical model relationship name so Livewire resolves associations correctly during form hydration.
-                            ->relationship('category', 'name')
+                            // Target the explicit relation helper to avoid column name collisions with the legacy `category` attribute.
+                            ->relationship('categoryRelation', 'name')
                             ->searchable()
                             ->preload()
                             ->required() // Keep the category link mandatory so reporting scopes retain context.
@@ -332,7 +332,7 @@ final class SystemSettingResource extends Resource
 
                         return $stringState;
                     }),
-                TextColumn::make('category.name')
+                TextColumn::make('categoryRelation.name')
                     ->label(__('system_settings.category'))
                     ->sortable()
                     ->toggleable()
@@ -403,7 +403,8 @@ final class SystemSettingResource extends Resource
                     ]),
                 SelectFilter::make('category_id')
                     ->label(__('system_settings.category'))
-                    ->relationship('category', 'name'),
+                    // Target the explicit relation helper so Filament can safely hydrate the filter options.
+                    ->relationship('categoryRelation', 'name'),
                 SelectFilter::make('group')
                     ->label(__('system_settings.group'))
                     ->options(fn (): array => SystemSetting::query()

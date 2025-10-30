@@ -749,7 +749,7 @@ final class SystemResource extends Resource
                             'name'     => $record->name,
                             'value'    => $record->value,
                             'type'     => $record->type,
-                            'category' => $record->category->name ?? null,
+                            'category' => $record->categoryRelation?->name, // Relation helper keeps the legacy column from shadowing lookups.
                         ];
                         $filename = "setting_{$record->key}_" . now()->format('Y-m-d_H-i-s') . '.json';
 
@@ -837,7 +837,7 @@ final class SystemResource extends Resource
                                     'name'     => $record->name,
                                     'value'    => $record->value,
                                     'type'     => $record->type,
-                                    'category' => $record->category->name ?? null,
+                                    'category' => $record->categoryRelation?->name, // Relation helper keeps the legacy column from shadowing lookups.
                                 ];
                             });
                             $filename = 'system_settings_' . now()->format('Y-m-d_H-i-s') . '.json';

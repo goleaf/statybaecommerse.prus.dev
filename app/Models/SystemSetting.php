@@ -176,6 +176,19 @@ final class SystemSetting extends Model implements HasMedia
      */
     public function category(): BelongsTo
     {
+        // Preserve the legacy accessor so existing code paths that still
+        // reference `$setting->category()` continue to resolve the relation
+        // while the Filament resource migrates to the explicit helper below.
+        return $this->categoryRelation();
+    }
+
+    /**
+     * Canonical relation helper used by Filament selects and table columns.
+     * The dedicated method avoids clashes with the legacy `category` column
+     * that remains on the database for backwards compatibility.
+     */
+    public function categoryRelation(): BelongsTo
+    {
         return $this->belongsTo(SystemSettingCategory::class, 'category_id');
     }
 
@@ -236,7 +249,7 @@ final class SystemSetting extends Model implements HasMedia
      */
     public function scopeByCategory(Builder $query, string $category): Builder
     {
-        return $query->whereHas('category', function ($q) use ($category): void {
+        return $query->whereHas('categoryRelation', function ($q) use ($category): void {
             $q->where('slug', $category);
         });
     }

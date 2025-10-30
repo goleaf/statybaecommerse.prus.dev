@@ -37,35 +37,35 @@ class ListSystemSettings extends BaseListRecords
             'all' => WidgetTab::make(__('system_settings.tabs.all'))
                 ->value(fn () => $this->getResource()::getEloquentQuery()->count()),
             'general' => WidgetTab::make(__('system_settings.tabs.general'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->where('category', 'general'))
-                ->value(fn () => $this->getResource()::getEloquentQuery()->where('category', 'general')->count()),
+                ->modifyQueryUsing(fn (Builder $query) => $this->scopeCategorySlug($query, 'general'))
+                ->value(fn () => $this->scopeCategorySlug($this->getResource()::getEloquentQuery(), 'general')->count()),
             'appearance' => WidgetTab::make(__('system_settings.tabs.appearance'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->where('category', 'appearance'))
-                ->value(fn () => $this->getResource()::getEloquentQuery()->where('category', 'appearance')->count()),
+                ->modifyQueryUsing(fn (Builder $query) => $this->scopeCategorySlug($query, 'appearance'))
+                ->value(fn () => $this->scopeCategorySlug($this->getResource()::getEloquentQuery(), 'appearance')->count()),
             'email' => WidgetTab::make(__('system_settings.tabs.email'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->where('category', 'email'))
-                ->value(fn () => $this->getResource()::getEloquentQuery()->where('category', 'email')->count()),
+                ->modifyQueryUsing(fn (Builder $query) => $this->scopeCategorySlug($query, 'email'))
+                ->value(fn () => $this->scopeCategorySlug($this->getResource()::getEloquentQuery(), 'email')->count()),
             'payment' => WidgetTab::make(__('system_settings.tabs.payment'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->where('category', 'payment'))
-                ->value(fn () => $this->getResource()::getEloquentQuery()->where('category', 'payment')->count()),
+                ->modifyQueryUsing(fn (Builder $query) => $this->scopeCategorySlug($query, 'payment'))
+                ->value(fn () => $this->scopeCategorySlug($this->getResource()::getEloquentQuery(), 'payment')->count()),
             'shipping' => WidgetTab::make(__('system_settings.tabs.shipping'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->where('category', 'shipping'))
-                ->value(fn () => $this->getResource()::getEloquentQuery()->where('category', 'shipping')->count()),
+                ->modifyQueryUsing(fn (Builder $query) => $this->scopeCategorySlug($query, 'shipping'))
+                ->value(fn () => $this->scopeCategorySlug($this->getResource()::getEloquentQuery(), 'shipping')->count()),
             'security' => WidgetTab::make(__('system_settings.tabs.security'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->where('category', 'security'))
-                ->value(fn () => $this->getResource()::getEloquentQuery()->where('category', 'security')->count()),
+                ->modifyQueryUsing(fn (Builder $query) => $this->scopeCategorySlug($query, 'security'))
+                ->value(fn () => $this->scopeCategorySlug($this->getResource()::getEloquentQuery(), 'security')->count()),
             'performance' => WidgetTab::make(__('system_settings.tabs.performance'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->where('category', 'performance'))
-                ->value(fn () => $this->getResource()::getEloquentQuery()->where('category', 'performance')->count()),
+                ->modifyQueryUsing(fn (Builder $query) => $this->scopeCategorySlug($query, 'performance'))
+                ->value(fn () => $this->scopeCategorySlug($this->getResource()::getEloquentQuery(), 'performance')->count()),
             'integration' => WidgetTab::make(__('system_settings.tabs.integration'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->where('category', 'integration'))
-                ->value(fn () => $this->getResource()::getEloquentQuery()->where('category', 'integration')->count()),
+                ->modifyQueryUsing(fn (Builder $query) => $this->scopeCategorySlug($query, 'integration'))
+                ->value(fn () => $this->scopeCategorySlug($this->getResource()::getEloquentQuery(), 'integration')->count()),
             'analytics' => WidgetTab::make(__('system_settings.tabs.analytics'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->where('category', 'analytics'))
-                ->value(fn () => $this->getResource()::getEloquentQuery()->where('category', 'analytics')->count()),
+                ->modifyQueryUsing(fn (Builder $query) => $this->scopeCategorySlug($query, 'analytics'))
+                ->value(fn () => $this->scopeCategorySlug($this->getResource()::getEloquentQuery(), 'analytics')->count()),
             'maintenance' => WidgetTab::make(__('system_settings.tabs.maintenance'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->where('category', 'maintenance'))
-                ->value(fn () => $this->getResource()::getEloquentQuery()->where('category', 'maintenance')->count()),
+                ->modifyQueryUsing(fn (Builder $query) => $this->scopeCategorySlug($query, 'maintenance'))
+                ->value(fn () => $this->scopeCategorySlug($this->getResource()::getEloquentQuery(), 'maintenance')->count()),
             'active' => WidgetTab::make(__('system_settings.tabs.active'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('is_active', true))
                 ->value(fn () => $this->getResource()::getEloquentQuery()->where('is_active', true)->count()),
@@ -73,5 +73,12 @@ class ListSystemSettings extends BaseListRecords
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('is_public', true))
                 ->value(fn () => $this->getResource()::getEloquentQuery()->where('is_public', true)->count()),
         ];
+    }
+
+    private function scopeCategorySlug(Builder $query, string $slug): Builder
+    {
+        // Route widget queries through the relation helper so counts remain accurate
+        // even while the legacy `category` column still exists on the table.
+        return $query->whereHas('categoryRelation', fn (Builder $relation) => $relation->where('slug', $slug));
     }
 }
