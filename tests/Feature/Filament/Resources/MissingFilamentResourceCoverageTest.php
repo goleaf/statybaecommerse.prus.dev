@@ -199,15 +199,6 @@ final class MissingFilamentResourceCoverageTest extends TestCase
             ->assertCanSeeTableRecords([$record]);
     }
 
-    private function createActivityLogRecord(): ActivityLog
-    {
-        // Persist a system activity entry so the audit-style listing resolves a populated row.
-        return ActivityLog::factory()->create([
-            'log_name'    => 'system',
-            'description' => 'Coverage activity log',
-        ]);
-    }
-
     private function createAuditTrailRecord(): AuditTrail
     {
         // Create actor and auditable users so the audit entry can resolve morph targets.
