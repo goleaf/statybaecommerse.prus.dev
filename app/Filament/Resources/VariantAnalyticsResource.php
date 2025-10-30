@@ -593,6 +593,8 @@ final class VariantAnalyticsResource extends Resource
             ])
             // Use Filament\Actions v4 classes for table actions.
             ->actions([
+                // Reinstate the stock delete action so table-level removals remain available to operators and tests alike.
+                Tables\Actions\DeleteAction::make(),
                 \Filament\Actions\Action::make('regenerate_metrics')
                     ->label(__('admin.variant_analytics.regenerate_metrics'))
                     ->icon('heroicon-o-arrow-path')
@@ -715,7 +717,7 @@ final class VariantAnalyticsResource extends Resource
     /**
      * Keep percentage formatting consistent between table columns and placeholders.
      */
-    public static function formatPercentage(float|int|null $value): string
+    public static function formatPercentage(float|int|string|null $value): string
     {
         // Fall back to zero for null entries while preserving decimal precision and the trailing percent sign.
         return number_format((float) $value, 2) . '%';

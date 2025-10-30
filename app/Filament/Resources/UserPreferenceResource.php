@@ -27,6 +27,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Lang; // Leverage the language facade so localized preference labels resolve correctly.
 use UnitEnum;
 
 final class UserPreferenceResource extends Resource
@@ -215,7 +216,24 @@ final class UserPreferenceResource extends Resource
         /** @var array<string, string> $types */
         $types = Lang::get('admin/user_preferences.preference_types');
 
-        return $types;
+        $defaults = [
+            'category'    => __('Category'),
+            'brand'       => __('Brand'),
+            'price_range' => __('Price Range'),
+            'color'       => __('Color'),
+            'size'        => __('Size'),
+            'material'    => __('Material'),
+            'style'       => __('Style'),
+            'feature'     => __('Feature'),
+        ];
+
+        if (! is_array($types)) {
+            // When translations are unavailable, fall back to sensible human-readable defaults so admin workflows remain usable.
+            return $defaults;
+        }
+
+        // Merge translations on top of defaults to ensure any missing keys still have readable labels.
+        return array_merge($defaults, $types);
     }
 
     public static function getPages(): array
