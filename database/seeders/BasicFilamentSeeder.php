@@ -16,6 +16,9 @@ final class BasicFilamentSeeder extends Seeder
 {
     public function run(): void
     {
+        // Use the admin guard so roles and permissions align with the Filament panel configuration.
+        $guardName = 'admin';
+
         $permissions = collect([
             'view_products',
             'create_products',
@@ -51,15 +54,33 @@ final class BasicFilamentSeeder extends Seeder
             'manage_roles',
         ]);
 
-        $permissions->each(fn (string $name) => Permission::query()->firstOrCreate(['name' => $name]));
+        $permissions->each(
+            function (string $name) use ($guardName): void {
+                // Ensure every permission is created for the admin guard to avoid guard mismatch errors during seeding.
+                Permission::query()->firstOrCreate([
+                    'name'       => $name,
+                    'guard_name' => $guardName,
+                ]);
+            }
+        );
 
-        $superAdmin = Role::query()->firstOrCreate(['name' => 'super_admin']);
+        // Roles also need to be tied to the admin guard so their permissions can be synced correctly.
+        $superAdmin = Role::query()->firstOrCreate([
+            'name'       => 'super_admin',
+            'guard_name' => $guardName,
+        ]);
         $superAdmin->syncPermissions($permissions);
 
-        $admin = Role::query()->firstOrCreate(['name' => 'admin']);
+        $admin = Role::query()->firstOrCreate([
+            'name'       => 'admin',
+            'guard_name' => $guardName,
+        ]);
         $admin->syncPermissions($permissions->except(['delete_orders', 'delete_customers', 'manage_roles']));
 
-        $manager = Role::query()->firstOrCreate(['name' => 'manager']);
+        $manager = Role::query()->firstOrCreate([
+            'name'       => 'manager',
+            'guard_name' => $guardName,
+        ]);
         $manager->syncPermissions([
             'view_products',
             'edit_products',
@@ -75,7 +96,10 @@ final class BasicFilamentSeeder extends Seeder
             'view_dashboard_stats',
         ]);
 
-        $editor = Role::query()->firstOrCreate(['name' => 'editor']);
+        $editor = Role::query()->firstOrCreate([
+            'name'       => 'editor',
+            'guard_name' => $guardName,
+        ]);
         $editor->syncPermissions([
             'view_products',
             'create_products',
