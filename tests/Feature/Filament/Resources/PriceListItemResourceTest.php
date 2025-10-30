@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
-use App\Filament\Resources\PriceListItemResource;
+use App\Filament\Resources\PriceListItemResource\Pages\CreatePriceListItem;
+use App\Filament\Resources\PriceListItemResource\Pages\EditPriceListItem;
+use App\Filament\Resources\PriceListItemResource\Pages\ListPriceListItems;
 use App\Models\Currency;
 use App\Models\PriceList;
 use App\Models\PriceListItem;
@@ -10,27 +12,51 @@ use App\Models\Product;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Schema;
+use Livewire\Livewire;
 
 use function Pest\Laravel\actingAs;
 
 uses(RefreshDatabase::class);
 
-it('feature: mounts the PriceListItemResource index page', function (): void {
-    $user = User::factory()->create();
-    actingAs($user);
+beforeEach(function (): void {
+    // Resolve the Filament admin panel so Livewire components resolve bindings correctly.
+    $this->resolveAdminPanel();
 
-    $this
-        ->get(PriceListItemResource::getUrl('index'))
-        ->assertOk();
+    // Authenticate a deterministic administrator so resource policies allow access in each scenario.
+    $this->adminUser = User::factory()->create([
+        'email'    => 'admin@example.com',
+        'is_admin' => true,
+    ]);
+
+    actingAs($this->adminUser);
+});
+
+it('feature: lists price list items via the Filament table component', function (): void {
+    $currency = Currency::factory()->create(['code' => 'EUR']);
+
+    // Seed a price list and a single discounted item for visibility assertions.
+    $priceList = PriceList::factory()->create([
+        'currency_id' => $currency->id,
+        'name'        => 'Livewire Coverage List',
+    ]);
+
+    $product = Product::factory()->create(['name' => 'Coverage Product']);
+
+    $item = PriceListItem::factory()->create([
+        'price_list_id'  => $priceList->id,
+        'product_id'     => $product->id,
+        'net_amount'     => 90,
+        'compare_amount' => 120,
+    ]);
+
+    Livewire::actingAs($this->adminUser)
+        ->test(ListPriceListItems::class)
+        ->call('loadTable')
+        ->assertCanSeeTableRecords([$item]);
 });
 
 it('feature: filters to only show items with a real discount', function (): void {
-    $user = User::factory()->create();
-    actingAs($user);
-
-    $currency = Currency::factory()->create([
-        'code' => 'EUR',
-    ]);
+    $currency = Currency::factory()->create(['code' => 'EUR']);
 
     $priceListData = [
         'name'        => 'Test Price List',
@@ -47,15 +73,10 @@ it('feature: filters to only show items with a real discount', function (): void
 
     $priceList = PriceList::create($priceListData);
 
-    $discountedProduct = Product::factory()->create([
-        'name' => 'Discounted Drill Product',
-    ]);
+    $discountedProduct = Product::factory()->create(['name' => 'Discounted Drill Product']);
+    $fullPriceProduct = Product::factory()->create(['name' => 'Full Price Saw Product']);
 
-    $fullPriceProduct = Product::factory()->create([
-        'name' => 'Full Price Saw Product',
-    ]);
-
-    PriceListItem::create([
+    $discountedItem = PriceListItem::factory()->create([
         'price_list_id'  => $priceList->id,
         'product_id'     => $discountedProduct->id,
         'net_amount'     => 90,
@@ -66,7 +87,7 @@ it('feature: filters to only show items with a real discount', function (): void
         'name'           => ['en' => 'Discounted Drill'],
     ]);
 
-    PriceListItem::create([
+    $fullPriceItem = PriceListItem::factory()->create([
         'price_list_id'  => $priceList->id,
         'product_id'     => $fullPriceProduct->id,
         'net_amount'     => 120,
@@ -77,10 +98,73 @@ it('feature: filters to only show items with a real discount', function (): void
         'name'           => ['en' => 'Full Price Saw'],
     ]);
 
-    $response = $this->get(PriceListItemResource::getUrl('index') . '?tableFilters[has_discount][isActive]=true');
+    Livewire::actingAs($this->adminUser)
+        ->test(ListPriceListItems::class)
+        ->call('loadTable')
+        ->filterTable('has_discount', ['isActive' => true])
+        ->assertCanSeeTableRecords([$discountedItem])
+        ->assertCanNotSeeTableRecords([$fullPriceItem]);
+});
 
-    $response
-        ->assertOk()
-        ->assertSee('Discounted Drill Product')
-        ->assertDontSee('Full Price Saw Product');
+it('feature: creates a price list item through the Livewire form', function (): void {
+    $currency = Currency::factory()->create(['code' => 'USD']);
+    $priceList = PriceList::factory()->create([
+        'currency_id' => $currency->id,
+        'name'        => 'Creation Coverage List',
+    ]);
+    $product = Product::factory()->create(['name' => 'Creatable Product']);
+
+    Livewire::actingAs($this->adminUser)
+        ->test(CreatePriceListItem::class)
+        ->fillForm([
+            'price_list_id'  => $priceList->id,
+            'product_id'     => $product->id,
+            'net_amount'     => 75,
+            'compare_amount' => 100,
+            'is_active'      => true,
+            'valid_from'     => now()->subDay()->toDateString(),
+            'valid_until'    => now()->addDay()->toDateString(),
+            'name'           => ['en' => 'New Coverage Item'],
+        ])
+        ->call('create')
+        ->assertHasNoFormErrors();
+
+    $this->assertDatabaseHas('price_list_items', [
+        'price_list_id' => $priceList->id,
+        'product_id'    => $product->id,
+        'net_amount'    => 75,
+    ]);
+});
+
+it('feature: edits an existing price list item', function (): void {
+    $currency = Currency::factory()->create(['code' => 'GBP']);
+    $priceList = PriceList::factory()->create([
+        'currency_id' => $currency->id,
+        'name'        => 'Editable Coverage List',
+    ]);
+    $product = Product::factory()->create(['name' => 'Editable Product']);
+
+    $item = PriceListItem::factory()->create([
+        'price_list_id'  => $priceList->id,
+        'product_id'     => $product->id,
+        'net_amount'     => 60,
+        'compare_amount' => 90,
+        'is_active'      => true,
+    ]);
+
+    Livewire::actingAs($this->adminUser)
+        ->test(EditPriceListItem::class, ['record' => $item->getRouteKey()])
+        ->fillForm([
+            'net_amount'     => 55,
+            'compare_amount' => 95,
+            'is_active'      => false,
+        ])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    $this->assertDatabaseHas('price_list_items', [
+        'id'         => $item->id,
+        'net_amount' => 55,
+        'is_active'  => false,
+    ]);
 });
