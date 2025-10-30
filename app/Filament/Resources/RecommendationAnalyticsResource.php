@@ -9,6 +9,8 @@ use App\Models\RecommendationAnalytics;
 use App\Support\Concerns\HasNav;
 use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use BackedEnum;
+use Carbon\CarbonImmutable;
+use Carbon\CarbonInterface;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -37,10 +39,10 @@ final class RecommendationAnalyticsResource extends Resource
 
     protected static ?string $model = RecommendationAnalytics::class;
 
-    public static function getNavigationIcon(): BackedEnum|\Illuminate\Contracts\Support\Htmlable|string|null
-    {
-        return 'heroicon-o-chart-bar';
-    }
+    /**
+     * Surface the chart icon so the shared Nav registry and HasNav trait stay in sync.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar';
 
     protected static ?int $navigationSort = 8;
 
@@ -115,7 +117,19 @@ final class RecommendationAnalyticsResource extends Resource
                                 SupportFlatpickr::makeDate('date')
                                     ->label(__('admin.recommendation_analytics.date'))
                                     ->required()
-                                    ->default(now()),
+                                    ->default(static fn (): string => now()->toDateString())
+                                    ->dehydrateStateUsing(static function (CarbonInterface|string|null $state): ?string {
+                                        // Normalise any Carbon instances or ISO strings into a plain date string for storage.
+                                        if ($state instanceof CarbonInterface) {
+                                            return $state->toDateString();
+                                        }
+
+                                        if (is_string($state) && $state !== '') {
+                                            return CarbonImmutable::parse($state)->toDateString();
+                                        }
+
+                                        return null;
+                                    }),
                             ]),
                     ]),
                 SchemaSection::make(__('admin.recommendation_analytics.metrics'))
