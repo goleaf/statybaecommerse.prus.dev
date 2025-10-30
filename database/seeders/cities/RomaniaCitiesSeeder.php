@@ -4,23 +4,24 @@ declare(strict_types=1);
 
 namespace Database\Seeders\Cities;
 
-use App\Models\City;
-use App\Models\Country;
-use App\Models\Translations\CityTranslation;
+use App\Support\Locales;
 use Illuminate\Database\Seeder;
 
 final class RomaniaCitiesSeeder extends Seeder
 {
-    public function run(): void
+    public static function iso2(): string
     {
-        $country = Country::where('cca2', 'RO')->first();
-        if (! $country) {
-            $this->command->warn('Romania country not found. Please run CountrySeeder first.');
+        // Expose the ISO2 country code so the city toolkit can resolve the related country record.
+        return 'RO';
+    }
 
-            return;
-        }
-
-        $cities = [
+    /**
+     * @return iterable<array<string, mixed>>
+     */
+    public static function data(): iterable
+    {
+        // The dataset is preserved verbatim from the legacy seeder to keep curated ordering intact.
+        return [
             ['code' => 'RO-BUC', 'slug' => 'bucharest', 'name' => ['lt' => 'Bukareštas', 'en' => 'Bucharest'], 'description' => 'Capital of ', 'is_capital' => true, 'latitude' => 44.4268, 'longitude' => 26.1025, 'population' => 1883425],
             ['code' => 'RO-CLU', 'slug' => 'cluj-napoca', 'name' => ['lt' => 'Klujas-Napoka', 'en' => 'Cluj-Napoca'], 'description' => 'Capital of ', 'is_capital' => false, 'latitude' => 46.7712, 'longitude' => 23.6236, 'population' => 324576],
             ['code' => 'RO-TIM', 'slug' => 'timisoara', 'name' => ['lt' => 'Timišoara', 'en' => 'Timișoara'], 'description' => 'Capital of ', 'is_capital' => false, 'latitude' => 45.7471, 'longitude' => 21.2087, 'population' => 319279],
@@ -32,31 +33,13 @@ final class RomaniaCitiesSeeder extends Seeder
             ['code' => 'RO-BRA', 'slug' => 'brasov', 'name' => ['lt' => 'Brašovas', 'en' => 'Brașov'], 'description' => 'Capital of ', 'is_capital' => false, 'latitude' => 45.6427, 'longitude' => 25.5887, 'population' => 253200],
             ['code' => 'RO-BRA', 'slug' => 'braila', 'name' => ['lt' => 'Braila', 'en' => 'Brăila'], 'description' => 'Capital of ', 'is_capital' => false, 'latitude' => 45.2667, 'longitude' => 27.9833, 'population' => 180302],
         ];
+    }
 
-        foreach ($cities as $cityData) {
-            $city = City::updateOrCreate(
-                ['code' => $cityData['code']],
-                array_merge($cityData, [
-                    'country_id' => $country->id,
-                    'name'       => $cityData['name']['en'],
-                    'slug'       => $cityData['slug'],
-                    'is_enabled' => true,
-                    'is_default' => false,
-                ])
-            );
+    public function run(): void
+    {
+        $locales = Locales::supported();
 
-            // Create translations
-            foreach (['lt', 'en'] as $locale) {
-                CityTranslation::updateOrCreate([
-                    'city_id' => $city->id,
-                    'locale'  => $locale,
-                ], [
-                    'name'        => $cityData['name'][$locale] ?? $cityData['name']['en'],
-                    'description' => $cityData['description'][$locale] ?? '',
-                ]);
-            }
-        }
-
-        $this->command->info('Romania cities seeded successfully.');
+        // Centralise insert/update logic through the shared toolkit for consistency across countries.
+        CitySeederToolkit::upsertForCountry(self::iso2(), self::data(), $locales);
     }
 }
