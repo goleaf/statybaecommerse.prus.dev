@@ -53,3 +53,4 @@ database/*.sqlite
 package-lock.json
 composer.lock
 composer.lock
+success-tests.txt
