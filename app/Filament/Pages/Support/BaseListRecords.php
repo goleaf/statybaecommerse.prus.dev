@@ -27,6 +27,15 @@ abstract class BaseListRecords extends ListRecords
         return $this->applyToggleableTableLayout($table);
     }
 
+    /**
+     * Provide a backwards-compatible hook for Pest tests expecting `loadTable`.
+     */
+    public function loadTable(): void
+    {
+        // Touch the table records collection so Livewire interactions behave like Filament v3.
+        $this->getTableRecords();
+    }
+
     protected function authorizeAccess(): void
     {
         abort_unless(static::getResource()::canViewAny(), 403);
