@@ -27,6 +27,7 @@
 ## Admin Experience & Testing
 - Filament form tests confirm that creating or editing a variant stores metadata such as size/color pairs and that matrix changes update the `product_variant_attributes` pivot, preventing desynchronization between admin selections and storefront availability.【F:tests/admin/resources/ProductVariantResourceTest.php†L31-L172】
 - Filament bulk-action coverage now mounts the sort order modal before submitting data so the Livewire harness mirrors the Filament v4 workflow when synchronising attribute value ordering.【F:tests/Feature/VariantAttributeValueResourceTest.php†L349-L383】
+- Variant stock administration now pins the Filament resource to the `VariantInventory` model, preventing runtime lookups for a non-existent `VariantStock` class when hydrating list pages or running Livewire tests.【F:app/Filament/Resources/VariantStockResource.php†L15-L114】
 
 ## Observations & Risks
 - The baseline `ProductVariantSeeder` assigns a random color value when building the matrix but never associates materials, so environments relying solely on this seeder will lack material coverage until `ComprehensiveProductVariantSeeder` (or similar) is executed.【F:database/seeders/ProductVariantSeeder.php†L281-L312】
