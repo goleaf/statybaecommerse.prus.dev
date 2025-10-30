@@ -5,6 +5,7 @@
 - Comprehensive seeding links multi-attribute variants to localized product data, generating realistic combinations across all three dimensions and persisting translations for storefront parity.【F:database/seeders/ComprehensiveProductVariantSeeder.php†L226-L365】【F:database/seeders/ComprehensiveProductVariantSeeder.php†L413-L591】
 - Runtime services and Livewire components keep variant attribute matrices synchronized and expose attribute-driven selection on the storefront, so shoppers can pivot by size, color, or material without stale data.【F:app/Services/ProductVariantAttributeMatrixService.php†L11-L185】【F:app/Livewire/ProductVariantSelector.php†L13-L337】
 - Admin coverage is validated through Livewire-powered Filament tests that confirm matrix persistence for size/color selections and metadata updates capturing material signals.【F:tests/admin/resources/ProductVariantResourceTest.php†L31-L172】
+- Dedicated Filament regression tests assert that the variant inventory searchable inputs normalise both variant and location metadata, keeping downstream automation payloads consistent across state changes.【F:tests/Filament/VariantInventoryResourceTest.php†L1-L120】
 
 ## Data Model & Attribute Definitions
 - `ProductVariant` persists serialized attribute metadata and matrix payloads to describe the active combination on each variant, while append accessors expose stock signals for storefront logic.【F:app/Models/ProductVariant.php†L44-L118】【F:app/Models/ProductVariant.php†L132-L161】
