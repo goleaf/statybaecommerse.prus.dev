@@ -9,6 +9,9 @@ use App\Models\SystemSetting;
 use App\Models\SystemSettingCategory;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -302,11 +305,25 @@ final class SystemResourceTest extends TestCase
             'cache_key'   => 'test_cache_key',
         ]);
 
-        Livewire::test(SystemResource\Pages\ListSystems::class)
-            ->callTableAction('clear_cache', $setting);
+        // Seed the cache so we can assert the action effect clears the key.
+        Cache::put('test_cache_key', 'cached-value');
+        // Reset any queued notifications to avoid leaking assertions between tests.
+        session()->forget('filament.notifications');
 
-        // The action should complete without errors
-        $this->assertTrue(true);
+        $component = Livewire::actingAs($this->adminUser)
+            ->test(SystemResource\Pages\ListSystems::class);
+
+        // Touch the table records so the Filament table actions are available during the test.
+        $component->loadTable();
+
+        $component
+            // Trigger the cache clearing action for the targeted record.
+            ->callTableAction('clear_cache', $setting)
+            // Confirm the translated success banner was dispatched.
+            ->assertNotified(__('system.cache_cleared'));
+
+        // Ensure the cached value is actually removed after the action runs.
+        $this->assertNull(Cache::get('test_cache_key'));
     }
 
     public function test_can_export_setting(): void
@@ -320,12 +337,52 @@ final class SystemResourceTest extends TestCase
             'value'       => 'export value',
         ]);
 
-        $response = Livewire::test(SystemResource\Pages\ListSystems::class)
-            ->callTableAction('export', $setting)
-            ->assertOk();
+        // Freeze time to stabilise the generated download name.
+        Carbon::setTestNow('2025-01-01 12:00:00');
 
-        // The export action should complete without errors
-        $this->assertTrue(true);
+        $component = Livewire::actingAs($this->adminUser)
+            ->test(SystemResource\Pages\ListSystems::class);
+
+        // Load the table once so the export action is registered for the test harness.
+        $component->loadTable();
+
+        $component
+            // Invoke the export action to ensure the Livewire bridge executes without validation errors.
+            ->callTableAction('export', $setting);
+
+        // Inspect the raw Livewire return payload to confirm the JSON structure matches the record data.
+        $livewireReturn = $component->effects['returns'][0] ?? [];
+        $this->assertSame([
+            'key'      => $setting->key,
+            'name'     => $setting->name,
+            'value'    => $setting->value,
+            'type'     => $setting->type,
+            // Livewire serialises the response payload without eager loading the relationship.
+            'category' => null,
+        ], $livewireReturn['original'] ?? []);
+
+        // Resolve the configured table action directly so we can inspect the full HTTP response object.
+        $action = $component->instance()->getTable()->getAction('export');
+        $this->assertNotNull($action);
+        $action->record($setting);
+        $response = $action->call();
+
+        // Validate the real response matches the expected JSON payload and attachment headers.
+        $this->assertInstanceOf(JsonResponse::class, $response);
+        $this->assertSame([
+            'key'      => $setting->key,
+            'name'     => $setting->name,
+            'value'    => $setting->value,
+            'type'     => $setting->type,
+            'category' => $setting->category->name,
+        ], $response->getData(true));
+        $this->assertSame(
+            sprintf('attachment; filename="setting_%s_2025-01-01_12-00-00.json"', $setting->key),
+            $response->headers->get('Content-Disposition'),
+        );
+
+        // Release the frozen clock so subsequent tests observe real time.
+        Carbon::setTestNow();
     }
 
     public function test_handles_different_setting_types(): void

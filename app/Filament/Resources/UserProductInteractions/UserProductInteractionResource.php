@@ -13,6 +13,7 @@ use App\Filament\Resources\UserProductInteractions\Schemas\UserProductInteractio
 use App\Filament\Resources\UserProductInteractions\Tables\UserProductInteractionsTable;
 use App\Models\UserProductInteraction;
 use App\Support\Concerns\HasNav;
+use Filament\Panel;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
@@ -23,9 +24,9 @@ class UserProductInteractionResource extends Resource
 
     protected static ?string $model = UserProductInteraction::class;
 
-    public static function getSlug(): string
+    public static function getSlug(?Panel $panel = null): string
     {
-        // Avoid clashing with the legacy resource's routes/slug.
+        // Avoid clashing with the legacy resource's routes/slug by keeping a dedicated identifier.
         return 'user-product-interactions-v4';
     }
 

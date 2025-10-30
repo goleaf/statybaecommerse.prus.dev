@@ -10,7 +10,7 @@ use App\Support\Monitoring\QueueMetricsStore;
 use Illuminate\Cache\Events\CacheHit;
 use Illuminate\Cache\Events\CacheMissed;
 use Illuminate\Contracts\Cache\Factory as CacheFactory;
-use Illuminate\Contracts\Database\ConnectionResolverInterface;
+use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;

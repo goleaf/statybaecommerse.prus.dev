@@ -4,21 +4,19 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use App\Filament\Resources\CartItemResource;
+use App\Filament\Resources\CartItemResource\Pages\CreateCartItem;
+use App\Filament\Resources\CartItemResource\Pages\EditCartItem;
+use App\Filament\Resources\CartItemResource\Pages\ListCartItems;
+use App\Filament\Resources\CartItemResource\Pages\ViewCartItem;
 use App\Models\CartItem;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\User;
-use Filament\Resources\Pages\CreateRecord;
-use Filament\Resources\Pages\EditRecord;
-use Filament\Resources\Pages\ListRecords;
-use Filament\Resources\Pages\ViewRecord;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
-use ReflectionProperty;
-use Tests\TestCase as BaseTestCase;
+use Tests\TestCase;
 
-final class CartItemResourceTest extends BaseTestCase
+final class CartItemResourceTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -30,18 +28,6 @@ final class CartItemResourceTest extends BaseTestCase
 
         // Ensure the Filament admin panel is registered before interacting with resource pages.
         $this->resolveAdminPanel();
-
-        // Prime the generic Filament resource pages with the current resource class for Livewire tests.
-        foreach ([
-            ListRecords::class,
-            CreateRecord::class,
-            EditRecord::class,
-            ViewRecord::class,
-        ] as $pageClass) {
-            $resourceProperty = new ReflectionProperty($pageClass, 'resource');
-            $resourceProperty->setAccessible(true);
-            $resourceProperty->setValue(null, CartItemResource::class);
-        }
 
         $this->adminUser = User::factory()->create([
             'email'    => 'admin@example.com',
@@ -62,11 +48,9 @@ final class CartItemResourceTest extends BaseTestCase
             'total_price' => 59.98,
         ]);
 
-        $this->actingAs($this->adminUser);
-
-        Livewire::test(ListRecords::class, [
-            'resource' => CartItemResource::class,
-        ])
+        Livewire::actingAs($this->adminUser)
+            ->test(ListCartItems::class)
+            ->call('loadTable')
             ->assertCanSeeTableRecords(CartItem::all())
             ->assertCanSeeTableColumns([
                 'user.name',
@@ -84,11 +68,8 @@ final class CartItemResourceTest extends BaseTestCase
         $user = User::factory()->create();
         $product = Product::factory()->create(['price' => 25.99]);
 
-        $this->actingAs($this->adminUser);
-
-        Livewire::test(CreateRecord::class, [
-            'resource' => CartItemResource::class,
-        ])
+        Livewire::actingAs($this->adminUser)
+            ->test(CreateCartItem::class)
             ->fillForm([
                 'user_id'         => $user->id,
                 'product_id'      => $product->id,
@@ -122,12 +103,8 @@ final class CartItemResourceTest extends BaseTestCase
             'unit_price' => 20.0,
         ]);
 
-        $this->actingAs($this->adminUser);
-
-        Livewire::test(EditRecord::class, [
-            'resource' => CartItemResource::class,
-            'record'   => $cartItem->id,
-        ])
+        Livewire::actingAs($this->adminUser)
+            ->test(EditCartItem::class, ['record' => $cartItem->getRouteKey()])
             ->fillForm([
                 'quantity'        => 5,
                 'unit_price'      => 25.0,
@@ -155,12 +132,8 @@ final class CartItemResourceTest extends BaseTestCase
             'unit_price' => 15.5,
         ]);
 
-        $this->actingAs($this->adminUser);
-
-        Livewire::test(ViewRecord::class, [
-            'resource' => CartItemResource::class,
-            'record'   => $cartItem->id,
-        ])
+        Livewire::actingAs($this->adminUser)
+            ->test(ViewCartItem::class, ['record' => $cartItem->getRouteKey()])
             ->assertHasNoErrors();
     }
 
@@ -180,11 +153,9 @@ final class CartItemResourceTest extends BaseTestCase
             'product_id' => $product->id,
         ]);
 
-        $this->actingAs($this->adminUser);
-
-        Livewire::test(ListRecords::class, [
-            'resource' => CartItemResource::class,
-        ])
+        Livewire::actingAs($this->adminUser)
+            ->test(ListCartItems::class)
+            ->call('loadTable')
             ->filterTable('user_id', $user1->id)
             ->assertCanSeeTableRecords([$cartItem1])
             ->assertCanNotSeeTableRecords([$cartItem2]);
@@ -206,12 +177,10 @@ final class CartItemResourceTest extends BaseTestCase
             'product_id' => $product2->id,
         ]);
 
-        $this->actingAs($this->adminUser);
+        $component = Livewire::actingAs($this->adminUser)
+            ->test(ListCartItems::class);
 
-        $component = Livewire::test(ListRecords::class, [
-            'resource' => CartItemResource::class,
-        ]);
-
+        $component->call('loadTable');
         $component->filterTable('product_id', (string) $product1->id);
         file_put_contents(storage_path('logs/filter-state.json'), json_encode($component->instance()->tableFilters));
         $component->call('loadTable');
@@ -242,11 +211,9 @@ final class CartItemResourceTest extends BaseTestCase
             'product_variant_id' => $variant2->id,
         ]);
 
-        $this->actingAs($this->adminUser);
-
-        Livewire::test(ListRecords::class, [
-            'resource' => CartItemResource::class,
-        ])
+        Livewire::actingAs($this->adminUser)
+            ->test(ListCartItems::class)
+            ->call('loadTable')
             ->filterTable('product_variant_id', $variant1->id)
             ->assertCanSeeTableRecords([$cartItem1])
             ->assertCanNotSeeTableRecords([$cartItem2]);
@@ -271,11 +238,9 @@ final class CartItemResourceTest extends BaseTestCase
             'minimum_quantity' => 5,
         ]);
 
-        $this->actingAs($this->adminUser);
-
-        Livewire::test(ListRecords::class, [
-            'resource' => CartItemResource::class,
-        ])
+        Livewire::actingAs($this->adminUser)
+            ->test(ListCartItems::class)
+            ->call('loadTable')
             ->filterTable('needs_restocking', true)
             ->assertCanSeeTableRecords([$needsRestocking])
             ->assertCanNotSeeTableRecords([$sufficientStock]);
@@ -298,11 +263,9 @@ final class CartItemResourceTest extends BaseTestCase
             'quantity'   => 10,
         ]);
 
-        $this->actingAs($this->adminUser);
-
-        Livewire::test(ListRecords::class, [
-            'resource' => CartItemResource::class,
-        ])
+        Livewire::actingAs($this->adminUser)
+            ->test(ListCartItems::class)
+            ->call('loadTable')
             ->filterTable('quantity_range', [
                 'quantity_from' => 1,
                 'quantity_to'   => 5,
@@ -328,11 +291,9 @@ final class CartItemResourceTest extends BaseTestCase
             'unit_price' => 50.0,
         ]);
 
-        $this->actingAs($this->adminUser);
-
-        Livewire::test(ListRecords::class, [
-            'resource' => CartItemResource::class,
-        ])
+        Livewire::actingAs($this->adminUser)
+            ->test(ListCartItems::class)
+            ->call('loadTable')
             ->filterTable('price_range', [
                 'price_from' => 5.0,
                 'price_to'   => 25.0,
@@ -352,11 +313,9 @@ final class CartItemResourceTest extends BaseTestCase
             'quantity'   => 2,
         ]);
 
-        $this->actingAs($this->adminUser);
-
-        Livewire::test(ListRecords::class, [
-            'resource' => CartItemResource::class,
-        ])
+        Livewire::actingAs($this->adminUser)
+            ->test(ListCartItems::class)
+            ->call('loadTable')
             ->mountTableAction('update_quantity', $cartItem)
             ->setTableActionData([
                 'quantity' => 5,
@@ -378,11 +337,9 @@ final class CartItemResourceTest extends BaseTestCase
             'product_id' => $product->id,
         ]);
 
-        $this->actingAs($this->adminUser);
-
-        Livewire::test(ListRecords::class, [
-            'resource' => CartItemResource::class,
-        ])
+        Livewire::actingAs($this->adminUser)
+            ->test(ListCartItems::class)
+            ->call('loadTable')
             ->callTableAction('move_to_wishlist', $cartItem)
             ->assertNotified();
     }
@@ -398,11 +355,9 @@ final class CartItemResourceTest extends BaseTestCase
             'quantity'   => 3,
         ]);
 
-        $this->actingAs($this->adminUser);
-
-        Livewire::test(ListRecords::class, [
-            'resource' => CartItemResource::class,
-        ])
+        Livewire::actingAs($this->adminUser)
+            ->test(ListCartItems::class)
+            ->call('loadTable')
             ->callTableAction('duplicate', $cartItem)
             ->assertNotified();
 
@@ -426,11 +381,9 @@ final class CartItemResourceTest extends BaseTestCase
             'quantity'   => 3,
         ]);
 
-        $this->actingAs($this->adminUser);
-
-        Livewire::test(ListRecords::class, [
-            'resource' => CartItemResource::class,
-        ])
+        Livewire::actingAs($this->adminUser)
+            ->test(ListCartItems::class)
+            ->call('loadTable')
             ->mountTableBulkAction('update_quantities', [$cartItem1, $cartItem2])
             ->setTableBulkActionData([
                 'quantity' => 5,
@@ -459,11 +412,9 @@ final class CartItemResourceTest extends BaseTestCase
             'product_id' => $product->id,
         ]);
 
-        $this->actingAs($this->adminUser);
-
-        Livewire::test(ListRecords::class, [
-            'resource' => CartItemResource::class,
-        ])
+        Livewire::actingAs($this->adminUser)
+            ->test(ListCartItems::class)
+            ->call('loadTable')
             ->callTableBulkAction('move_to_wishlist', [$cartItem1, $cartItem2])
             ->assertNotified();
     }
@@ -485,11 +436,9 @@ final class CartItemResourceTest extends BaseTestCase
             'created_at' => now()->subDays(10),
         ]);
 
-        $this->actingAs($this->adminUser);
-
-        Livewire::test(ListRecords::class, [
-            'resource' => CartItemResource::class,
-        ])
+        Livewire::actingAs($this->adminUser)
+            ->test(ListCartItems::class)
+            ->call('loadTable')
             ->callTableBulkAction('clear_old_carts', [$oldCartItem, $recentCartItem])
             ->assertNotified();
 
@@ -507,11 +456,9 @@ final class CartItemResourceTest extends BaseTestCase
             'product_id' => $product->id,
         ]);
 
-        $this->actingAs($this->adminUser);
-
-        Livewire::test(ListRecords::class, [
-            'resource' => CartItemResource::class,
-        ])
+        Livewire::actingAs($this->adminUser)
+            ->test(ListCartItems::class)
+            ->call('loadTable')
             ->callTableBulkAction('export_cart_items', [$cartItem])
             ->assertNotified();
     }
@@ -539,11 +486,9 @@ final class CartItemResourceTest extends BaseTestCase
             'quantity'   => 15,
         ]);
 
-        $this->actingAs($this->adminUser);
-
-        Livewire::test(ListRecords::class, [
-            'resource' => CartItemResource::class,
-        ])
+        Livewire::actingAs($this->adminUser)
+            ->test(ListCartItems::class)
+            ->call('loadTable')
             ->assertCanSeeTableRecords([$lowQuantity, $mediumQuantity, $highQuantity]);
     }
 
@@ -557,11 +502,9 @@ final class CartItemResourceTest extends BaseTestCase
             'product_id' => $product->id,
         ]);
 
-        $this->actingAs($this->adminUser);
-
-        Livewire::test(ListRecords::class, [
-            'resource' => CartItemResource::class,
-        ])
+        Livewire::actingAs($this->adminUser)
+            ->test(ListCartItems::class)
+            ->call('loadTable')
             ->assertCanSeeTableRecords([$cartItem]);
     }
 
@@ -580,11 +523,9 @@ final class CartItemResourceTest extends BaseTestCase
             'product_variant_id' => $variant->id,
         ]);
 
-        $this->actingAs($this->adminUser);
-
-        Livewire::test(ListRecords::class, [
-            'resource' => CartItemResource::class,
-        ])
+        Livewire::actingAs($this->adminUser)
+            ->test(ListCartItems::class)
+            ->call('loadTable')
             ->assertCanSeeTableRecords([$cartItem]);
     }
 
@@ -598,11 +539,9 @@ final class CartItemResourceTest extends BaseTestCase
             'product_id' => $product->id,
         ]);
 
-        $this->actingAs($this->adminUser);
-
-        Livewire::test(ListRecords::class, [
-            'resource' => CartItemResource::class,
-        ])
+        Livewire::actingAs($this->adminUser)
+            ->test(ListCartItems::class)
+            ->call('loadTable')
             ->assertCanSeeTableRecords([$cartItem]);
     }
 
@@ -718,11 +657,9 @@ final class CartItemResourceTest extends BaseTestCase
             'created_at' => now(),
         ]);
 
-        $this->actingAs($this->adminUser);
-
-        Livewire::test(ListRecords::class, [
-            'resource' => CartItemResource::class,
-        ])
+        Livewire::actingAs($this->adminUser)
+            ->test(ListCartItems::class)
+            ->call('loadTable')
             ->sortTable('created_at', 'desc')
             ->assertCanSeeTableRecords([$cartItem2, $cartItem1]);
     }
@@ -737,11 +674,9 @@ final class CartItemResourceTest extends BaseTestCase
             'product_id' => $product->id,
         ]);
 
-        $this->actingAs($this->adminUser);
-
-        Livewire::test(ListRecords::class, [
-            'resource' => CartItemResource::class,
-        ])
+        Livewire::actingAs($this->adminUser)
+            ->test(ListCartItems::class)
+            ->call('loadTable')
             ->searchTable('Searchable')
             ->assertCanSeeTableRecords([$cartItem]);
     }
