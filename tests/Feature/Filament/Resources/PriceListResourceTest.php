@@ -15,13 +15,32 @@ use function Pest\Laravel\actingAs;
 
 uses(RefreshDatabase::class);
 
-it('feature: mounts the PriceListResource index page', function (): void {
-    $user = User::factory()->create();
-    actingAs($user);
+beforeEach(function (): void {
+    // Register the Filament admin panel ahead of Livewire component assertions.
+    $this->resolveAdminPanel();
 
-    $this
-        ->get(PriceListResource::getUrl('index'))
-        ->assertOk();
+    // Authenticate a deterministic administrator for resource access checks.
+    $this->adminUser = User::factory()->create([
+        'email'    => 'admin@example.com',
+        'is_admin' => true,
+    ]);
+
+    actingAs($this->adminUser);
+});
+
+it('feature: lists price lists within the Filament table', function (): void {
+    $currency = Currency::factory()->create(['code' => 'EUR']);
+
+    // Persist a representative price list entry to confirm the table renders seeded records.
+    $priceList = PriceList::factory()->create([
+        'currency_id' => $currency->id,
+        'name'        => 'Primary Price List',
+    ]);
+
+    Livewire::actingAs($this->adminUser)
+        ->test(ListPriceLists::class)
+        ->call('loadTable')
+        ->assertCanSeeTableRecords([$priceList]);
 });
 
 it('feature: lists price lists via the Filament table component', function (): void {
