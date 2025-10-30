@@ -1,27 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="/www/wwwroot/statybaecommerse.prus.dev/phpunit.xml" tests="19" assertions="58" errors="0" failures="0" skipped="0" time="25.594352">
-    <testsuite name="Feature" tests="19" assertions="58" errors="0" failures="0" skipped="0" time="25.594352">
-      <testsuite name="Tests\Feature\AddressResourceTest" file="Address Resource (Tests\Feature\AddressResource)" tests="19" assertions="58" errors="0" failures="0" skipped="0" time="25.594352">
-        <testcase name="Can toggle address active status" file="Address Resource (Tests\Feature\AddressResource)::Can toggle address active status" class="Tests\Feature\AddressResourceTest" classname="Tests.Feature.AddressResourceTest" assertions="4" time="15.321260"/>
-        <testcase name="Can delete address" file="Address Resource (Tests\Feature\AddressResource)::Can delete address" class="Tests\Feature\AddressResourceTest" classname="Tests.Feature.AddressResourceTest" assertions="4" time="0.475299"/>
-        <testcase name="Can duplicate address" file="Address Resource (Tests\Feature\AddressResource)::Can duplicate address" class="Tests\Feature\AddressResourceTest" classname="Tests.Feature.AddressResourceTest" assertions="4" time="0.498269"/>
-        <testcase name="Can create address" file="Address Resource (Tests\Feature\AddressResource)::Can create address" class="Tests\Feature\AddressResourceTest" classname="Tests.Feature.AddressResourceTest" assertions="2" time="0.509364"/>
-        <testcase name="Can set address as default" file="Address Resource (Tests\Feature\AddressResource)::Can set address as default" class="Tests\Feature\AddressResourceTest" classname="Tests.Feature.AddressResourceTest" assertions="4" time="0.487822"/>
-        <testcase name="Validates required fields on create" file="Address Resource (Tests\Feature\AddressResource)::Validates required fields on create" class="Tests\Feature\AddressResourceTest" classname="Tests.Feature.AddressResourceTest" assertions="9" time="0.561241"/>
-        <testcase name="Can edit address" file="Address Resource (Tests\Feature\AddressResource)::Can edit address" class="Tests\Feature\AddressResourceTest" classname="Tests.Feature.AddressResourceTest" assertions="2" time="0.560643"/>
-        <testcase name="Can bulk activate addresses" file="Address Resource (Tests\Feature\AddressResource)::Can bulk activate addresses" class="Tests\Feature\AddressResourceTest" classname="Tests.Feature.AddressResourceTest" assertions="6" time="0.623184"/>
-        <testcase name="Can bulk set addresses as billing" file="Address Resource (Tests\Feature\AddressResource)::Can bulk set addresses as billing" class="Tests\Feature\AddressResourceTest" classname="Tests.Feature.AddressResourceTest" assertions="6" time="0.625915"/>
-        <testcase name="Can bulk delete addresses" file="Address Resource (Tests\Feature\AddressResource)::Can bulk delete addresses" class="Tests\Feature\AddressResourceTest" classname="Tests.Feature.AddressResourceTest" assertions="6" time="0.612406"/>
-        <testcase name="Can export addresses" file="Address Resource (Tests\Feature\AddressResource)::Can export addresses" class="Tests\Feature\AddressResourceTest" classname="Tests.Feature.AddressResourceTest" assertions="3" time="0.671937"/>
-        <testcase name="Can view address" file="Address Resource (Tests\Feature\AddressResource)::Can view address" class="Tests\Feature\AddressResourceTest" classname="Tests.Feature.AddressResourceTest" assertions="1" time="0.391611"/>
-        <testcase name="Can list addresses" file="Address Resource (Tests\Feature\AddressResource)::Can list addresses" class="Tests\Feature\AddressResourceTest" classname="Tests.Feature.AddressResourceTest" assertions="1" time="0.436831"/>
-        <testcase name="Can sort addresses by created at" file="Address Resource (Tests\Feature\AddressResource)::Can sort addresses by created at" class="Tests\Feature\AddressResourceTest" classname="Tests.Feature.AddressResourceTest" assertions="1" time="0.642926"/>
-        <testcase name="Can filter addresses by country" file="Address Resource (Tests\Feature\AddressResource)::Can filter addresses by country" class="Tests\Feature\AddressResourceTest" classname="Tests.Feature.AddressResourceTest" assertions="1" time="0.644681"/>
-        <testcase name="Can filter addresses by type" file="Address Resource (Tests\Feature\AddressResource)::Can filter addresses by type" class="Tests\Feature\AddressResourceTest" classname="Tests.Feature.AddressResourceTest" assertions="1" time="0.642271"/>
-        <testcase name="Can filter addresses with company" file="Address Resource (Tests\Feature\AddressResource)::Can filter addresses with company" class="Tests\Feature\AddressResourceTest" classname="Tests.Feature.AddressResourceTest" assertions="1" time="0.637395"/>
-        <testcase name="Can filter addresses created this month" file="Address Resource (Tests\Feature\AddressResource)::Can filter addresses created this month" class="Tests\Feature\AddressResourceTest" classname="Tests.Feature.AddressResourceTest" assertions="1" time="0.640255"/>
-        <testcase name="Can search addresses" file="Address Resource (Tests\Feature\AddressResource)::Can search addresses" class="Tests\Feature\AddressResourceTest" classname="Tests.Feature.AddressResourceTest" assertions="1" time="0.611041"/>
+  <testsuite name="D:\projects\statybaecommerse.prus.dev\phpunit.xml" tests="1" assertions="2" errors="0" failures="0" skipped="0" time="270.163316">
+    <testsuite name="Feature" tests="1" assertions="2" errors="0" failures="0" skipped="0" time="270.163316">
+      <testsuite name="Tests\Feature\AdminNavigationSnapshotTest" file="Admin Navigation Snapshot (Tests\Feature\AdminNavigationSnapshot)" tests="1" assertions="2" errors="0" failures="0" skipped="0" time="270.163316">
+        <testcase name="Admin navigation matches snapshot" file="Admin Navigation Snapshot (Tests\Feature\AdminNavigationSnapshot)::Admin navigation matches snapshot" class="Tests\Feature\AdminNavigationSnapshotTest" classname="Tests.Feature.AdminNavigationSnapshotTest" assertions="2" time="270.163316"/>
       </testsuite>
     </testsuite>
   </testsuite>
