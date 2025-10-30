@@ -145,6 +145,9 @@ final class MissingFilamentResourceCoverageTest extends TestCase
             'activity logs'             => [ListActivityLogs::class, 'createActivityLogRecord'],
             'audit trails'              => [ListAuditTrails::class, 'createAuditTrailRecord'],
             'brands'                    => [ListBrands::class, 'createBrandRecord'],
+            'campaign conversions'      => [ListCampaignConversions::class, 'createCampaignConversionRecord'],
+            'campaign schedules'        => [ListCampaignSchedules::class, 'createCampaignScheduleRecord'],
+            'campaign views'            => [ListCampaignViews::class, 'createCampaignViewRecord'],
             'campaigns'                 => [ListCampaigns::class, 'createCampaignRecord'],
             'campaign conversions'      => [ListCampaignConversions::class, 'createCampaignConversionRecord'],
             'campaign schedules'        => [ListCampaignSchedules::class, 'createCampaignScheduleRecord'],
@@ -158,6 +161,9 @@ final class MissingFilamentResourceCoverageTest extends TestCase
             'enum management'           => [ListEnumManagement::class, 'createEnumValueRecord'],
             'normal setting translations' => [ListNormalSettingTranslations::class, 'createNormalSettingTranslationRecord'],
             'posts'                     => [ListPosts::class, 'createPostRecord'],
+            'price list items'          => [ListPriceListItems::class, 'createPriceListItemRecord'],
+            'price lists'               => [ListPriceLists::class, 'createPriceListRecord'],
+            'prices'                    => [ListPrices::class, 'createPriceRecord'],
             'product variants'          => [ListProductVariants::class, 'createProductVariantRecord'],
             'referral code usage logs'  => [ListReferralCodeUsageLogs::class, 'createReferralCodeUsageLogRecord'],
             'recommendation analytics'  => [ListRecommendationAnalytics::class, 'createRecommendationAnalyticsRecord'],
@@ -744,6 +750,334 @@ final class MissingFilamentResourceCoverageTest extends TestCase
             'stock'     => 25,
             'reserved'  => 5,
             'threshold' => 3,
+        ]);
+    }
+
+    private function createCampaignConversionRecord(): CampaignConversion
+    {
+        // Compose supporting campaign metadata so the analytics table can resolve related campaign names without hitting nulls.
+        $campaign = Campaign::factory()->create([
+            'name' => 'Coverage Conversion Campaign',
+            'slug' => 'coverage-conversion-campaign',
+        ]);
+
+        // Persist a completed conversion with deterministic fields so table filters remain predictable during assertions.
+        return CampaignConversion::query()->create([
+            'campaign_id'      => $campaign->getKey(),
+            'customer_id'      => $this->admin->getKey(),
+            'conversion_type'  => 'purchase',
+            'conversion_value' => 123.45,
+            'status'           => 'completed',
+            'session_id'       => 'coverage-session',
+            'source'           => 'email',
+            'medium'           => 'newsletter',
+            'device_type'      => 'desktop',
+            'converted_at'     => now()->subHour(),
+        ]);
+    }
+
+    private function createCampaignScheduleRecord(): CampaignSchedule
+    {
+        // Seed the underlying campaign so the schedule row can display the owning campaign name within the listing.
+        $campaign = Campaign::factory()->create([
+            'name' => 'Schedule Host Campaign',
+            'slug' => 'schedule-host-campaign',
+        ]);
+
+        // Create a daily schedule with an explicit JSON payload to mirror realistic administrator input.
+        return CampaignSchedule::query()->create([
+            'campaign_id'     => $campaign->getKey(),
+            'schedule_type'   => ScheduleType::DAILY->value,
+            'schedule_config' => [
+                'time'      => '09:00',
+                'timezone'  => 'UTC',
+                'frequency' => 'every_day',
+            ],
+            'next_run_at'     => now()->addDay(),
+            'last_run_at'     => now()->subDay(),
+            'is_active'       => true,
+        ]);
+    }
+
+    private function createCampaignViewRecord(): CampaignView
+    {
+        // Provision a campaign so the view entry references a valid marketing initiative in the UI.
+        $campaign = Campaign::factory()->create([
+            'name' => 'Coverage View Campaign',
+            'slug' => 'coverage-view-campaign',
+        ]);
+
+        // Store a tracked view tied to the authenticated admin to verify scoped listings render expected traffic rows.
+        return CampaignView::query()->create([
+            'campaign_id' => $campaign->getKey(),
+            'session_id'  => 'coverage-view-session',
+            'ip_address'  => '192.0.2.10',
+            'user_agent'  => 'Coverage Browser',
+            'referer'     => 'https://example.com',
+            'customer_id' => $this->admin->getKey(),
+            'viewed_at'   => now()->subMinutes(15),
+        ]);
+    }
+
+    private function createCartItemRecord(): CartItem
+    {
+        // Create a simple product so the cart line item can resolve product level columns like SKU and name.
+        $product = Product::factory()->create([
+            'name' => 'Coverage Cart Product',
+            'slug' => 'coverage-cart-product',
+        ]);
+
+        // Ensure the cart item belongs to the authenticated admin to satisfy the user-owned global scope applied to the model.
+        return CartItem::factory()->create([
+            'user_id'     => $this->admin->getKey(),
+            'product_id'  => $product->getKey(),
+            'session_id'  => 'coverage-cart-session',
+            'quantity'    => 2,
+            'unit_price'  => 59.99,
+            'price'       => 59.99,
+            'total_price' => 119.98,
+        ]);
+    }
+
+    private function createInventoryRecord(): Inventory
+    {
+        // Provision a dedicated warehouse so the inventory listing can present a concrete fulfilment location.
+        $location = Location::factory()->create([
+            'code' => 'COV-WH',
+            'name' => 'Coverage Warehouse',
+            'type' => 'warehouse',
+        ]);
+
+        // Persist a stocked inventory row tied to the warehouse to keep the table hydrated with actionable quantity data.
+        return Inventory::factory()->create([
+            'warehouse_id' => $location->getKey(),
+            'sku'          => 'COV-SKU-001',
+            'qty'          => 75,
+        ]);
+    }
+
+    private function createLegalRecord(): Legal
+    {
+        // Store an enabled legal document so compliance tables render a visible policy entry.
+        return Legal::factory()->create([
+            'key'         => 'coverage-policy',
+            'type'        => 'privacy_policy',
+            'is_enabled'  => true,
+            'is_required' => true,
+            'sort_order'  => 1,
+        ]);
+    }
+
+    private function createLocationRecord(): Location
+    {
+        // Seed a warehouse style location to exercise logistics specific table columns.
+        return Location::factory()->create([
+            'code'         => 'COV-LOC',
+            'name'         => 'Coverage Logistics Hub',
+            'slug'         => 'coverage-logistics-hub',
+            'type'         => 'warehouse',
+            'city'         => 'Coverage City',
+            'country_code' => 'LT',
+            'is_enabled'   => true,
+        ]);
+    }
+
+    private function createNewsImageRecord(): NewsImage
+    {
+        // Pair the image with a published news article so foreign key constraints remain satisfied.
+        $news = News::factory()->create([
+            'author_name' => 'Coverage Reporter',
+        ]);
+
+        // Capture a featured image with a deterministic caption for reliable assertion behaviour.
+        return NewsImage::factory()->create([
+            'news_id'     => $news->getKey(),
+            'file_path'   => 'news-images/coverage.jpg',
+            'alt_text'    => 'Coverage illustration',
+            'caption'     => 'Coverage campaign artwork',
+            'is_featured' => true,
+            'sort_order'  => 1,
+        ]);
+    }
+
+    private function createNewsTagRecord(): NewsTag
+    {
+        // Persist a visible tag so editorial listings showcase a concrete taxonomy entry.
+        return NewsTag::factory()->create([
+            'name'       => 'Coverage Tag',
+            'slug'       => 'coverage-tag',
+            'is_visible' => true,
+            'is_active'  => true,
+            'sort_order' => 5,
+        ]);
+    }
+
+    private function createPriceListRecord(): PriceList
+    {
+        // Guarantee a base currency so downstream price list associations resolve predictable exchange metadata.
+        $currency = Currency::factory()->create([
+            'code'          => 'EUR',
+            'name'          => 'Euro',
+            'symbol'        => '€',
+            'exchange_rate' => 1.0,
+            'is_default'    => true,
+        ]);
+
+        // Create an enabled price list that anchors subsequent item fixtures in other helpers.
+        return PriceList::factory()->create([
+            'name'        => 'Coverage Price List',
+            'code'        => 'coverage-price-list',
+            'currency_id' => $currency->getKey(),
+            'is_enabled'  => true,
+        ]);
+    }
+
+    private function createPriceListItemRecord(): PriceListItem
+    {
+        // Reuse a deterministic price list so related tables can surface the parent pricing context.
+        $priceList = $this->createPriceListRecord();
+
+        // Couple the list item with a tangible product variant so relational columns remain populated.
+        $product = Product::factory()->create([
+            'name' => 'Coverage Price Item',
+            'slug' => 'coverage-price-item',
+        ]);
+
+        $variant = ProductVariant::factory()->for($product)->create([
+            'name' => 'Coverage Item Variant',
+            'sku'  => 'COV-VAR-001',
+        ]);
+
+        // Persist an active line item with translations to mimic real administrator input across locales.
+        return PriceListItem::factory()->create([
+            'price_list_id'  => $priceList->getKey(),
+            'product_id'     => $product->getKey(),
+            'variant_id'     => $variant->getKey(),
+            'name'           => ['en' => 'Coverage Item', 'lt' => 'Coverage Item'],
+            'description'    => ['en' => 'Coverage discount entry', 'lt' => 'Coverage discount entry'],
+            'notes'          => ['en' => 'Coverage note', 'lt' => 'Coverage note'],
+            'net_amount'     => 49.99,
+            'compare_amount' => 59.99,
+            'is_active'      => true,
+            'priority'       => 10,
+            'valid_from'     => now()->subDay(),
+            'valid_until'    => now()->addMonth(),
+        ]);
+    }
+
+    private function createPriceRecord(): Price
+    {
+        // Establish a base currency and product so the polymorphic relationship resolves within the listing grid.
+        $currency = Currency::factory()->create([
+            'code'          => 'USD',
+            'name'          => 'US Dollar',
+            'symbol'        => '$',
+            'exchange_rate' => 1.1,
+        ]);
+
+        $product = Product::factory()->create([
+            'name' => 'Coverage Price Product',
+            'slug' => 'coverage-price-product',
+        ]);
+
+        // Manually persist the price record to control the morph targets and enabled state used inside the Filament table.
+        return Price::query()->create([
+            'priceable_type' => Product::class,
+            'priceable_id'   => $product->getKey(),
+            'currency_id'    => $currency->getKey(),
+            'amount'         => 199.99,
+            'compare_amount' => 249.99,
+            'cost_amount'    => 129.99,
+            'type'           => 'base',
+            'is_enabled'     => true,
+            'metadata'       => ['label' => 'Coverage Base Price'],
+        ]);
+    }
+
+    private function createRecommendationConfigSimpleRecord(): RecommendationConfigSimple
+    {
+        // Create an active simplified configuration so recommendation admin tables surface non-empty datasets.
+        return RecommendationConfigSimple::factory()->create([
+            'name'        => 'Coverage Recommendation Config',
+            'code'        => 'coverage-config',
+            'is_active'   => true,
+            'is_default'  => false,
+            'max_results' => 5,
+        ]);
+    }
+
+    private function createReferralRecord(): Referral
+    {
+        // Prepare distinct referrer and referred users to satisfy the relational columns surfaced by the listing.
+        $referrer = User::factory()->create([
+            'name'  => 'Coverage Referrer',
+            'email' => 'coverage.referrer@example.com',
+        ]);
+
+        $referred = User::factory()->create([
+            'name'  => 'Coverage Referred',
+            'email' => 'coverage.referred@example.com',
+        ]);
+
+        // Persist an active referral with translated marketing copy to align with the resource expectations.
+        return Referral::query()->create([
+            'referrer_id'         => $referrer->getKey(),
+            'referred_id'         => $referred->getKey(),
+            'referral_code'       => 'COVERAGECODE',
+            'status'              => 'active',
+            'title'               => ['en' => 'Coverage Referral'],
+            'description'         => ['en' => 'Coverage referral description'],
+            'terms_conditions'    => ['en' => 'Coverage referral terms'],
+            'benefits_description'=> ['en' => 'Coverage benefits'],
+        ]);
+    }
+
+    private function createRoleRecord(): Role
+    {
+        // Store a custom role so the permission management grid renders at least one administrator defined entry.
+        return Role::factory()->create([
+            'name'       => 'coverage_role',
+            'guard_name' => 'web',
+        ]);
+    }
+
+    private function createSystemSettingCategoryRecord(): SystemSettingCategory
+    {
+        // Persist an active settings category so configuration tables display a tangible grouping.
+        return SystemSettingCategory::factory()->create([
+            'name'      => 'Coverage Settings',
+            'slug'      => 'coverage-settings',
+            'is_active' => true,
+            'sort_order'=> 10,
+        ]);
+    }
+
+    private function createSystemSettingCategoryTranslationRecord(): SystemSettingCategoryTranslation
+    {
+        // Reuse a dedicated category so the translation entry can reference an existing parent row.
+        $category = SystemSettingCategory::factory()->create([
+            'name' => 'Coverage Translation Category',
+            'slug' => 'coverage-translation-category',
+        ]);
+
+        // Insert an English translation to match the default locale asserted earlier in the test.
+        return SystemSettingCategoryTranslation::factory()->create([
+            'system_setting_category_id' => $category->getKey(),
+            'locale'                     => 'en',
+            'name'                       => 'Coverage Category',
+            'description'                => 'Coverage category description',
+        ]);
+    }
+
+    private function createUserWishlistRecord(): UserWishlist
+    {
+        // Attach the wishlist to the authenticated admin to satisfy the user-owned global scope on the model.
+        return UserWishlist::factory()->create([
+            'user_id'    => $this->admin->getKey(),
+            'name'       => 'Coverage Wishlist',
+            'description'=> 'Coverage wishlist description',
+            'is_public'  => true,
+            'is_default' => false,
         ]);
     }
 }
