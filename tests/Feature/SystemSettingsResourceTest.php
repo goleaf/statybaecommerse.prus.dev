@@ -10,7 +10,7 @@ use App\Models\SystemSettingCategory;
 use App\Models\User;
 use App\Support\Nav;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Livewire\Features\SupportTesting\TestableLivewire;
+use Livewire\Features\SupportTesting\Testable;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -534,11 +534,8 @@ final class SystemSettingsResourceTest extends TestCase
     {
         $this->createSetting();
 
-        $component = $this->listComponent()
-            ->call('loadTable');
-
-        // Assert each configured column remains available on the listing.
-        $component->assertCanSeeTableColumns(self::TABLE_COLUMNS);
+        $this->listComponent()
+            ->assertCanSeeTableColumns(self::TABLE_COLUMNS);
     }
 
     /**
@@ -579,7 +576,7 @@ final class SystemSettingsResourceTest extends TestCase
     /**
      * Convenience wrapper that always mounts the listing component as the administrator.
      */
-    private function listComponent(): TestableLivewire
+    private function listComponent(): Testable
     {
         return $this->livewire(SystemSettingsResource\Pages\ListSystemSettings::class);
     }
@@ -587,7 +584,7 @@ final class SystemSettingsResourceTest extends TestCase
     /**
      * Helper that mounts the create page while handling authentication.
      */
-    private function createComponent(): TestableLivewire
+    private function createComponent(): Testable
     {
         return $this->livewire(SystemSettingsResource\Pages\CreateSystemSetting::class);
     }
@@ -595,7 +592,7 @@ final class SystemSettingsResourceTest extends TestCase
     /**
      * Helper that mounts the edit page for the provided setting.
      */
-    private function editComponent(SystemSetting $setting): TestableLivewire
+    private function editComponent(SystemSetting $setting): Testable
     {
         return $this->livewire(SystemSettingsResource\Pages\EditSystemSetting::class, [
             'record' => $setting->getKey(),
@@ -605,7 +602,7 @@ final class SystemSettingsResourceTest extends TestCase
     /**
      * Helper that mounts the view page for a specific setting.
      */
-    private function viewComponent(SystemSetting $setting): TestableLivewire
+    private function viewComponent(SystemSetting $setting): Testable
     {
         return $this->livewire(SystemSettingsResource\Pages\ViewSystemSetting::class, [
             'record' => $setting->getKey(),
@@ -625,7 +622,7 @@ final class SystemSettingsResourceTest extends TestCase
     /**
      * Proxies Livewire::test while ensuring the admin guard is active.
      */
-    private function livewire(string $component, array $parameters = []): TestableLivewire
+    private function livewire(string $component, array $parameters = []): Testable
     {
         return Livewire::actingAs($this->adminUser)->test($component, $parameters);
     }
