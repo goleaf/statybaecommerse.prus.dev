@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Data\ExportRequestData;
 use App\Enums\ExportStatus;
 use App\Jobs\ProcessExport;
+use App\Jobs\ProcessExportJob;
 use App\Models\Export;
 use App\Models\User;
 use App\Notifications\ExportCompletedNotification;
@@ -120,7 +121,8 @@ test('it queues export records and dispatches the processor job', function (): v
         ->and($export->columns)->toBe(['number', 'status', 'total'])
         ->and($export->artifact_disk)->toBe('public');
 
-    Bus::assertDispatched(ProcessExport::class, fn (ProcessExport $job): bool => $job->exportId === $export->getKey());
+    // Validate that the compatibility job alias is queued, ensuring legacy automation continues monitoring exports.
+    Bus::assertDispatched(ProcessExportJob::class, fn (ProcessExportJob $job): bool => $job->exportId === $export->getKey());
 });
 
 test('it processes queued exports and stores downloadable artifacts', function (): void {
