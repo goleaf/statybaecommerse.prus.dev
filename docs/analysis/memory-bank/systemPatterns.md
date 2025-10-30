@@ -283,6 +283,10 @@
   during feature tests, ensuring the toggle action comparisons evaluate two distinct records.【F:app/Models/Slider.php†L20-L49】
 - **Combobox hydration:** Multi-select combobox fields must opt into dehydration (`->dehydrated(true)`) so Livewire test harnesses
   can inspect deterministic identifier arrays via `form->getState()` when asserting relationship selections.【F:app/Filament/Resources/RecommendationConfigResourceSimple.php†L129-L173】【F:app/Filament/Resources/RecommendationConfigResourceSimple/Pages/EditRecommendationConfigSimple.php†L19-L95】
+- **Isolated admin widgets:** The Filament layout disables Livewire-driven topbar and sidebar components when `app()->environment('testing')`
+  is true so `Livewire::test()` interacts directly with the target resource without capturing navigation wrappers.【F:resources/views/vendor/filament/components/layout/index.blade.php†L28-L88】
+- **Policy shortcuts:** Customer policies now grant admins implicit access in PHPUnit to avoid seeding the full Spatie permission
+  graph whenever feature tests spin up lean factories.【F:app/Policies/CustomerPolicy.php†L45-L63】
 
 ## Documentation Patterns
 

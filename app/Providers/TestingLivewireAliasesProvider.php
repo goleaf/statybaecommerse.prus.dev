@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Filament\Resources\ActivityLogResource\Pages\ListActivityLogs;
+use App\Filament\Resources\CustomerResource\Pages\CreateCustomer;
+use App\Filament\Resources\CustomerResource\Pages\EditCustomer;
+use App\Filament\Resources\CustomerResource\Pages\ListCustomers;
 use App\Http\Middleware\TestingLegalResourceStub;
 use Illuminate\Support\Facades\Response as ResponseFacade;
 use Illuminate\Support\Facades\Route;
@@ -36,6 +39,11 @@ final class TestingLivewireAliasesProvider extends ServiceProvider
             'filament.admin.resources.system-setting-categories.pages.view-system-setting-category',
             \App\Filament\Resources\SystemSettingCategoryResource\Pages\ViewSystemSettingCategory::class,
         );
+
+        // Register Filament customer resource pages explicitly so Livewire::test resolves the right components in isolation.
+        Livewire::component(ListCustomers::class);
+        Livewire::component(CreateCustomer::class);
+        Livewire::component(EditCustomer::class);
     }
 
     public function boot(): void

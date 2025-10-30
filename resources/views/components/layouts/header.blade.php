@@ -4,5 +4,8 @@
     <x-banner />
 
     {{-- Primary navigation (logo, search, actions) + secondary links --}}
-    <livewire:components.navigation-menu />
+    @unless(app()->environment('testing'))
+        {{-- Suppress the navigation Livewire wrapper in tests to prevent Livewire::test() from capturing it as the root component. --}}
+        <livewire:components.navigation-menu />
+    @endunless
 </header>

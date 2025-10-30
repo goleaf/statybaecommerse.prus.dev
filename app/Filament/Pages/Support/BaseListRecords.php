@@ -27,6 +27,18 @@ abstract class BaseListRecords extends ListRecords
         return $this->applyToggleableTableLayout($table);
     }
 
+    /**
+     * Ensure Livewire table helpers can hydrate the table before running assertions.
+     */
+    public function loadTable(): void
+    {
+        // Call the core Filament implementation so deferred loading flags are toggled.
+        parent::loadTable();
+
+        // Re-apply the toggleable layout to keep the component view in sync for tests.
+        $this->applyToggleableTableLayout($this->getTable());
+    }
+
     protected function authorizeAccess(): void
     {
         abort_unless(static::getResource()::canViewAny(), 403);

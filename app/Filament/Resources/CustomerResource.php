@@ -25,6 +25,8 @@ use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -137,6 +139,8 @@ final class CustomerResource extends Resource
                                 ->preload()
                                 ->live()
                                 ->afterStateUpdated(function ($state, Set $set): void {
+                                    // Reset the dependent city select using Filament's schema Set helper
+                                    // so reactive selections work consistently in the Livewire test harness.
                                     if ($state) {
                                         $set('city_id', null);
                                     }
@@ -147,6 +151,8 @@ final class CustomerResource extends Resource
                                 ->preload()
                                 ->live()
                                 ->options(function (Get $get): array {
+                                    // Resolve the city list using Filament's schema-aware getter so
+                                    // Livewire form hydration in tests hits the same code path as production.
                                     $query = City::query()->orderBy('name');
 
                                     if ($countryId = $get('country_id')) {

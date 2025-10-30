@@ -19,4 +19,13 @@ final class EditCustomer extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
+
+    /**
+     * Expose the form schema key explicitly so Filament's test macros resolve the page form.
+     */
+    public function getDefaultTestingSchemaName(): ?string
+    {
+        // Defer to the parent calculation while ensuring Livewire never receives a null identifier.
+        return parent::getDefaultTestingSchemaName() ?? 'form';
+    }
 }

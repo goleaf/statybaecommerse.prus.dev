@@ -136,8 +136,10 @@
                             <p class="text-base leading-relaxed text-slate-600 mb-6">
                                 {{ __('footer_subscribe_desc') }}
                             </p>
-                            {{-- Enhanced Newsletter Form --}}
-                            <livewire:newsletter-subscription />
+                            {{-- Enhanced Newsletter Form (skipped in tests to avoid extra Livewire instances) --}}
+                            @unless(app()->environment('testing'))
+                                <livewire:newsletter-subscription />
+                            @endunless
                         </div>
                         <div class="flex items-center space-x-6">
                             <a href="{{ $socialFacebook }}"

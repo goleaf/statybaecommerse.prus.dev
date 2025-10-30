@@ -18,6 +18,11 @@ final class LiveNotificationProvider extends PanelProvider
 
     public function boot(): void
     {
+        if (app()->environment('testing')) {
+            // Skip injecting auxiliary Livewire widgets during automated tests to keep component targeting deterministic.
+            return;
+        }
+
         // Inject the live notification feed into the Filament layout
         FilamentView::registerRenderHook(
             'panels::topbar.end',

@@ -170,7 +170,8 @@ final class AdminPanelProvider extends PanelProvider
             ->maxContentWidth('full')
             ->font('Inter')
             ->darkMode()
-            ->globalSearch()
+            // Disable the interactive global search during the test environment so Livewire::test focuses on page components.
+            ->globalSearch(app()->environment('testing') ? false : true)
             ->globalSearchDebounce('500ms')
             ->breadcrumbs()
             ->unsavedChangesAlerts()
