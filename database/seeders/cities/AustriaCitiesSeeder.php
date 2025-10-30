@@ -4,23 +4,24 @@ declare(strict_types=1);
 
 namespace Database\Seeders\Cities;
 
-use App\Models\City;
-use App\Models\Country;
-use App\Models\Translations\CityTranslation;
+use App\Support\Locales;
 use Illuminate\Database\Seeder;
 
 final class AustriaCitiesSeeder extends Seeder
 {
-    public function run(): void
+    public static function iso2(): string
     {
-        $country = Country::where('cca2', 'AT')->first();
-        if (! $country) {
-            $this->command->warn('Austria country not found. Please run CountrySeeder first.');
+        // Austria is represented by its ISO2 country code so the toolkit can resolve the country id reliably.
+        return 'AT';
+    }
 
-            return;
-        }
-
-        $cities = [
+    /**
+     * @return iterable<array<string, mixed>>
+     */
+    public static function data(): iterable
+    {
+        // The curated Austrian city list retains the original ordering used by the legacy seeders.
+        return [
             ['code' => 'AT-VIE', 'slug' => 'vienna', 'name' => ['lt' => 'Viena', 'en' => 'Vienna'], 'description' => 'Capital of Austria', 'is_capital' => true, 'latitude' => 48.2082, 'longitude' => 16.3738, 'population' => 1911191],
             ['code' => 'AT-GRA', 'slug' => 'graz', 'name' => ['lt' => 'Gracas', 'en' => 'Graz'], 'description' => 'Second largest city in Austria', 'is_capital' => false, 'latitude' => 47.0707, 'longitude' => 15.4395, 'population' => 289440],
             ['code' => 'AT-LIN', 'slug' => 'linz', 'name' => ['lt' => 'Lincas', 'en' => 'Linz'], 'description' => 'Capital of Upper Austria', 'is_capital' => false, 'latitude' => 48.3069, 'longitude' => 14.2858, 'population' => 204846],
@@ -32,31 +33,13 @@ final class AustriaCitiesSeeder extends Seeder
             ['code' => 'AT-SAN', 'slug' => 'sankt-polten', 'name' => ['lt' => 'Šv. Pöltenas', 'en' => 'Sankt Pölten'], 'description' => 'Capital of Lower Austria', 'is_capital' => false, 'latitude' => 48.2047, 'longitude' => 15.6256, 'population' => 55000],
             ['code' => 'AT-DOR', 'slug' => 'dornbirn', 'name' => ['lt' => 'Dornbirnas', 'en' => 'Dornbirn'], 'description' => 'City in Vorarlberg', 'is_capital' => false, 'latitude' => 47.4142, 'longitude' => 9.7419, 'population' => 49000],
         ];
+    }
 
-        foreach ($cities as $cityData) {
-            $city = City::updateOrCreate(
-                ['code' => $cityData['code']],
-                array_merge($cityData, [
-                    'country_id' => $country->id,
-                    'name'       => $cityData['name']['en'],
-                    'slug'       => $cityData['slug'],
-                    'is_enabled' => true,
-                    'is_default' => false,
-                ])
-            );
+    public function run(): void
+    {
+        $locales = Locales::supported();
 
-            // Create translations
-            foreach (['lt', 'en'] as $locale) {
-                CityTranslation::updateOrCreate([
-                    'city_id' => $city->id,
-                    'locale'  => $locale,
-                ], [
-                    'name'        => $cityData['name'][$locale] ?? $cityData['name']['en'],
-                    'description' => $cityData['description'][$locale] ?? '',
-                ]);
-            }
-        }
-
-        $this->command->info('Austria cities seeded successfully.');
+        // Delegate to the shared toolkit to keep slug generation, translations, and upserts consistent.
+        CitySeederToolkit::upsertForCountry(self::iso2(), self::data(), $locales);
     }
 }

@@ -4,23 +4,24 @@ declare(strict_types=1);
 
 namespace Database\Seeders\Cities;
 
-use App\Models\City;
-use App\Models\Country;
-use App\Models\Translations\CityTranslation;
+use App\Support\Locales;
 use Illuminate\Database\Seeder;
 
 final class SerbiaCitiesSeeder extends Seeder
 {
-    public function run(): void
+    public static function iso2(): string
     {
-        $country = Country::where('cca2', 'RS')->first();
-        if (! $country) {
-            $this->command->warn('Serbia country not found. Please run CountrySeeder first.');
+        // Expose the ISO2 country code so the city toolkit can resolve the related country record.
+        return 'RS';
+    }
 
-            return;
-        }
-
-        $cities = [
+    /**
+     * @return iterable<array<string, mixed>>
+     */
+    public static function data(): iterable
+    {
+        // The dataset is preserved verbatim from the legacy seeder to keep curated ordering intact.
+        return [
             ['code' => 'RS-BEG', 'slug' => 'belgrade', 'name' => ['lt' => 'Belgradas', 'en' => 'Belgrade'], 'description' => 'Capital of ', 'is_capital' => true, 'latitude' => 44.7866, 'longitude' => 20.4489, 'population' => 1378682],
             ['code' => 'RS-NOV', 'slug' => 'novi-sad', 'name' => ['lt' => 'Novi Sadas', 'en' => 'Novi Sad'], 'description' => 'Capital of ', 'is_capital' => false, 'latitude' => 45.2671, 'longitude' => 19.8335, 'population' => 277522],
             ['code' => 'RS-NIS', 'slug' => 'nis', 'name' => ['lt' => 'Nišas', 'en' => 'Niš'], 'description' => 'Capital of ', 'is_capital' => false, 'latitude' => 43.3209, 'longitude' => 21.8958, 'population' => 183164],
@@ -32,31 +33,13 @@ final class SerbiaCitiesSeeder extends Seeder
             ['code' => 'RS-NOV', 'slug' => 'novi-pazar', 'name' => ['lt' => 'Novi Pazaras', 'en' => 'Novi Pazar'], 'description' => 'Capital of ', 'is_capital' => false, 'latitude' => 43.1367, 'longitude' => 20.5122, 'population' => 66000],
             ['code' => 'RS-KRA', 'slug' => 'kraljevo', 'name' => ['lt' => 'Kraljevas', 'en' => 'Kraljevo'], 'description' => 'Capital of ', 'is_capital' => false, 'latitude' => 43.7258, 'longitude' => 20.6894, 'population' => 64000],
         ];
+    }
 
-        foreach ($cities as $cityData) {
-            $city = City::updateOrCreate(
-                ['code' => $cityData['code']],
-                array_merge($cityData, [
-                    'country_id' => $country->id,
-                    'name'       => $cityData['name']['en'],
-                    'slug'       => $cityData['slug'],
-                    'is_enabled' => true,
-                    'is_default' => false,
-                ])
-            );
+    public function run(): void
+    {
+        $locales = Locales::supported();
 
-            // Create translations
-            foreach (['lt', 'en'] as $locale) {
-                CityTranslation::updateOrCreate([
-                    'city_id' => $city->id,
-                    'locale'  => $locale,
-                ], [
-                    'name'        => $cityData['name'][$locale] ?? $cityData['name']['en'],
-                    'description' => $cityData['description'][$locale] ?? '',
-                ]);
-            }
-        }
-
-        $this->command->info('Serbia cities seeded successfully.');
+        // Centralise insert/update logic through the shared toolkit for consistency across countries.
+        CitySeederToolkit::upsertForCountry(self::iso2(), self::data(), $locales);
     }
 }

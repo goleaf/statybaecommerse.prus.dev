@@ -4,23 +4,24 @@ declare(strict_types=1);
 
 namespace Database\Seeders\Cities;
 
-use App\Models\City;
-use App\Models\Country;
-use App\Models\Translations\CityTranslation;
+use App\Support\Locales;
 use Illuminate\Database\Seeder;
 
 final class HungaryCitiesSeeder extends Seeder
 {
-    public function run(): void
+    public static function iso2(): string
     {
-        $country = Country::where('cca2', 'HU')->first();
-        if (! $country) {
-            $this->command->warn('Hungary country not found. Please run CountrySeeder first.');
+        // Expose the ISO2 country code so the city toolkit can resolve the related country record.
+        return 'HU';
+    }
 
-            return;
-        }
-
-        $cities = [
+    /**
+     * @return iterable<array<string, mixed>>
+     */
+    public static function data(): iterable
+    {
+        // The dataset is preserved verbatim from the legacy seeder to keep curated ordering intact.
+        return [
             ['code' => 'HU-BUD', 'slug' => 'budapest', 'name' => ['lt' => 'Budapeštas', 'en' => 'Budapest'], 'description' => 'Capital of ', 'is_capital' => true, 'latitude' => 47.4979, 'longitude' => 19.0402, 'population' => 1752286],
             ['code' => 'HU-DEB', 'slug' => 'debrecen', 'name' => ['lt' => 'Debrecenas', 'en' => 'Debrecen'], 'description' => 'Capital of ', 'is_capital' => false, 'latitude' => 47.5316, 'longitude' => 21.6273, 'population' => 201432],
             ['code' => 'HU-SZE', 'slug' => 'szeged', 'name' => ['lt' => 'Segedas', 'en' => 'Szeged'], 'description' => 'Capital of ', 'is_capital' => false, 'latitude' => 46.2530, 'longitude' => 20.1414, 'population' => 160258],
@@ -32,31 +33,13 @@ final class HungaryCitiesSeeder extends Seeder
             ['code' => 'HU-SZE', 'slug' => 'szekesfehervar', 'name' => ['lt' => 'Sekesfehervaras', 'en' => 'Székesfehérvár'], 'description' => 'Capital of ', 'is_capital' => false, 'latitude' => 47.1925, 'longitude' => 18.4106, 'population' => 96400],
             ['code' => 'HU-SZO', 'slug' => 'szombathely', 'name' => ['lt' => 'Sombathely', 'en' => 'Szombathely'], 'description' => 'Capital of ', 'is_capital' => false, 'latitude' => 47.2307, 'longitude' => 16.6219, 'population' => 78000],
         ];
+    }
 
-        foreach ($cities as $cityData) {
-            $city = City::updateOrCreate(
-                ['code' => $cityData['code']],
-                array_merge($cityData, [
-                    'country_id' => $country->id,
-                    'name'       => $cityData['name']['en'],
-                    'slug'       => $cityData['slug'],
-                    'is_enabled' => true,
-                    'is_default' => false,
-                ])
-            );
+    public function run(): void
+    {
+        $locales = Locales::supported();
 
-            // Create translations
-            foreach (['lt', 'en'] as $locale) {
-                CityTranslation::updateOrCreate([
-                    'city_id' => $city->id,
-                    'locale'  => $locale,
-                ], [
-                    'name'        => $cityData['name'][$locale] ?? $cityData['name']['en'],
-                    'description' => $cityData['description'][$locale] ?? '',
-                ]);
-            }
-        }
-
-        $this->command->info('Hungary cities seeded successfully.');
+        // Centralise insert/update logic through the shared toolkit for consistency across countries.
+        CitySeederToolkit::upsertForCountry(self::iso2(), self::data(), $locales);
     }
 }

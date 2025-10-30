@@ -4,23 +4,24 @@ declare(strict_types=1);
 
 namespace Database\Seeders\Cities;
 
-use App\Models\City;
-use App\Models\Country;
-use App\Models\Translations\CityTranslation;
+use App\Support\Locales;
 use Illuminate\Database\Seeder;
 
 final class CroatiaCitiesSeeder extends Seeder
 {
-    public function run(): void
+    public static function iso2(): string
     {
-        $country = Country::where('cca2', 'HR')->first();
-        if (! $country) {
-            $this->command->warn('Croatia country not found. Please run CountrySeeder first.');
+        // Expose the ISO2 country code so the city toolkit can resolve the related country record.
+        return 'HR';
+    }
 
-            return;
-        }
-
-        $cities = [
+    /**
+     * @return iterable<array<string, mixed>>
+     */
+    public static function data(): iterable
+    {
+        // The dataset is preserved verbatim from the legacy seeder to keep curated ordering intact.
+        return [
             ['code' => 'HR-ZAG', 'slug' => 'zagreb', 'name' => ['lt' => 'Zagrebas', 'en' => 'Zagreb'], 'description' => 'Capital of ', 'is_capital' => true, 'latitude' => 45.8150, 'longitude' => 15.9819, 'population' => 806341],
             ['code' => 'HR-SPL', 'slug' => 'split', 'name' => ['lt' => 'Splitas', 'en' => 'Split'], 'description' => 'Capital of ', 'is_capital' => false, 'latitude' => 43.5081, 'longitude' => 16.4402, 'population' => 178102],
             ['code' => 'HR-RIJ', 'slug' => 'rijeka', 'name' => ['lt' => 'Rijeka', 'en' => 'Rijeka'], 'description' => 'Capital of ', 'is_capital' => false, 'latitude' => 45.3271, 'longitude' => 14.4422, 'population' => 128624],
@@ -32,31 +33,13 @@ final class CroatiaCitiesSeeder extends Seeder
             ['code' => 'HR-SIS', 'slug' => 'sisak', 'name' => ['lt' => 'Sisakas', 'en' => 'Sisak'], 'description' => 'Capital of ', 'is_capital' => false, 'latitude' => 45.4833, 'longitude' => 16.3667, 'population' => 47000],
             ['code' => 'HR-VAR', 'slug' => 'varazdin', 'name' => ['lt' => 'Varaždinas', 'en' => 'Varaždin'], 'description' => 'Capital of ', 'is_capital' => false, 'latitude' => 46.3044, 'longitude' => 16.3378, 'population' => 46000],
         ];
+    }
 
-        foreach ($cities as $cityData) {
-            $city = City::updateOrCreate(
-                ['code' => $cityData['code']],
-                array_merge($cityData, [
-                    'country_id' => $country->id,
-                    'name'       => $cityData['name']['en'],
-                    'slug'       => $cityData['slug'],
-                    'is_enabled' => true,
-                    'is_default' => false,
-                ])
-            );
+    public function run(): void
+    {
+        $locales = Locales::supported();
 
-            // Create translations
-            foreach (['lt', 'en'] as $locale) {
-                CityTranslation::updateOrCreate([
-                    'city_id' => $city->id,
-                    'locale'  => $locale,
-                ], [
-                    'name'        => $cityData['name'][$locale] ?? $cityData['name']['en'],
-                    'description' => $cityData['description'][$locale] ?? '',
-                ]);
-            }
-        }
-
-        $this->command->info('Croatia cities seeded successfully.');
+        // Centralise insert/update logic through the shared toolkit for consistency across countries.
+        CitySeederToolkit::upsertForCountry(self::iso2(), self::data(), $locales);
     }
 }
