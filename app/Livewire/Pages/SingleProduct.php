@@ -15,6 +15,8 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as SupportCollection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Number;
+use Illuminate\Support\Str;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -471,47 +473,112 @@ final class SingleProduct extends Component
         return $this
             ->product
             ->variants
-            ->map(function (ProductVariant $variant): array {
-                $price = $variant->getPrice();
-                $currentCurrency = function_exists('current_currency') ? current_currency() : null;
-                $priceValue = $price?->value?->amount ?? $variant->price;
-                $priceFormatted = $priceValue !== null ? app_money_format((float) $priceValue, $currentCurrency) : null;
-                $compareFormatted = null;
+            ->map(fn (ProductVariant $variant): array => $this->formatVariantForDisplay($variant))
+            ->values();
+    }
 
-                if ($price && $price->compare) {
-                    $compareFormatted = app_money_format((float) $price->compare, $currentCurrency);
-                } elseif ($variant->compare_price) {
-                    $compareFormatted = app_money_format((float) $variant->compare_price, $currentCurrency);
+    #[Computed]
+    public function variantOptionGroups(): SupportCollection
+    {
+        if (! $this->product->relationLoaded('variants')) {
+            $this->product->loadMissing(['variants.media', 'variants.variantAttributeValues.attribute']);
+        }
+
+        $groups = [];
+
+        foreach ($this->variantMatrix as $variantData) {
+            foreach ($variantData['attributes'] as $attribute) {
+                $groupKey = (string) ($attribute['attribute_id'] ?? $attribute['attribute_slug']);
+
+                if (! isset($groups[$groupKey])) {
+                    $groups[$groupKey] = [
+                        'id'         => $attribute['attribute_id'],
+                        'name'       => $attribute['attribute'],
+                        'slug'       => $attribute['attribute_slug'],
+                        'sort_order' => $attribute['attribute_sort_order'],
+                        'values'     => [],
+                    ];
                 }
 
-                $thumbnail = $variant->getFirstMediaUrl(config('media.storage.thumbnail_collection'))
-                    ?: ($variant->getFirstMediaUrl(config('media.storage.collection_name'), 'small')
-                        ?: $variant->getFirstMediaUrl(config('media.storage.collection_name')));
+                $valueKey = $attribute['value_slug'] ?: Str::slug((string) ($attribute['value'] ?? 'value'));
 
-                $attributes = $variant
-                    ->variantAttributeValues
-                    ->map(function ($value): array {
-                        $attribute = $value->attribute;
+                if (! isset($groups[$groupKey]['values'][$valueKey])) {
+                    $groups[$groupKey]['values'][$valueKey] = [
+                        'key'                 => $valueKey,
+                        'label'               => $attribute['value'],
+                        'hex_color'           => $attribute['hex_color'],
+                        'swatch_image'        => $attribute['swatch_image'],
+                        'variant_ids'         => [],
+                        'primary_variant_id'  => null,
+                        'is_active'           => false,
+                        'is_available'        => false,
+                        'available_quantity'  => 0,
+                        'value_sort_order'    => $attribute['value_sort_order'],
+                        'price_samples'       => [],
+                        'price_currency_hint' => $variantData['pricing']['currency'] ?? (function_exists('current_currency') ? current_currency() : null),
+                    ];
+                }
+
+                $valueEntry = &$groups[$groupKey]['values'][$valueKey];
+                $valueEntry['variant_ids'][] = $variantData['id'];
+                $valueEntry['available_quantity'] += (int) ($variantData['available_quantity'] ?? 0);
+                $valueEntry['price_samples'][] = $variantData['pricing']['current'];
+
+                if ($valueEntry['primary_variant_id'] === null) {
+                    $valueEntry['primary_variant_id'] = $variantData['id'];
+                }
+
+                $valueEntry['is_active'] = $valueEntry['is_active'] || ($variantData['is_active'] ?? false);
+                $valueEntry['is_available'] = $valueEntry['is_available'] || ($variantData['is_available'] ?? false);
+
+                unset($valueEntry);
+            }
+        }
+
+        return collect($groups)
+            ->map(static function (array $group): array {
+                $values = collect($group['values'])
+                    ->map(static function (array $value): array {
+                        $prices = array_filter($value['price_samples'], static fn ($price): bool => $price !== null);
+                        $priceHint = null;
+
+                        if ($prices !== []) {
+                            $minPrice = min($prices);
+                            $currency = $value['price_currency_hint'];
+
+                            if ($currency) {
+                                $priceHint = __('product_page.variant_option_from_price', [
+                                    'price' => Number::currency((float) $minPrice, $currency, app()->getLocale()),
+                                ]);
+                            }
+                        }
 
                         return [
-                            'attribute' => $attribute?->trans('name') ?? $attribute?->name ?? $value->attribute_name,
-                            'value'     => $value->getLocalizedValue(),
+                            'key'                => $value['key'],
+                            'label'              => $value['label'],
+                            'hex_color'          => $value['hex_color'],
+                            'swatch_image'       => $value['swatch_image'],
+                            'variant_ids'        => array_values(array_unique($value['variant_ids'])),
+                            'primary_variant_id' => $value['primary_variant_id'],
+                            'is_active'          => $value['is_active'],
+                            'is_available'       => $value['is_available'],
+                            'available_quantity' => (int) $value['available_quantity'],
+                            'price_hint'         => $priceHint,
+                            'value_sort_order'   => $value['value_sort_order'],
                         ];
                     })
+                    ->sortBy(static fn (array $value): array => [$value['value_sort_order'] ?? 0, $value['label'] ?? ''])
                     ->values();
 
                 return [
-                    'id'                 => $variant->id,
-                    'name'               => $variant->name,
-                    'sku'                => $variant->sku,
-                    'price'              => $priceFormatted,
-                    'compare_price'      => $compareFormatted,
-                    'is_out_of_stock'    => $variant->isOutOfStock(),
-                    'available_quantity' => $variant->availableQuantity(),
-                    'thumbnail'          => $thumbnail,
-                    'attributes'         => $attributes,
+                    'id'         => $group['id'],
+                    'name'       => $group['name'],
+                    'slug'       => $group['slug'],
+                    'sort_order' => $group['sort_order'],
+                    'values'     => $values,
                 ];
             })
+            ->sortBy(static fn (array $group): array => [$group['sort_order'] ?? 0, $group['name'] ?? ''])
             ->values();
     }
 
@@ -531,6 +598,18 @@ final class SingleProduct extends Component
     public function handleVariantSelected(?int $variantId): void
     {
         $this->refreshVariantState($variantId);
+    }
+
+    /**
+     * Allow the Blade view to request variant changes while keeping nested components in sync.
+     */
+    public function selectVariant(?int $variantId = null): void
+    {
+        // Update the current pricing and inventory snapshot for the chosen variant.
+        $this->refreshVariantState($variantId);
+
+        // Propagate the selection to child Livewire components listening for the shared event channel.
+        $this->dispatch('variantSelected', $variantId);
     }
 
     protected function determineDefaultVariantId(): ?int
@@ -772,6 +851,77 @@ final class SingleProduct extends Component
         }
 
         return view('livewire.pages.single-product', ['relatedProducts' => $this->relatedProducts])->layout('components.layouts.base', ['title' => $this->product->name]);
+    }
+
+    /**
+     * Normalise variant metadata so Blade can reuse a single snapshot for cards and selectors.
+     */
+    private function formatVariantForDisplay(ProductVariant $variant): array
+    {
+        if (! $variant->relationLoaded('variantAttributeValues')) {
+            $variant->loadMissing(['variantAttributeValues.attribute']);
+        }
+
+        $pricing = $this->buildPricingSummary($variant);
+        $currency = $pricing['currency'] ?? (function_exists('current_currency') ? current_currency() : null);
+        $currentPrice = $pricing['current'];
+        $comparePrice = $pricing['compare'];
+
+        $priceFormatted = $currentPrice !== null ? app_money_format((float) $currentPrice, $currency) : null;
+        $compareFormatted = $comparePrice !== null ? app_money_format((float) $comparePrice, $currency) : null;
+
+        $thumbnail = $variant->getFirstMediaUrl(config('media.storage.thumbnail_collection'))
+            ?: ($variant->getFirstMediaUrl(config('media.storage.collection_name'), 'small')
+                ?: $variant->getFirstMediaUrl(config('media.storage.collection_name')));
+
+        $attributeValues = $variant
+            ->variantAttributeValues
+            ->map(function ($value): array {
+                $attribute = $value->attribute;
+
+                if ($attribute && ! $attribute->relationLoaded('values')) {
+                    $attribute->loadMissing('values');
+                }
+
+                $attributeSlug = $attribute?->slug ?? Str::slug((string) ($value->attribute_name ?? 'attribute'));
+                $valueSlug = $value->attribute_value_slug ?? Str::slug((string) ($value->getLocalizedValue() ?? $value->attribute_value ?? 'value'));
+
+                $attributeValueModel = $attribute?->values?->firstWhere('slug', $valueSlug)
+                    ?? $attribute?->values?->firstWhere('value', $value->attribute_value)
+                    ?? null;
+
+                $label = $attribute?->trans('name') ?? $attribute?->name ?? $value->attribute_name;
+                $displayValue = $value->getLocalizedValue();
+
+                return [
+                    'attribute_id'          => $attribute?->getKey(),
+                    'attribute'             => $label,
+                    'attribute_slug'        => $attributeSlug,
+                    'attribute_sort_order'  => $attribute?->sort_order ?? $value->sort_order ?? 0,
+                    'value'                 => $displayValue,
+                    'value_slug'            => $valueSlug,
+                    'value_sort_order'      => $value->sort_order ?? $attributeValueModel?->sort_order ?? 0,
+                    'hex_color'             => $attributeValueModel?->hex_color,
+                    'swatch_image'          => $attributeValueModel?->image,
+                ];
+            })
+            ->values();
+
+        return [
+            'id'                 => $variant->getKey(),
+            'name'               => $variant->getLocalizedName(),
+            'sku'                => $variant->sku,
+            'price'              => $priceFormatted,
+            'compare_price'      => $compareFormatted,
+            'is_out_of_stock'    => $variant->isOutOfStock(),
+            'is_available'       => $variant->isAvailableForPurchase(),
+            'available_quantity' => $variant->availableQuantity(),
+            'thumbnail'          => $thumbnail,
+            'attributes'         => $attributeValues,
+            'attribute_summary'  => $attributeValues->pluck('value')->filter()->implode(' • '),
+            'pricing'            => $pricing,
+            'is_active'          => $variant->getKey() === $this->activeVariantId,
+        ];
     }
 
     private function formatMeasurement(null|int|float|string $value, ?string $unit): ?string
