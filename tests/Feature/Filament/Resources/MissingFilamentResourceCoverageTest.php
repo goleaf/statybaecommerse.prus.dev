@@ -10,6 +10,8 @@ use App\Filament\Resources\CampaignResource\Pages\ListCampaigns;
 use App\Filament\Resources\CityResource\Pages\ListCities;
 use App\Filament\Resources\CollectionResource\Pages\ListCollections;
 use App\Filament\Resources\CollectionRuleResource\Pages\ListCollectionRules;
+use App\Filament\Resources\DocumentResource\Pages\ListDocuments;
+use App\Filament\Resources\DocumentTemplateResource\Pages\ListDocumentTemplates;
 use App\Filament\Resources\EnumManagementResource\Pages\ListEnumManagement;
 use App\Filament\Resources\PostResource\Pages\ListPosts;
 use App\Filament\Resources\ProductVariantResource\Pages\ListProductVariants;
@@ -27,6 +29,8 @@ use App\Models\City;
 use App\Models\Collection;
 use App\Models\CollectionRule;
 use App\Models\Country;
+use App\Models\Document;
+use App\Models\DocumentTemplate;
 use App\Models\EnumValue;
 use App\Models\Post;
 use App\Models\ProductVariant;
@@ -87,6 +91,8 @@ final class MissingFilamentResourceCoverageTest extends TestCase
             'cities'                    => [ListCities::class, 'createCityRecord'],
             'collections'               => [ListCollections::class, 'createCollectionRecord'],
             'collection rules'          => [ListCollectionRules::class, 'createCollectionRuleRecord'],
+            'documents'                 => [ListDocuments::class, 'createDocumentRecord'],
+            'document templates'        => [ListDocumentTemplates::class, 'createDocumentTemplateRecord'],
             'enum management'           => [ListEnumManagement::class, 'createEnumValueRecord'],
             'posts'                     => [ListPosts::class, 'createPostRecord'],
             'product variants'          => [ListProductVariants::class, 'createProductVariantRecord'],
@@ -191,6 +197,26 @@ final class MissingFilamentResourceCoverageTest extends TestCase
             'field'    => 'status',
             'operator' => 'equals',
             'value'    => 'active',
+        ]);
+    }
+
+    private function createDocumentRecord(): Document
+    {
+        // Tie the document to a deterministic template so related columns hydrate consistently.
+        $template = DocumentTemplate::factory()->create([
+            'name' => 'Coverage Template',
+        ]);
+
+        return Document::factory()->for($template, 'template')->draft()->create([
+            'title' => 'Coverage Document',
+        ]);
+    }
+
+    private function createDocumentTemplateRecord(): DocumentTemplate
+    {
+        // Persist an active invoice template to showcase the documents navigation group.
+        return DocumentTemplate::factory()->invoice()->create([
+            'name' => 'Coverage Invoice Template',
         ]);
     }
 
