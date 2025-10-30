@@ -80,10 +80,12 @@ final class CacheMaintenance extends Page
             return false;
         }
 
-        if (method_exists($user, 'hasAnyRole')) {
-            return $user->hasAnyRole(['super_admin', 'admin', 'administrator']);
+        if (method_exists($user, 'hasAnyRole') && $user->hasAnyRole(['super_admin', 'admin', 'administrator'])) {
+            return true;
         }
 
+        // Provide a graceful fallback for legacy admin toggles when role data
+        // has not been seeded alongside the core user accounts.
         return (bool) ($user->is_admin ?? false);
     }
 
@@ -119,7 +121,13 @@ final class CacheMaintenance extends Page
                 ->action(function (): void {
                     $key = $this->cacheKey;
                     if ($key === null || $key === '') {
-                        $this->notify('danger', 'Please provide a cache key to forget.');
+                        // Surface the validation feedback via the Filament notification pipeline
+                        // so the action remains compatible with Livewire testing hooks.
+                        Notification::make()
+                            ->title('Cache key required')
+                            ->body('Please provide a cache key to forget.')
+                            ->danger()
+                            ->send();
 
                         return;
                     }
@@ -144,7 +152,11 @@ final class CacheMaintenance extends Page
                     )));
 
                     if (empty($tags)) {
-                        $this->notify('danger', 'Add at least one cache tag before flushing tagged cache entries.');
+                        Notification::make()
+                            ->title('Cache tags required')
+                            ->body('Add at least one cache tag before flushing tagged cache entries.')
+                            ->danger()
+                            ->send();
 
                         return;
                     }
