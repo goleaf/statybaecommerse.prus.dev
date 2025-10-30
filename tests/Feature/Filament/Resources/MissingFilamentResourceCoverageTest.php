@@ -7,14 +7,18 @@ namespace Tests\Feature\Filament\Resources;
 use App\Filament\Resources\AuditTrailResource\Pages\ListAuditTrails;
 use App\Filament\Resources\BrandResource\Pages\ListBrands;
 use App\Filament\Resources\CampaignResource\Pages\ListCampaigns;
+use App\Filament\Resources\LocationResource\Pages\ListLocations;
 use App\Filament\Resources\CityResource\Pages\ListCities;
 use App\Filament\Resources\CollectionResource\Pages\ListCollections;
 use App\Filament\Resources\CollectionRuleResource\Pages\ListCollectionRules;
 use App\Filament\Resources\EnumManagementResource\Pages\ListEnumManagement;
+use App\Filament\Resources\RecommendationCacheResource\Pages\ListRecommendationCaches;
 use App\Filament\Resources\PostResource\Pages\ListPosts;
 use App\Filament\Resources\ProductVariantResource\Pages\ListProductVariants;
 use App\Filament\Resources\RecommendationAnalyticsResource\Pages\ListRecommendationAnalytics;
+use App\Filament\Resources\ReferralCodeUsageLogResource\Pages\ListReferralCodeUsageLogs;
 use App\Filament\Resources\ReferralCampaignResource\Pages\ListReferralCampaigns;
+use App\Filament\Resources\ReferralStatisticsResource\Pages\ListReferralStatistics;
 use App\Filament\Resources\SliderTranslationResource\Pages\ListSliderTranslations;
 use App\Filament\Resources\SystemSettingResource\Pages\ListSystemSettings;
 use App\Filament\Resources\UserManagementResource\Pages\ListUsers;
@@ -27,11 +31,18 @@ use App\Models\City;
 use App\Models\Collection;
 use App\Models\CollectionRule;
 use App\Models\Country;
+use App\Models\Location;
 use App\Models\EnumValue;
+use App\Models\Product;
 use App\Models\Post;
 use App\Models\ProductVariant;
+use App\Models\RecommendationBlock;
+use App\Models\RecommendationCache;
 use App\Models\RecommendationAnalytics;
 use App\Models\ReferralCampaign;
+use App\Models\ReferralCode;
+use App\Models\ReferralCodeUsageLog;
+use App\Models\ReferralStatistics;
 use App\Models\SliderTranslation;
 use App\Models\SystemSetting;
 use App\Models\User;
@@ -88,10 +99,14 @@ final class MissingFilamentResourceCoverageTest extends TestCase
             'collections'               => [ListCollections::class, 'createCollectionRecord'],
             'collection rules'          => [ListCollectionRules::class, 'createCollectionRuleRecord'],
             'enum management'           => [ListEnumManagement::class, 'createEnumValueRecord'],
+            'locations'                 => [ListLocations::class, 'createLocationRecord'],
             'posts'                     => [ListPosts::class, 'createPostRecord'],
             'product variants'          => [ListProductVariants::class, 'createProductVariantRecord'],
             'recommendation analytics'  => [ListRecommendationAnalytics::class, 'createRecommendationAnalyticsRecord'],
+            'recommendation caches'     => [ListRecommendationCaches::class, 'createRecommendationCacheRecord'],
             'referral campaigns'        => [ListReferralCampaigns::class, 'createReferralCampaignRecord'],
+            'referral code usage logs'  => [ListReferralCodeUsageLogs::class, 'createReferralCodeUsageLogRecord'],
+            'referral statistics'       => [ListReferralStatistics::class, 'createReferralStatisticsRecord'],
             'slider translations'       => [ListSliderTranslations::class, 'createSliderTranslationRecord'],
             'system settings'           => [ListSystemSettings::class, 'createSystemSettingRecord'],
             'user management'           => [ListUsers::class, 'createUserManagementRecord'],
@@ -204,6 +219,23 @@ final class MissingFilamentResourceCoverageTest extends TestCase
         ]);
     }
 
+    private function createLocationRecord(): Location
+    {
+        // Create an enabled warehouse location so logistics listings surface a deterministic row.
+        return Location::query()->create([
+            'code'           => 'COVLOC',
+            'name'           => 'Coverage Warehouse',
+            'slug'           => 'coverage-warehouse',
+            'type'           => 'warehouse',
+            'address_line_1' => '123 Coverage Street',
+            'city'           => 'Vilnius',
+            'country_code'   => 'LT',
+            'is_enabled'     => true,
+            'is_default'     => false,
+            'sort_order'     => 1,
+        ]);
+    }
+
     private function createPostRecord(): Post
     {
         // Seed a published post entry to exercise the marketing/content management listings.
@@ -230,6 +262,44 @@ final class MissingFilamentResourceCoverageTest extends TestCase
         ]);
     }
 
+    private function createRecommendationCacheRecord(): RecommendationCache
+    {
+        // Compose the related block, product, and user so the cached row resolves associations inside Filament.
+        $block = RecommendationBlock::factory()->create([
+            'name'  => 'coverage-block',
+            'title' => 'Coverage Block',
+        ]);
+
+        $user = User::factory()->create([
+            'email' => 'coverage.recommendation@example.com',
+        ]);
+
+        $product = Product::factory()->create([
+            'name' => 'Coverage Product',
+            'slug' => 'coverage-product',
+            'sku'  => 'COVERAGEPROD',
+        ]);
+
+        // Persist a recommendation cache entry with deterministic payload for table assertions.
+        return RecommendationCache::query()->create([
+            'cache_key'       => 'coverage-cache-key',
+            'block_id'        => $block->getKey(),
+            'user_id'         => $user->getKey(),
+            'product_id'      => $product->getKey(),
+            'context_type'    => 'homepage',
+            'context_data'    => ['locale' => 'en'],
+            'recommendations' => [
+                [
+                    'product_id' => $product->getKey(),
+                    'score'      => 0.95,
+                ],
+            ],
+            'hit_count'  => 3,
+            'expires_at' => now()->addDay(),
+            'meta'       => [],
+        ]);
+    }
+
     private function createReferralCampaignRecord(): ReferralCampaign
     {
         // Create a bilingual referral campaign so localized columns render deterministic strings.
@@ -239,6 +309,52 @@ final class MissingFilamentResourceCoverageTest extends TestCase
                 'lt' => 'Draudimo referral kampanija',
             ],
             'is_active' => true,
+        ]);
+    }
+
+    private function createReferralCodeUsageLogRecord(): ReferralCodeUsageLog
+    {
+        // Prepare a referral code owned by a seeded user so usage logs retain meaningful relationships.
+        $user = User::factory()->create([
+            'email' => 'coverage.referral@example.com',
+        ]);
+
+        $referralCode = ReferralCode::factory()->forUser($user)->create([
+            'code'      => 'COVERC',
+            'is_active' => true,
+        ]);
+
+        // Persist the usage log entry to validate auditing tables render inside Filament.
+        return ReferralCodeUsageLog::query()->create([
+            'referral_code_id' => $referralCode->getKey(),
+            'user_id'          => $user->getKey(),
+            'ip_address'       => '203.0.113.10',
+            'user_agent'       => 'CoverageBot/1.0',
+            'referrer'         => 'https://example.com/coverage-referral',
+            'metadata'         => [
+                'device_type' => 'desktop',
+            ],
+        ]);
+    }
+
+    private function createReferralStatisticsRecord(): ReferralStatistics
+    {
+        // Capture aggregated referral metrics so analytics dashboards display concrete results.
+        $user = User::factory()->create([
+            'email' => 'coverage.statistics@example.com',
+        ]);
+
+        return ReferralStatistics::query()->create([
+            'user_id'               => $user->getKey(),
+            'date'                  => now()->toDateString(),
+            'total_referrals'       => 5,
+            'completed_referrals'   => 3,
+            'pending_referrals'     => 2,
+            'total_rewards_earned'  => 45.50,
+            'total_discounts_given' => 30.25,
+            'metadata'              => [
+                'source' => 'coverage-suite',
+            ],
         ]);
     }
 
