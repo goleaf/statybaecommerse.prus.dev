@@ -46,19 +46,33 @@ use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role as PermissionRole;
 
-beforeEach(function (): void {
+/**
+ * Preserve the original Gate "before" callbacks so policy tests do not leak mutations
+ * into unrelated suites that expect the core authorization hooks to remain intact.
+ *
+ * @var array<int, callable>|null $originalGateBeforeCallbacks
+ */
+$originalGateBeforeCallbacks = null;
+
+beforeEach(function () use (&$originalGateBeforeCallbacks): void {
     app(PermissionRegistrar::class)->forgetCachedPermissions();
     config()->set('authorization.testing.skip_checks', false);
 
     $gate = Gate::getFacadeRoot();
 
     if ($gate === null) {
+        // Bail early when the Gate facade has not been resolved by the container yet.
+        $originalGateBeforeCallbacks = null;
+
         return;
     }
 
     $reflection = new ReflectionClass($gate);
 
     if (! $reflection->hasProperty('beforeCallbacks')) {
+        // Nothing to strip if the property is unavailable on the current Gate implementation.
+        $originalGateBeforeCallbacks = null;
+
         return;
     }
 
@@ -67,9 +81,8 @@ beforeEach(function (): void {
 
     $callbacks = $property->getValue($gate);
 
-    if (! is_array($callbacks)) {
-        return;
-    }
+    // Capture the original callbacks to restore them in the matching afterEach hook.
+    $originalGateBeforeCallbacks = is_array($callbacks) ? $callbacks : null;
 
     $property->setValue($gate, []);
 
@@ -102,6 +115,38 @@ beforeEach(function (): void {
             });
         }
     }
+});
+
+afterEach(function () use (&$originalGateBeforeCallbacks): void {
+    if ($originalGateBeforeCallbacks === null) {
+        // Skip restoration when the before callbacks were absent or the gate never resolved.
+        return;
+    }
+
+    $gate = Gate::getFacadeRoot();
+
+    if ($gate === null) {
+        // Reset the cached snapshot to avoid leaking stale references into later tests.
+        $originalGateBeforeCallbacks = null;
+
+        return;
+    }
+
+    $reflection = new ReflectionClass($gate);
+
+    if (! $reflection->hasProperty('beforeCallbacks')) {
+        $originalGateBeforeCallbacks = null;
+
+        return;
+    }
+
+    $property = $reflection->getProperty('beforeCallbacks');
+    $property->setAccessible(true);
+
+    // Restore the original callbacks to reinstate the application's authorization behaviour.
+    $property->setValue($gate, $originalGateBeforeCallbacks);
+
+    $originalGateBeforeCallbacks = null;
 });
 
 function policyUser(string $role, array $permissions = []): User
