@@ -103,18 +103,19 @@ final class OrderSeeder extends Seeder
                     $lineTotal = $unitPrice * $quantity;
                     $subtotal += $lineTotal;
 
-                    $order->items()->save(
-                        OrderItem::factory()
-                            ->for($product)
-                            ->state([
-                                'name'       => $product->name,
-                                'sku'        => $product->sku ?? 'SKU-' . Str::upper(Str::random(6)),
-                                'unit_price' => $unitPrice,
-                                'quantity'   => $quantity,
-                                'total'      => $lineTotal,
-                            ])
-                            ->make()
-                    );
+                    OrderItem::factory()
+                        ->for($order) // Explicitly associate the generated line item with the seeded order so no extra orders are created implicitly by the factory.
+                        ->for($product)
+                        ->create([
+                            'order_id'   => $order->getKey(), // Persist the concrete foreign key to stay resilient even if factory hooks change.
+                            'product_id' => $product->getKey(),
+                            'name'       => $product->name,
+                            'sku'        => $product->sku ?? 'SKU-' . Str::upper(Str::random(6)),
+                            'unit_price' => $unitPrice,
+                            'price'      => $unitPrice,
+                            'quantity'   => $quantity,
+                            'total'      => $lineTotal,
+                        ]);
                 }
 
                 $shippingCost = 9.99;
@@ -131,20 +132,23 @@ final class OrderSeeder extends Seeder
                 ]);
 
                 // Create shipping using factory relationship
-                $order->shipping()->save(
-                    OrderShipping::factory()
-                        ->state([
-                            'carrier_name'       => 'standard',
-                            'service'            => 'ground',
-                            'cost'               => $shippingCost,
-                            'weight'             => 1.0,
-                            'tracking_number'    => null,
-                            'tracking_url'       => null,
-                            'shipped_at'         => $config['date']->copy()->addDays(random_int(1, 5)),
-                            'estimated_delivery' => $config['date']->copy()->addDays(7),
-                        ])
-                        ->make()
-                );
+                OrderShipping::query()->create([
+                    'order_id'          => $order->getKey(),
+                    'carrier_name'      => 'standard',
+                    'carrier'           => 'standard',
+                    'shipping_method'   => 'standard',
+                    'service'           => 'ground',
+                    'service_type'      => 'ground',
+                    'cost'              => $shippingCost,
+                    'base_cost'         => $shippingCost,
+                    'insurance_cost'    => 0.0,
+                    'total_cost'        => $shippingCost,
+                    'weight'            => 1.0,
+                    'tracking_number'   => null,
+                    'tracking_url'      => null,
+                    'shipped_at'        => $config['date']->copy()->addDays(random_int(1, 5)),
+                    'estimated_delivery' => $config['date']->copy()->addDays(7),
+                ]); // Persist via the query builder to bypass factory defaults while keeping the dataset deterministic.
             }
         }
     }
