@@ -6,36 +6,78 @@ namespace Tests\Feature\Filament\Resources;
 
 use App\Filament\Resources\AuditTrailResource\Pages\ListAuditTrails;
 use App\Filament\Resources\BrandResource\Pages\ListBrands;
+use App\Filament\Resources\CampaignConversionResource\Pages\ListCampaignConversions;
 use App\Filament\Resources\CampaignResource\Pages\ListCampaigns;
+use App\Filament\Resources\CampaignScheduleResource\Pages\ListCampaignSchedules;
+use App\Filament\Resources\CampaignViewResource\Pages\ListCampaignViews;
+use App\Filament\Resources\CartItemResource\Pages\ListCartItems;
 use App\Filament\Resources\CityResource\Pages\ListCities;
 use App\Filament\Resources\CollectionResource\Pages\ListCollections;
 use App\Filament\Resources\CollectionRuleResource\Pages\ListCollectionRules;
 use App\Filament\Resources\EnumManagementResource\Pages\ListEnumManagement;
+use App\Filament\Resources\EnumResource\Pages\ListEnums;
+use App\Filament\Resources\InventoryResource\Pages\ListInventories;
+use App\Filament\Resources\LegalResource\Pages\ListLegal;
+use App\Filament\Resources\LegalResource\Pages\ListLegals;
+use App\Filament\Resources\LocationResource\Pages\ListLocations;
+use App\Filament\Resources\NewsImages\Pages\ListNewsImages;
+use App\Filament\Resources\NewsTags\Pages\ListNewsTags;
 use App\Filament\Resources\PostResource\Pages\ListPosts;
+use App\Filament\Resources\PriceListItemResource\Pages\ListPriceListItems;
+use App\Filament\Resources\PriceListResource\Pages\ListPriceLists;
+use App\Filament\Resources\PriceResource\Pages\ListPrices;
 use App\Filament\Resources\ProductVariantResource\Pages\ListProductVariants;
 use App\Filament\Resources\RecommendationAnalyticsResource\Pages\ListRecommendationAnalytics;
+use App\Filament\Resources\RecommendationConfigResourceSimple\Pages\ListRecommendationConfigResourceSimples;
+use App\Filament\Resources\RecommendationConfigResourceSimple\Pages\ListRecommendationConfigSimples;
 use App\Filament\Resources\ReferralCampaignResource\Pages\ListReferralCampaigns;
+use App\Filament\Resources\ReferralResource\Pages\ListReferrals;
+use App\Filament\Resources\RoleResource\Pages\ListRoles;
+use App\Filament\Resources\SettingResource\Pages\ListSettings;
 use App\Filament\Resources\SliderTranslationResource\Pages\ListSliderTranslations;
+use App\Filament\Resources\SystemSettingCategories\Pages\ListSystemSettingCategories;
 use App\Filament\Resources\SystemSettingResource\Pages\ListSystemSettings;
+use App\Filament\Resources\SystemSettingCategoryTranslationResource\Pages\ListSystemSettingCategoryTranslations;
 use App\Filament\Resources\UserManagementResource\Pages\ListUsers;
 use App\Filament\Resources\UserPreferenceResource\Pages\ListUserPreferences;
+use App\Filament\Resources\UserWishlistResource\Pages\ListUserWishlists;
 use App\Filament\Resources\VariantStockResource\Pages\ListVariantStocks;
 use App\Models\AuditTrail;
 use App\Models\Brand;
 use App\Models\Campaign;
+use App\Models\CampaignConversion;
+use App\Models\CampaignSchedule;
+use App\Models\CampaignView;
+use App\Models\CartItem;
 use App\Models\City;
 use App\Models\Collection;
 use App\Models\CollectionRule;
 use App\Models\Country;
+use App\Models\Currency;
 use App\Models\EnumValue;
+use App\Models\Inventory;
+use App\Models\Legal;
+use App\Models\Location;
+use App\Models\NewsImage;
+use App\Models\NewsTag;
 use App\Models\Post;
+use App\Models\Price;
+use App\Models\PriceList;
+use App\Models\PriceListItem;
 use App\Models\ProductVariant;
 use App\Models\RecommendationAnalytics;
+use App\Models\RecommendationConfigSimple;
+use App\Models\Referral;
 use App\Models\ReferralCampaign;
+use App\Models\Role;
+use App\Models\Setting;
 use App\Models\SliderTranslation;
 use App\Models\SystemSetting;
+use App\Models\SystemSettingCategory;
+use App\Models\SystemSettingCategoryTranslation;
 use App\Models\User;
 use App\Models\UserPreference;
+use App\Models\UserWishlist;
 use App\Models\VariantInventory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
@@ -81,22 +123,44 @@ final class MissingFilamentResourceCoverageTest extends TestCase
     {
         // Map each resource list page to the helper responsible for creating a visible record.
         return [
-            'audit trails'              => [ListAuditTrails::class, 'createAuditTrailRecord'],
-            'brands'                    => [ListBrands::class, 'createBrandRecord'],
-            'campaigns'                 => [ListCampaigns::class, 'createCampaignRecord'],
-            'cities'                    => [ListCities::class, 'createCityRecord'],
-            'collections'               => [ListCollections::class, 'createCollectionRecord'],
-            'collection rules'          => [ListCollectionRules::class, 'createCollectionRuleRecord'],
-            'enum management'           => [ListEnumManagement::class, 'createEnumValueRecord'],
-            'posts'                     => [ListPosts::class, 'createPostRecord'],
-            'product variants'          => [ListProductVariants::class, 'createProductVariantRecord'],
-            'recommendation analytics'  => [ListRecommendationAnalytics::class, 'createRecommendationAnalyticsRecord'],
-            'referral campaigns'        => [ListReferralCampaigns::class, 'createReferralCampaignRecord'],
-            'slider translations'       => [ListSliderTranslations::class, 'createSliderTranslationRecord'],
-            'system settings'           => [ListSystemSettings::class, 'createSystemSettingRecord'],
-            'user management'           => [ListUsers::class, 'createUserManagementRecord'],
-            'user preferences'          => [ListUserPreferences::class, 'createUserPreferenceRecord'],
-            'variant stock'             => [ListVariantStocks::class, 'createVariantInventoryRecord'],
+            'audit trails'                             => [ListAuditTrails::class, 'createAuditTrailRecord'],
+            'brands'                                   => [ListBrands::class, 'createBrandRecord'],
+            'campaign conversions'                     => [ListCampaignConversions::class, 'createCampaignConversionRecord'],
+            'campaign schedules'                       => [ListCampaignSchedules::class, 'createCampaignScheduleRecord'],
+            'campaign views'                           => [ListCampaignViews::class, 'createCampaignViewRecord'],
+            'campaigns'                                => [ListCampaigns::class, 'createCampaignRecord'],
+            'cart items'                               => [ListCartItems::class, 'createCartItemRecord'],
+            'cities'                                   => [ListCities::class, 'createCityRecord'],
+            'collections'                              => [ListCollections::class, 'createCollectionRecord'],
+            'collection rules'                         => [ListCollectionRules::class, 'createCollectionRuleRecord'],
+            'enum management'                          => [ListEnumManagement::class, 'createEnumValueRecord'],
+            'enums'                                    => [ListEnums::class, 'createEnumRecord'],
+            'inventories'                              => [ListInventories::class, 'createInventoryRecord'],
+            'legal overview'                           => [ListLegal::class, 'createLegalRecord'],
+            'legal tabbed'                             => [ListLegals::class, 'createLegalRecord'],
+            'locations'                                => [ListLocations::class, 'createLocationRecord'],
+            'news images'                              => [ListNewsImages::class, 'createNewsImageRecord'],
+            'news tags'                                => [ListNewsTags::class, 'createNewsTagRecord'],
+            'posts'                                    => [ListPosts::class, 'createPostRecord'],
+            'price list items'                         => [ListPriceListItems::class, 'createPriceListItemRecord'],
+            'price lists'                              => [ListPriceLists::class, 'createPriceListRecord'],
+            'prices'                                   => [ListPrices::class, 'createPriceRecord'],
+            'product variants'                         => [ListProductVariants::class, 'createProductVariantRecord'],
+            'recommendation analytics'                 => [ListRecommendationAnalytics::class, 'createRecommendationAnalyticsRecord'],
+            'recommendation configs'                   => [ListRecommendationConfigResourceSimples::class, 'createRecommendationConfigSimpleRecord'],
+            'recommendation configs alternate routing' => [ListRecommendationConfigSimples::class, 'createRecommendationConfigSimpleRecord'],
+            'referral campaigns'                       => [ListReferralCampaigns::class, 'createReferralCampaignRecord'],
+            'referrals'                                => [ListReferrals::class, 'createReferralRecord'],
+            'roles'                                    => [ListRoles::class, 'createRoleRecord'],
+            'settings'                                 => [ListSettings::class, 'createSettingRecord'],
+            'slider translations'                      => [ListSliderTranslations::class, 'createSliderTranslationRecord'],
+            'system setting categories'                => [ListSystemSettingCategories::class, 'createSystemSettingCategoryRecord'],
+            'system setting category translations'     => [ListSystemSettingCategoryTranslations::class, 'createSystemSettingCategoryTranslationRecord'],
+            'system settings'                          => [ListSystemSettings::class, 'createSystemSettingRecord'],
+            'user management'                          => [ListUsers::class, 'createUserManagementRecord'],
+            'user preferences'                         => [ListUserPreferences::class, 'createUserPreferenceRecord'],
+            'user wishlists'                           => [ListUserWishlists::class, 'createUserWishlistRecord'],
+            'variant stock'                            => [ListVariantStocks::class, 'createVariantInventoryRecord'],
         ];
     }
 
@@ -147,6 +211,42 @@ final class MissingFilamentResourceCoverageTest extends TestCase
         ]);
     }
 
+    private function createCampaignConversionRecord(): CampaignConversion
+    {
+        // Provision a conversion row with deterministic attributes so marketing metrics populate reliably.
+        return CampaignConversion::factory()->create([
+            'conversion_type' => 'purchase',
+            'session_id'      => 'coverage-session',
+            'status'          => 'completed',
+        ]);
+    }
+
+    private function createCampaignScheduleRecord(): CampaignSchedule
+    {
+        // Register a daily schedule to ensure timeline widgets receive predictable upcoming run data.
+        return CampaignSchedule::factory()->daily()->create([
+            'next_run_at' => now()->addDay(),
+        ]);
+    }
+
+    private function createCampaignViewRecord(): CampaignView
+    {
+        // Capture a recent campaign view with a linked customer for audience filters to resolve.
+        return CampaignView::factory()->withCustomer()->create([
+            'session_id' => 'coverage-view-session',
+        ]);
+    }
+
+    private function createCartItemRecord(): CartItem
+    {
+        // Persist a cart line item so merchandising reports surface a concrete basket entry.
+        return CartItem::factory()->create([
+            'session_id' => 'coverage-cart-session',
+            'quantity'   => 2,
+            'unit_price' => 29.99,
+        ]);
+    }
+
     private function createCampaignRecord(): Campaign
     {
         // Generate a simple active campaign so marketing listings show a concrete entry.
@@ -194,6 +294,12 @@ final class MissingFilamentResourceCoverageTest extends TestCase
         ]);
     }
 
+    private function createEnumRecord(): EnumValue
+    {
+        // Reuse the enum value helper so both enum list variants present consistent fixture data.
+        return $this->createEnumValueRecord();
+    }
+
     private function createEnumValueRecord(): EnumValue
     {
         // Persist an active enum value so the navigation badge logic treats it as part of the dataset.
@@ -201,6 +307,49 @@ final class MissingFilamentResourceCoverageTest extends TestCase
             'type'  => 'navigation_group',
             'key'   => 'coverage',
             'value' => 'Coverage',
+        ]);
+    }
+
+    private function createInventoryRecord(): Inventory
+    {
+        // Seed a stocked inventory row to exercise warehouse level metrics within the table view.
+        return Inventory::factory()->inStock()->create([
+            'sku' => 'INV-COVERAGE',
+        ]);
+    }
+
+    private function createLegalRecord(): Legal
+    {
+        // Generate an enabled legal document so widget tabs can partition active and archived policies.
+        return Legal::factory()->enabled()->create([
+            'key'  => 'coverage-terms',
+            'type' => 'terms_of_use',
+        ]);
+    }
+
+    private function createLocationRecord(): Location
+    {
+        // Produce a warehouse location ensuring logistics dashboards have a consistent origin entry.
+        return Location::factory()->warehouse()->create([
+            'code' => 'WARE-001',
+        ]);
+    }
+
+    private function createNewsImageRecord(): NewsImage
+    {
+        // Attach a featured news image so media galleries render a predictable thumbnail within listings.
+        return NewsImage::factory()->featured()->create([
+            'file_path' => 'news-images/coverage.jpg',
+            'alt_text'  => 'Coverage image asset',
+        ]);
+    }
+
+    private function createNewsTagRecord(): NewsTag
+    {
+        // Create an active news tag to guarantee taxonomy filters display a clear example tag.
+        return NewsTag::factory()->active()->create([
+            'name' => 'Coverage Tag',
+            'slug' => 'coverage-tag',
         ]);
     }
 
@@ -222,11 +371,52 @@ final class MissingFilamentResourceCoverageTest extends TestCase
         ]);
     }
 
+    private function createPriceListItemRecord(): PriceListItem
+    {
+        // Seed a price list item so tiered pricing tables expose a clear example configuration row.
+        return PriceListItem::factory()->create([
+            'name'       => ['en' => 'Coverage List Item', 'lt' => 'Coverage List Item'],
+            'priority'   => 10,
+            'net_amount' => 59.99,
+        ]);
+    }
+
+    private function createPriceListRecord(): PriceList
+    {
+        // Create a default price list ensuring catalog filters showcase an enabled pricing sheet.
+        return PriceList::factory()->default()->create([
+            'name' => 'Coverage Price List',
+            'code' => 'PL-COVER',
+        ]);
+    }
+
+    private function createPriceRecord(): Price
+    {
+        // Persist a price with an explicit currency so monetary formatting stays deterministic in assertions.
+        $currency = Currency::factory()->eur()->create();
+
+        return Price::factory()
+            ->for($currency, 'currency')
+            ->create([
+                'amount'         => 99.99,
+                'compare_amount' => 129.99,
+            ]);
+    }
+
     private function createRecommendationAnalyticsRecord(): RecommendationAnalytics
     {
         // Generate analytics metrics so reporting tables showcase actionable rows.
         return RecommendationAnalytics::factory()->create([
             'action' => 'view',
+        ]);
+    }
+
+    private function createRecommendationConfigSimpleRecord(): RecommendationConfigSimple
+    {
+        // Craft a streamlined recommendation config so simplified resource variants render populated cards.
+        return RecommendationConfigSimple::factory()->create([
+            'name' => 'Coverage Config',
+            'code' => 'coverage-config',
         ]);
     }
 
@@ -242,11 +432,59 @@ final class MissingFilamentResourceCoverageTest extends TestCase
         ]);
     }
 
+    private function createReferralRecord(): Referral
+    {
+        // Establish a referral link between two users so referral tracking tables present meaningful status data.
+        return Referral::factory()->pending()->create([
+            'referral_code' => 'COVREF01',
+            'status'        => 'pending',
+        ]);
+    }
+
+    private function createRoleRecord(): Role
+    {
+        // Register a bespoke administrator role to validate permission listings inside Filament.
+        return Role::factory()->create([
+            'name' => 'coverage-role',
+        ]);
+    }
+
+    private function createSettingRecord(): Setting
+    {
+        // Persist a configurable application setting so administrators see a sample key/value entry.
+        return Setting::factory()->create([
+            'key'          => 'coverage.setting',
+            'display_name' => 'Coverage Setting',
+            'value'        => 'Enabled',
+            'group'        => 'general',
+        ]);
+    }
+
     private function createSliderTranslationRecord(): SliderTranslation
     {
         // Persist a slider translation entry to validate the localized slider management grid.
         return SliderTranslation::factory()->english()->create([
             'title' => 'Coverage Slide',
+        ]);
+    }
+
+    private function createSystemSettingCategoryRecord(): SystemSettingCategory
+    {
+        // Seed a top-level system setting category so grouping filters display an obvious parent entry.
+        return SystemSettingCategory::factory()->create([
+            'name' => 'Coverage Category',
+            'slug' => 'coverage-category',
+        ]);
+    }
+
+    private function createSystemSettingCategoryTranslationRecord(): SystemSettingCategoryTranslation
+    {
+        // Attach an English translation to the seeded category for multilingual table assertions.
+        $category = $this->createSystemSettingCategoryRecord();
+
+        return SystemSettingCategoryTranslation::factory()->english()->create([
+            'system_setting_category_id' => $category->getKey(),
+            'name'                       => 'Coverage Category',
         ]);
     }
 
@@ -279,6 +517,14 @@ final class MissingFilamentResourceCoverageTest extends TestCase
         return UserPreference::factory()->forUser($user)->highScore()->create([
             'preference_type' => 'category',
             'preference_key'  => 'coverage-category',
+        ]);
+    }
+
+    private function createUserWishlistRecord(): UserWishlist
+    {
+        // Create a public wishlist entry so merchandising teams can inspect saved lists through Filament.
+        return UserWishlist::factory()->public()->create([
+            'name' => 'Coverage Wishlist',
         ]);
     }
 
