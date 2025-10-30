@@ -103,6 +103,7 @@ A comprehensive, intelligent product recommendation system has been successfully
   - Configure algorithm weights and parameters
   - Set performance thresholds
   - Manage cache settings
+  - Auto-hydrate numeric defaults so priority, cache TTL, and thresholds respect database constraints during creation
 
 #### 2. RecommendationBlockResource
 - **Location**: `app/Filament/Resources/RecommendationBlockResource.php`
