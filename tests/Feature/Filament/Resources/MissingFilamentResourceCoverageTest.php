@@ -42,7 +42,6 @@ use App\Filament\Resources\UserWishlistResource\Pages\ListUserWishlists;
 use App\Filament\Resources\VariantStockResource\Pages\ListVariantStocks;
 use App\Models\ActivityLog;
 use App\Models\AuditTrail;
-use App\Models\Brand;
 use App\Models\Campaign;
 use App\Models\CampaignConversion;
 use App\Models\CampaignSchedule;
@@ -125,6 +124,10 @@ final class MissingFilamentResourceCoverageTest extends TestCase
             'audit trails'              => [ListAuditTrails::class, 'createAuditTrailRecord'],
             'brands'                    => [ListBrands::class, 'createBrandRecord'],
             'campaigns'                 => [ListCampaigns::class, 'createCampaignRecord'],
+            'campaign conversions'      => [ListCampaignConversions::class, 'createCampaignConversionRecord'],
+            'campaign schedules'        => [ListCampaignSchedules::class, 'createCampaignScheduleRecord'],
+            'campaign views'            => [ListCampaignViews::class, 'createCampaignViewRecord'],
+            'cart items'                => [ListCartItems::class, 'createCartItemRecord'],
             'cities'                    => [ListCities::class, 'createCityRecord'],
             'collections'               => [ListCollections::class, 'createCollectionRecord'],
             'collection rules'          => [ListCollectionRules::class, 'createCollectionRuleRecord'],
@@ -135,6 +138,8 @@ final class MissingFilamentResourceCoverageTest extends TestCase
             'posts'                     => [ListPosts::class, 'createPostRecord'],
             'product variants'          => [ListProductVariants::class, 'createProductVariantRecord'],
             'recommendation analytics'  => [ListRecommendationAnalytics::class, 'createRecommendationAnalyticsRecord'],
+            'recommendation simple list'    => [ListRecommendationConfigResourceSimples::class, 'createRecommendationConfigSimpleRecord'],
+            'recommendation simple alias'   => [ListRecommendationConfigSimples::class, 'createRecommendationConfigSimpleRecord'],
             'referral campaigns'        => [ListReferralCampaigns::class, 'createReferralCampaignRecord'],
             'referral code usage logs'  => [ListReferralCodeUsageLogs::class, 'createReferralCodeUsageLogRecord'],
             'referral reward logs'      => [ListReferralRewardLogs::class, 'createReferralRewardLogRecord'],
