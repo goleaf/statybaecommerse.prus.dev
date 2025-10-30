@@ -4,22 +4,27 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ActivityLogResource\Pages;
 
-use App\Filament\Pages\Support\BaseListRecords;
 use App\Filament\Resources\ActivityLogResource;
+use Filament\Resources\Pages\ListRecords;
+use Filament\Tables\Table;
 
-final class ListActivityLogs extends BaseListRecords
+// If your BaseListRecords added these traits, you can keep them here:
+use App\Filament\Concerns\HasResizableColumns;
+use App\Filament\Tables\Concerns\ConfiguresToggleableTableLayout;
+use Hydrat\TableLayoutToggle\Concerns\HasToggleableTable;
+
+final class ListActivityLogs extends ListRecords
 {
+    // keep trait behavior that your BaseListRecords had
+    use ConfiguresToggleableTableLayout;
+    use HasResizableColumns;
+    use HasToggleableTable;
+
     protected static string $resource = ActivityLogResource::class;
 
-    public function mount(): void
+    // REQUIRED: instance table builder so Filament can construct $this->table
+    public function table(Table $table): Table
     {
-        parent::mount();
-
-        // Ensure the activity log table hydrates immediately so assertions and the UI
-        // can inspect the initial dataset without requiring an explicit loadTable() call.
-        $this->loadTable();
-
-        // The explicit flag is kept for clarity even though loadTable() currently only toggles it.
-        $this->isTableLoaded = true;
+        return static::getResource()::table($table);
     }
 }
