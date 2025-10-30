@@ -18,7 +18,7 @@ return [
     */
 
     // Default to Redis so cache data remains centralised across processes and workers.
-    'default' => env('CACHE_STORE', 'redis'),
+    'default' => env('CACHE_STORE', 'database'),
 
     /*
     |--------------------------------------------------------------------------
