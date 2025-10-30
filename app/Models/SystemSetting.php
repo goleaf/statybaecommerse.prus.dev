@@ -64,6 +64,23 @@ final class SystemSetting extends Model implements HasMedia
     protected $casts = ['is_public' => 'boolean', 'is_required' => 'boolean', 'is_encrypted' => 'boolean', 'is_readonly' => 'boolean', 'is_active' => 'boolean', 'is_cacheable' => 'boolean', 'validation_rules' => 'json', 'options' => 'json', 'metadata' => 'json', 'meta' => 'json', 'tags' => 'json', 'sort_order' => 'integer', 'cache_ttl' => 'integer', 'access_count' => 'integer', 'last_accessed_at' => 'datetime'];
 
     /**
+     * Override the attribute detection logic so Filament treats the "category"
+     * column as a relationship when building form components. The table stores
+     * a legacy string column named "category" for analytics widgets, but the
+     * admin resource also relies on the `category()` relationship. Returning
+     * false here ensures Filament resolves the relationship instead of the raw
+     * attribute while leaving other attributes to the framework defaults.
+     */
+    public function hasAttribute($key): bool
+    {
+        if ($key === 'category') {
+            return false;
+        }
+
+        return parent::hasAttribute($key);
+    }
+
+    /**
      * Handle value functionality with proper error handling.
      */
     protected function value(): Attribute
