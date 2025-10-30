@@ -372,58 +372,114 @@
                         <div class="space-y-6 p-6 lg:p-8">
                             <h2 class="text-lg font-semibold text-slate-900">
                                 {{ __('product_page.all_variants_options') }}</h2>
+                            @if ($this->variantOptionGroups->isNotEmpty())
+                                {{-- Render attribute-level variant selectors to mirror marketplace option matrices. --}}
+                                <div class="space-y-5">
+                                    @foreach ($this->variantOptionGroups as $group)
+                                        <div class="space-y-2">
+                                            <p class="text-sm font-semibold text-slate-800">{{ $group['name'] }}</p>
+                                            <div class="flex flex-wrap gap-3">
+                                                @foreach ($group['values'] as $value)
+                                                    @php
+                                                        $valueIsActive = $value['is_active'] ?? false;
+                                                        $valueIsAvailable = $value['is_available'] ?? false;
+                                                        $valueVariantId = $value['primary_variant_id'] ?? null;
+                                                    @endphp
+                                                    <div class="flex flex-col items-start">
+                                                        <button
+                                                            type="button"
+                                                            @if ($valueVariantId) wire:click="selectVariant({{ $valueVariantId }})" @endif
+                                                            class="flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium transition focus:outline-none focus-visible:ring focus-visible:ring-primary-400 {{ $valueIsActive ? 'border-primary-500 bg-primary-50 text-primary-700' : 'border-slate-200 bg-white text-slate-600 hover:border-primary-300 hover:text-primary-600' }} {{ ! $valueIsAvailable ? 'opacity-60' : '' }}"
+                                                            aria-pressed="{{ $valueIsActive ? 'true' : 'false' }}"
+                                                            @disabled(! $valueVariantId)
+                                                        >
+                                                            @if ($value['hex_color'])
+                                                                <span
+                                                                    class="h-3 w-3 rounded-full border border-slate-200"
+                                                                    style="background-color: {{ $value['hex_color'] }};"
+                                                                    aria-hidden="true"></span>
+                                                            @endif
+                                                            <span>{{ $value['label'] }}</span>
+                                                        </button>
+                                                        @if ($value['price_hint'])
+                                                            <span class="mt-1 text-[11px] text-slate-400">{{ $value['price_hint'] }}</span>
+                                                        @endif
+                                                        @if (! $valueIsAvailable)
+                                                            <span class="mt-0.5 text-[11px] font-medium text-rose-500">{{ __('translations.out_of_stock') }}</span>
+                                                        @endif
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @endif
                             @if ($this->variantMatrix->isEmpty())
                                 <p class="text-sm text-slate-600">{{ __('product_page.single_configuration') }}</p>
                             @else
                                 <div class="space-y-4">
                                     @foreach ($this->variantMatrix as $variant)
-                                        <div
-                                             class="flex flex-col gap-4 rounded-2xl border border-slate-100 bg-slate-50/70 p-5 sm:flex-row sm:items-center sm:justify-between">
-                                            <div class="flex items-start gap-4">
-                                                @if ($variant['thumbnail'])
-                                                    <img src="{{ $variant['thumbnail'] }}"
-                                                         alt="{{ $variant['name'] }}"
-                                                         class="h-16 w-16 rounded-xl object-cover shadow-sm">
-                                                @endif
-                                                <div class="space-y-2">
-                                                    <div>
-                                                        <p class="text-base font-semibold text-slate-900">
-                                                            {{ $variant['name'] }}</p>
-                                                        @if ($variant['sku'])
-                                                            <p class="text-xs text-slate-500">
-                                                                {{ __('translations.sku') }}: {{ $variant['sku'] }}
-                                                            </p>
+                                        @php
+                                            $variantIsActive = $variant['is_active'] ?? false;
+                                            $variantIsAvailable = $variant['is_available'] ?? true;
+                                        @endphp
+                                        {{-- Variant summary card --}}
+                                        <button
+                                            type="button"
+                                            wire:click="selectVariant({{ $variant['id'] }})"
+                                            class="w-full rounded-2xl border px-5 py-4 text-left transition focus:outline-none focus-visible:ring focus-visible:ring-primary-400 {{ $variantIsActive ? 'border-primary-500 bg-primary-50 shadow-md' : 'border-slate-100 bg-slate-50/70 hover:border-primary-200 hover:bg-white' }} {{ ! $variantIsAvailable ? 'opacity-70' : '' }}"
+                                            aria-pressed="{{ $variantIsActive ? 'true' : 'false' }}"
+                                        >
+                                            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                                                <div class="flex items-start gap-4">
+                                                    @if ($variant['thumbnail'])
+                                                        <img src="{{ $variant['thumbnail'] }}"
+                                                             alt="{{ $variant['name'] }}"
+                                                             class="h-16 w-16 rounded-xl object-cover shadow-sm">
+                                                    @endif
+                                                    <div class="space-y-2">
+                                                        <div>
+                                                            <p class="text-base font-semibold text-slate-900">
+                                                                {{ $variant['name'] }}</p>
+                                                            @if ($variant['sku'])
+                                                                <p class="text-xs text-slate-500">
+                                                                    {{ __('translations.sku') }}: {{ $variant['sku'] }}
+                                                                </p>
+                                                            @endif
+                                                        </div>
+                                                        @if (! empty($variant['attribute_summary']))
+                                                            <p class="text-xs text-slate-500">{{ $variant['attribute_summary'] }}</p>
                                                         @endif
+                                                        <dl class="flex flex-wrap gap-2 text-xs text-slate-600">
+                                                            @foreach ($variant['attributes'] as $attribute)
+                                                                <div
+                                                                     class="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 shadow-sm">
+                                                                    <span
+                                                                          class="font-medium text-slate-700">{{ $attribute['attribute'] }}:</span>
+                                                                    <span>{{ $attribute['value'] }}</span>
+                                                                </div>
+                                                            @endforeach
+                                                        </dl>
                                                     </div>
-                                                    <dl class="flex flex-wrap gap-2 text-xs text-slate-600">
-                                                        @foreach ($variant['attributes'] as $attribute)
-                                                            <div
-                                                                 class="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 shadow-sm">
-                                                                <span
-                                                                      class="font-medium text-slate-700">{{ $attribute['attribute'] }}:</span>
-                                                                <span>{{ $attribute['value'] }}</span>
-                                                            </div>
-                                                        @endforeach
-                                                    </dl>
+                                                </div>
+                                                <div class="text-right">
+                                                    @if ($variant['price'])
+                                                        <p class="text-lg font-semibold text-primary-600">
+                                                            {{ $variant['price'] }}</p>
+                                                    @endif
+                                                    @if ($variant['compare_price'])
+                                                        <p class="text-xs text-slate-500 line-through">
+                                                            {{ $variant['compare_price'] }}</p>
+                                                    @endif
+                                                    <p
+                                                       class="mt-2 text-xs font-medium uppercase tracking-wide {{ $variantIsAvailable ? 'text-emerald-500' : 'text-rose-500' }}">
+                                                        {{ $variantIsAvailable ? __('translations.available') : __('translations.out_of_stock') }}
+                                                    </p>
+                                                    <p class="text-xs text-slate-400">{{ __('translations.available') }}:
+                                                        {{ $variant['available_quantity'] }}</p>
                                                 </div>
                                             </div>
-                                            <div class="text-right">
-                                                @if ($variant['price'])
-                                                    <p class="text-lg font-semibold text-primary-600">
-                                                        {{ $variant['price'] }}</p>
-                                                @endif
-                                                @if ($variant['compare_price'])
-                                                    <p class="text-xs text-slate-500 line-through">
-                                                        {{ $variant['compare_price'] }}</p>
-                                                @endif
-                                                <p
-                                                   class="mt-2 text-xs font-medium uppercase tracking-wide {{ $variant['is_out_of_stock'] ? 'text-red-500' : 'text-emerald-500' }}">
-                                                    {{ $variant['is_out_of_stock'] ? __('translations.out_of_stock') : __('translations.available') }}
-                                                </p>
-                                                <p class="text-xs text-slate-400">{{ __('translations.available') }}:
-                                                    {{ $variant['available_quantity'] }}</p>
-                                            </div>
-                                        </div>
+                                        </button>
                                     @endforeach
                                 </div>
                             @endif

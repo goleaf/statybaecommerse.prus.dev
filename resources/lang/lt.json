@@ -866,6 +866,7 @@
     "product_page.change_frequency_30": "Pakeitimų dažnis (30 d.)",
     "product_page.avg_changes_30": "Vidutiniškai pakeitimų per dieną (pask. 30 d.)",
     "product_page.all_variants_options": "Visi variantai ir parinktys",
+    "product_page.variant_option_from_price": "Nuo :price",
     "product_page.single_configuration": "Šis produktas prieinamas vienoje konfigūracijoje. Konfigūruojamų produktų variantai bus rodomi čia.",
     "product_page.downloads_guides": "Atsisiuntimai ir gairės",
     "product_page.customer_feedback": "Klientų atsiliepimai",
