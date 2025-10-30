@@ -31,6 +31,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Js;
 use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
 use UnitEnum;
 
@@ -288,8 +289,16 @@ final class ReferralCodeResource extends Resource
                 Action::make('copy_url')
                     ->label(__('referral_codes.actions.copy_url'))
                     ->icon('heroicon-m-clipboard')
-                    ->copyable(fn (ReferralCode $record): string => route('referrals.track', ['code' => $record->code]))
-                    ->successNotificationTitle(__('referral_codes.notifications.url_copied')),
+                    ->extraAttributes(function (ReferralCode $record): array {
+                        // Use Alpine to copy the referral URL on the client without triggering a server round-trip.
+                        $copyableUrl = Js::from(route('referrals.track', ['code' => $record->code]));
+                        $copySuccessMessage = Js::from(__('referral_codes.notifications.url_copied'));
+
+                        return [
+                            'x-data'                  => '{}',
+                            'x-on:click.prevent.stop' => "window.navigator.clipboard.writeText({$copyableUrl}); \$dispatch('notify', { status: 'success', message: {$copySuccessMessage} });",
+                        ];
+                    }),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
