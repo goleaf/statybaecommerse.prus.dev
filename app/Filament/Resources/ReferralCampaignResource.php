@@ -20,6 +20,8 @@ use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Schemas\Components\Tabs as SchemaTabs;
+use Filament\Schemas\Components\Tabs\Tab as SchemaTab;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -68,69 +70,86 @@ final class ReferralCampaignResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema
-            ->schema([
+            ->components([
                 SchemaSection::make(__('admin.referral_campaigns.basic_information'))
-                    ->schema([
-                        SchemaGrid::make(2)
-                            ->schema([
-                                LanguageTabs::make([
-                                    TextInput::make('name')
-                                        ->label(__('admin.referral_campaigns.name'))
-                                        ->required()
-                                        ->maxLength(255)
-                                        ->translatable(),
-                                    Textarea::make('description')
-                                        ->label(__('admin.referral_campaigns.description'))
-                                        ->maxLength(65535)
-                                        ->nullable()
-                                        ->translatable(),
-                                ])->columnSpanFull(),
-                                Toggle::make('is_active')
-                                    ->label(__('admin.referral_campaigns.is_active'))
-                                    ->inline(false)
-                                    ->default(true),
-                                SupportFlatpickr::makeDate('start_date')
-                                    ->label(__('admin.referral_campaigns.start_date'))
-                                    ->nullable(),
-                                SupportFlatpickr::makeDate('end_date')
-                                    ->label(__('admin.referral_campaigns.end_date'))
-                                    ->nullable(),
-                            ]),
+                    ->columns(2)
+                    ->components([
+                        SchemaTabs::make('referral_campaign_translations')
+                            ->tabs(
+                                collect(config('filament-language-tabs.default_locales', ['lt', 'en']))
+                                    ->filter()
+                                    ->unique()
+                                    ->values()
+                                    ->map(function (string $locale): SchemaTab {
+                                        $localeUpper = strtoupper($locale);
+                                        $isRequired = in_array($locale, config('filament-language-tabs.required_locales', []), true);
+
+                                        return SchemaTab::make($localeUpper)
+                                            ->schema([
+                                                // Each locale receives its own inputs so the persisted state matches the nested array structure expected by the tests.
+                                                TextInput::make("name.{$locale}")
+                                                    ->label(sprintf('%s (%s)', __('admin.referral_campaigns.name'), $localeUpper))
+                                                    ->required($isRequired)
+                                                    ->maxLength(255),
+                                                Textarea::make("description.{$locale}")
+                                                    ->label(sprintf('%s (%s)', __('admin.referral_campaigns.description'), $localeUpper))
+                                                    ->maxLength(65535)
+                                                    ->nullable(),
+                                            ]);
+                                    })
+                                    ->all()
+                            )
+                            ->columnSpanFull(),
+                        Toggle::make('is_active')
+                            ->label(__('admin.referral_campaigns.is_active'))
+                            ->inline(false)
+                            ->default(true)
+                            ->columnSpan(1),
+                        SupportFlatpickr::makeDate('start_date')
+                            ->label(__('admin.referral_campaigns.start_date'))
+                            ->nullable()
+                            ->columnSpan(1),
+                        SupportFlatpickr::makeDate('end_date')
+                            ->label(__('admin.referral_campaigns.end_date'))
+                            ->nullable()
+                            ->columnSpan(1),
                     ]),
                 SchemaSection::make(__('admin.referral_campaigns.reward_settings'))
-                    ->schema([
-                        SchemaGrid::make(2)
-                            ->schema([
-                                TextInput::make('reward_amount')
-                                    ->label(__('admin.referral_campaigns.reward_amount'))
-                                    ->numeric()
-                                    ->default(0.0)
-                                    ->prefix('€'),
-                                Select::make('reward_type')
-                                    ->label(__('admin.referral_campaigns.reward_type'))
-                                    ->options([
-                                        'discount' => __('admin.referral_campaigns.reward_types.discount'),
-                                        'credit'   => __('admin.referral_campaigns.reward_types.credit'),
-                                        'points'   => __('admin.referral_campaigns.reward_types.points'),
-                                        'gift'     => __('admin.referral_campaigns.reward_types.gift'),
-                                    ])
-                                    ->nullable(),
-                                TextInput::make('max_referrals_per_user')
-                                    ->label(__('admin.referral_campaigns.max_referrals_per_user'))
-                                    ->numeric()
-                                    ->integer()
-                                    ->nullable()
-                                    ->helperText(__('admin.referral_campaigns.max_referrals_per_user_help')),
-                                TextInput::make('max_total_referrals')
-                                    ->label(__('admin.referral_campaigns.max_total_referrals'))
-                                    ->numeric()
-                                    ->integer()
-                                    ->nullable()
-                                    ->helperText(__('admin.referral_campaigns.max_total_referrals_help')),
-                            ]),
+                    ->columns(2)
+                    ->components([
+                        TextInput::make('reward_amount')
+                            ->label(__('admin.referral_campaigns.reward_amount'))
+                            ->numeric()
+                            ->default(0.0)
+                            ->prefix('€')
+                            ->columnSpan(1),
+                        Select::make('reward_type')
+                            ->label(__('admin.referral_campaigns.reward_type'))
+                            ->options([
+                                'discount' => __('admin.referral_campaigns.reward_types.discount'),
+                                'credit'   => __('admin.referral_campaigns.reward_types.credit'),
+                                'points'   => __('admin.referral_campaigns.reward_types.points'),
+                                'gift'     => __('admin.referral_campaigns.reward_types.gift'),
+                            ])
+                            ->nullable()
+                            ->columnSpan(1),
+                        TextInput::make('max_referrals_per_user')
+                            ->label(__('admin.referral_campaigns.max_referrals_per_user'))
+                            ->numeric()
+                            ->integer()
+                            ->nullable()
+                            ->helperText(__('admin.referral_campaigns.max_referrals_per_user_help'))
+                            ->columnSpan(1),
+                        TextInput::make('max_total_referrals')
+                            ->label(__('admin.referral_campaigns.max_total_referrals'))
+                            ->numeric()
+                            ->integer()
+                            ->nullable()
+                            ->helperText(__('admin.referral_campaigns.max_total_referrals_help'))
+                            ->columnSpan(1),
                     ]),
                 SchemaSection::make(__('admin.referral_campaigns.advanced_settings'))
-                    ->schema([
+                    ->components([
                         KeyValue::make('conditions')
                             ->label(__('admin.referral_campaigns.conditions'))
                             ->keyLabel(__('admin.referral_campaigns.condition_key'))
