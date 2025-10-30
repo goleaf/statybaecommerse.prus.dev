@@ -58,6 +58,7 @@ return [
     'set_as_default_successfully' => 'Валюта успешно назначена основной.',
     'update_rate'                 => 'Обновить курс',
     'rate_updated_successfully'   => 'Курс валюты успешно обновлён.',
+    'rate_update_failed'          => 'Не удалось обновить курс валюты.',
 
     'activate_selected'          => 'Включить выбранные',
     'deactivate_selected'        => 'Отключить выбранные',
@@ -65,4 +66,5 @@ return [
     'bulk_deactivated_success'   => 'Выбранные валюты успешно отключены.',
     'update_rates'               => 'Обновить курсы',
     'rates_updated_successfully' => 'Курсы обмена успешно обновлены.',
+    'rates_update_failed'        => 'Не удалось обновить ни один курс. Проверьте настройки провайдера.',
 ];

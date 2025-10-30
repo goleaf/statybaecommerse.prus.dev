@@ -146,6 +146,15 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
     }
 
     /**
+     * Ensure appended `reserved_quantity` access mirrors the explicit helper logic.
+     */
+    public function getReservedQuantityAttribute(): int
+    {
+        // Delegate to the core calculator so template consumers see consistent numbers.
+        return $this->reservedQuantity();
+    }
+
+    /**
      * Handle availableQuantity functionality with proper error handling.
      */
     public function availableQuantity(): int
@@ -157,11 +166,29 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
     }
 
     /**
+     * Bridge the appended `available_quantity` attribute that Filament infolists expect.
+     */
+    public function getAvailableQuantityAttribute(): int
+    {
+        // Reuse the shared calculator so the accessor and explicit method stay perfectly aligned.
+        return $this->availableQuantity();
+    }
+
+    /**
      * Handle isOutOfStock functionality with proper error handling.
      */
     public function isOutOfStock(): bool
     {
         return $this->availableQuantity() < 1;
+    }
+
+    /**
+     * Provide the appended `is_out_of_stock` attribute expected by resource views.
+     */
+    public function getIsOutOfStockAttribute(): bool
+    {
+        // Route through the shared helper so boolean logic stays centralized.
+        return $this->isOutOfStock();
     }
 
     /**
