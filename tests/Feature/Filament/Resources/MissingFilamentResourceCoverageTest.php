@@ -209,6 +209,17 @@ final class MissingFilamentResourceCoverageTest extends TestCase
         ]);
     }
 
+    private function createCampaignConversionRecord(): CampaignConversion
+    {
+        // Seed a conversion event linking to a marketing campaign so analytics tables surface a row.
+        return CampaignConversion::factory()->create([
+            'conversion_type'  => 'coverage_purchase',
+            'conversion_value' => 123.45,
+            'status'           => 'completed',
+            'session_id'       => 'coverage-session',
+        ]);
+    }
+
     private function createCampaignRecord(): Campaign
     {
         // Generate a simple active campaign so marketing listings show a concrete entry.
@@ -330,6 +341,67 @@ final class MissingFilamentResourceCoverageTest extends TestCase
             'type'  => 'navigation_group',
             'key'   => 'coverage',
             'value' => 'Coverage',
+        ]);
+    }
+
+    private function createInventoryRecord(): Inventory
+    {
+        // Provision a tracked inventory row so warehouse summaries display stock levels.
+        return Inventory::factory()->create([
+            'sku' => 'INV-COVERAGE',
+            'qty' => 42,
+            'meta' => [
+                'reserved'   => 4,
+                'incoming'   => 8,
+                'threshold'  => 5,
+                'is_tracked' => true,
+            ],
+        ]);
+    }
+
+    private function createLegalRecord(): Legal
+    {
+        // Create a published legal document so compliance listings surface a visible policy entry.
+        return Legal::factory()->create([
+            'key'         => 'coverage-terms',
+            'type'        => 'terms_of_use',
+            'is_enabled'  => true,
+            'is_required' => true,
+            'sort_order'  => 1,
+            'published_at' => now()->subDay(),
+        ]);
+    }
+
+    private function createLocationRecord(): Location
+    {
+        // Register a warehouse location so logistics screens have an enabled facility to display.
+        return Location::factory()->create([
+            'name'           => 'Coverage Warehouse',
+            'slug'           => 'coverage-warehouse',
+            'code'           => 'COV',
+            'address_line_1' => '1 Coverage Way',
+            'city'           => 'Vilnius',
+            'country_code'   => null,
+            'is_enabled'     => true,
+        ]);
+    }
+
+    private function createNewsImageRecord(): NewsImage
+    {
+        // Persist a featured news image so media management tables render preview metadata.
+        return NewsImage::factory()->featured()->create([
+            'file_path' => 'news-images/coverage-hero.jpg',
+            'caption'   => 'Coverage Hero Image',
+            'alt_text'  => 'Coverage alt text',
+        ]);
+    }
+
+    private function createNewsTagRecord(): NewsTag
+    {
+        // Create an active, visible tag to populate editorial taxonomy listings.
+        return NewsTag::factory()->active()->create([
+            'name' => 'Coverage Tag',
+            'slug' => 'coverage-tag',
         ]);
     }
 
