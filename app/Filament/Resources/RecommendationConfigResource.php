@@ -88,22 +88,34 @@ final class RecommendationConfigResource extends Resource
                         ->schema([
                             TextInput::make('min_score')
                                 ->label(__('recommendation_config.fields.min_score'))
-                                ->numeric(),
+                                ->numeric()
+                                // Mirror the database default so blank create forms hydrate deterministic values.
+                                ->default(0.1),
                             TextInput::make('max_results')
                                 ->label(__('recommendation_config.fields.max_results'))
-                                ->numeric(),
+                                ->numeric()
+                                // Keep max results aligned with schema defaults to avoid null assignments during creation.
+                                ->default(10),
                             TextInput::make('decay_factor')
                                 ->label(__('recommendation_config.fields.decay_factor'))
-                                ->numeric(),
+                                ->numeric()
+                                // Provide a sensible baseline decay factor while still allowing operators to fine-tune it.
+                                ->default(0.9),
                             TextInput::make('priority')
                                 ->label(__('recommendation_config.fields.priority'))
-                                ->numeric(),
+                                ->numeric()
+                                // Prevent null persistence on the NOT NULL column by defaulting to zero priority ordering.
+                                ->default(0),
                             TextInput::make('cache_ttl')
                                 ->label(__('recommendation_config.fields.cache_ttl'))
-                                ->numeric(),
+                                ->numeric()
+                                // Respect the 3600 second cache default defined at the database layer.
+                                ->default(3600),
                             TextInput::make('sort_order')
                                 ->label(__('recommendation_config.fields.sort_order'))
-                                ->numeric(),
+                                ->numeric()
+                                // Ensure sort order stays deterministic without forcing the user to enter a value manually.
+                                ->default(0),
                         ]),
                 ]),
             SchemaSection::make(__('recommendation_config.sections.flags'))

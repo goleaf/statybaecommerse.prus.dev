@@ -46,6 +46,8 @@ This repository mixes Laravel 12 and Filament v4 code. Use the following guardra
 - **Documentation diligence**: After completing fixes or features, review the contents of `docs/` for any references that need
   refreshing (runbooks, audits, closure notes). Update the relevant markdown files to mirror the behaviour you introduced and
   extend agent instructions when new recurring rules emerge.
+- **Filament form defaults**: When a Filament form field maps to a database column with a NOT NULL constraint, provide a
+  sensible default value so validation runs before persistence instead of tripping integrity errors during creation flows.
 - **Placeholder test coverage**: The QA dashboards now reference the `DashboardFixtureTest` identifiers, with unit,
   Livewire, Filament, and HTTP smoke tests renamed accordingly. Keep the mocked payloads inside
   `tests/Feature/TestResults*` aligned with `Tests\Feature\DashboardFixtureTest::*` so monitoring scripts render the expected
