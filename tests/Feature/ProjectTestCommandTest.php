@@ -211,9 +211,9 @@ it('feature: test status page displays results when available', function () {
             'current_index'   => 2,
         ],
         'tests' => [
-            'Tests\Unit\ExampleTest::testExample' => [
-                'id'                => 'Tests\Unit\ExampleTest::testExample',
-                'hash'              => md5('Tests\Unit\ExampleTest::testExample'),
+            'Tests\Unit\BaselinePlaceholderTest::placeholder_runs' => [
+                'id'                => 'Tests\Unit\BaselinePlaceholderTest::placeholder_runs',
+                'hash'              => md5('Tests\Unit\BaselinePlaceholderTest::placeholder_runs'),
                 'groups'            => [],
                 'status'            => 'passed',
                 'output'            => 'Test passed successfully',
@@ -231,7 +231,7 @@ it('feature: test status page displays results when available', function () {
             ],
         ],
         'order' => [
-            'Tests\Unit\ExampleTest::testExample',
+            'Tests\Unit\BaselinePlaceholderTest::placeholder_runs',
             // Reference the renamed dashboard placeholder so the mocked
             // ordering mirrors the new class name and method signature.
             'Tests\Feature\DashboardFixtureTest::it_passes',
@@ -242,7 +242,7 @@ it('feature: test status page displays results when available', function () {
     $response = $this->get(route('test-results'));
 
     $response->assertSuccessful();
-    $response->assertSee('Tests\Unit\ExampleTest::testExample');
+    $response->assertSee('Tests\Unit\BaselinePlaceholderTest::placeholder_runs');
     $response->assertSee('Tests\Feature\DashboardFixtureTest::it_passes');
     $response->assertSee(__('frontend.test_results.status.passed'));
     $response->assertSee(__('frontend.test_results.status.failed'));

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Enums\OrderStatus;
 use App\Filament\Resources\AnalyticsResource\Pages;
 use App\Models\Order;
 use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
@@ -25,6 +26,11 @@ use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTransla
 final class AnalyticsResource extends Resource
 {
     use SpatieTranslatableResource;  // Align translation support with other resources.
+
+    /**
+     * Anchor the resource to the Order model so Filament resolves queries without inferring a non-existent Analytics model.
+     */
+    protected static ?string $model = Order::class;
 
     // Use base Resource properties for navigation icon/group to avoid type conflicts in PHP.
 
@@ -131,12 +137,22 @@ final class AnalyticsResource extends Resource
                     ->label(__('analytics.status'))
                     ->sortable()
                     ->badge()
-                    ->formatStateUsing(static fn (string $state): string => __('analytics.' . strtolower($state)))
-                    ->color(static fn (string $state): string => match ($state) {
-                        'completed', 'delivered' => 'success',
-                        'pending' => 'warning',
-                        'cancelled', 'refunded' => 'danger',
-                        default => 'gray',
+                    ->formatStateUsing(static function (OrderStatus|string $state): string {
+                        // Normalise enum-backed states into simple translation keys before rendering.
+                        $value = $state instanceof OrderStatus ? $state->value : $state;
+
+                        return __('analytics.' . strtolower($value));
+                    })
+                    ->color(static function (OrderStatus|string $state): string {
+                        // Reuse the normalised value so badge colours remain stable for enums and raw strings alike.
+                        $value = $state instanceof OrderStatus ? $state->value : $state;
+
+                        return match ($value) {
+                            'completed', 'delivered' => 'success',
+                            'pending' => 'warning',
+                            'cancelled', 'refunded' => 'danger',
+                            default => 'gray',
+                        };
                     })
                     ->toggleable(),
                 // Maintain timestamps for auditing and allow toggling visibility per user preference.
@@ -202,7 +218,15 @@ final class AnalyticsResource extends Resource
                 // Provide chronological grouping by month for period-over-period reviews.
                 Group::make('created_at')
                     ->label(__('analytics.month'))
-                    ->date('Y-m'),
+                    ->date()
+                    ->getTitleFromRecordUsing(static function (Order $record): string {
+                        // Translate the stored timestamp into a YYYY-MM label without triggering Filament's bool-only date() API.
+                        return optional($record->created_at)?->translatedFormat('Y-m') ?? __('analytics.month');
+                    })
+                    ->getKeyFromRecordUsing(static function (Order $record): ?string {
+                        // Normalise the grouping key to the same YYYY-MM string used for the display title.
+                        return optional($record->created_at)?->format('Y-m');
+                    }),
             ])
             ->defaultSort('created_at', 'desc')
             ->actions([

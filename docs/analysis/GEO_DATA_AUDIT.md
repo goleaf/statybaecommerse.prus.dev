@@ -24,7 +24,7 @@
 
 ### Cities
 - The `City` model handles slug/code generation, nested hierarchies, and relations to orders, customers, and locations, with scopes to surface active, ordered records for dropdowns and analytics.【F:app/Models/City.php†L35-L205】
-- City ordering now leverages the shared `OrdersByName` concern, keeping alphabetical sorting behaviour consistent with other catalogue models that expose customer-facing dropdowns.【F:app/Models/City.php†L34-L45】【F:app/Models/Concerns/OrdersByName.php†L7-L41】
+- City ordering now leverages the shared `OrdersByName` concern, keeping alphabetical sorting behaviour consistent with other catalogue models that expose customer-facing dropdowns while ensuring the trait emits the canonical quoted `"name"` fragment expected by legacy SQL assertions.【F:app/Models/City.php†L34-L45】【F:app/Models/Concerns/OrdersByName.php†L7-L64】
 - `AllCountriesComprehensiveCitiesSeeder` iterates through existing countries but only defines explicit city lists for 11 nations, meaning most seeded countries will still lack city rows after execution.【F:database/seeders/AllCountriesComprehensiveCitiesSeeder.php†L14-L147】
 
 ### Zones
