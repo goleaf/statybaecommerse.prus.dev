@@ -32,6 +32,9 @@ The model-focused regression suite is a quick indicator that Eloquent scopes, ca
 - The test harness now provisions a deterministic application key and exposes the Slider Analytics navigation label via the
   shared error template so Filament dashboard assertions can execute without failing on missing environment state or
   asynchronous widget hydration. Keep those helpers in mind if you migrate to a bespoke testing bootstrap.
+- Guard-aware regression tests now validate both the authorization seeder and the Filament role resource guard selector, so
+  adjust `tests/Feature/Seeders/AdminAuthorizationSeederTest.php` and
+  `tests/Feature/Filament/Resources/RoleResourceGuardOptionsTest.php` whenever the guard configuration shifts.
 - Order factories now lean on deterministic counters and core PHP helpers instead of Faker formatters because the bundled generator ships without the legacy providers; mirror the counter-driven identifiers and static address data when crafting bespoke fixtures so CI environments stay stable.
 - Bulk customer seeding mirrors this determinism by issuing sequential `Customer 00001` style names and `customer#####@example.com` emails while keeping paired shipping/billing addresses in sync; reuse the seeded format when crafting manual fixtures so tests that assert on the convention stay reliable.【F:database/seeders/BulkCustomerSeeder.php†L28-L75】【F:database/factories/UserFactory.php†L31-L115】
 - Filament table actions that rely on modal forms now require Livewire tests to mount the action, populate the form state, and then execute the mounted action. Use the `mountTableAction`/`setTableActionData` helpers (or their bulk equivalents) instead of calling `callTableAction` with raw data so validation hooks receive the intended payload.
