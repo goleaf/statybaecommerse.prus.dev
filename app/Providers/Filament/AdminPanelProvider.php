@@ -344,11 +344,14 @@ final class AdminPanelProvider extends PanelProvider
 
         foreach ($discoveredGroups as $group) {
             $override = $overrides[$group['key']] ?? null;
-            $label = $override['label'] ?? $group['label'];
+
+            $labelSource = $override['label'] ?? $group['label'] ?? null;
+            $label = $this->normalizeGroupLabel($labelSource, $group['label_key'] ?? $group['key'] ?? 'Navigation');
+
             $icon = $override['icon'] ?? $group['icon'];
             $collapsed = $override['collapsed'] ?? false;
 
-            $navigationGroup = NavigationGroup::make()->label(__($label));
+            $navigationGroup = NavigationGroup::make()->label($label);
 
             if (! empty($icon)) {
                 $navigationGroup->icon($icon);
@@ -364,8 +367,9 @@ final class AdminPanelProvider extends PanelProvider
         }
 
         foreach (array_merge(array_values($overrides), $extras) as $group) {
-            $navigationGroup = NavigationGroup::make()
-                ->label(__($group['label'] ?? ''));
+            $label = $this->normalizeGroupLabel($group['label'] ?? null, $group['key'] ?? 'Navigation');
+
+            $navigationGroup = NavigationGroup::make()->label($label);
 
             if (! empty($group['icon'])) {
                 $navigationGroup->icon($group['icon']);
@@ -417,5 +421,30 @@ final class AdminPanelProvider extends PanelProvider
         }
 
         return $plugin;
+    }
+
+    /**
+     * Normalize a group label to a safe string for Filament NavigationGroup::label().
+     */
+    private function normalizeGroupLabel(mixed $label, string $fallback): string
+    {
+        // If translation array slipped in, fall back to a deterministic string.
+        if (is_array($label)) {
+            return $fallback;
+        }
+
+        // If it looks like a translation key, try to translate; if that yields an array, fall back.
+        if (is_string($label) && $label !== '') {
+            $resolved = __($label);
+
+            if (is_array($resolved)) {
+                return $fallback;
+            }
+
+            return (string) $resolved;
+        }
+
+        // Anything else (null, numbers, objects without __toString): use fallback.
+        return $fallback;
     }
 }

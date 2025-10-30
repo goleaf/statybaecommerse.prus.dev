@@ -17,20 +17,43 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
+use Tests\TestCase;
 
-class VariantImageResourceTest extends TestCase
+final class VariantImageResourceTest extends TestCase
 {
     use RefreshDatabase;
+
+    /**
+     * Authenticated administrator account for driving Filament interactions.
+     */
+    private User $adminUser;
+
+    /**
+     * Canonical product variant reference reused across individual scenarios.
+     */
+    private ProductVariant $productVariant;
+
+    /**
+     * Seeded variant image baseline that actions and filters operate against.
+     */
+    private VariantImage $variantImage;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        // Create a test user
-        $this->user = User::factory()->create([
-            'email' => 'admin@example.com',
-            'name'  => 'Admin User',
+        // Ensure Filament resolves the admin panel configuration required for resource pages.
+        $this->resolveAdminPanel();
+
+        // Provision an administrator so every table/form assertion runs with the correct guard.
+        $this->adminUser = User::factory()->create([
+            'email'    => 'admin@example.com',
+            'name'     => 'Admin User',
+            'is_admin' => true,
         ]);
+
+        // Switch the test guard to the privileged user before interacting with Livewire components.
+        $this->actingAs($this->adminUser);
 
         // Create test product variant
         $this->productVariant = ProductVariant::factory()->create([
@@ -51,8 +74,6 @@ class VariantImageResourceTest extends TestCase
 
     public function test_can_list_variant_images(): void
     {
-        $this->actingAs($this->user);
-
         Livewire::test(ListVariantImages::class)
             ->assertCanSeeTableRecords([$this->variantImage])
             ->assertCanRenderTableColumn('image_path')
@@ -65,8 +86,6 @@ class VariantImageResourceTest extends TestCase
 
     public function test_can_create_variant_image(): void
     {
-        $this->actingAs($this->user);
-
         Storage::fake(SecureStorage::disk());
 
         $imageFile = UploadedFile::fake()->image('test-image.jpg', 800, 600);
@@ -95,8 +114,6 @@ class VariantImageResourceTest extends TestCase
 
     public function test_metadata_is_populated_for_uploaded_images(): void
     {
-        $this->actingAs($this->user);
-
         Storage::fake(SecureStorage::disk());
 
         $imageFile = UploadedFile::fake()->image('meta-image.jpg', 320, 240);
@@ -126,8 +143,6 @@ class VariantImageResourceTest extends TestCase
 
     public function test_can_edit_variant_image(): void
     {
-        $this->actingAs($this->user);
-
         Livewire::test(EditVariantImage::class, ['record' => $this->variantImage->id])
             ->fillForm([
                 'alt_text'    => 'Updated Alt Text',
@@ -150,16 +165,12 @@ class VariantImageResourceTest extends TestCase
 
     public function test_can_view_variant_image(): void
     {
-        $this->actingAs($this->user);
-
         Livewire::test(ViewVariantImage::class, ['record' => $this->variantImage->id])
             ->assertCanSeeRecord($this->variantImage);
     }
 
     public function test_can_delete_variant_image(): void
     {
-        $this->actingAs($this->user);
-
         Livewire::test(ListVariantImages::class)
             ->callTableAction('delete', $this->variantImage);
 
@@ -170,8 +181,6 @@ class VariantImageResourceTest extends TestCase
 
     public function test_can_set_as_primary_action(): void
     {
-        $this->actingAs($this->user);
-
         // Create another image for the same variant
         $anotherImage = VariantImage::factory()->create([
             'variant_id' => $this->productVariant->id,
@@ -196,8 +205,6 @@ class VariantImageResourceTest extends TestCase
 
     public function test_can_toggle_active_action(): void
     {
-        $this->actingAs($this->user);
-
         Livewire::test(ListVariantImages::class)
             ->callTableAction('toggle_active', $this->variantImage);
 
@@ -209,8 +216,6 @@ class VariantImageResourceTest extends TestCase
 
     public function test_can_duplicate_variant_image(): void
     {
-        $this->actingAs($this->user);
-
         Livewire::test(ListVariantImages::class)
             ->callTableAction('duplicate', $this->variantImage);
 
@@ -223,8 +228,6 @@ class VariantImageResourceTest extends TestCase
 
     public function test_can_filter_by_variant(): void
     {
-        $this->actingAs($this->user);
-
         // Create another variant and image
         $anotherVariant = ProductVariant::factory()->create();
         $anotherImage = VariantImage::factory()->create([
@@ -239,8 +242,6 @@ class VariantImageResourceTest extends TestCase
 
     public function test_can_filter_by_primary_status(): void
     {
-        $this->actingAs($this->user);
-
         // Create a non-primary image
         $nonPrimaryImage = VariantImage::factory()->create([
             'variant_id' => $this->productVariant->id,
@@ -255,8 +256,6 @@ class VariantImageResourceTest extends TestCase
 
     public function test_can_filter_by_active_status(): void
     {
-        $this->actingAs($this->user);
-
         // Create an inactive image
         $inactiveImage = VariantImage::factory()->create([
             'variant_id' => $this->productVariant->id,
@@ -271,8 +270,6 @@ class VariantImageResourceTest extends TestCase
 
     public function test_can_bulk_activate_images(): void
     {
-        $this->actingAs($this->user);
-
         // Create inactive images
         $inactiveImages = VariantImage::factory()->count(3)->create([
             'variant_id' => $this->productVariant->id,
@@ -292,8 +289,6 @@ class VariantImageResourceTest extends TestCase
 
     public function test_can_bulk_deactivate_images(): void
     {
-        $this->actingAs($this->user);
-
         // Create active images
         $activeImages = VariantImage::factory()->count(3)->create([
             'variant_id' => $this->productVariant->id,
@@ -313,8 +308,6 @@ class VariantImageResourceTest extends TestCase
 
     public function test_can_bulk_reorder_images(): void
     {
-        $this->actingAs($this->user);
-
         // Create images with different sort orders
         $images = VariantImage::factory()->count(3)->create([
             'variant_id' => $this->productVariant->id,
@@ -333,8 +326,6 @@ class VariantImageResourceTest extends TestCase
 
     public function test_can_bulk_set_primary_images(): void
     {
-        $this->actingAs($this->user);
-
         // Create images from different variants
         $variant1 = ProductVariant::factory()->create();
         $variant2 = ProductVariant::factory()->create();
@@ -356,8 +347,6 @@ class VariantImageResourceTest extends TestCase
 
     public function test_can_bulk_delete_images(): void
     {
-        $this->actingAs($this->user);
-
         // Create images to delete
         $imagesToDelete = VariantImage::factory()->count(3)->create([
             'variant_id' => $this->productVariant->id,
@@ -375,8 +364,6 @@ class VariantImageResourceTest extends TestCase
 
     public function test_form_validation_works(): void
     {
-        $this->actingAs($this->user);
-
         Livewire::test(CreateVariantImage::class)
             ->fillForm([
                 'variant_id' => null, // Required field
@@ -388,8 +375,6 @@ class VariantImageResourceTest extends TestCase
 
     public function test_auto_sort_order_generation(): void
     {
-        $this->actingAs($this->user);
-
         // Create images with specific sort orders
         VariantImage::factory()->create([
             'variant_id' => $this->productVariant->id,

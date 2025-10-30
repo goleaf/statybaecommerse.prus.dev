@@ -58,6 +58,7 @@ return [
     'set_as_default_successfully' => 'Valiuta sėkmingai nustatyta kaip numatytoji.',
     'update_rate'                 => 'Atnaujinti kursą',
     'rate_updated_successfully'   => 'Valiutos kursas sėkmingai atnaujintas.',
+    'rate_update_failed'          => 'Nepavyko atnaujinti valiutos kurso.',
 
     'activate_selected'          => 'Įjungti pažymėtas',
     'deactivate_selected'        => 'Išjungti pažymėtas',
@@ -65,4 +66,5 @@ return [
     'bulk_deactivated_success'   => 'Pasirinktos valiutos sėkmingai išjungtos.',
     'update_rates'               => 'Atnaujinti kursus',
     'rates_updated_successfully' => 'Keitimo kursai sėkmingai atnaujinti.',
+    'rates_update_failed'        => 'Nepavyko atnaujinti jokių valiutų kursų. Patikrinkite tiekėjo nustatymus.',
 ];
