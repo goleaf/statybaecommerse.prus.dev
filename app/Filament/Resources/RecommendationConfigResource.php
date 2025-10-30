@@ -16,11 +16,13 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Schemas\Schema;
+use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Support\Collection;
 use Novadaemon\FilamentCombobox\Combobox;
 use UnitEnum;
 
@@ -64,7 +66,10 @@ final class RecommendationConfigResource extends Resource
                             TextInput::make('name')
                                 ->label(__('recommendation_config.fields.name'))
                                 ->required()
-                                ->maxLength(255),
+                                ->maxLength(255)
+                                // Guard against duplicate configuration names so the Livewire test never trips a database
+                                // unique constraint when attempting to create an existing record.
+                                ->unique(RecommendationConfig::class, 'name', ignoreRecord: true),
                             Select::make('type')
                                 ->label(__('recommendation_config.fields.type'))
                                 ->options([
@@ -156,6 +161,41 @@ final class RecommendationConfigResource extends Resource
     public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
+        // Pre-build bulk action definitions so they can be referenced consistently below and keep table configuration tidy.
+        $activateAction = BulkAction::make('activate')
+            ->label(__('recommendation_config.actions.activate_selected'))
+            ->icon('heroicon-m-bolt')
+            ->color('success')
+            // Apply the activation flag to every selected record so the table bulk action mirrors the tests' expectations.
+            ->action(static function (Collection $records): void {
+                foreach ($records as $record) {
+                    if (! $record instanceof RecommendationConfig) {
+                        // Skip unexpected payloads so bulk activation never crashes when the collection is re-typed elsewhere.
+                        continue;
+                    }
+
+                    $record->forceFill(['is_active' => true])->save();
+                }
+            })
+            ->deselectRecordsAfterCompletion();
+
+        $deactivateAction = BulkAction::make('deactivate')
+            ->label(__('recommendation_config.actions.deactivate_selected'))
+            ->icon('heroicon-m-pause')
+            ->color('warning')
+            // Flip the activation flag off for each selected record while leaving other attributes untouched.
+            ->action(static function (Collection $records): void {
+                foreach ($records as $record) {
+                    if (! $record instanceof RecommendationConfig) {
+                        // Mirror the guardrail from the activation bulk action to keep type-safety consistent.
+                        continue;
+                    }
+
+                    $record->forceFill(['is_active' => false])->save();
+                }
+            })
+            ->deselectRecordsAfterCompletion();
+
         return $table
             ->columns([
                 TextColumn::make('name')
