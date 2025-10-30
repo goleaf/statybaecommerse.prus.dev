@@ -8,16 +8,18 @@ use App\Filament\Resources\ReferralRewardResource\Pages;
 use App\Models\ReferralReward;
 use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use BackedEnum;
+use Filament\Forms;
+use Filament\Infolists;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
+use Filament\Tables;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -178,7 +180,7 @@ final class ReferralRewardResource extends Resource
                     ->label(__('referral_rewards.fields.type'))
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('amount')
+                Tables\Columns\TextColumn::make('amount')
                     ->money(fn (ReferralReward $record): string => $record->currency_code)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('status')
