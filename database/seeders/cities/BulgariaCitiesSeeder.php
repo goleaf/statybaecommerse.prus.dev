@@ -4,23 +4,24 @@ declare(strict_types=1);
 
 namespace Database\Seeders\Cities;
 
-use App\Models\City;
-use App\Models\Country;
-use App\Models\Translations\CityTranslation;
+use App\Support\Locales;
 use Illuminate\Database\Seeder;
 
 final class BulgariaCitiesSeeder extends Seeder
 {
-    public function run(): void
+    public static function iso2(): string
     {
-        $country = Country::where('cca2', 'BG')->first();
-        if (! $country) {
-            $this->command->warn('Bulgaria country not found. Please run CountrySeeder first.');
+        // Expose the ISO2 country code so the city toolkit can resolve the related country record.
+        return 'BG';
+    }
 
-            return;
-        }
-
-        $cities = [
+    /**
+     * @return iterable<array<string, mixed>>
+     */
+    public static function data(): iterable
+    {
+        // The dataset is preserved verbatim from the legacy seeder to keep curated ordering intact.
+        return [
             ['code' => 'BG-SOF', 'slug' => 'sofia', 'name' => ['lt' => 'Sofija', 'en' => 'Sofia'], 'description' => 'Capital of ', 'is_capital' => true, 'latitude' => 42.6977, 'longitude' => 23.3219, 'population' => 1241675],
             ['code' => 'BG-PLO', 'slug' => 'plovdiv', 'name' => ['lt' => 'Plovdivas', 'en' => 'Plovdiv'], 'description' => 'Capital of ', 'is_capital' => false, 'latitude' => 42.1354, 'longitude' => 24.7453, 'population' => 346893],
             ['code' => 'BG-VAR', 'slug' => 'varna', 'name' => ['lt' => 'Varna', 'en' => 'Varna'], 'description' => 'Capital of ', 'is_capital' => false, 'latitude' => 43.2141, 'longitude' => 27.9147, 'population' => 335177],
@@ -32,31 +33,13 @@ final class BulgariaCitiesSeeder extends Seeder
             ['code' => 'BG-DOB', 'slug' => 'dobrich', 'name' => ['lt' => 'Dobričas', 'en' => 'Dobrich'], 'description' => 'Capital of ', 'is_capital' => false, 'latitude' => 43.5726, 'longitude' => 27.8273, 'population' => 90000],
             ['code' => 'BG-SHU', 'slug' => 'shumen', 'name' => ['lt' => 'Šumenas', 'en' => 'Shumen'], 'description' => 'Capital of ', 'is_capital' => false, 'latitude' => 43.2706, 'longitude' => 26.9361, 'population' => 80000],
         ];
+    }
 
-        foreach ($cities as $cityData) {
-            $city = City::updateOrCreate(
-                ['code' => $cityData['code']],
-                array_merge($cityData, [
-                    'country_id' => $country->id,
-                    'name'       => $cityData['name']['en'],
-                    'slug'       => $cityData['slug'],
-                    'is_enabled' => true,
-                    'is_default' => false,
-                ])
-            );
+    public function run(): void
+    {
+        $locales = Locales::supported();
 
-            // Create translations
-            foreach (['lt', 'en'] as $locale) {
-                CityTranslation::updateOrCreate([
-                    'city_id' => $city->id,
-                    'locale'  => $locale,
-                ], [
-                    'name'        => $cityData['name'][$locale] ?? $cityData['name']['en'],
-                    'description' => $cityData['description'][$locale] ?? '',
-                ]);
-            }
-        }
-
-        $this->command->info('Bulgaria cities seeded successfully.');
+        // Centralise insert/update logic through the shared toolkit for consistency across countries.
+        CitySeederToolkit::upsertForCountry(self::iso2(), self::data(), $locales);
     }
 }

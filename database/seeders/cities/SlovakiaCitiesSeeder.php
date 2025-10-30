@@ -4,23 +4,24 @@ declare(strict_types=1);
 
 namespace Database\Seeders\Cities;
 
-use App\Models\City;
-use App\Models\Country;
-use App\Models\Translations\CityTranslation;
+use App\Support\Locales;
 use Illuminate\Database\Seeder;
 
 final class SlovakiaCitiesSeeder extends Seeder
 {
-    public function run(): void
+    public static function iso2(): string
     {
-        $country = Country::where('cca2', 'SK')->first();
-        if (! $country) {
-            $this->command->warn('Slovakia country not found. Please run CountrySeeder first.');
+        // Expose the ISO2 country code so the city toolkit can resolve the related country record.
+        return 'SK';
+    }
 
-            return;
-        }
-
-        $cities = [
+    /**
+     * @return iterable<array<string, mixed>>
+     */
+    public static function data(): iterable
+    {
+        // The dataset is preserved verbatim from the legacy seeder to keep curated ordering intact.
+        return [
             ['code' => 'SK-BRA', 'slug' => 'bratislava', 'name' => ['lt' => 'Bratislava', 'en' => 'Bratislava'], 'description' => 'Capital of ', 'is_capital' => true, 'latitude' => 48.1486, 'longitude' => 17.1077, 'population' => 475503],
             ['code' => 'SK-KOS', 'slug' => 'kosice', 'name' => ['lt' => 'Košice', 'en' => 'Košice'], 'description' => 'Capital of ', 'is_capital' => false, 'latitude' => 48.7164, 'longitude' => 21.2611, 'population' => 238593],
             ['code' => 'SK-PRE', 'slug' => 'presov', 'name' => ['lt' => 'Prešovas', 'en' => 'Prešov'], 'description' => 'Capital of ', 'is_capital' => false, 'latitude' => 49.0017, 'longitude' => 21.2394, 'population' => 88898],
@@ -32,31 +33,13 @@ final class SlovakiaCitiesSeeder extends Seeder
             ['code' => 'SK-TRE', 'slug' => 'trencin', 'name' => ['lt' => 'Trenčinas', 'en' => 'Trenčín'], 'description' => 'Capital of ', 'is_capital' => false, 'latitude' => 48.8944, 'longitude' => 18.0406, 'population' => 55000],
             ['code' => 'SK-POP', 'slug' => 'poprad', 'name' => ['lt' => 'Popradas', 'en' => 'Poprad'], 'description' => 'Capital of ', 'is_capital' => false, 'latitude' => 49.0614, 'longitude' => 20.2978, 'population' => 52000],
         ];
+    }
 
-        foreach ($cities as $cityData) {
-            $city = City::updateOrCreate(
-                ['code' => $cityData['code']],
-                array_merge($cityData, [
-                    'country_id' => $country->id,
-                    'name'       => $cityData['name']['en'],
-                    'slug'       => $cityData['slug'],
-                    'is_enabled' => true,
-                    'is_default' => false,
-                ])
-            );
+    public function run(): void
+    {
+        $locales = Locales::supported();
 
-            // Create translations
-            foreach (['lt', 'en'] as $locale) {
-                CityTranslation::updateOrCreate([
-                    'city_id' => $city->id,
-                    'locale'  => $locale,
-                ], [
-                    'name'        => $cityData['name'][$locale] ?? $cityData['name']['en'],
-                    'description' => $cityData['description'][$locale] ?? '',
-                ]);
-            }
-        }
-
-        $this->command->info('Slovakia cities seeded successfully.');
+        // Centralise insert/update logic through the shared toolkit for consistency across countries.
+        CitySeederToolkit::upsertForCountry(self::iso2(), self::data(), $locales);
     }
 }

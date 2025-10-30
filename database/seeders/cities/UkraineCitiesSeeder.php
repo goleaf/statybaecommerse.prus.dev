@@ -4,23 +4,24 @@ declare(strict_types=1);
 
 namespace Database\Seeders\Cities;
 
-use App\Models\City;
-use App\Models\Country;
-use App\Models\Translations\CityTranslation;
+use App\Support\Locales;
 use Illuminate\Database\Seeder;
 
 final class UkraineCitiesSeeder extends Seeder
 {
-    public function run(): void
+    public static function iso2(): string
     {
-        $country = Country::where('cca2', 'UA')->first();
-        if (! $country) {
-            $this->command->warn('Ukraine country not found. Please run CountrySeeder first.');
+        // Expose the ISO2 country code so the city toolkit can resolve the related country record.
+        return 'UA';
+    }
 
-            return;
-        }
-
-        $cities = [
+    /**
+     * @return iterable<array<string, mixed>>
+     */
+    public static function data(): iterable
+    {
+        // The dataset is preserved verbatim from the legacy seeder to keep curated ordering intact.
+        return [
             ['code' => 'UA-KIE', 'slug' => 'kyiv', 'name' => ['lt' => 'Kijevas', 'en' => 'Kyiv'], 'description' => 'Capital of ', 'is_capital' => true, 'latitude' => 50.4501, 'longitude' => 30.5234, 'population' => 2967360],
             ['code' => 'UA-KHA', 'slug' => 'kharkiv', 'name' => ['lt' => 'Charkivas', 'en' => 'Kharkiv'], 'description' => 'Capital of ', 'is_capital' => false, 'latitude' => 49.9935, 'longitude' => 36.2304, 'population' => 1441057],
             ['code' => 'UA-ODS', 'slug' => 'odessa', 'name' => ['lt' => 'Odesa', 'en' => 'Odesa'], 'description' => 'Capital of ', 'is_capital' => false, 'latitude' => 46.4825, 'longitude' => 30.7233, 'population' => 1015826],
@@ -32,31 +33,13 @@ final class UkraineCitiesSeeder extends Seeder
             ['code' => 'UA-MYK', 'slug' => 'mykolaiv', 'name' => ['lt' => 'Mykolajivas', 'en' => 'Mykolaiv'], 'description' => 'Capital of ', 'is_capital' => false, 'latitude' => 46.9750, 'longitude' => 31.9946, 'population' => 480080],
             ['code' => 'UA-MAR', 'slug' => 'mariupol', 'name' => ['lt' => 'Mariupolis', 'en' => 'Mariupol'], 'description' => 'Capital of ', 'is_capital' => false, 'latitude' => 47.0961, 'longitude' => 37.5562, 'population' => 431859],
         ];
+    }
 
-        foreach ($cities as $cityData) {
-            $city = City::updateOrCreate(
-                ['code' => $cityData['code']],
-                array_merge($cityData, [
-                    'country_id' => $country->id,
-                    'name'       => $cityData['name']['en'],
-                    'slug'       => $cityData['slug'],
-                    'is_enabled' => true,
-                    'is_default' => false,
-                ])
-            );
+    public function run(): void
+    {
+        $locales = Locales::supported();
 
-            // Create translations
-            foreach (['lt', 'en'] as $locale) {
-                CityTranslation::updateOrCreate([
-                    'city_id' => $city->id,
-                    'locale'  => $locale,
-                ], [
-                    'name'        => $cityData['name'][$locale] ?? $cityData['name']['en'],
-                    'description' => $cityData['description'][$locale] ?? '',
-                ]);
-            }
-        }
-
-        $this->command->info('Ukraine cities seeded successfully.');
+        // Centralise insert/update logic through the shared toolkit for consistency across countries.
+        CitySeederToolkit::upsertForCountry(self::iso2(), self::data(), $locales);
     }
 }
