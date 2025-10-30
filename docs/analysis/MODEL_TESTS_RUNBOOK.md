@@ -54,8 +54,8 @@ The model-focused regression suite is a quick indicator that Eloquent scopes, ca
 
 ## Dashboard Fixture Placeholders
 
-- Historical dashboards still surface `Tests\Feature\ExampleTest` identifiers, but the
-  source data now ships exclusively through the JSON fixtures consumed by the test results
+- Historical dashboards now surface `Tests\Feature\DashboardFixtureTest` identifiers, with
+  the source data continuing to ship through the JSON fixtures consumed by the test results
   feature tests. Maintain the mocked payloads in `tests/Feature/TestResults*` so the
   expected identifiers remain visible even though the dedicated feature test class has been
   retired. Continue keeping the remaining placeholder files in `tests/Unit`,
