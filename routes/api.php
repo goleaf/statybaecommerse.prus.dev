@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Http\Controllers\Api\AuditLogController;
 use App\Http\Controllers\Api\AuthenticatedUserController;
 use App\Http\Controllers\Api\AutocompleteSearchController;
+use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ExportDownloadController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\OrderController;
@@ -61,6 +62,26 @@ Route::prefix('products')
 
         Route::get('{product:slug}', [ProductController::class, 'show'])
             ->middleware('throttle:api.read')
+            ->name('show');
+    });
+
+Route::prefix('categories')
+    ->name('api.categories.')
+    ->group(function (): void {
+        Route::get('/', [CategoryController::class, 'index'])
+            ->middleware('throttle:api.read')
+            // Apply the shared read throttle so catalogue listings stay predictable under load.
+            ->name('index');
+
+        Route::get('tree', [CategoryController::class, 'tree'])
+            ->middleware('throttle:api.read')
+            // Keep the literal `tree` slug dedicated to this endpoint so implicit binding never steals the request.
+            ->name('tree');
+
+        Route::get('{category:slug}', [CategoryController::class, 'show'])
+            ->middleware('throttle:api.read')
+            // Use a regex guard so user-provided slugs cannot shadow the static tree endpoint.
+            ->where('category', '^(?!tree$)[A-Za-z0-9\-]+$')
             ->name('show');
     });
 
