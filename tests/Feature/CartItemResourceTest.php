@@ -357,9 +357,11 @@ final class CartItemResourceTest extends BaseTestCase
         Livewire::test(ListRecords::class, [
             'resource' => CartItemResource::class,
         ])
-            ->callTableAction('update_quantity', $cartItem, [
+            ->mountTableAction('update_quantity', $cartItem)
+            ->setTableActionData([
                 'quantity' => 5,
             ])
+            ->callMountedTableAction()
             ->assertNotified();
 
         $cartItem->refresh();
@@ -429,9 +431,11 @@ final class CartItemResourceTest extends BaseTestCase
         Livewire::test(ListRecords::class, [
             'resource' => CartItemResource::class,
         ])
-            ->callTableBulkAction('update_quantities', [$cartItem1, $cartItem2], [
+            ->mountTableBulkAction('update_quantities', [$cartItem1, $cartItem2])
+            ->setTableBulkActionData([
                 'quantity' => 5,
             ])
+            ->callMountedTableBulkAction()
             ->assertNotified();
 
         $cartItem1->refresh();

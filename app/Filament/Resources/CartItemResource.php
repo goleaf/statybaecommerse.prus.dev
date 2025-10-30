@@ -439,21 +439,14 @@ final class CartItemResource extends Resource
                             ->required(),
                     ])
                     ->action(function (CartItem $record, array $data): void {
-                        // Update the quantity while recalculating totals to include any applied discount.
-                        $quantity = (int) $data['quantity'];
-                        $newTotal = max(0, ($record->unit_price * $quantity) - (float) $record->discount_amount);
-
-                        $record->forceFill([
-                            'quantity'    => $quantity,
-                            'total_price' => $newTotal,
-                        ])->save();
+                        // Delegate to the domain helper so price synchronisation stays consistent across entry points.
+                        $record->updateQuantity((int) $data['quantity']);
 
                         Notification::make()
                             ->title(__('cart_items.notifications.quantity_updated'))
                             ->success()
                             ->send();
-                    })
-                    ->requiresConfirmation(),
+                    }),
                 Action::make('move_to_wishlist')
                     ->label(__('cart_items.move_to_wishlist'))
                     ->icon('heroicon-o-heart')
@@ -509,12 +502,8 @@ final class CartItemResource extends Resource
                             $quantity = (int) $data['quantity'];
 
                             $records->each(function (CartItem $record) use ($quantity): void {
-                                $newTotal = max(0, ($record->unit_price * $quantity) - (float) $record->discount_amount);
-
-                                $record->forceFill([
-                                    'quantity'    => $quantity,
-                                    'total_price' => $newTotal,
-                                ])->save();
+                                // Reuse the model helper to keep recalculated totals identical to single-row updates.
+                                $record->updateQuantity($quantity);
                             });
 
                             Notification::make()
