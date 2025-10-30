@@ -10,7 +10,7 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
-use Illuminate\Support\Facades\Artisan;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route as RouteFacade;
@@ -19,11 +19,19 @@ use Illuminate\Testing\TestResponse;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
-beforeAll(function (): void {
-    Artisan::call('migrate:fresh', [
-        '--database' => 'sqlite',
-        '--seed'     => true,
-    ]);
+// Enable Laravel's RefreshDatabase trait to prepare a migrated schema for every test run.
+uses(RefreshDatabase::class);
+
+beforeEach(function (): void {
+    static $hasSeeded = false;
+
+    if ($hasSeeded) {
+        return;
+    }
+
+    // Seed the database exactly once so authorization roles and fixtures exist for every assertion.
+    $this->seed();
+    $hasSeeded = true;
 });
 
 /**
