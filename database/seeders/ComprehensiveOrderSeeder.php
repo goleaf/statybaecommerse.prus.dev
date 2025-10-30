@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Enums\PaymentMethod;
+use App\Enums\PaymentStatus;
+use App\Models\Country;
 use App\Models\Document;
 use App\Models\DocumentTemplate;
 use App\Models\Order;
@@ -22,17 +25,103 @@ final class ComprehensiveOrderSeeder extends Seeder
 
     private array $paymentStatuses = ['pending', 'paid', 'failed', 'refunded'];
 
-    private array $paymentMethods = ['credit_card', 'paypal', 'bank_transfer', 'cash_on_delivery', 'stripe', 'mollie'];
+    private array $paymentMethods = [
+        // The list mirrors App\Enums\PaymentMethod so seed data respects enum casts on the Order model.
+        'credit_card',
+        'paypal',
+        'bank_transfer',
+        'cash_on_delivery',
+        'stripe',
+        'apple_pay',
+        'google_pay',
+    ];
 
     private array $currencies = ['EUR'];
 
     private array $shippingCarriers = ['DPD', 'Omniva', 'LP Express', 'UPS', 'FedEx', 'DHL'];
 
+    private array $countrySeeds = [
+        // Curated countries keep enum-bound factories deterministic and sidestep faker uniqueness collisions.
+        [
+            'name'               => 'Lithuania',
+            'name_official'      => 'Republic of Lithuania',
+            'cca2'               => 'LT',
+            'cca3'               => 'LTU',
+            'code'               => 'LTU',
+            'iso_code'           => 'LTU',
+            'currency_code'      => 'EUR',
+            'currency_symbol'    => '€',
+            'phone_code'         => '370',
+            'phone_calling_code' => '370',
+            'region'             => 'Europe',
+            'subregion'          => 'Northern Europe',
+            'timezone'           => 'Europe/Vilnius',
+            'languages'          => ['lt' => 'Lithuanian'],
+            'timezones'          => ['Europe/Vilnius' => 'Vilnius Time'],
+            'is_active'          => true,
+            'is_enabled'         => true,
+            'is_eu_member'       => true,
+            'requires_vat'       => true,
+            'vat_rate'           => 21.00,
+            'metadata'           => ['capital' => 'Vilnius'],
+            'sort_order'         => 1,
+        ],
+        [
+            'name'               => 'Latvia',
+            'name_official'      => 'Republic of Latvia',
+            'cca2'               => 'LV',
+            'cca3'               => 'LVA',
+            'code'               => 'LVA',
+            'iso_code'           => 'LVA',
+            'currency_code'      => 'EUR',
+            'currency_symbol'    => '€',
+            'phone_code'         => '371',
+            'phone_calling_code' => '371',
+            'region'             => 'Europe',
+            'subregion'          => 'Northern Europe',
+            'timezone'           => 'Europe/Riga',
+            'languages'          => ['lv' => 'Latvian'],
+            'timezones'          => ['Europe/Riga' => 'Riga Time'],
+            'is_active'          => true,
+            'is_enabled'         => true,
+            'is_eu_member'       => true,
+            'requires_vat'       => true,
+            'vat_rate'           => 21.00,
+            'metadata'           => ['capital' => 'Riga'],
+            'sort_order'         => 2,
+        ],
+        [
+            'name'               => 'Estonia',
+            'name_official'      => 'Republic of Estonia',
+            'cca2'               => 'EE',
+            'cca3'               => 'EST',
+            'code'               => 'EST',
+            'iso_code'           => 'EST',
+            'currency_code'      => 'EUR',
+            'currency_symbol'    => '€',
+            'phone_code'         => '372',
+            'phone_calling_code' => '372',
+            'region'             => 'Europe',
+            'subregion'          => 'Northern Europe',
+            'timezone'           => 'Europe/Tallinn',
+            'languages'          => ['et' => 'Estonian'],
+            'timezones'          => ['Europe/Tallinn' => 'Tallinn Time'],
+            'is_active'          => true,
+            'is_enabled'         => true,
+            'is_eu_member'       => true,
+            'requires_vat'       => true,
+            'vat_rate'           => 20.00,
+            'metadata'           => ['capital' => 'Tallinn'],
+            'sort_order'         => 3,
+        ],
+    ];
+
     private array $shippingServices = ['Standard', 'Express', 'Next Day', 'Economy', 'Premium'];
 
     public function run(): void
     {
-        $this->command->info('Starting comprehensive order seeding...');
+        // Gracefully announce the seeding phase even when the seeder is executed outside of Artisan. 
+        $this->writeMessage('Starting comprehensive order seeding...');
 
         // Ensure we have required data
         $this->ensureRequiredData();
@@ -41,37 +130,49 @@ final class ComprehensiveOrderSeeder extends Seeder
         $currentMonth = Carbon::now()->startOfMonth();
         $lastMonth = Carbon::now()->subMonth()->startOfMonth();
 
-        $this->command->info('Generating orders for current month...');
-        $this->generateOrdersForPeriod($currentMonth, $currentMonth->copy()->endOfMonth(), 500);
+        // Trim the dataset dramatically during tests to keep the suite quick while preserving production richness otherwise.
+        $orderCountPerPeriod = app()->runningUnitTests() ? 15 : 500;
 
-        $this->command->info('Generating orders for last month...');
-        $this->generateOrdersForPeriod($lastMonth, $lastMonth->copy()->endOfMonth(), 500);
+        // Provide visibility for the currently seeded period for easier debugging in tests and locally.
+        $this->writeMessage('Generating orders for current month...');
+        $this->generateOrdersForPeriod($currentMonth, $currentMonth->copy()->endOfMonth(), $orderCountPerPeriod);
 
-        $this->command->info('Comprehensive order seeding completed!');
+        // Mirror the message for the previous period so parallel runs stay understandable in logs.
+        $this->writeMessage('Generating orders for last month...');
+        $this->generateOrdersForPeriod($lastMonth, $lastMonth->copy()->endOfMonth(), $orderCountPerPeriod);
+
+        // Final confirmation keeps CLI usage and programmatic usage consistent in their messaging.
+        $this->writeMessage('Comprehensive order seeding completed!');
     }
 
     private function ensureRequiredData(): void
     {
         // Create users if needed
         if (User::count() < 50) {
-            $this->command->info('Creating additional users...');
+            // Inform about factory backfills to understand why additional records appear in assertions.
+            $this->writeMessage('Creating additional users...');
             User::factory(50)->create();
         }
 
         // Create products if needed
         if (Product::count() < 20) {
-            $this->command->info('Creating additional products...');
+            // Mirror the user notification so products are tracked with the same verbosity level.
+            $this->writeMessage('Creating additional products...');
             Product::factory(20)->create();
         }
 
         // Create currencies if needed
         $this->ensureCurrencies();
 
+        // Populate a stable set of Baltic countries to keep related factories deterministic.
+        $this->ensureCountries();
+
         // Skip channels and partners as they don't exist in current schema
 
         // Ensure document templates exist
         if (DocumentTemplate::count() === 0) {
-            $this->command->info('Creating document templates...');
+            // Document template generation is announced to highlight indirect dependencies in tests.
+            $this->writeMessage('Creating document templates...');
             $this->call(DocumentTemplateSeeder::class);
         }
     }
@@ -97,10 +198,44 @@ final class ComprehensiveOrderSeeder extends Seeder
         }
     }
 
+    private function ensureCountries(): void
+    {
+        // Seed a predictable trio of countries so factories relying on them never violate unique constraints.
+        foreach ($this->countrySeeds as $seed) {
+            Country::query()->updateOrCreate(
+                ['cca2' => $seed['cca2']],
+                [
+                    'name'               => $seed['name'],
+                    'name_official'      => $seed['name_official'],
+                    'cca3'               => $seed['cca3'],
+                    'code'               => $seed['code'],
+                    'iso_code'           => $seed['iso_code'],
+                    'currency_code'      => $seed['currency_code'],
+                    'currency_symbol'    => $seed['currency_symbol'],
+                    'phone_code'         => $seed['phone_code'],
+                    'phone_calling_code' => $seed['phone_calling_code'],
+                    'region'             => $seed['region'],
+                    'subregion'          => $seed['subregion'],
+                    'timezone'           => $seed['timezone'],
+                    'languages'          => $seed['languages'],
+                    'timezones'          => $seed['timezones'],
+                    'is_active'          => $seed['is_active'],
+                    'is_enabled'         => $seed['is_enabled'],
+                    'is_eu_member'       => $seed['is_eu_member'],
+                    'requires_vat'       => $seed['requires_vat'],
+                    'vat_rate'           => $seed['vat_rate'],
+                    'metadata'           => $seed['metadata'],
+                    'sort_order'         => $seed['sort_order'],
+                ],
+            );
+        }
+    }
+
     private function generateOrdersForPeriod(Carbon $startDate, Carbon $endDate, int $count): void
     {
         $users = User::all();
         $products = Product::all();
+        $countries = Country::query()->get();
         $invoiceTemplate = DocumentTemplate::where('type', 'invoice')->first();
         $receiptTemplate = DocumentTemplate::where('type', 'receipt')->first();
 
@@ -111,6 +246,8 @@ final class ComprehensiveOrderSeeder extends Seeder
             );
 
             // Create order using factory
+            $country = $countries->random();
+
             $order = Order::factory()
                 ->for($users->random())
                 ->state([
@@ -120,6 +257,9 @@ final class ComprehensiveOrderSeeder extends Seeder
                     'payment_method' => fake()->randomElement($this->paymentMethods),
                     'currency'       => 'EUR',
                     'locale'         => 'lt',
+                    'country_id'     => $country->id,
+                    'billing_address' => $this->addressForCountry($country),
+                    'shipping_address' => $this->addressForCountry($country),
                 ])
                 ->create();
 
@@ -147,9 +287,26 @@ final class ComprehensiveOrderSeeder extends Seeder
             $this->generateOrderDocuments($order, $invoiceTemplate, $receiptTemplate);
 
             if (($i + 1) % 50 === 0) {
-                $this->command->info('Generated ' . ($i + 1) . ' orders...');
+                // The periodic progress update is useful for long seeding runs and should log safely anywhere.
+                $this->writeMessage('Generated ' . ($i + 1) . ' orders...');
             }
         }
+    }
+
+    /**
+     * Write a message either to the CLI output or to the application log when running silently.
+     */
+    private function writeMessage(string $message): void
+    {
+        // When the seeder is executed through Artisan the command property is populated and we can reuse it.
+        if ($this->command instanceof \Illuminate\Console\Command) {
+            $this->command->info($message);
+
+            return;
+        }
+
+        // Fallback to the logger so the information is not lost during programmatic execution in tests.
+        Log::info($message);
     }
 
     // Zones were removed from the project, so helper methods tied to zone creation were deleted.
@@ -309,6 +466,20 @@ final class ComprehensiveOrderSeeder extends Seeder
             'phone'          => fake('lt_LT')->phoneNumber(),
             'email'          => fake()->email(),
         ];
+    }
+
+    /**
+     * Build an address snapshot aligned with the provided country metadata.
+     */
+    private function addressForCountry(Country $country): array
+    {
+        // Start from the localized Lithuanian template and adjust fields so downstream consumers pick up the right country.
+        $address = $this->generateAddress();
+        $address['country'] = $country->cca2;
+        $address['state'] = $country->region ?? $address['state'];
+        $address['city'] = $address['city'] ?? ($country->metadata['capital'] ?? $country->name);
+
+        return $address;
     }
 
     private function getPaymentStatusForOrderStatus(string $orderStatus): string
@@ -508,27 +679,38 @@ final class ComprehensiveOrderSeeder extends Seeder
         return implode("\n", $parts);
     }
 
-    private function translatePaymentMethod(string $method): string
+    private function translatePaymentMethod(string|PaymentMethod $method): string
     {
-        return match ($method) {
+        // Normalize to the raw backing value so enums and strings are handled uniformly.
+        $value = $method instanceof PaymentMethod ? $method->value : $method;
+
+        return match ($value) {
             'credit_card'      => 'Kredito kortelė',
             'paypal'           => 'PayPal',
             'bank_transfer'    => 'Banko pavedimas',
             'cash_on_delivery' => 'Atsiskaitymas pristatymo metu',
             'stripe'           => 'Stripe',
-            'mollie'           => 'Mollie',
-            default            => ucfirst($method),
+            'apple_pay'        => 'Apple Pay',
+            'google_pay'       => 'Google Pay',
+            default            => ucfirst($value),
         };
     }
 
-    private function translatePaymentStatus(string $status): string
+    private function translatePaymentStatus(string|PaymentStatus $status): string
     {
-        return match ($status) {
-            'pending'  => 'Laukiama apmokėjimo',
-            'paid'     => 'Apmokėta',
-            'failed'   => 'Apmokėjimas nepavyko',
-            'refunded' => 'Grąžinta',
-            default    => ucfirst($status),
+        // Normalize enum instances so string comparisons below remain straightforward.
+        $value = $status instanceof PaymentStatus ? $status->value : $status;
+
+        return match ($value) {
+            'pending'             => 'Laukiama apmokėjimo',
+            'authorized'          => 'Autorizuota',
+            'captured'            => 'Captuota',
+            'settled'             => 'Atsiskaityta',
+            'paid'                => 'Apmokėta',
+            'partially_refunded'  => 'Iš dalies grąžinta',
+            'refunded'            => 'Grąžinta',
+            'failed'              => 'Apmokėjimas nepavyko',
+            default               => ucfirst($value),
         };
     }
 
