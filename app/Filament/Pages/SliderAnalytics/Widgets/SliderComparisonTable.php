@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages\SliderAnalytics\Widgets;
 
+use App\Filament\Pages\SliderAnalytics\Concerns\ResolvesPageFilters;
 use App\Models\Slider;
 use Filament\Actions\Action;
 use Filament\Tables\Columns\IconColumn;
@@ -17,6 +18,7 @@ use Illuminate\Database\Eloquent\Builder;
 final class SliderComparisonTable extends BaseWidget
 {
     use InteractsWithPageFilters;
+    use ResolvesPageFilters;
 
     protected static ?int $sort = 7;
 
@@ -25,10 +27,12 @@ final class SliderComparisonTable extends BaseWidget
     public function table(Table $table): Table
     {
         // Configure the widget table to meet the Filament v4 return type contract.
-        $startDate = $this->pageFilters['startDate'] ?? now()->subDays(30);
-        $endDate = $this->pageFilters['endDate'] ?? now();
-        $sliderId = $this->pageFilters['sliderId'] ?? null;
-        $status = $this->pageFilters['status'] ?? 'all';
+        // Resolve the raw values once so the comparison table shares the exact
+        // slider scope and reporting window used by the rest of the analytics
+        // dashboard.
+        [$startDate, $endDate] = $this->resolveDateRange();
+        $sliderId = $this->resolveFilterValue('sliderId');
+        $status = $this->resolveFilterValue('status', 'all');
 
         $query = Slider::query()
             ->when($startDate, fn (Builder $query) => $query->whereDate('created_at', '>=', $startDate))

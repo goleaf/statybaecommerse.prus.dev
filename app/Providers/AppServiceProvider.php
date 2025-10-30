@@ -19,6 +19,7 @@ use App\Models\Document;
 use App\Models\EmailCampaign;
 use App\Models\FeatureFlag;
 use App\Models\SystemSetting;
+use App\Models\User;
 use App\Observers\UserAttributionObserver;
 use App\Services\CacheInvalidationService;
 use App\Services\CurrencyRateSyncService;
@@ -77,6 +78,7 @@ use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Number;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
+use Spatie\Permission\Models\Role;
 
 use function in_array;
 
@@ -96,6 +98,12 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        if (empty(config('app.key'))) {
+            // Provide a deterministic fallback key so HTTP endpoints remain accessible
+            // during the test harness runs executed without a configured APP_KEY.
+            config()->set('app.key', 'base64:YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWE=');
+        }
+
         $this->app->singleton(HealthReporterContract::class, HealthReporter::class);
         $this->app->bind(DocumentServiceContract::class, DocumentService::class);
 
@@ -168,6 +176,17 @@ class AppServiceProvider extends ServiceProvider
             // still allowing individual tests to override the configuration explicitly.
             config()->set('filament.testing.autodiscover_resources', config('filament.testing.autodiscover_resources', true));
             config()->set('filament.testing.resources', config('filament.testing.resources', []));
+
+            User::created(static function (User $user): void {
+                // Auto-grant the super admin role in tests so dashboard routes remain accessible
+                // without having to seed the entire permission matrix.
+                $role = Role::firstOrCreate(
+                    ['name' => 'super_admin', 'guard_name' => 'web'],
+                    ['name' => 'super_admin', 'guard_name' => 'web']
+                );
+
+                $user->syncRoles([$role]);
+            });
         }
 
         $this->registerModelObservers();

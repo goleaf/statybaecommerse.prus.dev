@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages\SliderAnalytics\Widgets;
 
+use App\Filament\Pages\SliderAnalytics\Concerns\ResolvesPageFilters;
 use App\Models\Slider;
 use Filament\Widgets\ChartWidget;
 use Filament\Widgets\Concerns\InteractsWithPageFilters;
@@ -12,6 +13,7 @@ use Illuminate\Database\Eloquent\Builder;
 final class SliderViewsTimeline extends ChartWidget
 {
     use InteractsWithPageFilters;
+    use ResolvesPageFilters;
 
     protected ?string $heading = 'Slider Views Timeline';
 
@@ -24,10 +26,12 @@ final class SliderViewsTimeline extends ChartWidget
 
     public function getData(): array
     {
-        $startDate = $this->pageFilters['startDate'] ?? now()->subDays(30);
-        $endDate = $this->pageFilters['endDate'] ?? now();
-        $sliderId = $this->pageFilters['sliderId'] ?? null;
-        $status = $this->pageFilters['status'] ?? 'all';
+        // Keep the timeline aligned with the resolved filter payload so the
+        // generated dataset follows the exact slider selection and timeframe
+        // applied on the dashboard.
+        [$startDate, $endDate] = $this->resolveDateRange();
+        $sliderId = $this->resolveFilterValue('sliderId');
+        $status = $this->resolveFilterValue('status', 'all');
 
         $query = Slider::query()
             ->when($startDate, fn (Builder $query) => $query->whereDate('created_at', '>=', $startDate))
@@ -45,8 +49,8 @@ final class SliderViewsTimeline extends ChartWidget
             $days[] = $date->format('M d');
 
             // Simulate views and clicks data based on slider activity
-            $daySliders = $query->whereDate('created_at', $date)->count();
-            $activeSliders = $query->where('is_active', true)->whereDate('created_at', '<=', $date)->count();
+            $daySliders = (clone $query)->whereDate('created_at', $date)->count();
+            $activeSliders = (clone $query)->where('is_active', true)->whereDate('created_at', '<=', $date)->count();
 
             // Simulate views (higher for active sliders)
             $views = $activeSliders * rand(10, 50) + $daySliders * rand(5, 20);

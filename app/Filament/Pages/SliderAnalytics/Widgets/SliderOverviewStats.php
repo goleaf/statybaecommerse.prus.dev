@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages\SliderAnalytics\Widgets;
 
+use App\Filament\Pages\SliderAnalytics\Concerns\ResolvesPageFilters;
 use App\Models\Slider;
 use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
@@ -13,6 +14,7 @@ use Illuminate\Database\Eloquent\Builder;
 final class SliderOverviewStats extends BaseWidget
 {
     use InteractsWithPageFilters;
+    use ResolvesPageFilters;
 
     protected static ?int $sort = 1;
 
@@ -20,10 +22,11 @@ final class SliderOverviewStats extends BaseWidget
 
     public function getStats(): array
     {
-        $startDate = $this->pageFilters['startDate'] ?? now()->subDays(30);
-        $endDate = $this->pageFilters['endDate'] ?? now();
-        $sliderId = $this->pageFilters['sliderId'] ?? null;
-        $status = $this->pageFilters['status'] ?? 'all';
+        // Normalise the filter payload so stats use the same window and scopes as
+        // the surrounding widgets even before the modal has been opened.
+        [$startDate, $endDate] = $this->resolveDateRange();
+        $sliderId = $this->resolveFilterValue('sliderId');
+        $status = $this->resolveFilterValue('status', 'all');
 
         $query = Slider::query()
             ->when($startDate, fn (Builder $query) => $query->whereDate('created_at', '>=', $startDate))
@@ -31,12 +34,20 @@ final class SliderOverviewStats extends BaseWidget
             ->when($sliderId, fn (Builder $query) => $query->where('id', $sliderId))
             ->when($status !== 'all', fn (Builder $query) => $query->where('is_active', $status === 'active'));
 
-        $totalSliders = $query->count();
-        $activeSliders = $query->where('is_active', true)->count();
-        $inactiveSliders = $query->where('is_active', false)->count();
-        $slidersWithImages = $query->whereHas('media', fn (Builder $q) => $q->where('collection_name', 'slider_images'))->count();
-        $slidersWithBackgrounds = $query->whereHas('media', fn (Builder $q) => $q->where('collection_name', 'slider_backgrounds'))->count();
-        $recentSliders = $query->where('created_at', '>=', now()->subDays(7))->count();
+        // Clone the base builder for each metric so cumulative where clauses do
+        // not leak between counts when the widget rehydrates.
+        $totalSliders = (clone $query)->count();
+        $activeSliders = (clone $query)->where('is_active', true)->count();
+        $inactiveSliders = (clone $query)->where('is_active', false)->count();
+        $slidersWithImages = (clone $query)
+            ->whereHas('media', fn (Builder $mediaQuery) => $mediaQuery->where('collection_name', 'slider_images'))
+            ->count();
+        $slidersWithBackgrounds = (clone $query)
+            ->whereHas('media', fn (Builder $mediaQuery) => $mediaQuery->where('collection_name', 'slider_backgrounds'))
+            ->count();
+        $recentSliders = (clone $query)
+            ->where('created_at', '>=', now()->subDays(7))
+            ->count();
 
         return [
             Stat::make('Total Sliders', $totalSliders)
