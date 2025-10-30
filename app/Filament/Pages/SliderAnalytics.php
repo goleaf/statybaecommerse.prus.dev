@@ -47,7 +47,9 @@ class SliderAnalytics extends BaseDashboard
             FilterAction::make()
                 ->label('Filter Analytics')
                 ->icon('heroicon-o-funnel')
-                ->components([
+                ->form([
+                    // Ensure page filter state stores concrete `startDate` and `endDate` keys
+                    // so downstream analytics queries can extract the intended range safely.
                     SupportFlatpickr::makeDate('startDate')
                         ->label('Start Date')
                         ->default(now()->subDays(30))
@@ -121,7 +123,7 @@ class SliderAnalytics extends BaseDashboard
 
     protected function exportAnalytics(): void
     {
-        [$startDate, $endDate] = DateRange::extract($this->pageFilters, 'date_range');
+        [$startDate, $endDate] = DateRange::extract($this->pageFilters, 'startDate', 'endDate');
         $startDate = $startDate ? Carbon::parse($startDate) : now()->subDays(30);
         $endDate = $endDate ? Carbon::parse($endDate) : now();
         $sliderId = $this->pageFilters['sliderId'] ?? null;
@@ -177,7 +179,7 @@ class SliderAnalytics extends BaseDashboard
 
     public function getSubheading(): string
     {
-        [$startDate, $endDate] = DateRange::extract($this->pageFilters, 'date_range');
+        [$startDate, $endDate] = DateRange::extract($this->pageFilters, 'startDate', 'endDate');
         $startDate = $startDate ? Carbon::parse($startDate) : now()->subDays(30);
         $endDate = $endDate ? Carbon::parse($endDate) : now();
 
