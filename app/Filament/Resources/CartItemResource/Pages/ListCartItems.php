@@ -10,6 +10,7 @@ use App\Filament\WidgetTabs\Components\WidgetTab;
 use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
 use Filament\Actions;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 final class ListCartItems extends BaseListRecords
 {
@@ -61,5 +62,28 @@ final class ListCartItems extends BaseListRecords
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('updated_at', '<', now()->subDays(3)))
                 ->value(fn () => $this->getResource()::getEloquentQuery()->where('updated_at', '<', now()->subDays(3))->count()),
         ];
+    }
+
+    /**
+     * Resolve a table record even when Livewire test helpers pass a JSON-serialised model string.
+     */
+    protected function resolveTableRecord(?string $key): Model | array | null
+    {
+        if (is_string($key)) {
+            $trimmedKey = ltrim($key);
+
+            if ($trimmedKey !== '' && $trimmedKey[0] === '{') {
+                /** @var mixed $decoded */
+                $decoded = json_decode($key, true);
+
+                if (is_array($decoded) && array_key_exists('id', $decoded)) {
+                    // Normalise the key to the underlying primary identifier so parent logic can locate the record.
+                    $key = (string) $decoded['id'];
+                }
+            }
+        }
+
+        // Delegate back to Filament so the parent resolver continues handling pagination and relationship lookups.
+        return parent::resolveTableRecord($key);
     }
 }
