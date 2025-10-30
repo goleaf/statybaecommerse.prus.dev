@@ -6,6 +6,7 @@
 - Runtime services and Livewire components keep variant attribute matrices synchronized and expose attribute-driven selection on the storefront, so shoppers can pivot by size, color, or material without stale data.【F:app/Services/ProductVariantAttributeMatrixService.php†L11-L185】【F:app/Livewire/ProductVariantSelector.php†L13-L337】
 - Admin coverage is validated through Livewire-powered Filament tests that confirm matrix persistence for size/color selections and metadata updates capturing material signals.【F:tests/admin/resources/ProductVariantResourceTest.php†L31-L172】
 - Dedicated Filament regression tests assert that the variant inventory searchable inputs normalise both variant and location metadata, keeping downstream automation payloads consistent across state changes.【F:tests/Filament/VariantInventoryResourceTest.php†L1-L120】
+- Inventory seeding now mirrors product-level coverage by creating variant inventory rows for every location whenever the variant inventory schema exists, keeping analytics and storefront stock queries populated even in lean seed profiles.【F:database/seeders/InventorySeeder.php†L12-L88】
 
 ## Data Model & Attribute Definitions
 - `ProductVariant` persists serialized attribute metadata and matrix payloads to describe the active combination on each variant, while append accessors expose stock signals for storefront logic.【F:app/Models/ProductVariant.php†L44-L118】【F:app/Models/ProductVariant.php†L132-L161】
