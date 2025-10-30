@@ -55,3 +55,4 @@ composer.lock
 composer.lock
 scripts/test/success-tests.txt
 scripts/test/failed-tests.txt
+junit.xml
