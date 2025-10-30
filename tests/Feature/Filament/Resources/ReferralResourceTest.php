@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Filament\Resources\ReferralResource;
+use App\Filament\Resources\ReferralResource\Pages\ListReferrals;
 use App\Filament\Resources\ReferralResource\Pages\CreateReferral;
 use App\Models\Referral;
 use App\Models\User;
@@ -78,4 +79,37 @@ it('feature: creates a referral via form action', function () {
         ->assertHasNoErrors();
 
     expect(Referral::query()->where('referral_code', 'CODE-ABC')->exists())->toBeTrue();
+});
+
+it('feature: lists referrals via the Filament table component', function (): void {
+    // Ensure Filament loads the admin panel so Livewire table helpers resolve correctly.
+    test()->resolveAdminPanel();
+
+    // Authenticate as an administrator capable of accessing the referral management pages.
+    $admin = User::factory()->create([
+        'email'    => 'admin@example.com',
+        'is_admin' => true,
+    ]);
+
+    $this->actingAs($admin);
+
+    // Normalise existing fixtures so relationship filter options never receive null labels.
+    Referral::query()->whereNull('source')->update(['source' => 'unspecified']);
+    Referral::query()->whereNull('campaign')->update(['campaign' => 'general']);
+
+    // Seed a referral with deterministic titles so the table has a predictable record to display.
+    $referral = Referral::factory()->create([
+        'source'   => 'direct',
+        'campaign' => 'coverage-program',
+        'title' => [
+            'en' => 'Coverage Referral Program',
+            'lt' => 'Padengimo rekomendacijų programa',
+        ],
+    ]);
+
+    // Hydrate the table data prior to asserting the seeded referral is visible.
+    Livewire::actingAs($admin)
+        ->test(ListReferrals::class)
+        ->call('loadTable')
+        ->assertCanSeeTableRecords([$referral]);
 });
