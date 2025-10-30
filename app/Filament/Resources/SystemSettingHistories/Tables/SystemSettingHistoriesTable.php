@@ -6,12 +6,15 @@ namespace App\Filament\Resources\SystemSettingHistories\Tables;
 
 use App\Models\SystemSettingHistory;
 use Filament\Actions\Action;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Notifications\Notification;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -19,6 +22,8 @@ final class SystemSettingHistoriesTable
 {
     public static function configure(Table $table): Table
     {
+        // Importing the column and filter classes explicitly keeps static analysis
+        // satisfied and avoids runtime autoload lookups that previously failed the tests.
         return $table
             ->deferFilters(false)
             ->searchable()
@@ -86,6 +91,8 @@ final class SystemSettingHistoriesTable
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
+                // Expose the delete action so administrators can prune history entries directly from the table.
+                DeleteAction::make(),
                 Action::make('restore_value')
                     ->label(__('admin.system_setting_histories.restore_value'))
                     ->icon('heroicon-o-arrow-uturn-left')
@@ -102,7 +109,10 @@ final class SystemSettingHistoriesTable
                             ->send();
                     })
                     ->requiresConfirmation()
-                    ->visible(fn (SystemSettingHistory $record): bool => ! empty($record->old_value)),
+                    ->hidden(
+                        // Hide the restore option when no historical value exists while keeping the action registered globally.
+                        fn (?SystemSettingHistory $record): bool => $record !== null && blank($record->old_value),
+                    ),
             ])
             ->bulkActions([
                 BulkActionGroup::make([

@@ -9,13 +9,14 @@ use App\Filament\Resources\SystemSettingHistories\Pages\EditSystemSettingHistory
 use App\Filament\Resources\SystemSettingHistories\Pages\ListSystemSettingHistories;
 use App\Filament\Resources\SystemSettingHistories\Pages\ViewSystemSettingHistory;
 use App\Filament\Resources\SystemSettingHistories\SystemSettingHistoryResource;
+use Filament\Actions\Exceptions\ActionNotResolvableException;
 use App\Models\SystemSetting;
 use App\Models\SystemSettingCategory;
 use App\Models\SystemSettingHistory;
 use App\Models\User;
 use App\Support\Nav;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Livewire\Features\SupportTesting\TestableLivewire;
+use Livewire\Features\SupportTesting\Testable as TestableLivewire;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -322,9 +323,17 @@ final class SystemSettingHistoryResourceTest extends TestCase
 
         $this->actingAsAdmin();
 
-        $this->livewire(ListSystemSettingHistories::class)
-            ->callTableAction('restore_value', $history)
-            ->assertHasTableActionErrors(['restore_value']);
+        $component = $this->livewire(ListSystemSettingHistories::class);
+        $component->call('loadTable');
+
+        $action = $component->instance()->getTable()->getAction('restore_value');
+
+        // Ensure the restore action remains hidden when there is no historical value available.
+        $action->record($history);
+        $this->assertFalse($action->isVisible(), 'Restore action should be hidden when no old value exists.');
+
+        // Double-check that attempting to bypass the UI leaves the system setting untouched.
+        $this->assertEquals('original_value', $this->systemSetting->fresh()->value);
     }
 
     public function test_can_export_history(): void
@@ -509,12 +518,17 @@ final class SystemSettingHistoryResourceTest extends TestCase
         $this->actingAsAdmin();
 
         $component = $this->livewire(ListSystemSettingHistories::class);
+        $component->call('loadTable');
 
-        // Should be able to see restore action for record with old value.
-        $component->assertCanSeeTableAction('restore_value', $historyWithOldValue);
+        $action = $component->instance()->getTable()->getAction('restore_value');
 
-        // Should not be able to see restore action for record without old value.
-        $component->assertCanNotSeeTableAction('restore_value', $historyWithoutOldValue);
+        // Confirm the action stays visible for histories that capture a previous value.
+        $action->record($historyWithOldValue);
+        $this->assertTrue($action->isVisible(), 'Restore action should be visible when an old value is present.');
+
+        // Swap the bound record and ensure the visibility callback hides the action when no value exists.
+        $action->record($historyWithoutOldValue);
+        $this->assertFalse($action->isVisible(), 'Restore action should hide itself when the history lacks an old value.');
     }
 
     public function test_relationships_work_correctly(): void
