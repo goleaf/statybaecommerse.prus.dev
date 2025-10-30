@@ -85,15 +85,27 @@ final class SeoDataController extends Controller
     }
 
     /**
-     * Handle analytics functionality with proper error handling.
+     * Render the statistics dashboard to surface aggregated SEO metrics without analytics phrasing.
      */
-    public function analytics(): View
+    public function statistics(): View
     {
-        $stats = ['total' => SeoData::count(), 'by_locale' => SeoData::selectRaw('locale, COUNT(*) as count')->groupBy('locale')->pluck('count', 'locale'), 'by_type' => SeoData::selectRaw('seoable_type, COUNT(*) as count')->groupBy('seoable_type')->pluck('count', 'seoable_type'), 'avg_score' => SeoData::avg('seo_score') ?? 0, 'complete_seo' => SeoData::whereNotNull('title')->whereNotNull('description')->whereNotNull('keywords')->count(), 'needs_optimization' => SeoData::where(function ($q) {
-            $q->whereNull('title')->orWhereNull('description')->orWhereNull('keywords');
-        })->count()];
+        // Build the high level statistics map so the view only needs to render presentation logic.
+        $statistics = [
+            'total'              => SeoData::count(),
+            'by_locale'          => SeoData::selectRaw('locale, COUNT(*) as count')->groupBy('locale')->pluck('count', 'locale'),
+            'by_type'            => SeoData::selectRaw('seoable_type, COUNT(*) as count')->groupBy('seoable_type')->pluck('count', 'seoable_type'),
+            'avg_score'          => SeoData::avg('seo_score') ?? 0,
+            'complete_seo'       => SeoData::whereNotNull('title')->whereNotNull('description')->whereNotNull('keywords')->count(),
+            'needs_optimization' => SeoData::where(static function (Builder $query): void {
+                // Keep the closure focused on filtering incomplete records for optimisation follow-up.
+                $query
+                    ->whereNull('title')
+                    ->orWhereNull('description')
+                    ->orWhereNull('keywords');
+            })->count(),
+        ];
 
-        return view('seo-data.analytics', compact('stats'));
+        return view('seo-data.statistics', compact('statistics'));
     }
 
     /**
