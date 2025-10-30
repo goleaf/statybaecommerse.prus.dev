@@ -39,6 +39,12 @@ final class VariantStockResource extends Resource
     use HasNav;
 
     /**
+     * Explicitly point the resource at the VariantInventory model so Filament does not
+     * attempt to resolve a non-existent VariantStock class when hydrating listings.
+     */
+    protected static ?string $model = VariantInventory::class;
+
+    /**
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
      */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-archive-box';
