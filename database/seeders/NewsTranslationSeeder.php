@@ -67,18 +67,22 @@ final class NewsTranslationSeeder extends Seeder
         // Store translations in database using UiTranslation model
         foreach ($translations as $locale => $localeTranslations) {
             foreach ($localeTranslations as $key => $value) {
-                UiTranslation::factory()
-                    ->forKey($key)
-                    ->forLocale($locale)
-                    ->forGroup('news')
-                    ->create([
+                // Use updateOrCreate so repeated seeding refreshes metadata without creating duplicates.
+                UiTranslation::updateOrCreate(
+                    [
+                        'key'    => $key,
+                        'locale' => $locale,
+                    ],
+                    [
                         'value'    => $value,
+                        'group'    => 'news',
                         'metadata' => [
                             'context'     => 'news_admin_interface',
                             'description' => "News admin interface translation for {$key}",
                             'seeded_at'   => now()->toISOString(),
                         ],
-                    ]);
+                    ],
+                );
             }
         }
     }
