@@ -11,10 +11,12 @@ use App\Filament\Resources\CityResource\Pages\ListCities;
 use App\Filament\Resources\CollectionResource\Pages\ListCollections;
 use App\Filament\Resources\CollectionRuleResource\Pages\ListCollectionRules;
 use App\Filament\Resources\EnumManagementResource\Pages\ListEnumManagement;
+use App\Filament\Resources\NormalSettingTranslationResource\Pages\ListNormalSettingTranslations;
 use App\Filament\Resources\PostResource\Pages\ListPosts;
 use App\Filament\Resources\ProductVariantResource\Pages\ListProductVariants;
 use App\Filament\Resources\RecommendationAnalyticsResource\Pages\ListRecommendationAnalytics;
 use App\Filament\Resources\ReferralCampaignResource\Pages\ListReferralCampaigns;
+use App\Filament\Resources\VariantCombinationResource\Pages\ListVariantCombinations;
 use App\Filament\Resources\SliderTranslationResource\Pages\ListSliderTranslations;
 use App\Filament\Resources\SystemSettingResource\Pages\ListSystemSettings;
 use App\Filament\Resources\UserManagementResource\Pages\ListUsers;
@@ -28,7 +30,10 @@ use App\Models\Collection;
 use App\Models\CollectionRule;
 use App\Models\Country;
 use App\Models\EnumValue;
+use App\Models\NormalSetting;
+use App\Models\NormalSettingTranslation;
 use App\Models\Post;
+use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\RecommendationAnalytics;
 use App\Models\ReferralCampaign;
@@ -37,6 +42,7 @@ use App\Models\SystemSetting;
 use App\Models\User;
 use App\Models\UserPreference;
 use App\Models\VariantInventory;
+use App\Models\VariantCombination;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use Livewire\Livewire;
@@ -88,6 +94,7 @@ final class MissingFilamentResourceCoverageTest extends TestCase
             'collections'               => [ListCollections::class, 'createCollectionRecord'],
             'collection rules'          => [ListCollectionRules::class, 'createCollectionRuleRecord'],
             'enum management'           => [ListEnumManagement::class, 'createEnumValueRecord'],
+            'normal setting translations' => [ListNormalSettingTranslations::class, 'createNormalSettingTranslationRecord'],
             'posts'                     => [ListPosts::class, 'createPostRecord'],
             'product variants'          => [ListProductVariants::class, 'createProductVariantRecord'],
             'recommendation analytics'  => [ListRecommendationAnalytics::class, 'createRecommendationAnalyticsRecord'],
@@ -96,6 +103,7 @@ final class MissingFilamentResourceCoverageTest extends TestCase
             'system settings'           => [ListSystemSettings::class, 'createSystemSettingRecord'],
             'user management'           => [ListUsers::class, 'createUserManagementRecord'],
             'user preferences'          => [ListUserPreferences::class, 'createUserPreferenceRecord'],
+            'variant combinations'      => [ListVariantCombinations::class, 'createVariantCombinationRecord'],
             'variant stock'             => [ListVariantStocks::class, 'createVariantInventoryRecord'],
         ];
     }
@@ -213,6 +221,32 @@ final class MissingFilamentResourceCoverageTest extends TestCase
         ]);
     }
 
+    private function createNormalSettingTranslationRecord(): NormalSettingTranslation
+    {
+        // Create the base normal setting so the translation points to a persistent configuration entry.
+        $setting = NormalSetting::factory()->create([
+            'group'        => 'coverage',
+            'key'          => 'coverage_setting',
+            'locale'       => 'en',
+            'type'         => NormalSetting::TYPE_STRING,
+            'value'        => 'Coverage value',
+            'description'  => 'Coverage description',
+            'is_public'    => true,
+            'is_encrypted' => false,
+            'is_active'    => true,
+        ]);
+
+        // Persist the translation with deterministic labels so the table renders predictable text values.
+        return NormalSettingTranslation::factory()
+            ->forSetting($setting)
+            ->forLocale('en')
+            ->create([
+                'display_name' => 'Coverage Setting',
+                'description'  => 'Coverage setting description',
+                'help_text'    => 'Coverage help text',
+            ]);
+    }
+
     private function createProductVariantRecord(): ProductVariant
     {
         // Use the factory to provision a variant with an associated product for catalog checks.
@@ -220,6 +254,25 @@ final class MissingFilamentResourceCoverageTest extends TestCase
             'name' => 'Coverage Variant',
             'sku'  => 'COVERAGE001',
         ]);
+    }
+
+    private function createVariantCombinationRecord(): VariantCombination
+    {
+        // Provision a parent product so the variant combination factory links to a real catalog item.
+        $product = Product::factory()->create([
+            'name' => 'Coverage Product',
+            'slug' => 'coverage-product',
+        ]);
+
+        // Store an available combination so the inventory tooling recognises a live configuration row.
+        return VariantCombination::factory()
+            ->forProduct($product)
+            ->withCombination(['color' => 'Crimson', 'size' => 'Large'])
+            ->available()
+            ->create([
+                'combination_hash'      => 'coverage-combination-hash',
+                'formatted_combinations' => 'Crimson / Large',
+            ]);
     }
 
     private function createRecommendationAnalyticsRecord(): RecommendationAnalytics
