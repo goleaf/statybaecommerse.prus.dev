@@ -97,15 +97,18 @@ final class AnalyticsEventsSeeder extends Seeder
 
         Product::factory()
             ->count($missing)
-            ->state([
-                'status'       => 'published',
-                'is_visible'   => true,
-                'published_at' => now(),
-            ])
-            ->create()
-            ->each(function ($product) use ($existingBrands) {
-                $product->update(['brand_id' => $existingBrands->random()->id]);
-            });
+            ->state(function () use ($existingBrands): array {
+                // Assign a brand before creation so the factory does not spawn extra brands during its lifecycle hooks.
+                $brandId = $existingBrands->random()->getKey();
+
+                return [
+                    'status'       => 'published',
+                    'is_visible'   => true,
+                    'published_at' => now(),
+                    'brand_id'     => $brandId,
+                ];
+            })
+            ->create();
 
         return Product::query()->where('status', 'published')->where('is_visible', true)->limit(10)->get();
     }
