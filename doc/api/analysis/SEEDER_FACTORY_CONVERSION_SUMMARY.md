@@ -53,6 +53,8 @@ Successfully converted all Laravel seeders to use model factories exclusively, e
 - **ProductImageSeeder.php** - Factory-based image creation
   - Uses ProductImage::factory()->create()
   - Maintains image generation logic
+  - Chunks across the full product catalogue so every seeded product receives gallery assets instead of just the first 20.
+  - Generates a 1x1 PNG fallback when the GD extension is unavailable, preventing zero-byte placeholders that previously broke storefront previews.
 
 ### 3. Relationship Improvements
 - Replaced manual foreign key assignments with factory relationships:
