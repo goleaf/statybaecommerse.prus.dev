@@ -1,0 +1,266 @@
+#!/bin/bash
+
+# Colors for output
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+YELLOW='\033[1;33m'
+BLUE='\033[1;37m'
+NC='\033[0m' # No Color
+
+# Default sort order
+SORT_ORDER="asc"
+
+# Get script directory and project root
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+
+# Files in the same directory as the script
+SUCCESS_FILE="$SCRIPT_DIR/success-tests.txt"
+FAILED_FILE="$SCRIPT_DIR/failed-tests.txt"
+RESET_SUCCESS=false
+
+# Create files if they don't exist
+touch "$SUCCESS_FILE"
+touch "$FAILED_FILE"
+
+# Change to project root for running tests
+cd "$PROJECT_ROOT"
+
+# Parse command line arguments
+for arg in "$@"; do
+    case $arg in
+        --sort=asc)
+            SORT_ORDER="asc"
+            shift
+            ;;
+        --sort=desc)
+            SORT_ORDER="desc"
+            shift
+            ;;
+        --reset)
+            RESET_SUCCESS=true
+            shift
+            ;;
+        *)
+            echo -e "${RED}Unknown argument: $arg${NC}"
+            echo -e "${YELLOW}Usage: $0 [--sort=asc|--sort=desc] [--reset]${NC}"
+            exit 1
+            ;;
+    esac
+done
+
+# Handle reset flag
+if [ "$RESET_SUCCESS" = true ]; then
+    if [ -f "$SUCCESS_FILE" ]; then
+        rm "$SUCCESS_FILE"
+        echo -e "${YELLOW}Reset: Removed $SUCCESS_FILE${NC}"
+    fi
+    if [ -f "$FAILED_FILE" ]; then
+        rm "$FAILED_FILE"
+        echo -e "${YELLOW}Reset: Removed $FAILED_FILE${NC}"
+    fi
+fi
+
+# Load previously passed tests
+declare -A passed_test_files=()
+if [ -f "$SUCCESS_FILE" ]; then
+    echo -e "${YELLOW}Loading previously passed tests from $SUCCESS_FILE...${NC}"
+    while IFS= read -r line; do
+        # Skip empty lines
+        if [ -n "$line" ]; then
+            passed_test_files["$line"]=1
+        fi
+    done < "$SUCCESS_FILE"
+    echo -e "${GREEN}Found ${#passed_test_files[@]} previously passed tests${NC}"
+    echo ""
+fi
+
+# Load previously failed tests
+declare -A failed_test_files=()
+declare -a failed_test_paths=()
+if [ -f "$FAILED_FILE" ]; then
+    echo -e "${YELLOW}Loading previously failed tests from $FAILED_FILE...${NC}"
+    # Read test paths from failed-tests.txt (same format as success-tests.txt)
+    while IFS= read -r line; do
+        # Skip empty lines
+        if [ -n "$line" ]; then
+            failed_test_files["$line"]=1
+            failed_test_paths+=("$line")
+        fi
+    done < "$FAILED_FILE"
+    echo -e "${RED}Found ${#failed_test_files[@]} previously failed tests${NC}"
+    echo ""
+fi
+
+# Create temporary file for new failed tests
+FAILED_FILE_TEMP="${FAILED_FILE}.tmp"
+rm -f "$FAILED_FILE_TEMP"
+
+echo -e "${BLUE}========================================${NC}"
+echo -e "${BLUE}  Collecting and Running Tests${NC}"
+echo -e "${BLUE}========================================${NC}"
+echo ""
+
+# Find all test files
+echo -e "${YELLOW}Collecting test files...${NC}"
+
+# Start with previously failed tests (highest priority)
+declare -a ordered_test_files=()
+
+if [ ${#failed_test_paths[@]} -gt 0 ]; then
+    echo -e "${RED}Prioritizing ${#failed_test_paths[@]} previously failed tests${NC}"
+    for failed_path in "${failed_test_paths[@]}"; do
+        if [ -f "$failed_path" ]; then
+            ordered_test_files+=("$failed_path")
+        fi
+    done
+fi
+
+# Then add all other test files
+if [ "$SORT_ORDER" = "desc" ]; then
+    echo -e "${YELLOW}Sort order: Descending${NC}"
+    all_tests=$(find tests -type f -name "*Test.php" | sort -r)
+else
+    echo -e "${YELLOW}Sort order: Ascending${NC}"
+    all_tests=$(find tests -type f -name "*Test.php" | sort)
+fi
+
+# Add non-failed, non-passed tests
+for test_file in $all_tests; do
+    # Skip if already in ordered list (was a failed test) or already passed
+    if [ "${failed_test_files[$test_file]}" != "1" ] && [ "${passed_test_files[$test_file]}" != "1" ]; then
+        ordered_test_files+=("$test_file")
+    fi
+done
+
+# Convert array to space-separated string for the loop
+test_files="${ordered_test_files[@]}"
+
+# Count total tests (all tests in the project)
+total_tests=$(find tests -type f -name "*Test.php" | wc -l)
+tests_to_run=${#ordered_test_files[@]}
+
+current_test=0
+passed_tests=0
+failed_tests=0
+skipped_tests=0
+fixed_tests=0
+
+echo -e "${GREEN}Found $total_tests test files total${NC}"
+echo -e "${YELLOW}Will run $tests_to_run tests (${#passed_test_files[@]} already passed, skipping them)${NC}"
+echo ""
+
+# Array to store failed tests
+declare -a failed_test_list=()
+
+# Run each test individually
+for test_file in $test_files; do
+    current_test=$((current_test + 1))
+    
+    # Extract test name without .php extension and path
+    test_name=$(basename "$test_file" .php)
+    
+    # Extract relative path for display
+    relative_path="${test_file#tests/}"
+    
+    # Check if test was already passed (should not happen, but keep as safety check)
+    if [ "${passed_test_files[$test_file]}" = "1" ]; then
+        skipped_tests=$((skipped_tests + 1))
+        echo -e "${BLUE}[$current_test/$tests_to_run]${NC} ${YELLOW}⊘ SKIPPED (already passed): $relative_path${NC}"
+        echo ""
+        continue
+    fi
+    
+    # Check if this is a retry of a previously failed test
+    was_failed=false
+    if [ "${failed_test_files[$test_file]}" = "1" ]; then
+        was_failed=true
+        echo -e "${BLUE}========================================${NC}"
+        echo -e "${BLUE}[$current_test/$tests_to_run] RETRYING: $relative_path${NC}"
+        echo -e "${BLUE}========================================${NC}"
+    else
+        echo -e "${BLUE}========================================${NC}"
+        echo -e "${BLUE}[$current_test/$tests_to_run] Running: $relative_path${NC}"
+        echo -e "${BLUE}========================================${NC}"
+    fi
+    
+    # Create temporary file for test output
+    test_output=$(mktemp)
+    
+    # Run the test and capture output
+    test_exit_code=0
+    php artisan test --filter="$test_name" 2>&1 | tee "$test_output" || test_exit_code=$?
+    
+    # Check if test failed by exit code OR by looking for "FAILED" in output
+    if [ $test_exit_code -ne 0 ] || grep -q "FAILED" "$test_output"; then
+        # Test failed
+        failed_tests=$((failed_tests + 1))
+        failed_test_list+=("$test_name ($relative_path)")
+        
+        if [ "$was_failed" = true ]; then
+            echo -e "${RED}✗ STILL FAILED: $test_name${NC}"
+        else
+            echo -e "${RED}✗ FAILED: $test_name${NC}"
+        fi
+        
+        # Save failed test path to temporary failed file (same format as success-tests.txt)
+        echo "$test_file" >> "$FAILED_FILE_TEMP"
+    else
+        # Test passed
+        passed_tests=$((passed_tests + 1))
+        
+        if [ "$was_failed" = true ]; then
+            fixed_tests=$((fixed_tests + 1))
+            echo -e "${GREEN}✓ PASSED (FIXED!): $test_name${NC}"
+        else
+            echo -e "${GREEN}✓ PASSED: $test_name${NC}"
+        fi
+        
+        # Save passed test to success file
+        echo "$test_file" >> "$SUCCESS_FILE"
+        # Don't add to failed file temp (removing from failed list)
+    fi
+    
+    # Clean up temporary file
+    rm -f "$test_output"
+    
+    echo ""
+done
+
+# Replace old failed file with new one
+if [ -f "$FAILED_FILE_TEMP" ]; then
+    mv "$FAILED_FILE_TEMP" "$FAILED_FILE"
+else
+    # No failures, remove failed file if it exists
+    rm -f "$FAILED_FILE"
+fi
+
+# Summary
+echo -e "${BLUE}========================================${NC}"
+echo -e "${BLUE}  Test Summary${NC}"
+echo -e "${BLUE}========================================${NC}"
+echo -e "Total Tests in Project:    $total_tests"
+echo -e "${YELLOW}Previously Passed (skipped): ${#passed_test_files[@]}${NC}"
+echo -e "Tests Run This Session:    $tests_to_run"
+echo -e "${GREEN}  ✓ Passed:                $passed_tests${NC}"
+if [ $fixed_tests -gt 0 ]; then
+    echo -e "${GREEN}  ✓ Fixed:                 $fixed_tests 🎉${NC}"
+fi
+echo -e "${RED}  ✗ Failed:                $failed_tests${NC}"
+echo ""
+
+# List failed tests if any
+if [ $failed_tests -gt 0 ]; then
+    echo -e "${RED}Failed Tests:${NC}"
+    for failed_test in "${failed_test_list[@]}"; do
+        echo -e "${RED}  - $failed_test${NC}"
+    done
+    echo ""
+    echo -e "${YELLOW}Detailed error logs saved to: $FAILED_FILE${NC}"
+    echo ""
+    exit 1
+else
+    echo -e "${GREEN}All tests passed! 🎉${NC}"
+    exit 0
+fi
+

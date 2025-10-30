@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Storage;
 use JsonException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Tests\TestCase;
-
 // Declare coverage via attribute so PHPUnit 12 migrations remain warning-free.
 #[CoversClass(DiscountPresetRepository::class)]
 final class DiscountPresetRepositoryTest extends TestCase

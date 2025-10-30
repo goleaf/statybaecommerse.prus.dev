@@ -91,11 +91,11 @@
                     <p class="text-xs text-gray-500">{{ number_format($this->cacheMetrics['hits'] ?? 0) }} hits / {{ number_format($this->cacheMetrics['misses'] ?? 0) }} misses.</p>
                 </div>
                 <div class="rounded-lg bg-gray-50 p-4">
-                    <dt class="text-sm font-medium text-gray-500">Telemetry sampling</dt>
+                    <dt class="text-sm font-medium text-gray-500">Prometheus snapshot lines</dt>
                     <dd class="mt-2 text-3xl font-semibold text-gray-900">
-                        {{ number_format(config('observability.tracing.sampler_ratio', 1) * 100, 1) }}%
+                        {{ number_format(collect(explode(PHP_EOL, trim($prometheusPreview)))->filter()->count()) }}
                     </dd>
-                    <p class="text-xs text-gray-500">Configured OTLP endpoint: {{ config('observability.tracing.otlp.endpoint') }}</p>
+                    <p class="text-xs text-gray-500">Counts non-empty rows rendered in the preview for quick exporter health checks.</p>
                 </div>
             </div>
         </x-filament::card>

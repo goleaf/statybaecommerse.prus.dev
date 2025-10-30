@@ -229,7 +229,7 @@ final class FeatureToggleService
     /**
      * Persist a lightweight analytics event describing how the feature evaluated.
      * Duplicate events for the same session are suppressed for a short window
-     * so noisy loops (e.g., API polling) do not flood the telemetry tables.
+     * so noisy loops (e.g., API polling) do not flood the analytics tables.
      *
      * @param array<string, mixed> $context
      */
