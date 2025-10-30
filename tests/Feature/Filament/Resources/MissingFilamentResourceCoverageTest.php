@@ -58,6 +58,7 @@ use App\Models\SystemSettingHistory;
 use App\Models\SystemSettingTranslation;
 use App\Models\User;
 use App\Models\UserPreference;
+use App\Models\UserProductInteraction;
 use App\Models\VariantInventory;
 use App\Models\VariantCombination;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -472,6 +473,15 @@ final class MissingFilamentResourceCoverageTest extends TestCase
         return UserPreference::factory()->forUser($user)->highScore()->create([
             'preference_type' => 'category',
             'preference_key'  => 'coverage-category',
+        ]);
+    }
+
+    private function createUserProductInteractionRecord(): UserProductInteraction
+    {
+        // Create an interaction linked to concrete user/product records for table relationship columns.
+        return UserProductInteraction::factory()->create([
+            'event' => 'coverage-event',
+            'meta'  => ['rating' => 3, 'notes' => 'Coverage note'],
         ]);
     }
 
