@@ -544,8 +544,17 @@ Route::prefix('api')->group(function (): void {
     Route::middleware('auth')->get('/user/profile', [App\Http\Controllers\Api\UserProfileController::class, '__invoke'])->name('api.user.profile');
 });
 
-// The dedicated categories tree endpoint now lives in routes/api.php so it automatically
-// receives the shared API middleware stack and avoids double registration across route files.
+// Mirror the category tree API endpoint in the web route file so test helpers and legacy
+// consumers that bypass the API route loader still resolve the JSON contract without hitting
+// implicit model binding fallbacks.
+Route::prefix('api')->group(function (): void {
+    Route::get('/categories/tree', [App\Http\Controllers\Api\CategoryController::class, 'tree'])
+        ->middleware('throttle:api.read')
+        // Keep the literal `tree` slug wired to this explicit route so model binding for
+        // `categories/{category}` never intercepts the payload when the API routes are skipped.
+        ->name('api.categories.tree');
+});
+
 
 // Public utility endpoints
 Route::get('/robots.txt', App\Http\Controllers\RobotsController::class)->name('robots');
