@@ -15,6 +15,8 @@ use App\Filament\Resources\PostResource\Pages\ListPosts;
 use App\Filament\Resources\ProductVariantResource\Pages\ListProductVariants;
 use App\Filament\Resources\RecommendationAnalyticsResource\Pages\ListRecommendationAnalytics;
 use App\Filament\Resources\ReferralCampaignResource\Pages\ListReferralCampaigns;
+use App\Filament\Resources\ReferralCodeUsageLogResource\Pages\ListReferralCodeUsageLogs;
+use App\Filament\Resources\ReferralRewardLogResource\Pages\ListReferralRewardLogs;
 use App\Filament\Resources\SliderTranslationResource\Pages\ListSliderTranslations;
 use App\Filament\Resources\SystemSettingResource\Pages\ListSystemSettings;
 use App\Filament\Resources\UserManagementResource\Pages\ListUsers;
@@ -32,6 +34,10 @@ use App\Models\Post;
 use App\Models\ProductVariant;
 use App\Models\RecommendationAnalytics;
 use App\Models\ReferralCampaign;
+use App\Models\ReferralCode;
+use App\Models\ReferralCodeUsageLog;
+use App\Models\ReferralReward;
+use App\Models\ReferralRewardLog;
 use App\Models\SliderTranslation;
 use App\Models\SystemSetting;
 use App\Models\User;
@@ -92,6 +98,8 @@ final class MissingFilamentResourceCoverageTest extends TestCase
             'product variants'          => [ListProductVariants::class, 'createProductVariantRecord'],
             'recommendation analytics'  => [ListRecommendationAnalytics::class, 'createRecommendationAnalyticsRecord'],
             'referral campaigns'        => [ListReferralCampaigns::class, 'createReferralCampaignRecord'],
+            'referral code usage logs'  => [ListReferralCodeUsageLogs::class, 'createReferralCodeUsageLogRecord'],
+            'referral reward logs'      => [ListReferralRewardLogs::class, 'createReferralRewardLogRecord'],
             'slider translations'       => [ListSliderTranslations::class, 'createSliderTranslationRecord'],
             'system settings'           => [ListSystemSettings::class, 'createSystemSettingRecord'],
             'user management'           => [ListUsers::class, 'createUserManagementRecord'],
@@ -239,6 +247,34 @@ final class MissingFilamentResourceCoverageTest extends TestCase
                 'lt' => 'Draudimo referral kampanija',
             ],
             'is_active' => true,
+        ]);
+    }
+
+    private function createReferralCodeUsageLogRecord(): ReferralCodeUsageLog
+    {
+        // Seed a referral code and associated usage log to populate the usage log listing table.
+        $referralCode = ReferralCode::factory()->create([
+            'code' => 'COVERAGE-REFERRAL',
+        ]);
+
+        // Persist the log with deterministic metadata so table assertions remain straightforward.
+        return ReferralCodeUsageLog::factory()->create([
+            'referral_code_id' => $referralCode->getKey(),
+            'metadata'         => ['device' => 'tablet'],
+        ]);
+    }
+
+    private function createReferralRewardLogRecord(): ReferralRewardLog
+    {
+        // Create a referral reward that the log can reference to satisfy foreign key requirements.
+        $reward = ReferralReward::factory()->create([
+            'title' => ['en' => 'Coverage Reward', 'lt' => 'Coverage Reward'],
+        ]);
+
+        // Insert an earned log entry so administrators always see at least one row in the listing.
+        return ReferralRewardLog::factory()->create([
+            'referral_reward_id' => $reward->getKey(),
+            'action'             => ReferralRewardLog::ACTION_EARNED,
         ]);
     }
 
