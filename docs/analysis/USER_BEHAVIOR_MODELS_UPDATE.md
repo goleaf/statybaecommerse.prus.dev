@@ -12,6 +12,7 @@
 - Refactored the unit and feature regression suites to share a centralised interaction factory helper and iterate scope expectations, keeping coverage consistent while reducing duplication in upcoming behavioural updates.【F:tests/Feature/UserProductInteractionTest.php†L16-L126】【F:tests/Unit/UserProductInteractionTest.php†L16-L110】
 - Updated the `UserPreference` unit tests to seed unique preference keys and explicitly order minimum-score queries so the composite `(user_id, preference_type, preference_key)` index remains respected while SQLite returns results deterministically across runs.【F:tests/Unit/UserPreferenceModelTest.php†L76-L133】
 - Refactored the `UserBehaviorResource` feature suite to exercise Filament table filters, record actions, and bulk workflows through Livewire tests, replacing brittle HTTP assertions while keeping notification messaging covered.【F:tests/Feature/UserBehaviorResourceTest.php†L17-L209】
+- Added a parallel Filament v4 regression harness that verifies the namespaced resource slug alongside create, edit, and list flows for the modernized admin entry point.【F:tests/Filament/UserProductInteractionsV4ResourceTest.php†L9-L89】
 - Admin guard seeders now prune legacy accounts and provision a single `AdminUser` record for `admin@example.com` with the shared `admin123` password so browser-driven authentication flows remain deterministic.【F:database/seeders/AdminUserSeeder.php†L1-L64】
 
 ## Follow-up Ideas
