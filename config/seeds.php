@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Database\Seeders\AdminAuthorizationSeeder;
 use Database\Seeders\AdminUserSeeder;
+use Database\Seeders\AllSeedersSeeder;
 use Database\Seeders\AttributeSeeder;
 use Database\Seeders\AttributeValueSeeder;
 use Database\Seeders\BrandSeeder;
@@ -38,18 +39,7 @@ return [
         ],
         'full' => [
             // The full profile builds on "minimal" and adds demo storefront content.
-            CurrencySeeder::class,
-            AttributeSeeder::class,
-            AttributeValueSeeder::class,
-            AdminAuthorizationSeeder::class,
-            RolesAndPermissionsSeeder::class,
-            AdminUserSeeder::class,
-            CustomerGroupSeeder::class,
-            DemoStoreSeeder::class,
-            // Enrich storefront visuals with fake slides and images
-            SliderSeeder::class,
-            ProductImageSeeder::class,
-            BrandSeeder::class,
+            AllSeedersSeeder::class,
         ],
     ],
 ];

@@ -27,14 +27,8 @@ final class DatabaseSeeder extends Seeder
         if (! is_array($profiles) || $profiles === []) {
             // Bail out early with the legacy seeder order if configuration is missing.
             $seeders = [
-                CurrencySeeder::class,
-                AttributeSeeder::class,
-                AttributeValueSeeder::class,
-                AdminAuthorizationSeeder::class,
-                RolesAndPermissionsSeeder::class,
-                AdminUserSeeder::class,
-                CustomerGroupSeeder::class,
-                DemoStoreSeeder::class,
+                // Default to the aggregator so a legacy configuration still seeds everything.
+                AllSeedersSeeder::class,
             ];
         } else {
             // Gracefully fall back to the default profile when an invalid name is provided.
