@@ -46,11 +46,12 @@ final class NotificationStreamController extends Controller
 
         // Establish configuration values that control the stream timing behaviour.
         $heartbeatIntervalSeconds = 30;
-        $pollIntervalMicroseconds = 250000; // 0.25 seconds between database polls.
+        $activePollIntervalMicroseconds = 250000; // 0.25 seconds between polls when new events are flowing.
+        $idlePollIntervalMicroseconds = 1000000; // 1 second between polls when the stream is idle.
         $streamLifetimeSeconds = 300; // Stop streaming after five minutes to avoid runaway PHP workers.
 
         return response()->stream(
-            callback: function () use ($user, $heartbeatIntervalSeconds, $pollIntervalMicroseconds, $streamLifetimeSeconds): void {
+            callback: function () use ($user, $heartbeatIntervalSeconds, $activePollIntervalMicroseconds, $idlePollIntervalMicroseconds, $streamLifetimeSeconds): void {
                 // Allow the script to continue even if the client disconnects so we can exit gracefully.
                 ignore_user_abort(true);
 
@@ -86,10 +87,12 @@ final class NotificationStreamController extends Controller
                     }
 
                     // Deliver any new unread notifications that have arrived since the last poll.
+                    $previousFingerprint = $this->fingerprintTimestamp($lastNotificationTimestamp);
                     $lastNotificationTimestamp = $this->pushUnreadNotifications($user, $lastNotificationTimestamp);
+                    $hasNewNotifications = $this->fingerprintTimestamp($lastNotificationTimestamp) !== $previousFingerprint;
 
                     // Sleep briefly to limit database load while still providing near real-time updates.
-                    usleep($pollIntervalMicroseconds);
+                    usleep($hasNewNotifications ? $activePollIntervalMicroseconds : $idlePollIntervalMicroseconds);
                 }
             },
             status: 200,
@@ -144,6 +147,15 @@ final class NotificationStreamController extends Controller
         }
 
         return $lastNotificationTimestamp;
+    }
+
+    /**
+     * Build a comparable fingerprint for a timestamp to detect when new notifications were emitted.
+     */
+    private function fingerprintTimestamp(DateTimeInterface $timestamp): string
+    {
+        // Format with microsecond precision and timezone to avoid collisions when notifications land within the same second.
+        return $timestamp->format('Y-m-d H:i:s.uP');
     }
 
     /**
