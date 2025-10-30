@@ -3,3 +3,4 @@
 - Keep `tests/Feature/Filament/Resources/MissingFilamentResourceCoverageTest.php` updated whenever new Filament resources are introduced or renamed so the smoke assertions continue to cover every list page.
 - Call `$component->call('loadTable')` before asserting table state inside Livewire-driven tests to hydrate deferred datasets.
 - Maintain descriptive inline comments in new or modified tests so reviewers can trace the intent behind helper methods and seeded fixtures.
+- When editing Post moderation workflows, update `PostResourceTest` alongside the resource so action guards, filters, and approval side effects remain aligned with the Livewire coverage.
