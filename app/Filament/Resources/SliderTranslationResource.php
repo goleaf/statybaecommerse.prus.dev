@@ -20,6 +20,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
 use UnitEnum;
 
 final class SliderTranslationResource extends Resource
@@ -64,7 +65,8 @@ final class SliderTranslationResource extends Resource
                         ->components([
                             Select::make('slider_id')
                                 ->label(__('admin.slider_translations.slider'))
-                                ->relationship('slider', 'name')
+                                // Surface the slider title because the model does not expose a dedicated name attribute.
+                                ->relationship('slider', 'title')
                                 ->required()
                                 ->preload()
                                 ->searchable(),
@@ -100,7 +102,8 @@ final class SliderTranslationResource extends Resource
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
-                TextColumn::make('slider.name')
+                // Display the related slider title to keep the table aligned with the updated relationship attribute.
+                TextColumn::make('slider.title')
                     ->label(__('admin.slider_translations.slider'))
                     ->searchable()
                     ->sortable()
@@ -163,7 +166,8 @@ final class SliderTranslationResource extends Resource
             ->filters([
                 SelectFilter::make('slider')
                     ->label(__('admin.slider_translations.slider'))
-                    ->relationship('slider', 'name')
+                    // Match the form relationship so filter options load without referencing a missing column.
+                    ->relationship('slider', 'title')
                     ->preload()
                     ->searchable(),
                 SelectFilter::make('locale')
