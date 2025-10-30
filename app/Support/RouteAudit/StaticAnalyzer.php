@@ -344,6 +344,31 @@ final class StaticAnalyzer
         $declared = array_values(array_unique($route->middleware()));
         $resolved = $route->gatherMiddleware();
 
+        // Normalise resolved middleware into class-name strings so closures and arrays never trigger string conversion errors.
+        $normalizedResolved = [];
+
+        foreach ($resolved as $middleware) {
+            if (is_string($middleware)) {
+                $normalizedResolved[] = $middleware;
+
+                continue;
+            }
+
+            if (is_object($middleware)) {
+                $normalizedResolved[] = $middleware::class;
+
+                continue;
+            }
+
+            if (is_array($middleware) && isset($middleware[0]) && is_string($middleware[0])) {
+                $normalizedResolved[] = $middleware[0];
+
+                continue;
+            }
+
+            $normalizedResolved[] = get_debug_type($middleware);
+        }
+
         $authGuard = null;
         $throttle = [];
 
@@ -400,7 +425,7 @@ final class StaticAnalyzer
 
         return [
             'declared'  => $declared,
-            'resolved'  => array_values(array_unique($resolved)),
+            'resolved'  => array_values(array_unique($normalizedResolved)),
             'authGuard' => $authGuard,
             'throttle'  => $throttle,
             'issues'    => $issues,
