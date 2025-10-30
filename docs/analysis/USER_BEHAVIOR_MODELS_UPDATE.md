@@ -13,6 +13,7 @@
 - Updated the `UserPreference` unit tests to seed unique preference keys and explicitly order minimum-score queries so the composite `(user_id, preference_type, preference_key)` index remains respected while SQLite returns results deterministically across runs.【F:tests/Unit/UserPreferenceModelTest.php†L76-L133】
 - Refactored the `UserBehaviorResource` feature suite to exercise Filament table filters, record actions, and bulk workflows through Livewire tests, replacing brittle HTTP assertions while keeping notification messaging covered.【F:tests/Feature/UserBehaviorResourceTest.php†L17-L209】
 - Admin guard seeders now prune legacy accounts and provision a single `AdminUser` record for `admin@example.com` with the shared `admin123` password so browser-driven authentication flows remain deterministic.【F:database/seeders/AdminUserSeeder.php†L1-L64】
+- Recommendation analytics management now includes Livewire coverage for the Filament resource, exercising CRUD workflows and composite filters to guarantee v4 table definitions remain stable during upgrades.【F:tests/Feature/RecommendationAnalyticsResourceTest.php†L1-L154】
 
 ## Follow-up Ideas
 - Extend model factories with named states that exercise alias-based mass assignment to guard against regressions in the hydrators.
