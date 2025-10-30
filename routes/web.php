@@ -535,7 +535,7 @@ Route::prefix('api')->group(function (): void {
     Route::get('/categories', [App\Http\Controllers\Api\CategoryController::class, 'index'])->name('api.categories.index');
     Route::get('/categories/{category:slug}', [App\Http\Controllers\Api\CategoryController::class, 'show'])
         // Reserve the `tree` slug for the dedicated endpoint so implicit model binding does not
-        // swallow the request before it reaches the static route definition below.
+        // swallow the request before it reaches the static route definition inside routes/api.php.
         ->where('category', '^(?!tree$)[A-Za-z0-9\-]+$')
         ->name('api.categories.show');
     Route::get('/brands', [App\Http\Controllers\Api\BrandController::class, 'index'])->name('api.brands.index');
@@ -544,9 +544,8 @@ Route::prefix('api')->group(function (): void {
     Route::middleware('auth')->get('/user/profile', [App\Http\Controllers\Api\UserProfileController::class, '__invoke'])->name('api.user.profile');
 });
 
-// API routes registered separately to ensure proper name
-Route::get('/api/categories/tree', [App\Http\Controllers\Api\CategoryController::class, 'tree'])
-    ->name('api.categories.tree');
+// The dedicated categories tree endpoint now lives in routes/api.php so it automatically
+// receives the shared API middleware stack and avoids double registration across route files.
 
 // Public utility endpoints
 Route::get('/robots.txt', App\Http\Controllers\RobotsController::class)->name('robots');
