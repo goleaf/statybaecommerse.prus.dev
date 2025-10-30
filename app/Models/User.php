@@ -737,10 +737,14 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
 
     /**
      * Handle activityLogs functionality with proper error handling.
+     *
+     * @return MorphMany<\App\Models\ActivityLog>
      */
-    public function activityLogs(): HasMany
+    public function activityLogs(): MorphMany
     {
-        return $this->hasMany(\App\Models\ActivityLog::class);
+        // Use a morphMany relation so the lookup honours the causer_type/causer_id columns
+        // provided by the activity log package instead of assuming a user_id foreign key.
+        return $this->morphMany(\App\Models\ActivityLog::class, 'causer');
     }
 
     /**
