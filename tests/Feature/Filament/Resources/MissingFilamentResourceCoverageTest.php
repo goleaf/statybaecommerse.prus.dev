@@ -77,7 +77,6 @@ use App\Models\UserProductInteraction;
 use App\Models\VariantInventory;
 use App\Models\VariantCombination;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Str;
 use Livewire\Livewire;
 use Tests\TestCase;
 
