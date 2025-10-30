@@ -65,6 +65,13 @@ final class Category extends Model implements HasMedia
     use Searchable;
     use SoftDeletes;
 
+    /**
+     * Reserved slugs that map to dedicated API endpoints.
+     *
+     * @var array<int, string>
+     */
+    public const RESERVED_SLUGS = ['tree'];
+
     public const SCOPE_COLUMN_HINTS = [
         'is_active'  => true,
         'is_visible' => true,
@@ -953,5 +960,26 @@ final class Category extends Model implements HasMedia
         $this->addMediaConversion('thumb')->width(300)->height(300)->sharpen(10);
         $this->addMediaConversion('medium')->width(600)->height(600)->sharpen(10);
         $this->addMediaConversion('large')->width(1200)->height(1200)->sharpen(10);
+    }
+
+    /**
+     * Build the regex used to guard API route bindings against reserved slugs.
+     */
+    public static function apiRouteBindingPattern(): string
+    {
+        if (self::RESERVED_SLUGS === []) {
+            // Default to the canonical slug pattern when no reserved values exist.
+            return '(?i)^[a-z0-9\\-]+$';
+        }
+
+        $escaped = array_map(
+            static fn (string $slug): string => preg_quote($slug, '/'),
+            self::RESERVED_SLUGS,
+        );
+
+        // Guard against the reserved slugs in a case-insensitive manner so static
+        // API endpoints (e.g. /api/categories/tree) do not get intercepted by
+        // implicit model binding when editors reuse the slug with new casing.
+        return '(?i)^(?!(?:' . implode('|', $escaped) . ')$)[a-z0-9\\-]+$';
     }
 }

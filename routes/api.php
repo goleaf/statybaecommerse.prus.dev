@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ProductHistoryController as ApiProductHistoryController;
+use App\Models\Category;
 use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\Api\V1\SearchController;
 use App\Http\Controllers\Webhooks\PaymentWebhookController;
@@ -80,8 +81,9 @@ Route::prefix('categories')
 
         Route::get('{category:slug}', [CategoryController::class, 'show'])
             ->middleware('throttle:api.read')
-            // Use a regex guard so user-provided slugs cannot shadow the static tree endpoint.
-            ->where('category', '^(?!tree$)[A-Za-z0-9\-]+$')
+            // Delegate to the model's guard so static endpoints stay protected even when
+            // administrators create categories that reuse reserved slugs with new casing.
+            ->where('category', Category::apiRouteBindingPattern())
             ->name('show');
     });
 

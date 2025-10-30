@@ -47,7 +47,10 @@ final class ContractValidationTest extends TestCase
         ]);
         $product->categories()->attach($category);
 
-        $response = $this->getJson('/api/products/search?q=' . urlencode(substr($product->name, 0, 4)));
+        $query = mb_substr($product->name, 0, 4, 'UTF-8');
+        // Use the multibyte-safe substring so Lithuanian fixtures do not trigger malformed
+        // UTF-8 errors when the query truncates a character mid-sequence.
+        $response = $this->getJson('/api/products/search?q=' . urlencode($query));
 
         $response->assertOk();
         $payload = $response->json();
