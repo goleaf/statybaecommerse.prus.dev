@@ -61,3 +61,7 @@ The model-focused regression suite is a quick indicator that Eloquent scopes, ca
   retired. Continue keeping the remaining placeholder files in `tests/Unit`,
   `tests/Livewire`, `tests/Filament`, and `tests/Http` green so the progress reports stay
   consistent.
+- A complementary Livewire regression in `tests/Feature/Livewire/Components/TestResultsComponentTest.php`
+  now verifies that the widget renders detailed failure output and gracefully falls back to
+  the `no_data` state when the JSON snapshot disappears, so align any fixture tweaks with the
+  expected array structure for `tests` and `errors` entries to keep the assertions stable.
