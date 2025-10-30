@@ -156,8 +156,10 @@ final class SystemSettingsResourceTest extends TestCase
                 'category_id' => $this->category->id,
             ]);
 
-        $this->listComponent()
-            ->assertCanSeeTableRecords($settings);
+        $component = $this->listComponent();
+        $component->call('loadTable');
+
+        $component->assertCanSeeTableRecords($settings);
     }
 
     /**
@@ -244,7 +246,10 @@ final class SystemSettingsResourceTest extends TestCase
             'default_value' => 'default value',
         ]);
 
-        $this->listComponent()
+        $component = $this->listComponent();
+        $component->call('loadTable');
+
+        $component
             ->callTableAction('reset_to_default', $setting)
             ->assertHasNoActionErrors();
 
@@ -264,7 +269,10 @@ final class SystemSettingsResourceTest extends TestCase
             'name' => 'Original Setting',
         ]);
 
-        $this->listComponent()
+        $component = $this->listComponent();
+        $component->call('loadTable');
+
+        $component
             ->callTableAction('duplicate', $setting)
             ->assertHasNoActionErrors();
 
@@ -285,7 +293,10 @@ final class SystemSettingsResourceTest extends TestCase
                 'category_id' => $this->category->id,
             ]);
 
-        $this->listComponent()
+        $component = $this->listComponent();
+        $component->call('loadTable');
+
+        $component
             ->callTableBulkAction('export_settings', $settings)
             ->assertHasNoBulkActionErrors();
     }
@@ -301,7 +312,10 @@ final class SystemSettingsResourceTest extends TestCase
                 'category_id' => $this->category->id,
             ]);
 
-        $this->listComponent()
+        $component = $this->listComponent();
+        $component->call('loadTable');
+
+        $component
             ->callTableBulkAction('clear_cache', $settings)
             ->assertHasNoBulkActionErrors();
     }
@@ -314,8 +328,11 @@ final class SystemSettingsResourceTest extends TestCase
         $visibleSetting = $this->createSetting(['type' => 'string']);
         $hiddenSetting = $this->createSetting(['type' => 'boolean']);
 
-        $this->listComponent()
-            ->filterTable('type', 'string')
+        $component = $this->listComponent();
+        $component->filterTable('type', 'string');
+        $component->call('loadTable');
+
+        $component
             ->assertCanSeeTableRecords([$visibleSetting])
             ->assertCanNotSeeTableRecords([$hiddenSetting]);
     }
@@ -332,8 +349,11 @@ final class SystemSettingsResourceTest extends TestCase
             'key'         => 'other-setting',
         ]);
 
-        $this->listComponent()
-            ->filterTable('category_id', $this->category->id)
+        $component = $this->listComponent();
+        $component->filterTable('category_id', $this->category->id);
+        $component->call('loadTable');
+
+        $component
             ->assertCanSeeTableRecords([$visibleSetting])
             ->assertCanNotSeeTableRecords([$hiddenSetting]);
     }
@@ -346,8 +366,11 @@ final class SystemSettingsResourceTest extends TestCase
         $visibleSetting = $this->createSetting(['is_public' => true, 'key' => 'public_setting']);
         $hiddenSetting = $this->createSetting(['is_public' => false, 'key' => 'private_setting']);
 
-        $this->listComponent()
-            ->filterTable('is_public', true)
+        $component = $this->listComponent();
+        $component->filterTable('is_public', true);
+        $component->call('loadTable');
+
+        $component
             ->assertCanSeeTableRecords([$visibleSetting])
             ->assertCanNotSeeTableRecords([$hiddenSetting]);
     }
@@ -361,8 +384,11 @@ final class SystemSettingsResourceTest extends TestCase
         $alsoVisible = $this->createSetting(['name' => 'Test Setting 2', 'key' => 'test_setting_2']);
         $hiddenSetting = $this->createSetting(['name' => 'Different Setting', 'key' => 'different_setting']);
 
-        $this->listComponent()
-            ->searchTable('Test')
+        $component = $this->listComponent();
+        $component->searchTable('Test');
+        $component->call('loadTable');
+
+        $component
             ->assertCanSeeTableRecords([$visibleSetting, $alsoVisible])
             ->assertCanNotSeeTableRecords([$hiddenSetting]);
     }
@@ -543,10 +569,9 @@ final class SystemSettingsResourceTest extends TestCase
      */
     public function test_table_filters_are_configured(): void
     {
-        $component = $this->listComponent();
-
         // Validate each expected filter exists to keep the listing feature-complete.
-        $component->assertCanSeeTableFilters(self::TABLE_FILTERS);
+        $this->listComponent()
+            ->assertCanSeeTableFilters(self::TABLE_FILTERS);
     }
 
     /**
@@ -556,10 +581,9 @@ final class SystemSettingsResourceTest extends TestCase
     {
         $this->createSetting();
 
-        $component = $this->listComponent();
-
         // Confirm the presence of each action instead of asserting a brittle ordered list.
-        $component->assertCanSeeTableActions(self::TABLE_ACTIONS);
+        $this->listComponent()
+            ->assertCanSeeTableActions(self::TABLE_ACTIONS);
     }
 
     /**
@@ -567,10 +591,9 @@ final class SystemSettingsResourceTest extends TestCase
      */
     public function test_bulk_actions_are_configured(): void
     {
-        $component = $this->listComponent();
-
         // Ensures each bulk action identifier remains registered.
-        $component->assertCanSeeBulkActions(self::BULK_ACTIONS);
+        $this->listComponent()
+            ->assertCanSeeBulkActions(self::BULK_ACTIONS);
     }
 
     /**
@@ -615,7 +638,10 @@ final class SystemSettingsResourceTest extends TestCase
     private function createSetting(array $overrides = []): SystemSetting
     {
         return SystemSetting::factory()->create($overrides + [
-            'category_id' => $this->category->id,
+            // Explicitly disable encryption so assertion payloads can compare
+            // plain-text values without chasing randomly encrypted fixtures.
+            'is_encrypted' => false,
+            'category_id'  => $this->category->id,
         ]);
     }
 
