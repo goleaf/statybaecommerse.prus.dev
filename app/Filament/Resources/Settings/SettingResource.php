@@ -9,6 +9,7 @@ use App\Filament\Resources\Settings\Pages\EditSetting;
 use App\Filament\Resources\Settings\Pages\ListSettings;
 use App\Filament\Resources\Settings\Schemas\SettingForm;
 use App\Filament\Resources\Settings\Tables\SettingsTable;
+use App\Models\Setting;
 use App\Support\Concerns\HasNav;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -19,6 +20,11 @@ use Filament\Tables\Table;
 class SettingResource extends Resource
 {
     use HasNav;
+
+    /**
+     * Explicitly register the underlying model so Filament resolves records correctly.
+     */
+    protected static ?string $model = Setting::class;
 
     /**
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
