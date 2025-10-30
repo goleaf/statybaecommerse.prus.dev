@@ -109,7 +109,8 @@ final class SystemSettingResource extends Resource
                             ]),
                         Select::make('category_id')
                             ->label(__('system_settings.category'))
-                            ->relationship('categoryRelation', 'name')
+                            // Use the canonical model relationship name so Livewire resolves associations correctly during form hydration.
+                            ->relationship('category', 'name')
                             ->searchable()
                             ->preload()
                             ->required() // Keep the category link mandatory so reporting scopes retain context.
