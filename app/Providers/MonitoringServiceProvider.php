@@ -7,7 +7,6 @@ namespace App\Providers;
 use App\Support\Monitoring\ApplicationMetrics;
 use App\Support\Monitoring\CacheMetricsStore;
 use App\Support\Monitoring\QueueMetricsStore;
-use App\Support\Telemetry\TelemetryManager;
 use Illuminate\Cache\Events\CacheHit;
 use Illuminate\Cache\Events\CacheMissed;
 use Illuminate\Contracts\Cache\Factory as CacheFactory;
@@ -22,8 +21,6 @@ final class MonitoringServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->app->singleton(TelemetryManager::class);
-
         $this->app->singleton(CacheMetricsStore::class, function ($app): CacheMetricsStore {
             $cacheFactory = $app->make(CacheFactory::class);
             $storeName = (string) config('observability.metrics.cache_store', config('cache.default'));
@@ -40,14 +37,12 @@ final class MonitoringServiceProvider extends ServiceProvider
             return new QueueMetricsStore($repository, (string) config('observability.metrics.queue_key'));
         });
 
-        $this->app->singleton(ApplicationMetrics::class, function ($app): ApplicationMetrics {
-            return new ApplicationMetrics(
-                $app->make(CacheMetricsStore::class),
-                $app->make(QueueMetricsStore::class),
-                $app->make(QueueManager::class),
-                $app->make(ConnectionResolverInterface::class),
-            );
-        });
+        $this->app->singleton(ApplicationMetrics::class, fn($app): ApplicationMetrics => new ApplicationMetrics(
+            $app->make(CacheMetricsStore::class),
+            $app->make(QueueMetricsStore::class),
+            $app->make(QueueManager::class),
+            $app->make(ConnectionResolverInterface::class),
+        ));
     }
 
     public function boot(Dispatcher $events, CacheMetricsStore $cacheMetrics, QueueMetricsStore $queueMetrics): void

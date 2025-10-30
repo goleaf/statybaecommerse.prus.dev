@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services\Shared;
 
-use App\Support\Telemetry\TelemetryManager;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
-use OpenTelemetry\API\Trace\SpanInterface;
 
 /**
  * ComponentPerformanceService
@@ -21,34 +19,35 @@ final class ComponentPerformanceService
     private const METRICS_TTL = 3600;
 
     // 1 hour
-    public function __construct(private readonly TelemetryManager $telemetry) {}
-
     /**
      * Handle trackComponentRender functionality with proper error handling.
      */
     public function trackComponentRender(string $component, float $renderTime): void
     {
-        $this->telemetry->inSpan('components.render', function (?SpanInterface $span) use ($component, $renderTime): void {
-            $metrics = $this->getMetrics();
-            if (! isset($metrics[$component])) {
-                $metrics[$component] = ['total_renders' => 0, 'total_time' => 0, 'avg_time' => 0, 'min_time' => PHP_FLOAT_MAX, 'max_time' => 0, 'last_render' => null];
-            }
-            $metrics[$component]['total_renders']++;
-            $metrics[$component]['total_time'] += $renderTime;
-            $metrics[$component]['avg_time'] = $metrics[$component]['total_time'] / $metrics[$component]['total_renders'];
-            $metrics[$component]['min_time'] = min($metrics[$component]['min_time'], $renderTime);
-            $metrics[$component]['max_time'] = max($metrics[$component]['max_time'], $renderTime);
-            $metrics[$component]['last_render'] = now()->toISOString();
-            $this->saveMetrics($metrics);
-            $span?->setAttribute('component.name', $component);
-            $span?->setAttribute('component.render_time', $renderTime);
-            $span?->setAttribute('component.render_count', $metrics[$component]['total_renders']);
-            if ($renderTime > 100) {
-                Log::warning('Slow component render detected', ['component' => $component, 'render_time' => $renderTime, 'avg_time' => $metrics[$component]['avg_time']]);
-            }
-        }, [
-            'component.name' => $component,
-        ]);
+        $metrics = $this->getMetrics();
+        if (! isset($metrics[$component])) {
+            $metrics[$component] = [
+                'total_renders' => 0,
+                'total_time'    => 0,
+                'avg_time'      => 0,
+                'min_time'      => PHP_FLOAT_MAX,
+                'max_time'      => 0,
+                'last_render'   => null,
+            ];
+        }
+        $metrics[$component]['total_renders']++;
+        $metrics[$component]['total_time'] += $renderTime;
+        $metrics[$component]['avg_time'] = $metrics[$component]['total_time'] / $metrics[$component]['total_renders'];
+        $metrics[$component]['min_time'] = min($metrics[$component]['min_time'], $renderTime);
+        $metrics[$component]['max_time'] = max($metrics[$component]['max_time'], $renderTime);
+        $metrics[$component]['last_render'] = now()->toISOString();
+        // Persist the refreshed metrics so dashboards stay accurate without span instrumentation.
+        $this->saveMetrics($metrics);
+
+        // Log unusually slow renders so engineers can trace bottlenecks using the aggregated cache data.
+        if ($renderTime > 100) {
+            Log::warning('Slow component render detected', ['component' => $component, 'render_time' => $renderTime, 'avg_time' => $metrics[$component]['avg_time']]);
+        }
     }
 
     /**
@@ -75,7 +74,7 @@ final class ComponentPerformanceService
     public function getSlowestComponents(int $limit = 10): array
     {
         $metrics = $this->getMetrics();
-        uasort($metrics, fn ($a, $b) => $b['avg_time'] <=> $a['avg_time']);
+        uasort($metrics, fn ($a, $b): int => $b['avg_time'] <=> $a['avg_time']);
 
         return array_slice($metrics, 0, $limit, true);
     }
@@ -86,7 +85,7 @@ final class ComponentPerformanceService
     public function getMostUsedComponents(int $limit = 10): array
     {
         $metrics = $this->getMetrics();
-        uasort($metrics, fn ($a, $b) => $b['total_renders'] <=> $a['total_renders']);
+        uasort($metrics, fn ($a, $b): int => $b['total_renders'] <=> $a['total_renders']);
 
         return array_slice($metrics, 0, $limit, true);
     }
@@ -97,7 +96,7 @@ final class ComponentPerformanceService
     public function getPerformanceReport(): array
     {
         $metrics = $this->getMetrics();
-        if (empty($metrics)) {
+        if ($metrics === []) {
             return ['total_components' => 0, 'total_renders' => 0, 'avg_render_time' => 0, 'slowest_component' => null, 'most_used_component' => null];
         }
         $totalRenders = array_sum(array_column($metrics, 'total_renders'));
@@ -106,7 +105,7 @@ final class ComponentPerformanceService
         $slowest = $this->getSlowestComponents(1);
         $mostUsed = $this->getMostUsedComponents(1);
 
-        return ['total_components' => count($metrics), 'total_renders' => $totalRenders, 'avg_render_time' => round($avgRenderTime, 2), 'slowest_component' => ! empty($slowest) ? array_key_first($slowest) : null, 'slowest_time' => ! empty($slowest) ? round(array_values($slowest)[0]['avg_time'], 2) : 0, 'most_used_component' => ! empty($mostUsed) ? array_key_first($mostUsed) : null, 'most_used_count' => ! empty($mostUsed) ? array_values($mostUsed)[0]['total_renders'] : 0, 'performance_score' => $this->calculatePerformanceScore($metrics)];
+        return ['total_components' => count($metrics), 'total_renders' => $totalRenders, 'avg_render_time' => round($avgRenderTime, 2), 'slowest_component' => $slowest === [] ? null : array_key_first($slowest), 'slowest_time' => $slowest === [] ? 0 : round(array_values($slowest)[0]['avg_time'], 2), 'most_used_component' => $mostUsed === [] ? null : array_key_first($mostUsed), 'most_used_count' => $mostUsed === [] ? 0 : array_values($mostUsed)[0]['total_renders'], 'performance_score' => $this->calculatePerformanceScore($metrics)];
     }
 
     /**
@@ -171,7 +170,7 @@ final class ComponentPerformanceService
      */
     private function calculatePerformanceScore(array $metrics): int
     {
-        if (empty($metrics)) {
+        if ($metrics === []) {
             return 100;
         }
         $totalComponents = count($metrics);
