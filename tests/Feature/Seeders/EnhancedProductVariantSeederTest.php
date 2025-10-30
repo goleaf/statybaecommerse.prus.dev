@@ -101,8 +101,9 @@ it('feature: creates pricing rules for products', function () {
     // Verify pricing rule structure
     $pricingRule = VariantPricingRule::first();
     expect($pricingRule->product_id)->not->toBeNull();
-    expect($pricingRule->rule_name)->not->toBeNull();
-    expect($pricingRule->rule_type)->not->toBeNull();
+    // Pricing rules only expose a single "name" column, so treat it as the canonical identifier.
+    expect($pricingRule->name)->toBe('Large Size Premium');
+    expect($pricingRule->type)->toBe('percentage');
     expect($pricingRule->is_active)->toBeTrue();
 });
 
