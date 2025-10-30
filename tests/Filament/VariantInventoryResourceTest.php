@@ -3,9 +3,13 @@
 declare(strict_types=1);
 
 use App\Filament\Resources\VariantInventoryResource;
+use App\Models\Location;
+use App\Models\Product;
+use App\Models\ProductVariant;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Schema;
+use ReflectionMethod;
 
 // Bridge the new Filament namespace layout so the resource signature resolves during tests.
 if (! class_exists(\Filament\Forms\Form::class)) {
@@ -54,4 +58,68 @@ it('clears lookup payload when the variant and location inputs are emptied', fun
         ->and($variantPayload->getState())->toBeArray()->toBeEmpty()
         ->and($locationInput->getState())->toBeNull()
         ->and($locationPayload->getState())->toBeArray()->toBeEmpty();
+});
+
+it('normalises the variant payload including related product metadata', function (): void {
+    // Prepare a product variant with numeric-friendly attributes to verify casting behaviour.
+    $variant = ProductVariant::make([
+        'product_id' => 654,
+        'sku'        => 1001,
+        'name'       => 'Wool Hat',
+        'price'      => '199.95',
+    ]);
+    $variant->setAttribute('id', 321);
+
+    // Attach a related product so the helper can surface parent identifiers in the payload.
+    $product = Product::make([
+        'sku'  => 'PROD-900',
+        'name' => 'Felt Collection',
+    ]);
+    $product->setAttribute('id', 654);
+    $variant->setRelation('product', $product);
+
+    // Reflect the private helper so we can assert on the exact metadata structure it emits.
+    $method = new ReflectionMethod(VariantInventoryResource::class, 'normaliseVariantPayload');
+    $method->setAccessible(true);
+
+    /** @var array<string, mixed> $payload */
+    $payload = $method->invoke(null, $variant);
+
+    expect($payload)
+        ->toMatchArray([
+            'variant_id'   => 321,
+            'sku'          => '1001',
+            'name'         => 'Wool Hat',
+            'price'        => 199.95,
+            'product_id'   => 654,
+            'product_sku'  => 'PROD-900',
+            'product_name' => 'Felt Collection',
+        ]);
+});
+
+it('casts arbitrary location attributes into the expected payload shape', function (): void {
+    // Seed a location with mixed attribute types so we can validate the string coercion logic.
+    $location = Location::make([
+        'name'         => 'Central Warehouse',
+        'code'         => 42,
+        'city'         => 'Vilnius',
+        'country_code' => 123,
+    ]);
+    $location->setAttribute('id', 777);
+
+    // Invoke the normaliser through reflection to reach the otherwise private helper.
+    $method = new ReflectionMethod(VariantInventoryResource::class, 'normaliseLocationPayload');
+    $method->setAccessible(true);
+
+    /** @var array<string, mixed> $payload */
+    $payload = $method->invoke(null, $location);
+
+    expect($payload)
+        ->toMatchArray([
+            'location_id'  => 777,
+            'name'         => 'Central Warehouse',
+            'code'         => '42',
+            'city'         => 'Vilnius',
+            'country_code' => '123',
+        ]);
 });
