@@ -27,7 +27,8 @@ final class DashboardTimeSeriesRepository
             $users = $this->usersPerDay($dateRange);
 
             $labels = $dateRange->map(function (CarbonImmutable $date): string {
-                return $date->locale(app()->getLocale())->translatedFormat('MMM d');
+                // Use isoFormat to avoid duplicated month fragments introduced by translatedFormat in Carbon v3.
+                return $date->locale(app()->getLocale())->isoFormat('MMM D');
             })->all();
 
             return [
