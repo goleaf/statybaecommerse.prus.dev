@@ -17,10 +17,13 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
 use UnitEnum;
 
 final class UserManagementResource extends Resource
 {
+    use SpatieTranslatableResource; // Reuse the translatable helpers so shared UserResource forms resolve locale-aware metadata.
+
     protected static ?string $model = User::class;
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-users';
