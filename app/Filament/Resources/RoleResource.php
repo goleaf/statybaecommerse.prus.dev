@@ -241,7 +241,8 @@ final class RoleResource extends Resource
     {
         $matrix = self::normalizedMatrix($role->permissions_matrix ?? []);
 
-        $role->permissions()->sync(self::permissionsFromMatrix($matrix));
+        // Delegate to Spatie's helper so we can pass permission names instead of raw IDs.
+        $role->syncPermissions(self::permissionsFromMatrix($matrix));
     }
 
     public static function moduleLabel(string $module): string
