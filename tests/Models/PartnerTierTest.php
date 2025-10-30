@@ -82,9 +82,21 @@ final class PartnerTierTest extends TestCase
     public function test_ordered_by_name_scope_sorts_alphabetically(): void
     {
         // Create tiers out of order so we can verify the alphabetical sort order.
-        $gamma = PartnerTier::factory()->create(['name' => 'Gamma', 'code' => 'gamma-001']);
-        $alpha = PartnerTier::factory()->create(['name' => 'Alpha', 'code' => 'alpha-001']);
-        $beta = PartnerTier::factory()->create(['name' => 'Beta', 'code' => 'beta-001']);
+        $gamma = PartnerTier::factory()->create([
+            'name' => 'Gamma',
+            'code' => 'gamma-001',
+            'is_enabled' => true, // Ensure the ActiveScope does not filter this tier from the query results.
+        ]);
+        $alpha = PartnerTier::factory()->create([
+            'name' => 'Alpha',
+            'code' => 'alpha-001',
+            'is_enabled' => true, // Keep the deterministic alphabetical expectations intact by retaining the record.
+        ]);
+        $beta = PartnerTier::factory()->create([
+            'name' => 'Beta',
+            'code' => 'beta-001',
+            'is_enabled' => true, // Guard against the global enabled scope removing this record during the assertion.
+        ]);
 
         // Collect IDs in the order returned by the scope and compare with the expected sequence.
         $orderedIds = PartnerTier::query()->orderedByName()->pluck('id')->all();
