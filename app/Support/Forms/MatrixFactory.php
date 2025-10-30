@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Support\Forms;
 
+use App\Support\Forms\Casts\MatrixBooleanStateCast;
+use App\Support\Forms\Components\BooleanMatrix;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Toggle;
@@ -12,7 +14,6 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Illuminate\Support\Collection;
-use LaraZeus\MatrixChoice\Components\Matrix;
 
 final class MatrixFactory
 {
@@ -117,16 +118,34 @@ final class MatrixFactory
      * @param array<string, string> $rows
      * @param array<string, string> $columns
      */
-    public static function checkboxGrid(string $name, array $rows, array $columns): Matrix
+    public static function checkboxGrid(string $name, array $rows, array $columns): BooleanMatrix
     {
-        return Matrix::make($name)
+        $rowKeys = array_keys($rows);
+        $columnKeys = array_keys($columns);
+        $stateCast = new MatrixBooleanStateCast($rowKeys, $columnKeys);
+
+        return BooleanMatrix::make($name)
             ->rowData($rows)
             ->columnData($columns)
             ->asCheckbox()
             // Allow the matrix to be submitted without selecting every row so default
             // channel creation flows (and automated tests) are not blocked by validation.
             ->rowSelectRequired(false)
-            ->default(static fn (): array => []);
+            // Prevent automatic dehydration so resources can manage persistence manually.
+            ->dehydrated(false)
+            // Disable the default checkbox list validation since matrix rows are handled manually.
+            ->rules([])
+            // Skip validation hooks since persistence is handled manually by the resource pages.
+            ->validatedWhenNotDehydrated(false)
+            // Apply a bespoke state cast so Livewire always works with a boolean grid.
+            ->stateCast($stateCast)
+            // Ensure null or sparse payloads are normalised before hitting the UI bindings.
+            ->formatStateUsing(fn (mixed $state): array => $stateCast->get($state))
+            // Keep the stored state aligned with the boolean grid representation even when
+            // Livewire submits partial checkbox payloads during interaction.
+            ->dehydrateStateUsing(fn (mixed $state): array => $stateCast->set($state))
+            // Provide a predictable default payload so Livewire bindings never operate on null.
+            ->default(static fn (): array => $stateCast->set([]));
     }
 
     /**
