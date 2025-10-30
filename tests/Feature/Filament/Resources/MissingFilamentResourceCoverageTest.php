@@ -13,8 +13,12 @@ use App\Filament\Resources\CollectionRuleResource\Pages\ListCollectionRules;
 use App\Filament\Resources\EnumManagementResource\Pages\ListEnumManagement;
 use App\Filament\Resources\PostResource\Pages\ListPosts;
 use App\Filament\Resources\ProductVariantResource\Pages\ListProductVariants;
+use App\Filament\Resources\ReferralCodeUsageLogResource\Pages\ListReferralCodeUsageLogs;
 use App\Filament\Resources\RecommendationAnalyticsResource\Pages\ListRecommendationAnalytics;
 use App\Filament\Resources\ReferralCampaignResource\Pages\ListReferralCampaigns;
+use App\Filament\Resources\ReferralRewardLogResource\Pages\ListReferralRewardLogs;
+use App\Filament\Resources\ReferralRewardResource\Pages\ListReferralRewards;
+use App\Filament\Resources\ReferralStatisticsResource\Pages\ListReferralStatistics;
 use App\Filament\Resources\SliderTranslationResource\Pages\ListSliderTranslations;
 use App\Filament\Resources\SystemSettingResource\Pages\ListSystemSettings;
 use App\Filament\Resources\UserManagementResource\Pages\ListUsers;
@@ -30,8 +34,13 @@ use App\Models\Country;
 use App\Models\EnumValue;
 use App\Models\Post;
 use App\Models\ProductVariant;
+use App\Models\ReferralCode;
+use App\Models\ReferralCodeUsageLog;
 use App\Models\RecommendationAnalytics;
 use App\Models\ReferralCampaign;
+use App\Models\ReferralReward;
+use App\Models\ReferralRewardLog;
+use App\Models\ReferralStatistics;
 use App\Models\SliderTranslation;
 use App\Models\SystemSetting;
 use App\Models\User;
@@ -90,8 +99,12 @@ final class MissingFilamentResourceCoverageTest extends TestCase
             'enum management'           => [ListEnumManagement::class, 'createEnumValueRecord'],
             'posts'                     => [ListPosts::class, 'createPostRecord'],
             'product variants'          => [ListProductVariants::class, 'createProductVariantRecord'],
+            'referral code usage logs'  => [ListReferralCodeUsageLogs::class, 'createReferralCodeUsageLogRecord'],
             'recommendation analytics'  => [ListRecommendationAnalytics::class, 'createRecommendationAnalyticsRecord'],
             'referral campaigns'        => [ListReferralCampaigns::class, 'createReferralCampaignRecord'],
+            'referral rewards'          => [ListReferralRewards::class, 'createReferralRewardRecord'],
+            'referral reward logs'      => [ListReferralRewardLogs::class, 'createReferralRewardLogRecord'],
+            'referral statistics'       => [ListReferralStatistics::class, 'createReferralStatisticsRecord'],
             'slider translations'       => [ListSliderTranslations::class, 'createSliderTranslationRecord'],
             'system settings'           => [ListSystemSettings::class, 'createSystemSettingRecord'],
             'user management'           => [ListUsers::class, 'createUserManagementRecord'],
@@ -225,8 +238,22 @@ final class MissingFilamentResourceCoverageTest extends TestCase
     private function createRecommendationAnalyticsRecord(): RecommendationAnalytics
     {
         // Generate analytics metrics so reporting tables showcase actionable rows.
-        return RecommendationAnalytics::factory()->create([
-            'action' => 'view',
+        return RecommendationAnalytics::query()->create([
+            // Leave relationships null so the insert bypasses factories requiring columns that
+            // do not exist in the lightweight sqlite test schema while still exercising the
+            // reporting table.
+            'block_id'        => null,
+            'config_id'       => null,
+            'user_id'         => null,
+            'product_id'      => null,
+            'action'          => 'view',
+            'ctr'             => 0.1500,
+            'conversion_rate' => 0.0500,
+            'metrics'         => [
+                'impressions' => 100,
+                'clicks'      => 15,
+            ],
+            'date'            => now()->toDateString(),
         ]);
     }
 
@@ -242,11 +269,97 @@ final class MissingFilamentResourceCoverageTest extends TestCase
         ]);
     }
 
+    private function createReferralCodeUsageLogRecord(): ReferralCodeUsageLog
+    {
+        // Provision a referral code and associated user so usage tracking columns resolve friendly labels.
+        $user = User::factory()->create([
+            'email' => 'referral.usage@example.com',
+        ]);
+
+        $code = ReferralCode::factory()->forUser($user)->create([
+            'code'      => 'COVERCODE',
+            'is_active' => true,
+        ]);
+
+        return ReferralCodeUsageLog::factory()->for($code, 'referralCode')->for($user)->create([
+            'ip_address' => '203.0.113.10',
+            'user_agent' => 'CoverageBrowser/1.0',
+            'metadata'   => [
+                'device_type' => 'desktop',
+            ],
+        ]);
+    }
+
     private function createSliderTranslationRecord(): SliderTranslation
     {
         // Persist a slider translation entry to validate the localized slider management grid.
         return SliderTranslation::factory()->english()->create([
             'title' => 'Coverage Slide',
+        ]);
+    }
+
+    private function createReferralRewardRecord(): ReferralReward
+    {
+        // Seed a referral reward linked to a deterministic user so finance reports display predictable values.
+        $user = User::factory()->create([
+            'email' => 'reward.owner@example.com',
+        ]);
+
+        return ReferralReward::query()->create([
+            // Provide the minimal required attributes so the reward renders consistently in the index table.
+            'user_id'       => $user->getKey(),
+            'type'          => 'discount',
+            'title'         => [
+                'en' => 'Coverage Reward',
+                'lt' => 'Draudimo Atlygis',
+            ],
+            'description'   => [
+                'en' => 'Coverage reward description',
+                'lt' => 'Draudimo atlygio aprasas',
+            ],
+            'amount'        => 25.50,
+            'currency_code' => 'EUR',
+            'status'        => 'pending',
+            'is_active'     => true,
+            'priority'      => 10,
+            'reward_data'   => [
+                'category' => 'discount',
+            ],
+        ]);
+    }
+
+    private function createReferralRewardLogRecord(): ReferralRewardLog
+    {
+        // Record a reward lifecycle event so audit tables confirm activity timelines render correctly.
+        $reward = $this->createReferralRewardRecord();
+
+        $actor = User::factory()->create([
+            'email' => 'reward.actor@example.com',
+        ]);
+
+        return ReferralRewardLog::factory()->for($reward, 'referralReward')->for($actor)->create([
+            'action' => ReferralRewardLog::ACTION_EARNED,
+            'data'   => [
+                'amount'   => 25.50,
+                'currency' => 'EUR',
+            ],
+        ]);
+    }
+
+    private function createReferralStatisticsRecord(): ReferralStatistics
+    {
+        // Capture aggregate referral metrics so analytics views render formatted totals without relying on scopes.
+        $user = User::factory()->create([
+            'email' => 'statistics.owner@example.com',
+        ]);
+
+        return ReferralStatistics::factory()->for($user)->create([
+            'date'                  => now()->toDateString(),
+            'total_referrals'       => 5,
+            'completed_referrals'   => 3,
+            'pending_referrals'     => 2,
+            'total_rewards_earned'  => 75.00,
+            'total_discounts_given' => 40.00,
         ]);
     }
 
