@@ -413,7 +413,7 @@ Route::middleware('auth')->group(function (): void {
     })->name('filament.admin.resources.customers.store');
 
     Route::get('/admin/customers/{customer}/edit', $placeholder('Edit Customer'))
-        ->name('filament.admin.resources.customers.edit');
+        ->name('filament.admin.resources.customers.edit.placeholder');
 
     Route::put('/admin/customers/{customer}', function (Request $request, \App\Models\Customer $customer) {
         $validated = $request->validate([

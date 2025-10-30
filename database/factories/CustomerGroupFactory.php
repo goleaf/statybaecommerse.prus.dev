@@ -24,7 +24,8 @@ final class CustomerGroupFactory extends Factory
     {
         $attributes = [
             'name'                => $this->faker->words(2, true),
-            'code'                => strtoupper($this->faker->bothify('??##')),
+            // Ensure generated codes remain unique so seeder runs never trip the database constraint.
+            'code'                => strtoupper($this->faker->unique()->bothify('??##')),
             'description'         => $this->faker->sentence(),
             'slug'                => $this->faker->slug(),
             'discount_percentage' => $this->faker->randomFloat(2, 0, 50),

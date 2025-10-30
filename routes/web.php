@@ -141,7 +141,7 @@ Route::middleware(['web'])->group(function () {
     });
 
     // Order Frontend Routes
-    Route::middleware(['auth'])->prefix('orders')->name('frontend.orders.')->group(function () {
+    Route::middleware(['auth'])->prefix('orders')->name('frontend.orders.manage.')->group(function () {
         Route::get('/', [App\Http\Controllers\Frontend\OrderController::class, 'index'])->name('index');
         Route::get('/create', [App\Http\Controllers\Frontend\OrderController::class, 'create'])->name('create');
         Route::post('/', [App\Http\Controllers\Frontend\OrderController::class, 'store'])->name('store');
@@ -210,7 +210,7 @@ Route::middleware(['web'])->group(function () {
     });
 
     // Discount Redemption Routes
-    Route::middleware(['auth'])->prefix('discount-redemptions')->name('frontend.discount-redemptions.')->group(function () {
+    Route::middleware(['auth'])->prefix('discount-redemptions')->name('frontend.discount-redemptions.manage.')->group(function () {
         Route::get('/', [App\Http\Controllers\Frontend\DiscountRedemptionController::class, 'index'])->name('index');
         Route::get('/create', [App\Http\Controllers\Frontend\DiscountRedemptionController::class, 'create'])->name('create');
         Route::post('/', [App\Http\Controllers\Frontend\DiscountRedemptionController::class, 'store'])->name('store');

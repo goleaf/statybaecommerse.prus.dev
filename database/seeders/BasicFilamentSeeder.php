@@ -51,15 +51,30 @@ final class BasicFilamentSeeder extends Seeder
             'manage_roles',
         ]);
 
-        $permissions->each(fn (string $name) => Permission::query()->firstOrCreate(['name' => $name]));
+        $permissions->each(function (string $name): void {
+            // Always create admin-guard permissions so Filament lookups stay in sync with the panel guard.
+            Permission::query()->firstOrCreate([
+                'name'       => $name,
+                'guard_name' => 'admin',
+            ]);
+        });
 
-        $superAdmin = Role::query()->firstOrCreate(['name' => 'super_admin']);
+        $superAdmin = Role::query()->firstOrCreate([
+            'name'       => 'super_admin',
+            'guard_name' => 'admin',
+        ]);
         $superAdmin->syncPermissions($permissions);
 
-        $admin = Role::query()->firstOrCreate(['name' => 'admin']);
+        $admin = Role::query()->firstOrCreate([
+            'name'       => 'admin',
+            'guard_name' => 'admin',
+        ]);
         $admin->syncPermissions($permissions->except(['delete_orders', 'delete_customers', 'manage_roles']));
 
-        $manager = Role::query()->firstOrCreate(['name' => 'manager']);
+        $manager = Role::query()->firstOrCreate([
+            'name'       => 'manager',
+            'guard_name' => 'admin',
+        ]);
         $manager->syncPermissions([
             'view_products',
             'edit_products',
@@ -75,7 +90,10 @@ final class BasicFilamentSeeder extends Seeder
             'view_dashboard_stats',
         ]);
 
-        $editor = Role::query()->firstOrCreate(['name' => 'editor']);
+        $editor = Role::query()->firstOrCreate([
+            'name'       => 'editor',
+            'guard_name' => 'admin',
+        ]);
         $editor->syncPermissions([
             'view_products',
             'create_products',

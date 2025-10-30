@@ -307,21 +307,28 @@ function build_route_parameters(array $entry, Route $route): array
  */
 function resolve_model_instance(string $class): ?Model
 {
+    // Cache resolved instances per class so repeated parameter generation avoids redundant factory inserts.
+    static $resolved = [];
+
+    if (array_key_exists($class, $resolved)) {
+        return $resolved[$class];
+    }
+
     if (! class_exists($class)) {
-        return null;
+        return $resolved[$class] = null;
     }
 
     $model = new $class;
 
     if (method_exists($class, 'factory')) {
         try {
-            return $class::factory()->create();
+            return $resolved[$class] = $class::factory()->create();
         } catch (Throwable) {
             // fall through
         }
     }
 
-    return $model->newQuery()->first() ?? null;
+    return $resolved[$class] = $model->newQuery()->first() ?? null;
 }
 
 /**
@@ -481,6 +488,13 @@ function send_request(
  */
 function authenticate_for_guard(TestCase $test, string $guard): Authenticatable
 {
+    // Reuse previously created identities per guard to keep repeated probes fast and deterministic.
+    static $users = [];
+
+    if (isset($users[$guard])) {
+        return $users[$guard];
+    }
+
     switch ($guard) {
         case 'admin':
             $user = AdminUser::factory()->create();
@@ -493,7 +507,7 @@ function authenticate_for_guard(TestCase $test, string $guard): Authenticatable
             }
             $test->actingAs($user, 'admin');
 
-            return $user;
+            return $users[$guard] = $user;
         case 'sanctum':
         case 'api':
             $user = User::factory()->create(['is_admin' => true]);
@@ -506,7 +520,7 @@ function authenticate_for_guard(TestCase $test, string $guard): Authenticatable
             }
             Sanctum::actingAs($user, permissions: ['*']);
 
-            return $user;
+            return $users[$guard] = $user;
         default:
             $user = User::factory()->create(['is_admin' => true]);
             if (method_exists($user, 'assignRole')) {
@@ -518,6 +532,6 @@ function authenticate_for_guard(TestCase $test, string $guard): Authenticatable
             }
             $test->actingAs($user, 'web');
 
-            return $user;
+            return $users[$guard] = $user;
     }
 }
