@@ -551,6 +551,18 @@ final class MissingFilamentResourceCoverageTest extends TestCase
         ]);
     }
 
+    private function createRecommendationConfigSimpleRecord(): RecommendationConfigSimple
+    {
+        // Persist a simplified recommendation configuration so the streamlined resource lists active presets.
+        return RecommendationConfigSimple::factory()->create([
+            'name'           => 'Coverage Simple Config',
+            'code'           => 'coverage-simple',
+            'algorithm_type' => 'collaborative',
+            'is_active'      => true,
+            'sort_order'     => 1,
+        ]);
+    }
+
     private function createReferralCampaignRecord(): ReferralCampaign
     {
         // Create a bilingual referral campaign so localized columns render deterministic strings.
