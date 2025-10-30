@@ -136,19 +136,26 @@ final class Nav
         }
 
         [$groupKey, $groupLabel, $groupIcon, $groupSort] = self::resolveGroupMeta($resource);
+
+        // Normalize label here so downstream calls always get a string (or null).
+        $normalizedGroupLabel = $groupKey !== null
+            ? self::normalizeLabel($groupLabel ?? __($groupKey), $groupKey)
+            : null;
+
         $icon = self::resolveIcon($resource);
         $sort = self::resolveSort($resource);
 
         if ($groupKey !== null && ! isset(self::$groupMetaCache[$groupKey])) {
             self::$groupMetaCache[$groupKey] = [
                 'key'   => $groupKey,
-                'label' => $groupLabel ?? __($groupKey),
+                'label' => $normalizedGroupLabel,
                 'icon'  => $groupIcon,
                 'sort'  => $groupSort,
             ];
         } elseif ($groupKey !== null) {
             $existing = self::$groupMetaCache[$groupKey];
-            $existing['label'] = $existing['label'] ?: ($groupLabel ?? __($groupKey));
+            $existing['label'] = $existing['label']
+                ?: self::normalizeLabel($groupLabel ?? __($groupKey), $groupKey);
             $existing['icon'] = $existing['icon'] ?: $groupIcon;
             $existing['sort'] = $existing['sort'] ?? $groupSort;
             self::$groupMetaCache[$groupKey] = $existing;
@@ -156,7 +163,7 @@ final class Nav
 
         return self::$resourceMetaCache[$resource] = [
             'group_key'   => $groupKey,
-            'group_label' => $groupLabel,
+            'group_label' => $normalizedGroupLabel,
             'group_icon'  => $groupIcon,
             'group_sort'  => $groupSort,
             'icon'        => $icon,
@@ -479,7 +486,7 @@ final class Nav
 
             $groups[$groupKey] = [
                 'key'       => $groupKey,
-                'label'     => (string) ($meta['label'] ?? $groupKey),
+                'label'     => self::normalizeLabel($meta['label'] ?? $groupKey, $groupKey),
                 'label_key' => $groupKey,
                 'icon'      => $meta['icon'] ?? null,
                 'sort'      => $meta['sort'] ?? null,
@@ -494,6 +501,28 @@ final class Nav
         );
 
         return $groups;
+    }
+
+    /**
+     * Ensure nav labels are always strings. If a translation returns an array,
+     * fall back to the group key; if Htmlable, cast; if scalar, cast to string.
+     */
+    private static function normalizeLabel(mixed $value, string $fallback): string
+    {
+        if ($value instanceof Htmlable) {
+            return (string) $value;
+        }
+
+        if (is_array($value)) {
+            $first = reset($value);
+            return is_string($first) ? $first : $fallback;
+        }
+
+        if (is_scalar($value) || (is_object($value) && method_exists($value, '__toString'))) {
+            return (string) $value;
+        }
+
+        return $fallback;
     }
 
     /**

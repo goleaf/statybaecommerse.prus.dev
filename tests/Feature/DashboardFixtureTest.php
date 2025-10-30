@@ -9,7 +9,7 @@ use Tests\TestCase;
 
 /**
  * Maintain a deterministic feature test that the dashboards can reference
- * after the ExampleTest placeholder was retired. Keeping the structure intact
+ * after the legacy placeholder was retired. Keeping the structure intact
  * ensures the UI fixtures still surface the expected mix of pass, skip, and
  * incomplete states without relying on the removed class name.
  */
