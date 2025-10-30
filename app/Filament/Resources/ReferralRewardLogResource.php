@@ -170,8 +170,8 @@ final class ReferralRewardLogResource extends Resource
                     ->options(self::getActionOptions()),
             ])
             ->recordActions([
-                TableViewAction::make(),
-                TableEditAction::make(),
+                ViewAction::make(),
+                EditAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

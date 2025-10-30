@@ -12,6 +12,7 @@ use Filament\Forms;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
+use Filament\Tables;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -180,7 +181,7 @@ final class ReferralRewardResource extends Resource
                     ->label(__('referral_rewards.fields.type'))
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('amount')
+                Tables\Columns\TextColumn::make('amount')
                     ->money(fn (ReferralReward $record): string => $record->currency_code)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('status')
