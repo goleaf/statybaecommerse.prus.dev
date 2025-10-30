@@ -15,6 +15,8 @@ use App\Filament\Resources\PostResource\Pages\ListPosts;
 use App\Filament\Resources\ProductVariantResource\Pages\ListProductVariants;
 use App\Filament\Resources\RecommendationAnalyticsResource\Pages\ListRecommendationAnalytics;
 use App\Filament\Resources\ReferralCampaignResource\Pages\ListReferralCampaigns;
+use App\Filament\Resources\ReferralCodeUsageLogs\Pages\ListReferralCodeUsageLogs;
+use App\Filament\Resources\ReferralRewardLogs\Pages\ListReferralRewardLogs;
 use App\Filament\Resources\SliderTranslationResource\Pages\ListSliderTranslations;
 use App\Filament\Resources\SystemSettingResource\Pages\ListSystemSettings;
 use App\Filament\Resources\UserManagementResource\Pages\ListUsers;
@@ -32,11 +34,15 @@ use App\Models\Post;
 use App\Models\ProductVariant;
 use App\Models\RecommendationAnalytics;
 use App\Models\ReferralCampaign;
+use App\Models\ReferralCode;
+use App\Models\ReferralCodeUsageLog;
 use App\Models\SliderTranslation;
 use App\Models\SystemSetting;
 use App\Models\User;
 use App\Models\UserPreference;
 use App\Models\VariantInventory;
+use App\Models\ReferralReward;
+use App\Models\ReferralRewardLog;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use Livewire\Livewire;
@@ -92,6 +98,8 @@ final class MissingFilamentResourceCoverageTest extends TestCase
             'product variants'          => [ListProductVariants::class, 'createProductVariantRecord'],
             'recommendation analytics'  => [ListRecommendationAnalytics::class, 'createRecommendationAnalyticsRecord'],
             'referral campaigns'        => [ListReferralCampaigns::class, 'createReferralCampaignRecord'],
+            'referral code usage logs'  => [ListReferralCodeUsageLogs::class, 'createReferralCodeUsageLogRecord'],
+            'referral reward logs'      => [ListReferralRewardLogs::class, 'createReferralRewardLogRecord'],
             'slider translations'       => [ListSliderTranslations::class, 'createSliderTranslationRecord'],
             'system settings'           => [ListSystemSettings::class, 'createSystemSettingRecord'],
             'user management'           => [ListUsers::class, 'createUserManagementRecord'],
@@ -240,6 +248,46 @@ final class MissingFilamentResourceCoverageTest extends TestCase
             ],
             'is_active' => true,
         ]);
+    }
+
+    private function createReferralCodeUsageLogRecord(): ReferralCodeUsageLog
+    {
+        // Create the referral code and participant so relationship columns hydrate predictably.
+        $referralCode = ReferralCode::factory()->create([
+            'code' => 'COVERAGE-CODE',
+        ]);
+        $participant = User::factory()->create([
+            'name' => 'Coverage Participant',
+        ]);
+
+        // Persist a usage log entry with deterministic networking metadata for table assertions.
+        return ReferralCodeUsageLog::factory()
+            ->for($referralCode, 'referralCode')
+            ->for($participant, 'user')
+            ->create([
+                'ip_address' => '198.51.100.77',
+                'referrer'   => 'https://example.test/referral',
+            ]);
+    }
+
+    private function createReferralRewardLogRecord(): ReferralRewardLog
+    {
+        // Seed a reward definition and recipient to populate the log relationships in the listing.
+        $reward = ReferralReward::factory()->create([
+            'title' => ['en' => 'Coverage Reward'],
+        ]);
+        $recipient = User::factory()->create([
+            'name' => 'Coverage Recipient',
+        ]);
+
+        // Record an earned log entry so the analytics table surfaces actionable data.
+        return ReferralRewardLog::factory()
+            ->for($reward, 'referralReward')
+            ->for($recipient, 'user')
+            ->create([
+                'action'     => ReferralRewardLog::ACTION_EARNED,
+                'ip_address' => '203.0.113.77',
+            ]);
     }
 
     private function createSliderTranslationRecord(): SliderTranslation
