@@ -404,7 +404,7 @@ ProductResource, CategoryResource, CollectionResource, BrandResource, AttributeR
 - Orders & Analytics: `OrderSeeder`, `ComprehensiveOrderSeeder`, `AnalyticsEventSeeder`, `AnalyticsEventsSeeder`
 - Filament Admin presets: `BasicFilamentSeeder`, `ComprehensiveFilamentSeeder`, `FilamentEnhancedSeeder`, `EnhancedFilamentSeeder`
 - Demos & comprehensive data: `ExtendedDemoSeeder`, `ComprehensiveMultilanguageSeeder`, `LithuanianBuilderShopSeeder`
-- Discounts/Campaigns: `AdminPresetDiscountsSeeder`, `CampaignSeeder`, `DiscountCodeSeeder`, `GroupSeeder`, `PartnerSeeder`
+- Discounts/Campaigns: `AdminPresetDiscountsSeeder`, `CampaignSeeder`, `CampaignClickSeeder` (now auto-creates seed campaigns so click data is always generated), `DiscountCodeSeeder`, `GroupSeeder`, `PartnerSeeder`
 - Settings: `SettingsSeeder`, `EnumDataFixSeeder`, `CurrencySeeder`
 - Utility: `EnsureBrandProductsSeeder`
 
