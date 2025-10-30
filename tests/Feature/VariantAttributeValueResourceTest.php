@@ -369,9 +369,14 @@ class VariantAttributeValueResourceTest extends TestCase
         ]);
 
         Livewire::test(VariantAttributeValueResource\Pages\ListVariantAttributeValues::class)
-            ->callTableBulkAction('update_sort_order', [$variantAttributeValue1, $variantAttributeValue2], [
+            // Mount the bulk action so the modal-driven form becomes available for data assignment.
+            ->mountTableBulkAction('update_sort_order', [$variantAttributeValue1, $variantAttributeValue2])
+            // Provide the replacement sort order value before confirming the bulk action execution.
+            ->setTableBulkActionData([
                 'sort_order' => 10,
-            ]);
+            ])
+            ->callMountedTableBulkAction()
+            ->assertHasNoTableBulkActionErrors();
 
         $this->assertDatabaseHas('variant_attribute_values', [
             'id'         => $variantAttributeValue1->id,

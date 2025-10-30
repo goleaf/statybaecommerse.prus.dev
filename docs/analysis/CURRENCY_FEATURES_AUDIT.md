@@ -4,7 +4,7 @@
 | Capability | Status | Notes |
 | --- | --- | --- |
 | Default currency (EUR) | ✅ Implemented | Helper defaults, configuration, and seed data all enforce EUR as the baseline currency.
-| Exchange rates – automatic updates | ⚠️ Partial | Admin toggles exist but rate-refresh actions are stubbed with no scheduler or integration.
+| Exchange rates – automatic updates | ⚠️ Partial | Manual rate refresh actions now sync via `CurrencyRateSyncService` using configured static rates, but no scheduler or external feed drives automatic updates.
 | Currency conversion – real-time | ❌ Missing | System only formats stored amounts; no runtime conversion logic uses exchange rates.
 | Price display – locale-aware formatting | ✅ Implemented | Helpers and views rely on `Number::currency` with locale-sensitive fallbacks, with regression tests.
 | Decimal places – per-currency precision | ⚠️ Partial | `decimal_places` columns drive formatting, but the enum helper references an undefined KRW case.
@@ -19,9 +19,9 @@
 - Seed data provisions an EUR record marked as default alongside other enabled currencies so fresh installs inherit the baseline correctly.【F:database/seeders/CurrencySeeder.php†L14-L28】
 
 ### Exchange Rates – Automatic Updates
-- Filament actions for updating a single rate or bulk rates currently contain only placeholder comments, so triggering them does not mutate exchange data.【F:app/Filament/Resources/CurrencyResource.php†L340-L404】
-- The accompanying feature tests acknowledge the gap with `assertTrue(true)` placeholders instead of verifying rate changes, confirming no implementation is wired up yet.【F:tests/Feature/CurrencyResourceTest.php†L200-L241】
-- No scheduled job or service consumes the `auto_update_rate` flag, so enabling the toggle has no operational effect today.【F:app/Filament/Resources/CurrencyResource.php†L213-L268】
+- Filament rate-update actions now delegate to `CurrencyRateSyncService`, which persists values returned by the static `CurrencyRateProvider`, ensuring manual refreshes mutate stored exchange data.【F:app/Filament/Resources/CurrencyResource.php†L326-L372】【F:app/Services/CurrencyRateSyncService.php†L18-L67】
+- Static rate lookups can be overridden per environment via `config/currency.php`, and feature coverage now asserts both single-record and bulk refresh flows update the database instead of using placeholders.【F:config/currency.php†L1-L12】【F:tests/Feature/CurrencyResourceTest.php†L198-L234】
+- No scheduled job or background service consumes the `auto_update_rate` flag, so enabling the toggle still has no operational effect beyond manual actions.【F:app/Filament/Resources/CurrencyResource.php†L213-L268】
 
 ### Currency Conversion – Real-time
 - Currency formatting relies on helpers that wrap Laravel's `Number::currency` or basic number formatting; there is no conversion logic that applies exchange rates to transform values between currencies.【F:app/helpers.php†L151-L233】
@@ -56,6 +56,6 @@
 - The attribution observer only fills the `*_by_name` columns when the database exposes them as text fields, side-stepping legacy integer columns with foreign keys that would otherwise reject cached names in SQLite-backed test runs.【F:app/Observers/UserAttributionObserver.php†L27-L30】【F:app/Observers/UserAttributionObserver.php†L152-L184】
 
 ## Recommendations
-- Implement a dedicated exchange-rate sync service (API client + scheduler) that respects the `auto_update_rate` toggle and updates records, replacing placeholder notifications with concrete operations.
+- Wire an external exchange-rate provider and scheduler into the new synchroniser so the `auto_update_rate` toggle triggers background refreshes instead of relying solely on manual actions.
 - Introduce a conversion helper/service that applies stored exchange rates for on-the-fly conversions, especially for presenting multi-currency prices when source data is only in EUR.
 - Fix `CurrencyEnum::getDecimalPlaces()` by defining the KRW case (or removing it) and expanding coverage tests to catch enum drift in the future.
