@@ -81,12 +81,14 @@ For every file under `app/Filament/**`:
   public static function table(Table $table): Table
   ```
 - Inside `form()` bodies, use the `$form` variable consistently after updating the signature.
-- Standardize the `$navigationIcon` property to be untyped with the docblock:
+- Standardize the `$navigationIcon` property to declare the
+  `string|\BackedEnum|null` union so subclasses stay compatible with the
+  Filament base class and avoid PHP inheritance fatals:
   ```php
-  /** @var string|\BackedEnum|null */
-  protected static $navigationIcon = 'heroicon-o-document-text';
+  protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-document-text';
   ```
-  (Preserve the existing icon value when normalizing the property.)
+  (Preserve the existing icon value when normalizing the property and keep a
+  brief comment explaining the intent.)
 - If a class named `App\Filament\Resources\Schema` exists, rename it to avoid collisions and update any imports accordingly.
 
 ## Testing & Data Discipline
