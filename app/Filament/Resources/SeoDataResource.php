@@ -41,6 +41,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
 use UnitEnum;
 
@@ -49,6 +50,11 @@ final class SeoDataResource extends Resource
     use SpatieTranslatableResource; // Enable locale-aware management for Spatie translatable attributes.
 
     protected static ?string $model = SeoData::class;
+
+    /**
+     * Limit the number of records loaded into select dropdowns to keep memory usage predictable.
+     */
+    private const SEOABLE_OPTIONS_LIMIT = 50;
 
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
@@ -96,21 +102,28 @@ final class SeoDataResource extends Resource
                         Select::make('seoable_id')
                             ->label(__('seo_data.fields.seoable_id'))
                             ->options(function (Forms\Get $get): array {
-                                $type = $get('seoable_type');
-
-                                if (! is_string($type)) {
-                                    return [];
-                                }
-
-                                return match ($type) {
-                                    Product::class  => Product::pluck('name', 'id')->all(),
-                                    Category::class => Category::pluck('name', 'id')->all(),
-                                    Brand::class    => Brand::pluck('name', 'id')->all(),
-                                    default         => [],
-                                };
+                                // Only hydrate the currently selected option to avoid loading the entire catalogue into memory.
+                                return self::resolveSelectedSeoableOption(
+                                    seoableType: $get('seoable_type'),
+                                    identifier: $get('seoable_id'),
+                                );
                             })
+                            ->getSearchResultsUsing(function (Forms\Get $get, string $search): array {
+                                // Perform a lightweight search query limited to a modest result set for responsiveness.
+                                return self::searchSeoables(
+                                    seoableType: $get('seoable_type'),
+                                    search: $search,
+                                );
+                            })
+                            ->getOptionLabelUsing(function (?string $value, Forms\Get $get): ?string {
+                                // Resolve the human-readable label when the field is hydrated with a stored identifier.
+                                return self::resolveSeoableLabel(
+                                    seoableType: $get('seoable_type'),
+                                    identifier: $value,
+                                );
+                            })
+                            ->disabled(fn (Forms\Get $get): bool => ! is_string($get('seoable_type')))
                             ->searchable()
-                            ->preload()
                             ->required(),
                         TextInput::make('locale')
                             ->label(__('seo_data.fields.locale'))
@@ -606,6 +619,111 @@ final class SeoDataResource extends Resource
         $count = (int) self::getModel()::count();
 
         return $count > 0 ? (string) $count : null;
+    }
+
+    /**
+     * Resolve the selected option so Filament can hydrate the dropdown state without loading the full dataset.
+     */
+    private static function resolveSelectedSeoableOption(mixed $seoableType, mixed $identifier): array
+    {
+        if (! is_string($seoableType)) {
+            return [];
+        }
+
+        if (! is_scalar($identifier) || $identifier === null || $identifier === '') {
+            return [];
+        }
+
+        $record = self::resolveSeoableQuery($seoableType)?->find($identifier);
+
+        if ($record === null) {
+            return [];
+        }
+
+        return [
+            (string) $record->getKey() => self::extractSeoableName($record),
+        ];
+    }
+
+    /**
+     * Retrieve search results for the currently selected SEO-able type, constrained to a reasonable limit.
+     */
+    private static function searchSeoables(mixed $seoableType, string $search): array
+    {
+        if (! is_string($seoableType)) {
+            return [];
+        }
+
+        $query = self::resolveSeoableQuery($seoableType);
+
+        if ($query === null) {
+            return [];
+        }
+
+        $trimmedSearch = trim($search);
+
+        if ($trimmedSearch !== '') {
+            $query->where('name', 'like', '%' . $trimmedSearch . '%');
+        }
+
+        /** @var array<string, string> $results */
+        $results = $query
+            ->orderBy('name')
+            ->limit(self::SEOABLE_OPTIONS_LIMIT)
+            ->pluck('name', 'id')
+            ->mapWithKeys(static fn ($label, $id): array => [(string) $id => (string) $label])
+            ->all();
+
+        return $results;
+    }
+
+    /**
+     * Resolve the human-readable label for a stored identifier so the select remains descriptive when editing records.
+     */
+    private static function resolveSeoableLabel(mixed $seoableType, mixed $identifier): ?string
+    {
+        if (! is_string($seoableType)) {
+            return null;
+        }
+
+        if (! is_scalar($identifier) || $identifier === null || $identifier === '') {
+            return null;
+        }
+
+        $record = self::resolveSeoableQuery($seoableType)?->find($identifier);
+
+        if ($record === null) {
+            return null;
+        }
+
+        return self::extractSeoableName($record);
+    }
+
+    /**
+     * Provide a builder targeting the requested SEO-able model while fetching only the required columns.
+     */
+    private static function resolveSeoableQuery(string $seoableType): ?Builder
+    {
+        return match ($seoableType) {
+            Product::class  => Product::query()->select(['id', 'name']),
+            Category::class => Category::query()->select(['id', 'name']),
+            Brand::class    => Brand::query()->select(['id', 'name']),
+            default         => null,
+        };
+    }
+
+    /**
+     * Extract the display label from a SEO-able model instance.
+     */
+    private static function extractSeoableName(Model $record): string
+    {
+        $name = $record->getAttribute('name');
+
+        if (is_string($name) && $name !== '') {
+            return $name;
+        }
+
+        return (string) $record->getKey();
     }
 
     private static function resolveTitleWarning(?string $value): ?string
