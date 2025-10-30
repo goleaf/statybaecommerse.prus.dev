@@ -15,6 +15,7 @@ use Filament\Schemas\Components\Fieldset;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Facades\Storage;
 
 final class DataImportExport extends Page
@@ -25,7 +26,11 @@ final class DataImportExport extends Page
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations while conveying the
      * accepted union types for maintainers via PHPDoc.
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-arrow-down-tray';
+//    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-arrow-down-tray';
+    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    {
+        return 'heroicon-o-arrow-down-tray';
+    }
 
     public ?string $provider = 'xml';
 

@@ -15,6 +15,7 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Hydrat\TableLayoutToggle\Concerns\HasToggleableTable;
+use Illuminate\Contracts\Support\Htmlable;
 
 final class UserImpersonation extends Page implements HasTable
 {
@@ -26,7 +27,12 @@ final class UserImpersonation extends Page implements HasTable
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations while declaring
      * the accepted union type via PHPDoc for downstream analyzers.
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-user';
+//    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-user';
+
+    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    {
+        return 'heroicon-o-user';
+    }
 
     public static function getNavigationGroup(): BackedEnum|string|null
     {

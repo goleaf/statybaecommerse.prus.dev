@@ -31,6 +31,7 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Support\Enums\Size;
 use Filament\Support\Enums\Width;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Str;
 
 class SliderManagement extends Page implements HasActions, HasForms
@@ -41,7 +42,12 @@ class SliderManagement extends Page implements HasActions, HasForms
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations while stating the
      * expected union type via PHPDoc so Filament tooling remains satisfied.
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
+//    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
+
+    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    {
+        return 'heroicon-o-rectangle-stack';
+    }
 
     protected static ?string $navigationLabel = 'Slider Management';
 

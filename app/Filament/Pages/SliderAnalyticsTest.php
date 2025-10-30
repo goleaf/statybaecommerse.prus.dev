@@ -6,6 +6,7 @@ namespace App\Filament\Pages;
 
 use BackedEnum;
 use Filament\Pages\Dashboard as BaseDashboard;
+use Illuminate\Contracts\Support\Htmlable;
 
 final class SliderAnalyticsTest extends BaseDashboard
 {
@@ -17,7 +18,12 @@ final class SliderAnalyticsTest extends BaseDashboard
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations while keeping
      * PHPStan-friendly union documentation for future contributors.
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar';
+//    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar';
+
+    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    {
+        return 'heroicon-o-chart-bar';
+    }
 
     protected static ?int $navigationSort = 3;
 

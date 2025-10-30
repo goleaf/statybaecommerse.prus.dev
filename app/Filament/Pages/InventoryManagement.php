@@ -18,6 +18,7 @@ use Filament\Tables\Table;
 use Hydrat\TableLayoutToggle\Concerns\HasToggleableTable;
 use Illuminate\Contracts\Pagination\CursorPaginator;
 use Illuminate\Contracts\Pagination\Paginator;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 
 final class InventoryManagement extends Page implements HasTable
@@ -32,7 +33,12 @@ final class InventoryManagement extends Page implements HasTable
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations and communicates
      * the accepted union via PHPDoc for IDE support.
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-archive-box';
+//    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-archive-box';
+
+    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    {
+        return 'heroicon-o-archive-box';
+    }
 
     public static function getNavigationGroup(): BackedEnum|string|null
     {

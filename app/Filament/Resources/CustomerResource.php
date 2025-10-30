@@ -56,7 +56,7 @@ final class CustomerResource extends Resource
      * resource signature and avoids PHP fatal errors when the parent expects a
      * typed union.
      */
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-users';
+//    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-users';
 
     protected static ?string $model = Customer::class;
 
