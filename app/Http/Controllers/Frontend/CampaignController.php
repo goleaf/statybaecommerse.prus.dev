@@ -30,17 +30,11 @@ final class CampaignController extends Controller
      */
     public function index(Request $request): View
     {
-        $campaigns = Campaign::query()->active()->byPriority()->with(['targetCategories', 'targetProducts', 'channel'])->when($request->filled('type'), function ($query) use ($request) {
-            return $query->where('type', $request->get('type'));
-        })->when($request->filled('category'), function ($query) use ($request) {
-            return $query->whereHas('targetCategories', function ($q) use ($request): void {
-                $q->where('slug', $request->get('category'));
-            });
-        })->when($request->filled('search'), function ($query) use ($request) {
-            return $query->where('name', 'like', '%' . $request->get('search') . '%');
-        })->paginate(12);
+        $campaigns = Campaign::query()->active()->byPriority()->with(['targetCategories', 'targetProducts', 'channel'])->when($request->filled('type'), fn($query) => $query->where('type', $request->get('type')))->when($request->filled('category'), fn($query) => $query->whereHas('targetCategories', function ($q) use ($request): void {
+            $q->where('slug', $request->get('category'));
+        }))->when($request->filled('search'), fn($query) => $query->where('name', 'like', '%' . $request->get('search') . '%'))->paginate(12);
 
-        return view('campaigns.index', compact('campaigns'));
+        return view('campaigns.index', ['campaigns' => $campaigns]);
     }
 
     /**
@@ -56,7 +50,7 @@ final class CampaignController extends Controller
             $query->whereIn('categories.id', $campaign->targetCategories->pluck('id'));
         })->limit(4)->get();
 
-        return view('campaigns.show', compact('campaign', 'relatedCampaigns'));
+        return view('campaigns.show', ['campaign' => $campaign, 'relatedCampaigns' => $relatedCampaigns]);
     }
 
     /**
@@ -80,7 +74,7 @@ final class CampaignController extends Controller
             content: new OA\JsonContent(ref: '#/components/schemas/CampaignInteractionRequest'),
         ),
         responses: [
-            new OA\Response(response: 200, ref: '#/components/responses/CampaignAcknowledgement'),
+            new OA\Response(ref: '#/components/responses/CampaignAcknowledgement', response: 200),
         ]
     )]
     public function click(Request $request, Campaign $campaign): JsonResponse
@@ -113,7 +107,7 @@ final class CampaignController extends Controller
             content: new OA\JsonContent(ref: '#/components/schemas/CampaignConversionRequest'),
         ),
         responses: [
-            new OA\Response(response: 200, ref: '#/components/responses/CampaignAcknowledgement'),
+            new OA\Response(ref: '#/components/responses/CampaignAcknowledgement', response: 200),
         ]
     )]
     public function conversion(Request $request, Campaign $campaign): JsonResponse
@@ -134,7 +128,7 @@ final class CampaignController extends Controller
     {
         $campaigns = Campaign::query()->featured()->active()->byPriority()->with(['targetCategories', 'channel'])->limit(6)->get();
 
-        return view('campaigns.featured', compact('campaigns'));
+        return view('campaigns.featured', ['campaigns' => $campaigns]);
     }
 
     /**
@@ -144,7 +138,7 @@ final class CampaignController extends Controller
     {
         $campaigns = Campaign::query()->active()->where('type', $type)->byPriority()->with(['targetCategories', 'targetProducts', 'channel'])->paginate(12);
 
-        return view('campaigns.by-type', compact('campaigns', 'type'));
+        return view('campaigns.by-type', ['campaigns' => $campaigns, 'type' => $type]);
     }
 
     /**
@@ -153,11 +147,9 @@ final class CampaignController extends Controller
     public function search(Request $request): View
     {
         $query = $request->get('q');
-        $campaigns = Campaign::query()->active()->when($query, function ($q) use ($query) {
-            return $q->where('name', 'like', '%' . $query . '%')->orWhere('description', 'like', '%' . $query . '%');
-        })->byPriority()->with(['targetCategories', 'channel'])->paginate(12);
+        $campaigns = Campaign::query()->active()->when($query, fn($q) => $q->where('name', 'like', '%' . $query . '%')->orWhere('description', 'like', '%' . $query . '%'))->byPriority()->with(['targetCategories', 'channel'])->paginate(12);
 
-        return view('campaigns.search', compact('campaigns', 'query'));
+        return view('campaigns.search', ['campaigns' => $campaigns, 'query' => $query]);
     }
 
     /**
@@ -168,7 +160,7 @@ final class CampaignController extends Controller
         summary: 'Retrieve aggregated campaign statistics.',
         tags: ['Campaigns'],
         responses: [
-            new OA\Response(response: 200, ref: '#/components/responses/CampaignStatistics'),
+            new OA\Response(ref: '#/components/responses/CampaignStatistics', response: 200),
         ]
     )]
     public function getCampaignStatistics(): JsonResponse
@@ -186,7 +178,7 @@ final class CampaignController extends Controller
         summary: 'List available campaign types and their usage counts.',
         tags: ['Campaigns'],
         responses: [
-            new OA\Response(response: 200, ref: '#/components/responses/CampaignTypes'),
+            new OA\Response(ref: '#/components/responses/CampaignTypes', response: 200),
         ]
     )]
     public function getCampaignTypes(): JsonResponse
@@ -229,7 +221,7 @@ final class CampaignController extends Controller
         summary: 'Summarize campaign performance groupings.',
         tags: ['Campaigns'],
         responses: [
-            new OA\Response(response: 200, ref: '#/components/responses/CampaignPerformance'),
+            new OA\Response(ref: '#/components/responses/CampaignPerformance', response: 200),
         ]
     )]
     public function getCampaignPerformance(): JsonResponse
@@ -257,14 +249,14 @@ final class CampaignController extends Controller
             ),
         ],
         responses: [
-            new OA\Response(response: 200, ref: '#/components/responses/CampaignAnalytics'),
+            new OA\Response(ref: '#/components/responses/CampaignAnalytics', response: 200),
         ]
     )]
     public function getCampaignAnalytics(Request $request): JsonResponse
     {
         // Normalise the requested window and clamp extremes to keep the query predictable.
         $periodInput = $request->input('period', 30);
-        $period = (int) filter_var($periodInput, FILTER_VALIDATE_INT, ['options' => ['default' => 30]]);
+        $period = filter_var($periodInput, FILTER_VALIDATE_INT, ['options' => ['default' => 30]]);
         $period = max(1, min(365, $period));
 
         $now = now();
@@ -303,7 +295,7 @@ final class CampaignController extends Controller
                 'created_at',
             ]);
 
-        // Collect conversion level telemetry to power attribution, ROI, and journey metrics.
+        // Collect conversion level analytics to power attribution, ROI, and journey metrics.
         $conversions = CampaignConversion::query()
             // Restrict attribution analytics to conversions that actually happened within the window.
             ->where('converted_at', '>=', $startDate)
@@ -330,7 +322,7 @@ final class CampaignController extends Controller
                 'converted_at',
             ]);
 
-        // Aggregate raw view and click telemetry by day to power timeline charts.
+        // Aggregate raw view and click analytics by day to power timeline charts.
         $viewsByDate = CampaignView::query()
             ->withoutGlobalScopes()
             ->whereBetween('viewed_at', [$startDate->copy()->startOfDay(), $now])
@@ -365,8 +357,8 @@ final class CampaignController extends Controller
                 'date'        => $dateKey,
                 'views'       => (int) ($viewsByDate[$dateKey] ?? 0),
                 'clicks'      => (int) ($clicksByDate[$dateKey] ?? 0),
-                'conversions' => (int) ($conversionCountByDate[$dateKey] ?? 0),
-                'revenue'     => round((float) ($conversionValueByDate[$dateKey] ?? 0.0), 2),
+                'conversions' => $conversionCountByDate[$dateKey] ?? 0,
+                'revenue'     => round($conversionValueByDate[$dateKey] ?? 0.0, 2),
             ];
         });
 
@@ -416,7 +408,7 @@ final class CampaignController extends Controller
         $assistedConversionValue = (float) $conversions->sum(static fn (CampaignConversion $conversion): float => (float) ($conversion->assisted_conversion_value ?? 0));
         $attributionBreakdown = $conversions
             ->groupBy(static fn (CampaignConversion $conversion): string => (string) ($conversion->attribution_model ?? 'unspecified'))
-            ->map(static function ($group) use ($totalConversions) {
+            ->map(static function ($group) use ($totalConversions): array {
                 $count = $group->count();
                 $avgRate = ($group->avg(static fn (CampaignConversion $conversion): float => (float) ($conversion->conversion_rate ?? 0)) ?? 0.0) * 100;
 
@@ -440,10 +432,10 @@ final class CampaignController extends Controller
         $averageRoas = (float) ($conversions->avg(static fn (CampaignConversion $conversion): float => (float) ($conversion->roas ?? 0)) ?? 0.0);
         $averageCostPerConversion = (float) ($conversions->avg(static fn (CampaignConversion $conversion): float => (float) ($conversion->cost_per_conversion ?? 0)) ?? 0.0);
 
-        // Translate conversion telemetry into journey insights.
+        // Translate conversion analytics into journey insights.
         $funnelBreakdown = $conversions
             ->groupBy(static fn (CampaignConversion $conversion): string => (string) ($conversion->funnel_step ?? 'unknown'))
-            ->map(static function ($group) use ($totalConversions) {
+            ->map(static function ($group) use ($totalConversions): array {
                 $count = $group->count();
 
                 return [
@@ -485,7 +477,7 @@ final class CampaignController extends Controller
 
                 return $campaignConversions
                     ->groupBy(static fn (CampaignConversion $conversion): string => (string) data_get($conversion->conversion_data, 'campaign_name', 'Standard Variant'))
-                    ->map(static function ($variantGroup, string $variantName) use ($campaignId, $campaignName) {
+                    ->map(static function ($variantGroup, string $variantName) use ($campaignId, $campaignName): array {
                         $conversionValue = (float) $variantGroup->sum(static fn (CampaignConversion $conversion): float => (float) ($conversion->conversion_value ?? 0));
                         $roiAverage = (float) ($variantGroup->avg(static fn (CampaignConversion $conversion): float => (float) ($conversion->roi ?? 0)) ?? 0.0);
                         $roasAverage = (float) ($variantGroup->avg(static fn (CampaignConversion $conversion): float => (float) ($conversion->roas ?? 0)) ?? 0.0);
@@ -705,8 +697,8 @@ final class CampaignController extends Controller
             ),
         ],
         responses: [
-            new OA\Response(response: 200, ref: '#/components/responses/CampaignComparison'),
-            new OA\Response(response: 400, ref: '#/components/responses/CampaignComparisonError'),
+            new OA\Response(ref: '#/components/responses/CampaignComparison', response: 200),
+            new OA\Response(ref: '#/components/responses/CampaignComparisonError', response: 400),
         ]
     )]
     public function getCampaignComparison(Request $request): JsonResponse
@@ -716,9 +708,7 @@ final class CampaignController extends Controller
             return response()->json(['success' => false, 'message' => __('campaigns.messages.no_campaigns_selected')], 400);
         }
         $campaigns = Campaign::whereIn('id', $campaignIds)->get(['id', 'name', 'type', 'status', 'total_views', 'total_clicks', 'total_conversions', 'total_revenue', 'conversion_rate', 'budget']);
-        $comparison = $campaigns->map(function ($campaign) {
-            return ['id' => $campaign->id, 'name' => $campaign->name, 'type' => $campaign->type, 'type_label' => __('campaigns.types.' . $campaign->type), 'status' => $campaign->status, 'status_label' => __('campaigns.status.' . $campaign->status), 'views' => $campaign->total_views, 'clicks' => $campaign->total_clicks, 'conversions' => $campaign->total_conversions, 'revenue' => $campaign->total_revenue, 'conversion_rate' => $campaign->conversion_rate, 'click_through_rate' => $campaign->getClickThroughRate(), 'roi' => $campaign->getROI(), 'performance_score' => $campaign->performance_score, 'performance_grade' => $campaign->performance_grade, 'budget' => $campaign->budget, 'budget_utilization' => $campaign->budget_utilization];
-        });
+        $comparison = $campaigns->map(fn($campaign): array => ['id' => $campaign->id, 'name' => $campaign->name, 'type' => $campaign->type, 'type_label' => __('campaigns.types.' . $campaign->type), 'status' => $campaign->status, 'status_label' => __('campaigns.status.' . $campaign->status), 'views' => $campaign->total_views, 'clicks' => $campaign->total_clicks, 'conversions' => $campaign->total_conversions, 'revenue' => $campaign->total_revenue, 'conversion_rate' => $campaign->conversion_rate, 'click_through_rate' => $campaign->getClickThroughRate(), 'roi' => $campaign->getROI(), 'performance_score' => $campaign->performance_score, 'performance_grade' => $campaign->performance_grade, 'budget' => $campaign->budget, 'budget_utilization' => $campaign->budget_utilization]);
 
         return response()->json(['success' => true, 'data' => $comparison]);
     }
@@ -739,7 +729,7 @@ final class CampaignController extends Controller
             ),
         ],
         responses: [
-            new OA\Response(response: 200, ref: '#/components/responses/CampaignRecommendations'),
+            new OA\Response(ref: '#/components/responses/CampaignRecommendations', response: 200),
         ]
     )]
     public function getCampaignRecommendations(Campaign $campaign): JsonResponse
