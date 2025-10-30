@@ -7,6 +7,7 @@ namespace App\Filament\Pages;
 use App\Support\Monitoring\ApplicationMetrics;
 use BackedEnum;
 use Filament\Pages\Page;
+use Illuminate\Contracts\Support\Htmlable;
 use UnitEnum;
 
 final class ObservabilityDashboard extends Page
@@ -15,7 +16,12 @@ final class ObservabilityDashboard extends Page
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations while surfacing
      * the accepted union type for static analyzers.
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar';
+//    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar';
+
+    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    {
+        return 'heroicon-o-chart-bar';
+    }
 
     protected static UnitEnum|string|null $navigationGroup = 'System';
 

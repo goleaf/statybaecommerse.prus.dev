@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="D:\projects\statybaecommerse.prus.dev\phpunit.xml" tests="4" assertions="12" errors="0" failures="0" skipped="0" time="274.639529">
+    <testsuite name="Models" tests="4" assertions="12" errors="0" failures="0" skipped="0" time="274.639529">
+      <testsuite name="Tests\Unit\Models\CollectionRuleTest" file="Collection Rule (Tests\Unit\Models\CollectionRule)" tests="4" assertions="12" errors="0" failures="0" skipped="0" time="274.639529">
+        <testcase name="Fillable configuration includes rule columns" file="Collection Rule (Tests\Unit\Models\CollectionRule)::Fillable configuration includes rule columns" class="Tests\Unit\Models\CollectionRuleTest" classname="Tests.Unit.Models.CollectionRuleTest" assertions="4" time="272.332758"/>
+        <testcase name="Casts configuration sets position and active types" file="Collection Rule (Tests\Unit\Models\CollectionRule)::Casts configuration sets position and active types" class="Tests\Unit\Models\CollectionRuleTest" classname="Tests.Unit.Models.CollectionRuleTest" assertions="2" time="0.842063"/>
+        <testcase name="Position defaults increment within collection" file="Collection Rule (Tests\Unit\Models\CollectionRule)::Position defaults increment within collection" class="Tests\Unit\Models\CollectionRuleTest" classname="Tests.Unit.Models.CollectionRuleTest" assertions="4" time="0.801714"/>
+        <testcase name="Collection relationship is configured" file="Collection Rule (Tests\Unit\Models\CollectionRule)::Collection relationship is configured" class="Tests\Unit\Models\CollectionRuleTest" classname="Tests.Unit.Models.CollectionRuleTest" assertions="2" time="0.662994"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

@@ -15,6 +15,7 @@ use Filament\Pages\Dashboard\Actions\FilterAction;
 use Filament\Pages\Dashboard as BaseDashboard;
 use Filament\Pages\Dashboard\Concerns\HasFiltersAction;
 use Filament\Widgets\Concerns\InteractsWithPageFilters;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 
@@ -27,7 +28,12 @@ class SliderAnalytics extends BaseDashboard
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations while documenting
      * the accepted union via PHPDoc to satisfy Filament's static analysis guidance.
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar';
+//    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar';
+
+    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    {
+        return 'heroicon-o-chart-bar';
+    }
 
     protected static ?int $navigationSort = 3;
 

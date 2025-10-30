@@ -6,6 +6,7 @@ namespace App\Filament\Pages;
 
 use BackedEnum;
 use Filament\Pages\Page;
+use Illuminate\Contracts\Support\Htmlable;
 
 final class AdvancedReports extends Page
 {
@@ -13,7 +14,11 @@ final class AdvancedReports extends Page
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations while providing
      * explicit PHPDoc for compatible union typing.
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
+//    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
+    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    {
+        return 'heroicon-o-chart-bar-square';
+    }
 
     public static function getNavigationGroup(): BackedEnum|string|null
     {

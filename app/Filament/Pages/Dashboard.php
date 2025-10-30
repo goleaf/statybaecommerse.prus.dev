@@ -7,6 +7,7 @@ namespace App\Filament\Pages;
 use BackedEnum;
 use Filament\Pages\Dashboard as BaseDashboard;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Model as EloquentModel;
 use Illuminate\Support\Facades\Gate;
 
@@ -18,7 +19,11 @@ class Dashboard extends BaseDashboard
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations while documenting
      * the supported union types via PHPDoc for tooling assistance.
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-home';
+//    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-home';
+    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    {
+        return 'heroicon-o-home';
+    }
 
     protected static ?string $title = 'Dashboard';
 

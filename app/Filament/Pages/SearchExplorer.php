@@ -8,6 +8,7 @@ use App\Data\SearchQueryData;
 use App\Services\SearchService;
 use BackedEnum;
 use Filament\Pages\Page;
+use Illuminate\Contracts\Support\Htmlable;
 
 final class SearchExplorer extends Page
 {
@@ -15,7 +16,12 @@ final class SearchExplorer extends Page
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations while keeping
      * the union types expressed through PHPDoc for clarity and tooling support.
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-magnifying-glass-circle';
+//    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-magnifying-glass-circle';
+
+    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    {
+        return 'heroicon-o-magnifying-glass-circle';
+    }
 
     public static function getNavigationGroup(): BackedEnum|string|null
     {

@@ -12,6 +12,7 @@ use Filament\Forms\Components\Section;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Schema;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
@@ -23,8 +24,12 @@ final class CacheMaintenance extends Page
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations while
      * documenting the accepted union type for downstream tooling.
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-server-stack';
+//    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-server-stack';
 
+    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    {
+        return 'heroicon-o-server-stack';
+    }
     public static function getNavigationGroup(): BackedEnum|string|null
     {
         return 'System'; // Keep cache tooling aligned with the broader system utilities group.
