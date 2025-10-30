@@ -14,6 +14,7 @@ use App\Models\ReferralRewardLog;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 /**
@@ -52,15 +53,13 @@ final class ReferralResourcesSmokeTest extends TestCase
     {
         // Map each list page class to the helper responsible for seeding a visible record.
         return [
-            'referral rewards'      => [ListReferralRewards::class, 'createReferralRewardRecord'],
-            'referral reward logs'  => [ListReferralRewardLogs::class, 'createReferralRewardLogRecord'],
-            'referral code usages'  => [ListReferralCodeUsageLogs::class, 'createReferralCodeUsageLogRecord'],
+            'referral rewards'     => [ListReferralRewards::class, 'createReferralRewardRecord'],
+            'referral reward logs' => [ListReferralRewardLogs::class, 'createReferralRewardLogRecord'],
+            'referral code usages' => [ListReferralCodeUsageLogs::class, 'createReferralCodeUsageLogRecord'],
         ];
     }
 
-    /**
-     * @dataProvider referralResourceProvider
-     */
+    #[DataProvider('referralResourceProvider')]
     public function test_referral_list_pages_render_seed_records(string $pageClass, string $factoryMethod): void
     {
         // Use the dedicated helper to ensure the table has a concrete record for the current resource.

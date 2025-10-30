@@ -19,6 +19,7 @@ use App\Models\VariantPricingRule;
 use App\Models\VariantStockHistory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 /**
@@ -66,9 +67,7 @@ final class VariantCatalogResourceCoverageTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider variantResourceProvider
-     */
+    #[DataProvider('variantResourceProvider')]
     public function test_variant_list_pages_render_seeded_records(string $pageClass, string $factoryMethod): void
     {
         // Seed a record via the dedicated helper so each table has content to assert against.
