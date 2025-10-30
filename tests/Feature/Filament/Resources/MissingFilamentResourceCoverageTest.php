@@ -59,6 +59,8 @@ use App\Models\NormalSettingTranslation;
 use App\Models\Post;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Models\RecommendationBlock;
+use App\Models\RecommendationCache;
 use App\Models\RecommendationAnalytics;
 use App\Models\RecommendationConfigSimple;
 use App\Models\Referral;
