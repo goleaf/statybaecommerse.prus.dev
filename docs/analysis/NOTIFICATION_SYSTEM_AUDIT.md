@@ -11,6 +11,7 @@
 - The Filament email campaign editor has been upgraded to the v4 form API and now requires a plain-text body alongside scheduling metadata, keeping generated payloads consistent for transactional fallbacks.【F:app/Filament/Resources/EmailCampaignResource.php†L15-L118】
 - Variant inventory management actions now emit deterministic success/failure notifications and enforce admin-only access, ensuring QA assertions catch stock adjustments, reservations, exports, and deletions uniformly across the Filament panel.【F:app/Filament/Resources/VariantInventoryResource.php†L520-L739】
 - The Livewire testing harness ships with a defensive `groupTable` macro so grouped inventory grid assertions run even when upstream helpers are unavailable, keeping notification-driven regressions observable in CI.【F:app/Providers/AppServiceProvider.php†L214-L233】
+- Server-sent notification streams now back off to a one-second idle poll interval when no new events arrive, preventing long-lived workers from hammering the database at 4 Hz while still emitting bursts rapidly when activity resumes.【F:app/Http/Controllers/Api/NotificationStreamController.php†L47-L158】
 
 ## Category Normalisation
 - The new `config/notifications.php` map defines the six primary categories—System Notifications, User Notifications, Email Campaigns, Newsletter, Order Updates, and Stock Alerts—each with descriptive text and alias support so legacy payloads (e.g., `order`, `stock`) resolve consistently.【F:config/notifications.php†L4-L27】
