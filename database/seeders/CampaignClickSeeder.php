@@ -15,20 +15,30 @@ final class CampaignClickSeeder extends Seeder
         $campaigns = Campaign::query()->with(['clicks', 'conversions'])->get();
 
         if ($campaigns->isEmpty()) {
-            $this->command?->warn('No campaigns found. Skipping CampaignClick seeding.');
+            // Creating a small batch of campaigns guarantees that the click factory
+            // runs even in freshly provisioned databases where no marketing data
+            // has been loaded yet, mirroring the behaviour expected by "make all".
+            Campaign::factory()
+                ->count(5)
+                ->create();
 
-            return;
+            $campaigns = Campaign::query()->with(['clicks', 'conversions'])->get();
         }
 
         $campaigns->each(function (Campaign $campaign): void {
-            if ($campaign->clicks()->exists()) {
+            $clicksPerCampaign = 25;
+            $existingClickCount = $campaign->clicks()->count();
+
+            if ($existingClickCount >= $clicksPerCampaign) {
                 return;
             }
 
-            $clicksPerCampaign = 25;
+            $missingClickCount = $clicksPerCampaign - $existingClickCount;
 
             CampaignClick::factory()
-                ->count($clicksPerCampaign)
+                // Only seed the amount required to reach the deterministic baseline
+                // so repeated seeder runs stay idempotent while still producing data.
+                ->count($missingClickCount)
                 ->for($campaign)
                 ->withCustomer()
                 ->state(function () use ($campaign): array {
