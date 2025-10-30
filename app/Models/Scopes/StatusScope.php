@@ -49,6 +49,7 @@ final class StatusScope implements Scope
             \App\Models\Order::class          => ['pending', 'processing', 'shipped', 'delivered', 'completed'], // Retain "completed" for historical rows while the lifecycle migrates to delivered.
             \App\Models\Campaign::class       => ['active', 'running', 'published'],
             \App\Models\Channel::class        => ['active', 'enabled'],
+            \App\Models\OrderShipping::class  => ['pending', 'processing', 'shipped', 'delivered'],
             Document::class                   => [
                 Document::STATUS_DRAFT,
                 Document::STATUS_GENERATED,
