@@ -770,6 +770,7 @@
     "product_page.change_frequency_30": "Change frequency (30 days)",
     "product_page.avg_changes_30": "Average changes per day (last 30 days)",
     "product_page.all_variants_options": "All Variants & Options",
+    "product_page.variant_option_from_price": "From :price",
     "product_page.single_configuration": "This product is available in a single configuration. Variant options will appear here for configurable products.",
     "product_page.downloads_guides": "Downloads & Guides",
     "product_page.customer_feedback": "Customer Feedback",
