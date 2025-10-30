@@ -15,6 +15,16 @@ return new class extends Migration
             return;
         }
 
+        if (
+            Schema::hasColumn('system_setting_dependencies', 'condition_value') ||
+            Schema::hasColumn('system_setting_dependencies', 'condition_operator')
+        ) {
+            // Bail out when a later patch already introduced the new schema columns. Without
+            // this guard SQLite would attempt to add duplicate columns during migrate:fresh,
+            // causing the test harness to drop back to the minimal fallback schema.
+            return;
+        }
+
         Schema::table('system_setting_dependencies', function (Blueprint $table): void {
             if (! Schema::hasColumn('system_setting_dependencies', 'condition_operator')) {
                 // Guard the operator column so repeated migrate:fresh cycles in tests
@@ -49,12 +59,15 @@ return new class extends Migration
 
                         $jsonError = json_last_error();
 
-                        if ($jsonError === JSON_ERROR_NONE) {
-                            if (is_array($decoded)) {
-                                $operator = $decoded['operator'] ?? null;
-                                $value = $decoded['value'] ?? null;
-                            } elseif (is_scalar($decoded)) {
-                                $operator = (string) $decoded;
+                            if ($jsonError === JSON_ERROR_NONE) {
+                                if (is_array($decoded)) {
+                                    $operator = $decoded['operator'] ?? null;
+                                    $value = $decoded['value'] ?? null;
+                                } elseif (is_scalar($decoded)) {
+                                    $operator = (string) $decoded;
+                                }
+                            } else {
+                                $operator = $dependency->condition;
                             }
                         } elseif (is_string($dependency->condition)) {
                             $operator = $dependency->condition;
