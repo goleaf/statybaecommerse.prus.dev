@@ -12,6 +12,7 @@ The model-focused regression suite is a quick indicator that Eloquent scopes, ca
    ```
    The PHPUnit configuration now registers `tests/Models` as its own suite, so invoking the folder (or the `Models` suite) avoids duplicate file discovery warnings during broader runs.
    - When adding new Pest files under `tests/Models`, import `Tests\\TestCase` and call `uses(TestCase::class);` so the shared SQLite harness registers the Eloquent connection before factories execute.
+- Full database refreshes automatically run `Database\\Seeders\\AllSeedersSeeder`, which discovers and executes every seeder class in the tree. Reach for `php artisan db:seed --class=...` when a focused dataset keeps feedback loops manageable.【F:database/seeders/AllSeedersSeeder.php†L7-L109】【F:config/seeds.php†L28-L44】
 3. When debugging individual failures, target the specific file for faster feedback. For example:
    ```bash
    php artisan test tests/Models/ActivityLogTest.php
