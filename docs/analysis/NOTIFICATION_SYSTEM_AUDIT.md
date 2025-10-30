@@ -12,6 +12,7 @@
 - Variant inventory management actions now emit deterministic success/failure notifications and enforce admin-only access, ensuring QA assertions catch stock adjustments, reservations, exports, and deletions uniformly across the Filament panel.【F:app/Filament/Resources/VariantInventoryResource.php†L520-L739】
 - The Livewire testing harness ships with a defensive `groupTable` macro so grouped inventory grid assertions run even when upstream helpers are unavailable, keeping notification-driven regressions observable in CI.【F:app/Providers/AppServiceProvider.php†L214-L233】
 - Server-sent notification streams now back off to a one-second idle poll interval when no new events arrive, preventing long-lived workers from hammering the database at 4 Hz while still emitting bursts rapidly when activity resumes.【F:app/Http/Controllers/Api/NotificationStreamController.php†L47-L158】
+- Livewire coverage now includes a dedicated dropdown regression suite that verifies guest gating, unread counters, and ownership checks for notification read actions, keeping the UI component contract stable across releases.【F:tests/Livewire/NotificationDropdownTest.php†L17-L170】
 
 ## Category Normalisation
 - The new `config/notifications.php` map defines the six primary categories—System Notifications, User Notifications, Email Campaigns, Newsletter, Order Updates, and Stock Alerts—each with descriptive text and alias support so legacy payloads (e.g., `order`, `stock`) resolve consistently.【F:config/notifications.php†L4-L27】
