@@ -209,6 +209,28 @@ final class MissingFilamentResourceCoverageTest extends TestCase
         ]);
     }
 
+    private function createActivityLogRecord(): ActivityLog
+    {
+        // Create a subject user so the morph relationship renders a friendly display name in the table.
+        $subject = User::factory()->create(['name' => 'Tracked Coverage User']);
+
+        // Seed a deterministic activity log entry so the Filament listing can surface a predictable badge row.
+        return ActivityLog::query()->create([
+            'log_name'      => 'coverage-activity-log',
+            'description'   => 'Coverage activity entry',
+            'event'         => 'login',
+            'subject_type'  => $subject->getMorphClass(),
+            'subject_id'    => $subject->getKey(),
+            'causer_type'   => $this->admin->getMorphClass(),
+            'causer_id'     => $this->admin->getKey(),
+            'properties'    => ['ip' => '127.0.0.1'],
+            'is_important'  => true,
+            'is_system'     => false,
+            'severity'      => 'low',
+            'category'      => 'authentication',
+        ]);
+    }
+
     private function createBrandRecord(): Brand
     {
         // Use the factory to create a visible brand that the table listing can display immediately.
