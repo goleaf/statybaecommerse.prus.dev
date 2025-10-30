@@ -4,6 +4,7 @@
 - The storefront and admin experiences share a multilayered translation stack that combines Laravel's locale middleware, Spatie-driven model tables, JSON and PHP language files, and database-backed UI key/value pairs so every interface has localized fallbacks.
 - Filament-specific tooling (Language Tabs and the LaraZeus Spatie Translatable plugin) keeps admin forms in sync with locale requirements while helper services normalise supported locales across the application.
 - The system ships with automated seeding, indexing, and migration scripts that enforce per-locale uniqueness, cascade deletes, and data backfills to prevent drift between base columns and translation tables.
+- Slider translation administration now binds dropdowns to slider titles instead of a non-existent name column, and dedicated Filament v4 Livewire tests exercise listing, creation, editing, viewing, and table filtering so regressions are caught early.【F:app/Filament/Resources/SliderTranslationResource.php†L20-L178】【F:tests/Feature/Filament/Resources/SliderTranslationResourceTest.php†L1-L141】
 
 ## Database Translations
 - Domain models opt into a reusable `HasTranslations` trait that exposes relation loaders, locale fallbacks, and attribute resolution backed by dedicated translation Eloquent models.【F:app/Traits/HasTranslations.php†L15-L92】【F:app/Models/Translations/ProductTranslation.php†L1-L120】
