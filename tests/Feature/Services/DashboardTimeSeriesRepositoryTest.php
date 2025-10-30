@@ -35,13 +35,13 @@ final class DashboardTimeSeriesRepositoryTest extends TestCase
 
     public function test_time_series_returns_expected_lengths_and_order(): void
     {
-        Order::factory()->completed()->create(['total' => 150, 'created_at' => CarbonImmutable::now()]);
-        Order::factory()->completed()->create(['total' => 200, 'created_at' => CarbonImmutable::now()->subDay()]);
-        Order::factory()->completed()->create(['total' => 80, 'created_at' => CarbonImmutable::now()->subDays(3)]);
+        $this->createOrderAt(150, CarbonImmutable::now());
+        $this->createOrderAt(200, CarbonImmutable::now()->subDay());
+        $this->createOrderAt(80, CarbonImmutable::now()->subDays(3));
 
-        User::factory()->create(['created_at' => CarbonImmutable::now()]);
-        User::factory()->create(['created_at' => CarbonImmutable::now()->subDay()]);
-        User::factory()->create(['created_at' => CarbonImmutable::now()->subDays(2)]);
+        $this->createUserAt(CarbonImmutable::now());
+        $this->createUserAt(CarbonImmutable::now()->subDay());
+        $this->createUserAt(CarbonImmutable::now()->subDays(2));
 
         $repository = app(DashboardTimeSeriesRepository::class);
 
@@ -55,16 +55,16 @@ final class DashboardTimeSeriesRepositoryTest extends TestCase
 
     public function test_time_series_matches_snapshot_for_five_days(): void
     {
-        Order::factory()->completed()->create(['total' => 150, 'created_at' => CarbonImmutable::now()]);
-        Order::factory()->completed()->create(['total' => 50, 'created_at' => CarbonImmutable::now()]);
-        Order::factory()->completed()->create(['total' => 200, 'created_at' => CarbonImmutable::now()->subDay()]);
-        Order::factory()->completed()->create(['total' => 80, 'created_at' => CarbonImmutable::now()->subDays(3)]);
+        $this->createOrderAt(150, CarbonImmutable::now());
+        $this->createOrderAt(50, CarbonImmutable::now());
+        $this->createOrderAt(200, CarbonImmutable::now()->subDay());
+        $this->createOrderAt(80, CarbonImmutable::now()->subDays(3));
 
-        User::factory()->create(['created_at' => CarbonImmutable::now()]);
-        User::factory()->create(['created_at' => CarbonImmutable::now()->subDay()]);
-        User::factory()->create(['created_at' => CarbonImmutable::now()->subDays(2)]);
-        User::factory()->create(['created_at' => CarbonImmutable::now()->subDays(3)]);
-        User::factory()->create(['created_at' => CarbonImmutable::now()->subDays(3)]);
+        $this->createUserAt(CarbonImmutable::now());
+        $this->createUserAt(CarbonImmutable::now()->subDay());
+        $this->createUserAt(CarbonImmutable::now()->subDays(2));
+        $this->createUserAt(CarbonImmutable::now()->subDays(3));
+        $this->createUserAt(CarbonImmutable::now()->subDays(3));
 
         $repository = app(DashboardTimeSeriesRepository::class);
 
@@ -77,5 +77,27 @@ final class DashboardTimeSeriesRepositoryTest extends TestCase
         }
 
         self::assertJsonStringEqualsJsonFile($expectedPath, json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+    }
+    private function createOrderAt(float $total, CarbonImmutable $createdAt): void
+    {
+        $order = Order::factory()->completed()->make([
+            'total'      => $total,
+            'created_at' => $createdAt,
+            'updated_at' => $createdAt,
+        ]);
+
+        // Persist manually to skip the factory's afterCreating hook that would seed extra related models.
+        $order->timestamps = false;
+        $order->save();
+    }
+
+    private function createUserAt(CarbonImmutable $createdAt): void
+    {
+        $user = User::factory()->make();
+        $user->created_at = $createdAt;
+        $user->updated_at = $createdAt;
+        // Disable automatic timestamps so the custom date persists despite guarded attributes on the model.
+        $user->timestamps = false;
+        $user->save();
     }
 }
