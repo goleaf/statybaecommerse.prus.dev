@@ -58,6 +58,13 @@ final class DashboardMetricsRepository
 
             return User::query()
                 ->withoutGlobalScopes([ActiveScope::class])
+                // Focus on customer signups and exclude internal administrator accounts
+                // so dashboard widgets reflect end-user growth instead of seeded staff.
+                ->where('is_admin', false)
+                // Ignore users already linked to historical orders so factory-generated
+                // fixtures and transactional customer associations do not inflate the
+                // registration count for dashboard KPIs.
+                ->whereDoesntHave('orders')
                 ->whereBetween('created_at', [$startOfDay, $endOfDay])
                 ->whereNull('deleted_at')
                 ->count();
