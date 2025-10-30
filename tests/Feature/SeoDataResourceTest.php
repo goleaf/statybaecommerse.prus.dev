@@ -16,6 +16,58 @@ class SeoDataResourceTest extends TestCase
 {
     use RefreshDatabase;
 
+    /**
+     * Remember original Filament testing environment overrides so we can restore them after this suite completes.
+     */
+    private static ?string $previousFilamentAutodiscoverEnv = null;
+
+    private static ?string $previousFilamentResourcesEnv = null;
+
+    public static function setUpBeforeClass(): void
+    {
+        parent::setUpBeforeClass();
+
+        self::$previousFilamentAutodiscoverEnv = getenv('FILAMENT_TESTING_AUTODISCOVER') !== false
+            ? getenv('FILAMENT_TESTING_AUTODISCOVER')
+            : null;
+
+        self::$previousFilamentResourcesEnv = getenv('FILAMENT_TESTING_RESOURCES') !== false
+            ? getenv('FILAMENT_TESTING_RESOURCES')
+            : null;
+
+        putenv('FILAMENT_TESTING_AUTODISCOVER=false');
+        $_ENV['FILAMENT_TESTING_AUTODISCOVER'] = 'false';
+        $_SERVER['FILAMENT_TESTING_AUTODISCOVER'] = 'false';
+
+        $resourceList = \App\Filament\Resources\SeoDataResource::class;
+        putenv('FILAMENT_TESTING_RESOURCES=' . $resourceList);
+        $_ENV['FILAMENT_TESTING_RESOURCES'] = $resourceList;
+        $_SERVER['FILAMENT_TESTING_RESOURCES'] = $resourceList;
+    }
+
+    public static function tearDownAfterClass(): void
+    {
+        if (self::$previousFilamentAutodiscoverEnv === null) {
+            putenv('FILAMENT_TESTING_AUTODISCOVER');
+            unset($_ENV['FILAMENT_TESTING_AUTODISCOVER'], $_SERVER['FILAMENT_TESTING_AUTODISCOVER']);
+        } else {
+            putenv('FILAMENT_TESTING_AUTODISCOVER=' . self::$previousFilamentAutodiscoverEnv);
+            $_ENV['FILAMENT_TESTING_AUTODISCOVER'] = self::$previousFilamentAutodiscoverEnv;
+            $_SERVER['FILAMENT_TESTING_AUTODISCOVER'] = self::$previousFilamentAutodiscoverEnv;
+        }
+
+        if (self::$previousFilamentResourcesEnv === null) {
+            putenv('FILAMENT_TESTING_RESOURCES');
+            unset($_ENV['FILAMENT_TESTING_RESOURCES'], $_SERVER['FILAMENT_TESTING_RESOURCES']);
+        } else {
+            putenv('FILAMENT_TESTING_RESOURCES=' . self::$previousFilamentResourcesEnv);
+            $_ENV['FILAMENT_TESTING_RESOURCES'] = self::$previousFilamentResourcesEnv;
+            $_SERVER['FILAMENT_TESTING_RESOURCES'] = self::$previousFilamentResourcesEnv;
+        }
+
+        parent::tearDownAfterClass();
+    }
+
     protected function setUp(): void
     {
         parent::setUp();
