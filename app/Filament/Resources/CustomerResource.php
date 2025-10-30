@@ -17,15 +17,17 @@ use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid as SchemaGrid;
-use Filament\Schemas\Components\Section as SchemaSection;
-use Filament\Schemas\Schema;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ViewColumn;
@@ -35,6 +37,7 @@ use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Number;
 use LaraZeus\InlineChart\Tables\Columns\InlineChart;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
@@ -47,9 +50,11 @@ use UnitEnum;
 final class CustomerResource extends Resource
 {
     /**
-     * Icon displayed in the navigation menu.
+     * Icon displayed in the navigation menu for Filament navigation lists.
+     *
+     * @var string|BackedEnum|null
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-users';
+    protected static $navigationIcon = 'heroicon-o-users';
 
     protected static ?string $model = Customer::class;
 
@@ -92,85 +97,87 @@ final class CustomerResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
-            SchemaSection::make(__('customers.basic_information'))
+        return $form
+            // Adopt the Filament v4 fluent builder so form hydration matches the resource defaults across Livewire tests.
+            ->schema([
+            Section::make(__('customers.basic_information'))
                 ->schema([
-                    SchemaGrid::make(2)
-                        ->schema([
-                            TextInput::make('name')
-                                ->label(__('customers.name'))
-                                ->required()
-                                ->maxLength(255),
-                            TextInput::make('email')
-                                ->label(__('customers.email'))
-                                ->email()
-                                ->required()
-                                ->maxLength(255)
-                                ->unique(ignoreRecord: true),
-                        ]),
-                    SchemaGrid::make(2)
-                        ->schema([
-                            TextInput::make('phone')
-                                ->label(__('customers.phone'))
-                                ->tel()
-                                ->maxLength(20),
-                            TextInput::make('address')
-                                ->label(__('customers.address'))
-                                ->maxLength(500),
-                        ]),
+                    Grid::make()->schema([
+                        TextInput::make('name')
+                            ->label(__('customers.name'))
+                            ->required()
+                            ->maxLength(255),
+                        TextInput::make('email')
+                            ->label(__('customers.email'))
+                            ->email()
+                            ->required()
+                            ->maxLength(255)
+                            ->unique(ignoreRecord: true),
+                    ])->columns(2),
+                    Grid::make()->schema([
+                        TextInput::make('phone')
+                            ->label(__('customers.phone'))
+                            ->tel()
+                            ->maxLength(20),
+                        TextInput::make('address')
+                            ->label(__('customers.address'))
+                            ->maxLength(500),
+                    ])->columns(2),
                     Textarea::make('description')
                         ->label(__('customers.description'))
                         ->rows(3)
                         ->maxLength(1000)
                         ->columnSpanFull(),
                 ]),
-            SchemaSection::make(__('customers.location'))
+            Section::make(__('customers.location'))
                 ->schema([
-                    SchemaGrid::make(3)
-                        ->schema([
-                            Select::make('country_id')
-                                ->label(__('customers.country'))
-                                ->relationship('country', 'name')
-                                ->searchable()
-                                ->preload()
-                                ->live()
-                                ->afterStateUpdated(function ($state, Set $set): void {
-                                    if ($state) {
-                                        $set('city_id', null);
-                                    }
-                                }),
-                            Select::make('city_id')
-                                ->label(__('customers.city'))
-                                ->searchable()
-                                ->preload()
-                                ->live()
-                                ->options(function (Get $get): array {
-                                    $query = City::query()->orderBy('name');
+                    Grid::make()->schema([
+                        Select::make('country_id')
+                            ->label(__('customers.country'))
+                            ->relationship('country', 'name')
+                            ->searchable()
+                            ->preload()
+                            ->live()
+                            ->afterStateUpdated(function ($state, Set $set): void {
+                                // Reset the dependant city when the country changes to avoid mismatched locations.
+                                if ($state) {
+                                    $set('city_id', null);
+                                }
+                            }),
+                        Select::make('city_id')
+                            ->label(__('customers.city'))
+                            ->searchable()
+                            ->preload()
+                            ->live()
+                            ->options(function (Get $get): array {
+                                // Scope the available cities to the selected country to simplify lookups.
+                                $query = City::query()->orderBy('name');
 
-                                    if ($countryId = $get('country_id')) {
-                                        $query->where('country_id', $countryId);
-                                    }
+                                if ($countryId = $get('country_id')) {
+                                    $query->where('country_id', $countryId);
+                                }
 
-                                    return $query->pluck('name', 'id')->all();
-                                })
-                                ->getSearchResultsUsing(function (Get $get, string $search): array {
-                                    return City::query()
-                                        ->where('name', 'like', "%{$search}%")
-                                        ->when($get('country_id'), fn (Builder $query, $countryId): Builder => $query->where('country_id', $countryId))
-                                        ->orderBy('name')
-                                        ->limit(50)
-                                        ->pluck('name', 'id')
-                                        ->all();
-                                })
-                                ->getOptionLabelUsing(fn ($value): ?string => City::query()->find($value)?->name),
-                            TextInput::make('postal_code')
-                                ->label(__('customers.postal_code'))
-                                ->maxLength(20),
-                        ]),
+                                return $query->pluck('name', 'id')->all();
+                            })
+                            ->getSearchResultsUsing(function (Get $get, string $search): array {
+                                // Mirror the filtering behaviour from the options resolver so both code paths stay consistent.
+                                return City::query()
+                                    ->where('name', 'like', "%{$search}%")
+                                    ->when($get('country_id'), fn (Builder $query, $countryId): Builder => $query->where('country_id', $countryId))
+                                    ->orderBy('name')
+                                    ->limit(50)
+                                    ->pluck('name', 'id')
+                                    ->all();
+                            })
+                            ->getOptionLabelUsing(fn ($value): ?string => City::query()->find($value)?->name),
+                        TextInput::make('postal_code')
+                            ->label(__('customers.postal_code'))
+                            ->maxLength(20),
+                    ])->columns(3),
                 ]),
-            SchemaSection::make(__('customers.company'))
+            Section::make(__('customers.company'))
                 ->schema([
                     Select::make('company_id')
                         ->label(__('customers.company'))
@@ -179,7 +186,7 @@ final class CustomerResource extends Resource
                         ->preload()
                         ->nullable(),
                 ]),
-            SchemaSection::make(__('customers.settings'))
+            Section::make(__('customers.settings'))
                 ->schema([
                     Toggle::make('is_active')
                         ->label(__('customers.is_active'))

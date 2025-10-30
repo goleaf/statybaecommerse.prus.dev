@@ -269,11 +269,11 @@
 ### 2. Filament Resource Pattern
 **Pattern:** Standardized Filament resource structure
 - **Form Schemas:** Separate form schema classes for complex forms
- - **Form Signatures:** Maintain `public static function form(Schema $schema): Schema` and return the provided `$schema` so the
-  Filament upgrade tooling remains compatible
+ - **Form Signatures:** Migrate resources to the Filament v4 API by type-hinting `public static function form(Form $form): Form` and returning the configured form instance so shared builders (grids, sections, and relationship selects) hydrate correctly in tests and during async reloads.
 - **Table Schemas:** Dedicated table schema classes for data display
 - **Page Classes:** Custom page classes for create, edit, and list operations
 - **Navigation Integration:** Proper navigation group and icon assignments
+- **Legacy Harness Support:** Retain compatibility helpers (for example `BaseListRecords::loadTable()`) so Pest suites that still call deprecated Livewire methods continue to boot the table state before asserting on records or actions.
 
 ### 3. Filament Testing Pattern
 **Pattern:** Deterministic assertions for the Livewire harness
