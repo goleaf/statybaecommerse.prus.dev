@@ -116,9 +116,9 @@ final class SeoDataControllerTest extends TestCase
         ]))->assertNotFound();
     }
 
-    public function test_analytics_view_receives_expected_statistics(): void
+    public function test_statistics_view_receives_expected_metrics(): void
     {
-        // Seed two SEO data records so the analytics view has predictable numbers to display.
+        // Seed two SEO data records so the statistics view has predictable numbers to display.
         $product = Product::factory()->create();
         $brand = Brand::factory()->create();
 
@@ -140,18 +140,18 @@ final class SeoDataControllerTest extends TestCase
         ]);
 
         $controller = app(SeoDataController::class);
-        $view = $controller->analytics();
+        $view = $controller->statistics();
 
         $this->assertInstanceOf(ViewContract::class, $view);
-        $this->assertSame('seo-data.analytics', $view->name());
+        $this->assertSame('seo-data.statistics', $view->name());
 
-        $stats = $view->getData()['stats'] ?? [];
-        $this->assertIsArray($stats);
-        /** @var array{total:int,complete_seo:int,needs_optimization:int} $stats */
-        $stats = $stats;
-        $this->assertSame(2, $stats['total']);
-        $this->assertSame(1, $stats['complete_seo']);
-        $this->assertSame(1, $stats['needs_optimization']);
+        $statistics = $view->getData()['statistics'] ?? [];
+        $this->assertIsArray($statistics);
+        /** @var array{total:int,complete_seo:int,needs_optimization:int} $statistics */
+        $statistics = $statistics;
+        $this->assertSame(2, $statistics['total']);
+        $this->assertSame(1, $statistics['complete_seo']);
+        $this->assertSame(1, $statistics['needs_optimization']);
     }
 
     /**
