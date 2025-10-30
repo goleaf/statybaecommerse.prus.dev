@@ -245,7 +245,7 @@ Every error includes a unique `request_id` header correlating with logs; include
 ## Observability & Support
 
 - **Rate-limit headers**: All responses include `X-RateLimit-Limit`, `X-RateLimit-Remaining`, and `X-RateLimit-Reset` headers to aid client-side throttling. `X-RateLimit-Reset` is a UNIX timestamp indicating the next reset.
-- **Tracing**: Provide the `X-Request-ID` response header in any support communication. Optional `X-Correlation-ID` headers in requests are echoed in responses for distributed tracing.
+- **Request correlation**: Provide the `X-Request-ID` response header in any support communication. Optional `X-Correlation-ID` headers in requests are echoed in responses for downstream log correlation.
 - **Audit logs**: Partner Console exposes a 30-day rolling log of key usage and revocation events. Export logs in CSV or syslog formats.
 - **Support contacts**:
   - General inquiries: `partners@prus.dev` (business hours 08:00–18:00 EET).
