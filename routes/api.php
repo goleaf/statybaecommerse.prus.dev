@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Api\AuditLogController;
 use App\Http\Controllers\Api\AuthenticatedUserController;
+use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\AutocompleteSearchController;
 use App\Http\Controllers\Api\ExportDownloadController;
 use App\Http\Controllers\Api\NotificationController;
@@ -42,6 +43,29 @@ Route::middleware('auth:sanctum')
             Route::post('/{notification}/mark-unread', [NotificationController::class, 'markAsUnread'])->name('mark-as-unread');
             Route::delete('/{notification}', [NotificationController::class, 'destroy'])->name('destroy');
         });
+    });
+
+Route::prefix('categories')
+    ->name('api.categories.')
+    ->group(function (): void {
+        Route::get('/', [CategoryController::class, 'index'])
+            // Keep the read throttle aligned with other catalogue endpoints so contract tests
+            // exercise the same limiter buckets used by production API consumers.
+            ->middleware('throttle:api.read')
+            ->name('index');
+
+        Route::get('tree', [CategoryController::class, 'tree'])
+            // Maintain the literal `tree` endpoint outside the slug binding route so cached
+            // responses win and implicit model binding never captures the request.
+            ->middleware('throttle:api.read')
+            ->name('tree');
+
+        Route::get('{category:slug}', [CategoryController::class, 'show'])
+            // Guard against the `tree` slug colliding with the dedicated tree endpoint while
+            // still accepting standard alpha-numeric category identifiers for the show action.
+            ->where('category', '^(?!tree$)[A-Za-z0-9\-]+$')
+            ->middleware('throttle:api.read')
+            ->name('show');
     });
 
 Route::prefix('products')
