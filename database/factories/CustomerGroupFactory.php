@@ -24,7 +24,10 @@ final class CustomerGroupFactory extends Factory
     {
         $attributes = [
             'name'                => $this->faker->words(2, true),
-            'code'                => strtoupper($this->faker->bothify('??##')),
+            // Ensure generated codes remain unique across test runs so the unique index on the
+            // `customer_groups` table does not raise constraint violations when factories are
+            // used repeatedly within the same scenario.
+            'code'                => strtoupper($this->faker->unique()->bothify('??##')),
             'description'         => $this->faker->sentence(),
             'slug'                => $this->faker->slug(),
             'discount_percentage' => $this->faker->randomFloat(2, 0, 50),
