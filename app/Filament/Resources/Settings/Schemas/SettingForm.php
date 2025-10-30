@@ -11,8 +11,9 @@ use Filament\Schemas\Schema;
 
 class SettingForm
 {
-    public static function configure(Schema $form): Schema
+    public static function configure(Schema $schema): Schema
     {
+        // Build the shared settings form schema so all pages stay in sync.
         return $schema
             ->components([
                 TextInput::make('key')
