@@ -33,7 +33,12 @@ class ProcessExport implements ShouldQueue
         return [60, 120, 300];
     }
 
-    public function __construct(public readonly int $exportId) {}
+    public function __construct(public int $exportId)
+    {
+        // The export identifier remains mutable so Laravel's queue serializer can
+        // hydrate the job when using the legacy ProcessExportJob alias without
+        // triggering readonly property violations during restoration.
+    }
 
     public function handle(ExportService $service): void
     {
