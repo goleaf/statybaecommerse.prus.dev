@@ -1004,7 +1004,7 @@ Route::middleware(['auth', 'localize'])->group(function (): void {
 // SEO Data Routes
 Route::prefix('seo-data')->name('seo-data.')->group(function () {
     Route::get('/', [App\Http\Controllers\SeoDataController::class, 'index'])->name('index');
-    Route::get('/analytics', [App\Http\Controllers\SeoDataController::class, 'analytics'])->name('analytics');
+    Route::get('/statistics', [App\Http\Controllers\SeoDataController::class, 'statistics'])->name('statistics');
     Route::get('/type/{type}', [App\Http\Controllers\SeoDataController::class, 'byType'])->name('by-type');
     Route::get('/{seoData}', [App\Http\Controllers\SeoDataController::class, 'show'])->name('show');
 });
