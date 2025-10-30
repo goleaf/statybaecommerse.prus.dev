@@ -367,32 +367,35 @@ final class EnhancedProductVariantSeeder extends Seeder
             // Size-based surcharge rule for larger garments.
             VariantPricingRule::factory()
                 ->state([
+                    // The pricing rules table only exposes a "name" column, so we reuse it for the
+                    // deterministic identifier that feature tests assert against.
                     'product_id'         => $product->getKey(),
                     'product_variant_id' => $primaryVariant->getKey(),
                     'name'               => 'Large Size Premium',
-                    'rule_name'          => 'Large Size Premium',
                     'type'               => 'percentage',
-                    'rule_type'          => 'size_based',
                     'value'              => 10,
                     'min_quantity'       => 1,
                     'priority'           => 1,
                     'is_active'          => true,
+                    // Capture the original rule intent in the description so the admin UI still
+                    // surfaces the context that previously lived in the removed `rule_type` column.
+                    'description'        => 'size_based surcharge',
                 ])
                 ->create();
 
             // Loyalty discount for bulk purchases to diversify rule coverage.
             VariantPricingRule::factory()
                 ->state([
+                    // Keep the loyalty discount human readable via the canonical "name" column.
                     'product_id'         => $product->getKey(),
                     'product_variant_id' => $primaryVariant->getKey(),
                     'name'               => 'Loyalty Bulk Discount',
-                    'rule_name'          => 'Loyalty Bulk Discount',
                     'type'               => 'percentage',
-                    'rule_type'          => 'quantity_based',
                     'value'              => -15,
                     'min_quantity'       => 5,
                     'priority'           => 2,
                     'is_active'          => true,
+                    'description'        => 'quantity_based discount',
                 ])
                 ->create();
         }
