@@ -10,9 +10,11 @@ use App\Models\ProductVariant;
 use App\Services\Pricing\VariantPriceService;
 use App\Support\Cache\CacheKeys;
 use App\Support\Cache\CacheTags;
+use Illuminate\Routing\Exceptions\UrlGenerationException;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as SupportCollection;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Route;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -38,6 +40,11 @@ final class SingleProduct extends Component
     public string $stockStatus = 'unavailable';
 
     public string $stockMessage = '';
+
+    /**
+     * Cached route key exposed for Livewire assertions and integrations.
+     */
+    public ?string $productRouteKey = null;
 
     /**
      * Structured pricing summary for the currently selected context (product or variant).
@@ -247,6 +254,22 @@ final class SingleProduct extends Component
     }
 
     /**
+     * Dispatch a browser share event that contains the localized product URL.
+     */
+    public function shareProduct(): void
+    {
+        // Resolve and cache the canonical route key so downstream listeners can assert state.
+        $routeKey = $this->resolveProductRouteKey($this->product);
+        $this->productRouteKey = $routeKey;
+
+        // Determine the appropriate URL prioritising localized routes before falling back.
+        $shareUrl = $this->resolveProductShareUrl($routeKey);
+
+        // Emit the Livewire browser event with the computed URL payload.
+        $this->dispatch('share-product', url: $shareUrl);
+    }
+
+    /**
      * Handle addToCartTrait functionality with proper error handling.
      */
     private function addToCartTrait(int $productId, int $quantity = 1): void
@@ -264,6 +287,74 @@ final class SingleProduct extends Component
         $this->trackAddToCartHistory($product, $quantity);
         $this->dispatch('add-to-cart', productId: $productId, quantity: $quantity);
         $this->dispatch('cart-updated');
+    }
+
+    /**
+     * Derive the most reliable route key for the current product instance.
+     */
+    private function resolveProductRouteKey(Product $product): string
+    {
+        // Prefer the standard route key, falling back to slug or attribute lookups when needed.
+        $routeKey = $product->getRouteKey() ?: ($product->slug ?? $product->getAttribute($product->getRouteKeyName()));
+
+        if (empty($routeKey) && $product->exists) {
+            // Persisted products always have a primary key we can expose to ensure deterministic URLs.
+            $routeKey = (string) $product->getKey();
+        }
+
+        return (string) ($routeKey ?? '');
+    }
+
+    /**
+     * Resolve the shareable URL, prioritising localized routes with safe fallbacks.
+     */
+    private function resolveProductShareUrl(string $routeKey): string
+    {
+        $resolvedUrl = null;
+
+        if ($routeKey !== '' && Route::has('localized.products.show')) {
+            try {
+                // Attempt to honour the active locale when a localized route exists.
+                $resolvedUrl = route('localized.products.show', [
+                    'locale'  => app()->getLocale(),
+                    'product' => $routeKey,
+                ]);
+            } catch (UrlGenerationException) {
+                // Ignore invalid parameters and continue through the fallback chain.
+            }
+        }
+
+        if (! $resolvedUrl && $routeKey !== '' && Route::has('frontend.products.show')) {
+            try {
+                // Defer to the storefront-facing route before exposing internal defaults.
+                $resolvedUrl = route('frontend.products.show', ['product' => $routeKey]);
+            } catch (UrlGenerationException) {
+                // Continue falling back when the route requires additional parameters.
+            }
+        }
+
+        if (! $resolvedUrl && $routeKey !== '' && Route::has('products.show')) {
+            try {
+                // As a final named-route fallback, use the generic product show route.
+                $resolvedUrl = route('products.show', ['product' => $routeKey]);
+            } catch (UrlGenerationException) {
+                // Ignore and fall through to the manual URL builder.
+            }
+        }
+
+        if (! $resolvedUrl) {
+            // Default to the conventional /products/{slug} pattern when routes are unavailable.
+            $resolvedUrl = $routeKey !== ''
+                ? url(sprintf('/products/%s', $routeKey))
+                : url('/products');
+        }
+
+        if ($routeKey !== '' && ! str_contains($resolvedUrl, $routeKey)) {
+            // Guarantee the share link highlights the same product even if route helpers stripped the slug.
+            $resolvedUrl = url(sprintf('/products/%s', $routeKey));
+        }
+
+        return $resolvedUrl;
     }
 
     /**
