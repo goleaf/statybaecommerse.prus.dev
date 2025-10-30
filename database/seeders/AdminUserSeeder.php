@@ -13,46 +13,37 @@ final class AdminUserSeeder extends Seeder
      */
     public function run(): void
     {
-        // Provision the primary admin guard accounts expected by Filament login flows.
-        $accounts = [
-            [
-                'email' => 'superuser@example.com',
-                'name' => 'Super User',
-                'password' => 'admin123',
-                'roles' => [
-                    AuthorizationRole::SUPER_ADMIN->value,
-                    AuthorizationRole::ADMIN->value,
-                ],
-            ],
-            [
-                'email' => 'admin@example.com',
-                'name' => 'Administrator',
-                'password' => 'admin123',
-                'roles' => [
-                    AuthorizationRole::ADMIN->value,
-                    AuthorizationRole::ADMINISTRATOR->value,
-                ],
-            ],
-        ];
+        // Remove any legacy administrator accounts so the canonical credential stays authoritative.
+        AdminUser::query()
+            ->where('email', '<>', 'admin@example.com')
+            ->each(static function (AdminUser $admin): void {
+                // Detach permissions before deletion to avoid pivot records hanging around between seed runs.
+                $admin->roles()->detach();
 
-        foreach ($accounts as $account) {
-            $admin = AdminUser::query()->firstOrNew(['email' => $account['email']]);
+                $admin->delete();
+            });
 
-            // Keep the guard credentials up to date so repeated seed runs refresh passwords and verification flags.
-            $admin->fill([
-                'name' => $account['name'],
-                'password' => $account['password'],
-                'email_verified_at' => now(),
-            ]);
+        // Provision the single administrator account expected by browser-based login checks.
+        $admin = AdminUser::query()->firstOrNew(['email' => 'admin@example.com']);
 
-            if ($admin->isDirty()) {
-                $admin->save();
-            }
+        // Keep the guard credentials up to date so repeated seed runs refresh passwords and verification flags.
+        $admin->fill([
+            'name' => 'Administrator',
+            'password' => 'admin123',
+            'email_verified_at' => now(),
+        ]);
 
-            // Sync the expected admin roles per account to guarantee panel access permissions.
-            $admin->syncRoles($account['roles']);
-
-            $this->command?->info(sprintf('🔐 Admin guard account ready: %s', $account['email']));
+        if ($admin->isDirty()) {
+            $admin->save();
         }
+
+        // Sync the expected admin roles to guarantee panel access permissions after cleanup.
+        $admin->syncRoles([
+            AuthorizationRole::SUPER_ADMIN->value,
+            AuthorizationRole::ADMIN->value,
+            AuthorizationRole::ADMINISTRATOR->value,
+        ]);
+
+        $this->command?->info('🔐 Admin guard account ready: admin@example.com');
     }
 }
