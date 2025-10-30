@@ -58,6 +58,7 @@ return [
     'set_as_default_successfully' => 'Currency set as default successfully.',
     'update_rate'                 => 'Update rate',
     'rate_updated_successfully'   => 'Currency rate updated successfully.',
+    'rate_update_failed'          => 'Unable to fetch an updated rate for the selected currency.',
 
     'activate_selected'          => 'Activate selected',
     'deactivate_selected'        => 'Deactivate selected',
@@ -65,4 +66,5 @@ return [
     'bulk_deactivated_success'   => 'Selected currencies deactivated successfully.',
     'update_rates'               => 'Update rates',
     'rates_updated_successfully' => 'Exchange rates updated successfully.',
+    'rates_update_failed'        => 'No exchange rates were updated. Please verify the provider configuration.',
 ];
