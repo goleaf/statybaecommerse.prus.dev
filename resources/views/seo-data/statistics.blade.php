@@ -1,15 +1,15 @@
 @extends('components.layouts.base')
 
-@section('title', __('seo_data.analytics'))
+@section('title', __('seo_data.statistics'))
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
     <div class="mb-8">
         <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-            {{ __('seo_data.analytics') }}
+            {{ __('seo_data.statistics') }}
         </h1>
         <p class="text-gray-600 dark:text-gray-400">
-            {{ __('seo_data.analytics_description') }}
+            {{ __('seo_data.statistics_description') }}
         </p>
     </div>
 
@@ -29,7 +29,7 @@
                         {{ __('seo_data.total_seo_data') }}
                     </p>
                     <p class="text-2xl font-semibold text-gray-900 dark:text-white">
-                        {{ number_format($stats['total']) }}
+                        {{ number_format($statistics['total']) }}
                     </p>
                 </div>
             </div>
@@ -49,7 +49,7 @@
                         {{ __('seo_data.complete_seo') }}
                     </p>
                     <p class="text-2xl font-semibold text-gray-900 dark:text-white">
-                        {{ number_format($stats['complete_seo']) }}
+                        {{ number_format($statistics['complete_seo']) }}
                     </p>
                 </div>
             </div>
@@ -69,7 +69,7 @@
                         {{ __('seo_data.needs_optimization') }}
                     </p>
                     <p class="text-2xl font-semibold text-gray-900 dark:text-white">
-                        {{ number_format($stats['needs_optimization']) }}
+                        {{ number_format($statistics['needs_optimization']) }}
                     </p>
                 </div>
             </div>
@@ -89,7 +89,7 @@
                         {{ __('seo_data.avg_seo_score') }}
                     </p>
                     <p class="text-2xl font-semibold text-gray-900 dark:text-white">
-                        {{ number_format($stats['avg_score'], 1) }}
+                        {{ number_format($statistics['avg_score'], 1) }}
                     </p>
                 </div>
             </div>
@@ -104,7 +104,7 @@
             </h3>
             
             <div class="space-y-4">
-                @foreach($stats['by_locale'] as $locale => $count)
+                @foreach($statistics['by_locale'] as $locale => $count)
                     <div class="flex items-center justify-between">
                         <div class="flex items-center space-x-3">
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
@@ -115,7 +115,7 @@
                         </div>
                         <div class="flex items-center space-x-2">
                             <div class="w-32 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                                <div class="bg-blue-600 h-2 rounded-full w-var" data-width="{{ $stats['total'] > 0 ? ($count / $stats['total']) * 100 : 0 }}"></div>
+                                <div class="bg-blue-600 h-2 rounded-full w-var" data-width="{{ $statistics['total'] > 0 ? ($count / $statistics['total']) * 100 : 0 }}"></div>
                             </div>
                             <span class="text-sm font-medium text-gray-900 dark:text-white w-12 text-right">
                                 {{ number_format($count) }}
@@ -133,7 +133,7 @@
             </h3>
             
             <div class="space-y-4">
-                @foreach($stats['by_type'] as $type => $count)
+                @foreach($statistics['by_type'] as $type => $count)
                     <div class="flex items-center justify-between">
                         <div class="flex items-center space-x-3">
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200">
@@ -154,7 +154,7 @@
                         </div>
                         <div class="flex items-center space-x-2">
                             <div class="w-32 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                                <div class="bg-green-600 h-2 rounded-full w-var" data-width="{{ $stats['total'] > 0 ? ($count / $stats['total']) * 100 : 0 }}"></div>
+                                <div class="bg-green-600 h-2 rounded-full w-var" data-width="{{ $statistics['total'] > 0 ? ($count / $statistics['total']) * 100 : 0 }}"></div>
                             </div>
                             <span class="text-sm font-medium text-gray-900 dark:text-white w-12 text-right">
                                 {{ number_format($count) }}
