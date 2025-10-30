@@ -11,6 +11,10 @@ use App\Filament\Resources\CityResource\Pages\ListCities;
 use App\Filament\Resources\CollectionResource\Pages\ListCollections;
 use App\Filament\Resources\CollectionRuleResource\Pages\ListCollectionRules;
 use App\Filament\Resources\EnumManagementResource\Pages\ListEnumManagement;
+use App\Filament\Resources\LegalResource\Pages\ListLegals;
+use App\Filament\Resources\LocationResource\Pages\ListLocations;
+use App\Filament\Resources\MenuItemResource\Pages\ListMenuItems;
+use App\Filament\Resources\MenuResource\Pages\ListMenus;
 use App\Filament\Resources\PostResource\Pages\ListPosts;
 use App\Filament\Resources\ProductVariantResource\Pages\ListProductVariants;
 use App\Filament\Resources\RecommendationAnalyticsResource\Pages\ListRecommendationAnalytics;
@@ -28,6 +32,10 @@ use App\Models\Collection;
 use App\Models\CollectionRule;
 use App\Models\Country;
 use App\Models\EnumValue;
+use App\Models\Legal;
+use App\Models\Location;
+use App\Models\Menu;
+use App\Models\MenuItem;
 use App\Models\Post;
 use App\Models\ProductVariant;
 use App\Models\RecommendationAnalytics;
@@ -88,6 +96,10 @@ final class MissingFilamentResourceCoverageTest extends TestCase
             'collections'               => [ListCollections::class, 'createCollectionRecord'],
             'collection rules'          => [ListCollectionRules::class, 'createCollectionRuleRecord'],
             'enum management'           => [ListEnumManagement::class, 'createEnumValueRecord'],
+            'legal documents'           => [ListLegals::class, 'createLegalRecord'],
+            'locations'                 => [ListLocations::class, 'createLocationRecord'],
+            'menu items'                => [ListMenuItems::class, 'createMenuItemRecord'],
+            'menus'                     => [ListMenus::class, 'createMenuRecord'],
             'posts'                     => [ListPosts::class, 'createPostRecord'],
             'product variants'          => [ListProductVariants::class, 'createProductVariantRecord'],
             'recommendation analytics'  => [ListRecommendationAnalytics::class, 'createRecommendationAnalyticsRecord'],
@@ -201,6 +213,98 @@ final class MissingFilamentResourceCoverageTest extends TestCase
             'type'  => 'navigation_group',
             'key'   => 'coverage',
             'value' => 'Coverage',
+        ]);
+    }
+
+    private function createLegalRecord(): Legal
+    {
+        // Create a published legal document so widget tabs and table filters can resolve active entries.
+        $legal = Legal::query()->create([
+            'key'          => 'coverage-privacy-policy',
+            'type'         => 'privacy_policy',
+            'is_enabled'   => true,
+            'is_required'  => true,
+            'sort_order'   => 1,
+            'published_at' => now()->subDay(),
+        ]);
+
+        // Attach a deterministic English translation to avoid nullable content when Filament renders columns.
+        $legal->translations()->create([
+            'locale'          => 'en',
+            'title'           => 'Coverage Privacy Policy',
+            'slug'            => 'coverage-privacy-policy',
+            'content'         => '<p>Coverage privacy policy content.</p>',
+            'seo_title'       => 'Coverage Privacy Policy',
+            'seo_description' => 'Privacy policy description for coverage assertions.',
+        ]);
+
+        return $legal->fresh();
+    }
+
+    private function createLocationRecord(): Location
+    {
+        // Seed a visible country to satisfy the location relationship and global scope expectations.
+        $country = Country::factory()->create([
+            'name'       => 'Coverage Nation',
+            'cca2'       => 'CN',
+            'cca3'       => 'CON',
+            'is_active'  => true,
+            'is_enabled' => true,
+        ]);
+
+        // Provision a supporting city so optional relational columns have consistent data to render.
+        $city = City::factory()->forCountry($country)->create([
+            'name'       => 'Coverage City',
+            'slug'       => 'coverage-city',
+            'code'       => 'CVCITY',
+            'is_enabled' => true,
+            'is_active'  => true,
+        ]);
+
+        // Persist the location record with explicit flags so the scoped query returns it without additional toggles.
+        $location = Location::factory()->create([
+            'name'         => 'Coverage Warehouse',
+            'code'         => 'COVLOC',
+            'city'         => 'Coverage City',
+            'country_code' => $country->cca2,
+            'phone'        => '+37060000000',
+            'email'        => 'coverage.location@example.com',
+            'is_enabled'   => true,
+            'is_default'   => false,
+            'type'         => 'warehouse',
+        ]);
+
+        // Associate the freshly created city to expose relationship-driven columns in the table listing.
+        $location->city()->associate($city);
+        $location->save();
+
+        return $location->fresh();
+    }
+
+    private function createMenuRecord(): Menu
+    {
+        // Create an active menu so navigation listings demonstrate a concrete data row.
+        return Menu::factory()->create([
+            'name'        => 'Coverage Menu',
+            'key'         => 'coverage-menu',
+            'location'    => 'header',
+            'description' => 'Menu seeded for Filament coverage smoke testing.',
+            'is_active'   => true,
+        ]);
+    }
+
+    private function createMenuItemRecord(): MenuItem
+    {
+        // Bootstrap the parent menu so scoped dropdowns and filters can resolve a backing record.
+        $menu = $this->createMenuRecord();
+
+        // Create a visible menu item pointing at an external URL to exercise table rendering paths.
+        return MenuItem::factory()->for($menu, 'menu')->create([
+            'label'      => 'Coverage Menu Item',
+            'url'        => 'https://example.com/coverage',
+            'icon'       => 'heroicon-o-link',
+            'sort_order' => 1,
+            'is_visible' => true,
         ]);
     }
 
