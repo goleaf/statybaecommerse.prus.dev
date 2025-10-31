@@ -257,98 +257,118 @@ final class FilamentEnhancedSeeder extends Seeder
 
     private function seedLegalPages(): void
     {
-        // Create legal pages using factories with translations
-        $privacyPolicy = Legal::factory()
-            ->state(['key' => 'privacy-policy', 'is_enabled' => true])
-            ->has(
-                LegalTranslation::factory()->state([
-                    'locale'  => 'en',
-                    'title'   => 'Privacy Policy',
-                    'slug'    => 'privacy-policy',
-                    'content' => '<h1>Privacy Policy</h1><p>This is our privacy policy content. We respect your privacy and are committed to protecting your personal data.</p>',
-                ]),
-                'translations'
-            )
-            ->has(
-                LegalTranslation::factory()->state([
-                    'locale'  => 'lt',
-                    'title'   => 'Privatumo politika',
-                    'slug'    => 'privatumo-politika',
-                    'content' => '<h1>Privatumo politika</h1><p>Čia yra mūsų privatumo politikos turinys. Mes gerbiame jūsų privatumą ir įsipareigojame saugoti jūsų asmens duomenis.</p>',
-                ]),
-                'translations'
-            )
-            ->has(
-                LegalTranslation::factory()->state([
-                    'locale'  => 'de',
-                    'title'   => 'Datenschutzrichtlinie',
-                    'slug'    => 'datenschutzrichtlinie',
-                    'content' => '<h1>Datenschutzrichtlinie</h1><p>Dies ist der Inhalt unserer Datenschutzrichtlinie. Wir respektieren Ihre Privatsphäre und verpflichten uns, Ihre persönlichen Daten zu schützen.</p>',
-                ]),
-                'translations'
-            )
-            ->create();
+        // Define deterministic legal documents so repeated seed runs stay idempotent.
+        $legalPageDefinitions = [
+            'privacy-policy'     => [
+                'type'          => 'privacy_policy',
+                'is_enabled'    => true,
+                'is_required'   => true,
+                'sort_order'    => 10,
+                'meta_data'     => [
+                    'version'          => '1.1',
+                    'last_reviewed'    => '2025-02-17',
+                    'review_frequency' => 'monthly',
+                ],
+                'published_at'  => now()->subMonths(1),
+                'translations'  => [
+                    'en' => [
+                        'title'   => 'Privacy Policy',
+                        'slug'    => 'privacy-policy',
+                        'content' => '<h1>Privacy Policy</h1><p>This is our privacy policy content. We respect your privacy and are committed to protecting your personal data.</p>',
+                    ],
+                    'lt' => [
+                        'title'   => 'Privatumo politika',
+                        'slug'    => 'privatumo-politika',
+                        'content' => '<h1>Privatumo politika</h1><p>Čia yra mūsų privatumo politikos turinys. Mes gerbiame jūsų privatumą ir įsipareigojame saugoti jūsų asmens duomenis.</p>',
+                    ],
+                    'de' => [
+                        'title'   => 'Datenschutzrichtlinie',
+                        'slug'    => 'datenschutzrichtlinie',
+                        'content' => '<h1>Datenschutzrichtlinie</h1><p>Dies ist der Inhalt unserer Datenschutzrichtlinie. Wir respektieren Ihre Privatsphäre und verpflichten uns, Ihre persönlichen Daten zu schützen.</p>',
+                    ],
+                ],
+            ],
+            'terms-of-service'   => [
+                'type'          => 'terms_of_use',
+                'is_enabled'    => true,
+                'is_required'   => true,
+                'sort_order'    => 20,
+                'meta_data'     => [
+                    'version'          => '2.0',
+                    'last_reviewed'    => '2025-01-15',
+                    'review_frequency' => 'quarterly',
+                ],
+                'published_at'  => now()->subWeeks(6),
+                'translations'  => [
+                    'en' => [
+                        'title'   => 'Terms of Service',
+                        'slug'    => 'terms-of-service',
+                        'content' => '<h1>Terms of Service</h1><p>These are our terms of service. By using our website, you agree to these terms.</p>',
+                    ],
+                    'lt' => [
+                        'title'   => 'Paslaugų teikimo sąlygos',
+                        'slug'    => 'paslaugu-teikimo-salygos',
+                        'content' => '<h1>Paslaugų teikimo sąlygos</h1><p>Tai mūsų paslaugų teikimo sąlygos. Naudodamiesi mūsų svetaine, sutinkate su šiomis sąlygomis.</p>',
+                    ],
+                    'de' => [
+                        'title'   => 'Nutzungsbedingungen',
+                        'slug'    => 'nutzungsbedingungen',
+                        'content' => '<h1>Nutzungsbedingungen</h1><p>Dies sind unsere Nutzungsbedingungen. Durch die Nutzung unserer Website stimmen Sie diesen Bedingungen zu.</p>',
+                    ],
+                ],
+            ],
+            'cookie-policy'      => [
+                'type'          => 'cookie_policy',
+                'is_enabled'    => true,
+                'is_required'   => false,
+                'sort_order'    => 30,
+                'meta_data'     => [
+                    'version'          => '1.0',
+                    'last_reviewed'    => '2024-12-01',
+                    'review_frequency' => 'annually',
+                ],
+                'published_at'  => now()->subMonths(2),
+                'translations'  => [
+                    'en' => [
+                        'title'   => 'Cookie Policy',
+                        'slug'    => 'cookie-policy',
+                        'content' => '<h1>Cookie Policy</h1><p>This is our cookie policy. We use cookies to improve your experience on our website.</p>',
+                    ],
+                    'lt' => [
+                        'title'   => 'Slapukų politika',
+                        'slug'    => 'slapuku-politika',
+                        'content' => '<h1>Slapukų politika</h1><p>Tai mūsų slapukų politika. Naudojame slapukus, kad pagerintume jūsų patirtį mūsų svetainėje.</p>',
+                    ],
+                    'de' => [
+                        'title'   => 'Cookie-Richtlinie',
+                        'slug'    => 'cookie-richtlinie',
+                        'content' => '<h1>Cookie-Richtlinie</h1><p>Dies ist unsere Cookie-Richtlinie. Wir verwenden Cookies, um Ihre Erfahrung auf unserer Website zu verbessern.</p>',
+                    ],
+                ],
+            ],
+        ];
 
-        $termsOfService = Legal::factory()
-            ->state(['key' => 'terms-of-service', 'is_enabled' => true])
-            ->has(
-                LegalTranslation::factory()->state([
-                    'locale'  => 'en',
-                    'title'   => 'Terms of Service',
-                    'slug'    => 'terms-of-service',
-                    'content' => '<h1>Terms of Service</h1><p>These are our terms of service. By using our website, you agree to these terms.</p>',
-                ]),
-                'translations'
-            )
-            ->has(
-                LegalTranslation::factory()->state([
-                    'locale'  => 'lt',
-                    'title'   => 'Paslaugų teikimo sąlygos',
-                    'slug'    => 'paslaugu-teikimo-salygos',
-                    'content' => '<h1>Paslaugų teikimo sąlygos</h1><p>Tai mūsų paslaugų teikimo sąlygos. Naudodamiesi mūsų svetaine, sutinkate su šiomis sąlygomis.</p>',
-                ]),
-                'translations'
-            )
-            ->has(
-                LegalTranslation::factory()->state([
-                    'locale'  => 'de',
-                    'title'   => 'Nutzungsbedingungen',
-                    'slug'    => 'nutzungsbedingungen',
-                    'content' => '<h1>Nutzungsbedingungen</h1><p>Dies sind unsere Nutzungsbedingungen. Durch die Nutzung unserer Website stimmen Sie diesen Bedingungen zu.</p>',
-                ]),
-                'translations'
-            )
-            ->create();
+        foreach ($legalPageDefinitions as $key => $definition) {
+            // Prevent duplicate keys by updating existing records instead of blindly creating new ones.
+            $legal = Legal::query()->updateOrCreate(
+                ['key' => $key],
+                [
+                    'type'        => $definition['type'],
+                    'is_enabled'  => $definition['is_enabled'],
+                    'is_required' => $definition['is_required'],
+                    'sort_order'  => $definition['sort_order'],
+                    'meta_data'   => $definition['meta_data'],
+                    'published_at'=> $definition['published_at'],
+                ]
+            );
 
-        $cookiePolicy = Legal::factory()
-            ->state(['key' => 'cookie-policy', 'is_enabled' => true])
-            ->has(
-                LegalTranslation::factory()->state([
-                    'locale'  => 'en',
-                    'title'   => 'Cookie Policy',
-                    'slug'    => 'cookie-policy',
-                    'content' => '<h1>Cookie Policy</h1><p>This is our cookie policy. We use cookies to improve your experience on our website.</p>',
-                ]),
-                'translations'
-            )
-            ->has(
-                LegalTranslation::factory()->state([
-                    'locale'  => 'lt',
-                    'title'   => 'Slapukų politika',
-                    'slug'    => 'slapuku-politika',
-                    'content' => '<h1>Slapukų politika</h1><p>Tai mūsų slapukų politika. Naudojame slapukus, kad pagerintume jūsų patirtį mūsų svetainėje.</p>',
-                ]),
-                'translations'
-            )
-            ->has(
-                LegalTranslation::factory()->state([
-                    'locale'  => 'de',
-                    'title'   => 'Cookie-Richtlinie',
-                    'slug'    => 'cookie-richtlinie',
-                    'content' => '<h1>Cookie-Richtlinie</h1><p>Dies ist unsere Cookie-Richtlinie. Wir verwenden Cookies, um Ihre Erfahrung auf unserer Website zu verbessern.</p>',
-                ]),
-                'translations'
-            )
-            ->create();
+            // Sync translations locale-by-locale so reruns keep content up to date without creating duplicates.
+            foreach ($definition['translations'] as $locale => $translationData) {
+                $legal->translations()->updateOrCreate(
+                    ['locale' => $locale],
+                    $translationData
+                );
+            }
+        }
     }
 }
