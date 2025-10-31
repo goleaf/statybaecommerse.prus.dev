@@ -164,6 +164,9 @@ final class ComprehensiveFilamentSeeder extends Seeder
 
     private function seedEnhancedPermissions(): void
     {
+        // Resolve the Filament guard once so permissions align with the active panel guard.
+        $guardName = $this->resolveFilamentGuard();
+
         $permissions = [
             // Basic CRUD permissions
             'view_products',
@@ -207,12 +210,13 @@ final class ComprehensiveFilamentSeeder extends Seeder
         ];
 
         foreach ($permissions as $permission) {
-            Permission::updateOrCreate(
-                ['name' => $permission],
+            Permission::query()->firstOrCreate(
                 [
-                    // Ensure every permission uses the Filament panel guard so role syncing never fails.
-                    'guard_name' => 'web',
-                ]
+                    'name'       => $permission,
+                    // Include the guard in the lookup so existing permissions with different guards
+                    // are left untouched and we avoid UNIQUE constraint violations.
+                    'guard_name' => $guardName,
+                ],
             );
         }
 
@@ -222,13 +226,18 @@ final class ComprehensiveFilamentSeeder extends Seeder
 
     private function seedEnhancedRoles(): void
     {
+        // Keep role creation and permission syncing on the same guard for Spatie compatibility.
+        $guardName = $this->resolveFilamentGuard();
+
         // Reset cached permissions before syncing to roles
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
         // Inventory Manager role
-        $inventoryManager = Role::firstOrCreate(
-            ['name' => 'inventory_manager'],
-            ['guard_name' => 'web']
+        $inventoryManager = Role::query()->firstOrCreate(
+            [
+                'name'       => 'inventory_manager',
+                'guard_name' => $guardName,
+            ]
         );
         $inventoryPermissions = [
             'view_products',
@@ -241,15 +250,22 @@ final class ComprehensiveFilamentSeeder extends Seeder
             'view_analytics_dashboard',
             'view_product_analytics',
         ];
-        $existingInventoryPermissions = Permission::whereIn('name', $inventoryPermissions)->pluck('name')->toArray();
+        $existingInventoryPermissions = Permission::query()
+            ->whereIn('name', $inventoryPermissions)
+            // Filter by guard to avoid pulling mismatched permission rows.
+            ->where('guard_name', $guardName)
+            ->pluck('name')
+            ->toArray();
         if (!empty($existingInventoryPermissions)) {
             $inventoryManager->syncPermissions($existingInventoryPermissions);
         }
 
         // Customer Service role
-        $customerService = Role::firstOrCreate(
-            ['name' => 'customer_service'],
-            ['guard_name' => 'web']
+        $customerService = Role::query()->firstOrCreate(
+            [
+                'name'       => 'customer_service',
+                'guard_name' => $guardName,
+            ]
         );
         $customerServicePermissions = [
             'view_customers',
@@ -261,15 +277,21 @@ final class ComprehensiveFilamentSeeder extends Seeder
             'send_customer_emails',
             'view_customer_analytics',
         ];
-        $existingCustomerServicePermissions = Permission::whereIn('name', $customerServicePermissions)->pluck('name')->toArray();
+        $existingCustomerServicePermissions = Permission::query()
+            ->whereIn('name', $customerServicePermissions)
+            ->where('guard_name', $guardName)
+            ->pluck('name')
+            ->toArray();
         if (!empty($existingCustomerServicePermissions)) {
             $customerService->syncPermissions($existingCustomerServicePermissions);
         }
 
         // Analytics Manager role
-        $analyticsManager = Role::firstOrCreate(
-            ['name' => 'analytics_manager'],
-            ['guard_name' => 'web']
+        $analyticsManager = Role::query()->firstOrCreate(
+            [
+                'name'       => 'analytics_manager',
+                'guard_name' => $guardName,
+            ]
         );
         $analyticsPermissions = [
             'view_analytics_dashboard',
@@ -281,10 +303,27 @@ final class ComprehensiveFilamentSeeder extends Seeder
             'view_products',
             'view_orders',
         ];
-        $existingAnalyticsPermissions = Permission::whereIn('name', $analyticsPermissions)->pluck('name')->toArray();
+        $existingAnalyticsPermissions = Permission::query()
+            ->whereIn('name', $analyticsPermissions)
+            ->where('guard_name', $guardName)
+            ->pluck('name')
+            ->toArray();
         if (!empty($existingAnalyticsPermissions)) {
             $analyticsManager->syncPermissions($existingAnalyticsPermissions);
         }
+    }
+
+    private function resolveFilamentGuard(): string
+    {
+        // Honour the configured Filament guard when available, otherwise mirror the panel default.
+        $configuredGuard = config('filament.auth.guard');
+
+        if (is_string($configuredGuard) && $configuredGuard !== '') {
+            return $configuredGuard;
+        }
+
+        // Fall back to the panel's environment aware guard selection (web in tests, admin elsewhere).
+        return app()->environment('testing') ? 'web' : 'admin';
     }
 
     private function seedAdminUsers(): void
