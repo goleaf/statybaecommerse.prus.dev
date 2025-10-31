@@ -79,7 +79,9 @@ final class Category extends Model implements HasMedia
         'status'     => false,
     ];
 
-    protected $fillable = ['name', 'slug', 'description', 'short_description', 'parent_id', 'sort_order', 'is_visible', 'is_enabled', 'is_active', 'is_featured', 'color', 'seo_title', 'seo_description', 'show_in_menu', 'product_limit'];
+    protected $fillable = ['name', 'slug', 'description', 'short_description', 'parent_id', 'sort_order', 'is_visible', 'is_enabled', 'is_active', 'is_featured', 'color', 'icon', 'seo_title', 'seo_description', 'meta_title', 'meta_description', 'show_in_menu', 'product_limit'];
+
+    // Allow SEO metadata and icon attributes to be mass assignable so Filament seeders can hydrate them safely.
 
     protected $casts = ['is_visible' => 'boolean', 'is_enabled' => 'boolean', 'is_active' => 'boolean', 'is_featured' => 'boolean', 'show_in_menu' => 'boolean', 'sort_order' => 'integer', 'product_limit' => 'integer'];
 
