@@ -21,6 +21,11 @@ use Illuminate\Support\Facades\Log;
 
 final class ComprehensiveOrderSeeder extends Seeder
 {
+    /**
+     * Maintain the next sequential order number across seeding passes so reruns remain idempotent.
+     */
+    private int $nextOrderSequence = 1;
+
     private array $orderStatuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
 
     private array $paymentStatuses = ['pending', 'paid', 'failed', 'refunded'];
@@ -125,6 +130,9 @@ final class ComprehensiveOrderSeeder extends Seeder
 
         // Ensure we have required data
         $this->ensureRequiredData();
+
+        // Prime the incremental order number counter using the existing records to avoid uniqueness conflicts.
+        $this->initialiseOrderNumberSequence();
 
         // Generate orders for current and last month
         $currentMonth = Carbon::now()->startOfMonth();
@@ -251,6 +259,8 @@ final class ComprehensiveOrderSeeder extends Seeder
             $order = Order::factory()
                 ->for($users->random())
                 ->state([
+                    // Supply an explicit order number so rerunning the seeder never collides with persisted data.
+                    'number'         => $this->nextOrderNumber(),
                     'created_at'     => $orderDate,
                     'updated_at'     => $orderDate->copy()->addMinutes(fake()->numberBetween(1, 1440)),
                     'status'         => fake()->randomElement($this->orderStatuses),
@@ -291,6 +301,49 @@ final class ComprehensiveOrderSeeder extends Seeder
                 $this->writeMessage('Generated ' . ($i + 1) . ' orders...');
             }
         }
+    }
+
+    /**
+     * Initialise the internal sequence counter after inspecting the database for the current maximum order number.
+     */
+    private function initialiseOrderNumberSequence(): void
+    {
+        $this->nextOrderSequence = $this->determineNextOrderSequence();
+    }
+
+    /**
+     * Determine the next order sequence index while gracefully handling malformed legacy values.
+     */
+    private function determineNextOrderSequence(): int
+    {
+        $latestNumber = Order::query()
+            ->whereNotNull('number')
+            ->orderByDesc('number')
+            ->value('number');
+
+        if (! is_string($latestNumber)) {
+            // No orders exist yet, so the very first seeded record should start at the canonical 1 suffix.
+            return 1;
+        }
+
+        if (preg_match('/(\d+)$/', $latestNumber, $matches) === 1) {
+            // Increment the trailing numeric segment while preserving leading zeros via sprintf later on.
+            return ((int) $matches[1]) + 1;
+        }
+
+        // Fallback to a simple count-based offset whenever the stored number no longer matches the ORD-###### pattern.
+        return Order::query()->count() + 1;
+    }
+
+    /**
+     * Produce the next formatted order number and increment the counter for subsequent calls.
+     */
+    private function nextOrderNumber(): string
+    {
+        $currentSequence = $this->nextOrderSequence;
+        $this->nextOrderSequence++;
+
+        return sprintf('ORD-%06d', $currentSequence);
     }
 
     /**
