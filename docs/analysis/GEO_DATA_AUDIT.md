@@ -9,6 +9,7 @@
 | Shipping zones | ⚠️ Partial | Zone model remains available while geography seeders still provision EU/NA/UK/Baltic entries, but the comprehensive order seeder no longer hydrates any zone records and configuration leaves rate matrices largely blank, limiting runtime differentiation.【F:app/Models/Zone.php†L11-L45】【F:database/seeders/ComprehensiveMultilanguageSeeder.php†L98-L116】【F:database/seeders/ComprehensiveOrderSeeder.php†L100-L155】【F:config/shipping.php†L5-L26】 |
 | Postal code validation | ⚠️ Partial | Address requests enforce pattern validation and sanitisation, but configuration and normalisation only recognise Lithuanian formats, so other countries fail validation despite seeded data.【F:app/Http/Requests/Frontend/AddressRequest.php†L26-L153】【F:config/addresses.php†L5-L42】【F:app/Support/Address/AddressDataSanitizer.php†L138-L166】 |
 | Admin address ownership | ✅ Implemented | Address resource creation now honours the customer selected in the form because the model accepts the `user_id`, avoiding fallback ownership to the logged-in admin and keeping audit trails accurate.【F:app/Models/Address.php†L39-L67】 |
+| Demo address seeding | ✅ Implemented | The extended demo seeder now persists ISO values via the `country_code` column to match the current schema, preventing SQLite inserts from targeting the removed `country` field.【F:database/seeders/ExtendedDemoSeeder.php†L125-L139】 |
 
 ## Detailed Findings
 
