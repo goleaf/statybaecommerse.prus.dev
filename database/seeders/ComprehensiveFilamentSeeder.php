@@ -212,10 +212,16 @@ final class ComprehensiveFilamentSeeder extends Seeder
                 ['guard_name' => 'web']
             );
         }
+
+        // Reset cached permissions
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
     }
 
     private function seedEnhancedRoles(): void
     {
+        // Reset cached permissions before syncing to roles
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+
         // Inventory Manager role
         $inventoryManager = Role::firstOrCreate(
             ['name' => 'inventory_manager'],
@@ -232,7 +238,10 @@ final class ComprehensiveFilamentSeeder extends Seeder
             'view_analytics_dashboard',
             'view_product_analytics',
         ];
-        $inventoryManager->syncPermissions($inventoryPermissions);
+        $existingInventoryPermissions = Permission::whereIn('name', $inventoryPermissions)->pluck('name')->toArray();
+        if (!empty($existingInventoryPermissions)) {
+            $inventoryManager->syncPermissions($existingInventoryPermissions);
+        }
 
         // Customer Service role
         $customerService = Role::firstOrCreate(
@@ -249,7 +258,10 @@ final class ComprehensiveFilamentSeeder extends Seeder
             'send_customer_emails',
             'view_customer_analytics',
         ];
-        $customerService->syncPermissions($customerServicePermissions);
+        $existingCustomerServicePermissions = Permission::whereIn('name', $customerServicePermissions)->pluck('name')->toArray();
+        if (!empty($existingCustomerServicePermissions)) {
+            $customerService->syncPermissions($existingCustomerServicePermissions);
+        }
 
         // Analytics Manager role
         $analyticsManager = Role::firstOrCreate(
@@ -266,7 +278,10 @@ final class ComprehensiveFilamentSeeder extends Seeder
             'view_products',
             'view_orders',
         ];
-        $analyticsManager->syncPermissions($analyticsPermissions);
+        $existingAnalyticsPermissions = Permission::whereIn('name', $analyticsPermissions)->pluck('name')->toArray();
+        if (!empty($existingAnalyticsPermissions)) {
+            $analyticsManager->syncPermissions($existingAnalyticsPermissions);
+        }
     }
 
     private function seedAdminUsers(): void
