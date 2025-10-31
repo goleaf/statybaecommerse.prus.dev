@@ -18,35 +18,35 @@ final class CountriesTableSeeder extends Seeder
         $countries = $this->getEuropeanCountriesData();
 
         foreach ($countries as $countryData) {
-            // Check if country exists
-            $country = Country::where('cca2', $countryData['cca2'])->first();
+            // Use updateOrCreate to make the seeder idempotent when rerun in CI pipelines.
+            $country = Country::updateOrCreate(
+                ['cca2' => $countryData['cca2']],
+                [
+                    'region'             => $countryData['region'],
+                    'subregion'          => $countryData['subregion'],
+                    'cca3'               => $countryData['cca3'],
+                    'flag'               => $countryData['flag'],
+                    'latitude'           => $countryData['latitude'],
+                    'longitude'          => $countryData['longitude'],
+                    'phone_calling_code' => $countryData['phone_calling_code'],
+                    'currencies'         => $countryData['currencies'],
+                    'name'               => $countryData['translations']['en']['name']
+                        ?? $countryData['translations'][array_key_first($countryData['translations'])]['name'],
+                    'name_official'      => $countryData['translations']['en']['name_official']
+                        ?? $countryData['translations'][array_key_first($countryData['translations'])]['name_official'],
+                ],
+            );
 
-            if (! $country) {
-                // Create using factory with translations
-                $country = Country::factory()
-                    ->hasTranslations(count($countryData['translations']), function (array $attributes, Country $country) use ($countryData) {
-                        static $localeIndex = 0;
-                        $locales = array_keys($countryData['translations']);
-                        $locale = $locales[$localeIndex % count($locales)];
-                        $localeIndex++;
-
-                        return array_merge([
-                            'locale' => $locale,
-                        ], $countryData['translations'][$locale]);
-                    })
-                    ->create([
-                        'region'             => $countryData['region'],
-                        'subregion'          => $countryData['subregion'],
-                        'cca2'               => $countryData['cca2'],
-                        'cca3'               => $countryData['cca3'],
-                        'flag'               => $countryData['flag'],
-                        'latitude'           => $countryData['latitude'],
-                        'longitude'          => $countryData['longitude'],
-                        'phone_calling_code' => $countryData['phone_calling_code'],
-                        'currencies'         => $countryData['currencies'],
-                        'name'               => $countryData['translations']['en']['name'] ?? $countryData['translations'][array_key_first($countryData['translations'])]['name'],
-                        'name_official'      => $countryData['translations']['en']['name_official'] ?? $countryData['translations'][array_key_first($countryData['translations'])]['name_official'],
-                    ]);
+            foreach ($countryData['translations'] as $locale => $translationData) {
+                // Keep translations fresh by updating existing rows or creating them when missing.
+                $country->translations()->updateOrCreate(
+                    ['locale' => $locale],
+                    [
+                        'name'          => $translationData['name'],
+                        'name_official' => $translationData['name_official'],
+                        'description'   => $translationData['description'] ?? null,
+                    ],
+                );
             }
         }
 
