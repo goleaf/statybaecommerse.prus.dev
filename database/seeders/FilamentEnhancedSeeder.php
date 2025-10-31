@@ -11,11 +11,74 @@ use App\Models\Product;
 use App\Models\Translations\LegalTranslation;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 final class FilamentEnhancedSeeder extends Seeder
 {
+    /**
+     * The Filament admin panel relies on the dedicated `admin` guard, so the
+     * seeder keeps the value centralised to avoid drifting back to the
+     * framework's default `web` guard when new permissions are added.
+     */
+    private const ADMIN_GUARD = 'admin';
+
+    /**
+     * Canonical permission names shared across Filament roles. Keeping them in
+     * a class constant allows role-specific subsets to reuse the same source
+     * list while ensuring new permissions are seeded against the correct
+     * guard.
+     *
+     * @var list<string>
+     */
+    private const PERMISSION_NAMES = [
+        // Product permissions
+        'view_products',
+        'create_products',
+        'edit_products',
+        'delete_products',
+        'bulk_delete_products',
+        // Category permissions
+        'view_categories',
+        'create_categories',
+        'edit_categories',
+        'delete_categories',
+        'bulk_delete_categories',
+        // Brand permissions
+        'view_brands',
+        'create_brands',
+        'edit_brands',
+        'delete_brands',
+        'bulk_delete_brands',
+        // Order permissions
+        'view_orders',
+        'create_orders',
+        'edit_orders',
+        'delete_orders',
+        'bulk_delete_orders',
+        // Customer permissions
+        'view_customers',
+        'create_customers',
+        'edit_customers',
+        'delete_customers',
+        'bulk_delete_customers',
+        // Legal pages permissions
+        'view_legals',
+        'create_legals',
+        'edit_legals',
+        'delete_legals',
+        'bulk_delete_legals',
+        // System permissions
+        'view_settings',
+        'edit_settings',
+        'view_analytics',
+        'export_data',
+        'import_data',
+        'manage_users',
+        'manage_roles',
+    ];
+
     public function run(): void
     {
         $this->seedPermissions();
@@ -27,163 +90,112 @@ final class FilamentEnhancedSeeder extends Seeder
 
     private function seedPermissions(): void
     {
-        $permissionNames = [
-            // Product permissions
-            'view_products',
-            'create_products',
-            'edit_products',
-            'delete_products',
-            'bulk_delete_products',
-            // Category permissions
-            'view_categories',
-            'create_categories',
-            'edit_categories',
-            'delete_categories',
-            'bulk_delete_categories',
-            // Brand permissions
-            'view_brands',
-            'create_brands',
-            'edit_brands',
-            'delete_brands',
-            'bulk_delete_brands',
-            // Order permissions
-            'view_orders',
-            'create_orders',
-            'edit_orders',
-            'delete_orders',
-            'bulk_delete_orders',
-            // Customer permissions
-            'view_customers',
-            'create_customers',
-            'edit_customers',
-            'delete_customers',
-            'bulk_delete_customers',
-            // Legal pages permissions
-            'view_legals',
-            'create_legals',
-            'edit_legals',
-            'delete_legals',
-            'bulk_delete_legals',
-            // System permissions
-            'view_settings',
-            'edit_settings',
-            'view_analytics',
-            'export_data',
-            'import_data',
-            'manage_users',
-            'manage_roles',
-        ];
-
-        collect($permissionNames)->each(fn (string $name) => Permission::firstOrCreate(['name' => $name]));
+        collect(self::PERMISSION_NAMES)->each(
+            function (string $name): void {
+                // Explicitly persist permissions against the admin guard to
+                // avoid `GuardDoesNotMatch` exceptions when roles are synced.
+                Permission::query()->firstOrCreate([
+                    'name'       => $name,
+                    'guard_name' => self::ADMIN_GUARD,
+                ]);
+            }
+        );
     }
 
     private function seedRoles(): void
     {
-        // Create roles with their permissions using factories
-        $superAdmin = Role::firstOrCreate(['name' => 'super_admin']);
-        $superAdmin->givePermissionTo(Permission::all());
+        $roleDefinitions = [
+            // Super administrators receive the complete permission matrix.
+            'super_admin' => self::PERMISSION_NAMES,
+            // Admins retain management access but avoid destructive role edits.
+            'admin'       => [
+                'view_products',
+                'create_products',
+                'edit_products',
+                'delete_products',
+                'view_categories',
+                'create_categories',
+                'edit_categories',
+                'delete_categories',
+                'view_brands',
+                'create_brands',
+                'edit_brands',
+                'delete_brands',
+                'view_orders',
+                'create_orders',
+                'edit_orders',
+                'view_customers',
+                'create_customers',
+                'edit_customers',
+                'view_legals',
+                'create_legals',
+                'edit_legals',
+                'delete_legals',
+                'view_analytics',
+                'export_data',
+            ],
+            // Managers cover day-to-day catalogue operations without deletes.
+            'manager'     => [
+                'view_products',
+                'edit_products',
+                'view_categories',
+                'edit_categories',
+                'view_brands',
+                'edit_brands',
+                'view_orders',
+                'edit_orders',
+                'view_customers',
+                'edit_customers',
+                'view_analytics',
+            ],
+            // Editors focus on creating catalogue data without destructive powers.
+            'editor'      => [
+                'view_products',
+                'create_products',
+                'edit_products',
+                'view_categories',
+                'create_categories',
+                'edit_categories',
+                'view_brands',
+                'create_brands',
+                'edit_brands',
+                'view_legals',
+                'create_legals',
+                'edit_legals',
+            ],
+        ];
 
-        $admin = Role::firstOrCreate(['name' => 'admin']);
-        $admin->givePermissionTo([
-            'view_products',
-            'create_products',
-            'edit_products',
-            'delete_products',
-            'view_categories',
-            'create_categories',
-            'edit_categories',
-            'delete_categories',
-            'view_brands',
-            'create_brands',
-            'edit_brands',
-            'delete_brands',
-            'view_orders',
-            'create_orders',
-            'edit_orders',
-            'view_customers',
-            'create_customers',
-            'edit_customers',
-            'view_legals',
-            'create_legals',
-            'edit_legals',
-            'delete_legals',
-            'view_analytics',
-            'export_data',
-        ]);
+        foreach ($roleDefinitions as $roleName => $permissions) {
+            $role = Role::query()->firstOrCreate([
+                'name'       => $roleName,
+                'guard_name' => self::ADMIN_GUARD,
+            ]);
 
-        $manager = Role::firstOrCreate(['name' => 'manager']);
-        $manager->givePermissionTo([
-            'view_products',
-            'edit_products',
-            'view_categories',
-            'edit_categories',
-            'view_brands',
-            'edit_brands',
-            'view_orders',
-            'edit_orders',
-            'view_customers',
-            'edit_customers',
-            'view_analytics',
-        ]);
-
-        $editor = Role::firstOrCreate(['name' => 'editor']);
-        $editor->givePermissionTo([
-            'view_products',
-            'create_products',
-            'edit_products',
-            'view_categories',
-            'create_categories',
-            'edit_categories',
-            'view_brands',
-            'create_brands',
-            'edit_brands',
-            'view_legals',
-            'create_legals',
-            'edit_legals',
-        ]);
+            // Sync by permission names so guard-aware lookups remain intact.
+            $role->syncPermissions($permissions);
+        }
     }
 
     private function seedAdminUsers(): void
     {
-        // Create admin users using factories with role assignment
-        $superAdmin = User::factory()
-            ->state([
-                'email'             => 'admin@example.com',
+        // Maintain a single deterministic admin account for browser-driven QA.
+        $superAdmin = User::query()->updateOrCreate(
+            ['email' => 'admin@example.com'],
+            [
                 'name'              => 'Super Admin',
+                'password'          => Hash::make('admin123'),
                 'is_admin'          => true,
                 'is_active'         => true,
                 'timezone'          => 'Europe/Vilnius',
                 'preferred_locale'  => 'lt',
                 'email_verified_at' => now(),
-            ])
-            ->create();
-        $superAdmin->assignRole('super_admin');
+            ]
+        );
 
-        $admin = User::factory()
-            ->state([
-                'email'             => 'admin.user@example.com',
-                'name'              => 'Admin User',
-                'is_admin'          => true,
-                'is_active'         => true,
-                'timezone'          => 'Europe/Vilnius',
-                'preferred_locale'  => 'lt',
-                'email_verified_at' => now(),
-            ])
-            ->create();
-        $admin->assignRole('admin');
-
-        $manager = User::factory()
-            ->state([
-                'email'             => 'manager@example.com',
-                'name'              => 'Manager User',
-                'is_admin'          => true,
-                'is_active'         => true,
-                'timezone'          => 'Europe/Vilnius',
-                'preferred_locale'  => 'lt',
-                'email_verified_at' => now(),
-            ])
-            ->create();
-        $manager->assignRole('manager');
+        if (! $superAdmin->hasRole('super_admin')) {
+            // Assign the Filament role after ensuring the guard-aware role exists.
+            $superAdmin->assignRole('super_admin');
+        }
     }
 
     private function enhanceExistingData(): void
