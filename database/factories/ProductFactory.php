@@ -264,10 +264,15 @@ class ProductFactory extends Factory
                 ? (string) ($product->slug ?? $name)
                 : $name . '-' . $locale;
 
+            // Ensure locale slugs remain unique across seeded products by suffixing the primary key for non-default locales.
+            $slug = $locale === $defaultLocale
+                ? Str::slug($slugSource)
+                : Str::slug($slugSource . '-' . $product->getKey());
+
             return [
                 'locale'            => $locale,
                 'name'              => $name,
-                'slug'              => Str::slug($slugSource),
+                'slug'              => $slug,
                 'summary'           => $this->faker->sentence(8),
                 'description'       => $locale === $defaultLocale ? (string) ($product->description ?? $this->generateLithuanianDescription($name)) : $this->faker->paragraphs(3, true),
                 'short_description' => $locale === $defaultLocale ? (string) ($product->short_description ?? $this->generateShortDescription($name)) : $this->faker->sentence(6),
