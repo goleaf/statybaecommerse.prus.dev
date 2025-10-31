@@ -11,11 +11,13 @@ use App\Models\Country;
 use App\Models\Currency;
 use App\Models\Location;
 use App\Models\Product;
+use App\Models\Translations\CategoryTranslation;
 use App\Models\Zone;
 use App\Services\Images\LocalImageGeneratorService;
 use Exception;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Throwable;
 
 final class ComprehensiveMultilanguageSeeder extends Seeder
@@ -374,14 +376,53 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
             }
 
             foreach ($categoryData['translations'] as $locale => $translation) {
+                // Ensure the translated slug stays unique per locale to avoid unique constraint violations.
+                $translationWithUniqueSlug = $translation;
+                $translationWithUniqueSlug['slug'] = $this->resolveUniqueCategoryTranslationSlug(
+                    $translation['slug'] ?? Str::slug($translation['name'] ?? $categoryData['name']),
+                    $locale,
+                    (int) $category->getKey()
+                );
+
                 $category->translations()->updateOrCreate(
                     ['locale' => $locale],
-                    $translation
+                    $translationWithUniqueSlug
                 );
             }
         }
 
         $this->command->info('   ✅ Created ' . count($categories) . ' categories with translations and images');
+    }
+
+    /**
+     * Generate a unique slug for a category translation within the given locale.
+     */
+    private function resolveUniqueCategoryTranslationSlug(string $preferredSlug, string $locale, int $categoryId): string
+    {
+        // Normalise the preferred slug and fall back to the base category identifier when the slug is empty.
+        $baseSlug = Str::slug($preferredSlug) ?: Str::slug('category-' . $categoryId);
+        $candidateSlug = $baseSlug;
+        $suffix = 1;
+
+        // Keep iterating until the slug is unique for the locale or belongs to the same category.
+        while ($this->categoryTranslationSlugExists($candidateSlug, $locale, $categoryId)) {
+            $candidateSlug = Str::slug($baseSlug . '-' . $suffix);
+            $suffix++;
+        }
+
+        return $candidateSlug;
+    }
+
+    /**
+     * Determine if a translation slug already exists for another category within the locale.
+     */
+    private function categoryTranslationSlugExists(string $slug, string $locale, int $categoryId): bool
+    {
+        return CategoryTranslation::query()
+            ->where('locale', $locale)
+            ->where('slug', $slug)
+            ->where('category_id', '!=', $categoryId)
+            ->exists();
     }
 
     private function seedBrandsWithTranslations(): void
