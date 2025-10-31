@@ -39,27 +39,28 @@ final class AddressSeeder extends Seeder
                 return;
             }
 
+            $types = [
+                AddressType::SHIPPING,
+                AddressType::BILLING,
+                AddressType::HOME,
+                AddressType::WORK,
+                AddressType::OTHER,
+                AddressType::OTHER,
+            ];
+
             Address::factory()
                 ->count(6)
-                ->state(function (int $sequence) use ($countries): array {
-                    $types = [
-                        AddressType::SHIPPING,
-                        AddressType::BILLING,
-                        AddressType::HOME,
-                        AddressType::WORK,
-                        AddressType::OTHER,
-                        AddressType::OTHER,
-                    ];
-
-                    $type = $types[$sequence] ?? AddressType::OTHER;
+                ->sequence(function ($sequence) use ($countries, $types): array {
+                    $index = $sequence->index;
+                    $type = $types[$index] ?? AddressType::OTHER;
 
                     return [
                         'type'         => $type,
-                        'country_code' => $countries[$sequence % count($countries)],
-                        'is_default'   => $sequence === 0,
+                        'country_code' => $countries[$index % count($countries)],
+                        'is_default'   => $index === 0,
                         'is_shipping'  => in_array($type, [AddressType::SHIPPING, AddressType::HOME], true),
                         'is_billing'   => $type === AddressType::BILLING,
-                        'is_active'    => $sequence !== 5,
+                        'is_active'    => $index !== 5,
                     ];
                 })
                 ->for($user)

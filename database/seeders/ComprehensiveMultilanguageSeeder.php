@@ -64,20 +64,13 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
         ];
 
         foreach ($countriesData as $index => $data) {
-            Country::factory()
-                ->hasTranslations(2, function (array $attributes, Country $country) use ($data) {
-                    static $localeIndex = 0;
-                    $locales = ['lt', 'en'];
-                    $locale = $locales[$localeIndex % 2];
-                    $localeIndex++;
+            $translations = $data['translations'];
+            unset($data['translations']);
 
-                    return array_merge([
-                        'locale' => $locale,
-                    ], $data['translations'][$locale]);
-                })
-                ->create([
+            $country = Country::updateOrCreate(
+                ['cca3' => $data['cca3']],
+                [
                     'cca2'               => $data['cca2'],
-                    'cca3'               => $data['cca3'],
                     'phone_calling_code' => $data['phone_calling_code'],
                     'flag'               => $data['flag'],
                     'region'             => $data['region'],
@@ -85,11 +78,21 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
                     'latitude'           => $data['latitude'],
                     'longitude'          => $data['longitude'],
                     'currencies'         => $data['currencies'],
-                    'name'               => $data['translations']['en']['name'],
-                    'name_official'      => $data['translations']['en']['name_official'],
+                    'name'               => $translations['en']['name'],
+                    'name_official'      => $translations['en']['name_official'],
                     'is_enabled'         => true,
                     'sort_order'         => $index + 1,
-                ]);
+                ]
+            );
+
+            foreach ($translations as $locale => $translation) {
+                $country->translations()->updateOrCreate(
+                    ['locale' => $locale],
+                    $translation
+                );
+            }
+
+            $this->command->info("   🏳️ Created/Updated country: {$country->name}");
         }
 
         $this->command->info('   ✅ Created ' . count($countriesData) . ' countries with translations');
@@ -106,11 +109,13 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
         ];
 
         foreach ($zonesData as $data) {
-            Zone::factory()->create([
-                'name'       => $data['name'],
-                'code'       => $data['code'],
-                'is_enabled' => true,
-            ]);
+            Zone::updateOrCreate(
+                ['code' => $data['code']],
+                [
+                    'name'       => $data['name'],
+                    'is_enabled' => true,
+                ]
+            );
         }
 
         $this->command->info('   ✅ Created ' . count($zonesData) . ' zones');
@@ -127,14 +132,16 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
         ];
 
         foreach ($currenciesData as $data) {
-            Currency::factory()->create([
-                'code'          => $data['code'],
-                'symbol'        => $data['symbol'],
-                'name'          => $data['name'],
-                'exchange_rate' => $data['exchange_rate'],
-                'is_default'    => $data['is_default'],
-                'is_enabled'    => true,
-            ]);
+            Currency::updateOrCreate(
+                ['code' => $data['code']],
+                [
+                    'symbol'        => $data['symbol'],
+                    'name'          => $data['name'],
+                    'exchange_rate' => $data['exchange_rate'],
+                    'is_default'    => $data['is_default'],
+                    'is_enabled'    => true,
+                ]
+            );
         }
 
         $this->command->info('   ✅ Created ' . count($currenciesData) . ' currencies');
@@ -229,13 +236,20 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
             $location = Location::updateOrCreate(
                 ['code' => $locationData['code']],
                 array_merge($locationData, [
-                    'name'        => collect($translations)->mapWithKeys(fn ($trans, $locale) => [$locale => $trans['name']])->all(),
-                    'slug'        => collect($translations)->mapWithKeys(fn ($trans, $locale) => [$locale => $trans['slug']])->all(),
-                    'description' => collect($translations)->mapWithKeys(fn ($trans, $locale) => [$locale => $trans['description']])->all(),
+                    'name'        => $translations['en']['name'],
+                    'slug'        => $translations['en']['slug'],
+                    'description' => $translations['en']['description'],
                 ])
             );
 
-            $this->command->info("   📍 Created location: {$location->getTranslation('name', 'en')}");
+            foreach ($translations as $locale => $translation) {
+                $location->translations()->updateOrCreate(
+                    ['locale' => $locale],
+                    $translation
+                );
+            }
+
+            $this->command->info("   📍 Created location: {$location->name}");
         }
 
         $this->command->info('   ✅ Created ' . count($locations) . ' locations with translations');
