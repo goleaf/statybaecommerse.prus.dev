@@ -82,7 +82,9 @@ final class Document extends Model
         'documentable_type',
         'documentable_id',
         'created_by',
+        'created_by_name', // Denormalised creator name helps power quick listings without joins.
         'updated_by',
+        'updated_by_name', // Mirror the updater name so at-a-glance audit trails stay accessible.
         'generated_at',
         'expires_at',
         'description',
