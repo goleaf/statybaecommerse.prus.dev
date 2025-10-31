@@ -159,11 +159,20 @@ final class ExtendedDemoSeeder extends Seeder
                 ])
                 ->has(
                     OrderShipping::factory()->state([
-                        'carrier'                 => 'standard',
-                        'service'                 => 'ground',
-                        'price'                   => 9.99,
-                        'weight'                  => 1.0,
-                        'estimated_delivery_date' => now()->addDays(5),
+                        // Persist deterministic carrier metadata so demo analytics stay repeatable.
+                        'carrier_name'       => 'Cartwright Logistics',
+                        'carrier'            => 'cartwright_logistics',
+                        'shipping_method'    => 'overnight',
+                        'service'            => 'ground',
+                        'service_type'       => 'standard',
+                        // Align with the order totals by reusing the same shipping amount columns.
+                        'cost'               => 9.99,
+                        'base_cost'          => 9.99,
+                        'insurance_cost'     => 0.00,
+                        'total_cost'         => 9.99,
+                        // Keep weights predictable for downstream fulfillment demos.
+                        'weight'             => 1.0,
+                        'estimated_delivery' => now()->addDays(5),
                     ]),
                     'shipping'
                 )
