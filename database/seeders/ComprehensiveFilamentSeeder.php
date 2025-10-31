@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -9,11 +7,11 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\Setting;
 use App\Models\User;
-use Exception;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Exception;
 
 final class ComprehensiveFilamentSeeder extends Seeder
 {
@@ -31,147 +29,155 @@ final class ComprehensiveFilamentSeeder extends Seeder
         $settings = [
             // General Settings
             [
-                'key'          => 'store_name',
+                'key' => 'store_name',
                 'display_name' => 'Store Name',
-                'type'         => 'string',
-                'value'        => config('app.name', 'E-Commerce Store'),
-                'group'        => 'general',
-                'description'  => 'The name of your store',
-                'is_public'    => true,
-                'is_required'  => true,
+                'type' => 'string',
+                'value' => config('app.name', 'E-Commerce Store'),
+                'group' => 'general',
+                'description' => 'The name of your store',
+                'is_public' => true,
+                'is_required' => true,
             ],
             [
-                'key'          => 'store_description',
+                'key' => 'store_description',
                 'display_name' => 'Store Description',
-                'type'         => 'text',
-                'value'        => 'Your trusted online shopping destination',
-                'group'        => 'general',
-                'description'  => 'Brief description of your store',
-                'is_public'    => true,
-                'is_required'  => false,
+                'type' => 'text',
+                'value' => 'Your trusted online shopping destination',
+                'group' => 'general',
+                'description' => 'Brief description of your store',
+                'is_public' => true,
+                'is_required' => false,
             ],
             [
-                'key'          => 'store_email',
+                'key' => 'store_email',
                 'display_name' => 'Store Email',
-                'type'         => 'email',
-                'value'        => 'info@example.com',
-                'group'        => 'general',
-                'description'  => 'Main contact email for the store',
-                'is_public'    => true,
-                'is_required'  => true,
+                'type' => 'email',
+                'value' => 'info@example.com',
+                'group' => 'general',
+                'description' => 'Main contact email for the store',
+                'is_public' => true,
+                'is_required' => true,
             ],
             [
-                'key'          => 'store_phone',
+                'key' => 'store_phone',
                 'display_name' => 'Store Phone',
-                'type'         => 'string',
-                'value'        => '+370 600 00000',
-                'group'        => 'general',
-                'description'  => 'Main contact phone number',
-                'is_public'    => true,
-                'is_required'  => false,
+                'type' => 'string',
+                'value' => '+370 600 00000',
+                'group' => 'general',
+                'description' => 'Main contact phone number',
+                'is_public' => true,
+                'is_required' => false,
             ],
             // Currency Settings
             [
-                'key'          => 'default_currency',
+                'key' => 'default_currency',
                 'display_name' => 'Default Currency',
-                'type'         => 'string',
-                'value'        => 'EUR',
-                'group'        => 'currency',
-                'description'  => 'Default currency for the store',
-                'is_public'    => true,
-                'is_required'  => true,
+                'type' => 'string',
+                'value' => 'EUR',
+                'group' => 'currency',
+                'description' => 'Default currency for the store',
+                'is_public' => true,
+                'is_required' => true,
             ],
             [
-                'key'          => 'currency_symbol',
+                'key' => 'currency_symbol',
                 'display_name' => 'Currency Symbol',
-                'type'         => 'string',
-                'value'        => '€',
-                'group'        => 'currency',
-                'description'  => 'Symbol for the default currency',
-                'is_public'    => true,
-                'is_required'  => true,
+                'type' => 'string',
+                'value' => '€',
+                'group' => 'currency',
+                'description' => 'Symbol for the default currency',
+                'is_public' => true,
+                'is_required' => true,
             ],
             // Email Settings
             [
-                'key'          => 'email_from_name',
+                'key' => 'email_from_name',
                 'display_name' => 'Email From Name',
-                'type'         => 'string',
-                'value'        => config('app.name'),
-                'group'        => 'email',
-                'description'  => 'Name used in outgoing emails',
-                'is_public'    => false,
-                'is_required'  => true,
+                'type' => 'string',
+                'value' => config('app.name'),
+                'group' => 'email',
+                'description' => 'Name used in outgoing emails',
+                'is_public' => false,
+                'is_required' => true,
             ],
             [
-                'key'          => 'email_from_address',
+                'key' => 'email_from_address',
                 'display_name' => 'Email From Address',
-                'type'         => 'email',
-                'value'        => 'noreply@example.com',
-                'group'        => 'email',
-                'description'  => 'Email address used for outgoing emails',
-                'is_public'    => false,
-                'is_required'  => true,
+                'type' => 'email',
+                'value' => 'noreply@example.com',
+                'group' => 'email',
+                'description' => 'Email address used for outgoing emails',
+                'is_public' => false,
+                'is_required' => true,
             ],
             // SEO Settings
             [
-                'key'          => 'meta_title',
+                'key' => 'meta_title',
                 'display_name' => 'Default Meta Title',
-                'type'         => 'string',
-                'value'        => config('app.name') . ' - Online Store',
-                'group'        => 'seo',
-                'description'  => 'Default meta title for pages',
-                'is_public'    => true,
-                'is_required'  => false,
+                'type' => 'string',
+                'value' => config('app.name') . ' - Online Store',
+                'group' => 'seo',
+                'description' => 'Default meta title for pages',
+                'is_public' => true,
+                'is_required' => false,
             ],
             [
-                'key'          => 'meta_description',
+                'key' => 'meta_description',
                 'display_name' => 'Default Meta Description',
-                'type'         => 'text',
-                'value'        => 'Shop the best products at great prices with fast shipping and excellent customer service.',
-                'group'        => 'seo',
-                'description'  => 'Default meta description for pages',
-                'is_public'    => true,
-                'is_required'  => false,
+                'type' => 'text',
+                'value' => 'Shop the best products at great prices with fast shipping and excellent customer service.',
+                'group' => 'seo',
+                'description' => 'Default meta description for pages',
+                'is_public' => true,
+                'is_required' => false,
             ],
             // Features Settings
             [
-                'key'          => 'enable_reviews',
+                'key' => 'enable_reviews',
                 'display_name' => 'Enable Product Reviews',
-                'type'         => 'boolean',
-                'value'        => 'true',
-                'group'        => 'features',
-                'description'  => 'Allow customers to leave product reviews',
-                'is_public'    => true,
-                'is_required'  => false,
+                'type' => 'boolean',
+                'value' => 'true',
+                'group' => 'features',
+                'description' => 'Allow customers to leave product reviews',
+                'is_public' => true,
+                'is_required' => false,
             ],
             [
-                'key'          => 'enable_wishlist',
+                'key' => 'enable_wishlist',
                 'display_name' => 'Enable Wishlist',
-                'type'         => 'boolean',
-                'value'        => 'true',
-                'group'        => 'features',
-                'description'  => 'Allow customers to save products to wishlist',
-                'is_public'    => true,
-                'is_required'  => false,
+                'type' => 'boolean',
+                'value' => 'true',
+                'group' => 'features',
+                'description' => 'Allow customers to save products to wishlist',
+                'is_public' => true,
+                'is_required' => false,
             ],
         ];
 
         foreach ($settings as $setting) {
-            $existingSetting = Setting::where('key', $setting['key'])->first();
-
-            if ($existingSetting) {
-                $existingSetting->update($setting);
-            } else {
-                Setting::factory()
-                    ->state($setting)
-                    ->create();
-            }
+            Setting::updateOrCreate(
+                ['key' => $setting['key']],
+                $setting
+            );
         }
     }
 
     private function seedEnhancedPermissions(): void
     {
         $permissions = [
+            // Basic CRUD permissions
+            'view_products',
+            'edit_products',
+            'create_products',
+            'delete_products',
+            'view_customers',
+            'edit_customers',
+            'create_customers',
+            'delete_customers',
+            'view_orders',
+            'edit_orders',
+            'create_orders',
+            'delete_orders',
             // Analytics permissions
             'view_analytics_dashboard',
             'export_analytics',
@@ -201,25 +207,20 @@ final class ComprehensiveFilamentSeeder extends Seeder
         ];
 
         foreach ($permissions as $permission) {
-            $existingPermission = Permission::where('name', $permission)->first();
-
-            if (! $existingPermission) {
-                Permission::factory()
-                    ->state(['name' => $permission])
-                    ->create();
-            }
+            Permission::firstOrCreate(
+                ['name' => $permission],
+                ['guard_name' => 'web']
+            );
         }
     }
 
     private function seedEnhancedRoles(): void
     {
         // Inventory Manager role
-        $inventoryManager = Role::where('name', 'inventory_manager')->first();
-        if (! $inventoryManager) {
-            $inventoryManager = Role::factory()
-                ->state(['name' => 'inventory_manager'])
-                ->create();
-        }
+        $inventoryManager = Role::firstOrCreate(
+            ['name' => 'inventory_manager'],
+            ['guard_name' => 'web']
+        );
         $inventoryPermissions = [
             'view_products',
             'edit_products',
@@ -231,15 +232,13 @@ final class ComprehensiveFilamentSeeder extends Seeder
             'view_analytics_dashboard',
             'view_product_analytics',
         ];
-        $inventoryManager->givePermissionTo($inventoryPermissions);
+        $inventoryManager->syncPermissions($inventoryPermissions);
 
         // Customer Service role
-        $customerService = Role::where('name', 'customer_service')->first();
-        if (! $customerService) {
-            $customerService = Role::factory()
-                ->state(['name' => 'customer_service'])
-                ->create();
-        }
+        $customerService = Role::firstOrCreate(
+            ['name' => 'customer_service'],
+            ['guard_name' => 'web']
+        );
         $customerServicePermissions = [
             'view_customers',
             'edit_customers',
@@ -250,15 +249,13 @@ final class ComprehensiveFilamentSeeder extends Seeder
             'send_customer_emails',
             'view_customer_analytics',
         ];
-        $customerService->givePermissionTo($customerServicePermissions);
+        $customerService->syncPermissions($customerServicePermissions);
 
         // Analytics Manager role
-        $analyticsManager = Role::where('name', 'analytics_manager')->first();
-        if (! $analyticsManager) {
-            $analyticsManager = Role::factory()
-                ->state(['name' => 'analytics_manager'])
-                ->create();
-        }
+        $analyticsManager = Role::firstOrCreate(
+            ['name' => 'analytics_manager'],
+            ['guard_name' => 'web']
+        );
         $analyticsPermissions = [
             'view_analytics_dashboard',
             'export_analytics',
@@ -269,24 +266,24 @@ final class ComprehensiveFilamentSeeder extends Seeder
             'view_products',
             'view_orders',
         ];
-        $analyticsManager->givePermissionTo($analyticsPermissions);
+        $analyticsManager->syncPermissions($analyticsPermissions);
     }
 
     private function seedAdminUsers(): void
     {
         // Inventory Manager User
         $inventoryManager = User::where('email', 'inventory@example.com')->first();
-        if (! $inventoryManager) {
+        if (!$inventoryManager) {
             $inventoryManager = User::factory()
                 ->state([
-                    'email'             => 'inventory@example.com',
-                    'name'              => 'Inventory Manager',
-                    'password'          => Hash::make('password'),
+                    'email' => 'inventory@example.com',
+                    'name' => 'Inventory Manager',
+                    'password' => Hash::make('password'),
                     'email_verified_at' => now(),
-                    'is_admin'          => true,
-                    'is_active'         => true,
-                    'timezone'          => 'Europe/Vilnius',
-                    'preferred_locale'  => 'lt',
+                    'is_admin' => true,
+                    'is_active' => true,
+                    'timezone' => 'Europe/Vilnius',
+                    'preferred_locale' => 'lt',
                 ])
                 ->create();
         }
@@ -294,17 +291,17 @@ final class ComprehensiveFilamentSeeder extends Seeder
 
         // Customer Service User
         $customerService = User::where('email', 'support@example.com')->first();
-        if (! $customerService) {
+        if (!$customerService) {
             $customerService = User::factory()
                 ->state([
-                    'email'             => 'support@example.com',
-                    'name'              => 'Customer Service',
-                    'password'          => Hash::make('password'),
+                    'email' => 'support@example.com',
+                    'name' => 'Customer Service',
+                    'password' => Hash::make('password'),
                     'email_verified_at' => now(),
-                    'is_admin'          => true,
-                    'is_active'         => true,
-                    'timezone'          => 'Europe/Vilnius',
-                    'preferred_locale'  => 'lt',
+                    'is_admin' => true,
+                    'is_active' => true,
+                    'timezone' => 'Europe/Vilnius',
+                    'preferred_locale' => 'lt',
                 ])
                 ->create();
         }
@@ -312,17 +309,17 @@ final class ComprehensiveFilamentSeeder extends Seeder
 
         // Analytics Manager User
         $analyticsManager = User::where('email', 'analytics@example.com')->first();
-        if (! $analyticsManager) {
+        if (!$analyticsManager) {
             $analyticsManager = User::factory()
                 ->state([
-                    'email'             => 'analytics@example.com',
-                    'name'              => 'Analytics Manager',
-                    'password'          => Hash::make('password'),
+                    'email' => 'analytics@example.com',
+                    'name' => 'Analytics Manager',
+                    'password' => Hash::make('password'),
                     'email_verified_at' => now(),
-                    'is_admin'          => true,
-                    'is_active'         => true,
-                    'timezone'          => 'Europe/Vilnius',
-                    'preferred_locale'  => 'lt',
+                    'is_admin' => true,
+                    'is_active' => true,
+                    'timezone' => 'Europe/Vilnius',
+                    'preferred_locale' => 'lt',
                 ])
                 ->create();
         }
@@ -343,23 +340,23 @@ final class ComprehensiveFilamentSeeder extends Seeder
                     $updateData = [];
 
                     // Only update columns that exist
-                    if (! $product->meta_title && $product->name) {
+                    if (!$product->meta_title && $product->name) {
                         $updateData['meta_title'] = $product->name;
                     }
 
-                    if (! $product->is_featured) {
+                    if (!$product->is_featured) {
                         $updateData['is_featured'] = fake()->boolean(15);  // 15% featured
                     }
 
-                    if (! $product->sort_order) {
+                    if (!$product->sort_order) {
                         $updateData['sort_order'] = fake()->numberBetween(1, 1000);
                     }
 
-                    if (! $product->published_at) {
+                    if (!$product->published_at) {
                         $updateData['published_at'] = fake()->dateTimeBetween('-6 months', 'now');
                     }
 
-                    if (! empty($updateData)) {
+                    if (!empty($updateData)) {
                         try {
                             $product->update($updateData);
                         } catch (Exception $e) {
@@ -382,7 +379,7 @@ final class ComprehensiveFilamentSeeder extends Seeder
                     try {
                         $category->update([
                             'is_featured' => $category->is_featured ?? fake()->boolean(25),
-                            'sort_order'  => $category->sort_order ?? fake()->numberBetween(1, 100),
+                            'sort_order' => $category->sort_order ?? fake()->numberBetween(1, 100),
                         ]);
                     } catch (Exception $e) {
                         // Skip if columns don't exist yet
@@ -403,7 +400,7 @@ final class ComprehensiveFilamentSeeder extends Seeder
                     try {
                         $brand->update([
                             'is_featured' => $brand->is_featured ?? fake()->boolean(20),
-                            'sort_order'  => $brand->sort_order ?? fake()->numberBetween(1, 100),
+                            'sort_order' => $brand->sort_order ?? fake()->numberBetween(1, 100),
                         ]);
                     } catch (Exception $e) {
                         // Skip if columns don't exist yet
