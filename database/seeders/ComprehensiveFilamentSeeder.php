@@ -315,15 +315,33 @@ final class ComprehensiveFilamentSeeder extends Seeder
 
     private function resolveFilamentGuard(): string
     {
-        // Honour the configured Filament guard when available, otherwise mirror the panel default.
+        // Honour the configured Filament guard when available so custom panel guards remain supported.
         $configuredGuard = config('filament.auth.guard');
 
         if (is_string($configuredGuard) && $configuredGuard !== '') {
             return $configuredGuard;
         }
 
-        // Fall back to the panel's environment aware guard selection (web in tests, admin elsewhere).
-        return app()->environment('testing') ? 'web' : 'admin';
+        // Align the fallback guard with the primary User model provider to avoid guard mismatches when assigning roles.
+        $userModel = config('auth.providers.users.model', User::class);
+        $guards = config('auth.guards', []);
+
+        foreach ($guards as $guardName => $guardConfiguration) {
+            $providerName = $guardConfiguration['provider'] ?? null;
+
+            if ($providerName === null) {
+                continue;
+            }
+
+            $providerConfiguration = config("auth.providers.{$providerName}");
+
+            if (($providerConfiguration['model'] ?? null) === $userModel) {
+                return $guardName;
+            }
+        }
+
+        // Default to Laravel's configured guard (typically `web`) when no explicit match is found.
+        return config('auth.defaults.guard', 'web');
     }
 
     private function seedAdminUsers(): void
