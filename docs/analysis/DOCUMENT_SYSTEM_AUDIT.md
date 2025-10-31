@@ -29,3 +29,4 @@ The document platform combines reusable templates, automated generation, variabl
 ## Versioning & Lifecycle Management
 - Status constants (`draft`, `generated`, `published`, `archived`) and helper scopes support lifecycle queries, while the `version` field and template-level `documents()` relationship (scoped to include archived records) preserve historical revisions.【F:app/Models/Document.php†L43-L317】【F:app/Models/DocumentTemplate.php†L64-L71】
 - Morph-many audit logs on `Document` capture chronological changes for traceability across revisions.【F:app/Models/Document.php†L166-L174】
+- Legal reference seed data now bypasses the enabled/published global scopes when rerun so idempotent inserts keep the canonical privacy, terms, and cookie policies aligned even after manual status tweaks in staging.【F:database/seeders/FilamentEnhancedSeeder.php†L258-L284】
