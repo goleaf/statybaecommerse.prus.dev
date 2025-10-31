@@ -23,8 +23,12 @@ class OrderFactory extends Factory
 
     /**
      * Maintain a simple sequence counter so deterministic placeholder data remains readable across tests.
+     *
+     * The counter is nullable so we can lazily bootstrap it from persisted order
+     * numbers, preventing unique constraint collisions when seeders run against a
+     * database that already contains historical orders.
      */
-    private static int $sequence = 1;
+    private static ?int $sequence = null;
 
     /**
      * Define the model's default state.
@@ -113,6 +117,24 @@ class OrderFactory extends Factory
      */
     private function nextSequence(): int
     {
+        if (self::$sequence === null) {
+            // Pull the highest stored order number (including soft-deleted and
+            // scope-filtered rows) so rerunning factories never reuses an
+            // existing identifier that would violate the unique constraint.
+            $maxNumber = Order::withoutGlobalScopes()
+                ->withTrashed()
+                ->max('number');
+
+            if (is_string($maxNumber) && preg_match('/(\d+)$/', $maxNumber, $matches)) {
+                self::$sequence = ((int) $matches[1]) + 1;
+            } else {
+                // Fall back to the default baseline when the table is empty or
+                // contains unexpected data so factories still generate readable
+                // identifiers during the first bootstrap run.
+                self::$sequence = 1;
+            }
+        }
+
         return self::$sequence++;
     }
 
