@@ -7,6 +7,8 @@ namespace Database\Seeders;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Legal;
+use App\Models\Scopes\EnabledScope;
+use App\Models\Scopes\PublishedScope;
 use App\Models\Product;
 use App\Models\Translations\LegalTranslation;
 use App\Models\User;
@@ -350,17 +352,21 @@ final class FilamentEnhancedSeeder extends Seeder
 
         foreach ($legalPageDefinitions as $key => $definition) {
             // Prevent duplicate keys by updating existing records instead of blindly creating new ones.
-            $legal = Legal::query()->updateOrCreate(
-                ['key' => $key],
-                [
-                    'type'        => $definition['type'],
-                    'is_enabled'  => $definition['is_enabled'],
-                    'is_required' => $definition['is_required'],
-                    'sort_order'  => $definition['sort_order'],
-                    'meta_data'   => $definition['meta_data'],
-                    'published_at'=> $definition['published_at'],
-                ]
-            );
+            // Removing the enabled/published global scopes keeps reruns idempotent even if an admin
+            // temporarily disables or future-dates a legal entry between seed executions.
+            $legal = Legal::query()
+                ->withoutGlobalScopes([EnabledScope::class, PublishedScope::class])
+                ->updateOrCreate(
+                    ['key' => $key],
+                    [
+                        'type'         => $definition['type'],
+                        'is_enabled'   => $definition['is_enabled'],
+                        'is_required'  => $definition['is_required'],
+                        'sort_order'   => $definition['sort_order'],
+                        'meta_data'    => $definition['meta_data'],
+                        'published_at' => $definition['published_at'],
+                    ]
+                );
 
             // Sync translations locale-by-locale so reruns keep content up to date without creating duplicates.
             foreach ($definition['translations'] as $locale => $translationData) {
