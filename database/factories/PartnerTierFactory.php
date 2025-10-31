@@ -22,7 +22,9 @@ final class PartnerTierFactory extends Factory
 
         return [
             'name'                => $tierName,
-            'code'                => Str::of($tierName)->slug('_') . '_' . $this->faker->unique()->numerify('###'),
+            // Generate a deterministic slug prefix and append a ULID segment so seeding large datasets never exhausts Faker's
+            // unique number pool while still yielding human-readable partner tier codes.
+            'code'                => Str::of($tierName)->slug('_')->append('_', Str::lower((string) Str::ulid())),
             'discount_rate'       => $this->faker->randomFloat(4, 0.01, 0.15), // 1% to 15%
             'commission_rate'     => $this->faker->randomFloat(4, 0.02, 0.10), // 2% to 10%
             'minimum_order_value' => $this->faker->randomFloat(2, 100, 5000),
