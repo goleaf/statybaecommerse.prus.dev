@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Carbon;
 
 final class OrderItemSeeder extends Seeder
 {
@@ -31,15 +32,28 @@ final class OrderItemSeeder extends Seeder
             $itemCount = fake()->numberBetween(1, 5);
             $selectedProducts = $products->random(min($itemCount, $products->count()));
 
+            // Normalise the order timestamps to Carbon instances so we can safely derive ranges for Faker.
+            $orderCreatedAt = $order->created_at instanceof Carbon
+                ? $order->created_at->copy()
+                : Carbon::parse((string) $order->created_at);
+
+            // Ensure the faker range never inverts by clamping the end date to now and the start date to the earlier value.
+            $startDate = $orderCreatedAt->lessThanOrEqualTo(now()) ? $orderCreatedAt : now();
+            $endDate = now();
+
             foreach ($selectedProducts as $product) {
+                // Generate timestamps in chronological order so updated_at never predates created_at even for future-dated orders.
+                $createdAt = fake()->dateTimeBetween($startDate, $endDate);
+                $updatedAt = fake()->dateTimeBetween($createdAt, $endDate);
+
                 OrderItem::factory()
                     ->for($order)
                     ->for($product)
                     ->state([
                         'name'       => $product->name,
                         'sku'        => $product->sku ?? fake()->bothify('SKU-####'),
-                        'created_at' => fake()->dateTimeBetween($order->created_at, 'now'),
-                        'updated_at' => fake()->dateTimeBetween($order->created_at, 'now'),
+                        'created_at' => $createdAt,
+                        'updated_at' => $updatedAt,
                     ])
                     ->create();
             }
