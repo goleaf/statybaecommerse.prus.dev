@@ -207,9 +207,12 @@ final class ComprehensiveFilamentSeeder extends Seeder
         ];
 
         foreach ($permissions as $permission) {
-            Permission::firstOrCreate(
+            Permission::updateOrCreate(
                 ['name' => $permission],
-                ['guard_name' => 'web']
+                [
+                    // Ensure every permission uses the Filament panel guard so role syncing never fails.
+                    'guard_name' => 'web',
+                ]
             );
         }
 
