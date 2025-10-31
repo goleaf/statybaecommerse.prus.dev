@@ -74,7 +74,25 @@ final class Brand extends Model implements HasMedia, TranslatableRecord
      *
      * @var array<int, string>
      */
-    protected $fillable = ['name', 'slug', 'description', 'website', 'is_enabled', 'is_active', 'is_visible', 'is_featured', 'is_premium', 'seo_title', 'seo_description', 'social_links'];
+    protected $fillable = [
+        'name',
+        'slug',
+        'description',
+        'website',
+        'contact_email',
+        'contact_phone',
+        'is_enabled',
+        'is_active',
+        'is_visible',
+        'is_featured',
+        'is_premium',
+        'sort_order',
+        'meta_title',
+        'meta_description',
+        'seo_title',
+        'seo_description',
+        'social_links',
+    ];
 
     /**
      * Enumerate supported social platforms to sanitise JSON payloads from the Filament repeater.
@@ -110,6 +128,8 @@ final class Brand extends Model implements HasMedia, TranslatableRecord
             'is_visible'  => 'boolean',
             'is_featured' => 'boolean',
             'is_premium'  => 'boolean',
+            // Normalise manual ordering values so table filters and JSON responses stay numeric.
+            'sort_order'  => 'integer',
         ];
     }
 
