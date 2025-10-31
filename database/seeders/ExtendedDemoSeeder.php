@@ -125,6 +125,7 @@ final class ExtendedDemoSeeder extends Seeder
         $demoUser = User::factory()
             ->has(
                 Address::factory()->state([
+                    // Persist a realistic shipping profile so demo storefront flows can resolve address metadata.
                     'type'           => 'shipping',
                     'last_name'      => 'Doe',
                     'first_name'     => 'John',
@@ -133,7 +134,8 @@ final class ExtendedDemoSeeder extends Seeder
                     'city'           => 'Springfield',
                     'phone'          => '1234567890',
                     'is_default'     => true,
-                    'country'        => 'LT',
+                    // Align with the addresses schema which stores ISO values in the country_code column.
+                    'country_code'   => 'LT',
                 ]),
                 'addresses'
             )
