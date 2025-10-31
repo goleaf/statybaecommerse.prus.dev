@@ -12,11 +12,19 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 final class AttributeValueFactory extends Factory
 {
+    /**
+     * Maintain a simple counter so generated attribute values remain unique across seeding runs.
+     */
+    private static int $valueSequence = 1;
+
     protected $model = AttributeValue::class;
 
     public function definition(): array
     {
-        $value = $this->faker->unique()->safeColorName();
+        $sequence = self::$valueSequence++;
+
+        // Append a deterministic sequence to the colour name to avoid Faker's limited unique pool exhausting during heavy seeders.
+        $value = sprintf('%s %s', $this->faker->colorName(), $sequence);
 
         return [
             'attribute_id'         => fn () => \App\Models\Attribute::factory(),
