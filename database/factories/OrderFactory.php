@@ -287,7 +287,16 @@ class OrderFactory extends Factory
                 }
 
                 if ($order->country_id === null && ! $order->relationLoaded('country')) {
-                    $order->setRelation('country', Country::factory()->make());
+                    // Reuse an existing country when available so high-volume seeders do not
+                    // collide with the unique cca2/cca3 constraints during factory pipelines.
+                    $existingCountry = Country::query()->inRandomOrder()->first();
+
+                    if ($existingCountry !== null) {
+                        $order->setRelation('country', $existingCountry);
+                        $order->country_id = $existingCountry->getKey();
+                    } else {
+                        $order->setRelation('country', Country::factory()->make());
+                    }
                 }
             })
             ->afterCreating(function (Order $order): void {
@@ -307,7 +316,16 @@ class OrderFactory extends Factory
                 }
 
                 if ($order->country_id === null && Schema::hasTable($countryTable)) {
-                    $order->country()->associate(Country::factory()->create());
+                    // Prefer recycling a persisted country to keep factories from generating
+                    // random country codes that may clash with curated seed data.
+                    $existingCountry = Country::query()->inRandomOrder()->first();
+
+                    if ($existingCountry !== null) {
+                        $order->country()->associate($existingCountry);
+                    } else {
+                        $order->country()->associate(Country::factory()->create());
+                    }
+
                     $dirty = true;
                 }
 
