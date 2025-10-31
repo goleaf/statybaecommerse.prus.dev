@@ -10,6 +10,7 @@ use App\Models\Product;
 use App\Models\ProductVariant;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\OrderItem>
@@ -24,12 +25,16 @@ final class OrderItemFactory extends Factory
         $unitPrice = $this->faker->randomFloat(2, 1, 100);
         $total = $quantity * $unitPrice;
 
+        // Prepare the core attributes for the order item so downstream states can
+        // override them without having to recalculate every dependent field.
         $attributes = [
             'order_id'           => Order::factory(),
             'product_id'         => Product::factory(),
             'product_variant_id' => null,
             'name'               => $this->faker->words(3, true),
-            'sku'                => $this->faker->unique()->bothify('SKU-####'),
+            // Use an explicit generator to avoid exhausting Faker's unique() pool
+            // when the seeder creates thousands of rows.
+            'sku'                => $this->generateSku(),
             'quantity'           => $quantity,
             'unit_price'         => $unitPrice,
             'price'              => $unitPrice,  // Same as unit_price for consistency
@@ -106,19 +111,33 @@ final class OrderItemFactory extends Factory
 
     public function expensive(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'unit_price' => $this->faker->randomFloat(2, 100, 1000),
-            'price'      => $this->faker->randomFloat(2, 100, 1000),
-        ]);
+        return $this->state(function (array $attributes): array {
+            // Keep the unit price and base price aligned, then force a total
+            // recalculation so the after hooks can keep everything in sync.
+            $unitPrice = $this->faker->randomFloat(2, 100, 1000);
+
+            return [
+                'unit_price' => $unitPrice,
+                'price'      => $unitPrice,
+                'total'      => null,
+            ];
+        });
     }
 
     public function cheap(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'unit_price' => $this->faker->randomFloat(2, 0.1, 10),
-            'price'      => $this->faker->randomFloat(2, 0.1, 10),
-        ]);
-}
+        return $this->state(function (array $attributes): array {
+            // Mirror the behaviour of expensive() but with a lower price band
+            // while still delegating total calculations to the factory hooks.
+            $unitPrice = $this->faker->randomFloat(2, 0.1, 10);
+
+            return [
+                'unit_price' => $unitPrice,
+                'price'      => $unitPrice,
+                'total'      => null,
+            ];
+        });
+    }
 
     /**
      * Strip attributes for columns that are not present on the order_items table.
@@ -141,5 +160,15 @@ final class OrderItemFactory extends Factory
         }
 
         return $attributes;
+    }
+
+    /**
+     * Generate an SKU that is random enough for demo data without relying on Faker's unique tracking.
+     */
+    private function generateSku(): string
+    {
+        // Combine a predictable prefix with a random segment so order items feel realistic
+        // while remaining fast to generate even for large seed batches.
+        return sprintf('SKU-%s', Str::upper(Str::random(8)));
     }
 }
