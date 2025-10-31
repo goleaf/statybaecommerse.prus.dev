@@ -18,7 +18,8 @@ class PartnerFactory extends Factory
 
         return [
             'name'            => $name,
-            'code'            => strtolower(preg_replace('/[^a-z0-9]+/i', '-', $name)) . '-' . $this->faker->unique()->numerify('###'),
+            // Use a longer unique suffix so large seed batches do not exhaust Faker's unique pool.
+            'code'            => strtolower(preg_replace('/[^a-z0-9]+/i', '-', $name)) . '-' . $this->faker->unique()->numerify('########'),
             'tier_id'         => PartnerTier::factory(),
             'contact_email'   => $this->faker->unique()->safeEmail(),
             'contact_phone'   => $this->faker->phoneNumber(),
