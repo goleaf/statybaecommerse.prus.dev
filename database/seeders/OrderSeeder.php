@@ -26,15 +26,15 @@ final class OrderSeeder extends Seeder
         $currency = Currency::where('code', 'EUR')->first() ?: Currency::factory()->eur()->default()->create();
         $zone = Zone::first() ?: Zone::factory()->create();
         $channel = Channel::first() ?: Channel::factory()->create();
-        $country = Country::query()->firstOrCreate(
-            ['code' => 'LTU'],
+        $country = Country::query()->updateOrCreate(
+            ['cca2' => 'LT'],
             [
                 // Persist a deterministic Lithuanian record so repeated seeding runs do not trip unique ISO/CCA constraints.
                 'name'               => 'Lithuania',
                 'name_official'      => 'Republic of Lithuania',
-                'cca2'               => 'LT',
                 'cca3'               => 'LTU',
                 'ccn3'               => '440',
+                'code'               => 'lt', // Reuse the lowercase alpha-2 code to align with the dedicated country seeders.
                 'iso_code'           => 'LTU',
                 'currency_code'      => $currency->code,
                 'currency_symbol'    => '€',

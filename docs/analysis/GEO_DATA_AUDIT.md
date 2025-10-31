@@ -16,6 +16,7 @@
 ### Countries
 - `Country` exposes relationships to addresses, cities, taxation, and currencies, alongside query scopes for regional filtering and VAT requirements, supporting admin analytics and storefront lookups.【F:app/Models/Country.php†L34-L249】
 - The refreshed `CountrySeeder` now provisions 47 European countries and synchronises Lithuanian, English, German, and Russian translations for each entry, but the catalogue still lacks coverage for other continents.【F:database/seeders/CountrySeeder.php†L15-L326】【483c33†L1-L1】
+- The order seeder now reuses Lithuania via `updateOrCreate` keyed on the alpha-2 code, preventing duplicate inserts from triggering unique ISO collisions during repeated seed runs.【F:database/seeders/OrderSeeder.php†L24-L57】
 - Address validation falls back to querying active countries when configuration omits an allow-list, so the absence of non-European records still reduces selectable countries at checkout and in admin forms.【F:app/Http/Requests/Frontend/AddressRequest.php†L102-L123】
 - The Filament country infolist now references the correct schema instance, restoring the admin "view" page that previously crashed because it returned an undefined variable.【F:app/Filament/Resources/CountryResource.php†L244-L291】
 
