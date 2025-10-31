@@ -23,6 +23,7 @@ The document platform combines reusable templates, automated generation, variabl
 ## Access Control & Distribution
 - `Document` records default to private, downloadable assets, exposing convenience checks (e.g., `isPublic`, `isDownloadable`) and generating temporary signed URLs via secure storage for gated delivery.【F:app/Models/Document.php†L66-L210】【F:app/Models/Document.php†L244-L258】
 - Ordering scopes trim whitespace-only names before deferring to the title, keeping admin dropdowns stable even when legacy records contain padded values.【F:app/Models/Document.php†L304-L320】
+- Documents now denormalise creator and updater names via dedicated columns so admin listings and audit trails surface attribution data without eager loading, with the seeder backfilling names when the schema supports it.【F:app/Models/Document.php†L110-L148】【F:database/migrations/2025_11_12_000001_add_attribution_names_to_documents_table.php†L1-L41】【F:database/seeders/DocumentSeeder.php†L27-L114】
 - `DocumentGenerated` notifications respect authorisation gates before surfacing view links and only attach PDFs when secure files exist, ensuring notifications honour per-document permissions.【F:app/Notifications/DocumentGenerated.php†L18-L103】
 
 ## Versioning & Lifecycle Management
