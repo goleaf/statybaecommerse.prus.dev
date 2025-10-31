@@ -11,14 +11,24 @@ use App\Models\User;
 use Database\Factories\DocumentFactory;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Schema;
 
 final class DocumentSeeder extends Seeder
 {
+    /**
+     * Cache whether the documents table exposes denormalised attribution columns.
+     */
+    private bool $shouldStoreAttributionNames = false;
+
     public function run(): void
     {
         $templates = DocumentTemplate::query()->get();
         $users = User::query()->get();
         $orders = Order::query()->get();
+
+        // Resolve the schema support flag once to avoid repeating metadata lookups per record.
+        $this->shouldStoreAttributionNames = Schema::hasColumn('documents', 'created_by_name')
+            && Schema::hasColumn('documents', 'updated_by_name');
 
         if ($templates->isEmpty() || $users->isEmpty() || $orders->isEmpty()) {
             return;
@@ -177,20 +187,29 @@ final class DocumentSeeder extends Seeder
             /** @var DocumentFactory $factory */
             $factory = $factoryConfigurator(Document::factory());
 
+            $state = [
+                // Normalise the stored type to the chosen template so analytics and filtering stay aligned.
+                'type' => $templateType,
+                // Persist explicit attribution to avoid the factory spinning up auxiliary users that the feature tests are not tracking.
+                'created_by' => $creator->getKey(),
+                'updated_by' => $creator->getKey(),
+            ];
+
+            if ($this->shouldStoreAttributionNames) {
+                // Store the denormalised names when the schema supports it so admin tables can surface attribution without eager loading.
+                $creatorName = $creator->getAttribute('name');
+                if (is_string($creatorName) && $creatorName !== '') {
+                    $state['created_by_name'] = $creatorName;
+                    $state['updated_by_name'] = $creatorName;
+                }
+            }
+
             $factory
                 ->for($template, 'template')
                 ->for($order, 'documentable')
                 ->for($creator, 'creator')
                 ->for($creator, 'updater')
-                ->state([
-                    // Normalise the stored type to the chosen template so
-                    // analytics and filtering stay aligned.
-                    'type' => $templateType,
-                    // Persist explicit attribution to avoid the factory spinning
-                    // up auxiliary users that the feature tests are not tracking.
-                    'created_by' => $creator->getKey(),
-                    'updated_by' => $creator->getKey(),
-                ])
+                ->state($state)
                 ->create();
         }
     }
