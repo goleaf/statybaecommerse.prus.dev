@@ -20,4 +20,7 @@
 17. ✅ Audit `RolePermissionSeeder` for incorrect guard assignments on roles and permissions.
 18. ✅ Normalize `RolePermissionSeeder` to enforce `admin` guard consistently.
 19. ✅ Re-run `RolePermissionSeeder` to confirm the guard mismatch error is resolved.
+20. ✅ Audit `SettingsSeeder` for duplicate key inserts causing constraint violations.
+21. ✅ Refactor `SettingsSeeder` to upsert settings instead of creating duplicates.
+22. ✅ Re-run `SettingsSeeder` to verify the unique constraint is respected.
 

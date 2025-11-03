@@ -6,6 +6,7 @@ namespace Database\Seeders;
 
 use App\Models\Setting;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Arr;
 
 final class SettingsSeeder extends Seeder
 {
@@ -244,9 +245,28 @@ final class SettingsSeeder extends Seeder
         ];
 
         foreach ($settings as $setting) {
-            Setting::factory()->create($setting);
+            $normalized = $this->normalizeSettingPayload($setting);
+
+            $model = Setting::query()->firstOrNew([
+                'key' => $normalized['key'],
+            ]);
+
+            $model->fill(Arr::except($normalized, ['key', 'value']));
+            $model->value = $normalized['value'];
+            $model->save();
         }
 
         $this->command->info('Settings seeded successfully with multilanguage support!');
+    }
+
+    private function normalizeSettingPayload(array $setting): array
+    {
+        $setting['is_public'] ??= false;
+        $setting['is_required'] ??= false;
+        $setting['is_encrypted'] ??= false;
+        $setting['description'] ??= null;
+        $setting['group'] ??= 'general';
+
+        return $setting;
     }
 }
