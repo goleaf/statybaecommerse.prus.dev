@@ -105,17 +105,17 @@ final class ProductFeatureSeeder extends Seeder
             ProductFeature::factory()
                 ->count($featureCount)
                 ->for($product)
-                ->state(fn () => $this->featureState($categoryKey))
+                ->state(fn () => self::featureState($categoryKey))
                 ->create();
         }
     }
 
-    private function featureState(string $categoryKey): array
+    private static function featureState(string $categoryKey): array
     {
         $categoryFeatures = self::FEATURE_TEMPLATES[$categoryKey] ?? [];
 
         if (empty($categoryFeatures) || fake()->boolean(25)) {
-            return $this->genericFeatureState();
+            return self::genericFeatureState();
         }
 
         $featureType = Arr::random(array_keys($categoryFeatures));
@@ -127,11 +127,11 @@ final class ProductFeatureSeeder extends Seeder
             'feature_type'  => $featureType,
             'feature_key'   => $featureKey,
             'feature_value' => $featureValue,
-            'weight'        => $this->generateWeight($featureType),
+            'weight'        => self::generateWeight($featureType),
         ];
     }
 
-    private function genericFeatureState(): array
+    private static function genericFeatureState(): array
     {
         $featureKey = Arr::random(array_keys(self::GENERIC_FEATURES));
         $featureValue = Arr::random(self::GENERIC_FEATURES[$featureKey]);
@@ -141,14 +141,14 @@ final class ProductFeatureSeeder extends Seeder
             'feature_type'  => $featureType,
             'feature_key'   => $featureKey,
             'feature_value' => $featureValue,
-            'weight'        => $this->generateWeight($featureType),
+            'weight'        => self::generateWeight($featureType),
         ];
     }
 
     /**
      * Generate weight based on feature type
      */
-    private function generateWeight(string $featureType): float
+    private static function generateWeight(string $featureType): float
     {
         return match ($featureType) {
             'specification' => fake()->numberBetween(80, 100) / 100,
