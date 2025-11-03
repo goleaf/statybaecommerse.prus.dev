@@ -225,6 +225,10 @@ Type: Complex System
    - [x] Audit existing roles and permissions for incorrect guard assignments
    - [x] Normalize seeder to enforce `admin` guard for all roles and permissions
    - [x] Re-run `RolePermissionSeeder` to confirm guard mismatch exception is resolved
+7. **SettingsSeeder duplicate key remediation (2025-11-03 — new)**
+   - [x] Inspect settings seeder for repeated `key` inserts causing unique constraint violations
+   - [x] Refactor seeder to upsert settings records instead of blindly creating duplicates
+   - [x] Re-run `SettingsSeeder` to ensure the unique constraint is satisfied
 1. **Admin Access Resolution** ✅ COMPLETED
    - [x] Fix Filament panel login redirect issues
    - [x] Verify admin dashboard accessibility
