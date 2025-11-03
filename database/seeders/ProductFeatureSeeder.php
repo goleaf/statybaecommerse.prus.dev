@@ -101,48 +101,18 @@ final class ProductFeatureSeeder extends Seeder
 
             $categoryKey = Arr::random(array_keys(self::FEATURE_TEMPLATES));
             $featureCount = fake()->numberBetween(8, 15);
+            $featureStates = self::generateUniqueFeatureStates($categoryKey, $featureCount);
+
+            if ($featureStates === []) {
+                continue;
+            }
 
             ProductFeature::factory()
-                ->count($featureCount)
+                ->count(count($featureStates))
                 ->for($product)
-                ->state(fn () => self::featureState($categoryKey))
+                ->sequence(...$featureStates)
                 ->create();
         }
-    }
-
-    private static function featureState(string $categoryKey): array
-    {
-        $categoryFeatures = self::FEATURE_TEMPLATES[$categoryKey] ?? [];
-
-        if (empty($categoryFeatures) || fake()->boolean(25)) {
-            return self::genericFeatureState();
-        }
-
-        $featureType = Arr::random(array_keys($categoryFeatures));
-        $featureOptions = $categoryFeatures[$featureType];
-        $featureKey = Arr::random(array_keys($featureOptions));
-        $featureValue = Arr::random($featureOptions[$featureKey]);
-
-        return [
-            'feature_type'  => $featureType,
-            'feature_key'   => $featureKey,
-            'feature_value' => $featureValue,
-            'weight'        => self::generateWeight($featureType),
-        ];
-    }
-
-    private static function genericFeatureState(): array
-    {
-        $featureKey = Arr::random(array_keys(self::GENERIC_FEATURES));
-        $featureValue = Arr::random(self::GENERIC_FEATURES[$featureKey]);
-        $featureType = Arr::random(self::FEATURE_TYPES);
-
-        return [
-            'feature_type'  => $featureType,
-            'feature_key'   => $featureKey,
-            'feature_value' => $featureValue,
-            'weight'        => self::generateWeight($featureType),
-        ];
     }
 
     /**
@@ -157,5 +127,104 @@ final class ProductFeatureSeeder extends Seeder
             'performance'   => fake()->numberBetween(75, 100) / 100,
             default         => fake()->numberBetween(50, 85) / 100,
         };
+    }
+
+    /**
+     * Generate a set of unique feature states for a product.
+     */
+    private static function generateUniqueFeatureStates(string $categoryKey, int $desiredCount): array
+    {
+        $states = [];
+        $usedPairs = [];
+
+        $categoryPairs = self::buildCategoryPairs($categoryKey);
+        self::appendPairsToStates($states, $usedPairs, $categoryPairs, $desiredCount);
+
+        if (count($states) < $desiredCount) {
+            $genericPairs = self::buildGenericPairs();
+            self::appendPairsToStates($states, $usedPairs, $genericPairs, $desiredCount);
+        }
+
+        return array_slice($states, 0, $desiredCount);
+    }
+
+    /**
+     * Build feature pairs from the category templates.
+     *
+     * @return array<int, array{feature_type: string, feature_key: string, values: array<int, string>}>
+     */
+    private static function buildCategoryPairs(string $categoryKey): array
+    {
+        $pairs = [];
+        $categoryFeatures = self::FEATURE_TEMPLATES[$categoryKey] ?? [];
+
+        foreach ($categoryFeatures as $featureType => $featureOptions) {
+            foreach ($featureOptions as $featureKey => $values) {
+                $pairs[] = [
+                    'feature_type' => $featureType,
+                    'feature_key'  => $featureKey,
+                    'values'       => $values,
+                ];
+            }
+        }
+
+        shuffle($pairs);
+
+        return $pairs;
+    }
+
+    /**
+     * Build generic feature pairs using all available feature types.
+     *
+     * @return array<int, array{feature_type: string, feature_key: string, values: array<int, string>}>
+     */
+    private static function buildGenericPairs(): array
+    {
+        $pairs = [];
+
+        foreach (array_keys(self::GENERIC_FEATURES) as $featureKey) {
+            foreach (self::FEATURE_TYPES as $featureType) {
+                $pairs[] = [
+                    'feature_type' => $featureType,
+                    'feature_key'  => $featureKey,
+                    'values'       => self::GENERIC_FEATURES[$featureKey],
+                ];
+            }
+        }
+
+        shuffle($pairs);
+
+        return $pairs;
+    }
+
+    /**
+     * Append feature pairs to the state list while ensuring uniqueness.
+     *
+     * @param array<int, array{feature_type: string, feature_key: string, feature_value: string, weight: float}> $states
+     * @param array<string, bool>                                                                                $usedPairs
+     * @param array<int, array{feature_type: string, feature_key: string, values: array<int, string>}>           $pairs
+     */
+    private static function appendPairsToStates(array &$states, array &$usedPairs, array $pairs, int $desiredCount): void
+    {
+        foreach ($pairs as $pair) {
+            if (count($states) >= $desiredCount) {
+                break;
+            }
+
+            $signature = $pair['feature_type'] . '|' . $pair['feature_key'];
+
+            if (isset($usedPairs[$signature])) {
+                continue;
+            }
+
+            $states[] = [
+                'feature_type'  => $pair['feature_type'],
+                'feature_key'   => $pair['feature_key'],
+                'feature_value' => Arr::random($pair['values']),
+                'weight'        => self::generateWeight($pair['feature_type']),
+            ];
+
+            $usedPairs[$signature] = true;
+        }
     }
 }
