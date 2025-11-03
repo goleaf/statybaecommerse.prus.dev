@@ -134,10 +134,8 @@ tests/Feature/Authorization/FilamentAuthorizationTest.php
 tests/Feature/AuditTrailResourceTest.php
 tests/Feature/Api/RateLimiting/ApiRateLimitTest.php
 tests/Feature/Api/ProductHistoryAdminApiTest.php
-tests/Feature/Api/PartnerApiTest.php
 tests/Feature/Api/OrderControllerTest.php
 tests/Feature/Api/AuditLogApiTest.php
 tests/Feature/Api/ApiRateLimitTest.php
 tests/Feature/AnalyticsResourceTest.php
-tests/Feature/AnalyticsEventScopeTest.php
 tests/Feature/AdminNavigationSnapshotTest.php

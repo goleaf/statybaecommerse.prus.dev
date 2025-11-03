@@ -85,7 +85,15 @@ final class AuthServiceProvider extends ServiceProvider
 
         if ($this->app->runningUnitTests()) {
             // Grant blanket access in tests so feature assertions can focus on rendered UI states.
-            Gate::before(static fn ($user, ?string $ability = null): ?bool => true);
+            // However, respect the skip_checks config setting to allow proper authorization testing.
+            Gate::before(static function ($user, ?string $ability = null): ?bool {
+                // If skip_checks is false, don't bypass authorization checks
+                if (! (bool) config('authorization.testing.skip_checks', true)) {
+                    return null;
+                }
+                
+                return true;
+            });
         }
 
         // Allow privileged admin roles to bypass granular authorization checks

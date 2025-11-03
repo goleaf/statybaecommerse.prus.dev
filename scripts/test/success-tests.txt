@@ -495,3 +495,5 @@ tests/Feature/Admin/AttributeValueTranslationControllerTest.php
 tests/Feature/AddressResourceTest.php
 tests/Feature/ActivityLogResourceTest.php
 tests/Admin/CustomerResourceTest.php
+tests/Feature/AnalyticsEventScopeTest.php
+tests/Feature/Api/PartnerApiTest.php

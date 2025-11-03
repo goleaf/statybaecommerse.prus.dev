@@ -1,0 +1,146 @@
+[
+    {
+        "label": "admin.navigation.dashboard",
+        "label_key": "admin.navigation.dashboard",
+        "icon": "heroicon-o-home",
+        "sort": 0
+    },
+    {
+        "label": "admin.navigation.commerce",
+        "label_key": "admin.navigation.commerce",
+        "icon": "heroicon-o-shopping-bag",
+        "sort": 1
+    },
+    {
+        "label": "admin.navigation.products",
+        "label_key": "admin.navigation.products",
+        "icon": "heroicon-o-cube",
+        "sort": 2
+    },
+    {
+        "label": "Orders",
+        "label_key": "Orders",
+        "icon": "heroicon-o-shopping-bag",
+        "sort": 2
+    },
+    {
+        "label": "admin.navigation.marketing",
+        "label_key": "admin.navigation.marketing",
+        "icon": "heroicon-o-megaphone",
+        "sort": 3
+    },
+    {
+        "label": "admin.navigation.content",
+        "label_key": "admin.navigation.content",
+        "icon": "heroicon-o-document-text",
+        "sort": 4
+    },
+    {
+        "label": "admin.navigation.analytics",
+        "label_key": "admin.navigation.analytics",
+        "icon": "heroicon-o-chart-bar",
+        "sort": 5
+    },
+    {
+        "label": "admin.navigation.system",
+        "label_key": "admin.navigation.system",
+        "icon": "heroicon-o-cog-6-tooth",
+        "sort": 6
+    },
+    {
+        "label": "translations.recommendation_system",
+        "label_key": "translations.recommendation_system",
+        "icon": "heroicon-o-sparkles",
+        "sort": 7
+    },
+    {
+        "label": "Campaigns",
+        "label_key": "Campaigns",
+        "icon": "heroicon-o-megaphone",
+        "sort": 7
+    },
+    {
+        "label": "Inventory",
+        "label_key": "Inventory",
+        "icon": "heroicon-o-archive-box",
+        "sort": 110
+    },
+    {
+        "label": "Customers",
+        "label_key": "Customers",
+        "icon": "heroicon-o-user-group",
+        "sort": 210
+    },
+    {
+        "label": "Users",
+        "label_key": "Users",
+        "icon": "heroicon-o-users",
+        "sort": 220
+    },
+    {
+        "label": "Discounts",
+        "label_key": "Discounts",
+        "icon": "heroicon-o-tag",
+        "sort": 320
+    },
+    {
+        "label": "Referral",
+        "label_key": "Referral",
+        "icon": "heroicon-o-gift",
+        "sort": 330
+    },
+    {
+        "label": "Content Management",
+        "label_key": "Content Management",
+        "icon": "heroicon-o-folder",
+        "sort": 410
+    },
+    {
+        "label": "Settings",
+        "label_key": "Settings",
+        "icon": "heroicon-o-cog-6-tooth",
+        "sort": 600
+    },
+    {
+        "label": "Sistema",
+        "label_key": "Sistema",
+        "icon": null,
+        "sort": null
+    },
+    {
+        "label": "Security",
+        "label_key": "Security",
+        "icon": null,
+        "sort": null
+    },
+    {
+        "label": "Analitika",
+        "label_key": "Analitika",
+        "icon": null,
+        "sort": null
+    },
+    {
+        "label": "Dokumentai",
+        "label_key": "Dokumentai",
+        "icon": null,
+        "sort": null
+    },
+    {
+        "label": "Klientų valdymas",
+        "label_key": "Klientų valdymas",
+        "icon": null,
+        "sort": null
+    },
+    {
+        "label": "Documents",
+        "label_key": "Documents",
+        "icon": null,
+        "sort": null
+    },
+    {
+        "label": "Nuolaidos",
+        "label_key": "Nuolaidos",
+        "icon": null,
+        "sort": null
+    }
+]
