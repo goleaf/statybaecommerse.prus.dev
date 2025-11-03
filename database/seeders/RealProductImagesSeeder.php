@@ -25,7 +25,7 @@ final class RealProductImagesSeeder extends Seeder
 
         // Get existing products or create some if none exist
         $products = Product::query()
-            ->with('media', 'category')
+            ->with(['media', 'categories'])
             ->get()
             ->filter(function ($product) {
                 if (! $product->hasMedia('images')) {
@@ -57,7 +57,7 @@ final class RealProductImagesSeeder extends Seeder
                 $this->command->info("Generating image for product: {$product->name}");
 
                 // Get category name for styling
-                $categoryName = $product->category?->name ?? 'general';
+                $categoryName = $product->categories->first()?->name ?? 'general';
 
                 // Generate local WebP image
                 $imagePath = $this->imageGenerator->generateProductImage(
