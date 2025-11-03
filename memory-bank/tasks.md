@@ -200,6 +200,14 @@ Type: Complex System
    - [ ] Run `php artisan test` after each merge batch to validate builds
    - [ ] Delete merged branches locally/remotely and prune stale references
    - [ ] Capture merge notes for bilingual release documentation
+1. **ProductFeatureSeeder unique constraint remediation (2025-11-03 — active)**
+   - [ ] Audit generated feature permutations to ensure `(product_id, feature_type, feature_key)` uniqueness
+   - [ ] Refactor seeder logic to enforce unique combinations while preserving localized feature values
+   - [ ] Re-run targeted seeder/database tests to confirm constraint stability on SQLite and MySQL
+2. **ProductVariantSeeder attribute slug stabilization (2025-11-03 — active)**
+   - [x] Reuse existing attribute records when seeding to avoid duplicate slug collisions
+   - [x] Ensure attribute values are upserted rather than blindly inserted to maintain unique `slug` constraints
+   - [x] Validate ProductVariant seeding workflow through targeted artisan seeder execution on SQLite/MySQL
 1. **Admin Access Resolution** ✅ COMPLETED
    - [x] Fix Filament panel login redirect issues
    - [x] Verify admin dashboard accessibility

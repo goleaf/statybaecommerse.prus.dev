@@ -31,18 +31,16 @@ final class ProductVariantSeeder extends Seeder
     private function createAttributes(): void
     {
         // Create size attribute using factory
-        $sizeAttribute = Attribute::factory()
-            ->state([
-                'slug'          => 'size',
-                'name'          => 'Size',
-                'type'          => 'select',
-                'is_required'   => true,
-                'is_filterable' => true,
-                'is_searchable' => false,
-                'is_enabled'    => true,
-                'sort_order'    => 1,
-            ])
-            ->create();
+        $sizeAttribute = $this->ensureAttribute([
+            'slug'          => 'size',
+            'name'          => 'Size',
+            'type'          => 'select',
+            'is_required'   => true,
+            'is_filterable' => true,
+            'is_searchable' => false,
+            'is_enabled'    => true,
+            'sort_order'    => 1,
+        ]);
 
         $sizes = [
             ['value' => 'XS', 'display' => 'Extra Small', 'sort_order' => 1],
@@ -54,30 +52,25 @@ final class ProductVariantSeeder extends Seeder
         ];
 
         foreach ($sizes as $size) {
-            AttributeValue::factory()
-                ->for($sizeAttribute)
-                ->state([
-                    'value'         => $size['value'],
-                    'slug'          => Str::slug($size['value']),
-                    'display_value' => $size['display'],
-                    'sort_order'    => $size['sort_order'],
-                    'is_enabled'    => true,
-                ])
-                ->create();
+            $this->ensureAttributeValue($sizeAttribute, [
+                'value'         => $size['value'],
+                'slug'          => Str::slug($size['value']),
+                'display_value' => $size['display'],
+                'sort_order'    => $size['sort_order'],
+                'is_enabled'    => true,
+            ]);
         }
 
-        $colorAttribute = Attribute::factory()
-            ->state([
-                'slug'          => 'color',
-                'name'          => 'Color',
-                'type'          => 'select',
-                'is_required'   => false,
-                'is_filterable' => true,
-                'is_searchable' => false,
-                'is_enabled'    => true,
-                'sort_order'    => 2,
-            ])
-            ->create();
+        $colorAttribute = $this->ensureAttribute([
+            'slug'          => 'color',
+            'name'          => 'Color',
+            'type'          => 'select',
+            'is_required'   => false,
+            'is_filterable' => true,
+            'is_searchable' => false,
+            'is_enabled'    => true,
+            'sort_order'    => 2,
+        ]);
 
         $colors = [
             ['value' => 'Black', 'hex' => '#000000', 'sort_order' => 1],
@@ -91,30 +84,25 @@ final class ProductVariantSeeder extends Seeder
         ];
 
         foreach ($colors as $color) {
-            AttributeValue::factory()
-                ->for($colorAttribute)
-                ->state([
-                    'value'      => $color['value'],
-                    'slug'       => Str::slug($color['value']),
-                    'hex_color'  => $color['hex'],
-                    'sort_order' => $color['sort_order'],
-                    'is_enabled' => true,
-                ])
-                ->create();
+            $this->ensureAttributeValue($colorAttribute, [
+                'value'      => $color['value'],
+                'slug'       => Str::slug($color['value']),
+                'hex_color'  => $color['hex'],
+                'sort_order' => $color['sort_order'],
+                'is_enabled' => true,
+            ]);
         }
 
-        $materialAttribute = Attribute::factory()
-            ->state([
-                'slug'          => 'material',
-                'name'          => 'Material',
-                'type'          => 'select',
-                'is_required'   => false,
-                'is_filterable' => true,
-                'is_searchable' => false,
-                'is_enabled'    => true,
-                'sort_order'    => 3,
-            ])
-            ->create();
+        $materialAttribute = $this->ensureAttribute([
+            'slug'          => 'material',
+            'name'          => 'Material',
+            'type'          => 'select',
+            'is_required'   => false,
+            'is_filterable' => true,
+            'is_searchable' => false,
+            'is_enabled'    => true,
+            'sort_order'    => 3,
+        ]);
 
         $materials = [
             ['value' => 'Cotton', 'sort_order' => 1],
@@ -126,15 +114,12 @@ final class ProductVariantSeeder extends Seeder
         ];
 
         foreach ($materials as $material) {
-            AttributeValue::factory()
-                ->for($materialAttribute)
-                ->state([
-                    'value'      => $material['value'],
-                    'slug'       => Str::slug($material['value']),
-                    'sort_order' => $material['sort_order'],
-                    'is_enabled' => true,
-                ])
-                ->create();
+            $this->ensureAttributeValue($materialAttribute, [
+                'value'      => $material['value'],
+                'slug'       => Str::slug($material['value']),
+                'sort_order' => $material['sort_order'],
+                'is_enabled' => true,
+            ]);
         }
     }
 
@@ -162,15 +147,13 @@ final class ProductVariantSeeder extends Seeder
             }
         }
 
-        $category = Category::factory()
-            ->state([
-                'slug'        => 'clothing',
-                'name'        => 'Clothing',
-                'description' => 'Clothing category',
-                'is_enabled'  => true,
-                'is_visible'  => true,
-            ])
-            ->create();
+        $category = $this->ensureCategory([
+            'slug'        => 'clothing',
+            'name'        => 'Clothing',
+            'description' => 'Clothing category',
+            'is_enabled'  => true,
+            'is_visible'  => true,
+        ]);
 
         $products = [
             [
@@ -243,44 +226,12 @@ final class ProductVariantSeeder extends Seeder
         ];
 
         foreach ($products as $productData) {
-            $product = Product::factory()
-                ->for($brand)
-                ->hasAttached($category)
-                ->state([
-                    'name'              => $productData['name'],
-                    'slug'              => Str::slug($productData['name']),
-                    'description'       => $productData['description'],
-                    'short_description' => substr($productData['description'], 0, 100),
-                    'price'             => $productData['base_price'],
-                    'compare_price'     => $productData['base_price'] * 1.2,
-                    'cost_price'        => $productData['base_price'] * 0.6,
-                    'manage_stock'      => true,
-                    'stock_quantity'    => 0,
-                    'type'              => 'variable',
-                    'is_visible'        => true,
-                    'is_featured'       => true,
-                    'published_at'      => now(),
-                ])
-                ->create();
+            $product = $this->ensureProduct($brand, $category, $productData);
 
             $this->syncProductTranslations($product, $productData);
 
             foreach ($productData['variants'] as $index => $variantData) {
-                $variant = ProductVariant::factory()
-                    ->for($product)
-                    ->state([
-                        'name'            => $productData['name'] . ' - ' . $variantData['size'],
-                        'sku'             => $product->sku . '-' . $variantData['size'],
-                        'price'           => $productData['base_price'] + $variantData['price_modifier'],
-                        'compare_price'   => ($productData['base_price'] + $variantData['price_modifier']) * 1.2,
-                        'cost_price'      => ($productData['base_price'] + $variantData['price_modifier']) * 0.6,
-                        'stock_quantity'  => $variantData['stock'],
-                        'is_default'      => $index === 0,
-                        'track_inventory' => true,
-                        'is_enabled'      => true,
-                        'attributes'      => ['size' => $variantData['size']],
-                    ])
-                    ->create();
+                $variant = $this->ensureVariant($product, $productData, $variantData, $index);
 
                 $this->syncVariantTranslations($variant, $variantData, $productData);
 
@@ -311,91 +262,196 @@ final class ProductVariantSeeder extends Seeder
                     ProductVariantAttributeMatrixService::sync($variant->fresh(), $matrix);
                 }
 
-                VariantInventory::factory()
-                    ->for($variant)
-                    ->state([
-                        'warehouse_code'   => 'main',
+                VariantInventory::query()->updateOrCreate(
+                    [
+                        'variant_id'     => $variant->getKey(),
+                        'warehouse_code' => 'main',
+                    ],
+                    [
                         'stock'            => $variantData['stock'],
                         'reserved'         => 0,
                         'available'        => $variantData['stock'],
                         'reorder_point'    => 10,
                         'reorder_quantity' => 50,
-                    ])
-                    ->create();
+                    ],
+                );
             }
         }
+    }
+
+    /**
+     * Ensure attribute exists and stays synchronized.
+     */
+    private function ensureAttribute(array $state): Attribute
+    {
+        $attribute = Attribute::query()->firstWhere('slug', $state['slug']);
+
+        if ($attribute === null) {
+            return Attribute::factory()->state($state)->create();
+        }
+
+        $attribute->forceFill($state);
+        $attribute->save();
+
+        return $attribute->fresh();
+    }
+
+    /**
+     * Ensure attribute value exists for given attribute.
+     */
+    private function ensureAttributeValue(Attribute $attribute, array $state): AttributeValue
+    {
+        $state['slug'] ??= Str::slug($state['value']);
+
+        $value = $attribute->values()->firstWhere('slug', $state['slug']);
+
+        if ($value === null) {
+            return AttributeValue::factory()
+                ->for($attribute)
+                ->state($state)
+                ->create();
+        }
+
+        $value->forceFill($state);
+        $value->save();
+
+        return $value->fresh();
+    }
+
+    /**
+     * Ensure category exists and is kept in sync.
+     */
+    private function ensureCategory(array $state): Category
+    {
+        $category = Category::query()->firstWhere('slug', $state['slug']);
+
+        if ($category === null) {
+            return Category::factory()->state($state)->create();
+        }
+
+        $category->forceFill($state);
+        $category->save();
+
+        return $category->fresh();
+    }
+
+    /**
+     * Ensure product exists for brand/category combination.
+     */
+    private function ensureProduct(Brand $brand, Category $category, array $productData): Product
+    {
+        $slug = Str::slug($productData['name']);
+        $state = [
+            'name'              => $productData['name'],
+            'slug'              => $slug,
+            'description'       => $productData['description'],
+            'short_description' => substr($productData['description'], 0, 100),
+            'price'             => $productData['base_price'],
+            'compare_price'     => $productData['base_price'] * 1.2,
+            'cost_price'        => $productData['base_price'] * 0.6,
+            'manage_stock'      => true,
+            'stock_quantity'    => 0,
+            'type'              => 'variable',
+            'is_visible'        => true,
+            'is_featured'       => true,
+            'published_at'      => now(),
+        ];
+
+        $product = Product::query()->where('slug', $slug)->first();
+
+        if ($product === null) {
+            $product = Product::factory()
+                ->for($brand)
+                ->hasAttached($category)
+                ->state($state)
+                ->create();
+        } else {
+            $product->forceFill($state);
+            $product->save();
+            $product->categories()->syncWithoutDetaching([$category->getKey()]);
+        }
+
+        return $product->fresh();
+    }
+
+    /**
+     * Ensure product variant exists and is updated.
+     */
+    private function ensureVariant(Product $product, array $productData, array $variantData, int $index): ProductVariant
+    {
+        $name = $productData['name'] . ' - ' . $variantData['size'];
+        $baseSku = $product->sku ?? Str::upper(Str::slug($productData['name'], '-'));
+        $sku = $baseSku . '-' . Str::slug((string) $variantData['size'], '-');
+        $state = [
+            'name'            => $name,
+            'sku'             => $sku,
+            'price'           => $productData['base_price'] + $variantData['price_modifier'],
+            'compare_price'   => ($productData['base_price'] + $variantData['price_modifier']) * 1.2,
+            'cost_price'      => ($productData['base_price'] + $variantData['price_modifier']) * 0.6,
+            'stock_quantity'  => $variantData['stock'],
+            'is_default'      => $index === 0,
+            'track_inventory' => true,
+            'is_enabled'      => true,
+            'attributes'      => ['size' => $variantData['size']],
+        ];
+
+        $variant = $product->variants()->where('sku', $sku)->first();
+
+        if ($variant === null) {
+            return ProductVariant::factory()
+                ->for($product)
+                ->state($state)
+                ->create();
+        }
+
+        $variant->forceFill($state);
+        $variant->save();
+
+        return $variant->fresh();
     }
 
     private function createPricingRules(): void
     {
         // Size-based pricing rule for larger sizes
-        $products = Product::where('type', 'variable')->get();
+        $products = Product::where('type', 'variable')->with('variants')->get();
 
         foreach ($products as $product) {
-            VariantPricingRule::factory()
-                ->for($product)
-                ->state([
-                    'rule_name'  => 'Large Size Premium',
-                    'rule_type'  => 'size_based',
-                    'conditions' => [
-                        [
-                            'attribute' => 'size',
-                            'operator'  => 'greater_than',
-                            'value'     => 'L',
-                        ],
-                    ],
-                    'pricing_modifiers' => [
-                        [
-                            'type'       => 'percentage',
-                            'value'      => 5,
-                            'conditions' => [
-                                [
-                                    'attribute' => 'size',
-                                    'operator'  => 'equals',
-                                    'value'     => 'XL',
-                                ],
-                            ],
-                        ],
-                        [
-                            'type'       => 'percentage',
-                            'value'      => 10,
-                            'conditions' => [
-                                [
-                                    'attribute' => 'size',
-                                    'operator'  => 'equals',
-                                    'value'     => 'XXL',
-                                ],
-                            ],
-                        ],
-                    ],
-                    'is_active' => true,
-                    'priority'  => 1,
-                ])
-                ->create();
+            VariantPricingRule::query()->updateOrCreate(
+                [
+                    'product_id' => $product->getKey(),
+                    'name'       => 'Large Size Premium',
+                ],
+                [
+                    'type'               => 'percentage',
+                    'value'              => 5,
+                    'priority'           => 1,
+                    'is_active'          => true,
+                    'is_cumulative'      => false,
+                    'product_variant_id' => optional(
+                        $product->variants->firstWhere(fn (ProductVariant $variant): bool => (
+                            $variant->attributes['size'] ?? null
+                        ) === 'XL')
+                    )->getKey(),
+                    'min_quantity' => null,
+                    'max_quantity' => null,
+                ],
+            );
 
-            // Quantity-based discount rule
-            VariantPricingRule::factory()
-                ->for($product)
-                ->state([
-                    'rule_name'  => 'Bulk Discount',
-                    'rule_type'  => 'quantity_based',
-                    'conditions' => [
-                        [
-                            'attribute' => 'quantity',
-                            'operator'  => 'greater_than',
-                            'value'     => 10,
-                        ],
-                    ],
-                    'pricing_modifiers' => [
-                        [
-                            'type'  => 'percentage',
-                            'value' => -10,  // 10% discount
-                        ],
-                    ],
-                    'is_active' => true,
-                    'priority'  => 2,
-                ])
-                ->create();
+            VariantPricingRule::query()->updateOrCreate(
+                [
+                    'product_id' => $product->getKey(),
+                    'name'       => 'Bulk Discount',
+                ],
+                [
+                    'type'          => 'percentage',
+                    'value'         => -10,
+                    'priority'      => 2,
+                    'is_active'     => true,
+                    'is_cumulative' => true,
+                    'min_quantity'  => 11,
+                    'max_quantity'  => null,
+                ],
+            );
         }
     }
 
