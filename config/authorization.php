@@ -6,6 +6,7 @@ return [
     'guards' => [
         'admin',
         'web',
+        'sanctum',
     ],
 
     'testing' => [

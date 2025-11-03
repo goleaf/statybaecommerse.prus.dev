@@ -21,8 +21,8 @@ final class AuditLogApiTest extends TestCase
 
         config()->set('authorization.testing.skip_checks', false);
 
-        Role::create(['name' => 'admin', 'guard_name' => 'web']);
-        Role::create(['name' => 'viewer', 'guard_name' => 'web']);
+        // Seed permissions and roles for all guards
+        $this->seed(\Database\Seeders\AdminAuthorizationSeeder::class);
     }
 
     public function test_it_returns_paginated_audit_logs_for_entity(): void

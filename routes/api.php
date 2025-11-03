@@ -152,7 +152,7 @@ Route::get('audit-logs', [AuditLogController::class, 'index'])
     ->name('api.audit-logs.index');
 
 Route::prefix('admin/products/{product:id}/histories')
-    ->middleware('auth:sanctum')
+    ->middleware(['auth:sanctum'])
     ->name('api.admin.product-histories.')
     ->group(function (): void {
         Route::get('/', [ApiProductHistoryController::class, 'index'])

@@ -17,3 +17,5 @@ final class RegionTranslation extends Model
 }
 
 
+
+
