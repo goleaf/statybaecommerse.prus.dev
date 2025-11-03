@@ -208,6 +208,23 @@ Type: Complex System
    - [x] Reuse existing attribute records when seeding to avoid duplicate slug collisions
    - [x] Ensure attribute values are upserted rather than blindly inserted to maintain unique `slug` constraints
    - [x] Validate ProductVariant seeding workflow through targeted artisan seeder execution on SQLite/MySQL
+3. **ReferralSeeder referred_id uniqueness remediation (2025-11-03 — new)**
+   - [x] Identify duplicate `referred_id` generation sources within factories and manual inserts
+   - [x] Adjust seeder logic to guarantee unique `referred_id` values per referral record
+   - [x] Re-run `DatabaseSeeder` (SQLite) to ensure the referrals table seeds without constraint violations
+4. **ReferralSystemComprehensiveSeeder referral_code uniqueness remediation (2025-11-03 — new)**
+   - [x] Inspect referral code reuse patterns within comprehensive seeder
+   - [x] Ensure referral code inventory covers requested referral volume and enforce unique assignment
+   - [x] Re-run `ReferralSystemComprehensiveSeeder` against SQLite to confirm uniqueness compliance
+5. **ReferralSystemSeeder referral_code uniqueness remediation (2025-11-03 — new)**
+   - [x] Audit referral code assignment to prevent duplication across sample referrals
+   - [x] Adjust seeder to guarantee unique referral codes per referral record
+   - [x] Normalize referral statistics seeding to respect unique `(user_id, date)` constraints
+   - [x] Re-run `ReferralSystemSeeder` to ensure seed completes without unique constraint violations
+6. **RolePermissionSeeder guard alignment (2025-11-03 — new)**
+   - [x] Audit existing roles and permissions for incorrect guard assignments
+   - [x] Normalize seeder to enforce `admin` guard for all roles and permissions
+   - [x] Re-run `RolePermissionSeeder` to confirm guard mismatch exception is resolved
 1. **Admin Access Resolution** ✅ COMPLETED
    - [x] Fix Filament panel login redirect issues
    - [x] Verify admin dashboard accessibility

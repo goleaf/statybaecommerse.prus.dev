@@ -18,38 +18,46 @@ final class ReferralSystemSeeder extends Seeder
     {
         DB::transaction(function (): void {
             $users = User::factory()->count(15)->create();
-            $codes = $this->createSampleReferralCodes($users);
-            $referrals = $this->createSampleReferrals($codes);
+            $referralTargetCount = 25;
+
+            $codes = $this->createSampleReferralCodes($users, $referralTargetCount);
+            $referrals = $this->createSampleReferrals($codes, $referralTargetCount);
             $this->createSampleRewards($referrals);
             $this->createSampleStatistics($users);
         });
     }
 
-    private function createSampleReferralCodes($users)
+    private function createSampleReferralCodes($users, int $desiredCount)
     {
         return ReferralCode::factory()
-            ->count(20)
+            ->count(max($desiredCount, 20))
             ->state(fn () => [
                 'user_id' => $users->random()->id,
             ])
             ->create();
     }
 
-    private function createSampleReferrals($codes)
+    private function createSampleReferrals($codes, int $desiredCount)
     {
-        return Referral::factory()
-            ->count(25)
-            ->state(function () use ($codes) {
-                $code = $codes->random();
-                $referrer = $code->user;
-                $referred = User::factory()->create();
+        $availableCodes = $codes->shuffle()->take($desiredCount)->values();
 
-                return [
-                    'referrer_id'   => $referrer->id,
-                    'referred_id'   => $referred->id,
-                    'referral_code' => $code->code,
-                ];
-            })
+        if ($availableCodes->count() < $desiredCount) {
+            throw new \RuntimeException('Not enough referral codes to generate unique sample referrals.');
+        }
+
+        $referralSequences = $availableCodes->map(function (ReferralCode $code): array {
+            $referred = User::factory()->create();
+
+            return [
+                'referrer_id'   => $code->user_id,
+                'referred_id'   => $referred->id,
+                'referral_code' => $code->code,
+            ];
+        });
+
+        return Referral::factory()
+            ->count($referralSequences->count())
+            ->sequence(...$referralSequences->all())
             ->create();
     }
 
@@ -73,13 +81,14 @@ final class ReferralSystemSeeder extends Seeder
     private function createSampleStatistics($users): void
     {
         $users->each(function (User $user): void {
-            ReferralStatistics::factory()
-                ->count(30)
-                ->state(fn (array $attributes) => [
-                    'user_id' => $user->id,
-                    'date'    => now()->subDays($attributes['total_referrals'] ?? 0)->toDateString(),
-                ])
-                ->create();
+            collect(range(0, 29))->each(function (int $dayOffset) use ($user): void {
+                ReferralStatistics::factory()
+                    ->state([
+                        'user_id' => $user->id,
+                        'date'    => now()->subDays($dayOffset)->toDateString(),
+                    ])
+                    ->create();
+            });
         });
     }
 }

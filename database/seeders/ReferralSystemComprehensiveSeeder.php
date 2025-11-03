@@ -22,12 +22,14 @@ final class ReferralSystemComprehensiveSeeder extends Seeder
         DB::transaction(function (): void {
             $campaigns = $this->createReferralCampaigns();
             $users = User::factory()->count(30)->create();
-            $codes = $this->createReferralCodes($users, $campaigns);
-            $referrals = $this->createReferrals($codes);
+            $referralTargetCount = 60;
+
+            $codes = $this->createReferralCodes($users, $campaigns, $referralTargetCount);
+            $referrals = $this->createReferrals($codes, $referralTargetCount);
             $rewards = $this->createReferralRewards($referrals);
-            $this->createReferralCodeStatistics($codes);
-            $this->createReferralCodeUsageLogs($codes, $users);
-            $this->createReferralRewardLogs($rewards);
+            $this->createReferralCodeStatistics();
+            $this->createReferralCodeUsageLogs();
+            $this->createReferralRewardLogs();
         });
     }
 
@@ -38,10 +40,10 @@ final class ReferralSystemComprehensiveSeeder extends Seeder
             ->create();
     }
 
-    private function createReferralCodes($users, $campaigns): \Illuminate\Support\Collection
+    private function createReferralCodes($users, $campaigns, int $desiredCount): \Illuminate\Support\Collection
     {
         return ReferralCode::factory()
-            ->count(40)
+            ->count($desiredCount)
             ->state(function () use ($users, $campaigns) {
                 return [
                     'user_id'     => $users->random()->id,
@@ -51,21 +53,27 @@ final class ReferralSystemComprehensiveSeeder extends Seeder
             ->create();
     }
 
-    private function createReferrals($codes): \Illuminate\Support\Collection
+    private function createReferrals($codes, int $desiredCount): \Illuminate\Support\Collection
     {
-        return Referral::factory()
-            ->count(60)
-            ->state(function () use ($codes) {
-                $code = $codes->random();
-                $referrer = $code->user;
-                $referred = User::factory()->create();
+        $availableCodes = $codes->shuffle()->take($desiredCount)->values();
 
-                return [
-                    'referrer_id'   => $referrer->id,
-                    'referred_id'   => $referred->id,
-                    'referral_code' => $code->code,
-                ];
-            })
+        if ($availableCodes->count() < $desiredCount) {
+            throw new \RuntimeException('Not enough referral codes to generate unique referrals.');
+        }
+
+        $referralSequences = $availableCodes->map(function (ReferralCode $code): array {
+            $referred = User::factory()->create();
+
+            return [
+                'referrer_id'   => $code->user_id,
+                'referred_id'   => $referred->id,
+                'referral_code' => $code->code,
+            ];
+        });
+
+        return Referral::factory()
+            ->count($referralSequences->count())
+            ->sequence(...$referralSequences->all())
             ->create();
     }
 

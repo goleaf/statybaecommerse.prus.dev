@@ -17,22 +17,29 @@ final class ReferralSeeder extends Seeder
      */
     public function run(): void
     {
-        $users = User::factory()
+        $referrers = User::factory()
             ->count(20)
             ->has(ReferralCode::factory()->count(1)->active(), 'referralCodes')
             ->create();
 
-        $referrals = Referral::factory()
+        $referredUsers = User::factory()
             ->count(50)
-            ->state(function () use ($users) {
-                $referrer = $users->random();
-                $referred = $users->where('id', '!=', $referrer->id)->random();
+            ->create();
+
+        $referralSequences = $referredUsers
+            ->map(function (User $referred) use ($referrers): array {
+                $referrer = $referrers->random();
 
                 return [
                     'referrer_id' => $referrer->id,
                     'referred_id' => $referred->id,
                 ];
             })
+            ->all();
+
+        $referrals = Referral::factory()
+            ->count(count($referralSequences))
+            ->sequence(...$referralSequences)
             ->create();
 
         $referrals->each(function (Referral $referral): void {
@@ -71,7 +78,7 @@ final class ReferralSeeder extends Seeder
 
         $this->command->info('Referral system seeded successfully!');
         $this->command->info('Created:');
-        $this->command->info('- ' . $users->count() . ' users');
+        $this->command->info('- ' . ($referrers->count() + $referredUsers->count()) . ' users');
         $this->command->info('- ' . $referrals->count() . ' referrals');
         $this->command->info('- ' . ReferralCode::count() . ' referral codes');
         $this->command->info('- ' . ReferralReward::count() . ' referral rewards');
