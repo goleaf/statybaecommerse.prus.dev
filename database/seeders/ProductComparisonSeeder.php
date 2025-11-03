@@ -46,7 +46,22 @@ final class ProductComparisonSeeder extends Seeder
                 continue;
             }
 
-            $this->pickProducts($products, 3, 7)->each(function (Product $product) use ($sessionId): void {
+            // Get products already in this session to avoid duplicates
+            $existingProductIds = ProductComparison::query()
+                ->where('session_id', $sessionId)
+                ->pluck('product_id')
+                ->toArray();
+
+            // Filter out products already in this session
+            $availableProducts = $products->reject(function (Product $product) use ($existingProductIds): bool {
+                return in_array($product->id, $existingProductIds, true);
+            });
+
+            if ($availableProducts->isEmpty()) {
+                continue;
+            }
+
+            $this->pickProducts($availableProducts, 3, 7)->each(function (Product $product) use ($sessionId): void {
                 ProductComparison::factory()
                     ->forSession($sessionId)
                     ->forProduct($product)
@@ -59,16 +74,40 @@ final class ProductComparisonSeeder extends Seeder
     private function createUserComparisons(Collection $users, Collection $products): void
     {
         $users->take(5)->each(function (User $user) use ($products): void {
-            $userSessions = rand(2, 5);
+            // Get all products already assigned to this user
+            $existingProductIds = ProductComparison::query()
+                ->where('user_id', $user->id)
+                ->pluck('product_id')
+                ->toArray();
 
-            for ($i = 0; $i < $userSessions; $i++) {
+            // Filter out products already assigned to this user
+            $availableProducts = $products->reject(function (Product $product) use ($existingProductIds): bool {
+                return in_array($product->id, $existingProductIds, true);
+            });
+
+            if ($availableProducts->isEmpty()) {
+                return;
+            }
+
+            $userSessions = rand(2, 5);
+            $remainingProducts = $availableProducts;
+
+            for ($i = 0; $i < $userSessions && ! $remainingProducts->isEmpty(); $i++) {
                 $sessionId = 'user_' . $user->id . '_session_' . ($i + 1);
 
                 if (ProductComparison::query()->where('session_id', $sessionId)->exists()) {
                     continue;
                 }
 
-                $this->pickProducts($products, 2, 6)->each(function (Product $product) use ($user, $sessionId): void {
+                $sessionProducts = $this->pickProducts($remainingProducts, 2, 6);
+
+                // Remove selected products from remaining pool
+                $selectedProductIds = $sessionProducts->pluck('id')->toArray();
+                $remainingProducts = $remainingProducts->reject(function (Product $product) use ($selectedProductIds): bool {
+                    return in_array($product->id, $selectedProductIds, true);
+                });
+
+                $sessionProducts->each(function (Product $product) use ($user, $sessionId): void {
                     ProductComparison::factory()
                         ->forUser($user)
                         ->forSession($sessionId)
@@ -96,11 +135,27 @@ final class ProductComparisonSeeder extends Seeder
             $createdAt = now()->subDays(rand(0, 7));
 
             $sessionProducts->each(function (Product $product) use ($users, $sessionId, $createdAt): void {
+                // Find a user who doesn't already have this product
+                $userIds = $users->pluck('id')->toArray();
+                $availableUserIds = array_filter($userIds, function (int $userId) use ($product): bool {
+                    return ! ProductComparison::query()
+                        ->where('user_id', $userId)
+                        ->where('product_id', $product->id)
+                        ->exists();
+                });
+
+                if (empty($availableUserIds)) {
+                    // If all users already have this product, skip it
+                    return;
+                }
+
+                $userId = $availableUserIds[array_rand($availableUserIds)];
+
                 ProductComparison::factory()
                     ->forSession($sessionId)
                     ->forProduct($product)
                     ->state([
-                        'user_id'    => $users->random()->id,
+                        'user_id'    => $userId,
                         'created_at' => $createdAt,
                         'updated_at' => $createdAt,
                     ])

@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="/www/wwwroot/statybaecommerse.prus.dev/phpunit.xml" tests="1" assertions="1" errors="0" failures="1" skipped="0" time="16.979661">
-    <testsuite name="Feature" tests="1" assertions="1" errors="0" failures="1" skipped="0" time="16.979661">
-      <testsuite name="Tests\Feature\Api\AuditLogApiTest" file="Audit Log Api (Tests\Feature\Api\AuditLogApi)" tests="1" assertions="1" errors="0" failures="1" skipped="0" time="16.979661">
-        <testcase name="Viewer role is forbidden from audit logs" file="Audit Log Api (Tests\Feature\Api\AuditLogApi)::Viewer role is forbidden from audit logs" class="Tests\Feature\Api\AuditLogApiTest" classname="Tests.Feature.Api.AuditLogApiTest" assertions="1" time="16.979661">
-          <failure type="PHPUnit\Framework\ExpectationFailedException">Viewer role is forbidden from audit logsExpected response status code [403] but received 200.
+  <testsuite name="/www/wwwroot/statybaecommerse.prus.dev/phpunit.xml" tests="1" assertions="2" errors="0" failures="1" skipped="0" time="16.608200">
+    <testsuite name="Feature" tests="1" assertions="2" errors="0" failures="1" skipped="0" time="16.608200">
+      <testsuite name="Tests\Feature\Api\ProductHistoryAdminApiTest" file="Product History Admin Api (Tests\Feature\Api\ProductHistoryAdminApi)" tests="1" assertions="2" errors="0" failures="1" skipped="0" time="16.608200">
+        <testcase name="Viewer cannot list product histories" file="Product History Admin Api (Tests\Feature\Api\ProductHistoryAdminApi)::Viewer cannot list product histories" class="Tests\Feature\Api\ProductHistoryAdminApiTest" classname="Tests.Feature.Api.ProductHistoryAdminApiTest" assertions="2" time="16.608200">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">Viewer cannot list product historiesExpected response status code [403] but received 200.
 Failed asserting that 200 is identical to 403.
 at vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:45
 at vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:174
 at vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:141
-at tests/Feature/Api/AuditLogApiTest.php:88</failure>
+at tests/Feature/Api/ProductHistoryAdminApiTest.php:95</failure>
         </testcase>
       </testsuite>
     </testsuite>
