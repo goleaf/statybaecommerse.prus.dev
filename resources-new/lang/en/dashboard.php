@@ -1,0 +1,26 @@
+<?php
+
+return [
+    'total_users' => 'Total Users',
+    'total_products' => 'Total Products',
+    'total_orders' => 'Total Orders',
+    'total_categories' => 'Total Categories',
+    'recent_users' => 'Recent Users',
+    'recent_products' => 'Recent Products',
+    'recent_orders' => 'Recent Orders',
+    'active_users' => 'Active Users',
+    'published_products' => 'Published Products',
+    'completed_orders' => 'Completed Orders',
+    'users_description' => 'Total registered users',
+    'products_description' => 'Total products in catalog',
+    'orders_description' => 'Total orders placed',
+    'categories_description' => 'Total product categories',
+    'last_7_days' => 'Last 7 days',
+    'active_description' => 'Currently active users',
+    'published_description' => 'Published products',
+    'completed_description' => 'Successfully delivered orders',
+    'product_views' => 'Product Views',
+    'recent_activity' => 'Recent Activity',
+    'system_health' => 'System Health',
+    'performance_metrics' => 'Performance Metrics',
+];
