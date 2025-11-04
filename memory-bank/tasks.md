@@ -229,6 +229,10 @@ Type: Complex System
    - [x] Inspect settings seeder for repeated `key` inserts causing unique constraint violations
    - [x] Refactor seeder to upsert settings records instead of blindly creating duplicates
    - [x] Re-run `SettingsSeeder` to ensure the unique constraint is satisfied
+8. **SimpleSystemSettingsSeeder attribution columns (2025-11-03 — new)**
+   - [ ] Add missing `created_by_name` / `updated_by_name` columns to `system_settings`
+   - [ ] Update model fillable attributes to accept attribution names
+   - [~] Re-run `php artisan migrate:fresh --seed` verifying seeder passes (in progress)
 1. **Admin Access Resolution** ✅ COMPLETED
    - [x] Fix Filament panel login redirect issues
    - [x] Verify admin dashboard accessibility

@@ -23,4 +23,7 @@
 20. ✅ Audit `SettingsSeeder` for duplicate key inserts causing constraint violations.
 21. ✅ Refactor `SettingsSeeder` to upsert settings instead of creating duplicates.
 22. ✅ Re-run `SettingsSeeder` to verify the unique constraint is respected.
+23. ⏳ Add missing attribution name columns to `system_settings` for seeder compatibility.
+24. ⏳ Update `SystemSetting` model fillable properties for attribution fields.
+25. ⏳ Re-run `php artisan migrate:fresh --seed` and confirm success.
 
