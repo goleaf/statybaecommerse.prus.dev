@@ -1,0 +1,26 @@
+<?php
+
+return [
+    'total_users' => 'Iš viso vartotojų',
+    'total_products' => 'Iš viso produktų',
+    'total_orders' => 'Iš viso užsakymų',
+    'total_categories' => 'Iš viso kategorijų',
+    'recent_users' => 'Nauji vartotojai',
+    'recent_products' => 'Nauji produktai',
+    'recent_orders' => 'Nauji užsakymai',
+    'active_users' => 'Aktyvūs vartotojai',
+    'published_products' => 'Publikuoti produktai',
+    'completed_orders' => 'Užbaigti užsakymai',
+    'users_description' => 'Iš viso registruotų vartotojų',
+    'products_description' => 'Iš viso produktų kataloge',
+    'orders_description' => 'Iš viso pateiktų užsakymų',
+    'categories_description' => 'Iš viso produktų kategorijų',
+    'last_7_days' => 'Paskutinės 7 dienos',
+    'active_description' => 'Šiuo metu aktyvūs vartotojai',
+    'published_description' => 'Publikuoti produktai',
+    'completed_description' => 'Sėkmingai pristatyti užsakymai',
+    'product_views' => 'Produktų peržiūros',
+    'recent_activity' => 'Naujausia veikla',
+    'system_health' => 'Sistemos būsena',
+    'performance_metrics' => 'Veiklos rodikliai',
+];
