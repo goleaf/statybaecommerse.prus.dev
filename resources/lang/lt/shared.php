@@ -38,6 +38,7 @@ return [
         'create' => 'Sukurti',
     ],
     'close'    => 'Uždaryti',
+    'navigation' => 'Navigacija',
     'back'     => 'Atgal',
     'next'     => 'Toliau',
     'previous' => 'Ankstesnis',

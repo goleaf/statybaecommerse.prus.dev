@@ -928,5 +928,9 @@
     "Fetching real-time shipping quotes…": "Gaunami pristatymo pasiūlymai realiu laiku…",
     "Recalculating delivery options…": "Perskaičiuojami pristatymo variantai…",
     "Shipping capped at :amount": "Pristatymo kaina ribojama iki :amount",
-    "Live quote from resolver": "Skaičiuoklės pateikta kaina"
+    "Live quote from resolver": "Skaičiuoklės pateikta kaina",
+    "nav_collections": "Kolekcijos",
+    "nav_downloads": "Atsisiuntimai",
+    "nav_vendor_catalogs": "Tiekėjų katalogai",
+    "nav_support_center": "Pagalbos centras"
 }

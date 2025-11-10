@@ -1,4 +1,4 @@
-<div class="border-b border-slate-200 bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/70 shadow-sm">
+<nav class="w-full relative z-50 overflow-visible">
     @php
         $locale = app()->getLocale();
         $homeUrl = Route::has('localized.home')
@@ -29,299 +29,183 @@
                     : url('/' . $locale . '/brands'),
             ],
             [
+                'key' => 'downloads',
+                'label' => __('nav_downloads'),
+                'url' => '#',
+            ],
+            [
+                'key' => 'vendor_catalogs',
+                'label' => __('nav_vendor_catalogs'),
+                'url' => '#',
+            ],
+            [
                 'key' => 'support',
-                'label' => __('support_centre'),
+                'label' => __('nav_support_center'),
                 'url' => 'mailto:support@statybae.com',
             ],
         ])->filter(fn($link) => !empty($link['url']));
-
-        $categoryFeature = config('app-features.features.category') ?? null;
-        $featureEnabled =
-            $categoryFeature instanceof \App\Support\FeatureState
-                ? $categoryFeature === \App\Support\FeatureState::Enabled
-                : (is_string($categoryFeature)
-                    ? strtolower($categoryFeature) === strtolower(\App\Support\FeatureState::Enabled->value)
-                    : (bool) $categoryFeature);
     @endphp
 
-
-    <div class="hidden lg:block bg-slate-900 text-slate-100">
-        <x-container class="px-4">
-            <div class="flex items-center justify-between gap-6 py-2 text-[13px]">
-                <div class="flex items-center gap-6">
-                    <span class="inline-flex items-center gap-2 font-semibold tracking-wide uppercase text-slate-200">
-                        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        {{ __('Fast next-day delivery across Lithuania') }}
-                    </span>
-                    <span class="inline-flex items-center gap-2 text-slate-300">
-                        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5"
-                             viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                  d="M12 11c0 1.657-1.343 3-3 3s-3-1.343-3-3 1.343-3 3-3 3 1.343 3 3z" />
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                  d="M19.4 15a1.65 1.65 0 01.4 1.09V18a2 2 0 01-2 2H6.2a2 2 0 01-2-2v-1.91A1.65 1.65 0 014.6 15c1.359-1.088 3.315-2 5.4-2s4.041.912 5.4 2z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M18 8V5a1 1 0 00-1-1h-2" />
-                        </svg>
-                        {{ __('Secure payments & 30-day returns') }}
-                    </span>
-                </div>
-                <div class="flex items-center gap-5 text-slate-300">
-                    @if (Route::has('localized.locations.index'))
-                        <a href="{{ route('localized.locations.index', ['locale' => $locale]) }}"
-                           class="inline-flex items-center gap-2 hover:text-white transition-colors">
-                            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5"
-                                 viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                      d="M12 11c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3z" />
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                      d="M19.5 9c0 7.5-7.5 12-7.5 12S4.5 16.5 4.5 9a7.5 7.5 0 1115 0z" />
-                            </svg>
-                            {{ __('Store locator') }}
-                        </a>
-                    @endif
-                    <span class="inline-flex items-center gap-2">
-                        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5"
-                             viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                  d="M2.25 6.75c0 2.138 1.912 3.75 3.75 3.75s3.75-1.612 3.75-3.75S8.838 3 6 3 2.25 4.612 2.25 6.75zM2.25 17.25c0 2.138 1.912 3.75 3.75 3.75S9.75 19.388 9.75 17.25 7.838 13.5 6 13.5s-3.75 1.612-3.75 3.75zM14.25 6.75c0 2.138 1.912 3.75 3.75 3.75s3.75-1.612 3.75-3.75S20.088 3 18.25 3s-3.75 1.612-3.75 3.75zM14.25 17.25c0 2.138 1.912 3.75 3.75 3.75s3.75-1.612 3.75-3.75-1.912-3.75-3.75-3.75-3.75 1.612-3.75 3.75z" />
-                        </svg>
-                        {{ __('company_phone') }}
-                    </span>
-                    <a href="mailto:{{ __('company_email') }}"
-                       class="inline-flex items-center gap-2 hover:text-white transition-colors">
-                        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5"
-                             viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                  d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                        </svg>
-                        {{ __('company_email') }}
-                    </a>
-                </div>
-            </div>
-        </x-container>
-    </div>
-
-    <x-container class="px-4">
-        <div class="flex flex-col gap-4 py-4 lg:flex-row lg:items-center lg:justify-between">
-            <div class="flex items-center gap-4 flex-1">
-                <button type="button"
-                        class="lg:hidden inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white p-2.5 text-slate-700 shadow-sm hover:border-blue-300 hover:text-blue-600 transition"
-                        wire:click="toggleMobileMenu"
-                        wire:confirm="{{ __('translations.confirm_toggle_mobile_menu') }}"
-                        aria-label="{{ __('nav_toggle') }}">
-                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+    {{-- Top utility bar with contact info and social links --}}
+    <section class="text-dark border-b border-ash bg-sage">
+        <div class="container mx-auto flex justify-between gap-10 h-9 px-5">
+            <div class="flex items-center gap-5 sm:gap-8">
+                <a href="tel:{{ __('frontend/header.topbar.phone_href') }}" class="flex items-center group gap-2 hover:text-stone transition-colors">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 2.138 1.912 3.75 3.75 3.75s3.75-1.612 3.75-3.75S8.838 3 6 3 2.25 4.612 2.25 6.75zM2.25 17.25c0 2.138 1.912 3.75 3.75 3.75S9.75 19.388 9.75 17.25 7.838 13.5 6 13.5s-3.75 1.612-3.75 3.75zM14.25 6.75c0 2.138 1.912 3.75 3.75 3.75s3.75-1.612 3.75-3.75S20.088 3 18.25 3s-3.75 1.612-3.75 3.75zM14.25 17.25c0 2.138 1.912 3.75 3.75 3.75s3.75-1.612 3.75-3.75-1.912-3.75-3.75-3.75-3.75 1.612-3.75 3.75z" />
                     </svg>
-                </button>
+                    <span class="hidden sm:block">{{ __('frontend/header.topbar.phone') }}</span>
+                </a>
+                <a href="mailto:{{ __('frontend/header.topbar.email_href') }}" class="flex items-center group gap-2 hover:text-stone transition-colors">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    <span class="hidden sm:block">{{ __('frontend/header.topbar.email') }}</span>
+                </a>
+                @if (Route::has('localized.locations.index'))
+                    <a href="{{ route('localized.locations.index', ['locale' => $locale]) }}" class="flex items-center group gap-2 hover:text-stone transition-colors">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 11c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 9c0 7.5-7.5 12-7.5 12S4.5 16.5 4.5 9a7.5 7.5 0 1115 0z" />
+                        </svg>
+                        <span class="hidden sm:block">{{ __('frontend/header.topbar.store_locator') }}</span>
+                    </a>
+                @endif
+            </div>
 
-                <a href="{{ $homeUrl }}" class="group flex items-center gap-3" aria-label="{{ __('nav_home') }}">
-                    <div class="relative">
-                        <img src="{{ asset('images/hero.png') }}" alt="{{ config('app.name') }}"
-                             class="h-11 w-11 rounded-2xl border border-slate-200 bg-white object-cover shadow-sm transition-all duration-300 group-hover:scale-105 group-hover:shadow-lg"
-                             width="44" height="44" />
-                        <span
-                              class="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></span>
-                    </div>
-                    <div class="flex flex-col">
-                        <span
-                              class="text-base font-semibold text-slate-900 group-hover:text-blue-600 transition-colors">{{ config('app.name') }}</span>
-                        <span
-                              class="hidden text-xs font-medium tracking-wide text-slate-400 lg:inline">{{ __('Building supplies marketplace') }}</span>
-                    </div>
+            <div class="hidden md:flex items-center gap-5">
+                <a href="#" class="flex items-center group gap-2 hover:text-stone transition-colors">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 5h16v14H4zM8 9h8M8 13h5" />
+                    </svg>
+                    <span class="hidden sm:block">{{ __('frontend/header.topbar.news') }}</span>
+                </a>
+                <a href="#" class="flex items-center group gap-2 hover:text-stone transition-colors">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h8M8 14h5M12 20l-3.5-2H6a2 2 0 01-2-2V6a2 2 0 012-2h12a2 2 0 012 2v8a2 2 0 01-2 2h-2" />
+                    </svg>
+                    <span class="hidden sm:block">{{ __('frontend/header.topbar.consultations') }}</span>
                 </a>
             </div>
-
-            <div class="hidden w-full max-w-3xl flex-1 lg:block">
-                <x-search-module
-                                 class="w-full"
-                                 :max-results="10"
-                                 :min-query-length="2"
-                                 :filters="request()->query()" />
-            </div>
-
-            <div class="flex items-center gap-3">
-                <div class="hidden items-center gap-2 lg:flex">
-                    @foreach ($quickLinks as $link)
-                        <a href="{{ $link['url'] }}"
-                           class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm font-semibold text-slate-600 shadow-sm transition hover:border-blue-300 hover:text-blue-600">
-                            @switch($link['key'])
-                                @case('categories')
-                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5"
-                                         viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-                                    </svg>
-                                @break
-
-                                @case('collections')
-                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5"
-                                         viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                              d="M4 7h16M4 12h16M4 17h16M8 3v4m0 10v4m8-18v4m0 10v4" />
-                                    </svg>
-                                @break
-
-                                @case('brands')
-                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5"
-                                         viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 7h4l2 9h8l2-9h4" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M16 17a2 2 0 11-4 0" />
-                                    </svg>
-                                @break
-
-                                @case('support')
-                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5"
-                                         viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                              d="M12 6.253v13m0-13c-2.486 0-4.5 2.014-4.5 4.5v3c0 2.761 2.239 5 5 5s5-2.239 5-5v-3c0-2.486-2.014-4.5-4.5-4.5z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                              d="M18.364 5.636a9 9 0 10-12.728 0" />
-                                    </svg>
-                                @break
-
-                                @default
-                            @endswitch
-                            {{ $link['label'] }}
-                        </a>
-                    @endforeach
-                </div>
-
-                <x-language-switcher />
-
-                @auth
-                    @php
-                        $accountUrl = Route::has('account.index')
-                            ? route('account.index')
-                            : (Route::has('account.orders')
-                                ? route('account.orders')
-                                : url('/account'));
-                    @endphp
-                    <a href="{{ $accountUrl }}"
-                       class="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-700 hover:border-blue-300 hover:text-blue-600 transition">
-                        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5"
-                             viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 21a8 8 0 0112 0" />
-                        </svg>
-                        {{ __('nav_account') }}
-                    </a>
-                @else
-                    @if (Route::has('login'))
-                        <a href="{{ route('login') }}"
-                           class="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-700 hover:border-blue-300 hover:text-blue-600 transition">
-                            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5"
-                                 viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                      d="M15 12H3m0 0l4 4m-4-4l4-4m6-4h6a2 2 0 012 2v12a2 2 0 01-2 2h-6" />
-                            </svg>
-                            {{ __('auth_login') }}
-                        </a>
-                    @endif
-                @endauth
-
-                <livewire:components.shopping-cart-button />
-            </div>
         </div>
+    </section>
 
-        <div class="lg:hidden">
-            <livewire:components.mobile-autocomplete
-                                                     :max-results="5"
-                                                     :search-types="['products', 'categories', 'brands']"
-                                                     :enable-suggestions="true"
-                                                     :enable-recent-searches="true"
-                                                     :enable-popular-searches="false"
-                                                     :filters="request()->query()" />
-        </div>
-
-
-        @if ($featureEnabled && isset($categories) && count($categories) && Route::has('localized.categories.show'))
-            <div class="mt-3 border-t border-slate-100 pt-3">
-                <div class="mb-2 flex items-center justify-between">
-                    <span
-                          class="text-xs font-semibold uppercase tracking-[0.25em] text-slate-400">{{ __('Highlighted categories') }}</span>
-                    @if ($quickLinks->firstWhere('key', 'categories'))
-                        <a href="{{ $quickLinks->firstWhere('key', 'categories')['url'] }}"
-                           class="text-xs font-semibold text-blue-600 hover:text-blue-700">
-                            {{ __('View all') }}
+    {{-- Main header section --}}
+    <div class="bg-sage transition-all duration-300 border-b border-ash">
+        {{-- Primary header line - Logo and main navigation --}}
+        <div class="h-20 flex items-center overflow-visible">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center">
+                    {{-- Logo section - Made bigger --}}
+                    <div class="flex-shrink-0 flex items-center">
+                        <a href="{{ $homeUrl }}" class="group" aria-label="{{ __('nav_home') }}">
+                            <img src="/images/logo/logo.png" 
+                                 alt="{{ config('app.name') }}" 
+                                 class="h-16 w-auto object-contain">
                         </a>
-                    @endif
-                </div>
-                <div class="flex items-stretch gap-3 overflow-x-auto pb-2">
-                    @foreach ($categories as $category)
-                        @php
-                            $slug = method_exists($category, 'trans')
-                                ? $category->trans('slug') ?? $category->slug
-                                : $category->slug;
-                            $name = method_exists($category, 'trans')
-                                ? $category->trans('name') ?? $category->name
-                                : $category->name;
-                        @endphp
-                        <a href="{{ route('localized.categories.show', ['locale' => $locale, 'category' => $slug]) }}"
-                           class="group relative flex min-w-[160px] flex-col justify-between rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-1 hover:border-blue-300 hover:shadow-lg">
-                            <div class="flex items-center justify-between">
-                                <span
-                                      class="text-sm font-semibold text-slate-800 group-hover:text-blue-600 transition-colors">{{ $name }}</span>
-                                <span
-                                      class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-50 text-sm font-bold text-blue-600">{{ mb_strtoupper(mb_substr($name, 0, 1)) }}</span>
+                    </div>
+
+                    {{-- Navigation menu - hidden on mobile, visible on xl+ --}}
+                    <nav class="hidden xl:flex space-x-10 text-sm">
+                        @foreach ($quickLinks as $link)
+                            <div class="header-link group relative cursor-pointer">
+                                <a href="{{ $link['url'] }}" class="relative">
+                                    <div class="relative">
+                                        <span class="hidden sm:block font-semibold text-base text-dark hover:text-stone transition-colors">{{ $link['label'] }}</span>
+                                        <span class="absolute inset-x-0 bottom-0 h-0.5 bg-dark transform scale-x-0 origin-left transition-transform group-hover:scale-x-100 duration-300"></span>
+                                    </div>
+                                </a>
                             </div>
-                            <span
-                                  class="mt-6 inline-flex items-center gap-2 text-xs font-medium text-slate-400 group-hover:text-blue-500">
-                                {{ __('Browse') }}
-                                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.5"
-                                     viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                                </svg>
-                            </span>
-                        </a>
-                    @endforeach
-                </div>
-            </div>
-        @endif
+                        @endforeach
+                    </nav>
 
-        @if ($mobileMenuOpen)
-            <div class="mt-4 border-t border-slate-200 pt-4 lg:hidden">
-                <div class="mb-4">
-                    <x-search-module
-                                     class="w-full"
-                                     :max-results="6"
-                                     :min-query-length="2"
-                                     :filters="request()->query()" />
+                    {{-- Right side actions --}}
+                    <div class="flex items-center gap-5">
+                        {{-- Shopping cart button --}}
+                        <livewire:components.shopping-cart-button />
+
+                        {{-- Register button (guest only) --}}
+                        @guest
+                            @if (Route::has('register'))
+                                <a href="{{ route('register') }}"
+                                   class="header-action-button">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.749 0-5.353-.62-7.499-1.632z" />
+                                    </svg>
+                                    <span>{{ __('auth_register') }}</span>
+                                </a>
+                            @endif
+                        @endguest
+
+                        {{-- Mobile menu button - visible on xl- --}}
+                        <div class="xl:hidden">
+                            <button type="button"
+                                    class="text-dark hover:text-stone focus:outline-none"
+                                    wire:click="toggleMobileMenu"
+                                    aria-label="{{ __('nav_toggle') }}">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
                 </div>
-                <nav class="grid gap-2 text-sm font-medium text-slate-700">
-                    @if ($quickLinks->firstWhere('key', 'categories'))
-                        <a href="{{ $quickLinks->firstWhere('key', 'categories')['url'] }}"
-                           class="rounded-lg bg-slate-100 px-3 py-2 hover:bg-blue-50 hover:text-blue-600 transition">{{ __('nav_categories') }}</a>
-                    @endif
-                    @if ($quickLinks->firstWhere('key', 'brands'))
-                        <a href="{{ $quickLinks->firstWhere('key', 'brands')['url'] }}"
-                           class="rounded-lg bg-slate-100 px-3 py-2 hover:bg-blue-50 hover:text-blue-600 transition">{{ __('nav_brands') }}</a>
-                    @endif
-                    @if ($quickLinks->firstWhere('key', 'collections'))
-                        <a href="{{ $quickLinks->firstWhere('key', 'collections')['url'] }}"
-                           class="rounded-lg bg-slate-100 px-3 py-2 hover:bg-blue-50 hover:text-blue-600 transition">{{ __('translations.collections') ?? __('Collections') }}</a>
-                    @endif
-                    @if ($quickLinks->firstWhere('key', 'support'))
-                        <a href="{{ $quickLinks->firstWhere('key', 'support')['url'] }}"
-                           class="rounded-lg bg-slate-100 px-3 py-2 hover:bg-blue-50 hover:text-blue-600 transition">
-                            {{ __('support_centre') }}
-                        </a>
-                    @endif
-                    @if (Route::has('localized.locations.index'))
-                        <a href="{{ route('localized.locations.index', ['locale' => $locale]) }}"
-                           class="rounded-lg bg-slate-100 px-3 py-2 hover:bg-blue-50 hover:text-blue-600 transition">{{ __('nav_locations') }}</a>
-                    @endif
-                    @if (Route::has('localized.search'))
-                        <a href="{{ route('localized.search', ['locale' => $locale]) }}"
-                           class="rounded-lg bg-slate-100 px-3 py-2 hover:bg-blue-50 hover:text-blue-600 transition">{{ __('nav_search') }}</a>
-                    @endif
-                    @if (Route::has('localized.cart.index'))
-                        <a href="{{ route('localized.cart.index', ['locale' => $locale]) }}"
-                           class="rounded-lg bg-slate-100 px-3 py-2 hover:bg-blue-50 hover:text-blue-600 transition">{{ __('nav_cart') }}</a>
-                    @endif
-                </nav>
             </div>
-        @endif
-    </x-container>
-</div>
+        </div>
+
+        {{-- Secondary header line - Search bar --}}
+        <div class="bg-sage border-t border-ash overflow-visible">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 relative z-50 overflow-visible">
+                <div class="flex justify-center overflow-visible">
+                    {{-- Enhanced search bar --}}
+                    <div class="w-full max-w-2xl relative z-60 overflow-visible">
+                        <x-search-module
+                                       class="w-full"
+                                       :max-results="10"
+                                       :min-query-length="2" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    {{-- Mobile menu overlay --}}
+    @if ($mobileMenuOpen)
+        <div class="fixed inset-0 z-50 lg:hidden" x-data="{ open: @entangle('mobileMenuOpen') }" x-show="open" x-transition>
+            {{-- Backdrop --}}
+            <div class="fixed inset-0 bg-black/30" x-on:click="open = false"></div>
+            
+            {{-- Mobile menu panel --}}
+            <div class="fixed top-0 right-0 h-full w-full max-w-[350px] bg-sage transform transition-transform duration-300" x-show="open">
+                {{-- Header --}}
+                <div class="flex justify-between items-center py-3 px-4 bg-dark text-sage">
+                    <h3 class="font-bold font-montserrat">{{ __('frontend/header.mobile.title') }}</h3>
+                    <button type="button" 
+                            class="size-8 inline-flex justify-center items-center gap-x-2 rounded-full border border-sage text-sage bg-transparent hover:bg-sage hover:text-dark transition-colors" 
+                            wire:click="toggleMobileMenu"
+                            aria-label="{{ __('shared.close') }}">
+                        <span class="sr-only">{{ __('shared.close') }}</span>
+                        <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 6 6 18" />
+                            <path d="m6 6 12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                {{-- Menu content --}}
+                <div class="p-4 h-[calc(100dvh-60px)] flex flex-col justify-between gap-4 bg-sage">
+                    <div class="space-y-3">
+                        @foreach ($quickLinks as $link)
+                            <a href="{{ $link['url'] }}" 
+                               class="w-full flex items-center gap-5 border-b border-dark text-dark py-2 hover:text-stone transition-colors"
+                               wire:click="toggleMobileMenu">
+                                <p class="capitalize font-normal font-montserrat">{{ $link['label'] }}</p>
+                            </a>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+</nav>

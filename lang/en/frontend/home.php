@@ -125,4 +125,14 @@ return [
         ],
         'empty' => 'New items are being prepared for this shelf.',
     ],
+        'slider' => [
+            'tagline'        => 'Construction without worries',
+            'description'    => 'A wide range of construction products that ensure quality at every step – from fasteners to facade finishing materials.',
+            'title'          => 'Solutions for your construction',
+            'autoplay_start' => 'Start autoplay',
+            'autoplay_stop'  => 'Stop autoplay',
+            'placeholder_alt' => 'Banner image',
+            'previous_slide' => 'Previous slide',
+            'next_slide'     => 'Next slide',
+        ],
 ];

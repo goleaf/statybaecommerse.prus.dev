@@ -27,6 +27,7 @@ database/testing.sqlite
 Homestead.json
 Homestead.yaml
 Thumbs.db
+styleref
 
 # Backup archives
 *.sql.gz

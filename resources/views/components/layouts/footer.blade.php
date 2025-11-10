@@ -4,8 +4,6 @@
     $companyEmail = $hasSettings ? app_setting('email') ?? null : null;
     $companyPhone = $hasSettings ? app_setting('phone_number') ?? null : null;
     $companyAddress = $hasSettings ? app_setting('company_address') ?? null : null;
-@endphp
-@php
     $socialFacebook = $hasSettings ? app_setting('social_facebook') ?? '#' : '#';
     $socialInstagram = $hasSettings ? app_setting('social_instagram') ?? '#' : '#';
     $locale = app()->getLocale();
@@ -24,124 +22,127 @@
         : (\Illuminate\Support\Facades\Route::has('legal.show') ? route('legal.show', 'refund') : url('/legal/returns'));
 @endphp
 
-<footer aria-labelledby="footer-heading"
-        class="bg-gradient-to-br from-slate-50 via-white to-blue-50/30 border-t border-slate-200/60 relative overflow-hidden shadow-lg shadow-slate-100/50">
-    <!-- Background decorative elements -->
-    <div class="absolute inset-0 overflow-hidden pointer-events-none">
-        <div class="absolute -top-40 -right-40 w-80 h-80 bg-blue-400/8 rounded-full blur-3xl"></div>
-        <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-indigo-400/8 rounded-full blur-3xl"></div>
-        <div
-             class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-blue-100/20 to-indigo-100/20 rounded-full blur-3xl">
-        </div>
-    </div>
+<footer aria-labelledby="footer-heading" class="bg-dark text-sage relative">
     <h2 id="footer-heading" class="sr-only">{{ __('footer_heading') }}</h2>
-    <x-container class="relative z-10">
-        <div class="grid grid-cols-1 gap-12 py-20 lg:grid-cols-3 lg:py-28">
-            <div class="lg:max-w-sm">
-                <h3 class="text-sm font-medium text-slate-800 mb-6">
-                    <x-brand
-                             class="w-auto h-12 lg:h-14 text-slate-800"
-                             aria-hidden="true" />
-                </h3>
-                <p class="text-slate-600 text-base leading-relaxed">
+
+    <!-- Geometric top separator with centered diamond -->
+    <div class="w-full h-[1px] bg-brand-primary relative">
+        <div class="aspect-square h-6 bg-brand-primary absolute -top-3 left-1/2 -translate-x-1/2 rotate-45"></div>
+    </div>
+
+    <!-- Main Footer Content -->
+    <div class="max-w-site mx-auto px-4 sm:px-6 lg:px-8 relative pt-16 pb-12">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-16">
+            <!-- Left: Company Info -->
+            <div class="md:col-span-4 text-center md:text-left">
+                <div class="mb-6 text-center md:text-left">
+                    <x-brand class="h-16 w-auto mx-auto md:mx-0 text-sage" aria-hidden="true" />
+                </div>
+
+                <div class="text-ash/80 mb-8 leading-relaxed">
                     {{ __('footer_tagline') }}
-                </p>
+                </div>
             </div>
-            <div class="space-y-12 lg:grid lg:grid-cols-2 lg:gap-12 lg:space-y-0 lg:col-span-2">
-                <div class="grid grid-cols-2 gap-8 lg:gap-12">
+
+            <!-- Center: Navigation - 2 Sections -->
+            <nav aria-label="{{ __('footer_heading') }}" class="md:col-span-4 md:border-l md:border-ash/20 md:pl-8 text-left">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                    <!-- Section 1: About -->
                     <div>
-                        <h3 class="font-heading text-sm font-semibold uppercase tracking-wider text-slate-700 mb-8">
-                            {{ __('footer_about') }}
-                        </h3>
-                        <ul role="list" class="space-y-4">
-                            <li>
-                                <x-footer-link href="{{ $docsUrl }}"
-                                               class="text-slate-600 hover:text-blue-600 transition-colors duration-200 font-medium">
-                                    {{ __('footer_documentation') }}
+                        <p class="text-xs uppercase tracking-wide text-ash/70 flex items-center gap-2 mb-4">
+                            <span class="w-8 h-[2px] bg-brand-primary"></span>
+                            // {{ __('footer_about') }}
+                        </p>
+                        <div class="space-y-3 footer-nav">
+                            <div>
+                                <x-footer-link :spa="false" href="{{ $docsUrl }}" class="text-ash hover:text-sage transition-colors duration-200 footer-nav-link">
+                                    <svg class="text-ash" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                                    </svg>
+                                    <span>{{ __('footer_documentation') }}</span>
                                 </x-footer-link>
-                            </li>
-                            <li>
-                                <x-footer-link :spa="false" href="{{ $githubUrl }}" target="_blank" rel="noopener"
-                                               class="text-slate-600 hover:text-blue-600 transition-colors duration-200 font-medium">
-                                    {{ __('footer_github') }}
+                            </div>
+                            <div>
+                                <x-footer-link :spa="false" href="{{ $githubUrl }}" target="_blank" rel="noopener" class="text-ash hover:text-sage transition-colors duration-200 footer-nav-link">
+                                    <svg class="text-ash" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                                    </svg>
+                                    <span>{{ __('footer_github') }}</span>
                                 </x-footer-link>
-                            </li>
-                            <li>
-                                <x-footer-link href="{{ $aboutUrl }}"
-                                               class="text-slate-600 hover:text-blue-600 transition-colors duration-200 font-medium">{{ __('footer_about') }}</x-footer-link>
-                            </li>
-                            <li>
-                                <x-footer-link href="{{ $securePaymentUrl }}"
-                                               class="text-slate-600 hover:text-blue-600 transition-colors duration-200 font-medium">{{ __('footer_secure_payment') }}</x-footer-link>
-                            </li>
-                            <li>
-                                <x-footer-link href="{{ $contactUrl }}"
-                                               class="text-slate-600 hover:text-blue-600 transition-colors duration-200 font-medium">{{ __('footer_contact') }}</x-footer-link>
-                            </li>
-                        </ul>
+                            </div>
+                            <div>
+                                <x-footer-link href="{{ $aboutUrl }}" class="text-ash hover:text-sage transition-colors duration-200 footer-nav-link">
+                                    <svg class="text-ash" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                                    </svg>
+                                    <span>{{ __('footer_about') }}</span>
+                                </x-footer-link>
+                            </div>
+                            <div>
+                                <x-footer-link href="{{ $securePaymentUrl }}" class="text-ash hover:text-sage transition-colors duration-200 footer-nav-link">
+                                    <svg class="text-ash" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                                    </svg>
+                                    <span>{{ __('footer_secure_payment') }}</span>
+                                </x-footer-link>
+                            </div>
+                            <div>
+                                <x-footer-link href="{{ $contactUrl }}" class="text-ash hover:text-sage transition-colors duration-200 footer-nav-link">
+                                    <svg class="text-ash" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                                    </svg>
+                                    <span>{{ __('footer_contact') }}</span>
+                                </x-footer-link>
+                            </div>
+                        </div>
                     </div>
+
+                    <!-- Section 2: Shop/Legal -->
                     <div>
-                        <h3 class="font-heading text-sm font-semibold uppercase tracking-wider text-slate-700 mb-8">
-                            {{ __('footer_shop') }}
-                        </h3>
-                        <ul role="list" class="space-y-4">
-                            @php
-                                $features = config('app-features.features');
-                            @endphp
-                            @if ((bool) ($features['category'] ?? false))
-                                <li>
-                                    <x-footer-link
-                                                   href="{{ route('localized.categories.index', ['locale' => app()->getLocale()]) }}"
-                                                   class="text-slate-600 hover:text-blue-600 transition-colors duration-200 font-medium">{{ __('nav_categories') }}</x-footer-link>
-                                </li>
-                            @endif
-                            @if ((bool) ($features['collection'] ?? false))
-                                @php
-                                    $collectionUrl = \Illuminate\Support\Facades\Route::has(
-                                        'localized.collections.index',
-                                    )
-                                        ? route('localized.collections.index', ['locale' => app()->getLocale()])
-                                        : url('/' . app()->getLocale() . '/collections');
-                                @endphp
-                                <li>
-                                    <x-footer-link
-                                                   href="{{ $collectionUrl }}"
-                                                   class="text-slate-600 hover:text-blue-600 transition-colors duration-200 font-medium">{{ __('nav_collections') }}</x-footer-link>
-                                </li>
-                            @endif
-                            @if ((bool) ($features['brand'] ?? false))
-                                <li>
-                                    <x-footer-link
-                                                   href="{{ route('localized.brands.index', ['locale' => app()->getLocale()]) }}"
-                                                   class="text-slate-600 hover:text-blue-600 transition-colors duration-200 font-medium">{{ __('nav_brands') }}</x-footer-link>
-                                </li>
-                            @endif
-                            <li>
-                                <x-footer-link href="{{ $shippingUrl }}"
-                                               class="text-slate-600 hover:text-blue-600 transition-colors duration-200 font-medium">{{ __('legal_shipping') }}</x-footer-link>
-                            </li>
-                            <li>
-                                <x-footer-link href="{{ $returnsUrl }}"
-                                               class="text-slate-600 hover:text-blue-600 transition-colors duration-200 font-medium">{{ __('footer_returns_refunds') }}</x-footer-link>
-                            </li>
-                        </ul>
+                        <p class="text-xs uppercase tracking-wide text-ash/70 flex items-center gap-2 mb-4">
+                            <span class="w-8 h-[2px] bg-brand-primary"></span>
+                            // {{ __('footer_shop') }}
+                        </p>
+                        <div class="space-y-3 footer-nav">
+                            <div>
+                                <x-footer-link href="{{ $shippingUrl }}" class="text-ash hover:text-sage transition-colors duration-200 footer-nav-link">
+                                    <svg class="text-ash" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                                    </svg>
+                                    <span>{{ __('legal_shipping') }}</span>
+                                </x-footer-link>
+                            </div>
+                            <div>
+                                <x-footer-link href="{{ $returnsUrl }}" class="text-ash hover:text-sage transition-colors duration-200 footer-nav-link">
+                                    <svg class="text-ash" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                                    </svg>
+                                    <span>{{ __('footer_returns_refunds') }}</span>
+                                </x-footer-link>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div>
-                    <h3 class="font-heading text-sm font-semibold uppercase tracking-wider text-slate-700 mb-8">
-                        {{ __('footer_subscribe_title') }}
-                    </h3>
-                    <div class="space-y-8">
-                        <div>
-                            <p class="text-base leading-relaxed text-slate-600 mb-6">
-                                {{ __('footer_subscribe_desc') }}
-                            </p>
-                            {{-- Enhanced Newsletter Form --}}
-                            <livewire:newsletter-subscription />
-                        </div>
-                        <div class="flex items-center space-x-6">
+            </nav>
+
+            <!-- Right: Newsletter & Contacts -->
+            <div class="md:col-span-4 md:border-l md:border-ash/20 md:pl-6 text-left">
+                <p class="text-xs uppercase tracking-wide text-ash/70 flex items-center gap-2 mb-4">
+                    <span class="w-8 h-[2px] bg-brand-primary"></span>
+                    // {{ __('footer_subscribe_title') }}
+                </p>
+                <div class="space-y-8">
+                    <div>
+                        <p class="text-sm leading-relaxed text-ash/80 mb-6">
+                            {{ __('footer_subscribe_desc') }}
+                        </p>
+                        {{-- Newsletter Form --}}
+                        <livewire:newsletter-subscription />
+                    </div>
+                    <div class="flex items-center space-x-6">
+                        @if ($socialFacebook)
                             <a href="{{ $socialFacebook }}"
-                               class="text-slate-600 hover:text-blue-600 transition-colors duration-200 transform hover:scale-110 p-2 rounded-full hover:bg-blue-50">
+                               class="text-ash hover:text-sage transition-colors duration-200 transform hover:scale-110 p-2 rounded-full">
                                 <span class="sr-only">{{ __('footer_facebook') }}</span>
                                 <svg class="size-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                     <path fill-rule="evenodd"
@@ -149,8 +150,10 @@
                                           clip-rule="evenodd" />
                                 </svg>
                             </a>
+                        @endif
+                        @if ($socialInstagram)
                             <a href="{{ $socialInstagram }}"
-                               class="text-slate-600 hover:text-pink-600 transition-colors duration-200 transform hover:scale-110 p-2 rounded-full hover:bg-pink-50">
+                               class="text-ash hover:text-sage transition-colors duration-200 transform hover:scale-110 p-2 rounded-full">
                                 <span class="sr-only">{{ __('footer_instagram') }}</span>
                                 <svg class="size-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                     <path fill-rule="evenodd"
@@ -158,27 +161,30 @@
                                           clip-rule="evenodd" />
                                 </svg>
                             </a>
-                        </div>
+                        @endif
                     </div>
                 </div>
             </div>
         </div>
-        <div class="pb-16 lg:flex lg:items-center lg:justify-between lg:pb-24">
+
+        <!-- Contact & Hours Section -->
+        <div class="pb-16 lg:flex lg:items-center lg:justify-between lg:pb-24 mt-12 pt-12 border-t border-ash/20">
             <div class="space-y-8 lg:space-y-0 lg:flex lg:flex-1 lg:gap-12">
                 <div>
-                    <dl class="font-heading text-sm font-semibold uppercase tracking-wider text-slate-700 mb-6">
-                        {{ __('footer_contact') }}
+                    <dl class="text-xs uppercase tracking-wide text-ash/70 flex items-center gap-2 mb-4">
+                        <span class="w-8 h-[2px] bg-brand-primary"></span>
+                        <span>{{ __('footer_contact') }}</span>
                     </dl>
-                    <ul class="flex flex-col space-y-3 text-sm text-slate-600">
+                    <ul class="flex flex-col space-y-3 text-sm text-ash">
                         @if ($companyPhone)
                             <li class="flex items-center gap-3">
-                                <svg class="size-5 text-slate-500" viewBox="0 0 24 24" fill="none"
+                                <svg class="size-5 text-sage" viewBox="0 0 24 24" fill="none"
                                      stroke="currentColor" stroke-width="1.5" aria-hidden="true">
                                     <path stroke-linecap="round" stroke-linejoin="round"
                                           d="M2 5a2 2 0 012-2h2l2 5-2 1a14 14 0 006 6l1-2 5 2v2a2 2 0 01-2 2h-1C9.163 19 5 14.837 5 9V8a2 2 0 00-2-2z" />
                                 </svg>
                                 <a href="tel:{{ $companyPhone }}"
-                                   class="hover:text-blue-600 transition-colors duration-200 font-medium">
+                                   class="hover:text-sage transition-colors duration-200 font-medium">
                                     {{ $companyPhone }}
                                 </a>
                             </li>
@@ -186,13 +192,13 @@
 
                         @if ($companyEmail)
                             <li class="flex items-center gap-3">
-                                <svg class="size-5 text-slate-500" viewBox="0 0 24 24" fill="none"
+                                <svg class="size-5 text-sage" viewBox="0 0 24 24" fill="none"
                                      stroke="currentColor" stroke-width="1.5" aria-hidden="true">
                                     <path stroke-linecap="round" stroke-linejoin="round"
                                           d="M3 8l9 6 9-6M4 6h16a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2z" />
                                 </svg>
                                 <a href="mailto:{{ $companyEmail }}"
-                                   class="hover:text-blue-600 transition-colors duration-200 font-medium">
+                                   class="hover:text-sage transition-colors duration-200 font-medium">
                                     {{ $companyEmail }}
                                 </a>
                             </li>
@@ -200,87 +206,92 @@
                     </ul>
                 </div>
                 <div>
-                    <dl class="font-heading text-sm font-semibold uppercase tracking-wider text-slate-700 mb-6">
-                        {{ __('footer_hours') }}
+                    <dl class="text-xs uppercase tracking-wide text-ash/70 flex items-center gap-2 mb-4">
+                        <span class="w-8 h-[2px] bg-brand-primary"></span>
+                        <span>{{ __('footer_hours') }}</span>
                     </dl>
-                    <dt class="text-sm leading-relaxed text-slate-600">
+                    <dt class="text-sm leading-relaxed text-ash">
                         {{ __('footer_hours_desc') }}
                     </dt>
                 </div>
             </div>
-
         </div>
-        <div
-             class="flex flex-col items-center border-t border-slate-200/60 py-8 sm:flex-row sm:justify-between lg:py-12">
-            <p class="text-sm text-slate-600">
-                © {{ date('Y') }} {{ config('app.name') }}, Inc. {{ __('footer_all_rights_reserved') }}
-                <a href="https://filamentphp.com" target="_blank"
-                   class="pl-1 underline hover:text-blue-600 transition-colors duration-200 font-medium">
-                    {{ __('footer_powered_by_filament') }}
-                </a>
-            </p>
-            <div class="mt-8 flex items-center gap-6 divide-x divide-slate-300/60 sm:mt-0">
-                <x-language-switcher />
-                @if (auth()->check() && auth()->user()->can('view orders'))
-                    <x-link href="{{ route('exports.index') }}"
-                            class="inline-flex px-3 text-sm leading-5 text-slate-600 hover:text-blue-600 transition-colors duration-200 font-medium">
-                        {{ __('Exports') }}
-                    </x-link>
-                @endif
-                @php
-                    $hasLegals = \Illuminate\Support\Facades\Schema::hasTable('legals');
-                @endphp
-                @if ($hasLegals)
-                    @php
-                        $legalModel = app(\App\Models\Legal::class);
-                        $privacy = $legalModel->newQuery()->where('key', 'privacy')->where('is_enabled', true)->first();
-                        $terms = $legalModel->newQuery()->where('key', 'terms')->where('is_enabled', true)->first();
-                        $refund = $legalModel->newQuery()->where('key', 'refund')->where('is_enabled', true)->first();
-                        $shipping = $legalModel
-                            ->newQuery()
-                            ->where('key', 'shipping')
-                            ->where('is_enabled', true)
-                            ->first();
-                    @endphp
-                    @if ($privacy)
-                        <x-link href="{{ route('legal.show', ['locale' => app()->getLocale(), 'slug' => $privacy->key ?? 'privacy']) }}"
-                                class="inline-flex px-3 text-sm leading-5 text-slate-600 hover:text-blue-600 transition-colors duration-200 font-medium">
-                            {{ __('legal_privacy') }}
+    </div>
+
+    <!-- Bottom Footer -->
+    <div class="border-t border-ash/30">
+        <div class="max-w-site mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="flex flex-col items-center border-t-0 sm:flex-row sm:justify-between">
+                <p class="text-sm text-ash">
+                    © {{ date('Y') }} {{ config('app.name') }}, Inc. {{ __('footer_all_rights_reserved') }}
+                    <a href="https://filamentphp.com" target="_blank"
+                       class="pl-1 underline hover:text-sage transition-colors duration-200 font-medium">
+                        {{ __('footer_powered_by_filament') }}
+                    </a>
+                </p>
+                <div class="mt-8 flex items-center gap-6 divide-x divide-ash/30 sm:mt-0">
+                    <x-language-switcher />
+                    @if (auth()->check() && auth()->user()->can('view orders'))
+                        <x-link href="{{ route('exports.index') }}"
+                                class="inline-flex px-3 text-sm leading-5 text-ash hover:text-sage transition-colors duration-200 font-medium">
+                            {{ __('Exports') }}
                         </x-link>
                     @endif
-                    @if ($terms)
-                        <x-link href="{{ route('legal.show', ['locale' => app()->getLocale(), 'slug' => $terms->key ?? 'terms']) }}"
-                                class="inline-flex px-3 text-sm leading-5 text-slate-600 hover:text-blue-600 transition-colors duration-200 font-medium">
+                    @php
+                        $hasLegals = \Illuminate\Support\Facades\Schema::hasTable('legals');
+                    @endphp
+                    @if ($hasLegals)
+                        @php
+                            $legalModel = app(\App\Models\Legal::class);
+                            $privacy = $legalModel->newQuery()->where('key', 'privacy')->where('is_enabled', true)->first();
+                            $terms = $legalModel->newQuery()->where('key', 'terms')->where('is_enabled', true)->first();
+                            $refund = $legalModel->newQuery()->where('key', 'refund')->where('is_enabled', true)->first();
+                            $shipping = $legalModel
+                                ->newQuery()
+                                ->where('key', 'shipping')
+                                ->where('is_enabled', true)
+                                ->first();
+                        @endphp
+                        @if ($privacy)
+                            <x-link href="{{ route('legal.show', ['locale' => app()->getLocale(), 'slug' => $privacy->key ?? 'privacy']) }}"
+                                    class="inline-flex px-3 text-sm leading-5 text-ash hover:text-sage transition-colors duration-200 font-medium">
+                                {{ __('legal_privacy') }}
+                            </x-link>
+                        @endif
+                        @if ($terms)
+                            <x-link href="{{ route('legal.show', ['locale' => app()->getLocale(), 'slug' => $terms->key ?? 'terms']) }}"
+                                    class="inline-flex px-3 text-sm leading-5 text-ash hover:text-sage transition-colors duration-200 font-medium">
+                                {{ __('legal_terms') }}
+                            </x-link>
+                        @endif
+                        @if ($refund)
+                            <x-link href="{{ route('legal.show', ['locale' => app()->getLocale(), 'slug' => $refund->key ?? 'refund']) }}"
+                                    class="inline-flex px-3 text-sm leading-5 text-ash hover:text-sage transition-colors duration-200 font-medium">
+                                {{ __('legal_refund') }}
+                            </x-link>
+                        @endif
+                        @if ($shipping)
+                            <x-link href="{{ route('legal.show', ['locale' => app()->getLocale(), 'slug' => $shipping->key ?? 'shipping']) }}"
+                                    class="inline-flex px-3 text-sm leading-5 text-ash hover:text-sage transition-colors duration-200 font-medium">
+                                {{ __('legal_shipping') }}
+                            </x-link>
+                        @endif
+                    @else
+                        <x-link href="{{ route('frontend.legal.privacy') }}"
+                                class="inline-flex px-3 text-sm leading-5 text-ash hover:text-sage transition-colors duration-200 font-medium">
+                            {{ __('legal_privacy') }}
+                        </x-link>
+                        <x-link href="{{ route('frontend.legal.cookies') }}"
+                                class="inline-flex px-3 text-sm leading-5 text-ash hover:text-sage transition-colors duration-200 font-medium">
+                            {{ __('frontend/legal.cookie_policy') }}
+                        </x-link>
+                        <x-link href="{{ route('frontend.legal.terms') }}"
+                                class="inline-flex px-3 text-sm leading-5 text-ash hover:text-sage transition-colors duration-200 font-medium">
                             {{ __('legal_terms') }}
                         </x-link>
                     @endif
-                    @if ($refund)
-                        <x-link href="{{ route('legal.show', ['locale' => app()->getLocale(), 'slug' => $refund->key ?? 'refund']) }}"
-                                class="inline-flex px-3 text-sm leading-5 text-slate-600 hover:text-blue-600 transition-colors duration-200 font-medium">
-                            {{ __('legal_refund') }}
-                        </x-link>
-                    @endif
-                    @if ($shipping)
-                        <x-link href="{{ route('legal.show', ['locale' => app()->getLocale(), 'slug' => $shipping->key ?? 'shipping']) }}"
-                                class="inline-flex px-3 text-sm leading-5 text-slate-600 hover:text-blue-600 transition-colors duration-200 font-medium">
-                            {{ __('legal_shipping') }}
-                        </x-link>
-                    @endif
-                @else
-                    <x-link href="{{ route('frontend.legal.privacy') }}"
-                            class="inline-flex px-3 text-sm leading-5 text-slate-600 hover:text-blue-600 transition-colors duration-200 font-medium">
-                        {{ __('legal_privacy') }}
-                    </x-link>
-                    <x-link href="{{ route('frontend.legal.cookies') }}"
-                            class="inline-flex px-3 text-sm leading-5 text-slate-600 hover:text-blue-600 transition-colors duration-200 font-medium">
-                        {{ __('frontend/legal.cookie_policy') }}
-                    </x-link>
-                    <x-link href="{{ route('frontend.legal.terms') }}"
-                            class="inline-flex px-3 text-sm leading-5 text-slate-600 hover:text-blue-600 transition-colors duration-200 font-medium">
-                        {{ __('legal_terms') }}
-                    </x-link>
-                @endif
+                </div>
             </div>
         </div>
-    </x-container>
+    </div>
 </footer>

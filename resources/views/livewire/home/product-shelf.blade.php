@@ -1,10 +1,10 @@
 @php
     $bg = match ($preset) {
-        'featured' => 'bg-indigo-50',
-        'latest' => 'bg-sky-50',
-        'trending' => 'bg-amber-50',
-        'sale' => 'bg-rose-50',
-        default => 'bg-white',
+        'featured' => 'bg-dark',
+        'latest' => 'bg-dark',
+        'trending' => 'bg-dark',
+        'sale' => 'bg-dark',
+        default => 'bg-dark',
     };
 @endphp
 <section class="relative {{ $bg }} py-20 text-gray-900"
@@ -16,7 +16,7 @@
     <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         <div class="space-y-4 max-w-3xl">
             <span
-                  class="inline-flex items-center gap-2 rounded-full border border-gray-300 bg-gray-100 px-4 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-gray-600">
+                  class="inline-flex items-center gap-2 rounded-full border border-sage bg-transparent px-4 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-black">
                 {{ $preset === 'sale' ? __('home.sale') : ($preset === 'latest' ? __('home.new') : ($preset === 'trending' ? __('home.trending') : __('home.featured'))) }}
             </span>
             <h2 id="home-products-heading-{{ $preset }}"

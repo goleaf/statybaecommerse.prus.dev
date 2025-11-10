@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 return [
+    'homepage' => 'Homepage',
     'meta' => [
         'title'       => 'Discover modern Lithuanian e-commerce',
         'description' => 'Explore curated collections, trusted brands, and personalized recommendations crafted for Baltic shoppers.',
@@ -131,6 +132,28 @@ return [
             'review_badge'   => 'Loved by our customers',
             'review_copy'    => 'Over the past months shoppers consistently rated their experience above four stars.',
             'review_caption' => ':count verified reviews and counting',
+        ],
+    ],
+    'mission' => [
+        'badge'    => 'Our mission',
+        'title'    => 'Your most trusted construction partner',
+        'subtitle' => 'With years of experience in construction, ventilated facades, and timber housing systems, we help you find the right accessories and deliver the best technical solutions. Can’t see what you need? Book a consultation and let’s build more together.',
+        'actions'  => [
+            'consultation'   => 'Book a consultation',
+            'view_solutions' => 'View available solutions',
+        ],
+    ],
+    'loyalty' => [
+        'badge'    => 'Loyalty',
+        'title'    => 'Rewards for loyal customers',
+        'subtitle' => 'Join the loyalty programme to unlock ongoing discounts and exclusive offers. The more you shop, the more you save.',
+        'actions'  => [
+            'join'          => 'Join the programme',
+            'invite_friend' => 'Invite a friend',
+        ],
+        'catalog' => [
+            'title'    => 'Order-ready catalogue',
+            'subtitle' => 'Choose from a comprehensive range of accessories – order directly or reach out for custom requirements.',
         ],
     ],
     'catalogue' => [

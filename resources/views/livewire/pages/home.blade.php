@@ -1,42 +1,55 @@
-<main class="bg-gray-50 text-gray-900" aria-label="{{ __('home.homepage') }}">
-    <!-- Hero / Slider -->
-    <section class="relative">
-        <livewire:home-slider />
-    </section>
+<main class="bg-sage text-gray-900" aria-label="{{ __('frontend/home.homepage') }}">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 gap-8 py-8 lg:grid-cols-4">
+            <aside class="lg:col-span-1">
+                <div class="sticky top-4 space-y-6">
+                    <livewire:components.category-sidebar />
+                </div>
+            </aside>
 
-    <!-- Hero Stats -->
-    <x-home.hero-stats :stats="$stats ?? []" />
+            <div class="lg:col-span-3 space-y-8">
+                <section class="relative">
+                    <livewire:home-slider />
+                </section>
 
-    <!-- Featured Shelf (primary) -->
-    <section class="relative">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <livewire:home.product-shelf :preset="'featured'" :limit="8" />
-        </div>
-    </section>
+                <x-home.mission-loyalty />
 
-    <!-- Collections Showcase -->
-    <section class="relative py-4">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 gap-8">
-            <div>
-                <livewire:home.collections-showcase />
+                <x-home.hero-stats :stats="$stats ?? []" />
+
+                <section class="relative">
+                    <livewire:home.product-shelf
+                        :preset="'featured'"
+                        :limit="8"
+                        :title="__('frontend/home.products.sections.featured.title')"
+                        :subtitle="__('frontend/home.products.sections.featured.subtitle')"
+                    />
+                </section>
+
+                <section class="relative space-y-20">
+                    <livewire:home.product-shelf
+                        :preset="'latest'"
+                        :limit="8"
+                        :title="__('frontend/home.products.sections.latest.title')"
+                        :subtitle="__('frontend/home.products.sections.latest.subtitle')"
+                    />
+                    <livewire:home.product-shelf
+                        :preset="'trending'"
+                        :limit="8"
+                        :title="__('frontend/home.products.sections.trending.title')"
+                        :subtitle="__('frontend/home.products.sections.trending.subtitle')"
+                    />
+                    <livewire:home.product-shelf
+                        :preset="'sale'"
+                        :limit="12"
+                        :title="__('frontend/home.products.sections.sale.title')"
+                        :subtitle="__('frontend/home.products.sections.sale.subtitle')"
+                    />
+                </section>
+
+                <section class="relative">
+                    <livewire:home.collections-showcase />
+                </section>
             </div>
         </div>
-    </section>
-
-    <!-- Shelves: Latest / Trending / Sale -->
-    <section class="relative">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-20">
-            <livewire:home.product-shelf :preset="'latest'" :limit="8" />
-            <livewire:home.product-shelf :preset="'trending'" :limit="8" />
-            <livewire:home.product-shelf :preset="'sale'" :limit="12" />
-        </div>
-    </section>
-
-    <!-- Full Catalogue Explorer -->
-    <section class="relative bg-slate-100 text-slate-900">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-            <livewire:home.product-catalogue />
-        </div>
-    </section>
-
+    </div>
 </main>
