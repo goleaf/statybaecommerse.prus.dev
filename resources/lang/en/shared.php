@@ -38,6 +38,7 @@ return [
         'create' => 'Create',
     ],
     'close'    => 'Close',
+    'navigation' => 'Navigation',
     'back'     => 'Back',
     'next'     => 'Next',
     'previous' => 'Previous',

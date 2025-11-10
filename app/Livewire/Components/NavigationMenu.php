@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Livewire\Components;
 
 use App\Models\Brand;
+use App\Models\Category;
 use App\Models\Collection;
 use App\Models\Menu;
 use App\Support\Cache\CacheKeys;

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 return [
+    'homepage' => 'Pagrindinis puslapis',
     'meta' => [
         'title'       => 'Atraskite šiuolaikinę el. prekybą',
         'description' => 'Naršykite kruopščiai atrinktas kolekcijas, patikimus prekės ženklus ir asmenines rekomendacijas Baltijos pirkėjams.',
@@ -131,6 +132,28 @@ return [
             'review_badge'   => 'Klientai mus vertina',
             'review_copy'    => 'Pastaruoju metu pirkėjai nuolat skiria daugiau nei keturias žvaigždes.',
             'review_caption' => 'Jau :count patikrintų atsiliepimų',
+        ],
+    ],
+    'mission' => [
+        'badge'    => 'Mūsų misija',
+        'title'    => 'Jūsų patikimiausias statybų partneris',
+        'subtitle' => 'Turime ilgametę patirtį statybose, ventiliuojamuose fasaduose ir karkasinių namų sprendimuose, todėl padedame ne tik rasti reikiamus priedus, bet ir pasiūlyti geriausius techninius sprendimus. Jei ko nerandate – drąsiai kreipkitės konsultacijai. Dirbkime kartu ir pasiekime daugiau.',
+        'actions'  => [
+            'consultation'   => 'Užsisakyti konsultaciją',
+            'view_solutions' => 'Peržiūrėti sprendimus',
+        ],
+    ],
+    'loyalty' => [
+        'badge'    => 'Lojalumas',
+        'title'    => 'Nuolaidos lojaliems klientams',
+        'subtitle' => 'Prisijunkite prie lojalumo programos ir gaukite pastovias nuolaidas bei išskirtinius pasiūlymus. Kuo dažniau perkate — tuo daugiau sutaupote.',
+        'actions'  => [
+            'join'          => 'Prisijungti',
+            'invite_friend' => 'Pakviesk draugą',
+        ],
+        'catalog' => [
+            'title'    => 'Katalogas užsakymams',
+            'subtitle' => 'Rinkitės iš plačios priedų pasiūlos – užsakykite tiesiogiai, o dėl specifinių poreikių susisiekite.',
         ],
     ],
     'catalogue' => [

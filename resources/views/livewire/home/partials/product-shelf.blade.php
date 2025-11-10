@@ -5,7 +5,7 @@
     /** @var Collection<int, ProductListItemData> $products */
 @endphp
 
-<div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+<div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
     @forelse ($products as $product)
         @include('livewire.home.partials.product-card', [
             'product' => $product,

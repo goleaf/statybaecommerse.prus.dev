@@ -10,6 +10,7 @@ use App\Models\Collection;
 use App\Models\Product;
 use App\Support\Cache\CacheKeys;
 use App\Support\Cache\CacheTags;
+use App\Support\Cache\TagAwareCache;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -19,7 +20,6 @@ use Filament\Schemas\Schema;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
-use Illuminate\Support\Facades\Cache;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -142,9 +142,7 @@ final class Index extends Component implements HasSchemas
         $locale = app()->getLocale();
 
         // Tag caches so we can flush locale-specific data when catalogue data changes.
-        return Cache::tags($this->tagsForCategoryIndex([
-            CacheTags::brands(),
-        ]))->remember(
+        return TagAwareCache::remember(
             CacheKeys::categoryIndexBrands($locale),
             now()->addSeconds(180),
             static function (): EloquentCollection {
@@ -152,7 +150,10 @@ final class Index extends Component implements HasSchemas
                     ->where('is_enabled', true)
                     ->orderBy('name')
                     ->get(['id', 'name']);
-            }
+            },
+            $this->tagsForCategoryIndex([
+                CacheTags::brands(),
+            ])
         );
     }
 
@@ -178,9 +179,7 @@ final class Index extends Component implements HasSchemas
     {
         $locale = app()->getLocale();
 
-        return Cache::tags($this->tagsForCategoryIndex([
-            CacheTags::collections(),
-        ]))->remember(
+        return TagAwareCache::remember(
             CacheKeys::categoryIndexCollections($locale),
             now()->addSeconds(180),
             static function (): EloquentCollection {
@@ -188,7 +187,10 @@ final class Index extends Component implements HasSchemas
                     ->visible()
                     ->orderBy('name')
                     ->get(['id', 'name']);
-            }
+            },
+            $this->tagsForCategoryIndex([
+                CacheTags::collections(),
+            ])
         );
     }
 
@@ -201,10 +203,7 @@ final class Index extends Component implements HasSchemas
         $locale = app()->getLocale();
         $filters = $this->filtersForCache();
 
-        return Cache::tags($this->tagsForCategoryIndex([
-            CacheTags::brands(),
-            CacheTags::products(),
-        ]))->remember(
+        return TagAwareCache::remember(
             CacheKeys::categoryIndexFacetBrands($locale, $filters),
             now()->addSeconds(180),
             function (): array {
@@ -228,7 +227,11 @@ final class Index extends Component implements HasSchemas
                     ])
                     ->values()
                     ->all();
-            }
+            },
+            $this->tagsForCategoryIndex([
+                CacheTags::brands(),
+                CacheTags::products(),
+            ])
         );
     }
 
@@ -241,10 +244,7 @@ final class Index extends Component implements HasSchemas
         $locale = app()->getLocale();
         $filters = $this->filtersForCache();
 
-        return Cache::tags($this->tagsForCategoryIndex([
-            CacheTags::collections(),
-            CacheTags::products(),
-        ]))->remember(
+        return TagAwareCache::remember(
             CacheKeys::categoryIndexFacetCollections($locale, $filters),
             now()->addSeconds(180),
             function (): array {
@@ -268,7 +268,11 @@ final class Index extends Component implements HasSchemas
                     ])
                     ->values()
                     ->all();
-            }
+            },
+            $this->tagsForCategoryIndex([
+                CacheTags::collections(),
+                CacheTags::products(),
+            ])
         );
     }
 
@@ -281,10 +285,7 @@ final class Index extends Component implements HasSchemas
         $locale = app()->getLocale();
         $filters = $this->filtersForCache();
 
-        return Cache::tags($this->tagsForCategoryIndex([
-            CacheTags::categories(),
-            CacheTags::products(),
-        ]))->remember(
+        return TagAwareCache::remember(
             CacheKeys::categoryIndexFacetCategories($locale, $filters),
             now()->addSeconds(180),
             function (): array {
@@ -308,7 +309,11 @@ final class Index extends Component implements HasSchemas
                     ])
                     ->values()
                     ->all();
-            }
+            },
+            $this->tagsForCategoryIndex([
+                CacheTags::categories(),
+                CacheTags::products(),
+            ])
         );
     }
 
@@ -352,10 +357,7 @@ final class Index extends Component implements HasSchemas
         $locale = app()->getLocale();
         $filters = $this->filtersForCache();
 
-        return Cache::tags($this->tagsForCategoryIndex([
-            CacheTags::categories(),
-            CacheTags::products(),
-        ]))->remember(
+        return TagAwareCache::remember(
             CacheKeys::categoryIndexCategories($locale, $filters),
             now()->addSeconds(180),
             function (): EloquentCollection {
@@ -410,7 +412,11 @@ final class Index extends Component implements HasSchemas
                     );
 
                 return $query->get();
-            }
+            },
+            $this->tagsForCategoryIndex([
+                CacheTags::categories(),
+                CacheTags::products(),
+            ])
         );
     }
 

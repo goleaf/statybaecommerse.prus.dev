@@ -125,4 +125,14 @@ return [
         ],
         'empty' => 'Šiai lentynai ruošiamos naujos prekės.',
     ],
+        'slider' => [
+            'tagline'        => 'Statyboms be rūpesčių',
+            'description'    => 'Platus statybinių prekių asortimentas, kuris užtikrina kokybę kiekviename žingsnyje – nuo varžtelio iki fasado apdailos medžiagų.',
+            'title'          => 'Sprendimai jūsų statyboms',
+            'autoplay_start' => 'Paleisti automatinį perjungimą',
+            'autoplay_stop'  => 'Sustabdyti automatinį perjungimą',
+            'placeholder_alt' => 'Banerio paveikslėlis',
+            'previous_slide' => 'Ankstesnis skaidrės',
+            'next_slide'     => 'Kitas skaidrės',
+        ],
 ];

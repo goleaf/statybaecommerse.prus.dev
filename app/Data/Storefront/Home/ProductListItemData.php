@@ -41,6 +41,7 @@ final class ProductListItemData implements Arrayable
         public readonly ?float $discountPercentage,
         public readonly ?string $imageUrl,
         public readonly string $initials,
+        public readonly ?string $shortDescription,
     ) {
         // Intentionally empty: DTO only stores data and exposes typed helpers below.
     }
@@ -106,6 +107,9 @@ final class ProductListItemData implements Arrayable
             'product' => $slug !== '' ? $slug : $product->getKey(),
         ]);
 
+        $shortDescription = (string) ($product->trans('short_description', $locale) ?? $product->short_description ?? '');
+        $shortDescription = $shortDescription !== '' ? $shortDescription : null;
+
         return new self(
             (int) $product->getKey(),
             $name,
@@ -122,6 +126,7 @@ final class ProductListItemData implements Arrayable
             $discountPercentage,
             $imageUrl !== '' ? $imageUrl : null,
             Str::upper(Str::of($name)->substr(0, 2)->toString()),
+            $shortDescription,
         );
     }
 
@@ -207,7 +212,8 @@ final class ProductListItemData implements Arrayable
      *     stock_quantity:int,
      *     discount_percentage:?float,
      *     image_url:?string,
-     *     initials:string
+     *     initials:string,
+     *     short_description:?string
      * }
      */
     public function toArray(): array
@@ -228,6 +234,7 @@ final class ProductListItemData implements Arrayable
             'discount_percentage' => $this->discountPercentage,
             'image_url'           => $this->imageUrl,
             'initials'            => $this->initials,
+            'short_description'   => $this->shortDescription,
         ];
     }
 }
