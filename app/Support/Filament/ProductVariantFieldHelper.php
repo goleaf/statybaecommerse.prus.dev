@@ -36,7 +36,7 @@ final class ProductVariantFieldHelper
     /**
      * Sync related order item fields whenever a product variant is picked via the lookup.
      */
-    public static function handleVariantSelection(?string $state, Set $set, Get $get, ?SearchableInput $component = null): void
+    public static function handleVariantSelection(?string $state, Set|callable $set, Get|callable $get, ?SearchableInput $component = null): void
     {
         if ($state === null || $state === '') {
             self::clearVariantComponent($component, $set, $get);
@@ -83,7 +83,7 @@ final class ProductVariantFieldHelper
     /**
      * Reset lookup-dependent fields when the variant is cleared.
      */
-    private static function clearVariantSelection(Set $set): void
+    private static function clearVariantSelection(Set|callable $set): void
     {
         // Clear identifier fields and any derived metadata so stale details never leak into a new selection.
         $set('product_variant_id', null);
@@ -96,7 +96,7 @@ final class ProductVariantFieldHelper
     /**
      * Calculate and persist the order item total after quantity/discount adjustments.
      */
-    private static function recalculateTotals(Set $set, Get $get, float $unitPrice): void
+    private static function recalculateTotals(Set|callable $set, Get|callable $get, float $unitPrice): void
     {
         $quantity = (int) ($get('quantity') ?? 1);
         $discount = (float) ($get('discount_amount') ?? 0);
@@ -121,7 +121,7 @@ final class ProductVariantFieldHelper
     /**
      * Clear the variant component UI alongside dependent snapshot fields.
      */
-    private static function clearVariantComponent(?SearchableInput $component, Set $set, Get $get): void
+    private static function clearVariantComponent(?SearchableInput $component, Set|callable $set, Get|callable $get): void
     {
         $clearSnapshot = static function () use ($set): void {
             self::clearVariantSelection($set);

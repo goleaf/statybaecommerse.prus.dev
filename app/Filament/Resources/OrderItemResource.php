@@ -8,6 +8,7 @@ use App\Enums\NavigationGroup;
 use App\Filament\Resources\OrderItemResource\Pages;
 use App\Models\OrderItem;
 use App\Models\Product;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use App\Support\Filament\Filters\DateRangeFilter;
 use App\Support\Filament\ProductVariantFieldHelper;
 use App\Support\Filament\SearchableInputHelper;
@@ -19,6 +20,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
@@ -280,6 +282,46 @@ final class OrderItemResource extends Resource
     }
 
     /**
+     * Configure the read-only view schema for order item details.
+     */
+    public static function infolist(Schema $schema): Schema
+    {
+        return $schema->schema([
+            SchemaSection::make(__('orders.sections.order_items'))
+                ->schema([
+                    SchemaGrid::make(2)
+                        ->schema([
+                            TextEntry::make('order.number')
+                                ->label(__('order_items.order_number')),
+                            TextEntry::make('name')
+                                ->label(__('order_items.product_name')),
+                            TextEntry::make('sku')
+                                ->label(__('order_items.product_sku'))
+                                ->placeholder('—'),
+                            TextEntry::make('quantity')
+                                ->label(__('order_items.quantity')),
+                            TextEntry::make('unit_price')
+                                ->label(__('order_items.unit_price'))
+                                ->formatStateUsing(static fn (mixed $state): string => number_format((float) $state, 2, '.', '')),
+                            TextEntry::make('discount_amount')
+                                ->label(__('order_items.discount_amount'))
+                                ->formatStateUsing(static fn (mixed $state): string => number_format((float) $state, 2, '.', '')),
+                            TextEntry::make('total')
+                                ->label(__('order_items.total'))
+                                ->formatStateUsing(static fn (mixed $state): string => number_format((float) $state, 2, '.', '')),
+                        ]),
+                ]),
+            SchemaSection::make(__('order_items.additional_information'))
+                ->schema([
+                    TextEntry::make('notes')
+                        ->label(__('order_items.notes'))
+                        ->placeholder('—')
+                        ->columnSpanFull(),
+                ]),
+        ]);
+    }
+
+    /**
      * Configure the Filament table with columns, filters, and actions.
      */
     public static function table(Table $table): Table
@@ -341,11 +383,7 @@ final class OrderItemResource extends Resource
                     ->preload(),
                 Filter::make('created_at')
                     ->form([
-                        Flatpickr::makeRange('range')
-                            ->label(__('order_items.created_at'))
-
-                            ->format('Y-m-d')
-                            ->displayFormat('Y-m-d'),
+                        SupportFlatpickr::makeRange('range'),
                     ])
                     ->query(fn (Builder $query, array $data): Builder => DateRangeFilter::apply(
                         $query,

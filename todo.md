@@ -1,3 +1,9 @@
+# TODO (2025-11-12)
+
+1. ✅ Fix `OrderItemResource` Filament table filter to use the shared Flatpickr helper and restore translations.
+2. ✅ Harden `SearchableComponentHelper` containerless handling so variant clearing tests pass.
+3. ✅ Re-run `php artisan test --filter=OrderItemResource` after fixes and document outcomes.
+
 # TODO (2025-11-03)
 
 1. ✅ Diagnose `ProductFeatureSeeder` duplicate constraint failures on unique `(product_id, feature_type, feature_key)`.

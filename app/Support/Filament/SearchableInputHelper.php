@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Support\Filament;
 
+use App\Support\Filament\Components\SearchableComponentHelper;
 use App\Support\Search\SearchResultPayload;
 use Closure;
 use DefStudio\SearchableInput\DTO\SearchResult;
@@ -57,7 +58,10 @@ final class SearchableInputHelper
             ->state($value)
             ->options([$value => $label]);
 
-        $component->payload($payload);
+        $payload['id'] = $value;
+        $payload['label'] = $label;
+
+        self::safeSetPayload($component, $payload);
     }
 
     /**
@@ -83,8 +87,9 @@ final class SearchableInputHelper
 
         $component
             ->state(null)
-            ->options([])
-            ->payload([]);
+            ->options([]);
+
+        self::safeSetPayload($component, []);
     }
 
     private static function normaliseState(int|string|null $state): int|string|null
@@ -173,5 +178,15 @@ final class SearchableInputHelper
             'label'   => (string) $label,
             'payload' => $payload,
         ];
+    }
+
+    /**
+     * Assign component payloads without failing when the schema container is absent.
+     *
+     * @param array<array-key, mixed> $payload
+     */
+    private static function safeSetPayload(SearchableInput $component, array $payload): void
+    {
+        SearchableComponentHelper::applyPayload($component, $payload);
     }
 }

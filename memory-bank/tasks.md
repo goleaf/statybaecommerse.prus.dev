@@ -194,6 +194,11 @@ Type: Complex System
 
 ## Remaining Critical Tasks
 
+### 🔥 Hotfix - Order Item Resource Regression (2025-11-12)
+- [x] Restore `OrderItemResource` table date filter to use the shared Flatpickr helper alias and ensure multilingual labels.
+- [x] Update `SearchableComponentHelper` so containerless components can clear payloads without triggering uninitialised container errors.
+- [x] Run `php artisan test --filter=OrderItemResource` to confirm regression resolved and capture notes for release log.
+
 ### 🔥 P0 - Critical Issues (Week 1)
 0. **Consolidate outstanding PR branches into `main` (2025-10-25 — active)**
    - [ ] Sequentially merge remaining `codex/*` branches, resolving conflicts inline

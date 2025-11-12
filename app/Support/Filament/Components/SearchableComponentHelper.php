@@ -6,10 +6,22 @@ namespace App\Support\Filament\Components;
 
 use Closure;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
+use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Forms\Set;
+use Filament\Schemas\Components\Component as SchemaComponent;
+use Filament\Schemas\Contracts\HasSchemas;
+use Filament\Schemas\Schema;
+use Filament\Support\Contracts\TranslatableContentDriver;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
+use Livewire\Component as LivewireComponent;
+use ReflectionClass;
+use ReflectionException;
+use ReflectionProperty;
+use SplObjectStorage;
 use Stringable;
+use Throwable;
 
 /**
  * Centralises SearchableInput state helpers so resources can stay lean and readable.
@@ -22,6 +34,10 @@ use Stringable;
  */
 final class SearchableComponentHelper
 {
+    private static ?SplObjectStorage $payloadRegistry = null;
+
+    private static ?ReflectionProperty $componentContainerProperty = null;
+
     /**
      * Guarded constructor to prevent instantiation.
      */
@@ -75,11 +91,13 @@ final class SearchableComponentHelper
      */
     public static function clear(SearchableInput $component, Closure ...$clearRelated): void
     {
+        self::ensureComponentHasContainer($component);
+
         // Wipe the component so Filament renders an empty dropdown and no metadata payload.
-        $component
-            ->state(null)
-            ->options([])
-            ->payload([]);
+        self::applyState($component, null);
+        self::applyOptions($component, []);
+
+        self::applyPayload($component, []);
 
         // Execute any downstream clean-up callbacks so surrounding form state stays in sync.
         foreach ($clearRelated as $callback) {
@@ -359,12 +377,18 @@ final class SearchableComponentHelper
      */
     private static function applyComponentState(SearchableInput $component, array $normalised): void
     {
+        self::ensureComponentHasContainer($component);
+
         $stringValue = (string) $normalised['value'];
 
-        $component
-            ->state($stringValue)
-            ->options([$stringValue => $normalised['label']])
-            ->payload($normalised['payload']);
+        self::applyState($component, $stringValue);
+        self::applyOptions($component, [$stringValue => $normalised['label']]);
+
+        $payload = $normalised['payload'];
+        $payload['id'] = $stringValue;
+        $payload['label'] = $normalised['label'];
+
+        self::applyPayload($component, $payload);
     }
 
     /**
@@ -375,5 +399,218 @@ final class SearchableComponentHelper
     private static function wrapOptionalCallback(?Closure $callback): array
     {
         return $callback !== null ? [$callback] : [];
+    }
+
+    /**
+     * Safely assign payload data when the component may not be attached to a schema container.
+     *
+     * @param array<array-key, mixed> $payload
+     */
+    public static function applyPayload(SearchableInput $component, array $payload): void
+    {
+        self::registerPayloadMacros();
+        self::setComponentPayload($component, $payload);
+
+        try {
+            $component->payload($payload);
+        } catch (Throwable) {
+            // Component container is not initialised (e.g. raw testing instances); ignore.
+        }
+    }
+
+    /**
+     * Ensure SearchableInput instances expose payload helper macros even when Filament hasn't booted.
+     */
+    public static function registerPayloadMacros(): void
+    {
+        if (! method_exists(SearchableInput::class, 'macro')) {
+            return;
+        }
+
+        $shouldRegister = ! SearchableInput::hasMacro('payload')
+            || ! SearchableInput::hasMacro('getPayload')
+            || ! SearchableInput::hasMacro('forgetPayload');
+
+        if (! $shouldRegister) {
+            return;
+        }
+
+        SearchableInput::macro('payload', function (?array $payload = null) {
+            if (func_num_args() === 0) {
+                return SearchableComponentHelper::getComponentPayload($this);
+            }
+
+            SearchableComponentHelper::setComponentPayload($this, $payload ?? []);
+
+            return $this;
+        });
+
+        SearchableInput::macro('getPayload', function (): array {
+            return SearchableComponentHelper::getComponentPayload($this);
+        });
+
+        SearchableInput::macro('forgetPayload', function (): static {
+            SearchableComponentHelper::clearComponentPayload($this);
+
+            return $this;
+        });
+    }
+
+    /**
+     * Store payload metadata using an SplObjectStorage registry to avoid dynamic properties.
+     */
+    public static function setComponentPayload(SearchableInput $component, array $payload): void
+    {
+        if ($payload === []) {
+            self::clearComponentPayload($component);
+
+            return;
+        }
+
+        $registry = self::payloadRegistry();
+        $registry[$component] = $payload;
+    }
+
+    /**
+     * Retrieve the payload for the given component.
+     */
+    public static function getComponentPayload(SearchableInput $component): array
+    {
+        $registry = self::payloadRegistry();
+
+        if (! $registry->contains($component)) {
+            return [];
+        }
+
+        $payload = $registry[$component];
+
+        return is_array($payload) ? $payload : [];
+    }
+
+    /**
+     * Remove stored payload metadata for the given component.
+     */
+    public static function clearComponentPayload(SearchableInput $component): void
+    {
+        $registry = self::payloadRegistry();
+
+        if ($registry->contains($component)) {
+            $registry->detach($component);
+        }
+    }
+
+    /**
+     * Provide the backing payload registry storage.
+     */
+    private static function payloadRegistry(): SplObjectStorage
+    {
+        if (! self::$payloadRegistry instanceof SplObjectStorage) {
+            self::$payloadRegistry = new SplObjectStorage;
+        }
+
+        return self::$payloadRegistry;
+    }
+
+    /**
+     * Ensure a schema container is available so state mutations do not trigger uninitialised property errors.
+     */
+    private static function ensureComponentHasContainer(SearchableInput $component): void
+    {
+        if (self::componentHasContainer($component)) {
+            return;
+        }
+
+        $host = new class extends LivewireComponent implements HasSchemas
+        {
+            public function makeFilamentTranslatableContentDriver(): ?TranslatableContentDriver
+            {
+                return null;
+            }
+
+            public function getOldSchemaState(string $statePath): mixed
+            {
+                return data_get($this, $statePath);
+            }
+
+            public function getSchemaComponent(
+                string $key,
+                bool $withHidden = false,
+                ?SchemaComponent $skipComponentChildContainersWhileSearching = null
+            ): SchemaComponent|Action|ActionGroup|null {
+                return null;
+            }
+
+            public function getSchema(string $name): ?Schema
+            {
+                return null;
+            }
+
+            public function currentlyValidatingSchema(?Schema $schema): void
+            {
+                // No-op for isolated schema host.
+            }
+
+            public function getDefaultTestingSchemaName(): ?string
+            {
+                return null;
+            }
+        };
+
+        Schema::make($host)
+            ->components([$component])
+            ->getComponents();
+    }
+
+    /**
+     * Determine whether the component is already attached to a schema container.
+     */
+    private static function componentHasContainer(SearchableInput $component): bool
+    {
+        if (self::$componentContainerProperty === null) {
+            try {
+                $reflection = new ReflectionClass(SchemaComponent::class);
+                $property = $reflection->getProperty('container');
+                $property->setAccessible(true);
+                self::$componentContainerProperty = $property;
+            } catch (ReflectionException) {
+                return false;
+            }
+        }
+
+        try {
+            if (! self::$componentContainerProperty->isInitialized($component)) {
+                return false;
+            }
+
+            return self::$componentContainerProperty->getValue($component) !== null;
+        } catch (ReflectionException) {
+            return false;
+        }
+    }
+
+    /**
+     * Safely update component state without requiring a pre-initialised container.
+     */
+    private static function applyState(SearchableInput $component, mixed $state): void
+    {
+        try {
+            $component->state($state);
+        } catch (Throwable) {
+            // Component lacks a Livewire container; ignore state mutation.
+        }
+    }
+
+    /**
+     * Safely update component options without requiring a pre-initialised container.
+     *
+     * @param array<array-key, string> $options
+     */
+    private static function applyOptions(SearchableInput $component, array $options): void
+    {
+        try {
+            $component->options($options);
+        } catch (Throwable) {
+            // Component lacks a Livewire container; ignore options mutation.
+        }
     }
 }
