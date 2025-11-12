@@ -1,16 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="/www/wwwroot/statybaecommerse.prus.dev/phpunit.xml" tests="1" assertions="2" errors="0" failures="1" skipped="0" time="16.608200">
-    <testsuite name="Feature" tests="1" assertions="2" errors="0" failures="1" skipped="0" time="16.608200">
-      <testsuite name="Tests\Feature\Api\ProductHistoryAdminApiTest" file="Product History Admin Api (Tests\Feature\Api\ProductHistoryAdminApi)" tests="1" assertions="2" errors="0" failures="1" skipped="0" time="16.608200">
-        <testcase name="Viewer cannot list product histories" file="Product History Admin Api (Tests\Feature\Api\ProductHistoryAdminApi)::Viewer cannot list product histories" class="Tests\Feature\Api\ProductHistoryAdminApiTest" classname="Tests.Feature.Api.ProductHistoryAdminApiTest" assertions="2" time="16.608200">
-          <failure type="PHPUnit\Framework\ExpectationFailedException">Viewer cannot list product historiesExpected response status code [403] but received 200.
-Failed asserting that 200 is identical to 403.
-at vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:45
-at vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:174
-at vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:141
-at tests/Feature/Api/ProductHistoryAdminApiTest.php:95</failure>
-        </testcase>
+  <testsuite name="/www/wwwroot/statybaecommerse.prus.dev/phpunit.xml" tests="21" assertions="53" errors="0" failures="0" skipped="0" time="22.744448">
+    <testsuite name="Feature" tests="21" assertions="53" errors="0" failures="0" skipped="0" time="22.744448">
+      <testsuite name="Tests\Feature\OrderItemResourceTest" file="Order Item Resource (Tests\Feature\OrderItemResource)" tests="21" assertions="53" errors="0" failures="0" skipped="0" time="22.744448">
+        <testcase name="Has correct navigation sort" file="Order Item Resource (Tests\Feature\OrderItemResource)::Has correct navigation sort" class="Tests\Feature\OrderItemResourceTest" classname="Tests.Feature.OrderItemResourceTest" assertions="1" time="13.224189"/>
+        <testcase name="Navigation group is orders" file="Order Item Resource (Tests\Feature\OrderItemResource)::Navigation group is orders" class="Tests\Feature\OrderItemResourceTest" classname="Tests.Feature.OrderItemResourceTest" assertions="1" time="0.276377"/>
+        <testcase name="Has correct record title attribute" file="Order Item Resource (Tests\Feature\OrderItemResource)::Has correct record title attribute" class="Tests\Feature\OrderItemResourceTest" classname="Tests.Feature.OrderItemResourceTest" assertions="1" time="0.271696"/>
+        <testcase name="Clearing variant selection resets lookup payload and snapshot fields" file="Order Item Resource (Tests\Feature\OrderItemResource)::Clearing variant selection resets lookup payload and snapshot fields" class="Tests\Feature\OrderItemResourceTest" classname="Tests.Feature.OrderItemResourceTest" assertions="9" time="0.402896"/>
+        <testcase name="Can list order items" file="Order Item Resource (Tests\Feature\OrderItemResource)::Can list order items" class="Tests\Feature\OrderItemResourceTest" classname="Tests.Feature.OrderItemResourceTest" assertions="1" time="0.463930"/>
+        <testcase name="Validation requires product" file="Order Item Resource (Tests\Feature\OrderItemResource)::Validation requires product" class="Tests\Feature\OrderItemResourceTest" classname="Tests.Feature.OrderItemResourceTest" assertions="3" time="0.446892"/>
+        <testcase name="Auto calculates total when unit price changes" file="Order Item Resource (Tests\Feature\OrderItemResource)::Auto calculates total when unit price changes" class="Tests\Feature\OrderItemResourceTest" classname="Tests.Feature.OrderItemResourceTest" assertions="1" time="0.489970"/>
+        <testcase name="Auto calculates total with discount" file="Order Item Resource (Tests\Feature\OrderItemResource)::Auto calculates total with discount" class="Tests\Feature\OrderItemResourceTest" classname="Tests.Feature.OrderItemResourceTest" assertions="1" time="0.506926"/>
+        <testcase name="Auto fills product data when product selected" file="Order Item Resource (Tests\Feature\OrderItemResource)::Auto fills product data when product selected" class="Tests\Feature\OrderItemResourceTest" classname="Tests.Feature.OrderItemResourceTest" assertions="3" time="0.500092"/>
+        <testcase name="Can create order item" file="Order Item Resource (Tests\Feature\OrderItemResource)::Can create order item" class="Tests\Feature\OrderItemResourceTest" classname="Tests.Feature.OrderItemResourceTest" assertions="2" time="0.512856"/>
+        <testcase name="Auto calculates total when quantity changes" file="Order Item Resource (Tests\Feature\OrderItemResource)::Auto calculates total when quantity changes" class="Tests\Feature\OrderItemResourceTest" classname="Tests.Feature.OrderItemResourceTest" assertions="1" time="0.496414"/>
+        <testcase name="Auto fills variant data when variant selected" file="Order Item Resource (Tests\Feature\OrderItemResource)::Auto fills variant data when variant selected" class="Tests\Feature\OrderItemResourceTest" classname="Tests.Feature.OrderItemResourceTest" assertions="3" time="0.498044"/>
+        <testcase name="Can edit order item" file="Order Item Resource (Tests\Feature\OrderItemResource)::Can edit order item" class="Tests\Feature\OrderItemResourceTest" classname="Tests.Feature.OrderItemResourceTest" assertions="2" time="0.508589"/>
+        <testcase name="Can delete order item" file="Order Item Resource (Tests\Feature\OrderItemResource)::Can delete order item" class="Tests\Feature\OrderItemResourceTest" classname="Tests.Feature.OrderItemResourceTest" assertions="3" time="0.509168"/>
+        <testcase name="Validation requires order" file="Order Item Resource (Tests\Feature\OrderItemResource)::Validation requires order" class="Tests\Feature\OrderItemResourceTest" classname="Tests.Feature.OrderItemResourceTest" assertions="3" time="0.516403"/>
+        <testcase name="Can filter by created date" file="Order Item Resource (Tests\Feature\OrderItemResource)::Can filter by created date" class="Tests\Feature\OrderItemResourceTest" classname="Tests.Feature.OrderItemResourceTest" assertions="3" time="0.510960"/>
+        <testcase name="Can filter by order" file="Order Item Resource (Tests\Feature\OrderItemResource)::Can filter by order" class="Tests\Feature\OrderItemResourceTest" classname="Tests.Feature.OrderItemResourceTest" assertions="3" time="0.556318"/>
+        <testcase name="Validation quantity must be minimum one" file="Order Item Resource (Tests\Feature\OrderItemResource)::Validation quantity must be minimum one" class="Tests\Feature\OrderItemResourceTest" classname="Tests.Feature.OrderItemResourceTest" assertions="3" time="0.519796"/>
+        <testcase name="Validation quantity must be numeric" file="Order Item Resource (Tests\Feature\OrderItemResource)::Validation quantity must be numeric" class="Tests\Feature\OrderItemResourceTest" classname="Tests.Feature.OrderItemResourceTest" assertions="3" time="0.530478"/>
+        <testcase name="Can filter by product" file="Order Item Resource (Tests\Feature\OrderItemResource)::Can filter by product" class="Tests\Feature\OrderItemResourceTest" classname="Tests.Feature.OrderItemResourceTest" assertions="3" time="0.585228"/>
+        <testcase name="Can view order item" file="Order Item Resource (Tests\Feature\OrderItemResource)::Can view order item" class="Tests\Feature\OrderItemResourceTest" classname="Tests.Feature.OrderItemResourceTest" assertions="3" time="0.417228"/>
       </testsuite>
     </testsuite>
   </testsuite>
