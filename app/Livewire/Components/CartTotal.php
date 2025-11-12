@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Components;
 
+use App\Services\Pricing\PriceCalculator;
 use DB;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Computed;

@@ -68,7 +68,7 @@
                 </div>
             </div>
             
-            <!-- Slider Container -->
+        <!-- Slider Container -->
             <div class="relative w-full h-max aspect-[16/9] md:aspect-[16/6] overflow-hidden">
                 @if($this->sliders->count() > 1)
                     <div class="pointer-events-none absolute top-1/2 left-0 right-0 z-30 -translate-y-1/2 transform flex items-center justify-between px-4 md:px-6">
@@ -91,9 +91,9 @@
                 @foreach($this->sliders as $index => $slider)
                     <div class="absolute inset-0 transition-opacity duration-1000 ease-in-out"
                          :class="{ 'opacity-100': currentSlide === {{ $index }}, 'opacity-0': currentSlide !== {{ $index }} }">
-                        
-                        <!-- Background Image -->
-                        @php($bgUrl = $slider->getImageUrl('slider_large') ?? $slider->getImageUrl('slider'))
+
+                    <!-- Background Image -->
+                    @php($bgUrl = $slider->getImageUrl('slider_large') ?? $slider->getImageUrl('slider'))
                         @if($bgUrl)
                             <img src="{{ $bgUrl }}" 
                                  class="w-full h-full object-cover" 
@@ -103,44 +103,44 @@
                             <div class="w-full h-full bg-gray-300 flex items-center justify-center">
                                 <span class="text-gray-500">{{ __('frontend/home.slider.placeholder_alt') }}</span>
                             </div>
-                        @endif
+                    @endif
 
-                        <!-- Overlay -->
+                    <!-- Overlay -->
                         <div class="absolute inset-0 bg-black bg-opacity-30"></div>
-                        
+
                         <!-- Slider Content -->
                         <div class="absolute inset-0 z-20 flex items-center justify-center">
                             <div class="max-w-4xl mx-auto text-center px-4">
-                                <div class="space-y-6">
-                                    <!-- Title -->
+                            <div class="space-y-6">
+                                <!-- Title -->
                                     <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight text-white">
-                                        {{ $slider->getTranslatedTitle() }}
-                                    </h1>
+                                    {{ $slider->getTranslatedTitle() }}
+                                </h1>
 
-                                    <!-- Description -->
+                                <!-- Description -->
                                     @if($slider->getTranslatedDescription())
                                         <p class="text-sm sm:text-base lg:text-lg max-w-3xl mx-auto leading-tight text-white opacity-90">
-                                            {{ $slider->getTranslatedDescription() }}
-                                        </p>
-                                    @endif
+                                        {{ $slider->getTranslatedDescription() }}
+                                    </p>
+                                @endif
 
-                                    <!-- Button -->
+                                <!-- Button -->
                                     @if($slider->getTranslatedButtonText() && $slider->button_url)
-                                        <div class="pt-4">
-                                            <a href="{{ $slider->button_url }}"
+                                    <div class="pt-4">
+                                        <a href="{{ $slider->button_url }}"
                                                class="inline-flex items-center px-8 py-4 text-lg font-semibold text-white rounded-full hover:opacity-90 transition-colors duration-300 shadow-lg bg-dark">
-                                                {{ $slider->getTranslatedButtonText() }}
+                                            {{ $slider->getTranslatedButtonText() }}
                                                 <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                                                </svg>
-                                            </a>
-                                        </div>
-                                    @endif
-                                </div>
+                                            </svg>
+                                        </a>
+                                    </div>
+                                @endif
                             </div>
                         </div>
                     </div>
-                @endforeach
+                </div>
+            @endforeach
                 
                 <!-- Decorative Elements -->
                 <div class="hidden md:block absolute z-10 h-48 aspect-square rotate-45 -top-32 right-[30%] bg-sage"></div>

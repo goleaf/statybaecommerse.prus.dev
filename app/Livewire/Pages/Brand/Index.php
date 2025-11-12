@@ -36,6 +36,8 @@ final class Index extends AbstractPageComponent implements HasSchemas
     #[Url(except: 'name')]
     public string $sortBy = 'name';
 
+    public bool $sidebarOpen = false;
+
     /**
      * Initialize the Livewire component with parameters.
      */

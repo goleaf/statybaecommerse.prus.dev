@@ -125,9 +125,9 @@
         {{-- Main product name with separator --}}
         <h3 id="product-title-{{ $id }}" class="text-base font-bold mb-2" style="color: {{ $brandPrimary }};">
             <a href="{{ $detailUrl }}" style="color: {{ $brandPrimary }};" class="hover:opacity-80 transition-opacity">
-                {{ $name }}
-            </a>
-        </h3>
+                    {{ $name }}
+                </a>
+            </h3>
         <div class="w-12 h-0.5 mb-3" style="background-color: {{ $brandPrimaryLighter }};"></div>
 
         {{-- Short Description --}}
@@ -149,7 +149,7 @@
                         {{ Number::currency($compareAtPrice, current_currency(), app()->getLocale()) }}
                     </span>
                 @endif
-            </div>
+        </div>
 
             {{-- Dark Add to Cart Button with brand primary color --}}
             <button type="button"
@@ -185,7 +185,7 @@
                         </svg>
                     @endfor
                     <span class="ml-1 text-xs" style="color: {{ $brandPrimaryLight }} !important;">({{ $reviewsCount }})</span>
-                @else
+        @else
                     {{-- Show empty stars when no reviews --}}
                     @for ($i = 1; $i <= 5; $i++)
                         <svg class="w-3.5 h-3.5" 
