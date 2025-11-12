@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace App\Livewire\Pages\Category;
 
+use App\Data\Storefront\Home\ProductListItemData;
+use App\Livewire\Concerns\WithCart;
 use App\Models\Category;
 use App\Models\Product;
 use App\Support\Cache\CacheKeys;
 use App\Support\Cache\CacheTags;
+use App\Support\Cache\TagAwareCache;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator as LengthAwarePaginatorContract;
 use Illuminate\Contracts\View\View;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -19,10 +22,11 @@ use Livewire\WithPagination;
  * @property Category $category
  * @property string   $sortBy
  * @property string   $sortDirection
- * @property-read LengthAwarePaginatorContract<int, Product> $products
+ * @property-read LengthAwarePaginatorContract<int, ProductListItemData> $products
  */
 final class Show extends Component
 {
+    use WithCart;
     use WithPagination;
 
     public Category $category;
@@ -43,7 +47,7 @@ final class Show extends Component
     }
 
     /**
-     * @return LengthAwarePaginatorContract<int, Product>
+     * @return LengthAwarePaginatorContract<int, ProductListItemData>
      */
     #[Computed]
     public function products(): LengthAwarePaginatorContract
@@ -66,12 +70,13 @@ final class Show extends Component
         ];
 
         // Cache each combination of pagination and sorting for a short window to reduce database pressure.
-        return Cache::tags($tags)->remember($cacheKey, now()->addSeconds(180), function (): LengthAwarePaginatorContract {
+        return TagAwareCache::remember($cacheKey, now()->addSeconds(180), function () use ($locale): LengthAwarePaginatorContract {
             /** @var LengthAwarePaginatorContract<int, Product> $paginator */
             $paginator = $this->category->products()
                 ->where('is_visible', true)
                 ->with([
                     'brand:id,name,slug',
+                    'categories:id,name,slug',
                     'media' => function ($query): void {
                         $query->select('id', 'model_id', 'model_type', 'name', 'file_name', 'disk', 'conversions_disk', 'size', 'mime_type', 'manipulations', 'custom_properties', 'generated_conversions', 'responsive_images', 'order_column', 'created_at', 'updated_at')
                             ->where('collection_name', 'images')
@@ -90,8 +95,21 @@ final class Show extends Component
                 ->orderBy('products.' . $this->sortBy, $this->sortDirection)
                 ->paginate(12);
 
-            return $paginator;
-        });
+            // Convert Product models to ProductListItemData DTOs
+            $items = $paginator->getCollection()->map(fn (Product $product): ProductListItemData => ProductListItemData::fromModel($product, $locale));
+
+            // Create a new paginator with the DTOs
+            return new LengthAwarePaginator(
+                $items,
+                $paginator->total(),
+                $paginator->perPage(),
+                $paginator->currentPage(),
+                [
+                    'path' => request()->url(),
+                    'pageName' => 'page',
+                ]
+            );
+        }, $tags);
     }
 
     public function render(): View

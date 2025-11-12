@@ -1,77 +1,70 @@
-<div x-data="{ showFilters: false, viewMode: 'grid' }" class="min-h-screen bg-white">
-    <x-container class="py-8 lg:py-12">
-        <!-- Enhanced Breadcrumbs -->
-        <div class="mb-8">
-            <x-breadcrumbs :items="[
-                ['label' => __('translations.categories'), 'url' => route('localized.categories.index', ['locale' => app()->getLocale()])],
-                ['label' => $category->name, 'url' => url()->current()],
-            ]" />
+<div x-data="{ showFilters: false, viewMode: 'grid' }" class="min-h-screen bg-sage">
+    <!-- Dark Banner Section -->
+    <div class="bg-dark text-sage">
+        <x-container class="px-4 py-12 sm:py-16">
+            <nav class="text-xs font-medium uppercase tracking-[0.3em] text-sage/80" aria-label="{{ __('Breadcrumb') }}">
+                <ol class="flex items-center gap-3">
+                    <li>
+                        <a href="{{ route('localized.home', ['locale' => app()->getLocale()]) }}"
+                           class="inline-flex items-center gap-2 text-sage transition hover:text-white">
+                            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h12a1 1 0 001-1V10" />
+                            </svg>
+                            {{ __('frontend.navigation.home') }}
+                        </a>
+                    </li>
+                    <li class="text-sage/60">/</li>
+                    <li>
+                        <a href="{{ route('localized.categories.index', ['locale' => app()->getLocale()]) }}"
+                           class="text-sage transition hover:text-white">
+                            {{ __('translations.categories') }}
+                        </a>
+                    </li>
+                    <li class="text-sage/60">/</li>
+                    <li class="text-white">{{ $category->name }}</li>
+                </ol>
+            </nav>
+
+            <div class="mt-8 flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+                <div class="max-w-2xl space-y-5">
+                    <span class="inline-flex items-center gap-2 rounded-full border border-sage bg-sage px-4 py-1 text-[11px] font-semibold uppercase tracking-[0.35em] text-dark">
+                        {{ __('Category') }}
+                    </span>
+                    <h1 class="text-3xl font-bold leading-tight text-white sm:text-4xl md:text-5xl">
+                        {{ $category->name }}
+                    </h1>
+                    @if (!empty($category->description))
+                        <p class="text-base text-white sm:text-lg">
+                            {{ $category->description }}
+                        </p>
+                    @endif
         </div>
 
-        <!-- Enhanced Header Section -->
-        <div class="mb-8">
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 lg:p-8">
-                <div class="flex items-start justify-between gap-6">
-                    <div class="flex-1">
-                        <div class="flex items-center gap-3 mb-3">
-                            <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
-                                </svg>
+                <div class="flex flex-col items-start gap-3 sm:flex-row sm:items-end sm:gap-6">
+                    <div class="rounded-2xl border border-sage/30 bg-sage/10 px-4 py-3 text-sm font-semibold text-sage shadow-sm">
+                        {{ __(':count products', ['count' => number_format($products->total())]) }}
                             </div>
-                            <h1 class="text-3xl lg:text-4xl font-bold text-gray-900">{{ $category->name }}</h1>
-                        </div>
-                        @if (!empty($category->description))
-                            <p class="text-gray-600 text-lg leading-relaxed max-w-3xl">{{ $category->description }}</p>
+                    <div class="rounded-2xl border border-sage/30 bg-sage/10 px-4 py-3 text-sm text-sage/80 shadow-sm">
+                        @if ($products->firstItem() && $products->lastItem())
+                            {{ __('Showing :from–:to', ['from' => $products->firstItem(), 'to' => $products->lastItem()]) }}
+                        @else
+                            {{ __('No products to display') }}
                         @endif
                     </div>
-                    <div class="flex items-center gap-3">
-                        <!-- View Mode Toggle -->
-                        <div class="hidden lg:flex items-center bg-gray-100 rounded-lg p-1">
-                            <button @click="viewMode = 'grid'" 
-                                    :class="viewMode === 'grid' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500'"
-                                    class="p-2 rounded-md transition-all duration-200">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
-                                </svg>
-                            </button>
-                            <button @click="viewMode = 'list'" 
-                                    :class="viewMode === 'list' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500'"
-                                    class="p-2 rounded-md transition-all duration-200">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
-                                </svg>
-                            </button>
-                        </div>
-                        <!-- Mobile Filter Button -->
-                        <div class="lg:hidden">
-                            <button @click="showFilters = true" type="button"
-                                    class="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 transition-all duration-200">
-                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                          d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707l-6.414 6.414A1 1 0 0014 13v6l-4-2v-4a1 1 0 00-.293-.707L3.293 6.707A1 1 0 013 6V4z" />
+                    <button type="button"
+                            @click="showFilters = true"
+                            class="inline-flex items-center gap-2 rounded-full border border-sage/30 bg-sage/10 px-4 py-2 text-sm font-semibold text-sage shadow-sm transition hover:border-sage hover:bg-sage/20 lg:hidden">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 5h6M3 12h6m-6 7h6M13 5h8M13 12h8m-8 7h8" />
                                 </svg>
                                 {{ __('translations.filter') }}
                             </button>
-                        </div>
-                    </div>
-                </div>
-                <!-- Enhanced Results Counter -->
-                <div class="mt-6 flex items-center justify-between">
-                    <div class="flex items-center gap-4">
-                        <div class="bg-blue-50 px-4 py-2 rounded-lg">
-                            <span class="text-sm font-semibold text-blue-700">
-                                {{ __('translations.showing') ?? 'Showing' }} {{ $products->firstItem() }}–{{ $products->lastItem() }} {{ __('translations.of_total') ?? 'of' }} {{ $products->total() }}
-                            </span>
-                        </div>
-                        <div class="text-sm text-gray-500">
-                            {{ $products->total() }} {{ __('translations.products') ?? 'Products' }}
-                        </div>
-                    </div>
                 </div>
             </div>
+        </x-container>
         </div>
 
+    <x-container class="px-4 pb-16 pt-12">
         @php
             $roots = \App\Models\Category::query()
                 ->where('is_visible', true)
@@ -121,152 +114,235 @@
                 ->values();
         @endphp
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <aside class="lg:col-span-3">
-                <div class="hidden lg:block sticky top-24 space-y-6">
-                    <!-- Enhanced Categories Filter -->
-                    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-                        <div class="border-b border-gray-200 p-4 bg-gray-50">
-                            <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="grid gap-8 lg:grid-cols-12">
+            <aside class="hidden lg:col-span-3 lg:block">
+                <div class="rounded-3xl border border-sage/30 bg-dark p-6 shadow-lg">
+                    <div class="mb-6 space-y-2">
+                        <span class="inline-flex items-center gap-2 rounded-full border border-sage/30 bg-sage/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.35em] text-sage">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                            </svg>
+                            {{ __('Filters') }}
+                        </span>
+                        <h2 class="text-xl font-semibold text-white">{{ __('Refine products') }}</h2>
+                        <p class="text-sm leading-relaxed text-sage/80">
+                            {{ __('Combine categories, brands and collections to focus your search.') }}
+                        </p>
+                    </div>
+                    <div class="space-y-6">
+                        <!-- Categories Filter -->
+                        <div class="rounded-2xl border border-sage/30 bg-dark/50 p-4">
+                            <h3 class="mb-3 text-sm font-semibold text-sage flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
                                 </svg>
                                 {{ __('translations.categories') }}
                             </h3>
-                        </div>
-                        <div class="p-4">
+                            <div class="space-y-1">
                             <x-category.tree :nodes="$categoryTree" />
                         </div>
                     </div>
 
-                    <!-- Enhanced Advanced Filters -->
-                    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-                        <div class="border-b border-gray-200 p-4 bg-gray-50">
-                            <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <!-- Advanced Filters -->
+                        <div class="rounded-2xl border border-sage/30 bg-dark/50 p-4">
+                            <h3 class="mb-3 text-sm font-semibold text-sage flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707l-6.414 6.414A1 1 0 0014 13v6l-4-2v-4a1 1 0 00-.293-.707L3.293 6.707A1 1 0 013 6V4z"></path>
                                 </svg>
                                 {{ __('translations.advanced_filters') }}
                             </h3>
-                        </div>
-                        <div class="p-4">
-                            @livewire('components.product-filter-widget')
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Enhanced Mobile off-canvas -->
-                <div x-cloak x-show="showFilters" class="lg:hidden fixed inset-0 z-50">
-                    <div @click="showFilters = false" class="absolute inset-0 bg-black/30"></div>
-                    <div
-                         class="absolute inset-y-0 left-0 w-80 max-w-[85%] overflow-y-auto bg-white shadow-xl">
-                        <!-- Mobile Header -->
-                        <div class="border-b border-gray-200 p-4 bg-gray-50">
-                            <div class="flex items-center justify-between">
-                                <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707l-6.414 6.414A1 1 0 0014 13v6l-4-2v-4a1 1 0 00-.293-.707L3.293 6.707A1 1 0 013 6V4z"></path>
-                                    </svg>
-                                    {{ __('translations.filters') ?? __('translations.advanced_filters') }}
-                                </h3>
-                                <button @click="showFilters = false"
-                                        class="rounded-lg p-2 text-gray-400 hover:bg-gray-100 transition-colors duration-200">
-                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="p-4 space-y-6">
                             <div>
-                                <h4 class="mb-3 text-sm font-semibold text-gray-700 flex items-center gap-2">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-                                    </svg>
-                                    {{ __('translations.categories') }}
-                                </h4>
-                                <x-category.tree :nodes="$categoryTree" />
+                                @livewire('components.product-filter-widget')
                             </div>
-                            @livewire('components.product-filter-widget')
                         </div>
                     </div>
                 </div>
             </aside>
 
-            <section class="lg:col-span-9">
-                <!-- Enhanced Sort and Filter Controls -->
-                <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 mb-6">
-                    <div class="flex items-center justify-between gap-4">
-                        <div class="flex items-center gap-4">
-                            <div class="text-sm font-semibold text-gray-700">
-                                {{ $products->total() }} {{ __('translations.products') ?? 'Products' }}
-                            </div>
+            <section class="lg:col-span-9 space-y-6" x-data="{ view: 'grid' }">
+                <!-- Sort and Filter Controls -->
+                <div class="rounded-3xl border border-sage/30 bg-dark p-4 shadow-sm sm:p-6">
+                    <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                        <div class="flex flex-wrap items-center gap-3 text-sm text-sage">
+                            <span class="inline-flex items-center gap-2 rounded-full border border-sage/30 bg-sage/10 px-3 py-1 text-xs font-semibold text-sage">
+                                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                {{ __('Real-time results') }}
+                            </span>
+                            @if ($products->firstItem() && $products->lastItem())
+                                <span class="text-sage/80">{{ __('Showing :from–:to of :total results', ['from' => $products->firstItem(), 'to' => $products->lastItem(), 'total' => $products->total()]) }}</span>
+                            @else
+                                <span class="text-sage/80">{{ __('No results to display') }}</span>
+                            @endif
                         </div>
-                        <div class="flex items-center gap-3">
-                            <div class="flex items-center gap-2">
-                                <label class="text-sm font-medium text-gray-700">{{ __('translations.sort_by') ?? 'Sort by' }}:</label>
-                                <select wire:model.live="sortBy"
-                                        class="rounded-lg border-gray-300 bg-white text-sm font-medium text-gray-900 px-3 py-2 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
-                                    <option value="created_at">{{ __('translations.newest') ?? 'Newest' }}</option>
-                                    <option value="name">{{ __('translations.name') ?? 'Name' }}</option>
-                                    <option value="price">{{ __('translations.price') ?? 'Price' }}</option>
-                                    <option value="rating">{{ __('translations.rating') ?? 'Rating' }}</option>
+
+                        <div class="flex flex-wrap items-center gap-3">
+                            <div class="flex items-center gap-2 rounded-xl border border-sage/30 bg-dark/30 px-3 py-2 text-sm text-sage">
+                                <label for="sort-by" class="text-xs font-semibold uppercase tracking-wide text-sage/60">
+                                    {{ __('Sort') }}
+                                </label>
+                                <select id="sort-by" wire:model.live="sortBy" class="border-0 bg-transparent text-sm font-medium text-sage focus:outline-none focus:ring-0">
+                                    <option value="created_at" class="bg-dark text-sage">{{ __('translations.newest') ?? 'Newest' }}</option>
+                                    <option value="name" class="bg-dark text-sage">{{ __('translations.name') ?? 'Name' }}</option>
+                                    <option value="price" class="bg-dark text-sage">{{ __('translations.price') ?? 'Price' }}</option>
+                                    <option value="rating" class="bg-dark text-sage">{{ __('translations.rating') ?? 'Rating' }}</option>
                                 </select>
                             </div>
-                            <div class="flex items-center gap-2">
-                                <label class="text-sm font-medium text-gray-700">{{ __('translations.order') ?? 'Order' }}:</label>
-                                <select wire:model.live="sortDirection"
-                                        class="rounded-lg border-gray-300 bg-white text-sm font-medium text-gray-900 px-3 py-2 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
-                                    <option value="asc">{{ __('translations.ascending') ?? 'Ascending' }}</option>
-                                    <option value="desc">{{ __('translations.descending') ?? 'Descending' }}</option>
+
+                            <div class="flex items-center gap-2 rounded-xl border border-sage/30 bg-dark/30 px-3 py-2 text-sm text-sage">
+                                <label for="sort-direction" class="text-xs font-semibold uppercase tracking-wide text-sage/60">
+                                    {{ __('Order') }}
+                                </label>
+                                <select id="sort-direction" wire:model.live="sortDirection" class="border-0 bg-transparent text-sm font-medium text-sage focus:outline-none focus:ring-0">
+                                    <option value="asc" class="bg-dark text-sage">{{ __('translations.ascending') ?? 'Ascending' }}</option>
+                                    <option value="desc" class="bg-dark text-sage">{{ __('translations.descending') ?? 'Descending' }}</option>
                                 </select>
+                            </div>
+
+                            <div class="hidden items-center gap-1 rounded-xl border border-sage/30 bg-dark/30 p-1 text-sage shadow-sm md:flex">
+                                <button type="button"
+                                        @click="view = 'grid'; viewMode = 'grid'"
+                                        :class="view === 'grid' ? 'bg-sage text-dark shadow-sm' : 'hover:text-white hover:bg-sage/10'"
+                                        class="inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-semibold transition text-sage">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h7v7H4V6zm9 0h7v7h-7V6zM4 13h7v7H4v-7zm9 0h7v7h-7v-7z" />
+                                    </svg>
+                                    {{ __('Grid') }}
+                                </button>
+                                <button type="button"
+                                        @click="view = 'list'; viewMode = 'list'"
+                                        :class="view === 'list' ? 'bg-sage text-dark shadow-sm' : 'hover:text-white hover:bg-sage/10'"
+                                        class="inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-semibold transition text-sage">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                                    </svg>
+                                    {{ __('List') }}
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <div class="relative">
+                    <div wire:loading.delay.longer class="absolute inset-0 z-10 flex items-center justify-center rounded-3xl bg-dark/80 backdrop-blur-sm">
+                        <div class="h-10 w-10 animate-spin rounded-full border-2 border-sage border-t-transparent"></div>
+                </div>
+
                 @if ($products->count() > 0)
-                    <!-- Enhanced Products Grid -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-                         :class="viewMode === 'list' ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'">
+                        <!-- Products Grid -->
+                        <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+                             :class="view === 'list' ? 'sm:grid-cols-1 xl:grid-cols-1' : 'sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'">
                         @foreach ($products as $product)
                             <div class="animate-fade-in-up animate-delay" data-delay="{{ $loop->index * 0.1 }}">
-                                <x-product-card :product="$product" :show-quick-add="true" :show-wishlist="true" :show-compare="true" />
+                                    @include('livewire.home.partials.product-card', [
+                                        'product' => $product,
+                                        'preset' => 'featured',
+                                        'attributes' => new \Illuminate\View\ComponentAttributeBag(),
+                                    ])
                             </div>
                         @endforeach
                     </div>
 
-                    <!-- Enhanced Pagination -->
-                    <div class="mt-12 flex justify-center">
-                        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-4">
-                            <x-filament::pagination :paginator="$products" />
-                        </div>
+                        <!-- Pagination -->
+                        <div class="mt-12 rounded-3xl border border-sage/30 bg-dark p-6 shadow-lg">
+                            <nav class="flex items-center justify-center" aria-label="{{ __('Pagination Navigation') }}">
+                                <div class="flex items-center justify-center">
+                                    <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+                                        @if ($products->onFirstPage())
+                                            <span class="relative inline-flex items-center rounded-l-md px-2 py-2 text-sage/60 ring-1 ring-inset ring-sage/30">
+                                                <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clip-rule="evenodd" />
+                                                </svg>
+                                            </span>
+                                        @else
+                                            <button wire:click="previousPage('page')" wire:loading.attr="disabled" class="relative inline-flex items-center rounded-l-md px-2 py-2 text-sage ring-1 ring-inset ring-sage/30 hover:bg-sage/10 hover:text-white focus:z-20 focus:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed">
+                                                <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clip-rule="evenodd" />
+                                                </svg>
+                                            </button>
+                                        @endif
+
+                                        @php
+                                            $currentPage = $products->currentPage();
+                                            $lastPage = $products->lastPage();
+                                            $startPage = max(1, $currentPage - 2);
+                                            $endPage = min($lastPage, $currentPage + 2);
+                                        @endphp
+
+                                        @if ($startPage > 1)
+                                            <button wire:click="gotoPage(1, 'page')" class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-sage ring-1 ring-inset ring-sage/30 hover:bg-sage/10 hover:text-white focus:z-20 focus:outline-offset-0">
+                                                1
+                                            </button>
+                                            @if ($startPage > 2)
+                                                <span class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-sage/60">...</span>
+                                            @endif
+                                        @endif
+
+                                        @for ($page = $startPage; $page <= $endPage; $page++)
+                                            @if ($page == $currentPage)
+                                                <span class="relative z-10 inline-flex items-center bg-sage px-4 py-2 text-sm font-semibold text-dark focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sage">
+                                                    {{ $page }}
+                                                </span>
+                                            @else
+                                                <button wire:click="gotoPage({{ $page }}, 'page')" class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-sage ring-1 ring-inset ring-sage/30 hover:bg-sage/10 hover:text-white focus:z-20 focus:outline-offset-0">
+                                                    {{ $page }}
+                                                </button>
+                                            @endif
+                                        @endfor
+
+                                        @if ($endPage < $lastPage)
+                                            @if ($endPage < $lastPage - 1)
+                                                <span class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-sage/60">...</span>
+                                            @endif
+                                            <button wire:click="gotoPage({{ $lastPage }}, 'page')" class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-sage ring-1 ring-inset ring-sage/30 hover:bg-sage/10 hover:text-white focus:z-20 focus:outline-offset-0">
+                                                {{ $lastPage }}
+                                            </button>
+                                        @endif
+
+                                        @if ($products->hasMorePages())
+                                            <button wire:click="nextPage('page')" wire:loading.attr="disabled" class="relative inline-flex items-center rounded-r-md px-2 py-2 text-sage ring-1 ring-inset ring-sage/30 hover:bg-sage/10 hover:text-white focus:z-20 focus:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed">
+                                                <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
+                                                </svg>
+                                            </button>
+                                        @else
+                                            <span class="relative inline-flex items-center rounded-r-md px-2 py-2 text-sage/60 ring-1 ring-inset ring-sage/30">
+                                                <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
+                                                </svg>
+                                            </span>
+                                        @endif
+                                    </nav>
+                                </div>
+                            </nav>
                     </div>
                 @else
-                    <!-- Enhanced Empty State -->
-                    <div class="bg-white rounded-2xl border border-dashed border-gray-300 p-12 text-center shadow-sm">
-                        <div class="mx-auto mb-6 h-16 w-16 text-gray-400">
+                        <!-- Empty State -->
+                        <div class="rounded-3xl border border-dashed border-sage/30 bg-dark/50 p-12 text-center shadow-sm">
+                            <div class="mx-auto mb-6 h-16 w-16 text-sage/60">
                             <svg class="h-16 w-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                                       d="M21 21l-4.35-4.35m1.1-4.4a7.5 7.5 0 11-15 0 7.5 7.5 0 0115 0z" />
                             </svg>
                         </div>
-                        <h3 class="text-xl font-bold text-gray-900 mb-2">
+                            <h3 class="text-xl font-bold text-white mb-2">
                             {{ __('translations.no_products_found') ?? 'No products found' }}
                         </h3>
-                        <p class="text-gray-500 mb-8 max-w-md mx-auto">
+                            <p class="text-sage/80 mb-8 max-w-md mx-auto">
                             {{ __('translations.try_different_search') ?? 'Try adjusting your filters or search terms to find what you\'re looking for.' }}
                         </p>
                         <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
                                 <a href="{{ route('localized.categories.index', ['locale' => app()->getLocale()]) }}"
-                               class="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-6 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-all duration-200 shadow-sm">
+                                   class="inline-flex items-center gap-2 rounded-full border border-sage/30 bg-sage/10 px-6 py-3 text-sm font-semibold text-sage transition hover:border-sage hover:bg-sage/20 shadow-sm">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
                                 </svg>
                                 {{ __('translations.browse_categories') ?? 'Browse Categories' }}
                             </a>
-                            <a href="{{ route('products.index') }}"
-                               class="inline-flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 px-6 py-3 text-sm font-semibold text-white transition-all duration-200 shadow-sm hover:shadow">
+                                <a href="{{ route('products.index') ?? route('localized.categories.index', ['locale' => app()->getLocale()]) }}"
+                                   class="inline-flex items-center gap-2 rounded-full bg-sage px-6 py-3 text-sm font-semibold text-dark transition hover:bg-sage/90 shadow-sm">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
                                 </svg>
@@ -275,19 +351,62 @@
                         </div>
                     </div>
                 @endif
+                </div>
             </section>
         </div>
-
-        <!-- Enhanced Back Button -->
-        <div class="mt-12 text-center">
-            <a href="{{ route('localized.categories.index', ['locale' => app()->getLocale()]) }}"
-               class="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 hover:bg-gray-800 text-white font-semibold rounded-xl transition-all duration-200 shadow-sm hover:shadow">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-                </svg>
-                {{ __('frontend.buttons.back_to_categories') ?? 'Back to Categories' }}
-            </a>
-        </div>
     </x-container>
-</div>
 
+    <!-- Mobile Filter Sidebar -->
+    <div x-cloak x-show="showFilters" class="lg:hidden fixed inset-0 z-50">
+        <div @click="showFilters = false" class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
+        <div class="absolute inset-y-0 right-0 w-11/12 max-w-md rounded-l-3xl bg-dark shadow-2xl">
+            <div class="flex h-full flex-col overflow-y-auto">
+                <div class="flex items-center justify-between border-b border-sage/30 p-6">
+                    <div class="space-y-2">
+                        <span class="inline-flex items-center gap-2 rounded-full border border-sage/30 bg-sage/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.35em] text-sage">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                            </svg>
+                            {{ __('Filters') }}
+                        </span>
+                        <h2 class="text-xl font-semibold text-white">{{ __('Filters') }}</h2>
+                        <p class="text-sm leading-relaxed text-sage/80">
+                            {{ __('Adjust filters to personalise the products view.') }}
+                        </p>
+                    </div>
+                    <button type="button"
+                            class="rounded-full border border-sage/30 p-2 text-sage transition hover:border-sage hover:bg-sage/10"
+                            @click="showFilters = false"
+                            aria-label="{{ __('Close') }}">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="flex-1 space-y-6 overflow-y-auto p-6">
+                    <div>
+                        <h4 class="mb-3 text-sm font-semibold text-sage flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                </svg>
+                            {{ __('translations.categories') }}
+                        </h4>
+                        <div class="space-y-1">
+                            <x-category.tree :nodes="$categoryTree" />
+                        </div>
+                    </div>
+                    @livewire('components.product-filter-widget')
+                </div>
+                <div class="border-t border-sage/30 p-6">
+                    <button type="button"
+                            @click="showFilters = false"
+                            class="w-full rounded-full bg-sage px-6 py-3 text-sm font-semibold text-dark transition hover:bg-sage/90 shadow-sm">
+                        {{ __('Apply filters') }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <x-filament-actions::modals />
+</div>

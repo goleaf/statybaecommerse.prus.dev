@@ -131,15 +131,15 @@
                     <span class="w-8 h-[2px] bg-brand-primary"></span>
                     // {{ __('footer_subscribe_title') }}
                 </p>
-                <div class="space-y-8">
-                    <div>
+                    <div class="space-y-8">
+                        <div>
                         <p class="text-sm leading-relaxed text-ash/80 mb-6">
-                            {{ __('footer_subscribe_desc') }}
-                        </p>
+                                {{ __('footer_subscribe_desc') }}
+                            </p>
                         {{-- Newsletter Form --}}
-                        <livewire:newsletter-subscription />
-                    </div>
-                    <div class="flex items-center space-x-6">
+                            <livewire:newsletter-subscription />
+                        </div>
+                        <div class="flex items-center space-x-6">
                         @if ($socialFacebook)
                             <a href="{{ $socialFacebook }}"
                                class="text-ash hover:text-sage transition-colors duration-200 transform hover:scale-110 p-2 rounded-full">
@@ -223,75 +223,75 @@
         <div class="max-w-site mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div class="flex flex-col items-center border-t-0 sm:flex-row sm:justify-between">
                 <p class="text-sm text-ash">
-                    © {{ date('Y') }} {{ config('app.name') }}, Inc. {{ __('footer_all_rights_reserved') }}
-                    <a href="https://filamentphp.com" target="_blank"
+                © {{ date('Y') }} {{ config('app.name') }}, Inc. {{ __('footer_all_rights_reserved') }}
+                <a href="https://filamentphp.com" target="_blank"
                        class="pl-1 underline hover:text-sage transition-colors duration-200 font-medium">
-                        {{ __('footer_powered_by_filament') }}
-                    </a>
-                </p>
+                    {{ __('footer_powered_by_filament') }}
+                </a>
+            </p>
                 <div class="mt-8 flex items-center gap-6 divide-x divide-ash/30 sm:mt-0">
-                    <x-language-switcher />
-                    @if (auth()->check() && auth()->user()->can('view orders'))
-                        <x-link href="{{ route('exports.index') }}"
+                <x-language-switcher />
+                @if (auth()->check() && auth()->user()->can('view orders'))
+                    <x-link href="{{ route('exports.index') }}"
                                 class="inline-flex px-3 text-sm leading-5 text-ash hover:text-sage transition-colors duration-200 font-medium">
-                            {{ __('Exports') }}
-                        </x-link>
-                    @endif
+                        {{ __('Exports') }}
+                    </x-link>
+                @endif
+                @php
+                    $hasLegals = \Illuminate\Support\Facades\Schema::hasTable('legals');
+                @endphp
+                @if ($hasLegals)
                     @php
-                        $hasLegals = \Illuminate\Support\Facades\Schema::hasTable('legals');
+                        $legalModel = app(\App\Models\Legal::class);
+                        $privacy = $legalModel->newQuery()->where('key', 'privacy')->where('is_enabled', true)->first();
+                        $terms = $legalModel->newQuery()->where('key', 'terms')->where('is_enabled', true)->first();
+                        $refund = $legalModel->newQuery()->where('key', 'refund')->where('is_enabled', true)->first();
+                        $shipping = $legalModel
+                            ->newQuery()
+                            ->where('key', 'shipping')
+                            ->where('is_enabled', true)
+                            ->first();
                     @endphp
-                    @if ($hasLegals)
-                        @php
-                            $legalModel = app(\App\Models\Legal::class);
-                            $privacy = $legalModel->newQuery()->where('key', 'privacy')->where('is_enabled', true)->first();
-                            $terms = $legalModel->newQuery()->where('key', 'terms')->where('is_enabled', true)->first();
-                            $refund = $legalModel->newQuery()->where('key', 'refund')->where('is_enabled', true)->first();
-                            $shipping = $legalModel
-                                ->newQuery()
-                                ->where('key', 'shipping')
-                                ->where('is_enabled', true)
-                                ->first();
-                        @endphp
-                        @if ($privacy)
-                            <x-link href="{{ route('legal.show', ['locale' => app()->getLocale(), 'slug' => $privacy->key ?? 'privacy']) }}"
+                    @if ($privacy)
+                        <x-link href="{{ route('legal.show', ['locale' => app()->getLocale(), 'slug' => $privacy->key ?? 'privacy']) }}"
                                     class="inline-flex px-3 text-sm leading-5 text-ash hover:text-sage transition-colors duration-200 font-medium">
-                                {{ __('legal_privacy') }}
-                            </x-link>
-                        @endif
-                        @if ($terms)
-                            <x-link href="{{ route('legal.show', ['locale' => app()->getLocale(), 'slug' => $terms->key ?? 'terms']) }}"
-                                    class="inline-flex px-3 text-sm leading-5 text-ash hover:text-sage transition-colors duration-200 font-medium">
-                                {{ __('legal_terms') }}
-                            </x-link>
-                        @endif
-                        @if ($refund)
-                            <x-link href="{{ route('legal.show', ['locale' => app()->getLocale(), 'slug' => $refund->key ?? 'refund']) }}"
-                                    class="inline-flex px-3 text-sm leading-5 text-ash hover:text-sage transition-colors duration-200 font-medium">
-                                {{ __('legal_refund') }}
-                            </x-link>
-                        @endif
-                        @if ($shipping)
-                            <x-link href="{{ route('legal.show', ['locale' => app()->getLocale(), 'slug' => $shipping->key ?? 'shipping']) }}"
-                                    class="inline-flex px-3 text-sm leading-5 text-ash hover:text-sage transition-colors duration-200 font-medium">
-                                {{ __('legal_shipping') }}
-                            </x-link>
-                        @endif
-                    @else
-                        <x-link href="{{ route('frontend.legal.privacy') }}"
-                                class="inline-flex px-3 text-sm leading-5 text-ash hover:text-sage transition-colors duration-200 font-medium">
                             {{ __('legal_privacy') }}
                         </x-link>
-                        <x-link href="{{ route('frontend.legal.cookies') }}"
-                                class="inline-flex px-3 text-sm leading-5 text-ash hover:text-sage transition-colors duration-200 font-medium">
-                            {{ __('frontend/legal.cookie_policy') }}
-                        </x-link>
-                        <x-link href="{{ route('frontend.legal.terms') }}"
-                                class="inline-flex px-3 text-sm leading-5 text-ash hover:text-sage transition-colors duration-200 font-medium">
+                    @endif
+                    @if ($terms)
+                        <x-link href="{{ route('legal.show', ['locale' => app()->getLocale(), 'slug' => $terms->key ?? 'terms']) }}"
+                                    class="inline-flex px-3 text-sm leading-5 text-ash hover:text-sage transition-colors duration-200 font-medium">
                             {{ __('legal_terms') }}
                         </x-link>
                     @endif
-                </div>
+                    @if ($refund)
+                        <x-link href="{{ route('legal.show', ['locale' => app()->getLocale(), 'slug' => $refund->key ?? 'refund']) }}"
+                                    class="inline-flex px-3 text-sm leading-5 text-ash hover:text-sage transition-colors duration-200 font-medium">
+                            {{ __('legal_refund') }}
+                        </x-link>
+                    @endif
+                    @if ($shipping)
+                        <x-link href="{{ route('legal.show', ['locale' => app()->getLocale(), 'slug' => $shipping->key ?? 'shipping']) }}"
+                                    class="inline-flex px-3 text-sm leading-5 text-ash hover:text-sage transition-colors duration-200 font-medium">
+                            {{ __('legal_shipping') }}
+                        </x-link>
+                    @endif
+                @else
+                    <x-link href="{{ route('frontend.legal.privacy') }}"
+                                class="inline-flex px-3 text-sm leading-5 text-ash hover:text-sage transition-colors duration-200 font-medium">
+                        {{ __('legal_privacy') }}
+                    </x-link>
+                    <x-link href="{{ route('frontend.legal.cookies') }}"
+                                class="inline-flex px-3 text-sm leading-5 text-ash hover:text-sage transition-colors duration-200 font-medium">
+                        {{ __('frontend/legal.cookie_policy') }}
+                    </x-link>
+                    <x-link href="{{ route('frontend.legal.terms') }}"
+                                class="inline-flex px-3 text-sm leading-5 text-ash hover:text-sage transition-colors duration-200 font-medium">
+                        {{ __('legal_terms') }}
+                    </x-link>
+                @endif
             </div>
+        </div>
         </div>
     </div>
 </footer>

@@ -1,7 +1,7 @@
 @section('meta')
     <x-meta
-        :title="__('Create account') . ' - ' . config('app.name')"
-        :description="__('Create an account to track orders, save favorites, and enjoy a personalized experience')"
+        :title="__('auth_register_title') . ' - ' . config('app.name')"
+        :description="__('auth_register_subtitle')"
         canonical="{{ url()->current() }}" />
 @endsection
 
@@ -10,58 +10,35 @@
         <div class="flex h-full flex-col justify-between">
             <div class="space-y-8">
                 <div class="space-y-4">
-                    <span class="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-white/70">
-                        {{ __('Why join us') }}
+                    <span class="inline-flex items-center gap-2 rounded-full bg-white/70 px-4 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-dark">
+                        {{ __('frontend/home.mission.badge') }}
                     </span>
 
-                    <h2 class="text-3xl font-semibold leading-tight text-white">
-                        {{ __('Unlock curated experiences and faster shopping with Statybae Commerce') }}
+                    <h2 class="text-3xl font-semibold leading-tight text-dark">
+                        {{ __('frontend/home.mission.title') }}
                     </h2>
 
-                    <p class="text-sm leading-relaxed text-white/75">
-                        {{ __('Create a free account to receive exclusive drops, personalised recommendations, and checkout in a fraction of the time on every visit.') }}
+                    <p class="text-sm leading-relaxed text-slate-800">
+                        {{ __('frontend/home.mission.subtitle') }}
                     </p>
                 </div>
 
-                <div class="space-y-6">
-                    <div class="rounded-3xl border border-white/15 bg-white/5 p-6">
-                        <p class="text-sm text-white/80">
-                            <span class="block text-xs uppercase tracking-[0.18em] text-white/60">{{ __('Member spotlight') }}</span>
-                            <span class="mt-3 block text-base font-medium text-white">{{ __('“I reorder essentials in seconds and always know what’s arriving.”') }}</span>
-                            <span class="mt-2 block text-xs text-white/60">{{ __('Elena, premium member since 2021') }}</span>
-                        </p>
+                <div class="rounded-3xl border border-ash bg-white/70 p-6 text-dark">
+                    <div class="space-y-3">
+                        <span class="inline-flex items-center gap-2 rounded-full bg-white/80 px-4 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-dark">
+                            {{ __('frontend/home.loyalty.badge') }}
+                        </span>
+                        <h3 class="text-2xl font-bold text-dark">{{ __('frontend/home.loyalty.title') }}</h3>
+                        <p class="text-slate-800">{{ __('frontend/home.loyalty.subtitle') }}</p>
                     </div>
-
-                    @php
-                        $registerBenefits = [
-                            [
-                                'icon' => 'rewards',
-                                'message' => __('Earn points and surprise rewards every time you shop.'),
-                            ],
-                            [
-                                'icon' => 'checkout',
-                                'message' => __('Save multiple addresses and payment preferences for instant checkout.'),
-                            ],
-                            [
-                                'icon' => 'records',
-                                'message' => __('Keep order history, invoices, and returns tidy within your dashboard.'),
-                            ],
-                        ];
-                    @endphp
-
-                    <ul class="space-y-4 text-sm text-white/80">
-                        @foreach ($registerBenefits as $benefit)
-                            <x-auth.register-benefit :icon="$benefit['icon']" :message="$benefit['message']" />
-                        @endforeach
-                    </ul>
                 </div>
             </div>
 
-            <div class="mt-10 rounded-2xl border border-white/20 bg-white/5 p-6">
-                <p class="text-sm text-white/80">
-                    {{ __('Already have an account?') }}
-                    <x-link :href="route('login')" class="ml-1 font-semibold text-white hover:text-white/90">
-                        {{ __('Sign in instead') }}
+            <div class="mt-10 rounded-2xl border border-ash bg-white/70 p-6">
+                <p class="text-sm text-slate-800">
+                    {{ __('auth_already_have_account') }}
+                    <x-link :href="route('login')" class="ml-1 font-semibold text-dark hover:text-black/80">
+                        {{ __('auth_login_link') }}
                     </x-link>
                 </p>
             </div>
@@ -70,139 +47,136 @@
 
     <div class="space-y-10">
         <div class="space-y-4 text-center">
-            <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 via-indigo-400 to-blue-500 shadow-lg">
+            <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-dark text-sage shadow-lg">
                 <svg class="h-7 w-7 text-white" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0z" />
                     <path stroke-linecap="round" stroke-linejoin="round" d="M3 20a6 6 0 0112 0v1H3v-1z" />
                 </svg>
             </div>
 
-            <div class="space-y-2">
-                <h1 class="text-3xl font-bold text-slate-900 sm:text-4xl">
-                    {{ __('Create your account') }}
+            <div class="space-y-3">
+                <span class="inline-flex items-center gap-2 rounded-full bg-dark/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-dark">
+                    {{ __('auth_join_statbae') }}
+                </span>
+                <h1 class="text-3xl font-extrabold tracking-tight text-dark sm:text-4xl">
+                    {{ __('auth_register_title') }}
                 </h1>
-                <p class="text-base text-slate-600">
-                    {{ __('Join our community and make every order easier, smarter, and more rewarding.') }}
+                <p class="mx-auto max-w-xl text-sm text-slate-600">
+                    {{ __('auth_register_subtitle') }}
                 </p>
             </div>
         </div>
 
-        {{-- Use Livewire's live model binding so the nested registration form state stays in sync with user input. --}}
-        <form wire:submit="register" class="space-y-7">
-            <div class="grid gap-5 sm:grid-cols-2">
-                <div class="space-y-2">
-                    <x-forms.label for="first_name" :value="__('First name')" />
-                    <x-forms.input
-                        id="first_name"
-                        type="text"
-                        {{-- Bind directly to the Livewire form object so validation targets the correct nested key. --}}
-                        wire:model.live="registrationForm.first_name"
-                        autocomplete="given-name"
-                        class="rounded-xl border border-slate-200 bg-white/90 px-4 py-3 text-base shadow-sm transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
-                        placeholder="{{ __('Jane') }}"
-                    />
-                    <x-forms.errors :messages="$errors->get('registrationForm.first_name')" class="mt-1" />
+        <div class="rounded-2xl border border-ash bg-white p-6 shadow-xl">
+            <form wire:submit="register" class="space-y-7">
+                <div class="grid gap-5 sm:grid-cols-2">
+                    <div class="space-y-2">
+                        <x-forms.label for="first_name" :value="__('auth_first_name')" />
+                        <x-forms.input
+                            id="first_name"
+                            type="text"
+                            wire:model.defer="registrationForm.first_name"
+                            autocomplete="given-name"
+                            class="rounded-xl border border-ash bg-white px-4 py-3 text-base shadow-sm transition focus:border-dark focus:ring-2 focus:ring-dark/10"
+                            placeholder="{{ __('auth_first_name_placeholder') }}"
+                        />
+                        <x-forms.errors :messages="$errors->get('registrationForm.first_name')" class="mt-1" />
+                    </div>
+                    <div class="space-y-2">
+                        <x-forms.label for="last_name" :value="__('auth_last_name')" />
+                        <x-forms.input
+                            id="last_name"
+                            type="text"
+                            wire:model.defer="registrationForm.last_name"
+                            autocomplete="family-name"
+                            class="rounded-xl border border-ash bg-white px-4 py-3 text-base shadow-sm transition focus:border-dark focus:ring-2 focus:ring-dark/10"
+                            placeholder="{{ __('auth_last_name_placeholder') }}"
+                        />
+                        <x-forms.errors :messages="$errors->get('registrationForm.last_name')" class="mt-1" />
+                    </div>
                 </div>
 
                 <div class="space-y-2">
-                    <x-forms.label for="last_name" :value="__('Last name')" />
+                    <x-forms.label for="email" :value="__('auth_email')" />
                     <x-forms.input
-                        id="last_name"
-                        type="text"
-                        {{-- Provide real-time updates for the nested last name attribute. --}}
-                        wire:model.live="registrationForm.last_name"
-                        autocomplete="family-name"
-                        class="rounded-xl border border-slate-200 bg-white/90 px-4 py-3 text-base shadow-sm transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
-                        placeholder="{{ __('Doe') }}"
+                        id="email"
+                        type="email"
+                        wire:model.defer="registrationForm.email"
+                        autocomplete="email"
+                        class="rounded-xl border border-ash bg-white px-4 py-3 text-base shadow-sm transition focus:border-dark focus:ring-2 focus:ring-dark/10"
+                        placeholder="{{ __('auth_email_placeholder') }}"
                     />
-                    <x-forms.errors :messages="$errors->get('registrationForm.last_name')" class="mt-1" />
+                    <x-forms.errors :messages="$errors->get('registrationForm.email')" class="mt-1" />
                 </div>
-            </div>
 
-            <div class="space-y-2">
-                <x-forms.label for="email" :value="__('Email address')" />
-                <x-forms.input
-                    id="email"
-                    type="email"
-                    {{-- Keep the email field synced so unique validation feedback appears instantly. --}}
-                    wire:model.live.debounce.500ms="registrationForm.email"
-                    x-on:input.debounce.500ms="$wire.validateOnly('registrationForm.email')"
-                    autocomplete="email"
-                    class="rounded-xl border border-slate-200 bg-white/90 px-4 py-3 text-base shadow-sm transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
-                    placeholder="{{ __('you@example.com') }}"
-                />
-                <x-forms.errors :messages="$errors->get('registrationForm.email')" class="mt-1" />
-            </div>
+                <div class="grid gap-5 sm:grid-cols-2">
+                    <div class="space-y-2">
+                        <x-forms.label for="password" :value="__('auth_password')" />
+                        <x-forms.input
+                            id="password"
+                            type="password"
+                            wire:model.defer="registrationForm.password"
+                            autocomplete="new-password"
+                            class="rounded-xl border border-ash bg-white px-4 py-3 text-base shadow-sm transition focus:border-dark focus:ring-2 focus:ring-dark/10"
+                            placeholder="{{ __('auth_password_placeholder') }}"
+                        />
+                        <x-forms.errors :messages="$errors->get('registrationForm.password')" class="mt-1" />
+                        <p class="text-xs text-slate-500">
+                            {{ __('auth_password_requirements') }}
+                        </p>
+                    </div>
 
-            <div class="grid gap-5 sm:grid-cols-2">
-                <div class="space-y-2">
-                    <x-forms.label for="password" :value="__('Password')" />
-                    <x-forms.input
-                        id="password"
-                        type="password"
-                        {{-- Ensure the password value flows through the Livewire form for confirmation checks. --}}
-                        wire:model.live="registrationForm.password"
-                        autocomplete="new-password"
-                        class="rounded-xl border border-slate-200 bg-white/90 px-4 py-3 text-base shadow-sm transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
-                        placeholder="••••••••"
-                    />
-                    <x-forms.errors :messages="$errors->get('registrationForm.password')" class="mt-1" />
-                    <p class="text-xs text-slate-400">
-                        {{ __('Use at least 8 characters with a mix of letters, numbers & symbols.') }}
+                    <div class="space-y-2">
+                        <x-forms.label for="password_confirmation" :value="__('auth_password_confirm')" />
+                        <x-forms.input
+                            id="password_confirmation"
+                            type="password"
+                            wire:model.defer="registrationForm.password_confirmation"
+                            autocomplete="new-password"
+                            class="rounded-xl border border-ash bg-white px-4 py-3 text-base shadow-sm transition focus:border-dark focus:ring-2 focus:ring-dark/10"
+                            placeholder="{{ __('auth_password_placeholder') }}"
+                        />
+                        <x-forms.errors :messages="$errors->get('registrationForm.password_confirmation')" class="mt-1" />
+                    </div>
+                </div>
+
+                <div class="flex items-start gap-3 rounded-2xl border border-ash bg-sage px-4 py-3 text-xs text-dark">
+                    <svg class="h-5 w-5 text-dark" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 11c1.104 0 2-.896 2-2s-.896-2-2-2-2 .896-2 2 .896 2 2 2z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 11c0 5-7 10-7 10s-7-5-7-10a7 7 0 1114 0z" />
+                    </svg>
+                    <p>
+                        {{ __('auth_security_notice') }}
                     </p>
                 </div>
 
-                <div class="space-y-2">
-                    <x-forms.label for="password_confirmation" :value="__('Confirm password')" />
-                    <x-forms.input
-                        id="password_confirmation"
-                        type="password"
-                        {{-- Bind to the confirmation attribute so matching logic remains accurate. --}}
-                        wire:model.live="registrationForm.password_confirmation"
-                        autocomplete="new-password"
-                        class="rounded-xl border border-slate-200 bg-white/90 px-4 py-3 text-base shadow-sm transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
-                        placeholder="••••••••"
-                    />
-                    <x-forms.errors :messages="$errors->get('registrationForm.password_confirmation')" class="mt-1" />
-                </div>
-            </div>
-
-            <div class="flex items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50/60 px-4 py-3 text-xs text-slate-500">
-                <svg class="h-5 w-5 text-indigo-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 11c1.104 0 2-.896 2-2s-.896-2-2-2-2 .896-2 2 .896 2 2 2z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 11c0 5-7 10-7 10s-7-5-7-10a7 7 0 1114 0z" />
-                </svg>
-                <p>
-                    {{ __('We safeguard your personal data with enterprise-grade security and never share it without consent.') }}
-                </p>
-            </div>
-
-            <button
-                type="submit"
-                wire:loading.attr="disabled"
-                class="group relative flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-500 via-indigo-500 to-blue-500 px-5 py-3.5 text-base font-semibold text-white shadow-lg transition hover:from-indigo-600 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-indigo-400/40 focus:ring-offset-2 focus:ring-offset-white disabled:cursor-not-allowed disabled:opacity-70"
-            >
-                <span wire:loading.remove>
-                    {{ __('Create account') }}
-                </span>
-                <span wire:loading class="inline-flex items-center gap-2">
-                    <svg class="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    {{ __('Creating account...') }}
-                </span>
-            </button>
-        </form>
+                <button
+                    type="submit"
+                    wire:loading.attr="disabled"
+                    class="group relative flex w-full items-center justify-center gap-2 rounded-xl bg-dark px-5 py-3.5 text-base font-semibold text-sage shadow-lg transition hover:bg-stone hover:text-dark focus:outline-none focus:ring-2 focus:ring-dark/20 focus:ring-offset-2 focus:ring-offset-white disabled:cursor-not-allowed disabled:opacity-70"
+                >
+                    <span wire:loading.remove>
+                        {{ __('auth_register') }}
+                    </span>
+                    <span wire:loading class="inline-flex items-center gap-2">
+                        <svg class="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        {{ __('auth_creating_account') }}
+                    </span>
+                </button>
+            </form>
+        </div>
 
         <div class="space-y-5">
             <div class="relative">
                 <div class="absolute inset-0 flex items-center" aria-hidden="true">
-                    <div class="w-full border-t border-slate-200"></div>
+                    <div class="w-full border-t border-ash"></div>
                 </div>
                 <div class="relative flex justify-center">
-                    <span class="bg-white px-4 text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">
-                        {{ __('Or join with') }}
+                    <span class="bg-white px-4 text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">
+                        {{ __('auth_or_login_with') }}
                     </span>
                 </div>
             </div>
@@ -212,15 +186,11 @@
             </div>
         </div>
 
-        <p class="text-center text-xs text-slate-400">
-            {{ __('frontend.legal.register_agreement_intro') }}
-            <x-link href="{{ route('frontend.legal.terms') }}" class="text-indigo-500 hover:text-indigo-600">
-                {{ __('frontend.legal.terms_of_service') }}
-            </x-link>
-            {{ __('frontend.legal.and') }}
-            <x-link href="{{ route('frontend.legal.privacy') }}" class="text-indigo-500 hover:text-indigo-600">
-                {{ __('frontend.legal.privacy_policy') }}
-            </x-link>.
+        <p class="text-center text-xs text-slate-500">
+            {{ __('auth_terms_agreement_register') }}
+            <x-link href="#" class="text-dark hover:text-stone">{{ __('auth_terms_of_use') }}</x-link>
+            {{ __('auth_and') }}
+            <x-link href="#" class="text-dark hover:text-stone">{{ __('auth_privacy_policy') }}</x-link>.
         </p>
     </div>
 </x-auth-page>

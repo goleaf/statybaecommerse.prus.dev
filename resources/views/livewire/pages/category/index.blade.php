@@ -24,45 +24,43 @@
     ])->filter()->count();
 @endphp
 
-<div class="bg-slate-50 dark:bg-gray-900">
-    <div class="relative overflow-hidden">
-        <div class="absolute inset-0 bg-gradient-to-br from-blue-100/40 via-white to-slate-100/60 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900"></div>
-        <div class="absolute inset-y-10 -left-24 hidden h-64 w-64 rounded-full bg-blue-500/10 blur-3xl lg:block"></div>
-        <x-container class="relative px-4 py-12 sm:py-16">
-            <nav class="text-xs font-medium uppercase tracking-[0.3em] text-slate-500" aria-label="{{ __('Breadcrumb') }}">
+<div class="bg-sage">
+    <div class="bg-dark text-sage">
+        <x-container class="px-4 py-12 sm:py-16">
+            <nav class="text-xs font-medium uppercase tracking-[0.3em] text-sage/80" aria-label="{{ __('Breadcrumb') }}">
                 <ol class="flex items-center gap-3">
                     <li>
                         <a href="{{ route('localized.home', ['locale' => $locale]) }}"
-                           class="inline-flex items-center gap-2 text-slate-600 transition hover:text-blue-600">
-                            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                           class="inline-flex items-center gap-2 text-sage transition hover:text-white">
+                            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h12a1 1 0 001-1V10" />
                             </svg>
                             {{ __('frontend.navigation.home') }}
                         </a>
                     </li>
-                    <li class="text-slate-400">/</li>
-                    <li class="text-slate-700">{{ __('Categories') }}</li>
+                    <li class="text-sage/60">/</li>
+                    <li class="text-white">{{ __('Categories') }}</li>
                 </ol>
             </nav>
 
             <div class="mt-8 flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
                 <div class="max-w-2xl space-y-5">
-                    <span class="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-4 py-1 text-[11px] font-semibold uppercase tracking-[0.35em] text-blue-600">
+                    <span class="inline-flex items-center gap-2 rounded-full border border-sage bg-sage px-4 py-1 text-[11px] font-semibold uppercase tracking-[0.35em] text-dark">
                         {{ __('Catalogue overview') }}
                     </span>
-                    <h1 class="text-3xl font-bold leading-tight text-slate-900 sm:text-4xl md:text-5xl">
+                    <h1 class="text-3xl font-bold leading-tight text-white sm:text-4xl md:text-5xl">
                         {{ __('Discover every department in StatyBae Commerce') }}
                     </h1>
-                    <p class="text-base text-slate-600 sm:text-lg">
+                    <p class="text-base text-sage sm:text-lg">
                         {{ __('Browse structured categories curated by our merchandisers to help professionals and DIY enthusiasts find the right materials faster.') }}
                     </p>
                 </div>
 
                 <div class="flex flex-col items-start gap-3 sm:flex-row sm:items-end sm:gap-6">
-                    <div class="rounded-2xl border border-blue-200 bg-white px-4 py-3 text-sm font-semibold text-blue-600 shadow-sm">
+                    <div class="rounded-2xl border border-sage/30 bg-sage/10 px-4 py-3 text-sm font-semibold text-sage shadow-sm">
                         {{ __(':count categories in catalogue', ['count' => number_format($totalCategories)]) }}
                     </div>
-                    <div class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-500 shadow-sm">
+                    <div class="rounded-2xl border border-sage/30 bg-sage/10 px-4 py-3 text-sm text-sage/80 shadow-sm">
                         @if ($activeFilterCount > 0)
                             {{ __(':count filters active', ['count' => $activeFilterCount]) }}
                         @else
@@ -72,7 +70,7 @@
                     <button type="button"
                             wire:click="$toggle('sidebarOpen')"
                             wire:confirm="{{ __('translations.confirm_toggle_sidebar') }}"
-                            class="inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-600 shadow-sm transition hover:border-blue-300 hover:text-blue-600 lg:hidden">
+                            class="inline-flex items-center gap-2 rounded-full border border-sage/30 bg-sage/10 px-4 py-2 text-sm font-semibold text-sage shadow-sm transition hover:border-sage hover:bg-sage/20 lg:hidden">
                         <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M3 5h6M3 12h6m-6 7h6M13 5h8M13 12h8m-8 7h8" />
                         </svg>
@@ -83,22 +81,33 @@
         </x-container>
     </div>
 
-    <x-container class="relative -mt-12 px-4 pb-16">
+    <x-container class="px-4 pb-16 pt-12">
         <div class="grid gap-8 lg:grid-cols-12">
             <aside class="hidden lg:col-span-3 lg:block">
-                <x-shared.filter-sidebar
-                    title="{{ __('Refine catalogue') }}"
-                    description="{{ __('Combine availability, price, brands and collections to focus your search.') }}"
-                >
+                <div class="rounded-3xl border border-sage/30 bg-dark p-6 shadow-lg">
+                    <div class="mb-6 space-y-2">
+                        <span class="inline-flex items-center gap-2 rounded-full border border-sage/30 bg-sage/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.35em] text-sage">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                            </svg>
+                            {{ __('Filters') }}
+                        </span>
+                        <h2 class="text-xl font-semibold text-white">{{ __('Refine catalogue') }}</h2>
+                        <p class="text-sm leading-relaxed text-sage/80">
+                            {{ __('Combine availability, price, brands and collections to focus your search.') }}
+                        </p>
+                    </div>
+                    <div class="space-y-6">
                     @include('livewire.pages.category.partials.filters', ['variant' => 'desktop'])
-                </x-shared.filter-sidebar>
+                    </div>
+                </div>
             </aside>
 
             <section class="lg:col-span-9 space-y-6" x-data="{ view: 'grid' }">
-                <div class="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+                <div class="rounded-3xl border border-sage/30 bg-dark p-4 shadow-sm sm:p-6">
                     <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                        <div class="flex flex-wrap items-center gap-3 text-sm text-slate-500">
-                            <span class="inline-flex items-center gap-2 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
+                        <div class="flex flex-wrap items-center gap-3 text-sm text-sage">
+                            <span class="inline-flex items-center gap-2 rounded-full border border-sage/30 bg-sage/10 px-3 py-1 text-xs font-semibold text-sage">
                                 <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2" />
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -106,42 +115,42 @@
                                 {{ __('Real-time results') }}
                             </span>
                             @if ($from && $to)
-                                <span>{{ __('Showing :from–:to of :total results', ['from' => $from, 'to' => $to, 'total' => $totalCategories]) }}</span>
+                                <span class="text-sage/80">{{ __('Showing :from–:to of :total results', ['from' => $from, 'to' => $to, 'total' => $totalCategories]) }}</span>
                             @else
-                                <span>{{ __('No results to display') }}</span>
+                                <span class="text-sage/80">{{ __('No results to display') }}</span>
                             @endif
                         </div>
 
                         <div class="flex flex-wrap items-center gap-3">
-                            <div class="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600">
-                                <label for="sort" class="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                            <div class="flex items-center gap-2 rounded-xl border border-sage/30 bg-dark/30 px-3 py-2 text-sm text-sage">
+                                <label for="sort" class="text-xs font-semibold uppercase tracking-wide text-sage/60">
                                     {{ __('Sort') }}
                                 </label>
-                                <select id="sort" wire:model.live="sort" class="border-0 bg-transparent text-sm font-medium focus:outline-none focus:ring-0">
-                                    <option value="name_asc">{{ __('Name (A–Z)') }}</option>
-                                    <option value="name_desc">{{ __('Name (Z–A)') }}</option>
-                                    <option value="products_desc">{{ __('Most products') }}</option>
-                                    <option value="products_asc">{{ __('Fewest products') }}</option>
+                                <select id="sort" wire:model.live="sort" class="border-0 bg-transparent text-sm font-medium text-sage focus:outline-none focus:ring-0">
+                                    <option value="name_asc" class="bg-dark text-sage">{{ __('Name (A–Z)') }}</option>
+                                    <option value="name_desc" class="bg-dark text-sage">{{ __('Name (Z–A)') }}</option>
+                                    <option value="products_desc" class="bg-dark text-sage">{{ __('Most products') }}</option>
+                                    <option value="products_asc" class="bg-dark text-sage">{{ __('Fewest products') }}</option>
                                 </select>
                             </div>
 
-                            <div class="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600">
-                                <label for="per-page" class="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                            <div class="flex items-center gap-2 rounded-xl border border-sage/30 bg-dark/30 px-3 py-2 text-sm text-sage">
+                                <label for="per-page" class="text-xs font-semibold uppercase tracking-wide text-sage/60">
                                     {{ __('Per page') }}
                                 </label>
-                                <select id="per-page" wire:model.live="perPage" class="border-0 bg-transparent text-sm font-medium focus:outline-none focus:ring-0">
-                                    <option value="12">12</option>
-                                    <option value="24">24</option>
-                                    <option value="36">36</option>
-                                    <option value="48">48</option>
+                                <select id="per-page" wire:model.live="perPage" class="border-0 bg-transparent text-sm font-medium text-sage focus:outline-none focus:ring-0">
+                                    <option value="12" class="bg-dark text-sage">12</option>
+                                    <option value="24" class="bg-dark text-sage">24</option>
+                                    <option value="36" class="bg-dark text-sage">36</option>
+                                    <option value="48" class="bg-dark text-sage">48</option>
                                 </select>
                             </div>
 
-                            <div class="hidden items-center gap-1 rounded-xl border border-slate-200 bg-white p-1 text-slate-500 shadow-sm md:flex">
+                            <div class="hidden items-center gap-1 rounded-xl border border-sage/30 bg-dark/30 p-1 text-sage shadow-sm md:flex">
                                 <button type="button"
                                         @click="view = 'grid'"
-                                        :class="view === 'grid' ? 'bg-blue-600 text-white shadow-sm' : 'hover:text-blue-600'"
-                                        class="inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-semibold transition">
+                                        :class="view === 'grid' ? 'bg-sage text-dark shadow-sm' : 'hover:text-white hover:bg-sage/10'"
+                                        class="inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-semibold transition text-sage">
                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h7v7H4V6zm9 0h7v7h-7V6zM4 13h7v7H4v-7zm9 0h7v7h-7v-7z" />
                                     </svg>
@@ -149,8 +158,8 @@
                                 </button>
                                 <button type="button"
                                         @click="view = 'list'"
-                                        :class="view === 'list' ? 'bg-blue-600 text-white shadow-sm' : 'hover:text-blue-600'"
-                                        class="inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-semibold transition">
+                                        :class="view === 'list' ? 'bg-sage text-dark shadow-sm' : 'hover:text-white hover:bg-sage/10'"
+                                        class="inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-semibold transition text-sage">
                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
                                     </svg>
@@ -162,8 +171,8 @@
                 </div>
 
                 <div class="relative">
-                    <div wire:loading.delay.longer class="absolute inset-0 z-10 flex items-center justify-center rounded-3xl bg-white/80 backdrop-blur-sm">
-                        <div class="h-10 w-10 animate-spin rounded-full border-2 border-blue-500 border-t-transparent"></div>
+                    <div wire:loading.delay.longer class="absolute inset-0 z-10 flex items-center justify-center rounded-3xl bg-dark/80 backdrop-blur-sm">
+                        <div class="h-10 w-10 animate-spin rounded-full border-2 border-sage border-t-transparent"></div>
                     </div>
 
                     @if ($categories->count() > 0)
@@ -189,7 +198,7 @@
                                         ?? ($category->published_products_count ?? ($category->products?->count() ?? 0));
                                 @endphp
 
-                                <article class="group flex flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:border-blue-300 hover:shadow-xl"
+                                <article class="group flex flex-col overflow-hidden rounded-3xl border border-ash/30 bg-white shadow-sm transition hover:-translate-y-1 hover:border-ash/60 hover:shadow-xl"
                                          :class="view === 'list' ? 'sm:flex-row' : ''">
                                     <div class="relative h-48 overflow-hidden sm:h-52" :class="view === 'list' ? 'sm:h-auto sm:w-64' : ''">
                                         @if ($image)
@@ -198,7 +207,7 @@
                                                  loading="lazy"
                                                  class="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
                                         @else
-                                            <div class="flex h-full w-full items-center justify-center bg-gradient-to-br from-blue-100 to-indigo-100 text-4xl font-semibold text-blue-600">
+                                            <div class="flex h-full w-full items-center justify-center bg-ash/10 text-4xl font-semibold text-dark">
                                                 {{ mb_strtoupper(mb_substr($name, 0, 2)) }}
                                             </div>
                                         @endif
@@ -206,27 +215,27 @@
                                             <h3 class="text-lg font-semibold text-white drop-shadow-lg">
                                                 {{ $name }}
                                             </h3>
-                                            <span class="inline-flex items-center gap-1 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-slate-700 shadow-sm">
+                                            <span class="inline-flex items-center gap-1 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-dark shadow-sm">
                                                 {{ $productCount }}
-                                                <span class="text-slate-400">{{ trans_choice('products', $productCount) }}</span>
+                                                <span class="text-ash">{{ trans_choice('products', $productCount) }}</span>
                                             </span>
                                         </div>
                                     </div>
 
                                     <div class="flex flex-1 flex-col justify-between gap-4 px-5 py-6">
                                         @if ($description)
-                                            <p class="text-sm leading-relaxed text-slate-600 line-clamp-3">
+                                            <p class="text-sm leading-relaxed text-stone line-clamp-3">
                                                 {{ \Illuminate\Support\Str::limit(strip_tags($description), 180) }}
                                             </p>
                                         @else
-                                            <p class="text-sm text-slate-400">
+                                            <p class="text-sm text-ash">
                                                 {{ __('Detailed description coming soon.') }}
                                             </p>
                                         @endif
 
                                         <div class="flex items-center justify-center">
                                             <a href="{{ route('localized.categories.show', ['locale' => $locale, 'category' => $slug]) }}"
-                                               class="inline-flex items-center gap-2 rounded-full bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-600 transition hover:bg-blue-100">
+                                               class="inline-flex items-center gap-2 rounded-full bg-sage px-4 py-2 text-sm font-semibold text-dark transition hover:bg-sage/90">
                                                 {{ __('View category') }}
                                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
@@ -258,16 +267,23 @@
                  wire:click="$toggle('sidebarOpen')"
                  wire:confirm="{{ __('translations.confirm_toggle_sidebar') }}"></div>
 
-            <div class="absolute inset-y-0 right-0 w-11/12 max-w-md rounded-l-3xl bg-white shadow-2xl">
-                <x-shared.filter-sidebar
-                    :sticky="false"
-                    class="h-full overflow-y-auto p-6"
-                    title="{{ __('Filters') }}"
-                    description="{{ __('Adjust filters to personalise the catalogue view.') }}"
-                >
-                    <x-slot name="headerActions">
+            <div class="absolute inset-y-0 right-0 w-11/12 max-w-md rounded-l-3xl bg-dark shadow-2xl">
+                <div class="flex h-full flex-col overflow-y-auto">
+                    <div class="flex items-center justify-between border-b border-sage/30 p-6">
+                        <div class="space-y-2">
+                            <span class="inline-flex items-center gap-2 rounded-full border border-sage/30 bg-sage/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.35em] text-sage">
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                                </svg>
+                                {{ __('Filters') }}
+                            </span>
+                            <h2 class="text-xl font-semibold text-white">{{ __('Filters') }}</h2>
+                            <p class="text-sm leading-relaxed text-sage/80">
+                                {{ __('Adjust filters to personalise the catalogue view.') }}
+                            </p>
+                        </div>
                         <button type="button"
-                                class="rounded-full border border-slate-200 p-2 text-slate-500 transition hover:border-blue-300 hover:text-blue-600"
+                                class="rounded-full border border-sage/30 p-2 text-sage transition hover:border-sage hover:bg-sage/10"
                                 wire:click="$toggle('sidebarOpen')"
                                 wire:confirm="{{ __('translations.confirm_toggle_sidebar') }}"
                                 aria-label="{{ __('Close') }}">
@@ -275,11 +291,11 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                             </svg>
                         </button>
-                    </x-slot>
-
+                    </div>
+                    <div class="flex-1 space-y-6 overflow-y-auto p-6">
                     @include('livewire.pages.category.partials.filters', ['variant' => 'mobile'])
-
-                    <x-slot name="footer">
+                    </div>
+                    <div class="border-t border-sage/30 p-6">
                         <x-shared.button
                             type="button"
                             variant="primary"
@@ -289,8 +305,8 @@
                         >
                             {{ __('Apply filters') }}
                         </x-shared.button>
-                    </x-slot>
-                </x-shared.filter-sidebar>
+                    </div>
+                </div>
             </div>
         </div>
     @endif

@@ -3685,6 +3685,44 @@ $transition-slow: 0.5s ease;
   }
 }
 
+// Hero Button Classes
+.btn-hero-primary {
+  @include brand-primary-button;
+}
+
+.btn-hero-secondary {
+  background-color: transparent;
+  color: $dark;
+  border: 1px solid $dark;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  
+  &:hover {
+    background-color: $dark;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba($dark, 0.2);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+}
+
 
 // ========================================
 // CART PAGE STYLES - Vue-inspired
