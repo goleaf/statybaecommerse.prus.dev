@@ -39,6 +39,7 @@ return [
     ],
     'close'    => 'Close',
     'navigation' => 'Navigation',
+    'breadcrumb' => 'Breadcrumb',
     'back'     => 'Back',
     'next'     => 'Next',
     'previous' => 'Previous',

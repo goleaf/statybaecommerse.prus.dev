@@ -11,6 +11,8 @@ return [
         'collections' => 'Collections',
         'about'       => 'About',
         'contact'     => 'Contact',
+        'breadcrumbs' => 'Breadcrumb',
+        'news'        => 'News',
     ],
     // Direct keys for tests
     'home'     => 'Home',

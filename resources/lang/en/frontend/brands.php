@@ -11,6 +11,7 @@ return [
         'title'       => 'Trusted construction brands',
         'description' => 'Discover reliable suppliers, tooling innovators, and material partners curated for Baltic building professionals.',
         'cta'         => 'Explore collections',
+        'badge'       => 'Catalogue brands',
     ],
     'stats' => [
         'brands' => [
@@ -48,6 +49,9 @@ return [
             'featured' => 'Featured first',
             'products' => 'Most products',
         ],
+        'quick_actions' => 'Quick actions',
+        'reset_filters' => 'Reset filters',
+        'apply_filters' => 'Apply filters',
     ],
     'list' => [
         'title'       => 'Brand directory',
@@ -67,6 +71,35 @@ return [
         'empty'         => [
             'title'       => 'No brands available',
             'description' => 'New partners will appear soon. Check back shortly.',
+        ],
+        'catalogue_count' => ':count brands in catalogue',
+        'description_placeholder' => 'Detailed description coming soon.',
+        'showing_results' => 'Showing :from–:to of :total results',
+        'no_results' => 'No results to display',
+        'pagination_navigation' => 'Pagination Navigation',
+    ],
+    'show' => [
+        'spotlight' => 'Brand spotlight',
+        'categories_title' => 'Categories this brand powers',
+        'products_count' => ':count products',
+        'categories_count' => ':count categories',
+        'quick_filters_label' => 'Quick filters:',
+        'all_products' => 'All products',
+        'apply' => 'Apply',
+        'sort_label' => 'Sort by',
+        'update' => 'Update',
+        'no_products' => 'No products found for this brand yet.',
+        'sort' => [
+            'featured' => 'Featured',
+            'latest' => 'Newest arrivals',
+            'price_asc' => 'Price: Low to High',
+            'price_desc' => 'Price: High to Low',
+            'bestsellers' => 'Popular picks',
+        ],
+        'filters' => [
+            'featured' => 'Featured only',
+            'sale' => 'On sale',
+            'in_stock' => 'In stock',
         ],
     ],
 ];

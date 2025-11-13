@@ -76,7 +76,7 @@
                             </div>
                             
                             <h3 class="text-sm font-medium text-gray-900 mb-2 line-clamp-2">
-                                <a href="{{ route('products.show', ['locale' => app()->getLocale(), 'product' => $product->slug]) }}" 
+                                <a href="{{ route('localized.products.show', ['locale' => app()->getLocale(), 'product' => $product->trans('slug') ?? $product->slug ?? $product->getKey()]) }}" 
                                    class="hover:text-gray-700"
                                    wire:click="trackRecommendationClick({{ $product->id }}, 'product_click')">
                                     {{ $product->name }}

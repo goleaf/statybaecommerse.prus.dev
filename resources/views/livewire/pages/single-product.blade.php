@@ -1,3 +1,46 @@
+@php
+    // Ensure locale is set before using translations
+    $request = request();
+    $supportedConfig = config('app.supported_locales', 'lt,en');
+    $supportedLocales = [];
+    if (is_array($supportedConfig)) {
+        $supportedLocales = array_filter($supportedConfig, fn ($locale): bool => is_string($locale) && $locale !== '');
+    } elseif (is_string($supportedConfig)) {
+        $supportedLocales = array_filter(
+            array_map(fn (string $locale): string => trim($locale), explode(',', $supportedConfig)),
+            fn (string $locale): bool => $locale !== ''
+        );
+    }
+    $supportedLocales = array_values(array_map(fn (string $locale): string => trim($locale), $supportedLocales));
+    
+    $routeLocale = $request->route('locale');
+    $queryLocale = $request->query('locale');
+    $defaultLocale = config('app.locale', 'lt');
+    
+    $candidateLocales = array_values(array_filter([
+        $routeLocale,
+        $queryLocale,
+        session('locale'),
+        session('app.locale'),
+        $request->cookie('app_locale'),
+        auth()->check() ? (auth()->user()->preferred_locale ?? null) : null,
+    ], fn ($candidate): bool => is_string($candidate) && $candidate !== ''));
+    
+    $locale = $defaultLocale;
+    foreach ($candidateLocales as $candidate) {
+        if (in_array($candidate, $supportedLocales, true)) {
+            $locale = $candidate;
+            break;
+        }
+    }
+    
+    if (!in_array($locale, $supportedLocales, true)) {
+        $fallbackLocale = config('app.fallback_locale', $defaultLocale);
+        $locale = in_array($fallbackLocale, $supportedLocales, true) ? $fallbackLocale : ($supportedLocales[0] ?? $defaultLocale);
+    }
+    
+    app()->setLocale($locale);
+@endphp
 <div class="bg-gradient-to-b from-slate-50 via-white to-white" wire:loading.attr="aria-busy" aria-busy="false">
     @section('meta')
         @php
@@ -27,14 +70,14 @@
             <x-breadcrumbs :items="[
                 [
                     'label' => __('frontend.navigation.products'),
-                    'url' => route('localized.products.index', ['locale' => app()->getLocale()]),
+                    'url' => route('localized.products.index', ['locale' => $locale]),
                 ],
                 [
                     'label' => $product->brand?->trans('name') ?? $product->brand?->name,
                     'url' =>
                         $product->brand && function_exists('route') && Route::has('localized.brands.show')
                             ? route('localized.brands.show', [
-                                'locale' => app()->getLocale(),
+                                'locale' => $locale,
                                 'slug' => $product->brand->trans('slug') ?? $product->brand->slug,
                             ])
                             : null,
@@ -129,13 +172,13 @@
                                 <div>
                                     @if ($currentPrice)
                                         <p class="text-4xl font-semibold text-primary-600">
-                                            {{ \Illuminate\Support\Number::currency((float) $currentPrice, $currentCurrency, app()->getLocale()) }}
+                                            {{ \Illuminate\Support\Number::currency((float) $currentPrice, $currentCurrency, $locale) }}
                                         </p>
                                     @endif
                                     @if ($comparePrice && $currentPrice && $comparePrice > $currentPrice)
                                         <p class="flex items-center gap-2 text-sm text-slate-500">
                                             <span class="line-through">
-                                                {{ \Illuminate\Support\Number::currency((float) $comparePrice, $currentCurrency, app()->getLocale()) }}
+                                                {{ \Illuminate\Support\Number::currency((float) $comparePrice, $currentCurrency, $locale) }}
                                             </span>
                                             @if ($discountPercent)
                                                 <span
@@ -175,7 +218,7 @@
                                     {{ __('product_page.features_title') }}</h2>
                                 <span
                                       class="text-xs font-medium uppercase tracking-wide text-slate-400">{{ $this->attributeFeatures->count() }}
-                                    {{ __('Features') }}</span>
+                                    {{ __('product_page.features_count') }}</span>
                             </div>
 
                             @if ($this->attributeFeatures->isEmpty())
@@ -183,38 +226,15 @@
                             @else
                                 <div class="grid gap-4 sm:grid-cols-2">
                                     @foreach ($this->attributeFeatures as $feature)
-                                        @php
-                                            $iconComponent = $feature['icon'] ?? null;
-                                            $iconColor = $feature['color'] ?? null;
-                                            $resolvedIcon = null;
-
-                                            if ($iconComponent) {
-                                                if (\Illuminate\Support\Str::startsWith($iconComponent, 'heroicon-')) {
-                                                    $resolvedIcon = $iconComponent;
-                                                } elseif (! \Illuminate\Support\Str::contains($iconComponent, '::')) {
-                                                    $resolvedIcon = 'heroicon-o-' . $iconComponent;
-                                                }
-                                            }
-                                        @endphp
                                         <div
-                                             class="flex items-start gap-3 rounded-2xl border border-slate-100 bg-white/70 p-4 shadow-sm">
+                                             class="flex items-start gap-3 rounded-2xl border border-slate-100 bg-slate-50/60 p-4">
                                             <div
-                                                 class="flex h-10 w-10 items-center justify-center rounded-full bg-slate-50">
-                                                @if ($resolvedIcon)
-                                                    <x-dynamic-component :component="$resolvedIcon"
-                                                                         class="h-5 w-5"
-                                                                         @if ($iconColor) style="color: {{ $iconColor }}" @endif />
-                                                @elseif ($iconComponent)
-                                                    <span class="text-sm font-semibold text-slate-600"
-                                                          @if ($iconColor) style="color: {{ $iconColor }}" @endif>
-                                                        {{ $iconComponent }}
-                                                    </span>
-                                                @else
-                                                    <x-heroicon-o-check-badge class="h-5 w-5 text-primary-500" />
-                                                @endif
+                                                 class="flex h-9 w-9 items-center justify-center rounded-full bg-white shadow-sm">
+                                                <x-heroicon-o-check-badge class="h-5 w-5 text-emerald-500" />
                                             </div>
                                             <div class="space-y-1">
-                                                <p class="text-sm font-semibold text-slate-900">{{ $feature['label'] }}</p>
+                                                <p class="text-sm font-semibold text-slate-900">{{ $feature['label'] }}
+                                                </p>
                                                 <p class="text-sm text-slate-600">{{ $feature['value'] }}</p>
                                             </div>
                                         </div>
@@ -228,14 +248,10 @@
                         <div class="space-y-6 p-6 lg:p-8">
                             <h2 class="text-lg font-semibold text-slate-900">
                                 {{ __('product_page.detailed_description') }}</h2>
-                            @php
-                                $fallbackDescription = '<p>' . __('product_page.no_description') . '</p>';
-                                $detailedDescription = $product->trans('description') ?? ($product->description ?? $fallbackDescription);
-                            @endphp
-                            <x-sanitized-html
-                                    class="prose prose-slate max-w-none text-slate-700"
-                                    :content="$detailedDescription"
-                            />
+                            <div class="prose prose-slate max-w-none text-slate-700">
+                                {!! $product->trans('description') ??
+                                    ($product->description ?? '<p>' . __('product_page.no_description') . '</p>') !!}
+                            </div>
                         </div>
                     </section>
 
@@ -273,7 +289,7 @@
                                 ),
                             ],
                             [
-                                'label' => __('Minimum quantity'),
+                                'label' => __('product_page.minimum_quantity'),
                                 'value' => $product->getMinimumQuantity() > 1 ? $product->getMinimumQuantity() : null,
                             ],
                         ];
@@ -304,7 +320,7 @@
                                 <h2 class="text-lg font-semibold text-slate-900">
                                     {{ __('product_page.change_history') }}
                                 </h2>
-                                <a href="{{ route('localized.products.history', ['locale' => app()->getLocale(), 'product' => $product->trans('slug') ?? $product->slug]) }}"
+                                <a href="{{ route('localized.products.history', ['locale' => $locale, 'product' => $product->trans('slug') ?? $product->slug]) }}"
                                    class="inline-flex items-center gap-2 text-sm font-medium text-primary-600 hover:text-primary-700">
                                     <x-heroicon-o-clock class="h-4 w-4" />
                                     {{ __('product_page.view_full_history') }}
@@ -419,65 +435,54 @@
                             @else
                                 <div class="space-y-4">
                                     @foreach ($this->variantMatrix as $variant)
-                                        @php
-                                            $variantIsActive = $variant['is_active'] ?? false;
-                                            $variantIsAvailable = $variant['is_available'] ?? true;
-                                        @endphp
-                                        {{-- Variant summary card --}}
                                         <button
                                             type="button"
                                             wire:click="selectVariant({{ $variant['id'] }})"
-                                            class="w-full rounded-2xl border px-5 py-4 text-left transition focus:outline-none focus-visible:ring focus-visible:ring-primary-400 {{ $variantIsActive ? 'border-primary-500 bg-primary-50 shadow-md' : 'border-slate-100 bg-slate-50/70 hover:border-primary-200 hover:bg-white' }} {{ ! $variantIsAvailable ? 'opacity-70' : '' }}"
-                                            aria-pressed="{{ $variantIsActive ? 'true' : 'false' }}"
+                                            class="w-full flex flex-col gap-4 rounded-2xl border border-slate-100 bg-slate-50/70 p-5 sm:flex-row sm:items-center sm:justify-between text-left transition hover:border-slate-200 hover:bg-slate-50 focus:outline-none focus-visible:ring focus-visible:ring-primary-400 {{ ($variant['is_active'] ?? false) ? 'border-primary-300 bg-primary-50/50' : '' }} {{ ($variant['is_out_of_stock'] ?? false) ? 'opacity-70' : '' }}"
                                         >
-                                            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                                                <div class="flex items-start gap-4">
-                                                    @if ($variant['thumbnail'])
-                                                        <img src="{{ $variant['thumbnail'] }}"
-                                                             alt="{{ $variant['name'] }}"
-                                                             class="h-16 w-16 rounded-xl object-cover shadow-sm">
-                                                    @endif
-                                                    <div class="space-y-2">
-                                                        <div>
-                                                            <p class="text-base font-semibold text-slate-900">
-                                                                {{ $variant['name'] }}</p>
-                                                            @if ($variant['sku'])
-                                                                <p class="text-xs text-slate-500">
-                                                                    {{ __('translations.sku') }}: {{ $variant['sku'] }}
-                                                                </p>
-                                                            @endif
-                                                        </div>
-                                                        @if (! empty($variant['attribute_summary']))
-                                                            <p class="text-xs text-slate-500">{{ $variant['attribute_summary'] }}</p>
+                                            <div class="flex items-start gap-4">
+                                                @if ($variant['thumbnail'])
+                                                    <img src="{{ $variant['thumbnail'] }}"
+                                                         alt="{{ $variant['name'] }}"
+                                                         class="h-16 w-16 rounded-xl object-cover shadow-sm">
+                                                @endif
+                                                <div class="space-y-2">
+                                                    <div>
+                                                        <p class="text-base font-semibold text-slate-900">
+                                                            {{ $variant['name'] }}</p>
+                                                        @if ($variant['sku'])
+                                                            <p class="text-xs text-slate-500">
+                                                                {{ __('translations.sku') }}: {{ $variant['sku'] }}
+                                                            </p>
                                                         @endif
-                                                        <dl class="flex flex-wrap gap-2 text-xs text-slate-600">
-                                                            @foreach ($variant['attributes'] as $attribute)
-                                                                <div
-                                                                     class="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 shadow-sm">
-                                                                    <span
-                                                                          class="font-medium text-slate-700">{{ $attribute['attribute'] }}:</span>
-                                                                    <span>{{ $attribute['value'] }}</span>
-                                                                </div>
-                                                            @endforeach
-                                                        </dl>
                                                     </div>
+                                                    <dl class="flex flex-wrap gap-2 text-xs text-slate-600">
+                                                        @foreach ($variant['attributes'] as $attribute)
+                                                            <div
+                                                                 class="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 shadow-sm">
+                                                                <span
+                                                                      class="font-medium text-slate-700">{{ $attribute['attribute'] }}:</span>
+                                                                <span>{{ $attribute['value'] }}</span>
+                                                            </div>
+                                                        @endforeach
+                                                    </dl>
                                                 </div>
-                                                <div class="text-right">
-                                                    @if ($variant['price'])
-                                                        <p class="text-lg font-semibold text-primary-600">
-                                                            {{ $variant['price'] }}</p>
-                                                    @endif
-                                                    @if ($variant['compare_price'])
-                                                        <p class="text-xs text-slate-500 line-through">
-                                                            {{ $variant['compare_price'] }}</p>
-                                                    @endif
-                                                    <p
-                                                       class="mt-2 text-xs font-medium uppercase tracking-wide {{ $variantIsAvailable ? 'text-emerald-500' : 'text-rose-500' }}">
-                                                        {{ $variantIsAvailable ? __('translations.available') : __('translations.out_of_stock') }}
-                                                    </p>
-                                                    <p class="text-xs text-slate-400">{{ __('translations.available') }}:
-                                                        {{ $variant['available_quantity'] }}</p>
-                                                </div>
+                                            </div>
+                                            <div class="text-right">
+                                                @if ($variant['price'])
+                                                    <p class="text-lg font-semibold text-primary-600">
+                                                        {{ $variant['price'] }}</p>
+                                                @endif
+                                                @if ($variant['compare_price'])
+                                                    <p class="text-xs text-slate-500 line-through">
+                                                        {{ $variant['compare_price'] }}</p>
+                                                @endif
+                                                <p
+                                                   class="mt-2 text-xs font-medium uppercase tracking-wide {{ ($variant['is_out_of_stock'] ?? false) ? 'text-red-500' : 'text-emerald-500' }}">
+                                                    {{ ($variant['is_out_of_stock'] ?? false) ? __('translations.out_of_stock') : __('translations.available') }}
+                                                </p>
+                                                <p class="text-xs text-slate-400">{{ __('translations.available_label') }}:
+                                                    {{ $variant['available_quantity'] }}</p>
                                             </div>
                                         </button>
                                     @endforeach
@@ -511,12 +516,18 @@
                     @endif
 
                     @if ((bool) (config('app-features.features.review') ?? true))
-                        <livewire:components.product-reviews :product="$product" />
+                        <section class="rounded-3xl border border-slate-100 bg-white shadow-sm">
+                            <div class="space-y-6 p-6 lg:p-8">
+                                <h2 class="text-lg font-semibold text-slate-900">
+                                    {{ __('product_page.customer_feedback') }}</h2>
+                                <livewire:components.product-reviews :product="$product" />
+                            </div>
+                        </section>
                     @endif
                 </div>
 
                 <div class="lg:col-span-5 space-y-6">
-                    <section class="rounded-3xl border border-slate-100 bg-white shadow-lg lg:sticky lg:top-24">
+                    <section class="rounded-3xl border border-slate-100 bg-white shadow-lg">
                         <div class="space-y-6 p-6 lg:p-8">
                             <div class="flex items-start justify-between gap-4">
                                 <div class="space-y-1">
@@ -527,7 +538,7 @@
                                 </div>
                                 @if ($currentPrice)
                                     <p class="text-3xl font-semibold text-primary-600">
-                                        {{ \Illuminate\Support\Number::currency((float) $currentPrice, $currentCurrency, app()->getLocale()) }}
+                                        {{ \Illuminate\Support\Number::currency((float) $currentPrice, $currentCurrency, $locale) }}
                                     </p>
                                 @endif
                             </div>
@@ -537,17 +548,7 @@
                                     {{ __('product_page.quality_guarantee') }}
                                 </p>
                             </div>
-                            <div class="flex flex-wrap items-center gap-3 text-sm font-medium text-slate-600">
-                                <span class="inline-flex items-center gap-1">
-                                    <span class="text-slate-500">{{ __('translations.reserved') }}:</span>
-                                    <span class="text-slate-900">{{ \Illuminate\Support\Number::format((float) $reservedQuantity) }}</span>
-                                </span>
-                                <span class="inline-flex items-center gap-1">
-                                    <span class="text-slate-500">{{ __('translations.available') }}:</span>
-                                    <span class="text-slate-900">{{ \Illuminate\Support\Number::format((float) $availableQuantity) }}</span>
-                                </span>
-                            </div>
-                            <div class="variant-selector-card">
+                            <div class="variant-selector-card" wire:loading.class="opacity-50 pointer-events-none">
                                 <livewire:product-variant-selector :product="$product" />
                             </div>
                         </div>
@@ -600,11 +601,24 @@
                     </section>
 
                     <livewire:components.product-request-form :product="$product" />
+
+                    <section class="rounded-3xl border border-slate-100 bg-white shadow-sm">
+                        <div class="space-y-4 p-6 lg:p-8">
+                            <h2 class="text-base font-semibold text-slate-900">
+                                {{ __('product_page.need_tailored_offer') }}</h2>
+                            <p class="text-sm text-slate-600">{{ __('product_page.tailored_offer_desc') }}</p>
+                            <a href="{{ $contactUrl }}"
+                               class="inline-flex items-center justify-center rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700">
+                                <x-heroicon-o-phone class="mr-2 h-4 w-4" />
+                                {{ __('translations.contact_us') }}
+                            </a>
+                        </div>
+                    </section>
                 </div>
             </div>
 
             <div class="text-center">
-                <a href="{{ route('localized.products.index', ['locale' => app()->getLocale()]) }}"
+                <a href="{{ route('localized.products.index', ['locale' => $locale]) }}"
                    class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-5 py-2 text-sm font-medium text-slate-600 hover:border-slate-300 hover:text-slate-900">
                     <x-heroicon-o-arrow-left class="h-4 w-4" />
                     {{ __('frontend.buttons.back_to_products') }}

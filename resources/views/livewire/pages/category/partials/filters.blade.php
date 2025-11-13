@@ -42,28 +42,28 @@
         {{ __('Availability') }}
     </h3>
 
-    <label class="flex items-center justify-between rounded-xl border border-sage/30 bg-dark/30 px-3 py-2 text-sm font-medium text-sage transition hover:border-sage hover:bg-sage/10 hover:text-dark">
+    <label class="flex items-center justify-between rounded-xl border border-sage/30 bg-dark/30 px-3 py-2 text-sm font-medium text-white transition hover:border-sage hover:bg-sage/10">
         <div class="flex items-center gap-3">
             <input type="checkbox" wire:model.live="inStock" class="rounded border-sage/30 text-sage focus:ring-sage">
-            <span>{{ __('In stock only') }}</span>
+            <span class="text-white">{{ __('In stock only') }}</span>
         </div>
         <span class="text-xs text-sage/60">{{ __('Real-time') }}</span>
     </label>
 
-    <label class="flex items-center justify-between rounded-xl border border-sage/30 bg-dark/30 px-3 py-2 text-sm font-medium text-sage transition hover:border-sage hover:bg-sage/10 hover:text-dark">
+    <label class="flex items-center justify-between rounded-xl border border-sage/30 bg-dark/30 px-3 py-2 text-sm font-medium text-white transition hover:border-sage hover:bg-sage/10">
         <div class="flex items-center gap-3">
             <input type="checkbox" wire:model.live="onSale" class="rounded border-sage/30 text-sage focus:ring-sage">
-            <span>{{ __('Promotions') }}</span>
+            <span class="text-white">{{ __('Promotions') }}</span>
         </div>
         <span class="inline-flex items-center gap-1 rounded-full border border-sage/30 bg-sage px-2 py-0.5 text-[11px] font-semibold text-dark">
             {{ __('Hot') }}
         </span>
     </label>
 
-    <label class="flex items-center justify-between rounded-xl border border-sage/30 bg-dark/30 px-3 py-2 text-sm font-medium text-sage transition hover:border-sage hover:bg-sage/10 hover:text-dark">
+    <label class="flex items-center justify-between rounded-xl border border-sage/30 bg-dark/30 px-3 py-2 text-sm font-medium text-white transition hover:border-sage hover:bg-sage/10">
         <div class="flex items-center gap-3">
             <input type="checkbox" wire:model.live="hasProducts" class="rounded border-sage/30 text-sage focus:ring-sage">
-            <span>{{ __('With active listings') }}</span>
+            <span class="text-white">{{ __('With active listings') }}</span>
         </div>
         <span class="text-xs text-sage/60">{{ __('Verified content') }}</span>
     </label>
@@ -103,21 +103,21 @@
 </div>
 
 <details class="group rounded-2xl border border-sage/30 bg-dark/50 {{ $cardShadow }}" open>
-    <summary class="flex cursor-pointer items-center justify-between {{ $summaryPaddingX }} {{ $summaryPaddingY }} text-sm font-semibold text-sage transition hover:text-dark">
-        <span>{{ __('Brands') }}</span>
+    <summary class="flex cursor-pointer items-center justify-between {{ $summaryPaddingX }} {{ $summaryPaddingY }} text-sm font-semibold text-white transition hover:text-sage">
+        <span>{{ __('categories_index_filters_brands') }}</span>
         <svg class="h-4 w-4 text-sage/60 transition-transform duration-200 group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6" />
         </svg>
     </summary>
     <div class="{{ $summaryPaddingX }} pb-5 {{ $sectionSpacing }} max-h-56 overflow-y-auto">
         @forelse ($this->facetBrands as $brand)
-            <label class="flex items-center justify-between gap-2 rounded-xl border border-sage/30 bg-dark/30 px-3 py-2 text-sm font-medium text-sage transition hover:border-sage hover:bg-sage/10 hover:text-dark">
-                <span class="flex items-center gap-3">
+            <label class="flex items-center justify-between gap-2 rounded-xl border border-sage/30 bg-dark/30 px-3 py-2 text-sm font-medium text-white transition hover:border-sage hover:bg-sage/10">
+                <span class="flex items-center gap-3 text-white">
                     <input type="checkbox"
                            value="{{ $brand['id'] }}"
                            wire:model.live="selectedBrandIds"
                            class="rounded border-sage/30 text-sage focus:ring-sage">
-                    {{ $brand['name'] }}
+                    <span class="text-white">{{ $brand['name'] }}</span>
                 </span>
                 <span class="inline-flex min-w-[2.5rem] items-center justify-center rounded-full border border-sage/30 bg-sage px-2 py-0.5 text-xs font-semibold text-dark">
                     {{ $brand['count'] }}
@@ -130,21 +130,21 @@
 </details>
 
 <details class="group rounded-2xl border border-sage/30 bg-dark/50 {{ $cardShadow }}" open>
-    <summary class="flex cursor-pointer items-center justify-between {{ $summaryPaddingX }} {{ $summaryPaddingY }} text-sm font-semibold text-sage transition hover:text-dark">
-        <span>{{ __('Collections') }}</span>
+    <summary class="flex cursor-pointer items-center justify-between {{ $summaryPaddingX }} {{ $summaryPaddingY }} text-sm font-semibold text-white transition hover:text-sage">
+        <span>{{ __('categories_index_filters_collections') }}</span>
         <svg class="h-4 w-4 text-sage/60 transition-transform duration-200 group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6" />
         </svg>
     </summary>
     <div class="{{ $summaryPaddingX }} pb-5 {{ $sectionSpacing }} max-h-56 overflow-y-auto">
         @forelse ($this->facetCollections as $collection)
-            <label class="flex items-center justify-between gap-2 rounded-xl border border-sage/30 bg-dark/30 px-3 py-2 text-sm font-medium text-sage transition hover:border-sage hover:bg-sage/10 hover:text-dark">
-                <span class="flex items-center gap-3">
+            <label class="flex items-center justify-between gap-2 rounded-xl border border-sage/30 bg-dark/30 px-3 py-2 text-sm font-medium text-white transition hover:border-sage hover:bg-sage/10">
+                <span class="flex items-center gap-3 text-white">
                     <input type="checkbox"
                            value="{{ $collection['id'] }}"
                            wire:model.live="selectedCollectionIds"
                            class="rounded border-sage/30 text-sage focus:ring-sage">
-                    {{ $collection['name'] }}
+                    <span class="text-white">{{ $collection['name'] }}</span>
                 </span>
                 <span class="inline-flex min-w-[2.5rem] items-center justify-center rounded-full border border-sage/30 bg-sage px-2 py-0.5 text-xs font-semibold text-dark">
                     {{ $collection['count'] }}
@@ -157,21 +157,21 @@
 </details>
 
 <details class="group rounded-2xl border border-sage/30 bg-dark/50 {{ $cardShadow }}" open>
-    <summary class="flex cursor-pointer items-center justify-between {{ $summaryPaddingX }} {{ $summaryPaddingY }} text-sm font-semibold text-sage transition hover:text-dark">
-        <span>{{ __('Categories') }}</span>
+    <summary class="flex cursor-pointer items-center justify-between {{ $summaryPaddingX }} {{ $summaryPaddingY }} text-sm font-semibold text-white transition hover:text-sage">
+        <span>{{ __('categories_index_filters_categories') }}</span>
         <svg class="h-4 w-4 text-sage/60 transition-transform duration-200 group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6" />
         </svg>
     </summary>
     <div class="{{ $summaryPaddingX }} pb-5 {{ $sectionSpacing }} max-h-56 overflow-y-auto">
         @forelse ($this->facetCategories as $category)
-            <label class="flex items-center justify-between gap-2 rounded-xl border border-sage/30 bg-dark/30 px-3 py-2 text-sm font-medium text-sage transition hover:border-sage hover:bg-sage/10 hover:text-dark">
-                <span class="flex items-center gap-3">
+            <label class="flex items-center justify-between gap-2 rounded-xl border border-sage/30 bg-dark/30 px-3 py-2 text-sm font-medium text-white transition hover:border-sage hover:bg-sage/10">
+                <span class="flex items-center gap-3 text-white">
                     <input type="checkbox"
                            value="{{ $category['id'] }}"
                            wire:model.live="selectedCategoryIds"
                            class="rounded border-sage/30 text-sage focus:ring-sage">
-                    {{ $category['name'] }}
+                    <span class="text-white">{{ $category['name'] }}</span>
                 </span>
                 <span class="inline-flex min-w-[2.5rem] items-center justify-center rounded-full border border-sage/30 bg-sage px-2 py-0.5 text-xs font-semibold text-dark">
                     {{ $category['count'] }}

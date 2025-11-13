@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 return [
     'topbar' => [
-        'phone'         => '+370 600 00 000',
-        'phone_href'    => '+37060000000',
-        'email'         => 'support@statybae.com',
-        'email_href'    => 'support@statybae.com',
+        'phone'         => '+370 695 72123',
+        'phone_href'    => '+37069572123',
+        'email'         => 'info@egisstatyba.lt',
+        'email_href'    => 'info@egisstatyba.lt',
         'store_locator' => 'Store locator',
         'downloads'     => 'Downloads',
         'catalog'       => 'Vendor catalogues',

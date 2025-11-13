@@ -7,6 +7,11 @@
     $socialFacebook = $hasSettings ? app_setting('social_facebook') ?? '#' : '#';
     $socialInstagram = $hasSettings ? app_setting('social_instagram') ?? '#' : '#';
     $locale = app()->getLocale();
+    $homeUrl = \Illuminate\Support\Facades\Route::has('localized.home')
+        ? route('localized.home', ['locale' => $locale])
+        : (\Illuminate\Support\Facades\Route::has('home')
+            ? route('home')
+            : url('/'));
     $docsUrl = \Illuminate\Support\Facades\Route::has('docs.api') ? route('docs.api') : url('/docs/api');
     $githubUrl = 'https://github.com/prus-dev/statybaecommerse.prus.dev';
     $aboutUrl = \Illuminate\Support\Facades\Route::has('localized.about')
@@ -36,7 +41,11 @@
             <!-- Left: Company Info -->
             <div class="md:col-span-4 text-center md:text-left">
                 <div class="mb-6 text-center md:text-left">
-                    <x-brand class="h-16 w-auto mx-auto md:mx-0 text-sage" aria-hidden="true" />
+                    <a href="{{ $homeUrl }}" class="group" aria-label="{{ __('frontend.navigation.home') }}">
+                        <img src="/images/logo/logo.png" 
+                             alt="{{ config('app.name') }}" 
+                             class="h-16 w-auto mx-auto md:mx-0 object-contain">
+                    </a>
                 </div>
 
                 <div class="text-ash/80 mb-8 leading-relaxed">

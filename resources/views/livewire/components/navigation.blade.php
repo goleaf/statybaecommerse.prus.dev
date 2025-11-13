@@ -1,6 +1,48 @@
+@php
+    // Ensure locale is set before using translations
+    $request = request();
+    $supportedConfig = config('app.supported_locales', 'lt,en');
+    $supportedLocales = [];
+    if (is_array($supportedConfig)) {
+        $supportedLocales = array_filter($supportedConfig, fn ($locale): bool => is_string($locale) && $locale !== '');
+    } elseif (is_string($supportedConfig)) {
+        $supportedLocales = array_filter(
+            array_map(fn (string $locale): string => trim($locale), explode(',', $supportedConfig)),
+            fn (string $locale): bool => $locale !== ''
+        );
+    }
+    $supportedLocales = array_values(array_map(fn (string $locale): string => trim($locale), $supportedLocales));
+    
+    $routeLocale = $request->route('locale');
+    $queryLocale = $request->query('locale');
+    $defaultLocale = config('app.locale', 'lt');
+    
+    $candidateLocales = array_values(array_filter([
+        $routeLocale,
+        $queryLocale,
+        session('locale'),
+        session('app.locale'),
+        $request->cookie('app_locale'),
+        auth()->check() ? (auth()->user()->preferred_locale ?? null) : null,
+    ], fn ($candidate): bool => is_string($candidate) && $candidate !== ''));
+    
+    $locale = $defaultLocale;
+    foreach ($candidateLocales as $candidate) {
+        if (in_array($candidate, $supportedLocales, true)) {
+            $locale = $candidate;
+            break;
+        }
+    }
+    
+    if (!in_array($locale, $supportedLocales, true)) {
+        $fallbackLocale = config('app.fallback_locale', $defaultLocale);
+        $locale = in_array($fallbackLocale, $supportedLocales, true) ? $fallbackLocale : ($supportedLocales[0] ?? $defaultLocale);
+    }
+    
+    app()->setLocale($locale);
+@endphp
 <nav class="w-full relative z-50 overflow-visible">
     @php
-        $locale = app()->getLocale();
         $homeUrl = Route::has('localized.home')
             ? route('localized.home', ['locale' => $locale])
             : (Route::has('home')
@@ -180,7 +222,7 @@
             <div class="fixed top-0 right-0 h-full w-full max-w-[350px] bg-sage transform transition-transform duration-300" x-show="open">
                 {{-- Header --}}
                 <div class="flex justify-between items-center py-3 px-4 bg-dark text-sage">
-                    <h3 class="font-bold font-montserrat">{{ __('frontend/header.mobile.title') }}</h3>
+                    <h3 class="font-bold font-montserrat">{{ __('frontend.header.mobile.title') }}</h3>
                     <button type="button" 
                             class="size-8 inline-flex justify-center items-center gap-x-2 rounded-full border border-sage text-sage bg-transparent hover:bg-sage hover:text-dark transition-colors" 
                             wire:click="toggleMobileMenu"

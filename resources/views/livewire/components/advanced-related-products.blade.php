@@ -36,7 +36,7 @@
                             <div class="mt-4 flex justify-between">
                                 <div class="flex-1">
                                     <h3 class="text-sm text-gray-900">
-                                        <a href="{{ route('products.show', ['locale' => app()->getLocale(), 'product' => $relatedProduct->trans('slug') ?? $relatedProduct->slug]) }}" 
+                                        <a href="{{ route('localized.products.show', ['locale' => app()->getLocale(), 'product' => $relatedProduct->trans('slug') ?? $relatedProduct->slug ?? $relatedProduct->getKey()]) }}" 
                                            class="group-hover:text-indigo-600 transition-colors duration-200">
                                             <span aria-hidden="true" class="absolute inset-0"></span>
                                             {{ $relatedProduct->trans('name') ?? $relatedProduct->name }}

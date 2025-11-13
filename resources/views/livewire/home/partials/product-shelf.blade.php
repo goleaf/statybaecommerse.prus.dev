@@ -14,7 +14,7 @@
         ])
     @empty
         <div class="col-span-full rounded-3xl border border-white/10 bg-white/5 px-6 py-16 text-center text-sm text-white/60">
-            {{ __('frontend/home.products.empty') }}
+            {{ __('home_products_empty') }}
         </div>
     @endforelse
 </div>

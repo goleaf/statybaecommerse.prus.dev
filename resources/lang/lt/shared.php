@@ -39,6 +39,7 @@ return [
     ],
     'close'    => 'Uždaryti',
     'navigation' => 'Navigacija',
+    'breadcrumb' => 'Navigacijos takelis',
     'back'     => 'Atgal',
     'next'     => 'Toliau',
     'previous' => 'Ankstesnis',
