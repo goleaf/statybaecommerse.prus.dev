@@ -532,12 +532,14 @@ final class Brand extends Model implements HasMedia, TranslatableRecord
             return 0.0;
         }
 
-        return $this->products()
+        $result = $this->products()
             ->withoutGlobalScopes()
             ->join('order_items', 'products.id', '=', 'order_items.product_id')
             ->join('orders', 'order_items.order_id', '=', 'orders.id')
             ->where('orders.status', 'completed')
             ->sum(DB::raw('order_items.quantity * order_items.price'));
+
+        return (float) ($result ?? 0.0);
     }
 
     /**
@@ -545,7 +547,9 @@ final class Brand extends Model implements HasMedia, TranslatableRecord
      */
     public function getAverageProductPrice(): ?float
     {
-        return $this->products()->published()->avg('price');
+        $result = $this->products()->published()->avg('price');
+
+        return $result !== null ? (float) $result : null;
     }
 
     /**

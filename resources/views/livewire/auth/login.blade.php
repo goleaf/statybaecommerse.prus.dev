@@ -58,13 +58,13 @@
             <div class="space-y-3">
                 <span class="inline-flex items-center gap-2 rounded-full bg-dark/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-dark">
                     {{ __('auth_account_zone') }}
-                </span>
+            </span>
                 <h1 class="text-3xl font-extrabold tracking-tight text-dark sm:text-4xl">
                     {{ __('auth_welcome_back') }}
-                </h1>
+            </h1>
                 <p class="mx-auto max-w-xl text-sm text-slate-600">
                     {{ __('auth_welcome_back_subtitle') }}
-                </p>
+            </p>
             </div>
         </div>
 
@@ -94,11 +94,11 @@
                                 {{ __('auth_forgot_password') }}
                             </x-link>
                         </div>
-                        <x-forms.input
-                            id="password"
-                            type="password"
-                            wire:model.defer="loginForm.password"
-                            autocomplete="current-password"
+                            <x-forms.input
+                                id="password"
+                                type="password"
+                                wire:model.defer="loginForm.password"
+                                autocomplete="current-password"
                             class="rounded-xl border border-ash bg-white px-4 py-3 text-base shadow-sm transition focus:border-dark focus:ring-2 focus:ring-dark/10"
                             placeholder="{{ __('auth_password_placeholder') }}"
                         />

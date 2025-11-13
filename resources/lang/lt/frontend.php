@@ -4,10 +4,15 @@ declare(strict_types=1);
 
 return [
     'navigation' => [
-        'home'     => 'Pagrindinis',
-        'products' => 'Produktai',
-        'about'    => 'Apie mus',
-        'contact'  => 'Kontaktai',
+        'home'        => 'Pagrindinis',
+        'products'    => 'Produktai',
+        'categories'  => 'Kategorijos',
+        'brands'      => 'Prekės ženklai',
+        'collections' => 'Kolekcijos',
+        'about'       => 'Apie mus',
+        'contact'     => 'Kontaktai',
+        'breadcrumbs' => 'Navigacijos kelias',
+        'news'        => 'Naujienos',
     ],
     // Direct keys for tests
     'home'     => 'Pagrindinis',

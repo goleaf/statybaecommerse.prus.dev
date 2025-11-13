@@ -16,27 +16,27 @@
     $items = [
         [
             'icon' => 'cube',
-            'label' => __('frontend/home.stats.products.label'),
+            'label' => __('home_stats_products_label'),
             'value' => number_format($productsCount),
-            'caption' => __('frontend/home.stats.products.caption'),
+            'caption' => __('home_stats_products_caption'),
         ],
         [
             'icon' => 'grid',
-            'label' => __('frontend/home.stats.categories.label'),
+            'label' => __('home_stats_categories_label'),
             'value' => number_format($categoriesCount),
-            'caption' => __('frontend/home.stats.categories.caption'),
+            'caption' => __('home_stats_categories_caption'),
         ],
         [
             'icon' => 'link-05',
-            'label' => __('frontend/home.stats.brands.label'),
+            'label' => __('home_stats_brands_label'),
             'value' => number_format($brandsCount),
-            'caption' => __('frontend/home.stats.brands.caption'),
+            'caption' => __('home_stats_brands_caption'),
         ],
         [
             'icon' => 'star',
-            'label' => __('frontend/home.stats.reviews.label'),
+            'label' => __('home_stats_reviews_label'),
             'value' => number_format($reviewsCount),
-            'caption' => __('frontend/home.stats.reviews.caption', [
+            'caption' => __('home_stats_reviews_caption', [
                 'rating' => number_format($averageRating, 1),
             ]),
         ],

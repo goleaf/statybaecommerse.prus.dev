@@ -11,6 +11,7 @@ return [
         'title'       => 'Patikimi statybų prekės ženklai',
         'description' => 'Atraskite patikimus tiekėjus, įrankių gamintojus ir medžiagų partnerius, atrinktus Baltijos statybų profesionalams.',
         'cta'         => 'Peržiūrėti kolekcijas',
+        'badge'       => 'Prekių ženklų katalogas',
     ],
     'stats' => [
         'brands' => [
@@ -48,6 +49,9 @@ return [
             'featured' => 'Pirmiausia išskirtiniai',
             'products' => 'Daugiausia produktų',
         ],
+        'quick_actions' => 'Greiti veiksmai',
+        'reset_filters' => 'Atstatyti filtrus',
+        'apply_filters' => 'Pritaikyti filtrus',
     ],
     'list' => [
         'title'       => 'Prekių ženklų katalogas',
@@ -67,6 +71,35 @@ return [
         'empty'         => [
             'title'       => 'Šiuo metu nėra prekės ženklų',
             'description' => 'Nauji partneriai pasirodys netrukus. Apsilankykite dar kartą.',
+        ],
+        'catalogue_count' => ':count prekės ženklai kataloge',
+        'description_placeholder' => 'Išsamus aprašymas netrukus bus pateiktas.',
+        'showing_results' => 'Rodoma :from–:to iš :total rezultatų',
+        'no_results' => 'Nėra rodytinų rezultatų',
+        'pagination_navigation' => 'Puslapių navigacija',
+    ],
+    'show' => [
+        'spotlight' => 'Prekės ženklo apžvalga',
+        'categories_title' => 'Kategorijos, kurioms šis prekės ženklas tinka',
+        'products_count' => ':count produktai',
+        'categories_count' => ':count kategorijos',
+        'quick_filters_label' => 'Greiti filtrai:',
+        'all_products' => 'Visi produktai',
+        'apply' => 'Pritaikyti',
+        'sort_label' => 'Rikiuoti pagal',
+        'update' => 'Atnaujinti',
+        'no_products' => 'Šio prekės ženklo produktų dar nerasta.',
+        'sort' => [
+            'featured' => 'Išskirtiniai',
+            'latest' => 'Naujausi',
+            'price_asc' => 'Kaina: nuo žemiausios',
+            'price_desc' => 'Kaina: nuo aukščiausios',
+            'bestsellers' => 'Populiariausi',
+        ],
+        'filters' => [
+            'featured' => 'Tik išskirtiniai',
+            'sale' => 'Su nuolaida',
+            'in_stock' => 'Yra sandėlyje',
         ],
     ],
 ];

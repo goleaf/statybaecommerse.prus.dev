@@ -1,12 +1,45 @@
-@section('meta')
-    <x-meta
-        :title="__('Categories') . ' - ' . config('app.name')"
-        :description="__('Explore our comprehensive range of categories')"
-        canonical="{{ url()->current() }}" />
-@endsection
-
 @php
-    $locale = app()->getLocale();
+    // Ensure locale is set from route before rendering (mirror SetLocale middleware logic)
+    $request = request();
+    $supportedConfig = config('app.supported_locales', 'lt,en');
+    $supportedLocales = is_array($supportedConfig) 
+        ? $supportedConfig 
+        : array_map('trim', explode(',', (string) $supportedConfig));
+    $supportedLocales = array_values(array_filter($supportedLocales, function($locale) {
+        return is_string($locale) && $locale !== '';
+    }));
+    
+    $routeLocale = $request->route('locale');
+    $locale = $routeLocale;
+    
+    // If no route parameter or invalid, try session, cookie, or default
+    if (!$locale || !in_array($locale, $supportedLocales, true)) {
+        $candidateLocales = array_filter([
+            session('locale'),
+            session('app.locale'),
+            $request->cookie('app_locale'),
+            config('app.locale', 'lt'),
+        ], function($candidate) {
+            return is_string($candidate) && $candidate !== '';
+        });
+        
+        foreach ($candidateLocales as $candidate) {
+            if (in_array($candidate, $supportedLocales, true)) {
+                $locale = $candidate;
+                break;
+            }
+        }
+    }
+    
+    // Ensure we have a valid locale
+    if (!$locale || !in_array($locale, $supportedLocales, true)) {
+        $locale = config('app.locale', 'lt');
+    }
+    
+    // Set the locale explicitly
+    app()->setLocale($locale);
+    app()->instance('request_locale', $locale);
+    
     $categories = $this->categories;
     $totalCategories = $categories->count();
     $from = $categories->count() ? 1 : 0;
@@ -24,6 +57,13 @@
     ])->filter()->count();
 @endphp
 
+@section('meta')
+    <x-meta
+        :title="__('categories_index_meta_title') . ' - ' . config('app.name')"
+        :description="__('categories_index_meta_description')"
+        canonical="{{ url()->current() }}" />
+@endsection
+
 <div class="bg-sage">
     <div class="bg-dark text-sage">
         <x-container class="px-4 py-12 sm:py-16">
@@ -39,32 +79,32 @@
                         </a>
                     </li>
                     <li class="text-sage/60">/</li>
-                    <li class="text-white">{{ __('Categories') }}</li>
+                    <li class="text-white">{{ __('categories_index_meta_title') }}</li>
                 </ol>
             </nav>
 
             <div class="mt-8 flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
                 <div class="max-w-2xl space-y-5">
                     <span class="inline-flex items-center gap-2 rounded-full border border-sage bg-sage px-4 py-1 text-[11px] font-semibold uppercase tracking-[0.35em] text-dark">
-                        {{ __('Catalogue overview') }}
+                        {{ __('categories_index_badge') }}
                     </span>
                     <h1 class="text-3xl font-bold leading-tight text-white sm:text-4xl md:text-5xl">
-                        {{ __('Discover every department in StatyBae Commerce') }}
+                        {{ __('categories_index_title') }}
                     </h1>
                     <p class="text-base text-sage sm:text-lg">
-                        {{ __('Browse structured categories curated by our merchandisers to help professionals and DIY enthusiasts find the right materials faster.') }}
+                        {{ __('categories_index_description') }}
                     </p>
                 </div>
 
                 <div class="flex flex-col items-start gap-3 sm:flex-row sm:items-end sm:gap-6">
                     <div class="rounded-2xl border border-sage/30 bg-sage/10 px-4 py-3 text-sm font-semibold text-sage shadow-sm">
-                        {{ __(':count categories in catalogue', ['count' => number_format($totalCategories)]) }}
+                        {{ __('categories_index_catalogue_count', ['count' => number_format($totalCategories)]) }}
                     </div>
                     <div class="rounded-2xl border border-sage/30 bg-sage/10 px-4 py-3 text-sm text-sage/80 shadow-sm">
                         @if ($activeFilterCount > 0)
-                            {{ __(':count filters active', ['count' => $activeFilterCount]) }}
+                            {{ __('categories_index_filters_active', ['count' => $activeFilterCount]) }}
                         @else
-                            {{ __('No filters applied') }}
+                            {{ __('categories_index_filters_none') }}
                         @endif
                     </div>
                     <button type="button"
@@ -74,7 +114,7 @@
                         <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M3 5h6M3 12h6m-6 7h6M13 5h8M13 12h8m-8 7h8" />
                         </svg>
-                        {{ __('Filters') }}
+                        {{ __('categories_index_filters_button') }}
                     </button>
                 </div>
             </div>
@@ -90,11 +130,11 @@
                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                             </svg>
-                            {{ __('Filters') }}
+                            {{ __('categories_index_filters_button') }}
                         </span>
-                        <h2 class="text-xl font-semibold text-white">{{ __('Refine catalogue') }}</h2>
+                        <h2 class="text-xl font-semibold text-white">{{ __('categories_index_filters_title') }}</h2>
                         <p class="text-sm leading-relaxed text-sage/80">
-                            {{ __('Combine availability, price, brands and collections to focus your search.') }}
+                            {{ __('categories_index_filters_description') }}
                         </p>
                     </div>
                     <div class="space-y-6">
@@ -112,31 +152,31 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2" />
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
-                                {{ __('Real-time results') }}
+                                {{ __('categories_index_real_time_results') }}
                             </span>
                             @if ($from && $to)
-                                <span class="text-sage/80">{{ __('Showing :from–:to of :total results', ['from' => $from, 'to' => $to, 'total' => $totalCategories]) }}</span>
+                                <span class="text-sage/80">{{ __('categories_index_showing_results', ['from' => $from, 'to' => $to, 'total' => $totalCategories]) }}</span>
                             @else
-                                <span class="text-sage/80">{{ __('No results to display') }}</span>
+                                <span class="text-sage/80">{{ __('categories_index_no_results') }}</span>
                             @endif
                         </div>
 
                         <div class="flex flex-wrap items-center gap-3">
                             <div class="flex items-center gap-2 rounded-xl border border-sage/30 bg-dark/30 px-3 py-2 text-sm text-sage">
                                 <label for="sort" class="text-xs font-semibold uppercase tracking-wide text-sage/60">
-                                    {{ __('Sort') }}
+                                    {{ __('categories_index_sort') }}
                                 </label>
                                 <select id="sort" wire:model.live="sort" class="border-0 bg-transparent text-sm font-medium text-sage focus:outline-none focus:ring-0">
-                                    <option value="name_asc" class="bg-dark text-sage">{{ __('Name (A–Z)') }}</option>
-                                    <option value="name_desc" class="bg-dark text-sage">{{ __('Name (Z–A)') }}</option>
-                                    <option value="products_desc" class="bg-dark text-sage">{{ __('Most products') }}</option>
-                                    <option value="products_asc" class="bg-dark text-sage">{{ __('Fewest products') }}</option>
+                                    <option value="name_asc" class="bg-dark text-sage">{{ __('categories_index_sort_name_asc') }}</option>
+                                    <option value="name_desc" class="bg-dark text-sage">{{ __('categories_index_sort_name_desc') }}</option>
+                                    <option value="products_desc" class="bg-dark text-sage">{{ __('categories_index_sort_products_desc') }}</option>
+                                    <option value="products_asc" class="bg-dark text-sage">{{ __('categories_index_sort_products_asc') }}</option>
                                 </select>
                             </div>
 
                             <div class="flex items-center gap-2 rounded-xl border border-sage/30 bg-dark/30 px-3 py-2 text-sm text-sage">
                                 <label for="per-page" class="text-xs font-semibold uppercase tracking-wide text-sage/60">
-                                    {{ __('Per page') }}
+                                    {{ __('categories_index_per_page') }}
                                 </label>
                                 <select id="per-page" wire:model.live="perPage" class="border-0 bg-transparent text-sm font-medium text-sage focus:outline-none focus:ring-0">
                                     <option value="12" class="bg-dark text-sage">12</option>
@@ -154,7 +194,7 @@
                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h7v7H4V6zm9 0h7v7h-7V6zM4 13h7v7H4v-7zm9 0h7v7h-7v-7z" />
                                     </svg>
-                                    {{ __('Grid') }}
+                                    {{ __('categories_index_view_grid') }}
                                 </button>
                                 <button type="button"
                                         @click="view = 'list'"
@@ -163,7 +203,7 @@
                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
                                     </svg>
-                                    {{ __('List') }}
+                                    {{ __('categories_index_view_list') }}
                                 </button>
                             </div>
                         </div>
@@ -176,7 +216,7 @@
                     </div>
 
                     @if ($categories->count() > 0)
-                        <div class="grid gap-5 sm:grid-cols-2 xl:grid-cols-3" :class="view === 'list' ? 'sm:grid-cols-1 xl:grid-cols-1' : 'sm:grid-cols-2 xl:grid-cols-3'">
+                        <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" :class="view === 'list' ? 'sm:grid-cols-1 xl:grid-cols-1' : 'sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'">
                             @foreach ($categories as $category)
                                 @php
                                     $slug = method_exists($category, 'trans')
@@ -229,14 +269,14 @@
                                             </p>
                                         @else
                                             <p class="text-sm text-ash">
-                                                {{ __('Detailed description coming soon.') }}
+                                                {{ __('categories_index_description_placeholder') }}
                                             </p>
                                         @endif
 
                                         <div class="flex items-center justify-center">
                                             <a href="{{ route('localized.categories.show', ['locale' => $locale, 'category' => $slug]) }}"
                                                class="inline-flex items-center gap-2 rounded-full bg-sage px-4 py-2 text-sm font-semibold text-dark transition hover:bg-sage/90">
-                                                {{ __('View category') }}
+                                                {{ __('categories_index_view_category') }}
                                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
                                                 </svg>
@@ -249,10 +289,10 @@
 
                     @else
                         <x-shared.empty-state
-                            title="{{ __('No categories found') }}"
-                            description="{{ __('Try adjusting your filters or search terms to discover available categories.') }}"
+                            title="{{ __('categories_index_empty_title') }}"
+                            description="{{ __('categories_index_empty_description') }}"
                             icon="heroicon-o-archive-box"
-                            :action-text="__('Reset filters')"
+                            :action-text="__('categories_index_reset_filters')"
                             :action-url="route('localized.categories.index', ['locale' => $locale])"
                         />
                     @endif
@@ -275,18 +315,18 @@
                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                                 </svg>
-                                {{ __('Filters') }}
+                                {{ __('categories_index_filters_button') }}
                             </span>
-                            <h2 class="text-xl font-semibold text-white">{{ __('Filters') }}</h2>
+                            <h2 class="text-xl font-semibold text-white">{{ __('categories_index_filters_button') }}</h2>
                             <p class="text-sm leading-relaxed text-sage/80">
-                                {{ __('Adjust filters to personalise the catalogue view.') }}
+                                {{ __('categories_index_adjust_filters') }}
                             </p>
                         </div>
                         <button type="button"
                                 class="rounded-full border border-sage/30 p-2 text-sage transition hover:border-sage hover:bg-sage/10"
                                 wire:click="$toggle('sidebarOpen')"
                                 wire:confirm="{{ __('translations.confirm_toggle_sidebar') }}"
-                                aria-label="{{ __('Close') }}">
+                                aria-label="{{ __('categories_index_close') }}">
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                             </svg>
@@ -303,7 +343,7 @@
                             class="w-full"
                             wire:click="$toggle('sidebarOpen')"
                         >
-                            {{ __('Apply filters') }}
+                            {{ __('categories_index_apply_filters') }}
                         </x-shared.button>
                     </div>
                 </div>

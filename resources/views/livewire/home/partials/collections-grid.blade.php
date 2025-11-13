@@ -45,7 +45,7 @@
                     <div class="absolute bottom-5 left-5 right-5 space-y-2 text-white">
                         <span
                               class="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold">
-                            {{ __('frontend/home.collections.badge') }}
+                            {{ __('home_collections_badge') }}
                         </span>
                         <h3 class="text-xl font-semibold leading-tight line-clamp-2">
                             {{ $collection['name'] ?? '' }}
@@ -65,10 +65,10 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 7h18M3 12h18M3 17h18" />
                             </svg>
                             @php($productsCount = (int) ($collection['products_count'] ?? 0))
-                            {{ trans_choice(__('frontend/home.collections.products_count'), $productsCount, ['count' => $productsCount]) }}
+                            {{ trans_choice(__('home_collections_products_count'), $productsCount, ['count' => $productsCount]) }}
                         </span>
                         <span class="inline-flex items-center gap-1 text-white/80">
-                            {{ __('frontend/home.collections.open') }}
+                            {{ __('home_collections_open') }}
                             <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.5"
                                  viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />

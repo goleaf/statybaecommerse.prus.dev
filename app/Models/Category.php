@@ -669,7 +669,9 @@ final class Category extends Model implements HasMedia
      */
     public function getAverageProductPrice(): ?float
     {
-        return $this->products()->published()->avg('price');
+        $result = $this->products()->published()->avg('price');
+
+        return $result !== null ? (float) $result : null;
     }
 
     /**

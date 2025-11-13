@@ -63,8 +63,4 @@
     @endforelse
 </div>
 
-@if ($products instanceof \Illuminate\Contracts\Pagination\Paginator)
-    <div class="mt-10">
-        {{ $products->onEachSide(1)->withQueryString()->links() }}
-    </div>
-@endif
+{{-- Pagination is handled by the parent view --}}
