@@ -41,7 +41,7 @@
     
     app()->setLocale($locale);
 @endphp
-<nav class="w-full relative z-50 overflow-visible">
+<nav class="w-full relative z-40 overflow-visible">
     @php
         $homeUrl = Route::has('localized.home')
             ? route('localized.home', ['locale' => $locale])
@@ -196,11 +196,11 @@
         </div>
 
         {{-- Secondary header line - Search bar --}}
-        <div class="bg-sage border-t border-ash overflow-visible">
-            <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 relative z-50 overflow-visible">
-                <div class="flex justify-center overflow-visible">
+        <div class="bg-sage border-t border-ash overflow-visible relative z-40" style="position: relative; z-index: 40;">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 relative overflow-visible" style="position: relative; z-index: 40;">
+                <div class="flex justify-center overflow-visible" style="position: relative; z-index: 40;">
                     {{-- Enhanced search bar --}}
-                    <div class="w-full max-w-2xl relative z-60 overflow-visible">
+                    <div class="w-full max-w-2xl relative overflow-visible" style="position: relative; z-index: 9998;">
                         <x-search-module
                                        class="w-full"
                                        :max-results="10"

@@ -1,17 +1,20 @@
-<div class="category-sidebar relative">
-    <div class="p-4 border-b border-sage/20">
-        <h3 class="text-lg font-semibold text-sage">{{ __('home.categories') }}</h3>
-        <p class="text-sm text-sage/70 mt-1">{{ __('home.browse_categories') }}</p>
+{{-- Category Sidebar - Clean implementation without scrolling --}}
+<div class="category-sidebar">
+    {{-- Header --}}
+    <div class="category-sidebar-header">
+        <h3 class="category-sidebar-title">{{ __('home.categories') }}</h3>
+        <p class="category-sidebar-subtitle">{{ __('home.browse_categories') }}</p>
     </div>
     
-    <div class="sidebar-content flex-1 overflow-y-auto overflow-x-visible">
-            @foreach ($this->categoryTree as $category)
-            <div class="category-item relative" data-category-id="{{ $category['id'] }}">
-                    @include('livewire.components.partials.category-tree-node', [
-                        'category' => $category,
-                        'level' => 0
-                    ])
-                </div>
-            @endforeach
+    {{-- Categories List - No scrolling, all visible --}}
+    <div class="category-sidebar-list">
+        @foreach ($this->categoryTree as $category)
+            <div class="category-item" data-category-id="{{ $category['id'] }}">
+                @include('livewire.components.partials.category-tree-node', [
+                    'category' => $category,
+                    'level' => 0
+                ])
+            </div>
+        @endforeach
     </div>
 </div>
