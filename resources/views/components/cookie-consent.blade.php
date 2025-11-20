@@ -6,35 +6,35 @@
 @endphp
 
 <div id="cookie-consent-banner"
-     class="fixed inset-x-0 bottom-4 z-40 mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white/95 shadow-xl shadow-slate-300/40 backdrop-blur px-6 py-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+     class="fixed inset-x-0 bottom-4 z-[9999] mx-auto max-w-5xl rounded-lg border border-sage/30 bg-dark shadow-2xl shadow-black/40 px-6 py-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
      role="dialog"
      aria-live="polite"
      aria-label="{{ __('translations.cookie_prompt_label') }}"
      hidden>
-    <div class="space-y-2 text-sm text-slate-700">
-        <p class="font-semibold text-slate-900">
+    <div class="space-y-2 text-sm text-white">
+        <p class="font-semibold">
             {{ __('translations.cookie_prompt_title') }}
         </p>
-        <p>
+        <p class="text-sage/80">
             {{ __('translations.cookie_prompt_description') }}
-            <a href="{{ $privacyRoute }}" class="font-medium text-blue-600 hover:text-blue-700 underline">
-                {{ __('Privacy Policy') }}
+            <a href="{{ $privacyRoute }}" class="font-medium text-sage hover:text-white underline transition-colors duration-200">
+                {{ __('translations.cookie_privacy_link') }}
             </a>
-            ·
-            <a href="{{ $cookieRoute }}" class="font-medium text-blue-600 hover:text-blue-700 underline">
-                {{ __('Cookie Policy') }}
+            <span class="text-sage/50"> · </span>
+            <a href="{{ $cookieRoute }}" class="font-medium text-sage hover:text-white underline transition-colors duration-200">
+                {{ __('translations.cookie_policy_link') }}
             </a>
         </p>
     </div>
     <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
         <button type="button"
                 data-cookie-action="reject"
-                class="inline-flex items-center justify-center rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                class="inline-flex items-center justify-center rounded-lg border border-sage/30 px-4 py-2 text-sm font-medium text-sage hover:bg-sage/20 hover:text-white focus:outline-none focus:ring-2 focus:ring-sage/40 focus:ring-offset-2 focus:ring-offset-dark transition-all duration-200">
             {{ __('translations.cookie_prompt_reject') }}
         </button>
         <button type="button"
                 data-cookie-action="accept"
-                class="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                class="inline-flex items-center justify-center rounded-lg bg-sage px-4 py-2 text-sm font-medium text-dark shadow hover:bg-sage/90 focus:outline-none focus:ring-2 focus:ring-sage/50 focus:ring-offset-2 focus:ring-offset-dark transition-all duration-200">
             {{ __('translations.cookie_prompt_accept') }}
         </button>
     </div>

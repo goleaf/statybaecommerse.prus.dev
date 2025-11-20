@@ -196,11 +196,11 @@
         </div>
 
         {{-- Secondary header line - Search bar --}}
-        <div class="bg-sage border-t border-ash overflow-visible relative z-40" style="position: relative; z-index: 40;">
-            <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 relative overflow-visible" style="position: relative; z-index: 40;">
-                <div class="flex justify-center overflow-visible" style="position: relative; z-index: 40;">
+        <div class="bg-sage border-t border-ash overflow-visible">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 relative overflow-visible">
+                <div class="flex justify-center overflow-visible">
                     {{-- Enhanced search bar --}}
-                    <div class="w-full max-w-2xl relative overflow-visible" style="position: relative; z-index: 9998;">
+                    <div class="w-full max-w-2xl relative overflow-visible">
                         <x-search-module
                                        class="w-full"
                                        :max-results="10"

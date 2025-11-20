@@ -41,7 +41,7 @@
     app()->instance('request_locale', $locale);
 @endphp
 
-<main class="bg-sage text-gray-900 relative z-10" aria-label="{{ __('home_homepage') }}">
+<main class="bg-sage text-gray-900" aria-label="{{ __('home_homepage') }}">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 gap-8 py-8 lg:grid-cols-4">
             <aside class="lg:col-span-1">
@@ -56,8 +56,6 @@
                 </section>
 
                 <x-home.mission-loyalty />
-
-                <x-home.hero-stats :stats="$stats ?? []" />
 
                 <section class="relative">
                     <livewire:home.product-shelf

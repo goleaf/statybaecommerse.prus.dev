@@ -317,6 +317,14 @@ return [
     'contact_specialists_cta'  => 'Susisiekite',
     // Footer extras
     'footer_documentation'       => 'Dokumentacija',
+    // Slapukų sutikimas
+    'cookie_prompt_label'       => 'Slapukų pranešimas',
+    'cookie_prompt_title'       => 'Gerbiame jūsų privatumą',
+    'cookie_prompt_description' => 'Naudojame slapukus turiniui pritaikyti, srauto analizei ir geresnėms paslaugoms užtikrinti. Nebūtiniems slapukams galite sutikti arba jų atsisakyti bet kuriuo metu.',
+    'cookie_prompt_accept'      => 'Leisti slapukus',
+    'cookie_prompt_reject'      => 'Tik būtini slapukai',
+    'cookie_privacy_link'       => 'Privatumo politika',
+    'cookie_policy_link'        => 'Slapukų politika',
     'footer_secure_payment'      => 'Saugus mokėjimas',
     'footer_contact'             => 'Kontaktai',
     'footer_shop'                => 'Parduotuvė',

@@ -5,13 +5,13 @@ declare(strict_types=1);
 return [
     'homepage' => 'Homepage',
     'meta' => [
-        'title'       => 'Discover modern Lithuanian e-commerce',
+        'title'       => 'Building without worries.',
         'description' => 'Explore curated collections, trusted brands, and personalized recommendations crafted for Baltic shoppers.',
     ],
     'hero' => [
         'eyebrow'       => 'Seasonal highlights',
-        'title'         => 'All of your favourite products in one vibrant marketplace',
-        'subtitle'      => 'Find elevated essentials, local gems, and the newest arrivals selected by our merchandising team.',
+        'title'         => 'Your construction solutions.',
+        'subtitle'      => 'A wide range of construction products that ensure quality at every step – from fasteners to facade finishing materials and accessories.',
         'cta_primary'   => 'Shop featured products',
         'cta_secondary' => 'Browse new arrivals',
         'featured_card' => [
