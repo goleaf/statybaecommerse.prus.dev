@@ -17,8 +17,11 @@ use Illuminate\Support\Facades\Route;
  */
 
 Route::middleware(['web'])->group(function () {
-    // Homepage
-    Route::get('/', [App\Http\Controllers\Frontend\HomeController::class, 'index'])->name('home');
+    // Homepage - redirect to /lt (localized home)
+    Route::get('/', function () {
+        $locale = config('app.locale', 'lt');
+        return redirect()->route('localized.home', ['locale' => $locale]);
+    })->name('home');
 
     // About page
     Route::view('/about', 'frontend.about.index')->name('frontend.about.index');

@@ -106,5 +106,12 @@
     "translations.category": "Категория",
     "translations.last_updated": "Последнее обновление",
     "translations.out_of_stock": "Нет в наличии",
-    "translations.contact_us": "Свяжитесь с нами"
+    "translations.contact_us": "Свяжитесь с нами",
+    "translations.cookie_prompt_label": "Баннер согласия на cookie",
+    "translations.cookie_prompt_title": "Мы ценим вашу конфиденциальность",
+    "translations.cookie_prompt_description": "Мы используем файлы cookie, чтобы персонализировать контент, анализировать трафик и улучшать сервис. Вы можете в любой момент принять или отклонить необязательные cookie.",
+    "translations.cookie_prompt_accept": "Разрешить cookie",
+    "translations.cookie_prompt_reject": "Только необходимые cookie",
+    "translations.cookie_privacy_link": "Политика конфиденциальности",
+    "translations.cookie_policy_link": "Политика файлов cookie"
 }

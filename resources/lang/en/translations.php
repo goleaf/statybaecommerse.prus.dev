@@ -433,6 +433,14 @@ return [
     'need_tailored_offer'      => 'Need a tailored offer?',
     'contact_specialists_hint' => 'Contact our specialists for bulk pricing, project support, or technical consultations.',
     'contact_specialists_cta'  => 'Contact',
+    // Cookie consent
+    'cookie_prompt_label'       => 'Cookie consent banner',
+    'cookie_prompt_title'       => 'We value your privacy',
+    'cookie_prompt_description' => 'We use cookies to personalise content, analyse traffic, and deliver better services. You can opt in or out of optional cookies at any time.',
+    'cookie_prompt_accept'      => 'Allow cookies',
+    'cookie_prompt_reject'      => 'Only essential cookies',
+    'cookie_privacy_link'       => 'Privacy Policy',
+    'cookie_policy_link'        => 'Cookie Policy',
     // Footer extras
     'footer_documentation'       => 'Documentation',
     'footer_secure_payment'      => 'Secure payment',

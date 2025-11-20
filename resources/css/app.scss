@@ -6769,17 +6769,13 @@ $transition-slow: 0.5s ease;
 // HOMEPAGE STACKING CONTEXT FIXES (Sidebar flyouts over shelves)
 // =============================================================================
 // =============================================================================
-// Z-index hierarchy:
-// - Main content: 1-10 (base layers)
+// Keep sidebar and dropdown stacking contexts predictable without forcing `main`
+// to create a new stacking context. This ensures the global header/search can
+// float above the homepage hero content.
 // - Sidebar: 30 (category sidebar)
 // - Navigation header: 40
 // - Search wrapper: 9998
 // - Search dropdowns: 9999 (maximum - always on top)
-
-main {
-  position: relative;
-  z-index: 10 !important;
-}
 
 main .grid aside .sticky {
   position: sticky;

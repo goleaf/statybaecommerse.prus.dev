@@ -1,4 +1,4 @@
-<section class="relative z-10 overflow-hidden bg-sage"
+<section class="relative overflow-hidden bg-sage"
          x-data="{
              currentSlide: @entangle('currentSlide'),
              autoPlay: @entangle('autoPlay'),

@@ -138,5 +138,12 @@
     "translations.category": "Kategorie",
     "translations.last_updated": "Zuletzt aktualisiert",
     "translations.out_of_stock": "Nicht vorrätig",
-    "translations.contact_us": "Kontaktieren Sie uns"
+    "translations.contact_us": "Kontaktieren Sie uns",
+    "translations.cookie_prompt_label": "Cookie-Hinweis",
+    "translations.cookie_prompt_title": "Wir respektieren Ihre Privatsphäre",
+    "translations.cookie_prompt_description": "Wir verwenden Cookies, um Inhalte zu personalisieren, den Traffic zu analysieren und bessere Services zu bieten. Sie können optionale Cookies jederzeit akzeptieren oder ablehnen.",
+    "translations.cookie_prompt_accept": "Cookies zulassen",
+    "translations.cookie_prompt_reject": "Nur notwendige Cookies",
+    "translations.cookie_privacy_link": "Datenschutzerklärung",
+    "translations.cookie_policy_link": "Cookie-Richtlinie"
 }
