@@ -41,24 +41,24 @@ final class SetLocale
         $queryLocale = $request->query('locale');
 
         // Honor the Accept-Language header if it matches a supported locale.
-        $headerLocale = null;
-        if ($request->hasHeader('Accept-Language')) {
-            $preferred = $request->getPreferredLanguage($supportedLocales);
-            if (is_string($preferred) && $preferred !== '') {
-                $headerLocale = $preferred;
-            } else {
-                // Manually inspect the header to gracefully handle regional variants (e.g., en-GB).
-                foreach ($request->getLanguages() as $language) {
-                    $primary = strtolower(str_replace('_', '-', $language));
-                    $segment = explode('-', (string) $primary)[0] ?? '';
-
-                    if ($segment !== '' && in_array($segment, $supportedLocales, true)) {
-                        $headerLocale = $segment;
-                        break;
-                    }
-                }
-            }
-        }
+//        $headerLocale = null;
+//        if ($request->hasHeader('Accept-Language')) {
+//            $preferred = $request->getPreferredLanguage($supportedLocales);
+//            if (is_string($preferred) && $preferred !== '') {
+//                $headerLocale = $preferred;
+//            } else {
+//                // Manually inspect the header to gracefully handle regional variants (e.g., en-GB).
+//                foreach ($request->getLanguages() as $language) {
+//                    $primary = strtolower(str_replace('_', '-', $language));
+//                    $segment = explode('-', (string) $primary)[0] ?? '';
+//
+//                    if ($segment !== '' && in_array($segment, $supportedLocales, true)) {
+//                        $headerLocale = $segment;
+//                        break;
+//                    }
+//                }
+//            }
+//        }
 
         // Get locale from query, header, session, cookie, or user preference
         $defaultLocaleConfig = config('app.locale', 'lt');
@@ -69,7 +69,8 @@ final class SetLocale
         $candidateLocales = array_values(array_filter([
             $routeLocale,
             $queryLocale,
-            $headerLocale,
+            $defaultLocale,
+//            $headerLocale,
             Session::get('locale'),
             Session::get('app.locale'),
             $request->cookie('app_locale'),
