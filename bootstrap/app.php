@@ -22,6 +22,7 @@ use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+use App\ApplicationOverride;
 
 // Load the Filament compatibility shims before the application boots so the
 // legacy class aliases are always available during early package discovery.
@@ -33,7 +34,7 @@ if (!env('SKIP_FILAMENT_BOOT')) {
 }
 $providers[] = SecurityServiceProvider::class;
 
-$app = Application::configure(basePath: dirname(__DIR__))
+$app = ApplicationOverride::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__ . '/../routes/web.php',
         api: __DIR__ . '/../routes/api.php',
