@@ -17,31 +17,96 @@ class WishlistItemSeeder extends Seeder
      */
     public function run(): void
     {
-        // Use existing users and create wishlists for them
-        $users = User::query()->inRandomOrder()->limit(5)->get();
+        $this->command->info('💝 Starting Wishlist Items seeding...');
+
+        // Get or create users
+        $users = $this->getOrCreateUsers();
 
         if ($users->isEmpty()) {
-            // Create users if none exist
-            $users = User::factory()->count(5)->create();
+            $this->command->error('❌ No users available.');
+            return;
         }
 
-        $users->each(function (User $user): void {
-            // Create wishlists for each user
+        // Create wishlists and items for random users
+        $this->createUserWishlists($users);
+
+        // Create specific test scenarios
+        $this->createSpecificScenarios();
+
+        $this->command->info('✅ Wishlist items seeded successfully!');
+    }
+
+    private function getOrCreateUsers()
+    {
+        $existingCount = User::where('is_admin', false)->count();
+
+        if ($existingCount >= 5) {
+            $this->command->info("✓ Using existing users");
+            return User::where('is_admin', false)->inRandomOrder()->limit(5)->get();
+        }
+
+        $needed = 5 - $existingCount;
+        $this->command->info("Creating {$needed} users...");
+
+        User::factory()->count($needed)->create();
+
+        return User::where('is_admin', false)->limit(5)->get();
+    }
+
+    private function createUserWishlists($users): void
+    {
+        $this->command->info('Creating wishlists for users...');
+
+        $wishlistsCreated = 0;
+        $itemsCreated = 0;
+
+        $users->each(function (User $user) use (&$wishlistsCreated, &$itemsCreated): void {
+            // Check if user already has wishlists
+            $existingWishlists = UserWishlist::where('user_id', $user->id)->count();
+
+            if ($existingWishlists >= 2) {
+                $this->command->info("✓ User #{$user->id} already has {$existingWishlists} wishlists");
+                return;
+            }
+
+            $needed = 2 - $existingWishlists;
+
+            // Create wishlists for this user
             $wishlists = UserWishlist::factory()
-                ->count(2)
+                ->count($needed)
                 ->for($user)
                 ->create();
 
-            $wishlists->each(function (UserWishlist $wishlist): void {
-                WishlistItem::factory()
-                    ->count(fake()->numberBetween(3, 8))
+            $wishlistsCreated += $wishlists->count();
+
+            $wishlists->each(function (UserWishlist $wishlist) use (&$itemsCreated): void {
+                // Check if wishlist already has items
+                $existingItems = WishlistItem::where('wishlist_id', $wishlist->id)->count();
+
+                if ($existingItems >= 3) {
+                    return;
+                }
+
+                $targetItems = fake()->numberBetween(3, 8);
+                $needed = max(0, $targetItems - $existingItems);
+
+                $created = WishlistItem::factory()
+                    ->count($needed)
                     ->create([
                         'wishlist_id' => $wishlist->id,
                     ]);
+
+                $itemsCreated += $created->count();
             });
         });
 
-        $this->createSpecificScenarios();
+        if ($wishlistsCreated > 0) {
+            $this->command->info("✓ Created {$wishlistsCreated} wishlists");
+        }
+
+        if ($itemsCreated > 0) {
+            $this->command->info("✓ Created {$itemsCreated} wishlist items");
+        }
     }
 
     /**
@@ -49,17 +114,68 @@ class WishlistItemSeeder extends Seeder
      */
     private function createSpecificScenarios(): void
     {
-        // Scenario 1: User with many items in wishlist
-        $powerUser = User::firstOrCreate(
-            ['email' => 'poweruser@example.com'],
-            [
-                'name'              => 'Power User',
-                'email_verified_at' => now(),
-                'password'          => bcrypt('password'),
-                'preferred_locale'  => 'en',
-                'is_admin'          => false,
-            ]
-        );
+        $this->command->info('Creating specific test scenarios...');
+
+        $scenariosCreated = [];
+
+        // Scenario 1: Power user with many items
+        if (!$this->scenarioExists('poweruser@example.com')) {
+            $this->createPowerUserScenario();
+            $scenariosCreated[] = 'Power user with 15+ items';
+        } else {
+            $this->command->info('✓ Power user scenario already exists');
+        }
+
+        // Scenario 2: Minimal user with empty wishlist
+        if (!$this->scenarioExists('minimal@example.com')) {
+            $this->createMinimalUserScenario();
+            $scenariosCreated[] = 'Minimal user with empty wishlist';
+        } else {
+            $this->command->info('✓ Minimal user scenario already exists');
+        }
+
+        // Scenario 3: Organized user with multiple wishlists
+        if (!$this->scenarioExists('organized@example.com')) {
+            $this->createOrganizedUserScenario();
+            $scenariosCreated[] = 'Organized user with 4 categorized wishlists';
+        } else {
+            $this->command->info('✓ Organized user scenario already exists');
+        }
+
+        // Scenario 4: Bulk buyer
+        if (!$this->scenarioExists('bulk@example.com')) {
+            $this->createBulkBuyerScenario();
+            $scenariosCreated[] = 'Bulk buyer with high quantity items';
+        } else {
+            $this->command->info('✓ Bulk buyer scenario already exists');
+        }
+
+        if (!empty($scenariosCreated)) {
+            $this->command->info('✅ Created wishlist items for various user scenarios:');
+            foreach ($scenariosCreated as $scenario) {
+                $this->command->info("  - {$scenario}");
+            }
+        }
+    }
+
+    private function scenarioExists(string $email): bool
+    {
+        return User::where('email', $email)->exists();
+    }
+
+    private function createPowerUserScenario(): void
+    {
+        $powerUser = User::create([
+            'name'              => 'Power User',
+            'email'             => 'poweruser@example.com',
+            'email_verified_at' => now(),
+            'password'          => bcrypt('password'),
+            'preferred_locale'  => 'en',
+            'is_admin'          => false,
+            'first_name'        => 'Power',
+            'last_name'         => 'User',
+            'is_active'         => true,
+        ]);
 
         $powerUserWishlist = UserWishlist::factory()->create([
             'user_id'   => $powerUser->id,
@@ -67,46 +183,58 @@ class WishlistItemSeeder extends Seeder
             'is_public' => true,
         ]);
 
-        $products = Product::factory()->count(15)->create();
-        foreach ($products as $product) {
-            WishlistItem::factory()
-                ->create([
-                    'wishlist_id' => $powerUserWishlist->id,
-                    'product_id'  => $product->id,
-                    'quantity'    => rand(1, 5),
-                    'notes'       => 'Priority: ' . rand(1, 5),
-                ]);
+        // Use existing products instead of creating new ones
+        $products = Product::inRandomOrder()->limit(15)->get();
+
+        // If not enough products exist, get what we can
+        if ($products->count() < 15) {
+            $this->command->warn("Only {$products->count()} products available for power user wishlist");
         }
 
-        // Scenario 2: User with empty wishlist
-        $minimalUser = User::firstOrCreate(
-            ['email' => 'minimal@example.com'],
-            [
-                'name'              => 'Minimal User',
-                'email_verified_at' => now(),
-                'password'          => bcrypt('password'),
-                'preferred_locale'  => 'en',
-                'is_admin'          => false,
-            ]
-        );
+        foreach ($products as $product) {
+            WishlistItem::factory()->create([
+                'wishlist_id' => $powerUserWishlist->id,
+                'product_id'  => $product->id,
+                'quantity'    => rand(1, 5),
+                'notes'       => 'Priority: ' . rand(1, 5),
+            ]);
+        }
+    }
+
+    private function createMinimalUserScenario(): void
+    {
+        $minimalUser = User::create([
+            'name'              => 'Minimal User',
+            'email'             => 'minimal@example.com',
+            'email_verified_at' => now(),
+            'password'          => bcrypt('password'),
+            'preferred_locale'  => 'en',
+            'is_admin'          => false,
+            'first_name'        => 'Minimal',
+            'last_name'         => 'User',
+            'is_active'         => true,
+        ]);
 
         UserWishlist::factory()->create([
             'user_id'    => $minimalUser->id,
             'name'       => 'Empty Wishlist',
             'is_default' => true,
         ]);
+    }
 
-        // Scenario 3: User with multiple wishlists
-        $organizedUser = User::firstOrCreate(
-            ['email' => 'organized@example.com'],
-            [
-                'name'              => 'Organized User',
-                'email_verified_at' => now(),
-                'password'          => bcrypt('password'),
-                'preferred_locale'  => 'en',
-                'is_admin'          => false,
-            ]
-        );
+    private function createOrganizedUserScenario(): void
+    {
+        $organizedUser = User::create([
+            'name'              => 'Organized User',
+            'email'             => 'organized@example.com',
+            'email_verified_at' => now(),
+            'password'          => bcrypt('password'),
+            'preferred_locale'  => 'en',
+            'is_admin'          => false,
+            'first_name'        => 'Organized',
+            'last_name'         => 'User',
+            'is_active'         => true,
+        ]);
 
         $wishlists = [
             'Electronics',
@@ -129,18 +257,21 @@ class WishlistItemSeeder extends Seeder
                     'notes'       => "For {$wishlistName} collection",
                 ]);
         }
+    }
 
-        // Scenario 4: Items with high quantities
-        $bulkBuyer = User::firstOrCreate(
-            ['email' => 'bulk@example.com'],
-            [
-                'name'              => 'Bulk Buyer',
-                'email_verified_at' => now(),
-                'password'          => bcrypt('password'),
-                'preferred_locale'  => 'en',
-                'is_admin'          => false,
-            ]
-        );
+    private function createBulkBuyerScenario(): void
+    {
+        $bulkBuyer = User::create([
+            'name'              => 'Bulk Buyer',
+            'email'             => 'bulk@example.com',
+            'email_verified_at' => now(),
+            'password'          => bcrypt('password'),
+            'preferred_locale'  => 'en',
+            'is_admin'          => false,
+            'first_name'        => 'Bulk',
+            'last_name'         => 'Buyer',
+            'is_active'         => true,
+        ]);
 
         $bulkWishlist = UserWishlist::factory()->create([
             'user_id' => $bulkBuyer->id,
@@ -154,12 +285,5 @@ class WishlistItemSeeder extends Seeder
                 'quantity'    => rand(10, 50),
                 'notes'       => 'Bulk order for business',
             ]);
-
-        $this->command->info('Wishlist items seeded successfully!');
-        $this->command->info('Created wishlist items for various user scenarios:');
-        $this->command->info('- Power user with 15+ items');
-        $this->command->info('- Minimal user with empty wishlist');
-        $this->command->info('- Organized user with 4 categorized wishlists');
-        $this->command->info('- Bulk buyer with high quantity items');
     }
 }

@@ -6,7 +6,6 @@ namespace Database\Seeders;
 
 use App\Models\Product;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -81,7 +80,7 @@ final class UltraFastProductImageSeeder extends Seeder
             return;
         }
 
-        // Ultra-fast chunked processing with minimal overhead and timeout protection
+        // Ultra-fast chunked processing with regular chunk() instead of cursor()->chunk()
         $timeout = now()->addMinutes(30);  // 30 minute timeout for image generation
 
         Product::query()
@@ -96,10 +95,13 @@ final class UltraFastProductImageSeeder extends Seeder
                     });
             })
             ->orderBy('id')
-            ->cursor()
-            ->takeUntilTimeout($timeout)
-            ->chunk(self::BATCH_SIZE)
-            ->each(function (Collection $products): void {
+            ->chunk(self::BATCH_SIZE, function ($products) use ($timeout) {
+                // Check timeout
+                if (now()->greaterThan($timeout)) {
+                    $this->command->warn('⏱️ Timeout reached, stopping processing...');
+                    return false; // Stop chunking
+                }
+
                 $batchStart = microtime(true);
                 $this->processBatchUltraFast($products);
                 $batchTime = microtime(true) - $batchStart;
@@ -126,7 +128,7 @@ final class UltraFastProductImageSeeder extends Seeder
             });
     }
 
-    private function processBatchUltraFast(Collection $products): void
+    private function processBatchUltraFast($products): void
     {
         foreach ($products as $product) {
             try {
@@ -363,14 +365,14 @@ final class UltraFastProductImageSeeder extends Seeder
     {
         $totalTime = microtime(true) - $this->startTime;
         $avgBatchTime = ! empty($this->batchTimes) ? array_sum($this->batchTimes) / count($this->batchTimes) : 0;
-        $imagesPerSecond = $this->processedCount * self::MAX_IMAGES_PER_PRODUCT / $totalTime;
+        $imagesPerSecond = $this->processedCount > 0 ? ($this->processedCount * self::MAX_IMAGES_PER_PRODUCT / $totalTime) : 0;
 
         $this->command->info('');
         $this->command->info('📈 PERFORMANCE METRICS:');
         $this->command->info('⏱️ Bendras laikas: ' . number_format($totalTime, 2) . 's');
         $this->command->info('🚀 Vidutinis batch laikas: ' . number_format($avgBatchTime, 3) . 's');
         $this->command->info('🖼️ Paveikslėlių per sekundę: ' . number_format($imagesPerSecond, 1));
-        $this->command->info('📊 Produktų per sekundę: ' . number_format($this->processedCount / $totalTime, 1));
+        $this->command->info('📊 Produktų per sekundę: ' . number_format($this->processedCount > 0 ? $this->processedCount / $totalTime : 0, 1));
         $this->command->info('💾 Atmintis: ' . number_format(memory_get_peak_usage(true) / 1024 / 1024, 1) . 'MB');
     }
 
@@ -386,9 +388,11 @@ final class UltraFastProductImageSeeder extends Seeder
 
         // Clean up any remaining temp files
         $tempFiles = glob(sys_get_temp_dir() . '/product_*');
-        foreach ($tempFiles as $file) {
-            if (is_file($file) && (time() - filemtime($file)) > 300) {  // 5 minutes old
-                unlink($file);
+        if ($tempFiles) {
+            foreach ($tempFiles as $file) {
+                if (is_file($file) && (time() - filemtime($file)) > 300) {  // 5 minutes old
+                    unlink($file);
+                }
             }
         }
     }

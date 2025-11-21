@@ -8,6 +8,7 @@ use App\Models\Location;
 use App\Models\ProductVariant;
 use App\Models\VariantInventory;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Collection;
 
 /**
  * VariantInventorySeeder
@@ -22,50 +23,179 @@ final class VariantInventorySeeder extends Seeder
      */
     public function run(): void
     {
-        $locations = Location::factory()->count(5)->create();
+        $this->command?->info('🏭 Starting Variant Inventory seeding...');
 
-        ProductVariant::factory()
-            ->count(20)
-            ->create()
-            ->each(function (ProductVariant $variant) use ($locations): void {
-                $locations->each(function (Location $location) use ($variant): void {
-                    VariantInventory::factory()
-                        ->for($variant, 'variant')
-                        ->for($location, 'location')
-                        ->create();
-                });
+        // Get or create locations
+        $locations = $this->getOrCreateLocations();
+
+        if ($locations->isEmpty()) {
+            $this->command?->error('❌ No locations available. Please run LocationSeeder first.');
+            return;
+        }
+
+        // Get or create product variants
+        $variants = $this->getOrCreateVariants();
+
+        if ($variants->isEmpty()) {
+            $this->command?->error('❌ No product variants available. Please run ProductVariantSeeder first.');
+            return;
+        }
+
+        // Create inventory records for each variant-location combination
+        $this->createVariantInventories($variants, $locations);
+
+        // Create specific test scenarios
+        $this->createSpecificScenarios($variants, $locations);
+
+        $this->command?->info('✅ VariantInventorySeeder: completed successfully!');
+    }
+
+    private function getOrCreateLocations(): Collection
+    {
+        $existingCount = Location::count();
+
+        if ($existingCount >= 5) {
+            $this->command?->info("✓ Using {$existingCount} existing locations");
+            return Location::limit(5)->get();
+        }
+
+        $needed = 5 - $existingCount;
+        $this->command?->info("Creating {$needed} locations...");
+
+        Location::factory()->count($needed)->create();
+
+        return Location::limit(5)->get();
+    }
+
+    private function getOrCreateVariants(): Collection
+    {
+        $existingCount = ProductVariant::count();
+
+        if ($existingCount >= 20) {
+            $this->command?->info("✓ Using {$existingCount} existing product variants");
+            return ProductVariant::limit(20)->get();
+        }
+
+        $needed = 20 - $existingCount;
+        $this->command?->info("Creating {$needed} product variants...");
+
+        ProductVariant::factory()->count($needed)->create();
+
+        return ProductVariant::limit(20)->get();
+    }
+
+    private function createVariantInventories(Collection $variants, Collection $locations): void
+    {
+        $this->command?->info('Creating variant inventories for each location...');
+
+        $created = 0;
+        $skipped = 0;
+
+        $variants->each(function (ProductVariant $variant) use ($locations, &$created, &$skipped): void {
+            $locations->each(function (Location $location) use ($variant, &$created, &$skipped): void {
+                // Check if inventory already exists for this variant-location combination
+                $exists = VariantInventory::where('variant_id', $variant->id)
+                    ->where('location_id', $location->id)
+                    ->exists();
+
+                if ($exists) {
+                    $skipped++;
+                    return;
+                }
+
+                VariantInventory::factory()
+                    ->for($variant, 'variant')
+                    ->for($location, 'location')
+                    ->create();
+
+                $created++;
             });
+        });
 
-        $this->command?->info('VariantInventorySeeder: ensured variant inventories via factories and relationships.');
+        if ($created > 0) {
+            $this->command?->info("✓ Created {$created} variant inventories");
+        }
+
+        if ($skipped > 0) {
+            $this->command?->info("✓ Skipped {$skipped} existing variant inventories");
+        }
     }
 
     /**
      * Create specific scenarios for testing and demonstration
      */
-    private function createSpecificScenarios($variants, $locations): void
+    private function createSpecificScenarios(Collection $variants, Collection $locations): void
     {
+        $this->command?->info('Creating specific inventory scenarios...');
+
+        $scenariosCreated = 0;
+
         // Low stock scenarios
-        $lowStockVariants = $variants->random(5);
+        $scenariosCreated += $this->createLowStockScenarios($variants, $locations);
+
+        // Out of stock scenarios
+        $scenariosCreated += $this->createOutOfStockScenarios($variants, $locations);
+
+        // High utilization scenarios
+        $scenariosCreated += $this->createHighUtilizationScenarios($variants, $locations);
+
+        // Expiring soon scenarios
+        $scenariosCreated += $this->createExpiringSoonScenarios($variants, $locations);
+
+        // Discontinued items
+        $scenariosCreated += $this->createDiscontinuedScenarios($variants, $locations);
+
+        // Untracked items
+        $scenariosCreated += $this->createUntrackedScenarios($variants, $locations);
+
+        $this->command?->info("✓ Created {$scenariosCreated} specific scenarios");
+    }
+
+    private function createLowStockScenarios(Collection $variants, Collection $locations): int
+    {
+        $created = 0;
+        $lowStockVariants = $variants->random(min(5, $variants->count()));
+
         foreach ($lowStockVariants as $variant) {
             $location = $locations->random();
+
+            // Skip if already has inventory at this location
+            if ($this->hasInventory($variant->id, $location->id)) {
+                continue;
+            }
+
             VariantInventory::factory()->create([
                 'variant_id'     => $variant->id,
-                'warehouse_code' => $this->generateWarehouseCodeUnique($location, $variant->id),
+                'location_id'    => $location->id,
+                'warehouse_code' => $this->generateWarehouseCode($location, $variant->id),
                 'stock'          => fake()->numberBetween(1, 10),
                 'available'      => fake()->numberBetween(1, 10),
                 'reorder_point'  => fake()->numberBetween(10, 20),
                 'status'         => 'active',
                 'notes'          => 'Low stock - needs reorder',
             ]);
+            $created++;
         }
 
-        // Out of stock scenarios
-        $outOfStockVariants = $variants->random(3);
+        return $created;
+    }
+
+    private function createOutOfStockScenarios(Collection $variants, Collection $locations): int
+    {
+        $created = 0;
+        $outOfStockVariants = $variants->random(min(3, $variants->count()));
+
         foreach ($outOfStockVariants as $variant) {
             $location = $locations->random();
+
+            if ($this->hasInventory($variant->id, $location->id)) {
+                continue;
+            }
+
             VariantInventory::factory()->create([
                 'variant_id'     => $variant->id,
-                'warehouse_code' => $this->generateWarehouseCodeUnique($location, $variant->id),
+                'location_id'    => $location->id,
+                'warehouse_code' => $this->generateWarehouseCode($location, $variant->id),
                 'stock'          => 0,
                 'available'      => 0,
                 'reserved'       => 0,
@@ -73,17 +203,31 @@ final class VariantInventorySeeder extends Seeder
                 'status'         => 'active',
                 'notes'          => 'Out of stock - urgent reorder needed',
             ]);
+            $created++;
         }
 
-        // High utilization scenarios
-        $highUtilizationVariants = $variants->random(4);
+        return $created;
+    }
+
+    private function createHighUtilizationScenarios(Collection $variants, Collection $locations): int
+    {
+        $created = 0;
+        $highUtilizationVariants = $variants->random(min(4, $variants->count()));
+
         foreach ($highUtilizationVariants as $variant) {
             $location = $locations->random();
+
+            if ($this->hasInventory($variant->id, $location->id)) {
+                continue;
+            }
+
             $stock = fake()->numberBetween(50, 100);
             $reserved = fake()->numberBetween(40, $stock - 5);
+
             VariantInventory::factory()->create([
                 'variant_id'     => $variant->id,
-                'warehouse_code' => $this->generateWarehouseCodeUnique($location, $variant->id),
+                'location_id'    => $location->id,
+                'warehouse_code' => $this->generateWarehouseCode($location, $variant->id),
                 'stock'          => $stock,
                 'reserved'       => $reserved,
                 'available'      => $stock - $reserved,
@@ -91,72 +235,117 @@ final class VariantInventorySeeder extends Seeder
                 'status'         => 'active',
                 'notes'          => 'High utilization - monitor closely',
             ]);
+            $created++;
         }
 
-        // Expiring soon scenarios
-        $expiringVariants = $variants->random(6);
+        return $created;
+    }
+
+    private function createExpiringSoonScenarios(Collection $variants, Collection $locations): int
+    {
+        $created = 0;
+        $expiringVariants = $variants->random(min(6, $variants->count()));
+
         foreach ($expiringVariants as $variant) {
             $location = $locations->random();
+
+            if ($this->hasInventory($variant->id, $location->id)) {
+                continue;
+            }
+
             VariantInventory::factory()->create([
                 'variant_id'     => $variant->id,
-                'warehouse_code' => $this->generateWarehouseCodeUnique($location, $variant->id),
+                'location_id'    => $location->id,
+                'warehouse_code' => $this->generateWarehouseCode($location, $variant->id),
                 'stock'          => fake()->numberBetween(20, 80),
                 'available'      => fake()->numberBetween(15, 75),
                 'expiry_date'    => fake()->dateTimeBetween('+1 week', '+1 month'),
                 'status'         => 'active',
                 'notes'          => 'Expires soon - consider promotion',
             ]);
+            $created++;
         }
 
-        // Discontinued items
-        $discontinuedVariants = $variants->random(2);
+        return $created;
+    }
+
+    private function createDiscontinuedScenarios(Collection $variants, Collection $locations): int
+    {
+        $created = 0;
+        $discontinuedVariants = $variants->random(min(2, $variants->count()));
+
         foreach ($discontinuedVariants as $variant) {
             $location = $locations->random();
+
+            if ($this->hasInventory($variant->id, $location->id)) {
+                continue;
+            }
+
             VariantInventory::factory()->create([
                 'variant_id'     => $variant->id,
-                'warehouse_code' => $this->generateWarehouseCodeUnique($location, $variant->id),
+                'location_id'    => $location->id,
+                'warehouse_code' => $this->generateWarehouseCode($location, $variant->id),
                 'stock'          => fake()->numberBetween(5, 30),
                 'available'      => fake()->numberBetween(5, 30),
                 'status'         => 'discontinued',
                 'notes'          => 'Discontinued - clear remaining stock',
             ]);
+            $created++;
         }
 
-        // Untracked items
-        $untrackedVariants = $variants->random(3);
+        return $created;
+    }
+
+    private function createUntrackedScenarios(Collection $variants, Collection $locations): int
+    {
+        $created = 0;
+        $untrackedVariants = $variants->random(min(3, $variants->count()));
+
         foreach ($untrackedVariants as $variant) {
             $location = $locations->random();
+
+            if ($this->hasInventory($variant->id, $location->id)) {
+                continue;
+            }
+
             VariantInventory::factory()->create([
                 'variant_id'     => $variant->id,
-                'warehouse_code' => $this->generateWarehouseCodeUnique($location, $variant->id),
+                'location_id'    => $location->id,
+                'warehouse_code' => $this->generateWarehouseCode($location, $variant->id),
                 'stock'          => fake()->numberBetween(10, 50),
                 'available'      => fake()->numberBetween(10, 50),
                 'status'         => 'active',
                 'notes'          => 'Not tracked - manual management',
             ]);
+            $created++;
         }
+
+        return $created;
     }
 
     /**
-     * Generate warehouse code based on location
+     * Check if inventory already exists for variant-location combination
      */
-    private function generateWarehouseCodeUnique(Location $location, int $variantId, ?array &$usedCodesByVariant = null): string
+    private function hasInventory(int $variantId, int $locationId): bool
+    {
+        return VariantInventory::where('variant_id', $variantId)
+            ->where('location_id', $locationId)
+            ->exists();
+    }
+
+    /**
+     * Generate unique warehouse code based on location
+     */
+    private function generateWarehouseCode(Location $location, int $variantId): string
     {
         $prefix = strtoupper(substr($location->code ?? $location->name, 0, 3));
+
         do {
             $code = $prefix . '-' . fake()->numerify('###');
-            $existsInDb = VariantInventory::query()
-                ->where('variant_id', $variantId)
+            $exists = VariantInventory::where('variant_id', $variantId)
                 ->where('warehouse_code', $code)
                 ->exists();
-            $existsInMemory = is_array($usedCodesByVariant) &&
-                in_array($code, $usedCodesByVariant[$variantId] ?? [], true);
-        } while ($existsInDb || $existsInMemory);
-
-        if (is_array($usedCodesByVariant)) {
-            $usedCodesByVariant[$variantId] ??= [];
-            $usedCodesByVariant[$variantId][] = $code;
-        }
+        } while ($exists);
 
         return $code;
     }
