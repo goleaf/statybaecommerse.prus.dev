@@ -20,19 +20,39 @@ final class SuperAdminSeeder extends Seeder
             ['name' => 'super-admin', 'guard_name' => 'web']
         );
 
-        $permissions = Permission::factory()
-            ->count(50)
-            ->create(['guard_name' => 'web']);
+        // Create permissions manually instead of using factory
+        $permissionsList = [
+            'users.view', 'users.create', 'users.edit', 'users.delete',
+            'roles.view', 'roles.create', 'roles.edit', 'roles.delete',
+            'permissions.view', 'permissions.create', 'permissions.edit', 'permissions.delete',
+            'products.view', 'products.create', 'products.edit', 'products.delete',
+            'orders.view', 'orders.create', 'orders.edit', 'orders.delete',
+            'categories.view', 'categories.create', 'categories.edit', 'categories.delete',
+            'settings.view', 'settings.edit',
+            'reports.view', 'reports.export',
+        ];
+
+        $permissions = collect($permissionsList)->map(function ($permission) {
+            return Permission::firstOrCreate(
+                ['name' => $permission, 'guard_name' => 'web']
+            );
+        });
 
         $superAdminRole->syncPermissions($permissions);
 
-        $admin = User::factory()
-            ->admin()
-            ->create([
-                'email'    => 'admin@example.com',
-                'name'     => 'Super Administrator',
-                'password' => Hash::make('password'),
-            ]);
+        // Use updateOrCreate instead of factory()->create()
+        $admin = User::updateOrCreate(
+            ['email' => 'admin@example.com'],
+            [
+                'name'              => 'Super Administrator',
+                'first_name'        => 'Super',
+                'last_name'         => 'Administrator',
+                'password'          => Hash::make('password'),
+                'is_admin'          => true,
+                'is_active'         => true,
+                'email_verified_at' => now(),
+            ]
+        );
 
         $admin->syncRoles([$superAdminRole]);
 
