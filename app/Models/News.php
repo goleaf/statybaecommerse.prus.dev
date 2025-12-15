@@ -462,4 +462,12 @@ final class News extends Model implements TranslatableRecord
 
         return 'https://share.transistor.fm' . $path;
     }
+
+    /**
+     * Get the news translations.
+     */
+    public function translations(): HasMany
+    {
+        return $this->hasMany(\App\Models\Translations\NewsTranslation::class);
+    }
 }

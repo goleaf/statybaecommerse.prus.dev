@@ -439,4 +439,12 @@ final class Collection extends Model implements HasMedia, TranslatableRecord
         $this->addMediaConversion('thumb')->performOnCollections('images')->width(200)->height(200)->format('webp')->quality(85)->sharpen(10)->optimize();
         $this->addMediaConversion('small')->performOnCollections('images')->width(400)->height(400)->format('webp')->quality(85)->sharpen(10)->optimize();
     }
+
+    /**
+     * Get the collection translations.
+     */
+    public function translations(): HasMany
+    {
+        return $this->hasMany(\App\Models\Translations\CollectionTranslation::class);
+    }
 }

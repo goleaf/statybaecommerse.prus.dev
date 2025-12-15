@@ -4,90 +4,176 @@ declare(strict_types=1);
 
 namespace App\Traits;
 
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use RuntimeException;
+use App\Services\TranslationHookService;
 
-/**
- * HasTranslations
- *
- * Trait providing reusable functionality across multiple classes.
- */
 trait HasTranslations
 {
-    public function translations(): HasMany
-    {
-        $translationModel = $this->translationModelClass();
-        $foreignKey = $this->getForeignKey();
+    /**
+     * Fields that should be automatically translated
+     */
+    protected array $translatableFields = [
+        'name', 'title', 'description', 'content', 'summary',
+        'meta_title', 'meta_description', 'alt_text', 'caption'
+    ];
 
-        return $this->hasMany($translationModel, $foreignKey);
+    /**
+     * Boot the trait
+     */
+    protected static function bootHasTranslations(): void
+    {
+        static::saving(function ($model) {
+            $model->processTranslations();
+        });
     }
 
-    public function trans(string $field, ?string $locale = null): mixed
+    /**
+     * Process translations for translatable fields
+     */
+    public function processTranslations(): void
     {
-        $locale = $locale ?: app()->getLocale();
-        // Load translations if not already loaded
-        if (! $this->relationLoaded('translations')) {
-            $this->load('translations');
-        }
-        $translation = $this->translations->firstWhere('locale', $locale);
-        // If relation was loaded earlier and now a new locale was added, fetch it fresh
-        if (! $translation) {
-            $fresh = $this->translations()->where('locale', $locale)->first();
-            if ($fresh) {
-                // Merge freshly fetched translation into the loaded relation to keep cache coherent
-                $this->setRelation('translations', $this->translations->push($fresh));
-                $translation = $fresh;
-            }
-        }
-        if ($translation && isset($translation->{$field}) && ! empty($translation->{$field})) {
-            $value = $translation->{$field};
-            if (is_array($value)) {
-                return $value[$locale] ?? reset($value) ?? $this->{$field} ?? null;
-            }
+        $service = app(TranslationHookService::class);
 
-            return $value;
-        }
-        // Fallback to default locale if current locale not found
-        $defaultLocale = config('app.locale', 'en');
-        if ($locale !== $defaultLocale) {
-            $defaultTranslation = $this->translations->firstWhere('locale', $defaultLocale);
-            if ($defaultTranslation && isset($defaultTranslation->{$field}) && ! empty($defaultTranslation->{$field})) {
-                return $defaultTranslation->{$field};
+        foreach ($this->getTranslatableFields() as $field) {
+            if ($this->isDirty($field) && !empty($this->$field)) {
+                $key = $service->generateTranslationKey(
+                    $this->$field,
+                    strtolower(class_basename($this))
+                );
+
+                $service->addTranslation($key, [
+                    config('app.locale', 'lt') => $this->$field
+                ]);
+
+                // Store translation key if field exists
+                if ($this->isFillable($field . '_translation_key')) {
+                    $this->{$field . '_translation_key'} = $key;
+                }
             }
         }
-
-        return $this->getAttributes()[$field] ?? null;
     }
 
-    public function getTranslation(string $field, ?string $locale = null, bool $useFallbackLocale = true): mixed
+    /**
+     * Get translatable fields for this model
+     */
+    public function getTranslatableFields(): array
     {
-        $locale ??= app()->getLocale();
+        return array_intersect($this->translatableFields, $this->getFillable());
+    }
 
-        $value = $this->translations()
-            ->where('locale', $locale)
-            ->value($field);
+    /**
+     * Set translatable fields
+     */
+    public function setTranslatableFields(array $fields): self
+    {
+        $this->translatableFields = $fields;
+        return $this;
+    }
 
-        if ($value !== null) {
-            return $value;
+    /**
+     * Add a translatable field
+     */
+    public function addTranslatableField(string $field): self
+    {
+        if (!in_array($field, $this->translatableFields)) {
+            $this->translatableFields[] = $field;
+        }
+        return $this;
+    }
+
+    /**
+     * Get translation for a field
+     */
+    public function getTranslation(string $field, string $locale = null): ?string
+    {
+        $locale = $locale ?? app()->getLocale();
+        $key = $this->getTranslationKey($field);
+        
+        if ($key) {
+            return __($key, [], $locale);
         }
 
-        if ($useFallbackLocale) {
-            $fallback = config('app.fallback_locale', 'en');
+        return $this->$field;
+    }
 
-            if ($fallback !== $locale) {
-                return $this->getTranslation($field, $fallback, false);
+    /**
+     * Get translation key for a field
+     */
+    public function getTranslationKey(string $field): ?string
+    {
+        $keyField = $field . '_translation_key';
+        
+        if ($this->isFillable($keyField) && !empty($this->$keyField)) {
+            return $this->$keyField;
+        }
+
+        // Generate key if not stored
+        if (!empty($this->$field)) {
+            $service = app(TranslationHookService::class);
+            return $service->generateTranslationKey(
+                $this->$field,
+                strtolower(class_basename($this))
+            );
+        }
+
+        return null;
+    }
+
+    /**
+     * Check if field has translation
+     */
+    public function hasTranslation(string $field, string $locale = null): bool
+    {
+        $locale = $locale ?? app()->getLocale();
+        $key = $this->getTranslationKey($field);
+        
+        if (!$key) {
+            return false;
+        }
+
+        $translation = __($key, [], $locale);
+        return $translation !== $key; // If translation exists, it won't return the key
+    }
+
+    /**
+     * Get all translations for a field
+     */
+    public function getAllTranslations(string $field): array
+    {
+        $key = $this->getTranslationKey($field);
+        
+        if (!$key) {
+            return [];
+        }
+
+        $translations = [];
+        $supportedLocales = config('app.supported_locales', 'lt,en');
+        
+        if (is_string($supportedLocales)) {
+            $supportedLocales = array_map('trim', explode(',', $supportedLocales));
+        }
+
+        foreach ($supportedLocales as $locale) {
+            $translation = __($key, [], $locale);
+            if ($translation !== $key) {
+                $translations[$locale] = $translation;
             }
         }
 
-        return $this->getAttributes()[$field] ?? null;
+        return $translations;
     }
 
-    protected function translationModelClass(): string
+    /**
+     * Update translation for a specific locale
+     */
+    public function updateTranslation(string $field, string $locale, string $translation): bool
     {
-        // Expect model to define translation model via property
-        if (property_exists($this, 'translationModel')) {
-            return $this->translationModel;
+        $key = $this->getTranslationKey($field);
+        
+        if (!$key) {
+            return false;
         }
-        throw new RuntimeException(static::class . ' must define $translationModel to use HasTranslations');
+
+        $service = app(TranslationHookService::class);
+        return $service->addTranslation($key, [$locale => $translation]);
     }
 }

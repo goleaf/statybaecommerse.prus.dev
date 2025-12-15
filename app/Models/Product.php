@@ -1971,4 +1971,12 @@ final class Product extends Model implements HasMedia, TranslatableRecord
     {
         return $this->getFormattedComparePrice();
     }
+
+    /**
+     * Get the product translations.
+     */
+    public function translations(): HasMany
+    {
+        return $this->hasMany(\App\Models\Translations\ProductTranslation::class);
+    }
 }

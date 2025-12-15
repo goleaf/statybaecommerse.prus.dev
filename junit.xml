@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="C:\Code\statybaecommerse.prus.dev\phpunit.xml" tests="1" assertions="10" errors="0" failures="0" skipped="0" time="47.413137">
-    <testsuite name="Feature" tests="1" assertions="10" errors="0" failures="0" skipped="0" time="47.413137">
-      <testsuite name="Tests\Feature\Livewire\SingleProductVariantSelectionTest" file="Single Product Variant Selection (Tests\Feature\Livewire\SingleProductVariantSelection)" tests="1" assertions="10" errors="0" failures="0" skipped="0" time="47.413137">
-        <testcase name="Variant selection updates pricing and stock context" file="Single Product Variant Selection (Tests\Feature\Livewire\SingleProductVariantSelection)::Variant selection updates pricing and stock context" class="Tests\Feature\Livewire\SingleProductVariantSelectionTest" classname="Tests.Feature.Livewire.SingleProductVariantSelectionTest" assertions="10" time="47.413137"/>
-      </testsuite>
-    </testsuite>
+  <testsuite name="Tests\Unit\Services\TranslationHookServiceTest" file="Translation Hook Service (Tests\Unit\Services\TranslationHookService)" tests="1" assertions="0" errors="1" failures="0" skipped="0" time="0.000000">
+    <testcase name="It adds translation successfully" file="Translation Hook Service (Tests\Unit\Services\TranslationHookService)::It adds translation successfully" class="Tests\Unit\Services\TranslationHookServiceTest" classname="Tests.Unit.Services.TranslationHookServiceTest" assertions="0" time="0.000000">
+      <error type="BadMethodCallException">It adds translation successfullyBadMethodCallException: Method App\ApplicationOverride::useLanguagePath does not exist.&#13;
+at vendor\laravel\framework\src\Illuminate\Macroable\Traits\Macroable.php:115
+at tests\Unit\Services\TranslationHookServiceTest.php:33</error>
+    </testcase>
   </testsuite>
 </testsuites>
