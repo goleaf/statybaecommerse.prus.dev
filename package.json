@@ -30,7 +30,7 @@
         "sass": "^1.93.2",
         "sass-embedded": "^1.92.1",
         "tailwindcss": "^4.1.16",
-        "vite": "^7.1.12"
+        "vite": "^7.3.0"
     },
     "dependencies": {
         "@fontsource-variable/figtree": "^5.2.10",
