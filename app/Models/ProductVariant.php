@@ -963,4 +963,12 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
     {
         return $query->where('views_count', '>=', $threshold);
     }
+
+    /**
+     * Get the product variant translations.
+     */
+    public function translations(): HasMany
+    {
+        return $this->hasMany(\App\Models\Translations\ProductVariantTranslation::class);
+    }
 }

@@ -6,6 +6,7 @@ $providers = [
     App\Providers\SharedComponentServiceProvider::class,
     App\Providers\CodeStyleServiceProvider::class,
     App\Providers\ExistsOrServiceProvider::class,
+    App\Providers\TranslationHookServiceProvider::class,
     App\Providers\Filament\AdminPanelProvider::class,
 ];
 

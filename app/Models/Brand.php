@@ -830,4 +830,12 @@ final class Brand extends Model implements HasMedia, TranslatableRecord
             },
         );
     }
+
+    /**
+     * Get the brand translations.
+     */
+    public function translations(): HasMany
+    {
+        return $this->hasMany(\App\Models\Translations\BrandTranslation::class);
+    }
 }
