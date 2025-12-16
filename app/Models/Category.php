@@ -178,6 +178,34 @@ final class Category extends Model implements HasMedia
     }
 
     /**
+     * Get translated field value for the specified locale.
+     * Uses the eager-loaded translations relationship to avoid N+1 queries.
+     */
+    public function trans(string $field, ?string $locale = null): mixed
+    {
+        $locale ??= app()->getLocale();
+
+        // If translations are loaded, use them to avoid additional queries
+        if ($this->relationLoaded('translations')) {
+            $translation = $this->translations->firstWhere('locale', $locale);
+            if ($translation && isset($translation->{$field})) {
+                return $translation->{$field};
+            }
+        }
+
+        // Fallback to the base field value
+        return $this->{$field} ?? null;
+    }
+
+    /**
+     * Handle translations functionality with proper error handling.
+     */
+    public function translations(): HasMany
+    {
+        return $this->hasMany($this->translationModel ?? \App\Models\Translations\CategoryTranslation::class);
+    }
+
+    /**
      * Handle getRouteKeyName functionality with proper error handling.
      */
     public function getRouteKeyName(): string

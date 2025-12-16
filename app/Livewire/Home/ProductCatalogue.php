@@ -97,15 +97,8 @@ final class ProductCatalogue extends Component implements HasSchemas
         $locale = app()->getLocale();
 
         $query = Product::query()
-            ->with(['brand', 'categories', 'media'])
-            ->with([
-                'translations' => function ($q) use ($locale): void {
-                    $q->where('locale', $locale);
-                },
-                'categories.translations' => function ($q) use ($locale): void {
-                    $q->where('locale', $locale);
-                },
-            ])
+            ->forProductList()
+            ->withListRelations()
             ->withAvg(['reviews as average_rating' => fn ($q) => $q->where('is_approved', true)], 'rating')
             ->withCount(['reviews' => fn ($q) => $q->where('is_approved', true)])
             ->where('is_visible', true)

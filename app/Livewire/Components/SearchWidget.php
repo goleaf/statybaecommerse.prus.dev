@@ -4,13 +4,17 @@ declare(strict_types=1);
 
 namespace App\Livewire\Components;
 
+use App\Data\SearchQueryData;
 use App\Models\Attribute;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
+use App\Services\SearchService;
+use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator as Paginator;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
@@ -177,90 +181,51 @@ final class SearchWidget extends Component
     #[Computed]
     public function products(): LengthAwarePaginator
     {
-        $query = Product::query()->with(['brand', 'categories', 'media', 'variants', 'reviews'])->where('is_visible', true);
-        // Text search
-        if ($this->query) {
-            $query->where(function ($q) {
-                $q->where('name', 'like', '%' . $this->query . '%')->orWhere('description', 'like', '%' . $this->query . '%')->orWhere('sku', 'like', '%' . $this->query . '%')->orWhereHas('brand', function ($brandQuery) {
-                    $brandQuery->where('name', 'like', '%' . $this->query . '%');
-                })->orWhereHas('categories', function ($catQuery) {
-                    $catQuery->where('name', 'like', '%' . $this->query . '%');
-                });
-            });
-        }
-        // Category filter
-        if (! empty($this->selectedCategories)) {
-            $query->whereHas('categories', function ($q) {
-                $q->whereIn('categories.id', $this->selectedCategories);
-            });
-        }
-        // Brand filter
-        if (! empty($this->selectedBrands)) {
-            $query->whereIn('brand_id', $this->selectedBrands);
-        }
-        // Attribute filter
-        if (! empty($this->selectedAttributes)) {
-            $query->whereHas('variants.attributeValues', function ($q) {
-                $q->whereIn('attribute_values.id', $this->selectedAttributes);
-            });
-        }
-        // Price range filter
-        if ($this->minPrice !== null) {
-            $query->whereHas('variants', function ($q) {
-                $q->where('price', '>=', $this->minPrice);
-            });
-        }
-        if ($this->maxPrice !== null) {
-            $query->whereHas('variants', function ($q) {
-                $q->where('price', '<=', $this->maxPrice);
-            });
-        }
-        // Stock filter
-        if ($this->inStock) {
-            $query->whereHas('variants', function ($q) {
-                $q->where('stock_quantity', '>', 0);
-            });
-        }
-        // Sale filter
-        if ($this->onSale) {
-            $query->whereHas('variants', function ($q) {
-                $q->whereNotNull('compare_price')->whereColumn('compare_price', '>', 'price');
-            });
-        }
-        // Sorting
-        switch ($this->sortBy) {
-            case 'price_asc':
-                $query->join('product_variants', 'products.id', '=', 'product_variants.product_id')->orderBy('product_variants.price', 'asc');
-                break;
-            case 'price_desc':
-                $query->join('product_variants', 'products.id', '=', 'product_variants.product_id')->orderBy('product_variants.price', 'desc');
-                break;
-            case 'name':
-                $query->orderBy('name', $this->sortDirection);
-                break;
-            case 'created_at':
-                $query->orderBy('created_at', $this->sortDirection);
-                break;
-            case 'rating':
-                $query->withAvg('reviews', 'rating')->orderBy('reviews_avg_rating', 'desc');
-                break;
-            default:
-                // relevance
-                if ($this->query) {
-                    // Boost exact matches
-                    $query->orderByRaw('CASE 
-                        WHEN name LIKE ? THEN 1
-                        WHEN name LIKE ? THEN 2
-                        WHEN description LIKE ? THEN 3
-                        ELSE 4
-                    END', [$this->query, '%' . $this->query . '%', '%' . $this->query . '%']);
-                } else {
-                    $query->orderBy('created_at', 'desc');
-                }
-                break;
+        // Return empty paginator if no search query
+        if (trim($this->query) === '') {
+            return $this->createEmptyPaginator();
         }
 
-        return $query->distinct()->paginate($this->perPage);
+        try {
+            $searchService = app(SearchService::class);
+
+            // Build filters from component state
+            $filters = $this->buildSearchFilters();
+
+            // Map sort parameter to SearchService format
+            $searchSort = $this->mapSortParameter($this->sortBy);
+
+            // Create search query data for products only
+            $queryData = SearchQueryData::fromArray([
+                'query'    => $this->query,
+                'page'     => $this->getPage(),
+                'per_page' => $this->perPage,
+                'types'    => ['product'], // Only search for products
+                'sort'     => $searchSort,
+                'filters'  => $filters,
+            ], [
+                'source' => 'search-widget',
+                'locale' => app()->getLocale(),
+            ]);
+
+            // Execute search through SearchService
+            $searchResults = $searchService->search($queryData);
+
+            // Extract product data from search results
+            $products = $this->extractProductsFromSearchResults($searchResults);
+
+            // Convert to paginator format expected by the view
+            return $this->createPaginatorFromSearchResults($products, $searchResults['meta'] ?? []);
+
+        } catch (Exception $e) {
+            // Log error and return empty results on failure
+            logger()->error('SearchWidget search failed', [
+                'query' => $this->query,
+                'error' => $e->getMessage(),
+            ]);
+
+            return $this->createEmptyPaginator();
+        }
     }
 
     /**
@@ -319,13 +284,156 @@ final class SearchWidget extends Component
     }
 
     /**
-     * Handle checkWishlistStatus functionality with proper error handling.
+     * Build search filters from component state
      */
-    private function checkWishlistStatus(): void
+    private function buildSearchFilters(): array
     {
-        if (auth()->check()) {
-            $this->isWishlisted = auth()->user()->wishlist()->where('product_id', $this->product->id)->exists();
+        $filters = [];
+
+        if (! empty($this->selectedCategories)) {
+            $filters['categories'] = $this->selectedCategories;
         }
+
+        if (! empty($this->selectedBrands)) {
+            $filters['brands'] = $this->selectedBrands;
+        }
+
+        if (! empty($this->selectedAttributes)) {
+            $filters['attributes'] = $this->selectedAttributes;
+        }
+
+        if ($this->minPrice !== null) {
+            $filters['min_price'] = $this->minPrice;
+        }
+
+        if ($this->maxPrice !== null) {
+            $filters['max_price'] = $this->maxPrice;
+        }
+
+        if ($this->inStock) {
+            $filters['in_stock'] = true;
+        }
+
+        if ($this->onSale) {
+            $filters['on_sale'] = true;
+        }
+
+        return $filters;
+    }
+
+    /**
+     * Map component sort parameter to SearchService format
+     */
+    private function mapSortParameter(string $sort): string
+    {
+        return match ($sort) {
+            'price_asc'  => 'price_asc',
+            'price_desc' => 'price_desc',
+            'name'       => 'name_' . $this->sortDirection,
+            'created_at' => 'created_at_' . $this->sortDirection,
+            'rating'     => 'rating_desc',
+            default      => 'relevance',
+        };
+    }
+
+    /**
+     * Extract product data from SearchService results
+     */
+    private function extractProductsFromSearchResults(array $searchResults): \Illuminate\Support\Collection
+    {
+        $products = collect();
+
+        // Get products from the aggregated data structure
+        if (isset($searchResults['data']['products']['items'])) {
+            $productItems = $searchResults['data']['products']['items'];
+        } elseif (isset($searchResults['data']) && is_array($searchResults['data'])) {
+            // Handle flat data structure
+            $productItems = array_filter($searchResults['data'], fn ($item) => is_array($item) && ($item['type'] ?? null) === 'product'
+            );
+        } else {
+            $productItems = [];
+        }
+
+        foreach ($productItems as $item) {
+            if (! is_array($item) || ! isset($item['id'])) {
+                continue;
+            }
+
+            // Create a Product-like object from search result data
+            $product = (object) [
+                'id'             => $item['id'],
+                'slug'           => $this->extractSlugFromUrl($item['url'] ?? ''),
+                'name'           => $item['title'] ?? '',
+                'summary'        => $item['description'] ?? '',
+                'brand_id'       => null, // Not available in search results
+                'published_at'   => now(), // Assume published since it's in results
+                'brand'          => $item['subtitle'] ? (object) ['name' => $item['subtitle']] : null,
+                'media'          => collect(), // Empty collection for compatibility
+                'prices'         => collect(), // Empty collection for compatibility
+                'variants_count' => 0, // Not available in search results
+            ];
+
+            $products->push($product);
+        }
+
+        return $products;
+    }
+
+    /**
+     * Extract slug from product URL
+     */
+    private function extractSlugFromUrl(string $url): string
+    {
+        if (empty($url)) {
+            return '';
+        }
+
+        $path = parse_url($url, PHP_URL_PATH);
+        if (! $path) {
+            return '';
+        }
+
+        $segments = explode('/', trim($path, '/'));
+
+        return end($segments) ?: '';
+    }
+
+    /**
+     * Create paginator from search results
+     */
+    private function createPaginatorFromSearchResults(\Illuminate\Support\Collection $products, array $meta): LengthAwarePaginator
+    {
+        $currentPage = $meta['page'] ?? 1;
+        $perPage = $meta['per_page'] ?? $this->perPage;
+        $total = $meta['total_results'] ?? 0;
+
+        return new Paginator(
+            $products,
+            $total,
+            $perPage,
+            $currentPage,
+            [
+                'path'     => request()->url(),
+                'pageName' => 'page',
+            ]
+        );
+    }
+
+    /**
+     * Create empty paginator for no results
+     */
+    private function createEmptyPaginator(): LengthAwarePaginator
+    {
+        return new Paginator(
+            collect(),
+            0,
+            $this->perPage,
+            1,
+            [
+                'path'     => request()->url(),
+                'pageName' => 'page',
+            ]
+        );
     }
 
     /**

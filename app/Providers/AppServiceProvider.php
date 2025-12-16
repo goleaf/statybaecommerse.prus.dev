@@ -78,7 +78,6 @@ use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Number;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
-use Spatie\Permission\Models\Role;
 
 use function in_array;
 
@@ -90,6 +89,9 @@ use Livewire\Features\SupportTesting\Testable;
 use Livewire\Livewire;
 
 use function Livewire\store;
+
+use Spatie\Permission\Models\Role;
+
 use function str_contains;
 
 use Throwable;
@@ -145,6 +147,13 @@ class AppServiceProvider extends ServiceProvider
 
         // Bind the domain-level product repository to its Eloquent implementation.
         $this->app->bind(ProductRepositoryInterface::class, EloquentProductRepository::class);
+
+        // Register the centralized locale service
+        $this->app->singleton(\App\Services\LocaleService::class);
+
+        // Register the database search optimizer for production performance
+        $this->app->singleton(\App\Services\Search\DatabaseSearchOptimizer::class, static fn ($app): \App\Services\Search\DatabaseSearchOptimizer => new \App\Services\Search\DatabaseSearchOptimizer($app->make('db.connection'))
+        );
 
         // Provide a lightweight static exchange rate provider that can be swapped in tests.
         $this->app->singleton(CurrencyRateProvider::class, static fn (): CurrencyRateProvider => new StaticCurrencyRateProvider);
@@ -589,7 +598,7 @@ class AppServiceProvider extends ServiceProvider
                 });
         });
 
-        // Legacy Shopper components removed - using native Filament resources
+        // Using native Filament resources for admin panel functionality
 
         Model::saved(function ($model): void {
             // Flush cache entries for supported aggregates whenever their models change.

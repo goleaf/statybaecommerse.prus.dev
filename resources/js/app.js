@@ -4,7 +4,7 @@ import './shared/utilities.js';
 import './alpine/search-components.js';
 // Bind cart badge helpers that avoid inline Alpine expressions.
 import './alpine/cart.js';
-// import '../../vendor/shopper/framework/resources/js/index.js'; // Temporarily disabled
+// Using native Filament and Livewire for admin and frontend functionality
 // Local fonts are now loaded via CSS @font-face declarations
 
 // -----------------------------------------------------------------------------

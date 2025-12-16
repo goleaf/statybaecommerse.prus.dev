@@ -41,7 +41,7 @@ final class FakeFilamentComponent extends LivewireComponent implements HasSchema
     public function getSchemaComponent(
         string $key,
         bool $withHidden = false,
-        ?Component $skipComponentChildContainersWhileSearching = null
+        array $skipComponentsChildContainersWhileSearching = []
     ): Component|Action|ActionGroup|null {
         return null;
     }

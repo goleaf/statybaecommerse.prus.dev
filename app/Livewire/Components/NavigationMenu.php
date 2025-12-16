@@ -8,7 +8,7 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Collection;
 use App\Models\Menu;
-use App\Support\Cache\CacheKeys;
+use App\Support\Cache\CacheTags;
 use App\Support\Cache\TagAwareCache;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Route;
@@ -46,7 +46,7 @@ final class NavigationMenu extends Component
             }
 
             return $menu->items()->with('children')->where('is_visible', true)->get();
-        }, [CacheKeys::homeTag()]);
+        }, [CacheTags::navigation(), CacheTags::locale(app()->getLocale())]);
     }
 
     /**
@@ -61,7 +61,7 @@ final class NavigationMenu extends Component
             }, 'children.translations' => function ($q) {
                 $q->where('locale', app()->getLocale());
             }])->where('is_visible', true)->whereNull('parent_id')->orderBy('sort_order')->limit(8)->get();
-        }, [CacheKeys::homeTag()]);
+        }, [CacheTags::categories(), CacheTags::navigation(), CacheTags::locale(app()->getLocale())]);
     }
 
     /**
@@ -74,7 +74,7 @@ final class NavigationMenu extends Component
             return Brand::query()->with(['translations' => function ($q) {
                 $q->where('locale', app()->getLocale());
             }])->where('is_enabled', true)->where('is_featured', true)->orderBy('sort_order')->limit(6)->get();
-        }, [CacheKeys::homeTag()]);
+        }, [CacheTags::brands(), CacheTags::navigation(), CacheTags::locale(app()->getLocale())]);
     }
 
     /**
@@ -87,7 +87,7 @@ final class NavigationMenu extends Component
             return Collection::query()->with(['translations' => function ($q) {
                 $q->where('locale', app()->getLocale());
             }])->where('is_enabled', true)->where('is_featured', true)->orderBy('sort_order')->limit(4)->get();
-        }, [CacheKeys::homeTag()]);
+        }, [CacheTags::collections(), CacheTags::navigation(), CacheTags::locale(app()->getLocale())]);
     }
 
     /**

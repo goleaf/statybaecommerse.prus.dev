@@ -129,6 +129,17 @@ return [
             ],
         ],
 
+        'performance' => [
+            'driver'               => 'daily',
+            'path'                 => storage_path('logs/performance.log'),
+            'level'                => env('LOG_PERFORMANCE_LEVEL', 'warning'),
+            'days'                 => env('LOG_PERFORMANCE_DAYS', 7),
+            'replace_placeholders' => true,
+            'tap'                  => [
+                CustomizeFormatter::class,
+            ],
+        ],
+
         'slack' => [
             'driver'               => 'slack',
             'url'                  => env('LOG_SLACK_WEBHOOK_URL'),

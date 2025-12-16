@@ -23,6 +23,45 @@ use function route;
 final class ProductListItemData implements Arrayable
 {
     /**
+     * Specify the minimal fields required from the products table for list views.
+     * This helps optimize queries by avoiding loading unnecessary large text fields.
+     */
+    public const REQUIRED_PRODUCT_FIELDS = [
+        'products.id',
+        'products.name',
+        'products.slug',
+        'products.short_description', // Used for short description, NOT description
+        'products.price',
+        'products.sale_price',
+        'products.compare_price',
+        'products.stock_quantity',
+        'products.brand_id',
+        'products.created_at', // May be needed for sorting
+        'products.updated_at', // May be needed for sorting
+        'products.published_at', // May be needed for sorting
+        'products.is_visible', // Needed for filtering
+        'products.is_featured', // May be needed for sorting
+    ];
+
+    /**
+     * Specify the minimal fields required for brand relation in list views.
+     */
+    public const REQUIRED_BRAND_FIELDS = [
+        'id',
+        'name',
+        'slug', // May be needed for URLs
+    ];
+
+    /**
+     * Specify the minimal fields required for category relation in list views.
+     */
+    public const REQUIRED_CATEGORY_FIELDS = [
+        'id',
+        'name',
+        'slug', // May be needed for URLs
+    ];
+
+    /**
      * @param array<int, string> $categoryLabels
      */
     public function __construct(

@@ -46,16 +46,8 @@ final class BrandController extends Controller
         $locale = app()->getLocale();
         try {
             $productModels = $brand->products()
-                ->with([
-                    'media' => function ($query): void {
-                        $query->select('id', 'model_id', 'model_type', 'name', 'file_name', 'disk', 'conversions_disk', 'size', 'mime_type', 'manipulations', 'custom_properties', 'generated_conversions', 'responsive_images', 'order_column', 'created_at', 'updated_at')
-                            ->where('collection_name', 'images')
-                            ->orderBy('order_column');
-                    },
-                    'translations',
-                    'brand:id,name,slug',
-                    'categories:id,name,slug',
-                ])
+                ->forProductList()
+                ->withListRelations()
                 ->where('is_visible', true)
                 ->whereNotNull('published_at')
                 ->where('published_at', '<=', now())
@@ -96,29 +88,29 @@ final class BrandController extends Controller
 
         // Provide default values for filter/sort options
         $availableSorts = [
-            'featured' => __('sort_featured'),
-            'latest' => __('sort_latest'),
-            'price_asc' => __('sort_price_low'),
-            'price_desc' => __('sort_price_high'),
+            'featured'    => __('sort_featured'),
+            'latest'      => __('sort_latest'),
+            'price_asc'   => __('sort_price_low'),
+            'price_desc'  => __('sort_price_high'),
             'bestsellers' => __('sort_bestsellers'),
         ];
 
         $availableFilters = [
             'featured' => __('filter_featured'),
-            'sale' => __('filter_sale'),
+            'sale'     => __('filter_sale'),
             'in_stock' => __('filter_in_stock'),
         ];
 
         return view('frontend.brands.show', [
-            'brand'            => $brand,
-            'products'         => $products,
+            'brand'             => $brand,
+            'products'          => $products,
             'relatedCategories' => $relatedCategories,
-            'availableSorts'   => $availableSorts,
-            'availableFilters' => $availableFilters,
-            'activeSort'       => $request->get('sort', 'featured'),
-            'activeFilter'     => $request->get('filter'),
-            'seoTitle'         => $seoTitle,
-            'seoDescription'   => $seoDescription,
+            'availableSorts'    => $availableSorts,
+            'availableFilters'  => $availableFilters,
+            'activeSort'        => $request->get('sort', 'featured'),
+            'activeFilter'      => $request->get('filter'),
+            'seoTitle'          => $seoTitle,
+            'seoDescription'    => $seoDescription,
         ]);
     }
 

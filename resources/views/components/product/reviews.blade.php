@@ -4,5 +4,5 @@
 ])
 <div class="flex items-center">
     <x-rate-stars :rating="$rating" />
-    <p class="sr-only">{{ __('shopper::pages.products.reviews.rating_count', ['rating' => $rating, 'count' => $count]) }}</p>
+    <p class="sr-only">{{ __('products.reviews.rating_count', ['rating' => $rating, 'count' => $count]) }}</p>
 </div>

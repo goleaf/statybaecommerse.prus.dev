@@ -90,6 +90,11 @@ final class CacheTags
         return 'collections';
     }
 
+    public static function navigation(): string
+    {
+        return 'navigation';
+    }
+
     public static function sliders(): string
     {
         // Shared tag identifier for storefront slider payloads.

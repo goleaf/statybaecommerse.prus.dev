@@ -64,11 +64,13 @@ final class CreateProduct extends CreateRecord
         return $data;
     }
 
-    protected function afterCreate(): void
+    protected function handleRecordCreation(array $data): \Illuminate\Database\Eloquent\Model
     {
-        $this->syncTranslationRecords($this->record, $this->languageTabsPayload);
+        $record = parent::handleRecordCreation($data);
 
-        parent::afterCreate();
+        $this->syncTranslationRecords($record, $this->languageTabsPayload);
+
+        return $record;
     }
 
     /**

@@ -35,6 +35,7 @@ final class CacheInvalidator
             CacheKeys::homeTag(),
             CacheKeys::productAggregateTag(),
             CacheKeys::productTag($productId),
+            CacheTags::navigation(), // Products can appear in navigation menus
         ];
 
         // Include both the new and previous brand identifiers so cached brand widgets
@@ -80,6 +81,7 @@ final class CacheInvalidator
         $tags = [
             CacheKeys::homeTag(),
             CacheKeys::categoryTag($categoryId),
+            CacheTags::navigation(), // Categories appear in navigation menus
         ];
 
         TagAwareCache::flush($tags);
