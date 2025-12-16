@@ -1,113 +1,32 @@
 ---
 inclusion: always
 ---
-always use documentation from https://filamentphp.com/docs
-always use documentation from https://laravel.com/docs/12.x/
-always use mcp
 
----
+# Project Steering (egistatyba)
 
----
+## Docs & tools
+- Prefer official docs: `https://filamentphp.com/docs` and `https://laravel.com/docs/12.x/`.
+- Prefer MCP (Laravel Boost) tools for introspection (routes, schema, logs, config, docs) before guessing.
 
-- update git with this prompt changesd files. write in commit message what was changed and do not put in commit any another files what is not in git, after end of prompt, after end of work with prompt, update git, make commit and push and write what was updated in every file. and write summary of changes in work of prompt, in commit attach not all not commited files, but only files what was modified in this work prompt. dont do it. make 
+## Stack (source of truth)
+- Laravel 12, Filament 4, Livewire 3, TailwindCSS 4.
+- PHP target/version constraints live in `composer.json` (`config.platform.php`).
 
+## Workflow
+- Keep changes minimal and consistent with existing conventions in this repo (check sibling files).
+- Prefer small loops: change → targeted test → fix → repeat.
 
+## Commands / generators
+- Avoid `php artisan make:*` scaffolding for app code unless explicitly requested.
+- OK: running tests (`php artisan test`) and formatting (`vendor/bin/pint`).
 
+## Localization + money
+- Every new user-facing string must have both `lt` and `en` translations.
+- Default language: Lithuanian (`lt`). Default currency: EUR.
+- Add translation keys using snake_case, inside existing files under `resources/lang/{lt,en}` (don’t create new locale folders unless asked).
 
-# Scope
+## Naming
+- Do not introduce new `advanced-*` / `enhanced-*` prefixed files; merge into existing modules instead.
 
-**Use only for Filament v4 projects.** Apply these fixes to all PHP files under `app/Filament/**`.
-
-# Hard Requirements (v4)
-
-1. **Imports**
-
-   * Ensure **present**:
-
-     ```php
-     use Filament\Schemas\Schema;
-     use Filament\Tables\Table;
-     ```
-   * Ensure **absent** in any file:
-
-     ```php
-     use App\Filament\Resources\Schema; // remove if found
-     ```
-   * Do **not** remove any existing `Filament\Forms\Components\*` imports.
-
-2. **Resource::form signature (v4)**
-
-   * In every Filament Resource class, enforce:
-
-     ```php
-     public static function form(Schema $schema): Schema
-     ```
-   * Inside the `form` method body, if the parameter variable was `$form`, rename all **method-local** usages from `$form` → `$schema`.
-
-3. **Resource::table signature (v4)**
-
-   * Enforce:
-
-     ```php
-     public static function table(Table $table): Table
-     ```
-
-5. **Ban conflicting local class names**
-
-   * No class must exist with FQN `App\Filament\Resources\Schema`. If found, **rename** the class/file (e.g., to `App\Filament\ResourceSchemas\{DescriptiveName}`) and update imports accordingly across the project.
-
-# Regex-Guided Edits (idempotent)
-
-> Apply these in every file under `app/Filament/**`:
-
-* **Remove conflicting import**
-
-  * Find:  `^use\s+App\\Filament\\Resources\\Schema;\s*$`
-  * Replace: *empty string*
-
-* **Ensure v4 Schema import** (if missing)
-
-  * If file contains `public static function form(` and lacks `use Filament\Schemas\Schema;`, **insert** after the namespace/import block:
-
-    ```php
-    use Filament\Schemas\Schema;
-    ```
-
-* **Ensure Table import** (if missing)
-
-  * If file contains `public static function table(` and lacks `use Filament\Tables\Table;`, **insert**:
-
-    ```php
-    use Filament\Tables\Table;
-    ```
-
-* **Normalize `form` signature to v4**
-
-  * Replace any of:
-
-    * `public\s+static\s+function\s+form\s*\([^)]*\)\s*:\s*[^{\s]+`
-    * `public\s+static\s+function\s+form\s*\([^)]*\)`
-  * With exactly:
-
-    ```php
-    public static function form(Schema $schema): Schema
-    ```
-
-* **Rename `$form` to `$schema` inside `form` method body only**
-
-  * Within the braces of `public static function form(Schema $schema): Schema { ... }`, replace:
-
-    * `\$(form)\b` → `$schema`
-
-* **Normalize `table` signature**
-
-  * Replace any of:
-
-    * `public\s+static\s+function\s+table\s*\([^)]*\)\s*:\s*[^{\s]+`
-    * `public\s+static\s+function\s+table\s*\([^)]*\)`
-  * With exactly:
-
-    ```php
-    public static function table(Table $table): Table
-    ```
-
+## Git
+- Never commit or push unless explicitly asked.

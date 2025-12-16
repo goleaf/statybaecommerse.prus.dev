@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Observers;
 
 use App\Services\TranslationHookService;
+use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 
@@ -41,13 +42,13 @@ final class TranslationObserver
     private function processTranslatableFields(Model $model): void
     {
         $translatableFields = $this->getTranslatableFields($model);
-        
+
         if (empty($translatableFields)) {
             return;
         }
 
         foreach ($translatableFields as $field) {
-            if ($model->isDirty($field) && !empty($model->$field)) {
+            if ($model->isDirty($field) && ! empty($model->$field)) {
                 $this->createTranslationEntry($model, $field);
             }
         }
@@ -59,10 +60,10 @@ final class TranslationObserver
             $value = $model->$field;
             $modelName = strtolower(class_basename($model));
             $key = $this->translationService->generateTranslationKey($value, $modelName);
-            
+
             // Create translation for all supported locales
             $translations = [
-                config('app.locale', 'lt') => $value
+                config('app.locale', 'lt') => $value,
             ];
 
             $this->translationService->addTranslation($key, $translations);
@@ -72,27 +73,32 @@ final class TranslationObserver
                 $model->{$field . '_translation_key'} = $key;
             }
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Failed to create translation entry', [
                 'model' => get_class($model),
                 'field' => $field,
                 'value' => $model->$field ?? null,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
         }
     }
 
     private function getTranslatableFields(Model $model): array
     {
-        // Check if model has translatable fields defined
-        if (property_exists($model, 'translatableFields')) {
-            return $model->translatableFields;
+        // Check if model has getTranslatableFields method (from HasTranslations trait)
+        if (method_exists($model, 'getTranslatableFields')) {
+            return $model->getTranslatableFields();
+        }
+
+        // Check if model has translatable fields property defined
+        if (property_exists($model, 'translatableFields') && is_array($model->translatableFields)) {
+            return array_intersect($model->translatableFields, $model->getFillable());
         }
 
         // Default translatable fields for common models
         $defaultFields = [
             'name', 'title', 'description', 'content', 'summary',
-            'meta_title', 'meta_description', 'alt_text', 'caption'
+            'meta_title', 'meta_description', 'alt_text', 'caption',
         ];
 
         // Return only fields that exist in the model's fillable array
@@ -102,13 +108,13 @@ final class TranslationObserver
     private function logTranslationActivity(Model $model, string $action): void
     {
         $translatableFields = $this->getTranslatableFields($model);
-        
-        if (!empty($translatableFields)) {
+
+        if (! empty($translatableFields)) {
             Log::info('Translation hook processed', [
-                'model' => get_class($model),
-                'action' => $action,
-                'id' => $model->getKey(),
-                'translatable_fields' => $translatableFields
+                'model'               => get_class($model),
+                'action'              => $action,
+                'id'                  => $model->getKey(),
+                'translatable_fields' => $translatableFields,
             ]);
         }
     }

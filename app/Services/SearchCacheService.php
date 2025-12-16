@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Support\Cache\CacheTags;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Redis;
 use Log;
@@ -13,22 +14,47 @@ final class SearchCacheService
 {
     private const CACHE_PREFIX = 'search_cache:';
 
-    private const DEFAULT_TTL = 3600; // 1 hour
-
-    private const POPULAR_TTL = 7200; // 2 hours
-
-    private const RECENT_TTL = 1800; // 30 minutes
-
     private const ANALYTICS_TTL = 86400; // 24 hours
 
+    private function getDefaultTTL(): int
+    {
+        return (int) config('search.cache.default_ttl', 3600);
+    }
+
+    private function getPopularTTL(): int
+    {
+        return (int) config('search.cache.popular_ttl', 7200);
+    }
+
+    private function getRecentTTL(): int
+    {
+        return (int) config('search.cache.recent_ttl', 1800);
+    }
+
+    private function isCacheEnabled(): bool
+    {
+        return (bool) config('search.cache.enabled', true);
+    }
+
+    private function areTagsEnabled(): bool
+    {
+        return (bool) config('search.cache.tags.enabled', true);
+    }
+
     /**
-     * Cache search results with intelligent TTL
+     * Cache search results with intelligent TTL and proper tagging
      */
     public function cacheSearchResults(string $key, array $results, string $query, array $context = []): void
     {
+        // Skip caching if disabled
+        if (! $this->isCacheEnabled()) {
+            return;
+        }
+
         try {
             $ttl = $this->calculateIntelligentTTL($query, $results, $context);
             $cacheKey = self::CACHE_PREFIX . $key;
+            $tags = $this->generateCacheTags($context, $results);
 
             $cacheData = [
                 'results'      => $results,
@@ -36,16 +62,22 @@ final class SearchCacheService
                 'context'      => $context,
                 'cached_at'    => now()->toISOString(),
                 'ttl'          => $ttl,
-                'result_count' => count($results),
+                'result_count' => count($results['data'] ?? $results),
+                'tags'         => $tags,
             ];
 
-            Cache::put($cacheKey, $cacheData, $ttl);
+            // Use tag-aware caching when supported by the cache driver and enabled
+            if ($this->supportsCacheTags() && $this->areTagsEnabled()) {
+                Cache::tags($tags)->put($cacheKey, $cacheData, $ttl);
+            } else {
+                Cache::put($cacheKey, $cacheData, $ttl);
+            }
 
             // Store in Redis for advanced operations
             $this->storeInRedis($cacheKey, $cacheData, $ttl);
 
             // Update cache statistics
-            $this->updateCacheStatistics($key, $query, count($results));
+            $this->updateCacheStatistics($key, $query, count($results['data'] ?? $results));
 
         } catch (Throwable $e) {
             // We intentionally swallow any cache backend issues so the search response
@@ -75,6 +107,25 @@ final class SearchCacheService
             Log::warning('Search cache retrieval failed: ' . $e->getMessage());
 
             return null;
+        }
+    }
+
+    /**
+     * Clear cache by tags
+     */
+    public function clearCacheByTags(array $tags): void
+    {
+        try {
+            if ($this->supportsCacheTags()) {
+                Cache::tags($tags)->flush();
+                Log::info('Cache cleared by tags', ['tags' => $tags]);
+            } else {
+                // Fallback: clear all search cache when tags not supported
+                $this->clearCacheByPattern('*');
+                Log::info('Cache cleared by pattern (tags not supported)', ['tags' => $tags]);
+            }
+        } catch (Throwable $e) {
+            Log::warning('Cache tag clearing failed: ' . $e->getMessage(), ['tags' => $tags]);
         }
     }
 
@@ -175,36 +226,123 @@ final class SearchCacheService
     }
 
     /**
+     * Generate cache tags for search results based on context and results
+     */
+    private function generateCacheTags(array $context, array $results): array
+    {
+        $tags = [];
+
+        // Include locale tag if enabled in config
+        if (config('search.cache.tags.include_locale', true)) {
+            $locale = $context['locale'] ?? app()->getLocale();
+            $tags[] = CacheTags::locale($locale);
+        }
+
+        // Include catalog tags if enabled in config
+        if (config('search.cache.tags.include_catalog', true)) {
+            $resultData = $results['data'] ?? $results;
+
+            if (is_array($resultData)) {
+                $hasProducts = false;
+                $hasBrands = false;
+                $hasCategories = false;
+                $hasCollections = false;
+
+                // Check for different result types in flat results
+                foreach ($resultData as $result) {
+                    if (! is_array($result)) {
+                        continue;
+                    }
+
+                    $type = $result['type'] ?? null;
+                    if ($type === 'product') {
+                        $hasProducts = true;
+                    } elseif ($type === 'brand') {
+                        $hasBrands = true;
+                    } elseif ($type === 'category') {
+                        $hasCategories = true;
+                    } elseif ($type === 'collection') {
+                        $hasCollections = true;
+                    }
+                }
+
+                // Check for aggregated results structure
+                if (isset($resultData['products']) || isset($resultData['categories']) || isset($resultData['brands'])) {
+                    if (isset($resultData['products'])) {
+                        $hasProducts = true;
+                    }
+                    if (isset($resultData['categories'])) {
+                        $hasCategories = true;
+                    }
+                    if (isset($resultData['brands'])) {
+                        $hasBrands = true;
+                    }
+                }
+
+                // Add appropriate catalog tags
+                if ($hasProducts) {
+                    $tags[] = CacheTags::products();
+                }
+                if ($hasBrands) {
+                    $tags[] = CacheTags::brands();
+                }
+                if ($hasCategories) {
+                    $tags[] = CacheTags::categories();
+                }
+                if ($hasCollections) {
+                    $tags[] = CacheTags::collections();
+                }
+            }
+        }
+
+        // Add search-specific tag for bulk invalidation
+        $tags[] = 'search';
+
+        return array_unique($tags);
+    }
+
+    /**
+     * Check if the current cache driver supports tags
+     */
+    private function supportsCacheTags(): bool
+    {
+        $driver = config('cache.default');
+
+        // Redis and Memcached support tags, database and file do not
+        return in_array($driver, ['redis', 'memcached'], true);
+    }
+
+    /**
      * Calculate intelligent TTL based on query characteristics
      */
     private function calculateIntelligentTTL(string $query, array $results, array $context): int
     {
-        $baseTTL = self::DEFAULT_TTL;
+        $baseTTL = $this->getDefaultTTL();
 
         // Popular queries get longer TTL
         if ($this->isPopularQuery($query)) {
-            $baseTTL = self::POPULAR_TTL;
+            $baseTTL = $this->getPopularTTL();
         }
 
         // Recent queries get shorter TTL
         if ($this->isRecentQuery($query)) {
-            $baseTTL = self::RECENT_TTL;
+            $baseTTL = $this->getRecentTTL();
         }
 
         // Adjust based on result count
-        $resultCount = count($results);
+        $resultCount = count($results['data'] ?? $results);
         if ($resultCount === 0) {
-            $baseTTL = $baseTTL / 2; // Shorter TTL for no results
+            $baseTTL = (int) ($baseTTL / 2); // Shorter TTL for no results
         } elseif ($resultCount > 50) {
-            $baseTTL = $baseTTL * 1.5; // Longer TTL for many results
+            $baseTTL = (int) ($baseTTL * 1.5); // Longer TTL for many results
         }
 
         // Adjust based on context
         if (isset($context['user_id'])) {
-            $baseTTL = $baseTTL * 0.8; // Shorter TTL for personalized results
+            $baseTTL = (int) ($baseTTL * 0.8); // Shorter TTL for personalized results
         }
 
-        return (int) $baseTTL;
+        return $baseTTL;
     }
 
     /**

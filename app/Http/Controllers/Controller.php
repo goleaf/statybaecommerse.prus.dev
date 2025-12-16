@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Request;
 
 /**
  * Controller
@@ -19,22 +17,13 @@ abstract class Controller
 
     /**
      * Initialize the class instance with required dependencies.
+     *
+     * Note: Locale resolution is now handled centrally by SetLocale middleware,
+     * removing duplicate locale resolution from individual controllers.
      */
     public function __construct()
     {
-        $this->applyPreferredLocale();
-    }
-
-    /**
-     * Handle applyPreferredLocale functionality with proper error handling.
-     */
-    protected function applyPreferredLocale(): void
-    {
-        $supported = collect(is_array(config('app.supported_locales')) ? config('app.supported_locales') : explode(',', (string) config('app.supported_locales', 'en')))->map(fn ($l) => trim((string) $l))->filter()->values();
-        $preferred = ((Request::user()?->preferred_locale ?: Request::route('locale')) ?: Request::get('locale')) ?: substr((string) Request::header('Accept-Language', ''), 0, 2);
-        if (is_string($preferred) && $preferred !== '' && $supported->contains($preferred)) {
-            App::setLocale($preferred);
-        }
+        // Locale resolution removed - handled by SetLocale middleware
     }
 
     /**

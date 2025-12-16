@@ -46,8 +46,16 @@ final class Collection extends Model implements HasMedia, TranslatableRecord
 {
     use HasFactory, SoftDeletes;
     use HasTranslations;
-    use OrdersByName;
     use InteractsWithMedia;
+    use OrdersByName;
+
+    public const SCOPE_COLUMN_HINTS = [
+        'is_active'    => true,
+        'is_visible'   => true,
+        'is_enabled'   => false,
+        'status'       => false,
+        'published_at' => false,
+    ];
 
     protected $table = 'collections';
 

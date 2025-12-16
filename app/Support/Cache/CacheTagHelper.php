@@ -27,6 +27,8 @@ final class CacheTagHelper
 
     public const COLLECTIONS = 'collections';
 
+    public const NAVIGATION = 'navigation';
+
     public const DASHBOARDS = 'dashboard';
 
     public const SLIDERS = 'sliders';
@@ -61,6 +63,14 @@ final class CacheTagHelper
     public static function collections(): array
     {
         return [CacheTags::collections()];
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    public static function navigation(): array
+    {
+        return [CacheTags::navigation()];
     }
 
     /**

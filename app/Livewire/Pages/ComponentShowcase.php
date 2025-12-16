@@ -18,6 +18,7 @@ use Illuminate\Support\Collection;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
+
 use function route;
 
 /**
@@ -79,14 +80,8 @@ final class ComponentShowcase extends Component
             now()->addMinutes(5),
             static function () use ($locale): Collection {
                 return Product::query()
-                    ->with([
-                        'brand',
-                        'media',
-                        'categories',
-                        'translations' => static fn ($query) => $query->where('locale', $locale),
-                        'brand.translations' => static fn ($query) => $query->where('locale', $locale),
-                        'categories.translations' => static fn ($query) => $query->where('locale', $locale),
-                    ])
+                    ->forProductList()
+                    ->withListRelations()
                     ->withAvg(['reviews as average_rating' => static fn ($query) => $query->where('is_approved', true)], 'rating')
                     ->withCount(['reviews' => static fn ($query) => $query->where('is_approved', true)])
                     ->where('is_visible', true)
@@ -190,10 +185,10 @@ final class ComponentShowcase extends Component
                             : null;
 
                         return [
-                            'id'       => (int) $brand->getKey(),
-                            'name'     => $name,
-                            'slug'     => $slug,
-                            'url'      => route('localized.brands.show', [
+                            'id'   => (int) $brand->getKey(),
+                            'name' => $name,
+                            'slug' => $slug,
+                            'url'  => route('localized.brands.show', [
                                 'locale' => $locale,
                                 'brand'  => $slug !== '' ? $slug : $brand->getKey(),
                             ]),

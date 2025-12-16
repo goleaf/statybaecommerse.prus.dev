@@ -130,10 +130,11 @@ final class CacheInvalidationService
      */
     public function flushBrands(): void
     {
-        // Featured brand carousels live in storefront sections, so share the home tag.
+        // Featured brand carousels live in storefront sections and navigation menus.
         $brandTags = CacheTagHelper::merge(
             CacheTagHelper::brands(),
-            [CacheKeys::homeTag()]
+            [CacheKeys::homeTag()],
+            [CacheKeys::navigationTag()]
         );
 
         $this->flushTags($brandTags);
@@ -172,10 +173,11 @@ final class CacheInvalidationService
      */
     public function flushCollections(): void
     {
-        // Collections feed the home page carousels; merge with the shared home tag.
+        // Collections feed the home page carousels and navigation menus.
         $collectionTags = CacheTagHelper::merge(
             CacheTagHelper::collections(),
-            [CacheKeys::homeTag()]
+            [CacheKeys::homeTag()],
+            [CacheKeys::navigationTag()]
         );
 
         $this->flushTags($collectionTags);

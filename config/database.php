@@ -22,6 +22,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Query Monitoring
+    |--------------------------------------------------------------------------
+    |
+    | Configure query monitoring thresholds for detecting N+1 patterns
+    | and performance issues during development.
+    |
+    */
+
+    'query_threshold' => env('DB_QUERY_THRESHOLD', 20),
+
+    /*
+    |--------------------------------------------------------------------------
     | Database Connections
     |--------------------------------------------------------------------------
     |

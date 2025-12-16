@@ -18,10 +18,10 @@ final class MenuRepository
         $resolvedLocale = $locale ?? app()->getLocale();
         $cacheKey = CacheKeys::menuCollectionKey($location, $resolvedLocale);
 
-        // Tag navigation menus with category + locale identifiers so dashboard
+        // Tag navigation menus with navigation + locale identifiers so dashboard
         // invalidation routines can flush the cache without touching unrelated data.
         $tags = CacheTagHelper::merge(
-            CacheTagHelper::categories(),
+            CacheTagHelper::navigation(),
             CacheTagHelper::locale($resolvedLocale)
         );
 
@@ -39,7 +39,7 @@ final class MenuRepository
         $cacheKey = CacheKeys::menuByKey($key, $resolvedLocale);
 
         $tags = CacheTagHelper::merge(
-            CacheTagHelper::categories(),
+            CacheTagHelper::navigation(),
             CacheTagHelper::locale($resolvedLocale)
         );
 
@@ -65,7 +65,7 @@ final class MenuRepository
         $cacheKey = CacheKeys::menuByLocation($location, $resolvedLocale);
 
         $tags = CacheTagHelper::merge(
-            CacheTagHelper::categories(),
+            CacheTagHelper::navigation(),
             CacheTagHelper::locale($resolvedLocale)
         );
 

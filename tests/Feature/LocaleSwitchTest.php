@@ -35,6 +35,11 @@ it('feature: persists the selected locale and updates the user preference', func
 });
 
 it('feature: falls back to the configured fallback locale when an unsupported locale is provided', function (): void {
+    // Enable SetLocale middleware for this test
+    $this->withMiddleware([
+        \App\Http\Middleware\SetLocale::class,
+    ]);
+
     Session::put('locale', 'zz');
     Session::put('app.locale', 'zz');
 

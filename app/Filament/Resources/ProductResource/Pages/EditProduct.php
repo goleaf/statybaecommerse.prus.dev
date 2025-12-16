@@ -11,6 +11,7 @@ use App\Support\Html\HtmlSanitizer;
 use Filament\Actions;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 final class EditProduct extends EditRecord
@@ -115,11 +116,13 @@ final class EditProduct extends EditRecord
         return $data;
     }
 
-    protected function afterSave(): void
+    protected function handleRecordUpdate(Model $record, array $data): Model
     {
-        $this->syncTranslationRecords($this->record, $this->languageTabsPayload);
+        $record->update($data);
 
-        parent::afterSave();
+        $this->syncTranslationRecords($record, $this->languageTabsPayload);
+
+        return $record;
     }
 
     /**

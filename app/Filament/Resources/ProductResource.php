@@ -388,7 +388,7 @@ final class ProductResource extends Resource implements DefinesExportColumns
                     ->size(50),
                 BadgeableColumn::make('name')
                     ->label(__('products.fields.name'))
-                    ->searchable(['name', 'sku', 'brand.name'])
+                    ->searchable(['name', 'sku'])
                     ->sortable()
                     ->limit(50)
                     ->asPills()

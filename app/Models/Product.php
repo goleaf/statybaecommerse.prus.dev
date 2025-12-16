@@ -1146,6 +1146,72 @@ final class Product extends Model implements HasMedia, TranslatableRecord
     }
 
     /**
+     * Scope for optimized product list queries with selective field loading.
+     * Only loads fields required by ProductListItemData to reduce memory usage and transfer time.
+     */
+    public function scopeForProductList(Builder $query): Builder
+    {
+        return $query->select([
+            'products.id',
+            'products.name',
+            'products.slug',
+            'products.short_description', // Used for short description, NOT description
+            'products.price',
+            'products.sale_price',
+            'products.compare_price',
+            'products.stock_quantity',
+            'products.brand_id',
+            'products.created_at', // May be needed for sorting
+            'products.updated_at', // May be needed for sorting
+            'products.published_at', // May be needed for sorting
+            'products.is_visible', // Needed for filtering
+            'products.is_featured', // May be needed for sorting
+        ]);
+    }
+
+    /**
+     * Scope for optimized product list relations with selective field loading.
+     * Only loads relation fields required by ProductListItemData.
+     */
+    public function scopeWithListRelations(Builder $query): Builder
+    {
+        $locale = app()->getLocale();
+
+        return $query->with([
+            // Load only essential brand fields
+            'brand:id,name,slug',
+
+            // Load brand translations for current locale only
+            'brand.translations' => function ($q) use ($locale): void {
+                $q->select('brand_id', 'locale', 'name', 'slug')
+                    ->where('locale', $locale);
+            },
+
+            // Load only essential category fields
+            'categories:id,name,slug',
+
+            // Load category translations for current locale only
+            'categories.translations' => function ($q) use ($locale): void {
+                $q->select('category_id', 'locale', 'name', 'slug')
+                    ->where('locale', $locale);
+            },
+
+            // Load product translations for current locale only
+            'translations' => function ($q) use ($locale): void {
+                $q->select('product_id', 'locale', 'name', 'slug', 'short_description')
+                    ->where('locale', $locale);
+            },
+
+            // Load only essential media fields for images
+            'media' => function ($q): void {
+                $q->select('id', 'model_id', 'model_type', 'name', 'file_name', 'disk', 'conversions_disk', 'size', 'mime_type', 'manipulations', 'custom_properties', 'generated_conversions', 'responsive_images', 'order_column', 'created_at', 'updated_at')
+                    ->where('collection_name', 'images')
+                    ->orderBy('order_column');
+            },
+        ]);
+    }
+
+    /**
      * Handle scopeByBrand functionality with proper error handling.
      *
      * @param mixed $query
@@ -1970,6 +2036,26 @@ final class Product extends Model implements HasMedia, TranslatableRecord
     public function getFormattedComparePriceAttribute(): string
     {
         return $this->getFormattedComparePrice();
+    }
+
+    /**
+     * Get translated field value for the specified locale.
+     * Uses the eager-loaded translations relationship to avoid N+1 queries.
+     */
+    public function trans(string $field, ?string $locale = null): mixed
+    {
+        $locale ??= app()->getLocale();
+
+        // If translations are loaded, use them to avoid additional queries
+        if ($this->relationLoaded('translations')) {
+            $translation = $this->translations->firstWhere('locale', $locale);
+            if ($translation && isset($translation->{$field})) {
+                return $translation->{$field};
+            }
+        }
+
+        // Fallback to the base field value
+        return $this->{$field} ?? null;
     }
 
     /**

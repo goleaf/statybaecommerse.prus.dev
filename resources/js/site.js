@@ -1,2 +1,2 @@
 import './bootstrap';
-import '../../vendor/shopper/framework/resources/js/index.js';
+// Using native Filament and Livewire for frontend functionality

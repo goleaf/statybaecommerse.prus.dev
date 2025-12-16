@@ -8,6 +8,7 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Collection;
 use App\Models\Product;
+use App\Services\FacetCountingService;
 use App\Support\Cache\CacheKeys;
 use App\Support\Cache\CacheTags;
 use App\Support\Cache\TagAwareCache;
@@ -44,6 +45,12 @@ use Livewire\Component;
 final class Index extends Component implements HasSchemas
 {
     use InteractsWithSchemas;
+
+    public function __construct(
+        private readonly FacetCountingService $facetCountingService
+    ) {
+        parent::__construct();
+    }
 
     #[Url(except: '')]
     public string $search = '';
@@ -86,106 +93,12 @@ final class Index extends Component implements HasSchemas
 
     public bool $sidebarOpen = false;
 
-    public function boot(): void
-    {
-        // Ensure locale is set from route parameter on every request (including AJAX)
-        // This must happen before any translations are used
-        $this->ensureLocale();
-    }
-
     public function mount(): void
     {
-        // Ensure locale is set from route parameter
-        $this->ensureLocale();
-
         // Normalize legacy single brand parameter to the modern multi-select input.
         if (property_exists($this, 'brandId') && $this->brandId) {
             $this->selectedBrandIds = [(int) $this->brandId];
         }
-    }
-
-    /**
-     * Ensure locale is set from route parameter.
-     * This mirrors the SetLocale middleware logic to ensure locale is set correctly
-     * for both initial page load and Livewire AJAX requests.
-     */
-    private function ensureLocale(): void
-    {
-        $request = request();
-        
-        // Get supported locales (config can be string or array)
-        $supportedConfig = config('app.supported_locales', 'lt,en');
-        $supportedLocales = [];
-        if (is_array($supportedConfig)) {
-            $supportedLocales = array_filter($supportedConfig, static fn ($locale): bool => is_string($locale) && $locale !== '');
-        } elseif (is_string($supportedConfig)) {
-            $supportedLocales = array_filter(
-                array_map(
-                    static fn (string $locale): string => trim($locale),
-                    explode(',', $supportedConfig)
-                ),
-                static fn (string $locale): bool => $locale !== ''
-            );
-        }
-        $supportedLocales = array_values(array_map(
-            static fn (string $locale): string => trim($locale),
-            $supportedLocales
-        ));
-        
-        // Prefer locale from route parameter if present (e.g., /{locale}/...)
-        $routeLocale = $request->route('locale');
-        // Allow explicit override via query (?locale=xx)
-        $queryLocale = $request->query('locale');
-        
-        // Get locale from query, header, session, cookie, or user preference
-        $defaultLocaleConfig = config('app.locale', 'lt');
-        $defaultLocale = is_string($defaultLocaleConfig) && $defaultLocaleConfig !== ''
-            ? $defaultLocaleConfig
-            : 'lt';
-        
-        $candidateLocales = array_values(array_filter([
-            $routeLocale,
-            $queryLocale,
-            session('locale'),
-            session('app.locale'),
-            $request->cookie('app_locale'),
-            auth()->check() ? (auth()->user()->preferred_locale ?? null) : null,
-        ], static fn ($candidate): bool => is_string($candidate) && $candidate !== ''));
-        
-        $locale = $defaultLocale;
-        
-        foreach ($candidateLocales as $candidate) {
-            if (in_array($candidate, $supportedLocales, true)) {
-                $locale = $candidate;
-                break;
-            }
-        }
-        
-        if (!in_array($locale, $supportedLocales, true)) {
-            $fallbackLocaleConfig = config('app.fallback_locale');
-            $fallbackLocale = is_string($fallbackLocaleConfig) && $fallbackLocaleConfig !== ''
-                ? $fallbackLocaleConfig
-                : $defaultLocale;
-            
-            if (in_array($fallbackLocale, $supportedLocales, true)) {
-                $locale = $fallbackLocale;
-            } elseif (in_array($defaultLocale, $supportedLocales, true)) {
-                $locale = $defaultLocale;
-            } elseif ($supportedLocales !== []) {
-                $locale = $supportedLocales[0];
-            } else {
-                $locale = $defaultLocale;
-            }
-        }
-        
-        // Set application locale (this is critical for translations to work)
-        app()->setLocale($locale);
-        app()->instance('request_locale', $locale);
-        
-        // Store in session and cookie for persistence (mirror middleware behavior)
-        session()->put('locale', $locale);
-        session()->put('app.locale', $locale);
-        cookie()->queue(cookie('app_locale', $locale, 60 * 24 * 30));
     }
 
     public function form(Schema $schema): Schema
@@ -301,26 +214,9 @@ final class Index extends Component implements HasSchemas
             CacheKeys::categoryIndexFacetBrands($locale, $filters),
             now()->addSeconds(180),
             function (): array {
-                $brands = Brand::query()
-                    ->where('is_enabled', true)
-                    ->orderBy('name')
-                    ->get(['id', 'name']);
+                $this->facetCountingService->resetQueryCount();
 
-                $countsByBrand = [];
-                foreach ($brands as $brand) {
-                    $countsByBrand[$brand->id] = $this->baseProductQuery()
-                        ->where('brand_id', $brand->id)
-                        ->count();
-                }
-
-                return $brands
-                    ->map(static fn (Brand $brand): array => [
-                        'id'    => (int) $brand->id,
-                        'name'  => (string) $brand->name,
-                        'count' => (int) ($countsByBrand[$brand->id] ?? 0),
-                    ])
-                    ->values()
-                    ->all();
+                return $this->facetCountingService->getBrandFacets($this->baseProductQuery());
             },
             $this->tagsForCategoryIndex([
                 CacheTags::brands(),
@@ -342,26 +238,9 @@ final class Index extends Component implements HasSchemas
             CacheKeys::categoryIndexFacetCollections($locale, $filters),
             now()->addSeconds(180),
             function (): array {
-                $collections = Collection::query()
-                    ->visible()
-                    ->orderBy('name')
-                    ->get(['id', 'name']);
+                $this->facetCountingService->resetQueryCount();
 
-                $countsByCollection = [];
-                foreach ($collections as $collection) {
-                    $countsByCollection[$collection->id] = $this->baseProductQuery()
-                        ->whereHas('collections', fn (Builder $q): Builder => $q->where('collections.id', $collection->id))
-                        ->count();
-                }
-
-                return $collections
-                    ->map(static fn (Collection $collection): array => [
-                        'id'    => (int) $collection->id,
-                        'name'  => (string) $collection->name,
-                        'count' => (int) ($countsByCollection[$collection->id] ?? 0),
-                    ])
-                    ->values()
-                    ->all();
+                return $this->facetCountingService->getCollectionFacets($this->baseProductQuery());
             },
             $this->tagsForCategoryIndex([
                 CacheTags::collections(),
@@ -383,26 +262,9 @@ final class Index extends Component implements HasSchemas
             CacheKeys::categoryIndexFacetCategories($locale, $filters),
             now()->addSeconds(180),
             function (): array {
-                $categories = Category::query()
-                    ->visible()
-                    ->orderBy('name')
-                    ->get(['id', 'name']);
+                $this->facetCountingService->resetQueryCount();
 
-                $countsByCategory = [];
-                foreach ($categories as $category) {
-                    $countsByCategory[$category->id] = $this->baseProductQuery()
-                        ->whereHas('categories', fn (Builder $q): Builder => $q->where('categories.id', $category->id))
-                        ->count();
-                }
-
-                return $categories
-                    ->map(static fn (Category $category): array => [
-                        'id'    => (int) $category->id,
-                        'name'  => (string) $category->name,
-                        'count' => (int) ($countsByCategory[$category->id] ?? 0),
-                    ])
-                    ->values()
-                    ->all();
+                return $this->facetCountingService->getCategoryFacets($this->baseProductQuery());
             },
             $this->tagsForCategoryIndex([
                 CacheTags::categories(),

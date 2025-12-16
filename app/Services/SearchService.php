@@ -8,7 +8,11 @@ use App\Data\SearchQueryData;
 use App\Repositories\Search\BrandSearchRepository;
 use App\Repositories\Search\CategorySearchRepository;
 use App\Repositories\Search\ProductSearchRepository;
+use App\Services\Search\DatabaseSearchOptimizer;
+use App\Services\Search\ScoutSearchEngine;
 use Illuminate\Support\Str;
+use RuntimeException;
+use Throwable;
 
 final class SearchService
 {
@@ -23,7 +27,9 @@ final class SearchService
         private readonly CategorySearchRepository $categoryRepository,
         private readonly BrandSearchRepository $brandRepository,
         private readonly SearchRankingService $rankingService,
-        private readonly SearchCacheService $cacheService
+        private readonly SearchCacheService $cacheService,
+        private readonly ScoutSearchEngine $scoutSearchEngine,
+        private readonly DatabaseSearchOptimizer $databaseOptimizer
     ) {}
 
     /**
@@ -163,6 +169,11 @@ final class SearchService
      */
     private function collectBucketsUsingDatabase(SearchQueryData $queryData): array
     {
+        // Apply database-specific optimizations for production
+        if (app()->environment('production')) {
+            $this->databaseOptimizer->optimizeForProduction();
+        }
+
         $limits = $this->resolveBucketLimits($queryData->perPage());
 
         $buckets = [];
@@ -230,7 +241,79 @@ final class SearchService
 
     private function shouldUseScout(): bool
     {
-        return config('search.driver') === 'scout' && config('search.scout.enabled');
+        // Check if Scout is configured as the search driver
+        if (config('search.driver') !== 'scout') {
+            return false;
+        }
+
+        // Check if Scout is explicitly enabled (check both new and legacy config)
+        $scoutEnabled = config('search.drivers.scout.enabled', config('search.scout.enabled', false));
+        if (! $scoutEnabled) {
+            return false;
+        }
+
+        // Verify Scout is properly configured (has a driver)
+        $scoutDriver = config('scout.driver');
+        if (empty($scoutDriver) || $scoutDriver === 'null') {
+            logger()->info('Scout driver not configured, using database fallback', [
+                'configured_driver' => $scoutDriver,
+            ]);
+
+            return false;
+        }
+
+        // Additional check for production environments - ensure Scout service is available
+        if (app()->environment('production')) {
+            try {
+                // Test if Scout is actually working by checking if we can create a search builder
+                $testBuilder = \App\Models\Product::search('test');
+                if ($testBuilder === null) {
+                    throw new RuntimeException('Scout search builder returned null');
+                }
+
+                // Additional validation: check if Scout engine is responsive
+                $this->validateScoutEngine();
+
+                return true;
+            } catch (Throwable $e) {
+                // Check if fallback to database is enabled
+                $fallbackEnabled = config('search.drivers.scout.fallback', true);
+
+                if ($fallbackEnabled) {
+                    logger()->warning('Scout search engine unavailable, falling back to database', [
+                        'error'            => $e->getMessage(),
+                        'driver'           => $scoutDriver,
+                        'fallback_enabled' => true,
+                    ]);
+
+                    return false;
+                } else {
+                    // If fallback is disabled, re-throw the exception
+                    logger()->error('Scout search engine unavailable and fallback disabled', [
+                        'error'            => $e->getMessage(),
+                        'driver'           => $scoutDriver,
+                        'fallback_enabled' => false,
+                    ]);
+                    throw $e;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Validate that the Scout search engine is responsive.
+     */
+    private function validateScoutEngine(): void
+    {
+        // Perform a lightweight test search to ensure Scout is working
+        try {
+            $testResults = \App\Models\Product::search('__scout_health_check__')->take(1)->get();
+            // If we get here without exception, Scout is working
+        } catch (Throwable $e) {
+            throw new RuntimeException('Scout engine validation failed: ' . $e->getMessage(), 0, $e);
+        }
     }
 
     private function blockedAggregatedPayload(SearchQueryData $queryData, ?string $originalQuery = null): array

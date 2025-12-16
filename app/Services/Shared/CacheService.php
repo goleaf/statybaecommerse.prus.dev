@@ -6,9 +6,13 @@ namespace App\Services\Shared;
 
 use App\Services\CacheInvalidationService;
 use App\Support\Cache\CacheTagHelper;
+use App\Support\Cache\SerializationOptimizer;
 use Closure;
 use DateInterval;
 use Illuminate\Cache\TaggableStore;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 
 /**
@@ -206,4 +210,76 @@ final class CacheService
      * @param  Closure(): TCacheValue $callback
      * @return TCacheValue
      */
+    private function rememberWithTagsHelper(array $tags, string $key, int|DateInterval $ttl, Closure $callback): mixed
+    {
+        if ($tags !== [] && $this->supportsTags) {
+            return Cache::tags($tags)->remember($key, $ttl, $callback);
+        }
+
+        return Cache::remember($key, $ttl, $callback);
+    }
+
+    /**
+     * Cache a paginated result with optimized serialization.
+     *
+     * @param  array<int, string> $tags
+     */
+    public function rememberPaginator(string $key, Closure $callback, ?int $ttl = null, array $tags = []): LengthAwarePaginator
+    {
+        $cacheKey = "paginator:{$key}";
+        
+        $cached = $this->supportsTags && $tags !== []
+            ? Cache::tags($tags)->get($cacheKey)
+            : Cache::get($cacheKey);
+
+        if ($cached !== null && SerializationOptimizer::isOptimized($cached)) {
+            return SerializationOptimizer::restorePaginator($cached);
+        }
+
+        $result = $callback();
+        
+        if ($result instanceof LengthAwarePaginator) {
+            $optimized = SerializationOptimizer::optimizePaginator($result);
+            
+            if ($this->supportsTags && $tags !== []) {
+                Cache::tags($tags)->put($cacheKey, $optimized, $ttl ?? self::DEFAULT_TTL);
+            } else {
+                Cache::put($cacheKey, $optimized, $ttl ?? self::DEFAULT_TTL);
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Cache a collection with optimized serialization.
+     *
+     * @param  array<int, string> $tags
+     */
+    public function rememberCollection(string $key, Closure $callback, ?int $ttl = null, array $tags = []): Collection|EloquentCollection
+    {
+        $cacheKey = "collection:{$key}";
+        
+        $cached = $this->supportsTags && $tags !== []
+            ? Cache::tags($tags)->get($cacheKey)
+            : Cache::get($cacheKey);
+
+        if ($cached !== null && is_array($cached)) {
+            return collect($cached);
+        }
+
+        $result = $callback();
+        
+        if ($result instanceof Collection || $result instanceof EloquentCollection) {
+            $optimized = SerializationOptimizer::optimizeCollection($result);
+            
+            if ($this->supportsTags && $tags !== []) {
+                Cache::tags($tags)->put($cacheKey, $optimized, $ttl ?? self::DEFAULT_TTL);
+            } else {
+                Cache::put($cacheKey, $optimized, $ttl ?? self::DEFAULT_TTL);
+            }
+        }
+
+        return $result;
+    }
 }

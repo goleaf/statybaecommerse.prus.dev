@@ -69,6 +69,14 @@ final class Brand extends Model implements HasMedia, TranslatableRecord
     use Searchable;
     use SoftDeletes;
 
+    public const SCOPE_COLUMN_HINTS = [
+        'is_active'    => true,
+        'is_visible'   => false,
+        'is_enabled'   => true,
+        'status'       => false,
+        'published_at' => false,
+    ];
+
     /**
      * Allow the admin panel to mass assign all primary profile fields, including premium flags and social links.
      *
@@ -129,7 +137,7 @@ final class Brand extends Model implements HasMedia, TranslatableRecord
             'is_featured' => 'boolean',
             'is_premium'  => 'boolean',
             // Normalise manual ordering values so table filters and JSON responses stay numeric.
-            'sort_order'  => 'integer',
+            'sort_order' => 'integer',
         ];
     }
 
@@ -825,10 +833,31 @@ final class Brand extends Model implements HasMedia, TranslatableRecord
                     ->filter()
                     ->values()
                     ->all();
+
                 // Return explicitly keyed JSON so Eloquent persists the sanitised payload consistently.
                 return ['social_links' => json_encode($normalized)];
             },
         );
+    }
+
+    /**
+     * Get translated field value for the specified locale.
+     * Uses the eager-loaded translations relationship to avoid N+1 queries.
+     */
+    public function trans(string $field, ?string $locale = null): mixed
+    {
+        $locale ??= app()->getLocale();
+
+        // If translations are loaded, use them to avoid additional queries
+        if ($this->relationLoaded('translations')) {
+            $translation = $this->translations->firstWhere('locale', $locale);
+            if ($translation && isset($translation->{$field})) {
+                return $translation->{$field};
+            }
+        }
+
+        // Fallback to the base field value
+        return $this->{$field} ?? null;
     }
 
     /**

@@ -42,7 +42,7 @@
 @endsection
 
 <?php
-// Legacy Shopper\Core\Models\Order removed - using App\Models\Order
+// Using App\Models\Order for order management
 
 use function Livewire\Volt\{mount, state, layout};
 
