@@ -85,6 +85,7 @@ return [
         'sanitize_paths'               => env('EXCEPTION_SANITIZE_PATHS', true),
         'rate_limit_enabled'           => env('EXCEPTION_RATE_LIMIT_ENABLED', true),
         'max_boot_errors_per_minute'   => env('EXCEPTION_MAX_BOOT_ERRORS_PER_MINUTE', 10),
+        'rate_limit_cleanup_threshold' => env('EXCEPTION_RATE_LIMIT_CLEANUP_THRESHOLD', 60),
         'redact_sensitive_data'        => env('EXCEPTION_REDACT_SENSITIVE_DATA', true),
         'log_request_id'               => env('EXCEPTION_LOG_REQUEST_ID', true),
         'prevent_log_injection'        => env('EXCEPTION_PREVENT_LOG_INJECTION', true),

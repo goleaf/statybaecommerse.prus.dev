@@ -10,7 +10,7 @@ use Tests\TestCase;
 
 /**
  * Security-focused tests for the Exception Handler.
- * 
+ *
  * Tests information disclosure, injection vulnerabilities, and security controls.
  */
 class ExceptionHandlerSecurityTest extends TestCase
@@ -39,10 +39,10 @@ class ExceptionHandlerSecurityTest extends TestCase
                 // Ensure sensitive data patterns are not logged
                 $message = $context['message'] ?? '';
                 $actionableMessage = $context['actionable_message'] ?? '';
-                
+
                 // Should not contain potential secrets
-                return !str_contains($message, 'secret123') &&
-                       !str_contains($actionableMessage, 'password:');
+                return ! str_contains($message, 'secret123') &&
+                       ! str_contains($actionableMessage, 'password:');
             }));
     }
 
@@ -50,7 +50,7 @@ class ExceptionHandlerSecurityTest extends TestCase
     public function it_sanitizes_file_paths_in_error_context(): void
     {
         $exception = new Exception('Error in sensitive file');
-        
+
         // Mock file path with sensitive information
         $reflection = new ReflectionClass($exception);
         $fileProperty = $reflection->getProperty('file');
@@ -62,9 +62,9 @@ class ExceptionHandlerSecurityTest extends TestCase
         Log::shouldHaveReceived('error')
             ->with('Application boot failure detected', \Mockery::on(function ($context) {
                 // File path should be present but not expose sensitive directories
-                return isset($context['file']) && 
-                       !str_contains($context['file'], 'secret') &&
-                       !str_contains($context['file'], 'password');
+                return isset($context['file']) &&
+                       ! str_contains($context['file'], 'secret') &&
+                       ! str_contains($context['file'], 'password');
             }));
     }
 
@@ -80,10 +80,10 @@ class ExceptionHandlerSecurityTest extends TestCase
         Log::shouldHaveReceived('error')
             ->with('Application boot failure detected', \Mockery::on(function ($context) {
                 $message = $context['message'] ?? '';
-                
+
                 // Should not contain newlines that could inject fake log entries
-                return !str_contains($message, "\n[2024-01-01]") &&
-                       !str_contains($message, "Admin access granted");
+                return ! str_contains($message, "\n[2024-01-01]") &&
+                       ! str_contains($message, 'Admin access granted');
             }));
     }
 
@@ -99,7 +99,7 @@ class ExceptionHandlerSecurityTest extends TestCase
         Log::shouldHaveReceived('error')
             ->with('Application boot failure detected', \Mockery::on(function ($context) {
                 $message = $context['message'] ?? '';
-                
+
                 // Message should be truncated to reasonable length
                 return strlen($message) < 5000;
             }));
@@ -134,7 +134,7 @@ class ExceptionHandlerSecurityTest extends TestCase
         ]);
 
         $exception = new Exception('Error in model');
-        
+
         $reflection = new ReflectionClass($exception);
         $fileProperty = $reflection->getProperty('file');
         $fileProperty->setAccessible(true);
@@ -150,6 +150,11 @@ class ExceptionHandlerSecurityTest extends TestCase
     /** @test */
     public function it_rate_limits_boot_error_logging_to_prevent_spam(): void
     {
+        Config::set('exception-handling.security.rate_limit_enabled', true);
+        Config::set('exception-handling.security.max_boot_errors_per_minute', 5);
+
+        Log::spy();
+
         // Simulate rapid fire boot errors
         for ($i = 0; $i < 100; $i++) {
             $exception = new Exception("Boot error #{$i} with TranslatableRecord");
@@ -157,8 +162,9 @@ class ExceptionHandlerSecurityTest extends TestCase
         }
 
         // Should not log all 100 errors (implementation should include rate limiting)
-        $errorCalls = Log::spy()->shouldHaveReceived('error')->times();
-        expect($errorCalls)->toBeLessThan(100);
+        Log::shouldHaveReceived('error')
+            ->with('Application boot failure detected', \Mockery::any())
+            ->times(5); // Should only log up to the rate limit
     }
 
     /** @test */
@@ -171,10 +177,10 @@ class ExceptionHandlerSecurityTest extends TestCase
         Log::shouldHaveReceived('error')
             ->with('Application boot failure detected', \Mockery::on(function ($context) {
                 $actionableMessage = $context['actionable_message'] ?? '';
-                
+
                 // Should not expose internal class names
-                return !str_contains($actionableMessage, 'SecretService') &&
-                       !str_contains($actionableMessage, 'Internal\\');
+                return ! str_contains($actionableMessage, 'SecretService') &&
+                       ! str_contains($actionableMessage, 'Internal\\');
             }));
     }
 
@@ -199,7 +205,7 @@ class ExceptionHandlerSecurityTest extends TestCase
     {
         // Create exception with large trace
         $exception = new Exception('TranslatableRecord error');
-        
+
         // Mock a large stack trace
         $reflection = new ReflectionClass($exception);
         $traceProperty = $reflection->getProperty('trace');
@@ -227,10 +233,10 @@ class ExceptionHandlerSecurityTest extends TestCase
         Log::shouldHaveReceived('error')
             ->with('Application boot failure detected', \Mockery::on(function ($context) {
                 $message = $context['message'] ?? '';
-                
+
                 // Should handle unicode safely and remove null bytes
-                return !str_contains($message, "\x00") &&
-                       !str_contains($message, "\x01") &&
+                return ! str_contains($message, "\x00") &&
+                       ! str_contains($message, "\x01") &&
                        mb_check_encoding($message, 'UTF-8');
             }));
     }
@@ -269,7 +275,7 @@ class ExceptionHandlerSecurityTest extends TestCase
         Log::shouldHaveReceived('error')
             ->with('Application boot failure detected', \Mockery::on(function ($context) {
                 $message = $context['message'] ?? '';
-                
+
                 // Should respect security configuration
                 return strlen($message) <= 100;
             }));

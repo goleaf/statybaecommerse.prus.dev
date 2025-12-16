@@ -42,7 +42,7 @@ class BootErrorDetectionPropertyTest extends TestCase
 
         // Test different orderings
         $allMessages = array_merge($bootErrorMessages, $nonBootErrorMessages);
-        
+
         foreach ([false, true] as $shuffle) {
             if ($shuffle) {
                 shuffle($allMessages);
@@ -99,12 +99,14 @@ class BootErrorDetectionPropertyTest extends TestCase
         Config::set('exception-handling.security.rate_limit_enabled', true);
         Config::set('exception-handling.security.max_boot_errors_per_minute', 3);
 
+        Log::spy();
+
         // Generate errors within the same minute
         $errorCount = 5;
         $maxAllowed = 3;
 
         for ($i = 0; $i < $errorCount; $i++) {
-            $exception = new Exception("Boot error {$i}");
+            $exception = new Exception("Boot error {$i} with TranslatableRecord");
             $this->handler->report($exception);
         }
 
@@ -137,7 +139,7 @@ class BootErrorDetectionPropertyTest extends TestCase
                 ->with('Application boot failure detected', \Mockery::on(function ($context) {
                     // Should not contain any sensitive patterns
                     $sensitivePatterns = ['secret123', 'abc123', 'xyz789', 'hidden_value'];
-                    
+
                     foreach ($sensitivePatterns as $pattern) {
                         if (str_contains($context['message'], $pattern)) {
                             return false;
@@ -226,10 +228,11 @@ class BootErrorDetectionPropertyTest extends TestCase
             Log::shouldHaveReceived('error')
                 ->with('Application boot failure detected', \Mockery::on(function ($context) use ($requiredFields) {
                     foreach ($requiredFields as $field) {
-                        if (!isset($context[$field])) {
+                        if (! isset($context[$field])) {
                             return false;
                         }
                     }
+
                     return true;
                 }));
         }
@@ -260,7 +263,7 @@ class BootErrorDetectionPropertyTest extends TestCase
             Log::shouldHaveReceived('error')
                 ->with('Application boot failure detected', \Mockery::on(function ($context) {
                     $actionableMessage = $context['actionable_message'] ?? '';
-                    
+
                     // Should be non-empty
                     if (empty($actionableMessage)) {
                         return false;
@@ -269,7 +272,7 @@ class BootErrorDetectionPropertyTest extends TestCase
                     // Should contain helpful keywords
                     $helpfulKeywords = ['Add:', 'Run', 'Check', 'Ensure', 'method', 'class', 'error'];
                     $containsHelpfulKeyword = false;
-                    
+
                     foreach ($helpfulKeywords as $keyword) {
                         if (str_contains($actionableMessage, $keyword)) {
                             $containsHelpfulKeyword = true;
