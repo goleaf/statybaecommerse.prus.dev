@@ -5,12 +5,10 @@ declare(strict_types=1);
 use App\Exceptions\Handler;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Tests\TestCase;
-
 
 class HandlerTest extends TestCase
 {
@@ -35,24 +33,8 @@ class HandlerTest extends TestCase
 
     private function resetHandlerCaches(): void
     {
-        // Reset static caches using reflection
-        $reflection = new ReflectionClass(Handler::class);
-        
-        $bootErrorDetectionProperty = $reflection->getProperty('bootErrorDetectionEnabled');
-        $bootErrorDetectionProperty->setAccessible(true);
-        $bootErrorDetectionProperty->setValue(null, null);
-
-        $bootErrorPatternsProperty = $reflection->getProperty('bootErrorPatterns');
-        $bootErrorPatternsProperty->setAccessible(true);
-        $bootErrorPatternsProperty->setValue(null, null);
-
-        $bootRelatedPathsProperty = $reflection->getProperty('bootRelatedPaths');
-        $bootRelatedPathsProperty->setAccessible(true);
-        $bootRelatedPathsProperty->setValue(null, null);
-
-        $bootErrorCountsProperty = $reflection->getProperty('bootErrorCounts');
-        $bootErrorCountsProperty->setAccessible(true);
-        $bootErrorCountsProperty->setValue(null, []);
+        // Use the proper reset method for the refactored handler
+        Handler::resetCache();
     }
 
     // === Boot Error Detection Tests ===
@@ -60,7 +42,7 @@ class HandlerTest extends TestCase
     public function test_detects_translatable_record_boot_error(): void
     {
         Log::spy();
-        
+
         $exception = new Exception('Class App\Models\Product must implement translations() method from TranslatableRecord interface');
 
         $this->handler->report($exception);
@@ -78,7 +60,7 @@ class HandlerTest extends TestCase
     public function test_detects_class_not_found_boot_error(): void
     {
         Log::spy();
-        
+
         $exception = new Exception('Class App\Models\NonExistentModel not found');
 
         $this->handler->report($exception);
@@ -284,8 +266,8 @@ class HandlerTest extends TestCase
 
         Log::shouldHaveReceived('error')
             ->with('Application boot failure detected', \Mockery::on(function ($context) {
-                return !str_contains($context['message'], 'secret123')
-                    && !str_contains($context['message'], 'abc123')
+                return ! str_contains($context['message'], 'secret123')
+                    && ! str_contains($context['message'], 'abc123')
                     && str_contains($context['message'], '[REDACTED]');
             }));
     }
@@ -300,7 +282,7 @@ class HandlerTest extends TestCase
 
         Log::shouldHaveReceived('error')
             ->with('Application boot failure detected', \Mockery::on(function ($context) use ($basePath) {
-                return !str_contains($context['file'], $basePath)
+                return ! str_contains($context['file'], $basePath)
                     && str_contains($context['file'], '[APP_ROOT]');
             }));
     }
@@ -314,8 +296,8 @@ class HandlerTest extends TestCase
 
         Log::shouldHaveReceived('error')
             ->with('Application boot failure detected', \Mockery::on(function ($context) {
-                return !str_contains($context['message'], "\n")
-                    && !str_contains($context['message'], "\r")
+                return ! str_contains($context['message'], "\n")
+                    && ! str_contains($context['message'], "\r")
                     && str_contains($context['message'], 'FAKE LOG ENTRY');
             }));
     }
@@ -340,17 +322,19 @@ class HandlerTest extends TestCase
 
     public function test_rate_limits_boot_error_logging(): void
     {
+        Log::spy();
+
         Config::set('exception-handling.security.rate_limit_enabled', true);
         Config::set('exception-handling.security.max_boot_errors_per_minute', 2);
 
         // First two errors should be logged
         for ($i = 0; $i < 2; $i++) {
-            $exception = new Exception("Error {$i}");
+            $exception = new Exception("Error {$i} with TranslatableRecord");
             $this->handler->report($exception);
         }
 
         // Third error should be rate limited
-        $exception = new Exception('Rate limited error');
+        $exception = new Exception('Rate limited error with TranslatableRecord');
         $this->handler->report($exception);
 
         Log::shouldHaveReceived('error')
@@ -360,11 +344,13 @@ class HandlerTest extends TestCase
 
     public function test_respects_rate_limit_disabled_config(): void
     {
+        Log::spy();
+
         Config::set('exception-handling.security.rate_limit_enabled', false);
 
         // Should log all errors when rate limiting is disabled
         for ($i = 0; $i < 5; $i++) {
-            $exception = new Exception("Error {$i}");
+            $exception = new Exception("Error {$i} with TranslatableRecord");
             $this->handler->report($exception);
         }
 
@@ -389,7 +375,7 @@ class HandlerTest extends TestCase
                 ];
 
                 foreach ($requiredKeys as $key) {
-                    if (!isset($context[$key])) {
+                    if (! isset($context[$key])) {
                         return false;
                     }
                 }
