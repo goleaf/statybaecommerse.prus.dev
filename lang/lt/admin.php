@@ -3,6 +3,11 @@
 declare(strict_types=1);
 
 return [
+    'brand_name' => 'Egistatyba',
+    'navigation' => [
+        'profile'  => 'Profilis',
+        'language' => 'Kalba',
+    ],
     'menu_items' => require __DIR__ . '/admin/menu_items.php',
     'dashboard'  => require __DIR__ . '/admin/dashboard.php',
     'no_image'   => 'Nėra paveikslėlio', // Bendras užrašas, kai nėra galimų medijos failų.

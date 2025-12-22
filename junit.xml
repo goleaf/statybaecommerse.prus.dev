@@ -1,71 +1,230 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="C:\Dropbox\projects\egistatyba\phpunit.xml" tests="49" assertions="2191" errors="0" failures="0" skipped="0" time="67.792392">
-    <testsuite name="Unit" tests="31" assertions="2139" errors="0" failures="0" skipped="0" time="56.709671">
-      <testsuite name="Tests\Unit\Exceptions\BootErrorRateLimiterBoundaryFixTest" file="Boot Error Rate Limiter Boundary Fix (Tests\Unit\Exceptions\BootErrorRateLimiterBoundaryFix)" tests="10" assertions="88" errors="0" failures="0" skipped="0" time="42.765462">
-        <testcase name="It handles zero limit correctly" file="Boot Error Rate Limiter Boundary Fix (Tests\Unit\Exceptions\BootErrorRateLimiterBoundaryFix)::It handles zero limit correctly" class="Tests\Unit\Exceptions\BootErrorRateLimiterBoundaryFixTest" classname="Tests.Unit.Exceptions.BootErrorRateLimiterBoundaryFixTest" assertions="4" time="37.165850"/>
-        <testcase name="It handles limit of one correctly" file="Boot Error Rate Limiter Boundary Fix (Tests\Unit\Exceptions\BootErrorRateLimiterBoundaryFix)::It handles limit of one correctly" class="Tests\Unit\Exceptions\BootErrorRateLimiterBoundaryFixTest" classname="Tests.Unit.Exceptions.BootErrorRateLimiterBoundaryFixTest" assertions="4" time="0.844898"/>
-        <testcase name="It predicts rate limiting accurately" file="Boot Error Rate Limiter Boundary Fix (Tests\Unit\Exceptions\BootErrorRateLimiterBoundaryFix)::It predicts rate limiting accurately" class="Tests\Unit\Exceptions\BootErrorRateLimiterBoundaryFixTest" classname="Tests.Unit.Exceptions.BootErrorRateLimiterBoundaryFixTest" assertions="5" time="0.589470"/>
-        <testcase name="It respects dynamic configuration changes" file="Boot Error Rate Limiter Boundary Fix (Tests\Unit\Exceptions\BootErrorRateLimiterBoundaryFix)::It respects dynamic configuration changes" class="Tests\Unit\Exceptions\BootErrorRateLimiterBoundaryFixTest" classname="Tests.Unit.Exceptions.BootErrorRateLimiterBoundaryFixTest" assertions="3" time="0.593516"/>
-        <testcase name="It never limits when disabled" file="Boot Error Rate Limiter Boundary Fix (Tests\Unit\Exceptions\BootErrorRateLimiterBoundaryFix)::It never limits when disabled" class="Tests\Unit\Exceptions\BootErrorRateLimiterBoundaryFixTest" classname="Tests.Unit.Exceptions.BootErrorRateLimiterBoundaryFixTest" assertions="40" time="0.585039"/>
-        <testcase name="It resets completely" file="Boot Error Rate Limiter Boundary Fix (Tests\Unit\Exceptions\BootErrorRateLimiterBoundaryFix)::It resets completely" class="Tests\Unit\Exceptions\BootErrorRateLimiterBoundaryFixTest" classname="Tests.Unit.Exceptions.BootErrorRateLimiterBoundaryFixTest" assertions="4" time="0.609095"/>
-        <testcase name="It maintains boundary under high volume access" file="Boot Error Rate Limiter Boundary Fix (Tests\Unit\Exceptions\BootErrorRateLimiterBoundaryFix)::It maintains boundary under high volume access" class="Tests\Unit\Exceptions\BootErrorRateLimiterBoundaryFixTest" classname="Tests.Unit.Exceptions.BootErrorRateLimiterBoundaryFixTest" assertions="3" time="0.659058"/>
-        <testcase name="It provides accurate statistics" file="Boot Error Rate Limiter Boundary Fix (Tests\Unit\Exceptions\BootErrorRateLimiterBoundaryFix)::It provides accurate statistics" class="Tests\Unit\Exceptions\BootErrorRateLimiterBoundaryFixTest" classname="Tests.Unit.Exceptions.BootErrorRateLimiterBoundaryFixTest" assertions="12" time="0.579209"/>
-        <testcase name="It manages memory efficiently" file="Boot Error Rate Limiter Boundary Fix (Tests\Unit\Exceptions\BootErrorRateLimiterBoundaryFix)::It manages memory efficiently" class="Tests\Unit\Exceptions\BootErrorRateLimiterBoundaryFixTest" classname="Tests.Unit.Exceptions.BootErrorRateLimiterBoundaryFixTest" assertions="3" time="0.561513"/>
-        <testcase name="It prevents counter from exceeding configured limit" file="Boot Error Rate Limiter Boundary Fix (Tests\Unit\Exceptions\BootErrorRateLimiterBoundaryFix)::It prevents counter from exceeding configured limit" class="Tests\Unit\Exceptions\BootErrorRateLimiterBoundaryFixTest" classname="Tests.Unit.Exceptions.BootErrorRateLimiterBoundaryFixTest" assertions="10" time="0.577814"/>
-      </testsuite>
-      <testsuite name="BootErrorRateLimiterBoundaryTest" file="Boot Error Rate Limiter Boundary" tests="7" assertions="44" errors="0" failures="0" skipped="0" time="4.222804">
-        <testcase name="Rate limiting boundary condition fix" file="Boot Error Rate Limiter Boundary::Rate limiting boundary condition fix" class="BootErrorRateLimiterBoundaryTest" classname="BootErrorRateLimiterBoundaryTest" assertions="10" time="0.579327"/>
-        <testcase name="Rate limiting disabled never limits" file="Boot Error Rate Limiter Boundary::Rate limiting disabled never limits" class="BootErrorRateLimiterBoundaryTest" classname="BootErrorRateLimiterBoundaryTest" assertions="20" time="0.556422"/>
-        <testcase name="Concurrent access simulation" file="Boot Error Rate Limiter Boundary::Concurrent access simulation" class="BootErrorRateLimiterBoundaryTest" classname="BootErrorRateLimiterBoundaryTest" assertions="3" time="0.563410"/>
-        <testcase name="Reset functionality" file="Boot Error Rate Limiter Boundary::Reset functionality" class="BootErrorRateLimiterBoundaryTest" classname="BootErrorRateLimiterBoundaryTest" assertions="3" time="0.589701"/>
-        <testcase name="Rate limiting with zero limit" file="Boot Error Rate Limiter Boundary::Rate limiting with zero limit" class="BootErrorRateLimiterBoundaryTest" classname="BootErrorRateLimiterBoundaryTest" assertions="2" time="0.642575"/>
-        <testcase name="Time window key generation" file="Boot Error Rate Limiter Boundary::Time window key generation" class="BootErrorRateLimiterBoundaryTest" classname="BootErrorRateLimiterBoundaryTest" assertions="2" time="0.655581"/>
-        <testcase name="Would be rate limited does not increment" file="Boot Error Rate Limiter Boundary::Would be rate limited does not increment" class="BootErrorRateLimiterBoundaryTest" classname="BootErrorRateLimiterBoundaryTest" assertions="4" time="0.635789"/>
-      </testsuite>
-      <testsuite name="BootErrorRateLimiterFixTest" file="Boot Error Rate Limiter Fix" tests="6" assertions="237" errors="0" failures="0" skipped="0" time="4.086665">
-        <testcase name="Rate limiting stops exactly at limit" file="Boot Error Rate Limiter Fix::Rate limiting stops exactly at limit" class="BootErrorRateLimiterFixTest" classname="BootErrorRateLimiterFixTest" assertions="12" time="0.761918"/>
-        <testcase name="Would be rate limited predicts correctly" file="Boot Error Rate Limiter Fix::Would be rate limited predicts correctly" class="BootErrorRateLimiterFixTest" classname="BootErrorRateLimiterFixTest" assertions="5" time="0.728726"/>
-        <testcase name="Edge case with limit of one" file="Boot Error Rate Limiter Fix::Edge case with limit of one" class="BootErrorRateLimiterFixTest" classname="BootErrorRateLimiterFixTest" assertions="4" time="0.657337"/>
-        <testcase name="Edge case with limit of zero" file="Boot Error Rate Limiter Fix::Edge case with limit of zero" class="BootErrorRateLimiterFixTest" classname="BootErrorRateLimiterFixTest" assertions="4" time="0.663300"/>
-        <testcase name="Statistics method provides monitoring data" file="Boot Error Rate Limiter Fix::Statistics method provides monitoring data" class="BootErrorRateLimiterFixTest" classname="BootErrorRateLimiterFixTest" assertions="10" time="0.638218"/>
-        <testcase name="Boundary condition with high limit" file="Boot Error Rate Limiter Fix::Boundary condition with high limit" class="BootErrorRateLimiterFixTest" classname="BootErrorRateLimiterFixTest" assertions="202" time="0.637167"/>
-      </testsuite>
-      <testsuite name="Tests\Unit\Exceptions\BootErrorRateLimiterPropertyTest" file="Boot Error Rate Limiter Property (Tests\Unit\Exceptions\BootErrorRateLimiterProperty)" tests="8" assertions="1770" errors="0" failures="0" skipped="0" time="5.634740">
-        <testcase name="Property time window behavior is consistent" file="Boot Error Rate Limiter Property (Tests\Unit\Exceptions\BootErrorRateLimiterProperty)::Property time window behavior is consistent" class="Tests\Unit\Exceptions\BootErrorRateLimiterPropertyTest" classname="Tests.Unit.Exceptions.BootErrorRateLimiterPropertyTest" assertions="40" time="0.703636"/>
-        <testcase name="Property boundary conditions are handled correctly" file="Boot Error Rate Limiter Property (Tests\Unit\Exceptions\BootErrorRateLimiterProperty)::Property boundary conditions are handled correctly" class="Tests\Unit\Exceptions\BootErrorRateLimiterPropertyTest" classname="Tests.Unit.Exceptions.BootErrorRateLimiterPropertyTest" assertions="6" time="0.656321"/>
-        <testcase name="Property reset clears all state" file="Boot Error Rate Limiter Property (Tests\Unit\Exceptions\BootErrorRateLimiterProperty)::Property reset clears all state" class="Tests\Unit\Exceptions\BootErrorRateLimiterPropertyTest" classname="Tests.Unit.Exceptions.BootErrorRateLimiterPropertyTest" assertions="15" time="0.852680"/>
-        <testcase name="Property statistics reflect accurate state" file="Boot Error Rate Limiter Property (Tests\Unit\Exceptions\BootErrorRateLimiterProperty)::Property statistics reflect accurate state" class="Tests\Unit\Exceptions\BootErrorRateLimiterPropertyTest" classname="Tests.Unit.Exceptions.BootErrorRateLimiterPropertyTest" assertions="124" time="0.756707"/>
-        <testcase name="Property predictions are consistent with actual behavior" file="Boot Error Rate Limiter Property (Tests\Unit\Exceptions\BootErrorRateLimiterProperty)::Property predictions are consistent with actual behavior" class="Tests\Unit\Exceptions\BootErrorRateLimiterPropertyTest" classname="Tests.Unit.Exceptions.BootErrorRateLimiterPropertyTest" assertions="52" time="0.724742"/>
-        <testcase name="Property memory usage remains bounded" file="Boot Error Rate Limiter Property (Tests\Unit\Exceptions\BootErrorRateLimiterProperty)::Property memory usage remains bounded" class="Tests\Unit\Exceptions\BootErrorRateLimiterPropertyTest" classname="Tests.Unit.Exceptions.BootErrorRateLimiterPropertyTest" assertions="6" time="0.661703"/>
-        <testcase name="Property disabled rate limiting never limits" file="Boot Error Rate Limiter Property (Tests\Unit\Exceptions\BootErrorRateLimiterProperty)::Property disabled rate limiting never limits" class="Tests\Unit\Exceptions\BootErrorRateLimiterPropertyTest" classname="Tests.Unit.Exceptions.BootErrorRateLimiterPropertyTest" assertions="400" time="0.590233"/>
-        <testcase name="Property counter never exceeds limit" file="Boot Error Rate Limiter Property (Tests\Unit\Exceptions\BootErrorRateLimiterProperty)::Property counter never exceeds limit" class="Tests\Unit\Exceptions\BootErrorRateLimiterPropertyTest" classname="Tests.Unit.Exceptions.BootErrorRateLimiterPropertyTest" assertions="1127" time="0.688719"/>
-      </testsuite>
-    </testsuite>
-    <testsuite name="Feature" tests="9" assertions="36" errors="0" failures="0" skipped="0" time="5.609610">
-      <testsuite name="Tests\Feature\Exceptions\BootErrorRateLimiterIntegrationTest" file="Boot Error Rate Limiter Integration (Tests\Feature\Exceptions\BootErrorRateLimiterIntegration)" tests="9" assertions="36" errors="0" failures="0" skipped="0" time="5.609610">
-        <testcase name="It does not rate limit non boot errors" file="Boot Error Rate Limiter Integration (Tests\Feature\Exceptions\BootErrorRateLimiterIntegration)::It does not rate limit non boot errors" class="Tests\Feature\Exceptions\BootErrorRateLimiterIntegrationTest" classname="Tests.Feature.Exceptions.BootErrorRateLimiterIntegrationTest" assertions="4" time="0.673425"/>
-        <testcase name="It handles concurrent access safely" file="Boot Error Rate Limiter Integration (Tests\Feature\Exceptions\BootErrorRateLimiterIntegration)::It handles concurrent access safely" class="Tests\Feature\Exceptions\BootErrorRateLimiterIntegrationTest" classname="Tests.Feature.Exceptions.BootErrorRateLimiterIntegrationTest" assertions="4" time="0.649181"/>
-        <testcase name="It respects rate limiting configuration changes" file="Boot Error Rate Limiter Integration (Tests\Feature\Exceptions\BootErrorRateLimiterIntegration)::It respects rate limiting configuration changes" class="Tests\Feature\Exceptions\BootErrorRateLimiterIntegrationTest" classname="Tests.Feature.Exceptions.BootErrorRateLimiterIntegrationTest" assertions="8" time="0.605722"/>
-        <testcase name="It rate limits different boot error types" file="Boot Error Rate Limiter Integration (Tests\Feature\Exceptions\BootErrorRateLimiterIntegration)::It rate limits different boot error types" class="Tests\Feature\Exceptions\BootErrorRateLimiterIntegrationTest" classname="Tests.Feature.Exceptions.BootErrorRateLimiterIntegrationTest" assertions="3" time="0.612494"/>
-        <testcase name="It rate limits boot errors in http context" file="Boot Error Rate Limiter Integration (Tests\Feature\Exceptions\BootErrorRateLimiterIntegration)::It rate limits boot errors in http context" class="Tests\Feature\Exceptions\BootErrorRateLimiterIntegrationTest" classname="Tests.Feature.Exceptions.BootErrorRateLimiterIntegrationTest" assertions="4" time="0.653902"/>
-        <testcase name="It maintains rate limiting across requests" file="Boot Error Rate Limiter Integration (Tests\Feature\Exceptions\BootErrorRateLimiterIntegration)::It maintains rate limiting across requests" class="Tests\Feature\Exceptions\BootErrorRateLimiterIntegrationTest" classname="Tests.Feature.Exceptions.BootErrorRateLimiterIntegrationTest" assertions="2" time="0.645248"/>
-        <testcase name="It performs cleanup correctly" file="Boot Error Rate Limiter Integration (Tests\Feature\Exceptions\BootErrorRateLimiterIntegration)::It performs cleanup correctly" class="Tests\Feature\Exceptions\BootErrorRateLimiterIntegrationTest" classname="Tests.Feature.Exceptions.BootErrorRateLimiterIntegrationTest" assertions="3" time="0.584131"/>
-        <testcase name="It tracks rate limiting metrics" file="Boot Error Rate Limiter Integration (Tests\Feature\Exceptions\BootErrorRateLimiterIntegration)::It tracks rate limiting metrics" class="Tests\Feature\Exceptions\BootErrorRateLimiterIntegrationTest" classname="Tests.Feature.Exceptions.BootErrorRateLimiterIntegrationTest" assertions="6" time="0.586582"/>
-        <testcase name="It maintains acceptable performance" file="Boot Error Rate Limiter Integration (Tests\Feature\Exceptions\BootErrorRateLimiterIntegration)::It maintains acceptable performance" class="Tests\Feature\Exceptions\BootErrorRateLimiterIntegrationTest" classname="Tests.Feature.Exceptions.BootErrorRateLimiterIntegrationTest" assertions="2" time="0.598924"/>
-      </testsuite>
-    </testsuite>
-    <testsuite name="Performance" tests="9" assertions="16" errors="0" failures="0" skipped="0" time="5.473112">
-      <testsuite name="Tests\Performance\BootErrorRateLimiterPerformanceTest" file="Boot Error Rate Limiter Performance (Tests\Performance\BootErrorRateLimiterPerformance)" tests="9" assertions="16" errors="0" failures="0" skipped="0" time="5.473112">
-        <testcase name="It performs cleanup efficiently" file="Boot Error Rate Limiter Performance (Tests\Performance\BootErrorRateLimiterPerformance)::It performs cleanup efficiently" class="Tests\Performance\BootErrorRateLimiterPerformanceTest" classname="Tests.Performance.BootErrorRateLimiterPerformanceTest" assertions="3" time="0.612570"/>
-        <testcase name="It caches configuration access" file="Boot Error Rate Limiter Performance (Tests\Performance\BootErrorRateLimiterPerformance)::It caches configuration access" class="Tests\Performance\BootErrorRateLimiterPerformanceTest" classname="Tests.Performance.BootErrorRateLimiterPerformanceTest" assertions="1" time="0.576281"/>
-        <testcase name="It maintains stable memory usage" file="Boot Error Rate Limiter Performance (Tests\Performance\BootErrorRateLimiterPerformance)::It maintains stable memory usage" class="Tests\Performance\BootErrorRateLimiterPerformanceTest" classname="Tests.Performance.BootErrorRateLimiterPerformanceTest" assertions="2" time="0.579108"/>
-        <testcase name="It collects statistics efficiently" file="Boot Error Rate Limiter Performance (Tests\Performance\BootErrorRateLimiterPerformance)::It collects statistics efficiently" class="Tests\Performance\BootErrorRateLimiterPerformanceTest" classname="Tests.Performance.BootErrorRateLimiterPerformanceTest" assertions="1" time="0.591543"/>
-        <testcase name="It optimizes boundary condition checks" file="Boot Error Rate Limiter Performance (Tests\Performance\BootErrorRateLimiterPerformance)::It optimizes boundary condition checks" class="Tests\Performance\BootErrorRateLimiterPerformanceTest" classname="Tests.Performance.BootErrorRateLimiterPerformanceTest" assertions="2" time="0.608459"/>
-        <testcase name="It maintains performance with high limits" file="Boot Error Rate Limiter Performance (Tests\Performance\BootErrorRateLimiterPerformance)::It maintains performance with high limits" class="Tests\Performance\BootErrorRateLimiterPerformanceTest" classname="Tests.Performance.BootErrorRateLimiterPerformanceTest" assertions="3" time="0.613064"/>
-        <testcase name="It performs prediction checks efficiently" file="Boot Error Rate Limiter Performance (Tests\Performance\BootErrorRateLimiterPerformance)::It performs prediction checks efficiently" class="Tests\Performance\BootErrorRateLimiterPerformanceTest" classname="Tests.Performance.BootErrorRateLimiterPerformanceTest" assertions="1" time="0.657697"/>
-        <testcase name="It has minimal overhead when disabled" file="Boot Error Rate Limiter Performance (Tests\Performance\BootErrorRateLimiterPerformance)::It has minimal overhead when disabled" class="Tests\Performance\BootErrorRateLimiterPerformanceTest" classname="Tests.Performance.BootErrorRateLimiterPerformanceTest" assertions="1" time="0.614619"/>
-        <testcase name="It performs rate limiting checks efficiently" file="Boot Error Rate Limiter Performance (Tests\Performance\BootErrorRateLimiterPerformance)::It performs rate limiting checks efficiently" class="Tests\Performance\BootErrorRateLimiterPerformanceTest" classname="Tests.Performance.BootErrorRateLimiterPerformanceTest" assertions="2" time="0.619771"/>
+  <testsuite name="C:\Dropbox\projects\egistatyba\phpunit.xml" tests="15" assertions="18" errors="9" failures="1" skipped="0" time="40.248318">
+    <testsuite name="Unit" tests="15" assertions="18" errors="9" failures="1" skipped="0" time="40.248318">
+      <testsuite name="Tests\Unit\Models\RelationshipTest" file="tests\Unit\Models\RelationshipTest.php" tests="15" assertions="18" errors="9" failures="1" skipped="0" time="40.248318">
+        <testcase name="`Polymorphic Relationships` → models can have comments" file="tests\Unit\Models\RelationshipTest.php::`Polymorphic Relationships` → models can have comments" class="Tests\Unit\Models\RelationshipTest" classname="Tests.Unit.Models.RelationshipTest" assertions="3" time="26.852133"/>
+        <testcase name="`Nested Comments` → comments can have replies" file="tests\Unit\Models\RelationshipTest.php::`Nested Comments` → comments can have replies" class="Tests\Unit\Models\RelationshipTest" classname="Tests.Unit.Models.RelationshipTest" assertions="4" time="1.505869"/>
+        <testcase name="`Organization Relationships` → organization can check user membership" file="tests\Unit\Models\RelationshipTest.php::`Organization Relationships` → organization can check user membership" class="Tests\Unit\Models\RelationshipTest" classname="Tests.Unit.Models.RelationshipTest" assertions="0" time="0.887722">
+          <error type="Illuminate\Database\QueryException">`Organization Relationships` → organization can check user membershipIlluminate\Database\QueryException: SQLSTATE[HY000]: General error: 1 no such table: organization_user (Connection: sqlite, SQL: insert into "organization_user" ("created_at", "is_active", "joined_at", "organization_id", "permissions", "role", "updated_at", "user_id") values (2025-12-22 20:15:12, 1, 2025-12-22 20:15:12, 2, ?, member, 2025-12-22 20:15:12, 3))&#13;
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:564
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:813
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:780
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:559
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:523
+at vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php:3804
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithPivotTable.php:274
+at app\Models\Organization.php:194
+at tests\Unit\Models\RelationshipTest.php:40
+Caused by
+PDOException: SQLSTATE[HY000]: General error: 1 no such table: organization_user
+
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:564
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:813
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:780
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:559
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:523
+at vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php:3804
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithPivotTable.php:274
+at app\Models\Organization.php:194
+at tests\Unit\Models\RelationshipTest.php:40</error>
+        </testcase>
+        <testcase name="`Project Relationships` → project can add members" file="tests\Unit\Models\RelationshipTest.php::`Project Relationships` → project can add members" class="Tests\Unit\Models\RelationshipTest" classname="Tests.Unit.Models.RelationshipTest" assertions="0" time="0.817015">
+          <error type="Illuminate\Database\QueryException">`Project Relationships` → project can add membersIlluminate\Database\QueryException: SQLSTATE[HY000]: General error: 1 no such table: project_user (Connection: sqlite, SQL: insert into "project_user" ("created_at", "joined_at", "permissions", "project_id", "role", "updated_at", "user_id") values (2025-12-22 20:15:13, 2025-12-22 20:15:13, ?, 3, lead, 2025-12-22 20:15:13, 5))&#13;
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:564
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:813
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:780
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:559
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:523
+at vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php:3804
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithPivotTable.php:274
+at app\Models\Project.php:269
+at tests\Unit\Models\RelationshipTest.php:59
+Caused by
+PDOException: SQLSTATE[HY000]: General error: 1 no such table: project_user
+
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:564
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:813
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:780
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:559
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:523
+at vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php:3804
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithPivotTable.php:274
+at app\Models\Project.php:269
+at tests\Unit\Models\RelationshipTest.php:59</error>
+        </testcase>
+        <testcase name="`Task Relationships` → task can have assignees with responsibilities" file="tests\Unit\Models\RelationshipTest.php::`Task Relationships` → task can have assignees with responsibilities" class="Tests\Unit\Models\RelationshipTest" classname="Tests.Unit.Models.RelationshipTest" assertions="0" time="0.783201">
+          <error type="Illuminate\Database\QueryException">`Task Relationships` → task can have assignees with responsibilitiesIlluminate\Database\QueryException: SQLSTATE[HY000]: General error: 1 no such table: task_user (Connection: sqlite, SQL: insert into "task_user" ("assigned_at", "created_at", "notes", "responsibility", "task_id", "updated_at", "user_id") values (2025-12-22 20:15:14, 2025-12-22 20:15:14, Primary assignee, assignee, 4, 2025-12-22 20:15:14, 7))&#13;
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:564
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:813
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:780
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:559
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:523
+at vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php:3804
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithPivotTable.php:274
+at app\Models\Task.php:260
+at tests\Unit\Models\RelationshipTest.php:81
+Caused by
+PDOException: SQLSTATE[HY000]: General error: 1 no such table: task_user
+
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:564
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:813
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:780
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:559
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:523
+at vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php:3804
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithPivotTable.php:274
+at app\Models\Task.php:260
+at tests\Unit\Models\RelationshipTest.php:81</error>
+        </testcase>
+        <testcase name="`Task Relationships` → task can be marked as completed" file="tests\Unit\Models\RelationshipTest.php::`Task Relationships` → task can be marked as completed" class="Tests\Unit\Models\RelationshipTest" classname="Tests.Unit.Models.RelationshipTest" assertions="0" time="0.820726">
+          <error type="Illuminate\Database\QueryException">`Task Relationships` → task can be marked as completedIlluminate\Database\QueryException: SQLSTATE[HY000]: General error: 1 no such table: task_user (Connection: sqlite, SQL: insert into "task_user" ("assigned_at", "created_at", "notes", "responsibility", "task_id", "updated_at", "user_id") values (2025-12-22 20:15:14, 2025-12-22 20:15:14, ?, assignee, 5, 2025-12-22 20:15:14, 9))&#13;
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:564
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:813
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:780
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:559
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:523
+at vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php:3804
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithPivotTable.php:274
+at app\Models\Task.php:260
+at tests\Unit\Models\RelationshipTest.php:103
+Caused by
+PDOException: SQLSTATE[HY000]: General error: 1 no such table: task_user
+
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:564
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:813
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:780
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:559
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:523
+at vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php:3804
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithPivotTable.php:274
+at app\Models\Task.php:260
+at tests\Unit\Models\RelationshipTest.php:103</error>
+        </testcase>
+        <testcase name="`Polymorphic Relationships` → models can have files" file="tests\Unit\Models\RelationshipTest.php::`Polymorphic Relationships` → models can have files" class="Tests\Unit\Models\RelationshipTest" classname="Tests.Unit.Models.RelationshipTest" assertions="0" time="0.806264">
+          <error type="Illuminate\Database\QueryException">`Polymorphic Relationships` → models can have filesIlluminate\Database\QueryException: SQLSTATE[HY000]: General error: 1 no such table: files (Connection: sqlite, SQL: insert into "files" ("name", "original_name", "path", "mime_type", "size", "uploaded_by", "fileable_id", "fileable_type", "updated_at", "created_at") values (test.pdf, test.pdf, files/test.pdf, application/pdf, 1024, 11, 6, App\Models\Project, 2025-12-22 20:15:15, 2025-12-22 20:15:15))&#13;
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:564
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:813
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:780
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:559
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:523
+at vendor\laravel\framework\src\Illuminate\Database\Query\Processors\Processor.php:32
+at vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php:3853
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Builder.php:2235
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1436
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1401
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1240
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Relations\HasOneOrMany.php:370
+at vendor\laravel\framework\src\Illuminate\Support\helpers.php:390
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Relations\HasOneOrMany.php:367
+at app\Models\Concerns\HasPolymorphicRelationships.php:130
+at tests\Unit\Models\RelationshipTest.php:122
+Caused by
+PDOException: SQLSTATE[HY000]: General error: 1 no such table: files
+
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:564
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:813
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:780
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:559
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:523
+at vendor\laravel\framework\src\Illuminate\Database\Query\Processors\Processor.php:32
+at vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php:3853
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Builder.php:2235
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1436
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1401
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1240
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Relations\HasOneOrMany.php:370
+at vendor\laravel\framework\src\Illuminate\Support\helpers.php:390
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Relations\HasOneOrMany.php:367
+at app\Models\Concerns\HasPolymorphicRelationships.php:130
+at tests\Unit\Models\RelationshipTest.php:122</error>
+        </testcase>
+        <testcase name="`Polymorphic Relationships` → models can have tags" file="tests\Unit\Models\RelationshipTest.php::`Polymorphic Relationships` → models can have tags" class="Tests\Unit\Models\RelationshipTest" classname="Tests.Unit.Models.RelationshipTest" assertions="0" time="0.800755">
+          <error type="BadMethodCallException">`Polymorphic Relationships` → models can have tagsBadMethodCallException: Call to undefined method App\Models\Task::addTag()&#13;
+at vendor\laravel\framework\src\Illuminate\Support\Traits\ForwardsCalls.php:67
+at vendor\laravel\framework\src\Illuminate\Support\Traits\ForwardsCalls.php:36
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:2540
+at tests\Unit\Models\RelationshipTest.php:137</error>
+        </testcase>
+        <testcase name="`Nested Comments` → comment hierarchy methods work" file="tests\Unit\Models\RelationshipTest.php::`Nested Comments` → comment hierarchy methods work" class="Tests\Unit\Models\RelationshipTest" classname="Tests.Unit.Models.RelationshipTest" assertions="3" time="0.806110"/>
+        <testcase name="`Complex Queries` → can get tasks with assignees and roles" file="tests\Unit\Models\RelationshipTest.php::`Complex Queries` → can get tasks with assignees and roles" class="Tests\Unit\Models\RelationshipTest" classname="Tests.Unit.Models.RelationshipTest" assertions="0" time="0.831723">
+          <error type="Illuminate\Database\QueryException">`Complex Queries` → can get tasks with assignees and rolesIlluminate\Database\QueryException: SQLSTATE[HY000]: General error: 1 no such table: task_user (Connection: sqlite, SQL: insert into "task_user" ("assigned_at", "created_at", "notes", "responsibility", "task_id", "updated_at", "user_id") values (2025-12-22 20:15:18, 2025-12-22 20:15:18, ?, assignee, 9, 2025-12-22 20:15:18, 17))&#13;
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:564
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:813
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:780
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:559
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:523
+at vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php:3804
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithPivotTable.php:274
+at app\Models\Task.php:260
+at tests\Unit\Models\RelationshipTest.php:209
+Caused by
+PDOException: SQLSTATE[HY000]: General error: 1 no such table: task_user
+
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:564
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:813
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:780
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:559
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:523
+at vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php:3804
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithPivotTable.php:274
+at app\Models\Task.php:260
+at tests\Unit\Models\RelationshipTest.php:209</error>
+        </testcase>
+        <testcase name="`Complex Queries` → can get user projects across organizations" file="tests\Unit\Models\RelationshipTest.php::`Complex Queries` → can get user projects across organizations" class="Tests\Unit\Models\RelationshipTest" classname="Tests.Unit.Models.RelationshipTest" assertions="0" time="0.767552">
+          <error type="Illuminate\Database\QueryException">`Complex Queries` → can get user projects across organizationsIlluminate\Database\QueryException: SQLSTATE[HY000]: General error: 1 no such table: organization_user (Connection: sqlite, SQL: insert into "organization_user" ("created_at", "is_active", "joined_at", "organization_id", "permissions", "role", "updated_at", "user_id") values (2025-12-22 20:15:18, 1, 2025-12-22 20:15:18, 10, ?, member, 2025-12-22 20:15:18, 19))&#13;
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:564
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:813
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:780
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:559
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:523
+at vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php:3804
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithPivotTable.php:274
+at app\Models\Organization.php:194
+at tests\Unit\Models\RelationshipTest.php:186
+Caused by
+PDOException: SQLSTATE[HY000]: General error: 1 no such table: organization_user
+
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:564
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:813
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:780
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:559
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:523
+at vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php:3804
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithPivotTable.php:274
+at app\Models\Organization.php:194
+at tests\Unit\Models\RelationshipTest.php:186</error>
+        </testcase>
+        <testcase name="`Organization Relationships` → organization has users with roles" file="tests\Unit\Models\RelationshipTest.php::`Organization Relationships` → organization has users with roles" class="Tests\Unit\Models\RelationshipTest" classname="Tests.Unit.Models.RelationshipTest" assertions="0" time="1.698622">
+          <error type="Illuminate\Database\QueryException">`Organization Relationships` → organization has users with rolesIlluminate\Database\QueryException: SQLSTATE[HY000]: General error: 1 no such table: organization_user (Connection: sqlite, SQL: insert into "organization_user" ("created_at", "is_active", "joined_at", "organization_id", "permissions", "role", "updated_at", "user_id") values (2025-12-22 20:15:20, 1, 2025-12-22 20:15:20, 11, ?, admin, 2025-12-22 20:15:20, 21))&#13;
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:564
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:813
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:780
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:559
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:523
+at vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php:3804
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithPivotTable.php:274
+at app\Models\Organization.php:194
+at tests\Unit\Models\RelationshipTest.php:22
+Caused by
+PDOException: SQLSTATE[HY000]: General error: 1 no such table: organization_user
+
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:564
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:813
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:780
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:559
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:523
+at vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php:3804
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithPivotTable.php:274
+at app\Models\Organization.php:194
+at tests\Unit\Models\RelationshipTest.php:22</error>
+        </testcase>
+        <testcase name="`Task Relationships` → task hierarchy works correctly" file="tests\Unit\Models\RelationshipTest.php::`Task Relationships` → task hierarchy works correctly" class="Tests\Unit\Models\RelationshipTest" classname="Tests.Unit.Models.RelationshipTest" assertions="4" time="1.124903"/>
+        <testcase name="`Performance Optimizations` → subquery relationships work correctly" file="tests\Unit\Models\RelationshipTest.php::`Performance Optimizations` → subquery relationships work correctly" class="Tests\Unit\Models\RelationshipTest" classname="Tests.Unit.Models.RelationshipTest" assertions="2" time="0.898476"/>
+        <testcase name="`Project Relationships` → project scopes work correctly" file="tests\Unit\Models\RelationshipTest.php::`Project Relationships` → project scopes work correctly" class="Tests\Unit\Models\RelationshipTest" classname="Tests.Unit.Models.RelationshipTest" assertions="2" time="0.847246">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">`Project Relationships` → project scopes work correctlyFailed asserting that 14 is identical to 1.&#13;
+at tests\Unit\Models\RelationshipTest.php:70</failure>
+        </testcase>
       </testsuite>
     </testsuite>
   </testsuite>

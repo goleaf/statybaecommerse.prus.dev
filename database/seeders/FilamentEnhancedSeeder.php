@@ -7,13 +7,11 @@ namespace Database\Seeders;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Legal;
+use App\Models\Product;
 use App\Models\Scopes\EnabledScope;
 use App\Models\Scopes\PublishedScope;
-use App\Models\Product;
-use App\Models\Translations\LegalTranslation;
 use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
@@ -110,7 +108,7 @@ final class FilamentEnhancedSeeder extends Seeder
             // Super administrators receive the complete permission matrix.
             'super_admin' => self::PERMISSION_NAMES,
             // Admins retain management access but avoid destructive role edits.
-            'admin'       => [
+            'admin' => [
                 'view_products',
                 'create_products',
                 'edit_products',
@@ -137,7 +135,7 @@ final class FilamentEnhancedSeeder extends Seeder
                 'export_data',
             ],
             // Managers cover day-to-day catalogue operations without deletes.
-            'manager'     => [
+            'manager' => [
                 'view_products',
                 'edit_products',
                 'view_categories',
@@ -151,7 +149,7 @@ final class FilamentEnhancedSeeder extends Seeder
                 'view_analytics',
             ],
             // Editors focus on creating catalogue data without destructive powers.
-            'editor'      => [
+            'editor' => [
                 'view_products',
                 'create_products',
                 'edit_products',
@@ -184,8 +182,9 @@ final class FilamentEnhancedSeeder extends Seeder
         $superAdmin = User::query()->updateOrCreate(
             ['email' => 'admin@example.com'],
             [
-                'name'              => 'Super Admin',
-                'password'          => Hash::make('admin123'),
+                'name' => 'Super Admin',
+                // Keep the seed password strong so SecurePasswordHandling accepts it before hashing.
+                'password'          => 'Admin123!',
                 'is_admin'          => true,
                 'is_active'         => true,
                 'timezone'          => 'Europe/Vilnius',
@@ -261,18 +260,18 @@ final class FilamentEnhancedSeeder extends Seeder
     {
         // Define deterministic legal documents so repeated seed runs stay idempotent.
         $legalPageDefinitions = [
-            'privacy-policy'     => [
-                'type'          => 'privacy_policy',
-                'is_enabled'    => true,
-                'is_required'   => true,
-                'sort_order'    => 10,
-                'meta_data'     => [
+            'privacy-policy' => [
+                'type'        => 'privacy_policy',
+                'is_enabled'  => true,
+                'is_required' => true,
+                'sort_order'  => 10,
+                'meta_data'   => [
                     'version'          => '1.1',
                     'last_reviewed'    => '2025-02-17',
                     'review_frequency' => 'monthly',
                 ],
-                'published_at'  => now()->subMonths(1),
-                'translations'  => [
+                'published_at' => now()->subMonths(1),
+                'translations' => [
                     'en' => [
                         'title'   => 'Privacy Policy',
                         'slug'    => 'privacy-policy',
@@ -290,18 +289,18 @@ final class FilamentEnhancedSeeder extends Seeder
                     ],
                 ],
             ],
-            'terms-of-service'   => [
-                'type'          => 'terms_of_use',
-                'is_enabled'    => true,
-                'is_required'   => true,
-                'sort_order'    => 20,
-                'meta_data'     => [
+            'terms-of-service' => [
+                'type'        => 'terms_of_use',
+                'is_enabled'  => true,
+                'is_required' => true,
+                'sort_order'  => 20,
+                'meta_data'   => [
                     'version'          => '2.0',
                     'last_reviewed'    => '2025-01-15',
                     'review_frequency' => 'quarterly',
                 ],
-                'published_at'  => now()->subWeeks(6),
-                'translations'  => [
+                'published_at' => now()->subWeeks(6),
+                'translations' => [
                     'en' => [
                         'title'   => 'Terms of Service',
                         'slug'    => 'terms-of-service',
@@ -319,18 +318,18 @@ final class FilamentEnhancedSeeder extends Seeder
                     ],
                 ],
             ],
-            'cookie-policy'      => [
-                'type'          => 'cookie_policy',
-                'is_enabled'    => true,
-                'is_required'   => false,
-                'sort_order'    => 30,
-                'meta_data'     => [
+            'cookie-policy' => [
+                'type'        => 'cookie_policy',
+                'is_enabled'  => true,
+                'is_required' => false,
+                'sort_order'  => 30,
+                'meta_data'   => [
                     'version'          => '1.0',
                     'last_reviewed'    => '2024-12-01',
                     'review_frequency' => 'annually',
                 ],
-                'published_at'  => now()->subMonths(2),
-                'translations'  => [
+                'published_at' => now()->subMonths(2),
+                'translations' => [
                     'en' => [
                         'title'   => 'Cookie Policy',
                         'slug'    => 'cookie-policy',

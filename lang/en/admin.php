@@ -3,6 +3,11 @@
 declare(strict_types=1);
 
 return [
+    'brand_name' => 'Egistatyba',
+    'navigation' => [
+        'profile'  => 'Profile',
+        'language' => 'Language',
+    ],
     'menu_items' => require __DIR__ . '/admin/menu_items.php',
     'dashboard'  => require __DIR__ . '/admin/dashboard.php',
     'no_image'   => 'No Image', // Shared admin fallback label whenever media assets are missing.

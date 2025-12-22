@@ -8,7 +8,6 @@ use App\Models\Legal;
 use App\Models\Translations\LegalTranslation;
 use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
@@ -179,8 +178,9 @@ final class BasicFilamentSeeder extends Seeder
         $user = User::query()->firstOrCreate(
             ['email' => $email],
             [
-                'name'              => $name,
-                'password'          => Hash::make('password'),
+                'name' => $name,
+                // Use a strong password so SecurePasswordHandling validates before hashing.
+                'password'          => 'Admin123!',
                 'email_verified_at' => now(),
                 'preferred_locale'  => 'lt',
             ]

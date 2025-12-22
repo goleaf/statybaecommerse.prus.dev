@@ -13,6 +13,11 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Avoid clobbering alternate schemas created earlier in the migration chain.
+        if (Schema::hasTable('performance_metrics')) {
+            return;
+        }
+
         Schema::create('performance_metrics', function (Blueprint $table) {
             $table->id();
             $table->string('page_route');
@@ -24,8 +29,13 @@ return new class extends Migration
             $table->json('additional_metrics')->nullable(); // For extensibility
             $table->timestamps();
 
-            $table->index(['page_route', 'created_at']);
-            $table->index('environment');
+            // Seed explicit index names so legacy migrations and schema dumps stay aligned.
+            $table->index(['page_route', 'created_at'], 'performance_metrics_page_route_created_at_index');
+            $table->index('environment', 'performance_metrics_environment_index');
+            $table->index(['page_route', 'created_at'], 'performance_metrics_route_date_idx');
+            $table->index('environment', 'performance_metrics_environment_idx');
+            $table->index(['page_route', 'environment', 'created_at'], 'performance_metrics_aggregation_idx');
+            $table->index(['page_route', 'created_at'], 'performance_metrics_route_time_idx');
         });
     }
 

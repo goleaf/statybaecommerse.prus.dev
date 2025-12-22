@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -29,7 +31,8 @@ final class AdminUserSeeder extends Seeder
         // Keep the guard credentials up to date so repeated seed runs refresh passwords and verification flags.
         $admin->fill([
             'name' => 'Administrator',
-            'password' => 'admin123',
+            // Use a strong seed password so SecurePasswordHandling validation passes.
+            'password'          => 'Admin123!',
             'email_verified_at' => now(),
         ]);
 

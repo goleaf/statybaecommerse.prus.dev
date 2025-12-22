@@ -5,15 +5,24 @@ declare(strict_types=1);
 namespace App\Traits;
 
 use App\Services\TranslationHookService;
+use Illuminate\Support\Facades\Schema;
+use Throwable;
 
 trait HasTranslations
 {
+    /**
+     * Cache translation key column lookups per table to avoid repeated schema hits.
+     *
+     * @var array<string, bool>
+     */
+    protected static array $translationKeyColumnCache = [];
+
     /**
      * Fields that should be automatically translated
      */
     protected array $translatableFields = [
         'name', 'title', 'description', 'content', 'summary',
-        'meta_title', 'meta_description', 'alt_text', 'caption'
+        'meta_title', 'meta_description', 'alt_text', 'caption',
     ];
 
     /**
@@ -34,18 +43,18 @@ trait HasTranslations
         $service = app(TranslationHookService::class);
 
         foreach ($this->getTranslatableFields() as $field) {
-            if ($this->isDirty($field) && !empty($this->$field)) {
+            if ($this->isDirty($field) && ! empty($this->$field)) {
                 $key = $service->generateTranslationKey(
                     $this->$field,
                     strtolower(class_basename($this))
                 );
 
                 $service->addTranslation($key, [
-                    config('app.locale', 'lt') => $this->$field
+                    config('app.locale', 'lt') => $this->$field,
                 ]);
 
                 // Store translation key if field exists
-                if ($this->isFillable($field . '_translation_key')) {
+                if ($this->canStoreTranslationKey($field)) {
                     $this->{$field . '_translation_key'} = $key;
                 }
             }
@@ -66,6 +75,7 @@ trait HasTranslations
     public function setTranslatableFields(array $fields): self
     {
         $this->translatableFields = $fields;
+
         return $this;
     }
 
@@ -74,20 +84,21 @@ trait HasTranslations
      */
     public function addTranslatableField(string $field): self
     {
-        if (!in_array($field, $this->translatableFields)) {
+        if (! in_array($field, $this->translatableFields)) {
             $this->translatableFields[] = $field;
         }
+
         return $this;
     }
 
     /**
      * Get translation for a field
      */
-    public function getTranslation(string $field, string $locale = null): ?string
+    public function getTranslation(string $field, ?string $locale = null): ?string
     {
         $locale = $locale ?? app()->getLocale();
         $key = $this->getTranslationKey($field);
-        
+
         if ($key) {
             return __($key, [], $locale);
         }
@@ -101,14 +112,15 @@ trait HasTranslations
     public function getTranslationKey(string $field): ?string
     {
         $keyField = $field . '_translation_key';
-        
-        if ($this->isFillable($keyField) && !empty($this->$keyField)) {
+
+        if ($this->canStoreTranslationKey($field) && ! empty($this->$keyField)) {
             return $this->$keyField;
         }
 
         // Generate key if not stored
-        if (!empty($this->$field)) {
+        if (! empty($this->$field)) {
             $service = app(TranslationHookService::class);
+
             return $service->generateTranslationKey(
                 $this->$field,
                 strtolower(class_basename($this))
@@ -121,16 +133,17 @@ trait HasTranslations
     /**
      * Check if field has translation
      */
-    public function hasTranslation(string $field, string $locale = null): bool
+    public function hasTranslation(string $field, ?string $locale = null): bool
     {
         $locale = $locale ?? app()->getLocale();
         $key = $this->getTranslationKey($field);
-        
-        if (!$key) {
+
+        if (! $key) {
             return false;
         }
 
         $translation = __($key, [], $locale);
+
         return $translation !== $key; // If translation exists, it won't return the key
     }
 
@@ -140,14 +153,14 @@ trait HasTranslations
     public function getAllTranslations(string $field): array
     {
         $key = $this->getTranslationKey($field);
-        
-        if (!$key) {
+
+        if (! $key) {
             return [];
         }
 
         $translations = [];
         $supportedLocales = config('app.supported_locales', 'lt,en');
-        
+
         if (is_string($supportedLocales)) {
             $supportedLocales = array_map('trim', explode(',', $supportedLocales));
         }
@@ -168,12 +181,36 @@ trait HasTranslations
     public function updateTranslation(string $field, string $locale, string $translation): bool
     {
         $key = $this->getTranslationKey($field);
-        
-        if (!$key) {
+
+        if (! $key) {
             return false;
         }
 
         $service = app(TranslationHookService::class);
+
         return $service->addTranslation($key, [$locale => $translation]);
+    }
+
+    /**
+     * Determine whether a translation key column exists for the given field.
+     */
+    protected function canStoreTranslationKey(string $field): bool
+    {
+        $column = $field . '_translation_key';
+        $cacheKey = $this->getTable() . '.' . $column;
+
+        if (array_key_exists($cacheKey, self::$translationKeyColumnCache)) {
+            return self::$translationKeyColumnCache[$cacheKey];
+        }
+
+        try {
+            $exists = Schema::hasColumn($this->getTable(), $column);
+        } catch (Throwable $e) {
+            $exists = false;
+        }
+
+        self::$translationKeyColumnCache[$cacheKey] = $exists;
+
+        return $exists;
     }
 }

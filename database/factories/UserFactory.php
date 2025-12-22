@@ -6,7 +6,6 @@ namespace Database\Factories;
 
 use App\Enums\AddressType;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Throwable;
@@ -40,17 +39,18 @@ class UserFactory extends Factory
         );
 
         $state = [
-            'name'              => $firstName . ' ' . $lastName,
+            'name' => $firstName . ' ' . $lastName,
             // Store decomposed name parts so seeders and UI components can reuse
             // deterministic values without re-parsing the combined name.
             'first_name'        => $firstName,
             'last_name'         => $lastName,
             'email'             => $email,
             'email_verified_at' => now(),
-            'password'          => static::$password ??= Hash::make('password'),
-            'preferred_locale'  => fake()->randomElement(['en', 'lt']),
-            'is_admin'          => false,
-            'remember_token'    => Str::random(10),
+            // Use a strong default so SecurePasswordHandling validates before hashing.
+            'password'         => static::$password ??= 'Admin123!',
+            'preferred_locale' => fake()->randomElement(['en', 'lt']),
+            'is_admin'         => false,
+            'remember_token'   => Str::random(10),
         ];
 
         // Some test runs (e.g. partial migrations, in-memory DBs) may not yet
@@ -81,7 +81,8 @@ class UserFactory extends Factory
             'is_admin'          => true,
             'email_verified_at' => now(),
             'is_active'         => true,
-            'password'          => static::$password ??= Hash::make('password'),
+            // Reuse the strong default so admin fixtures pass SecurePasswordHandling validation.
+            'password' => static::$password ??= 'Admin123!',
         ]);
     }
 
@@ -102,7 +103,7 @@ class UserFactory extends Factory
     public function billingAddress(): static
     {
         return $this->hasAddresses(1, fn (): array => [
-            'type'           => AddressType::BILLING,
+            'type' => AddressType::BILLING,
             // Ensure billing addresses do not unintentionally become the
             // customer's default entry because factories rely on null defaults.
             'is_default'     => false,

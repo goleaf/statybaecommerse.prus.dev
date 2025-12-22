@@ -62,8 +62,9 @@ final class EnhancedFilamentSeeder extends Seeder
         $admin = User::query()->firstOrCreate(
             ['email' => 'admin@statybaecommerse.prus.dev'],
             [
-                'name'              => 'System Administrator',
-                'password'          => bcrypt('admin123'),
+                'name' => 'System Administrator',
+                // Use a strong password so SecurePasswordHandling can validate before hashing.
+                'password'          => 'Admin123!',
                 'email_verified_at' => now(),
                 'preferred_locale'  => 'lt',
                 'is_admin'          => true,
@@ -73,7 +74,7 @@ final class EnhancedFilamentSeeder extends Seeder
 
         $admin->assignRole(AuthorizationRole::ADMIN->value);
 
-        $this->command->info('✅ Admin user created: admin@statybaecommerse.prus.dev / admin123');
+        $this->command->info('✅ Admin user created: admin@statybaecommerse.prus.dev / Admin123!');
     }
 
     private function enhanceProductData(): void

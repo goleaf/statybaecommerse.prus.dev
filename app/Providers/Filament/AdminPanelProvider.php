@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers\Filament;
 
-use Andreia\FilamentNordTheme\FilamentNordThemePlugin;
 use App\Support\Nav;
-use App\Support\ViteManifest;
 use Asmit\ResizedColumn\ResizedColumnPlugin;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 
@@ -21,7 +19,6 @@ use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Navigation\NavigationGroup;
 use Filament\Panel;
 use Filament\PanelProvider;
-use Filament\Support\Colors\Color;
 use Filament\Widgets\AccountWidget;
 use Hydrat\TableLayoutToggle\Persisters\LocalStoragePersister;
 use Hydrat\TableLayoutToggle\TableLayoutTogglePlugin;
@@ -113,7 +110,6 @@ final class AdminPanelProvider extends PanelProvider
             ->listLayoutButtonIcon('heroicon-o-list-bullet')
             ->gridLayoutButtonIcon('heroicon-o-squares-2x2');
 
-        $plugins[] = FilamentNordThemePlugin::make();
         $plugins[] = ResizedColumnPlugin::make()->preserveOnDB();
 
         $configuredGuard = config('filament.auth.guard');
@@ -134,14 +130,6 @@ final class AdminPanelProvider extends PanelProvider
             ->brandLogo(fn (): string => asset('images/logo-admin.svg'))
             ->brandLogoHeight('2rem')
             ->favicon(fn (): string => asset('favicon.ico'))
-            ->colors([
-                'primary' => Color::Blue,
-                'gray'    => Color::Slate,
-                'success' => Color::Green,
-                'warning' => Color::Amber,
-                'danger'  => Color::Red,
-                'info'    => Color::Sky,
-            ])
             ->resources($resourceClasses)
             ->pages($pageClasses)
             ->widgets([
@@ -168,8 +156,6 @@ final class AdminPanelProvider extends PanelProvider
             ->globalSearchKeyBindings(['command+k', 'ctrl+k'])
             ->sidebarCollapsibleOnDesktop()
             ->maxContentWidth('full')
-            ->font('Inter')
-            ->darkMode()
             ->globalSearch()
             ->globalSearchDebounce('500ms')
             ->breadcrumbs()
@@ -196,13 +182,6 @@ final class AdminPanelProvider extends PanelProvider
             ->when(app()->environment('testing'),
                 fn (Panel $p) => $p->plugins($this->testingPlugins()),
                 fn (Panel $p) => $p->plugins($this->configuredPlugins()))
-            // Enable the custom Filament theme only when the compiled manifest exposes the entry.
-            // Feature tests stub an empty manifest, so we skip the theme there to keep rendering resilient.
-            ->when(
-                ViteManifest::hasEntry('resources/css/filament/admin/theme.scss') && ! app()->environment('testing'),
-                fn (Panel $p): Panel => $p->viteTheme('resources/css/filament/admin/theme.scss'),
-                fn (Panel $p): Panel => $p
-            )
             ->spa();
     }
 
@@ -258,10 +237,6 @@ final class AdminPanelProvider extends PanelProvider
             }
 
             $plugins[] = $tableLayoutPlugin;
-        }
-
-        if (class_exists(FilamentNordThemePlugin::class)) {
-            $plugins[] = FilamentNordThemePlugin::make();
         }
 
         if ($translatablePlugin = $this->makeTranslatablePlugin()) {
