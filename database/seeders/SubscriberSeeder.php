@@ -10,7 +10,6 @@ use App\Models\User;
 use function collect;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 
 final class SubscriberSeeder extends Seeder
 {
@@ -68,7 +67,8 @@ final class SubscriberSeeder extends Seeder
 
     private function seedLinkedUserSubscribers(\Illuminate\Support\Collection $companies): void
     {
-        $password = Hash::make('password');
+        // Use a strong password so SecurePasswordHandling validates before hashing.
+        $password = 'Admin123!';
 
         collect(range(1, 10))->each(function (int $index) use ($companies, $password): void {
             $email = "company.user{$index}@statybae.test";
@@ -111,7 +111,8 @@ final class SubscriberSeeder extends Seeder
         User::withTrashed()->where('email', 'admin@example.com')->forceDelete();
         Subscriber::withTrashed()->where('email', 'admin@example.com')->forceDelete();
 
-        $password = Hash::make('password');
+        // Use a strong password so SecurePasswordHandling validates before hashing.
+        $password = 'Admin123!';
 
         $admin = User::factory()
             ->admin()

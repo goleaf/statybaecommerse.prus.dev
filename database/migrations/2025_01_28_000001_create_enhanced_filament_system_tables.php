@@ -143,20 +143,8 @@ return new class extends Migration
         }
 
         // Enhanced Performance Monitoring
-        if (! Schema::hasTable('performance_metrics')) {
-            Schema::create('performance_metrics', function (Blueprint $table): void {
-                $table->id();
-                $table->string('metric_name');
-                $table->string('metric_type'); // counter, gauge, histogram
-                $table->decimal('value', 15, 6);
-                $table->json('tags')->nullable(); // additional metadata
-                $table->timestamp('recorded_at');
-                $table->timestamps();
-
-                $table->index(['metric_name', 'recorded_at']);
-                $table->index(['metric_type']);
-            });
-        }
+        // The performance_metrics table is created later with the storefront schema
+        // to avoid conflicting definitions during fresh migrations.
 
         // Enhanced Background Jobs
         if (! Schema::hasTable('job_batches_extended')) {

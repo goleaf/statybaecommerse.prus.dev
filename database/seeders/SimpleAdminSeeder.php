@@ -50,9 +50,10 @@ final class SimpleAdminSeeder extends Seeder
         $admin = User::firstOrCreate(
             ['email' => 'admin@example.com'],
             [
-                'name'              => 'Super Administrator',
-                'email'             => 'admin@example.com',
-                'password'          => 'password',  // Will be hashed by User model mutator
+                'name'  => 'Super Administrator',
+                'email' => 'admin@example.com',
+                // Use a strong password so the User mutator validates before hashing.
+                'password'          => 'Admin123!',
                 'email_verified_at' => now(),
                 'is_admin'          => true,
                 'is_active'         => true,
@@ -64,7 +65,7 @@ final class SimpleAdminSeeder extends Seeder
 
         $this->command->info('✅ Super Admin created successfully!');
         $this->command->info('📧 Email: admin@example.com');
-        $this->command->info('🔑 Password: password');
+        $this->command->info('🔑 Password: Admin123!');
         $this->command->info('🎭 Role: super-admin');
     }
 }

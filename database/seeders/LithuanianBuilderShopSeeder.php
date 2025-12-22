@@ -80,10 +80,11 @@ class LithuanianBuilderShopSeeder extends Seeder
         $admin = User::firstOrCreate(
             ['email' => 'admin@statybaecommerse.lt'],
             [
-                'name'              => 'Administratorius Sistema',
-                'first_name'        => 'Administratorius',
-                'last_name'         => 'Sistema',
-                'password'          => bcrypt('password'),
+                'name'       => 'Administratorius Sistema',
+                'first_name' => 'Administratorius',
+                'last_name'  => 'Sistema',
+                // Use a strong password so SecurePasswordHandling validates before hashing.
+                'password'          => 'Admin123!',
                 'email_verified_at' => now(),
                 'preferred_locale'  => 'lt',
             ]
@@ -93,10 +94,11 @@ class LithuanianBuilderShopSeeder extends Seeder
         $manager = User::firstOrCreate(
             ['email' => 'manager@statybaecommerse.lt'],
             [
-                'name'              => 'Vadybininkas Parduotuvės',
-                'first_name'        => 'Vadybininkas',
-                'last_name'         => 'Parduotuvės',
-                'password'          => bcrypt('password'),
+                'name'       => 'Vadybininkas Parduotuvės',
+                'first_name' => 'Vadybininkas',
+                'last_name'  => 'Parduotuvės',
+                // Use a strong password so SecurePasswordHandling validates before hashing.
+                'password'          => 'Admin123!',
                 'email_verified_at' => now(),
                 'preferred_locale'  => 'lt',
             ]

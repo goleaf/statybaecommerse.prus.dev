@@ -100,6 +100,31 @@ final class Country extends Model
     }
 
     /**
+     * Get translated field value for the specified locale.
+     */
+    public function trans(string $field, ?string $locale = null): mixed
+    {
+        $locale ??= app()->getLocale();
+
+        if ($this->relationLoaded('translations')) {
+            $translation = $this->translations->firstWhere('locale', $locale);
+            if ($translation && isset($translation->{$field})) {
+                return $translation->{$field};
+            }
+        }
+
+        return $this->{$field} ?? null;
+    }
+
+    /**
+     * Handle translations functionality with proper error handling.
+     */
+    public function translations(): HasMany
+    {
+        return $this->hasMany($this->translationModel ?? CountryTranslation::class);
+    }
+
+    /**
      * Handle getDisplayNameAttribute functionality with proper error handling.
      */
     public function getDisplayNameAttribute(): string

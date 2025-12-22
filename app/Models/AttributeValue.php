@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -123,6 +124,31 @@ final class AttributeValue extends Model
     public function valueable(): MorphTo
     {
         return $this->morphTo();
+    }
+
+    /**
+     * Get translated field value for the specified locale.
+     */
+    public function trans(string $field, ?string $locale = null): mixed
+    {
+        $locale ??= app()->getLocale();
+
+        if ($this->relationLoaded('translations')) {
+            $translation = $this->translations->firstWhere('locale', $locale);
+            if ($translation && isset($translation->{$field})) {
+                return $translation->{$field};
+            }
+        }
+
+        return $this->{$field} ?? null;
+    }
+
+    /**
+     * Handle translations functionality with proper error handling.
+     */
+    public function translations(): HasMany
+    {
+        return $this->hasMany($this->translationModel ?? \App\Models\Translations\AttributeValueTranslation::class);
     }
 
     /**

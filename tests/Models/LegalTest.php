@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Enums\LegalDocumentType;
 use App\Models\Legal;
 use App\Models\Translations\LegalTranslation;
 use App\Services\Security\HtmlContentSanitizer;
@@ -87,4 +88,126 @@ it('updates an existing translation through the helper', function (): void {
 
     // Assert: verify the persisted value matches the expected new title.
     expect($translation->fresh()->title)->toBe('Updated title');
+});
+it('uses enum for document types', function (): void {
+    // Arrange: get types from the model
+    $types = Legal::getTypes();
+    
+    // Assert: verify the types match the enum options
+    expect($types)->toBe(LegalDocumentType::getOptions());
+    expect($types)->toHaveKey('privacy_policy');
+    expect($types)->toHaveKey('terms_of_use');
+});
+
+it('identifies required document types using enum', function (): void {
+    // Arrange: get required types from the model
+    $requiredTypes = Legal::getRequiredTypes();
+    
+    // Assert: verify required types match enum
+    expect($requiredTypes)->toContain('privacy_policy');
+    expect($requiredTypes)->toContain('terms_of_use');
+    expect($requiredTypes)->not->toContain('refund_policy');
+});
+
+it('provides status accessor based on enabled and published state', function (): void {
+    // Arrange: create documents in different states
+    $disabled = Legal::factory()->create(['is_enabled' => false]);
+    $draft = Legal::factory()->create(['is_enabled' => true, 'published_at' => null]);
+    $published = Legal::factory()->create(['is_enabled' => true, 'published_at' => now()->subDay()]);
+    
+    // Assert: verify status calculation
+    expect($disabled->status)->toBe('disabled');
+    expect($draft->status)->toBe('draft');
+    expect($published->status)->toBe('published');
+});
+
+it('provides is_published accessor', function (): void {
+    // Arrange: create documents with different publish states
+    $unpublished = Legal::factory()->create(['published_at' => null]);
+    $futurePublished = Legal::factory()->create(['published_at' => now()->addDay()]);
+    $published = Legal::factory()->create(['published_at' => now()->subDay()]);
+    
+    // Assert: verify publication status
+    expect($unpublished->is_published)->toBeFalse();
+    expect($futurePublished->is_published)->toBeFalse();
+    expect($published->is_published)->toBeTrue();
+});
+
+it('provides helper methods for document state management', function (): void {
+    // Arrange: create a legal document
+    $legal = Legal::factory()->create([
+        'is_enabled' => false,
+        'is_required' => false,
+        'published_at' => null,
+    ]);
+    
+    // Act & Assert: test enable/disable
+    expect($legal->enable())->toBeTrue();
+    expect($legal->fresh()->is_enabled)->toBeTrue();
+    
+    expect($legal->disable())->toBeTrue();
+    expect($legal->fresh()->is_enabled)->toBeFalse();
+    
+    // Act & Assert: test publish/unpublish
+    expect($legal->publish())->toBeTrue();
+    expect($legal->fresh()->published_at)->not->toBeNull();
+    
+    expect($legal->unpublish())->toBeTrue();
+    expect($legal->fresh()->published_at)->toBeNull();
+    
+    // Act & Assert: test required/optional
+    expect($legal->makeRequired())->toBeTrue();
+    expect($legal->fresh()->is_required)->toBeTrue();
+    
+    expect($legal->makeOptional())->toBeTrue();
+    expect($legal->fresh()->is_required)->toBeFalse();
+});
+
+it('provides static methods for retrieving documents', function (): void {
+    // Arrange: create test documents
+    $published = Legal::factory()->enabled()->published()->create(['key' => 'test-doc']);
+    $disabled = Legal::factory()->disabled()->create(['key' => 'disabled-doc']);
+    $required = Legal::factory()->enabled()->published()->required()->create(['type' => 'privacy_policy']);
+    
+    // Act & Assert: test getByKey
+    $found = Legal::getByKey('test-doc');
+    expect($found)->not->toBeNull();
+    expect($found->id)->toBe($published->id);
+    
+    $notFound = Legal::getByKey('disabled-doc'); // disabled documents shouldn't be found
+    expect($notFound)->toBeNull();
+    
+    // Act & Assert: test getRequiredDocuments
+    $requiredDocs = Legal::getRequiredDocuments();
+    expect($requiredDocs)->toHaveCount(1);
+    expect($requiredDocs->first()->id)->toBe($required->id);
+    
+    // Act & Assert: test getByType
+    $privacyDocs = Legal::getByType('privacy_policy');
+    expect($privacyDocs)->toHaveCount(1);
+    expect($privacyDocs->first()->id)->toBe($required->id);
+});
+
+it('handles translation field retrieval with proper null checks', function (): void {
+    // Arrange: create a legal document with a translation
+    $legal = Legal::factory()->create();
+    $translation = \App\Models\Translations\LegalTranslation::factory()->create([
+        'legal_id' => $legal->id,
+        'locale' => 'en',
+        'title' => 'Test Title',
+        'content' => '<p>Test content</p>',
+        'slug' => 'test-slug',
+        'seo_title' => 'SEO Title',
+        'seo_description' => 'SEO Description',
+    ]);
+    
+    // Act & Assert: test translation field retrieval
+    expect($legal->getTranslatedTitle('en'))->toBe('Test Title');
+    expect($legal->getTranslatedSlug('en'))->toBe('test-slug');
+    expect($legal->getTranslatedSeoTitle('en'))->toBe('SEO Title');
+    expect($legal->getTranslatedSeoDescription('en'))->toBe('SEO Description');
+    
+    // Test with non-existent locale
+    expect($legal->getTranslatedTitle('fr'))->toBeNull();
+    expect($legal->getTranslatedSlug('fr'))->toBeNull();
 });

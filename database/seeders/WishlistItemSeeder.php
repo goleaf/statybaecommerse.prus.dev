@@ -24,6 +24,7 @@ class WishlistItemSeeder extends Seeder
 
         if ($users->isEmpty()) {
             $this->command->error('❌ No users available.');
+
             return;
         }
 
@@ -41,7 +42,8 @@ class WishlistItemSeeder extends Seeder
         $existingCount = User::where('is_admin', false)->count();
 
         if ($existingCount >= 5) {
-            $this->command->info("✓ Using existing users");
+            $this->command->info('✓ Using existing users');
+
             return User::where('is_admin', false)->inRandomOrder()->limit(5)->get();
         }
 
@@ -66,6 +68,7 @@ class WishlistItemSeeder extends Seeder
 
             if ($existingWishlists >= 2) {
                 $this->command->info("✓ User #{$user->id} already has {$existingWishlists} wishlists");
+
                 return;
             }
 
@@ -119,7 +122,7 @@ class WishlistItemSeeder extends Seeder
         $scenariosCreated = [];
 
         // Scenario 1: Power user with many items
-        if (!$this->scenarioExists('poweruser@example.com')) {
+        if (! $this->scenarioExists('poweruser@example.com')) {
             $this->createPowerUserScenario();
             $scenariosCreated[] = 'Power user with 15+ items';
         } else {
@@ -127,7 +130,7 @@ class WishlistItemSeeder extends Seeder
         }
 
         // Scenario 2: Minimal user with empty wishlist
-        if (!$this->scenarioExists('minimal@example.com')) {
+        if (! $this->scenarioExists('minimal@example.com')) {
             $this->createMinimalUserScenario();
             $scenariosCreated[] = 'Minimal user with empty wishlist';
         } else {
@@ -135,7 +138,7 @@ class WishlistItemSeeder extends Seeder
         }
 
         // Scenario 3: Organized user with multiple wishlists
-        if (!$this->scenarioExists('organized@example.com')) {
+        if (! $this->scenarioExists('organized@example.com')) {
             $this->createOrganizedUserScenario();
             $scenariosCreated[] = 'Organized user with 4 categorized wishlists';
         } else {
@@ -143,14 +146,14 @@ class WishlistItemSeeder extends Seeder
         }
 
         // Scenario 4: Bulk buyer
-        if (!$this->scenarioExists('bulk@example.com')) {
+        if (! $this->scenarioExists('bulk@example.com')) {
             $this->createBulkBuyerScenario();
             $scenariosCreated[] = 'Bulk buyer with high quantity items';
         } else {
             $this->command->info('✓ Bulk buyer scenario already exists');
         }
 
-        if (!empty($scenariosCreated)) {
+        if (! empty($scenariosCreated)) {
             $this->command->info('✅ Created wishlist items for various user scenarios:');
             foreach ($scenariosCreated as $scenario) {
                 $this->command->info("  - {$scenario}");
@@ -169,12 +172,13 @@ class WishlistItemSeeder extends Seeder
             'name'              => 'Power User',
             'email'             => 'poweruser@example.com',
             'email_verified_at' => now(),
-            'password'          => bcrypt('password'),
-            'preferred_locale'  => 'en',
-            'is_admin'          => false,
-            'first_name'        => 'Power',
-            'last_name'         => 'User',
-            'is_active'         => true,
+            // Use a strong password so SecurePasswordHandling validates before hashing.
+            'password'         => 'Admin123!',
+            'preferred_locale' => 'en',
+            'is_admin'         => false,
+            'first_name'       => 'Power',
+            'last_name'        => 'User',
+            'is_active'        => true,
         ]);
 
         $powerUserWishlist = UserWishlist::factory()->create([
@@ -207,12 +211,13 @@ class WishlistItemSeeder extends Seeder
             'name'              => 'Minimal User',
             'email'             => 'minimal@example.com',
             'email_verified_at' => now(),
-            'password'          => bcrypt('password'),
-            'preferred_locale'  => 'en',
-            'is_admin'          => false,
-            'first_name'        => 'Minimal',
-            'last_name'         => 'User',
-            'is_active'         => true,
+            // Use a strong password so SecurePasswordHandling validates before hashing.
+            'password'         => 'Admin123!',
+            'preferred_locale' => 'en',
+            'is_admin'         => false,
+            'first_name'       => 'Minimal',
+            'last_name'        => 'User',
+            'is_active'        => true,
         ]);
 
         UserWishlist::factory()->create([
@@ -228,12 +233,13 @@ class WishlistItemSeeder extends Seeder
             'name'              => 'Organized User',
             'email'             => 'organized@example.com',
             'email_verified_at' => now(),
-            'password'          => bcrypt('password'),
-            'preferred_locale'  => 'en',
-            'is_admin'          => false,
-            'first_name'        => 'Organized',
-            'last_name'         => 'User',
-            'is_active'         => true,
+            // Use a strong password so SecurePasswordHandling validates before hashing.
+            'password'         => 'Admin123!',
+            'preferred_locale' => 'en',
+            'is_admin'         => false,
+            'first_name'       => 'Organized',
+            'last_name'        => 'User',
+            'is_active'        => true,
         ]);
 
         $wishlists = [
@@ -265,12 +271,13 @@ class WishlistItemSeeder extends Seeder
             'name'              => 'Bulk Buyer',
             'email'             => 'bulk@example.com',
             'email_verified_at' => now(),
-            'password'          => bcrypt('password'),
-            'preferred_locale'  => 'en',
-            'is_admin'          => false,
-            'first_name'        => 'Bulk',
-            'last_name'         => 'Buyer',
-            'is_active'         => true,
+            // Use a strong password so SecurePasswordHandling validates before hashing.
+            'password'         => 'Admin123!',
+            'preferred_locale' => 'en',
+            'is_admin'         => false,
+            'first_name'       => 'Bulk',
+            'last_name'        => 'Buyer',
+            'is_active'        => true,
         ]);
 
         $bulkWishlist = UserWishlist::factory()->create([

@@ -6,7 +6,6 @@ namespace Database\Factories;
 
 use App\Models\AdminUser;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 /**
@@ -22,8 +21,9 @@ final class AdminUserFactory extends Factory
             'name'              => fake()->name(),
             'email'             => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
-            'password'          => Hash::make('password'),
-            'remember_token'    => Str::random(10),
+            // Use a strong default so SecurePasswordHandling validates before hashing.
+            'password'       => 'Admin123!',
+            'remember_token' => Str::random(10),
         ];
     }
 
@@ -37,7 +37,8 @@ final class AdminUserFactory extends Factory
     public function withPassword(string $password): static
     {
         return $this->state(fn (array $attributes) => [
-            'password' => Hash::make($password),
+            // Accept raw passwords so the model mutator can validate and hash consistently.
+            'password' => $password,
         ]);
     }
 }

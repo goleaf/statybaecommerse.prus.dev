@@ -31,7 +31,6 @@ use App\Models\Zone;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Throwable;
 
@@ -132,7 +131,8 @@ final class AdminSeeder extends Seeder
 
         $this->logInfo('✅ Comprehensive Admin Seeder completed successfully!');
         $this->logInfo('👤 Admin user: admin@example.com');
-        $this->logInfo('🔑 Password: password');
+        // Keep the printed credentials aligned with the seeded password for QA logins.
+        $this->logInfo('🔑 Password: Admin123!');
     }
 
     private function createAdminUser(): User
@@ -144,9 +144,10 @@ final class AdminSeeder extends Seeder
             [
                 'name'              => 'Admin User',
                 'email_verified_at' => now(),
-                'password'          => Hash::make('password'),
-                'is_admin'          => true,
-                'is_active'         => true,
+                // Use a strong seed password so SecurePasswordHandling accepts it.
+                'password'  => 'Admin123!',
+                'is_admin'  => true,
+                'is_active' => true,
             ]
         );
     }

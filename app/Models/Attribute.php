@@ -11,7 +11,6 @@ use App\Models\Scopes\VisibleScope;
 use App\Traits\HasTranslations;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute as EloquentAttribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -198,6 +197,31 @@ final class Attribute extends Model
     public function values(): HasMany
     {
         return $this->hasMany(AttributeValue::class)->orderBy('sort_order');
+    }
+
+    /**
+     * Get translated field value for the specified locale.
+     */
+    public function trans(string $field, ?string $locale = null): mixed
+    {
+        $locale ??= app()->getLocale();
+
+        if ($this->relationLoaded('translations')) {
+            $translation = $this->translations->firstWhere('locale', $locale);
+            if ($translation && isset($translation->{$field})) {
+                return $translation->{$field};
+            }
+        }
+
+        return $this->{$field} ?? null;
+    }
+
+    /**
+     * Handle translations functionality with proper error handling.
+     */
+    public function translations(): HasMany
+    {
+        return $this->hasMany($this->translationModel ?? \App\Models\Translations\AttributeTranslation::class);
     }
 
     /**

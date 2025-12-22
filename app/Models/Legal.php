@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\LegalDocumentType;
 use App\Models\Scopes\EnabledScope;
 use App\Models\Scopes\PublishedScope;
 use App\Services\Security\HtmlContentSanitizer;
-use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -51,15 +51,31 @@ final class Legal extends Model
     /** @use HasFactory<\Database\Factories\LegalFactory> */
     use HasFactory;
 
-    use HasTranslations;
-
     protected $table = 'legals';
 
     protected $fillable = ['key', 'type', 'is_enabled', 'is_required', 'sort_order', 'meta_data', 'published_at'];
 
-    protected $casts = ['is_enabled' => 'boolean', 'is_required' => 'boolean', 'sort_order' => 'integer', 'meta_data' => 'array', 'published_at' => 'datetime'];
+    protected $casts = [
+        'is_enabled'   => 'boolean',
+        'is_required'  => 'boolean',
+        'sort_order'   => 'integer',
+        'meta_data'    => 'array',
+        'published_at' => 'datetime',
+    ];
 
     protected string $translationModel = \App\Models\Translations\LegalTranslation::class;
+
+    // Relationships
+
+    /**
+     * Get the translations for the legal document.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Translations\LegalTranslation>
+     */
+    public function translations(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(\App\Models\Translations\LegalTranslation::class);
+    }
 
     // Scopes
 
@@ -169,9 +185,7 @@ final class Legal extends Model
      */
     public function getTranslatedTitle(?string $locale = null): ?string
     {
-        $title = $this->trans('title', $locale);
-
-        return is_string($title) ? $title : null;
+        return $this->getTranslatedField('title', $locale);
     }
 
     /**
@@ -179,8 +193,8 @@ final class Legal extends Model
      */
     public function getTranslatedContent(?string $locale = null): ?string
     {
-        $content = $this->trans('content', $locale);
-        if ($content === null || ! is_string($content)) {
+        $content = $this->getTranslatedField('content', $locale);
+        if ($content === null) {
             return null;
         }
 
@@ -192,9 +206,7 @@ final class Legal extends Model
      */
     public function getTranslatedSlug(?string $locale = null): ?string
     {
-        $slug = $this->trans('slug', $locale);
-
-        return is_string($slug) ? $slug : null;
+        return $this->getTranslatedField('slug', $locale);
     }
 
     /**
@@ -202,9 +214,7 @@ final class Legal extends Model
      */
     public function getTranslatedSeoTitle(?string $locale = null): ?string
     {
-        $seoTitle = $this->trans('seo_title', $locale);
-
-        return is_string($seoTitle) ? $seoTitle : null;
+        return $this->getTranslatedField('seo_title', $locale);
     }
 
     /**
@@ -212,9 +222,27 @@ final class Legal extends Model
      */
     public function getTranslatedSeoDescription(?string $locale = null): ?string
     {
-        $seoDescription = $this->trans('seo_description', $locale);
+        return $this->getTranslatedField('seo_description', $locale);
+    }
 
-        return is_string($seoDescription) ? $seoDescription : null;
+    /**
+     * Get a translated field value for the given locale.
+     */
+    private function getTranslatedField(string $field, ?string $locale = null): ?string
+    {
+        $locale = $locale ?? app()->getLocale();
+
+        $translation = $this->translations()
+            ->where('locale', $locale)
+            ->first();
+
+        if (! $translation || ! isset($translation->{$field})) {
+            return null;
+        }
+
+        $value = $translation->{$field};
+
+        return is_string($value) && $value !== '' ? $value : null;
     }
 
     /**
@@ -253,16 +281,26 @@ final class Legal extends Model
         /** @var \App\Models\Translations\LegalTranslation $translation */
         $translation = $this->translations()->firstOrCreate(
             ['locale' => $locale],
-            [
-                'title'           => $this->key,
-                'slug'            => \Illuminate\Support\Str::slug($this->key) . '-' . $locale,
-                'content'         => '',
-                'seo_title'       => $this->key,
-                'seo_description' => '',
-            ]
+            $this->getDefaultTranslationData($locale)
         );
 
         return $translation;
+    }
+
+    /**
+     * Get default translation data for a new translation.
+     *
+     * @return array<string, string>
+     */
+    private function getDefaultTranslationData(string $locale): array
+    {
+        return [
+            'title'           => $this->key,
+            'slug'            => \Illuminate\Support\Str::slug($this->key) . '-' . $locale,
+            'content'         => '',
+            'seo_title'       => $this->key,
+            'seo_description' => '',
+        ];
     }
 
     /**
@@ -337,17 +375,7 @@ final class Legal extends Model
      */
     public static function getTypes(): array
     {
-        return [
-            'privacy_policy'  => 'Privatumo politika',
-            'terms_of_use'    => 'Naudojimosi sąlygos',
-            'refund_policy'   => 'Grąžinimo politika',
-            'shipping_policy' => 'Pristatymo politika',
-            'cookie_policy'   => 'Slapukų politika',
-            'gdpr_policy'     => 'GDPR politika',
-            'legal_notice'    => 'Teisinė informacija',
-            'imprint'         => 'Imprint',
-            'legal_document'  => 'Teisinis dokumentas',
-        ];
+        return LegalDocumentType::getOptions();
     }
 
     /**
@@ -357,7 +385,10 @@ final class Legal extends Model
      */
     public static function getRequiredTypes(): array
     {
-        return ['privacy_policy', 'terms_of_use'];
+        return array_map(
+            static fn (LegalDocumentType $type): string => $type->value,
+            LegalDocumentType::getRequiredTypes()
+        );
     }
 
     /**

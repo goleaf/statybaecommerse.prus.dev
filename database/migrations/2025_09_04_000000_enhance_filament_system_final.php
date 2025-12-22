@@ -162,21 +162,8 @@ return new class extends Migration
         }
 
         // Create performance metrics table
-        if (! Schema::hasTable('performance_metrics')) {
-            Schema::create('performance_metrics', function (Blueprint $table) {
-                $table->id();
-                $table->string('metric_name');
-                $table->string('metric_type'); // counter, gauge, histogram, summary
-                $table->decimal('value', 15, 6);
-                $table->json('labels')->nullable();
-                $table->timestamp('recorded_at');
-                $table->timestamps();
-
-                $table->index(['metric_name', 'recorded_at']);
-                $table->index(['metric_type', 'recorded_at']);
-                $table->index(['recorded_at']);
-            });
-        }
+        // The final performance_metrics schema is defined in a later migration
+        // to keep the table definition consistent across fresh installs.
 
         // Create user preferences table
         if (! Schema::hasTable('user_preferences')) {

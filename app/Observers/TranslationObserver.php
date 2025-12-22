@@ -8,9 +8,18 @@ use App\Services\TranslationHookService;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
+use Throwable;
 
 final class TranslationObserver
 {
+    /**
+     * Cache translation key column lookups per table to avoid repeated schema hits.
+     *
+     * @var array<string, bool>
+     */
+    private static array $translationKeyColumnCache = [];
+
     public function __construct(
         private readonly TranslationHookService $translationService
     ) {}
@@ -69,7 +78,7 @@ final class TranslationObserver
             $this->translationService->addTranslation($key, $translations);
 
             // Store translation key reference if model supports it
-            if ($model->isFillable($field . '_translation_key')) {
+            if ($this->canStoreTranslationKey($model, $field)) {
                 $model->{$field . '_translation_key'} = $key;
             }
 
@@ -117,5 +126,25 @@ final class TranslationObserver
                 'translatable_fields' => $translatableFields,
             ]);
         }
+    }
+
+    private function canStoreTranslationKey(Model $model, string $field): bool
+    {
+        $column = $field . '_translation_key';
+        $cacheKey = $model->getTable() . '.' . $column;
+
+        if (array_key_exists($cacheKey, self::$translationKeyColumnCache)) {
+            return self::$translationKeyColumnCache[$cacheKey];
+        }
+
+        try {
+            $exists = Schema::hasColumn($model->getTable(), $column);
+        } catch (Throwable $e) {
+            $exists = false;
+        }
+
+        self::$translationKeyColumnCache[$cacheKey] = $exists;
+
+        return $exists;
     }
 }
