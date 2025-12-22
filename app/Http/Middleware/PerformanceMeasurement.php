@@ -49,11 +49,6 @@ class PerformanceMeasurement
             return $next($request);
         }
 
-        // Skip measurement in testing environment to avoid interference
-        if (app()->environment('testing')) {
-            return $next($request);
-        }
-
         $startTime = microtime(true);
         $startMemory = memory_get_peak_usage(true);
 
@@ -65,13 +60,19 @@ class PerformanceMeasurement
         $endTime = microtime(true);
         $endMemory = memory_get_peak_usage(true);
 
-        // Calculate metrics
-        $ttfb = ($endTime - $startTime) * 1000; // Convert to milliseconds
+        // Calculate metrics with optimized precision
+        $ttfb = round(($endTime - $startTime) * 1000, 2); // Convert to milliseconds with 2 decimal precision
         $queryCount = $this->getQueryCount() - $initialQueryCount;
-        $peakMemoryMb = (int) round($endMemory / 1024 / 1024);
+        $peakMemoryMb = round($endMemory / 1024 / 1024, 2); // More precise memory calculation
 
-        // Store metrics asynchronously to avoid impacting response time
-        $this->storeMetricsAsync($routeName, $ttfb, $queryCount, $peakMemoryMb);
+        // Store metrics based on environment
+        if (app()->environment('testing')) {
+            // Synchronous storage in tests for predictable behavior
+            $this->storeMetricsSync($routeName, $ttfb, $queryCount, $peakMemoryMb);
+        } else {
+            // Asynchronous storage in production
+            $this->storeMetricsAsync($routeName, $ttfb, $queryCount, $peakMemoryMb);
+        }
 
         return $response;
     }
@@ -93,11 +94,40 @@ class PerformanceMeasurement
     }
 
     /**
+     * Store performance metrics synchronously (for testing).
+     */
+    private function storeMetricsSync(string $routeName, float $ttfb, int $queryCount, float $peakMemoryMb): void
+    {
+        try {
+            // Use raw DB insert for better performance in tests
+            DB::table('performance_metrics')->insert([
+                'page_route'         => $routeName,
+                'ttfb_p50'           => $ttfb,
+                'ttfb_p95'           => $ttfb,
+                'query_count'        => $queryCount,
+                'peak_memory_mb'     => $peakMemoryMb,
+                'environment'        => app()->environment(),
+                'additional_metrics' => json_encode([
+                    'timestamp'  => now()->toISOString(),
+                    'user_agent' => request()->userAgent(),
+                ]),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        } catch (Throwable $e) {
+            Log::warning('Failed to store performance metrics synchronously', [
+                'route' => $routeName,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
      * Store performance metrics asynchronously.
      */
-    private function storeMetricsAsync(string $routeName, float $ttfb, int $queryCount, int $peakMemoryMb): void
+    private function storeMetricsAsync(string $routeName, float $ttfb, int $queryCount, float $peakMemoryMb): void
     {
-        // Use dispatch_sync in testing, async in production
+        // Asynchronous storage in production to avoid blocking response
         $job = new \App\Jobs\StorePerformanceMetricsJob(
             $routeName,
             $ttfb,
@@ -106,20 +136,7 @@ class PerformanceMeasurement
             app()->environment()
         );
 
-        if (app()->environment('testing')) {
-            // Synchronous in tests for predictable behavior
-            try {
-                $job->handle();
-            } catch (Throwable $e) {
-                Log::warning('Failed to store performance metrics in test', [
-                    'route' => $routeName,
-                    'error' => $e->getMessage(),
-                ]);
-            }
-        } else {
-            // Asynchronous in production to avoid blocking response
-            dispatch($job)->onQueue('metrics');
-        }
+        dispatch($job)->onQueue('metrics');
     }
 
     /**

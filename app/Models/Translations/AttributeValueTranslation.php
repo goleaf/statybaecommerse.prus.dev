@@ -33,7 +33,11 @@ final class AttributeValueTranslation extends Model
 
     protected $table = 'attribute_value_translations';
 
-    protected $guarded = [];
+    protected $fillable = [
+        'locale',
+        'value',
+        'description',
+    ];
 
     public $timestamps = true;
 

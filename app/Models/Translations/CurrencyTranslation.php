@@ -25,7 +25,12 @@ final class CurrencyTranslation extends Model
 {
     protected $table = 'currency_translations';
 
-    protected $guarded = [];
+    protected $fillable = [
+        'locale',
+        'name',
+        'symbol',
+        'description',
+    ];
 
     /**
      * Handle casts functionality with proper error handling.

@@ -23,14 +23,15 @@ class ExceptionHandlerSecurityTest extends TestCase
     {
         parent::setUp();
         $this->handler = app(Handler::class);
-        Log::spy();
     }
 
     /** @test */
     public function it_prevents_information_disclosure_in_boot_error_logs(): void
     {
+        Log::spy();
+
         // Test that sensitive information is not logged
-        $exception = new Exception('Database password: secret123 in /app/Models/Product.php');
+        $exception = new Exception('TranslatableRecord error: Database password: secret123 in /app/Models/Product.php');
 
         $this->handler->report($exception);
 
@@ -49,7 +50,9 @@ class ExceptionHandlerSecurityTest extends TestCase
     /** @test */
     public function it_sanitizes_file_paths_in_error_context(): void
     {
-        $exception = new Exception('Error in sensitive file');
+        Log::spy();
+
+        $exception = new Exception('TranslatableRecord error in sensitive file');
 
         // Mock file path with sensitive information
         $reflection = new ReflectionClass($exception);
@@ -71,8 +74,10 @@ class ExceptionHandlerSecurityTest extends TestCase
     /** @test */
     public function it_prevents_log_injection_attacks(): void
     {
+        Log::spy();
+
         // Test with malicious input that could cause log injection
-        $maliciousInput = "Error\n[2024-01-01] FAKE LOG ENTRY: Admin access granted\nReal error";
+        $maliciousInput = "TranslatableRecord error\n[2024-01-01] FAKE LOG ENTRY: Admin access granted\nReal error";
         $exception = new Exception($maliciousInput);
 
         $this->handler->report($exception);
@@ -90,6 +95,8 @@ class ExceptionHandlerSecurityTest extends TestCase
     /** @test */
     public function it_limits_error_message_length_to_prevent_dos(): void
     {
+        Log::spy();
+
         // Create an extremely long error message
         $longMessage = str_repeat('A', 10000) . ' TranslatableRecord error';
         $exception = new Exception($longMessage);
@@ -108,6 +115,8 @@ class ExceptionHandlerSecurityTest extends TestCase
     /** @test */
     public function it_validates_configuration_input_to_prevent_injection(): void
     {
+        Log::spy();
+
         // Test with malicious configuration
         Config::set('exception-handling.boot_error_detection.patterns', [
             'valid_pattern',
@@ -127,6 +136,8 @@ class ExceptionHandlerSecurityTest extends TestCase
     /** @test */
     public function it_prevents_path_traversal_in_boot_related_paths(): void
     {
+        Log::spy();
+
         Config::set('exception-handling.boot_error_detection.paths', [
             '/Models/',
             '../../../etc/passwd',
@@ -150,14 +161,14 @@ class ExceptionHandlerSecurityTest extends TestCase
     /** @test */
     public function it_rate_limits_boot_error_logging_to_prevent_spam(): void
     {
+        Log::spy();
+
         Config::set('exception-handling.security.rate_limit_enabled', true);
         Config::set('exception-handling.security.max_boot_errors_per_minute', 5);
 
-        Log::spy();
-
         // Simulate rapid fire boot errors
         for ($i = 0; $i < 100; $i++) {
-            $exception = new Exception("Boot error #{$i} with TranslatableRecord");
+            $exception = new Exception("TranslatableRecord boot error #{$i}");
             $this->handler->report($exception);
         }
 
@@ -170,6 +181,8 @@ class ExceptionHandlerSecurityTest extends TestCase
     /** @test */
     public function it_does_not_expose_internal_class_names_in_actionable_messages(): void
     {
+        Log::spy();
+
         $exception = new Exception('App\\Internal\\SecretService class not found');
 
         $this->handler->report($exception);
@@ -187,6 +200,8 @@ class ExceptionHandlerSecurityTest extends TestCase
     /** @test */
     public function it_validates_log_channel_configuration(): void
     {
+        Log::spy();
+
         // Test with potentially malicious log channel
         Config::set('exception-handling.boot_error_detection.log_channel', '../../../var/log/auth.log');
 
@@ -203,6 +218,8 @@ class ExceptionHandlerSecurityTest extends TestCase
     /** @test */
     public function it_prevents_memory_exhaustion_from_large_context_arrays(): void
     {
+        Log::spy();
+
         // Create exception with large trace
         $exception = new Exception('TranslatableRecord error');
 
@@ -225,6 +242,8 @@ class ExceptionHandlerSecurityTest extends TestCase
     /** @test */
     public function it_handles_unicode_and_special_characters_safely(): void
     {
+        Log::spy();
+
         $unicodeMessage = "TranslatableRecord error: 测试 🚀 \x00\x01\x02";
         $exception = new Exception($unicodeMessage);
 
@@ -244,7 +263,15 @@ class ExceptionHandlerSecurityTest extends TestCase
     /** @test */
     public function it_prevents_recursive_exception_handling(): void
     {
-        // Mock Log to throw exception on first call
+        // Clear the spy and set up specific mocks
+        Log::clearResolvedInstances();
+
+        // Mock Log to allow normal Laravel error logging first
+        Log::shouldReceive('error')
+            ->with('TranslatableRecord error', \Mockery::any())
+            ->once();
+
+        // Mock Log to throw exception on boot error logging
         Log::shouldReceive('error')
             ->once()
             ->with('Application boot failure detected', \Mockery::any())
@@ -263,11 +290,13 @@ class ExceptionHandlerSecurityTest extends TestCase
     /** @test */
     public function it_respects_security_configuration_overrides(): void
     {
+        Log::spy();
+
         Config::set('exception-handling.security.max_message_length', 100);
         Config::set('exception-handling.security.sanitize_paths', true);
         Config::set('exception-handling.security.rate_limit_enabled', true);
 
-        $longMessage = str_repeat('A', 200) . ' TranslatableRecord error';
+        $longMessage = 'TranslatableRecord error: ' . str_repeat('A', 200);
         $exception = new Exception($longMessage);
 
         $this->handler->report($exception);

@@ -109,6 +109,7 @@ class Handler extends ExceptionHandler
      */
     public function report(Throwable $e): void
     {
+        // Fast exit for common exceptions to reduce overhead
         if ($e instanceof ValidationException) {
             // Don't spam logs for user input errors.
             return;
@@ -123,16 +124,40 @@ class Handler extends ExceptionHandler
             return;
         }
 
-        // Check if this is a boot error and boot error detection is disabled
-        // If so, skip all logging to respect the configuration
-        if (! config('exception-handling.boot_error_detection.enabled', true)) {
-            $detector = $this->getBootErrorDetector();
-            if ($detector->isBootError($e)) {
-                return; // Skip logging entirely when boot error detection is disabled
-            }
+        // Optimized boot error detection with early exit
+        if (! $this->shouldProcessBootError($e)) {
+            parent::report($e);
+
+            return;
         }
 
         parent::report($e);
+    }
+
+    /**
+     * Optimized boot error processing check.
+     */
+    private function shouldProcessBootError(Throwable $e): bool
+    {
+        // Cache config check to avoid repeated config() calls
+        static $bootErrorEnabled = null;
+
+        if ($bootErrorEnabled === null || app()->environment('testing')) {
+            $bootErrorEnabled = config('exception-handling.boot_error_detection.enabled', true);
+        }
+
+        if (! $bootErrorEnabled) {
+            return true; // Process normally if boot error detection is disabled
+        }
+
+        $detector = $this->getBootErrorDetector();
+
+        // If it's a boot error and detection is enabled, let the detector handle it
+        if ($detector->isBootError($e)) {
+            return false; // Skip normal processing, let boot error handler take over
+        }
+
+        return true; // Process normally
     }
 
     protected function unauthenticated($request, AuthenticationException $exception): JsonResponse|RedirectResponse

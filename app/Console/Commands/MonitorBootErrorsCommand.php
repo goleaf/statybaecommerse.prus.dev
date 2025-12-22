@@ -21,7 +21,7 @@ class MonitorBootErrorsCommand extends Command
     public function handle(): int
     {
         if (! config('exception-handling.performance.track_boot_errors', false)) {
-            $this->error('Boot error tracking is disabled. Enable it in config/exception-handling.php');
+            $this->error(__('exceptions_monitoring_disabled') . '. Enable it in config/exception-handling.php');
 
             return self::FAILURE;
         }
@@ -29,7 +29,7 @@ class MonitorBootErrorsCommand extends Command
         $metrics = BootErrorMetrics::getMetrics();
 
         if (empty($metrics['error_patterns']) && $metrics['rate_limit_hits'] === 0) {
-            $this->info('No boot errors detected in the current hour.');
+            $this->info(__('No boot errors detected in the current hour.'));
 
             return self::SUCCESS;
         }

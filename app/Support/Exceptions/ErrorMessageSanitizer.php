@@ -15,6 +15,17 @@ final class ErrorMessageSanitizer
         '/key[:\s=]+[^\s\n]+/i',
         '/token[:\s=]+[^\s\n]+/i',
         '/api[_-]?key[:\s=]+[^\s\n]+/i',
+        '/bearer\s+[a-zA-Z0-9\-_\.]+/i',
+        '/authorization[:\s=]+[^\s\n]+/i',
+        '/cookie[:\s=]+[^\s\n]+/i',
+        '/session[:\s=]+[^\s\n]+/i',
+        '/csrf[_-]?token[:\s=]+[^\s\n]+/i',
+        '/x-api-key[:\s=]+[^\s\n]+/i',
+        '/database[_-]?url[:\s=]+[^\s\n]+/i',
+        '/redis[_-]?url[:\s=]+[^\s\n]+/i',
+        '/mail[_-]?password[:\s=]+[^\s\n]+/i',
+        '/aws[_-]?secret[:\s=]+[^\s\n]+/i',
+        '/private[_-]?key[:\s=]+[^\s\n]+/i',
     ];
 
     private static ?int $maxLength = null;
@@ -61,6 +72,22 @@ final class ErrorMessageSanitizer
         $basePath = base_path();
         if (str_starts_with($filePath, $basePath)) {
             $filePath = str_replace($basePath, '[APP_ROOT]', $filePath);
+        }
+        
+        // Also handle common server paths
+        $commonPaths = [
+            '/var/www/html' => '[APP_ROOT]',
+            '/home/forge' => '[APP_ROOT]',
+            '/var/www' => '[APP_ROOT]',
+            'C:\\xampp\\htdocs' => '[APP_ROOT]',
+            'C:\\wamp\\www' => '[APP_ROOT]',
+        ];
+        
+        foreach ($commonPaths as $path => $replacement) {
+            if (str_starts_with($filePath, $path)) {
+                $filePath = str_replace($path, $replacement, $filePath);
+                break;
+            }
         }
 
         // Remove potential path traversal attempts

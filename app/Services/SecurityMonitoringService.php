@@ -9,289 +9,320 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 /**
- * Security monitoring service for detecting and responding to security threats.
+ * Security monitoring and threat detection service.
  */
-class SecurityMonitoringService
+final class SecurityMonitoringService
 {
-    private const SUSPICIOUS_PATTERNS = [
-        'sql_injection' => [
-            '/union\s+select/i',
-            '/drop\s+table/i',
-            '/insert\s+into/i',
-            '/delete\s+from/i',
-            '/update\s+.*set/i',
-        ],
-        'xss_attempts' => [
-            '/<script[^>]*>/i',
-            '/javascript:/i',
-            '/on\w+\s*=/i',
-            '/<iframe[^>]*>/i',
-        ],
-        'path_traversal' => [
-            '/\.\.\//i',
-            '/\.\.\\\/i',
-            '/etc\/passwd/i',
-            '/proc\/self\/environ/i',
-        ],
-        'command_injection' => [
-            '/;\s*cat\s+/i',
-            '/;\s*ls\s+/i',
-            '/;\s*rm\s+/i',
-            '/`.*`/i',
-            '/\$\(.*\)/i',
-        ],
-    ];
-
-    public function __construct() {}
-
+    private const SUSPICIOUS_IP_CACHE_KEY = 'security:suspicious_ips';
+    private const BLOCKED_IP_CACHE_KEY = 'security:blocked_ips';
+    private const THREAT_COUNTER_CACHE_KEY = 'security:threat_count';
+    
+    public function __construct(
+        private readonly int $suspiciousThreshold = 10,
+        private readonly int $blockThreshold = 20,
+        private readonly int $decayMinutes = 15
+    ) {}
+    
     /**
      * Monitor request for security threats.
      */
     public function monitorRequest(Request $request): array
     {
+        $ip = $request->ip();
         $threats = [];
-        $requestData = $this->extractRequestData($request);
-
-        foreach (self::SUSPICIOUS_PATTERNS as $threatType => $patterns) {
-            if ($this->detectThreat($requestData, $patterns)) {
-                $threats[] = $threatType;
-                $this->logSecurityThreat($request, $threatType, $requestData);
-            }
+        
+        // Check if IP is already blocked
+        if ($this->isIpBlocked($ip)) {
+            $threats[] = [
+                'type' => 'blocked_ip',
+                'severity' => 'critical',
+                'message' => 'Request from blocked IP address',
+            ];
         }
-
-        if (!empty($threats)) {
-            $this->trackSuspiciousActivity($request, $threats);
+        
+        // Analyze request for threats
+        $detectedThreats = $this->analyzeRequest($request);
+        $threats = array_merge($threats, $detectedThreats);
+        
+        // Update threat counters
+        if (!empty($detectedThreats)) {
+            $this->updateThreatCounters($ip, count($detectedThreats));
         }
-
+        
+        // Check if IP should be blocked
+        if ($this->shouldBlockIp($ip)) {
+            $this->blockIp($ip);
+            $threats[] = [
+                'type' => 'ip_auto_blocked',
+                'severity' => 'critical',
+                'message' => 'IP automatically blocked due to repeated threats',
+            ];
+        }
+        
         return $threats;
     }
-
+    
     /**
-     * Check if IP address should be blocked.
+     * Analyze request for security threats.
      */
-    public function shouldBlockIp(string $ipAddress): bool
+    private function analyzeRequest(Request $request): array
     {
-        $key = "security:blocked_ip:{$ipAddress}";
+        $threats = [];
         
-        return Cache::has($key);
+        // Check for SQL injection patterns
+        if ($this->detectSqlInjection($request)) {
+            $threats[] = [
+                'type' => 'sql_injection',
+                'severity' => 'high',
+                'message' => 'SQL injection attempt detected',
+            ];
+        }
+        
+        // Check for XSS patterns
+        if ($this->detectXss($request)) {
+            $threats[] = [
+                'type' => 'xss',
+                'severity' => 'high',
+                'message' => 'XSS attempt detected',
+            ];
+        }
+        
+        // Check for path traversal
+        if ($this->detectPathTraversal($request)) {
+            $threats[] = [
+                'type' => 'path_traversal',
+                'severity' => 'medium',
+                'message' => 'Path traversal attempt detected',
+            ];
+        }
+        
+        // Check for command injection
+        if ($this->detectCommandInjection($request)) {
+            $threats[] = [
+                'type' => 'command_injection',
+                'severity' => 'high',
+                'message' => 'Command injection attempt detected',
+            ];
+        }
+        
+        // Check for suspicious user agents
+        if ($this->detectSuspiciousUserAgent($request)) {
+            $threats[] = [
+                'type' => 'suspicious_user_agent',
+                'severity' => 'low',
+                'message' => 'Suspicious user agent detected',
+            ];
+        }
+        
+        return $threats;
     }
-
+    
     /**
-     * Block IP address for specified duration.
+     * Detect SQL injection attempts.
      */
-    public function blockIp(string $ipAddress, int $minutes = 60, string $reason = 'Security violation'): void
+    private function detectSqlInjection(Request $request): bool
     {
-        $key = "security:blocked_ip:{$ipAddress}";
+        $patterns = [
+            '/(\b(SELECT|INSERT|UPDATE|DELETE|DROP|CREATE|ALTER|EXEC|UNION|SCRIPT)\b)/i',
+            '/(\b(OR|AND)\s+\d+\s*=\s*\d+)/i',
+            '/(\bUNION\b.*\bSELECT\b)/i',
+            '/(\b(INFORMATION_SCHEMA|SYSOBJECTS|SYSCOLUMNS)\b)/i',
+        ];
         
-        Cache::put($key, [
-            'blocked_at' => now()->toISOString(),
-            'reason' => $reason,
-            'expires_at' => now()->addMinutes($minutes)->toISOString(),
-        ], $minutes * 60);
-
-        try {
-            Log::channel('security')->warning('IP address blocked', [
-                'ip_address' => $ipAddress,
-                'reason' => $reason,
-                'duration_minutes' => $minutes,
-            ]);
-        } catch (\Throwable) {
-            Log::warning('IP address blocked', [
-                'ip_address' => $ipAddress,
-                'reason' => $reason,
-            ]);
+        return $this->checkPatterns($request, $patterns);
+    }
+    
+    /**
+     * Detect XSS attempts.
+     */
+    private function detectXss(Request $request): bool
+    {
+        $patterns = [
+            '/<script[^>]*>.*?<\/script>/is',
+            '/javascript:/i',
+            '/on\w+\s*=/i',
+            '/<iframe[^>]*>.*?<\/iframe>/is',
+            '/expression\s*\(/i',
+        ];
+        
+        return $this->checkPatterns($request, $patterns);
+    }
+    
+    /**
+     * Detect path traversal attempts.
+     */
+    private function detectPathTraversal(Request $request): bool
+    {
+        $patterns = [
+            '/\.\.\//',
+            '/\.\.\\\\/',
+            '/%2e%2e%2f/i',
+            '/%2e%2e%5c/i',
+        ];
+        
+        return $this->checkPatterns($request, $patterns);
+    }
+    
+    /**
+     * Detect command injection attempts.
+     */
+    private function detectCommandInjection(Request $request): bool
+    {
+        $patterns = [
+            '/[;&|`$(){}[\]]/i',
+            '/\b(cat|ls|pwd|id|whoami|uname|ps|netstat|ifconfig|ping|wget|curl|nc|telnet|ssh|ftp)\b/i',
+            '/(\||;|&|\$\(|\`|>|<)/i',
+        ];
+        
+        return $this->checkPatterns($request, $patterns);
+    }
+    
+    /**
+     * Detect suspicious user agents.
+     */
+    private function detectSuspiciousUserAgent(Request $request): bool
+    {
+        $userAgent = strtolower($request->userAgent() ?? '');
+        
+        $suspiciousPatterns = [
+            'sqlmap',
+            'nikto',
+            'nessus',
+            'openvas',
+            'nmap',
+            'masscan',
+            'zap',
+            'burp',
+            'w3af',
+            'havij',
+        ];
+        
+        foreach ($suspiciousPatterns as $pattern) {
+            if (str_contains($userAgent, $pattern)) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Check patterns against request data.
+     */
+    private function checkPatterns(Request $request, array $patterns): bool
+    {
+        $allInput = array_merge(
+            $request->query(),
+            $request->request->all(),
+            [$request->getPathInfo(), $request->userAgent()]
+        );
+        
+        foreach ($allInput as $value) {
+            if (!is_string($value)) {
+                continue;
+            }
+            
+            foreach ($patterns as $pattern) {
+                if (preg_match($pattern, $value)) {
+                    return true;
+                }
+            }
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Update threat counters for IP.
+     */
+    private function updateThreatCounters(string $ip, int $threatCount): void
+    {
+        $key = self::THREAT_COUNTER_CACHE_KEY . ':' . $ip;
+        $current = Cache::get($key, 0);
+        Cache::put($key, $current + $threatCount, now()->addMinutes($this->decayMinutes));
+        
+        // Mark as suspicious if threshold exceeded
+        if ($current + $threatCount >= $this->suspiciousThreshold) {
+            $this->markIpSuspicious($ip);
         }
     }
-
+    
     /**
-     * Get security metrics for monitoring dashboard.
+     * Mark IP as suspicious.
+     */
+    private function markIpSuspicious(string $ip): void
+    {
+        $suspiciousIps = Cache::get(self::SUSPICIOUS_IP_CACHE_KEY, []);
+        $suspiciousIps[$ip] = now()->timestamp;
+        Cache::put(self::SUSPICIOUS_IP_CACHE_KEY, $suspiciousIps, now()->addHours(24));
+        
+        Log::warning('IP marked as suspicious', [
+            'ip' => $ip,
+            'threat_count' => Cache::get(self::THREAT_COUNTER_CACHE_KEY . ':' . $ip, 0),
+        ]);
+    }
+    
+    /**
+     * Check if IP should be blocked.
+     */
+    private function shouldBlockIp(string $ip): bool
+    {
+        $threatCount = Cache::get(self::THREAT_COUNTER_CACHE_KEY . ':' . $ip, 0);
+        return $threatCount >= $this->blockThreshold;
+    }
+    
+    /**
+     * Block IP address.
+     */
+    private function blockIp(string $ip): void
+    {
+        $blockedIps = Cache::get(self::BLOCKED_IP_CACHE_KEY, []);
+        $blockedIps[$ip] = now()->timestamp;
+        Cache::put(self::BLOCKED_IP_CACHE_KEY, $blockedIps, now()->addHours(24));
+        
+        Log::critical('IP address blocked', [
+            'ip' => $ip,
+            'threat_count' => Cache::get(self::THREAT_COUNTER_CACHE_KEY . ':' . $ip, 0),
+        ]);
+    }
+    
+    /**
+     * Check if IP is blocked.
+     */
+    public function isIpBlocked(string $ip): bool
+    {
+        $blockedIps = Cache::get(self::BLOCKED_IP_CACHE_KEY, []);
+        return isset($blockedIps[$ip]);
+    }
+    
+    /**
+     * Unblock IP address.
+     */
+    public function unblockIp(string $ip): void
+    {
+        $blockedIps = Cache::get(self::BLOCKED_IP_CACHE_KEY, []);
+        unset($blockedIps[$ip]);
+        Cache::put(self::BLOCKED_IP_CACHE_KEY, $blockedIps, now()->addHours(24));
+        
+        // Also clear threat counters
+        Cache::forget(self::THREAT_COUNTER_CACHE_KEY . ':' . $ip);
+        
+        Log::info('IP address unblocked', ['ip' => $ip]);
+    }
+    
+    /**
+     * Get security metrics.
      */
     public function getSecurityMetrics(): array
     {
-        $cacheKey = 'security:metrics:' . now()->format('Y-m-d-H');
+        $suspiciousIps = Cache::get(self::SUSPICIOUS_IP_CACHE_KEY, []);
+        $blockedIps = Cache::get(self::BLOCKED_IP_CACHE_KEY, []);
         
-        return Cache::remember($cacheKey, 3600, function () {
-            return [
-                'threats_detected_today' => $this->getThreatCount('today'),
-                'blocked_ips_count' => $this->getBlockedIpsCount(),
-                'top_threat_types' => $this->getTopThreatTypes(),
-                'suspicious_user_agents' => $this->getSuspiciousUserAgents(),
-                'failed_login_attempts' => $this->getFailedLoginAttempts(),
-            ];
-        });
-    }
-
-    /**
-     * Extract request data for threat analysis.
-     */
-    private function extractRequestData(Request $request): array
-    {
         return [
-            'url' => $request->fullUrl(),
-            'method' => $request->method(),
-            'headers' => $request->headers->all(),
-            'query' => $request->query->all(),
-            'input' => $request->input(),
-            'user_agent' => $request->userAgent(),
-            'referer' => $request->header('referer'),
+            'suspicious_ips_count' => count($suspiciousIps),
+            'blocked_ips_count' => count($blockedIps),
+            'suspicious_ips' => array_keys($suspiciousIps),
+            'blocked_ips' => array_keys($blockedIps),
         ];
-    }
-
-    /**
-     * Detect threats in request data.
-     */
-    private function detectThreat(array $requestData, array $patterns): bool
-    {
-        $searchableData = json_encode($requestData);
-        
-        foreach ($patterns as $pattern) {
-            if (preg_match($pattern, $searchableData)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Log security threat with context.
-     */
-    private function logSecurityThreat(Request $request, string $threatType, array $requestData): void
-    {
-        // Use default log channel if security channel doesn't exist
-        try {
-            Log::channel('security')->warning('Security threat detected', [
-            'threat_type' => $threatType,
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-            'url' => $request->fullUrl(),
-            'method' => $request->method(),
-            'request_id' => $request->header('X-Request-ID'),
-            'user_id' => auth()->id(),
-            'timestamp' => now()->toISOString(),
-            'request_data' => $this->sanitizeRequestData($requestData),
-        ]);
-        } catch (\Throwable) {
-            // Fallback to default log channel
-            Log::warning('Security threat detected', [
-                'threat_type' => $threatType,
-                'ip_address' => $request->ip(),
-                'url' => $request->fullUrl(),
-            ]);
-        }
-    }
-
-    /**
-     * Track suspicious activity for rate limiting and blocking.
-     */
-    private function trackSuspiciousActivity(Request $request, array $threats): void
-    {
-        $ipAddress = $request->ip();
-        $key = "security:suspicious_activity:{$ipAddress}";
-        
-        $activity = Cache::get($key, []);
-        $activity[] = [
-            'timestamp' => now()->toISOString(),
-            'threats' => $threats,
-            'url' => $request->fullUrl(),
-        ];
-
-        // Keep only last 10 activities
-        $activity = array_slice($activity, -10);
-        
-        Cache::put($key, $activity, 3600); // 1 hour
-
-        // Auto-block if too many threats
-        if (count($activity) >= 5) {
-            $this->blockIp($ipAddress, 120, 'Multiple security violations');
-        }
-    }
-
-    /**
-     * Sanitize request data for logging (remove sensitive information).
-     */
-    private function sanitizeRequestData(array $requestData): array
-    {
-        $sensitiveKeys = ['password', 'token', 'api_key', 'secret', 'authorization'];
-        
-        return $this->recursiveSanitize($requestData, $sensitiveKeys);
-    }
-
-    /**
-     * Recursively sanitize array data.
-     */
-    private function recursiveSanitize(array $data, array $sensitiveKeys): array
-    {
-        foreach ($data as $key => $value) {
-            if (is_array($value)) {
-                $data[$key] = $this->recursiveSanitize($value, $sensitiveKeys);
-            } elseif (is_string($key) && $this->isSensitiveKey($key, $sensitiveKeys)) {
-                $data[$key] = '[REDACTED]';
-            }
-        }
-
-        return $data;
-    }
-
-    /**
-     * Check if key is sensitive.
-     */
-    private function isSensitiveKey(string $key, array $sensitiveKeys): bool
-    {
-        $key = strtolower($key);
-        
-        foreach ($sensitiveKeys as $sensitiveKey) {
-            if (str_contains($key, $sensitiveKey)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Get threat count for specified period.
-     */
-    private function getThreatCount(string $period): int
-    {
-        // This would typically query a database or log aggregation service
-        // For now, return a placeholder
-        return 0;
-    }
-
-    /**
-     * Get count of currently blocked IPs.
-     */
-    private function getBlockedIpsCount(): int
-    {
-        // This would scan cache for blocked IP keys
-        return 0;
-    }
-
-    /**
-     * Get top threat types.
-     */
-    private function getTopThreatTypes(): array
-    {
-        // This would aggregate threat data
-        return [];
-    }
-
-    /**
-     * Get suspicious user agents.
-     */
-    private function getSuspiciousUserAgents(): array
-    {
-        // This would analyze user agent patterns
-        return [];
-    }
-
-    /**
-     * Get failed login attempts count.
-     */
-    private function getFailedLoginAttempts(): int
-    {
-        // This would query authentication logs
-        return 0;
     }
 }

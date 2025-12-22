@@ -88,32 +88,59 @@ final class BootErrorDetector
     private function matchesBootErrorPatterns(Throwable $e): bool
     {
         $message = $e->getMessage();
-        $patterns = $this->getPatterns();
 
-        // Optimized pattern matching - check most common patterns first
-        // Use stripos for case-insensitive matching
-        foreach ($patterns as $pattern) {
-            if (stripos($message, $pattern) !== false) {
-                return true;
-            }
+        // Fast exit for empty messages
+        if ($message === '') {
+            return false;
         }
 
-        return false;
+        $patterns = $this->getPatterns();
+
+        // Use single regex for better performance than multiple stripos calls
+        $regexPattern = '/(' . implode('|', array_map('preg_quote', $patterns)) . ')/i';
+
+        // Handle potential regex compilation errors from malicious patterns
+        $result = @preg_match($regexPattern, $message);
+        if ($result === false) {
+            // Fall back to safe string matching if regex fails
+            foreach ($patterns as $pattern) {
+                if (stripos($message, $pattern) !== false) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        return $result === 1;
     }
 
     private function isBootRelatedFile(Throwable $e): bool
     {
         $file = $e->getFile();
-        $paths = $this->getPaths();
 
-        // Optimized path checking - most common paths first
-        foreach ($paths as $path) {
-            if (str_contains($file, $path)) {
-                return true;
-            }
+        // Fast exit for empty file paths
+        if ($file === '') {
+            return false;
         }
 
-        return false;
+        $paths = $this->getPaths();
+
+        // Use single regex for better performance than multiple str_contains calls
+        $regexPattern = '/(' . implode('|', array_map('preg_quote', $paths)) . ')/';
+
+        // Handle potential regex compilation errors from malicious paths
+        $result = @preg_match($regexPattern, $file);
+        if ($result === false) {
+            // Fall back to safe string matching if regex fails
+            foreach ($paths as $path) {
+                if (str_contains($file, $path)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        return $result === 1;
     }
 
     private function getPatterns(): array

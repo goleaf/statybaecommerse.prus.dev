@@ -48,11 +48,13 @@ return [
     */
 
     'performance' => [
-        'track_boot_errors'     => env('TRACK_BOOT_ERROR_METRICS', false),
-        'cache_error_patterns'  => env('CACHE_ERROR_PATTERNS', true),
-        'async_metrics_storage' => env('ASYNC_METRICS_STORAGE', true),
-        'metrics_queue'         => env('METRICS_QUEUE', 'metrics'),
-        'cache_ttl_minutes'     => env('PERFORMANCE_CACHE_TTL', 5),
+        'track_boot_errors'        => env('TRACK_BOOT_ERROR_METRICS', false),
+        'cache_error_patterns'     => env('CACHE_ERROR_PATTERNS', true),
+        'async_metrics_storage'    => env('ASYNC_METRICS_STORAGE', true),
+        'metrics_queue'            => env('METRICS_QUEUE', 'metrics'),
+        'cache_ttl_minutes'        => env('PERFORMANCE_CACHE_TTL', 5),
+        'distributed_rate_limiting' => env('DISTRIBUTED_RATE_LIMITING', false),
+        'enable_profiling'         => env('BOOT_ERROR_PROFILING_ENABLED', false),
     ],
 
     /*
@@ -81,13 +83,21 @@ return [
     */
 
     'security' => [
-        'max_message_length'           => env('EXCEPTION_MAX_MESSAGE_LENGTH', 2000),
-        'sanitize_paths'               => env('EXCEPTION_SANITIZE_PATHS', true),
-        'rate_limit_enabled'           => env('EXCEPTION_RATE_LIMIT_ENABLED', true),
-        'max_boot_errors_per_minute'   => env('EXCEPTION_MAX_BOOT_ERRORS_PER_MINUTE', 10),
+        'max_message_length' => env('EXCEPTION_MAX_MESSAGE_LENGTH', 2000),
+        'sanitize_paths'     => env('EXCEPTION_SANITIZE_PATHS', true),
+
+        // Rate limiting prevents DoS attacks via boot error spam
+        'rate_limit_enabled' => env('EXCEPTION_RATE_LIMIT_ENABLED', true),
+
+        // Maximum boot errors allowed per minute before rate limiting kicks in
+        // Set to 0 to block all boot error logging immediately
+        'max_boot_errors_per_minute' => env('EXCEPTION_MAX_BOOT_ERRORS_PER_MINUTE', 10),
+
+        // Memory cleanup threshold - when to clean old rate limit entries
         'rate_limit_cleanup_threshold' => env('EXCEPTION_RATE_LIMIT_CLEANUP_THRESHOLD', 60),
-        'redact_sensitive_data'        => env('EXCEPTION_REDACT_SENSITIVE_DATA', true),
-        'log_request_id'               => env('EXCEPTION_LOG_REQUEST_ID', true),
-        'prevent_log_injection'        => env('EXCEPTION_PREVENT_LOG_INJECTION', true),
+
+        'redact_sensitive_data' => env('EXCEPTION_REDACT_SENSITIVE_DATA', true),
+        'log_request_id'        => env('EXCEPTION_LOG_REQUEST_ID', true),
+        'prevent_log_injection' => env('EXCEPTION_PREVENT_LOG_INJECTION', true),
     ],
 ];

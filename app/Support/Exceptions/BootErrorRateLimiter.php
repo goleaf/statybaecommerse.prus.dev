@@ -27,9 +27,13 @@ final class BootErrorRateLimiter
 
     public function isRateLimited(): bool
     {
+        BootErrorProfiler::startTiming('rate_limit_check');
+        BootErrorProfiler::incrementCallCount('rate_limit_check');
+
         $this->initializeConfig();
 
         if (! self::$rateLimitEnabled) {
+            BootErrorProfiler::endTiming('rate_limit_check');
             return false;
         }
 
@@ -42,15 +46,19 @@ final class BootErrorRateLimiter
         // Check if we're already at the limit BEFORE incrementing
         if (self::$bootErrorCounts[$key] >= self::$maxErrorsPerMinute) {
             BootErrorMetrics::recordRateLimitHit();
+            BootErrorProfiler::endTiming('rate_limit_check');
 
             return true;
         }
 
-        // Atomic increment to prevent race conditions
+        // Increment counter - this is safe in PHP's single-threaded model
         self::$bootErrorCounts[$key]++;
 
         // Clean old entries to prevent memory leaks
         $this->cleanupOldEntries();
+
+        BootErrorProfiler::recordMemoryUsage('rate_limit_check');
+        BootErrorProfiler::endTiming('rate_limit_check');
 
         return false;
     }
@@ -84,6 +92,22 @@ final class BootErrorRateLimiter
     }
 
     /**
+     * Get rate limiting statistics for monitoring.
+     */
+    public function getStatistics(): array
+    {
+        $this->initializeConfig();
+
+        return [
+            'enabled'               => self::$rateLimitEnabled,
+            'max_errors_per_minute' => self::$maxErrorsPerMinute,
+            'current_counts'        => self::$bootErrorCounts,
+            'total_active_windows'  => count(self::$bootErrorCounts),
+            'cleanup_threshold'     => self::$cleanupThreshold,
+        ];
+    }
+
+    /**
      * Reset rate limiting counters (for testing).
      */
     public static function reset(): void
@@ -114,7 +138,14 @@ final class BootErrorRateLimiter
 
     private function generateKey(): string
     {
-        return 'boot_errors_' . date('Y-m-d-H-i');
+        $baseKey = 'boot_errors_' . date('Y-m-d-H-i');
+        
+        // Support distributed rate limiting with Redis
+        if (config('cache.default') === 'redis' && config('exception-handling.performance.distributed_rate_limiting', false)) {
+            return 'distributed:' . $baseKey;
+        }
+        
+        return $baseKey;
     }
 
     private function cleanupOldEntries(): void

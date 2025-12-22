@@ -11,6 +11,16 @@ return [
     'errors_validation_failed'          => 'Please check your input',
     'errors_unauthorized'               => 'Unauthorized',
     'errors_forbidden'                  => 'Access forbidden',
+    
+    // Exception Handling
+    'exceptions_rate_limit_exceeded'    => 'Rate limit exceeded',
+    'exceptions_boot_error_detected'    => 'Boot error detected',
+    'exceptions_monitoring_disabled'    => 'Monitoring disabled',
+    'exceptions_configuration_invalid'  => 'Invalid configuration',
+    'exceptions_rate_limiting_active'   => 'Rate limiting active',
+    'exceptions_performance_degraded'   => 'Performance degraded',
+    'exceptions_memory_threshold_exceeded' => 'Memory threshold exceeded',
+    'exceptions_security_incident'      => 'Security incident',
     'common'                            => [
         'back_to_list'              => 'Back to List',
         'back_to_list_tooltip'      => 'Return to the list view',
