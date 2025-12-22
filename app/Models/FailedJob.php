@@ -27,7 +27,14 @@ final class FailedJob extends Model
 
     protected $table = 'failed_jobs';
 
-    protected $guarded = [];
+    protected $fillable = [
+        'uuid',
+        'connection',
+        'queue',
+        'payload',
+        'exception',
+        'failed_at',
+    ];
 
     /**
      * Define the attribute casting rules for the model.

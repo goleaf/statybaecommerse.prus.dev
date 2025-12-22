@@ -38,7 +38,7 @@ return [
     |
     */
 
-    'lifetime' => (int) env('SESSION_LIFETIME', 120),
+    'lifetime' => (int) env('SESSION_LIFETIME', 60),
 
     'expire_on_close' => filter_var((string) env('SESSION_EXPIRE_ON_CLOSE', 'false'), FILTER_VALIDATE_BOOLEAN),
 
@@ -53,7 +53,7 @@ return [
     |
     */
 
-    'encrypt' => filter_var((string) env('SESSION_ENCRYPT', 'false'), FILTER_VALIDATE_BOOLEAN),
+    'encrypt' => filter_var((string) env('SESSION_ENCRYPT', 'true'), FILTER_VALIDATE_BOOLEAN),
 
     /*
     |--------------------------------------------------------------------------

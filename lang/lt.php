@@ -11,6 +11,16 @@ return [
     'errors_validation_failed'          => 'Patikrinkite įvestus duomenis',
     'errors_unauthorized'               => 'Neturite teisių',
     'errors_forbidden'                  => 'Prieiga uždrausta',
+    
+    // Exception Handling
+    'exceptions_rate_limit_exceeded'    => 'Viršytas užklausų limitas',
+    'exceptions_boot_error_detected'    => 'Aptikta sistemos paleidimo klaida',
+    'exceptions_monitoring_disabled'    => 'Stebėjimas išjungtas',
+    'exceptions_configuration_invalid'  => 'Netinkama konfigūracija',
+    'exceptions_rate_limiting_active'   => 'Aktyvus užklausų ribojimas',
+    'exceptions_performance_degraded'   => 'Pablogėjęs sistemos našumas',
+    'exceptions_memory_threshold_exceeded' => 'Viršytas atminties limitas',
+    'exceptions_security_incident'      => 'Saugumo incidentas',
     'common'                            => [
         'back_to_list'              => 'Grįžti į sąrašą',
         'back_to_list_tooltip'      => 'Grįžti į sąrašo rodinį',

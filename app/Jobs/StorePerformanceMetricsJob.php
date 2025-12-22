@@ -34,7 +34,7 @@ class StorePerformanceMetricsJob implements ShouldQueue
         private readonly string $routeName,
         private readonly float $ttfb,
         private readonly int $queryCount,
-        private readonly int $peakMemoryMb,
+        private readonly float $peakMemoryMb,
         private readonly string $environment,
         private readonly ?string $userAgent = null
     ) {

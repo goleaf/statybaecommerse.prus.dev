@@ -94,11 +94,13 @@ final class SecurityEnhancement
      */
     private function buildContentSecurityPolicy(): string
     {
+        $nonce = base64_encode(random_bytes(16));
+        
         $policies = [
             "default-src 'self'",
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval'", // Filament requires inline scripts
+            "script-src 'self' 'nonce-{$nonce}' 'strict-dynamic'",
             "style-src 'self' 'unsafe-inline'", // Filament requires inline styles
-            "img-src 'self' data: blob:",
+            "img-src 'self' data: blob: https:",
             "font-src 'self' data:",
             "connect-src 'self'",
             "media-src 'self'",
@@ -107,7 +109,11 @@ final class SecurityEnhancement
             "frame-ancestors 'none'",
             "base-uri 'self'",
             "form-action 'self'",
+            "upgrade-insecure-requests",
         ];
+
+        // Store nonce for use in views
+        request()->attributes->set('csp_nonce', $nonce);
 
         return implode('; ', $policies);
     }

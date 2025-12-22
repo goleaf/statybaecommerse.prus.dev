@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Livewire\Features\SupportTesting\Testable as TestableLivewire;
+use Mockery;
 use PHPUnit\Framework\Assert;
 use RuntimeException;
 use Tests\Support\TestingDatabase;
@@ -176,6 +177,14 @@ abstract class TestCase extends BaseTestCase
 
     protected function tearDown(): void
     {
+        // Clean up Mockery mocks to prevent redeclaration errors
+        if (class_exists(Mockery::class)) {
+            Mockery::close();
+        }
+
+        // Clear resolved facade instances to prevent mock conflicts
+        \Illuminate\Support\Facades\Log::clearResolvedInstances();
+
         if ($this->resolvedAdminPanel instanceof Panel) {
             Filament::setCurrentPanel(null);
             Filament::setServingStatus(false);
