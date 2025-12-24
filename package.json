@@ -39,7 +39,7 @@
         "@fontsource-variable/space-grotesk": "^5.2.10",
         "shiki": "^3.14.0",
         "sortablejs": "^1.15.6",
-        "treeselectjs": "^0.13.1"
+        "treeselectjs": "^0.13.2"
     },
     "version": "0.4.0"
 }
