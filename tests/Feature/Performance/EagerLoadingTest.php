@@ -10,8 +10,9 @@ use App\Livewire\Pages\Category\Show as CategoryShow;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
-use App\Services\QueryMonitoringService;
+use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -23,13 +24,11 @@ final class EagerLoadingTest extends TestCase
 {
     use RefreshDatabase;
 
-    private QueryMonitoringService $queryMonitor;
+    private array $queries = [];
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->queryMonitor = app(QueryMonitoringService::class);
-    }
+    private bool $monitoring = false;
+
+    private int $queryThreshold = 20;
 
     public function test_product_shelf_eliminates_n1_patterns(): void
     {
@@ -72,7 +71,7 @@ final class EagerLoadingTest extends TestCase
         ]);
 
         // Start monitoring queries
-        $this->queryMonitor->startMonitoring(30); // Allow up to 30 queries for Livewire component
+        $this->startQueryMonitoring(30); // Allow up to 30 queries for Livewire component
 
         // Render the ProductShelf component
         $component = Livewire::test(ProductShelf::class, [
@@ -83,7 +82,7 @@ final class EagerLoadingTest extends TestCase
         $component->assertOk();
 
         // Stop monitoring and analyze results
-        $queryData = $this->queryMonitor->stopMonitoring();
+        $queryData = $this->stopQueryMonitoring();
 
         // Assert that we don't exceed the query budget
         $this->assertLessThanOrEqual(30, $queryData['total_queries'],
@@ -141,7 +140,7 @@ final class EagerLoadingTest extends TestCase
         ]);
 
         // Start monitoring queries
-        $this->queryMonitor->startMonitoring(50); // Allow up to 50 queries for Livewire component with pagination
+        $this->startQueryMonitoring(50); // Allow up to 50 queries for Livewire component with pagination
 
         // Test the CategoryShow component
         $component = Livewire::test(CategoryShow::class, [
@@ -151,7 +150,7 @@ final class EagerLoadingTest extends TestCase
         $component->assertOk();
 
         // Stop monitoring and analyze results
-        $queryData = $this->queryMonitor->stopMonitoring();
+        $queryData = $this->stopQueryMonitoring();
 
         // Assert that we don't exceed the query budget
         $this->assertLessThanOrEqual(50, $queryData['total_queries'],
@@ -209,7 +208,7 @@ final class EagerLoadingTest extends TestCase
         ]);
 
         // Start monitoring queries
-        $this->queryMonitor->startMonitoring(25); // Allow up to 25 queries for pagination
+        $this->startQueryMonitoring(25); // Allow up to 25 queries for pagination
 
         // Test the ProductCatalogue component
         $component = Livewire::test(ProductCatalogue::class, [
@@ -219,7 +218,7 @@ final class EagerLoadingTest extends TestCase
         $component->assertOk();
 
         // Stop monitoring and analyze results
-        $queryData = $this->queryMonitor->stopMonitoring();
+        $queryData = $this->stopQueryMonitoring();
 
         // Assert that we don't exceed the query budget
         $this->assertLessThanOrEqual(25, $queryData['total_queries'],
@@ -291,13 +290,13 @@ final class EagerLoadingTest extends TestCase
         $this->assertNotNull($loadedProduct);
 
         // Start monitoring to detect any lazy loading
-        $this->queryMonitor->startMonitoring(1); // Should not trigger any additional queries
+        $this->startQueryMonitoring(1); // Should not trigger any additional queries
 
         // Convert to DTO - this should not trigger any database queries
         $dto = \App\Data\Storefront\Home\ProductListItemData::fromModel($loadedProduct, 'en');
 
         // Stop monitoring
-        $queryData = $this->queryMonitor->stopMonitoring();
+        $queryData = $this->stopQueryMonitoring();
 
         // Assert no queries were executed during DTO conversion
         $this->assertEquals(0, $queryData['total_queries'],
@@ -368,14 +367,14 @@ final class EagerLoadingTest extends TestCase
         }
     }
 
-    public function test_query_monitoring_service_detects_n1_patterns(): void
+    public function test_query_monitoring_detects_n1_patterns(): void
     {
         // Create test data
         $brand = Brand::factory()->create();
         $products = Product::factory()->count(5)->create(['brand_id' => $brand->id]);
 
         // Start monitoring
-        $this->queryMonitor->startMonitoring(10);
+        $this->startQueryMonitoring(10);
 
         // Simulate N+1 pattern by loading products without eager loading
         $loadedProducts = Product::withoutGlobalScopes()->get();
@@ -386,13 +385,123 @@ final class EagerLoadingTest extends TestCase
         }
 
         // Stop monitoring
-        $queryData = $this->queryMonitor->stopMonitoring();
+        $queryData = $this->stopQueryMonitoring();
 
         // Should detect N+1 patterns
         $this->assertNotEmpty($queryData['n1_patterns'],
-            'QueryMonitoringService should detect N+1 patterns');
+            'Query monitoring should detect N+1 patterns');
 
         $this->assertGreaterThan(5, $queryData['total_queries'],
             'Should have more queries due to N+1 pattern');
+    }
+
+    private function startQueryMonitoring(int $threshold = 20): void
+    {
+        if ($this->monitoring) {
+            return;
+        }
+
+        $this->monitoring = true;
+        $this->queryThreshold = $threshold;
+        $this->queries = [];
+
+        Event::listen(QueryExecuted::class, function (QueryExecuted $query): void {
+            if (! $this->monitoring) {
+                return;
+            }
+
+            $this->queries[] = [
+                'sql'        => $query->sql,
+                'bindings'   => $query->bindings,
+                'time'       => $query->time,
+                'connection' => $query->connectionName,
+            ];
+        });
+    }
+
+    private function stopQueryMonitoring(): array
+    {
+        $this->monitoring = false;
+
+        return [
+            'total_queries'      => count($this->queries),
+            'total_time'         => array_sum(array_column($this->queries, 'time')),
+            'queries'            => $this->queries,
+            'n1_patterns'        => $this->detectN1Patterns(),
+            'threshold_exceeded' => count($this->queries) > $this->queryThreshold,
+        ];
+    }
+
+    private function detectN1Patterns(): array
+    {
+        $patterns = [];
+        $queryGroups = [];
+
+        foreach ($this->queries as $query) {
+            $sql = $query['sql'] ?? null;
+
+            if (! is_string($sql) || $sql === '') {
+                continue;
+            }
+
+            $normalizedSql = $this->normalizeSql($sql);
+            $queryGroups[$normalizedSql][] = $query;
+        }
+
+        foreach ($queryGroups as $sql => $queries) {
+            if (count($queries) > 3) {
+                $patterns[] = [
+                    'sql'        => $sql,
+                    'count'      => count($queries),
+                    'total_time' => array_sum(array_column($queries, 'time')),
+                    'likely_n1'  => $this->isLikelyN1Pattern($sql),
+                ];
+            }
+        }
+
+        return $patterns;
+    }
+
+    private function normalizeSql(string $sql): string
+    {
+        $normalized = preg_replace('/\?/', '?', $sql);
+        $normalized = preg_replace('/\b\d+\b/', '?', $normalized);
+        $normalized = preg_replace('/\'[^\']*\'/', '?', $normalized);
+        $normalized = preg_replace('/`[^`]*`/', '?', $normalized);
+
+        return trim($normalized);
+    }
+
+    private function isLikelyN1Pattern(string $sql): bool
+    {
+        $sqlLower = strtolower($sql);
+
+        $schemaQueries = [
+            'pragma_table_xinfo',
+            'sqlite_master',
+            'pragma_table_info',
+            'pragma_foreign_key_list',
+            'information_schema',
+        ];
+
+        foreach ($schemaQueries as $schemaQuery) {
+            if (str_contains($sqlLower, $schemaQuery)) {
+                return false;
+            }
+        }
+
+        $n1Indicators = [
+            'select .* from .* where .*\.id = .*',
+            'select .* from .* where .*_id = .*',
+            'limit 1',
+        ];
+
+        foreach ($n1Indicators as $indicator) {
+            if (preg_match('/' . $indicator . '/i', $sqlLower)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

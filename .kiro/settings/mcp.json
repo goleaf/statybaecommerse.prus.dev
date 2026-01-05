@@ -14,7 +14,8 @@
         "search-docs",
         "last-error",
         "read-log-entries",
-        "get-config"
+        "get-config",
+        "list-available-env-vars"
       ]
     }
   }
