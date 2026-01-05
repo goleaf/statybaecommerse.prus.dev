@@ -17,9 +17,11 @@ final class DashboardRecentErrorsTable extends BaseTableWidget
 
     protected int|string|array $columnSpan = ['md' => 2, 'xl' => 2];
 
-    public function __construct(private readonly DashboardTableRepository $tableRepository)
+    private ?DashboardTableRepository $tableRepository = null;
+
+    protected function getTableRepository(): DashboardTableRepository
     {
-        parent::__construct();
+        return $this->tableRepository ??= app(DashboardTableRepository::class);
     }
 
     public static function canView(): bool
@@ -36,7 +38,7 @@ final class DashboardRecentErrorsTable extends BaseTableWidget
     {
         // Configure the widget table to meet the Filament v4 return type contract.
         return $table
-            ->query(fn () => $this->tableRepository->recentFailedJobsQuery()->limit(10))
+            ->query(fn () => $this->getTableRepository()->recentFailedJobsQuery()->limit(10))
             ->columns([
                 TextColumn::make('job_name')
                     ->label(trans('admin/dashboard.errors.job'))

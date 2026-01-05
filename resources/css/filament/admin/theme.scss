@@ -1,4 +1,8 @@
-@use '../../filament-enhancements' as *;
+@use 'tailwindcss';
+@use '../widget-tabs' as *;
+
+@source '../../../../vendor/filament/**/*.blade.php';
+@source '../../../../vendor/defstudio/filament-searchable-input/resources/**/*.blade.php';
 
 @tailwind base;
 @tailwind components;
@@ -17,6 +21,32 @@
 @source '../../../../vendor/novadaemon/filament-combobox/resources/views/**/*.blade.php';
 
 @layer base {
+    :root {
+        /* Define reusable surface colors so the Filament admin UI shares a cohesive background. */
+        --filament-admin-surface: #f8fafc;
+        /* Establish a neutral card surface that keeps forms legible against the light background. */
+        --filament-admin-card: #ffffff;
+        /* Provide a subtle border color for cards and inputs to avoid harsh separators. */
+        --filament-admin-border: rgba(15, 23, 42, 0.08);
+        /* Store a muted accent used for hover states and dividers in light mode. */
+        --filament-admin-muted: rgba(148, 163, 184, 0.18);
+        /* Capture the RGB tuple that powers the primary ring highlight during focus events. */
+        --filament-admin-ring: 59 130 246;
+    }
+
+    [data-theme='dark'] {
+        /* Mirror the surface tokens for dark mode so panels adapt without duplicating selectors. */
+        --filament-admin-surface: #0f172a;
+        /* Slightly lighten the card background to preserve contrast with form controls. */
+        --filament-admin-card: #111827;
+        /* Increase border opacity in dark mode to keep edges perceptible. */
+        --filament-admin-border: rgba(148, 163, 184, 0.24);
+        /* Dark mode hover layers rely on a cooler muted tone to avoid muddy grays. */
+        --filament-admin-muted: rgba(71, 85, 105, 0.42);
+        /* Use a softer ring accent that still reads as branded blue in dark contexts. */
+        --filament-admin-ring: 96 165 250;
+    }
+
     .fi-body {
         /* Apply the surface token to the overall panel to keep dashboard pages consistent. */
         background-color: var(--filament-admin-surface);
@@ -31,12 +61,21 @@
 
     .fi-section,
     .fi-fo-fieldset,
-    .fi-simple-layout > div,
     .fi-panel-ctn {
         /* Use the shared card token and rounded corners for all panel sections and form wrappers. */
         background-color: var(--filament-admin-card);
         border: 1px solid var(--filament-admin-border);
         @apply rounded-xl shadow-sm;
+    }
+
+    /* Exclude login and auth pages from custom styling to preserve default Filament design */
+    .fi-simple-layout .fi-section,
+    .fi-simple-layout .fi-fo-fieldset,
+    .fi-simple-layout .fi-panel-ctn {
+        background-color: initial;
+        border: initial;
+        border-radius: initial;
+        box-shadow: initial;
     }
 
     .fi-fo-field-wrapper,
@@ -70,6 +109,20 @@
         @apply rounded-lg shadow-none transition-colors duration-200;
     }
 
+    /* Preserve default Filament styling for login page inputs */
+    .fi-simple-layout .fi-input,
+    .fi-simple-layout .fi-select,
+    .fi-simple-layout .fi-textarea,
+    .fi-simple-layout .fi-tag-input,
+    .fi-simple-layout .fi-color-picker,
+    .fi-simple-layout .fi-date-time-picker,
+    .fi-simple-layout .fi-radio {
+        background-color: initial;
+        border: initial;
+        border-radius: initial;
+        box-shadow: initial;
+    }
+
     .fi-input:focus,
     .fi-input:focus-visible,
     .fi-select:focus,
@@ -88,6 +141,26 @@
         outline: none;
         border-color: transparent;
         box-shadow: 0 0 0 2px rgb(var(--filament-admin-ring) / 0.45);
+    }
+
+    /* Preserve default Filament focus styling for login page */
+    .fi-simple-layout .fi-input:focus,
+    .fi-simple-layout .fi-input:focus-visible,
+    .fi-simple-layout .fi-select:focus,
+    .fi-simple-layout .fi-select:focus-visible,
+    .fi-simple-layout .fi-textarea:focus,
+    .fi-simple-layout .fi-textarea:focus-visible,
+    .fi-simple-layout .fi-tag-input:focus,
+    .fi-simple-layout .fi-tag-input:focus-visible,
+    .fi-simple-layout .fi-color-picker:focus,
+    .fi-simple-layout .fi-color-picker:focus-visible,
+    .fi-simple-layout .fi-date-time-picker:focus,
+    .fi-simple-layout .fi-date-time-picker:focus-visible,
+    .fi-simple-layout .fi-radio:focus,
+    .fi-simple-layout .fi-radio:focus-visible {
+        outline: initial;
+        border-color: initial;
+        box-shadow: initial;
     }
 
     .dark .fi-input,
@@ -127,5 +200,22 @@
         background-image: linear-gradient(135deg, rgba(37, 99, 235, 1), rgba(59, 130, 246, 0.95));
         box-shadow: 0 18px 45px -20px rgba(37, 99, 235, 0.65);
         transform: translateY(-1px);
+    }
+
+    /* Preserve default Filament button styling for login page */
+    .fi-simple-layout .fi-btn,
+    .fi-simple-layout .fi-icon-btn {
+        background-image: initial;
+        border: initial;
+        color: initial;
+        box-shadow: initial;
+        transition: initial;
+    }
+
+    .fi-simple-layout .fi-btn:hover,
+    .fi-simple-layout .fi-icon-btn:hover {
+        background-image: initial;
+        box-shadow: initial;
+        transform: initial;
     }
 }

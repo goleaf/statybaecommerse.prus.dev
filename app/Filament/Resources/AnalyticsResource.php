@@ -78,11 +78,21 @@ final class AnalyticsResource extends Resource
         return $table
             // Preload frequently accessed relationships so table metrics do not suffer from N+1 queries.
             ->modifyQueryUsing(
-                static fn (Builder $query): Builder => $query->with([
-                    'user:id,name,email',
-                    'items:id,order_id',
-                    'channel:id,name',
-                ])
+                static fn (Builder $query): Builder => $query
+                    ->select([
+                        'id',
+                        'number',
+                        'user_id',
+                        'channel_id',
+                        'status',
+                        'total',
+                        'created_at',
+                        'updated_at',
+                    ])
+                    ->with([
+                        'user:id,name,email',
+                        'channel:id,name',
+                    ])
             )
             ->columns([
                 // Order number helps link analytics rows back to operational records.
@@ -117,10 +127,10 @@ final class AnalyticsResource extends Resource
                     ->label(__('analytics.channel'))
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                // Count items through the eager-loaded relationship for accurate basket analysis.
+                // Count items via a relationship aggregate to avoid loading full item rows.
                 TextColumn::make('items_count')
                     ->label(__('analytics.items'))
-                    ->getStateUsing(static fn (Order $record): int => $record->items->count())
+                    ->counts('items')
                     ->toggleable(),
                 // Total revenue column contributes to aggregate KPIs.
                 TextColumn::make('total')

@@ -14,9 +14,11 @@ final class DashboardTimeSeriesWidget extends ChartWidget
 
     protected int|string|array $columnSpan = ['md' => 2, 'xl' => 2];
 
-    public function __construct(private readonly DashboardTimeSeriesRepository $timeSeriesRepository)
+    private ?DashboardTimeSeriesRepository $timeSeriesRepository = null;
+
+    protected function getTimeSeriesRepository(): DashboardTimeSeriesRepository
     {
-        parent::__construct();
+        return $this->timeSeriesRepository ??= app(DashboardTimeSeriesRepository::class);
     }
 
     public static function canView(): bool
@@ -36,7 +38,7 @@ final class DashboardTimeSeriesWidget extends ChartWidget
 
     protected function getData(): array
     {
-        return $this->timeSeriesRepository->allSeries();
+        return $this->getTimeSeriesRepository()->allSeries();
     }
 
     protected function getType(): string
