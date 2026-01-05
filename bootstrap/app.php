@@ -63,8 +63,6 @@ $app = ApplicationOverride::configure(basePath: dirname(__DIR__))
         $middleware->append(App\Http\Middleware\SetFilamentLocale::class);
         // Handle user impersonation for admin support
         $middleware->append(App\Http\Middleware\HandleImpersonation::class);
-        // Monitor database queries for N+1 patterns in development
-        $middleware->web(App\Http\Middleware\QueryMonitoringMiddleware::class);
         $middleware->throttleApi('api.default');
         // Register Spatie permission middlewares (Laravel 11+/12 style)
         $middleware->alias([
