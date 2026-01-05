@@ -19,9 +19,11 @@ final class DashboardLowStockTable extends BaseTableWidget
 
     protected int|string|array $columnSpan = ['md' => 2, 'xl' => 1];
 
-    public function __construct(private readonly DashboardTableRepository $tableRepository)
+    private ?DashboardTableRepository $tableRepository = null;
+
+    protected function getTableRepository(): DashboardTableRepository
     {
-        parent::__construct();
+        return $this->tableRepository ??= app(DashboardTableRepository::class);
     }
 
     public static function canView(): bool
@@ -38,7 +40,7 @@ final class DashboardLowStockTable extends BaseTableWidget
     {
         // Configure the widget table to meet the Filament v4 return type contract.
         return $table
-            ->query(fn () => $this->tableRepository->lowStockProductsQuery()->limit(10))
+            ->query(fn () => $this->getTableRepository()->lowStockProductsQuery()->limit(10))
             ->columns([
                 TextColumn::make('sku')
                     ->label(trans('inventory.sku'))

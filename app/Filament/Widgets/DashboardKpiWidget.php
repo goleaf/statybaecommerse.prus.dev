@@ -16,9 +16,11 @@ final class DashboardKpiWidget extends StatsOverviewWidget
 
     protected int|string|array $columnSpan = 'full';
 
-    public function __construct(private readonly DashboardMetricsRepository $metricsRepository)
+    private ?DashboardMetricsRepository $metricsRepository = null;
+
+    protected function getMetricsRepository(): DashboardMetricsRepository
     {
-        parent::__construct();
+        return $this->metricsRepository ??= app(DashboardMetricsRepository::class);
     }
 
     public static function canView(): bool
@@ -29,11 +31,12 @@ final class DashboardKpiWidget extends StatsOverviewWidget
     protected function getStats(): array
     {
         $locale = app()->getLocale();
+        $metricsRepository = $this->getMetricsRepository();
 
-        $ordersToday = $this->metricsRepository->ordersToday();
-        $revenueLastSevenDays = $this->metricsRepository->revenueLastSevenDays();
-        $newUsersToday = $this->metricsRepository->newUsersToday();
-        $lowStockItems = $this->metricsRepository->lowStockItems();
+        $ordersToday = $metricsRepository->ordersToday();
+        $revenueLastSevenDays = $metricsRepository->revenueLastSevenDays();
+        $newUsersToday = $metricsRepository->newUsersToday();
+        $lowStockItems = $metricsRepository->lowStockItems();
 
         return [
             Stat::make(trans('admin/dashboard.kpis.orders_today'), Number::format($ordersToday, locale: $locale))
