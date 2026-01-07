@@ -563,20 +563,18 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
      */
     public function canAccessPanel(Panel $panel): bool
     {
-        if (app()->runningUnitTests()) {
+        // Allow access in unit tests unless specifically disabled
+        if (app()->runningUnitTests() && config('authorization.testing.skip_checks', true)) {
             return true;
         }
 
+        // Users with is_admin flag always have access
         if ((bool) ($this->is_admin ?? false)) {
             return true;
         }
 
-        $allowedRoles = collect(array_keys(config('permissions.roles', [])))
-            ->merge(array_keys(config('permissions.aliases', [])))
-            ->unique()
-            ->all();
-
-        return $this->hasAnyRole($allowedRoles);
+        // Check if user has panel access permission through AuthorizationMatrix
+        return \App\Support\Authorization\AuthorizationMatrix::check('panel', 'access', $this);
     }
 
     // Referral relationships

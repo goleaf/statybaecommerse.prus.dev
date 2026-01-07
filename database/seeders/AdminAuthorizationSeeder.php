@@ -8,50 +8,71 @@ use App\Support\Authorization\AuthorizationMatrix;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
-use Spatie\Permission\PermissionRegistrar;
 
-final class AdminAuthorizationSeeder extends Seeder
+/**
+ * Seeder for admin authorization system.
+ * 
+ * This seeder creates all the necessary roles and permissions
+ * for the admin panel authorization system.
+ */
+class AdminAuthorizationSeeder extends Seeder
 {
+    /**
+     * Run the database seeds.
+     */
     public function run(): void
     {
-        /** @var PermissionRegistrar $registrar */
-        $registrar = app(PermissionRegistrar::class);
+        // Clear cached permissions
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
-        foreach (AuthorizationMatrix::guardNames() as $guard) {
-            $registrar->forgetCachedPermissions();
+        // Create permissions for each guard
+        $this->createPermissions();
 
-            $allPermissions = AuthorizationMatrix::allPermissions();
+        // Create roles and assign permissions
+        $this->createRoles();
+    }
 
-            foreach ($allPermissions as $permission) {
+    /**
+     * Create all permissions for each configured guard.
+     */
+    private function createPermissions(): void
+    {
+        $permissions = AuthorizationMatrix::allPermissions();
+        $guards = AuthorizationMatrix::guardNames();
+
+        foreach ($guards as $guard) {
+            foreach ($permissions as $permission) {
                 Permission::firstOrCreate([
-                    'name'       => $permission,
+                    'name' => $permission,
                     'guard_name' => $guard,
                 ]);
-            }
-
-            foreach (AuthorizationMatrix::roles() as ['role' => $role]) {
-                $roleModel = Role::firstOrCreate([
-                    'name'       => $role->value,
-                    'guard_name' => $guard,
-                ]);
-
-                $permissions = AuthorizationMatrix::permissionsForRole($role);
-
-                if ($permissions === []) {
-                    $roleModel->syncPermissions([]);
-
-                    continue;
-                }
-
-                $roleModel->syncPermissions(
-                    Permission::query()
-                        ->where('guard_name', $guard)
-                        ->whereIn('name', $permissions)
-                        ->pluck('name')
-                );
             }
         }
+    }
 
-        $registrar->forgetCachedPermissions();
+    /**
+     * Create roles and assign permissions.
+     */
+    private function createRoles(): void
+    {
+        $guards = AuthorizationMatrix::guardNames();
+        $roleDefinitions = AuthorizationMatrix::roles();
+
+        foreach ($guards as $guard) {
+            foreach ($roleDefinitions as $roleDefinition) {
+                $role = Role::firstOrCreate([
+                    'name' => $roleDefinition['role']->value,
+                    'guard_name' => $guard,
+                ]);
+
+                // Get permissions for this guard
+                $permissions = Permission::where('guard_name', $guard)
+                    ->whereIn('name', $roleDefinition['permissions'])
+                    ->get();
+
+                // Sync permissions to role
+                $role->syncPermissions($permissions);
+            }
+        }
     }
 }

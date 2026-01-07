@@ -23,6 +23,7 @@ use App\Models\ReferralCode;
 use App\Models\Role;
 use App\Models\SystemSetting;
 use App\Models\User;
+use App\Models\VariantCombination;
 use App\Policies\AddressPolicy;
 use App\Policies\AuditLogPolicy;
 use App\Policies\BrandPolicy;
@@ -41,6 +42,7 @@ use App\Policies\ReferralPolicy;
 use App\Policies\RolePolicy;
 use App\Policies\SystemSettingPolicy;
 use App\Policies\UserPolicy;
+use App\Policies\VariantCombinationPolicy;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
@@ -71,6 +73,7 @@ final class AuthServiceProvider extends ServiceProvider
         Role::class              => RolePolicy::class,
         SystemSetting::class     => SystemSettingPolicy::class,
         User::class              => UserPolicy::class,
+        VariantCombination::class => VariantCombinationPolicy::class,
     ];
 
     /**

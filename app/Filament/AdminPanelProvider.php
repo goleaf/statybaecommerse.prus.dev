@@ -119,7 +119,6 @@ class AdminPanelProvider extends PanelProvider
     private function applyBaseConfiguration(Panel $panel): Panel
     {
         return $panel
-            ->default()
             ->id('admin')
             ->path('/admin')
             ->login(AdminLogin::class)
@@ -129,6 +128,9 @@ class AdminPanelProvider extends PanelProvider
             ])
             // Configure authentication guard and user model
             ->authGuard('web')
+            ->authPasswordBroker('users')
+            ->default()
+            ->homeUrl('/admin/dashboard')
             ->userMenuItems([
                 'profile' => \Filament\Pages\Auth\EditProfile::class,
                 'logout' => \Filament\Pages\Auth\Logout::class,

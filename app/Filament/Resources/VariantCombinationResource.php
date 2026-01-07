@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Enums\NavigationGroup;
+use App\Filament\Resources\BaseResource;
 use App\Filament\Resources\VariantCombinationResource\Pages;
 use App\Models\Product;
 use App\Models\VariantCombination;
@@ -20,7 +21,6 @@ use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
-use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Schemas\Schema;
@@ -35,7 +35,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
 
-final class VariantCombinationResource extends Resource
+final class VariantCombinationResource extends BaseResource
 {
     protected static ?string $model = \App\Models\VariantCombination::class;
 
@@ -54,51 +54,11 @@ final class VariantCombinationResource extends Resource
     protected static ?int $navigationSort = 19;
 
     /**
-     * Determine if the current user can view any records.
+     * Override the authorization resource name for this resource.
      */
-    public static function canViewAny(): bool
+    protected static function getAuthorizationResource(): string
     {
-        return \App\Support\Authorization\AuthorizationMatrix::check('products', 'viewAny');
-    }
-
-    /**
-     * Determine if the current user can view the specified record.
-     */
-    public static function canView(\Illuminate\Database\Eloquent\Model $record): bool
-    {
-        return \App\Support\Authorization\AuthorizationMatrix::check('products', 'view');
-    }
-
-    /**
-     * Determine if the current user can create records.
-     */
-    public static function canCreate(): bool
-    {
-        return \App\Support\Authorization\AuthorizationMatrix::check('products', 'create');
-    }
-
-    /**
-     * Determine if the current user can edit the specified record.
-     */
-    public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
-    {
-        return \App\Support\Authorization\AuthorizationMatrix::check('products', 'update');
-    }
-
-    /**
-     * Determine if the current user can delete the specified record.
-     */
-    public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
-    {
-        return \App\Support\Authorization\AuthorizationMatrix::check('products', 'delete');
-    }
-
-    /**
-     * Determine if the current user can delete any records.
-     */
-    public static function canDeleteAny(): bool
-    {
-        return \App\Support\Authorization\AuthorizationMatrix::check('products', 'delete');
+        return 'products'; // Use products permissions for variant combinations
     }
 
     public static function getNavigationLabel(): string
