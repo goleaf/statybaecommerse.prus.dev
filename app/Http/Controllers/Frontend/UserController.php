@@ -212,7 +212,14 @@ final class UserController extends Controller
 
         return view('users.reviews', compact('reviews'));
     }
-}
+
+    /**
+     * Handle wishlist functionality with proper error handling.
+     */
+    public function wishlist(): View
+    {
+        $user = Auth::user();
+        $wishlist = $user->wishlist()->with('product')->latest()->paginate(10);
 
         return view('users.wishlist', compact('wishlist'));
     }

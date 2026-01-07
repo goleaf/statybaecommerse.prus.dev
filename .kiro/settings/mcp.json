@@ -16,7 +16,8 @@
         "read-log-entries",
         "get-config",
         "list-available-env-vars",
-        "database-schema"
+        "database-schema",
+        "tinker"
       ]
     }
   }
