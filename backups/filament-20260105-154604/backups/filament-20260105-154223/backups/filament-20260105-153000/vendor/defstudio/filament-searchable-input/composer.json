@@ -1,0 +1,82 @@
+{
+    "name": "defstudio/filament-searchable-input",
+    "description": "A searchable autocomplete input for Filament forms",
+    "keywords": [
+        "defstudio",
+        "laravel",
+        "filament",
+        "filamentphp",
+        "forms",
+        "input",
+        "searchable"
+    ],
+    "homepage": "https://github.com/defstudio/filament-searchable-input",
+    "support": {
+        "issues": "https://github.com/defstudio/filament-searchable-input/issues",
+        "source": "https://github.com/defstudio/filament-searchable-input"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabio Ivona",
+            "email": "fabio.ivona@defstudio.it",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "filament/filament": "^4.0",
+        "filament/forms": "^4.0",
+        "spatie/laravel-package-tools": "^1.15"
+    },
+    "require-dev": {
+        "larastan/larastan": "^3.0",
+        "laravel/pint": "^1.0",
+        "nunomaduro/collision": "^8.0",
+        "orchestra/testbench": "^9.0|^10.0",
+        "pestphp/pest": "^3.0",
+        "pestphp/pest-plugin-arch": "^3.0",
+        "pestphp/pest-plugin-laravel": "^3.0",
+        "pestphp/pest-plugin-livewire": "^3.0",
+        "phpstan/extension-installer": "^1.1",
+        "phpstan/phpstan-deprecation-rules": "^2.0",
+        "phpstan/phpstan-phpunit": "^2.0",
+        "rector/rector": "^2.0",
+        "spatie/laravel-ray": "^1.26"
+    },
+    "autoload": {
+        "psr-4": {
+            "DefStudio\\SearchableInput\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "DefStudio\\SearchableInput\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "post-autoload-dump": "@php ./vendor/bin/testbench package:discover --ansi",
+        "analyse": "vendor/bin/phpstan analyse",
+        "test": "vendor/bin/pest",
+        "test-coverage": "vendor/bin/pest --coverage",
+        "refactor": "vendor/bin/rector",
+        "format": "vendor/bin/pint"
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "composer/package-versions-deprecated": true,
+            "pestphp/pest-plugin": true,
+            "phpstan/extension-installer": true
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "DefStudio\\SearchableInput\\SearchableInputServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

@@ -1,0 +1,69 @@
+{
+    "name": "eightynine/filament-advanced-widgets",
+    "description": "Advanced widgets for your filament php application",
+    "keywords": [
+        "eightynine",
+        "laravel",
+        "filament-advanced-widgets"
+    ],
+    "homepage": "https://github.com/eightynine/filament-advanced-widgets",
+    "support": {
+        "issues": "https://github.com/eightynine/filament-advanced-widgets/issues",
+        "source": "https://github.com/eightynine/filament-advanced-widgets"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Eighty Nine",
+            "email": "eighty9nine@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "filament/filament": "^4.0",
+        "spatie/laravel-package-tools": "^1.15.0"
+    },
+    "require-dev": {
+        "nunomaduro/collision": "^8.1",
+        "orchestra/testbench": "^10.0|^11.0",
+        "pestphp/pest": "^3.7",
+        "pestphp/pest-plugin-arch": "^3.0",
+        "pestphp/pest-plugin-laravel": "^3.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "EightyNine\\FilamentAdvancedWidget\\": "src/",
+            "EightyNine\\FilamentAdvancedWidget\\Database\\Factories\\": "database/factories/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "EightyNine\\FilamentAdvancedWidget\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "post-autoload-dump": "@php ./vendor/bin/testbench package:discover --ansi",
+        "test": "vendor/bin/pest",
+        "test-coverage": "vendor/bin/pest --coverage"
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "phpstan/extension-installer": true
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "EightyNine\\FilamentAdvancedWidget\\FilamentAdvancedWidgetServiceProvider"
+            ],
+            "aliases": {
+                "FilamentAdvancedWidget": "EightyNine\\FilamentAdvancedWidget\\Facades\\FilamentAdvancedWidget"
+            }
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

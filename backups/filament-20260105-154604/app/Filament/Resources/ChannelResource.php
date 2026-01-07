@@ -1,0 +1,341 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Filament\Resources;
+
+use App\Filament\Resources\ChannelResource\Pages;
+use App\Models\Channel;
+use App\Support\Concerns\HasNav;
+use App\Support\Forms\MatrixFactory;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Forms;
+use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Schemas\Schema;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Table;
+use Illuminate\Support\Str;
+
+/**
+ * ChannelResource
+ *
+ * Filament v4 resource for Channel management in the admin panel with comprehensive CRUD operations, filters, and actions.
+ */
+final class ChannelResource extends Resource
+{
+    use HasNav;
+
+    protected static ?string $model = Channel::class;
+
+    protected static ?int $navigationSort = 2;
+
+    protected static ?string $recordTitleAttribute = 'name';
+
+    public static function getNavigationIcon(): string
+    {
+        return 'heroicon-o-rectangle-stack';
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('admin.channels.navigation_label');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('admin.channels.plural_model_label');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('admin.channels.model_label');
+    }
+
+    public static function form(Schema $schema): Schema
+    {
+        return $schema
+            ->schema([
+                SchemaSection::make(__('admin.channels.basic_information'))
+                    ->schema([
+                        SchemaGrid::make(2)
+                            ->schema([
+                                TextInput::make('name')
+                                    ->label(__('admin.channels.name'))
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->live(onBlur: true)
+                                    // Keep the slug synchronised with the name when creating new channels.
+                                    ->afterStateUpdated(function (string $operation, mixed $state, Forms\Set $set): void {
+                                        if ($operation !== 'create' || ! is_string($state)) {
+                                            return;
+                                        }
+
+                                        // Mirror the old auto-slug behaviour while ensuring we avoid casting non-string values.
+                                        $set('slug', Str::slug($state));
+                                    }),
+                                TextInput::make('slug')
+                                    ->label(__('admin.channels.slug'))
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->unique(Channel::class, 'slug', ignoreRecord: true)
+                                    ->rules(['alpha_dash']),
+                                TextInput::make('code')
+                                    ->label(__('admin.channels.code'))
+                                    // Keep the field non-nullable to mirror the database constraint and avoid runtime SQL errors.
+                                    ->required(fn (string $operation): bool => $operation === 'create')
+                                    ->maxLength(50)
+                                    ->unique(Channel::class, 'code', ignoreRecord: true)
+                                    ->rules(['alpha_dash']),
+                                Select::make('type')
+                                    ->label(__('admin.channels.type'))
+                                    ->options([
+                                        'web'    => __('admin.channels.types.web'),
+                                        'mobile' => __('admin.channels.types.mobile'),
+                                        'api'    => __('admin.channels.types.api'),
+                                        'pos'    => __('admin.channels.types.pos'),
+                                    ])
+                                    ->required()
+                                    ->default('web'),
+                            ]),
+                        Textarea::make('description')
+                            ->label(__('admin.channels.description'))
+                            ->maxLength(1000)
+                            ->rows(3),
+                    ]),
+                SchemaSection::make(__('admin.channels.configuration'))
+                    ->schema([
+                        SchemaGrid::make(2)
+                            ->schema([
+                                TextInput::make('url')
+                                    ->label(__('admin.channels.url'))
+                                    ->url()
+                                    ->maxLength(255),
+                                TextInput::make('domain')
+                                    ->label(__('admin.channels.domain'))
+                                    ->maxLength(255),
+                                TextInput::make('timezone')
+                                    ->label(__('admin.channels.timezone'))
+                                    ->maxLength(50)
+                                    ->default('UTC'),
+                                TextInput::make('currency_code')
+                                    ->label(__('admin.channels.currency_code'))
+                                    ->maxLength(3)
+                                    ->default('EUR'),
+                                TextInput::make('currency_symbol')
+                                    ->label(__('admin.channels.currency_symbol'))
+                                    ->maxLength(10)
+                                    ->default('€'),
+                                Select::make('currency_position')
+                                    ->label(__('admin.channels.currency_position'))
+                                    ->options([
+                                        'before' => __('admin.channels.currency_positions.before'),
+                                        'after'  => __('admin.channels.currency_positions.after'),
+                                    ])
+                                    ->default('after'),
+                            ]),
+                    ]),
+                SchemaSection::make(__('admin.channels.advanced_settings'))
+                    ->schema([
+                        SchemaGrid::make(2)
+                            ->schema([
+                                KeyValue::make('metadata')
+                                    ->label(__('admin.channels.metadata'))
+                                    ->keyLabel(__('admin.channels.metadata_key'))
+                                    ->valueLabel(__('admin.channels.metadata_value'))
+                                    ->addButtonLabel(__('admin.channels.add_metadata'))
+                                    // Storing JSON pairs keeps integration hooks flexible without custom column migrations.
+                                    ->columnSpan(1)
+                                    ->reorderable(),
+                                KeyValue::make('configuration')
+                                    ->label(__('admin.channels.configuration_pairs'))
+                                    ->keyLabel(__('admin.channels.configuration_key'))
+                                    ->valueLabel(__('admin.channels.configuration_value'))
+                                    ->addButtonLabel(__('admin.channels.add_configuration'))
+                                    // Allow administrators to persist bespoke configuration flags alongside metadata.
+                                    ->columnSpan(1)
+                                    ->reorderable(),
+                            ])
+                            ->columns(2),
+                    ])
+                    ->columns(1),
+                SchemaSection::make(__('admin.channels.payment_matrix_section'))
+                    ->schema([
+                        MatrixFactory::checkboxGrid(
+                            'payment_matrix',
+                            [
+                                'lt' => __('admin.channels.payment_rows.lt'),
+                                'lv' => __('admin.channels.payment_rows.lv'),
+                                'ee' => __('admin.channels.payment_rows.ee'),
+                                'pl' => __('admin.channels.payment_rows.pl'),
+                                'eu' => __('admin.channels.payment_rows.eu'),
+                            ],
+                            [
+                                'web'         => __('admin.channels.payment_columns.web'),
+                                'pos'         => __('admin.channels.payment_columns.pos'),
+                                'marketplace' => __('admin.channels.payment_columns.marketplace'),
+                            ],
+                        )
+                            ->label(__('admin.channels.payment_matrix_label'))
+                            ->helperText(__('admin.channels.payment_matrix_help'))
+                            ->columnSpanFull()
+                            ->live(),
+                    ])
+                    ->columns(1),
+                SchemaSection::make(__('admin.channels.status'))
+                    ->schema([
+                        SchemaGrid::make(3)
+                            ->schema([
+                                Toggle::make('is_enabled')
+                                    ->label(__('admin.channels.is_enabled'))
+                                    ->default(true),
+                                Toggle::make('is_default')
+                                    ->label(__('admin.channels.is_default'))
+                                    ->default(false),
+                                Toggle::make('is_active')
+                                    ->label(__('admin.channels.is_active'))
+                                    ->default(true),
+                                Toggle::make('ssl_enabled')
+                                    ->label(__('admin.channels.ssl_enabled'))
+                                    ->default(true),
+                                Toggle::make('analytics_enabled')
+                                    ->label(__('admin.channels.analytics_enabled'))
+                                    ->default(false),
+                                TextInput::make('sort_order')
+                                    ->label(__('admin.channels.sort_order'))
+                                    ->numeric()
+                                    ->default(0),
+                            ]),
+                    ]),
+            ]);
+    }
+
+    public static function table(Table $table): Table
+    {
+        // Configure the table definition for the streamlined Filament v4 return type.
+        return $table
+            ->columns([
+                TextColumn::make('name')
+                    ->label(__('admin.channels.name'))
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('code')
+                    ->label(__('admin.channels.code'))
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('type')
+                    ->label(__('admin.channels.type'))
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'web'    => 'success',
+                        'mobile' => 'info',
+                        'api'    => 'warning',
+                        'pos'    => 'danger',
+                        default  => 'gray',
+                    }),
+                TextColumn::make('timezone')
+                    ->label(__('admin.channels.timezone'))
+                    // Keeping the timezone visible helps troubleshoot locale-specific scheduling issues.
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->sortable(),
+                TextColumn::make('url')
+                    ->label(__('admin.channels.url'))
+                    ->limit(30)
+                    ->tooltip(function (TextColumn $column): ?string {
+                        $state = $column->getState();
+
+                        if (! is_string($state)) {
+                            return null;
+                        }
+
+                        return strlen($state) > 30 ? $state : null;
+                    }),
+                TextColumn::make('currency_code')
+                    ->label(__('admin.channels.currency_code'))
+                    // Surfacing the currency code allows quick auditing when multiple regions are configured.
+                    ->badge()
+                    ->sortable(),
+                IconColumn::make('is_enabled')
+                    ->label(__('admin.channels.is_enabled'))
+                    ->boolean(),
+                IconColumn::make('is_default')
+                    ->label(__('admin.channels.is_default'))
+                    ->boolean(),
+                IconColumn::make('is_active')
+                    ->label(__('admin.channels.is_active'))
+                    ->boolean(),
+                IconColumn::make('ssl_enabled')
+                    ->label(__('admin.channels.ssl_enabled'))
+                    // Showing SSL state informs reviewers whether secure storefront routes are enforced.
+                    ->boolean()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                IconColumn::make('analytics_enabled')
+                    ->label(__('admin.channels.analytics_enabled'))
+                    // Analytics toggles are optional, so keep them available via the column toggles menu.
+                    ->boolean()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('created_at')
+                    ->label(__('admin.common.created_at'))
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+            ])
+            ->filters([
+                SelectFilter::make('type')
+                    ->label(__('admin.channels.type'))
+                    ->options([
+                        'web'    => __('admin.channels.types.web'),
+                        'mobile' => __('admin.channels.types.mobile'),
+                        'api'    => __('admin.channels.types.api'),
+                        'pos'    => __('admin.channels.types.pos'),
+                    ]),
+                TernaryFilter::make('is_enabled')
+                    ->label(__('admin.channels.is_enabled')),
+                TernaryFilter::make('is_default')
+                    ->label(__('admin.channels.is_default')),
+                TernaryFilter::make('is_active')
+                    ->label(__('admin.channels.is_active')),
+            ])
+            ->recordActions([
+                ViewAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
+            ])
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                ]),
+            ])
+            ->defaultSort('sort_order');
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            //
+        ];
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index'  => Pages\ListChannels::route('/'),
+            'create' => Pages\CreateChannel::route('/create'),
+            'view'   => Pages\ViewChannel::route('/{record}'),
+            'edit'   => Pages\EditChannel::route('/{record}/edit'),
+        ];
+    }
+}
