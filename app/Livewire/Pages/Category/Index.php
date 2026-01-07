@@ -15,6 +15,9 @@ use App\Support\Cache\TagAwareCache;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Concerns\InteractsWithSchemas;
+use Filament\Schemas\Contracts\HasSchemas;
+use Filament\Schemas\Schema;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
@@ -39,13 +42,9 @@ use Livewire\Component;
  * @property-read EloquentCollection<int, Brand> $brands
  * @property-read EloquentCollection<int, Collection> $collections
  */
-final class Index extends Component
+final class Index extends Component implements HasSchemas
 {
-    public function __construct(
-        private readonly FacetCountingService $facetCountingService
-    ) {
-        parent::__construct();
-    }
+    use InteractsWithSchemas;
 
     #[Url(except: '')]
     public string $search = '';
@@ -209,9 +208,10 @@ final class Index extends Component
             CacheKeys::categoryIndexFacetBrands($locale, $filters),
             now()->addSeconds(180),
             function (): array {
-                $this->facetCountingService->resetQueryCount();
+                $facetCountingService = app(FacetCountingService::class);
+                $facetCountingService->resetQueryCount();
 
-                return $this->facetCountingService->getBrandFacets($this->baseProductQuery());
+                return $facetCountingService->getBrandFacets($this->baseProductQuery());
             },
             $this->tagsForCategoryIndex([
                 CacheTags::brands(),
@@ -233,9 +233,10 @@ final class Index extends Component
             CacheKeys::categoryIndexFacetCollections($locale, $filters),
             now()->addSeconds(180),
             function (): array {
-                $this->facetCountingService->resetQueryCount();
+                $facetCountingService = app(FacetCountingService::class);
+                $facetCountingService->resetQueryCount();
 
-                return $this->facetCountingService->getCollectionFacets($this->baseProductQuery());
+                return $facetCountingService->getCollectionFacets($this->baseProductQuery());
             },
             $this->tagsForCategoryIndex([
                 CacheTags::collections(),
@@ -257,9 +258,10 @@ final class Index extends Component
             CacheKeys::categoryIndexFacetCategories($locale, $filters),
             now()->addSeconds(180),
             function (): array {
-                $this->facetCountingService->resetQueryCount();
+                $facetCountingService = app(FacetCountingService::class);
+                $facetCountingService->resetQueryCount();
 
-                return $this->facetCountingService->getCategoryFacets($this->baseProductQuery());
+                return $facetCountingService->getCategoryFacets($this->baseProductQuery());
             },
             $this->tagsForCategoryIndex([
                 CacheTags::categories(),
@@ -373,7 +375,7 @@ final class Index extends Component
 
     public function render(): View
     {
-        return view('livewire.pages.category.index')
+        return view('livewire.pages.category.show')
             ->layout('components.layouts.base', [
                 'title' => __('categories_index_meta_title'),
             ]);

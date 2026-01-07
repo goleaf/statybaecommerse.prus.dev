@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Models\Concerns\HasTranslations;
 use Database\Factories\CampaignClickFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -12,14 +11,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * CampaignClick Model (Deprecated)
- * 
+ *
  * @deprecated This model is deprecated as the campaigns feature has been removed.
  */
 final class CampaignClick extends Model
 {
     /** @use HasFactory<CampaignClickFactory> */
     use HasFactory;
-    use HasTranslations;
 
     protected $table = 'campaign_clicks';
 
@@ -49,19 +47,10 @@ final class CampaignClick extends Model
     ];
 
     protected $casts = [
-        'clicked_at' => 'datetime',
+        'clicked_at'       => 'datetime',
         'conversion_value' => 'decimal:2',
-        'is_converted' => 'boolean',
-        'conversion_data' => 'array',
-    ];
-
-    public array $translatable = [
-        'click_type_label',
-        'device_type_label',
-        'browser_label',
-        'os_label',
-        'notes',
-        'custom_data',
+        'is_converted'     => 'boolean',
+        'conversion_data'  => 'array',
     ];
 
     /**

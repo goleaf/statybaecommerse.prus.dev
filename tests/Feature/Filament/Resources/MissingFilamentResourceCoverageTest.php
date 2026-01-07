@@ -6,7 +6,6 @@ namespace Tests\Feature\Filament\Resources;
 
 use App\Filament\Resources\AuditTrailResource\Pages\ListAuditTrails;
 use App\Filament\Resources\BrandResource\Pages\ListBrands;
-use App\Filament\Resources\CampaignConversionResource\Pages\ListCampaignConversions;
 use App\Filament\Resources\CampaignResource\Pages\ListCampaigns;
 use App\Filament\Resources\CampaignScheduleResource\Pages\ListCampaignSchedules;
 use App\Filament\Resources\CampaignViewResource\Pages\ListCampaignViews;
@@ -42,7 +41,6 @@ use App\Filament\Resources\VariantStockResource\Pages\ListVariantStocks;
 use App\Models\AuditTrail;
 use App\Models\Brand;
 use App\Models\Campaign;
-use App\Models\CampaignConversion;
 use App\Models\CampaignSchedule;
 use App\Models\CampaignView;
 use App\Models\CartItem;
@@ -151,13 +149,9 @@ final class MissingFilamentResourceCoverageTest extends TestCase
         return [
             'audit trails'                         => [ListAuditTrails::class, 'createAuditTrailRecord'],
             'brands'                               => [ListBrands::class, 'createBrandRecord'],
-            'campaign conversions'                 => [ListCampaignConversions::class, 'createCampaignConversionRecord'],
             'campaign schedules'                   => [ListCampaignSchedules::class, 'createCampaignScheduleRecord'],
             'campaign views'                       => [ListCampaignViews::class, 'createCampaignViewRecord'],
             'campaigns'                            => [ListCampaigns::class, 'createCampaignRecord'],
-            'campaign conversions'                 => [ListCampaignConversions::class, 'createCampaignConversionRecord'],
-            'campaign schedules'                   => [ListCampaignSchedules::class, 'createCampaignScheduleRecord'],
-            'campaign views'                       => [ListCampaignViews::class, 'createCampaignViewRecord'],
             'cart items'                           => [ListCartItems::class, 'createCartItemRecord'],
             'cities'                               => [ListCities::class, 'createCityRecord'],
             'collections'                          => [ListCollections::class, 'createCollectionRecord'],
@@ -675,29 +669,6 @@ final class MissingFilamentResourceCoverageTest extends TestCase
             'type'           => 'base',
             'is_enabled'     => true,
             'metadata'       => ['label' => 'Coverage Base Price'],
-        ]);
-    }
-
-    private function createCampaignConversionRecord(): CampaignConversion
-    {
-        // Compose supporting campaign metadata so the analytics table can resolve related campaign names without hitting nulls.
-        $campaign = Campaign::factory()->create([
-            'name' => 'Coverage Conversion Campaign',
-            'slug' => 'coverage-conversion-campaign',
-        ]);
-
-        // Persist a completed conversion with deterministic fields so table filters remain predictable during assertions.
-        return CampaignConversion::query()->create([
-            'campaign_id'      => $campaign->getKey(),
-            'customer_id'      => $this->admin->getKey(),
-            'conversion_type'  => 'purchase',
-            'conversion_value' => 123.45,
-            'status'           => 'completed',
-            'session_id'       => 'coverage-session',
-            'source'           => 'email',
-            'medium'           => 'newsletter',
-            'device_type'      => 'desktop',
-            'converted_at'     => now()->subHour(),
         ]);
     }
 

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Filament\Widgets;
 
 use App\Models\AnalyticsEvent;
-use App\Models\CampaignConversion;
 use App\Models\Order;
 use App\Models\User;
 use Carbon\Carbon;
@@ -59,9 +58,8 @@ class AdvancedAnalyticsWidget extends ChartWidget
                 ->count();
             $pageViewsData[] = $pageViews;
 
-            // Conversions
-            $conversions = CampaignConversion::whereDate('created_at', $date)
-                ->sum('conversions_count');
+            // Conversions (removed)
+            $conversions = 0; // CampaignConversion removed
             $conversionsData[] = $conversions;
         }
 

@@ -10,7 +10,6 @@ use App\Models\Attribute;
 use App\Models\Brand;
 use App\Models\Campaign;
 use App\Models\CampaignClick;
-use App\Models\CampaignConversion;
 use App\Models\CampaignView;
 use App\Models\CartItem;
 use App\Models\Category;
@@ -110,7 +109,7 @@ class UltimateStatsWidget extends BaseWidget
         $activeCampaigns = 0; // Campaign::where('status', 'active')->count();
         $totalCampaignViews = 0; // CampaignView::sum('views_count');
         $totalCampaignClicks = 0; // CampaignClick::sum('clicks_count');
-        $totalConversions = 0; // CampaignConversion::sum('conversions_count');
+        $totalConversions = 0; // Removed CampaignConversion
 
         // === DISCOUNTS & COUPONS ===
         $totalCoupons = Coupon::count();

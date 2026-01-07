@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Enums\NavigationGroup;
 use App\Filament\Resources\VariantCombinationResource\Pages;
 use App\Models\Product;
 use App\Models\VariantCombination;
@@ -48,7 +49,7 @@ final class VariantCombinationResource extends Resource
      * Match Filament's required union type so sidebar grouping works with native enums while still
      * supporting plain string labels during configuration overrides.
      */
-    protected static string|UnitEnum|null $navigationGroup = 'Inventory';
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroup::Inventory;
 
     protected static ?int $navigationSort = 19;
 

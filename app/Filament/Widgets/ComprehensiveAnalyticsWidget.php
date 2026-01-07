@@ -6,7 +6,6 @@ namespace App\Filament\Widgets;
 
 use App\Models\AnalyticsEvent;
 use App\Models\CampaignClick;
-use App\Models\CampaignConversion;
 use App\Models\CampaignView;
 use App\Models\Order;
 use App\Models\Product;
@@ -114,9 +113,8 @@ class ComprehensiveAnalyticsWidget extends ChartWidget
                 ->sum('clicks_count');
             $campaignClicksData[] = $campaignClicks;
 
-            // Conversions
-            $conversions = CampaignConversion::whereDate('created_at', $date)
-                ->sum('conversions_count');
+            // Conversions (removed)
+            $conversions = 0; // CampaignConversion removed
             $conversionsData[] = $conversions;
 
             // User Behaviors

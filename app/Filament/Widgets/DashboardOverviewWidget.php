@@ -8,7 +8,6 @@ use App\Models\Address;
 use App\Models\AnalyticsEvent;
 use App\Models\Campaign;
 use App\Models\CampaignClick;
-use App\Models\CampaignConversion;
 use App\Models\CampaignView;
 use App\Models\Country;
 use App\Models\Inventory;
@@ -66,7 +65,7 @@ class DashboardOverviewWidget extends BaseWidget
         $activeCampaigns = 0; // Campaign::where('status', 'active')->count();
         $totalCampaignViews = 0; // CampaignView::sum('views_count');
         $totalCampaignClicks = 0; // CampaignClick::sum('clicks_count');
-        $totalConversions = CampaignConversion::sum('conversions_count');
+        $totalConversions = 0; // Removed CampaignConversion
 
         // Performance Metrics
         $totalPageViews = AnalyticsEvent::where('event_type', 'page_view')->count();

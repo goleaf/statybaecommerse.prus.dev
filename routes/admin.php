@@ -7,7 +7,6 @@ use App\Filament\Resources\VariantCombinationResource\Pages\EditVariantCombinati
 use App\Filament\Resources\VariantCombinationResource\Pages\ListVariantCombinations;
 use App\Filament\Resources\VariantCombinationResource\Pages\ViewVariantCombination;
 use App\Http\Controllers\Admin\AttributeValueTranslationController;
-
 use App\Http\Controllers\Admin\DiscountPresetController;
 use App\Http\Controllers\Admin\EnumValueController;
 use App\Http\Controllers\Admin\LocationController as AdminLocationController;
@@ -460,7 +459,6 @@ Route::middleware('auth')->group(function (): void {
 
 Route::middleware('auth')->prefix('admin')->group(function (): void {
 
-
     Route::get('/locations', [AdminLocationController::class, 'index'])
         ->name('admin.locations.index');
     Route::get('/locations/create', [AdminLocationController::class, 'create'])
@@ -698,16 +696,4 @@ if (app()->runningUnitTests()) {
         ))->whereNumber('inventory')
             ->name('filament.admin.resources.inventories.edit');
     });
-
-    Route::get('/__stub/campaign-conversions', fn () => 'ok')
-        ->name('filament.admin.resources.campaign-conversions.index');
-
-    Route::get('/__stub/campaign-conversions/create', fn () => 'ok')
-        ->name('filament.admin.resources.campaign-conversions.create');
-
-    Route::get('/__stub/campaign-conversions/{record}', fn () => 'ok')
-        ->name('filament.admin.resources.campaign-conversions.view');
-
-    Route::get('/__stub/campaign-conversions/{record}/edit', fn () => 'ok')
-        ->name('filament.admin.resources.campaign-conversions.edit');
 }
