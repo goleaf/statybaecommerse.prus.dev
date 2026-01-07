@@ -1,0 +1,78 @@
+{
+    "name": "guava/filament-icon-picker",
+    "description": "A filament plugin that adds an icon picker field.",
+    "type": "library",
+    "license": "MIT",
+    "keywords": [
+        "Guava",
+        "laravel",
+        "filament-icon-picker"
+    ],
+    "homepage": "https://github.com/GuavaCZ/filament-icon-picker",
+    "support": {
+        "issues": "https://github.com/guavaCZ/filament-icon-picker/issues",
+        "source": "https://github.com/guavaCZ/filament-icon-picker"
+    },
+    "authors": [
+        {
+            "name": "Lukas Frey",
+            "email": "lukas.frey@guava.cz",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "blade-ui-kit/blade-icons": "^1.8",
+        "filament/filament": "^4.0",
+        "spatie/laravel-package-tools": "^1.15.0"
+    },
+    "require-dev": {
+        "laravel/pint": "^1.0",
+        "nunomaduro/collision": "^8.0",
+        "nunomaduro/larastan": "^3.0",
+        "orchestra/testbench": "^10.0",
+        "pestphp/pest": "^3.1",
+        "pestphp/pest-plugin-arch": "^3.0",
+        "pestphp/pest-plugin-laravel": "^3.0",
+        "phpstan/extension-installer": "^1.1",
+        "phpstan/phpstan-deprecation-rules": "^2.0",
+        "phpstan/phpstan-phpunit": "2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Guava\\IconPicker\\": "src/",
+            "Guava\\IconPicker\\Database\\Factories\\": "database/factories/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Guava\\IconPicker\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "post-autoload-dump": "@php ./vendor/bin/testbench package:discover --ansi",
+        "analyse": "vendor/bin/phpstan analyse",
+        "test": "vendor/bin/pest",
+        "test-coverage": "vendor/bin/pest --coverage",
+        "format": "vendor/bin/pint"
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "phpstan/extension-installer": true
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Guava\\IconPicker\\IconPickerServiceProvider"
+            ],
+            "aliases": {
+                "IconPicker": "IconManager"
+            }
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

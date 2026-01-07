@@ -1,0 +1,43 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+.it-table-repeatable{
+    @apply bg-white border border-gray-300 shadow-sm rounded-xl relative dark:bg-gray-800 dark:border-gray-600;
+
+    & > div{
+        @apply gap-4;
+
+        & > table{
+            @apply w-full table-auto divide-y divide-gray-200 text-start dark:divide-white/5 shadow rounded-xl;
+
+            & > thead{
+                & >tr{
+                    & .it-table-repeatable-index{
+                        @apply px-3 py-4 sm:first-of-type:ps-6 sm:last-of-type:pe-6;
+                    }
+
+                    & .it-table-repeatable-header-cell{
+                        @apply font-semibold text-gray-950 dark:text-white text-start py-4 sm:first-of-type:ps-3 sm:last-of-type:pe-3;
+                    }
+                }
+
+            }
+
+            & > tbody{
+                @apply divide-y divide-gray-200 whitespace-nowrap dark:divide-white/5;
+
+                & .it-table-repeatable-striped-row{
+                    @apply bg-gray-50 dark:bg-white/5;
+                }
+
+                & > tr{
+                    & > td{
+                        @apply p-0 first-of-type:ps-1 last-of-type:pe-1 sm:first-of-type:ps-3 sm:last-of-type:pe-3 text-center py-2
+                    }
+
+                }
+            }
+        }
+    }
+}

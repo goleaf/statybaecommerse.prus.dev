@@ -1,0 +1,39 @@
+<?php
+
+namespace {{ namespace }};
+
+use Filament\Forms\Components\Toggle;
+use LaraZeus\Bolt\Fields\FieldsContract;
+
+class {{ class }} extends FieldsContract
+{
+    public string $renderClass = {{ plugin }}::class;
+
+    public int $sort = 20;
+
+    public function title(): string
+    {
+        return __('Checkbox List');
+    }
+
+    public static function getOptions(): array
+    {
+        return [
+            self::htmlID(),
+            self::required(),
+            self::columnSpanFull(),
+            self::hiddenLabel(),
+        ];
+    }
+
+    public static function getOptionsHidden(): array
+    {
+        return [
+            self::hiddenHtmlID(),
+            self::hiddenRequired(),
+            self::hiddenColumnSpanFull(),
+            self::hiddenHiddenLabel(),
+        ];
+    }
+}
+
