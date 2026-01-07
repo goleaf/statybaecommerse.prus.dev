@@ -15,7 +15,8 @@
         "last-error",
         "read-log-entries",
         "get-config",
-        "list-available-env-vars"
+        "list-available-env-vars",
+        "database-schema"
       ]
     }
   }
