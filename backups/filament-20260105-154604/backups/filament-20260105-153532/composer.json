@@ -1,0 +1,271 @@
+{
+    "$schema": "https://getcomposer.org/schema.json",
+    "name": "laravel/laravel",
+    "type": "project",
+    "description": "The skeleton application for the Laravel framework.",
+    "keywords": [
+        "laravel",
+        "framework"
+    ],
+    "license": "MIT",
+    "require": {
+        "php": "^8.2",
+        "andreia/filament-nord-theme": "^2.0",
+        "asmit/resized-column": "*",
+        "awcodes/filament-badgeable-column": "^3.0",
+        "awcodes/overlook": "^3.0",
+        "barryvdh/laravel-dompdf": "^3.1",
+        "bezhansalleh/filament-shield": "^4.0",
+        "coolsam/flatpickr": "^5.0",
+        "defstudio/filament-searchable-input": "^4.0",
+        "dutchcodingcompany/filament-socialite": "^3.0",
+        "eightynine/filament-advanced-widgets": "^4.0",
+        "encoredigitalgroup/filament-helpers": "^4.0@rc",
+        "filament/filament": "^4.1",
+        "filament/spatie-laravel-media-library-plugin": "^4.0",
+        "hydrat/filament-table-layout-toggle": "^3.0",
+        "icetalker/filament-table-repeatable-entry": "^2.0",
+        "kenepa/resource-lock": "^4.0",
+        "lara-zeus/bolt": "^4.0.5",
+        "lara-zeus/inline-chart": "^2.0",
+        "lara-zeus/list-group": "^2.0",
+        "lara-zeus/matrix-choice": "*",
+        "lara-zeus/spatie-translatable": "*",
+        "laravel/framework": "^12.0",
+        "laravel/sanctum": "^4.0",
+        "laravel/scout": "^10.19",
+        "laravel/tinker": "^2.10.1",
+        "livewire/volt": "^1.0",
+        "novadaemon/filament-combobox": "^2.0.1",
+        "phpoffice/phpspreadsheet": "^1.30",
+        "pixelpeter/filament-language-tabs": "^3.0",
+        "predis/predis": "^3.2",
+        "pxlrbt/filament-excel": "^3.1",
+        "saade/filament-fullcalendar": "^4.0@beta",
+        "solution-forest/tab-layout-plugin": "^3.2",
+        "spatie/laravel-activitylog": "^4.10",
+        "spatie/laravel-data": "^4.17",
+        "spatie/laravel-medialibrary": "^11",
+        "spatie/laravel-permission": "^6.21",
+        "spatie/laravel-sluggable": "^3.7",
+        "spatie/laravel-translatable": "^6.11",
+        "tapp/filament-value-range-filter": "^2.0",
+        "zvizvi/relation-manager-repeater": "^2.0"
+    },
+    "require-dev": {
+        "barryvdh/laravel-debugbar": "^3.16",
+        "brianium/paratest": "^7.8",
+        "fakerphp/faker": "^1.24",
+        "filament/upgrade": "^4.0",
+        "larastan/larastan": "^3.6",
+        "laravel/boost": "*",
+        "laravel/dusk": "^8.3",
+        "laravel/pail": "^1.2.2",
+        "laravel/pint": "*",
+        "laravel/sail": "^1.41",
+        "league/openapi-psr7-validator": "^0.22",
+        "mockery/mockery": "^1.6",
+        "nunomaduro/collision": "^8.6",
+        "pestphp/pest": "^3.8",
+        "pestphp/pest-plugin-laravel": "^3.0",
+        "pestphp/pest-plugin-livewire": "^3.0",
+        "phpstan/phpstan": "^2.1",
+        "phpstan/phpstan-deprecation-rules": "^2.0",
+        "phpunit/phpunit": "^11.5",
+        "zircote/swagger-php": "^5.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/",
+            "Database\\Factories\\": "database/factories/",
+            "Database\\Seeders\\": "database/seeders/",
+            "Database\\Seeders\\Cities\\": "database/seeders/cities/"
+        },
+        "files": [
+            "app/helpers.php"
+        ]
+    },
+    "autoload-dev": {
+        "classmap": [
+            "tests/"
+        ]
+    },
+    "scripts": {
+        "post-autoload-dump": [
+            "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
+            "@php artisan package:discover --ansi",
+            "@php artisan filament:upgrade"
+        ],
+        "post-update-cmd": [
+            "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
+        ],
+        "post-root-package-install": [
+            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
+        ],
+        "post-create-project-cmd": [
+            "@php artisan key:generate --ansi",
+            "@php -r \"file_exists('database/database.sqlite') || touch('database/database.sqlite');\"",
+            "@php artisan migrate --graceful --ansi"
+        ],
+        "api:spec": "@php artisan api:spec",
+        "dev": [
+            "Composer\\Config::disableProcessTimeout",
+            "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1\" \"php artisan pail --timeout=0\" \"npm run dev\" --names=server,queue,logs,vite --kill-others"
+        ],
+        "ci": [
+            "@analyze",
+            "@test:ci"
+        ],
+        "app:install": [
+            "@php artisan migrate --force",
+            "@php artisan storage:link"
+        ],
+        "analyse": "@analyze",
+        "seed:fresh": "@php artisan migrate:fresh --seed --ansi",
+        "build": [
+            "@php artisan optimize --ansi",
+            "npm run build"
+        ],
+        "serve": "@php artisan serve --ansi",
+        "lint:php": "vendor/bin/pint --test",
+        "fix:php": "vendor/bin/pint -v",
+        "format": "vendor/bin/pint",
+        "analyze": [
+            "Composer\\Config::disableProcessTimeout",
+            "vendor/bin/phpstan analyse -c phpstan.neon --memory-limit=1G --no-progress"
+        ],
+        "rector": "vendor/bin/rector process --ansi",
+        "blade:format": "php artisan view:clear && php artisan view:cache",
+        "test": "@php vendor/bin/pest",
+        "test:ci": "phpunit --log-junit build/junit.xml --coverage-clover build/coverage.xml",
+        "tests:check-refresh": [
+            "@php artisan tests:check-refresh-database --path=tests/Feature --fail-on-find"
+        ],
+        "check": [
+            "@lint:php",
+            "@analyze",
+            "@test"
+        ],
+        "fix": [
+            "@fix:php",
+            "@rector",
+            "@blade:format"
+        ],
+        "realtime": "./autofix-realtime.sh",
+        "monitor": "./autofix-realtime.sh",
+        "watch": "./autofix-realtime.sh",
+        "autofix:start": "./autofix-realtime.sh",
+        "autofix:stop": "pkill -f autofix-realtime.sh",
+        "autofix:status": "ps aux | grep autofix-realtime.sh | grep -v grep",
+        "qa": [
+            "@php vendor/bin/pint --test",
+            "@analyze"
+        ],
+        "dusk:chrome": [
+            "@php artisan dusk:chrome-driver --detect",
+            "@php artisan dusk"
+        ],
+        "cache:warm": [
+            "@php artisan config:clear",
+            "@php artisan route:clear",
+            "@php artisan view:clear",
+            "@php artisan config:cache",
+            "@php artisan route:cache",
+            "@php artisan view:cache"
+        ],
+        "cache:clear": [
+            "@php artisan optimize:clear"
+        ],
+        "sqlite:optimize": [
+            "@php artisan sqlite:optimize"
+        ],
+        "sqlite:check": [
+            "@php artisan sqlite:optimize --check"
+        ],
+        "sqlite:vacuum": [
+            "@php artisan sqlite:optimize --vacuum"
+        ],
+        "docs:generate": [
+            "php artisan docs:generate"
+        ],
+        "docs:upgrade": [
+            "php artisan docs:upgrade"
+        ],
+        "docs:serve": [
+            "php artisan docs:serve"
+        ],
+        "docs:clean": [
+            "php artisan docs:clean"
+        ],
+        "docs:full": [
+            "php artisan docs:full"
+        ],
+        "diagnose:filament-pages": [
+            "@php artisan filament:diagnose-pages"
+        ],
+        "scan:filament-pages": [
+            "@php artisan filament:scan-resource-pages"
+        ],
+        "scan:filament-uninitialized": [
+            "@php artisan filament:scan-uninitialized-pages"
+        ],
+        "filament:analyze": [
+            "@php artisan filament:analyze"
+        ],
+        "filament:fix-form-schema": [
+            "@php artisan filament:fix-form-schema"
+        ],
+        "filament:fix-navigation": [
+            "@php artisan filament:navigation-groups:fix-all"
+        ],
+        "filament:fix-navigation-comprehensive": [
+            "@php artisan filament:navigation-groups:fix-comprehensive"
+        ],
+        "filament:fix-navigation-recursive": [
+            "@php artisan filament:navigation-groups:fix-recursive"
+        ],
+        "filament:fix-navigation-final": [
+            "@php artisan filament:navigation-groups:fix-final --skip-tests"
+        ],
+        "filament:fix-critical": [
+            "@php artisan filament:fix-critical-errors"
+        ],
+        "filament:fix-simple": [
+            "@php artisan filament:fix-simple-issues"
+        ],
+        "app:test-analytics": [
+            "@php vendor/bin/phpunit --testsuite=Unit --filter=AnalyticsEventDiagnosticsTest"
+        ],
+        "app:test-brand": [
+            "@php vendor/bin/phpunit --testsuite=Unit --filter=BrandResourceMetadataTest"
+        ],
+        "app:test-seeders": [
+            "@php vendor/bin/phpunit --testsuite=Feature --filter=DiagnosticsSeedersTest"
+        ]
+    },
+    "extra": {
+        "laravel": {
+            "dont-discover": []
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "platform": {
+            "php": "8.3.0"
+        },
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "php-http/discovery": true,
+            "tbachert/spi": true
+        },
+        "audit": {
+            "ignore": [
+                "PKSA-1gck-s111-yq7g"
+            ]
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

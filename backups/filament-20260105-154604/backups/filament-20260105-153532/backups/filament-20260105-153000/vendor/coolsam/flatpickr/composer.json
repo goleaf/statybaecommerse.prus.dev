@@ -1,0 +1,74 @@
+{
+    "name": "coolsam/flatpickr",
+    "description": "Flatpickr input for Filamentphp",
+    "keywords": [
+        "coolsam",
+        "laravel",
+        "flatpickr"
+    ],
+    "homepage": "https://github.com/coolsam/flatpickr",
+    "support": {
+        "issues": "https://github.com/coolsam/flatpickr/issues",
+        "source": "https://github.com/coolsam/flatpickr"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Sam Maosa",
+            "email": "maosa.sam@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "filament/filament": "^4.0",
+        "spatie/laravel-package-tools": "^1.15.0"
+    },
+    "require-dev": {
+        "barryvdh/laravel-ide-helper": "^3.5",
+        "laravel/pint": "^1.0",
+        "nunomaduro/larastan": "^3.1.0",
+        "orchestra/testbench": "^9.12",
+        "pestphp/pest-plugin-laravel": "^3.1",
+        "pestphp/pest-plugin-livewire": "^3.0",
+        "phpstan/extension-installer": "^1.4.3",
+        "spatie/laravel-ray": "^1.39"
+    },
+    "autoload": {
+        "psr-4": {
+            "Coolsam\\Flatpickr\\": "src/",
+            "Coolsam\\Flatpickr\\Database\\Factories\\": "database/factories/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Coolsam\\Flatpickr\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "post-autoload-dump": "@php ./vendor/bin/testbench package:discover --ansi",
+        "analyse": "vendor/bin/phpstan analyse",
+        "test": "vendor/bin/pest",
+        "test-coverage": "vendor/bin/pest --coverage",
+        "format": "vendor/bin/pint"
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "phpstan/extension-installer": true
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Coolsam\\Flatpickr\\FlatpickrServiceProvider"
+            ],
+            "aliases": {
+                "Flatpickr": "FilamentFlatpickr"
+            }
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
