@@ -63,7 +63,7 @@ final class RealtimeAnalyticsWidget extends ChartWidget
             ? (($revenueToday - $revenueYesterday) / $revenueYesterday) * 100
             : ($revenueToday > 0 ? 100 : 0);
 
-        $activeCampaigns = Campaign::query()->withoutGlobalScopes()->where('is_active', true)->count();
+        $activeCampaigns = 0; // Campaign::query()->withoutGlobalScopes()->where('is_active', true)->count();
         $totalProducts = Product::query()->withoutGlobalScopes()->count();
 
         return [

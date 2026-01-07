@@ -209,14 +209,6 @@ final class CacheInvalidationService
 
         $this->flushTags($sliderTags);
 
-        // Forget the analytics payload explicitly to support cache stores without tag support.
-        Cache::forget(CacheKeys::sliderAnalytics());
-
-        if (CacheTagHelper::supportsTags()) {
-            // Ensure the tag-aware cache entry is purged when the analytics payload was stored with tags.
-            Cache::tags(CacheTagHelper::sliders())->forget(CacheKeys::sliderAnalytics());
-        }
-
         foreach ($this->supportedLocales() as $locale) {
             Cache::forget(CacheKeys::homeSliders($locale));
 
