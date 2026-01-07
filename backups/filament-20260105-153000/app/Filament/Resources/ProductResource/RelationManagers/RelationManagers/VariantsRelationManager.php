@@ -1,0 +1,180 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Filament\Resources\ProductResource\RelationManagers;
+
+use App\Filament\RelationManagers\Support\BaseRelationManager;
+use App\Models\ProductVariant;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
+use Filament\Forms;
+use Filament\Forms\Components\Repeater;
+use Filament\Schemas\Schema;
+use Filament\Tables;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
+
+final class VariantsRelationManager extends BaseRelationManager
+{
+    protected static string $relationship = 'variants';
+
+    protected static ?string $title = 'Product Variants';
+
+    public function form(Schema $schema): Schema
+    {
+        return $schema
+            ->components([
+                Forms\Components\TextInput::make('name')
+                    ->label(__('admin.products.fields.variant_name'))
+                    ->required()
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('sku')
+                    ->label(__('admin.products.fields.sku'))
+                    ->maxLength(255)
+                    ->unique(ProductVariant::class, 'sku', ignoreRecord: true),
+                Forms\Components\TextInput::make('barcode')
+                    ->label(__('admin.products.fields.barcode')),
+                Forms\Components\TextInput::make('price')
+                    ->label(__('admin.products.fields.price'))
+                    ->numeric()
+                    ->prefix('€')
+                    ->required(),
+                Forms\Components\TextInput::make('compare_price')
+                    ->label(__('admin.products.fields.compare_price'))
+                    ->prefix('€'),
+                Forms\Components\TextInput::make('cost_price')
+                    ->label(__('admin.products.fields.cost_price')),
+                Forms\Components\TextInput::make('weight')
+                    ->label(__('admin.products.fields.weight'))
+                    ->suffix(' kg'),
+                Forms\Components\TextInput::make('stock_quantity')
+                    ->label(__('admin.products.fields.stock_quantity'))
+                    ->default(0),
+                Forms\Components\TextInput::make('low_stock_threshold')
+                    ->label(__('admin.products.fields.low_stock_threshold'))
+                    ->default(5),
+                Forms\Components\Toggle::make('track_stock')
+                    ->label(__('admin.products.fields.track_stock'))
+                    ->default(true),
+                Forms\Components\Toggle::make('is_published')
+                    ->label(__('admin.products.fields.is_published')),
+                Forms\Components\KeyValue::make('attributes')
+                    ->label(__('admin.products.fields.variant_attributes'))
+                    ->keyLabel(__('admin.products.fields.attribute_name'))
+                    ->valueLabel(__('admin.products.fields.attribute_value'))
+                    ->columnSpanFull(),
+            ]);
+    }
+
+    public function table(Table $table): Table
+    {
+        // Configure the relation manager table to satisfy Filament v4's return type requirements.
+        return $table
+            ->modifyQueryUsing(fn (Builder $query): Builder => $query->with('translations'))
+            ->recordTitleAttribute('name')
+            ->columns([
+                Tables\Columns\TextColumn::make('name')
+                    ->searchable(['name', 'translations.name'])
+                    ->sortable()
+                    ->formatStateUsing(fn ($state, ProductVariant $record): string => $record->getLocalizedName()),
+                Tables\Columns\TextColumn::make('sku')
+                    ->sortable()
+                    ->copyable()
+                    ->copyMessage(__('admin.common.copied')),
+                Tables\Columns\TextColumn::make('barcode')
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('price')
+                    ->money('EUR'),
+                Tables\Columns\TextColumn::make('compare_price'),
+                Tables\Columns\TextColumn::make('cost_price'),
+                Tables\Columns\TextColumn::make('stock_quantity')
+                    ->badge()
+                    ->color(fn ($state) => match (true) {
+                        $state <= 0 => 'danger',
+                        $state <= 5 => 'warning',
+                        default     => 'success',
+                    }),
+                Tables\Columns\TextColumn::make('weight')
+                    ->suffix(' kg'),
+                Tables\Columns\IconColumn::make('track_stock')
+                    ->boolean(),
+                Tables\Columns\IconColumn::make('is_published'),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label(__('admin.products.fields.created_at'))
+                    ->dateTime(),
+            ])
+            ->filters([
+                Tables\Filters\TernaryFilter::make('track_stock')
+                    ->label(__('admin.products.fields.track_stock')),
+                Tables\Filters\TernaryFilter::make('is_published')
+                    ->label(__('admin.products.fields.is_published')),
+                Tables\Filters\Filter::make('low_stock')
+                    ->label(__('admin.products.filters.low_stock'))
+                    ->query(fn (Builder $query): Builder => $query->whereColumn('stock_quantity', '<=', 'low_stock_threshold')),
+                Tables\Filters\Filter::make('out_of_stock')
+                    ->label(__('admin.products.filters.out_of_stock'))
+                    ->query(fn (Builder $query): Builder => $query->where('stock_quantity', '<=', 0)),
+            ])
+            ->headerActions([
+                RelationManagerRepeaterAction::make()
+                    ->label('Quick edit variants')
+                    ->icon('heroicon-m-pencil-square')
+                    ->modalHeading('Edit product variants')
+                    ->modalWidth('5xl')
+                    // Streamline variant updates by exposing key inventory fields in a repeater modal.
+                    ->configureRepeater(static function (Repeater $repeater): Repeater {
+                        return $repeater
+                            ->collapsible()
+                            ->cloneable()
+                            ->defaultItems(0)
+                            ->schema([
+                                Forms\Components\Hidden::make('id'),
+                                Forms\Components\TextInput::make('name')
+                                    ->label(__('admin.products.fields.variant_name'))
+                                    ->required()
+                                    ->maxLength(255),
+                                Forms\Components\TextInput::make('sku')
+                                    ->label(__('admin.products.fields.sku'))
+                                    ->maxLength(255),
+                                Forms\Components\TextInput::make('price')
+                                    ->label(__('admin.products.fields.price'))
+                                    ->numeric()
+                                    ->prefix('€')
+                                    ->required(),
+                                Forms\Components\TextInput::make('compare_price')
+                                    ->label(__('admin.products.fields.compare_price'))
+                                    ->prefix('€'),
+                                Forms\Components\TextInput::make('cost_price')
+                                    ->label(__('admin.products.fields.cost_price'))
+                                    ->prefix('€'),
+                                Forms\Components\TextInput::make('stock_quantity')
+                                    ->label(__('admin.products.fields.stock_quantity'))
+                                    ->numeric()
+                                    ->minValue(0),
+                                Forms\Components\TextInput::make('low_stock_threshold')
+                                    ->label(__('admin.products.fields.low_stock_threshold'))
+                                    ->numeric()
+                                    ->minValue(0),
+                                Forms\Components\Toggle::make('track_stock')
+                                    ->label(__('admin.products.fields.track_stock')),
+                                Forms\Components\Toggle::make('is_published')
+                                    ->label(__('admin.products.fields.is_published')),
+                            ]);
+                    }),
+                Tables\Actions\CreateAction::make(),
+            ])
+            ->actions([
+                EditAction::make(),
+                DeleteAction::make(),
+            ])
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                ]),
+            ])
+            ->defaultSort('created_at', 'desc');
+    }
+}
