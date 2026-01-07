@@ -1,5 +1,5 @@
 {
-  "enabled": false,
+  "enabled": true,
   "name": "Laravel Expert Code Generator",
   "description": "Generates/assesses Laravel code with project conventions (Laravel 12, Filament v4 admin, strict types, PSR-12, SOLID).",
   "version": "2.0",
@@ -11,8 +11,7 @@
   },
   "then": {
     "type": "askAgent",
-    "prompt": ""
+    "prompt": "LARAVEL EXPERT CODE ASSESSMENT\n\nCONTEXT: PHP file was modified. Review and improve following project standards.\n\nPROJECT STACK: Laravel 12, Filament v4, Livewire 3, TailwindCSS 4, multi-tenant architecture.\n\nREVIEW AREAS:\n1) **Code Quality**: PSR-12 compliance, strict types, SOLID principles\n2) **Laravel Conventions**: Eloquent relationships, query scopes, Form Requests, policies\n3) **Architecture**: Service layer usage, dependency injection, proper abstractions\n4) **Performance**: N+1 queries, eager loading, caching opportunities\n5) **Security**: Authorization checks, validation, mass assignment protection\n6) **Localization**: Translation keys for user-facing strings (lt/en)\n\nACTIONS:\n- Identify code smells and suggest improvements\n- Ensure proper type hints and error handling\n- Verify multi-tenant scoping where applicable\n- Check for hardcoded strings that need translation\n- Suggest design patterns where beneficial\n\nOUTPUT:\n✅ **Strengths**: What's well implemented\n⚠️ **Improvements**: Specific suggestions with code examples\n🔧 **Fixes**: Critical issues that should be addressed\n\nKeep suggestions practical and maintain backward compatibility."
   },
-  "workspaceFolderName": "laravel",
   "shortName": "laravel-expert-assistant"
 }

@@ -127,6 +127,12 @@ class AdminPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Blue,
             ])
+            // Configure authentication guard and user model
+            ->authGuard('web')
+            ->userMenuItems([
+                'profile' => \Filament\Pages\Auth\EditProfile::class,
+                'logout' => \Filament\Pages\Auth\Logout::class,
+            ])
             // Render hooks removed to fix config cache serialization issue
             // ->renderHook(PanelsRenderHook::STYLES_AFTER, ...)
             // ->renderHook(PanelsRenderHook::SCRIPTS_AFTER, ...)

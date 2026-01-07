@@ -53,6 +53,54 @@ final class VariantCombinationResource extends Resource
 
     protected static ?int $navigationSort = 19;
 
+    /**
+     * Determine if the current user can view any records.
+     */
+    public static function canViewAny(): bool
+    {
+        return \App\Support\Authorization\AuthorizationMatrix::check('products', 'viewAny');
+    }
+
+    /**
+     * Determine if the current user can view the specified record.
+     */
+    public static function canView(\Illuminate\Database\Eloquent\Model $record): bool
+    {
+        return \App\Support\Authorization\AuthorizationMatrix::check('products', 'view');
+    }
+
+    /**
+     * Determine if the current user can create records.
+     */
+    public static function canCreate(): bool
+    {
+        return \App\Support\Authorization\AuthorizationMatrix::check('products', 'create');
+    }
+
+    /**
+     * Determine if the current user can edit the specified record.
+     */
+    public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
+    {
+        return \App\Support\Authorization\AuthorizationMatrix::check('products', 'update');
+    }
+
+    /**
+     * Determine if the current user can delete the specified record.
+     */
+    public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
+    {
+        return \App\Support\Authorization\AuthorizationMatrix::check('products', 'delete');
+    }
+
+    /**
+     * Determine if the current user can delete any records.
+     */
+    public static function canDeleteAny(): bool
+    {
+        return \App\Support\Authorization\AuthorizationMatrix::check('products', 'delete');
+    }
+
     public static function getNavigationLabel(): string
     {
         // Return translation keys so tests can assert deterministically
