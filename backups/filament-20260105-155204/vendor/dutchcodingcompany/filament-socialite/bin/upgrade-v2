@@ -1,6 +1,0 @@
-#!/usr/bin/env php
-<?php
-
-namespace Composer;
-
-exec("vendor/bin/rector process --config vendor/dutchcodingcompany/filament-socialite/rector.php --clear-cache");
