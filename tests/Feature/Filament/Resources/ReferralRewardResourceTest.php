@@ -74,16 +74,16 @@ final class ReferralRewardResourceTest extends TestCase
 
         // Verify the payload was persisted with the translated attributes intact.
         $this->assertDatabaseHas('referral_rewards', [
-            'referral_id'        => $referral->getKey(),
-            'user_id'            => $referrer->getKey(),
-            'type'               => 'discount',
-            'amount'             => 10.0,
-            'currency_code'      => 'EUR',
-            'status'             => 'pending',
-            'is_active'          => true,
-            'priority'           => 5,
-            'title->lt'          => 'Launch Discount',
-            'description->lt'    => 'Reward issued for new referral sign ups.',
+            'referral_id'     => $referral->getKey(),
+            'user_id'         => $referrer->getKey(),
+            'type'            => 'discount',
+            'amount'          => 10.0,
+            'currency_code'   => 'EUR',
+            'status'          => 'pending',
+            'is_active'       => true,
+            'priority'        => 5,
+            'title->lt'       => 'Launch Discount',
+            'description->lt' => 'Reward issued for new referral sign ups.',
         ]);
     }
 

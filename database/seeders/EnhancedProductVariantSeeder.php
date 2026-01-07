@@ -152,12 +152,12 @@ final class EnhancedProductVariantSeeder extends Seeder
             $mainLocation = Location::factory()
                 ->warehouse()
                 ->state([
-                    'code'        => 'MAIN',
-                    'name'        => 'Main Warehouse',
-                    'slug'        => 'main-warehouse',
-                    'is_default'  => true,
-                    'is_enabled'  => true,
-                    'country_code'=> 'LT',
+                    'code'         => 'MAIN',
+                    'name'         => 'Main Warehouse',
+                    'slug'         => 'main-warehouse',
+                    'is_default'   => true,
+                    'is_enabled'   => true,
+                    'country_code' => 'LT',
                 ])
                 ->create();
         }
@@ -168,7 +168,7 @@ final class EnhancedProductVariantSeeder extends Seeder
     /**
      * Create products with curated variants and keep the resulting models handy for follow-up seeders.
      *
-     * @param array<string, Attribute> $attributes
+     * @param  array<string, Attribute>                $attributes
      * @return EloquentCollection<int, ProductVariant>
      */
     private function seedProductsWithVariants(array $attributes): EloquentCollection
@@ -216,7 +216,7 @@ final class EnhancedProductVariantSeeder extends Seeder
             ],
         ];
 
-        $variants = new EloquentCollection();
+        $variants = new EloquentCollection;
 
         foreach ($productsBlueprint as $productData) {
             // Compose an anchor product with predictable pricing metadata.
@@ -303,8 +303,8 @@ final class EnhancedProductVariantSeeder extends Seeder
 
         VariantAttributeValue::query()->updateOrCreate(
             [
-                'variant_id'   => $variant->getKey(),
-                'attribute_id' => $attribute->getKey(),
+                'variant_id'      => $variant->getKey(),
+                'attribute_id'    => $attribute->getKey(),
                 'attribute_value' => $display,
             ],
             [
@@ -379,7 +379,7 @@ final class EnhancedProductVariantSeeder extends Seeder
                     'is_active'          => true,
                     // Capture the original rule intent in the description so the admin UI still
                     // surfaces the context that previously lived in the removed `rule_type` column.
-                    'description'        => 'size_based surcharge',
+                    'description' => 'size_based surcharge',
                 ])
                 ->create();
 
@@ -410,10 +410,10 @@ final class EnhancedProductVariantSeeder extends Seeder
             VariantPriceHistory::factory()
                 ->for($variant, 'variant')
                 ->state([
-                    'old_price' => max(1, $variant->price - 5),
-                    'new_price' => $variant->price,
-                    'price_type'=> 'regular',
-                    'reason'    => 'manual',
+                    'old_price'     => max(1, $variant->price - 5),
+                    'new_price'     => $variant->price,
+                    'price_type'    => 'regular',
+                    'reason'        => 'manual',
                     'change_reason' => 'manual',
                 ])
                 ->create();
@@ -430,11 +430,11 @@ final class EnhancedProductVariantSeeder extends Seeder
                 ->for($variant, 'variant')
                 ->increase()
                 ->state([
-                    'old_quantity'    => max(0, $variant->stock_quantity - 5),
-                    'new_quantity'    => $variant->stock_quantity,
-                    'change_reason'   => 'restock',
-                    'reference_type'  => 'order',
-                    'reference_id'    => 1,
+                    'old_quantity'   => max(0, $variant->stock_quantity - 5),
+                    'new_quantity'   => $variant->stock_quantity,
+                    'change_reason'  => 'restock',
+                    'reference_type' => 'order',
+                    'reference_id'   => 1,
                 ])
                 ->create();
         }

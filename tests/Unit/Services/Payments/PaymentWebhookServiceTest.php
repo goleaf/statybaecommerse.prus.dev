@@ -9,11 +9,11 @@ use App\Enums\PaymentStatus;
 use App\Jobs\SendOrderFulfillmentEmail;
 use App\Models\Order;
 use App\Services\Payments\Webhooks\PaymentWebhookService;
+use BackedEnum;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Bus;
 use ReflectionClass;
 use Tests\TestCase;
-use BackedEnum;
 
 final class PaymentWebhookServiceTest extends TestCase
 {

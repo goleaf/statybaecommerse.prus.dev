@@ -3,26 +3,20 @@
 declare(strict_types=1);
 
 return [
-    'title'               => 'Posts',
-    'single'              => 'Post',
-    'plural'              => 'Posts',
-    'view_author_profile' => 'View author profile',
-    'browse_by_author'    => 'Browse articles by :author',
-    'search_tagged'       => 'Search for posts tagged :tag',
-    'sections'            => [
+    // Basic fields
+    'title'    => 'Posts',
+    'post'     => 'Post',
+    'single'   => 'Post',
+    'plural'   => 'Posts',
+    'sections' => [
         'basic_information' => 'Basic Information',
         'media'             => 'Media',
         'seo'               => 'SEO',
         'settings'          => 'Settings',
     ],
-    'add_tag'      => 'Add tag',
-    'create_title' => 'Create Post',
-    'edit_title'   => 'Edit Post',
-    'view_title'   => 'View Post',
-    'list_title'   => 'Posts List',
-    'fields'       => [
+    'fields' => [
         'title'                   => 'Title',
-        'slug'                    => 'URL Slug',
+        'slug'                    => 'Slug',
         'content'                 => 'Content',
         'excerpt'                 => 'Excerpt',
         'status'                  => 'Status',
@@ -31,17 +25,23 @@ return [
         'approved_at'             => 'Approved At',
         'approved_by'             => 'Approved By',
         'published_at'            => 'Published At',
+        'featured'                => 'Featured',
+        'is_pinned'               => 'Pinned',
         'user_id'                 => 'Author',
         'meta_title'              => 'Meta Title',
         'meta_description'        => 'Meta Description',
-        'featured'                => 'Featured',
-        'images'                  => 'Featured Image',
-        'gallery'                 => 'Gallery Images',
         'tags'                    => 'Tags',
-        'is_pinned'               => 'Pinned',
+        'images'                  => 'Featured Image',
+        'gallery'                 => 'Gallery',
+        'views_count'             => 'Views',
+        'likes_count'             => 'Likes',
+        'comments_count'          => 'Comments',
         'allow_comments'          => 'Allow Comments',
         'created_at'              => 'Created At',
+        'updated_at'              => 'Updated At',
     ],
+
+    // Status
     'status' => [
         'draft'     => 'Draft',
         'review'    => 'In Review',
@@ -50,16 +50,18 @@ return [
     ],
 
     'status_managed_by_workflow' => 'Status is managed by the moderation workflow.',
-    'actions'                    => [
-        'create'    => 'Create',
-        'edit'      => 'Edit',
-        'delete'    => 'Delete',
-        'view'      => 'View',
+
+    // Actions
+    'add_tag' => 'Add tag',
+
+    'actions' => [
         'publish'   => 'Publish',
         'unpublish' => 'Unpublish',
         'archive'   => 'Archive',
         'feature'   => 'Feature',
         'unfeature' => 'Unfeature',
+        'pin'       => 'Pin',
+        'unpin'     => 'Unpin',
     ],
 
     'approvals' => [
@@ -75,6 +77,97 @@ return [
         'empty_heading'     => 'No approvals yet',
         'empty_description' => 'Approval history will appear here once reviewers make a decision.',
     ],
+
+    // Filters
+    'filters' => [
+        'status'          => 'Status',
+        'featured'        => 'Featured',
+        'all_posts'       => 'All Posts',
+        'featured_only'   => 'Featured Only',
+        'not_featured'    => 'Not Featured',
+        'author'          => 'Author',
+        'published_from'  => 'Published From',
+        'published_until' => 'Published Until',
+        'pinned_only'     => 'Pinned Only',
+        'not_pinned'      => 'Not Pinned',
+    ],
+
+    // SEO
+    'seo' => [
+        'meta_title_help'       => 'Recommended length: 50-60 characters',
+        'meta_description_help' => 'Recommended length: 150-160 characters',
+    ],
+
+    // Widgets
+    'widgets' => [
+        'total_posts'     => 'Total Posts',
+        'published_posts' => 'Published Posts',
+        'draft_posts'     => 'Draft Posts',
+        'featured_posts'  => 'Featured Posts',
+        'posts_by_status' => 'Posts by Status',
+        'recent_posts'    => 'Recent Posts',
+    ],
+
+    // Engagement
+    'engagement' => [
+        'total_views'                         => 'Total Views',
+        'total_views_description'             => 'All time page views',
+        'total_likes'                         => 'Total Likes',
+        'total_likes_description'             => 'All time likes received',
+        'total_comments'                      => 'Total Comments',
+        'total_comments_description'          => 'All time comments received',
+        'total_engagement'                    => 'Total Engagement',
+        'total_engagement_description'        => 'Combined likes and comments',
+        'average_views'                       => 'Average Views',
+        'average_views_description'           => 'Average views per post',
+        'average_likes'                       => 'Average Likes',
+        'average_likes_description'           => 'Average likes per post',
+        'average_comments'                    => 'Average Comments',
+        'average_comments_description'        => 'Average comments per post',
+        'average_engagement_rate'             => 'Average Engagement Rate',
+        'average_engagement_rate_description' => 'Average engagement percentage',
+    ],
+
+    // Performance
+    'performance' => [
+        'most_viewed'    => 'Most Viewed',
+        'most_liked'     => 'Most Liked',
+        'most_commented' => 'Most Commented',
+        'most_popular'   => 'Most Popular',
+        'no_posts'       => 'No posts available',
+    ],
+
+    // Authors
+    'authors' => [
+        'posts_count' => 'Posts Count',
+        'posts'       => 'Posts',
+    ],
+
+    // Media
+    'media' => [
+        'posts_with_media'                      => 'Posts with Media',
+        'posts_with_media_description'          => 'Posts that have media files',
+        'posts_without_media'                   => 'Posts without Media',
+        'posts_without_media_description'       => 'Posts without media files',
+        'posts_with_featured_image'             => 'Posts with Featured Image',
+        'posts_with_featured_image_description' => 'Posts with featured images',
+        'posts_with_gallery'                    => 'Posts with Gallery',
+        'posts_with_gallery_description'        => 'Posts with image galleries',
+        'total_media_files'                     => 'Total Media Files',
+        'total_media_files_description'         => 'Total media files across all posts',
+        'average_media_per_post'                => 'Average Media per Post',
+        'average_media_per_post_description'    => 'Average media files per post',
+    ],
+
+    // Empty states
+    'empty_states' => [
+        'no_posts'           => 'No posts found',
+        'no_published_posts' => 'No published posts',
+        'no_draft_posts'     => 'No draft posts',
+        'no_featured_posts'  => 'No featured posts',
+    ],
+
+    // Messages
     'messages' => [
         'created'     => 'Post created successfully',
         'updated'     => 'Post updated successfully',
@@ -85,59 +178,19 @@ return [
         'featured'    => 'Post featured successfully',
         'unfeatured'  => 'Post unfeatured successfully',
     ],
-    'badges' => [
-        'moderation_unknown' => 'Unknown',
-        'featured'           => 'Featured',
-        'standard'           => 'Standard',
-        'pinned'             => 'Pinned',
-        'not_pinned'         => 'Not pinned',
-        'comments_on'        => 'Comments enabled',
-        'comments_off'       => 'Comments disabled',
+
+    // Validation
+    'validation' => [
+        'title_required'        => 'Title is required',
+        'title_max'             => 'Title must not exceed 255 characters',
+        'slug_required'         => 'Slug is required',
+        'slug_unique'           => 'Slug must be unique',
+        'slug_alpha_dash'       => 'Slug can only contain letters, numbers, dashes and underscores',
+        'content_required'      => 'Content is required',
+        'status_required'       => 'Status is required',
+        'user_required'         => 'Author is required',
+        'published_at_required' => 'Published date is required',
+        'meta_title_max'        => 'Meta title must not exceed 60 characters',
+        'meta_description_max'  => 'Meta description must not exceed 160 characters',
     ],
-    'filters' => [
-        'status'          => 'Status',
-        'featured'        => 'Featured Posts',
-        'author'          => 'Author',
-        'published_from'  => 'Published From',
-        'published_until' => 'Published Until',
-        'all_posts'       => 'All Posts',
-        'featured_only'   => 'Featured Only',
-        'not_featured'    => 'Not Featured',
-        'pinned_only'     => 'Pinned Only',
-        'not_pinned'      => 'Not Pinned',
-    ],
-    'widgets' => [
-        'total_posts'     => 'Total Posts',
-        'published_posts' => 'Published Posts',
-        'draft_posts'     => 'Draft Posts',
-        'featured_posts'  => 'Featured Posts',
-        'recent_posts'    => 'Recent Posts',
-        'posts_by_status' => 'Posts by Status',
-        'posts_by_author' => 'Posts by Author',
-    ],
-    'navigation' => [
-        'group' => 'Content',
-        'icon'  => 'heroicon-o-document-text',
-    ],
-    'seo' => [
-        'meta_title_help'       => 'Recommended: 50-60 characters',
-        'meta_description_help' => 'Recommended: 150-160 characters',
-    ],
-    'index' => [
-        'description' => 'Discover the latest news and updates from our blog.',
-    ],
-    'search' => [
-        'placeholder' => 'Search posts...',
-    ],
-    'no_posts' => [
-        'title'       => 'No posts found',
-        'description' => 'There are no posts available at the moment.',
-    ],
-    'views'         => 'views',
-    'like'          => 'Like',
-    'share'         => 'Share',
-    'last_updated'  => 'Last updated',
-    'gallery'       => 'Gallery',
-    'related_posts' => 'Related Posts',
-    'tags'          => 'Tags',
 ];

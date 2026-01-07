@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Filament\Resources;
 
-use App\Filament\Resources\EnumResource\Pages\ListEnumValues;
 use App\Filament\Resources\EnumResource\Pages\ListEnums;
+use App\Filament\Resources\EnumResource\Pages\ListEnumValues;
 use App\Models\EnumValue;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;

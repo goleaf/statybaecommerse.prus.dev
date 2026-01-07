@@ -107,6 +107,7 @@ final class SystemSettingsResourceTest extends TestCase
 
     /**
      * Baseline payload used by form submissions across the suite.
+     *
      * @var array<string, mixed>
      */
     private array $baseFormData = [];
@@ -653,4 +654,3 @@ final class SystemSettingsResourceTest extends TestCase
         return Livewire::actingAs($this->adminUser)->test($component, $parameters);
     }
 }
-

@@ -17,7 +17,6 @@ use Illuminate\Support\Facades\Schema;
  *  - UserOwnedScope (via user_id + logged-in user)
  *  - Series filters (paid/completed states, payment columns, join on orders)
  */
-
 beforeEach(function (): void {
     // Recreate minimal schema each time (SQLite-friendly)
     Schema::dropIfExists('order_items');
@@ -50,7 +49,11 @@ beforeEach(function (): void {
     });
 
     // Deterministic cache
-    try { Cache::clear(); } catch (\Throwable $e) { Cache::flush(); }
+    try {
+        Cache::clear();
+    } catch (\Throwable $e) {
+        Cache::flush();
+    }
 
     // Stable "now" so bucket positions are deterministic
     Carbon::setTestNow(Carbon::create(2024, 12, 1, 0, 0, 0));
@@ -70,12 +73,12 @@ it('daily sales returns expected values and caches result', function (): void {
     $productId = 1234;
 
     // Log in a lightweight in-memory user so UserOwnedScope matches
-    $user = new \App\Models\User();
+    $user = new \App\Models\User;
     $user->setAttribute($user->getKeyName(), 999);
     Auth::login($user);
 
     // Unpersisted Product with the desired key (Series only needs ->getKey())
-    $product = new Product();
+    $product = new Product;
     $product->setAttribute($product->getKeyName(), $productId);
 
     // Create two PAID/COMPLETED orders for this user

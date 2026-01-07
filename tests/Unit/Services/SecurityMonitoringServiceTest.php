@@ -19,10 +19,10 @@ class SecurityMonitoringServiceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $cacheService = $this->app->make(CacheService::class);
         $this->service = new SecurityMonitoringService($cacheService);
-        
+
         Log::spy();
         Cache::flush();
     }
@@ -37,7 +37,7 @@ class SecurityMonitoringServiceTest extends TestCase
         $threats = $this->service->monitorRequest($request);
 
         $this->assertContains('sql_injection', $threats);
-        
+
         Log::shouldHaveReceived('warning')
             ->with('Security threat detected', \Mockery::on(function ($context) {
                 return $context['threat_type'] === 'sql_injection';
@@ -88,7 +88,7 @@ class SecurityMonitoringServiceTest extends TestCase
         $this->service->blockIp($ipAddress, 60, 'Test block');
 
         $this->assertTrue($this->service->shouldBlockIp($ipAddress));
-        
+
         Log::shouldHaveReceived('warning')
             ->with('IP address blocked', \Mockery::on(function ($context) use ($ipAddress) {
                 return $context['ip_address'] === $ipAddress &&
@@ -100,7 +100,7 @@ class SecurityMonitoringServiceTest extends TestCase
     public function it_auto_blocks_after_multiple_threats(): void
     {
         $ipAddress = '192.168.1.101';
-        
+
         // Simulate 5 malicious requests
         for ($i = 0; $i < 5; $i++) {
             $request = Request::create('/test', 'GET', [
@@ -118,8 +118,8 @@ class SecurityMonitoringServiceTest extends TestCase
     public function it_sanitizes_sensitive_data_in_logs(): void
     {
         $request = Request::create('/test', 'POST', [
-            'username' => 'admin',
-            'password' => 'secret123',
+            'username'  => 'admin',
+            'password'  => 'secret123',
             'malicious' => "'; DROP TABLE users; --",
         ]);
 
@@ -128,7 +128,7 @@ class SecurityMonitoringServiceTest extends TestCase
         Log::shouldHaveReceived('warning')
             ->with('Security threat detected', \Mockery::on(function ($context) {
                 $requestData = $context['request_data'];
-                
+
                 // Should redact password but keep other data
                 return isset($requestData['input']['password']) &&
                        $requestData['input']['password'] === '[REDACTED]' &&
@@ -141,13 +141,13 @@ class SecurityMonitoringServiceTest extends TestCase
     {
         $request = Request::create('/test', 'GET', [
             'search' => 'normal search query',
-            'page' => '1',
+            'page'   => '1',
         ]);
 
         $threats = $this->service->monitorRequest($request);
 
         $this->assertEmpty($threats);
-        
+
         Log::shouldNotHaveReceived('warning');
     }
 
@@ -188,7 +188,7 @@ class SecurityMonitoringServiceTest extends TestCase
     public function it_handles_unicode_and_encoded_payloads(): void
     {
         $request = Request::create('/test', 'POST', [
-            'data' => urlencode('<script>alert("xss")</script>'),
+            'data'    => urlencode('<script>alert("xss")</script>'),
             'unicode' => '&#60;script&#62;alert("xss")&#60;/script&#62;',
         ]);
 
@@ -201,7 +201,7 @@ class SecurityMonitoringServiceTest extends TestCase
     public function it_limits_suspicious_activity_tracking(): void
     {
         $ipAddress = '192.168.1.102';
-        
+
         // Generate more than 10 activities
         for ($i = 0; $i < 15; $i++) {
             $request = Request::create('/test', 'GET', [
@@ -215,7 +215,7 @@ class SecurityMonitoringServiceTest extends TestCase
         // Should only keep last 10 activities in cache
         $cacheKey = "security:suspicious_activity:{$ipAddress}";
         $activities = Cache::get($cacheKey, []);
-        
+
         $this->assertLessThanOrEqual(10, count($activities));
     }
 

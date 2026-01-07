@@ -33,7 +33,6 @@ return [
     // Direct keys for tests
     'add_to_cart' => 'Add to Cart',
     'checkout'    => 'Checkout',
-    'cart'        => 'Cart',
     'wishlist'    => 'Wishlist',
     'account'     => [
         'profile'   => 'Profile',
@@ -48,24 +47,10 @@ return [
         'shipping' => 'Shipping',
         'legal'    => 'Legal',
     ],
-    'cart' => [
-        'subtotal'   => 'Subtotal',
-        'discount'   => 'Discount',
-        'total'      => 'Total',
-        'apply'      => 'Apply',
-        'remove'     => 'Remove',
-        'coupon'     => 'Coupon code',
-        'enter_code' => 'Enter code',
-    ],
+    'cart'   => 'Cart',
     'search' => [
         'placeholder' => 'Search products...',
         'empty'       => 'No products found.',
         'help'        => 'Search products across categories, brands, and collections.',
-    ],
-    'collections' => [
-        'types' => [
-            'automatic' => 'automatic',
-            'manual'    => 'manual',
-        ],
     ],
 ];

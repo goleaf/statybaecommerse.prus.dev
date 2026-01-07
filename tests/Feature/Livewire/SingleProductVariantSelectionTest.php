@@ -28,21 +28,21 @@ final class SingleProductVariantSelectionTest extends TestCase
 
         // Arrange: seed a default variant with comfortable inventory levels for baseline assertions.
         $defaultVariant = ProductVariant::factory()->for($product)->create([
-            'price'              => 49.99,
-            'compare_price'      => 59.99,
-            'is_default_variant' => true,
-            'is_default'         => true,
-            'track_inventory'    => true,
+            'price'               => 49.99,
+            'compare_price'       => 59.99,
+            'is_default_variant'  => true,
+            'is_default'          => true,
+            'track_inventory'     => true,
             'low_stock_threshold' => 5,
         ]);
 
         // Arrange: seed a secondary variant that should trigger the low stock message when selected.
         $lowStockVariant = ProductVariant::factory()->for($product)->create([
-            'price'              => 89.50,
-            'compare_price'      => 109.50,
-            'is_default_variant' => false,
-            'is_default'         => false,
-            'track_inventory'    => true,
+            'price'               => 89.50,
+            'compare_price'       => 109.50,
+            'is_default_variant'  => false,
+            'is_default'          => false,
+            'track_inventory'     => true,
             'low_stock_threshold' => 5,
         ]);
 

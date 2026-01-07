@@ -106,11 +106,11 @@ final class VariantAnalyticsTest extends TestCase
         $variant = ProductVariant::factory()->create();
         $lowPerformer = $this->createAnalytics([
             'conversion_rate' => 1.0,
-            'revenue' => 100.0,
+            'revenue'         => 100.0,
         ], $variant);
         $highPerformer = $this->createAnalytics([
             'conversion_rate' => 10.0,
-            'revenue' => 1000.0,
+            'revenue'         => 1000.0,
         ], $variant);
 
         // Act: request the single top performer.
@@ -142,11 +142,11 @@ final class VariantAnalyticsTest extends TestCase
     {
         // Arrange rows tagged as daily and weekly to verify the prefix filter.
         $daily = $this->createAnalytics([
-            'date' => '2025-01-01',
+            'date'        => '2025-01-01',
             'date_bucket' => 'daily:2025-01-01',
         ]);
         $weekly = $this->createAnalytics([
-            'date' => '2024-12-30',
+            'date'        => '2024-12-30',
             'date_bucket' => 'weekly:2024-12-30',
         ]);
 
@@ -168,8 +168,8 @@ final class VariantAnalyticsTest extends TestCase
 
         $variant = ProductVariant::factory()->create();
         $payload = [
-            'views' => 100,
-            'clicks' => 50,
+            'views'   => 100,
+            'clicks'  => 50,
             'revenue' => 500.00,
         ];
 
@@ -197,8 +197,8 @@ final class VariantAnalyticsTest extends TestCase
             ->withVariant($variant)
             ->forDate('2025-04-09')
             ->create([
-                'views' => 50,
-                'purchases' => 5,
+                'views'           => 50,
+                'purchases'       => 5,
                 'conversion_rate' => 10.0,
             ]);
 
@@ -207,7 +207,7 @@ final class VariantAnalyticsTest extends TestCase
             $variant->id,
             '2025-04-09',
             [
-                'views' => 25,
+                'views'     => 25,
                 'purchases' => 2,
             ]
         );
@@ -258,8 +258,8 @@ final class VariantAnalyticsTest extends TestCase
             ->withVariant($variant)
             ->forDate('2025-06-01')
             ->create([
-                'views' => 200,
-                'purchases' => 10,
+                'views'           => 200,
+                'purchases'       => 10,
                 'conversion_rate' => 5.0,
             ]);
 
@@ -268,7 +268,7 @@ final class VariantAnalyticsTest extends TestCase
             $variant->id,
             '2025-06-01',
             [
-                'views' => 0,
+                'views'           => 0,
                 'conversion_rate' => 12.5,
             ]
         );
@@ -305,8 +305,8 @@ final class VariantAnalyticsTest extends TestCase
     {
         // Arrange deterministic counts so the conversion calculation is known.
         $analytics = $this->createAnalytics([
-            'views' => 1000,
-            'purchases' => 50,
+            'views'           => 1000,
+            'purchases'       => 50,
             'conversion_rate' => 0,
         ]);
 
@@ -322,8 +322,8 @@ final class VariantAnalyticsTest extends TestCase
     {
         // Arrange: zero views should always reset the conversion rate to zero.
         $analytics = $this->createAnalytics([
-            'views' => 0,
-            'purchases' => 50,
+            'views'           => 0,
+            'purchases'       => 50,
             'conversion_rate' => 10,
         ]);
 
@@ -346,16 +346,16 @@ final class VariantAnalyticsTest extends TestCase
             'purchases',
             'revenue',
             'conversion_rate',
-        ], (new VariantAnalytics())->getFillable());
+        ], (new VariantAnalytics)->getFillable());
     }
 
     public function test_casts_are_correct(): void
     {
         // Arrange explicit string payloads to ensure casts normalise the data types.
         $analytics = VariantAnalytics::factory()->create([
-            'views' => '100',
-            'clicks' => '50',
-            'revenue' => '500.1234',
+            'views'           => '100',
+            'clicks'          => '50',
+            'revenue'         => '500.1234',
             'conversion_rate' => '10.5678',
         ]);
 
@@ -433,11 +433,11 @@ final class VariantAnalyticsTest extends TestCase
         $variant ??= ProductVariant::factory()->create();
 
         $defaults = [
-            'views' => 0,
-            'clicks' => 0,
-            'add_to_cart' => 0,
-            'purchases' => 0,
-            'revenue' => 0.0,
+            'views'           => 0,
+            'clicks'          => 0,
+            'add_to_cart'     => 0,
+            'purchases'       => 0,
+            'revenue'         => 0.0,
             'conversion_rate' => 0.0,
         ];
 
@@ -460,11 +460,11 @@ final class VariantAnalyticsTest extends TestCase
             ->withVariant($variant)
             ->forDate($normalizedDate)
             ->create(array_merge([
-                'views' => 0,
-                'clicks' => 0,
-                'add_to_cart' => 0,
-                'purchases' => 0,
-                'revenue' => 0.0,
+                'views'           => 0,
+                'clicks'          => 0,
+                'add_to_cart'     => 0,
+                'purchases'       => 0,
+                'revenue'         => 0.0,
                 'conversion_rate' => 0.0,
             ], $overrides));
     }

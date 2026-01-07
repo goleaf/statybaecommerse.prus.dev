@@ -19,6 +19,7 @@ final class VariantPriceHistorySeeder extends Seeder
 
         if ($variants->isEmpty()) {
             $this->command->error('❌ No product variants available. Please run ProductVariantSeeder first.');
+
             return;
         }
 
@@ -34,6 +35,7 @@ final class VariantPriceHistorySeeder extends Seeder
 
         if ($existingCount >= 10) {
             $this->command->info("✓ Using {$existingCount} existing product variants");
+
             return ProductVariant::limit(10)->get();
         }
 
@@ -57,6 +59,7 @@ final class VariantPriceHistorySeeder extends Seeder
 
             if ($existingCount >= 3) {
                 $this->command->info("✓ Variant #{$variant->id} already has {$existingCount} price history records");
+
                 return;
             }
 

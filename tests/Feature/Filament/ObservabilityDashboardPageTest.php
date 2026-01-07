@@ -51,9 +51,9 @@ final class ObservabilityDashboardPageTest extends TestCase
         ]);
 
         Cache::store('array')->forever(config('observability.metrics.cache_key'), [
-            'hits'       => 10,
-            'misses'     => 2,
-            'stores'     => [
+            'hits'   => 10,
+            'misses' => 2,
+            'stores' => [
                 'redis' => ['hits' => 10, 'misses' => 2],
             ],
             'updated_at' => '2024-01-01T00:00:00Z',

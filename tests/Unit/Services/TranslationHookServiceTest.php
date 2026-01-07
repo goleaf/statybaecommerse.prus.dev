@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace Tests\Unit\Services;
 
 use App\Services\TranslationHookService;
+use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
+use Mockery;
 use PHPUnit\Framework\Attributes\Test;
+use ReflectionClass;
 use Tests\TestCase;
 
 final class TranslationHookServiceTest extends TestCase
@@ -17,26 +20,27 @@ final class TranslationHookServiceTest extends TestCase
     use RefreshDatabase;
 
     private TranslationHookService $service;
+
     private string $tempLangPath;
 
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         // Create temporary language directory for testing
         $this->tempLangPath = base_path('lang_test_' . uniqid());
-        if (!File::exists($this->tempLangPath)) {
+        if (! File::exists($this->tempLangPath)) {
             File::makeDirectory($this->tempLangPath, 0755, true);
         }
-        
+
         // Override the lang_path helper function
         $this->app->useLanguagePath($this->tempLangPath);
-        
+
         // Set up test configuration
         Config::set('app.locale', 'lt');
         Config::set('app.supported_locales', ['lt', 'en']);
-        
-        $this->service = new TranslationHookService();
+
+        $this->service = new TranslationHookService;
     }
 
     protected function tearDown(): void
@@ -45,23 +49,23 @@ final class TranslationHookServiceTest extends TestCase
         if (File::exists($this->tempLangPath)) {
             File::deleteDirectory($this->tempLangPath);
         }
-        
+
         parent::tearDown();
     }
 
     #[Test]
     public function it_initializes_with_correct_default_values(): void
     {
-        $reflection = new \ReflectionClass($this->service);
-        
+        $reflection = new ReflectionClass($this->service);
+
         $supportedLocalesProperty = $reflection->getProperty('supportedLocales');
         $supportedLocalesProperty->setAccessible(true);
         $supportedLocales = $supportedLocalesProperty->getValue($this->service);
-        
+
         $defaultLocaleProperty = $reflection->getProperty('defaultLocale');
         $defaultLocaleProperty->setAccessible(true);
         $defaultLocale = $defaultLocaleProperty->getValue($this->service);
-        
+
         expect($supportedLocales)->toBe(['lt', 'en']);
         expect($defaultLocale)->toBe('lt');
     }
@@ -72,21 +76,21 @@ final class TranslationHookServiceTest extends TestCase
         $key = 'test.greeting';
         $translations = [
             'lt' => 'Labas',
-            'en' => 'Hello'
+            'en' => 'Hello',
         ];
 
         $result = $this->service->addTranslation($key, $translations);
 
         expect($result)->toBeTrue();
-        
+
         // Verify files were created
         expect(File::exists($this->tempLangPath . '/lt.json'))->toBeTrue();
         expect(File::exists($this->tempLangPath . '/en.json'))->toBeTrue();
-        
+
         // Verify content
         $ltContent = json_decode(File::get($this->tempLangPath . '/lt.json'), true);
         $enContent = json_decode(File::get($this->tempLangPath . '/en.json'), true);
-        
+
         expect($ltContent[$key])->toBe('Labas');
         expect($enContent[$key])->toBe('Hello');
     }
@@ -96,13 +100,13 @@ final class TranslationHookServiceTest extends TestCase
     {
         $key = 'test.fallback';
         $translations = [
-            'lt' => 'Lietuviškai'
+            'lt' => 'Lietuviškai',
         ];
 
         $result = $this->service->addTranslation($key, $translations);
 
         expect($result)->toBeTrue();
-        
+
         $enContent = json_decode(File::get($this->tempLangPath . '/en.json'), true);
         expect($enContent[$key])->toBe('Lietuviškai'); // Should fallback to Lithuanian
     }
@@ -116,7 +120,7 @@ final class TranslationHookServiceTest extends TestCase
         $result = $this->service->addTranslation($key, $translations);
 
         expect($result)->toBeTrue();
-        
+
         $ltContent = json_decode(File::get($this->tempLangPath . '/lt.json'), true);
         expect($ltContent[$key])->toBe($key);
     }
@@ -126,11 +130,11 @@ final class TranslationHookServiceTest extends TestCase
     {
         Log::shouldReceive('error')
             ->once()
-            ->with('Translation hook failed', \Mockery::type('array'));
+            ->with('Translation hook failed', Mockery::type('array'));
 
         // Mock File::put to throw exception
         File::shouldReceive('put')
-            ->andThrow(new \Exception('File write failed'));
+            ->andThrow(new Exception('File write failed'));
 
         $result = $this->service->addTranslation('test.key', ['lt' => 'value']);
 
@@ -181,14 +185,14 @@ final class TranslationHookServiceTest extends TestCase
             <h1>{{ __("missing.title") }}</h1>
             <p>{{ __("missing.description") }}</p>
         ';
-        
+
         File::put($bladeFile, $bladeContent);
 
         $missingKeys = $this->service->processBladeFile($bladeFile);
 
         expect($missingKeys)->toContain('missing.title');
         expect($missingKeys)->toContain('missing.description');
-        
+
         // Verify translations were created
         $ltContent = json_decode(File::get($this->tempLangPath . '/lt.json'), true);
         expect($ltContent['missing.title'])->toBe('Missing Title');
@@ -208,7 +212,7 @@ final class TranslationHookServiceTest extends TestCase
         // Create JSON file
         $jsonTranslations = ['json.key' => 'JSON Value'];
         File::put($this->tempLangPath . '/lt.json', json_encode($jsonTranslations));
-        
+
         // Create PHP file
         $phpTranslations = ['php.key' => 'PHP Value'];
         File::put($this->tempLangPath . '/lt.php', "<?php\n\nreturn " . var_export($phpTranslations, true) . ";\n");
@@ -247,7 +251,7 @@ final class TranslationHookServiceTest extends TestCase
         expect($report['locales']['lt']['translated'])->toBe(2);
         expect($report['locales']['lt']['missing'])->toBe(0);
         expect($report['locales']['lt']['completion_percentage'])->toBe(100.0);
-        
+
         expect($report['locales']['en']['translated'])->toBe(1);
         expect($report['locales']['en']['missing'])->toBe(1);
         expect($report['locales']['en']['completion_percentage'])->toBe(50.0);
@@ -258,14 +262,14 @@ final class TranslationHookServiceTest extends TestCase
     public function it_handles_string_supported_locales_configuration(): void
     {
         Config::set('app.supported_locales', 'lt,en,de');
-        
-        $service = new TranslationHookService();
-        
-        $reflection = new \ReflectionClass($service);
+
+        $service = new TranslationHookService;
+
+        $reflection = new ReflectionClass($service);
         $supportedLocalesProperty = $reflection->getProperty('supportedLocales');
         $supportedLocalesProperty->setAccessible(true);
         $supportedLocales = $supportedLocalesProperty->getValue($service);
-        
+
         expect($supportedLocales)->toBe(['lt', 'en', 'de']);
     }
 
@@ -273,14 +277,14 @@ final class TranslationHookServiceTest extends TestCase
     public function it_handles_array_supported_locales_configuration(): void
     {
         Config::set('app.supported_locales', ['lt', 'en', 'fr']);
-        
-        $service = new TranslationHookService();
-        
-        $reflection = new \ReflectionClass($service);
+
+        $service = new TranslationHookService;
+
+        $reflection = new ReflectionClass($service);
         $supportedLocalesProperty = $reflection->getProperty('supportedLocales');
         $supportedLocalesProperty->setAccessible(true);
         $supportedLocales = $supportedLocalesProperty->getValue($service);
-        
+
         expect($supportedLocales)->toBe(['lt', 'en', 'fr']);
     }
 
@@ -288,14 +292,14 @@ final class TranslationHookServiceTest extends TestCase
     public function it_falls_back_to_default_locales_when_config_invalid(): void
     {
         Config::set('app.supported_locales', null);
-        
-        $service = new TranslationHookService();
-        
-        $reflection = new \ReflectionClass($service);
+
+        $service = new TranslationHookService;
+
+        $reflection = new ReflectionClass($service);
         $supportedLocalesProperty = $reflection->getProperty('supportedLocales');
         $supportedLocalesProperty->setAccessible(true);
         $supportedLocales = $supportedLocalesProperty->getValue($service);
-        
+
         expect($supportedLocales)->toBe(['lt', 'en']);
     }
 
@@ -320,7 +324,7 @@ final class TranslationHookServiceTest extends TestCase
         $existingTranslations = ['existing.key' => 'Existing Value'];
         File::put($this->tempLangPath . '/lt.json', json_encode($existingTranslations));
 
-        $service = new TranslationHookService();
+        $service = new TranslationHookService;
 
         // Add new translation
         $service->addTranslation('new.key', ['lt' => 'New Value']);
@@ -337,11 +341,11 @@ final class TranslationHookServiceTest extends TestCase
         // Create malformed JSON file
         File::put($this->tempLangPath . '/lt.json', '{"invalid": json}');
 
-        $service = new TranslationHookService();
+        $service = new TranslationHookService;
         $result = $service->addTranslation('test.key', ['lt' => 'Test Value']);
 
         expect($result)->toBeTrue();
-        
+
         // Should overwrite malformed file with valid JSON
         $content = json_decode(File::get($this->tempLangPath . '/lt.json'), true);
         expect($content['test.key'])->toBe('Test Value');

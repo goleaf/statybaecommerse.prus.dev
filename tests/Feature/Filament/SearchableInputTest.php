@@ -7,7 +7,6 @@ use App\Filament\Resources\InventoryResource;
 use App\Filament\Resources\OrderItemResource;
 use App\Filament\Resources\PriceResource;
 use App\Filament\Resources\ProductRequestResource;
-use App\Filament\Resources\WishlistItemResource;
 use App\Models\Product;
 use App\Support\Search\SearchResultPayload;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
@@ -81,7 +80,6 @@ it('feature: exposes product search results through the form component', functio
     PriceResource::class,
     InventoryResource::class,
     ProductRequestResource::class,
-    WishlistItemResource::class,
 ]);
 
 it('feature: exposes payload macros for standalone searchable inputs', function (): void {

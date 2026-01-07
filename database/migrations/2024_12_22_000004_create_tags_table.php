@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -16,7 +18,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->string('type')->default('general'); // general, category, label
             $table->timestamps();
-            
+
             $table->index(['type', 'name']);
         });
     }

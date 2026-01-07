@@ -6,7 +6,11 @@ namespace Tests\Unit\Database;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\DataProvider;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use ReflectionClass;
 use Tests\TestCase;
+use Throwable;
 
 final class AllFactoriesTest extends TestCase
 {
@@ -28,8 +32,8 @@ final class AllFactoriesTest extends TestCase
 
         $factoryDataset = [];
 
-        $iterator = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($factoryDirectory)
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($factoryDirectory)
         );
 
         foreach ($iterator as $file) {
@@ -48,7 +52,7 @@ final class AllFactoriesTest extends TestCase
                 continue;
             }
 
-            $reflection = new \ReflectionClass($className);
+            $reflection = new ReflectionClass($className);
 
             if ($reflection->isAbstract()) {
                 // Ignore abstract base factories because they are not invokable on their own.
@@ -72,7 +76,7 @@ final class AllFactoriesTest extends TestCase
         try {
             // Resolve the model class to surface missing bindings early.
             $expectedModelClass = get_class($factory->newModel());
-        } catch (\Throwable $exception) {
+        } catch (Throwable $exception) {
             $this->markTestIncomplete(sprintf('Unable to resolve the model for %s: %s', $factoryClass, $exception->getMessage()));
 
             return;

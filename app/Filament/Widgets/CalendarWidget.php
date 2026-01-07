@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
-use App\Filament\Resources\CampaignResource;
 use App\Models\Campaign;
 use App\Models\Channel;
 use App\Models\Scopes\ActiveCampaignScope;
@@ -94,7 +93,6 @@ final class CalendarWidget extends FullCalendarWidget
                     ->id($key)
                     ->title($title)
                     ->start($startAt)
-                    ->url(CampaignResource::getUrl('view', ['record' => $campaign]))
                     ->extendedProps([
                         'status'    => $campaign->status,
                         'is_active' => (bool) $campaign->is_active,

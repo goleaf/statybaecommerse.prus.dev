@@ -225,13 +225,6 @@
                                                 {{ __('admin.models.system_settings') }}
                                             </a>
                                         @endif
-                                        @if (Route::has('filament.admin.resources.activity-logs.index'))
-                                            <a href="{{ route('filament.admin.resources.activity-logs.index') }}"
-                                               class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                                                <x-heroicon-o-clock class="h-4 w-4 mr-3" />
-                                                {{ __('admin.models.activity_logs') }}
-                                            </a>
-                                        @endif
                                     @endif
                                 </div>
                             </div>

@@ -48,25 +48,8 @@ return new class extends Migration
             });
         }
 
-        // Enhanced Notification Templates
-        if (! Schema::hasTable('notification_templates')) {
-            Schema::create('notification_templates', function (Blueprint $table) {
-                $table->id();
-                $table->string('name');
-                $table->string('key')->unique();
-                $table->string('type');  // email, sms, push, database
-                $table->string('event');  // order_created, user_registered, etc.
-                $table->json('subject');  // Multilingual
-                $table->json('content');  // Multilingual
-                $table->json('variables')->nullable();  // Available variables
-                $table->boolean('is_active')->default(true);
-                $table->string('locale')->default('lt');
-                $table->timestamps();
-
-                $table->index(['type', 'event']);
-                $table->index(['is_active', 'locale']);
-            });
-        }
+        // Enhanced Notification Templates - REMOVED
+        // NotificationTemplate functionality has been removed from the system
 
         // Enhanced User Wishlists with better structure
         if (! Schema::hasTable('user_wishlists')) {
@@ -290,7 +273,7 @@ return new class extends Migration
         Schema::dropIfExists('user_wishlists');
         Schema::dropIfExists('cart_items');
         Schema::dropIfExists('seo_data');
-        Schema::dropIfExists('notification_templates');
+        // notification_templates table removed - no longer needed
         Schema::dropIfExists('feature_flags');
         Schema::dropIfExists('settings');
 

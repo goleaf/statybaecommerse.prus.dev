@@ -88,11 +88,11 @@ final class SliderTranslationResourceTest extends TestCase
         // Drive the create flow with deterministic copy to guarantee assertions remain stable.
         Livewire::test(CreateSliderTranslation::class)
             ->fillForm([
-                'slider_id'    => $this->slider->id,
-                'locale'       => 'de',
-                'title'        => 'Startseiten Banner',
-                'description'  => 'Beschreibung für die deutschsprachige Folie.',
-                'button_text'  => 'Mehr erfahren',
+                'slider_id'   => $this->slider->id,
+                'locale'      => 'de',
+                'title'       => 'Startseiten Banner',
+                'description' => 'Beschreibung für die deutschsprachige Folie.',
+                'button_text' => 'Mehr erfahren',
             ])
             ->call('create')
             ->assertHasNoFormErrors();

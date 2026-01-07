@@ -147,17 +147,6 @@ class EmailCampaignResourceTest extends TestCase
         $this->assertEquals($user->id, $campaign->creator->id);
     }
 
-    public function test_campaign_template_relationship(): void
-    {
-        $template = \App\Models\NotificationTemplate::factory()->create();
-        /** @var EmailCampaign $campaign */
-        $campaign = EmailCampaign::factory()->create(['template_id' => $template->id]);
-
-        $this->assertNotNull($campaign->template);
-        $this->assertInstanceOf(\App\Models\NotificationTemplate::class, $campaign->template);
-        $this->assertEquals($template->id, $campaign->template->id);
-    }
-
     public function test_campaign_recipients_relationship(): void
     {
         /** @var EmailCampaign $campaign */
@@ -288,7 +277,6 @@ class EmailCampaignResourceTest extends TestCase
     public function test_campaign_fillable_attributes(): void
     {
         // Seed concrete relations so foreign key constraints remain satisfied during the assertion loop.
-        $template = \App\Models\NotificationTemplate::factory()->create();
         $user = User::factory()->create();
 
         $data = [
@@ -303,7 +291,6 @@ class EmailCampaignResourceTest extends TestCase
             'sent_at'      => now(),
             'is_active'    => true,
             'status'       => 'scheduled',
-            'template_id'  => $template->id,
             'created_by'   => $user->id,
             'settings'     => ['key' => 'value'],
             'metadata'     => ['meta' => 'data'],

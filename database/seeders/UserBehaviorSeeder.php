@@ -30,16 +30,19 @@ final class UserBehaviorSeeder extends Seeder
         // Only create behaviors if we have the necessary data
         if ($users->isEmpty()) {
             $this->command->error('No users found. Please run UserSeeder first.');
+
             return;
         }
 
         if ($products->isEmpty()) {
             $this->command->error('No products found. Please run ProductSeeder first.');
+
             return;
         }
 
         if ($categories->isEmpty()) {
             $this->command->error('No categories found. Please run CategorySeeder first.');
+
             return;
         }
 
@@ -61,6 +64,7 @@ final class UserBehaviorSeeder extends Seeder
 
         if ($existingCount >= 8) {
             $this->command->info("✓ Using {$existingCount} existing categories");
+
             return Category::limit(8)->get();
         }
 
@@ -105,6 +109,7 @@ final class UserBehaviorSeeder extends Seeder
 
         if ($existingCount >= 10) {
             $this->command->info("✓ Using {$existingCount} existing users");
+
             return User::where('is_admin', false)->limit(10)->get();
         }
 
@@ -122,6 +127,7 @@ final class UserBehaviorSeeder extends Seeder
 
         if ($existingCount >= 500) {
             $this->command->info("✓ View behaviors already complete ({$existingCount}/500)");
+
             return;
         }
 
@@ -136,7 +142,7 @@ final class UserBehaviorSeeder extends Seeder
             ->recycle($categories)
             ->create();
 
-        $this->command->info("✓ View behaviors created");
+        $this->command->info('✓ View behaviors created');
     }
 
     private function createClickBehaviors(Collection $users, Collection $products, Collection $categories): void
@@ -145,6 +151,7 @@ final class UserBehaviorSeeder extends Seeder
 
         if ($existingCount >= 200) {
             $this->command->info("✓ Click behaviors already complete ({$existingCount}/200)");
+
             return;
         }
 
@@ -159,7 +166,7 @@ final class UserBehaviorSeeder extends Seeder
             ->recycle($categories)
             ->create();
 
-        $this->command->info("✓ Click behaviors created");
+        $this->command->info('✓ Click behaviors created');
     }
 
     private function createAddToCartBehaviors(Collection $users, Collection $products, Collection $categories): void
@@ -168,6 +175,7 @@ final class UserBehaviorSeeder extends Seeder
 
         if ($existingCount >= 150) {
             $this->command->info("✓ Add to cart behaviors already complete ({$existingCount}/150)");
+
             return;
         }
 
@@ -182,7 +190,7 @@ final class UserBehaviorSeeder extends Seeder
             ->recycle($categories)
             ->create();
 
-        $this->command->info("✓ Add to cart behaviors created");
+        $this->command->info('✓ Add to cart behaviors created');
     }
 
     private function createPurchaseBehaviors(Collection $users, Collection $products, Collection $categories): void
@@ -191,6 +199,7 @@ final class UserBehaviorSeeder extends Seeder
 
         if ($existingCount >= 100) {
             $this->command->info("✓ Purchase behaviors already complete ({$existingCount}/100)");
+
             return;
         }
 
@@ -205,7 +214,7 @@ final class UserBehaviorSeeder extends Seeder
             ->recycle($categories)
             ->create();
 
-        $this->command->info("✓ Purchase behaviors created");
+        $this->command->info('✓ Purchase behaviors created');
     }
 
     private function createSearchBehaviors(Collection $users, Collection $categories): void
@@ -214,6 +223,7 @@ final class UserBehaviorSeeder extends Seeder
 
         if ($existingCount >= 300) {
             $this->command->info("✓ Search behaviors already complete ({$existingCount}/300)");
+
             return;
         }
 
@@ -227,7 +237,7 @@ final class UserBehaviorSeeder extends Seeder
             ->recycle($categories)
             ->create();
 
-        $this->command->info("✓ Search behaviors created");
+        $this->command->info('✓ Search behaviors created');
     }
 
     private function createWishlistBehaviors(Collection $users, Collection $products): void
@@ -236,6 +246,7 @@ final class UserBehaviorSeeder extends Seeder
 
         if ($existingCount >= 80) {
             $this->command->info("✓ Wishlist behaviors already complete ({$existingCount}/80)");
+
             return;
         }
 
@@ -249,7 +260,7 @@ final class UserBehaviorSeeder extends Seeder
             ->recycle($products)
             ->create();
 
-        $this->command->info("✓ Wishlist behaviors created");
+        $this->command->info('✓ Wishlist behaviors created');
     }
 
     private function createFilterBehaviors(Collection $users, Collection $categories): void
@@ -258,6 +269,7 @@ final class UserBehaviorSeeder extends Seeder
 
         if ($existingCount >= 120) {
             $this->command->info("✓ Filter behaviors already complete ({$existingCount}/120)");
+
             return;
         }
 
@@ -271,6 +283,6 @@ final class UserBehaviorSeeder extends Seeder
             ->recycle($categories)
             ->create();
 
-        $this->command->info("✓ Filter behaviors created");
+        $this->command->info('✓ Filter behaviors created');
     }
 }

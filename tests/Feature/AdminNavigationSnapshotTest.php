@@ -5,7 +5,17 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Support\Nav;
+
+use function dirname;
+use function file_get_contents;
+use function file_put_contents;
+
 use Illuminate\Support\Arr;
+
+use function json_decode;
+use function json_encode;
+use function mkdir;
+
 use Tests\TestCase;
 
 final class AdminNavigationSnapshotTest extends TestCase
@@ -26,13 +36,13 @@ final class AdminNavigationSnapshotTest extends TestCase
         // If not found and regeneration requested, write it now (opt-in).
         if ($snapshotPath === null && $this->shouldRegenerateSnapshots()) {
             $snapshotPath = base_path('tests/Feature/__snapshots__/admin_navigation.snapshot.json');
-            $dir = \dirname($snapshotPath);
+            $dir = dirname($snapshotPath);
             if (! is_dir($dir)) {
-                \mkdir($dir, 0777, true);
+                mkdir($dir, 0777, true);
             }
-            \file_put_contents(
+            file_put_contents(
                 $snapshotPath,
-                \json_encode($navigation, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+                json_encode($navigation, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
             );
 
             // Sanity: ensure it was written
@@ -42,7 +52,7 @@ final class AdminNavigationSnapshotTest extends TestCase
         // If still not found, fail with a helpful message listing the paths we tried.
         if ($snapshotPath === null) {
             $this->fail(
-                "Snapshot file not found.\n".
+                "Snapshot file not found.\n" .
                 "Create one by setting REGENERATE_SNAPSHOTS=true and re-running this test, or place it at one of:\n" .
                 "- tests/Feature/__snapshots__/admin_navigation.snapshot.json\n" .
                 "- tests/__snapshots__/admin_navigation.snapshot.json\n" .
@@ -53,8 +63,8 @@ final class AdminNavigationSnapshotTest extends TestCase
 
         // Load expected snapshot & compare strictly.
         /** @var array<int, array<string,mixed>> $expected */
-        $expected = \json_decode(
-            (string) \file_get_contents($snapshotPath),
+        $expected = json_decode(
+            (string) file_get_contents($snapshotPath),
             true,
             512,
             JSON_THROW_ON_ERROR
@@ -85,8 +95,8 @@ final class AdminNavigationSnapshotTest extends TestCase
             return Arr::only([
                 'label'     => $label,
                 'label_key' => $g['label_key'] ?? $labelKey,
-                'icon'      => $g['icon']      ?? null,
-                'sort'      => $g['sort']      ?? null,
+                'icon'      => $g['icon'] ?? null,
+                'sort'      => $g['sort'] ?? null,
             ], ['label', 'label_key', 'icon', 'sort']);
         }, $groups));
     }
@@ -111,6 +121,7 @@ final class AdminNavigationSnapshotTest extends TestCase
     private function shouldRegenerateSnapshots(): bool
     {
         $flag = env('REGENERATE_SNAPSHOTS');
+
         return in_array($flag, [true, 1, '1', 'true', 'yes'], true);
     }
 }

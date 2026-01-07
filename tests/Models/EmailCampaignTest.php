@@ -6,7 +6,6 @@ namespace Tests\Models;
 
 use App\Models\EmailCampaign;
 use App\Models\EmailCampaignRecipient;
-use App\Models\NotificationTemplate;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
@@ -39,7 +38,6 @@ final class EmailCampaignTest extends TestCase
             'completed_at',
             'is_active',
             'status',
-            'template_id',
             'created_by',
             'settings',
             'metadata',
@@ -155,10 +153,8 @@ final class EmailCampaignTest extends TestCase
     {
         // Arrange: hydrate related models using dedicated factories for clarity.
         $user = User::factory()->create();
-        $template = NotificationTemplate::factory()->create();
         $campaign = EmailCampaign::factory()
             ->withCreator($user)
-            ->withTemplate($template)
             ->create();
 
         EmailCampaignRecipient::factory()->count(2)->create([
@@ -167,7 +163,6 @@ final class EmailCampaignTest extends TestCase
 
         // Assert: confirm each relationship resolves correctly.
         $this->assertTrue($campaign->creator->is($user));
-        $this->assertTrue($campaign->template->is($template));
         $this->assertCount(2, $campaign->recipients);
     }
 

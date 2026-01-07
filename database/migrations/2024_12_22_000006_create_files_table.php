@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -21,8 +23,7 @@ return new class extends Migration
             $table->foreignId('uploaded_by')->constrained('users')->cascadeOnDelete();
             $table->json('metadata')->nullable();
             $table->timestamps();
-            
-            $table->index(['fileable_type', 'fileable_id']);
+
             $table->index(['uploaded_by']);
             $table->index(['hash']);
             $table->index(['mime_type']);

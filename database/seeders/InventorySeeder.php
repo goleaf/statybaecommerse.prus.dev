@@ -90,12 +90,12 @@ final class InventorySeeder extends Seeder
                                 ->for($location, 'location')
                                 ->state([
                                     // Ensure inventory-style payloads stay realistic for analytics and storefronts.
-                                    'stock'     => $stock,
-                                    'reserved'  => $reserved,
-                                    'available' => max(0, $stock - $reserved),
-                                    'incoming'  => fake()->numberBetween(0, 20),
-                                    'threshold' => fake()->numberBetween(5, 15),
-                                    'status'    => 'active',
+                                    'stock'      => $stock,
+                                    'reserved'   => $reserved,
+                                    'available'  => max(0, $stock - $reserved),
+                                    'incoming'   => fake()->numberBetween(0, 20),
+                                    'threshold'  => fake()->numberBetween(5, 15),
+                                    'status'     => 'active',
                                     'is_tracked' => true,
                                 ])
                                 ->make();

@@ -17,7 +17,7 @@ class PartnerFactory extends Factory
         $name = $this->faker->company();
 
         return [
-            'name'            => $name,
+            'name' => $name,
             // Use a longer unique suffix so large seed batches do not exhaust Faker's unique pool.
             'code'            => strtolower(preg_replace('/[^a-z0-9]+/i', '-', $name)) . '-' . $this->faker->unique()->numerify('########'),
             'tier_id'         => PartnerTier::factory(),

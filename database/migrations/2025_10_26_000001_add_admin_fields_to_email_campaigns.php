@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('from_name')->nullable()->after('from_email');
             $table->string('reply_to')->nullable()->after('from_name');
             $table->boolean('is_active')->default(true)->after('sent_at');
-            $table->foreignId('template_id')->nullable()->after('status')->constrained('notification_templates')->nullOnDelete();
+            // template_id foreign key removed - NotificationTemplate functionality removed
             $table->json('settings')->nullable()->after('template_id');
 
             $table->index('is_active');
@@ -33,7 +33,7 @@ return new class extends Migration
     {
         Schema::table('email_campaigns', function (Blueprint $table): void {
             $table->dropIndex(['is_active']);
-            $table->dropForeign(['template_id']);
+            // template_id foreign key was removed - no longer needed
 
             $table->dropColumn([
                 'description',
@@ -41,7 +41,6 @@ return new class extends Migration
                 'from_name',
                 'reply_to',
                 'is_active',
-                'template_id',
                 'settings',
             ]);
         });

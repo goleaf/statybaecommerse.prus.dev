@@ -6,9 +6,7 @@ namespace Tests\Feature;
 
 use App\Models\News;
 use App\Models\NewsCategory;
-use App\Models\NewsComment;
 use App\Models\NewsImage;
-use App\Models\NewsTag;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -151,24 +149,6 @@ final class NewsResourceTest extends TestCase
         $this->assertTrue($news->categories->contains($category));
     }
 
-    public function test_news_article_has_tags_relation(): void
-    {
-        $news = News::factory()->create();
-        $tag = NewsTag::factory()->create();
-
-        $news->tags()->attach($tag->id);
-
-        $this->assertTrue($news->tags->contains($tag));
-    }
-
-    public function test_news_article_has_comments_relation(): void
-    {
-        $news = News::factory()->create();
-        $comment = NewsComment::factory()->create(['news_id' => $news->id]);
-
-        $this->assertTrue($news->comments->contains($comment));
-    }
-
     public function test_news_article_has_images_relation(): void
     {
         $news = News::factory()->create();
@@ -196,27 +176,6 @@ final class NewsResourceTest extends TestCase
 
         $news = News::where('slug', 'test-news-with-categories')->first();
         $this->assertCount(3, $news->categories);
-    }
-
-    public function test_can_create_news_with_tags(): void
-    {
-        $tags = NewsTag::factory()->count(2)->create();
-
-        $newsData = [
-            'title'        => 'Test News with Tags',
-            'slug'         => 'test-news-with-tags',
-            'content'      => 'Test content',
-            'author_name'  => 'Test Author',
-            'published_at' => now(),
-            'is_visible'   => true,
-            'tags'         => $tags->pluck('id')->toArray(),
-        ];
-
-        $response = $this->post('/admin/news', $newsData);
-        $response->assertRedirect();
-
-        $news = News::where('slug', 'test-news-with-tags')->first();
-        $this->assertCount(2, $news->tags);
     }
 
     public function test_news_slug_is_automatically_generated(): void

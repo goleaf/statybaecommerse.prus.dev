@@ -56,7 +56,8 @@ it('respects an existing schema host that was already assigned', function (): vo
     // Prepare a schema with a bespoke Livewire component so we can confirm the resource leaves it untouched.
     $schema = Schema::make();
 
-    $customHost = new class extends LivewireComponent {
+    $customHost = new class extends LivewireComponent
+    {
         // Provide a no-op render implementation because Livewire components must return markup.
         public function render(): string
         {

@@ -45,7 +45,6 @@ final class VariantImageResourceTest extends TestCase
         // Ensure Filament resolves the admin panel configuration required for resource pages.
         $this->resolveAdminPanel();
 
-
         // Provision an administrator so every table/form assertion runs with the correct guard.
         $this->adminUser = User::factory()->create([
             'email'    => 'admin@example.com',
@@ -99,7 +98,6 @@ final class VariantImageResourceTest extends TestCase
 
         $this->assertTrue(Storage::disk(SecureStorage::disk())->exists($storedPath));
         $this->assertNotFalse(getimagesize(Storage::disk(SecureStorage::disk())->path($storedPath)));
-
 
         $component = Livewire::test(CreateVariantImage::class);
 

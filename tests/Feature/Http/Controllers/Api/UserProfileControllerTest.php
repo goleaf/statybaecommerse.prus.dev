@@ -18,7 +18,7 @@ final class UserProfileControllerTest extends TestCase
 
     public function test_profile_requires_authenticated_user(): void
     {
-        $controller = new UserProfileController();
+        $controller = new UserProfileController;
         $request = Request::create('/user/profile', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/json']);
         $request->setUserResolver(static fn () => null);
 
@@ -33,7 +33,7 @@ final class UserProfileControllerTest extends TestCase
 
     public function test_profile_returns_not_found_for_trashed_user(): void
     {
-        $controller = new UserProfileController();
+        $controller = new UserProfileController;
         $user = User::factory()->create();
         $user->delete();
         $request = Request::create('/user/profile', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/json']);
@@ -50,7 +50,7 @@ final class UserProfileControllerTest extends TestCase
 
     public function test_profile_returns_contract_payload_for_active_user(): void
     {
-        $controller = new UserProfileController();
+        $controller = new UserProfileController;
         $user = User::factory()->create([
             'first_name' => 'Test',
             'last_name'  => 'User',

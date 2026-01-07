@@ -6,11 +6,8 @@ namespace Database\Seeders;
 
 use App\Models\News;
 use App\Models\NewsCategory;
-use App\Models\NewsComment;
 use App\Models\NewsImage;
-use App\Models\NewsTag;
 use App\Models\Translations\NewsCategoryTranslation;
-use App\Models\Translations\NewsTagTranslation;
 use App\Models\Translations\NewsTranslation;
 use Illuminate\Database\Seeder;
 
@@ -27,9 +24,6 @@ final class NewsSeeder extends Seeder
 
         // Create categories first
         $categories = $this->createCategories($locales);
-
-        // Create tags
-        $tags = $this->createTags($locales);
 
         // Create 20 news items with different dates and relationships
         for ($i = 1; $i <= 20; $i++) {
@@ -68,19 +62,6 @@ final class NewsSeeder extends Seeder
             // Attach random categories (1-3 per news)
             $randomCategories = $categories->random(fake()->numberBetween(1, 3));
             $news->categories()->attach($randomCategories->pluck('id'));
-
-            // Attach random tags (2-5 per news)
-            $randomTags = $tags->random(fake()->numberBetween(2, 5));
-            $news->tags()->attach($randomTags->pluck('id'));
-
-            // Create comments (0-5 per news)
-            $commentCount = fake()->numberBetween(0, 5);
-            for ($j = 0; $j < $commentCount; $j++) {
-                NewsComment::factory()->create([
-                    'news_id'     => $news->id,
-                    'is_approved' => fake()->boolean(80),  // 80% approved
-                ]);
-            }
 
             // Create images (0-3 per news)
             $imageCount = fake()->numberBetween(0, 3);
@@ -131,44 +112,5 @@ final class NewsSeeder extends Seeder
         }
 
         return $categories;
-    }
-
-    private function createTags($locales)
-    {
-        $tagNames = [
-            'Breaking', 'Exclusive', 'Trending', 'Popular', 'Latest', 'Important',
-            'Update', 'Announcement', 'Event', 'News', 'Report', 'Analysis',
-        ];
-
-        $tags = collect();
-
-        foreach ($tagNames as $name) {
-            $tag = NewsTag::factory()->create([
-                'is_visible' => true,
-                'color'      => fake()->hexColor(),
-            ]);
-
-            foreach ($locales as $locale) {
-                $localizedName = $locale === 'lt'
-                    ? ['Skubūs', 'Ekskluzyvūs', 'Populiarūs', 'Populiarūs', 'Naujausi', 'Svarbūs',
-                        'Atnaujinimai', 'Pranešimai', 'Renginiai', 'Naujienos', 'Ataskaitos', 'Analizės'][array_search($name, $tagNames)]
-                    : $name;
-
-                $slug = str($localizedName)->slug()->toString() . '-' . $tag->id;
-
-                NewsTagTranslation::updateOrCreate([
-                    'news_tag_id' => $tag->id,
-                    'locale'      => $locale,
-                ], [
-                    'name'        => $localizedName,
-                    'slug'        => $slug,
-                    'description' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-                ]);
-            }
-
-            $tags->push($tag);
-        }
-
-        return $tags;
     }
 }

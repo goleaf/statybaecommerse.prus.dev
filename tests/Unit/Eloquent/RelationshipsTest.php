@@ -48,7 +48,7 @@ final class RelationshipsTest extends TestCase
     public function test_order_relationships_work(): void
     {
         // Ensure the user() belongsTo relation has a real parent
-        $user  = User::factory()->create();
+        $user = User::factory()->create();
         $order = Order::factory()->for($user, 'user')->create();
 
         // BelongsTo: user

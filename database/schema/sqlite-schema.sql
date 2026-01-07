@@ -4807,29 +4807,7 @@ CREATE UNIQUE INDEX "seo_data_seoable_type_seoable_id_locale_unique" on "seo_dat
   "locale"
 );
 CREATE INDEX "system_settings_category_index" on "system_settings"("category");
-CREATE TABLE IF NOT EXISTS "api_keys"(
-  "id" integer primary key autoincrement not null,
-  "key" varchar not null,
-  "name" varchar not null,
-  "secret" varchar,
-  "scopes" text,
-  "permissions" text,
-  "rate_limit" integer,
-  "user_id" integer,
-  "partner_id" integer,
-  "last_used_at" datetime,
-  "expires_at" datetime,
-  "is_active" tinyint(1) not null default '1',
-  "created_at" datetime,
-  "updated_at" datetime,
-  foreign key("user_id") references "users"("id") on delete set null,
-  foreign key("partner_id") references "partners"("id") on delete set null
-);
-CREATE INDEX "api_keys_name_index" on "api_keys"("name");
-CREATE INDEX "api_keys_rate_limit_index" on "api_keys"("rate_limit");
-CREATE INDEX "api_keys_is_active_index" on "api_keys"("is_active");
-CREATE INDEX "api_keys_last_used_at_index" on "api_keys"("last_used_at");
-CREATE UNIQUE INDEX "api_keys_key_unique" on "api_keys"("key");
+
 CREATE UNIQUE INDEX "news_tags_slug_unique" on "news_tags"("slug");
 CREATE INDEX "attribute_values_attribute_value_type_index" on "attribute_values"(
   "attribute_value_type"
@@ -5765,6 +5743,245 @@ CREATE INDEX "performance_metrics_route_time_idx" on "performance_metrics"(
   "page_route",
   "created_at"
 );
+CREATE TABLE IF NOT EXISTS "organizations"(
+  "id" integer primary key autoincrement not null,
+  "name" varchar not null,
+  "slug" varchar not null,
+  "description" text,
+  "type" varchar not null default 'company',
+  "is_active" tinyint(1) not null default '1',
+  "settings" text,
+  "created_at" datetime,
+  "updated_at" datetime
+);
+CREATE INDEX "organizations_is_active_type_index" on "organizations"(
+  "is_active",
+  "type"
+);
+CREATE UNIQUE INDEX "organizations_slug_unique" on "organizations"("slug");
+CREATE TABLE IF NOT EXISTS "projects"(
+  "id" integer primary key autoincrement not null,
+  "name" varchar not null,
+  "slug" varchar not null,
+  "description" text,
+  "status" varchar not null default 'active',
+  "type" varchar not null default 'organizational',
+  "user_id" integer,
+  "organization_id" integer,
+  "start_date" date,
+  "end_date" date,
+  "metadata" text,
+  "created_at" datetime,
+  "updated_at" datetime,
+  foreign key("user_id") references "users"("id") on delete set null,
+  foreign key("organization_id") references "organizations"("id") on delete cascade
+);
+CREATE INDEX "projects_status_type_index" on "projects"("status", "type");
+CREATE INDEX "projects_user_id_type_index" on "projects"("user_id", "type");
+CREATE INDEX "projects_organization_id_status_index" on "projects"(
+  "organization_id",
+  "status"
+);
+CREATE UNIQUE INDEX "projects_slug_unique" on "projects"("slug");
+CREATE TABLE IF NOT EXISTS "tasks"(
+  "id" integer primary key autoincrement not null,
+  "title" varchar not null,
+  "description" text,
+  "status" varchar not null default 'pending',
+  "priority" varchar not null default 'medium',
+  "project_id" integer not null,
+  "created_by" integer not null,
+  "parent_task_id" integer,
+  "due_date" datetime,
+  "completed_at" datetime,
+  "metadata" text,
+  "created_at" datetime,
+  "updated_at" datetime,
+  foreign key("project_id") references "projects"("id") on delete cascade,
+  foreign key("created_by") references "users"("id") on delete cascade,
+  foreign key("parent_task_id") references "tasks"("id") on delete cascade
+);
+CREATE INDEX "tasks_project_id_status_index" on "tasks"(
+  "project_id",
+  "status"
+);
+CREATE INDEX "tasks_created_by_status_index" on "tasks"(
+  "created_by",
+  "status"
+);
+CREATE INDEX "tasks_parent_task_id_index" on "tasks"("parent_task_id");
+CREATE INDEX "tasks_due_date_index" on "tasks"("due_date");
+CREATE TABLE IF NOT EXISTS "tags"(
+  "id" integer primary key autoincrement not null,
+  "name" varchar not null,
+  "slug" varchar not null,
+  "color" varchar,
+  "description" text,
+  "type" varchar not null default 'general',
+  "created_at" datetime,
+  "updated_at" datetime
+);
+CREATE INDEX "tags_type_name_index" on "tags"("type", "name");
+CREATE UNIQUE INDEX "tags_slug_unique" on "tags"("slug");
+CREATE TABLE IF NOT EXISTS "comments"(
+  "id" integer primary key autoincrement not null,
+  "content" text not null,
+  "user_id" integer not null,
+  "commentable_type" varchar not null,
+  "commentable_id" integer not null,
+  "parent_id" integer,
+  "is_approved" tinyint(1) not null default '1',
+  "is_pinned" tinyint(1) not null default '0',
+  "likes_count" integer not null default '0',
+  "metadata" text,
+  "created_at" datetime,
+  "updated_at" datetime,
+  "deleted_at" datetime,
+  foreign key("user_id") references "users"("id") on delete cascade,
+  foreign key("parent_id") references "comments"("id") on delete cascade
+);
+CREATE INDEX "comments_commentable_type_commentable_id_index" on "comments"(
+  "commentable_type",
+  "commentable_id"
+);
+CREATE INDEX "comments_parent_id_index" on "comments"("parent_id");
+CREATE INDEX "comments_user_id_created_at_index" on "comments"(
+  "user_id",
+  "created_at"
+);
+CREATE TABLE IF NOT EXISTS "files"(
+  "id" integer primary key autoincrement not null,
+  "name" varchar not null,
+  "original_name" varchar not null,
+  "path" varchar not null,
+  "disk" varchar not null default 'local',
+  "mime_type" varchar not null,
+  "size" integer not null,
+  "hash" varchar,
+  "fileable_type" varchar not null,
+  "fileable_id" integer not null,
+  "uploaded_by" integer not null,
+  "metadata" text,
+  "created_at" datetime,
+  "updated_at" datetime,
+  foreign key("uploaded_by") references "users"("id") on delete cascade
+);
+CREATE INDEX "files_fileable_type_fileable_id_index" on "files"(
+  "fileable_type",
+  "fileable_id"
+);
+CREATE INDEX "files_uploaded_by_index" on "files"("uploaded_by");
+CREATE INDEX "files_hash_index" on "files"("hash");
+CREATE INDEX "files_mime_type_index" on "files"("mime_type");
+CREATE TABLE IF NOT EXISTS "organization_user"(
+  "id" integer primary key autoincrement not null,
+  "organization_id" integer not null,
+  "user_id" integer not null,
+  "role" varchar not null default 'member',
+  "permissions" text,
+  "is_active" tinyint(1) not null default '1',
+  "joined_at" datetime not null,
+  "left_at" datetime,
+  "created_at" datetime,
+  "updated_at" datetime,
+  foreign key("organization_id") references "organizations"("id") on delete cascade,
+  foreign key("user_id") references "users"("id") on delete cascade
+);
+CREATE UNIQUE INDEX "organization_user_organization_id_user_id_unique" on "organization_user"(
+  "organization_id",
+  "user_id"
+);
+CREATE INDEX "organization_user_user_id_role_index" on "organization_user"(
+  "user_id",
+  "role"
+);
+CREATE INDEX "organization_user_organization_id_is_active_index" on "organization_user"(
+  "organization_id",
+  "is_active"
+);
+CREATE TABLE IF NOT EXISTS "task_user"(
+  "id" integer primary key autoincrement not null,
+  "task_id" integer not null,
+  "user_id" integer not null,
+  "responsibility" varchar not null default 'assignee',
+  "assigned_at" datetime not null,
+  "completed_at" datetime,
+  "notes" text,
+  "created_at" datetime,
+  "updated_at" datetime,
+  foreign key("task_id") references "tasks"("id") on delete cascade,
+  foreign key("user_id") references "users"("id") on delete cascade
+);
+CREATE UNIQUE INDEX "task_user_task_id_user_id_responsibility_unique" on "task_user"(
+  "task_id",
+  "user_id",
+  "responsibility"
+);
+CREATE INDEX "task_user_user_id_responsibility_index" on "task_user"(
+  "user_id",
+  "responsibility"
+);
+CREATE TABLE IF NOT EXISTS "taggables"(
+  "id" integer primary key autoincrement not null,
+  "tag_id" integer not null,
+  "taggable_type" varchar not null,
+  "taggable_id" integer not null,
+  "tagged_by" integer,
+  "tagged_at" datetime not null,
+  "created_at" datetime,
+  "updated_at" datetime,
+  foreign key("tag_id") references "tags"("id") on delete cascade,
+  foreign key("tagged_by") references "users"("id") on delete set null
+);
+CREATE INDEX "taggables_taggable_type_taggable_id_index" on "taggables"(
+  "taggable_type",
+  "taggable_id"
+);
+CREATE UNIQUE INDEX "taggables_tag_id_taggable_type_taggable_id_unique" on "taggables"(
+  "tag_id",
+  "taggable_type",
+  "taggable_id"
+);
+CREATE TABLE IF NOT EXISTS "project_user"(
+  "id" integer primary key autoincrement not null,
+  "project_id" integer not null,
+  "user_id" integer not null,
+  "role" varchar not null default 'member',
+  "permissions" text,
+  "joined_at" datetime not null,
+  "left_at" datetime,
+  "created_at" datetime,
+  "updated_at" datetime,
+  foreign key("project_id") references "projects"("id") on delete cascade,
+  foreign key("user_id") references "users"("id") on delete cascade
+);
+CREATE UNIQUE INDEX "project_user_project_id_user_id_unique" on "project_user"(
+  "project_id",
+  "user_id"
+);
+CREATE INDEX "project_user_user_id_role_index" on "project_user"(
+  "user_id",
+  "role"
+);
+CREATE INDEX "comments_commentable_index" on "comments"(
+  "commentable_type",
+  "commentable_id"
+);
+CREATE INDEX "comments_commentable_approved_index" on "comments"(
+  "commentable_type",
+  "commentable_id",
+  "is_approved"
+);
+CREATE INDEX "comments_commentable_created_index" on "comments"(
+  "commentable_type",
+  "commentable_id",
+  "created_at"
+);
+CREATE INDEX "comments_commentable_parent_index" on "comments"(
+  "commentable_type",
+  "commentable_id",
+  "parent_id"
+);
 
 INSERT INTO migrations VALUES(1,'0001_01_01_000000_create_users_table',1);
 INSERT INTO migrations VALUES(2,'0001_01_01_000001_create_cache_table',1);
@@ -5922,7 +6139,7 @@ INSERT INTO migrations VALUES(153,'2025_09_09_120000_add_soft_deletes_to_discoun
 INSERT INTO migrations VALUES(154,'2025_09_09_150500_optimize_reviews_keys',3);
 INSERT INTO migrations VALUES(155,'2025_09_09_160500_add_indexes_to_media_table',3);
 INSERT INTO migrations VALUES(156,'2025_09_10_000100_update_variant_combinations_add_hash_and_soft_deletes',3);
-INSERT INTO migrations VALUES(157,'2025_09_10_000200_add_partner_id_to_api_keys_table',3);
+
 INSERT INTO migrations VALUES(158,'2025_09_10_000900_create_news_tables',3);
 INSERT INTO migrations VALUES(159,'2025_09_10_001000_add_indexes_to_news_tables',3);
 INSERT INTO migrations VALUES(160,'2025_09_10_001100_create_news_categories_tables',3);
@@ -6009,7 +6226,7 @@ INSERT INTO migrations VALUES(240,'2025_09_25_000001_add_flags_to_subscribers_ta
 INSERT INTO migrations VALUES(241,'2025_09_25_000001_add_product_and_bucket_to_variant_analytics_table',3);
 INSERT INTO migrations VALUES(242,'2025_09_25_180000_update_seo_data_add_columns',3);
 INSERT INTO migrations VALUES(243,'2025_09_25_200500_add_missing_columns_to_system_settings_table',3);
-INSERT INTO migrations VALUES(244,'2025_09_26_000000_create_api_keys_table',3);
+
 INSERT INTO migrations VALUES(245,'2025_09_26_000001_enforce_order_shipping_constraints',3);
 INSERT INTO migrations VALUES(246,'2025_09_26_090000_add_variant_attribute_matrix_to_product_variants_table',3);
 INSERT INTO migrations VALUES(247,'2025_09_30_000000_add_content_columns_to_news_tags_table',3);
@@ -6068,3 +6285,12 @@ INSERT INTO migrations VALUES(300,'2025_12_15_192103_create_performance_metrics_
 INSERT INTO migrations VALUES(301,'2024_12_16_000001_add_performance_metrics_indexes',5);
 INSERT INTO migrations VALUES(302,'2025_12_31_000001_add_country_slug_unique_index_to_cities_table',5);
 INSERT INTO migrations VALUES(303,'2024_12_16_000001_optimize_storefront_indexes',6);
+INSERT INTO migrations VALUES(304,'2024_12_22_000001_create_organizations_table',7);
+INSERT INTO migrations VALUES(305,'2024_12_22_000002_create_projects_table',7);
+INSERT INTO migrations VALUES(306,'2024_12_22_000003_create_tasks_table',7);
+INSERT INTO migrations VALUES(307,'2024_12_22_000004_create_tags_table',7);
+INSERT INTO migrations VALUES(308,'2024_12_22_000005_create_comments_table',7);
+INSERT INTO migrations VALUES(309,'2024_12_22_000006_create_files_table',7);
+INSERT INTO migrations VALUES(310,'2024_12_22_000007_create_pivot_tables',7);
+INSERT INTO migrations VALUES(311,'2024_12_22_200000_create_missing_pivot_tables',7);
+INSERT INTO migrations VALUES(312,'2025_01_07_000001_restore_comments_composite_index',8);

@@ -21,10 +21,7 @@ class LithuanianBuilderShopSeeder extends Seeder
 {
     public function run(): void
     {
-        $activityStatus = app(\Spatie\Activitylog\ActivityLogStatus::class);
-        $activityStatus->disable();
-        try {
-            // Create roles and permissions
+        // Create roles and permissions
             $this->createRolesAndPermissions();
 
             // Create admin users
@@ -44,9 +41,7 @@ class LithuanianBuilderShopSeeder extends Seeder
 
             // Create sample orders
             $this->createSampleOrders();
-        } finally {
-            $activityStatus->enable();
-        }
+    }
     }
 
     private function createRolesAndPermissions(): void

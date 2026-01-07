@@ -98,7 +98,7 @@ final class ContractValidationTest extends TestCase
             'is_visible' => true,
             // Explicitly reuse the reserved slug so we confirm the API call still resolves
             // the collection payload rather than hitting implicit model binding.
-            'slug'       => 'tree',
+            'slug' => 'tree',
         ]);
 
         $root = Category::factory()->create(['is_visible' => true]);

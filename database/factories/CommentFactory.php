@@ -18,12 +18,12 @@ final class CommentFactory extends Factory
     public function definition(): array
     {
         return [
-            'content' => $this->faker->paragraph(),
-            'user_id' => User::factory(),
+            'content'     => $this->faker->paragraph(),
+            'user_id'     => User::factory(),
             'is_approved' => true,
-            'is_pinned' => false,
+            'is_pinned'   => false,
             'likes_count' => $this->faker->numberBetween(0, 100),
-            'metadata' => [
+            'metadata'    => [
                 'edited' => $this->faker->boolean(20),
                 'source' => $this->faker->randomElement(['web', 'mobile', 'api']),
             ],

@@ -30,6 +30,7 @@ final class VariantInventorySeeder extends Seeder
 
         if ($locations->isEmpty()) {
             $this->command?->error('❌ No locations available. Please run LocationSeeder first.');
+
             return;
         }
 
@@ -38,6 +39,7 @@ final class VariantInventorySeeder extends Seeder
 
         if ($variants->isEmpty()) {
             $this->command?->error('❌ No product variants available. Please run ProductVariantSeeder first.');
+
             return;
         }
 
@@ -56,6 +58,7 @@ final class VariantInventorySeeder extends Seeder
 
         if ($existingCount >= 5) {
             $this->command?->info("✓ Using {$existingCount} existing locations");
+
             return Location::limit(5)->get();
         }
 
@@ -73,6 +76,7 @@ final class VariantInventorySeeder extends Seeder
 
         if ($existingCount >= 20) {
             $this->command?->info("✓ Using {$existingCount} existing product variants");
+
             return ProductVariant::limit(20)->get();
         }
 
@@ -100,6 +104,7 @@ final class VariantInventorySeeder extends Seeder
 
                 if ($exists) {
                     $skipped++;
+
                     return;
                 }
 

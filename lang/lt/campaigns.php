@@ -3,17 +3,29 @@
 declare(strict_types=1);
 
 return [
+    // Navigation
+    'navigation' => [
+        'campaigns' => 'Kampanijos',
+    ],
+
+    // Models
+    'models' => [
+        'campaign'  => 'Kampanija',
+        'campaigns' => 'Kampanijos',
+    ],
+
     // Sections
     'sections' => [
         'basic_information' => 'Pagrindinė informacija',
         'campaign_settings' => 'Kampanijos nustatymai',
         'content'           => 'Turinys',
         'media'             => 'Medija',
-        'targeting'         => 'Tikslinimas',
+        'targeting'         => 'Taikinys',
         'tracking'          => 'Sekimas',
         'seo'               => 'SEO',
         'automation'        => 'Automatizavimas',
     ],
+
     // Fields
     'fields' => [
         'name'                   => 'Pavadinimas',
@@ -28,209 +40,120 @@ return [
         'target_audience'        => 'Tikslinė auditorija',
         'subject'                => 'Tema',
         'content'                => 'Turinys',
-        'cta_text'               => 'Kvietimo veiksmui tekstas',
-        'cta_url'                => 'Kvietimo veiksmui URL',
+        'cta_text'               => 'Kvietimo tekstas',
+        'cta_url'                => 'Kvietimo URL',
         'image'                  => 'Paveikslėlis',
         'banner'                 => 'Baneris',
-        'banner_alt_text'        => 'Banerio alt tekstas',
+        'banner_alt_text'        => 'Banerio alternatyvus tekstas',
         'attachments'            => 'Priedai',
         'target_segments'        => 'Tiksliniai segmentai',
         'target_products'        => 'Tiksliniai produktai',
         'target_categories'      => 'Tikslinės kategorijos',
         'target_customer_groups' => 'Tikslinės klientų grupės',
+        'channel'                => 'Kanalas',
+        'discounts'              => 'Nuolaidos',
         'display_priority'       => 'Rodymo prioritetas',
-        'is_featured'            => 'Išskirtinis',
+        'is_featured'            => 'Rekomenduojama',
+        'is_active'              => 'Aktyvi',
         'send_notifications'     => 'Siųsti pranešimus',
         'track_conversions'      => 'Sekti konversijas',
         'max_uses'               => 'Maksimalus naudojimų skaičius',
+        'auto_pause_on_budget'   => 'Stabdyti viršijus biudžetą',
+        'auto_start'             => 'Automatinė pradžia',
+        'auto_end'               => 'Automatinė pabaiga',
         'total_views'            => 'Iš viso peržiūrų',
         'total_clicks'           => 'Iš viso paspaudimų',
         'total_conversions'      => 'Iš viso konversijų',
-        'total_revenue'          => 'Iš viso pajamų',
+        'total_revenue'          => 'Bendros pajamos',
         'conversion_rate'        => 'Konversijos rodiklis',
         'meta_title'             => 'Meta pavadinimas',
         'meta_description'       => 'Meta aprašymas',
-        'social_media_ready'     => 'Paruoštas socialiniams tinklams',
-        'auto_start'             => 'Automatinis paleidimas',
-        'auto_end'               => 'Automatinis sustabdymas',
-        'auto_pause_on_budget'   => 'Automatinis sustabdymas pasiekus biudžetą',
+        'social_media_ready'     => 'Paruošta socialiniams tinklams',
         'created_at'             => 'Sukurta',
         'updated_at'             => 'Atnaujinta',
     ],
-    // Types
-    'types' => [
-        'email'   => 'El. paštas',
-        'sms'     => 'SMS',
-        'push'    => 'Push pranešimas',
-        'banner'  => 'Baneris',
-        'popup'   => 'Iššokantis langas',
-        'social'  => 'Socialiniai tinklai',
-        'unknown' => 'Nežinoma', // Užtikrina, kad neapibrėžti tipai turėtų lokalizuotą etiketę.
-    ],
+
     // Status
     'status' => [
         'draft'     => 'Juodraštis',
-        'scheduled' => 'Suplanuota',
         'active'    => 'Aktyvi',
         'paused'    => 'Pristabdyta',
         'completed' => 'Užbaigta',
         'cancelled' => 'Atšaukta',
-        'expired'   => 'Pasibaigusi',
-        'unknown'   => 'Nežinoma',
+        'scheduled' => 'Suplanuota',
     ],
-    // Segments
-    'segments' => [
-        'all_customers'        => 'Visi klientai',
-        'new_customers'        => 'Nauji klientai',
-        'returning_customers'  => 'Grįžtantys klientai',
-        'high_value_customers' => 'Aukštos vertės klientai',
-        'inactive_customers'   => 'Neaktyvūs klientai',
+
+    // Types
+    'types' => [
+        'email'        => 'El. paštas',
+        'sms'          => 'SMS',
+        'push'         => 'Push pranešimas',
+        'banner'       => 'Baneris',
+        'popup'        => 'Iššokantis langas',
+        'social_media' => 'Socialiniai tinklai',
+        'display'      => 'Ekrano reklama',
+        'search'       => 'Paieškos reklama',
     ],
-    // Filters
-    'filters' => [
-        'active'        => 'Aktyvios kampanijos',
-        'scheduled'     => 'Suplanuotos kampanijos',
-        'created_from'  => 'Sukurta nuo',
-        'created_until' => 'Sukurta iki',
-    ],
+
     // Actions
     'actions' => [
-        'activate'     => 'Aktyvuoti',
-        'pause'        => 'Pristabdyti',
-        'complete'     => 'Užbaigti',
-        'view_details' => 'Peržiūrėti detales',
+        'create'    => 'Sukurti kampaniją',
+        'edit'      => 'Redaguoti kampaniją',
+        'delete'    => 'Ištrinti kampaniją',
+        'duplicate' => 'Dubliuoti kampaniją',
+        'activate'  => 'Aktyvuoti',
+        'pause'     => 'Pristabdyti',
+        'resume'    => 'Tęsti',
+        'stop'      => 'Sustabdyti',
+        'preview'   => 'Peržiūrėti',
+        'test'      => 'Testuoti',
+        'send'      => 'Siųsti',
+        'schedule'  => 'Suplanuoti',
     ],
-    // Messages
-    'messages' => [
-        'created'                  => 'Kampanija sėkmingai sukurta',
-        'updated'                  => 'Kampanija sėkmingai atnaujinta',
-        'deleted'                  => 'Kampanija sėkmingai ištrinta',
-        'activated'                => 'Kampanija aktyvuota',
-        'paused'                   => 'Kampanija pristabdyta',
-        'duplicated'               => 'Kampanija dubliuota',
-        'scheduled'                => 'Kampanija suplanuota',
-        'test_sent'                => 'Bandomasis el. laiškas išsiųstas',
-        'no_campaigns'             => 'Kampanijų nerasta',
-        'no_campaigns_description' => 'Pabandykite pakoreguoti filtrus arba sugrįžkite vėliau – netrukus atsiras naujų kampanijų.',
-        'campaign_not_found'       => 'Kampanija nerasta',
-        'insufficient_budget'      => 'Nepakanka biudžeto',
-        'campaign_expired'         => 'Kampanijos galiojimas pasibaigęs',
-        'campaign_not_active'      => 'Kampanija neaktyvi',
+
+    // Notifications
+    'notifications' => [
+        'created'   => 'Kampanija sėkmingai sukurta',
+        'updated'   => 'Kampanija sėkmingai atnaujinta',
+        'deleted'   => 'Kampanija sėkmingai ištrinta',
+        'activated' => 'Kampanija sėkmingai aktyvuota',
+        'paused'    => 'Kampanija sėkmingai pristabdyta',
+        'resumed'   => 'Kampanija sėkmingai tęsta',
+        'stopped'   => 'Kampanija sėkmingai sustabdyta',
+        'sent'      => 'Kampanija sėkmingai išsiųsta',
+        'scheduled' => 'Kampanija sėkmingai suplanuota',
     ],
-    // Validation
-    'validation' => [
-        'name_required'       => 'Pavadinimas yra privalomas',
-        'name_max'            => 'Pavadinimas negali būti ilgesnis nei :max simbolių',
-        'slug_required'       => 'URL dalis yra privaloma',
-        'slug_unique'         => 'URL dalis jau naudojama',
-        'start_date_required' => 'Pradžios data yra privaloma',
-        'end_date_after'      => 'Pabaigos data turi būti vėlesnė nei pradžios data',
-        'budget_numeric'      => 'Biudžetas turi būti skaičius',
-        'budget_min'          => 'Biudžetas turi būti didesnis nei :min',
-        'type_required'       => 'Tipas yra privalomas',
-        'status_required'     => 'Būsena yra privaloma',
+
+    // Filters
+    'filters' => [
+        'status'       => 'Būsena',
+        'type'         => 'Tipas',
+        'date_range'   => 'Datos intervalas',
+        'budget_range' => 'Biudžeto intervalas',
+        'featured'     => 'Rekomenduojamos',
+        'active'       => 'Aktyvios',
+        'completed'    => 'Užbaigtos',
+        'inactive'     => 'Neaktyvios',
     ],
-    // Analytics
-    'analytics' => [
-        'views'            => 'Peržiūros',
-        'clicks'           => 'Paspaudimai',
-        'conversions'      => 'Konversijos',
-        'revenue'          => 'Pajamos',
-        'ctr'              => 'CTR (paspaudimų rodiklis)',
-        'conversion_rate'  => 'Konversijos rodiklis',
-        'roi'              => 'ROI (investicijų grąža)',
-        'performance'      => 'Rezultatai',
-        'overview'         => 'Apžvalga',
-        'trends'           => 'Tendencijos',
-        'top_performing'   => 'Geriausiai veikiantys',
-        'worst_performing' => 'Silpniausiai veikiantys',
+
+    // Widgets
+    'widgets' => [
+        'total_campaigns'          => 'Iš viso kampanijų',
+        'active_campaigns'         => 'Aktyvios kampanijos',
+        'total_budget'             => 'Bendras biudžetas',
+        'total_revenue'            => 'Bendros pajamos',
+        'average_conversion_rate'  => 'Vidutinis konversijos rodiklis',
+        'top_performing_campaigns' => 'Geriausiai veikiančios kampanijos',
+        'recent_campaigns'         => 'Paskutinės kampanijos',
     ],
-    // Help text
-    'help' => [
-        'name'                 => 'Unikalus kampanijos pavadinimas',
-        'slug'                 => 'URL dalis kampanijos puslapiui',
-        'description'          => 'Trumpas kampanijos aprašymas',
-        'budget'               => 'Kampanijos biudžetas eurais',
-        'budget_limit'         => 'Didžiausia leidžiama biudžeto suma',
-        'target_audience'      => 'Kampanijos tikslinė auditorija',
-        'display_priority'     => 'Didelis skaičius = aukštesnis prioritetas',
-        'meta_title'           => 'SEO pavadinimas (50–60 simbolių)',
-        'meta_description'     => 'SEO aprašymas (150–160 simbolių)',
-        'auto_start'           => 'Automatiškai pradėti kampaniją nurodytu laiku',
-        'auto_end'             => 'Automatiškai baigti kampaniją pasibaigus laikui',
-        'auto_pause_on_budget' => 'Automatiškai pristabdyti pasiekus biudžeto limitą',
-    ],
-    // Navigation
-    'navigation' => [
-        'campaigns' => 'Kampanijos',
-    ],
-    // Models
-    'models' => [
-        'campaign'  => 'Kampanija',
-        'campaigns' => 'Kampanijos',
-    ],
-    // Stats
-    'stats' => [
-        'total_campaigns'                 => 'Iš viso kampanijų',
-        'total_campaigns_description'     => 'Bendras kampanijų skaičius',
-        'active_campaigns'                => 'Aktyvios kampanijos',
-        'active_campaigns_description'    => 'Šiuo metu aktyvios kampanijos',
-        'scheduled_campaigns'             => 'Suplanuotos kampanijos',
-        'scheduled_campaigns_description' => 'Suplanuotos ateityje',
-        'featured_campaigns'              => 'Išskirtinės kampanijos',
-        'featured_campaigns_description'  => 'Išskirtinės kampanijos',
-        'total_views'                     => 'Iš viso peržiūrų',
-        'total_views_description'         => 'Bendras peržiūrų skaičius',
-        'total_clicks'                    => 'Iš viso paspaudimų',
-        'total_clicks_description'        => 'Bendras paspaudimų skaičius',
-        'total_conversions'               => 'Iš viso konversijų',
-        'total_conversions_description'   => 'Bendras konversijų skaičius',
-        'total_revenue'                   => 'Iš viso pajamų',
-        'total_revenue_description'       => 'Bendros pajamos iš kampanijų',
-        'avg_conversion_rate'             => 'Vidutinis konversijos rodiklis',
-        'avg_conversion_rate_description' => 'Vidutinis konversijos procentas',
-        'avg_ctr'                         => 'Vidutinis CTR',
-        'avg_ctr_description'             => 'Vidutinis paspaudimų per peržiūras procentas',
-    ],
-    'index' => [
-        'description' => 'Atraskite naujausias mūsų rinkodaros kampanijas ir pasiūlymus, pritaikytus jums.',
-    ],
-    'featured' => [
-        'title'             => 'Išskirtinės kampanijos',
-        'description'       => 'Peržiūrėkite atrinktas kampanijas su geriausiais pasiūlymais ir patirtimis.',
-        'empty_title'       => 'Šiuo metu nėra išskirtinių kampanijų',
-        'empty_description' => 'Užsukite vėliau – netrukus pateiksime naujų išskirtinių kampanijų.',
-    ],
-    'by_type' => [
-        'title'             => ':type kampanijos',
-        'heading'           => ':type kampanijos',
-        'description'       => 'Peržiūrėkite aktyvias :type kampanijas, pritaikytas šiam kanalui.',
-        'empty_title'       => 'Nėra :type kampanijų',
-        'empty_description' => 'Pabandykite pasirinkti kitą kampanijos tipą, kad rastumėte daugiau pasiūlymų.',
-    ],
-    'search' => [
-        'title'                     => 'Paieškos rezultatai „:query“',
-        'title_default'             => 'Ieškoti kampanijų',
-        'description'               => 'Kampanijos, atitinkančios „:query“.',
-        'description_default'       => 'Ieškokite tarp visų kampanijų ir raskite jums tinkamiausią pasiūlymą.',
-        'empty_title'               => 'Nerasta kampanijų, atitinkančių „:query“',
-        'empty_description'         => 'Pabandykite kitus raktinius žodžius arba pakoreguokite paieškos filtrus.',
-        'empty_title_default'       => 'Pradėkite kampanijų paiešką',
-        'empty_description_default' => 'Naudokite paiešką ir raskite kampanijas pagal pavadinimą, aprašymą ar kanalą.',
-    ],
-    // Frontend
-    'frontend' => [
-        'click_recorded'       => 'Paspaudimas užfiksuotas',
-        'conversion_recorded'  => 'Konversija užfiksuota',
-        'no_campaigns_found'   => 'Kampanijų nerasta',
-        'search_placeholder'   => 'Ieškoti kampanijų...',
-        'filter_by_type'       => 'Filtruoti pagal tipą',
-        'filter_by_category'   => 'Filtruoti pagal kategoriją',
-        'show_featured_only'   => 'Rodyti tik išskirtines',
-        'view_campaign'        => 'Peržiūrėti kampaniją',
-        'related_campaigns'    => 'Susijusios kampanijos',
-        'campaign_ended'       => 'Kampanija baigėsi',
-        'campaign_not_started' => 'Kampanija dar neprasidėjo',
-        'campaign_paused'      => 'Kampanija pristabdyta',
+
+    'tabs' => [
+        'all'       => 'Visos kampanijos',
+        'active'    => 'Aktyvios',
+        'scheduled' => 'Suplanuotos',
+        'draft'     => 'Juodraščiai',
+        'paused'    => 'Pristabdytos',
+        'inactive'  => 'Neaktyvios',
+        'featured'  => 'Išskirtinės',
     ],
 ];

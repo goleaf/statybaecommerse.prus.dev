@@ -14,6 +14,7 @@ use App\Models\ReferralRewardLog;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use RuntimeException;
 
 final class ReferralSystemComprehensiveSeeder extends Seeder
 {
@@ -58,7 +59,7 @@ final class ReferralSystemComprehensiveSeeder extends Seeder
         $availableCodes = $codes->shuffle()->take($desiredCount)->values();
 
         if ($availableCodes->count() < $desiredCount) {
-            throw new \RuntimeException('Not enough referral codes to generate unique referrals.');
+            throw new RuntimeException('Not enough referral codes to generate unique referrals.');
         }
 
         $referralSequences = $availableCodes->map(function (ReferralCode $code): array {

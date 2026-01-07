@@ -18,18 +18,18 @@ final class FileFactory extends Factory
     public function definition(): array
     {
         $originalName = $this->faker->word() . '.' . $this->faker->fileExtension();
-        
+
         return [
-            'name' => $this->faker->uuid() . '.' . $this->faker->fileExtension(),
+            'name'          => $this->faker->uuid() . '.' . $this->faker->fileExtension(),
             'original_name' => $originalName,
-            'path' => 'uploads/' . $this->faker->uuid() . '/' . $originalName,
-            'disk' => 'local',
-            'mime_type' => $this->faker->mimeType(),
-            'size' => $this->faker->numberBetween(1024, 10485760), // 1KB to 10MB
-            'hash' => $this->faker->sha256(),
-            'uploaded_by' => User::factory(),
-            'metadata' => [
-                'width' => $this->faker->optional()->numberBetween(100, 1920),
+            'path'          => 'uploads/' . $this->faker->uuid() . '/' . $originalName,
+            'disk'          => 'local',
+            'mime_type'     => $this->faker->mimeType(),
+            'size'          => $this->faker->numberBetween(1024, 10485760), // 1KB to 10MB
+            'hash'          => $this->faker->sha256(),
+            'uploaded_by'   => User::factory(),
+            'metadata'      => [
+                'width'  => $this->faker->optional()->numberBetween(100, 1920),
                 'height' => $this->faker->optional()->numberBetween(100, 1080),
             ],
         ];
@@ -39,7 +39,7 @@ final class FileFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'mime_type' => $this->faker->randomElement(['image/jpeg', 'image/png', 'image/gif']),
-            'name' => $this->faker->uuid() . '.' . $this->faker->randomElement(['jpg', 'png', 'gif']),
+            'name'      => $this->faker->uuid() . '.' . $this->faker->randomElement(['jpg', 'png', 'gif']),
         ]);
     }
 
@@ -47,7 +47,7 @@ final class FileFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'mime_type' => $this->faker->randomElement(['application/pdf', 'application/msword']),
-            'name' => $this->faker->uuid() . '.' . $this->faker->randomElement(['pdf', 'doc']),
+            'name'      => $this->faker->uuid() . '.' . $this->faker->randomElement(['pdf', 'doc']),
         ]);
     }
 }

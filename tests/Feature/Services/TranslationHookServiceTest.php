@@ -10,7 +10,7 @@ uses(RefreshDatabase::class);
 
 beforeEach(function () {
     $this->service = app(TranslationHookService::class);
-    
+
     // Create test translation files
     $this->ensureTranslationDirectoryExists();
 });
@@ -25,18 +25,18 @@ it('can add translations across all supported locales', function () {
     $translations = [
         'lt' => 'Labas',
         'en' => 'Hello',
-        'de' => 'Hallo'
+        'de' => 'Hallo',
     ];
 
     $result = $this->service->addTranslation($key, $translations);
 
     expect($result)->toBeTrue();
-    
+
     // Verify translations were saved
     foreach (['lt', 'en', 'de'] as $locale) {
         $file = lang_path("{$locale}.json");
         expect(File::exists($file))->toBeTrue();
-        
+
         $content = json_decode(File::get($file), true);
         expect($content)->toHaveKey($key);
         expect($content[$key])->toBe($translations[$locale]);
@@ -72,13 +72,13 @@ it('extracts translatable strings from blade content', function () {
 it('processes blade files and creates missing translations', function () {
     $testFile = resource_path('views/test-translation.blade.php');
     $bladeContent = '<div>{{ __("test.missing_key") }}</div>';
-    
+
     File::put($testFile, $bladeContent);
 
     $missingKeys = $this->service->processBladeFile($testFile);
 
     expect($missingKeys)->toContain('test.missing_key');
-    
+
     // Verify translation was auto-created
     $ltFile = lang_path('lt.json');
     $content = json_decode(File::get($ltFile), true);
@@ -99,7 +99,7 @@ it('generates translation report correctly', function () {
     expect($report)->toHaveKey('locales');
     expect($report['locales'])->toHaveKey('lt');
     expect($report['locales'])->toHaveKey('en');
-    
+
     expect($report['locales']['lt']['completion_percentage'])->toBe(100.0);
     expect($report['locales']['en']['completion_percentage'])->toBeLessThan(100.0);
 });
@@ -132,7 +132,7 @@ it('syncs translation formats between json and php', function () {
 
 function ensureTranslationDirectoryExists(): void
 {
-    if (!File::isDirectory(lang_path())) {
+    if (! File::isDirectory(lang_path())) {
         File::makeDirectory(lang_path(), 0755, true);
     }
 }
@@ -144,7 +144,7 @@ function cleanupTestTranslations(): void
         lang_path('en.json'),
         lang_path('de.json'),
         lang_path('lt.php'),
-        resource_path('views/test-translation.blade.php')
+        resource_path('views/test-translation.blade.php'),
     ];
 
     foreach ($testFiles as $file) {

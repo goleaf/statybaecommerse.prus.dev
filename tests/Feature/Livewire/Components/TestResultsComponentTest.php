@@ -45,22 +45,22 @@ final class TestResultsComponentTest extends TestCase
             'failed_tests'    => 1,
             'tests'           => [
                 [
-                    'file'    => 'tests/Feature/PassingTest.php',
-                    'status'  => 'passed',
-                    'output'  => 'ok',
-                    'run_at'  => '2025-10-01T10:00:00Z',
-                    'error'   => '',
+                    'file'   => 'tests/Feature/PassingTest.php',
+                    'status' => 'passed',
+                    'output' => 'ok',
+                    'run_at' => '2025-10-01T10:00:00Z',
+                    'error'  => '',
                 ],
             ],
-            'errors'          => [
+            'errors' => [
                 [
                     'file'   => 'tests/Feature/BrokenTest.php',
                     'error'  => 'Failed asserting that false is true.',
                     'output' => "Failed asserting that false is true.\n--- Expected\n+++ Actual\n@@\n-true\n+false\n",
                 ],
             ],
-            'started_at'      => '2025-10-01T09:55:00Z',
-            'completed_at'    => '2025-10-01T10:05:00Z',
+            'started_at'   => '2025-10-01T09:55:00Z',
+            'completed_at' => '2025-10-01T10:05:00Z',
         ];
 
         // Persist a realistic snapshot so the Livewire component hydrates from actual disk data.

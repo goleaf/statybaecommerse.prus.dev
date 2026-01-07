@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -19,7 +21,7 @@ return new class extends Migration
             $table->datetime('joined_at');
             $table->datetime('left_at')->nullable();
             $table->timestamps();
-            
+
             $table->unique(['organization_id', 'user_id']);
             $table->index(['user_id', 'role']);
             $table->index(['organization_id', 'is_active']);
@@ -35,7 +37,7 @@ return new class extends Migration
             $table->datetime('completed_at')->nullable();
             $table->text('notes')->nullable();
             $table->timestamps();
-            
+
             $table->unique(['task_id', 'user_id', 'responsibility']);
             $table->index(['user_id', 'responsibility']);
         });
@@ -48,9 +50,8 @@ return new class extends Migration
             $table->foreignId('tagged_by')->nullable()->constrained('users')->nullOnDelete();
             $table->datetime('tagged_at');
             $table->timestamps();
-            
+
             $table->unique(['tag_id', 'taggable_type', 'taggable_id']);
-            $table->index(['taggable_type', 'taggable_id']);
         });
 
         // Project members (many-to-many with additional data)
@@ -63,7 +64,7 @@ return new class extends Migration
             $table->datetime('joined_at');
             $table->datetime('left_at')->nullable();
             $table->timestamps();
-            
+
             $table->unique(['project_id', 'user_id']);
             $table->index(['user_id', 'role']);
         });

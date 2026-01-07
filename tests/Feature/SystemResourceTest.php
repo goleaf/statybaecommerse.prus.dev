@@ -353,10 +353,10 @@ final class SystemResourceTest extends TestCase
         // Inspect the raw Livewire return payload to confirm the JSON structure matches the record data.
         $livewireReturn = $component->effects['returns'][0] ?? [];
         $this->assertSame([
-            'key'      => $setting->key,
-            'name'     => $setting->name,
-            'value'    => $setting->value,
-            'type'     => $setting->type,
+            'key'   => $setting->key,
+            'name'  => $setting->name,
+            'value' => $setting->value,
+            'type'  => $setting->type,
             // Livewire serialises the response payload without eager loading the relationship.
             'category' => null,
         ], $livewireReturn['original'] ?? []);

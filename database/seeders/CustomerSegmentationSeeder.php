@@ -42,7 +42,7 @@ final class CustomerSegmentationSeeder extends Seeder
                     'can_use_coupons'      => true,
                     'sort_order'           => 10,
                 ],
-                'conditions'           => [
+                'conditions' => [
                     'min_order_value' => 1000,
                     'min_orders'      => 10,
                     'loyalty_months'  => 12,
@@ -76,7 +76,7 @@ final class CustomerSegmentationSeeder extends Seeder
                     'can_use_coupons'      => true,
                     'sort_order'           => 20,
                 ],
-                'conditions'           => [
+                'conditions' => [
                     'min_order_value' => 100,
                     'min_orders'      => 3,
                 ],
@@ -109,7 +109,7 @@ final class CustomerSegmentationSeeder extends Seeder
                     'can_use_coupons'      => true,
                     'sort_order'           => 30,
                 ],
-                'conditions'           => [
+                'conditions' => [
                     'max_orders'        => 1,
                     'registration_days' => 30,
                 ],
@@ -142,7 +142,7 @@ final class CustomerSegmentationSeeder extends Seeder
                     'can_use_coupons'      => true,
                     'sort_order'           => 40,
                 ],
-                'conditions'           => [
+                'conditions' => [
                     'min_quantity'    => 50,
                     'min_order_value' => 500,
                 ],
@@ -175,7 +175,7 @@ final class CustomerSegmentationSeeder extends Seeder
                     'can_use_coupons'      => true,
                     'sort_order'           => 50,
                 ],
-                'conditions'           => [
+                'conditions' => [
                     'customer_type'      => 'business',
                     'min_monthly_volume' => 5000,
                 ],
@@ -208,7 +208,7 @@ final class CustomerSegmentationSeeder extends Seeder
                     'can_use_coupons'      => true,
                     'sort_order'           => 60,
                 ],
-                'conditions'           => [
+                'conditions' => [
                     'last_order_days'       => 180,
                     'reactivation_campaign' => true,
                 ],

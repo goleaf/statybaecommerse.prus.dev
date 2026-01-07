@@ -95,23 +95,23 @@ final class CacheSerializationTest extends TestCase
     public function test_optimization_detection_works_correctly(): void
     {
         $products = Product::factory()->count(3)->create();
-        
+
         // Test paginator detection
         $paginator = new LengthAwarePaginator($products, 3, 3, 1);
         $optimizedPaginator = SerializationOptimizer::optimizePaginator($paginator);
-        
+
         expect(SerializationOptimizer::isOptimized($optimizedPaginator))->toBeTrue()
             ->and(SerializationOptimizer::isOptimized($paginator))->toBeFalse();
 
         // Test model detection
         $optimizedModel = SerializationOptimizer::optimizeModel($products->first());
-        
+
         expect(SerializationOptimizer::isOptimized($optimizedModel))->toBeTrue()
             ->and(SerializationOptimizer::isOptimized($products->first()))->toBeFalse();
 
         // Test collection detection
         $optimizedCollection = SerializationOptimizer::optimizeCollection($products);
-        
+
         expect(SerializationOptimizer::isOptimized($optimizedCollection))->toBeTrue()
             ->and(SerializationOptimizer::isOptimized($products))->toBeFalse();
     }
@@ -119,18 +119,18 @@ final class CacheSerializationTest extends TestCase
     public function test_serialization_reduces_livewire_hydration_overhead(): void
     {
         $products = Product::factory()->count(20)->create();
-        
+
         // Measure serialization time for Eloquent collection
         $start = microtime(true);
         $serializedEloquent = serialize($products);
         $eloquentTime = microtime(true) - $start;
-        
+
         // Measure serialization time for optimized array
         $optimized = SerializationOptimizer::optimizeCollection($products);
         $start = microtime(true);
         $serializedOptimized = serialize($optimized);
         $optimizedTime = microtime(true) - $start;
-        
+
         expect($optimizedTime)->toBeLessThanOrEqual($eloquentTime)
             ->and(strlen($serializedOptimized))->toBeLessThanOrEqual(strlen($serializedEloquent));
     }

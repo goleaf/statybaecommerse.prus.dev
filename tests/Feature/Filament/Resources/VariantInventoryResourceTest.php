@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\VariantInventory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
+
 use function Pest\Laravel\actingAs;
 
 uses(RefreshDatabase::class);

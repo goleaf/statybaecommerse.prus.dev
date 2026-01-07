@@ -12,7 +12,7 @@ uses()->group('filament');
 
 it('boots and touches the table records when loadTable runs without prior Livewire lifecycle', function (): void {
     // Instantiate the harness and emulate an uninitialized table state before invoking the helper.
-    $page = new BaseListRecordsHarness();
+    $page = new BaseListRecordsHarness;
     $page->resetTableState();
 
     $page->loadTable();
@@ -24,7 +24,7 @@ it('boots and touches the table records when loadTable runs without prior Livewi
 
 it('mounts the create action when no action is already active', function (): void {
     // Execute the convenience shim while the mounted action stack is empty to confirm it mounts the create action.
-    $page = new BaseListRecordsHarness();
+    $page = new BaseListRecordsHarness;
     $page->mountedActions = [];
 
     $page->create();
@@ -35,7 +35,7 @@ it('mounts the create action when no action is already active', function (): voi
 
 it('executes the mounted create action when the modal is already open', function (): void {
     // Preload the mounted actions so the shim reuses the existing modal instead of double-mounting the action.
-    $page = new BaseListRecordsHarness();
+    $page = new BaseListRecordsHarness;
     $page->mountedActions = [
         ['name' => 'edit'],
         ['name' => 'create'],

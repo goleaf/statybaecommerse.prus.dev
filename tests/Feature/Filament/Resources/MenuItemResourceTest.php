@@ -44,7 +44,7 @@ final class MenuItemResourceTest extends TestCase
     {
         $menu = Menu::factory()->create(['name' => 'Primary']);
         $items = MenuItem::factory()->count(2)->create([
-            'menu_id' => $menu->id,
+            'menu_id'    => $menu->id,
             'is_visible' => true,
         ]);
 

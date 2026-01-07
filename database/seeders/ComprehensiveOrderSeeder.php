@@ -125,7 +125,7 @@ final class ComprehensiveOrderSeeder extends Seeder
 
     public function run(): void
     {
-        // Gracefully announce the seeding phase even when the seeder is executed outside of Artisan. 
+        // Gracefully announce the seeding phase even when the seeder is executed outside of Artisan.
         $this->writeMessage('Starting comprehensive order seeding...');
 
         // Ensure we have required data
@@ -260,15 +260,15 @@ final class ComprehensiveOrderSeeder extends Seeder
                 ->for($users->random())
                 ->state([
                     // Supply an explicit order number so rerunning the seeder never collides with persisted data.
-                    'number'         => $this->nextOrderNumber(),
-                    'created_at'     => $orderDate,
-                    'updated_at'     => $orderDate->copy()->addMinutes(fake()->numberBetween(1, 1440)),
-                    'status'         => fake()->randomElement($this->orderStatuses),
-                    'payment_method' => fake()->randomElement($this->paymentMethods),
-                    'currency'       => 'EUR',
-                    'locale'         => 'lt',
-                    'country_id'     => $country->id,
-                    'billing_address' => $this->addressForCountry($country),
+                    'number'           => $this->nextOrderNumber(),
+                    'created_at'       => $orderDate,
+                    'updated_at'       => $orderDate->copy()->addMinutes(fake()->numberBetween(1, 1440)),
+                    'status'           => fake()->randomElement($this->orderStatuses),
+                    'payment_method'   => fake()->randomElement($this->paymentMethods),
+                    'currency'         => 'EUR',
+                    'locale'           => 'lt',
+                    'country_id'       => $country->id,
+                    'billing_address'  => $this->addressForCountry($country),
                     'shipping_address' => $this->addressForCountry($country),
                 ])
                 ->create();
@@ -755,15 +755,15 @@ final class ComprehensiveOrderSeeder extends Seeder
         $value = $status instanceof PaymentStatus ? $status->value : $status;
 
         return match ($value) {
-            'pending'             => 'Laukiama apmokėjimo',
-            'authorized'          => 'Autorizuota',
-            'captured'            => 'Captuota',
-            'settled'             => 'Atsiskaityta',
-            'paid'                => 'Apmokėta',
-            'partially_refunded'  => 'Iš dalies grąžinta',
-            'refunded'            => 'Grąžinta',
-            'failed'              => 'Apmokėjimas nepavyko',
-            default               => ucfirst($value),
+            'pending'            => 'Laukiama apmokėjimo',
+            'authorized'         => 'Autorizuota',
+            'captured'           => 'Captuota',
+            'settled'            => 'Atsiskaityta',
+            'paid'               => 'Apmokėta',
+            'partially_refunded' => 'Iš dalies grąžinta',
+            'refunded'           => 'Grąžinta',
+            'failed'             => 'Apmokėjimas nepavyko',
+            default              => ucfirst($value),
         };
     }
 

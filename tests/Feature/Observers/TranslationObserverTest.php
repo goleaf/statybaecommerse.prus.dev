@@ -13,9 +13,9 @@ uses(RefreshDatabase::class);
 beforeEach(function () {
     $this->observer = app(TranslationObserver::class);
     $this->service = app(TranslationHookService::class);
-    
+
     // Ensure translation directory exists
-    if (!File::isDirectory(lang_path())) {
+    if (! File::isDirectory(lang_path())) {
         File::makeDirectory(lang_path(), 0755, true);
     }
 });
@@ -36,8 +36,8 @@ afterEach(function () {
 
 it('processes translatable fields when model is saving', function () {
     $product = Product::factory()->make([
-        'name' => 'Test Product Name',
-        'description' => 'Test Product Description'
+        'name'        => 'Test Product Name',
+        'description' => 'Test Product Description',
     ]);
 
     // Simulate the saving event
@@ -46,7 +46,7 @@ it('processes translatable fields when model is saving', function () {
     // Verify translations were created
     $ltFile = lang_path('lt.json');
     expect(File::exists($ltFile))->toBeTrue();
-    
+
     $translations = json_decode(File::get($ltFile), true);
     expect($translations)->toHaveKey('product.test_product_name');
     expect($translations)->toHaveKey('product.test_product_description');
@@ -54,8 +54,8 @@ it('processes translatable fields when model is saving', function () {
 
 it('creates translation entries for dirty fields only', function () {
     $product = Product::factory()->create([
-        'name' => 'Original Name',
-        'description' => 'Original Description'
+        'name'        => 'Original Name',
+        'description' => 'Original Description',
     ]);
 
     // Update only the name
@@ -67,7 +67,7 @@ it('creates translation entries for dirty fields only', function () {
 
     $ltFile = lang_path('lt.json');
     $translations = json_decode(File::get($ltFile), true);
-    
+
     // Should have translation for the updated name
     expect($translations)->toHaveKey('product.final_name');
     // Should not have translation for unchanged description
@@ -76,20 +76,22 @@ it('creates translation entries for dirty fields only', function () {
 
 it('handles models without translatable fields gracefully', function () {
     // Create a model instance that doesn't have translatable fields
-    $model = new class extends \Illuminate\Database\Eloquent\Model {
+    $model = new class extends \Illuminate\Database\Eloquent\Model
+    {
         protected $fillable = ['non_translatable_field'];
+
         public $timestamps = false;
     };
 
     $model->non_translatable_field = 'Some Value';
 
     // This should not throw an exception
-    expect(fn() => $this->observer->saving($model))->not->toThrow();
+    expect(fn () => $this->observer->saving($model))->not->toThrow();
 });
 
 it('logs translation activity for created models', function () {
     $product = Product::factory()->create([
-        'name' => 'New Product'
+        'name' => 'New Product',
     ]);
 
     // Capture log output
@@ -102,7 +104,7 @@ it('logs translation activity for created models', function () {
 
 it('logs translation activity for updated models', function () {
     $product = Product::factory()->create([
-        'name' => 'Updated Product'
+        'name' => 'Updated Product',
     ]);
 
     // Capture log output
@@ -115,7 +117,7 @@ it('logs translation activity for updated models', function () {
 
 it('handles translation creation errors gracefully', function () {
     $product = Product::factory()->make([
-        'name' => 'Test Product'
+        'name' => 'Test Product',
     ]);
 
     // Mock the service to throw an exception
@@ -129,16 +131,19 @@ it('handles translation creation errors gracefully', function () {
         ->with('Failed to create translation entry', \Mockery::type('array'));
 
     // This should not throw an exception
-    expect(fn() => $this->observer->saving($product))->not->toThrow();
+    expect(fn () => $this->observer->saving($product))->not->toThrow();
 });
 
 it('stores translation key reference when model supports it', function () {
     // Create a test model that supports translation key storage
-    $testModel = new class extends \Illuminate\Database\Eloquent\Model {
+    $testModel = new class extends \Illuminate\Database\Eloquent\Model
+    {
         protected $fillable = ['name', 'name_translation_key'];
+
         protected $translatableFields = ['name'];
+
         public $timestamps = false;
-        
+
         public function isFillable($key): bool
         {
             return in_array($key, $this->fillable);

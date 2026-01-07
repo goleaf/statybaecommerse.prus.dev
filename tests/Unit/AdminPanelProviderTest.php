@@ -2,8 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Providers\Filament\AdminPanelProvider;
-use Filament\Enums\UserMenuPosition;
+use App\Filament\AdminPanelProvider;
 use Filament\Panel;
 use Illuminate\Foundation\Testing\RefreshDatabaseState;
 
@@ -11,11 +10,10 @@ beforeEach(function (): void {
     RefreshDatabaseState::$migrated = true;
 });
 
-it('unit: disables the topbar and moves the user menu to the sidebar', function (): void {
+it('unit: disables the topbar', function (): void {
     $provider = new AdminPanelProvider(app());
 
     $panel = $provider->panel(Panel::make());
 
-    expect($panel->hasTopbar())->toBeFalse()
-        ->and($panel->getUserMenuPosition())->toBe(UserMenuPosition::Sidebar);
+    expect($panel->hasTopbar())->toBeFalse();
 });

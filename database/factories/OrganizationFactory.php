@@ -18,14 +18,14 @@ final class OrganizationFactory extends Factory
     public function definition(): array
     {
         $name = $this->faker->company();
-        
+
         return [
-            'name' => $name,
-            'slug' => Str::slug($name),
+            'name'        => $name,
+            'slug'        => Str::slug($name),
             'description' => $this->faker->paragraph(),
-            'type' => $this->faker->randomElement(['company', 'team', 'department']),
-            'is_active' => true,
-            'settings' => [
+            'type'        => $this->faker->randomElement(['company', 'team', 'department']),
+            'is_active'   => true,
+            'settings'    => [
                 'timezone' => $this->faker->timezone(),
                 'currency' => 'EUR',
                 'features' => $this->faker->randomElements(['projects', 'tasks', 'files', 'reports'], 3),
@@ -44,14 +44,14 @@ final class OrganizationFactory extends Factory
     {
         return $this->afterCreating(function (Organization $organization) use ($count) {
             $users = \App\Models\User::factory($count)->create();
-            
+
             $users->each(function ($user, $index) use ($organization) {
                 $role = match ($index) {
-                    0 => 'owner',
-                    1 => 'admin',
+                    0       => 'owner',
+                    1       => 'admin',
                     default => 'member',
                 };
-                
+
                 $organization->addUser($user, $role, ['read', 'write']);
             });
         });

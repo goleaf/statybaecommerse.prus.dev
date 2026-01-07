@@ -19,6 +19,7 @@ class VariantStockHistorySeeder extends Seeder
 
         if ($variants->isEmpty()) {
             $this->command->error('❌ No product variants available. Please run ProductVariantSeeder first.');
+
             return;
         }
 
@@ -34,6 +35,7 @@ class VariantStockHistorySeeder extends Seeder
 
         if ($existingCount >= 10) {
             $this->command->info("✓ Using {$existingCount} existing product variants");
+
             return ProductVariant::limit(10)->get();
         }
 
@@ -59,6 +61,7 @@ class VariantStockHistorySeeder extends Seeder
             if ($existingCount >= 6) {
                 $this->command->info("✓ Variant #{$variant->id} already has {$existingCount} stock history records");
                 $totalSkipped++;
+
                 return;
             }
 
@@ -67,6 +70,7 @@ class VariantStockHistorySeeder extends Seeder
 
             if ($needed === 0) {
                 $totalSkipped++;
+
                 return;
             }
 

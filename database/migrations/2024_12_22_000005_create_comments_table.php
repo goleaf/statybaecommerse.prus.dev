@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -20,8 +22,16 @@ return new class extends Migration
             $table->json('metadata')->nullable();
             $table->timestamps();
             $table->softDeletes();
-            
-            $table->index(['commentable_type', 'commentable_id']);
+
+            // Critical: Composite index for polymorphic relationships - essential for performance
+            $table->index(['commentable_type', 'commentable_id'], 'comments_commentable_index');
+
+            // Optimized composite indexes for common query patterns
+            $table->index(['commentable_type', 'commentable_id', 'is_approved'], 'comments_commentable_approved_index');
+            $table->index(['commentable_type', 'commentable_id', 'created_at'], 'comments_commentable_created_index');
+            $table->index(['commentable_type', 'commentable_id', 'parent_id'], 'comments_commentable_parent_index');
+
+            // Existing indexes
             $table->index(['parent_id']);
             $table->index(['user_id', 'created_at']);
         });

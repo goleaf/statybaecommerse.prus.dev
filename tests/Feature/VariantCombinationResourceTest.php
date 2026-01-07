@@ -455,7 +455,7 @@ final class VariantCombinationResourceTest extends TestCase
     /**
      * Normalise Filament schema components into a simple array for assertion friendly iteration.
      *
-     * @param  array<int, mixed>|Schema  $components
+     * @param  array<int, mixed>|Schema $components
      * @return array<int, mixed>
      */
     private function normaliseSchemaComponents(array|Schema $components): array

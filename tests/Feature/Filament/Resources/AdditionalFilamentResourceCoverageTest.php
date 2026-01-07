@@ -6,21 +6,16 @@ namespace Tests\Feature\Filament\Resources;
 
 use App\Filament\Resources\NewsImageResource\Pages\ListNewsImages as NewsImageResourceListNewsImages;
 use App\Filament\Resources\NewsImages\Pages\ListNewsImages as LegacyNewsImagesListNewsImages;
-use App\Filament\Resources\NewsTagResource\Pages\ListNewsTags as NewsTagResourceListNewsTags;
-use App\Filament\Resources\NewsTags\Pages\ListNewsTags as LegacyNewsTagsListNewsTags;
 use App\Filament\Resources\RecommendationConfigResourceSimple\Pages\ListRecommendationConfigResourceSimples;
 use App\Filament\Resources\RecommendationConfigResourceSimple\Pages\ListRecommendationConfigSimples;
 use App\Filament\Resources\SystemSettingCategories\Pages\ListSystemSettingCategories as LegacyListSystemSettingCategories;
 use App\Filament\Resources\SystemSettingCategoryResource\Pages\ListSystemSettingCategories;
 use App\Filament\Resources\SystemSettingCategoryTranslationResource\Pages\ListSystemSettingCategoryTranslations;
-use App\Filament\Resources\UserWishlistResource\Pages\ListUserWishlists;
 use App\Models\NewsImage;
-use App\Models\NewsTag;
 use App\Models\RecommendationConfigSimple;
 use App\Models\SystemSettingCategory;
 use App\Models\SystemSettingCategoryTranslation;
 use App\Models\User;
-use App\Models\UserWishlist;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -64,14 +59,11 @@ final class AdditionalFilamentResourceCoverageTest extends TestCase
         return [
             'news image legacy listings'            => [LegacyNewsImagesListNewsImages::class, 'createNewsImageRecord'],
             'news image listings'                   => [NewsImageResourceListNewsImages::class, 'createNewsImageRecord'],
-            'news tag legacy listings'              => [LegacyNewsTagsListNewsTags::class, 'createNewsTagRecord'],
-            'news tag listings'                     => [NewsTagResourceListNewsTags::class, 'createNewsTagRecord'],
             'recommendation config simple legacy'   => [ListRecommendationConfigResourceSimples::class, 'createRecommendationConfigSimpleRecord'],
             'recommendation config simple listings' => [ListRecommendationConfigSimples::class, 'createRecommendationConfigSimpleRecord'],
             'system setting categories legacy'      => [LegacyListSystemSettingCategories::class, 'createSystemSettingCategoryRecord'],
             'system setting categories'             => [ListSystemSettingCategories::class, 'createSystemSettingCategoryRecord'],
             'system setting category translations'  => [ListSystemSettingCategoryTranslations::class, 'createSystemSettingCategoryTranslationRecord'],
-            'user wishlists'                        => [ListUserWishlists::class, 'createUserWishlistRecord'],
         ];
     }
 
@@ -96,22 +88,13 @@ final class AdditionalFilamentResourceCoverageTest extends TestCase
         ]);
     }
 
-    private function createNewsTagRecord(): NewsTag
-    {
-        // Persist a bilingual news tag ensuring translations hydrate consistently across namespace variants.
-        return NewsTag::factory()->create([
-            'name' => 'Coverage Tag',
-            'slug' => 'coverage-tag',
-        ]);
-    }
-
     private function createRecommendationConfigSimpleRecord(): RecommendationConfigSimple
     {
         // Store an active recommendation configuration so list filters expose a realistic payload.
         return RecommendationConfigSimple::factory()->create([
-            'name'     => 'Coverage Config Simple',
-            'code'     => 'coverage-config',
-            'is_active'=> true,
+            'name'      => 'Coverage Config Simple',
+            'code'      => 'coverage-config',
+            'is_active' => true,
         ]);
     }
 
@@ -132,14 +115,6 @@ final class AdditionalFilamentResourceCoverageTest extends TestCase
         return SystemSettingCategoryTranslation::factory()->for($category)->english()->create([
             'name'        => 'Coverage Settings EN',
             'description' => 'Coverage category description',
-        ]);
-    }
-
-    private function createUserWishlistRecord(): UserWishlist
-    {
-        // Provision a public wishlist belonging to the administrator to keep engagement dashboards populated.
-        return UserWishlist::factory()->public()->for($this->admin)->create([
-            'name' => 'Coverage Wishlist',
         ]);
     }
 }

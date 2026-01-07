@@ -10,7 +10,6 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\OrderShipping;
 use App\Models\Product;
-use App\Models\ProductHistory;
 use App\Models\ProductVariant;
 use App\Models\User;
 use Database\Seeders\AdminSeeder;
@@ -559,23 +558,6 @@ final class AdminSeederTest extends TestCase
     }
 
     #[Test]
-    public function it_creates_product_histories_correctly(): void
-    {
-        $this->seed(AdminSeeder::class);
-
-        $this->assertDatabaseCount('product_histories', 5);
-
-        $history = ProductHistory::all();
-        foreach ($history as $record) {
-            $this->assertNotNull($record->product_id);
-            $this->assertEquals('created', $record->action);
-            $this->assertNull($record->old_value);
-            $this->assertNotNull($record->new_value);
-            $this->assertEquals(1, $record->user_id);
-        }
-    }
-
-    #[Test]
     public function it_creates_locations_correctly(): void
     {
         $this->seed(AdminSeeder::class);
@@ -707,7 +689,6 @@ final class AdminSeederTest extends TestCase
         $this->assertDatabaseCount('seo_data', 2);
         $this->assertDatabaseCount('subscribers', 5);
         // Referral rewards are temporarily disabled in the seeder
-        $this->assertDatabaseCount('product_histories', 5);
         $this->assertDatabaseCount('locations', 2);
     }
 }

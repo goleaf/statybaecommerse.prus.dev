@@ -7,85 +7,45 @@ return [
     'plural' => 'Price Lists',
     'single' => 'Price List',
 
-    // Sections
+    // Form labels
     'basic_information' => 'Basic Information',
-    'availability'      => 'Availability & Conditions',
-    'settings'          => 'Settings',
+    'name'              => 'Name',
+    'description'       => 'Description',
+    'pricing_type'      => 'Pricing Type',
+    'fixed'             => 'Fixed',
+    'tiered'            => 'Tiered',
+    'volume'            => 'Volume',
 
-    'name'             => 'Name',
-    'code'             => 'Code',
-    'currency'         => 'Currency',
-    'priority'         => 'Priority',
-    'description'      => 'Description',
-    'is_enabled'       => 'Enabled',
-    'is_default'       => 'Default',
-    'auto_apply'       => 'Auto-apply',
-    'starts_at'        => 'Starts At',
-    'ends_at'          => 'Ends At',
-    'starts_at_from'   => 'Start date from',
-    'starts_at_until'  => 'Start date until',
-    'ends_at_from'     => 'End date from',
-    'ends_at_until'    => 'End date until',
-    'min_order_amount' => 'Minimum Order Amount',
-    'max_order_amount' => 'Maximum Order Amount',
-    'created_at'       => 'Created At',
-    'updated_at'       => 'Updated At',
+    'tiered_pricing' => 'Tiered Pricing',
+    'tiers'          => 'Tiers',
+    'min_quantity'   => 'Min Quantity',
+    'max_quantity'   => 'Max Quantity',
+    'price'          => 'Price',
+    'add_tier'       => 'Add Tier',
 
-    'created_at' => 'Created at',
-    'updated_at' => 'Updated at',
+    'volume_pricing' => 'Volume Pricing',
+    'volume_tiers'   => 'Volume Tiers',
 
-    'all_records'      => 'All records',
-    'enabled_only'     => 'Enabled only',
-    'disabled_only'    => 'Disabled only',
-    'default_only'     => 'Default only',
-    'non_default_only' => 'Non-default only',
-    'auto_apply_only'  => 'Auto-apply only',
-    'manual_only'      => 'Manual only',
+    'settings'    => 'Settings',
+    'is_active'   => 'Is Active',
+    'valid_from'  => 'Valid From',
+    'valid_until' => 'Valid Until',
+    'notes'       => 'Notes',
 
-    // Relation data
     'customer_group'      => 'Customer Group',
+    'code'                => 'Code',
     'discount_percentage' => 'Discount Percentage',
-    'is_active'           => 'Active',
     'partner'             => 'Partner',
     'email'               => 'Email',
     'phone'               => 'Phone',
     'commission_rate'     => 'Commission Rate',
 
-    'tabs' => [
-        'all'        => 'All price lists',
-        'active'     => 'Active',
-        'default'    => 'Default',
-        'auto_apply' => 'Auto-apply',
-    ],
+    // Status labels
+    'all_records'   => 'All Records',
+    'active_only'   => 'Active Only',
+    'inactive_only' => 'Inactive Only',
 
-    // Relation managers
-    'relation_managers' => [
-        'customer_groups' => [
-            'title' => 'Customer Groups',
-        ],
-        'partners' => [
-            'title' => 'Partners',
-        ],
-        'items' => [
-            'title' => 'Price List Items',
-        ],
-    ],
-
-    'stats' => [
-        'total_price_lists'                  => 'Total Price Lists',
-        'total_price_lists_description'      => 'All price lists in the catalogue',
-        'enabled_price_lists'                => 'Enabled Price Lists',
-        'enabled_price_lists_description'    => 'Price lists currently enabled',
-        'active_price_lists'                 => 'Active Price Lists',
-        'active_price_lists_description'     => 'Price lists that are currently active',
-        'default_price_lists'                => 'Default Price Lists',
-        'default_price_lists_description'    => 'Primary price lists applied automatically',
-        'auto_apply_price_lists'             => 'Auto-apply Price Lists',
-        'auto_apply_price_lists_description' => 'Price lists automatically applied to customers',
-    ],
-
-    'charts' => [
-        'activity_over_time'  => 'Price List Activity Over Time',
-        'price_lists_created' => 'Price Lists Created',
-    ],
+    // Table columns
+    'created_at' => 'Created At',
+    'updated_at' => 'Updated At',
 ];

@@ -78,6 +78,7 @@ final class DashboardTimeSeriesRepositoryTest extends TestCase
 
         self::assertJsonStringEqualsJsonFile($expectedPath, json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
     }
+
     private function createOrderAt(float $total, CarbonImmutable $createdAt): void
     {
         $order = Order::factory()->completed()->make([

@@ -125,7 +125,7 @@ class BootErrorProfilerTest extends TestCase
         }
 
         $data = BootErrorProfiler::getProfilingData();
-        
+
         // Should keep only last 100 measurements
         $this->assertLessThanOrEqual(100, count($data['timings']['test_operation']));
     }
@@ -174,27 +174,27 @@ class BootErrorProfilerTest extends TestCase
     public function test_severity_classification_in_regressions(): void
     {
         Config::set('exception-handling.performance.enable_profiling', true);
-        
+
         // Simulate timing data directly instead of relying on usleep which can be inconsistent
         $currentHour = date('Y-m-d-H');
-        
+
         // High severity: 5ms average with 2ms budget (>2x = high)
         Config::set('exception-handling.budgets.slow_operation_max_ms', 2);
         cache()->put('boot_error_profiling_timings_' . $currentHour, [
-            'slow_operation' => [0.005] // 5ms
+            'slow_operation' => [0.005], // 5ms
         ], now()->addMinutes(30));
-        
+
         // Medium severity: 3ms average with 2ms budget (1.5x = medium)
         Config::set('exception-handling.budgets.medium_operation_max_ms', 2);
         cache()->put('boot_error_profiling_timings_' . $currentHour, [
-            'slow_operation' => [0.005], // 5ms
-            'medium_operation' => [0.003] // 3ms
+            'slow_operation'   => [0.005], // 5ms
+            'medium_operation' => [0.003], // 3ms
         ], now()->addMinutes(30));
 
         $regressions = BootErrorProfiler::detectPerformanceRegression();
 
         $this->assertCount(2, $regressions);
-        
+
         $highSeverity = collect($regressions)->firstWhere('operation', 'slow_operation');
         $mediumSeverity = collect($regressions)->firstWhere('operation', 'medium_operation');
 

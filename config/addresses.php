@@ -8,10 +8,7 @@ return [
      * customer addresses. Adjust the value in the environment variable to extend
      * the allow-list without modifying source control.
      */
-    'allowed_countries' => array_values(array_filter(array_map(
-        static fn (string $code): string => strtoupper(trim($code)),
-        explode(',', (string) env('ADDRESS_ALLOWED_COUNTRIES', 'LT'))
-    ))),
+    'allowed_countries' => array_values(array_filter(explode(',', (string) env('ADDRESS_ALLOWED_COUNTRIES', 'LT')))),
 
     /*
      * Regions/provinces that we explicitly accept per country. The keys must use

@@ -6,8 +6,8 @@ use App\Support\Stats\Inline\ProductSeries;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 beforeEach(function (): void {
     // Fresh minimal schema each test (safe for SQLite & facades)
@@ -24,7 +24,11 @@ beforeEach(function (): void {
     });
 
     // Deterministic cache
-    try { Cache::clear(); } catch (Throwable $e) { Cache::flush(); }
+    try {
+        Cache::clear();
+    } catch (Throwable $e) {
+        Cache::flush();
+    }
 
     // Freeze time so the 30-day window is stable
     Carbon::setTestNow(Carbon::create(2024, 12, 1, 0, 0, 0));

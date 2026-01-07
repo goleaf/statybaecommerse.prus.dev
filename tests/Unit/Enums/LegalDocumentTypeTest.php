@@ -25,7 +25,7 @@ it('identifies required document types correctly', function (): void {
 
 it('returns correct required types', function (): void {
     $requiredTypes = LegalDocumentType::getRequiredTypes();
-    
+
     expect($requiredTypes)->toHaveCount(2);
     expect($requiredTypes)->toContain(LegalDocumentType::PRIVACY_POLICY);
     expect($requiredTypes)->toContain(LegalDocumentType::TERMS_OF_USE);
@@ -33,7 +33,7 @@ it('returns correct required types', function (): void {
 
 it('provides options for forms', function (): void {
     $options = LegalDocumentType::getOptions();
-    
+
     expect($options)->toBeArray();
     expect($options)->toHaveKey('privacy_policy');
     expect($options)->toHaveKey('terms_of_use');
@@ -42,7 +42,7 @@ it('provides options for forms', function (): void {
 
 it('converts to array with all metadata', function (): void {
     $array = LegalDocumentType::PRIVACY_POLICY->toArray();
-    
+
     expect($array)->toHaveKeys(['value', 'label', 'description', 'icon', 'color', 'priority', 'is_required']);
     expect($array['value'])->toBe('privacy_policy');
     expect($array['is_required'])->toBeTrue();
@@ -50,16 +50,16 @@ it('converts to array with all metadata', function (): void {
 
 it('orders cases by priority', function (): void {
     $ordered = LegalDocumentType::ordered();
-    
+
     expect($ordered->first())->toBe(LegalDocumentType::PRIVACY_POLICY);
     expect($ordered->get(1))->toBe(LegalDocumentType::TERMS_OF_USE);
 });
 
 it('finds enum case by label', function (): void {
     $found = LegalDocumentType::fromLabel(__('legal.types.privacy_policy'));
-    
+
     expect($found)->toBe(LegalDocumentType::PRIVACY_POLICY);
-    
+
     $notFound = LegalDocumentType::fromLabel('Non-existent Label');
     expect($notFound)->toBeNull();
 });

@@ -128,11 +128,11 @@ final class UserProductInteractionsResourceTest extends TestCase
         // Update the interaction event and supporting metadata through the Filament edit form.
         Livewire::test(EditUserProductInteraction::class, ['record' => $interaction->getRouteKey()])
             ->fillForm([
-                'user_id'    => $interaction->user_id,
-                'product_id' => $interaction->product_id,
-                'event'      => 'purchase',
-                'occurred_at'=> $newTimestamp->format('Y-m-d H:i:s'),
-                'meta'       => [
+                'user_id'     => $interaction->user_id,
+                'product_id'  => $interaction->product_id,
+                'event'       => 'purchase',
+                'occurred_at' => $newTimestamp->format('Y-m-d H:i:s'),
+                'meta'        => [
                     'notes'  => 'Upgraded to purchase',
                     'rating' => '5',
                 ],

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 return [
     // Navigation and Labels
-    'enhanced_settings' => 'Normal Settings',
-    'enhanced_setting'  => 'Normal Setting',
+    'enhanced_settings' => 'Enhanced Settings',
+    'enhanced_setting'  => 'Enhanced Setting',
     'settings'          => 'Settings',
     'setting'           => 'Setting',
     // Form Fields
@@ -48,7 +48,7 @@ return [
     // Form Sections
     'setting_information' => 'Setting Information',
     'value_configuration' => 'Value Configuration',
-    'advanced_options'    => 'Normal Options',
+    'advanced_options'    => 'Advanced Options',
     // Help Text
     'help' => [
         'key'               => 'Use lowercase letters, numbers, underscores and dots only',

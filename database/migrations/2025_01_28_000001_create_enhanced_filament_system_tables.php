@@ -73,21 +73,8 @@ return new class extends Migration
             });
         }
 
-        // Enhanced Notification System
-        if (! Schema::hasTable('notification_templates')) {
-            Schema::create('notification_templates', function (Blueprint $table): void {
-                $table->id();
-                $table->string('name');
-                $table->string('slug')->unique();
-                $table->string('type'); // email, sms, push, database
-                $table->string('event'); // order_created, user_registered, etc.
-                $table->json('subject')->nullable(); // multilingual
-                $table->json('content'); // multilingual
-                $table->json('variables')->nullable(); // available variables
-                $table->boolean('is_active')->default(true);
-                $table->timestamps();
-            });
-        }
+        // Enhanced Notification System - REMOVED
+        // NotificationTemplate functionality has been removed from the system
 
         // Enhanced Audit Log
         if (! Schema::hasTable('system_logs')) {
@@ -204,7 +191,7 @@ return new class extends Migration
         Schema::dropIfExists('cache_tags');
         Schema::dropIfExists('feature_flags');
         Schema::dropIfExists('system_logs');
-        Schema::dropIfExists('notification_templates');
+        // notification_templates table removed - no longer needed
         Schema::dropIfExists('media_collections');
         // Drop translations before the parent table to avoid foreign key complaints during teardown.
         Schema::dropIfExists('enhanced_settings_translations');

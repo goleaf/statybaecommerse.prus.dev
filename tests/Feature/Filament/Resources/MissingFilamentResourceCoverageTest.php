@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Filament\Resources;
 
-use App\Filament\Resources\ActivityLogResource\Pages\ListActivityLogs;
 use App\Filament\Resources\AuditTrailResource\Pages\ListAuditTrails;
 use App\Filament\Resources\BrandResource\Pages\ListBrands;
 use App\Filament\Resources\CampaignConversionResource\Pages\ListCampaignConversions;
@@ -24,7 +23,6 @@ use App\Filament\Resources\PriceListItemResource\Pages\ListPriceListItems;
 use App\Filament\Resources\PriceListResource\Pages\ListPriceLists;
 use App\Filament\Resources\PriceResource\Pages\ListPrices;
 use App\Filament\Resources\ProductVariantResource\Pages\ListProductVariants;
-use App\Filament\Resources\RecommendationAnalyticsResource\Pages\ListRecommendationAnalytics;
 use App\Filament\Resources\RecommendationConfigResourceSimple\Pages\ListRecommendationConfigSimples;
 use App\Filament\Resources\ReferralCampaignResource\Pages\ListReferralCampaigns;
 use App\Filament\Resources\ReferralCodeUsageLogResource\Pages\ListReferralCodeUsageLogs;
@@ -41,7 +39,6 @@ use App\Filament\Resources\UserManagementResource\Pages\ListUsers;
 use App\Filament\Resources\UserPreferenceResource\Pages\ListUserPreferences;
 use App\Filament\Resources\VariantCombinationResource\Pages\ListVariantCombinations;
 use App\Filament\Resources\VariantStockResource\Pages\ListVariantStocks;
-use App\Models\ActivityLog;
 use App\Models\AuditTrail;
 use App\Models\Brand;
 use App\Models\Campaign;
@@ -62,7 +59,6 @@ use App\Models\Legal;
 use App\Models\Location;
 use App\Models\News;
 use App\Models\NewsImage;
-use App\Models\NewsTag;
 use App\Models\NormalSetting;
 use App\Models\NormalSettingTranslation;
 use App\Models\Post;
@@ -71,8 +67,6 @@ use App\Models\PriceList;
 use App\Models\PriceListItem;
 use App\Models\Product;
 use App\Models\ProductVariant;
-use App\Models\RecommendationAnalytics;
-use App\Models\RecommendationBlock;
 use App\Models\RecommendationConfigSimple;
 use App\Models\Referral;
 use App\Models\ReferralCampaign;
@@ -89,7 +83,6 @@ use App\Models\SystemSettingTranslation;
 use App\Models\User;
 use App\Models\UserPreference;
 use App\Models\UserProductInteraction;
-use App\Models\UserWishlist;
 use App\Models\VariantCombination;
 use App\Models\VariantInventory;
 use Illuminate\Database\Schema\Blueprint;
@@ -156,7 +149,6 @@ final class MissingFilamentResourceCoverageTest extends TestCase
     {
         // Map each resource list page to the helper responsible for creating a visible record.
         return [
-            'activity logs'                        => [ListActivityLogs::class, 'createActivityLogRecord'],
             'audit trails'                         => [ListAuditTrails::class, 'createAuditTrailRecord'],
             'brands'                               => [ListBrands::class, 'createBrandRecord'],
             'campaign conversions'                 => [ListCampaignConversions::class, 'createCampaignConversionRecord'],
@@ -180,7 +172,6 @@ final class MissingFilamentResourceCoverageTest extends TestCase
             'prices'                               => [ListPrices::class, 'createPriceRecord'],
             'product variants'                     => [ListProductVariants::class, 'createProductVariantRecord'],
             'referral code usage logs'             => [ListReferralCodeUsageLogs::class, 'createReferralCodeUsageLogRecord'],
-            'recommendation analytics'             => [ListRecommendationAnalytics::class, 'createRecommendationAnalyticsRecord'],
             'recommendation simple list'           => [ListRecommendationConfigResourceSimples::class, 'createRecommendationConfigSimpleRecord'],
             'recommendation simple alias'          => [ListRecommendationConfigSimples::class, 'createRecommendationConfigSimpleRecord'],
             'referral campaigns'                   => [ListReferralCampaigns::class, 'createReferralCampaignRecord'],
@@ -403,27 +394,6 @@ final class MissingFilamentResourceCoverageTest extends TestCase
             ]);
     }
 
-    private function createRecommendationAnalyticsRecord(): RecommendationAnalytics
-    {
-        // Generate analytics metrics so reporting tables showcase actionable rows.
-        $block = RecommendationBlock::query()->create([
-            'name'             => 'coverage-block',
-            'title'            => 'Coverage Block',
-            'description'      => 'Ensures analytics tables hydrate inside tests.',
-            'config_ids'       => [],
-            'is_active'        => true,
-            'max_products'     => 4,
-            'cache_duration'   => 3600,
-            'display_settings' => ['layout' => 'grid', 'columns' => 3],
-        ]);
-
-        return RecommendationAnalytics::factory()
-            ->for($block, 'block')
-            ->create([
-                'action' => 'view',
-            ]);
-    }
-
     private function createReferralCampaignRecord(): ReferralCampaign
     {
         // Create a bilingual referral campaign so localized columns render deterministic strings.
@@ -626,18 +596,6 @@ final class MissingFilamentResourceCoverageTest extends TestCase
         ]);
     }
 
-    private function createNewsTagRecord(): NewsTag
-    {
-        // Persist a visible tag so editorial listings showcase a concrete taxonomy entry.
-        return NewsTag::factory()->create([
-            'name'       => 'Coverage Tag',
-            'slug'       => 'coverage-tag',
-            'is_visible' => true,
-            'is_active'  => true,
-            'sort_order' => 5,
-        ]);
-    }
-
     private function createPriceListRecord(): PriceList
     {
         // Guarantee a base currency so downstream price list associations resolve predictable exchange metadata.
@@ -717,40 +675,6 @@ final class MissingFilamentResourceCoverageTest extends TestCase
             'type'           => 'base',
             'is_enabled'     => true,
             'metadata'       => ['label' => 'Coverage Base Price'],
-        ]);
-    }
-
-    private function createUserWishlistRecord(): UserWishlist
-    {
-        // Attach the wishlist to the authenticated admin to satisfy the user-owned global scope on the model.
-        return UserWishlist::factory()->create([
-            'user_id'     => $this->admin->getKey(),
-            'name'        => 'Coverage Wishlist',
-            'description' => 'Coverage wishlist description',
-            'is_public'   => true,
-            'is_default'  => false,
-        ]);
-    }
-
-    private function createActivityLogRecord(): ActivityLog
-    {
-        // Create a subject user so the morph relationship renders a friendly display name in the table.
-        $subject = User::factory()->create(['name' => 'Tracked Coverage User']);
-
-        // Seed a deterministic activity log entry so the Filament listing can surface a predictable badge row.
-        return ActivityLog::query()->create([
-            'log_name'     => 'coverage-activity-log',
-            'description'  => 'Coverage activity entry',
-            'event'        => 'login',
-            'subject_type' => $subject->getMorphClass(),
-            'subject_id'   => $subject->getKey(),
-            'causer_type'  => $this->admin->getMorphClass(),
-            'causer_id'    => $this->admin->getKey(),
-            'properties'   => ['ip' => '127.0.0.1'],
-            'is_important' => true,
-            'is_system'    => false,
-            'severity'     => 'low',
-            'category'     => 'authentication',
         ]);
     }
 

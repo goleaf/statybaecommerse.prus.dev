@@ -27,7 +27,7 @@ final class BrandModelTest extends TestCase
             'social_links' => [
                 ['platform' => 'facebook', 'url' => 'https://facebook.com/test-brand'],
                 ['platform' => 'unknown',  'url' => 'https://example.com/invalid'],
-                ['platform' => 'instagram','url' => ''],
+                ['platform' => 'instagram', 'url' => ''],
             ],
         ]);
 
@@ -91,6 +91,4 @@ final class BrandModelTest extends TestCase
         $platforms = array_map(static fn ($l) => $l['platform'] ?? null, $payload['social_links']);
         $this->assertContains('instagram', $platforms);
     }
-
-
 }

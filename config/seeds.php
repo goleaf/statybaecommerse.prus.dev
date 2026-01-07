@@ -7,13 +7,9 @@ use Database\Seeders\AdminUserSeeder;
 use Database\Seeders\AllSeedersSeeder;
 use Database\Seeders\AttributeSeeder;
 use Database\Seeders\AttributeValueSeeder;
-use Database\Seeders\BrandSeeder;
 use Database\Seeders\CurrencySeeder;
 use Database\Seeders\CustomerGroupSeeder;
-use Database\Seeders\DemoStoreSeeder;
-use Database\Seeders\ProductImageSeeder;
 use Database\Seeders\RolesAndPermissionsSeeder;
-use Database\Seeders\SliderSeeder;
 
 return [
     /*

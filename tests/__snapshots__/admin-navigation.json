@@ -46,11 +46,6 @@
                     "sort": 10
                 },
                 {
-                    "class": "App\\Filament\\Resources\\ProductHistoryResource",
-                    "icon": "heroicon-o-clock",
-                    "sort": 11
-                },
-                {
                     "class": "App\\Filament\\Resources\\PriceResource",
                     "icon": null,
                     "sort": 12
@@ -110,11 +105,6 @@
                     "class": "App\\Filament\\Resources\\PartnerResource",
                     "icon": "heroicon-o-user-group",
                     "sort": 1
-                },
-                {
-                    "class": "App\\Filament\\Resources\\PartnerTierResource",
-                    "icon": "heroicon-o-star",
-                    "sort": 2
                 },
                 {
                     "class": "App\\Filament\\Resources\\ReferralResource",
@@ -200,11 +190,6 @@
             "icon": "heroicon-o-cog-6-tooth",
             "sort": 6,
             "resources": [
-                {
-                    "class": "App\\Filament\\Resources\\ActivityLogResource",
-                    "icon": null,
-                    "sort": 9
-                },
                 {
                     "class": "App\\Filament\\Resources\\NormalSettingTranslationResource",
                     "icon": "heroicon-o-language",
@@ -351,11 +336,6 @@
             "icon": "heroicon-o-user-group",
             "sort": 210,
             "resources": [
-                {
-                    "class": "App\\Filament\\Resources\\WishlistItemResource",
-                    "icon": "heroicon-o-heart",
-                    "sort": 10
-                }
             ]
         },
         {
@@ -393,11 +373,6 @@
                     "class": "App\\Filament\\Resources\\UserPreferenceResource",
                     "icon": "heroicon-o-document-text",
                     "sort": 6
-                },
-                {
-                    "class": "App\\Filament\\Resources\\UserWishlistResource",
-                    "icon": null,
-                    "sort": 8
                 },
                 {
                     "class": "App\\Filament\\Resources\\UserProductInteractionResource",
@@ -483,19 +458,7 @@
                 }
             ]
         },
-        {
-            "label": "Sistema",
-            "label_key": "Sistema",
-            "icon": null,
-            "sort": null,
-            "resources": [
-                {
-                    "class": "App\\Filament\\Resources\\ApiKeyResource",
-                    "icon": "heroicon-o-key",
-                    "sort": 4
-                }
-            ]
-        },
+
         {
             "label": "Security",
             "label_key": "Security",
@@ -632,11 +595,6 @@
             "sort": 3
         },
         {
-            "class": "App\\Filament\\Resources\\NewsCommentResource",
-            "icon": "heroicon-o-chat-bubble-left-ellipsis",
-            "sort": 3
-        },
-        {
             "class": "App\\Filament\\Resources\\OrderShippingResource",
             "icon": null,
             "sort": 3
@@ -685,11 +643,6 @@
             "class": "App\\Filament\\Resources\\CampaignViewResource",
             "icon": null,
             "sort": 7
-        },
-        {
-            "class": "App\\Filament\\Resources\\RecommendationAnalyticsResource",
-            "icon": null,
-            "sort": 8
         },
         {
             "class": "App\\Filament\\Resources\\SystemSettingHistoryResource",

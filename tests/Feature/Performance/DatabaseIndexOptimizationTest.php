@@ -10,7 +10,6 @@ use App\Models\Collection;
 use App\Models\Product;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
 /**
@@ -26,7 +25,7 @@ final class DatabaseIndexOptimizationTest extends TestCase
     public function test_storefront_visibility_index_exists(): void
     {
         $indexes = $this->getTableIndexes('products');
-        
+
         expect($indexes)->toContain('products_storefront_visibility_idx')
             ->and($indexes)->toContain('products_price_visibility_idx')
             ->and($indexes)->toContain('products_stock_visibility_idx')
@@ -36,9 +35,9 @@ final class DatabaseIndexOptimizationTest extends TestCase
     public function test_product_translations_indexes_exist(): void
     {
         $indexes = $this->getTableIndexes('product_translations');
-        
+
         expect($indexes)->toContain('product_translations_locale_product_idx');
-        
+
         // Full-text index only for MySQL
         if (config('database.default') === 'mysql') {
             expect($indexes)->toContain('product_translations_search_idx');
@@ -75,7 +74,7 @@ final class DatabaseIndexOptimizationTest extends TestCase
             ->orderBy('published_at', 'desc');
 
         $explain = DB::select('EXPLAIN ' . $query->toSql(), $query->getBindings());
-        
+
         // Should use the storefront visibility index
         $usesIndex = collect($explain)->contains(function ($row) {
             return str_contains(strtolower($row->Extra ?? ''), 'index') ||
@@ -150,10 +149,10 @@ final class DatabaseIndexOptimizationTest extends TestCase
         $products = Product::query()
             ->whereHas('translations', function ($query) use ($searchTerm) {
                 $query->where('locale', 'lt')
-                      ->where(function ($q) use ($searchTerm) {
-                          $q->where('name', 'like', "%{$searchTerm}%")
+                    ->where(function ($q) use ($searchTerm) {
+                        $q->where('name', 'like', "%{$searchTerm}%")
                             ->orWhere('description', 'like', "%{$searchTerm}%");
-                      });
+                    });
             })
             ->where('is_visible', true)
             ->limit(10)
@@ -166,11 +165,13 @@ final class DatabaseIndexOptimizationTest extends TestCase
     {
         if (config('database.default') === 'sqlite') {
             $indexes = DB::select("PRAGMA index_list({$table})");
+
             return collect($indexes)->pluck('name')->toArray();
         }
 
         if (config('database.default') === 'mysql') {
             $indexes = DB::select("SHOW INDEX FROM {$table}");
+
             return collect($indexes)->pluck('Key_name')->unique()->toArray();
         }
 
@@ -187,12 +188,12 @@ final class DatabaseIndexOptimizationTest extends TestCase
         ]);
 
         $products = Product::factory()->count(20)->create([
-            'is_visible' => true,
-            'is_enabled' => true,
-            'published_at' => now(),
-            'price' => fake()->numberBetween(10, 200),
+            'is_visible'     => true,
+            'is_enabled'     => true,
+            'published_at'   => now(),
+            'price'          => fake()->numberBetween(10, 200),
             'stock_quantity' => fake()->numberBetween(1, 100),
-            'view_count' => fake()->numberBetween(0, 1000),
+            'view_count'     => fake()->numberBetween(0, 1000),
         ]);
 
         // Associate products with brands and categories

@@ -228,4 +228,3 @@ return [
         'categories'     => 'Kategorien',
     ],
 ];
-

@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Tests\Feature\Filament\Resources;
 
 use App\Filament\Resources\ReferralRewardLogs\Pages\ListReferralRewardLogs;
+use App\Models\ReferralReward;
 use App\Models\ReferralRewardLog;
 use App\Models\User;
-use App\Models\ReferralReward;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -123,15 +123,15 @@ final class ReferralRewardLogsResourceTest extends TestCase
 
         // Build a deterministic reward payload mirroring the required schema columns.
         $baseAttributes = [
-            'referral_id'   => null,
-            'user_id'       => $user->id,
-            'order_id'      => null,
-            'type'          => 'discount',
-            'title'         => [
+            'referral_id' => null,
+            'user_id'     => $user->id,
+            'order_id'    => null,
+            'type'        => 'discount',
+            'title'       => [
                 'en' => 'Base Reward Title',
                 'lt' => 'Base Reward Title',
             ],
-            'description'   => [
+            'description' => [
                 'en' => 'Base reward description',
                 'lt' => 'Base reward description',
             ],

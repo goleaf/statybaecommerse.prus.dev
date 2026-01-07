@@ -43,7 +43,7 @@ final class AdminLoginRefactorTest extends TestCase
     {
         foreach (['super_admin', 'admin', 'administrator'] as $roleName) {
             Role::firstOrCreate([
-                'name' => $roleName,
+                'name'       => $roleName,
                 'guard_name' => 'admin',
             ]);
         }
@@ -52,8 +52,8 @@ final class AdminLoginRefactorTest extends TestCase
     private function createAdminUser(): AdminUser
     {
         $admin = AdminUser::factory()->create([
-            'email' => 'admin@example.com',
-            'password' => 'Admin123!',
+            'email'             => 'admin@example.com',
+            'password'          => 'Admin123!',
             'email_verified_at' => now(),
         ]);
 

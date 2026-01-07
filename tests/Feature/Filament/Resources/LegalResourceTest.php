@@ -41,10 +41,10 @@ final class LegalResourceTest extends TestCase
     {
         // Seed a published legal document so the list page has a deterministic record to render.
         $legal = Legal::factory()->create([
-            'key'         => 'privacy-policy',
-            'type'        => 'privacy_policy',
-            'is_enabled'  => true,
-            'is_required' => true,
+            'key'          => 'privacy-policy',
+            'type'         => 'privacy_policy',
+            'is_enabled'   => true,
+            'is_required'  => true,
             'published_at' => now()->subDay(),
         ]);
 
@@ -58,18 +58,18 @@ final class LegalResourceTest extends TestCase
     {
         // Prepare a trio of legal entries that cover published, draft, and disabled permutations.
         Legal::factory()->create([
-            'key'         => 'privacy-policy',
-            'type'        => 'privacy_policy',
-            'is_enabled'  => true,
-            'is_required' => true,
+            'key'          => 'privacy-policy',
+            'type'         => 'privacy_policy',
+            'is_enabled'   => true,
+            'is_required'  => true,
             'published_at' => now()->subDay(),
         ]);
 
         Legal::factory()->create([
-            'key'         => 'terms-of-use',
-            'type'        => 'terms_of_use',
-            'is_enabled'  => true,
-            'is_required' => false,
+            'key'          => 'terms-of-use',
+            'type'         => 'terms_of_use',
+            'is_enabled'   => true,
+            'is_required'  => false,
             'published_at' => now()->subDay(),
         ]);
 

@@ -3,134 +3,143 @@
 declare(strict_types=1);
 
 return [
-    // Basic labels
-    'plural'         => 'Cities',
-    'single'         => 'City',
-    'name'           => 'Name',
-    'code'           => 'Code',
-    'slug'           => 'Slug',
-    'description'    => 'Description',
-    'country'        => 'Country',
-    'city'           => 'City',
-    'state_province' => 'State/Province',
-    'country_code'   => 'Country Code',
-    'postal_code'    => 'Postal Code',
+    // Navigation
+    'navigation_label'   => 'Cities',
+    'navigation_group'   => 'Content',
+    'model_label'        => 'City',
+    'plural_model_label' => 'Cities',
 
-    // Coordinates
-    'latitude'    => 'Latitude',
-    'longitude'   => 'Longitude',
-    'coordinates' => 'Coordinates',
-
-    // Demographics
-    'population' => 'Population',
-    'area'       => 'Area (km²)',
-    'density'    => 'Density (/km²)',
-    'elevation'  => 'Elevation (m)',
-    'timezone'   => 'Timezone',
-
-    // Localization
-    'currency_code' => 'Currency Code',
-    'language_code' => 'Language Code',
-    'phone_code'    => 'Phone Code',
-
-    // Hierarchy
-    'parent_city' => 'Parent City',
-    'level'       => 'Level',
-
-    // Settings
-    'is_active'  => 'Active',
-    'is_capital' => 'Capital',
-    'is_default' => 'Default',
-    'sort_order' => 'Sort Order',
-    'type'       => 'Type',
-
-    // Types
-    'types' => [
-        'metropolitan' => 'Metropolitan',
-        'urban'        => 'Urban',
-        'rural'        => 'Rural',
-        'suburban'     => 'Suburban',
-        'industrial'   => 'Industrial',
-        'tourist'      => 'Tourist',
-    ],
-
-    // Levels
-    'levels' => [
-        0 => 'City',
-        1 => 'District',
-        2 => 'Neighborhood',
-        3 => 'Suburb',
-        4 => 'Village',
-        5 => 'Town',
-    ],
-
-    // Sections
+    // Basic Information
     'basic_information' => 'Basic Information',
-    'coordinates'       => 'Coordinates',
-    'demographics'      => 'Demographics',
-    'localization'      => 'Localization',
-    'hierarchy'         => 'Hierarchy',
-    'settings'          => 'Settings',
+    'name'              => 'Name',
+    'slug'              => 'URL Slug',
+    'code'              => 'Code',
+    'description'       => 'Description',
 
-    // Help text
-    'slug_help'          => 'URL-friendly version of the name',
-    'code_help'          => 'Short unique identifier',
-    'latitude_help'      => 'Latitude coordinate (-90 to 90)',
-    'longitude_help'     => 'Longitude coordinate (-180 to 180)',
-    'population_help'    => 'Number of inhabitants',
-    'area_help'          => 'Area in square kilometers',
-    'density_help'       => 'Population density per square kilometer',
-    'elevation_help'     => 'Elevation above sea level in meters',
-    'timezone_help'      => 'Timezone identifier (e.g., Europe/London)',
-    'currency_code_help' => 'ISO 4217 currency code',
-    'language_code_help' => 'ISO 639 language code',
-    'phone_code_help'    => 'International phone code',
-    'parent_city_help'   => 'Parent city for hierarchical structure',
-    'level_help'         => 'Hierarchy level (0-10)',
-    'sort_order_help'    => 'Display order (lower numbers first)',
-    'type_help'          => 'City classification type',
+    // Location
+    'location'           => 'Location',
+    'country'            => 'Country',
+    'region'             => 'Region',
+    'parent_city'        => 'Parent City',
+    'level'              => 'Level',
+    'level_city'         => 'City',
+    'level_district'     => 'District',
+    'level_neighborhood' => 'Neighborhood',
+    'level_suburb'       => 'Suburb',
+    'level_help'         => 'Hierarchy level: 0=city, 1=district, 2=neighborhood, 3=suburb',
+
+    // Geographic Data
+    'geographic_data'          => 'Geographic Data',
+    'latitude'                 => 'Latitude',
+    'longitude'                => 'Longitude',
+    'population'               => 'Population',
+    'postal_codes'             => 'Postal Codes',
+    'postal_codes_placeholder' => 'Enter postal codes',
+
+    // Status
+    'status'     => 'Status',
+    'is_enabled' => 'Enabled',
+    'is_default' => 'Default',
+    'is_capital' => 'Capital',
+    'is_active'  => 'Active',
+    'sort_order' => 'Sort Order',
+
+    // Translations
+    'translations'    => 'Translations',
+    'locale'          => 'Locale',
+    'locale_lt'       => 'Lithuanian',
+    'locale_en'       => 'English',
+    'locale_de'       => 'German',
+    'locale_ru'       => 'Russian',
+    'add_translation' => 'Add Translation',
+
+    // Metadata
+    'metadata' => 'Metadata',
+    'key'      => 'Key',
+    'value'    => 'Value',
 
     // Actions
-    'activate'       => 'Activate',
-    'deactivate'     => 'Deactivate',
-    'set_capital'    => 'Set as Capital',
-    'remove_capital' => 'Remove Capital',
-    'set_default'    => 'Set as Default',
-    'remove_default' => 'Remove Default',
-
-    // Bulk actions
-    'activate_selected'       => 'Activate Selected',
-    'deactivate_selected'     => 'Deactivate Selected',
-    'set_capital_selected'    => 'Set Capital Selected',
-    'remove_capital_selected' => 'Remove Capital Selected',
+    'view'        => 'View',
+    'edit'        => 'Edit',
+    'delete'      => 'Delete',
+    'bulk_delete' => 'Delete Selected',
+    'create'      => 'Create',
+    'save'        => 'Save',
+    'cancel'      => 'Cancel',
 
     // Filters
-    'active_only'      => 'Active Only',
-    'inactive_only'    => 'Inactive Only',
-    'capital_only'     => 'Capital Only',
-    'non_capital_only' => 'Non-Capital Only',
-    'default_only'     => 'Default Only',
-    'non_default_only' => 'Non-Default Only',
+    'filter_all'         => 'All',
+    'filter_enabled'     => 'Enabled',
+    'filter_disabled'    => 'Disabled',
+    'filter_capital'     => 'Capitals',
+    'filter_non_capital' => 'Non-capitals',
+    'filter_default'     => 'Default',
+    'filter_non_default' => 'Non-default',
+    'with_coordinates'   => 'With Coordinates',
+    'with_population'    => 'With Population',
+    'population_from'    => 'Population From',
+    'population_to'      => 'Population To',
 
-    // Success messages
-    'activated_successfully'       => 'City activated successfully',
-    'deactivated_successfully'     => 'City deactivated successfully',
-    'set_as_capital_success'       => 'City set as capital successfully',
-    'removed_from_capital_success' => 'City removed from capital successfully',
-    'set_as_default_success'       => 'City set as default successfully',
-    'removed_from_default_success' => 'City removed from default successfully',
+    // Messages
+    'created_successfully'       => 'City created successfully',
+    'updated_successfully'       => 'City updated successfully',
+    'deleted_successfully'       => 'City deleted successfully',
+    'bulk_deleted_successfully'  => 'Selected cities deleted successfully',
+    'restored_successfully'      => 'City restored successfully',
+    'force_deleted_successfully' => 'City permanently deleted',
 
-    // Bulk success messages
-    'bulk_activated_success'      => 'Selected cities activated successfully',
-    'bulk_deactivated_success'    => 'Selected cities deactivated successfully',
-    'bulk_set_capital_success'    => 'Selected cities set as capital successfully',
-    'bulk_remove_capital_success' => 'Selected cities removed from capital successfully',
+    // Validation
+    'validation_name_required'    => 'Name is required',
+    'validation_name_max'         => 'Name cannot be longer than 255 characters',
+    'validation_slug_required'    => 'URL slug is required',
+    'validation_slug_unique'      => 'URL slug already exists',
+    'validation_code_required'    => 'Code is required',
+    'validation_code_unique'      => 'Code already exists',
+    'validation_country_required' => 'Country is required',
+
+    // Statistics
+    'total_cities'            => 'Total Cities',
+    'enabled_cities'          => 'Enabled Cities',
+    'capital_cities'          => 'Capital Cities',
+    'cities_with_population'  => 'Cities with Population',
+    'cities_with_coordinates' => 'Cities with Coordinates',
+
+    // Frontend
+    'select_city'     => 'Select City',
+    'search_cities'   => 'Search cities...',
+    'no_cities_found' => 'No cities found',
+    'city_details'    => 'City Details',
+    'related_cities'  => 'Related Cities',
+    'nearby_cities'   => 'Nearby Cities',
+
+    // Additional fields
+    'type'            => 'Type',
+    'area'            => 'Area',
+    'density'         => 'Density',
+    'elevation'       => 'Elevation',
+    'timezone'        => 'Timezone',
+    'currency_code'   => 'Currency Code',
+    'currency_symbol' => 'Currency Symbol',
+    'language_code'   => 'Language Code',
+    'language_name'   => 'Language Name',
+    'phone_code'      => 'Phone Code',
+    'postal_code'     => 'Postal Code',
 
     // Timestamps
     'created_at' => 'Created At',
     'updated_at' => 'Updated At',
+    'deleted_at' => 'Deleted At',
 
-    // Navigation
-    'navigation_label' => 'Cities',
-    'navigation_group' => 'Locations',
+    // Export/Import
+    'export'        => 'Export',
+    'import'        => 'Import',
+    'export_cities' => 'Export Cities',
+    'import_cities' => 'Import Cities',
+
+    // Bulk Actions
+    'bulk_actions'        => 'Bulk Actions',
+    'bulk_enable'         => 'Enable Selected',
+    'bulk_disable'        => 'Disable Selected',
+    'bulk_set_as_capital' => 'Set as Capital',
+    'bulk_remove_capital' => 'Remove from Capitals',
 ];

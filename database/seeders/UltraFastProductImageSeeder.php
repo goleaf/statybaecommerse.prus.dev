@@ -99,6 +99,7 @@ final class UltraFastProductImageSeeder extends Seeder
                 // Check timeout
                 if (now()->greaterThan($timeout)) {
                     $this->command->warn('⏱️ Timeout reached, stopping processing...');
+
                     return false; // Stop chunking
                 }
 

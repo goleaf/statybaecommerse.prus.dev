@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use App\Console\Commands\TranslationHookCommand;
 use App\Services\TranslationHookService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\File;
@@ -11,12 +10,12 @@ uses(RefreshDatabase::class);
 
 beforeEach(function () {
     $this->service = app(TranslationHookService::class);
-    
+
     // Ensure directories exist
-    if (!File::isDirectory(lang_path())) {
+    if (! File::isDirectory(lang_path())) {
         File::makeDirectory(lang_path(), 0755, true);
     }
-    if (!File::isDirectory(resource_path('views/test'))) {
+    if (! File::isDirectory(resource_path('views/test'))) {
         File::makeDirectory(resource_path('views/test'), 0755, true);
     }
 });
@@ -24,7 +23,7 @@ beforeEach(function () {
 afterEach(function () {
     // Clean up test files
     File::deleteDirectory(resource_path('views/test'));
-    collect(['lt.json', 'en.json'])->each(fn($file) => File::delete(lang_path($file)));
+    collect(['lt.json', 'en.json'])->each(fn ($file) => File::delete(lang_path($file)));
 });
 
 it('scans blade files and reports missing translations', function () {
@@ -47,7 +46,7 @@ it('fixes missing translations when using fix flag', function () {
     // Verify translation was created
     $ltFile = lang_path('lt.json');
     expect(File::exists($ltFile))->toBeTrue();
-    
+
     $translations = json_decode(File::get($ltFile), true);
     expect($translations)->toHaveKey('test.auto_fix');
 });
@@ -66,10 +65,10 @@ it('syncs translations between locales', function () {
     // Create test translations with missing keys
     File::put(lang_path('lt.json'), json_encode([
         'test.key1' => 'Testas 1',
-        'test.key2' => 'Testas 2'
+        'test.key2' => 'Testas 2',
     ]));
     File::put(lang_path('en.json'), json_encode([
-        'test.key1' => 'Test 1'
+        'test.key1' => 'Test 1',
         // Missing key2
     ]));
 
@@ -97,7 +96,7 @@ it('processes blade files and creates translations', function () {
     // Verify all translations were created
     $ltFile = lang_path('lt.json');
     expect(File::exists($ltFile))->toBeTrue();
-    
+
     $translations = json_decode(File::get($ltFile), true);
     expect($translations)->toHaveKey('page.title');
     expect($translations)->toHaveKey('page.description');

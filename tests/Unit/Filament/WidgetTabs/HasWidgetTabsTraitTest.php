@@ -149,7 +149,7 @@ final class WidgetTabTraitHarness extends FakeTableComponent
         // Provide two tabs: one passive and one that tracks query mutations.
         return [
             'overview' => WidgetTab::make('Overview')->value(10),
-            'sales' => WidgetTab::make('Sales')->query(function (Builder $builder): Builder {
+            'sales'    => WidgetTab::make('Sales')->query(function (Builder $builder): Builder {
                 $this->queryCallbacks[] = 'sales';
 
                 return $builder;

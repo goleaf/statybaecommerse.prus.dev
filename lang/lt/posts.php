@@ -3,26 +3,20 @@
 declare(strict_types=1);
 
 return [
-    'title'               => 'Pranešimai',
-    'single'              => 'Pranešimas',
-    'plural'              => 'Pranešimai',
-    'view_author_profile' => 'Peržiūrėti autoriaus profilį',
-    'browse_by_author'    => 'Naršyti :author straipsnius',
-    'search_tagged'       => 'Ieškoti įrašų su žyme :tag',
-    'sections'            => [
+    // Basic fields
+    'title'    => 'Straipsniai',
+    'post'     => 'Straipsnis',
+    'single'   => 'Straipsnis',
+    'plural'   => 'Straipsniai',
+    'sections' => [
         'basic_information' => 'Pagrindinė informacija',
         'media'             => 'Medija',
         'seo'               => 'SEO',
         'settings'          => 'Nustatymai',
     ],
-    'add_tag'      => 'Pridėti žymą',
-    'create_title' => 'Sukurti pranešimą',
-    'edit_title'   => 'Redaguoti pranešimą',
-    'view_title'   => 'Peržiūrėti pranešimą',
-    'list_title'   => 'Pranešimų sąrašas',
-    'fields'       => [
+    'fields' => [
         'title'                   => 'Pavadinimas',
-        'slug'                    => 'URL adresas',
+        'slug'                    => 'Slug',
         'content'                 => 'Turinys',
         'excerpt'                 => 'Santrauka',
         'status'                  => 'Būsena',
@@ -31,17 +25,23 @@ return [
         'approved_at'             => 'Patvirtinta',
         'approved_by'             => 'Patvirtino',
         'published_at'            => 'Publikuota',
+        'featured'                => 'Išskirtinis',
+        'is_pinned'               => 'Prisegtas',
         'user_id'                 => 'Autorius',
         'meta_title'              => 'Meta pavadinimas',
         'meta_description'        => 'Meta aprašymas',
-        'featured'                => 'Rekomenduojamas',
-        'images'                  => 'Pagrindinis paveikslėlis',
-        'gallery'                 => 'Galerijos paveikslėliai',
         'tags'                    => 'Žymos',
-        'is_pinned'               => 'Prisegtas',
+        'images'                  => 'Pagrindinis vaizdas',
+        'gallery'                 => 'Galerija',
+        'views_count'             => 'Peržiūros',
+        'likes_count'             => 'Patinka',
+        'comments_count'          => 'Komentarai',
         'allow_comments'          => 'Leisti komentarus',
         'created_at'              => 'Sukurta',
+        'updated_at'              => 'Atnaujinta',
     ],
+
+    // Status
     'status' => [
         'draft'     => 'Juodraštis',
         'review'    => 'Peržiūroje',
@@ -50,16 +50,18 @@ return [
     ],
 
     'status_managed_by_workflow' => 'Būseną valdo moderavimo procesas.',
-    'actions'                    => [
-        'create'    => 'Sukurti',
-        'edit'      => 'Redaguoti',
-        'delete'    => 'Ištrinti',
-        'view'      => 'Peržiūrėti',
+
+    // Actions
+    'add_tag' => 'Pridėti žymą',
+
+    'actions' => [
         'publish'   => 'Publikuoti',
         'unpublish' => 'Nepublikuoti',
         'archive'   => 'Archyvuoti',
-        'feature'   => 'Rekomenduoti',
-        'unfeature' => 'Nerekomenduoti',
+        'feature'   => 'Išskirti',
+        'unfeature' => 'Neišskirti',
+        'pin'       => 'Prisegti',
+        'unpin'     => 'Atsegti',
     ],
 
     'approvals' => [
@@ -75,69 +77,120 @@ return [
         'empty_heading'     => 'Patvirtinimų kol kas nėra',
         'empty_description' => 'Peržiūros istorija bus rodoma čia, kai tik bus priimtas sprendimas.',
     ],
-    'messages' => [
-        'created'     => 'Pranešimas sėkmingai sukurtas',
-        'updated'     => 'Pranešimas sėkmingai atnaujintas',
-        'deleted'     => 'Pranešimas sėkmingai ištrintas',
-        'published'   => 'Pranešimas sėkmingai publikuotas',
-        'unpublished' => 'Pranešimas sėkmingai nepublikuotas',
-        'archived'    => 'Pranešimas sėkmingai archyvuotas',
-        'featured'    => 'Pranešimas sėkmingai rekomenduotas',
-        'unfeatured'  => 'Pranešimas sėkmingai nerekomenduotas',
-    ],
-    'badges' => [
-        'moderation_unknown' => 'Nežinoma',
-        'featured'           => 'Rekomenduojamas',
-        'standard'           => 'Įprastas',
-        'pinned'             => 'Prisegtas',
-        'not_pinned'         => 'Ne prisegtas',
-        'comments_on'        => 'Komentarai įjungti',
-        'comments_off'       => 'Komentarai išjungti',
-    ],
+
+    // Filters
     'filters' => [
         'status'          => 'Būsena',
-        'featured'        => 'Rekomenduojami pranešimai',
+        'featured'        => 'Išskirtinis',
+        'all_posts'       => 'Visi straipsniai',
+        'featured_only'   => 'Tik išskirtiniai',
+        'not_featured'    => 'Neišskirtiniai',
         'author'          => 'Autorius',
         'published_from'  => 'Publikuota nuo',
         'published_until' => 'Publikuota iki',
-        'all_posts'       => 'Visi pranešimai',
-        'featured_only'   => 'Tik rekomenduojami',
-        'not_featured'    => 'Nerekomenduojami',
         'pinned_only'     => 'Tik prisegti',
         'not_pinned'      => 'Ne prisegti',
     ],
-    'widgets' => [
-        'total_posts'     => 'Iš viso pranešimų',
-        'published_posts' => 'Publikuoti pranešimai',
-        'draft_posts'     => 'Juodraščiai',
-        'featured_posts'  => 'Rekomenduojami pranešimai',
-        'recent_posts'    => 'Naujausi pranešimai',
-        'posts_by_status' => 'Pranešimai pagal būseną',
-        'posts_by_author' => 'Pranešimai pagal autorių',
-    ],
-    'navigation' => [
-        'group' => 'Turinys',
-        'icon'  => 'heroicon-o-document-text',
-    ],
+
+    // SEO
     'seo' => [
-        'meta_title_help'       => 'Rekomenduojama: 50-60 simbolių',
-        'meta_description_help' => 'Rekomenduojama: 150-160 simbolių',
+        'meta_title_help'       => 'Rekomenduojamas ilgis: 50-60 simbolių',
+        'meta_description_help' => 'Rekomenduojamas ilgis: 150-160 simbolių',
     ],
-    'index' => [
-        'description' => 'Atraskite naujausias naujienas ir atnaujinimus iš mūsų tinklaraščio.',
+
+    // Widgets
+    'widgets' => [
+        'total_posts'     => 'Iš viso straipsnių',
+        'published_posts' => 'Publikuoti straipsniai',
+        'draft_posts'     => 'Juodraščiai',
+        'featured_posts'  => 'Išskirtiniai straipsniai',
+        'posts_by_status' => 'Straipsniai pagal būseną',
+        'recent_posts'    => 'Naujausi straipsniai',
     ],
-    'search' => [
-        'placeholder' => 'Ieškoti pranešimų...',
+
+    // Engagement
+    'engagement' => [
+        'total_views'                         => 'Iš viso peržiūrų',
+        'total_views_description'             => 'Visų laikų puslapių peržiūros',
+        'total_likes'                         => 'Iš viso patinka',
+        'total_likes_description'             => 'Visų laikų gauti patinka',
+        'total_comments'                      => 'Iš viso komentarų',
+        'total_comments_description'          => 'Visų laikų gauti komentarai',
+        'total_engagement'                    => 'Iš viso sąveikos',
+        'total_engagement_description'        => 'Kombinuoti patinka ir komentarai',
+        'average_views'                       => 'Vidutinis peržiūrų skaičius',
+        'average_views_description'           => 'Vidutinis peržiūrų skaičius per straipsnį',
+        'average_likes'                       => 'Vidutinis patinka skaičius',
+        'average_likes_description'           => 'Vidutinis patinka skaičius per straipsnį',
+        'average_comments'                    => 'Vidutinis komentarų skaičius',
+        'average_comments_description'        => 'Vidutinis komentarų skaičius per straipsnį',
+        'average_engagement_rate'             => 'Vidutinis sąveikos procentas',
+        'average_engagement_rate_description' => 'Vidutinis sąveikos procentas',
     ],
-    'no_posts' => [
-        'title'       => 'Pranešimų nerasta',
-        'description' => 'Šiuo metu nėra prieinamų pranešimų.',
+
+    // Performance
+    'performance' => [
+        'most_viewed'    => 'Daugiausiai peržiūrų',
+        'most_liked'     => 'Daugiausiai patinka',
+        'most_commented' => 'Daugiausiai komentarų',
+        'most_popular'   => 'Populiariausias',
+        'no_posts'       => 'Straipsnių nėra',
     ],
-    'views'         => 'peržiūros',
-    'like'          => 'Patinka',
-    'share'         => 'Dalintis',
-    'last_updated'  => 'Paskutinį kartą atnaujinta',
-    'gallery'       => 'Galerija',
-    'related_posts' => 'Susiję pranešimai',
-    'tags'          => 'Žymos',
+
+    // Authors
+    'authors' => [
+        'posts_count' => 'Straipsnių skaičius',
+        'posts'       => 'Straipsniai',
+    ],
+
+    // Media
+    'media' => [
+        'posts_with_media'                      => 'Straipsniai su medija',
+        'posts_with_media_description'          => 'Straipsniai, turintys medijos failus',
+        'posts_without_media'                   => 'Straipsniai be medijos',
+        'posts_without_media_description'       => 'Straipsniai be medijos failų',
+        'posts_with_featured_image'             => 'Straipsniai su pagrindiniu vaizdu',
+        'posts_with_featured_image_description' => 'Straipsniai su pagrindiniais vaizdais',
+        'posts_with_gallery'                    => 'Straipsniai su galerija',
+        'posts_with_gallery_description'        => 'Straipsniai su vaizdų galerijomis',
+        'total_media_files'                     => 'Iš viso medijos failų',
+        'total_media_files_description'         => 'Iš viso medijos failų visuose straipsniuose',
+        'average_media_per_post'                => 'Vidutinis medijos skaičius per straipsnį',
+        'average_media_per_post_description'    => 'Vidutinis medijos failų skaičius per straipsnį',
+    ],
+
+    // Empty states
+    'empty_states' => [
+        'no_posts'           => 'Straipsnių nerasta',
+        'no_published_posts' => 'Nėra publikuotų straipsnių',
+        'no_draft_posts'     => 'Nėra juodraščių',
+        'no_featured_posts'  => 'Nėra išskirtinių straipsnių',
+    ],
+
+    // Messages
+    'messages' => [
+        'created'     => 'Straipsnis sėkmingai sukurtas',
+        'updated'     => 'Straipsnis sėkmingai atnaujintas',
+        'deleted'     => 'Straipsnis sėkmingai ištrintas',
+        'published'   => 'Straipsnis sėkmingai publikuotas',
+        'unpublished' => 'Straipsnis sėkmingai nepublikuotas',
+        'archived'    => 'Straipsnis sėkmingai archyvuotas',
+        'featured'    => 'Straipsnis sėkmingai išskirtas',
+        'unfeatured'  => 'Straipsnis sėkmingai neišskirtas',
+    ],
+
+    // Validation
+    'validation' => [
+        'title_required'        => 'Pavadinimas yra privalomas',
+        'title_max'             => 'Pavadinimas negali viršyti 255 simbolių',
+        'slug_required'         => 'Slug yra privalomas',
+        'slug_unique'           => 'Slug turi būti unikalus',
+        'slug_alpha_dash'       => 'Slug gali turėti tik raides, skaičius, brūkšnelius ir pabraukimus',
+        'content_required'      => 'Turinys yra privalomas',
+        'status_required'       => 'Būsena yra privaloma',
+        'user_required'         => 'Autorius yra privalomas',
+        'published_at_required' => 'Publikuojimo data yra privaloma',
+        'meta_title_max'        => 'Meta pavadinimas negali viršyti 60 simbolių',
+        'meta_description_max'  => 'Meta aprašymas negali viršyti 160 simbolių',
+    ],
 ];

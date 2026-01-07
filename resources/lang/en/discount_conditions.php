@@ -50,7 +50,6 @@ return [
         'currency'        => 'Currency',
         'customer_group'  => 'Customer Group',
         'user'            => 'User',
-        'partner_tier'    => 'Partner Tier',
         'first_order'     => 'First Order',
         'day_time'        => 'Time of Day',
         'custom_script'   => 'Custom Script',

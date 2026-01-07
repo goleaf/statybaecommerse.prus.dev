@@ -15,7 +15,6 @@ use App\Models\Legal;
 use App\Models\Notification;
 use App\Models\Order;
 use App\Models\Product;
-use App\Models\ProductHistory;
 use App\Models\ProductRequest;
 use App\Models\Referral;
 use App\Models\ReferralCode;
@@ -33,7 +32,6 @@ use App\Policies\LegalPolicy;
 use App\Policies\NotificationPolicy;
 use App\Policies\OrderPolicy;
 use App\Policies\ProductPolicy;
-use App\Policies\ProductHistoryPolicy;
 use App\Policies\ProductRequestPolicy;
 use App\Policies\ReferralCodePolicy;
 use App\Policies\ReferralPolicy;
@@ -42,9 +40,9 @@ use App\Policies\SystemSettingPolicy;
 use App\Policies\UserPolicy;
 use App\Support\Authorization\AuthorizationMatrix;
 use Illuminate\Support\Facades\Gate;
-use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role as PermissionRole;
+use Spatie\Permission\PermissionRegistrar;
 
 /**
  * Preserve the original Gate "before" callbacks so policy tests do not leak mutations
@@ -476,42 +474,6 @@ it('unit: legal policy leaves public reading open but guards editorial actions',
     // Operators without permissions are denied destructive management access.
     expect($policy->create($restrictedAdmin))->toBeFalse()
         ->and($policy->delete($restrictedAdmin, $legal))->toBeFalse();
-});
-
-it('unit: product history policy requires both history and product privileges', function (): void {
-    $admin = policyUser('admin');
-    $viewer = policyUser('viewer');
-    $product = Product::factory()->make([
-        'id' => random_int(1, PHP_INT_MAX),
-    ]);
-    $history = ProductHistory::factory()->make([
-        'product_id' => $product->getKey(),
-    ]);
-
-    $policy = app(ProductHistoryPolicy::class);
-
-    // Admins with catalog access can browse, export, and append history entries.
-    expect($policy->viewAny($admin, $product))->toBeTrue()
-        ->and($policy->view($admin, $history, $product))->toBeTrue()
-        ->and($policy->statistics($admin, $product))->toBeTrue()
-        ->and($policy->export($admin, $product))->toBeTrue()
-        ->and($policy->create($admin, $product))->toBeTrue();
-
-    // Flip the lowest bit to craft a different product identifier for the mismatch assertion.
-    $otherProductId = $product->getKey() ^ 1;
-    if ($otherProductId === 0) {
-        $otherProductId = 2;
-    }
-    $foreignHistory = ProductHistory::factory()->make([
-        'product_id' => $otherProductId,
-    ]);
-
-    // Cross-product lookups must be rejected to prevent data leakage.
-    expect($policy->view($admin, $foreignHistory, $product))->toBeFalse();
-
-    // Read-only viewers cannot access detailed history features.
-    expect($policy->viewAny($viewer, $product))->toBeFalse()
-        ->and($policy->create($viewer, $product))->toBeFalse();
 });
 
 it('unit: referral policy enforces ownership while empowering administrators', function (): void {

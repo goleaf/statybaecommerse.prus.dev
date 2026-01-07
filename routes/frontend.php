@@ -20,6 +20,7 @@ Route::middleware(['web'])->group(function () {
     // Homepage - redirect to /lt (localized home)
     Route::get('/', function () {
         $locale = config('app.locale', 'lt');
+
         return redirect()->route('localized.home', ['locale' => $locale]);
     })->name('home');
 
@@ -101,16 +102,7 @@ Route::middleware(['web'])->group(function () {
         Route::post('/privacy-settings', [App\Http\Controllers\Frontend\UserController::class, 'updatePrivacySettings'])->name('privacy.update');
     });
 
-    // Campaigns
-    Route::prefix('campaigns')->name('frontend.campaigns.')->group(function () {
-        Route::get('/', [App\Http\Controllers\Frontend\CampaignController::class, 'index'])->name('index');
-        Route::get('/featured', [App\Http\Controllers\Frontend\CampaignController::class, 'featured'])->name('featured');
-        Route::get('/search', [App\Http\Controllers\Frontend\CampaignController::class, 'search'])->name('search');
-        Route::get('/type/{type}', [App\Http\Controllers\Frontend\CampaignController::class, 'byType'])->name('by-type');
-        Route::get('/{campaign}', [App\Http\Controllers\Frontend\CampaignController::class, 'show'])->name('show');
-        Route::post('/{campaign}/click', [App\Http\Controllers\Frontend\CampaignController::class, 'click'])->name('click');
-        Route::post('/{campaign}/conversion', [App\Http\Controllers\Frontend\CampaignController::class, 'conversion'])->name('conversion');
-    });
+
 
     // Discounts & Coupons
     Route::prefix('discounts')->name('frontend.discounts.')->group(function () {
@@ -158,18 +150,8 @@ Route::middleware(['web'])->group(function () {
     Route::prefix('api')->name('frontend.api.')->group(function () {
         // Categories tree route is defined in routes/web.php to avoid conflicts
         Route::get('/cart/count', [App\Http\Controllers\Frontend\ApiController::class, 'getCartCount'])->name('cart.count');
-        Route::get('/wishlist/count', [App\Http\Controllers\Frontend\ApiController::class, 'getWishlistCount'])->name('wishlist.count');
-        Route::post('/wishlist/toggle', [App\Http\Controllers\Frontend\ApiController::class, 'toggleWishlist'])->name('wishlist.toggle');
         Route::get('/recently-viewed', [App\Http\Controllers\Frontend\ApiController::class, 'getRecentlyViewed'])->name('recently-viewed');
         Route::post('/recently-viewed/add', [App\Http\Controllers\Frontend\ApiController::class, 'addRecentlyViewed'])->name('recently-viewed.add');
-    });
-
-    // Wishlist
-    Route::middleware(['auth'])->prefix('wishlist')->name('frontend.wishlist.')->group(function () {
-        Route::get('/', [App\Http\Controllers\Frontend\WishlistController::class, 'index'])->name('index');
-        Route::post('/add', [App\Http\Controllers\Frontend\WishlistController::class, 'add'])->name('add');
-        Route::delete('/remove', [App\Http\Controllers\Frontend\WishlistController::class, 'remove'])->name('remove');
-        Route::delete('/clear', [App\Http\Controllers\Frontend\WishlistController::class, 'clear'])->name('clear');
     });
 
     // Reviews

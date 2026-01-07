@@ -55,7 +55,6 @@ return [
         ],
         'pages' => [
             App\Filament\Pages\Dashboard::class,
-            App\Filament\Pages\SliderAnalytics::class,
             App\Filament\Pages\SliderManagement::class,
             App\Filament\Pages\InventoryManagement::class,
             App\Filament\Pages\AdvancedReports::class,

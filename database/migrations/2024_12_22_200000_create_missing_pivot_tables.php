@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -9,7 +11,7 @@ return new class extends Migration
     public function up(): void
     {
         // Create organization_user pivot table
-        if (!Schema::hasTable('organization_user')) {
+        if (! Schema::hasTable('organization_user')) {
             Schema::create('organization_user', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('organization_id')->constrained()->cascadeOnDelete();
@@ -20,13 +22,13 @@ return new class extends Migration
                 $table->datetime('joined_at');
                 $table->datetime('left_at')->nullable();
                 $table->timestamps();
-                
+
                 $table->unique(['organization_id', 'user_id']);
             });
         }
 
         // Create project_user pivot table
-        if (!Schema::hasTable('project_user')) {
+        if (! Schema::hasTable('project_user')) {
             Schema::create('project_user', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('project_id')->constrained()->cascadeOnDelete();
@@ -36,13 +38,13 @@ return new class extends Migration
                 $table->datetime('joined_at');
                 $table->datetime('left_at')->nullable();
                 $table->timestamps();
-                
+
                 $table->unique(['project_id', 'user_id']);
             });
         }
 
         // Create task_user pivot table
-        if (!Schema::hasTable('task_user')) {
+        if (! Schema::hasTable('task_user')) {
             Schema::create('task_user', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('task_id')->constrained()->cascadeOnDelete();
@@ -52,7 +54,7 @@ return new class extends Migration
                 $table->datetime('completed_at')->nullable();
                 $table->text('notes')->nullable();
                 $table->timestamps();
-                
+
                 $table->unique(['task_id', 'user_id', 'responsibility']);
             });
         }

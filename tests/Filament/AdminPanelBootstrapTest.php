@@ -12,9 +12,10 @@ uses(TestCase::class);
  * panel container is bootable before heavier resource tests execute.
  */
 it('resolves the admin panel container', function (): void {
-    // Align with the default panel identifier used throughout the application.
-    Filament::setCurrentPanel('admin');
+    // Get the admin panel by ID instead of setting current panel
+    $panel = Filament::getPanel('admin');
 
     // Ensure the resolved panel is not null so navigation builders remain stable.
-    expect(Filament::getCurrentPanel())->not->toBeNull();
+    expect($panel)->not->toBeNull();
+    expect($panel->getId())->toBe('admin');
 });

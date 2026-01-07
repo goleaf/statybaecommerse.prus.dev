@@ -70,11 +70,11 @@ final class CityResourceTest extends TestCase
     public function test_admin_can_create_city_with_country_metadata(): void
     {
         $country = Country::factory()->create([
-            'name'         => 'Lithuania',
-            'code'         => 'LT',
-            'currency_code'=> 'EUR',
-            'language_code'=> 'lt',
-            'phone_code'   => '+370',
+            'name'          => 'Lithuania',
+            'code'          => 'LT',
+            'currency_code' => 'EUR',
+            'language_code' => 'lt',
+            'phone_code'    => '+370',
         ]);
 
         Livewire::actingAs($this->adminUser)

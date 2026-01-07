@@ -71,11 +71,11 @@ final class UserManagementResourceTest extends TestCase
         Livewire::actingAs($this->adminUser)
             ->test(CreateUser::class)
             ->fillForm([
-                'name'              => 'New Admin User',
-                'email'             => 'new-admin@example.test',
-                'password'          => 'secret-pass',
-                'preferred_locale'  => 'en',
-                'is_active'         => true,
+                'name'               => 'New Admin User',
+                'email'              => 'new-admin@example.test',
+                'password'           => 'secret-pass',
+                'preferred_locale'   => 'en',
+                'is_active'          => true,
                 'permissions_matrix' => Arr::wrap([]),
             ])
             ->call('create')

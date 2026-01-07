@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use App\Filament\Resources\PriceListResource;
 use App\Filament\Resources\PriceListResource\Pages\ListPriceLists;
 use App\Models\Currency;
 use App\Models\PriceList;

@@ -17,16 +17,16 @@ it('normalises relation identifier payloads into sorted unique strings', functio
     // Seed a mixture of payload shapes to mirror how Filament combobox components may hydrate their state.
     $state = [
         $product,
-        ['id' => 2],
-        ['id' => '3'],
+        ['id'         => 2],
+        ['id'         => '3'],
         ['identifier' => 'ignored'],
-        ['0' => 1],
+        ['0'          => 1],
         '2',
         3,
         1.0,
         null,
         false,
-        new stdClass(),
+        new stdClass,
     ];
 
     // Invoke the helper and confirm the identifiers are string-cast, de-duplicated, sorted, and re-indexed.
@@ -37,7 +37,7 @@ it('normalises relation identifier payloads into sorted unique strings', functio
 
 it('returns an empty array when no identifiers can be resolved', function (): void {
     // Provide empty and non-scalar inputs to simulate an unselected combobox payload.
-    $state = [null, false, new stdClass()];
+    $state = [null, false, new stdClass];
 
     // Ensure the helper gracefully collapses to an empty array instead of propagating placeholder values.
     $normalised = RecommendationConfigResourceSimple::normaliseRelationIdentifiers($state);

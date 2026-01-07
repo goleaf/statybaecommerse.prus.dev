@@ -1,23 +1,16 @@
-<?php declare(strict_types=1);
+<?php
 
-$providers = [
+declare(strict_types=1);
+
+return [
+    App\Filament\AdminPanelProvider::class,
+    App\Providers\AdminNavigationServiceProvider::class,
     App\Providers\AppServiceProvider::class,
-    App\Providers\DebugServiceProvider::class,
-    App\Providers\SharedComponentServiceProvider::class,
     App\Providers\CodeStyleServiceProvider::class,
+    App\Providers\DebugServiceProvider::class,
     App\Providers\ExistsOrServiceProvider::class,
+    App\Providers\SharedComponentServiceProvider::class,
     App\Providers\TranslationHookServiceProvider::class,
-    App\Providers\Filament\AdminPanelProvider::class,
+    App\Providers\VersionCompatibilityServiceProvider::class,
+    BezhanSalleh\FilamentShield\FilamentShieldServiceProvider::class,
 ];
-
-$env = function_exists('env') ? env('APP_ENV', 'production') : ($_ENV['APP_ENV'] ?? getenv('APP_ENV') ?? 'production');
-$queueConnection = function_exists('env') ? env('QUEUE_CONNECTION', 'sync') : ($_ENV['QUEUE_CONNECTION'] ?? getenv('QUEUE_CONNECTION') ?? 'sync');
-
-if ($env !== 'testing') {
-    $providers[] = App\Providers\AdminNavigationServiceProvider::class;
-    $providers[] = BezhanSalleh\FilamentShield\FilamentShieldServiceProvider::class;
-} else {
-    $providers[] = App\Providers\TestingLivewireAliasesProvider::class;
-}
-
-return $providers;
