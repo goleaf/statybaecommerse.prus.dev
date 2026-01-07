@@ -140,7 +140,6 @@ final class Currency extends Model
     {
         return $this->hasMany(Campaign::class);
     }
-    }
 
     /**
      * Handle discounts functionality with proper error handling.
