@@ -89,6 +89,10 @@ return [
         'no_categories_found'   => 'Kategorijų nerasta',
         'create_first_category' => 'Sukurkite savo pirmąją kategoriją, kad pradėtumėte',
     ],
+
+    // UI Labels
+    'index_close' => 'Uždaryti',
+    'show_adjust_filters' => 'Koreguokite filtrus, kad rastumėte tobulus produktus',
     // Help
     'help' => [
         'create_first_category' => 'Sukurkite savo pirmąją kategoriją, kad organizuotumėte savo produktus',

@@ -100,6 +100,10 @@ return [
         'create_first_category' => 'Create your first category to get started',
     ],
 
+    // UI Labels
+    'index_close' => 'Close',
+    'show_adjust_filters' => 'Adjust your filters to find the perfect products',
+
     // Help
     'help' => [
         'create_first_category' => 'Create your first category to organize your products',

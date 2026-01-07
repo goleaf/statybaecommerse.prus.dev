@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\AdminAuthenticationTest" file="tests/Feature/AdminAuthenticationTest.php" tests="6" assertions="8" errors="0" failures="0" skipped="0" time="20.058250">
+    <testcase name="it allows admin users to access admin panel" file="tests/Feature/AdminAuthenticationTest.php::it allows admin users to access admin panel" class="Tests\Feature\AdminAuthenticationTest" classname="Tests.Feature.AdminAuthenticationTest" assertions="1" time="10.368482"/>
+    <testcase name="it enforces role-based permissions for resources" file="tests/Feature/AdminAuthenticationTest.php::it enforces role-based permissions for resources" class="Tests\Feature\AdminAuthenticationTest" classname="Tests.Feature.AdminAuthenticationTest" assertions="2" time="1.904388"/>
+    <testcase name="it allows authenticated admin users to access admin panel" file="tests/Feature/AdminAuthenticationTest.php::it allows authenticated admin users to access admin panel" class="Tests\Feature\AdminAuthenticationTest" classname="Tests.Feature.AdminAuthenticationTest" assertions="1" time="1.419312"/>
+    <testcase name="it allows users with admin role to access admin panel" file="tests/Feature/AdminAuthenticationTest.php::it allows users with admin role to access admin panel" class="Tests\Feature\AdminAuthenticationTest" classname="Tests.Feature.AdminAuthenticationTest" assertions="1" time="2.246284"/>
+    <testcase name="it redirects unauthenticated users to login" file="tests/Feature/AdminAuthenticationTest.php::it redirects unauthenticated users to login" class="Tests\Feature\AdminAuthenticationTest" classname="Tests.Feature.AdminAuthenticationTest" assertions="2" time="2.010975"/>
+    <testcase name="it denies access to users without admin privileges" file="tests/Feature/AdminAuthenticationTest.php::it denies access to users without admin privileges" class="Tests\Feature\AdminAuthenticationTest" classname="Tests.Feature.AdminAuthenticationTest" assertions="1" time="2.108810"/>
+  </testsuite>
+</testsuites>
