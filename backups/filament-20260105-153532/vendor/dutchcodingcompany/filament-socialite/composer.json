@@ -1,0 +1,84 @@
+{
+    "name": "dutchcodingcompany/filament-socialite",
+    "description": "Social login for Filament through Laravel Socialite",
+    "keywords": [
+        "DutchCodingCompany",
+        "laravel",
+        "filament-socialite"
+    ],
+    "homepage": "https://github.com/dutchcodingcompany/filament-socialite",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Marco Boers",
+            "email": "m@rcoboe.rs",
+            "role": "Developer"
+        },
+        {
+            "name": "Tom Janssen",
+            "email": "dododedodonl@thor.edu",
+            "role": "Developer"
+        },
+        {
+            "name": "Bram Raaijmakers",
+            "email": "bram@dutchcodingcompany.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "filament/filament": "^4.0",
+        "illuminate/contracts": "^11.0|^12.0",
+        "laravel/socialite": "^5.5",
+        "spatie/laravel-package-tools": "^1.9.2"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.8",
+        "larastan/larastan": "^2.9|^3.0",
+        "nunomaduro/collision": "^7.0|^8.1",
+        "orchestra/testbench": "^9.0|^10.0",
+        "phpunit/phpunit": "^10.0|^11.5.3",
+        "rector/rector": "^0.19.8|^2.0"
+    },
+    "suggest": {
+        "owenvoke/blade-fontawesome": "^2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "DutchCodingCompany\\FilamentSocialite\\": "src",
+            "DutchCodingCompany\\FilamentSocialite\\Tests\\": "tests",
+            "DutchCodingCompany\\FilamentSocialite\\Database\\Factories\\": "database/factories",
+            "Utils\\Rector\\": "utils/rector/src"
+        }
+    },
+    "scripts": {
+        "analyse": "vendor/bin/phpstan analyse",
+        "test": "vendor/bin/phpunit"
+    },
+    "bin": [
+        "bin/upgrade-v2"
+    ],
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "phpstan/extension-installer": true
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "DutchCodingCompany\\FilamentSocialite\\FilamentSocialiteServiceProvider"
+            ],
+            "aliases": {
+                "FilamentSocialite": "DutchCodingCompany\\FilamentSocialite\\Facades\\FilamentSocialite"
+            }
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "autoload-dev": {
+        "psr-4": {
+            "DutchCodingCompany\\FilamentSocialite\\Tests\\": "tests"
+        }
+    }
+}

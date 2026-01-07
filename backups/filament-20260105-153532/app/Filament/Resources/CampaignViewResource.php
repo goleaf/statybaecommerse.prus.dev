@@ -1,0 +1,190 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Filament\Resources;
+
+use App\Filament\Resources\CampaignViewResource\Pages;
+use App\Models\CampaignView;
+use App\Support\Concerns\HasNav;
+use App\Support\Filament\Components\Flatpickr;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Resources\Resource;
+use Filament\Schemas\Components\Tabs as SchemaTabs;
+use Filament\Schemas\Components\Tabs\Tab as SchemaTab;
+use Filament\Schemas\Schema;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Table;
+
+final class CampaignViewResource extends Resource
+{
+    use HasNav;
+
+    protected static ?string $model = CampaignView::class;
+
+    protected static ?int $navigationSort = 7;
+
+    protected static ?string $recordTitleAttribute = 'ip_address';
+
+    public static function getModelLabel(): string
+    {
+        return __('campaign_views.single');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('campaign_views.plural');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('campaign_views.navigation');
+    }
+
+    public static function form(Schema $schema): Schema
+    {
+        // Wire the form schema using the provided Schema contract to avoid undefined variable issues.
+        return $schema
+            ->schema([
+                SchemaTabs::make(__('campaign_views.section_title'))
+                    ->tabs([
+                        SchemaTab::make(__('campaign_views.tabs.basic_information'))
+                            ->icon('heroicon-o-information-circle')
+                            ->schema([
+                                Select::make('campaign_id')
+                                    ->label(__('campaign_views.campaign'))
+                                    ->relationship('campaign', 'name')
+                                    ->required()
+                                    ->searchable()
+                                    ->preload(),
+                                Select::make('customer_id')
+                                    ->label(__('campaign_views.customer'))
+                                    ->relationship('customer', 'name')
+                                    ->searchable()
+                                    ->preload()
+                                    ->placeholder(__('campaign_views.guest')),
+                                TextInput::make('ip_address')
+                                    ->label(__('campaign_views.ip_address'))
+                                    ->ip()
+                                    ->required(),
+                                TextInput::make('user_agent')
+                                    ->label(__('campaign_views.user_agent'))
+                                    ->maxLength(500),
+                                TextInput::make('referer')
+                                    ->label(__('campaign_views.referrer'))
+                                    ->url()
+                                    ->maxLength(255),
+                                TextInput::make('session_id')
+                                    ->label(__('campaign_views.session_id'))
+                                    ->maxLength(255),
+                                Flatpickr::makeDateTime('viewed_at')
+                                    ->label(__('campaign_views.viewed_at'))
+                                    ->seconds(false)
+                                    ->required(),
+                            ]),
+                    ])
+                    ->columnSpanFull(),
+            ]);
+    }
+
+    public static function table(Table $table): Table
+    {
+        // Configure the table definition for the streamlined Filament v4 return type.
+        return $table
+            ->columns([
+                TextColumn::make('campaign.name')
+                    ->label(__('campaign_views.campaign'))
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('customer.name')
+                    ->label(__('campaign_views.customer'))
+                    ->searchable()
+                    ->sortable()
+                    ->placeholder(__('campaign_views.guest')),
+                TextColumn::make('ip_address')
+                    ->label(__('campaign_views.ip_address'))
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('user_agent')
+                    ->label(__('campaign_views.user_agent'))
+                    ->limit(50)
+                    ->tooltip(function (TextColumn $column): ?string {
+                        $state = $column->getState();
+
+                        if (! is_string($state)) {
+                            return null;
+                        }
+
+                        if (mb_strlen($state) <= 50) {
+                            return null;
+                        }
+
+                        return $state;
+                    })
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('referer')
+                    ->label(__('campaign_views.referrer'))
+                    ->limit(30)
+                    ->tooltip(function (TextColumn $column): ?string {
+                        $state = $column->getState();
+
+                        if (! is_string($state)) {
+                            return null;
+                        }
+
+                        if (mb_strlen($state) <= 30) {
+                            return null;
+                        }
+
+                        return $state;
+                    })
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('viewed_at')
+                    ->label(__('campaign_views.viewed_at'))
+                    ->dateTime()
+                    ->sortable(),
+            ])
+            ->filters([
+                SelectFilter::make('campaign_id')
+                    ->label(__('campaign_views.campaign'))
+                    ->relationship('campaign', 'name')
+                    ->searchable()
+                    ->preload(),
+                SelectFilter::make('customer_id')
+                    ->label(__('campaign_views.customer'))
+                    ->relationship('customer', 'name')
+                    ->searchable()
+                    ->preload(),
+                SelectFilter::make('ip_address')
+                    ->label(__('campaign_views.ip_address'))
+                    ->options(fn (): array => CampaignView::query()
+                        ->distinct('ip_address')
+                        ->pluck('ip_address', 'ip_address')
+                        ->toArray())
+                    ->searchable(),
+            ])
+            ->actions([
+                // Actions will be handled by pages
+            ])
+            ->bulkActions([
+                // Bulk actions will be handled by pages
+            ]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            //
+        ];
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => Pages\ListCampaignViews::route('/'),
+            'view'  => Pages\ViewCampaignView::route('/{record}'),
+        ];
+    }
+}
