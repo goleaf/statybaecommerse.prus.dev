@@ -1,0 +1,91 @@
+{
+    "name": "lara-zeus/bolt",
+    "description": "Zeus Bolt is form builder for your users, with so many use cases",
+    "keywords": [
+        "laravel",
+        "lara-zeus",
+        "bolt",
+        "form",
+        "forms",
+        "generator",
+        "self hosted",
+        "maker",
+        "builder",
+        "filamentphp"
+    ],
+    "homepage": "https://larazeus.com/bolt",
+    "support": {
+        "issues": "https://github.com/lara-zeus/bolt/issues",
+        "source": "https://github.com/lara-zeus/bolt"
+    },
+    "license": "MIT",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Lara Zeus",
+            "email": "info@larazeus.com"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "guava/filament-icon-picker": "^3.1",
+        "flowframe/laravel-trend": "^0.4",
+        "lara-zeus/accordion": "^2.0",
+        "lara-zeus/core": "^4.0",
+        "lara-zeus/filament-plugin-tools": "^2.0",
+        "lara-zeus/list-group": "^2.0",
+        "lara-zeus/tabler-icons-enum": "^1.0",
+        "pxlrbt/filament-excel": "^3.1"
+    },
+    "require-dev": {
+        "larastan/larastan": "^3.0",
+        "laravel/pint": "^1.24",
+        "nunomaduro/collision": "^8.6",
+        "nunomaduro/phpinsights": "^2.8",
+        "orchestra/testbench": "^10.0",
+        "pestphp/pest": "^3.0",
+        "pestphp/pest-plugin-arch": "^3.0",
+        "pestphp/pest-plugin-laravel": "^3.0",
+        "pestphp/pest-plugin-livewire": "^3.0",
+        "phpstan/extension-installer": "^1.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "LaraZeus\\Bolt\\": "src",
+            "LaraZeus\\Bolt\\Database\\Factories\\": "database/factories/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "LaraZeus\\Bolt\\Tests\\": "tests"
+        }
+    },
+    "scripts": {
+        "analyse": "vendor/bin/phpstan analyse",
+        "test": "vendor/bin/pest",
+        "test-coverage": "vendor/bin/pest --coverage",
+        "format": "vendor/bin/pint",
+        "pint": "vendor/bin/pint",
+        "test:pest": "vendor/bin/pest --parallel",
+        "test:phpstan": "vendor/bin/phpstan analyse"
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "phpstan/extension-installer": true,
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "LaraZeus\\Bolt\\BoltServiceProvider"
+            ],
+            "aliases": {
+                "Bolt": "LaraZeus\\Bolt\\Facades\\Bolt"
+            }
+        }
+    },
+    "prefer-stable": true
+}
