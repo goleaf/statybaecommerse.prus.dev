@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages\Auth;
 
-use Filament\Forms\Components\Component;
-// use Filament\Pages\Auth\Login as BaseLogin;
-use Filament\Pages\Page as BaseLogin;
+use Filament\Auth\Pages\Login as BaseLogin;
+use Filament\Schemas\Components\Component;
 
 final class Login extends BaseLogin
 {
