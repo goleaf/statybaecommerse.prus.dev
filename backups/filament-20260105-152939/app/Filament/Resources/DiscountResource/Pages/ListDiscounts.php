@@ -1,0 +1,39 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Filament\Resources\DiscountResource\Pages;
+
+use App\Filament\Pages\Support\BaseListRecords;
+use App\Filament\Resources\DiscountResource;
+use App\Filament\Resources\DiscountResource\Widgets\DiscountChartWidget;
+use App\Filament\Resources\DiscountResource\Widgets\DiscountStatsWidget;
+use App\Filament\Resources\DiscountResource\Widgets\RecentRedemptionsWidget;
+use Filament\Actions;
+
+final class ListDiscounts extends BaseListRecords
+{
+    protected static string $resource = DiscountResource::class;
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            Actions\CreateAction::make(),
+        ];
+    }
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            DiscountStatsWidget::class,
+            DiscountChartWidget::class,
+        ];
+    }
+
+    protected function getFooterWidgets(): array
+    {
+        return [
+            RecentRedemptionsWidget::class,
+        ];
+    }
+}
