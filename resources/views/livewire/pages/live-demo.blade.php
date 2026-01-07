@@ -248,7 +248,7 @@
                    class="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-colors duration-200">
                     {{ __('translations.explore_homepage') }}
                 </a>
-                <a href="{{ route('products.index') }}" 
+                <a href="{{ route('localized.products.index', ['locale' => app()->getLocale()]) }}" 
                    class="bg-white/10 backdrop-blur-sm text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/20 transition-colors duration-200">
                     {{ __('translations.browse_products') }}
                 </a>

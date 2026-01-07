@@ -269,11 +269,6 @@
                     "class": "App\\Filament\\Resources\\EmailCampaignResource",
                     "icon": "heroicon-o-envelope",
                     "sort": 4
-                },
-                {
-                    "class": "App\\Filament\\Resources\\CampaignConversionResource",
-                    "icon": "heroicon-o-rocket-launch",
-                    "sort": null
                 }
             ]
         },

@@ -1,2 +1,492 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuites/>
+<testsuites>
+  <testsuite name="C:\Dropbox\projects\egistatyba\phpunit.xml" tests="35" assertions="0" errors="35" failures="0" skipped="0" time="37.941421">
+    <testsuite name="Feature" tests="35" assertions="0" errors="35" failures="0" skipped="0" time="37.941421">
+      <testsuite name="Tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest" file="Missing Filament Resource Coverage (Tests\Feature\Filament\Resources\MissingFilamentResourceCoverage)" tests="35" assertions="0" errors="35" failures="0" skipped="0" time="37.941421">
+        <testsuite name="List pages render seeded records" tests="35" assertions="0" errors="35" failures="0" skipped="0" time="37.941421">
+          <testcase name="List pages render seeded records with data set &quot;audit trails&quot;" file="Missing Filament Resource Coverage (Tests\Feature\Filament\Resources\MissingFilamentResourceCoverage)::List pages render seeded records with data set &quot;audit trails&quot;" class="Tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest" classname="Tests.Feature.Filament.Resources.MissingFilamentResourceCoverageTest" assertions="0" time="13.188066">
+            <error type="ErrorException">List pages render seeded records with data set "audit trails"ErrorException: include(C:\Dropbox\projects\egistatyba\vendor\composer/../../app/Filament/Resources/AuditTrailResource/Pages/ListAuditTrails.php): Failed to open stream: No such file or directory&#13;
+at vendor\laravel\framework\src\Illuminate\Foundation\Bootstrap\HandleExceptions.php:258
+at vendor\livewire\livewire\src\Mechanisms\ComponentRegistry.php:52
+at vendor\livewire\livewire\src\LivewireManager.php:63
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:80
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:40
+at vendor\livewire\livewire\src\LivewireManager.php:197
+at vendor\laravel\framework\src\Illuminate\Support\Facades\Facade.php:363
+at tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest.php:196</error>
+          </testcase>
+          <testcase name="List pages render seeded records with data set &quot;brands&quot;" file="Missing Filament Resource Coverage (Tests\Feature\Filament\Resources\MissingFilamentResourceCoverage)::List pages render seeded records with data set &quot;brands&quot;" class="Tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest" classname="Tests.Feature.Filament.Resources.MissingFilamentResourceCoverageTest" assertions="0" time="1.161306">
+            <error type="ErrorException">List pages render seeded records with data set "brands"ErrorException: include(C:\Dropbox\projects\egistatyba\vendor\composer/../../app/Filament/Resources/BrandResource/Pages/ListBrands.php): Failed to open stream: No such file or directory&#13;
+at vendor\laravel\framework\src\Illuminate\Foundation\Bootstrap\HandleExceptions.php:258
+at vendor\livewire\livewire\src\Mechanisms\ComponentRegistry.php:52
+at vendor\livewire\livewire\src\LivewireManager.php:63
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:80
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:40
+at vendor\livewire\livewire\src\LivewireManager.php:197
+at vendor\laravel\framework\src\Illuminate\Support\Facades\Facade.php:363
+at tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest.php:196</error>
+          </testcase>
+          <testcase name="List pages render seeded records with data set &quot;campaign schedules&quot;" file="Missing Filament Resource Coverage (Tests\Feature\Filament\Resources\MissingFilamentResourceCoverage)::List pages render seeded records with data set &quot;campaign schedules&quot;" class="Tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest" classname="Tests.Feature.Filament.Resources.MissingFilamentResourceCoverageTest" assertions="0" time="0.605355">
+            <error type="ErrorException">List pages render seeded records with data set "campaign schedules"ErrorException: include(C:\Dropbox\projects\egistatyba\vendor\composer/../../database/factories/CampaignScheduleFactory.php): Failed to open stream: No such file or directory&#13;
+at vendor\laravel\framework\src\Illuminate\Foundation\Bootstrap\HandleExceptions.php:258
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:950
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\HasFactory.php:21
+at tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest.php:247
+at tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest.php:193</error>
+          </testcase>
+          <testcase name="List pages render seeded records with data set &quot;campaign views&quot;" file="Missing Filament Resource Coverage (Tests\Feature\Filament\Resources\MissingFilamentResourceCoverage)::List pages render seeded records with data set &quot;campaign views&quot;" class="Tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest" classname="Tests.Feature.Filament.Resources.MissingFilamentResourceCoverageTest" assertions="0" time="0.630638">
+            <error type="ErrorException">List pages render seeded records with data set "campaign views"ErrorException: include(C:\Dropbox\projects\egistatyba\vendor\composer/../../database/factories/CampaignFactory.php): Failed to open stream: No such file or directory&#13;
+at vendor\laravel\framework\src\Illuminate\Foundation\Bootstrap\HandleExceptions.php:258
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:950
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\HasFactory.php:21
+at tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest.php:678
+at tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest.php:193</error>
+          </testcase>
+          <testcase name="List pages render seeded records with data set &quot;campaigns&quot;" file="Missing Filament Resource Coverage (Tests\Feature\Filament\Resources\MissingFilamentResourceCoverage)::List pages render seeded records with data set &quot;campaigns&quot;" class="Tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest" classname="Tests.Feature.Filament.Resources.MissingFilamentResourceCoverageTest" assertions="0" time="0.717393">
+            <error type="ErrorException">List pages render seeded records with data set "campaigns"ErrorException: include(C:\Dropbox\projects\egistatyba\vendor\composer/../../database/factories/CampaignFactory.php): Failed to open stream: No such file or directory&#13;
+at vendor\laravel\framework\src\Illuminate\Foundation\Bootstrap\HandleExceptions.php:258
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:950
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\HasFactory.php:21
+at tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest.php:237
+at tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest.php:193</error>
+          </testcase>
+          <testcase name="List pages render seeded records with data set &quot;cart items&quot;" file="Missing Filament Resource Coverage (Tests\Feature\Filament\Resources\MissingFilamentResourceCoverage)::List pages render seeded records with data set &quot;cart items&quot;" class="Tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest" classname="Tests.Feature.Filament.Resources.MissingFilamentResourceCoverageTest" assertions="0" time="1.152481">
+            <error type="ErrorException">List pages render seeded records with data set "cart items"ErrorException: include(C:\Dropbox\projects\egistatyba\vendor\composer/../../app/Filament/Resources/CartItemResource/Pages/ListCartItems.php): Failed to open stream: No such file or directory&#13;
+at vendor\laravel\framework\src\Illuminate\Foundation\Bootstrap\HandleExceptions.php:258
+at vendor\livewire\livewire\src\Mechanisms\ComponentRegistry.php:52
+at vendor\livewire\livewire\src\LivewireManager.php:63
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:80
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:40
+at vendor\livewire\livewire\src\LivewireManager.php:197
+at vendor\laravel\framework\src\Illuminate\Support\Facades\Facade.php:363
+at tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest.php:196</error>
+          </testcase>
+          <testcase name="List pages render seeded records with data set &quot;cities&quot;" file="Missing Filament Resource Coverage (Tests\Feature\Filament\Resources\MissingFilamentResourceCoverage)::List pages render seeded records with data set &quot;cities&quot;" class="Tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest" classname="Tests.Feature.Filament.Resources.MissingFilamentResourceCoverageTest" assertions="0" time="0.944652">
+            <error type="ErrorException">List pages render seeded records with data set "cities"ErrorException: include(C:\Dropbox\projects\egistatyba\vendor\composer/../../app/Filament/Resources/CityResource/Pages/ListCities.php): Failed to open stream: No such file or directory&#13;
+at vendor\laravel\framework\src\Illuminate\Foundation\Bootstrap\HandleExceptions.php:258
+at vendor\livewire\livewire\src\Mechanisms\ComponentRegistry.php:52
+at vendor\livewire\livewire\src\LivewireManager.php:63
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:80
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:40
+at vendor\livewire\livewire\src\LivewireManager.php:197
+at vendor\laravel\framework\src\Illuminate\Support\Facades\Facade.php:363
+at tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest.php:196</error>
+          </testcase>
+          <testcase name="List pages render seeded records with data set &quot;collections&quot;" file="Missing Filament Resource Coverage (Tests\Feature\Filament\Resources\MissingFilamentResourceCoverage)::List pages render seeded records with data set &quot;collections&quot;" class="Tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest" classname="Tests.Feature.Filament.Resources.MissingFilamentResourceCoverageTest" assertions="0" time="0.829744">
+            <error type="ErrorException">List pages render seeded records with data set "collections"ErrorException: include(C:\Dropbox\projects\egistatyba\vendor\composer/../../app/Filament/Resources/CollectionResource/Pages/ListCollections.php): Failed to open stream: No such file or directory&#13;
+at vendor\laravel\framework\src\Illuminate\Foundation\Bootstrap\HandleExceptions.php:258
+at vendor\livewire\livewire\src\Mechanisms\ComponentRegistry.php:52
+at vendor\livewire\livewire\src\LivewireManager.php:63
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:80
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:40
+at vendor\livewire\livewire\src\LivewireManager.php:197
+at vendor\laravel\framework\src\Illuminate\Support\Facades\Facade.php:363
+at tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest.php:196</error>
+          </testcase>
+          <testcase name="List pages render seeded records with data set &quot;collection rules&quot;" file="Missing Filament Resource Coverage (Tests\Feature\Filament\Resources\MissingFilamentResourceCoverage)::List pages render seeded records with data set &quot;collection rules&quot;" class="Tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest" classname="Tests.Feature.Filament.Resources.MissingFilamentResourceCoverageTest" assertions="0" time="0.722251">
+            <error type="ErrorException">List pages render seeded records with data set "collection rules"ErrorException: include(C:\Dropbox\projects\egistatyba\vendor\composer/../../app/Filament/Resources/CollectionRuleResource/Pages/ListCollectionRules.php): Failed to open stream: No such file or directory&#13;
+at vendor\laravel\framework\src\Illuminate\Foundation\Bootstrap\HandleExceptions.php:258
+at vendor\livewire\livewire\src\Mechanisms\ComponentRegistry.php:52
+at vendor\livewire\livewire\src\LivewireManager.php:63
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:80
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:40
+at vendor\livewire\livewire\src\LivewireManager.php:197
+at vendor\laravel\framework\src\Illuminate\Support\Facades\Facade.php:363
+at tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest.php:196</error>
+          </testcase>
+          <testcase name="List pages render seeded records with data set &quot;documents&quot;" file="Missing Filament Resource Coverage (Tests\Feature\Filament\Resources\MissingFilamentResourceCoverage)::List pages render seeded records with data set &quot;documents&quot;" class="Tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest" classname="Tests.Feature.Filament.Resources.MissingFilamentResourceCoverageTest" assertions="0" time="0.749465">
+            <error type="ErrorException">List pages render seeded records with data set "documents"ErrorException: include(C:\Dropbox\projects\egistatyba\vendor\composer/../../app/Filament/Resources/DocumentResource/Pages/ListDocuments.php): Failed to open stream: No such file or directory&#13;
+at vendor\laravel\framework\src\Illuminate\Foundation\Bootstrap\HandleExceptions.php:258
+at vendor\livewire\livewire\src\Mechanisms\ComponentRegistry.php:52
+at vendor\livewire\livewire\src\LivewireManager.php:63
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:80
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:40
+at vendor\livewire\livewire\src\LivewireManager.php:197
+at vendor\laravel\framework\src\Illuminate\Support\Facades\Facade.php:363
+at tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest.php:196</error>
+          </testcase>
+          <testcase name="List pages render seeded records with data set &quot;document templates&quot;" file="Missing Filament Resource Coverage (Tests\Feature\Filament\Resources\MissingFilamentResourceCoverage)::List pages render seeded records with data set &quot;document templates&quot;" class="Tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest" classname="Tests.Feature.Filament.Resources.MissingFilamentResourceCoverageTest" assertions="0" time="0.634166">
+            <error type="ErrorException">List pages render seeded records with data set "document templates"ErrorException: include(C:\Dropbox\projects\egistatyba\vendor\composer/../../app/Filament/Resources/DocumentTemplateResource/Pages/ListDocumentTemplates.php): Failed to open stream: No such file or directory&#13;
+at vendor\laravel\framework\src\Illuminate\Foundation\Bootstrap\HandleExceptions.php:258
+at vendor\livewire\livewire\src\Mechanisms\ComponentRegistry.php:52
+at vendor\livewire\livewire\src\LivewireManager.php:63
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:80
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:40
+at vendor\livewire\livewire\src\LivewireManager.php:197
+at vendor\laravel\framework\src\Illuminate\Support\Facades\Facade.php:363
+at tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest.php:196</error>
+          </testcase>
+          <testcase name="List pages render seeded records with data set &quot;enum management&quot;" file="Missing Filament Resource Coverage (Tests\Feature\Filament\Resources\MissingFilamentResourceCoverage)::List pages render seeded records with data set &quot;enum management&quot;" class="Tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest" classname="Tests.Feature.Filament.Resources.MissingFilamentResourceCoverageTest" assertions="0" time="0.596182">
+            <error type="ErrorException">List pages render seeded records with data set "enum management"ErrorException: include(C:\Dropbox\projects\egistatyba\vendor\composer/../../app/Filament/Resources/EnumManagementResource/Pages/ListEnumManagement.php): Failed to open stream: No such file or directory&#13;
+at vendor\laravel\framework\src\Illuminate\Foundation\Bootstrap\HandleExceptions.php:258
+at vendor\livewire\livewire\src\Mechanisms\ComponentRegistry.php:52
+at vendor\livewire\livewire\src\LivewireManager.php:63
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:80
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:40
+at vendor\livewire\livewire\src\LivewireManager.php:197
+at vendor\laravel\framework\src\Illuminate\Support\Facades\Facade.php:363
+at tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest.php:196</error>
+          </testcase>
+          <testcase name="List pages render seeded records with data set &quot;normal setting translations&quot;" file="Missing Filament Resource Coverage (Tests\Feature\Filament\Resources\MissingFilamentResourceCoverage)::List pages render seeded records with data set &quot;normal setting translations&quot;" class="Tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest" classname="Tests.Feature.Filament.Resources.MissingFilamentResourceCoverageTest" assertions="0" time="0.569443">
+            <error type="ErrorException">List pages render seeded records with data set "normal setting translations"ErrorException: include(C:\Dropbox\projects\egistatyba\vendor\composer/../../app/Filament/Resources/NormalSettingTranslationResource/Pages/ListNormalSettingTranslations.php): Failed to open stream: No such file or directory&#13;
+at vendor\laravel\framework\src\Illuminate\Foundation\Bootstrap\HandleExceptions.php:258
+at vendor\livewire\livewire\src\Mechanisms\ComponentRegistry.php:52
+at vendor\livewire\livewire\src\LivewireManager.php:63
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:80
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:40
+at vendor\livewire\livewire\src\LivewireManager.php:197
+at vendor\laravel\framework\src\Illuminate\Support\Facades\Facade.php:363
+at tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest.php:196</error>
+          </testcase>
+          <testcase name="List pages render seeded records with data set &quot;posts&quot;" file="Missing Filament Resource Coverage (Tests\Feature\Filament\Resources\MissingFilamentResourceCoverage)::List pages render seeded records with data set &quot;posts&quot;" class="Tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest" classname="Tests.Feature.Filament.Resources.MissingFilamentResourceCoverageTest" assertions="0" time="0.578345">
+            <error type="ErrorException">List pages render seeded records with data set "posts"ErrorException: include(C:\Dropbox\projects\egistatyba\vendor\composer/../../app/Filament/Resources/PostResource/Pages/ListPosts.php): Failed to open stream: No such file or directory&#13;
+at vendor\laravel\framework\src\Illuminate\Foundation\Bootstrap\HandleExceptions.php:258
+at vendor\livewire\livewire\src\Mechanisms\ComponentRegistry.php:52
+at vendor\livewire\livewire\src\LivewireManager.php:63
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:80
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:40
+at vendor\livewire\livewire\src\LivewireManager.php:197
+at vendor\laravel\framework\src\Illuminate\Support\Facades\Facade.php:363
+at tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest.php:196</error>
+          </testcase>
+          <testcase name="List pages render seeded records with data set &quot;price list items&quot;" file="Missing Filament Resource Coverage (Tests\Feature\Filament\Resources\MissingFilamentResourceCoverage)::List pages render seeded records with data set &quot;price list items&quot;" class="Tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest" classname="Tests.Feature.Filament.Resources.MissingFilamentResourceCoverageTest" assertions="0" time="0.655900">
+            <error type="ParseError">List pages render seeded records with data set "price list items"ParseError: syntax error, unexpected token "public", expecting end of file&#13;
+at app\Models\Currency.php:148
+at tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest.php:596
+at tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest.php:616
+at tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest.php:193</error>
+          </testcase>
+          <testcase name="List pages render seeded records with data set &quot;price lists&quot;" file="Missing Filament Resource Coverage (Tests\Feature\Filament\Resources\MissingFilamentResourceCoverage)::List pages render seeded records with data set &quot;price lists&quot;" class="Tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest" classname="Tests.Feature.Filament.Resources.MissingFilamentResourceCoverageTest" assertions="0" time="0.671682">
+            <error type="ParseError">List pages render seeded records with data set "price lists"ParseError: syntax error, unexpected token "public", expecting end of file&#13;
+at app\Models\Currency.php:148
+at tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest.php:596
+at tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest.php:193</error>
+          </testcase>
+          <testcase name="List pages render seeded records with data set &quot;prices&quot;" file="Missing Filament Resource Coverage (Tests\Feature\Filament\Resources\MissingFilamentResourceCoverage)::List pages render seeded records with data set &quot;prices&quot;" class="Tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest" classname="Tests.Feature.Filament.Resources.MissingFilamentResourceCoverageTest" assertions="0" time="0.638256">
+            <error type="ParseError">List pages render seeded records with data set "prices"ParseError: syntax error, unexpected token "public", expecting end of file&#13;
+at app\Models\Currency.php:148
+at tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest.php:649
+at tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest.php:193</error>
+          </testcase>
+          <testcase name="List pages render seeded records with data set &quot;product variants&quot;" file="Missing Filament Resource Coverage (Tests\Feature\Filament\Resources\MissingFilamentResourceCoverage)::List pages render seeded records with data set &quot;product variants&quot;" class="Tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest" classname="Tests.Feature.Filament.Resources.MissingFilamentResourceCoverageTest" assertions="0" time="1.032043">
+            <error type="ErrorException">List pages render seeded records with data set "product variants"ErrorException: include(C:\Dropbox\projects\egistatyba\vendor\composer/../../app/Filament/Resources/ProductVariantResource/Pages/ListProductVariants.php): Failed to open stream: No such file or directory&#13;
+at vendor\laravel\framework\src\Illuminate\Foundation\Bootstrap\HandleExceptions.php:258
+at vendor\livewire\livewire\src\Mechanisms\ComponentRegistry.php:52
+at vendor\livewire\livewire\src\LivewireManager.php:63
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:80
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:40
+at vendor\livewire\livewire\src\LivewireManager.php:197
+at vendor\laravel\framework\src\Illuminate\Support\Facades\Facade.php:363
+at tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest.php:196</error>
+          </testcase>
+          <testcase name="List pages render seeded records with data set &quot;referral code usage logs&quot;" file="Missing Filament Resource Coverage (Tests\Feature\Filament\Resources\MissingFilamentResourceCoverage)::List pages render seeded records with data set &quot;referral code usage logs&quot;" class="Tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest" classname="Tests.Feature.Filament.Resources.MissingFilamentResourceCoverageTest" assertions="0" time="0.584969">
+            <error type="ErrorException">List pages render seeded records with data set "referral code usage logs"ErrorException: include(C:\Dropbox\projects\egistatyba\vendor\composer/../../app/Filament/Resources/ReferralCodeUsageLogResource/Pages/ListReferralCodeUsageLogs.php): Failed to open stream: No such file or directory&#13;
+at vendor\laravel\framework\src\Illuminate\Foundation\Bootstrap\HandleExceptions.php:258
+at vendor\livewire\livewire\src\Mechanisms\ComponentRegistry.php:52
+at vendor\livewire\livewire\src\LivewireManager.php:63
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:80
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:40
+at vendor\livewire\livewire\src\LivewireManager.php:197
+at vendor\laravel\framework\src\Illuminate\Support\Facades\Facade.php:363
+at tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest.php:196</error>
+          </testcase>
+          <testcase name="List pages render seeded records with data set &quot;recommendation simple list&quot;" file="Missing Filament Resource Coverage (Tests\Feature\Filament\Resources\MissingFilamentResourceCoverage)::List pages render seeded records with data set &quot;recommendation simple list&quot;" class="Tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest" classname="Tests.Feature.Filament.Resources.MissingFilamentResourceCoverageTest" assertions="0" time="0.681681">
+            <error type="Livewire\Exceptions\ComponentNotFoundException">List pages render seeded records with data set "recommendation simple list"Livewire\Exceptions\ComponentNotFoundException: Unable to find component: [Tests\Feature\Filament\Resources\ListRecommendationConfigResourceSimples]&#13;
+at vendor\livewire\livewire\src\Mechanisms\ComponentRegistry.php:116
+at vendor\livewire\livewire\src\Mechanisms\ComponentRegistry.php:25
+at vendor\livewire\livewire\src\LivewireManager.php:58
+at vendor\livewire\livewire\src\Mechanisms\HandleComponents\HandleComponents.php:43
+at vendor\livewire\livewire\src\LivewireManager.php:73
+at vendor\livewire\volt\src\LivewireManager.php:23
+at storage\framework\views\d82c20e82e828e183339cab050c82ddf.php:11
+at vendor\laravel\framework\src\Illuminate\Filesystem\Filesystem.php:123
+at vendor\laravel\framework\src\Illuminate\Filesystem\Filesystem.php:124
+at vendor\laravel\framework\src\Illuminate\View\Engines\PhpEngine.php:57
+at vendor\livewire\livewire\src\Mechanisms\ExtendBlade\ExtendedCompilerEngine.php:22
+at vendor\laravel\framework\src\Illuminate\View\Engines\CompilerEngine.php:76
+at vendor\livewire\livewire\src\Mechanisms\ExtendBlade\ExtendedCompilerEngine.php:10
+at vendor\laravel\framework\src\Illuminate\View\View.php:208
+at vendor\laravel\framework\src\Illuminate\View\View.php:191
+at vendor\laravel\framework\src\Illuminate\View\View.php:160
+at vendor\laravel\framework\src\Illuminate\View\Compilers\BladeCompiler.php:353
+at vendor\laravel\framework\src\Illuminate\Support\Facades\Facade.php:363
+at vendor\livewire\livewire\src\Features\SupportTesting\InitialRender.php:25
+at vendor\laravel\framework\src\Illuminate\Routing\CallableDispatcher.php:39
+at vendor\laravel\framework\src\Illuminate\Routing\Route.php:243
+at vendor\laravel\framework\src\Illuminate\Routing\Route.php:214
+at vendor\laravel\framework\src\Illuminate\Routing\Router.php:822
+at vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php:180
+at vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php:137
+at vendor\laravel\framework\src\Illuminate\Routing\Router.php:821
+at vendor\laravel\framework\src\Illuminate\Routing\Router.php:800
+at vendor\laravel\framework\src\Illuminate\Routing\Router.php:764
+at vendor\laravel\framework\src\Illuminate\Routing\Router.php:753
+at vendor\laravel\framework\src\Illuminate\Foundation\Http\Kernel.php:200
+at vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php:180
+at vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php:137
+at vendor\laravel\framework\src\Illuminate\Foundation\Http\Kernel.php:175
+at vendor\laravel\framework\src\Illuminate\Foundation\Http\Kernel.php:144
+at vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\MakesHttpRequests.php:607
+at vendor\livewire\livewire\src\Features\SupportTesting\InitialRender.php:33
+at vendor\livewire\livewire\src\Features\SupportTesting\RequestBroker.php:30
+at vendor\livewire\livewire\src\Features\SupportTesting\InitialRender.php:32
+at vendor\livewire\livewire\src\Features\SupportTesting\Render.php:24
+at vendor\livewire\livewire\src\Features\SupportTesting\InitialRender.php:31
+at vendor\livewire\livewire\src\Features\SupportTesting\InitialRender.php:17
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:44
+at vendor\livewire\livewire\src\LivewireManager.php:197
+at vendor\laravel\framework\src\Illuminate\Support\Facades\Facade.php:363
+at tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest.php:196</error>
+          </testcase>
+          <testcase name="List pages render seeded records with data set &quot;recommendation simple alias&quot;" file="Missing Filament Resource Coverage (Tests\Feature\Filament\Resources\MissingFilamentResourceCoverage)::List pages render seeded records with data set &quot;recommendation simple alias&quot;" class="Tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest" classname="Tests.Feature.Filament.Resources.MissingFilamentResourceCoverageTest" assertions="0" time="0.675068">
+            <error type="ErrorException">List pages render seeded records with data set "recommendation simple alias"ErrorException: include(C:\Dropbox\projects\egistatyba\vendor\composer/../../app/Filament/Resources/RecommendationConfigResourceSimple/Pages/ListRecommendationConfigSimples.php): Failed to open stream: No such file or directory&#13;
+at vendor\laravel\framework\src\Illuminate\Foundation\Bootstrap\HandleExceptions.php:258
+at vendor\livewire\livewire\src\Mechanisms\ComponentRegistry.php:52
+at vendor\livewire\livewire\src\LivewireManager.php:63
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:80
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:40
+at vendor\livewire\livewire\src\LivewireManager.php:197
+at vendor\laravel\framework\src\Illuminate\Support\Facades\Facade.php:363
+at tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest.php:196</error>
+          </testcase>
+          <testcase name="List pages render seeded records with data set &quot;referral campaigns&quot;" file="Missing Filament Resource Coverage (Tests\Feature\Filament\Resources\MissingFilamentResourceCoverage)::List pages render seeded records with data set &quot;referral campaigns&quot;" class="Tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest" classname="Tests.Feature.Filament.Resources.MissingFilamentResourceCoverageTest" assertions="0" time="0.678187">
+            <error type="Livewire\Exceptions\ComponentNotFoundException">List pages render seeded records with data set "referral campaigns"Livewire\Exceptions\ComponentNotFoundException: Unable to find component: [App\Filament\Resources\ReferralCampaignResource\Pages\ListReferralCampaigns]&#13;
+at vendor\livewire\livewire\src\Mechanisms\ComponentRegistry.php:116
+at vendor\livewire\livewire\src\Mechanisms\ComponentRegistry.php:25
+at vendor\livewire\livewire\src\LivewireManager.php:58
+at vendor\livewire\livewire\src\Mechanisms\HandleComponents\HandleComponents.php:43
+at vendor\livewire\livewire\src\LivewireManager.php:73
+at vendor\livewire\volt\src\LivewireManager.php:23
+at storage\framework\views\d82c20e82e828e183339cab050c82ddf.php:11
+at vendor\laravel\framework\src\Illuminate\Filesystem\Filesystem.php:123
+at vendor\laravel\framework\src\Illuminate\Filesystem\Filesystem.php:124
+at vendor\laravel\framework\src\Illuminate\View\Engines\PhpEngine.php:57
+at vendor\livewire\livewire\src\Mechanisms\ExtendBlade\ExtendedCompilerEngine.php:22
+at vendor\laravel\framework\src\Illuminate\View\Engines\CompilerEngine.php:76
+at vendor\livewire\livewire\src\Mechanisms\ExtendBlade\ExtendedCompilerEngine.php:10
+at vendor\laravel\framework\src\Illuminate\View\View.php:208
+at vendor\laravel\framework\src\Illuminate\View\View.php:191
+at vendor\laravel\framework\src\Illuminate\View\View.php:160
+at vendor\laravel\framework\src\Illuminate\View\Compilers\BladeCompiler.php:353
+at vendor\laravel\framework\src\Illuminate\Support\Facades\Facade.php:363
+at vendor\livewire\livewire\src\Features\SupportTesting\InitialRender.php:25
+at vendor\laravel\framework\src\Illuminate\Routing\CallableDispatcher.php:39
+at vendor\laravel\framework\src\Illuminate\Routing\Route.php:243
+at vendor\laravel\framework\src\Illuminate\Routing\Route.php:214
+at vendor\laravel\framework\src\Illuminate\Routing\Router.php:822
+at vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php:180
+at vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php:137
+at vendor\laravel\framework\src\Illuminate\Routing\Router.php:821
+at vendor\laravel\framework\src\Illuminate\Routing\Router.php:800
+at vendor\laravel\framework\src\Illuminate\Routing\Router.php:764
+at vendor\laravel\framework\src\Illuminate\Routing\Router.php:753
+at vendor\laravel\framework\src\Illuminate\Foundation\Http\Kernel.php:200
+at vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php:180
+at vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php:137
+at vendor\laravel\framework\src\Illuminate\Foundation\Http\Kernel.php:175
+at vendor\laravel\framework\src\Illuminate\Foundation\Http\Kernel.php:144
+at vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\MakesHttpRequests.php:607
+at vendor\livewire\livewire\src\Features\SupportTesting\InitialRender.php:33
+at vendor\livewire\livewire\src\Features\SupportTesting\RequestBroker.php:30
+at vendor\livewire\livewire\src\Features\SupportTesting\InitialRender.php:32
+at vendor\livewire\livewire\src\Features\SupportTesting\Render.php:24
+at vendor\livewire\livewire\src\Features\SupportTesting\InitialRender.php:31
+at vendor\livewire\livewire\src\Features\SupportTesting\InitialRender.php:17
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:44
+at vendor\livewire\livewire\src\LivewireManager.php:197
+at vendor\laravel\framework\src\Illuminate\Support\Facades\Facade.php:363
+at tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest.php:196</error>
+          </testcase>
+          <testcase name="List pages render seeded records with data set &quot;referral reward logs&quot;" file="Missing Filament Resource Coverage (Tests\Feature\Filament\Resources\MissingFilamentResourceCoverage)::List pages render seeded records with data set &quot;referral reward logs&quot;" class="Tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest" classname="Tests.Feature.Filament.Resources.MissingFilamentResourceCoverageTest" assertions="0" time="0.899090">
+            <error type="ErrorException">List pages render seeded records with data set "referral reward logs"ErrorException: include(C:\Dropbox\projects\egistatyba\vendor\composer/../../app/Filament/Resources/ReferralRewardLogResource/Pages/ListReferralRewardLogs.php): Failed to open stream: No such file or directory&#13;
+at vendor\laravel\framework\src\Illuminate\Foundation\Bootstrap\HandleExceptions.php:258
+at vendor\livewire\livewire\src\Mechanisms\ComponentRegistry.php:52
+at vendor\livewire\livewire\src\LivewireManager.php:63
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:80
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:40
+at vendor\livewire\livewire\src\LivewireManager.php:197
+at vendor\laravel\framework\src\Illuminate\Support\Facades\Facade.php:363
+at tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest.php:196</error>
+          </testcase>
+          <testcase name="List pages render seeded records with data set &quot;slider translations&quot;" file="Missing Filament Resource Coverage (Tests\Feature\Filament\Resources\MissingFilamentResourceCoverage)::List pages render seeded records with data set &quot;slider translations&quot;" class="Tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest" classname="Tests.Feature.Filament.Resources.MissingFilamentResourceCoverageTest" assertions="0" time="0.679539">
+            <error type="ErrorException">List pages render seeded records with data set "slider translations"ErrorException: include(C:\Dropbox\projects\egistatyba\vendor\composer/../../app/Filament/Resources/SliderTranslationResource/Pages/ListSliderTranslations.php): Failed to open stream: No such file or directory&#13;
+at vendor\laravel\framework\src\Illuminate\Foundation\Bootstrap\HandleExceptions.php:258
+at vendor\livewire\livewire\src\Mechanisms\ComponentRegistry.php:52
+at vendor\livewire\livewire\src\LivewireManager.php:63
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:80
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:40
+at vendor\livewire\livewire\src\LivewireManager.php:197
+at vendor\laravel\framework\src\Illuminate\Support\Facades\Facade.php:363
+at tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest.php:196</error>
+          </testcase>
+          <testcase name="List pages render seeded records with data set &quot;system setting categories&quot;" file="Missing Filament Resource Coverage (Tests\Feature\Filament\Resources\MissingFilamentResourceCoverage)::List pages render seeded records with data set &quot;system setting categories&quot;" class="Tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest" classname="Tests.Feature.Filament.Resources.MissingFilamentResourceCoverageTest" assertions="0" time="0.623656">
+            <error type="ErrorException">List pages render seeded records with data set "system setting categories"ErrorException: include(C:\Dropbox\projects\egistatyba\vendor\composer/../../app/Filament/Resources/SystemSettingCategoryResource/Pages/ListSystemSettingCategories.php): Failed to open stream: No such file or directory&#13;
+at vendor\laravel\framework\src\Illuminate\Foundation\Bootstrap\HandleExceptions.php:258
+at vendor\livewire\livewire\src\Mechanisms\ComponentRegistry.php:52
+at vendor\livewire\livewire\src\LivewireManager.php:63
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:80
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:40
+at vendor\livewire\livewire\src\LivewireManager.php:197
+at vendor\laravel\framework\src\Illuminate\Support\Facades\Facade.php:363
+at tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest.php:196</error>
+          </testcase>
+          <testcase name="List pages render seeded records with data set &quot;system setting category translations&quot;" file="Missing Filament Resource Coverage (Tests\Feature\Filament\Resources\MissingFilamentResourceCoverage)::List pages render seeded records with data set &quot;system setting category translations&quot;" class="Tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest" classname="Tests.Feature.Filament.Resources.MissingFilamentResourceCoverageTest" assertions="0" time="0.593848">
+            <error type="ErrorException">List pages render seeded records with data set "system setting category translations"ErrorException: include(C:\Dropbox\projects\egistatyba\vendor\composer/../../app/Filament/Resources/SystemSettingCategoryTranslationResource/Pages/ListSystemSettingCategoryTranslations.php): Failed to open stream: No such file or directory&#13;
+at vendor\laravel\framework\src\Illuminate\Foundation\Bootstrap\HandleExceptions.php:258
+at vendor\livewire\livewire\src\Mechanisms\ComponentRegistry.php:52
+at vendor\livewire\livewire\src\LivewireManager.php:63
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:80
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:40
+at vendor\livewire\livewire\src\LivewireManager.php:197
+at vendor\laravel\framework\src\Illuminate\Support\Facades\Facade.php:363
+at tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest.php:196</error>
+          </testcase>
+          <testcase name="List pages render seeded records with data set &quot;system setting dependencies&quot;" file="Missing Filament Resource Coverage (Tests\Feature\Filament\Resources\MissingFilamentResourceCoverage)::List pages render seeded records with data set &quot;system setting dependencies&quot;" class="Tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest" classname="Tests.Feature.Filament.Resources.MissingFilamentResourceCoverageTest" assertions="0" time="0.664829">
+            <error type="ErrorException">List pages render seeded records with data set "system setting dependencies"ErrorException: include(C:\Dropbox\projects\egistatyba\vendor\composer/../../app/Filament/Resources/SystemSettingDependencyResource/Pages/ListSystemSettingDependencies.php): Failed to open stream: No such file or directory&#13;
+at vendor\laravel\framework\src\Illuminate\Foundation\Bootstrap\HandleExceptions.php:258
+at vendor\livewire\livewire\src\Mechanisms\ComponentRegistry.php:52
+at vendor\livewire\livewire\src\LivewireManager.php:63
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:80
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:40
+at vendor\livewire\livewire\src\LivewireManager.php:197
+at vendor\laravel\framework\src\Illuminate\Support\Facades\Facade.php:363
+at tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest.php:196</error>
+          </testcase>
+          <testcase name="List pages render seeded records with data set &quot;system setting histories&quot;" file="Missing Filament Resource Coverage (Tests\Feature\Filament\Resources\MissingFilamentResourceCoverage)::List pages render seeded records with data set &quot;system setting histories&quot;" class="Tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest" classname="Tests.Feature.Filament.Resources.MissingFilamentResourceCoverageTest" assertions="0" time="0.610884">
+            <error type="ErrorException">List pages render seeded records with data set "system setting histories"ErrorException: include(C:\Dropbox\projects\egistatyba\vendor\composer/../../app/Filament/Resources/SystemSettingHistoryResource/Pages/ListSystemSettingHistories.php): Failed to open stream: No such file or directory&#13;
+at vendor\laravel\framework\src\Illuminate\Foundation\Bootstrap\HandleExceptions.php:258
+at vendor\livewire\livewire\src\Mechanisms\ComponentRegistry.php:52
+at vendor\livewire\livewire\src\LivewireManager.php:63
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:80
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:40
+at vendor\livewire\livewire\src\LivewireManager.php:197
+at vendor\laravel\framework\src\Illuminate\Support\Facades\Facade.php:363
+at tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest.php:196</error>
+          </testcase>
+          <testcase name="List pages render seeded records with data set &quot;system settings&quot;" file="Missing Filament Resource Coverage (Tests\Feature\Filament\Resources\MissingFilamentResourceCoverage)::List pages render seeded records with data set &quot;system settings&quot;" class="Tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest" classname="Tests.Feature.Filament.Resources.MissingFilamentResourceCoverageTest" assertions="0" time="0.588148">
+            <error type="ErrorException">List pages render seeded records with data set "system settings"ErrorException: include(C:\Dropbox\projects\egistatyba\vendor\composer/../../app/Filament/Resources/SystemSettingResource/Pages/ListSystemSettings.php): Failed to open stream: No such file or directory&#13;
+at vendor\laravel\framework\src\Illuminate\Foundation\Bootstrap\HandleExceptions.php:258
+at vendor\livewire\livewire\src\Mechanisms\ComponentRegistry.php:52
+at vendor\livewire\livewire\src\LivewireManager.php:63
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:80
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:40
+at vendor\livewire\livewire\src\LivewireManager.php:197
+at vendor\laravel\framework\src\Illuminate\Support\Facades\Facade.php:363
+at tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest.php:196</error>
+          </testcase>
+          <testcase name="List pages render seeded records with data set &quot;system settings panel alias&quot;" file="Missing Filament Resource Coverage (Tests\Feature\Filament\Resources\MissingFilamentResourceCoverage)::List pages render seeded records with data set &quot;system settings panel alias&quot;" class="Tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest" classname="Tests.Feature.Filament.Resources.MissingFilamentResourceCoverageTest" assertions="0" time="0.580001">
+            <error type="ErrorException">List pages render seeded records with data set "system settings panel alias"ErrorException: include(C:\Dropbox\projects\egistatyba\vendor\composer/../../app/Filament/Resources/SystemSettingsResource/Pages/ListSystemSettings.php): Failed to open stream: No such file or directory&#13;
+at vendor\laravel\framework\src\Illuminate\Foundation\Bootstrap\HandleExceptions.php:258
+at vendor\livewire\livewire\src\Mechanisms\ComponentRegistry.php:52
+at vendor\livewire\livewire\src\LivewireManager.php:63
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:80
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:40
+at vendor\livewire\livewire\src\LivewireManager.php:197
+at vendor\laravel\framework\src\Illuminate\Support\Facades\Facade.php:363
+at tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest.php:196</error>
+          </testcase>
+          <testcase name="List pages render seeded records with data set &quot;system setting translations&quot;" file="Missing Filament Resource Coverage (Tests\Feature\Filament\Resources\MissingFilamentResourceCoverage)::List pages render seeded records with data set &quot;system setting translations&quot;" class="Tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest" classname="Tests.Feature.Filament.Resources.MissingFilamentResourceCoverageTest" assertions="0" time="0.582178">
+            <error type="ErrorException">List pages render seeded records with data set "system setting translations"ErrorException: include(C:\Dropbox\projects\egistatyba\vendor\composer/../../app/Filament/Resources/SystemSettingTranslationResource/Pages/ListSystemSettingTranslations.php): Failed to open stream: No such file or directory&#13;
+at vendor\laravel\framework\src\Illuminate\Foundation\Bootstrap\HandleExceptions.php:258
+at vendor\livewire\livewire\src\Mechanisms\ComponentRegistry.php:52
+at vendor\livewire\livewire\src\LivewireManager.php:63
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:80
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:40
+at vendor\livewire\livewire\src\LivewireManager.php:197
+at vendor\laravel\framework\src\Illuminate\Support\Facades\Facade.php:363
+at tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest.php:196</error>
+          </testcase>
+          <testcase name="List pages render seeded records with data set &quot;user management&quot;" file="Missing Filament Resource Coverage (Tests\Feature\Filament\Resources\MissingFilamentResourceCoverage)::List pages render seeded records with data set &quot;user management&quot;" class="Tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest" classname="Tests.Feature.Filament.Resources.MissingFilamentResourceCoverageTest" assertions="0" time="0.623620">
+            <error type="ErrorException">List pages render seeded records with data set "user management"ErrorException: include(C:\Dropbox\projects\egistatyba\vendor\composer/../../app/Filament/Resources/UserManagementResource/Pages/ListUsers.php): Failed to open stream: No such file or directory&#13;
+at vendor\laravel\framework\src\Illuminate\Foundation\Bootstrap\HandleExceptions.php:258
+at vendor\livewire\livewire\src\Mechanisms\ComponentRegistry.php:52
+at vendor\livewire\livewire\src\LivewireManager.php:63
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:80
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:40
+at vendor\livewire\livewire\src\LivewireManager.php:197
+at vendor\laravel\framework\src\Illuminate\Support\Facades\Facade.php:363
+at tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest.php:196</error>
+          </testcase>
+          <testcase name="List pages render seeded records with data set &quot;user preferences&quot;" file="Missing Filament Resource Coverage (Tests\Feature\Filament\Resources\MissingFilamentResourceCoverage)::List pages render seeded records with data set &quot;user preferences&quot;" class="Tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest" classname="Tests.Feature.Filament.Resources.MissingFilamentResourceCoverageTest" assertions="0" time="0.614112">
+            <error type="ErrorException">List pages render seeded records with data set "user preferences"ErrorException: include(C:\Dropbox\projects\egistatyba\vendor\composer/../../app/Filament/Resources/UserPreferenceResource/Pages/ListUserPreferences.php): Failed to open stream: No such file or directory&#13;
+at vendor\laravel\framework\src\Illuminate\Foundation\Bootstrap\HandleExceptions.php:258
+at vendor\livewire\livewire\src\Mechanisms\ComponentRegistry.php:52
+at vendor\livewire\livewire\src\LivewireManager.php:63
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:80
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:40
+at vendor\livewire\livewire\src\LivewireManager.php:197
+at vendor\laravel\framework\src\Illuminate\Support\Facades\Facade.php:363
+at tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest.php:196</error>
+          </testcase>
+          <testcase name="List pages render seeded records with data set &quot;variant combinations&quot;" file="Missing Filament Resource Coverage (Tests\Feature\Filament\Resources\MissingFilamentResourceCoverage)::List pages render seeded records with data set &quot;variant combinations&quot;" class="Tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest" classname="Tests.Feature.Filament.Resources.MissingFilamentResourceCoverageTest" assertions="0" time="1.094529">
+            <error type="Illuminate\Database\QueryException">List pages render seeded records with data set "variant combinations"Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 1 table variant_combinations has no column named formatted_combinations (Connection: sqlite, Database: C:\Dropbox\projects\egistatyba/database/testing/databases\testing_parallel_pid_13300.sqlite, SQL: insert into "variant_combinations" ("product_id", "attribute_combinations", "is_available", "combination_hash", "formatted_combinations", "updated_at", "created_at") values (1, {"color":"Crimson","size":"Large"}, 1, ce7a028f843251c69f2bfb8fe733637734e62d8ef9e1bcceb00e831bf1ef5258, Crimson / Large, 2026-01-07 20:54:53, 2026-01-07 20:54:53))&#13;
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:571
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:820
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:787
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:566
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:530
+at vendor\laravel\framework\src\Illuminate\Database\Query\Processors\Processor.php:32
+at vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php:3897
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Builder.php:2235
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1436
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1401
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1240
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:370
+at vendor\laravel\framework\src\Illuminate\Collections\Traits\EnumeratesValues.php:271
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:365
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:321
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:315
+at tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest.php:385
+at tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest.php:193
+Caused by
+PDOException: SQLSTATE[HY000]: General error: 1 table variant_combinations has no column named formatted_combinations
+
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:571
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:820
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:787
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:566
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:530
+at vendor\laravel\framework\src\Illuminate\Database\Query\Processors\Processor.php:32
+at vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php:3897
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Builder.php:2235
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1436
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1401
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1240
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:370
+at vendor\laravel\framework\src\Illuminate\Collections\Traits\EnumeratesValues.php:271
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:365
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:321
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:315
+at tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest.php:385
+at tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest.php:193</error>
+          </testcase>
+          <testcase name="List pages render seeded records with data set &quot;variant stock&quot;" file="Missing Filament Resource Coverage (Tests\Feature\Filament\Resources\MissingFilamentResourceCoverage)::List pages render seeded records with data set &quot;variant stock&quot;" class="Tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest" classname="Tests.Feature.Filament.Resources.MissingFilamentResourceCoverageTest" assertions="0" time="1.089715">
+            <error type="ErrorException">List pages render seeded records with data set "variant stock"ErrorException: include(C:\Dropbox\projects\egistatyba\vendor\composer/../../app/Models/PartnerTier.php): Failed to open stream: No such file or directory&#13;
+at vendor\laravel\framework\src\Illuminate\Foundation\Bootstrap\HandleExceptions.php:258
+at database\factories\PartnerFactory.php:23
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:527
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:506
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:490
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Concerns\GuardsAttributes.php:151
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:489
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:429
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:318
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:560
+at vendor\laravel\framework\src\Illuminate\Collections\Arr.php:786
+at vendor\laravel\framework\src\Illuminate\Collections\Collection.php:819
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:552
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:506
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:490
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Concerns\GuardsAttributes.php:157
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:489
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:429
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:318
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:315
+at tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest.php:525
+at tests\Feature\Filament\Resources\MissingFilamentResourceCoverageTest.php:193</error>
+          </testcase>
+        </testsuite>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

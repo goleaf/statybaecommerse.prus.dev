@@ -80,6 +80,35 @@ enum NavigationGroup: string
         };
     }
 
+    public function icon(): string
+    {
+        return str_replace('heroicon-o-', '', $this->getIcon());
+    }
+
+    public function priority(): int
+    {
+        return match ($this) {
+            self::UserManagement    => 10,
+            self::ContentManagement => 20,
+            self::Ecommerce         => 30,
+            self::System            => 90,
+            self::Analytics         => 40,
+            self::Marketing         => 50,
+            self::Reports           => 60,
+            self::Settings          => 80,
+            self::Users             => 11,
+            self::Products          => 31,
+            self::Orders            => 32,
+            self::Inventory         => 33,
+            self::Content           => 21,
+            self::Locations         => 34,
+            self::Discounts         => 35,
+            self::Campaigns         => 51,
+            self::News              => 22,
+            self::Referral          => 52,
+        };
+    }
+
     public function getColor(): string
     {
         return match ($this) {

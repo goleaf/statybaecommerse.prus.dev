@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Models\Concerns\HasTranslations;
 use App\Models\Scopes\ActiveScope;
 use Database\Factories\CampaignFactory;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
@@ -16,11 +15,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Campaign Model (Deprecated)
- * 
+ *
  * This model maps to the discount_campaigns table for backward compatibility.
  * The campaigns feature has been removed but the model is kept to prevent
  * fatal errors in existing code.
- * 
+ *
  * @deprecated This model is deprecated as the campaigns feature has been removed.
  */
 #[ScopedBy([ActiveScope::class])]
@@ -28,14 +27,14 @@ final class Campaign extends Model
 {
     /** @use HasFactory<CampaignFactory> */
     use HasFactory;
-    use HasTranslations;
+
     use SoftDeletes;
 
     protected $table = 'discount_campaigns';
 
     protected $fillable = [
         'name',
-        'slug', 
+        'slug',
         'starts_at',
         'ends_at',
         'channel_id',
@@ -47,22 +46,11 @@ final class Campaign extends Model
     ];
 
     protected $casts = [
-        'starts_at' => 'datetime',
-        'ends_at' => 'datetime',
-        'metadata' => 'array',
-        'is_active' => 'boolean',
+        'starts_at'     => 'datetime',
+        'ends_at'       => 'datetime',
+        'metadata'      => 'array',
+        'is_active'     => 'boolean',
         'deprecated_at' => 'datetime',
-    ];
-
-    public array $translatable = [
-        'name',
-        'description',
-        'subject',
-        'content',
-        'cta_text',
-        'banner_alt_text',
-        'meta_title',
-        'meta_description',
     ];
 
     /**
@@ -114,14 +102,6 @@ final class Campaign extends Model
     }
 
     /**
-     * Get the campaign conversions.
-     */
-    public function conversions(): HasMany
-    {
-        return $this->hasMany(CampaignConversion::class);
-    }
-
-    /**
      * Get the campaign schedules.
      */
     public function schedules(): HasMany
@@ -134,10 +114,10 @@ final class Campaign extends Model
      */
     public function isActive(): bool
     {
-        return $this->is_active && 
+        return $this->is_active &&
                $this->status === 'active' &&
-               (!$this->starts_at || $this->starts_at->isPast()) &&
-               (!$this->ends_at || $this->ends_at->isFuture());
+               (! $this->starts_at || $this->starts_at->isPast()) &&
+               (! $this->ends_at || $this->ends_at->isFuture());
     }
 
     /**
@@ -147,8 +127,8 @@ final class Campaign extends Model
     {
         $this->update([
             'deprecated_at' => now(),
-            'is_active' => false,
-            'status' => 'deprecated',
+            'is_active'     => false,
+            'status'        => 'deprecated',
         ]);
     }
 }

@@ -11,13 +11,18 @@ use App\Support\Cache\CacheTagHelper;
 use App\Support\Cache\CacheTags;
 use App\Support\Cache\TagAwareCache;
 use Filament\Infolists\Components\ViewEntry;
+use Filament\Schemas\Concerns\InteractsWithSchemas;
+use Filament\Schemas\Contracts\HasSchemas;
+use Filament\Schemas\Schema;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
-final class CollectionsShowcase extends Component
+final class CollectionsShowcase extends Component implements HasSchemas
 {
+    use InteractsWithSchemas;
+
     public function mount(): void
     {
         // Mount method can be empty or contain other initialization logic
@@ -28,7 +33,7 @@ final class CollectionsShowcase extends Component
      * underlying cache invalidation hooks for locale-aware payloads.
      */
     #[Computed]
-    public function collections(): Collection
+    public function collectionsList(): Collection
     {
         $locale = app()->getLocale();
 
@@ -64,17 +69,17 @@ final class CollectionsShowcase extends Component
      */
     public function getCollectionsProperty(): Collection
     {
-        return $this->collections();
+        return $this->collectionsList();
     }
 
-    public function collectionsSchema(Schema $schema): Schema
+    public function collections(Schema $schema): Schema
     {
         return $schema->components([
             ViewEntry::make('collections')
                 ->label('')
                 ->view('livewire.home.partials.collections-grid')
                 ->viewData(fn (): array => [
-                    'collections' => $this->collections(),
+                    'collections' => $this->collectionsList(),
                 ]),
         ]);
     }

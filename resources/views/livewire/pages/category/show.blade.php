@@ -39,7 +39,19 @@
     // Set the locale explicitly
     app()->setLocale($locale);
     app()->instance('request_locale', $locale);
+    
+    // Determine if this is category index or category show
+    $isIndex = !isset($category);
+    $pageTitle = $isIndex ? __('categories_index_meta_title') : $category->name;
+    $pageDescription = $isIndex ? __('categories_index_meta_description') : ($category->description ?? '');
 @endphp
+
+@section('meta')
+    <x-meta
+        :title="$pageTitle . ' - ' . config('app.name')"
+        :description="$pageDescription"
+        canonical="{{ url()->current() }}" />
+@endsection
 
 <div x-data="{ showFilters: false, viewMode: 'grid' }" class="min-h-screen bg-sage">
     <!-- Dark Banner Section -->
@@ -57,51 +69,106 @@
                         </a>
                     </li>
                     <li class="text-sage/60">/</li>
-                    <li>
-                        <a href="{{ route('localized.categories.index', ['locale' => app()->getLocale()]) }}"
-                           class="text-sage transition hover:text-white">
-                            {{ __('categories_index_meta_title') }}
-                        </a>
-                    </li>
-                    <li class="text-sage/60">/</li>
-                    <li class="text-white">{{ $category->name }}</li>
+                    @if (!$isIndex)
+                        <li>
+                            <a href="{{ route('localized.categories.index', ['locale' => app()->getLocale()]) }}"
+                               class="text-sage transition hover:text-white">
+                                {{ __('categories_index_meta_title') }}
+                            </a>
+                        </li>
+                        <li class="text-sage/60">/</li>
+                        <li class="text-white">{{ $category->name }}</li>
+                    @else
+                        <li class="text-white">{{ __('categories_index_meta_title') }}</li>
+                    @endif
                 </ol>
             </nav>
 
             <div class="mt-8 flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
                 <div class="max-w-2xl space-y-5">
                     <span class="inline-flex items-center gap-2 rounded-full border border-sage bg-sage px-4 py-1 text-[11px] font-semibold uppercase tracking-[0.35em] text-dark">
-                        {{ __('categories_show_badge') }}
+                        @if ($isIndex)
+                            {{ __('categories_index_badge') }}
+                        @else
+                            {{ __('categories_show_badge') }}
+                        @endif
                     </span>
                     <h1 class="text-3xl font-bold leading-tight text-white sm:text-4xl md:text-5xl">
-                        {{ $category->name }}
+                        @if ($isIndex)
+                            {{ __('categories_index_title') }}
+                        @else
+                            {{ $category->name }}
+                        @endif
                     </h1>
-                    @if (!empty($category->description))
+                    @if ($isIndex)
+                        <p class="text-base text-sage sm:text-lg">
+                            {{ __('categories_index_description') }}
+                        </p>
+                    @elseif (!empty($category->description))
                         <p class="text-base text-white sm:text-lg">
                             {{ $category->description }}
                         </p>
                     @endif
-        </div>
+                </div>
 
                 <div class="flex flex-col items-start gap-3 sm:flex-row sm:items-end sm:gap-6">
-                    <div class="rounded-2xl border border-sage/30 bg-sage/10 px-4 py-3 text-sm font-semibold text-sage shadow-sm">
-                        {{ __('categories_show_products_count', ['count' => number_format($products->total())]) }}
-                            </div>
-                    <div class="rounded-2xl border border-sage/30 bg-sage/10 px-4 py-3 text-sm text-sage/80 shadow-sm">
-                        @if ($products->firstItem() && $products->lastItem())
-                            {{ __('categories_show_showing', ['from' => $products->firstItem(), 'to' => $products->lastItem()]) }}
-                        @else
-                            {{ __('categories_show_no_products') }}
-                        @endif
-                    </div>
-                    <button type="button"
-                            @click="showFilters = true"
-                            class="inline-flex items-center gap-2 rounded-full border border-sage/30 bg-sage/10 px-4 py-2 text-sm font-semibold text-sage shadow-sm transition hover:border-sage hover:bg-sage/20 lg:hidden">
-                        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 5h6M3 12h6m-6 7h6M13 5h8M13 12h8m-8 7h8" />
-                                </svg>
-                                {{ __('categories_show_filter') }}
-                            </button>
+                    @if ($isIndex)
+                        @php
+                            $categories = $this->categories;
+                            $totalCategories = $categories->count();
+                            $from = $categories->count() ? 1 : 0;
+                            $to = $categories->count();
+                            $activeFilterCount = collect([
+                                !empty($search ?? ''),
+                                $inStock ?? false,
+                                $onSale ?? false,
+                                $hasProducts ?? false,
+                                filled($priceMin ?? null),
+                                filled($priceMax ?? null),
+                                !empty($selectedBrandIds ?? []),
+                                !empty($selectedCollectionIds ?? []),
+                                !empty($selectedCategoryIds ?? []),
+                            ])->filter()->count();
+                        @endphp
+                        <div class="rounded-2xl border border-sage/30 bg-sage/10 px-4 py-3 text-sm font-semibold text-sage shadow-sm">
+                            {{ __('categories_index_catalogue_count', ['count' => number_format($totalCategories)]) }}
+                        </div>
+                        <div class="rounded-2xl border border-sage/30 bg-sage/10 px-4 py-3 text-sm text-sage/80 shadow-sm">
+                            @if ($activeFilterCount > 0)
+                                {{ __('categories_index_filters_active', ['count' => $activeFilterCount]) }}
+                            @else
+                                {{ __('categories_index_filters_none') }}
+                            @endif
+                        </div>
+                        <button type="button"
+                                wire:click="$toggle('sidebarOpen')"
+                                wire:confirm="{{ __('translations.confirm_toggle_sidebar') }}"
+                                class="inline-flex items-center gap-2 rounded-full border border-sage/30 bg-sage/10 px-4 py-2 text-sm font-semibold text-sage shadow-sm transition hover:border-sage hover:bg-sage/20 lg:hidden">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 5h6M3 12h6m-6 7h6M13 5h8M13 12h8m-8 7h8" />
+                            </svg>
+                            {{ __('categories_index_filters_button') }}
+                        </button>
+                    @else
+                        <div class="rounded-2xl border border-sage/30 bg-sage/10 px-4 py-3 text-sm font-semibold text-sage shadow-sm">
+                            {{ __('categories_show_products_count', ['count' => number_format($products->total())]) }}
+                        </div>
+                        <div class="rounded-2xl border border-sage/30 bg-sage/10 px-4 py-3 text-sm text-sage/80 shadow-sm">
+                            @if ($products->firstItem() && $products->lastItem())
+                                {{ __('categories_show_showing', ['from' => $products->firstItem(), 'to' => $products->lastItem()]) }}
+                            @else
+                                {{ __('categories_show_no_products') }}
+                            @endif
+                        </div>
+                        <button type="button"
+                                @click="showFilters = true"
+                                class="inline-flex items-center gap-2 rounded-full border border-sage/30 bg-sage/10 px-4 py-2 text-sm font-semibold text-sage shadow-sm transition hover:border-sage hover:bg-sage/20 lg:hidden">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 5h6M3 12h6m-6 7h6M13 5h8M13 12h8m-8 7h8" />
+                            </svg>
+                            {{ __('categories_show_filter') }}
+                        </button>
+                    @endif
                 </div>
             </div>
         </x-container>
@@ -384,7 +451,7 @@
                                 </svg>
                                 {{ __('categories_show_browse_categories') }}
                             </a>
-                                <a href="{{ route('products.index') ?? route('localized.categories.index', ['locale' => app()->getLocale()]) }}"
+                                <a href="{{ route('localized.products.index', ['locale' => app()->getLocale()]) }}"
                                    class="inline-flex items-center gap-2 rounded-full bg-sage px-6 py-3 text-sm font-semibold text-dark transition hover:bg-sage/90 shadow-sm">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
@@ -450,6 +517,4 @@
             </div>
         </div>
     </div>
-
-    <x-filament-actions::modals />
 </div>

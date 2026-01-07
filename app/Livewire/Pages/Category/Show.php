@@ -11,6 +11,10 @@ use App\Models\Product;
 use App\Support\Cache\CacheKeys;
 use App\Support\Cache\CacheTags;
 use App\Support\Cache\TagAwareCache;
+use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Actions\Contracts\HasActions;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator as LengthAwarePaginatorContract;
 use Illuminate\Contracts\View\View;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -24,8 +28,10 @@ use Livewire\WithPagination;
  * @property string   $sortDirection
  * @property-read LengthAwarePaginatorContract<int, ProductListItemData> $products
  */
-final class Show extends Component
+final class Show extends Component implements HasActions, HasForms
 {
+    use InteractsWithActions;
+    use InteractsWithForms;
     use WithCart;
     use WithPagination;
 

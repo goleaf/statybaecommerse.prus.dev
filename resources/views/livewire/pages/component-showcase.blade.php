@@ -242,7 +242,7 @@
                 description="This is an example of an empty state component with action buttons"
                 icon="heroicon-o-cube"
                 action-text="Browse Products"
-                action-url="{{ route('products.index') }}"
+                action-url="{{ route('localized.products.index', ['locale' => app()->getLocale()]) }}"
             />
         </x-shared.section>
 
