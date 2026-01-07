@@ -63,9 +63,9 @@ class DashboardOverviewWidget extends BaseWidget
         $avgOrderValue = $totalOrders > 0 ? $totalRevenue / $totalOrders : 0;
         $totalReviews = Review::where('is_approved', true)->count();
         $avgRating = (float) (Review::where('is_approved', true)->avg('rating') ?? 0);
-        $activeCampaigns = Campaign::where('status', 'active')->count();
-        $totalCampaignViews = CampaignView::sum('views_count');
-        $totalCampaignClicks = CampaignClick::sum('clicks_count');
+        $activeCampaigns = 0; // Campaign::where('status', 'active')->count();
+        $totalCampaignViews = 0; // CampaignView::sum('views_count');
+        $totalCampaignClicks = 0; // CampaignClick::sum('clicks_count');
         $totalConversions = CampaignConversion::sum('conversions_count');
 
         // Performance Metrics

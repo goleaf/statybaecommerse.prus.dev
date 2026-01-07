@@ -104,12 +104,13 @@ class UltimateStatsWidget extends BaseWidget
         $avgRating = (float) (Review::where('is_approved', true)->avg('rating') ?? 0);
         $pendingReviews = Review::where('is_approved', false)->count();
 
-        // === CAMPAIGNS & MARKETING ===
-        $totalCampaigns = Campaign::count();
-        $activeCampaigns = Campaign::where('status', 'active')->count();
-        $totalCampaignViews = CampaignView::sum('views_count');
-        $totalCampaignClicks = CampaignClick::sum('clicks_count');
-        $totalConversions = CampaignConversion::sum('conversions_count');
+        // === CAMPAIGNS & MARKETING === (DEPRECATED)
+        // Campaign functionality has been removed - using fallback values
+        $totalCampaigns = 0; // Campaign::count();
+        $activeCampaigns = 0; // Campaign::where('status', 'active')->count();
+        $totalCampaignViews = 0; // CampaignView::sum('views_count');
+        $totalCampaignClicks = 0; // CampaignClick::sum('clicks_count');
+        $totalConversions = 0; // CampaignConversion::sum('conversions_count');
 
         // === DISCOUNTS & COUPONS ===
         $totalCoupons = Coupon::count();

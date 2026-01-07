@@ -57,7 +57,7 @@ final class EcommerceOverview extends BaseWidget
 
         $totalCustomers = (int) User::count();
         $totalProducts = (int) Product::query()->withoutGlobalScopes()->count();
-        $activeCampaigns = (int) Campaign::query()->withoutGlobalScopes()->where('is_active', true)->count();
+        $activeCampaigns = 0; // (int) Campaign::query()->withoutGlobalScopes()->where('is_active', true)->count();
 
         $avgOrderValue = $ordersThisMonth > 0 ? $revenueThisMonth / $ordersThisMonth : 0.0;
 
