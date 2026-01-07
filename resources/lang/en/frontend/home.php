@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 return [
     'homepage' => 'Homepage',
-    'meta' => [
+    'meta'     => [
         'title'       => 'Building without worries.',
         'description' => 'Explore curated collections, trusted brands, and personalized recommendations crafted for Baltic shoppers.',
     ],

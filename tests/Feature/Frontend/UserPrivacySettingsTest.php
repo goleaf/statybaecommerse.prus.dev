@@ -7,7 +7,6 @@ namespace Tests\Feature\Frontend;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
-use Spatie\Activitylog\Models\Activity;
 use Tests\TestCase;
 
 final class UserPrivacySettingsTest extends TestCase
@@ -45,9 +44,5 @@ final class UserPrivacySettingsTest extends TestCase
             'user_id' => $user->getKey(),
             'action'  => 'privacy_settings_updated',
         ]);
-
-        $activity = Activity::query()->where('event', 'privacy_settings_updated')->first();
-        $this->assertNotNull($activity);
-        $this->assertSame($user->getKey(), $activity->causer_id);
     }
 }

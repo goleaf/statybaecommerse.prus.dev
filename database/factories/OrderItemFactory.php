@@ -34,14 +34,14 @@ final class OrderItemFactory extends Factory
             'name'               => $this->faker->words(3, true),
             // Use an explicit generator to avoid exhausting Faker's unique() pool
             // when the seeder creates thousands of rows.
-            'sku'                => $this->generateSku(),
-            'quantity'           => $quantity,
-            'unit_price'         => $unitPrice,
-            'price'              => $unitPrice,  // Same as unit_price for consistency
-            'total'              => $total,
-            'notes'              => $this->faker->optional(0.3)->sentence(),
-            'discount_amount'    => 0,
-            'status'             => 'pending',
+            'sku'             => $this->generateSku(),
+            'quantity'        => $quantity,
+            'unit_price'      => $unitPrice,
+            'price'           => $unitPrice,  // Same as unit_price for consistency
+            'total'           => $total,
+            'notes'           => $this->faker->optional(0.3)->sentence(),
+            'discount_amount' => 0,
+            'status'          => 'pending',
         ];
 
         return $this->filterOrderItemColumns($attributes);
@@ -142,7 +142,7 @@ final class OrderItemFactory extends Factory
     /**
      * Strip attributes for columns that are not present on the order_items table.
      *
-     * @param array<string, mixed> $attributes
+     * @param  array<string, mixed> $attributes
      * @return array<string, mixed>
      */
     private function filterOrderItemColumns(array $attributes): array

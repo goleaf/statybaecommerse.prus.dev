@@ -34,9 +34,7 @@ final class DemoStoreSeeder extends Seeder
 
     private const DEFAULT_LOCALE = 'en';
 
-    public function __construct(private readonly LocalImageGeneratorService $imageGenerator)
-    {
-    }
+    public function __construct(private readonly LocalImageGeneratorService $imageGenerator) {}
 
     public function run(): void
     {

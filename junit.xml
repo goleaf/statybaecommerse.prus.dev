@@ -1,15 +1,2 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuites>
-  <testsuite name="C:\Dropbox\projects\egistatyba\phpunit.xml" tests="6" assertions="13" errors="0" failures="0" skipped="0" time="14.919066">
-    <testsuite name="Feature" tests="6" assertions="13" errors="0" failures="0" skipped="0" time="14.919066">
-      <testsuite name="Tests\Feature\AdminLoginRefactorTest" file="Admin Login Refactor (Tests\Feature\AdminLoginRefactor)" tests="6" assertions="13" errors="0" failures="0" skipped="0" time="14.919066">
-        <testcase name="Admin login route resolves correctly" file="Admin Login Refactor (Tests\Feature\AdminLoginRefactor)::Admin login route resolves correctly" class="Tests\Feature\AdminLoginRefactorTest" classname="Tests.Feature.AdminLoginRefactorTest" assertions="1" time="11.970630"/>
-        <testcase name="Admin panel redirects unauthenticated users" file="Admin Login Refactor (Tests\Feature\AdminLoginRefactor)::Admin panel redirects unauthenticated users" class="Tests\Feature\AdminLoginRefactorTest" classname="Tests.Feature.AdminLoginRefactorTest" assertions="2" time="0.731374"/>
-        <testcase name="Admin login page loads successfully" file="Admin Login Refactor (Tests\Feature\AdminLoginRefactor)::Admin login page loads successfully" class="Tests\Feature\AdminLoginRefactorTest" classname="Tests.Feature.AdminLoginRefactorTest" assertions="3" time="0.564456"/>
-        <testcase name="Admin login page contains form elements" file="Admin Login Refactor (Tests\Feature\AdminLoginRefactor)::Admin login page contains form elements" class="Tests\Feature\AdminLoginRefactorTest" classname="Tests.Feature.AdminLoginRefactorTest" assertions="4" time="0.540722"/>
-        <testcase name="Admin logout works correctly" file="Admin Login Refactor (Tests\Feature\AdminLoginRefactor)::Admin logout works correctly" class="Tests\Feature\AdminLoginRefactorTest" classname="Tests.Feature.AdminLoginRefactorTest" assertions="2" time="0.568987"/>
-        <testcase name="Admin login page uses default filament login" file="Admin Login Refactor (Tests\Feature\AdminLoginRefactor)::Admin login page uses default filament login" class="Tests\Feature\AdminLoginRefactorTest" classname="Tests.Feature.AdminLoginRefactorTest" assertions="1" time="0.542897"/>
-      </testsuite>
-    </testsuite>
-  </testsuite>
-</testsuites>
+<testsuites/>

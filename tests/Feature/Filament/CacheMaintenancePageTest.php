@@ -54,7 +54,7 @@ final class CacheMaintenancePageTest extends TestCase
 
         Livewire::test(CacheMaintenance::class)
             ->fillForm([
-                'cacheKey' => 'demo-key',
+                'cacheKey'  => 'demo-key',
                 'cacheTags' => [],
             ])
             ->callAction('forgetCacheKey')

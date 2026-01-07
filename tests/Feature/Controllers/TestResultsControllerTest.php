@@ -22,7 +22,7 @@ final class TestResultsControllerTest extends TestCase
 
         // Seed a deterministic dataset so the underlying service produces a populated view model.
         File::put($temporaryPath, json_encode([
-            'meta'  => [
+            'meta' => [
                 'created_at'   => '2024-01-01T00:00:00Z',
                 'is_running'   => false,
                 'total'        => 1,

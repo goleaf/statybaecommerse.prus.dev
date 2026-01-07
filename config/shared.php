@@ -70,7 +70,6 @@ return [
     ],
 
     'features' => [
-        'wishlist_enabled'   => true,
         'compare_enabled'    => true,
         'reviews_enabled'    => true,
         'ratings_enabled'    => true,

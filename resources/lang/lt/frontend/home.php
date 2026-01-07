@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 return [
     'homepage' => 'Pagrindinis puslapis',
-    'meta' => [
+    'meta'     => [
         'title'       => 'Atraskite šiuolaikinę el. prekybą',
         'description' => 'Naršykite kruopščiai atrinktas kolekcijas, patikimus prekės ženklus ir asmenines rekomendacijas Baltijos pirkėjams.',
     ],

@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
 use Tests\TestCase;
 
-
 /**
  * Feature tests for exception handler HTTP behavior and integration.
  */
@@ -74,13 +73,13 @@ class ExceptionHandlerFeatureTest extends TestCase
         Route::post('/api/test', function (Request $request) {
             $request->validate([
                 'required_field' => 'required|string',
-                'email_field' => 'required|email',
+                'email_field'    => 'required|email',
             ]);
         })->middleware('api');
 
         $response = $this->postJson('/api/test', [
             'required_field' => '',
-            'email_field' => 'invalid-email',
+            'email_field'    => 'invalid-email',
         ]);
 
         $response->assertStatus(422)
@@ -91,8 +90,8 @@ class ExceptionHandlerFeatureTest extends TestCase
                 'detail',
                 'instance',
                 'violations' => [
-                    '*' => ['field', 'messages', 'reason']
-                ]
+                    '*' => ['field', 'messages', 'reason'],
+                ],
             ]);
     }
 
@@ -110,7 +109,7 @@ class ExceptionHandlerFeatureTest extends TestCase
                 'title',
                 'status',
                 'detail',
-                'context' => ['reason']
+                'context' => ['reason'],
             ]);
     }
 
@@ -124,7 +123,7 @@ class ExceptionHandlerFeatureTest extends TestCase
 
         $response->assertStatus(401)
             ->assertJson([
-                'message' => 'Token expired'
+                'message' => 'Token expired',
             ]);
     }
 
@@ -212,7 +211,7 @@ class ExceptionHandlerFeatureTest extends TestCase
 
         // Should complete within performance budget
         $maxTime = config('exception-handling.budgets.exception_handling_max_ms', 5);
-        $this->assertLessThan($maxTime, $executionTime, 
+        $this->assertLessThan($maxTime, $executionTime,
             "Exception handling took {$executionTime}ms, exceeding budget of {$maxTime}ms");
     }
 
@@ -232,8 +231,8 @@ class ExceptionHandlerFeatureTest extends TestCase
         // For testing, we verify the handler would sanitize the message
         Log::shouldHaveReceived('error')
             ->with('Application boot failure detected', \Mockery::on(function ($context) {
-                return !str_contains($context['message'], 'secret123')
-                    && !str_contains($context['message'], 'abc123');
+                return ! str_contains($context['message'], 'secret123')
+                    && ! str_contains($context['message'], 'abc123');
             }));
     }
 
@@ -241,16 +240,16 @@ class ExceptionHandlerFeatureTest extends TestCase
     {
         // Create an exception with a malicious file path
         $maliciousPath = '/app/../../../etc/passwd';
-        
+
         Route::get('/path-traversal-test', function () use ($maliciousPath) {
             $exception = new Exception('Path traversal test');
-            
+
             // Use reflection to set a malicious file path
             $reflection = new ReflectionClass($exception);
             $fileProperty = $reflection->getProperty('file');
             $fileProperty->setAccessible(true);
             $fileProperty->setValue($exception, $maliciousPath);
-            
+
             throw $exception;
         });
 
@@ -265,8 +264,8 @@ class ExceptionHandlerFeatureTest extends TestCase
 
         Log::shouldHaveReceived('error')
             ->with('Application boot failure detected', \Mockery::on(function ($context) {
-                return !str_contains($context['file'], '../')
-                    && !str_contains($context['file'], '/etc/passwd');
+                return ! str_contains($context['file'], '../')
+                    && ! str_contains($context['file'], '/etc/passwd');
             }));
     }
 
@@ -291,7 +290,7 @@ class ExceptionHandlerFeatureTest extends TestCase
 
         // Verify the exception was reported through Laravel's system
         Exceptions::assertReported(Exception::class);
-        
+
         // And our boot error detection also logged it
         Log::shouldHaveReceived('error')
             ->with('Application boot failure detected', \Mockery::any());
@@ -300,21 +299,21 @@ class ExceptionHandlerFeatureTest extends TestCase
     public function test_multiple_exception_types_handled_correctly_in_sequence(): void
     {
         // Test sequence: ValidationException -> TypeError -> Boot Error
-        
+
         // 1. Validation Exception (should not trigger boot error detection)
         Route::post('/validation-test', function (Request $request) {
             $request->validate(['required_field' => 'required']);
         });
 
         $this->postJson('/validation-test', []);
-        
+
         // 2. Type Error (should log as warning)
         Route::get('/type-error-test/{id}', function (int $id) {
             return response()->json(['id' => $id]);
         });
 
         $this->getJson('/type-error-test/not-a-number');
-        
+
         // 3. Boot Error (should trigger boot error detection)
         Route::get('/boot-error-test', function () {
             throw new Exception('TranslatableRecord error');

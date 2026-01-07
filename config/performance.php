@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     /*
     |--------------------------------------------------------------------------
@@ -91,11 +93,11 @@ return [
         |
         */
         'query_budgets' => [
-            'home' => 15,
+            'home'     => 15,
             'category' => 20,
-            'product' => 25,
-            'search' => 10,
-            'api' => 5,
+            'product'  => 25,
+            'search'   => 10,
+            'api'      => 5,
         ],
 
         /*
@@ -107,11 +109,11 @@ return [
         |
         */
         'memory_budgets' => [
-            'home' => 64,
+            'home'     => 64,
             'category' => 96,
-            'product' => 128,
-            'search' => 48,
-            'api' => 32,
+            'product'  => 128,
+            'search'   => 48,
+            'api'      => 32,
         ],
 
         /*
@@ -123,11 +125,11 @@ return [
         |
         */
         'ttfb_budgets' => [
-            'home' => 500,
+            'home'     => 500,
             'category' => 750,
-            'product' => 600,
-            'search' => 400,
-            'api' => 200,
+            'product'  => 600,
+            'search'   => 400,
+            'api'      => 200,
         ],
     ],
 
@@ -140,8 +142,8 @@ return [
         | Redis settings for cache and session storage.
         |
         */
-        'enabled' => env('REDIS_ENABLED', false),
-        'cache_prefix' => env('REDIS_CACHE_PREFIX', 'egistatyba_cache'),
+        'enabled'        => env('REDIS_ENABLED', false),
+        'cache_prefix'   => env('REDIS_CACHE_PREFIX', 'egistatyba_cache'),
         'session_prefix' => env('REDIS_SESSION_PREFIX', 'egistatyba_session'),
     ],
 ];

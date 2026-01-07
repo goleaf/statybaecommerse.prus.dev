@@ -52,8 +52,4 @@ it('ensures optional user relations resolve to supported relation classes', func
     if (method_exists($model, 'orders')) {
         AssertsRelations::assertRelation($model, 'orders', HasMany::class);
     }
-
-    if (method_exists($model, 'wishlistItems')) {
-        AssertsRelations::assertRelation($model, 'wishlistItems', HasMany::class);
-    }
 });

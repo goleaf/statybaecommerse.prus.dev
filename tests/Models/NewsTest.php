@@ -12,6 +12,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use ReflectionClass;
+use ReflectionMethod;
 use Tests\TestCase;
 
 final class NewsTest extends TestCase
@@ -63,9 +65,6 @@ final class NewsTest extends TestCase
         $this->assertInstanceOf(HasMany::class, $news->approvals());
         $this->assertInstanceOf(HasOne::class, $news->latestApproval());
         $this->assertInstanceOf(BelongsToMany::class, $news->categories());
-        $this->assertInstanceOf(BelongsToMany::class, $news->tags());
-        $this->assertInstanceOf(HasMany::class, $news->comments());
-        $this->assertInstanceOf(HasOne::class, $news->latestComment());
         $this->assertInstanceOf(HasMany::class, $news->images());
         $this->assertInstanceOf(HasOne::class, $news->latestImage());
     }
@@ -249,3 +248,48 @@ final class NewsTest extends TestCase
         $this->assertFalse($news->fresh()->isReadyForFrontend());
     }
 }
+
+// Property-based tests for News model cleanup
+describe('News Model Cleanup Property Tests', function () {
+    /**
+     * **Feature: news-blog-cleanup-upgrade, Property 1: News model cleanup completeness**
+     * **Validates: Requirements 1.1, 2.1, 4.1, 4.2, 4.3**
+     *
+     * For any News model instance after cleanup, the model should not contain any methods
+     * or references related to NewsTag or NewsComment functionality, and all core News
+     * operations should work correctly.
+     */
+    it('ensures News model has no tag or comment functionality', function () {
+        // Property: News model should not have any tag or comment related methods
+        $newsModel = new News;
+        $reflection = new ReflectionClass($newsModel);
+
+        // Get all public methods
+        $methods = $reflection->getMethods(ReflectionMethod::IS_PUBLIC);
+        $methodNames = array_map(fn ($method) => $method->getName(), $methods);
+
+        // Property: No tag-related methods should exist
+        $tagMethods = array_filter($methodNames, fn ($name) => str_contains(strtolower($name), 'tag') ||
+            str_contains(strtolower($name), 'tags')
+        );
+        expect($tagMethods)->toBeEmpty('News model should not contain any tag-related methods');
+
+        // Property: No comment-related methods should exist
+        $commentMethods = array_filter($methodNames, fn ($name) => str_contains(strtolower($name), 'comment') ||
+            str_contains(strtolower($name), 'comments')
+        );
+        expect($commentMethods)->toBeEmpty('News model should not contain any comment-related methods');
+
+        // Property: Core relationship methods should exist
+        expect(in_array('categories', $methodNames))->toBeTrue('News model should have categories relationship');
+        expect(in_array('images', $methodNames))->toBeTrue('News model should have images relationship');
+        expect(in_array('approvals', $methodNames))->toBeTrue('News model should have approvals relationship');
+        expect(in_array('translations', $methodNames))->toBeTrue('News model should have translations relationship');
+
+        // Property: Core functionality methods should exist
+        expect(in_array('isPublished', $methodNames))->toBeTrue('News model should have isPublished method');
+        expect(in_array('isFeatured', $methodNames))->toBeTrue('News model should have isFeatured method');
+        expect(in_array('incrementViewCount', $methodNames))->toBeTrue('News model should have incrementViewCount method');
+        expect(in_array('isReadyForFrontend', $methodNames))->toBeTrue('News model should have isReadyForFrontend method');
+    });
+});

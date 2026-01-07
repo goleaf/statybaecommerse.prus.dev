@@ -117,9 +117,9 @@ final class UserPreferenceResourceTest extends TestCase
     {
         // Persist a preference record so the view page has real content to render.
         $preference = UserPreference::factory()->create([
-            'preference_type' => 'category',
-            'preference_key'  => 'viewable-key',
-            'preference_score'=> 0.42,
+            'preference_type'  => 'category',
+            'preference_key'   => 'viewable-key',
+            'preference_score' => 0.42,
         ]);
 
         Livewire::actingAs($this->adminUser)

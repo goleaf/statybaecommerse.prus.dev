@@ -10,11 +10,10 @@ use App\Http\Controllers\Api\ExportDownloadController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ProductController;
-use App\Http\Controllers\Api\ProductHistoryController as ApiProductHistoryController;
-use App\Models\Category;
 use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\Api\V1\SearchController;
 use App\Http\Controllers\Webhooks\PaymentWebhookController;
+use App\Models\Category;
 use App\Support\Authorization\AuthorizationMatrix;
 use Illuminate\Support\Facades\Route;
 
@@ -136,13 +135,6 @@ Route::get('exports/download/{export:uuid}', ExportDownloadController::class)
     ->middleware(['signed', 'throttle:api.exports'])
     ->name('api.exports.download');
 
-Route::prefix('partner')
-    ->middleware(['partner.api.auth', 'partner.api.rate_limit'])
-    ->name('api.partner.')
-    ->group(function (): void {
-        require __DIR__ . '/api/partner.php';
-    });
-
 Route::get('audit-logs', [AuditLogController::class, 'index'])
     ->middleware([
         'auth:sanctum',
@@ -150,31 +142,3 @@ Route::get('audit-logs', [AuditLogController::class, 'index'])
         'throttle:api.read',
     ])
     ->name('api.audit-logs.index');
-
-Route::prefix('admin/products/{product:id}/histories')
-    ->middleware(['auth:sanctum'])
-    ->name('api.admin.product-histories.')
-    ->group(function (): void {
-        Route::get('/', [ApiProductHistoryController::class, 'index'])
-            ->middleware('permission:' . AuthorizationMatrix::ability('product_histories', 'viewAny'))
-            ->name('index');
-
-        Route::get('/statistics', [ApiProductHistoryController::class, 'statistics'])
-            ->middleware('permission:' . AuthorizationMatrix::ability('product_histories', 'viewAny'))
-            ->name('statistics');
-
-        Route::get('/{history}', [ApiProductHistoryController::class, 'show'])
-            ->middleware('permission:' . AuthorizationMatrix::ability('product_histories', 'view'))
-            ->name('show');
-
-        Route::post('/', [ApiProductHistoryController::class, 'store'])
-            ->middleware('permission:' . AuthorizationMatrix::ability('product_histories', 'create'))
-            ->name('store');
-
-        Route::post('/export', [ApiProductHistoryController::class, 'export'])
-            ->middleware('permission:' . AuthorizationMatrix::ability('product_histories', 'export'))
-            ->name('export');
-    });
-
-// Pull in the legacy campaign click endpoints until we consolidate them under the versioned API namespace.
-require base_path('routes/campaign-clicks.php');

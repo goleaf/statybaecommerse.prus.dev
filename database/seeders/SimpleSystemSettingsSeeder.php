@@ -201,7 +201,7 @@ final class SimpleSystemSettingsSeeder extends Seeder
                 'de' => 'Deutsch',
                 'ru' => 'Русский',
             ],
-            'sort_order'  => 5,
+            'sort_order' => 5,
         ])->create();
 
         // E-commerce Settings

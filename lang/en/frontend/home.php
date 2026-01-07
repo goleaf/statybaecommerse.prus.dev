@@ -3,110 +3,175 @@
 declare(strict_types=1);
 
 return [
-    'meta' => [
-        'title'       => 'Construction catalogue for Baltic professionals',
-        'description' => 'Browse trusted building materials, power tools, and safety essentials sourced across Lithuania and the wider European market.',
+    'homepage' => 'Homepage',
+    'meta'     => [
+        'title'       => 'Building without worries.',
+        'description' => 'Explore curated collections, trusted brands, and personalized recommendations crafted for Baltic shoppers.',
     ],
     'hero' => [
-        'eyebrow'       => 'Trade-grade supplies delivered reliably',
-        'title'         => 'Everything you need to keep Baltic projects moving',
-        'subtitle'      => 'From structural timber to finishing touches, our curated marketplace keeps warehouses and job sites stocked with dependable equipment.',
-        'cta_primary'   => 'Browse catalogue',
-        'cta_secondary' => 'See new arrivals',
+        'eyebrow'       => 'Seasonal highlights',
+        'title'         => 'Your construction solutions.',
+        'subtitle'      => 'A wide range of construction products that ensure quality at every step – from fasteners to facade finishing materials and accessories.',
+        'cta_primary'   => 'Shop featured products',
+        'cta_secondary' => 'Browse new arrivals',
         'featured_card' => [
-            'badge'    => 'Featured spotlight',
-            'title'    => 'Essential safety gear for demanding sites',
-            'subtitle' => 'Certified helmets, harnesses, and footwear ready to ship across the Baltics.',
-            'link'     => 'Explore featured items',
+            'badge'    => 'Editor’s choice',
+            'title'    => 'Hand-picked looks tailored to Baltic lifestyles',
+            'subtitle' => 'Discover curated outfits, lifestyle picks, and trending gear built around quality and versatility.',
+            'link'     => 'See all featured collections',
         ],
         'secondary_cards' => [
             'new' => [
-                'badge'    => 'Just landed',
-                'title'    => 'Fresh stock from regional partners',
-                'subtitle' => 'Discover the latest additions from local distributors and EU manufacturers.',
-                'link'     => 'View what is new',
+                'badge'    => 'Fresh in stock',
+                'title'    => 'Latest product drops',
+                'subtitle' => 'Updated every morning with limited releases and exclusive colourways.',
+                'link'     => 'View the newest items',
             ],
             'sale' => [
-                'badge'    => 'Limited offers',
-                'title'    => 'Seasonal savings on popular lines',
-                'subtitle' => 'Secure discounted pricing on bulk materials and workshop essentials while stock lasts.',
-                'link'     => 'Shop promotions',
+                'badge'    => 'Limited offer',
+                'title'    => 'Member pricing events',
+                'subtitle' => 'Stretch your budget with weekly promotions and bundle-friendly deals.',
+                'link'     => 'Unlock current deals',
             ],
         ],
     ],
     'stats' => [
         'products' => [
-            'label'   => 'Products listed',
-            'caption' => 'Continuously updated inventory ready for dispatch.',
+            'label'   => 'Products',
+            'caption' => 'Live in catalogue',
         ],
         'categories' => [
-            'label'   => 'Catalogue categories',
-            'caption' => 'Organised for quick sourcing across every trade.',
+            'label'   => 'Categories',
+            'caption' => 'Curated for easy browsing',
         ],
         'brands' => [
-            'label'   => 'Partner brands',
-            'caption' => 'Trusted manufacturers from Lithuania and abroad.',
+            'label'   => 'Brands',
+            'caption' => 'Verified partners',
         ],
         'reviews' => [
-            'label'   => 'Verified reviews',
-            'caption' => 'Average rating :rating/5 from professional buyers.',
+            'label'   => 'Reviews',
+            'caption' => 'Community rating: :rating ★',
         ],
     ],
     'sections' => [
         'featured' => [
-            'title'    => 'Highlighted catalogue picks',
-            'subtitle' => 'Hand-selected products demonstrating craftsmanship, durability, and value.',
+            'title'    => 'Featured selections',
+            'subtitle' => 'Premium drops and editorial collections crafted by our buyers.',
         ],
         'catalogue' => [
-            'title'    => 'Plan your next procurement run',
-            'subtitle' => 'Track popular categories and reliable brands to keep projects on schedule.',
+            'title'    => 'Explore the full catalogue',
+            'subtitle' => 'Navigate by category or brand and uncover experiences tailored for you.',
+            'cards'    => [
+                'categories' => [
+                    'title'    => 'Shop by category',
+                    'subtitle' => 'Compare essentials, discover niche finds, and explore seasonal edits.',
+                    'link'     => 'Browse categories',
+                ],
+                'brands' => [
+                    'title'    => 'Shop by brand',
+                    'subtitle' => 'Support trusted labels and up-and-coming creators from across Europe.',
+                    'link'     => 'Meet the brands',
+                ],
+            ],
+            'lists' => [
+                'categories' => [
+                    'title'      => 'Top catalogue categories',
+                    'subtitle'   => 'Our most visited departments from heavy-duty tools to finishing materials.',
+                    'link'       => 'View all',
+                    'item_count' => ':count listed products',
+                    'empty'      => 'Catalogue will showcase categories once published.',
+                ],
+                'brands' => [
+                    'title'      => 'Featured construction brands',
+                    'subtitle'   => 'Leaders in professional equipment, insulation, and structural systems.',
+                    'link'       => 'View all',
+                    'item_count' => ':count stocked items',
+                    'empty'      => 'Brand showcases will appear soon.',
+                ],
+            ],
         ],
         'highlights' => [
-            'title'    => 'Fresh arrivals & trusted partners',
-            'subtitle' => 'Stay informed about newly published stock and leading construction suppliers.',
+            'title'    => 'Stay inspired',
+            'subtitle' => 'Keep up with trending, new-in, and best-value picks curated daily.',
+            'latest'   => [
+                'title' => 'Latest arrivals from the warehouse',
+                'empty' => 'Fresh stock will appear shortly.',
+            ],
+            'brands' => [
+                'fallback_description' => 'Baltic construction favourite.',
+                'cta'                  => 'Explore brand',
+            ],
         ],
         'discovery' => [
-            'title'    => 'Why Baltic teams rely on StatybaEcommerce',
-            'subtitle' => 'Tools and insights crafted around procurement teams, warehouse planners, and on-site crews.',
+            'title'    => 'Why shop with us?',
+            'subtitle' => 'An adaptive commerce experience focused on trust, convenience, and delight.',
             'items'    => [
                 'recommendations' => [
-                    'title'    => 'Curated recommendations',
-                    'subtitle' => 'Dynamic product groupings tailored to current demand and seasonality.',
+                    'title'    => 'Personal recommendations',
+                    'subtitle' => 'Smart suggestions powered by browsing habits and community favourites.',
                 ],
                 'security' => [
-                    'title'    => 'Secure purchasing',
-                    'subtitle' => 'Enterprise-grade authentication and approval workflows keep orders in check.',
+                    'title'    => 'Secure by default',
+                    'subtitle' => 'Advanced fraud protection and privacy-first architecture keep you safe.',
                 ],
                 'payments' => [
                     'title'    => 'Flexible payments',
-                    'subtitle' => 'Support for invoicing, split payments, and negotiated credit terms.',
+                    'subtitle' => 'Pay with cards, instalments, or digital wallets supporting euros.',
                 ],
                 'delivery' => [
                     'title'    => 'Reliable delivery',
-                    'subtitle' => 'Nationwide logistics partners with predictable lead times.',
+                    'subtitle' => 'Trackable shipping across the Baltics with carbon-conscious partners.',
                 ],
             ],
         ],
         'cta' => [
-            'title'          => 'Build smarter with actionable insights',
-            'subtitle'       => 'Follow the latest industry analysis and talk directly with our procurement specialists.',
-            'primary'        => 'Read construction insights',
-            'secondary'      => 'Speak with our team',
-            'review_badge'   => 'Customer confidence',
-            'review_copy'    => 'Professionals across the Baltics rate our catalogue highly for transparency, pricing, and support.',
-            'review_caption' => 'Based on :count published testimonials.',
+            'title'          => 'Join our community of modern shoppers',
+            'subtitle'       => 'Get the inside scoop on product launches, loyalty perks, and editorial guides.',
+            'primary'        => 'Read the latest stories',
+            'secondary'      => 'Talk to our team',
+            'review_badge'   => 'Loved by our customers',
+            'review_copy'    => 'Over the past months shoppers consistently rated their experience above four stars.',
+            'review_caption' => ':count verified reviews and counting',
+        ],
+    ],
+    'mission' => [
+        'badge'    => 'Our mission',
+        'title'    => 'Your most trusted construction partner',
+        'subtitle' => 'With years of experience in construction, ventilated facades, and timber housing systems, we help you find the right accessories and deliver the best technical solutions. Can’t see what you need? Book a consultation and let’s build more together.',
+        'actions'  => [
+            'consultation'   => 'Book a consultation',
+            'view_solutions' => 'View available solutions',
+        ],
+    ],
+    'loyalty' => [
+        'badge'    => 'Loyalty',
+        'title'    => 'Rewards for loyal customers',
+        'subtitle' => 'Join the loyalty programme to unlock ongoing discounts and exclusive offers. The more you shop, the more you save.',
+        'actions'  => [
+            'join'          => 'Join the programme',
+            'invite_friend' => 'Invite a friend',
+        ],
+        'catalog' => [
+            'title'    => 'Order-ready catalogue',
+            'subtitle' => 'Choose from a comprehensive range of accessories – order directly or reach out for custom requirements.',
         ],
     ],
     'catalogue' => [
-        'badge'    => 'Smart catalogue',
-        'title'    => 'Dynamic assortments for every project phase',
-        'subtitle' => 'Switch between new, trending, and featured line-ups curated automatically from live data.',
-        'empty'    => 'Catalogue highlights will appear once new assortments are available.',
-    ],
-    'collections' => [
-        'badge'          => 'Curated collections',
-        'products_count' => '{0}No products|{1}:count product|[2,*]:count products',
-        'open'           => 'Open collection',
+        'badge'    => 'Catalogue',
+        'title'    => 'Discover our catalogue',
+        'subtitle' => 'Browse products by category, sort, and find what you need.',
+        'filters'  => [
+            'all_categories' => 'All categories',
+            'sort_by'        => 'Sort by',
+        ],
+        'sort' => [
+            'latest'     => 'Latest',
+            'popular'    => 'Popular',
+            'price_asc'  => 'Price: Low to High',
+            'price_desc' => 'Price: High to Low',
+        ],
+        'search_placeholder' => 'Search the catalogue...',
+        'empty'              => 'No products available at the moment.',
     ],
     'products' => [
         'badges' => [
@@ -118,21 +183,40 @@ return [
             'in'  => 'In stock',
             'out' => 'Out of stock',
         ],
-        'rating_out_of_5' => 'rating out of 5',
-        'actions'         => [
+        'actions' => [
             'details'     => 'View details',
             'add_to_cart' => 'Add to cart',
         ],
-        'empty' => 'New items are being prepared for this shelf.',
-    ],
-        'slider' => [
-            'tagline'        => 'Construction without worries',
-            'description'    => 'A wide range of construction products that ensure quality at every step – from fasteners to facade finishing materials.',
-            'title'          => 'Solutions for your construction',
-            'autoplay_start' => 'Start autoplay',
-            'autoplay_stop'  => 'Stop autoplay',
-            'placeholder_alt' => 'Banner image',
-            'previous_slide' => 'Previous slide',
-            'next_slide'     => 'Next slide',
+        'rating_out_of_5' => 'out of 5',
+        'sections'        => [
+            'featured' => [
+                'title'    => 'Featured products',
+                'subtitle' => 'Our curated picks',
+            ],
+            'latest' => [
+                'title'    => 'Latest arrivals',
+                'subtitle' => 'Just landed products',
+            ],
+            'trending' => [
+                'title'    => 'Trending now',
+                'subtitle' => 'Most viewed and purchased',
+            ],
+            'sale' => [
+                'title'    => 'On sale',
+                'subtitle' => 'Save today',
+            ],
         ],
+        'empty' => 'No products found.',
+    ],
+    'collections' => [
+        'badge'          => 'Collection',
+        'open'           => 'Open collection',
+        'products_count' => '{0}No products|{1}1 product|[2,*]:count products',
+    ],
+    'messages' => [
+        'no_featured_products' => 'Featured products are coming soon.',
+        'no_latest_products'   => 'New arrivals will appear here once published.',
+        'no_trending_products' => 'Trending picks update soon – check back shortly.',
+        'no_sale_products'     => 'Sale items will populate as promotions go live.',
+    ],
 ];

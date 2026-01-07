@@ -53,7 +53,7 @@ class SecurityHeadersTest extends TestCase
         ])->get('/');
 
         $response->assertHeader('X-Request-ID');
-        
+
         $requestId = $response->headers->get('X-Request-ID');
         $this->assertStringStartsWith('req_', $requestId);
     }
@@ -68,7 +68,7 @@ class SecurityHeadersTest extends TestCase
             ->get('/admin');
 
         $response->assertHeader('Content-Security-Policy');
-        
+
         $csp = $response->headers->get('Content-Security-Policy');
         $this->assertStringContains("default-src 'self'", $csp);
         $this->assertStringContains("object-src 'none'", $csp);
@@ -100,10 +100,10 @@ class SecurityHeadersTest extends TestCase
         // Should not contain newlines that could inject fake log entries
         $request = $this->app['request'];
         $securityContext = $request->attributes->get('security_context');
-        
+
         $this->assertArrayHasKey('user_agent', $securityContext);
         $this->assertStringNotContainsString("\n", $securityContext['user_agent']);
-        $this->assertStringNotContainsString("FAKE LOG ENTRY", $securityContext['user_agent']);
+        $this->assertStringNotContainsString('FAKE LOG ENTRY', $securityContext['user_agent']);
     }
 
     /** @test */
@@ -117,7 +117,7 @@ class SecurityHeadersTest extends TestCase
 
         $request = $this->app['request'];
         $securityContext = $request->attributes->get('security_context');
-        
+
         $this->assertLessThanOrEqual(200, strlen($securityContext['user_agent']));
     }
 
@@ -130,7 +130,7 @@ class SecurityHeadersTest extends TestCase
 
         $request = $this->app['request'];
         $securityContext = $request->attributes->get('security_context');
-        
+
         $this->assertEquals('unknown', $securityContext['user_agent']);
     }
 
@@ -154,7 +154,7 @@ class SecurityHeadersTest extends TestCase
 
         $request = $this->app['request'];
         $securityContext = $request->attributes->get('security_context');
-        
+
         $this->assertIsArray($securityContext);
         $this->assertArrayHasKey('request_id', $securityContext);
         $this->assertArrayHasKey('ip_address', $securityContext);

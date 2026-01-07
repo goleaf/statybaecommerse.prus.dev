@@ -18,13 +18,13 @@ final class TagFactory extends Factory
     public function definition(): array
     {
         $name = $this->faker->word();
-        
+
         return [
-            'name' => $name,
-            'slug' => Str::slug($name),
-            'color' => $this->faker->hexColor(),
+            'name'        => $name,
+            'slug'        => Str::slug($name),
+            'color'       => $this->faker->hexColor(),
             'description' => $this->faker->optional()->sentence(),
-            'type' => $this->faker->randomElement(['general', 'category', 'label']),
+            'type'        => $this->faker->randomElement(['general', 'category', 'label']),
         ];
     }
 }

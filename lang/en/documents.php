@@ -28,9 +28,10 @@ return [
     // Document Status
     'statuses' => [
         'draft'     => 'Draft',
+        'generated' => 'Generated',
+        'sent'      => 'Sent',
         'published' => 'Published',
         'archived'  => 'Archived',
-        'pending'   => 'Pending Review',
     ],
 
     // Document Format
@@ -54,7 +55,6 @@ return [
     'format'               => 'Format',
     'file_path'            => 'File Path',
     'created_by'           => 'Created By',
-    'updated_by'           => 'Updated By',
     'created_at'           => 'Created At',
     'created_from'         => 'Created From',
     'created_until'        => 'Created Until',
@@ -65,22 +65,6 @@ return [
     'related_model_id'     => 'Related Model ID',
     'metadata'             => 'Metadata',
     'add_variable'         => 'Add Variable',
-    'audit'                => [
-        'title'        => 'Audit Trail',
-        'action'       => 'Action',
-        'performed_by' => 'Performed By',
-        'logged_at'    => 'Logged At',
-        'before'       => 'Before',
-        'after'        => 'After',
-        'empty'        => 'No audit entries recorded yet.',
-        'system'       => 'System',
-    ],
-    'audit_actions' => [
-        'created'  => 'Created',
-        'updated'  => 'Updated',
-        'deleted'  => 'Deleted',
-        'restored' => 'Restored',
-    ],
 
     // Document Actions
     'generate'     => 'Generate Document',
@@ -90,20 +74,6 @@ return [
     'duplicate'    => 'Duplicate',
     'archive'      => 'Archive',
     'restore'      => 'Restore',
-
-    // Document Action Form Fields
-    'title_placeholder'            => 'Enter document title (optional)',
-    'custom_variables'             => 'Custom Variables',
-    'custom_variables_placeholder' => 'VARIABLE_NAME=value' . "\n" . 'ANOTHER_VARIABLE=another value',
-    'custom_variables_help'        => 'Add custom variables in format: VARIABLE_NAME=value (one per line)',
-    'generate_pdf_help'            => 'Generate PDF version of the document',
-
-    // Document Action Messages
-    'document_generated_successfully' => 'Document Generated Successfully',
-    'document_ready_for_review'       => 'Your document has been generated and is ready for review.',
-    'pdf_generated_successfully'      => 'PDF Generated Successfully',
-    'pdf_ready_for_download'          => 'Your PDF document is ready for download.',
-    'generation_failed'               => 'Document Generation Failed',
 
     // Variables
     'available_variables'  => 'Available Variables',

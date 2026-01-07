@@ -15,10 +15,7 @@ $sentryAvailable = $sentryDsn !== '' && class_exists(\Sentry\Laravel\Integration
 
 $rawStack = env('LOG_STACK', 'daily');
 $stackString = is_string($rawStack) ? $rawStack : 'daily';
-$configuredStackChannels = array_filter(array_map(
-    static fn (string $channel): ?string => $channel !== '' ? $channel : null,
-    explode(',', $stackString)
-));
+$configuredStackChannels = array_filter(explode(',', $stackString));
 
 // Retention is configured directly in channel definitions below.
 

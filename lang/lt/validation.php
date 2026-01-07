@@ -14,7 +14,6 @@ return [
         'numeric' => ':attribute negali būti didesnis nei :max.',
     ],
     'unique'     => ':attribute jau egzistuoja.',
-    'exists'     => 'Pasirinktas :attribute yra neteisingas.',
     'confirmed'  => ':attribute patvirtinimas nesutampa.',
     'attributes' => [
         'email'      => 'el. paštas',

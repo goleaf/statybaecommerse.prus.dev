@@ -44,7 +44,7 @@ class ExceptionHandlingPerformanceTest extends TestCase
         $totalTime = (microtime(true) - $startTime) * 1000; // Convert to milliseconds
         $averageTime = $totalTime / $iterations;
 
-        $this->assertLessThan($maxTime, $averageTime, 
+        $this->assertLessThan($maxTime, $averageTime,
             "Boot error detection took {$averageTime}ms on average, exceeding budget of {$maxTime}ms");
     }
 
@@ -92,7 +92,7 @@ class ExceptionHandlingPerformanceTest extends TestCase
         $averageTime = $totalTime / $iterations;
 
         // Rate limiting should not significantly impact performance
-        $this->assertLessThan(5, $averageTime, 
+        $this->assertLessThan(5, $averageTime,
             "Rate limiting caused significant performance degradation: {$averageTime}ms average");
     }
 
@@ -115,7 +115,7 @@ class ExceptionHandlingPerformanceTest extends TestCase
         $averageTime = $totalTime / $iterations;
 
         // Security sanitization should complete quickly
-        $this->assertLessThan(3, $averageTime, 
+        $this->assertLessThan(3, $averageTime,
             "Security sanitization is too slow: {$averageTime}ms average");
     }
 
@@ -147,7 +147,7 @@ class ExceptionHandlingPerformanceTest extends TestCase
         $averageTime = $totalTime / ($iterations * count($exceptions));
 
         // Exception type filtering should be very fast
-        $this->assertLessThan(1, $averageTime, 
+        $this->assertLessThan(1, $averageTime,
             "Exception type filtering is too slow: {$averageTime}ms average");
     }
 
@@ -198,11 +198,11 @@ class ExceptionHandlingPerformanceTest extends TestCase
         $timeWithCaching = (microtime(true) - $startTime) * 1000;
 
         // Caching should provide performance benefit
-        $this->assertLessThan($timeWithoutCaching, $timeWithCaching, 
-            "Configuration caching should improve performance");
+        $this->assertLessThan($timeWithoutCaching, $timeWithCaching,
+            'Configuration caching should improve performance');
 
         // Both should be within reasonable bounds
-        $this->assertLessThan(100, $timeWithCaching, 
+        $this->assertLessThan(100, $timeWithCaching,
             "Even with caching, performance is too slow: {$timeWithCaching}ms total");
     }
 
@@ -226,7 +226,7 @@ class ExceptionHandlingPerformanceTest extends TestCase
         $averageTime = $totalTime / $iterations;
 
         // Metrics tracking should not significantly impact performance
-        $this->assertLessThan(5, $averageTime, 
+        $this->assertLessThan(5, $averageTime,
             "Metrics tracking caused performance degradation: {$averageTime}ms average");
     }
 
@@ -249,7 +249,7 @@ class ExceptionHandlingPerformanceTest extends TestCase
         $averageTime = $totalTime / $iterations;
 
         // Should handle long paths efficiently
-        $this->assertLessThan(3, $averageTime, 
+        $this->assertLessThan(3, $averageTime,
             "Large file path handling is too slow: {$averageTime}ms average");
     }
 
@@ -273,7 +273,7 @@ class ExceptionHandlingPerformanceTest extends TestCase
         $totalTime = (microtime(true) - $startTime) * 1000;
 
         // Should handle multiple exceptions quickly
-        $this->assertLessThan(50, $totalTime, 
+        $this->assertLessThan(50, $totalTime,
             "Concurrent exception handling is too slow: {$totalTime}ms total");
     }
 

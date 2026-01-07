@@ -14,11 +14,11 @@ use App\Services\SearchService;
 use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Response;
-use Illuminate\Testing\TestResponse;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Testing\TestResponse;
 use Tests\TestCase;
 use Throwable;
 
@@ -119,7 +119,7 @@ final class EndToEndFunctionalityTest extends TestCase
         $response->assertSee('collection', false);
 
         // Verify no N+1 query indicators in response (lenient for dev environment)
-        if (!app()->environment('testing', 'local')) {
+        if (! app()->environment('testing', 'local')) {
             $response->assertDontSee('Query', false);
             $response->assertDontSee('SQL', false);
         }
@@ -170,6 +170,7 @@ final class EndToEndFunctionalityTest extends TestCase
         // Skip if search route doesn't exist
         if (! Route::has('search')) {
             $this->markTestSkipped('Search route not available in test environment');
+
             return;
         }
 
@@ -192,6 +193,7 @@ final class EndToEndFunctionalityTest extends TestCase
 
             if ($response->status() === Response::HTTP_INTERNAL_SERVER_ERROR) {
                 $this->markTestSkipped('Search page has dependency issues in test environment');
+
                 return;
             }
 
@@ -207,7 +209,7 @@ final class EndToEndFunctionalityTest extends TestCase
 
             // Verify no SQL debugging output (indicates proper SearchService usage)
             $this->assertNoErrorsInResponse($response);
-            if (!app()->environment('testing', 'local')) {
+            if (! app()->environment('testing', 'local')) {
                 $response->assertDontSee('SELECT * FROM products', false);
                 $response->assertDontSee('LIKE %', false);
             }
@@ -245,7 +247,7 @@ final class EndToEndFunctionalityTest extends TestCase
         // Multiple requests with same locale should not cause issues
         $this->get('/lt');
         expect(App::getLocale())->toBe('lt');
-        
+
         $this->get('/lt');
         expect(App::getLocale())->toBe('lt');
 
@@ -482,9 +484,9 @@ final class EndToEndFunctionalityTest extends TestCase
 
         // Create visible product for testing using preset
         $this->visibleProduct = Product::factory()->published()->create([
-            'name'       => 'Visible Test Product',
-            'slug'       => 'visible-test-product',
-            'brand_id'   => $this->testBrand->id,
+            'name'     => 'Visible Test Product',
+            'slug'     => 'visible-test-product',
+            'brand_id' => $this->testBrand->id,
         ]);
 
         // Create hidden product for business rules testing
@@ -505,7 +507,7 @@ final class EndToEndFunctionalityTest extends TestCase
         Brand::factory()->count(2)->featured()->create();
         Category::factory()->count(2)->create();
         Collection::factory()->count(2)->create();
-        
+
         // Create additional visible products for facet testing
         Product::factory()->count(3)->published()->create([
             'brand_id' => $this->testBrand->id,
@@ -602,24 +604,24 @@ final class EndToEndFunctionalityTest extends TestCase
     private function assertNoErrorsInResponse(TestResponse $response): void
     {
         $content = $response->getContent();
-        
+
         // Check for PHP errors
         expect($content)->not->toContain('Fatal error');
         expect($content)->not->toContain('Exception:');
         expect($content)->not->toContain('Stack trace');
         expect($content)->not->toContain('Parse error');
-        
+
         // Check for Laravel errors
         expect($content)->not->toContain('Whoops!');
         expect($content)->not->toContain('ErrorException');
         expect($content)->not->toContain('FatalErrorException');
-        
+
         // Check for SQL errors
         expect($content)->not->toContain('SQLSTATE');
         expect($content)->not->toContain('SQL syntax error');
-        
+
         // Check for debugging output that shouldn't be in production (lenient for dev environment)
-        if (!app()->environment('testing', 'local')) {
+        if (! app()->environment('testing', 'local')) {
             expect($content)->not->toContain('Debugbar');
             expect($content)->not->toContain('dd(');
             expect($content)->not->toContain('var_dump');
@@ -644,7 +646,7 @@ final class EndToEndFunctionalityTest extends TestCase
 
         // Essential elements should be present in both
         $essentialElements = ['<title>', '<html', '</html>', '<head>', '<body', 'lang="lt"', '<nav'];
-        
+
         foreach ($essentialElements as $element) {
             expect($content1)->toContain($element, "First response should contain {$element}");
             expect($content2)->toContain($element, "Second response should contain {$element}");
@@ -667,7 +669,7 @@ final class EndToEndFunctionalityTest extends TestCase
 
         // Test that cache warming reduces query counts
         Cache::flush();
-        
+
         // First request (cold cache)
         $coldQueryCount = 0;
         DB::listen(function () use (&$coldQueryCount): void {
@@ -692,13 +694,14 @@ final class EndToEndFunctionalityTest extends TestCase
     {
         if (! Route::has('categories.index')) {
             $this->markTestSkipped('Categories index route not available');
+
             return;
         }
 
         // Create additional test data for facet counting
         $additionalBrands = Brand::factory()->count(3)->create();
         $additionalCategories = Category::factory()->count(2)->create();
-        
+
         // Create products across different brands and categories
         foreach ($additionalBrands as $brand) {
             Product::factory()->count(2)->published()->create(['brand_id' => $brand->id])
@@ -714,11 +717,11 @@ final class EndToEndFunctionalityTest extends TestCase
         });
 
         $response = $this->get('/lt/categories');
-        
+
         if ($response->status() === Response::HTTP_OK) {
             // Facet counting should use aggregated queries (≤ 5 queries per requirement 4.2)
             expect($queryCount)->toBeLessThanOrEqual(10, 'Facet counting should use optimized aggregated queries, not N+1 patterns');
-            
+
             // Response should contain filter elements
             $response->assertSee('filter', false);
         }

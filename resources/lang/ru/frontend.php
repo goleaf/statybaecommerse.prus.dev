@@ -142,12 +142,12 @@ return [
     ],
     'buttons' => [
         'back_to_product'     => 'Назад к товару',
-        'back_to_products'      => 'Назад к товарам',
-        'back_to_categories'    => 'Назад к категориям',
-        'back_to_brands'        => 'Назад к брендам',
-        'back_to_collections'   => 'Назад к коллекциям',
-        'back_to_news'          => 'Назад к новостям',
-        'back_to_home'          => 'Назад на главную',
+        'back_to_products'    => 'Назад к товарам',
+        'back_to_categories'  => 'Назад к категориям',
+        'back_to_brands'      => 'Назад к брендам',
+        'back_to_collections' => 'Назад к коллекциям',
+        'back_to_news'        => 'Назад к новостям',
+        'back_to_home'        => 'Назад на главную',
     ],
     // Product page specific translations
     'products' => [
@@ -228,4 +228,3 @@ return [
         'categories'     => 'Категории',
     ],
 ];
-

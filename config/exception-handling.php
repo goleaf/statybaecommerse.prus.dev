@@ -48,13 +48,13 @@ return [
     */
 
     'performance' => [
-        'track_boot_errors'        => env('TRACK_BOOT_ERROR_METRICS', false),
-        'cache_error_patterns'     => env('CACHE_ERROR_PATTERNS', true),
-        'async_metrics_storage'    => env('ASYNC_METRICS_STORAGE', true),
-        'metrics_queue'            => env('METRICS_QUEUE', 'metrics'),
-        'cache_ttl_minutes'        => env('PERFORMANCE_CACHE_TTL', 5),
+        'track_boot_errors'         => env('TRACK_BOOT_ERROR_METRICS', false),
+        'cache_error_patterns'      => env('CACHE_ERROR_PATTERNS', true),
+        'async_metrics_storage'     => env('ASYNC_METRICS_STORAGE', true),
+        'metrics_queue'             => env('METRICS_QUEUE', 'metrics'),
+        'cache_ttl_minutes'         => env('PERFORMANCE_CACHE_TTL', 5),
         'distributed_rate_limiting' => env('DISTRIBUTED_RATE_LIMITING', false),
-        'enable_profiling'         => env('BOOT_ERROR_PROFILING_ENABLED', false),
+        'enable_profiling'          => env('BOOT_ERROR_PROFILING_ENABLED', false),
     ],
 
     /*

@@ -11,7 +11,6 @@ use App\Filament\Resources\CollectionRuleResource;
 use App\Filament\Resources\EnumManagementResource;
 use App\Filament\Resources\PostResource;
 use App\Filament\Resources\ProductVariantResource;
-use App\Filament\Resources\RecommendationAnalyticsResource;
 use App\Filament\Resources\ReferralCampaignResource;
 use App\Filament\Resources\Settings\SettingResource;
 use App\Filament\Resources\SliderTranslationResource;
@@ -40,7 +39,6 @@ dataset('filament-resource-indices', [
     EnumManagementResource::class,
     PostResource::class,
     ProductVariantResource::class,
-    RecommendationAnalyticsResource::class,
     ReferralCampaignResource::class,
     SettingResource::class,
     SliderTranslationResource::class,

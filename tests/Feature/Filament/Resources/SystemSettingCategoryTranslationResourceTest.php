@@ -227,4 +227,3 @@ final class SystemSettingCategoryTranslationResourceTest extends TestCase
             ->assertCanNotSeeTableRecords([$incomplete]);
     }
 }
-

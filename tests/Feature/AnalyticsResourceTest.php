@@ -61,8 +61,8 @@ final class AnalyticsResourceTest extends TestCase
 
         // Merge deterministic defaults so analytics assertions remain stable across runs.
         $attributes = array_merge([
-            'status' => 'pending',
-            'total' => 750.00,
+            'status'     => 'pending',
+            'total'      => 750.00,
             'created_at' => now(),
         ], $overrides);
 
@@ -110,8 +110,8 @@ final class AnalyticsResourceTest extends TestCase
     {
         $order = $this->createOrder([
             'status' => 'pending',
-            'total' => 915.50,
-            'items' => 3,
+            'total'  => 915.50,
+            'items'  => 3,
         ]);
 
         Livewire::actingAs($this->adminUser)
@@ -215,7 +215,7 @@ final class AnalyticsResourceTest extends TestCase
             ->filterTable('created_at', [
                 'range' => [
                     'start' => $now->copy()->subDay()->format('Y-m-d'),
-                    'end' => $now->copy()->addDay()->format('Y-m-d'),
+                    'end'   => $now->copy()->addDay()->format('Y-m-d'),
                 ],
             ])
             ->assertCanSeeTableRecords([$recentOrder])

@@ -32,7 +32,7 @@ final class UserControllerTest extends TestCase
 
     public function test_profile_returns_authenticated_user_resource(): void
     {
-        $controller = new UserController();
+        $controller = new UserController;
         $user = User::factory()->create([
             'first_name' => 'Ada',
             'last_name'  => 'Lovelace',
@@ -54,15 +54,15 @@ final class UserControllerTest extends TestCase
 
     public function test_update_profile_persists_mutable_attributes(): void
     {
-        $controller = new UserController();
+        $controller = new UserController;
         $user = User::factory()->create([
-            'first_name' => 'Grace',
-            'last_name'  => 'Hopper',
+            'first_name'   => 'Grace',
+            'last_name'    => 'Hopper',
             'phone_number' => '123456',
         ]);
         $request = Request::create('/api/users/profile', 'POST', [
-            'first_name' => 'Grace',
-            'last_name'  => 'Updated',
+            'first_name'   => 'Grace',
+            'last_name'    => 'Updated',
             'phone_number' => '987654321',
         ]);
         $request->setUserResolver(static fn () => $user);
@@ -79,7 +79,7 @@ final class UserControllerTest extends TestCase
 
     public function test_statistics_endpoint_summarises_account_totals(): void
     {
-        $controller = new UserController();
+        $controller = new UserController;
         $admin = User::factory()->create(['is_admin' => true]);
         $request = Request::create('/api/users/statistics', 'GET');
         $request->setUserResolver(static fn () => $admin);

@@ -42,10 +42,10 @@ final class PostResourceTest extends TestCase
     {
         // Seed a draft post so the listing has a concrete record to render.
         $post = Post::factory()->draft()->create([
-            'title'              => 'Coverage Draft',
-            'slug'               => 'coverage-draft',
-            'user_id'            => $this->admin->id,
-            'moderation_state'   => ModerationState::Draft->value,
+            'title'                   => 'Coverage Draft',
+            'slug'                    => 'coverage-draft',
+            'user_id'                 => $this->admin->id,
+            'moderation_state'        => ModerationState::Draft->value,
             'submitted_for_review_at' => null,
         ]);
 
@@ -89,12 +89,12 @@ final class PostResourceTest extends TestCase
             'moderation_state' => ModerationState::Draft->value,
         ]);
         $reviewPost = Post::factory()->create([
-            'title'                  => 'Review Spotlight',
-            'slug'                   => 'review-spotlight',
-            'user_id'                => $this->admin->id,
-            'status'                 => 'draft',
-            'moderation_state'       => ModerationState::Review->value,
-            'submitted_for_review_at'=> now()->subDay(),
+            'title'                   => 'Review Spotlight',
+            'slug'                    => 'review-spotlight',
+            'user_id'                 => $this->admin->id,
+            'status'                  => 'draft',
+            'moderation_state'        => ModerationState::Review->value,
+            'submitted_for_review_at' => now()->subDay(),
         ]);
 
         // Focus the table on review-ready submissions and confirm the draft stays hidden.
@@ -133,12 +133,12 @@ final class PostResourceTest extends TestCase
     {
         // Seed a review-stage post so the approve action can publish it.
         $post = Post::factory()->create([
-            'title'                  => 'Review Candidate',
-            'slug'                   => 'review-candidate',
-            'user_id'                => $this->admin->id,
-            'status'                 => 'draft',
-            'moderation_state'       => ModerationState::Review->value,
-            'submitted_for_review_at'=> now()->subDay(),
+            'title'                   => 'Review Candidate',
+            'slug'                    => 'review-candidate',
+            'user_id'                 => $this->admin->id,
+            'status'                  => 'draft',
+            'moderation_state'        => ModerationState::Review->value,
+            'submitted_for_review_at' => now()->subDay(),
         ]);
 
         // Provide moderator notes through the table action form before executing the approval.

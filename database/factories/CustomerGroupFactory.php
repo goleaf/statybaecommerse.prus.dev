@@ -23,7 +23,7 @@ final class CustomerGroupFactory extends Factory
     public function definition(): array
     {
         $attributes = [
-            'name'                => $this->faker->words(2, true),
+            'name' => $this->faker->words(2, true),
             // Ensure generated codes remain unique across test runs so the unique index on the
             // `customer_groups` table does not raise constraint violations when factories are
             // used repeatedly within the same scenario.

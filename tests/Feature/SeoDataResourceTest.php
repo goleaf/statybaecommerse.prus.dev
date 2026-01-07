@@ -419,14 +419,14 @@ class SeoDataResourceTest extends TestCase
         $productWithoutMatch = Product::factory()->createQuietly(['name' => 'Unrelated Item']);
 
         $seoData1 = $this->createSeoData([
-            'seoable_type'  => Product::class,
-            'seoable_id'    => $productWithMatch->getKey(),
-            'title'         => 'Test SEO Title',
+            'seoable_type' => Product::class,
+            'seoable_id'   => $productWithMatch->getKey(),
+            'title'        => 'Test SEO Title',
         ]);
         $seoData2 = $this->createSeoData([
-            'seoable_type'  => Product::class,
-            'seoable_id'    => $productWithoutMatch->getKey(),
-            'title'         => 'Another Title',
+            'seoable_type' => Product::class,
+            'seoable_id'   => $productWithoutMatch->getKey(),
+            'title'        => 'Another Title',
         ]);
 
         Livewire::test(\App\Filament\Resources\SeoDataResource\Pages\ListSeoData::class)

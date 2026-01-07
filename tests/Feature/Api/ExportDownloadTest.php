@@ -37,8 +37,8 @@ test('it downloads completed export artifacts via signed url', function (): void
 
 test('it returns not found for missing or incomplete exports', function (): void {
     $queuedExport = Export::factory()->create([
-        'status' => ExportStatus::Queued,
-        'format' => 'csv',
+        'status'       => ExportStatus::Queued,
+        'format'       => 'csv',
         'requested_by' => null,
     ]);
 

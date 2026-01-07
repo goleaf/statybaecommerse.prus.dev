@@ -7,7 +7,7 @@ use App\Filament\Resources\VariantCombinationResource\Pages\EditVariantCombinati
 use App\Filament\Resources\VariantCombinationResource\Pages\ListVariantCombinations;
 use App\Filament\Resources\VariantCombinationResource\Pages\ViewVariantCombination;
 use App\Http\Controllers\Admin\AttributeValueTranslationController;
-use App\Http\Controllers\Admin\CampaignConversionController;
+
 use App\Http\Controllers\Admin\DiscountPresetController;
 use App\Http\Controllers\Admin\EnumValueController;
 use App\Http\Controllers\Admin\LocationController as AdminLocationController;
@@ -459,37 +459,7 @@ Route::middleware('auth')->group(function (): void {
 });
 
 Route::middleware('auth')->prefix('admin')->group(function (): void {
-    Route::prefix('campaign-conversions')->name('admin.campaign-conversions.')->group(function (): void {
-        Route::get('/', [CampaignConversionController::class, 'index'])->name('index');
-        Route::get('/export', [CampaignConversionController::class, 'export'])->name('export');
-        Route::get('/import', [CampaignConversionController::class, 'import'])->name('import');
-        Route::post('/', [CampaignConversionController::class, 'store'])->name('store');
-        Route::get('/{campaignConversion}', [CampaignConversionController::class, 'show'])
-            ->whereNumber('campaignConversion')
-            ->name('show');
-        Route::put('/{campaignConversion}', [CampaignConversionController::class, 'update'])
-            ->whereNumber('campaignConversion')
-            ->name('update');
-        Route::delete('/{campaignConversion}', [CampaignConversionController::class, 'destroy'])
-            ->whereNumber('campaignConversion')
-            ->name('destroy');
-        Route::post('/{campaignConversion}/verify', [CampaignConversionController::class, 'verify'])
-            ->whereNumber('campaignConversion')
-            ->name('verify');
-        Route::post('/{campaignConversion}/unverify', [CampaignConversionController::class, 'unverify'])
-            ->whereNumber('campaignConversion')
-            ->name('unverify');
-        Route::post('/{campaignConversion}/attribute', [CampaignConversionController::class, 'attribute'])
-            ->whereNumber('campaignConversion')
-            ->name('attribute');
-        Route::post('/{campaignConversion}/unattribute', [CampaignConversionController::class, 'unattribute'])
-            ->whereNumber('campaignConversion')
-            ->name('unattribute');
-        Route::post('/bulk-verify', [CampaignConversionController::class, 'bulkVerify'])->name('bulk-verify');
-        Route::post('/bulk-unverify', [CampaignConversionController::class, 'bulkUnverify'])->name('bulk-unverify');
-        Route::post('/bulk-attribute', [CampaignConversionController::class, 'bulkAttribute'])->name('bulk-attribute');
-        Route::post('/bulk-unattribute', [CampaignConversionController::class, 'bulkUnattribute'])->name('bulk-unattribute');
-    });
+
 
     Route::get('/locations', [AdminLocationController::class, 'index'])
         ->name('admin.locations.index');

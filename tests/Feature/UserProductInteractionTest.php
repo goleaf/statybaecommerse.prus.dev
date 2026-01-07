@@ -8,8 +8,8 @@ use App\Models\Product;
 use App\Models\User;
 use App\Models\UserProductInteraction;
 use Carbon\CarbonImmutable;
-use Illuminate\Support\Facades\Date;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Date;
 use Tests\TestCase;
 
 final class UserProductInteractionTest extends TestCase
@@ -84,8 +84,8 @@ final class UserProductInteractionTest extends TestCase
     public function test_scopes_filter_using_event_and_occurred_at(): void
     {
         $recent = $this->createInteraction([
-            'event'      => 'click',
-            'meta'       => [
+            'event' => 'click',
+            'meta'  => [
                 'rating' => 4.8,
                 'count'  => 8,
             ],
@@ -93,8 +93,8 @@ final class UserProductInteractionTest extends TestCase
         ]);
 
         $stale = $this->createInteraction([
-            'event'      => 'view',
-            'meta'       => [
+            'event' => 'view',
+            'meta'  => [
                 'rating' => 1.5,
                 'count'  => 2,
             ],

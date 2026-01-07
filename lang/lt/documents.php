@@ -28,9 +28,10 @@ return [
     // Document Status
     'statuses' => [
         'draft'     => 'Juodraštis',
+        'generated' => 'Sugeneruotas',
+        'sent'      => 'Išsiųstas',
         'published' => 'Publikuotas',
         'archived'  => 'Archyvuotas',
-        'pending'   => 'Laukia peržiūros',
     ],
 
     // Document Format
@@ -54,7 +55,6 @@ return [
     'format'               => 'Formatas',
     'file_path'            => 'Failo kelias',
     'created_by'           => 'Sukūrė',
-    'updated_by'           => 'Atnaujino',
     'created_at'           => 'Sukurta',
     'created_from'         => 'Sukurta nuo',
     'created_until'        => 'Sukurta iki',
@@ -65,22 +65,6 @@ return [
     'related_model_id'     => 'Susijusio modelio ID',
     'metadata'             => 'Metaduomenys',
     'add_variable'         => 'Pridėti kintamąjį',
-    'audit'                => [
-        'title'        => 'Audito žurnalas',
-        'action'       => 'Veiksmas',
-        'performed_by' => 'Vykdytojas',
-        'logged_at'    => 'Užfiksuota',
-        'before'       => 'Prieš',
-        'after'        => 'Po',
-        'empty'        => 'Audito įrašų dar nėra.',
-        'system'       => 'Sistema',
-    ],
-    'audit_actions' => [
-        'created'  => 'Sukurta',
-        'updated'  => 'Atnaujinta',
-        'deleted'  => 'Ištrinta',
-        'restored' => 'Atkurta',
-    ],
 
     // Document Actions
     'generate'     => 'Generuoti dokumentą',
@@ -90,20 +74,6 @@ return [
     'duplicate'    => 'Dubliuoti',
     'archive'      => 'Archyvuoti',
     'restore'      => 'Atkurti',
-
-    // Document Action Form Fields
-    'title_placeholder'            => 'Įveskite dokumento pavadinimą (neprivaloma)',
-    'custom_variables'             => 'Pasirinktiniai kintamieji',
-    'custom_variables_placeholder' => 'KINTAMOJO_PAVADINIMAS=reikšmė' . "\n" . 'KITAS_KINTAMASIS=kita reikšmė',
-    'custom_variables_help'        => 'Pridėkite pasirinktinius kintamuosius formatu: KINTAMOJO_PAVADINIMAS=reikšmė (po vieną eilutėje)',
-    'generate_pdf_help'            => 'Generuoti PDF dokumento versiją',
-
-    // Document Action Messages
-    'document_generated_successfully' => 'Dokumentas sėkmingai sugeneruotas',
-    'document_ready_for_review'       => 'Jūsų dokumentas buvo sugeneruotas ir paruoštas peržiūrai.',
-    'pdf_generated_successfully'      => 'PDF sėkmingai sugeneruotas',
-    'pdf_ready_for_download'          => 'Jūsų PDF dokumentas paruoštas atsisiuntimui.',
-    'generation_failed'               => 'Dokumento generavimas nepavyko',
 
     // Variables
     'available_variables'  => 'Galimi kintamieji',

@@ -19,16 +19,16 @@ final class TaskFactory extends Factory
     public function definition(): array
     {
         return [
-            'title' => $this->faker->sentence(),
+            'title'       => $this->faker->sentence(),
             'description' => $this->faker->paragraph(),
-            'status' => $this->faker->randomElement(['pending', 'in_progress', 'completed', 'cancelled']),
-            'priority' => $this->faker->randomElement(['low', 'medium', 'high', 'urgent']),
-            'project_id' => Project::factory(),
-            'created_by' => User::factory(),
-            'due_date' => $this->faker->optional()->dateTimeBetween('now', '+3 months'),
-            'metadata' => [
+            'status'      => $this->faker->randomElement(['pending', 'in_progress', 'completed', 'cancelled']),
+            'priority'    => $this->faker->randomElement(['low', 'medium', 'high', 'urgent']),
+            'project_id'  => Project::factory(),
+            'created_by'  => User::factory(),
+            'due_date'    => $this->faker->optional()->dateTimeBetween('now', '+3 months'),
+            'metadata'    => [
                 'estimated_hours' => $this->faker->numberBetween(1, 40),
-                'complexity' => $this->faker->randomElement(['simple', 'medium', 'complex']),
+                'complexity'      => $this->faker->randomElement(['simple', 'medium', 'complex']),
             ],
         ];
     }
@@ -36,7 +36,7 @@ final class TaskFactory extends Factory
     public function pending(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status' => 'pending',
+            'status'       => 'pending',
             'completed_at' => null,
         ]);
     }
@@ -44,7 +44,7 @@ final class TaskFactory extends Factory
     public function inProgress(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status' => 'in_progress',
+            'status'       => 'in_progress',
             'completed_at' => null,
         ]);
     }
@@ -52,7 +52,7 @@ final class TaskFactory extends Factory
     public function completed(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status' => 'completed',
+            'status'       => 'completed',
             'completed_at' => $this->faker->dateTimeBetween('-1 month', 'now'),
         ]);
     }
@@ -61,7 +61,7 @@ final class TaskFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'due_date' => $this->faker->dateTimeBetween('-1 month', '-1 day'),
-            'status' => $this->faker->randomElement(['pending', 'in_progress']),
+            'status'   => $this->faker->randomElement(['pending', 'in_progress']),
         ]);
     }
 
@@ -83,14 +83,14 @@ final class TaskFactory extends Factory
     {
         return $this->afterCreating(function (Task $task) use ($count) {
             $users = User::factory($count)->create();
-            
+
             $users->each(function ($user, $index) use ($task) {
                 $responsibility = match ($index) {
-                    0 => 'assignee',
-                    1 => 'reviewer',
+                    0       => 'assignee',
+                    1       => 'reviewer',
                     default => 'watcher',
                 };
-                
+
                 $task->assignUser($user, $responsibility);
             });
         });
@@ -100,7 +100,7 @@ final class TaskFactory extends Factory
     {
         return $this->afterCreating(function (Task $task) use ($count) {
             $users = User::factory($count)->create();
-            
+
             $users->each(function ($user) use ($task) {
                 $task->addComment($this->faker->paragraph(), $user);
             });

@@ -18,7 +18,6 @@ use App\Models\Product;
 use App\Models\ProductFeature;
 use App\Models\ProductImage;
 use App\Models\ProductVariant;
-use App\Models\RecommendationAnalytics;
 use App\Models\RecommendationBlock;
 use App\Models\RecommendationCache;
 use App\Models\RecommendationConfig;
@@ -167,11 +166,6 @@ dataset('model_relation_matrix', function (): array {
         [RecommendationConfigSimple::class, 'analytics', HasMany::class],
         [RecommendationConfigSimple::class, 'products', BelongsToMany::class],
         [RecommendationConfigSimple::class, 'categories', BelongsToMany::class],
-
-        [RecommendationAnalytics::class, 'block', BelongsTo::class],
-        [RecommendationAnalytics::class, 'config', BelongsTo::class],
-        [RecommendationAnalytics::class, 'user', BelongsTo::class],
-        [RecommendationAnalytics::class, 'product', BelongsTo::class],
 
         [Referral::class, 'referrer', BelongsTo::class],
         [Referral::class, 'referred', BelongsTo::class],

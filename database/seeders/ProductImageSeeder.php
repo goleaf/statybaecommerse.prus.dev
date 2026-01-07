@@ -15,9 +15,7 @@ final class ProductImageSeeder extends Seeder
 {
     private const FALLBACK_PIXEL = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO2aXhQAAAAASUVORK5CYII=';
 
-    public function __construct(private readonly LocalImageGeneratorService $imageGenerator)
-    {
-    }
+    public function __construct(private readonly LocalImageGeneratorService $imageGenerator) {}
 
     /**
      * Run the database seeds.

@@ -32,7 +32,7 @@ final class CountriesTableSeeder extends Seeder
                     'currencies'         => $countryData['currencies'],
                     'name'               => $countryData['translations']['en']['name']
                         ?? $countryData['translations'][array_key_first($countryData['translations'])]['name'],
-                    'name_official'      => $countryData['translations']['en']['name_official']
+                    'name_official' => $countryData['translations']['en']['name_official']
                         ?? $countryData['translations'][array_key_first($countryData['translations'])]['name_official'],
                 ],
             );

@@ -2,20 +2,7 @@
 
 declare(strict_types=1);
 
-$csvToArray = static function (mixed $value): array {
-    if (! is_string($value) || $value === '') {
-        return [];
-    }
-
-    $segments = array_map('trim', explode(',', $value));
-
-    return array_values(array_filter(
-        array_map(
-            static fn (string $segment): ?string => $segment !== '' ? $segment : null,
-            $segments
-        )
-    ));
-};
+// Helper function moved inline to avoid closure serialization issues
 
 $resolvedDsn = (string) env('SENTRY_LARAVEL_DSN', env('SENTRY_DSN', ''));
 
@@ -52,9 +39,9 @@ return [
 
     'attachments' => (bool) env('SENTRY_ATTACHMENTS_ENABLED', false),
 
-    'ignore_exceptions' => $csvToArray(env('SENTRY_IGNORE_EXCEPTIONS')),
+    'ignore_exceptions' => [],
 
-    'in_app_exclude' => $csvToArray(env('SENTRY_IN_APP_EXCLUDE')),
+    'in_app_exclude' => [],
 
     'breadcrumbs' => [
         'logs'         => (bool) env('SENTRY_BREADCRUMBS_LOGS_ENABLED', true),

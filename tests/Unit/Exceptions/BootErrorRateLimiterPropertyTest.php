@@ -10,7 +10,7 @@ use Tests\TestCase;
 
 /**
  * Property-based tests for boot error rate limiter invariants.
- * 
+ *
  * These tests verify that the rate limiter maintains its core invariants
  * across a wide range of inputs and scenarios, ensuring the boundary fix
  * works correctly under all conditions.
@@ -37,10 +37,10 @@ final class BootErrorRateLimiterPropertyTest extends TestCase
     {
         // Test with various limit values
         $limits = [0, 1, 2, 5, 10, 50, 100];
-        
+
         foreach ($limits as $limit) {
             BootErrorRateLimiter::reset();
-            
+
             Config::set('exception-handling.security.rate_limit_enabled', true);
             Config::set('exception-handling.security.max_boot_errors_per_minute', $limit);
 
@@ -48,10 +48,10 @@ final class BootErrorRateLimiterPropertyTest extends TestCase
 
             // Make many more calls than the limit
             $callCount = max($limit * 3, 20);
-            
+
             for ($i = 0; $i < $callCount; $i++) {
                 $rateLimiter->isRateLimited();
-                
+
                 // INVARIANT: Counter must never exceed limit
                 expect($rateLimiter->getCurrentCount())
                     ->toBeLessThanOrEqual($limit, "Counter exceeded limit {$limit} on iteration {$i}");
@@ -61,7 +61,7 @@ final class BootErrorRateLimiterPropertyTest extends TestCase
             if ($limit > 0) {
                 expect($rateLimiter->getCurrentCount())->toBe($limit, "Final count should equal limit {$limit}");
             } else {
-                expect($rateLimiter->getCurrentCount())->toBe(0, "Final count should be 0 when limit is 0");
+                expect($rateLimiter->getCurrentCount())->toBe(0, 'Final count should be 0 when limit is 0');
             }
         }
     }
@@ -80,7 +80,7 @@ final class BootErrorRateLimiterPropertyTest extends TestCase
 
         foreach ($testCases as $case) {
             BootErrorRateLimiter::reset();
-            
+
             Config::set('exception-handling.security.rate_limit_enabled', true);
             Config::set('exception-handling.security.max_boot_errors_per_minute', $case['limit']);
 
@@ -100,8 +100,8 @@ final class BootErrorRateLimiterPropertyTest extends TestCase
                     $countBefore = $rateLimiter->getCurrentCount();
                     $rateLimiter->isRateLimited(); // Additional call
                     $countAfter = $rateLimiter->getCurrentCount();
-                    
-                    expect($countAfter)->toBe($countBefore, "Counter changed when rate limited");
+
+                    expect($countAfter)->toBe($countBefore, 'Counter changed when rate limited');
                 }
             }
         }
@@ -114,13 +114,13 @@ final class BootErrorRateLimiterPropertyTest extends TestCase
     public function property_disabled_rate_limiting_never_limits(): void
     {
         Config::set('exception-handling.security.rate_limit_enabled', false);
-        
+
         // Test with various limits (should be ignored when disabled)
         $limits = [0, 1, 5, 100];
-        
+
         foreach ($limits as $limit) {
             Config::set('exception-handling.security.max_boot_errors_per_minute', $limit);
-            
+
             $rateLimiter = new BootErrorRateLimiter;
 
             // Make many calls
@@ -129,7 +129,7 @@ final class BootErrorRateLimiterPropertyTest extends TestCase
                 expect($rateLimiter->isRateLimited())->toBeFalse(
                     "Rate limited when disabled (limit: {$limit}, call: {$i})"
                 );
-                
+
                 expect($rateLimiter->wouldBeRateLimited())->toBeFalse(
                     "Predicted rate limiting when disabled (limit: {$limit}, call: {$i})"
                 );
@@ -144,10 +144,10 @@ final class BootErrorRateLimiterPropertyTest extends TestCase
     public function property_statistics_reflect_accurate_state(): void
     {
         $limits = [1, 5, 10];
-        
+
         foreach ($limits as $limit) {
             BootErrorRateLimiter::reset();
-            
+
             Config::set('exception-handling.security.rate_limit_enabled', true);
             Config::set('exception-handling.security.max_boot_errors_per_minute', $limit);
 
@@ -155,18 +155,18 @@ final class BootErrorRateLimiterPropertyTest extends TestCase
 
             // Make calls up to and beyond the limit
             $callsToMake = $limit + 5;
-            
+
             for ($i = 0; $i < $callsToMake; $i++) {
                 $rateLimiter->isRateLimited();
-                
+
                 $stats = $rateLimiter->getStatistics();
                 $currentCount = $rateLimiter->getCurrentCount();
 
                 // INVARIANT: Statistics should be consistent with current state
-                expect($stats['enabled'])->toBeTrue("Statistics should show enabled");
-                expect($stats['max_errors_per_minute'])->toBe($limit, "Statistics should show correct limit");
-                expect(array_sum($stats['current_counts']))->toBe($currentCount, "Statistics count should match current count");
-                expect($stats['total_active_windows'])->toBeGreaterThan(0, "Should have active windows");
+                expect($stats['enabled'])->toBeTrue('Statistics should show enabled');
+                expect($stats['max_errors_per_minute'])->toBe($limit, 'Statistics should show correct limit');
+                expect(array_sum($stats['current_counts']))->toBe($currentCount, 'Statistics count should match current count');
+                expect($stats['total_active_windows'])->toBeGreaterThan(0, 'Should have active windows');
             }
         }
     }
@@ -178,7 +178,7 @@ final class BootErrorRateLimiterPropertyTest extends TestCase
     public function property_reset_clears_all_state(): void
     {
         $limits = [1, 5, 10];
-        
+
         foreach ($limits as $limit) {
             Config::set('exception-handling.security.rate_limit_enabled', true);
             Config::set('exception-handling.security.max_boot_errors_per_minute', $limit);
@@ -191,18 +191,18 @@ final class BootErrorRateLimiterPropertyTest extends TestCase
             }
 
             // Verify we're at the limit
-            expect($rateLimiter->wouldBeRateLimited())->toBeTrue("Should be at limit before reset");
+            expect($rateLimiter->wouldBeRateLimited())->toBeTrue('Should be at limit before reset');
 
             // Reset
             BootErrorRateLimiter::reset();
 
             // INVARIANT: After reset, should behave as if fresh
-            expect($rateLimiter->getCurrentCount())->toBe(0, "Count should be 0 after reset");
-            expect($rateLimiter->wouldBeRateLimited())->toBeFalse("Should not predict rate limiting after reset");
-            
+            expect($rateLimiter->getCurrentCount())->toBe(0, 'Count should be 0 after reset');
+            expect($rateLimiter->wouldBeRateLimited())->toBeFalse('Should not predict rate limiting after reset');
+
             // First call after reset should succeed
-            expect($rateLimiter->isRateLimited())->toBeFalse("First call after reset should succeed");
-            expect($rateLimiter->getCurrentCount())->toBe(1, "Count should be 1 after first call post-reset");
+            expect($rateLimiter->isRateLimited())->toBeFalse('First call after reset should succeed');
+            expect($rateLimiter->getCurrentCount())->toBe(1, 'Count should be 1 after first call post-reset');
         }
     }
 
@@ -225,15 +225,15 @@ final class BootErrorRateLimiterPropertyTest extends TestCase
 
             // INVARIANT: Active windows should not decrease during normal operation
             expect($statsAfter['total_active_windows'])
-                ->toBeGreaterThanOrEqual($statsBefore['total_active_windows'], 
-                    "Active windows should not decrease during normal operation");
+                ->toBeGreaterThanOrEqual($statsBefore['total_active_windows'],
+                    'Active windows should not decrease during normal operation');
 
             // INVARIANT: Current counts should only increase or stay same
             $beforeSum = array_sum($statsBefore['current_counts']);
             $afterSum = array_sum($statsAfter['current_counts']);
-            
-            expect($afterSum)->toBeGreaterThanOrEqual($beforeSum, 
-                "Total count should not decrease during normal operation");
+
+            expect($afterSum)->toBeGreaterThanOrEqual($beforeSum,
+                'Total count should not decrease during normal operation');
         }
     }
 
@@ -244,10 +244,10 @@ final class BootErrorRateLimiterPropertyTest extends TestCase
     public function property_boundary_conditions_are_handled_correctly(): void
     {
         $boundaryLimits = [0, 1, 2]; // Edge cases
-        
+
         foreach ($boundaryLimits as $limit) {
             BootErrorRateLimiter::reset();
-            
+
             Config::set('exception-handling.security.rate_limit_enabled', true);
             Config::set('exception-handling.security.max_boot_errors_per_minute', $limit);
 
@@ -255,20 +255,20 @@ final class BootErrorRateLimiterPropertyTest extends TestCase
 
             if ($limit === 0) {
                 // INVARIANT: With zero limit, should be rate limited immediately
-                expect($rateLimiter->isRateLimited())->toBeTrue("Should be rate limited immediately with zero limit");
-                expect($rateLimiter->getCurrentCount())->toBe(0, "Count should remain 0 with zero limit");
+                expect($rateLimiter->isRateLimited())->toBeTrue('Should be rate limited immediately with zero limit');
+                expect($rateLimiter->getCurrentCount())->toBe(0, 'Count should remain 0 with zero limit');
             } else {
                 // INVARIANT: Should allow exactly 'limit' number of calls
                 $successfulCalls = 0;
-                
+
                 for ($i = 0; $i < $limit + 5; $i++) {
-                    if (!$rateLimiter->isRateLimited()) {
+                    if (! $rateLimiter->isRateLimited()) {
                         $successfulCalls++;
                     }
                 }
-                
+
                 expect($successfulCalls)->toBe($limit, "Should allow exactly {$limit} successful calls");
-                expect($rateLimiter->getCurrentCount())->toBe($limit, "Final count should equal limit");
+                expect($rateLimiter->getCurrentCount())->toBe($limit, 'Final count should equal limit');
             }
         }
     }
@@ -290,12 +290,12 @@ final class BootErrorRateLimiterPropertyTest extends TestCase
         // Make many calls to test memory management
         for ($i = 0; $i < 200; $i++) {
             $rateLimiter->isRateLimited();
-            
+
             // Check memory periodically
             if ($i % 50 === 0) {
                 $currentMemory = memory_get_usage();
                 $memoryIncrease = $currentMemory - $initialMemory;
-                
+
                 // INVARIANT: Memory usage should remain bounded
                 expect($memoryIncrease)->toBeLessThan(5 * 1024 * 1024, // 5MB
                     "Memory usage should remain bounded (increase: {$memoryIncrease} bytes at iteration {$i})");
@@ -304,7 +304,7 @@ final class BootErrorRateLimiterPropertyTest extends TestCase
 
         // INVARIANT: Cleanup should have occurred
         $stats = $rateLimiter->getStatistics();
-        expect($stats['total_active_windows'])->toBeLessThanOrEqual(10, 
-            "Cleanup should limit active windows");
+        expect($stats['total_active_windows'])->toBeLessThanOrEqual(10,
+            'Cleanup should limit active windows');
     }
 }

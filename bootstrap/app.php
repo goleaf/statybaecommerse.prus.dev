@@ -27,11 +27,11 @@ use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 // Load the Filament compatibility shims before the application boots so the
 // legacy class aliases are always available during early package discovery.
-require_once __DIR__ . '/filament_compat.php';
+// require_once __DIR__ . '/filament_compat.php';
 
 $providers[] = App\Providers\LocaleServiceProvider::class;
 if (! env('SKIP_FILAMENT_BOOT')) {
-    $providers[] = App\Providers\Filament\AdminPanelProvider::class;
+    $providers[] = App\Filament\AdminPanelProvider::class;
 }
 $providers[] = SecurityServiceProvider::class;
 
@@ -66,15 +66,12 @@ $app = ApplicationOverride::configure(basePath: dirname(__DIR__))
         $middleware->throttleApi('api.default');
         // Register Spatie permission middlewares (Laravel 11+/12 style)
         $middleware->alias([
-            'role'                   => Spatie\Permission\Middleware\RoleMiddleware::class,
-            'permission'             => Spatie\Permission\Middleware\PermissionMiddleware::class,
-            'permissions'            => Spatie\Permission\Middleware\PermissionMiddleware::class,
-            'role_or_permission'     => Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
-            'localize'               => App\Http\Middleware\SetLocale::class,
-            'partner.api'            => App\Http\Middleware\PartnerApiAuthenticate::class,
-            'partner.api.auth'       => App\Http\Middleware\EnsurePartnerApiKey::class,
-            'partner.api.scope'      => App\Http\Middleware\EnsurePartnerApiScope::class,
-            'partner.api.rate_limit' => App\Http\Middleware\EnsurePartnerApiRateLimit::class,
+            'role'               => Spatie\Permission\Middleware\RoleMiddleware::class,
+            'permission'         => Spatie\Permission\Middleware\PermissionMiddleware::class,
+            'permissions'        => Spatie\Permission\Middleware\PermissionMiddleware::class,
+            'role_or_permission' => Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
+            'localize'           => App\Http\Middleware\SetLocale::class,
+
             // Surface Sanctum's middleware aliases for SPA and token authentication.
             'sanctum.stateful' => Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
             'abilities'        => Laravel\Sanctum\Http\Middleware\CheckForAnyAbility::class,
@@ -580,7 +577,9 @@ $app = ApplicationOverride::configure(basePath: dirname(__DIR__))
         ];
 
         $providers[] = App\Providers\LocaleServiceProvider::class;
-        $providers[] = App\Providers\Filament\AdminPanelProvider::class;
+        if (! env('SKIP_FILAMENT_BOOT', false)) {
+            $providers[] = App\Filament\AdminPanelProvider::class;
+        }
         // Register the Livewire testing helpers so resource hooks and test assets load reliably.
         $providers[] = App\Providers\LivewireTestingServiceProvider::class;
         $providers[] = SecurityServiceProvider::class;

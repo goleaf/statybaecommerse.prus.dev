@@ -242,8 +242,8 @@ final class VariantAnalyticsResourceTest extends TestCase
             ->fillForm([
                 'variant_id' => $variant->id,
                 // Explicitly nullify the date so we bypass the default value supplied by the form component.
-                'date'       => null,
-                'views'      => 100,
+                'date'  => null,
+                'views' => 100,
             ])
             ->call('create')
             ->assertHasFormErrors(['date']);

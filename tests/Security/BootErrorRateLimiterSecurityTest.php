@@ -8,12 +8,13 @@ use App\Exceptions\Handler;
 use App\Support\Exceptions\BootErrorRateLimiter;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
+use InvalidArgumentException;
 use Tests\TestCase;
-use TypeError;
+use Throwable;
 
 /**
  * Security tests for the boot error rate limiter boundary fix.
- * 
+ *
  * These tests verify that the rate limiting fix effectively prevents
  * denial-of-service attacks and other security vulnerabilities.
  */
@@ -47,9 +48,9 @@ final class BootErrorRateLimiterSecurityTest extends TestCase
         // Simulate DoS attack with many rate limiting calls
         $attackAttempts = 100;
         $successfulCalls = 0;
-        
+
         for ($i = 0; $i < $attackAttempts; $i++) {
-            if (!$rateLimiter->isRateLimited()) {
+            if (! $rateLimiter->isRateLimited()) {
                 $successfulCalls++;
             }
         }
@@ -85,7 +86,7 @@ final class BootErrorRateLimiterSecurityTest extends TestCase
 
         // Memory increase should be bounded (cleanup should prevent exhaustion)
         expect($memoryIncrease)->toBeLessThan(2 * 1024 * 1024, // 2MB
-            "Memory increase should be bounded to prevent exhaustion attacks");
+            'Memory increase should be bounded to prevent exhaustion attacks');
 
         // Verify cleanup occurred
         $stats = $rateLimiter->getStatistics();
@@ -102,13 +103,13 @@ final class BootErrorRateLimiterSecurityTest extends TestCase
         Config::set('exception-handling.security.max_boot_errors_per_minute', 3);
 
         $rateLimiter = new BootErrorRateLimiter;
-        
+
         // Simulate flooding attempts with many calls
         $totalAttempts = 50;
         $successfulCalls = 0;
 
         for ($i = 0; $i < $totalAttempts; $i++) {
-            if (!$rateLimiter->isRateLimited()) {
+            if (! $rateLimiter->isRateLimited()) {
                 $successfulCalls++;
             }
         }
@@ -137,7 +138,7 @@ final class BootErrorRateLimiterSecurityTest extends TestCase
 
         // Attempt to create new instance (should maintain state)
         $newRateLimiter = new BootErrorRateLimiter;
-        expect($newRateLimiter->isRateLimited())->toBeTrue("New instance should maintain rate limiting state");
+        expect($newRateLimiter->isRateLimited())->toBeTrue('New instance should maintain rate limiting state');
         expect($newRateLimiter->getCurrentCount())->toBe(2);
     }
 
@@ -207,10 +208,10 @@ final class BootErrorRateLimiterSecurityTest extends TestCase
         // In production, config should be cached and not change mid-request
         // In testing, it may change, but the rate limiter should handle it gracefully
         $result = $rateLimiter->isRateLimited();
-        
+
         // Should either maintain rate limiting (production) or handle change gracefully (testing)
         expect($result)->toBeIn([true, false], 'Should handle configuration changes gracefully');
-        
+
         // Count should never be negative or exceed reasonable bounds
         $count = $rateLimiter->getCurrentCount();
         expect($count)->toBeGreaterThanOrEqual(0);
@@ -232,12 +233,12 @@ final class BootErrorRateLimiterSecurityTest extends TestCase
         // Attempt to exhaust resources via excessive statistics collection
         for ($i = 0; $i < 500; $i++) {
             $rateLimiter->isRateLimited();
-            
+
             if ($i % 10 === 0) {
                 $stats = $rateLimiter->getStatistics();
-                
+
                 // Verify statistics don't contain excessive data
-                expect(count($stats['current_counts']))->toBeLessThan(100, 
+                expect(count($stats['current_counts']))->toBeLessThan(100,
                     'Statistics should not contain excessive data');
             }
         }
@@ -265,7 +266,7 @@ final class BootErrorRateLimiterSecurityTest extends TestCase
 
         foreach ($extremeConfigs as $config) {
             BootErrorRateLimiter::reset();
-            
+
             Config::set('exception-handling.security.rate_limit_enabled', $config['enabled']);
             Config::set('exception-handling.security.max_boot_errors_per_minute', $config['limit']);
 
@@ -275,16 +276,16 @@ final class BootErrorRateLimiterSecurityTest extends TestCase
             try {
                 $result = $rateLimiter->isRateLimited();
                 expect($result)->toBeIn([true, false], 'Should return valid boolean result');
-                
+
                 $count = $rateLimiter->getCurrentCount();
                 expect($count)->toBeGreaterThanOrEqual(0, 'Count should not be negative');
-                
+
                 $stats = $rateLimiter->getStatistics();
                 expect($stats)->toBeArray('Statistics should be valid array');
-                
-            } catch (\Throwable $e) {
+
+            } catch (Throwable $e) {
                 // If an exception occurs, it should be a reasonable one, not a fatal error
-                expect($e)->toBeInstanceOf(\InvalidArgumentException::class, 
+                expect($e)->toBeInstanceOf(InvalidArgumentException::class,
                     'Should throw reasonable exception for invalid config');
             }
         }

@@ -25,4 +25,3 @@ return [
         'browse'   => 'Naršyti',
     ],
 ];
-

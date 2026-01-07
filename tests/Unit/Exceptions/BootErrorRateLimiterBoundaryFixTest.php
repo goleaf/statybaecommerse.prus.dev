@@ -10,10 +10,10 @@ use Tests\TestCase;
 
 /**
  * Comprehensive tests for the boot error rate limiter boundary condition fix.
- * 
+ *
  * This test suite specifically validates the critical fix that prevents the counter
  * from exceeding the configured limit by checking BEFORE incrementing rather than after.
- * 
+ *
  * The fix addresses a security vulnerability where the rate limiter could allow
  * one extra error beyond the configured limit, potentially enabling DoS attacks.
  */
@@ -119,8 +119,8 @@ final class BootErrorRateLimiterBoundaryFixTest extends TestCase
         }
 
         // Verify exactly 10 calls succeeded, 40 were rate limited
-        $successful = array_filter($results, static fn($result) => !$result);
-        $rateLimited = array_filter($results, static fn($result) => $result);
+        $successful = array_filter($results, static fn ($result) => ! $result);
+        $rateLimited = array_filter($results, static fn ($result) => $result);
 
         expect($successful)->toHaveCount(10, 'Exactly 10 calls should succeed')
             ->and($rateLimited)->toHaveCount(40, 'Exactly 40 calls should be rate limited')
@@ -192,7 +192,7 @@ final class BootErrorRateLimiterBoundaryFixTest extends TestCase
         // Make many calls - none should be rate limited
         for ($i = 0; $i < 20; $i++) {
             expect($rateLimiter->isRateLimited())->toBeFalse("Call {$i} should not be rate limited when disabled");
-            expect($rateLimiter->wouldBeRateLimited())->toBeFalse("wouldBeRateLimited should return false when disabled");
+            expect($rateLimiter->wouldBeRateLimited())->toBeFalse('wouldBeRateLimited should return false when disabled');
         }
     }
 

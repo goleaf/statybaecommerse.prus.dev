@@ -3,123 +3,166 @@
 declare(strict_types=1);
 
 return [
-    'navigation' => [
-        'label' => 'Prekės ženklai',
-    ],
-
+    // Navigation
+    'navigation' => [],
+    // Model labels
     'model' => [
-        'singular' => 'Prekės ženklas',
-        'plural'   => 'Prekės ženklai',
+        'singular' => 'Prekių ženklas',
     ],
-
-    'tabs' => [
-        'basic_information' => 'Pagrindinė informacija',
-        'seo'               => 'SEO',
-        'translations'      => 'Vertimai',
-        'with_products'     => 'Su produktais',
-        'without_products'  => 'Be produktų',
-    ],
-
+    // Sections
     'sections' => [
         'basic_information' => 'Pagrindinė informacija',
-        'media'             => 'Medija',
+        'media'             => 'Medijos',
         'seo'               => 'SEO nustatymai',
+        'settings'          => 'Nustatymai',
+        'social'            => 'Socialiniai profiliai',
         'translations'      => 'Vertimai',
-        'description'       => 'Aprašymas',
-        'statistics'        => 'Statistika',
-        'timestamps'        => 'Laiko žymos',
     ],
-
+    // Fields
     'fields' => [
-        'name'                  => 'Pavadinimas',
-        'slug'                  => 'URL adresas',
-        'description'           => 'Aprašymas',
-        'website'               => 'Svetainė',
-        'is_enabled'            => 'Aktyvus',
-        'is_visible'            => 'Matomas',
-        'logo'                  => 'Logotipas',
-        'banner'                => 'Baneris',
-        'seo_title'             => 'SEO pavadinimas',
-        'seo_description'       => 'SEO aprašymas',
-        'translations'          => 'Vertimai',
-        'locale'                => 'Kalbos kodas',
-        'products_count'        => 'Produktų skaičius',
-        'active_products_count' => 'Aktyvių produktų skaičius',
-        'translations_count'    => 'Vertimų skaičius',
-        'created_at'            => 'Sukurta',
-        'updated_at'            => 'Atnaujinta',
+        'name'               => 'Pavadinimas',
+        'slug'               => 'Slug',
+        'description'        => 'Aprašymas',
+        'website'            => 'Svetainė',
+        'is_enabled'         => 'Įjungtas',
+        'is_active'          => 'Aktyvus',
+        'is_visible'         => 'Matomas',
+        'is_featured'        => 'Išskirtinis',
+        'is_premium'         => 'Premium',
+        'logo'               => 'Logotipas',
+        'banner'             => 'Baneris',
+        'seo_title'          => 'SEO pavadinimas',
+        'seo_description'    => 'SEO aprašymas',
+        'social_links'       => 'Socialiniai tinklai',
+        'social_platform'    => 'Platforma',
+        'social_url'         => 'Profilio nuoroda',
+        'translations'       => 'Vertimai',
+        'locale'             => 'Kalba',
+        'translations_count' => 'Vertimai',
+        'products_count'     => 'Produktai',
+        'created_at'         => 'Sukurta',
+        'updated_at'         => 'Atnaujinta',
     ],
-
+    // Helpers
     'helpers' => [
+        'enabled'         => 'Ar šis prekių ženklas yra aktyvus ir matomas',
         'seo_title'       => 'Rekomenduojamas ilgis: 50-60 simbolių',
         'seo_description' => 'Rekomenduojamas ilgis: 150-160 simbolių',
-        'enabled'         => 'Aktyvūs prekės ženklai bus rodomi svetainėje',
+        'website'         => 'Nuoroda į oficialią prekių ženklo svetainę',
+        'social_links'    => 'Pridėkite patvirtintas socialinių tinklų paskyras, jos bus saugomos JSON formatu',
+        'is_premium'      => 'Premium ženklai išskiriami vitrinose ir reklamose',
     ],
-
+    // Placeholders
     'placeholders' => [
-        'no_website'     => 'Svetainės nėra',
-        'no_description' => 'Aprašymo nėra',
+        'no_website' => 'Nėra svetainės',
     ],
-
+    // Actions
+    'actions' => [
+        'add_translation'         => 'Pridėti vertimą',
+        'enable'                  => 'Įjungti',
+        'disable'                 => 'Išjungti',
+        'enable_selected'         => 'Įjungti pasirinktus',
+        'disable_selected'        => 'Išjungti pasirinktus',
+        'activate'                => 'Aktyvuoti',
+        'deactivate'              => 'Deaktyvuoti',
+        'feature'                 => 'Pažymėti kaip išskirtinį',
+        'unfeature'               => 'Pašalinti iš išskirtinių',
+        'feature_selected'        => 'Pažymėti pasirinktus kaip išskirtinius',
+        'unfeature_selected'      => 'Pašalinti pasirinktus iš išskirtinių',
+        'mark_premium'            => 'Pažymėti kaip premium',
+        'unmark_premium'          => 'Pašalinti premium statusą',
+        'mark_premium_selected'   => 'Pažymėti pasirinktus kaip premium',
+        'unmark_premium_selected' => 'Pašalinti pasirinktų premium statusą',
+        'add_social_link'         => 'Pridėti socialinę nuorodą',
+        'manage_translations'     => 'Valdyti vertimus',
+        'bulk_actions'            => 'Masiniai veiksmai',
+    ],
+    // Filters
     'filters' => [
-        'enabled'            => 'Aktyvumo būsena',
-        'all_brands'         => 'Visi prekės ženklai',
-        'enabled_only'       => 'Tik aktyvūs',
-        'disabled_only'      => 'Tik neaktyvūs',
+        'enabled_only'       => 'Tik įjungti',
+        'featured_only'      => 'Tik išskirtiniai',
+        'not_featured'       => 'Neišskirtiniai',
+        'premium_only'       => 'Tik premium',
+        'not_premium'        => 'Ne premium',
+        'visible_only'       => 'Tik matomi',
+        'hidden_only'        => 'Tik paslėpti',
+        'with_products'      => 'Su produktais',
+        'without_products'   => 'Be produktų',
+        'with_website'       => 'Su svetaine',
+        'recent'             => 'Naujausi',
         'has_products'       => 'Turi produktų',
-        'has_website'        => 'Turi svetainės',
-        'has_logo'           => 'Turi logotipo',
-        'has_banner'         => 'Turi banerio',
         'has_translations'   => 'Turi vertimų',
         'translation_locale' => 'Vertimo kalba',
-        'created_from'       => 'Sukurta nuo',
-        'created_until'      => 'Sukurta iki',
     ],
-
-    'actions' => [
-        'create'              => 'Sukurti prekės ženklą',
-        'create_first_brand'  => 'Sukurti pirmą prekės ženklą',
-        'add_translation'     => 'Pridėti vertimą',
-        'enable_selected'     => 'Aktyvuoti pasirinktus',
-        'disable_selected'    => 'Deaktyvuoti pasirinktus',
-        'enable'              => 'Aktyvuoti',
-        'disable'             => 'Deaktyvuoti',
-        'manage_translations' => 'Tvarkyti vertimus',
-        'bulk_actions'        => 'Masiniai veiksmai',
-    ],
-
-    'messages' => [
-        'slug_copied' => 'URL adresas nukopijuotas į iškarpinę',
-    ],
-
-    'notifications' => [
-        'created'             => 'Prekės ženklas sėkmingai sukurtas',
-        'created_description' => 'Prekės ženklas „:name“ sėkmingai sukurtas.',
-        'updated'             => 'Prekės ženklas sėkmingai atnaujintas',
-        'updated_description' => 'Prekės ženklas „:name“ sėkmingai atnaujintas.',
-        'deleted'             => 'Prekės ženklas sėkmingai ištrintas',
-    ],
-
-    'empty_state' => [
-        'heading'     => 'Prekės ženklų nerasta',
-        'description' => 'Pradėkite kurdami savo pirmą prekės ženklą.',
-    ],
-
+    // Statistics
     'stats' => [
-        'total_brands'                         => 'Iš viso prekės ženklų',
-        'total_brands_description'             => 'Bendras prekės ženklų skaičius sistemoje',
-        'enabled_brands'                       => 'Aktyvūs prekės ženklai',
-        'enabled_brands_description'           => 'Prekės ženklai, kurie rodomi svetainėje',
-        'brands_with_products'                 => 'Su produktais',
-        'brands_with_products_description'     => 'Prekės ženklai, turintys produktų',
-        'brands_with_translations'             => 'Su vertimais',
-        'brands_with_translations_description' => 'Prekės ženklai su vertimais',
+        'total_brands'               => 'Iš viso prekių ženklų',
+        'total_brands_description'   => 'Visi sistemos prekių ženklai',
+        'enabled_brands'             => 'Įjungti prekių ženklai',
+        'enabled_brands_description' => 'Aktyvūs ir matomi prekių ženklai',
+    ],
+    // Widgets
+    'widgets' => [
+        'brand_overview'    => 'Prekių ženklų apžvalga',
+        'brand_performance' => 'Prekių ženklų veikla',
+        'brand_analytics'   => 'Prekių ženklų analitika',
+    ],
+    // Empty states
+    'empty_states' => [
+        'no_brands'               => 'Prekių ženklų nerasta',
+        'no_enabled_brands'       => 'Nėra įjungtų prekių ženklų',
+        'no_brands_with_products' => 'Nėra prekių ženklų su produktais',
+    ],
+    // Messages
+    'messages' => [
+        'created'  => 'Prekių ženklas sėkmingai sukurtas',
+        'updated'  => 'Prekių ženklas sėkmingai atnaujintas',
+        'deleted'  => 'Prekių ženklas sėkmingai ištrintas',
+        'enabled'  => 'Prekių ženklas sėkmingai įjungtas',
+        'disabled' => 'Prekių ženklas sėkmingai išjungtas',
     ],
 
-    'widgets' => [
-        'overview_heading'    => 'Naujausi prekės ženklai',
-        'performance_heading' => 'Prekės ženklų veikla',
-        'products_count'      => 'Produktų skaičius',
-        'translations_count'  => 'Vertimų skaičius',
+    // Notifications
+    'notifications' => [
+        'activated'             => 'Prekių ženklas sėkmingai aktyvuotas',
+        'deactivated'           => 'Prekių ženklas sėkmingai deaktyvuotas',
+        'featured_enabled'      => 'Prekių ženklas pažymėtas kaip išskirtinis',
+        'featured_disabled'     => 'Prekių ženklas nebėra išskirtinis',
+        'bulk_enabled'          => 'Pasirinkti prekių ženklai įjungti',
+        'bulk_disabled'         => 'Pasirinkti prekių ženklai išjungti',
+        'bulk_featured'         => 'Pasirinkti prekių ženklai pažymėti kaip išskirtiniai',
+        'bulk_unfeatured'       => 'Pasirinkti prekių ženklai pašalinti iš išskirtinių',
+        'premium_enabled'       => 'Prekių ženklas pažymėtas kaip premium',
+        'premium_disabled'      => 'Prekių ženklui pašalintas premium statusas',
+        'bulk_premium_enabled'  => 'Pasirinkti prekių ženklai pažymėti kaip premium',
+        'bulk_premium_disabled' => 'Pasirinkti prekių ženklai neteko premium statuso',
+    ],
+
+    // Social platform labels
+    'social' => [
+        'platforms' => [
+            'facebook'  => 'Facebook',
+            'instagram' => 'Instagram',
+            'linkedin'  => 'LinkedIn',
+            'tiktok'    => 'TikTok',
+            'twitter'   => 'Twitter',
+            'youtube'   => 'YouTube',
+            'pinterest' => 'Pinterest',
+            'github'    => 'GitHub',
+            'website'   => 'Svetainė',
+        ],
+    ],
+    // Validation
+    'validation' => [
+        'name_required'       => 'Prekių ženklo pavadinimas yra privalomas',
+        'name_max'            => 'Prekių ženklo pavadinimas negali viršyti 255 simbolių',
+        'slug_required'       => 'Prekių ženklo slug yra privalomas',
+        'slug_unique'         => 'Prekių ženklo slug turi būti unikalus',
+        'slug_alpha_dash'     => 'Prekių ženklo slug gali turėti tik raides, skaičius, brūkšnelius ir pabraukimus',
+        'description_max'     => 'Prekių ženklo aprašymas negali viršyti 1000 simbolių',
+        'website_url'         => 'Svetainė turi būti galiojantis URL',
+        'website_max'         => 'Svetainė negali viršyti 255 simbolių',
+        'seo_title_max'       => 'SEO pavadinimas negali viršyti 60 simbolių',
+        'seo_description_max' => 'SEO aprašymas negali viršyti 160 simbolių',
     ],
 ];

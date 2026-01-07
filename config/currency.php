@@ -7,7 +7,7 @@ return [
     'base_currency' => 'EUR',
 
     // Static fallback rates consumed by the synchroniser until a dynamic provider is introduced.
-    'static_rates'  => [
+    'static_rates' => [
         'EUR' => 1.0,
         'USD' => 1.08,
         'GBP' => 0.86,

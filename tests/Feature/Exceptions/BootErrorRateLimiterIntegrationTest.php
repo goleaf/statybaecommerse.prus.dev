@@ -7,13 +7,12 @@ namespace Tests\Feature\Exceptions;
 use App\Exceptions\Handler;
 use App\Support\Exceptions\BootErrorRateLimiter;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
 use TypeError;
 
 /**
  * Integration tests for boot error rate limiting within the exception handler.
- * 
+ *
  * These tests verify that the rate limiting fix works correctly in the context
  * of the full exception handling pipeline, including HTTP requests and logging.
  */
@@ -66,7 +65,7 @@ final class BootErrorRateLimiterIntegrationTest extends TestCase
     {
         // Test with rate limiting disabled
         Config::set('exception-handling.security.rate_limit_enabled', false);
-        
+
         $rateLimiter = new BootErrorRateLimiter;
 
         // With rate limiting disabled, should never be rate limited
@@ -105,8 +104,8 @@ final class BootErrorRateLimiterIntegrationTest extends TestCase
         }
 
         // First 3 should succeed, rest should be rate limited
-        $successful = array_filter($results, static fn($result) => !$result);
-        $rateLimited = array_filter($results, static fn($result) => $result);
+        $successful = array_filter($results, static fn ($result) => ! $result);
+        $rateLimited = array_filter($results, static fn ($result) => $result);
 
         expect($successful)->toHaveCount(3);
         expect($rateLimited)->toHaveCount(3);
@@ -205,8 +204,8 @@ final class BootErrorRateLimiterIntegrationTest extends TestCase
         }
 
         // Count successful vs rate limited calls
-        $successful = array_filter($results, static fn($result) => !$result);
-        $rateLimited = array_filter($results, static fn($result) => $result);
+        $successful = array_filter($results, static fn ($result) => ! $result);
+        $rateLimited = array_filter($results, static fn ($result) => $result);
 
         // Should have exactly 5 successful calls, 15 rate limited
         expect($successful)->toHaveCount(5);

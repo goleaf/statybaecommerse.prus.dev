@@ -10,7 +10,7 @@ use Tests\TestCase;
 
 /**
  * Performance tests for the boot error rate limiter boundary fix.
- * 
+ *
  * These tests ensure that the fix doesn't introduce performance regressions
  * and that the rate limiter operates efficiently under various load conditions.
  */
@@ -51,11 +51,11 @@ final class BootErrorRateLimiterPerformanceTest extends TestCase
         $averageTime = ($totalTime / $iterations) * 1000; // Convert to milliseconds
 
         // Performance budget: Each rate limiting check should take less than 1ms on average
-        expect($averageTime)->toBeLessThan(1.0, 
+        expect($averageTime)->toBeLessThan(1.0,
             "Rate limiting check should be fast (average: {$averageTime}ms per check)");
 
         // Total time for 1000 checks should be reasonable
-        expect($totalTime)->toBeLessThan(1.0, 
+        expect($totalTime)->toBeLessThan(1.0,
             "Total time for {$iterations} checks should be under 1 second (actual: {$totalTime}s)");
     }
 
@@ -87,7 +87,7 @@ final class BootErrorRateLimiterPerformanceTest extends TestCase
         $averageTime = ($totalTime / $iterations) * 1000; // Convert to milliseconds
 
         // Prediction should be faster than actual rate limiting
-        expect($averageTime)->toBeLessThan(0.5, 
+        expect($averageTime)->toBeLessThan(0.5,
             "Prediction check should be very fast (average: {$averageTime}ms per check)");
     }
 
@@ -108,7 +108,7 @@ final class BootErrorRateLimiterPerformanceTest extends TestCase
         // Take memory readings during operation
         for ($i = 0; $i < 500; $i++) {
             $rateLimiter->isRateLimited();
-            
+
             if ($i % 100 === 0) {
                 $memoryReadings[] = memory_get_usage(true) - $initialMemory;
             }
@@ -118,7 +118,7 @@ final class BootErrorRateLimiterPerformanceTest extends TestCase
 
         // Memory usage should remain reasonable
         expect($finalMemory)->toBeLessThan(1024 * 1024, // 1MB
-            "Memory usage should remain under 1MB (actual: " . number_format($finalMemory) . " bytes)");
+            'Memory usage should remain under 1MB (actual: ' . number_format($finalMemory) . ' bytes)');
 
         // Memory should not grow significantly over time
         $maxMemory = max($memoryReadings);
@@ -126,7 +126,7 @@ final class BootErrorRateLimiterPerformanceTest extends TestCase
         $memoryVariation = $maxMemory - $minMemory;
 
         expect($memoryVariation)->toBeLessThan(512 * 1024, // 512KB
-            "Memory variation should be minimal (variation: " . number_format($memoryVariation) . " bytes)");
+            'Memory variation should be minimal (variation: ' . number_format($memoryVariation) . ' bytes)');
     }
 
     /**
@@ -150,7 +150,7 @@ final class BootErrorRateLimiterPerformanceTest extends TestCase
 
         for ($i = 0; $i < $iterations; $i++) {
             $rateLimiter->isRateLimited();
-            
+
             // Collect statistics every 10th iteration
             if ($i % 10 === 0) {
                 $rateLimiter->getStatistics();
@@ -161,7 +161,7 @@ final class BootErrorRateLimiterPerformanceTest extends TestCase
         $totalTime = $endTime - $startTime;
 
         // Should complete within reasonable time even with statistics collection
-        expect($totalTime)->toBeLessThan(2.0, 
+        expect($totalTime)->toBeLessThan(2.0,
             "Operations with statistics collection should complete quickly (actual: {$totalTime}s)");
     }
 
@@ -188,13 +188,13 @@ final class BootErrorRateLimiterPerformanceTest extends TestCase
         $totalTime = $endTime - $startTime;
 
         // Even with cleanup operations, should remain fast
-        expect($totalTime)->toBeLessThan(1.0, 
+        expect($totalTime)->toBeLessThan(1.0,
             "Operations with cleanup should complete quickly (actual: {$totalTime}s)");
 
         // Verify cleanup actually occurred
         $stats = $rateLimiter->getStatistics();
-        expect($stats['total_active_windows'])->toBeLessThanOrEqual(50, 
-            "Cleanup should have limited active windows");
+        expect($stats['total_active_windows'])->toBeLessThanOrEqual(50,
+            'Cleanup should have limited active windows');
     }
 
     /**
@@ -245,7 +245,7 @@ final class BootErrorRateLimiterPerformanceTest extends TestCase
         $totalTime = $endTime - $startTime;
 
         // Performance should not degrade with high limits
-        expect($totalTime)->toBeLessThan(1.0, 
+        expect($totalTime)->toBeLessThan(1.0,
             "High limit scenarios should maintain performance (actual: {$totalTime}s)");
 
         // Verify we haven't hit the limit
@@ -282,11 +282,11 @@ final class BootErrorRateLimiterPerformanceTest extends TestCase
         $averageTime = ($totalTime / $iterations) * 1000; // Convert to milliseconds
 
         // Rate-limited calls should be fast (early exit optimization)
-        expect($averageTime)->toBeLessThan(0.1, 
+        expect($averageTime)->toBeLessThan(0.1,
             "Rate-limited calls should be optimized (average: {$averageTime}ms per check)");
 
         // Verify all calls were indeed rate limited
-        expect($rateLimiter->getCurrentCount())->toBe(5, "Count should remain at limit");
+        expect($rateLimiter->getCurrentCount())->toBe(5, 'Count should remain at limit');
     }
 
     /**
@@ -318,7 +318,7 @@ final class BootErrorRateLimiterPerformanceTest extends TestCase
 
         // Subsequent calls should be faster than the first call
         // (This test may be environment-dependent, so we use a reasonable threshold)
-        expect($subsequentCallsTime)->toBeLessThan($firstCallTime * 2, 
-            "Configuration should be cached for better performance");
+        expect($subsequentCallsTime)->toBeLessThan($firstCallTime * 2,
+            'Configuration should be cached for better performance');
     }
 }

@@ -189,4 +189,3 @@ final class SystemSettingCategoryResourceTest extends TestCase
             ->assertCanNotSeeTableRecords([$inactive]);
     }
 }
-

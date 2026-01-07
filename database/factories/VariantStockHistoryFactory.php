@@ -7,6 +7,7 @@ namespace Database\Factories;
 use App\Models\ProductVariant;
 use App\Models\User;
 use App\Models\VariantStockHistory;
+use Closure;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -31,20 +32,20 @@ class VariantStockHistoryFactory extends Factory
                     (int) ($attributes['old_quantity'] ?? 0),
                 );
             },
-            'new_quantity'    => function (array $attributes): int {
+            'new_quantity' => function (array $attributes): int {
                 $oldQuantity = (int) ($attributes['old_quantity'] ?? 0);
                 $quantityChange = (int) ($attributes['quantity_change'] ?? 0);
 
                 return max(0, $oldQuantity + $quantityChange);
             },
-            'change_reason'   => $this->faker->randomElement($changeReasons),
-            'changed_by'      => User::factory(),
-            'reference_type'  => function (array $attributes) use ($referenceTypes): ?string {
+            'change_reason'  => $this->faker->randomElement($changeReasons),
+            'changed_by'     => User::factory(),
+            'reference_type' => function (array $attributes) use ($referenceTypes): ?string {
                 return in_array($attributes['change_type'] ?? null, ['increase', 'decrease'], true)
                     ? $this->faker->randomElement($referenceTypes)
                     : null;
             },
-            'reference_id'    => function (array $attributes): ?int {
+            'reference_id' => function (array $attributes): ?int {
                 return in_array($attributes['change_type'] ?? null, ['increase', 'decrease'], true)
                     ? $this->faker->numberBetween(1, 100)
                     : null;
@@ -98,14 +99,14 @@ class VariantStockHistoryFactory extends Factory
             : $this->faker->numberBetween(0, 100);
 
         $quantityAttribute = $attributes['quantity_change'] ?? null;
-        $quantityChange = $quantityAttribute instanceof \Closure
+        $quantityChange = $quantityAttribute instanceof Closure
             ? null
             : $quantityAttribute;
 
         $quantityChange ??= $this->randomQuantityChange($changeType, $oldQuantity);
 
         $newQuantityAttribute = $attributes['new_quantity'] ?? null;
-        $newQuantity = $newQuantityAttribute instanceof \Closure
+        $newQuantity = $newQuantityAttribute instanceof Closure
             ? null
             : $newQuantityAttribute;
 
@@ -125,11 +126,11 @@ class VariantStockHistoryFactory extends Factory
         $availableStock = max(1, $oldQuantity);
 
         return match ($changeType) {
-            'increase'   => $this->faker->numberBetween(1, 20),
-            'decrease'   => -$this->faker->numberBetween(1, min(10, $availableStock)),
-            'reserve'    => -$this->faker->numberBetween(1, min(5, $availableStock)),
-            'unreserve'  => $this->faker->numberBetween(1, 10),
-            default      => $this->faker->numberBetween(-5, 10),
+            'increase'  => $this->faker->numberBetween(1, 20),
+            'decrease'  => -$this->faker->numberBetween(1, min(10, $availableStock)),
+            'reserve'   => -$this->faker->numberBetween(1, min(5, $availableStock)),
+            'unreserve' => $this->faker->numberBetween(1, 10),
+            default     => $this->faker->numberBetween(-5, 10),
         };
     }
 }

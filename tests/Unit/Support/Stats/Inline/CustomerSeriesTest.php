@@ -7,15 +7,14 @@ use App\Support\Stats\Inline\CustomerSeries;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * Note:
  * - Do not add `uses(Tests\TestCase::class)` here. Pest already applies it to this folder.
  * - This test creates only the minimal `orders` table it needs.
  */
-
 beforeEach(function (): void {
     // Re-create a minimal orders table each time (SQLite-friendly)
     Schema::dropIfExists('orders');

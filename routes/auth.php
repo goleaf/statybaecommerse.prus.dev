@@ -62,9 +62,6 @@ Route::middleware('auth')->group(function (): void {
             Route::view('reviews', 'livewire.pages.account.reviews')->name('reviews');
         }
 
-        // Wishlist page
-        Route::get('wishlist', \App\Livewire\Pages\Account\Wishlist::class)->name('wishlist');
-
         // Documents page
         Route::view('documents', 'livewire.pages.account.documents')->name('documents');
 

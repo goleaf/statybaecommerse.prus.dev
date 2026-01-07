@@ -7,7 +7,6 @@ namespace Database\Seeders;
 use function array_key_exists;
 
 use Illuminate\Database\Seeder;
-use Spatie\Activitylog\ActivityLogStatus;
 
 final class DatabaseSeeder extends Seeder
 {
@@ -39,22 +38,10 @@ final class DatabaseSeeder extends Seeder
             $seeders = $profiles[$resolvedProfile] ?? [];
         }
 
-        /** @var ActivityLogStatus $activityLogStatus */
-        $activityLogStatus = app(ActivityLogStatus::class);
-        $wasLoggingDisabled = $activityLogStatus->disabled();
-
-        if (! $wasLoggingDisabled) {
-            // Temporarily suspend activity logging for cleaner seed runs without touching the logger facade.
-            $activityLogStatus->disable();
-        }
-
         try {
             $this->call($seeders);
         } finally {
-            if (! $wasLoggingDisabled) {
-                // Ensure logging is re-enabled even if a seeder fails midway.
-                $activityLogStatus->enable();
-            }
+            // Cleanup completed
         }
     }
 }

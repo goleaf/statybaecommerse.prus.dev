@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Tests\Feature\Filament\Resources;
 
 use App\Models\Partner;
-use App\Models\PartnerTier;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -24,16 +23,11 @@ class PartnerResourceTest extends TestCase
             'email'    => 'admin@example.com',
             'is_admin' => true,
         ]);
-
-        // Create test partner tier
-        $this->partnerTier = PartnerTier::factory()->create();
     }
 
     public function test_can_list_partners(): void
     {
-        $partner = Partner::factory()->create([
-            'tier_id' => $this->partnerTier->id,
-        ]);
+        $partner = Partner::factory()->create();
 
         $this->actingAs($this->user);
 

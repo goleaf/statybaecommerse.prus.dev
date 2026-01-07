@@ -60,14 +60,14 @@ final class UserProductInteractionsV4ResourceTest extends TestCase
 
         $formState = [
             // Link the interaction to concrete user and product records.
-            'user_id'             => $user->getKey(),
-            'product_id'          => $product->getKey(),
-            'product_variant_id'  => $variant->getKey(),
-            'event'               => 'add_to_cart',
+            'user_id'            => $user->getKey(),
+            'product_id'         => $product->getKey(),
+            'product_variant_id' => $variant->getKey(),
+            'event'              => 'add_to_cart',
             // Use an ISO timestamp so the flatpickr component hydrates correctly.
-            'occurred_at'         => now()->toDateTimeString(),
+            'occurred_at' => now()->toDateTimeString(),
             // Provide simple metadata to ensure array payloads round-trip.
-            'meta'                => ['source' => 'test'],
+            'meta' => ['source' => 'test'],
         ];
 
         // Submit the create form and expect a successful validation run.

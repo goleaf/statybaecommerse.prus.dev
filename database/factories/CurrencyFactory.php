@@ -51,7 +51,7 @@ final class CurrencyFactory extends Factory
         $code = $this->generateCurrencyCode();
         $isoNumeric = $this->nextIsoNumericCode();
 
-        $sequenceOrder = max(0, static::$codeSequence - 1);
+        $sequenceOrder = max(0, self::$codeSequence - 1);
 
         $symbols = ['€', '$', '£', '¥', '₿'];
         $symbolPositionOptions = ['before', 'after'];

@@ -135,7 +135,7 @@ final class ExtendedDemoSeeder extends Seeder
                     'phone'          => '1234567890',
                     'is_default'     => true,
                     // Align with the addresses schema which stores ISO values in the country_code column.
-                    'country_code'   => 'LT',
+                    'country_code' => 'LT',
                 ]),
                 'addresses'
             )
@@ -160,16 +160,16 @@ final class ExtendedDemoSeeder extends Seeder
                 ->has(
                     OrderShipping::factory()->state([
                         // Persist deterministic carrier metadata so demo analytics stay repeatable.
-                        'carrier_name'       => 'Cartwright Logistics',
-                        'carrier'            => 'cartwright_logistics',
-                        'shipping_method'    => 'overnight',
-                        'service'            => 'ground',
-                        'service_type'       => 'standard',
+                        'carrier_name'    => 'Cartwright Logistics',
+                        'carrier'         => 'cartwright_logistics',
+                        'shipping_method' => 'overnight',
+                        'service'         => 'ground',
+                        'service_type'    => 'standard',
                         // Align with the order totals by reusing the same shipping amount columns.
-                        'cost'               => 9.99,
-                        'base_cost'          => 9.99,
-                        'insurance_cost'     => 0.00,
-                        'total_cost'         => 9.99,
+                        'cost'           => 9.99,
+                        'base_cost'      => 9.99,
+                        'insurance_cost' => 0.00,
+                        'total_cost'     => 9.99,
                         // Keep weights predictable for downstream fulfillment demos.
                         'weight'             => 1.0,
                         'estimated_delivery' => now()->addDays(5),

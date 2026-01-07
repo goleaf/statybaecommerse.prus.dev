@@ -5,29 +5,46 @@ declare(strict_types=1);
 return [
     'meta' => [
         'title'       => 'Collections',
-        'description' => 'Discover curated product collections tailored to every mood and moment.',
+        'description' => 'Browse our curated collections of products',
     ],
+
     'hero' => [
-        'badge'    => 'Curated collections',
-        'title'    => 'Collections for every story',
-        'subtitle' => 'Explore ready-made sets of products assembled by the Statybae team so you can find the perfect combination in seconds.',
+        'badge'    => 'Collections',
+        'title'    => 'Curated Collections',
+        'subtitle' => 'Discover our handpicked collections of products designed to meet your specific needs.',
     ],
-    'empty' => [
-        'collections' => 'No collections are available right now. Please check back soon.',
-        'products'    => 'This collection does not have any published products yet.',
-    ],
+
     'buttons' => [
-        'view_collection' => 'View collection',
-        'view_product'    => 'View product',
+        'view_collection' => 'View Collection',
+        'view_products'   => 'View Products',
+        'load_more'       => 'Load More',
     ],
-    'products' => [
-        'title' => 'Products in :name',
+
+    'empty' => [
+        'collections' => 'No collections available at the moment.',
+        'products'    => 'No products in this collection.',
     ],
-    'types' => [
-        'automatic' => 'Automatic',
-        'manual'    => 'Manual',
+
+    'filters' => [
+        'all'           => 'All Collections',
+        'automatic'     => 'Automatic',
+        'manual'        => 'Manual',
+        'with_products' => 'With Products',
     ],
+
     'stats' => [
-        'products' => '{0}0 products|{1}1 product|[2,*]:count products',
+        'products_count'    => 'Products',
+        'collections_count' => 'Collections',
+    ],
+
+    'types' => [
+        'automatic' => 'Automatic Collection',
+        'manual'    => 'Manual Collection',
+    ],
+
+    'display_types' => [
+        'grid'     => 'Grid View',
+        'list'     => 'List View',
+        'carousel' => 'Carousel View',
     ],
 ];

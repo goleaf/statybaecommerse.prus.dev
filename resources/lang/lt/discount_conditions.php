@@ -50,7 +50,6 @@ return [
         'currency'        => 'Valiuta',
         'customer_group'  => 'Klientų grupė',
         'user'            => 'Naudotojas',
-        'partner_tier'    => 'Partnerių lygis',
         'first_order'     => 'Pirmasis užsakymas',
         'day_time'        => 'Dienos laikas',
         'custom_script'   => 'Pasirinktinis scenarijus',

@@ -6,8 +6,8 @@ namespace Tests\Feature;
 
 use App\Filament\Resources\VariantStockResource\Pages\ListVariantStocks;
 use App\Models\Location;
-use App\Models\VariantInventory;
 use App\Models\User;
+use App\Models\VariantInventory;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;

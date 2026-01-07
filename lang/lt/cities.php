@@ -3,134 +3,143 @@
 declare(strict_types=1);
 
 return [
-    // Pagrindiniai pavadinimai
-    'plural'         => 'Miestai',
-    'single'         => 'Miestas',
-    'name'           => 'Pavadinimas',
-    'code'           => 'Kodas',
-    'slug'           => 'URL dalis',
-    'description'    => 'Aprašymas',
-    'country'        => 'Šalis',
-    'city'           => 'Miestas',
-    'state_province' => 'Valstija / provincija',
-    'country_code'   => 'Šalies kodas',
-    'postal_code'    => 'Pašto kodas',
+    // Navigation
+    'navigation_label'   => 'Miestai',
+    'navigation_group'   => 'Turinys',
+    'model_label'        => 'Miestas',
+    'plural_model_label' => 'Miestai',
 
-    // Koordinatės
-    'latitude'    => 'Platuma',
-    'longitude'   => 'Ilguma',
-    'coordinates' => 'Koordinatės',
-
-    // Demografija
-    'population' => 'Gyventojų skaičius',
-    'area'       => 'Plotas (km²)',
-    'density'    => 'Tankis (/km²)',
-    'elevation'  => 'Aukštis (m)',
-    'timezone'   => 'Laiko juosta',
-
-    // Lokalizacija
-    'currency_code' => 'Valiutos kodas',
-    'language_code' => 'Kalbos kodas',
-    'phone_code'    => 'Telefono kodas',
-
-    // Hierarchija
-    'parent_city' => 'Tėvinis miestas',
-    'level'       => 'Lygis',
-
-    // Nustatymai
-    'is_active'  => 'Aktyvus',
-    'is_capital' => 'Sostinė',
-    'is_default' => 'Numatytasis',
-    'sort_order' => 'Rikiavimo tvarka',
-    'type'       => 'Tipas',
-
-    // Tipai
-    'types' => [
-        'metropolitan' => 'Metropolinis',
-        'urban'        => 'Miesto',
-        'rural'        => 'Kaimo',
-        'suburban'     => 'Priemiestinis',
-        'industrial'   => 'Pramoninis',
-        'tourist'      => 'Turistinis',
-    ],
-
-    // Lygiai
-    'levels' => [
-        0 => 'Miestas',
-        1 => 'Rajonas',
-        2 => 'Mikrorajonas',
-        3 => 'Priemiestis',
-        4 => 'Kaimas',
-        5 => 'Miestelis',
-    ],
-
-    // Skyriai
+    // Basic Information
     'basic_information' => 'Pagrindinė informacija',
-    'coordinates'       => 'Koordinatės',
-    'demographics'      => 'Demografiniai duomenys',
-    'localization'      => 'Lokalizacija',
-    'hierarchy'         => 'Hierarchija',
-    'settings'          => 'Nustatymai',
+    'name'              => 'Pavadinimas',
+    'slug'              => 'URL nuoroda',
+    'code'              => 'Kodas',
+    'description'       => 'Aprašymas',
 
-    // Pagalbos tekstai
-    'slug_help'          => 'URL formato pavadinimas',
-    'code_help'          => 'Trumpas unikalus identifikatorius',
-    'latitude_help'      => 'Platumos koordinatė (-90 iki 90)',
-    'longitude_help'     => 'Ilgumos koordinatė (-180 iki 180)',
-    'population_help'    => 'Gyventojų skaičius',
-    'area_help'          => 'Plotas kvadratiniais kilometrais',
-    'density_help'       => 'Gyventojų tankis viename kvadratiniame kilometre',
-    'elevation_help'     => 'Aukštis virš jūros lygio (metrais)',
-    'timezone_help'      => 'Laiko juostos identifikatorius (pvz., Europe/Vilnius)',
-    'currency_code_help' => 'ISO 4217 valiutos kodas',
-    'language_code_help' => 'ISO 639 kalbos kodas',
-    'phone_code_help'    => 'Tarptautinis telefono kodas',
-    'parent_city_help'   => 'Tėvinis miestas hierarchijai sudaryti',
-    'level_help'         => 'Hierarchijos lygis (0–10)',
-    'sort_order_help'    => 'Atvaizdavimo eilė (mažesni skaičiai rodomi pirmiau)',
-    'type_help'          => 'Miesto klasifikacijos tipas',
+    // Location
+    'location'           => 'Vietovė',
+    'country'            => 'Šalis',
+    'region'             => 'Regionas',
+    'parent_city'        => 'Tėvinis miestas',
+    'level'              => 'Lygis',
+    'level_city'         => 'Miestas',
+    'level_district'     => 'Rajonas',
+    'level_neighborhood' => 'Mikrorajonas',
+    'level_suburb'       => 'Priemiestis',
+    'level_help'         => 'Hierarchijos lygis: 0=miestas, 1=rajonas, 2=mikrorajonas, 3=priemiestis',
 
-    // Veiksmai
-    'activate'       => 'Aktyvuoti',
-    'deactivate'     => 'Išjungti',
-    'set_capital'    => 'Nustatyti sostine',
-    'remove_capital' => 'Pašalinti sostinės statusą',
-    'set_default'    => 'Nustatyti numatytuoju',
-    'remove_default' => 'Pašalinti numatytojo statusą',
+    // Geographic Data
+    'geographic_data'          => 'Geografiniai duomenys',
+    'latitude'                 => 'Platuma',
+    'longitude'                => 'Ilguma',
+    'population'               => 'Gyventojų skaičius',
+    'postal_codes'             => 'Pašto kodai',
+    'postal_codes_placeholder' => 'Įveskite pašto kodus',
 
-    // Masiniai veiksmai
-    'activate_selected'       => 'Aktyvuoti pasirinktus',
-    'deactivate_selected'     => 'Išjungti pasirinktus',
-    'set_capital_selected'    => 'Pažymėtus nustatyti sostinėmis',
-    'remove_capital_selected' => 'Pažymėtiems pašalinti sostinės statusą',
+    // Status
+    'status'     => 'Būsena',
+    'is_enabled' => 'Įjungta',
+    'is_default' => 'Pagal nutylėjimą',
+    'is_capital' => 'Sostinė',
+    'is_active'  => 'Aktyvus',
+    'sort_order' => 'Rikiavimo tvarka',
 
-    // Filtrai
-    'active_only'      => 'Tik aktyvūs',
-    'inactive_only'    => 'Tik neaktyvūs',
-    'capital_only'     => 'Tik sostinės',
-    'non_capital_only' => 'Tik ne sostinės',
-    'default_only'     => 'Tik numatytieji',
-    'non_default_only' => 'Tik ne numatytieji',
+    // Translations
+    'translations'    => 'Vertimai',
+    'locale'          => 'Kalbos kodas',
+    'locale_lt'       => 'Lietuvių kalba',
+    'locale_en'       => 'Anglų kalba',
+    'locale_de'       => 'Vokiečių kalba',
+    'locale_ru'       => 'Rusų kalba',
+    'add_translation' => 'Pridėti vertimą',
 
-    // Sėkmės pranešimai
-    'activated_successfully'       => 'Miestas sėkmingai aktyvuotas',
-    'deactivated_successfully'     => 'Miestas sėkmingai išjungtas',
-    'set_as_capital_success'       => 'Miestas sėkmingai nustatytas sostine',
-    'removed_from_capital_success' => 'Sostinės statusas sėkmingai pašalintas',
-    'set_as_default_success'       => 'Miestas sėkmingai nustatytas numatytuoju',
-    'removed_from_default_success' => 'Numatytojo statusas sėkmingai pašalintas',
+    // Metadata
+    'metadata' => 'Metaduomenys',
+    'key'      => 'Raktas',
+    'value'    => 'Reikšmė',
 
-    // Masinių veiksmų sėkmė
-    'bulk_activated_success'      => 'Pažymėti miestai sėkmingai aktyvuoti',
-    'bulk_deactivated_success'    => 'Pažymėti miestai sėkmingai išjungti',
-    'bulk_set_capital_success'    => 'Pažymėti miestai sėkmingai tapo sostinėmis',
-    'bulk_remove_capital_success' => 'Pažymėtiems miestams sostinės statusas pašalintas',
+    // Actions
+    'view'        => 'Peržiūrėti',
+    'edit'        => 'Redaguoti',
+    'delete'      => 'Ištrinti',
+    'bulk_delete' => 'Ištrinti pažymėtus',
+    'create'      => 'Sukurti',
+    'save'        => 'Išsaugoti',
+    'cancel'      => 'Atšaukti',
 
-    // Laiko žymos
+    // Filters
+    'filter_all'         => 'Visi',
+    'filter_enabled'     => 'Įjungti',
+    'filter_disabled'    => 'Išjungti',
+    'filter_capital'     => 'Sostinės',
+    'filter_non_capital' => 'Ne sostinės',
+    'filter_default'     => 'Pagal nutylėjimą',
+    'filter_non_default' => 'Ne pagal nutylėjimą',
+    'with_coordinates'   => 'Su koordinatėmis',
+    'with_population'    => 'Su gyventojų skaičiumi',
+    'population_from'    => 'Gyventojų skaičius nuo',
+    'population_to'      => 'Gyventojų skaičius iki',
+
+    // Messages
+    'created_successfully'       => 'Miestas sėkmingai sukurtas',
+    'updated_successfully'       => 'Miestas sėkmingai atnaujintas',
+    'deleted_successfully'       => 'Miestas sėkmingai ištrintas',
+    'bulk_deleted_successfully'  => 'Pažymėti miestai sėkmingai ištrinti',
+    'restored_successfully'      => 'Miestas sėkmingai atkurtas',
+    'force_deleted_successfully' => 'Miestas visam laikui ištrintas',
+
+    // Validation
+    'validation_name_required'    => 'Pavadinimas yra privalomas',
+    'validation_name_max'         => 'Pavadinimas negali būti ilgesnis nei 255 simboliai',
+    'validation_slug_required'    => 'URL nuoroda yra privaloma',
+    'validation_slug_unique'      => 'URL nuoroda jau egzistuoja',
+    'validation_code_required'    => 'Kodas yra privalomas',
+    'validation_code_unique'      => 'Kodas jau egzistuoja',
+    'validation_country_required' => 'Šalis yra privaloma',
+
+    // Statistics
+    'total_cities'            => 'Iš viso miestų',
+    'enabled_cities'          => 'Įjungti miestai',
+    'capital_cities'          => 'Sostinės',
+    'cities_with_population'  => 'Miestai su gyventojų skaičiumi',
+    'cities_with_coordinates' => 'Miestai su koordinatėmis',
+
+    // Frontend
+    'select_city'     => 'Pasirinkite miestą',
+    'search_cities'   => 'Ieškoti miestų...',
+    'no_cities_found' => 'Miestų nerasta',
+    'city_details'    => 'Miesto detalės',
+    'related_cities'  => 'Susiję miestai',
+    'nearby_cities'   => 'Artimiausi miestai',
+
+    // Additional fields
+    'type'            => 'Tipas',
+    'area'            => 'Plotas',
+    'density'         => 'Tankumas',
+    'elevation'       => 'Aukštis virš jūros lygio',
+    'timezone'        => 'Laiko juosta',
+    'currency_code'   => 'Valiutos kodas',
+    'currency_symbol' => 'Valiutos simbolis',
+    'language_code'   => 'Kalbos kodas',
+    'language_name'   => 'Kalbos pavadinimas',
+    'phone_code'      => 'Telefono kodas',
+    'postal_code'     => 'Pašto kodas',
+
+    // Timestamps
     'created_at' => 'Sukurta',
     'updated_at' => 'Atnaujinta',
+    'deleted_at' => 'Ištrinta',
 
-    // Navigacija
-    'navigation_label' => 'Miestai',
-    'navigation_group' => 'Vietos',
+    // Export/Import
+    'export'        => 'Eksportuoti',
+    'import'        => 'Importuoti',
+    'export_cities' => 'Eksportuoti miestus',
+    'import_cities' => 'Importuoti miestus',
+
+    // Bulk Actions
+    'bulk_actions'        => 'Masinės operacijos',
+    'bulk_enable'         => 'Įjungti pažymėtus',
+    'bulk_disable'        => 'Išjungti pažymėtus',
+    'bulk_set_as_capital' => 'Nustatyti kaip sostines',
+    'bulk_remove_capital' => 'Pašalinti iš sostinių',
 ];

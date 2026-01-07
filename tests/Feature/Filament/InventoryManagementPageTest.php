@@ -42,7 +42,7 @@ final class InventoryManagementPageTest extends TestCase
             // Provide the form payload the action expects before execution.
             ->setTableBulkActionData([
                 'operation' => 'increase',
-                'quantity' => 4,
+                'quantity'  => 4,
             ])
             // Execute the mounted action and confirm no validation issues surface.
             ->callMountedTableBulkAction()
@@ -64,7 +64,7 @@ final class InventoryManagementPageTest extends TestCase
             ->mountTableBulkAction('bulk_stock_update', [$product])
             ->setTableBulkActionData([
                 'operation' => 'decrease',
-                'quantity' => 10,
+                'quantity'  => 10,
             ])
             ->callMountedTableBulkAction()
             ->assertHasNoTableActionErrors();

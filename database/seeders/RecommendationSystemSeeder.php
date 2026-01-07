@@ -8,7 +8,6 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductFeature;
 use App\Models\ProductSimilarity;
-use App\Models\RecommendationAnalytics;
 use App\Models\RecommendationBlock;
 use App\Models\RecommendationCache;
 use App\Models\RecommendationConfig;
@@ -70,10 +69,6 @@ class RecommendationSystemSeeder extends Seeder
         // Create recommendation caches
         $this->createRecommendationCaches();
         $this->command->info('Created recommendation caches');
-
-        // Create recommendation analytics
-        $this->createRecommendationAnalytics();
-        $this->command->info('Created recommendation analytics');
 
         // Create user behaviors
         $this->createUserBehaviors($users, $products);
@@ -392,36 +387,6 @@ class RecommendationSystemSeeder extends Seeder
                     })->toArray(),
                     'hit_count'  => fake()->numberBetween(0, 100),
                     'expires_at' => now()->addHours(fake()->numberBetween(1, 24)),
-                ];
-            })
-            ->create();
-    }
-
-    private function createRecommendationAnalytics(): void
-    {
-        $blocks = RecommendationBlock::all();
-        $configs = RecommendationConfig::all();
-        $users = User::all();
-        $products = Product::all();
-
-        RecommendationAnalytics::factory()
-            ->count(50)
-            ->state(function () use ($blocks, $configs, $users, $products) {
-                return [
-                    'block_id'        => $blocks->random()->id,
-                    'config_id'       => $configs->random()->id,
-                    'user_id'         => $users->random()->id,
-                    'product_id'      => $products->random()->id,
-                    'action'          => fake()->randomElement(['view', 'click', 'add_to_cart', 'purchase']),
-                    'ctr'             => fake()->randomFloat(4, 0.01, 0.5),
-                    'conversion_rate' => fake()->randomFloat(4, 0.01, 0.3),
-                    'metrics'         => [
-                        'impressions' => fake()->numberBetween(100, 10000),
-                        'clicks'      => fake()->numberBetween(10, 1000),
-                        'conversions' => fake()->numberBetween(1, 100),
-                        'revenue'     => fake()->randomFloat(2, 10, 1000),
-                    ],
-                    'date' => fake()->dateTimeBetween('-30 days', 'now')->format('Y-m-d'),
                 ];
             })
             ->create();

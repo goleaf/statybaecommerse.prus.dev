@@ -109,18 +109,18 @@ final class ReferralRewardLogResourceV4Test extends TestCase
     {
         // Merge the deterministic defaults with any caller overrides so tests stay expressive and resilient.
         $defaults = [
-            'user_id'      => $this->admin->getKey(),
-            'type'         => 'referrer_bonus',
-            'amount'       => 25.50,
-            'currency_code'=> 'EUR',
-            'status'       => 'pending',
-            'title'        => ['en' => 'Default Reward', 'lt' => 'Numatytoji premija'],
-            'description'  => ['en' => 'Default description', 'lt' => 'Numatytasis aprašas'],
-            'is_active'    => true,
-            'priority'     => 0,
-            'conditions'   => [],
-            'reward_data'  => ['category' => 'discount'],
-            'metadata'     => [],
+            'user_id'       => $this->admin->getKey(),
+            'type'          => 'referrer_bonus',
+            'amount'        => 25.50,
+            'currency_code' => 'EUR',
+            'status'        => 'pending',
+            'title'         => ['en' => 'Default Reward', 'lt' => 'Numatytoji premija'],
+            'description'   => ['en' => 'Default description', 'lt' => 'Numatytasis aprašas'],
+            'is_active'     => true,
+            'priority'      => 0,
+            'conditions'    => [],
+            'reward_data'   => ['category' => 'discount'],
+            'metadata'      => [],
         ];
 
         return ReferralReward::query()->create(array_merge($defaults, $overrides));

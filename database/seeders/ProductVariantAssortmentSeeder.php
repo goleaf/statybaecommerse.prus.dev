@@ -111,12 +111,12 @@ final class ProductVariantAssortmentSeeder extends Seeder
         }
 
         return Location::query()->create([
-            'code'        => 'MAIN',
-            'name'        => 'Main Warehouse',
-            'slug'        => 'main-warehouse',
-            'is_default'  => true,
-            'is_enabled'  => true,
-            'country_code'=> 'LT',
+            'code'         => 'MAIN',
+            'name'         => 'Main Warehouse',
+            'slug'         => 'main-warehouse',
+            'is_default'   => true,
+            'is_enabled'   => true,
+            'country_code' => 'LT',
         ]);
     }
 
@@ -195,11 +195,11 @@ final class ProductVariantAssortmentSeeder extends Seeder
         $hash = hash('sha256', $combinationKey);
 
         $sizeModifier = match (Str::upper((string) ($sizeValue?->value ?? ''))) {
-            'XS' => -2.0,
-            'S'  => -1.0,
-            'L'  => 2.0,
-            'XL' => 3.0,
-            'XXL' => 4.0,
+            'XS'    => -2.0,
+            'S'     => -1.0,
+            'L'     => 2.0,
+            'XL'    => 3.0,
+            'XXL'   => 4.0,
             default => 0.0,
         };
 
@@ -223,15 +223,15 @@ final class ProductVariantAssortmentSeeder extends Seeder
                 'variant_combination_hash' => $hash,
             ],
             [
-                'name'           => sprintf('%s - %s / %s / %s', $product->name, $packValue->value, $sizeValue?->value ?? 'One Size', $colorValue?->value ?? 'Neutral'),
-                'sku'            => Str::upper(implode('-', $skuParts)),
-                'price'          => $price,
-                'compare_price'  => $compare,
-                'cost_price'     => $cost,
-                'stock_quantity' => $this->resolveStockForIndexes($packIndex, $sizeIndex, $colorIndex),
-                'track_inventory'=> true,
-                'is_enabled'     => true,
-                'attributes'     => [
+                'name'            => sprintf('%s - %s / %s / %s', $product->name, $packValue->value, $sizeValue?->value ?? 'One Size', $colorValue?->value ?? 'Neutral'),
+                'sku'             => Str::upper(implode('-', $skuParts)),
+                'price'           => $price,
+                'compare_price'   => $compare,
+                'cost_price'      => $cost,
+                'stock_quantity'  => $this->resolveStockForIndexes($packIndex, $sizeIndex, $colorIndex),
+                'track_inventory' => true,
+                'is_enabled'      => true,
+                'attributes'      => [
                     'pack_size' => $packValue->value,
                     'size'      => $sizeValue?->value,
                     'color'     => $colorValue?->value,

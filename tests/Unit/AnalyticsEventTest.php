@@ -12,11 +12,6 @@ use Illuminate\Support\Str;
 beforeEach(function (): void {
     // Capture the original activity log configuration so we can reinstate the
     // value after the SQLite-powered analytics tests finish running. Without
-    // this snapshot, later suites that rely on activity logging (such as the
-    // system setting category assertions) would observe logging being disabled
-    // and produce false negatives when checking for activity entries.
-    $this->originalActivityLogEnabled = config('activitylog.enabled');
-
     // Persist the current database connection metadata so we can restore the
     // canonical testing SQLite database after each analytics test iteration.
     $this->originalDatabaseDefault = config('database.default');
@@ -36,10 +31,6 @@ beforeEach(function (): void {
     config()->set('database.connections.sqlite.prefix', '');
 
     // Disable activity logging for the analytics model tests to keep the
-    // temporary SQLite datastore lean while still tracking the original setting
-    // so downstream suites can restore the behaviour they expect.
-    config()->set('activitylog.enabled', false);
-
     Schema::connection('sqlite')->dropAllTables();
 
     Schema::create('users', function (Blueprint $table): void {
@@ -106,10 +97,6 @@ beforeEach(function (): void {
 
 afterEach(function (): void {
     // Restore the global activity log toggle so subsequent test cases do not
-    // inherit the disabled configuration state from this analytics-specific
-    // harness.
-    config()->set('activitylog.enabled', $this->originalActivityLogEnabled);
-
     // Reset the database connection configuration so future tests continue to
     // operate on the shared testing SQLite database rather than the temporary
     // file used for analytics fixtures.

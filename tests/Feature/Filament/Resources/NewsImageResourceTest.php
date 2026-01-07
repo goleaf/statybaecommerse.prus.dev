@@ -136,8 +136,8 @@ final class NewsImageResourceTest extends TestCase
 
         foreach ($images as $image) {
             $this->assertDatabaseHas('news_images', [
-                'id'           => $image->id,
-                'is_featured'  => true,
+                'id'          => $image->id,
+                'is_featured' => true,
             ]);
         }
 
@@ -151,8 +151,8 @@ final class NewsImageResourceTest extends TestCase
 
         foreach ($images as $image) {
             $this->assertDatabaseHas('news_images', [
-                'id'           => $image->id,
-                'is_featured'  => false,
+                'id'          => $image->id,
+                'is_featured' => false,
             ]);
         }
     }
@@ -174,8 +174,8 @@ final class NewsImageResourceTest extends TestCase
             ->assertHasNoTableActionErrors();
 
         $this->assertDatabaseHas('news_images', [
-            'news_id'    => $this->news->id,
-            'caption'    => 'Original Caption',
+            'news_id' => $this->news->id,
+            'caption' => 'Original Caption',
         ]);
 
         $this->assertSame(2, NewsImage::query()->where('news_id', $this->news->id)->count());
@@ -189,23 +189,23 @@ final class NewsImageResourceTest extends TestCase
         // Use the create page form to store a brand new news image record.
         Livewire::test(CreateNewsImage::class)
             ->fillForm([
-                'news_id'    => $this->news->id,
-                'file_path'  => $upload,
-                'alt_text'   => 'Accessibility copy',
-                'caption'    => 'Form created caption',
-                'is_featured'=> true,
-                'sort_order' => 5,
-                'mime_type'  => 'image/jpeg',
+                'news_id'     => $this->news->id,
+                'file_path'   => $upload,
+                'alt_text'    => 'Accessibility copy',
+                'caption'     => 'Form created caption',
+                'is_featured' => true,
+                'sort_order'  => 5,
+                'mime_type'   => 'image/jpeg',
             ])
             ->call('create')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('news_images', [
-            'news_id'    => $this->news->id,
-            'alt_text'   => 'Accessibility copy',
-            'caption'    => 'Form created caption',
-            'is_featured'=> true,
-            'sort_order' => 5,
+            'news_id'     => $this->news->id,
+            'alt_text'    => 'Accessibility copy',
+            'caption'     => 'Form created caption',
+            'is_featured' => true,
+            'sort_order'  => 5,
         ]);
     }
 
@@ -223,13 +223,13 @@ final class NewsImageResourceTest extends TestCase
         // Submit updated metadata and confirm the persisted record reflects the changes.
         Livewire::test(EditNewsImage::class, ['record' => $image->getRouteKey()])
             ->fillForm([
-                'news_id'    => $this->news->id,
-                'file_path'  => [$image->file_path],
-                'alt_text'   => 'Updated alt text',
-                'caption'    => 'Updated caption',
-                'is_featured'=> false,
-                'sort_order' => 7,
-                'mime_type'  => $image->mime_type,
+                'news_id'     => $this->news->id,
+                'file_path'   => [$image->file_path],
+                'alt_text'    => 'Updated alt text',
+                'caption'     => 'Updated caption',
+                'is_featured' => false,
+                'sort_order'  => 7,
+                'mime_type'   => $image->mime_type,
             ])
             ->call('save')
             ->assertHasNoFormErrors();

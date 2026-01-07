@@ -13,7 +13,6 @@ use App\Filament\Resources\CollectionRuleResource;
 use App\Filament\Resources\EnumManagementResource;
 use App\Filament\Resources\PostResource;
 use App\Filament\Resources\ProductVariantResource;
-use App\Filament\Resources\RecommendationAnalyticsResource;
 use App\Filament\Resources\ReferralCampaignResource;
 use App\Filament\Resources\Settings\SettingResource;
 use App\Filament\Resources\SliderTranslationResource;
@@ -30,8 +29,6 @@ use App\Models\CollectionRule;
 use App\Models\EnumValue;
 use App\Models\Post;
 use App\Models\ProductVariant;
-use App\Models\RecommendationAnalytics;
-use App\Models\RecommendationBlock;
 use App\Models\ReferralCampaign;
 use App\Models\Setting;
 use App\Models\Slider;
@@ -163,24 +160,6 @@ final class MissingResourceSmokeTest extends TestCase
                 'resource' => ProductVariantResource::class,
                 'page'     => \App\Filament\Resources\ProductVariantResource\Pages\ListProductVariants::class,
                 'factory'  => static fn (): array => [ProductVariant::factory()->create()],
-            ],
-            'recommendation_analytics' => [
-                'resource' => RecommendationAnalyticsResource::class,
-                'page'     => \App\Filament\Resources\RecommendationAnalyticsResource\Pages\ListRecommendationAnalytics::class,
-                'factory'  => static function (): array {
-                    $block = RecommendationBlock::query()->create([
-                        'name'             => 'coverage-block',
-                        'title'            => 'Coverage Block',
-                        'description'      => 'Ensures analytics tables hydrate inside tests.',
-                        'config_ids'       => [],
-                        'is_active'        => true,
-                        'max_products'     => 4,
-                        'cache_duration'   => 3600,
-                        'display_settings' => ['layout' => 'grid', 'columns' => 3],
-                    ]);
-
-                    return [RecommendationAnalytics::factory()->for($block, 'block')->create()];
-                },
             ],
             'referral_campaigns' => [
                 'resource' => ReferralCampaignResource::class,

@@ -69,14 +69,14 @@ final class ProductVariantResourceTest extends TestCase
     {
         // Force inventory data to hit both the out-of-stock and in-stock code paths for the filter.
         $outOfStock = ProductVariant::factory()->create([
-            'stock_quantity'     => 0,
-            'reserved_quantity'  => 0,
-            'track_inventory'    => true,
+            'stock_quantity'    => 0,
+            'reserved_quantity' => 0,
+            'track_inventory'   => true,
         ]);
         $inStock = ProductVariant::factory()->create([
-            'stock_quantity'     => 25,
-            'reserved_quantity'  => 0,
-            'track_inventory'    => true,
+            'stock_quantity'    => 25,
+            'reserved_quantity' => 0,
+            'track_inventory'   => true,
         ]);
 
         Livewire::actingAs($this->adminUser)

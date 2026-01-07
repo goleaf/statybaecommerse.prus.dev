@@ -57,25 +57,25 @@ final class LocationResourceTest extends TestCase
     {
         // Generate contrasting fixtures so each filter produces observable differences.
         $warehouse = Location::factory()->create([
-            'name'         => 'Kaunas Warehouse',
-            'code'         => 'KAU-001',
-            'type'         => 'warehouse',
-            'latitude'     => 54.8985,
-            'longitude'    => 23.9036,
+            'name'          => 'Kaunas Warehouse',
+            'code'          => 'KAU-001',
+            'type'          => 'warehouse',
+            'latitude'      => 54.8985,
+            'longitude'     => 23.9036,
             'opening_hours' => [
                 ['day' => 'monday', 'is_closed' => false, 'open_time' => '09:00', 'close_time' => '18:00'],
             ],
-            'is_enabled'   => true,
+            'is_enabled' => true,
         ]);
 
         $store = Location::factory()->create([
-            'name'         => 'Vilnius Store',
-            'code'         => 'VIL-010',
-            'type'         => 'store',
-            'latitude'     => null,
-            'longitude'    => null,
+            'name'          => 'Vilnius Store',
+            'code'          => 'VIL-010',
+            'type'          => 'store',
+            'latitude'      => null,
+            'longitude'     => null,
             'opening_hours' => null,
-            'is_enabled'   => true,
+            'is_enabled'    => true,
         ]);
 
         // Scope the dataset by type to isolate warehouses and exclude store records.

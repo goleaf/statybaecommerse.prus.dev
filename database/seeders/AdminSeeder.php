@@ -19,7 +19,6 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\OrderShipping;
 use App\Models\Product;
-use App\Models\ProductHistory;
 use App\Models\ProductVariant;
 use App\Models\RecommendationBlock;
 use App\Models\ReferralReward;
@@ -111,9 +110,6 @@ final class AdminSeeder extends Seeder
 
                 // Create referral rewards
                 // $this->createReferralRewards($admin); // Temporarily disabled - requires referral_id
-
-                // Create product history
-                $this->createProductHistory($products, $admin);
 
                 // Locations already created above
             });
@@ -921,32 +917,6 @@ final class AdminSeeder extends Seeder
                 'expires_at'    => now()->addMonths(6),
             ]
         );
-    }
-
-    /**
-     * @param array<int, Product> $products
-     */
-    private function createProductHistory(array $products, User $admin): void
-    {
-        $this->logInfo('📈 Creating product history...');
-
-        foreach ($products as $product) {
-            ProductHistory::updateOrCreate(
-                [
-                    'product_id' => $product->id,
-                    'action'     => 'created',
-                ],
-                [
-                    'product_id'  => $product->id,
-                    'action'      => 'created',
-                    'old_value'   => null,
-                    'new_value'   => $product->toArray(),
-                    'user_id'     => $admin->id,
-                    'causer_type' => 'App\Models\User',
-                    'causer_id'   => $admin->id,
-                ]
-            );
-        }
     }
 
     /**

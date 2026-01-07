@@ -55,11 +55,11 @@ final class AuditTrailResourceTest extends TestCase
     {
         // Generate a mixed dataset so filtering to price updates hides inventory changes.
         $priceAudit = AuditTrail::factory()->create([
-            'event' => 'price.updated',
+            'event'  => 'price.updated',
             'reason' => 'Pricing adjustment verification.',
         ]);
         $inventoryAudit = AuditTrail::factory()->create([
-            'event' => 'inventory.updated',
+            'event'  => 'inventory.updated',
             'reason' => 'Inventory sync verification.',
         ]);
 

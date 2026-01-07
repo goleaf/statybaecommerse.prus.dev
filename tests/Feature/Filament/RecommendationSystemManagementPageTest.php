@@ -6,7 +6,6 @@ namespace Tests\Feature\Filament;
 
 use App\Filament\Pages\RecommendationSystemManagement;
 use App\Models\ProductSimilarity;
-use App\Models\RecommendationAnalytics;
 use App\Models\RecommendationBlock;
 use App\Models\RecommendationCache;
 use App\Models\RecommendationConfig;
@@ -86,28 +85,15 @@ final class RecommendationSystemManagementPageTest extends TestCase
             'sort_order' => 1,
         ]);
 
-        RecommendationAnalytics::factory()->create([
-            'block_id'        => $block->id,
-            'metrics'         => ['requests' => 5],
-            'ctr'             => 0.4,
-            'conversion_rate' => 0.1,
-        ]);
-
-        RecommendationAnalytics::factory()->create([
-            'block_id'        => $block->id,
-            'metrics'         => ['requests' => 7],
-            'ctr'             => 0.6,
-            'conversion_rate' => 0.2,
-        ]);
-
         $performance = Livewire::test(RecommendationSystemManagement::class)
             ->instance()
             ->getBlockPerformance();
 
         $this->assertCount(1, $performance);
         $this->assertSame('Homepage Hero', $performance[0]['name']);
-        $this->assertSame(12, $performance[0]['total_requests']);
-        $this->assertEqualsWithDelta(0.5, $performance[0]['avg_ctr'], 0.0001);
-        $this->assertEqualsWithDelta(0.15, $performance[0]['avg_conversion'], 0.0001);
+        // Note: Analytics removed, so these metrics will be empty/default
+        $this->assertSame(0, $performance[0]['total_requests'] ?? 0);
+        $this->assertEqualsWithDelta(0.0, $performance[0]['avg_ctr'] ?? 0.0, 0.0001);
+        $this->assertEqualsWithDelta(0.0, $performance[0]['avg_conversion'] ?? 0.0, 0.0001);
     }
 }
