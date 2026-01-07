@@ -13,7 +13,7 @@ final class SalesByMonthChart extends AdvancedChartWidget
 {
     use InteractsWithDateFilter;
 
-    protected static ?string $heading = 'Revenue';
+    protected ?string $heading = 'Revenue';
 
     protected static string $color = 'info';
 

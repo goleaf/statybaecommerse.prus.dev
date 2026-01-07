@@ -27,7 +27,7 @@ final class PruneAuditLogsCommand extends Command
 
         $cutoff = Carbon::now()->subDays($retentionDays);
 
-        $tables = ['activity_log', 'admin_activity_logs'];
+        $tables = ['admin_activity_logs'];
         $totalDeleted = 0;
 
         foreach ($tables as $table) {

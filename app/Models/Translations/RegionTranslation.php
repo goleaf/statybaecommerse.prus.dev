@@ -15,10 +15,3 @@ final class RegionTranslation extends Model
         'description',
     ];
 }
-
-
-
-
-
-
-

@@ -11,7 +11,6 @@ use App\Models\CampaignView;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\ProductVariant;
-use App\Models\RecommendationAnalytics;
 use App\Models\Review;
 use App\Models\User;
 use App\Models\UserBehavior;
@@ -124,9 +123,8 @@ class ComprehensiveAnalyticsWidget extends ChartWidget
             $userBehaviors = UserBehavior::whereDate('created_at', $date)->count();
             $userBehaviorsData[] = $userBehaviors;
 
-            // Recommendations
-            $recommendations = RecommendationAnalytics::whereDate('created_at', $date)
-                ->sum('recommendations_count');
+            // Recommendations (analytics removed)
+            $recommendations = 0; // RecommendationAnalytics removed
             $recommendationsData[] = $recommendations;
         }
 

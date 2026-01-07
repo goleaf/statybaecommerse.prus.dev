@@ -26,10 +26,15 @@ use Livewire\Form;
 final class RegistrationForm extends Form
 {
     private const FIRST_NAME_RULES = 'required|string|max:255';
+
     private const LAST_NAME_RULES = 'required|string|max:255';
+
     private const EMAIL_RULES = 'required|string|email:filter|max:255|lowercase|unique:users,email';
+
     private const PASSWORD_RULES = 'required|string|min:8|confirmed|same:password_confirmation';
+
     private const PASSWORD_LIVE_RULES = 'required|string|min:8';
+
     private const PASSWORD_CONFIRMATION_RULES = 'required|string|min:8';
 
     // Maintain the Livewire form field state so validation rules can be applied consistently.
@@ -58,12 +63,12 @@ final class RegistrationForm extends Form
     public function validateField(string $property): void
     {
         $rule = match ($property) {
-            'first_name' => self::FIRST_NAME_RULES,
-            'last_name' => self::LAST_NAME_RULES,
-            'email' => self::EMAIL_RULES,
-            'password' => self::PASSWORD_LIVE_RULES,
+            'first_name'            => self::FIRST_NAME_RULES,
+            'last_name'             => self::LAST_NAME_RULES,
+            'email'                 => self::EMAIL_RULES,
+            'password'              => self::PASSWORD_LIVE_RULES,
             'password_confirmation' => self::PASSWORD_CONFIRMATION_RULES,
-            default => null,
+            default                 => null,
         };
 
         if ($rule === null) {

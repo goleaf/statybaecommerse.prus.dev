@@ -16,14 +16,14 @@ final class SearchExplorer extends Page
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations while keeping
      * the union types expressed through PHPDoc for clarity and tooling support.
      */
-//    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-magnifying-glass-circle';
+    //    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-magnifying-glass-circle';
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    public static function getNavigationIcon(): string|Htmlable|null
     {
         return 'heroicon-o-magnifying-glass-circle';
     }
 
-    public static function getNavigationGroup(): BackedEnum|string|null
+    public static function getNavigationGroup(): ?string
     {
         return 'Search'; // Keep discovery tooling under the dedicated search navigation bucket.
     }

@@ -4,22 +4,20 @@ declare(strict_types=1);
 
 namespace App\Filament\RelationManagers\Support;
 
-use App\Filament\Tables\Concerns\ConfiguresToggleableTableLayout;
 use Closure;
 // Support action-based schema entries in downstream implementations.
-use Filament\Actions\Action;
+use Filament\Forms\Components\Component;
 // Allow grouped actions to appear within quick-edit schema arrays.
-use Filament\Actions\ActionGroup;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Schemas\Components\Component;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Table;
 use Hydrat\TableLayoutToggle\Concerns\HasToggleableTable;
 use Illuminate\Contracts\Support\Htmlable;
 
 abstract class BaseRelationManager extends RelationManager
 {
-    use ConfiguresToggleableTableLayout;
-    use HasToggleableTable;
+    // Temporarily removed HasToggleableTable trait due to package compatibility
 
     public function table(Table $table): Table
     {

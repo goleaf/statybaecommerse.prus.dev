@@ -10,6 +10,7 @@ use App\Models\Project;
 use App\Models\Tag;
 use App\Models\Task;
 use App\Models\User;
+use DB;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -149,11 +150,11 @@ final class RelationshipQueryService
     public function getUserTaskStatistics(User $user): array
     {
         $stats = [
-            'total_assigned' => 0,
-            'completed' => 0,
-            'overdue' => 0,
+            'total_assigned'  => 0,
+            'completed'       => 0,
+            'overdue'         => 0,
             'by_organization' => [],
-            'by_priority' => [],
+            'by_priority'     => [],
         ];
 
         // Total assigned tasks
@@ -183,7 +184,7 @@ final class RelationshipQueryService
 
         // By organization
         $orgStats = Task::query()
-            ->select('organizations.name', \DB::raw('count(*) as task_count'))
+            ->select('organizations.name', DB::raw('count(*) as task_count'))
             ->join('projects', 'tasks.project_id', '=', 'projects.id')
             ->join('organizations', 'projects.organization_id', '=', 'organizations.id')
             ->whereHas('assignees', function (Builder $query) use ($user) {
@@ -196,7 +197,7 @@ final class RelationshipQueryService
 
         // By priority
         $priorityStats = Task::query()
-            ->select('priority', \DB::raw('count(*) as task_count'))
+            ->select('priority', DB::raw('count(*) as task_count'))
             ->whereHas('assignees', function (Builder $query) use ($user) {
                 $query->where('user_id', $user->id);
             })
@@ -223,9 +224,10 @@ final class RelationshipQueryService
             ])
             ->get()
             ->map(function (Project $project) {
-                $project->completion_rate = $project->tasks_count > 0 
+                $project->completion_rate = $project->tasks_count > 0
                     ? round(($project->completed_tasks_count / $project->tasks_count) * 100, 2)
                     : 0;
+
                 return $project;
             });
     }
@@ -282,7 +284,7 @@ final class RelationshipQueryService
             ->where('name', 'like', "%{$searchTerm}%")
             ->orWhere('description', 'like', "%{$searchTerm}%");
 
-        if (!empty($tagIds)) {
+        if (! empty($tagIds)) {
             $projectQuery->whereHas('tags', function (Builder $query) use ($tagIds) {
                 $query->whereIn('tag_id', $tagIds);
             });
@@ -295,7 +297,7 @@ final class RelationshipQueryService
             ->where('title', 'like', "%{$searchTerm}%")
             ->orWhere('description', 'like', "%{$searchTerm}%");
 
-        if (!empty($tagIds)) {
+        if (! empty($tagIds)) {
             $taskQuery->whereHas('tags', function (Builder $query) use ($tagIds) {
                 $query->whereIn('tag_id', $tagIds);
             });
@@ -308,7 +310,7 @@ final class RelationshipQueryService
             ->where('name', 'like', "%{$searchTerm}%")
             ->orWhere('email', 'like', "%{$searchTerm}%");
 
-        if (!empty($tagIds)) {
+        if (! empty($tagIds)) {
             $userQuery->whereHas('tags', function (Builder $query) use ($tagIds) {
                 $query->whereIn('tag_id', $tagIds);
             });

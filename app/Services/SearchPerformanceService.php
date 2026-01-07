@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use DateTime;
 use Exception;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -81,8 +82,7 @@ final class SearchPerformanceService
     {
         $cacheKey = self::CACHE_PREFIX . 'cache_hit_rates';
 
-        return Cache::remember($cacheKey, 1800, fn(): array =>
-            // This would typically come from cache monitoring
+        return Cache::remember($cacheKey, 1800, fn (): array => // This would typically come from cache monitoring
             // For now, return estimated values based on cache patterns
             ['autocomplete_cache_hit_rate' => $this->estimateCacheHitRate('autocomplete_'), 'search_results_cache_hit_rate' => $this->estimateCacheHitRate('search_results_'), 'suggestions_cache_hit_rate' => $this->estimateCacheHitRate('suggestions_'), 'total_cache_hit_rate' => $this->estimateCacheHitRate('')]);
     }
@@ -169,7 +169,7 @@ final class SearchPerformanceService
     /**
      * Handle getAverageExecutionTime functionality with proper error handling.
      */
-    private function getAverageExecutionTime(\DateTime $since): float
+    private function getAverageExecutionTime(DateTime $since): float
     {
         $cacheKey = self::CACHE_PREFIX . 'avg_execution_time_' . $since->format('Y-m-d');
 
@@ -184,35 +184,33 @@ final class SearchPerformanceService
     /**
      * Handle getSlowSearchesCount functionality with proper error handling.
      */
-    private function getSlowSearchesCount(\DateTime $since): int
+    private function getSlowSearchesCount(DateTime $since): int
     {
         $cacheKey = self::CACHE_PREFIX . 'slow_searches_' . $since->format('Y-m-d');
 
-        return Cache::remember($cacheKey, 1800, fn(): int =>
-            // This would typically query a performance log table
+        return Cache::remember($cacheKey, 1800, fn (): int => // This would typically query a performance log table
             0);
     }
 
     /**
      * Handle getTotalSearches functionality with proper error handling.
      */
-    private function getTotalSearches(\DateTime $since): int
+    private function getTotalSearches(DateTime $since): int
     {
         $cacheKey = self::CACHE_PREFIX . 'total_searches_' . $since->format('Y-m-d');
 
-        return Cache::remember($cacheKey, 1800, fn(): int =>
-            // This would typically query a performance log table
+        return Cache::remember($cacheKey, 1800, fn (): int => // This would typically query a performance log table
             0);
     }
 
     /**
      * Handle getMemoryUsageStats functionality with proper error handling.
      */
-    private function getMemoryUsageStats(\DateTime $since): array
+    private function getMemoryUsageStats(DateTime $since): array
     {
         $cacheKey = self::CACHE_PREFIX . 'memory_stats_' . $since->format('Y-m-d');
 
-        return Cache::remember($cacheKey, 1800, fn(): array => [
+        return Cache::remember($cacheKey, 1800, fn (): array => [
             'average_memory' => 25 * 1024 * 1024,
             // 25MB
             'peak_memory' => 100 * 1024 * 1024,
@@ -224,17 +222,17 @@ final class SearchPerformanceService
     /**
      * Handle getSearchTypePerformance functionality with proper error handling.
      */
-    private function getSearchTypePerformance(\DateTime $since): array
+    private function getSearchTypePerformance(DateTime $since): array
     {
         $cacheKey = self::CACHE_PREFIX . 'type_performance_' . $since->format('Y-m-d');
 
-        return Cache::remember($cacheKey, 1800, fn(): array => ['products' => ['avg_time' => 0.2, 'count' => 1000], 'categories' => ['avg_time' => 0.1, 'count' => 500], 'brands' => ['avg_time' => 0.15, 'count' => 300], 'customers' => ['avg_time' => 0.3, 'count' => 200]]);
+        return Cache::remember($cacheKey, 1800, fn (): array => ['products' => ['avg_time' => 0.2, 'count' => 1000], 'categories' => ['avg_time' => 0.1, 'count' => 500], 'brands' => ['avg_time' => 0.15, 'count' => 300], 'customers' => ['avg_time' => 0.3, 'count' => 200]]);
     }
 
     /**
      * Handle getHourlyPerformance functionality with proper error handling.
      */
-    private function getHourlyPerformance(\DateTime $since): array
+    private function getHourlyPerformance(DateTime $since): array
     {
         $cacheKey = self::CACHE_PREFIX . 'hourly_performance_' . $since->format('Y-m-d');
 

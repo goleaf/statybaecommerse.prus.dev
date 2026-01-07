@@ -6,7 +6,6 @@ namespace App\Http\Controllers;
 
 use App\Models\News;
 use App\Models\NewsCategory;
-use App\Models\NewsTag;
 use App\Services\PaginationService;
 use App\Support\SearchQuerySanitizer;
 use Illuminate\Http\JsonResponse;
@@ -25,11 +24,10 @@ final class NewsController extends Controller
      */
     public function index(Request $request): View|JsonResponse
     {
-        $query = News::published()->with(['categories', 'tags', 'images'])->withCount('comments');
+        $query = News::published()->with(['categories', 'images'])->withCount('comments');
 
         $searchTerm = SearchQuerySanitizer::sanitize($request->get('search'));
         $categoryId = $request->filled('category') ? (int) $request->get('category') : null;
-        $tagId = $request->filled('tag') ? (int) $request->get('tag') : null;
         $featuredOnly = $request->boolean('featured');
 
         // Search functionality
@@ -39,10 +37,6 @@ final class NewsController extends Controller
         // Category filter
         if ($categoryId !== null) {
             $query->byCategory($categoryId);
-        }
-        // Tag filter
-        if ($tagId !== null) {
-            $query->byTag($tagId);
         }
         // Featured filter
         if ($featuredOnly) {
@@ -62,10 +56,6 @@ final class NewsController extends Controller
             $appends['category'] = $categoryId;
         }
 
-        if ($tagId !== null) {
-            $appends['tag'] = $tagId;
-        }
-
         if ($featuredOnly) {
             $appends['featured'] = 1;
         } else {
@@ -74,10 +64,9 @@ final class NewsController extends Controller
 
         $news = $news->appends($appends);
         $categories = NewsCategory::visible()->with('translations')->get();
-        $tags = NewsTag::visible()->with('translations')->get();
         $featuredNews = News::published()
             ->featured()
-            ->with(['categories', 'tags', 'images'])
+            ->with(['categories', 'images'])
             ->orderBy('published_at', 'desc')
             ->limit(3)
             ->get()
@@ -106,11 +95,9 @@ final class NewsController extends Controller
         return view('news.index', [
             'news'             => $news,
             'categories'       => $categories,
-            'tags'             => $tags,
             'featuredNews'     => $featuredNews,
             'searchTerm'       => $searchTerm,
             'selectedCategory' => $categoryId,
-            'selectedTag'      => $tagId,
             'featuredOnly'     => $featuredOnly,
         ]);
     }
@@ -122,7 +109,7 @@ final class NewsController extends Controller
     {
         $news = News::published()->whereHas('translations', function ($query) use ($slug) {
             $query->where('slug', $slug)->where('locale', app()->getLocale());
-        })->with(['categories', 'tags', 'images', 'comments' => function ($query) {
+        })->with(['categories', 'images', 'comments' => function ($query) {
             $query->approved()->visible()->topLevel()->with('replies');
         }])->firstOrFail();
         // Increment view count
@@ -133,7 +120,7 @@ final class NewsController extends Controller
             ->whereHas('categories', function ($query) use ($news): void {
                 $query->whereIn('news_category_id', $news->categories->pluck('id'));
             })
-            ->with(['categories', 'tags', 'images'])
+            ->with(['categories', 'images'])
             ->limit(4)
             ->get()
             ->filter(function (News $related): bool {
@@ -153,25 +140,9 @@ final class NewsController extends Controller
         $category = NewsCategory::visible()->whereHas('translations', function ($query) use ($slug) {
             $query->where('slug', $slug)->where('locale', app()->getLocale());
         })->firstOrFail();
-        $news = News::published()->byCategory($category->id)->with(['categories', 'tags', 'images'])->orderBy('published_at', 'desc')->paginate(12);
+        $news = News::published()->byCategory($category->id)->with(['categories', 'images'])->orderBy('published_at', 'desc')->paginate(12);
         $categories = NewsCategory::visible()->with('translations')->get();
-        $tags = NewsTag::visible()->with('translations')->get();
 
-        return view('news.category', compact('news', 'category', 'categories', 'tags'));
-    }
-
-    /**
-     * Handle tag functionality with proper error handling.
-     */
-    public function tag(string $slug): View
-    {
-        $tag = NewsTag::visible()->whereHas('translations', function ($query) use ($slug) {
-            $query->where('slug', $slug)->where('locale', app()->getLocale());
-        })->firstOrFail();
-        $news = News::published()->byTag($tag->id)->with(['categories', 'tags', 'images'])->orderBy('published_at', 'desc')->paginate(12);
-        $categories = NewsCategory::visible()->with('translations')->get();
-        $tags = NewsTag::visible()->with('translations')->get();
-
-        return view('news.tag', compact('news', 'tag', 'categories', 'tags'));
+        return view('news.category', compact('news', 'category', 'categories'));
     }
 }

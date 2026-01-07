@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use App\Filament\Resources\ActivityLogResource\Pages\ListActivityLogs;
 use App\Http\Middleware\TestingLegalResourceStub;
 use Illuminate\Support\Facades\Response as ResponseFacade;
 use Illuminate\Support\Facades\Route;
@@ -46,9 +45,6 @@ final class TestingLivewireAliasesProvider extends ServiceProvider
         }
 
         Route::middleware('web')->group(function (): void {
-            Route::get('/admin/activity-logs', ListActivityLogs::class)
-                ->name('filament.admin.resources.activity-logs.index');
-
             if (! Route::has('search')) {
                 Route::get('/search', static fn () => response()->json(['status' => 'ok']))
                     ->name('search');

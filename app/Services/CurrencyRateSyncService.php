@@ -14,14 +14,13 @@ use Illuminate\Database\Eloquent\Collection;
 final class CurrencyRateSyncService
 {
     /**
-     * @param CurrencyRateProvider $provider Service that knows how to fetch the most recent rate data.
-     * @param string $defaultBaseCurrency Base currency code used when a record does not provide its own value.
+     * @param CurrencyRateProvider $provider            Service that knows how to fetch the most recent rate data.
+     * @param string               $defaultBaseCurrency Base currency code used when a record does not provide its own value.
      */
     public function __construct(
         private readonly CurrencyRateProvider $provider,
         private readonly string $defaultBaseCurrency = 'EUR',
-    ) {
-    }
+    ) {}
 
     /**
      * Update a single currency model with the latest available rate.

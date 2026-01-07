@@ -19,13 +19,14 @@ class WarmCaches extends Command
         $this->info('Starting cache warming...');
 
         $locale = $this->option('locale');
-        
+
         if ($locale) {
-            if (!in_array($locale, $localeResolver->getSupportedLocales(), true)) {
+            if (! in_array($locale, $localeResolver->getSupportedLocales(), true)) {
                 $this->error("Unsupported locale: {$locale}");
+
                 return self::FAILURE;
             }
-            
+
             $this->info("Warming caches for locale: {$locale}");
             $warmer->warmHomePageCaches($locale);
             $warmer->warmNavigationCaches($locale);
@@ -36,7 +37,7 @@ class WarmCaches extends Command
         }
 
         $this->info('Cache warming completed successfully!');
-        
+
         return self::SUCCESS;
     }
 }

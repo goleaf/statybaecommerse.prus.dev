@@ -21,14 +21,14 @@ final class SerializationOptimizer
     public static function optimizePaginator(LengthAwarePaginator $paginator): array
     {
         return [
-            'data' => self::optimizeCollection($paginator->getCollection()),
+            'data'         => self::optimizeCollection($paginator->getCollection()),
             'current_page' => $paginator->currentPage(),
-            'last_page' => $paginator->lastPage(),
-            'per_page' => $paginator->perPage(),
-            'total' => $paginator->total(),
-            'from' => $paginator->firstItem(),
-            'to' => $paginator->lastItem(),
-            'path' => $paginator->path(),
+            'last_page'    => $paginator->lastPage(),
+            'per_page'     => $paginator->perPage(),
+            'total'        => $paginator->total(),
+            'from'         => $paginator->firstItem(),
+            'to'           => $paginator->lastItem(),
+            'path'         => $paginator->path(),
         ];
     }
 
@@ -52,7 +52,7 @@ final class SerializationOptimizer
     public static function optimizeModel(Model $model): array
     {
         $attributes = $model->getAttributes();
-        
+
         // Include loaded relations as optimized arrays
         $relations = [];
         foreach ($model->getRelations() as $key => $relation) {
@@ -66,8 +66,8 @@ final class SerializationOptimizer
         }
 
         return [
-            'attributes' => $attributes,
-            'relations' => $relations,
+            'attributes'  => $attributes,
+            'relations'   => $relations,
             'model_class' => get_class($model),
         ];
     }
@@ -83,7 +83,7 @@ final class SerializationOptimizer
             perPage: $data['per_page'],
             currentPage: $data['current_page'],
             options: [
-                'path' => $path ?: $data['path'],
+                'path'  => $path ?: $data['path'],
                 'query' => $query,
             ]
         );
@@ -94,7 +94,7 @@ final class SerializationOptimizer
      */
     public static function isOptimized(mixed $data): bool
     {
-        if (!is_array($data)) {
+        if (! is_array($data)) {
             return false;
         }
 
@@ -109,8 +109,9 @@ final class SerializationOptimizer
         }
 
         // Check for collection of optimized models
-        if (is_array($data) && !empty($data)) {
+        if (is_array($data) && ! empty($data)) {
             $first = reset($data);
+
             return is_array($first) && isset($first['attributes'], $first['model_class']);
         }
 

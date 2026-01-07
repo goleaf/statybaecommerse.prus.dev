@@ -83,8 +83,8 @@ trait HasConditionalRelationships
     {
         return match (static::class) {
             \App\Models\Organization::class => 'organization_user',
-            \App\Models\Project::class => 'project_user',
-            default => 'user_memberships',
+            \App\Models\Project::class      => 'project_user',
+            default                         => 'user_memberships',
         };
     }
 
@@ -113,8 +113,8 @@ trait HasConditionalRelationships
             $q->whereHas('activeMembers', function (Builder $memberQuery) use ($user) {
                 $memberQuery->where('user_id', $user->id);
             })
-            ->orWhere('created_by', $user->id)
-            ->orWhere('user_id', $user->id);
+                ->orWhere('created_by', $user->id)
+                ->orWhere('user_id', $user->id);
         });
     }
 }

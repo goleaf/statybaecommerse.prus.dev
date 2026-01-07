@@ -70,9 +70,9 @@ final class ProductIndexRequest extends FormRequest
                 'min:0',
                 Rule::when($this->filled('price_min'), 'gte:price_min'),
             ],
-            'sort'      => ['nullable', Rule::enum(ProductSort::class)],
-            'per_page'  => ['nullable', 'integer', 'min:1', 'max:50'],
-            'page'      => ['nullable', 'integer', 'min:1'],
+            'sort'     => ['nullable', Rule::enum(ProductSort::class)],
+            'per_page' => ['nullable', 'integer', 'min:1', 'max:50'],
+            'page'     => ['nullable', 'integer', 'min:1'],
         ];
     }
 

@@ -23,8 +23,8 @@ use Spatie\LivewireWizard\Components\StepComponent;
  * Delivery step of the checkout wizard responsible for presenting shipping options.
  *
  * @property array<int, array{id:int,name:string,description:string,price:float,original_price:float,formatted_price:string,estimated_delivery:string,currency_code:string,badges:array<int, array{type:string,label:string}>}> $options
- * @property bool                                                                                                                                                                              $isResolving
- * @property int|string|null                                                                                                                                                                   $currentSelected
+ * @property bool                                                                                                                                                                                                               $isResolving
+ * @property int|string|null                                                                                                                                                                                                    $currentSelected
  */
 final class Delivery extends StepComponent
 {
@@ -177,15 +177,15 @@ final class Delivery extends StepComponent
                 $formattedFinal = app_money_format($finalAmount, $currency);
 
                 return [
-                    'id'                        => $identifier,
-                    'name'                      => (string) ($option['name'] ?? $model?->name ?? ''),
-                    'description'               => (string) ($option['description'] ?? $model?->description ?? ''),
-                    'price'                     => $finalAmount,
-                    'original_price'            => $baseAmount,
-                    'formatted_price'           => $formattedFinal,
-                    'estimated_delivery'        => (string) ($option['estimated_delivery'] ?? $model?->estimated_delivery_text ?? ''),
-                    'currency_code'             => $currency,
-                    'badges'                    => $this->buildBadges($baseAmount, $finalAmount, $discount, $currency),
+                    'id'                 => $identifier,
+                    'name'               => (string) ($option['name'] ?? $model?->name ?? ''),
+                    'description'        => (string) ($option['description'] ?? $model?->description ?? ''),
+                    'price'              => $finalAmount,
+                    'original_price'     => $baseAmount,
+                    'formatted_price'    => $formattedFinal,
+                    'estimated_delivery' => (string) ($option['estimated_delivery'] ?? $model?->estimated_delivery_text ?? ''),
+                    'currency_code'      => $currency,
+                    'badges'             => $this->buildBadges($baseAmount, $finalAmount, $discount, $currency),
                 ];
             })
             ->values()
@@ -244,15 +244,15 @@ final class Delivery extends StepComponent
         $finalAmount = max(0.0, round($baseAmount - $discount, 2));
 
         return [
-            'id'                        => $optionModel->getKey(),
-            'name'                      => (string) ($optionData['name'] ?? $optionModel->name),
-            'description'               => (string) ($optionData['description'] ?? $optionModel->description ?? ''),
-            'price'                     => $finalAmount,
-            'original_price'            => $baseAmount,
-            'formatted_price'           => app_money_format($finalAmount, $currency),
-            'estimated_delivery'        => (string) ($optionData['estimated_delivery'] ?? $optionModel->estimated_delivery_text ?? ''),
-            'currency_code'             => $currency,
-            'badges'                    => $this->buildBadges($baseAmount, $finalAmount, $discount, $currency),
+            'id'                 => $optionModel->getKey(),
+            'name'               => (string) ($optionData['name'] ?? $optionModel->name),
+            'description'        => (string) ($optionData['description'] ?? $optionModel->description ?? ''),
+            'price'              => $finalAmount,
+            'original_price'     => $baseAmount,
+            'formatted_price'    => app_money_format($finalAmount, $currency),
+            'estimated_delivery' => (string) ($optionData['estimated_delivery'] ?? $optionModel->estimated_delivery_text ?? ''),
+            'currency_code'      => $currency,
+            'badges'             => $this->buildBadges($baseAmount, $finalAmount, $discount, $currency),
         ];
     }
 

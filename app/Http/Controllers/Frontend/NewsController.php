@@ -7,7 +7,6 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Models\News;
 use App\Models\NewsCategory;
-use App\Models\NewsTag;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -23,7 +22,7 @@ final class NewsController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $query = News::published()->with(['categories', 'tags', 'images'])->withCount('comments');
+        $query = News::published()->with(['categories', 'images'])->withCount('comments');
         // Search functionality
         if ($request->filled('search')) {
             $search = $request->get('search');
@@ -34,13 +33,6 @@ final class NewsController extends Controller
             $category = $request->get('category');
             $query->whereHas('categories', function ($q) use ($category) {
                 $q->where('slug', $category);
-            });
-        }
-        // Tag filter
-        if ($request->filled('tag')) {
-            $tag = $request->get('tag');
-            $query->whereHas('tags', function ($q) use ($tag) {
-                $q->where('slug', $tag);
             });
         }
         // Date range filter
@@ -66,7 +58,7 @@ final class NewsController extends Controller
      */
     public function show(string $slug): JsonResponse
     {
-        $news = News::published()->where('slug', $slug)->with(['categories', 'tags', 'images', 'comments' => function ($query) {
+        $news = News::published()->where('slug', $slug)->with(['categories', 'images', 'comments' => function ($query) {
             $query->approved()->with('user');
         }])->withCount('comments')->first();
         if (! $news) {
@@ -77,8 +69,6 @@ final class NewsController extends Controller
 
         return response()->json(['success' => true, 'data' => ['id' => $news->id, 'title' => $news->title, 'slug' => $news->slug, 'excerpt' => $news->excerpt, 'content' => $news->content, 'featured_image' => $news->featured_image, 'author' => $news->author, 'published_at' => $news->published_at, 'views_count' => $news->views_count, 'comments_count' => $news->comments_count, 'categories' => $news->categories->map(function ($category) {
             return ['id' => $category->id, 'name' => $category->name, 'slug' => $category->slug];
-        }), 'tags' => $news->tags->map(function ($tag) {
-            return ['id' => $tag->id, 'name' => $tag->name, 'slug' => $tag->slug];
         }), 'images' => $news->images->map(function ($image) {
             return ['id' => $image->id, 'url' => $image->getUrl(), 'alt' => $image->alt_text, 'caption' => $image->caption];
         }), 'comments' => $news->comments->map(function ($comment) {
@@ -94,7 +84,7 @@ final class NewsController extends Controller
         $limit = min((int) $request->get('limit', 5), 10);
         $timeout = now()->addSeconds(10);
         // 10 second timeout for featured news
-        $featuredNews = News::published()->where('is_featured', true)->with(['categories', 'tags'])->orderBy('published_at', 'desc')->limit($limit)->cursor()->takeUntilTimeout($timeout)->collect()->skipWhile(function ($news) {
+        $featuredNews = News::published()->where('is_featured', true)->with(['categories'])->orderBy('published_at', 'desc')->limit($limit)->cursor()->takeUntilTimeout($timeout)->collect()->skipWhile(function ($news) {
             // Skip news items that are not properly configured for display
             return empty($news->title) || empty($news->slug) || ! $news->is_published || empty($news->excerpt);
         });
@@ -116,21 +106,6 @@ final class NewsController extends Controller
 
         return response()->json(['success' => true, 'data' => $categories->map(function ($category) {
             return ['id' => $category->id, 'name' => $category->name, 'slug' => $category->slug, 'description' => $category->description, 'news_count' => $category->news_count];
-        })]);
-    }
-
-    /**
-     * Handle tags functionality with proper error handling.
-     */
-    public function tags(): JsonResponse
-    {
-        $tags = NewsTag::active()->withCount('news')->orderBy('name')->get()->skipWhile(function ($tag) {
-            // Skip tags that are not properly configured for display
-            return empty($tag->name) || empty($tag->slug) || ! $tag->is_active || $tag->news_count <= 0;
-        });
-
-        return response()->json(['success' => true, 'data' => $tags->map(function ($tag) {
-            return ['id' => $tag->id, 'name' => $tag->name, 'slug' => $tag->slug, 'news_count' => $tag->news_count];
         })]);
     }
 

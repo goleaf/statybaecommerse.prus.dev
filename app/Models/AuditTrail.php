@@ -12,8 +12,8 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use JsonException;
 use InvalidArgumentException;
+use JsonException;
 
 /**
  * @property array<string, array{previous:mixed,current:mixed}>|null $diff

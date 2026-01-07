@@ -9,7 +9,6 @@ use Filament\Tables\Columns\Column;
 use Filament\Tables\Columns\ColumnGroup;
 use Filament\Tables\Columns\Layout\Component as ColumnLayoutComponent;
 use Filament\Tables\Table;
-use Hydrat\TableLayoutToggle\Concerns\HasToggleableTable;
 
 /**
  * @mixin HasToggleableTable

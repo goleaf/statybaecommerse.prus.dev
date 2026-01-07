@@ -19,23 +19,23 @@ final class SecureQueryBuilder
     public static function jsonExtract(Builder $query, string $column, string $path, string $operator, mixed $value): Builder
     {
         $driver = $query->getConnection()->getDriverName();
-        
+
         // Validate column name to prevent injection
-        if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $column)) {
+        if (! preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $column)) {
             throw new InvalidArgumentException('Invalid column name for JSON extraction');
         }
-        
+
         // Validate JSON path to prevent injection
-        if (!preg_match('/^\$\.[a-zA-Z_][a-zA-Z0-9_]*$/', $path)) {
+        if (! preg_match('/^\$\.[a-zA-Z_][a-zA-Z0-9_]*$/', $path)) {
             throw new InvalidArgumentException('Invalid JSON path format');
         }
-        
+
         // Validate operator
         $allowedOperators = ['=', '!=', 'LIKE', 'ILIKE', 'NOT LIKE'];
-        if (!in_array(strtoupper($operator), $allowedOperators, true)) {
+        if (! in_array(strtoupper($operator), $allowedOperators, true)) {
             throw new InvalidArgumentException('Invalid operator for JSON extraction');
         }
-        
+
         return match ($driver) {
             'mysql', 'mariadb' => $query->whereRaw(
                 "JSON_UNQUOTE(JSON_EXTRACT({$column}, ?)) {$operator} ?",
@@ -52,63 +52,63 @@ final class SecureQueryBuilder
             default => throw new InvalidArgumentException("Unsupported database driver: {$driver}")
         };
     }
-    
+
     /**
      * Safely build COALESCE queries for price sorting.
      */
     public static function coalescePriceOrder(Builder $query, string $direction = 'asc'): Builder
     {
         $direction = strtolower($direction) === 'desc' ? 'desc' : 'asc';
-        
+
         return $query->orderByRaw("COALESCE(NULLIF(sale_price, 0), price) {$direction}");
     }
-    
+
     /**
      * Safely build date-based grouping queries.
      */
     public static function dateGroup(Builder $query, string $column, string $format = 'Y-m-d'): Builder
     {
         // Validate column name
-        if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*(\.[a-zA-Z_][a-zA-Z0-9_]*)?$/', $column)) {
+        if (! preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*(\.[a-zA-Z_][a-zA-Z0-9_]*)?$/', $column)) {
             throw new InvalidArgumentException('Invalid column name for date grouping');
         }
-        
+
         $driver = $query->getConnection()->getDriverName();
-        
+
         return match ($driver) {
             'mysql', 'mariadb' => $query->selectRaw("DATE({$column}) as date_group"),
-            'pgsql' => $query->selectRaw("DATE({$column}) as date_group"),
+            'pgsql'  => $query->selectRaw("DATE({$column}) as date_group"),
             'sqlite' => $query->selectRaw("DATE({$column}) as date_group"),
-            default => throw new InvalidArgumentException("Unsupported database driver: {$driver}")
+            default  => throw new InvalidArgumentException("Unsupported database driver: {$driver}")
         };
     }
-    
+
     /**
      * Safely build aggregation queries with proper column validation.
      */
-    public static function safeAggregate(Builder $query, string $function, string $column, string $alias = null): Builder
+    public static function safeAggregate(Builder $query, string $function, string $column, ?string $alias = null): Builder
     {
         // Validate function name
         $allowedFunctions = ['COUNT', 'SUM', 'AVG', 'MIN', 'MAX'];
-        if (!in_array(strtoupper($function), $allowedFunctions, true)) {
+        if (! in_array(strtoupper($function), $allowedFunctions, true)) {
             throw new InvalidArgumentException('Invalid aggregate function');
         }
-        
+
         // Validate column name
-        if ($column !== '*' && !preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*(\.[a-zA-Z_][a-zA-Z0-9_]*)?$/', $column)) {
+        if ($column !== '*' && ! preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*(\.[a-zA-Z_][a-zA-Z0-9_]*)?$/', $column)) {
             throw new InvalidArgumentException('Invalid column name for aggregation');
         }
-        
+
         $alias = $alias ?? strtolower($function) . '_' . str_replace('.', '_', $column);
-        
+
         // Validate alias
-        if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $alias)) {
+        if (! preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $alias)) {
             throw new InvalidArgumentException('Invalid alias name');
         }
-        
+
         return $query->selectRaw("{$function}({$column}) as {$alias}");
     }
-    
+
     /**
      * Safely build EXISTS subqueries with proper validation.
      */

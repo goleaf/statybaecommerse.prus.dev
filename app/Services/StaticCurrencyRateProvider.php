@@ -14,9 +14,7 @@ final class StaticCurrencyRateProvider implements CurrencyRateProvider
     /**
      * @param array<string, float|int|string> $configuredRates Optional set of preloaded rates for dependency injection.
      */
-    public function __construct(private readonly array $configuredRates = [])
-    {
-    }
+    public function __construct(private readonly array $configuredRates = []) {}
 
     /**
      * {@inheritDoc}

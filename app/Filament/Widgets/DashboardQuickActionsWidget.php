@@ -7,9 +7,9 @@ namespace App\Filament\Widgets;
 use App\Jobs\ClearApplicationCacheJob;
 use App\Jobs\RebuildSearchIndexJob;
 use App\Jobs\RunMinimalSeedJob;
-use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
+use Filament\Tables\Actions\Action;
 use Filament\Widgets\Widget;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
@@ -23,6 +23,11 @@ final class DashboardQuickActionsWidget extends Widget implements HasActions
     protected string $view = 'filament.widgets.dashboard.quick-actions';
 
     protected int|string|array $columnSpan = 'full';
+
+    public function makeFilamentTranslatableContentDriver(): ?\Filament\Support\Contracts\TranslatableContentDriver
+    {
+        return null;
+    }
 
     public static function canView(): bool
     {

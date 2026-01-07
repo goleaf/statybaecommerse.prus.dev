@@ -15,7 +15,7 @@ final class GeneralStatsOverview extends BaseWidget
 {
     use InteractsWithDateFilter;
 
-    protected static ?string $heading = 'Store KPIs';
+    protected ?string $heading = 'Store KPIs';
 
     protected static ?string $label = 'Key metrics';
 

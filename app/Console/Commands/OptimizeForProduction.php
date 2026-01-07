@@ -15,8 +15,9 @@ class OptimizeForProduction extends Command
 
     public function handle(): int
     {
-        if (!app()->isProduction() && !$this->option('force')) {
+        if (! app()->isProduction() && ! $this->option('force')) {
             $this->error('This command should only be run in production. Use --force to override.');
+
             return self::FAILURE;
         }
 
@@ -31,14 +32,15 @@ class OptimizeForProduction extends Command
 
         foreach ($commands as $command) {
             $this->info("Running: php artisan {$command}");
-            
+
             $exitCode = Artisan::call($command);
-            
+
             if ($exitCode !== 0) {
                 $this->error("Failed to run: {$command}");
+
                 return self::FAILURE;
             }
-            
+
             $this->line(Artisan::output());
         }
 
@@ -50,7 +52,7 @@ class OptimizeForProduction extends Command
         }
 
         $this->info('Production optimizations completed successfully!');
-        
+
         return self::SUCCESS;
     }
 }

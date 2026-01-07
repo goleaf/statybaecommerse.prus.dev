@@ -26,7 +26,6 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\ProductVariant;
-use App\Models\RecommendationAnalytics;
 use App\Models\Referral;
 use App\Models\ReferralCode;
 use App\Models\Review;
@@ -126,7 +125,7 @@ class UltimateStatsWidget extends BaseWidget
         $totalVariantAnalytics = VariantAnalytics::count();
 
         // === RECOMMENDATION SYSTEM ===
-        $totalRecommendations = RecommendationAnalytics::sum('recommendations_count');
+        $totalRecommendations = 0; // RecommendationAnalytics removed
         $totalReferrals = Referral::count();
         $totalReferralCodes = ReferralCode::count();
 

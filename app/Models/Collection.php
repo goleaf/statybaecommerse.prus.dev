@@ -449,6 +449,24 @@ final class Collection extends Model implements HasMedia, TranslatableRecord
     }
 
     /**
+     * Get translated field value for the specified locale.
+     * Uses the eager-loaded translations relationship to avoid N+1 queries.
+     */
+    public function trans(string $field, ?string $locale = null): mixed
+    {
+        $locale ??= app()->getLocale();
+
+        if ($this->relationLoaded('translations')) {
+            $translation = $this->translations->firstWhere('locale', $locale);
+            if ($translation && isset($translation->{$field})) {
+                return $translation->{$field};
+            }
+        }
+
+        return $this->{$field} ?? null;
+    }
+
+    /**
      * Get the collection translations.
      */
     public function translations(): HasMany

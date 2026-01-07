@@ -19,7 +19,6 @@ final class FixFormToSchemaCommand extends Command
 
         $resourcesToFix = [
             'NewsResource',
-            'NewsTagResource',
             'NormalSettingResource',
             'PriceListResource',
             'RecommendationBlockResource',

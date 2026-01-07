@@ -211,13 +211,7 @@ final class SingleProduct extends Component
         if (! auth()->check()) {
             return;
         }
-        // Check if we already tracked this view in the last hour
-        $lastView = \App\Models\ProductHistory::where('product_id', $this->product->id)->where('user_id', auth()->id())->where('action', 'viewed')->where('created_at', '>', now()->subHour())->first();
-        if ($lastView) {
-            return;
-        }
-        // Create history entry for product view
-        \App\Models\ProductHistory::create(['product_id' => $this->product->id, 'user_id' => auth()->id(), 'action' => 'viewed', 'field_name' => 'page_view', 'old_value' => null, 'new_value' => 'product_page', 'description' => 'Product page viewed', 'ip_address' => request()->ip(), 'user_agent' => request()->userAgent(), 'metadata' => ['referrer' => request()->header('referer'), 'session_id' => session()->getId(), 'view_timestamp' => now()->toISOString()], 'causer_type' => \App\Models\User::class, 'causer_id' => auth()->id()]);
+        // Product view tracking removed
     }
 
     /**
@@ -233,8 +227,7 @@ final class SingleProduct extends Component
         if (! auth()->check()) {
             return;
         }
-        // Create history entry for add to cart
-        \App\Models\ProductHistory::create(['product_id' => $product->id, 'user_id' => auth()->id(), 'action' => 'added_to_cart', 'field_name' => 'cart_quantity', 'old_value' => null, 'new_value' => (string) $quantity, 'description' => "Added {$quantity} item(s) to cart", 'ip_address' => request()->ip(), 'user_agent' => request()->userAgent(), 'metadata' => ['product_name' => $product->name, 'product_sku' => $product->sku, 'unit_price' => $product->price, 'total_price' => $product->price * $quantity, 'session_id' => session()->getId(), 'cart_timestamp' => now()->toISOString()], 'causer_type' => \App\Models\User::class, 'causer_id' => auth()->id()]);
+        // Add to cart history tracking removed
     }
 
     /**

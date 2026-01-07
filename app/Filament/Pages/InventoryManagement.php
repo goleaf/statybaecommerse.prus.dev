@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Pages;
 
 use App\Filament\Forms\Components\Quantity;
-use App\Filament\Tables\Concerns\ConfiguresToggleableTableLayout;
 use App\Models\Product;
-use BackedEnum;
 use Filament\Forms\Components\Select;
 use Filament\Pages\Page;
 use Filament\Tables\Actions\BulkAction;
@@ -15,34 +13,24 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
-use Hydrat\TableLayoutToggle\Concerns\HasToggleableTable;
 use Illuminate\Contracts\Pagination\CursorPaginator;
 use Illuminate\Contracts\Pagination\Paginator;
-use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 
 final class InventoryManagement extends Page implements HasTable
 {
-    use ConfiguresToggleableTableLayout;
-    use HasToggleableTable;
-    use InteractsWithTable {
-        InteractsWithTable::paginateTableQuery as protected basePaginateTableQuery;
-    }
+    use InteractsWithTable;
 
-    /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations and communicates
-     * the accepted union via PHPDoc for IDE support.
-     */
-//    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-archive-box';
+    protected string $view = 'filament.pages.inventory-management';
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    public static function getNavigationIcon(): string
     {
         return 'heroicon-o-archive-box';
     }
 
-    public static function getNavigationGroup(): BackedEnum|string|null
+    public static function getNavigationGroup(): ?string
     {
-        return 'Products'; // Keep stock controls grouped with the rest of the product catalog tools.
+        return 'Products';
     }
 
     public static function getSlug(?\Filament\Panel $panel = null): string
@@ -57,7 +45,6 @@ final class InventoryManagement extends Page implements HasTable
 
     public function table(Table $table): Table
     {
-        // Configure the Filament table definition for the resource.
         $table = $table
             ->query(Product::query())
             ->columns([
@@ -98,18 +85,13 @@ final class InventoryManagement extends Page implements HasTable
                     }),
             ]);
 
-        return $this->applyToggleableTableLayout($table); // Reuse the helper to apply saved column visibility.
+        return $this->applyToggleableTableLayout($table);
     }
 
-    /**
-     * Override the paginator so the generated links retain the current query string filters.
-     */
     protected function paginateTableQuery(Builder $query): Paginator|CursorPaginator
     {
-        // Defer to the base Filament pagination logic before adjusting the query string behaviour.
         $paginator = $this->basePaginateTableQuery($query);
 
-        // Append the existing request query parameters (product, location, etc.) to every page link.
         if (method_exists($paginator, 'withQueryString')) {
             return $paginator->withQueryString();
         }

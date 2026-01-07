@@ -12,13 +12,13 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 /**
  * TaskUser Pivot
  *
- * @property int $id
- * @property int $task_id
- * @property int $user_id
- * @property string $responsibility
- * @property \Illuminate\Support\Carbon $assigned_at
+ * @property int                             $id
+ * @property int                             $task_id
+ * @property int                             $user_id
+ * @property string                          $responsibility
+ * @property \Illuminate\Support\Carbon      $assigned_at
  * @property \Illuminate\Support\Carbon|null $completed_at
- * @property string|null $notes
+ * @property string|null                     $notes
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  */
@@ -36,7 +36,7 @@ final class TaskUser extends Pivot
     ];
 
     protected $casts = [
-        'assigned_at' => 'datetime',
+        'assigned_at'  => 'datetime',
         'completed_at' => 'datetime',
     ];
 
@@ -69,7 +69,7 @@ final class TaskUser extends Pivot
     {
         $this->update([
             'completed_at' => now(),
-            'notes' => $notes ?? $this->notes,
+            'notes'        => $notes ?? $this->notes,
         ]);
     }
 
@@ -102,7 +102,7 @@ final class TaskUser extends Pivot
      */
     public function getDuration(): ?int
     {
-        if (!$this->completed_at) {
+        if (! $this->completed_at) {
             return null;
         }
 

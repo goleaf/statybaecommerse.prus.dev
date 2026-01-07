@@ -61,11 +61,11 @@ trait HasHierarchy
     public function getRoot(): static
     {
         $current = $this;
-        
+
         while ($current->parent) {
             $current = $current->parent;
         }
-        
+
         return $current;
     }
 
@@ -214,12 +214,12 @@ trait HasHierarchy
     public function getAllDescendants(): Collection
     {
         $descendants = collect();
-        
+
         foreach ($this->children as $child) {
             $descendants->push($child);
             $descendants = $descendants->merge($child->getAllDescendants());
         }
-        
+
         return $descendants;
     }
 
@@ -229,9 +229,9 @@ trait HasHierarchy
     public function toTree(): array
     {
         return [
-            'id' => $this->getKey(),
-            'name' => $this->name ?? $this->title ?? (string) $this->getKey(),
-            'children' => $this->children->map(fn($child) => $child->toTree())->toArray(),
+            'id'       => $this->getKey(),
+            'name'     => $this->name ?? $this->title ?? (string) $this->getKey(),
+            'children' => $this->children->map(fn ($child) => $child->toTree())->toArray(),
         ];
     }
 
@@ -260,6 +260,7 @@ trait HasHierarchy
             ->where(static::make()->getParentKeyName(), $parentId)
             ->map(function ($item) use ($items) {
                 $item->children = static::buildTree($items, $item->getKey());
+
                 return $item;
             })
             ->values();

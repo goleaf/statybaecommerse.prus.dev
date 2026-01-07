@@ -19,17 +19,17 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 /**
  * Project
  *
- * @property int $id
- * @property string $name
- * @property string $slug
- * @property string|null $description
- * @property string $status
- * @property string $type
- * @property int|null $user_id
- * @property int|null $organization_id
+ * @property int                             $id
+ * @property string                          $name
+ * @property string                          $slug
+ * @property string|null                     $description
+ * @property string                          $status
+ * @property string                          $type
+ * @property int|null                        $user_id
+ * @property int|null                        $organization_id
  * @property \Illuminate\Support\Carbon|null $start_date
  * @property \Illuminate\Support\Carbon|null $end_date
- * @property array|null $metadata
+ * @property array|null                      $metadata
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  *
@@ -57,8 +57,8 @@ final class Project extends Model
 
     protected $casts = [
         'start_date' => 'date',
-        'end_date' => 'date',
-        'metadata' => 'array',
+        'end_date'   => 'date',
+        'metadata'   => 'array',
     ];
 
     // Relationships
@@ -208,12 +208,12 @@ final class Project extends Model
     {
         return $query->where(function ($q) use ($user) {
             $q->where('user_id', $user->id) // personal projects
-              ->orWhereHas('members', function ($memberQuery) use ($user) {
-                  $memberQuery->where('user_id', $user->id);
-              })
-              ->orWhereHas('organization.users', function ($orgQuery) use ($user) {
-                  $orgQuery->where('user_id', $user->id);
-              });
+                ->orWhereHas('members', function ($memberQuery) use ($user) {
+                    $memberQuery->where('user_id', $user->id);
+                })
+                ->orWhereHas('organization.users', function ($orgQuery) use ($user) {
+                    $orgQuery->where('user_id', $user->id);
+                });
         });
     }
 
@@ -267,9 +267,9 @@ final class Project extends Model
     public function addMember(User $user, string $role = 'member', array $permissions = []): void
     {
         $this->members()->attach($user->id, [
-            'role' => $role,
+            'role'        => $role,
             'permissions' => $permissions,
-            'joined_at' => now(),
+            'joined_at'   => now(),
         ]);
     }
 }

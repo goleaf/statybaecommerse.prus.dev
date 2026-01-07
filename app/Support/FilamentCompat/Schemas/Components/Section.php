@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Support\FilamentCompat\Schemas\Components;
 
-use Filament\Schemas\Components\Section as BaseSection;
+use Filament\Forms\Components\Section as BaseSection;
 
 /**
  * Temporary bridge so traversal logic expecting `getComponents()` continues to work
@@ -19,7 +19,7 @@ final class Section extends BaseSection
     {
         $components = $this->getDefaultChildComponents();
 
-        if ($components instanceof \Filament\Schemas\Schema) {
+        if (class_exists(\Filament\Schemas\Schema::class) && $components instanceof \Filament\Schemas\Schema) {
             return $components->getComponents();
         }
 

@@ -62,7 +62,7 @@ class ProductResource extends JsonResource
             'media'      => [
                 'images' => $media,
             ],
-            'variants'  => ProductVariantResource::collection(
+            'variants' => ProductVariantResource::collection(
                 $product->relationLoaded('variants') ? $product->variants : collect()
             ),
             'inventory' => [

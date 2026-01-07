@@ -9,7 +9,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * RecommendationConfig
@@ -39,14 +38,6 @@ final class RecommendationConfig extends Model
     protected $fillable = ['name', 'type', 'config', 'is_active', 'is_default', 'priority', 'sort_order', 'filters', 'max_results', 'min_score', 'decay_factor', 'description', 'cache_ttl', 'enable_caching', 'enable_analytics', 'batch_size', 'timeout_seconds', 'conditions', 'notes', 'metadata', 'meta'];
 
     protected $casts = ['config' => 'array', 'filters' => 'array', 'conditions' => 'array', 'metadata' => 'array', 'meta' => 'array', 'is_active' => 'boolean', 'enable_caching' => 'boolean', 'enable_analytics' => 'boolean', 'priority' => 'integer', 'max_results' => 'integer', 'min_score' => 'decimal:6', 'cache_ttl' => 'integer', 'batch_size' => 'integer', 'timeout_seconds' => 'integer'];
-
-    /**
-     * Handle analytics functionality with proper error handling.
-     */
-    public function analytics(): HasMany
-    {
-        return $this->hasMany(RecommendationAnalytics::class, 'config_id');
-    }
 
     public function products(): BelongsToMany
     {

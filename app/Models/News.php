@@ -22,8 +22,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
-use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Traits\LogsActivity;
 
 /**
  * News
@@ -45,7 +43,6 @@ final class News extends Model implements TranslatableRecord
 {
     use HasFactory;
     use HasTranslations;
-    use LogsActivity;
     use SoftDeletes;
 
     protected $table = 'news';
@@ -150,30 +147,6 @@ final class News extends Model implements TranslatableRecord
     public function categories(): BelongsToMany
     {
         return $this->belongsToMany(NewsCategory::class, 'news_category_pivot', 'news_id', 'news_category_id');
-    }
-
-    /**
-     * Handle tags functionality with proper error handling.
-     */
-    public function tags(): BelongsToMany
-    {
-        return $this->belongsToMany(NewsTag::class, 'news_tag_pivot', 'news_id', 'news_tag_id');
-    }
-
-    /**
-     * Handle comments functionality with proper error handling.
-     */
-    public function comments(): HasMany
-    {
-        return $this->hasMany(NewsComment::class);
-    }
-
-    /**
-     * Handle latestComment functionality with proper error handling.
-     */
-    public function latestComment(): HasOne
-    {
-        return $this->comments()->one()->latestOfMany();
     }
 
     /**
@@ -290,16 +263,6 @@ final class News extends Model implements TranslatableRecord
     {
         return $query->whereHas('categories', function (Builder $q) use ($categoryId): void {
             $q->where('news_category_id', $categoryId);
-        });
-    }
-
-    /**
-     * Handle scopeByTag functionality with proper error handling.
-     */
-    public function scopeByTag(Builder $query, int $tagId): Builder
-    {
-        return $query->whereHas('tags', function (Builder $q) use ($tagId): void {
-            $q->where('news_tag_id', $tagId);
         });
     }
 

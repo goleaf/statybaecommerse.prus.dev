@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Auth;
  */
 class TopNavigation extends Widget
 {
-    protected string $view = 'filament.components.top-navigation';
+    protected static string $view = 'filament.components.top-navigation';
 
     /**
      * Match the parent widget signature while forcing a full-width layout by default.

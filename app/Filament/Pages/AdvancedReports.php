@@ -14,13 +14,13 @@ final class AdvancedReports extends Page
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations while providing
      * explicit PHPDoc for compatible union typing.
      */
-//    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    //    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
+    public static function getNavigationIcon(): string|Htmlable|null
     {
         return 'heroicon-o-chart-bar-square';
     }
 
-    public static function getNavigationGroup(): BackedEnum|string|null
+    public static function getNavigationGroup(): ?string
     {
         return 'Analytics'; // Ensure advanced analytics live with the rest of the reporting suite.
     }

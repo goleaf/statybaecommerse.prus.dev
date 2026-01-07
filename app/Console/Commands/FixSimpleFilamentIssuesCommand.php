@@ -19,7 +19,6 @@ final class FixSimpleFilamentIssuesCommand extends Command
         $criticalResources = [
             'NewsImageResource',
             'NewsResource',
-            'NewsTagResource',
             'NormalSettingResource',
             'CartItemResource',
             'LocationResource',
@@ -28,7 +27,6 @@ final class FixSimpleFilamentIssuesCommand extends Command
             'PartnerTierResource',
             'ProductComparisonResource',
             'ProductFeatureResource',
-            'ProductHistoryResource',
             'ProductImageResource',
             'ProductVariantResource',
             'RecommendationConfigResource',

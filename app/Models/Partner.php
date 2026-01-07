@@ -11,7 +11,6 @@ use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -35,9 +34,6 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property float|null                $discount_rate
  * @property float|null                $commission_rate
  * @property array<string, mixed>|null $metadata
- * @property-read \App\Models\PartnerTier|null $tier
- * @property-read float $effective_discount_rate
- * @property-read float $effective_commission_rate
  *
  * @mixin \Eloquent
  */
@@ -55,7 +51,7 @@ final class Partner extends Model implements HasMedia
 
     protected $table = 'partners';
 
-    protected $fillable = ['name', 'code', 'tier_id', 'contact_email', 'contact_phone', 'is_enabled', 'discount_rate', 'commission_rate', 'metadata'];
+    protected $fillable = ['name', 'code', 'contact_email', 'contact_phone', 'is_enabled', 'discount_rate', 'commission_rate', 'metadata'];
 
     /**
      * Handle casts functionality with proper error handling.
@@ -63,16 +59,6 @@ final class Partner extends Model implements HasMedia
     protected function casts(): array
     {
         return ['is_enabled' => 'boolean', 'discount_rate' => 'decimal:4', 'commission_rate' => 'decimal:4', 'metadata' => 'array'];
-    }
-
-    /**
-     * Handle tier functionality with proper error handling.
-     *
-     * @return BelongsTo<PartnerTier, $this>
-     */
-    public function tier(): BelongsTo
-    {
-        return $this->belongsTo(PartnerTier::class);
     }
 
     /**
@@ -138,18 +124,6 @@ final class Partner extends Model implements HasMedia
     }
 
     /**
-     * Handle scopeByTier functionality with proper error handling.
-     *
-     * @param  Builder<static> $query
-     * @return Builder<static>
-     */
-    public function scopeByTier(Builder $query, int $tierId): Builder
-    {
-        // Limit the query to partners assigned to the specified tier identifier.
-        return $query->where('tier_id', $tierId);
-    }
-
-    /**
      * Handle scopeOrderedByName functionality with proper error handling.
      *
      * @param  Builder<static> $query
@@ -159,90 +133,6 @@ final class Partner extends Model implements HasMedia
     {
         // Apply an ascending sort on the partner name to ensure predictable listings.
         return $query->orderBy('name');
-    }
-
-    /**
-     * Handle getEffectiveDiscountRateAttribute functionality with proper error handling.
-     */
-    public function getEffectiveDiscountRateAttribute(): float
-    {
-        // Prefer the partner-specific discount when available and fall back to the related tier rate.
-        $ownRate = $this->getAttribute('discount_rate');
-        if (is_numeric($ownRate)) {
-            return (float) $ownRate;
-        }
-
-        // Lazily resolve the tier relationship so persisted partners without eager loading still inherit tier discounts.
-        $tier = $this->resolveTierForFallback();
-        if ($tier instanceof PartnerTier) {
-            $tierRate = $tier->getAttribute('discount_rate');
-
-            if (is_numeric($tierRate)) {
-                return (float) $tierRate;
-            }
-        }
-
-        return 0.0;
-    }
-
-    /**
-     * Handle getEffectiveCommissionRateAttribute functionality with proper error handling.
-     */
-    public function getEffectiveCommissionRateAttribute(): float
-    {
-        // Prefer the partner-specific commission rate before falling back to the linked tier configuration.
-        $ownRate = $this->getAttribute('commission_rate');
-        if (is_numeric($ownRate)) {
-            return (float) $ownRate;
-        }
-
-        // Resolve the tier relation lazily so accessors work even when the relationship was not eager loaded.
-        $tier = $this->resolveTierForFallback();
-        if ($tier instanceof PartnerTier) {
-            $tierRate = $tier->getAttribute('commission_rate');
-
-            if (is_numeric($tierRate)) {
-                return (float) $tierRate;
-            }
-        }
-
-        return 0.0;
-    }
-
-    /**
-     * Resolve the tier relationship with a lazy-loading fallback for accessor usage.
-     */
-    private function resolveTierForFallback(): ?PartnerTier
-    {
-        // Return the already loaded relation when available to avoid redundant database queries.
-        $tier = $this->getRelationValue('tier');
-        if ($tier instanceof PartnerTier) {
-            return $tier;
-        }
-
-        // Attempt to lazy load the relation when a foreign key is present but the relation was not eager loaded.
-        $relation = $this->tier();
-        $resolved = $relation->getResults();
-        if ($resolved instanceof PartnerTier) {
-            $this->setRelation('tier', $resolved);
-
-            return $resolved;
-        }
-
-        // When global scopes hide disabled or soft-deleted tiers, bypass them so the fallback accessor can still
-        // surface the historic rate associated with the partner record without requiring eager loading beforehand.
-        $resolved = $relation
-            ->withoutGlobalScopes([ActiveScope::class, EnabledScope::class])
-            ->withTrashed()
-            ->first();
-
-        if ($resolved instanceof PartnerTier) {
-            $this->setRelation('tier', $resolved);
-
-            return $resolved;
-        }
-
-        return null;
     }
 
     /**

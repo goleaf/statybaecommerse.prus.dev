@@ -36,24 +36,24 @@ final class RelationshipServiceProvider extends ServiceProvider
     {
         Relation::morphMap([
             // Core models
-            'user' => \App\Models\User::class,
+            'user'         => \App\Models\User::class,
             'organization' => \App\Models\Organization::class,
-            'project' => \App\Models\Project::class,
-            'task' => \App\Models\Task::class,
-            'comment' => \App\Models\Comment::class,
-            'file' => \App\Models\File::class,
-            'tag' => \App\Models\Tag::class,
-            
+            'project'      => \App\Models\Project::class,
+            'task'         => \App\Models\Task::class,
+            'comment'      => \App\Models\Comment::class,
+            'file'         => \App\Models\File::class,
+            'tag'          => \App\Models\Tag::class,
+
             // Existing models
-            'product' => \App\Models\Product::class,
-            'order' => \App\Models\Order::class,
-            'legal' => \App\Models\Legal::class,
-            'news' => \App\Models\News::class,
-            'review' => \App\Models\Review::class,
-            'brand' => \App\Models\Brand::class,
-            'category' => \App\Models\Category::class,
+            'product'    => \App\Models\Product::class,
+            'order'      => \App\Models\Order::class,
+            'legal'      => \App\Models\Legal::class,
+            'news'       => \App\Models\News::class,
+            'review'     => \App\Models\Review::class,
+            'brand'      => \App\Models\Brand::class,
+            'category'   => \App\Models\Category::class,
             'collection' => \App\Models\Collection::class,
-            'document' => \App\Models\Document::class,
+            'document'   => \App\Models\Document::class,
         ]);
     }
 
@@ -65,12 +65,12 @@ final class RelationshipServiceProvider extends ServiceProvider
         // Macro for loading relationships with counts
         \Illuminate\Database\Eloquent\Builder::macro('withRelationCounts', function (array $relations) {
             $withCount = [];
-            
+
             foreach ($relations as $relation) {
                 $withCount[] = $relation;
                 $withCount[] = "{$relation} as {$relation}_count";
             }
-            
+
             return $this->withCount($withCount);
         });
 
@@ -85,7 +85,7 @@ final class RelationshipServiceProvider extends ServiceProvider
         });
 
         // Macro for existence queries with custom conditions
-        \Illuminate\Database\Eloquent\Builder::macro('whereHasAny', function (array $relations, callable $callback = null) {
+        \Illuminate\Database\Eloquent\Builder::macro('whereHasAny', function (array $relations, ?callable $callback = null) {
             return $this->where(function ($query) use ($relations, $callback) {
                 foreach ($relations as $relation) {
                     $query->orWhereHas($relation, $callback);
@@ -94,11 +94,11 @@ final class RelationshipServiceProvider extends ServiceProvider
         });
 
         // Macro for non-existence queries
-        \Illuminate\Database\Eloquent\Builder::macro('whereDoesntHaveAny', function (array $relations, callable $callback = null) {
+        \Illuminate\Database\Eloquent\Builder::macro('whereDoesntHaveAny', function (array $relations, ?callable $callback = null) {
             foreach ($relations as $relation) {
                 $this->whereDoesntHave($relation, $callback);
             }
-            
+
             return $this;
         });
     }

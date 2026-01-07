@@ -34,6 +34,7 @@ final class BootErrorRateLimiter
 
         if (! self::$rateLimitEnabled) {
             BootErrorProfiler::endTiming('rate_limit_check');
+
             return false;
         }
 
@@ -139,12 +140,12 @@ final class BootErrorRateLimiter
     private function generateKey(): string
     {
         $baseKey = 'boot_errors_' . date('Y-m-d-H-i');
-        
+
         // Support distributed rate limiting with Redis
         if (config('cache.default') === 'redis' && config('exception-handling.performance.distributed_rate_limiting', false)) {
             return 'distributed:' . $baseKey;
         }
-        
+
         return $baseKey;
     }
 

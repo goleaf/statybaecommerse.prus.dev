@@ -71,23 +71,24 @@ final class TranslationHookServiceProvider extends ServiceProvider
         // TODO: Fix macro registration - currently causing abstract class instantiation issues
         // Temporarily disabled to allow tests to run
         return;
-        
+
         // Add translation helper macro to Model
         Model::macro('addTranslation', function (string $field, array $translations) {
             $service = app(TranslationHookService::class);
             $key = $service->generateTranslationKey(
-                $this->$field, 
+                $this->$field,
                 strtolower(class_basename($this))
             );
-            
+
             return $service->addTranslation($key, $translations);
         });
 
         // Add translation key getter macro
         Model::macro('getTranslationKey', function (string $field) {
             $service = app(TranslationHookService::class);
+
             return $service->generateTranslationKey(
-                $this->$field, 
+                $this->$field,
                 strtolower(class_basename($this))
             );
         });
@@ -99,14 +100,14 @@ final class TranslationHookServiceProvider extends ServiceProvider
         $service = app(TranslationHookService::class);
 
         foreach ($translatableProperties as $property) {
-            if (isset($component->$property) && !empty($component->$property)) {
+            if (isset($component->$property) && ! empty($component->$property)) {
                 $key = $service->generateTranslationKey(
                     $component->$property,
                     strtolower(class_basename($component))
                 );
 
                 $service->addTranslation($key, [
-                    config('app.locale', 'lt') => $component->$property
+                    config('app.locale', 'lt') => $component->$property,
                 ]);
             }
         }

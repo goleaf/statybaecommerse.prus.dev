@@ -22,7 +22,7 @@ trait HasCustomRelationships
             \App\Models\User::class,
             \App\Models\Organization::class,
             'id', // organizations.id
-            'id', // users.id  
+            'id', // users.id
             'organization_id', // projects.organization_id
             'id' // organizations.id (local key on intermediate)
         )->join('organization_user', function ($join) {
@@ -150,7 +150,7 @@ trait HasCustomRelationships
                  JOIN task_user ON tasks.id = task_user.task_id 
                  WHERE task_user.user_id = users.id 
                  AND tasks.project_id = ? 
-                 AND task_user.completed_at IS NOT NULL) as completed_tasks_count', 
+                 AND task_user.completed_at IS NOT NULL) as completed_tasks_count',
                 [$this->getKey(), $this->getKey()]);
     }
 
@@ -223,7 +223,7 @@ trait HasCustomRelationships
             ->selectRaw('*, 
                 (6371 * acos(cos(radians(?)) * cos(radians(latitude)) * 
                 cos(radians(longitude) - radians(?)) + sin(radians(?)) * 
-                sin(radians(latitude)))) AS distance', 
+                sin(radians(latitude)))) AS distance',
                 [$latitude, $longitude, $latitude])
             ->having('distance', '<', $radiusKm)
             ->orderBy('distance');

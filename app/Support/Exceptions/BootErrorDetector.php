@@ -108,6 +108,7 @@ final class BootErrorDetector
                     return true;
                 }
             }
+
             return false;
         }
 
@@ -137,6 +138,7 @@ final class BootErrorDetector
                     return true;
                 }
             }
+
             return false;
         }
 

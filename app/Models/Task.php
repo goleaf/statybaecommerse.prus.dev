@@ -17,17 +17,17 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 /**
  * Task
  *
- * @property int $id
- * @property string $title
- * @property string|null $description
- * @property string $status
- * @property string $priority
- * @property int $project_id
- * @property int $created_by
- * @property int|null $parent_task_id
+ * @property int                             $id
+ * @property string                          $title
+ * @property string|null                     $description
+ * @property string                          $status
+ * @property string                          $priority
+ * @property int                             $project_id
+ * @property int                             $created_by
+ * @property int|null                        $parent_task_id
  * @property \Illuminate\Support\Carbon|null $due_date
  * @property \Illuminate\Support\Carbon|null $completed_at
- * @property array|null $metadata
+ * @property array|null                      $metadata
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  *
@@ -54,9 +54,9 @@ final class Task extends Model
     ];
 
     protected $casts = [
-        'due_date' => 'datetime',
+        'due_date'     => 'datetime',
         'completed_at' => 'datetime',
-        'metadata' => 'array',
+        'metadata'     => 'array',
     ];
 
     // Relationships
@@ -223,9 +223,9 @@ final class Task extends Model
      */
     public function isOverdue(): bool
     {
-        return $this->due_date && 
-               $this->due_date->isPast() && 
-               !in_array($this->status, ['completed', 'cancelled']);
+        return $this->due_date &&
+               $this->due_date->isPast() &&
+               ! in_array($this->status, ['completed', 'cancelled']);
     }
 
     /**
@@ -259,8 +259,8 @@ final class Task extends Model
     {
         $this->assignees()->attach($user->id, [
             'responsibility' => $responsibility,
-            'assigned_at' => now(),
-            'notes' => $notes,
+            'assigned_at'    => now(),
+            'notes'          => $notes,
         ]);
     }
 
@@ -270,7 +270,7 @@ final class Task extends Model
     public function markCompleted(): void
     {
         $this->update([
-            'status' => 'completed',
+            'status'       => 'completed',
             'completed_at' => now(),
         ]);
 

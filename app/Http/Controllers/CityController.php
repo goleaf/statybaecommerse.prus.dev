@@ -26,8 +26,8 @@ final class CityController extends Controller
         $query = City::query()
             ->with([
                 'country' => fn ($q) => $q->withTranslations(),
-                'region' => fn ($q) => $q->withTranslations(),
-                'parent' => fn ($q) => $q->withTranslations(),
+                'region'  => fn ($q) => $q->withTranslations(),
+                'parent'  => fn ($q) => $q->withTranslations(),
             ])
             ->withTranslations()
             ->enabled()

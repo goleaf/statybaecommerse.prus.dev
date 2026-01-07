@@ -142,7 +142,8 @@ final class VariantPricingRule extends Model
         if ($this->valid_from && $this->valid_from->gt($moment)) {
             return false;
         }
-        return !($this->valid_until && $this->valid_until->lt($moment));
+
+        return ! ($this->valid_until && $this->valid_until->lt($moment));
     }
 
     /**

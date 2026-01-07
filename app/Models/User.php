@@ -10,6 +10,7 @@ use App\Models\Scopes\ApprovedScope;
 use App\Observers\UserObserver;
 use App\Support\Storage\SecureStorage;
 use App\Traits\HasSafeSerialization;
+use App\Traits\SecurePasswordHandling;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Auth\Notifications\ResetPassword as ResetPasswordNotification;
@@ -26,13 +27,10 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use App\Traits\SecurePasswordHandling;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Arr;
 use JsonException;
 use Laravel\Sanctum\HasApiTokens;
-use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Permission\Traits\HasRoles;
 use Spatie\Translatable\HasTranslations;
 
@@ -56,9 +54,11 @@ use Spatie\Translatable\HasTranslations;
 #[ScopedBy([ActiveScope::class])]
 final class User extends Authenticatable implements FilamentUser, HasLocalePreferenceContract
 {
-    use HasApiTokens;  // Allow issuing API tokens for Sanctum-protected endpoints.
+    use HasApiTokens;
+    use HasFactory, HasRoles, HasSafeSerialization, HasTranslations, Notifiable, OrdersByName, SoftDeletes;
+
+    // Allow issuing API tokens for Sanctum-protected endpoints.
     use SecurePasswordHandling;
-    use HasFactory, HasRoles, HasSafeSerialization, HasTranslations, LogsActivity, Notifiable, OrdersByName, SoftDeletes;
 
     /**
      * Handle booted functionality with proper error handling.
@@ -288,14 +288,6 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     }
 
     /**
-     * Handle getActivitylogOptions functionality with proper error handling.
-     */
-    public function getActivitylogOptions(): LogOptions
-    {
-        return LogOptions::defaults()->logOnly(['name', 'email', 'is_active', 'last_login_at', 'preferred_locale', 'first_name', 'last_name', 'phone_number', 'is_admin', 'accepts_marketing', 'two_factor_enabled', 'company', 'position', 'website'])->logOnlyDirty()->dontSubmitEmptyLogs()->setDescriptionForEvent(fn (string $eventName) => "User {$eventName}")->useLogName('user');
-    }
-
-    /**
      * Handle orders functionality with proper error handling.
      */
     public function orders(): HasMany
@@ -343,22 +335,6 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     }
 
     /**
-     * Handle wishlist functionality with proper error handling.
-     */
-    public function wishlist(): BelongsToMany
-    {
-        return $this->belongsToMany(Product::class, 'user_wishlists', 'user_id', 'product_id')->withTimestamps();
-    }
-
-    /**
-     * Handle wishlists functionality with proper error handling.
-     */
-    public function wishlists(): HasMany
-    {
-        return $this->hasMany(UserWishlist::class);
-    }
-
-    /**
      * Handle addresses functionality with proper error handling.
      */
     public function addresses(): HasMany
@@ -385,11 +361,6 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     public function reviews(): HasMany
     {
         return $this->hasMany(Review::class)->withoutGlobalScopes([ApprovedScope::class, ActiveScope::class]);
-    }
-
-    public function productHistories(): HasMany
-    {
-        return $this->hasMany(ProductHistory::class);
     }
 
     /**
@@ -740,18 +711,6 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     public function sessions(): HasMany
     {
         return $this->hasMany(\App\Models\Session::class);
-    }
-
-    /**
-     * Handle activityLogs functionality with proper error handling.
-     *
-     * @return MorphMany<\App\Models\ActivityLog>
-     */
-    public function activityLogs(): MorphMany
-    {
-        // Use a morphMany relation so the lookup honours the causer_type/causer_id columns
-        // provided by the activity log package instead of assuming a user_id foreign key.
-        return $this->morphMany(\App\Models\ActivityLog::class, 'causer');
     }
 
     /**

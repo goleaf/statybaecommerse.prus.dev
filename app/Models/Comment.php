@@ -19,16 +19,16 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 /**
  * Comment
  *
- * @property int $id
- * @property string $content
- * @property int $user_id
- * @property string $commentable_type
- * @property int $commentable_id
- * @property int|null $parent_id
- * @property bool $is_approved
- * @property bool $is_pinned
- * @property int $likes_count
- * @property array|null $metadata
+ * @property int                             $id
+ * @property string                          $content
+ * @property int                             $user_id
+ * @property string                          $commentable_type
+ * @property int                             $commentable_id
+ * @property int|null                        $parent_id
+ * @property bool                            $is_approved
+ * @property bool                            $is_pinned
+ * @property int                             $likes_count
+ * @property array|null                      $metadata
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
@@ -56,9 +56,9 @@ final class Comment extends Model
 
     protected $casts = [
         'is_approved' => 'boolean',
-        'is_pinned' => 'boolean',
+        'is_pinned'   => 'boolean',
         'likes_count' => 'integer',
-        'metadata' => 'array',
+        'metadata'    => 'array',
     ];
 
     // Relationships
@@ -149,6 +149,49 @@ final class Comment extends Model
     public function scopeRecent(Builder $query, int $days = 7): Builder
     {
         return $query->where('created_at', '>=', now()->subDays($days));
+    }
+
+    /**
+     * Scope for efficient polymorphic queries with proper index usage.
+     * Uses the composite index (commentable_type, commentable_id) for optimal performance.
+     */
+    public function scopeForEntity(Builder $query, Model $entity): Builder
+    {
+        return $query->where([
+            ['commentable_type', '=', $entity->getMorphClass()],
+            ['commentable_id', '=', $entity->getKey()],
+        ]);
+    }
+
+    /**
+     * Scope for paginated comments with optimized ordering and eager loading.
+     * Uses composite indexes for efficient filtering and sorting.
+     */
+    public function scopePaginatedForEntity(Builder $query, Model $entity, int $perPage = 15): Builder
+    {
+        return $query->forEntity($entity)
+            ->approved()
+            ->with(['user:id,name,avatar_url', 'children' => function ($q) {
+                $q->approved()
+                    ->with('user:id,name,avatar_url')
+                    ->orderBy('created_at', 'asc')
+                    ->limit(3);
+            }])
+            ->rootComments()
+            ->orderBy('is_pinned', 'desc')
+            ->orderBy('created_at', 'desc');
+    }
+
+    /**
+     * Scope for efficient approved comments with index optimization.
+     */
+    public function scopeApprovedForEntity(Builder $query, Model $entity): Builder
+    {
+        return $query->where([
+            ['commentable_type', '=', $entity->getMorphClass()],
+            ['commentable_id', '=', $entity->getKey()],
+            ['is_approved', '=', true],
+        ]);
     }
 
     // Helper methods

@@ -17,7 +17,7 @@ final class SecurityEnhancement
     public function handle(Request $request, Closure $next): Response
     {
         // Add request ID for tracking and correlation
-        if (!$request->hasHeader('X-Request-ID')) {
+        if (! $request->hasHeader('X-Request-ID')) {
             $requestId = $this->generateRequestId();
             $request->headers->set('X-Request-ID', $requestId);
         }
@@ -27,7 +27,7 @@ final class SecurityEnhancement
             'request_id' => $request->header('X-Request-ID'),
             'ip_address' => $request->ip(),
             'user_agent' => $this->sanitizeUserAgent($request->userAgent()),
-            'timestamp' => now()->toISOString(),
+            'timestamp'  => now()->toISOString(),
         ]);
 
         /** @var Response $response */
@@ -58,7 +58,7 @@ final class SecurityEnhancement
 
         // Remove control characters and limit length
         $sanitized = preg_replace('/[\x00-\x1F\x7F]/', '', $userAgent) ?? 'unknown';
-        
+
         return substr($sanitized, 0, 200);
     }
 
@@ -78,10 +78,10 @@ final class SecurityEnhancement
 
         // Add additional security headers
         $response->headers->set('X-Robots-Tag', 'noindex, nofollow', false);
-        
+
         // Prevent MIME type sniffing
         $response->headers->set('X-Content-Type-Options', 'nosniff', false);
-        
+
         // Add cache control for sensitive pages
         if ($request->is('admin/*') || $request->is('api/*')) {
             $response->headers->set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
@@ -95,7 +95,7 @@ final class SecurityEnhancement
     private function buildContentSecurityPolicy(): string
     {
         $nonce = base64_encode(random_bytes(16));
-        
+
         $policies = [
             "default-src 'self'",
             "script-src 'self' 'nonce-{$nonce}' 'strict-dynamic'",
@@ -109,7 +109,7 @@ final class SecurityEnhancement
             "frame-ancestors 'none'",
             "base-uri 'self'",
             "form-action 'self'",
-            "upgrade-insecure-requests",
+            'upgrade-insecure-requests',
         ];
 
         // Store nonce for use in views

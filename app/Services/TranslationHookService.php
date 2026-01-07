@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use Exception;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -11,7 +12,9 @@ use Illuminate\Support\Str;
 final class TranslationHookService
 {
     private array $supportedLocales;
+
     private string $defaultLocale;
+
     private array $translationFiles = [];
 
     public function __construct()
@@ -33,13 +36,15 @@ final class TranslationHookService
             }
 
             $this->saveTranslationFiles();
+
             return true;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Translation hook failed', [
-                'key' => $key,
+                'key'          => $key,
                 'translations' => $translations,
-                'error' => $e->getMessage()
+                'error'        => $e->getMessage(),
             ]);
+
             return false;
         }
     }
@@ -80,7 +85,7 @@ final class TranslationHookService
         $keys = [];
         foreach ($patterns as $pattern) {
             preg_match_all($pattern, $content, $matches);
-            if (!empty($matches[1])) {
+            if (! empty($matches[1])) {
                 $keys = array_merge($keys, $matches[1]);
             }
         }
@@ -93,7 +98,7 @@ final class TranslationHookService
      */
     public function processBladeFile(string $filePath): array
     {
-        if (!File::exists($filePath)) {
+        if (! File::exists($filePath)) {
             return [];
         }
 
@@ -102,11 +107,11 @@ final class TranslationHookService
         $missingKeys = [];
 
         foreach ($keys as $key) {
-            if (!$this->translationExists($key)) {
+            if (! $this->translationExists($key)) {
                 $missingKeys[] = $key;
                 // Auto-create translation with key as default value
                 $this->addTranslation($key, [
-                    $this->defaultLocale => $this->humanizeKey($key)
+                    $this->defaultLocale => $this->humanizeKey($key),
                 ]);
             }
         }
@@ -121,12 +126,12 @@ final class TranslationHookService
     {
         $modelClass::saving(function ($model) use ($translatableFields) {
             foreach ($translatableFields as $field) {
-                if ($model->isDirty($field) && !empty($model->$field)) {
+                if ($model->isDirty($field) && ! empty($model->$field)) {
                     $key = $this->generateTranslationKey($model->$field, strtolower(class_basename($model)));
-                    
+
                     // Create translation entry
                     $this->addTranslation($key, [
-                        $this->defaultLocale => $model->$field
+                        $this->defaultLocale => $model->$field,
                     ]);
 
                     // Store the translation key for reference
@@ -147,7 +152,7 @@ final class TranslationHookService
 
             if (File::exists($jsonFile)) {
                 $jsonTranslations = json_decode(File::get($jsonFile), true) ?? [];
-                
+
                 if (File::exists($phpFile)) {
                     $phpTranslations = include $phpFile;
                     if (is_array($phpTranslations)) {
@@ -178,20 +183,20 @@ final class TranslationHookService
     {
         $report = [
             'total_keys' => count($this->translationFiles[$this->defaultLocale] ?? []),
-            'locales' => []
+            'locales'    => [],
         ];
 
         foreach ($this->supportedLocales as $locale) {
             $translations = $this->translationFiles[$locale] ?? [];
             $missing = $this->getMissingTranslations($locale);
-            
+
             $report['locales'][$locale] = [
-                'translated' => count($translations),
-                'missing' => count($missing),
-                'completion_percentage' => $report['total_keys'] > 0 
-                    ? round((count($translations) / $report['total_keys']) * 100, 2) 
+                'translated'            => count($translations),
+                'missing'               => count($missing),
+                'completion_percentage' => $report['total_keys'] > 0
+                    ? round((count($translations) / $report['total_keys']) * 100, 2)
                     : 0,
-                'missing_keys' => array_keys($missing)
+                'missing_keys' => array_keys($missing),
             ];
         }
 
@@ -201,11 +206,11 @@ final class TranslationHookService
     private function getSupportedLocales(): array
     {
         $locales = config('app.supported_locales', 'lt,en');
-        
+
         if (is_string($locales)) {
             return array_map('trim', explode(',', $locales));
         }
-        
+
         return is_array($locales) ? $locales : ['lt', 'en'];
     }
 
@@ -213,7 +218,7 @@ final class TranslationHookService
     {
         foreach ($this->supportedLocales as $locale) {
             $jsonFile = lang_path("{$locale}.json");
-            
+
             if (File::exists($jsonFile)) {
                 $content = File::get($jsonFile);
                 $this->translationFiles[$locale] = json_decode($content, true) ?? [];
@@ -225,7 +230,7 @@ final class TranslationHookService
 
     private function updateTranslationFile(string $locale, string $key, string $translation): void
     {
-        if (!isset($this->translationFiles[$locale])) {
+        if (! isset($this->translationFiles[$locale])) {
             $this->translationFiles[$locale] = [];
         }
 
@@ -236,10 +241,10 @@ final class TranslationHookService
     {
         foreach ($this->translationFiles as $locale => $translations) {
             $jsonFile = lang_path("{$locale}.json");
-            
+
             // Sort translations alphabetically
             ksort($translations);
-            
+
             $jsonContent = json_encode($translations, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
             File::put($jsonFile, $jsonContent);
         }

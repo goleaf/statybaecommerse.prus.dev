@@ -6,13 +6,13 @@ namespace App\Models;
 
 use App\Models\Scopes\ActiveScope;
 use App\Support\Authorization\AuthorizationMatrix;
+use App\Traits\SecurePasswordHandling;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use App\Traits\SecurePasswordHandling;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 
@@ -35,10 +35,10 @@ final class AdminUser extends Authenticatable implements FilamentUser
 {
     /** @use HasFactory<\Database\Factories\AdminUserFactory> */
     use HasFactory;
-    use SecurePasswordHandling;
 
     use HasRoles;
     use Notifiable;
+    use SecurePasswordHandling;
 
     /**
      * Guard name for Spatie permissions (separate admin guard).

@@ -91,16 +91,6 @@ final class RecommendationBlock extends Model
     }
 
     /**
-     * Handle analytics functionality with proper error handling.
-     *
-     * @return HasMany<RecommendationAnalytics, self>
-     */
-    public function analytics(): HasMany
-    {
-        return $this->hasMany(RecommendationAnalytics::class, 'block_id');
-    }
-
-    /**
      * Handle cache functionality with proper error handling.
      *
      * @return HasMany<RecommendationCache, self>

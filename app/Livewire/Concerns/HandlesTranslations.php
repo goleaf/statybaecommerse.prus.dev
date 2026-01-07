@@ -34,7 +34,7 @@ trait HandlesTranslations
      */
     public function addTranslatableProperty(string $property): void
     {
-        if (!in_array($property, $this->translatableProperties)) {
+        if (! in_array($property, $this->translatableProperties)) {
             $this->translatableProperties[] = $property;
         }
     }
@@ -47,14 +47,14 @@ trait HandlesTranslations
         $service = app(TranslationHookService::class);
 
         foreach ($this->translatableProperties as $property) {
-            if (isset($this->$property) && !empty($this->$property)) {
+            if (isset($this->$property) && ! empty($this->$property)) {
                 $key = $service->generateTranslationKey(
                     $this->$property,
                     strtolower(class_basename($this))
                 );
 
                 $service->addTranslation($key, [
-                    config('app.locale', 'lt') => $this->$property
+                    config('app.locale', 'lt') => $this->$property,
                 ]);
             }
         }
@@ -63,11 +63,11 @@ trait HandlesTranslations
     /**
      * Get translation for a property
      */
-    public function getPropertyTranslation(string $property, string $locale = null): ?string
+    public function getPropertyTranslation(string $property, ?string $locale = null): ?string
     {
         $locale = $locale ?? app()->getLocale();
-        
-        if (!isset($this->$property) || empty($this->$property)) {
+
+        if (! isset($this->$property) || empty($this->$property)) {
             return null;
         }
 
@@ -78,6 +78,7 @@ trait HandlesTranslations
         );
 
         $translation = __($key, [], $locale);
+
         return $translation !== $key ? $translation : $this->$property;
     }
 
@@ -86,7 +87,7 @@ trait HandlesTranslations
      */
     public function updatePropertyTranslation(string $property, string $locale, string $translation): bool
     {
-        if (!isset($this->$property)) {
+        if (! isset($this->$property)) {
             return false;
         }
 
@@ -104,7 +105,7 @@ trait HandlesTranslations
      */
     public function dehydrate(): void
     {
-        if (!empty($this->translatableProperties)) {
+        if (! empty($this->translatableProperties)) {
             $this->processComponentTranslations();
         }
     }
@@ -112,20 +113,20 @@ trait HandlesTranslations
     /**
      * Helper method to translate text on the fly
      */
-    public function translateText(string $text, array $locales = null): array
+    public function translateText(string $text, ?array $locales = null): array
     {
         $service = app(TranslationHookService::class);
         $key = $service->generateTranslationKey($text, 'component');
-        
+
         $locales = $locales ?? $this->getSupportedLocales();
         $translations = [];
-        
+
         foreach ($locales as $locale) {
             $translations[$locale] = $locale === config('app.locale', 'lt') ? $text : $text;
         }
 
         $service->addTranslation($key, $translations);
-        
+
         return $translations;
     }
 
@@ -135,11 +136,11 @@ trait HandlesTranslations
     private function getSupportedLocales(): array
     {
         $locales = config('app.supported_locales', 'lt,en');
-        
+
         if (is_string($locales)) {
             return array_map('trim', explode(',', $locales));
         }
-        
+
         return is_array($locales) ? $locales : ['lt', 'en'];
     }
 }

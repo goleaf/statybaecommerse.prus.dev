@@ -9,7 +9,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * RecommendationConfigSimple
@@ -84,14 +83,6 @@ final class RecommendationConfigSimple extends Model
     public function categories(): BelongsToMany
     {
         return $this->belongsToMany(Category::class, 'recommendation_config_simple_categories');
-    }
-
-    /**
-     * Analytics relationship
-     */
-    public function analytics(): HasMany
-    {
-        return $this->hasMany(RecommendationAnalytics::class, 'config_simple_id');
     }
 
     /**

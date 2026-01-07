@@ -15,7 +15,6 @@ use App\Models\Inventory;
 use App\Models\Location;
 use App\Models\Order;
 use App\Models\Product;
-use App\Models\RecommendationAnalytics;
 use App\Models\Review;
 use App\Models\SystemSetting;
 use App\Models\User;
@@ -81,8 +80,8 @@ class DashboardOverviewWidget extends BaseWidget
         $totalAddresses = Address::count();
         $totalSystemSettings = SystemSetting::count();
 
-        // Recommendation System
-        $totalRecommendations = RecommendationAnalytics::sum('recommendations_count');
+        // Recommendation System (analytics removed)
+        $totalRecommendations = 0; // RecommendationAnalytics removed
         $totalUserBehaviors = UserBehavior::count();
         $totalVariantAnalytics = VariantAnalytics::count();
 

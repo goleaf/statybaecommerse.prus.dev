@@ -80,10 +80,10 @@ final class BootErrorProfiler
         $currentHour = date('Y-m-d-H');
 
         return [
-            'timings' => cache()->get(self::PROFILING_KEY_PREFIX . 'timings_' . $currentHour, []),
+            'timings'      => cache()->get(self::PROFILING_KEY_PREFIX . 'timings_' . $currentHour, []),
             'memory_usage' => cache()->get(self::PROFILING_KEY_PREFIX . 'memory_' . $currentHour, []),
-            'call_counts' => cache()->get(self::PROFILING_KEY_PREFIX . 'calls_' . $currentHour, []),
-            'timestamp' => now()->toISOString(),
+            'call_counts'  => cache()->get(self::PROFILING_KEY_PREFIX . 'calls_' . $currentHour, []),
+            'timestamp'    => now()->toISOString(),
         ];
     }
 
@@ -103,11 +103,11 @@ final class BootErrorProfiler
 
             if ($averageTime * 1000 > $budget) {
                 $regressions[] = [
-                    'type' => 'timing',
-                    'operation' => $operation,
+                    'type'       => 'timing',
+                    'operation'  => $operation,
                     'average_ms' => round($averageTime * 1000, 2),
-                    'budget_ms' => $budget,
-                    'severity' => $averageTime * 1000 > $budget * 2 ? 'high' : 'medium',
+                    'budget_ms'  => $budget,
+                    'severity'   => $averageTime * 1000 > $budget * 2 ? 'high' : 'medium',
                 ];
             }
         }
@@ -119,11 +119,11 @@ final class BootErrorProfiler
 
             if ($averageMemory / 1024 / 1024 > $budgetMB) {
                 $regressions[] = [
-                    'type' => 'memory',
-                    'operation' => $operation,
+                    'type'       => 'memory',
+                    'operation'  => $operation,
                     'average_mb' => round($averageMemory / 1024 / 1024, 2),
-                    'budget_mb' => $budgetMB,
-                    'severity' => $averageMemory / 1024 / 1024 > $budgetMB * 2 ? 'high' : 'medium',
+                    'budget_mb'  => $budgetMB,
+                    'severity'   => $averageMemory / 1024 / 1024 > $budgetMB * 2 ? 'high' : 'medium',
                 ];
             }
         }

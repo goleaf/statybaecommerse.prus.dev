@@ -21,17 +21,29 @@ trait HasNav
     /**
      * Resolve the translated navigation group label for the resource.
      */
-    public static function getNavigationGroup(): UnitEnum|string|null
+    public static function getNavigationGroup(): ?string
     {
-        return Nav::groupForResource(static::class);
+        $group = Nav::groupForResource(static::class);
+
+        if ($group instanceof UnitEnum) {
+            return $group->value ?? $group->name;
+        }
+
+        return $group;
     }
 
     /**
      * Resolve the navigation icon using the central Nav metadata map.
      */
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    public static function getNavigationIcon(): Htmlable|string|null
     {
-        return Nav::iconForResource(static::class);
+        $icon = Nav::iconForResource(static::class);
+
+        if ($icon instanceof BackedEnum) {
+            return $icon->value ?? $icon->name;
+        }
+
+        return $icon;
     }
 
     /**

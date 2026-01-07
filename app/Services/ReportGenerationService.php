@@ -12,7 +12,6 @@ use App\Models\Report;
 use App\Models\Scopes\UserOwnedScope;
 use App\Models\User;
 use App\Models\UserProductInteraction;
-use App\Models\WishlistItem;
 use App\Services\Pricing\PriceCalculator;
 use App\Support\Logging\StructuredLogger;
 use Exception;
@@ -158,13 +157,6 @@ final class ReportGenerationService
                     ->get()
                     ->keyBy('product_id');
 
-                $wishlistMetrics = WishlistItem::query()
-                    ->withoutGlobalScopes([UserOwnedScope::class])
-                    ->selectRaw('product_id, COUNT(*) as wishlist_additions')
-                    ->whereIn('product_id', $productIds)
-                    ->groupBy('product_id')
-                    ->pluck('wishlist_additions', 'product_id');
-
                 $variantMetrics = ProductVariant::query()
                     ->select(['id', 'product_id', 'name', 'sku', 'views_count', 'sold_quantity', 'conversion_rate'])
                     ->whereIn('product_id', $productIds)
@@ -174,7 +166,6 @@ final class ReportGenerationService
                 $totalViews = 0;
                 $totalCartAdditions = 0;
                 $totalPurchases = 0;
-                $totalWishlistAdditions = 0;
                 $cartRateSum = 0.0;
                 $purchaseRateSum = 0.0;
                 $cartRateProducts = 0;
@@ -187,7 +178,6 @@ final class ReportGenerationService
                     $views = (int) ($interactionGroup->firstWhere('event', 'view')['total_count'] ?? 0);
                     $uniqueViewers = (int) ($interactionGroup->firstWhere('event', 'view')['unique_users'] ?? 0);
                     $cartAdditions = (int) ($interactionGroup->firstWhere('event', 'add_to_cart')['total_count'] ?? 0);
-                    $wishlistAdditions = (int) ($wishlistMetrics[$productId] ?? 0);
 
                     $orderStat = $orderMetrics->get($productId);
                     $purchasedQuantity = (int) ($orderStat->purchased_quantity ?? 0);
@@ -220,10 +210,6 @@ final class ReportGenerationService
                         'purchase_to_view_rate' => round($purchaseRate, 2),
                     ];
 
-                    $analytics['wishlist'] = [
-                        'wishlist_additions' => $wishlistAdditions,
-                    ];
-
                     $variants = $variantMetrics->get($productId, collect());
                     $analytics['variant_analytics'] = [
                         'total_variants' => $variants->count(),
@@ -249,17 +235,15 @@ final class ReportGenerationService
                     $totalViews += $views;
                     $totalCartAdditions += $cartAdditions;
                     $totalPurchases += $purchasedQuantity;
-                    $totalWishlistAdditions += $wishlistAdditions;
                 }
 
                 $summary = [
                     'total_products'     => $processedCount,
                     'processed_products' => $processedCount,
                     'totals'             => [
-                        'views'              => $totalViews,
-                        'cart_additions'     => $totalCartAdditions,
-                        'purchases'          => $totalPurchases,
-                        'wishlist_additions' => $totalWishlistAdditions,
+                        'views'          => $totalViews,
+                        'cart_additions' => $totalCartAdditions,
+                        'purchases'      => $totalPurchases,
                     ],
                     'average_conversion_rates' => [
                         'cart_to_view'     => $cartRateProducts > 0 ? round($cartRateSum / $cartRateProducts, 2) : 0.0,
@@ -270,7 +254,7 @@ final class ReportGenerationService
                 $summary = [
                     'total_products'           => 0,
                     'processed_products'       => 0,
-                    'totals'                   => ['views' => 0, 'cart_additions' => 0, 'purchases' => 0, 'wishlist_additions' => 0],
+                    'totals'                   => ['views' => 0, 'cart_additions' => 0, 'purchases' => 0],
                     'average_conversion_rates' => ['cart_to_view' => 0.0, 'purchase_to_view' => 0.0],
                 ];
             }

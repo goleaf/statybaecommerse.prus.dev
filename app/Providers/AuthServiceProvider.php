@@ -17,7 +17,6 @@ use App\Models\Legal;
 use App\Models\Notification;
 use App\Models\Order;
 use App\Models\Product;
-use App\Models\ProductHistory;
 use App\Models\ProductRequest;
 use App\Models\Referral;
 use App\Models\ReferralCode;
@@ -35,7 +34,6 @@ use App\Policies\ExportPolicy;
 use App\Policies\LegalPolicy;
 use App\Policies\NotificationPolicy;
 use App\Policies\OrderPolicy;
-use App\Policies\ProductHistoryPolicy;
 use App\Policies\ProductPolicy;
 use App\Policies\ProductRequestPolicy;
 use App\Policies\ReferralCodePolicy;
@@ -67,7 +65,6 @@ final class AuthServiceProvider extends ServiceProvider
         Notification::class      => NotificationPolicy::class,
         Order::class             => OrderPolicy::class,
         Product::class           => ProductPolicy::class,
-        ProductHistory::class    => ProductHistoryPolicy::class,
         ProductRequest::class    => ProductRequestPolicy::class,
         Referral::class          => ReferralPolicy::class,
         ReferralCode::class      => ReferralCodePolicy::class,
@@ -91,7 +88,7 @@ final class AuthServiceProvider extends ServiceProvider
                 if (! (bool) config('authorization.testing.skip_checks', true)) {
                     return null;
                 }
-                
+
                 return true;
             });
         }
