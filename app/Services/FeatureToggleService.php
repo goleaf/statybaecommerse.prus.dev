@@ -32,10 +32,11 @@ class FeatureToggleService
 
     /**
      * Check if campaigns feature is enabled (for backward compatibility)
+     * @deprecated Campaigns feature has been permanently removed
      */
     public function isCampaignsEnabled(): bool
     {
-        return false; // Explicitly disabled
+        return false; // Campaigns feature permanently disabled
     }
 
     /**
