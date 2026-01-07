@@ -890,42 +890,6 @@ final class Product extends Model implements HasMedia, TranslatableRecord
     }
 
     /**
-     * Handle histories functionality with proper error handling.
-     */
-    public function histories(): HasMany
-    {
-        return $this->hasMany(ProductHistory::class);
-    }
-
-    /**
-     * Handle latestHistory functionality with proper error handling.
-     */
-    public function latestHistory(): HasOne
-    {
-        return $this->histories()->one()->latestOfMany();
-    }
-
-    /**
-     * Handle latestPriceChange functionality with proper error handling.
-     */
-    public function latestPriceChange(): HasOne
-    {
-        return $this->histories()->one()->ofMany(['created_at' => 'max'], function ($query): void {
-            $query->where('field_name', 'price');
-        });
-    }
-
-    /**
-     * Handle latestStockUpdate functionality with proper error handling.
-     */
-    public function latestStockUpdate(): HasOne
-    {
-        return $this->histories()->one()->ofMany(['created_at' => 'max'], function ($query): void {
-            $query->where('field_name', 'stock_quantity');
-        });
-    }
-
-    /**
      * Handle currentPrice functionality with proper error handling.
      */
     public function currentPrice(): HasOne
@@ -936,109 +900,19 @@ final class Product extends Model implements HasMedia, TranslatableRecord
     }
 
     /**
-     * Handle recentHistories functionality with proper error handling.
-     */
-    public function recentHistories(): HasMany
-    {
-        return $this->hasMany(ProductHistory::class)->recent(30);
-    }
-
-    /**
-     * Handle priceHistories functionality with proper error handling.
-     */
-    public function priceHistories(): HasMany
-    {
-        return $this->hasMany(ProductHistory::class)->byAction('price_changed');
-    }
-
-    /**
-     * Handle stockHistories functionality with proper error handling.
-     */
-    public function stockHistories(): HasMany
-    {
-        return $this->hasMany(ProductHistory::class)->byAction('stock_updated');
-    }
-
-    /**
-     * Handle statusHistories functionality with proper error handling.
-     */
-    public function statusHistories(): HasMany
-    {
-        return $this->hasMany(ProductHistory::class)->byAction('status_changed');
-    }
-
-    /**
-     * Handle significantHistories functionality with proper error handling.
-     */
-    public function significantHistories(): HasMany
-    {
-        return $this->hasMany(ProductHistory::class)->whereIn('field_name', ['price', 'sale_price', 'stock_quantity', 'status', 'is_visible']);
-    }
-
-    /**
-     * Handle getLastPriceChange functionality with proper error handling.
-     */
-    public function getLastPriceChange(): ?ProductHistory
-    {
-        return $this->latestPriceChange;
-    }
-
-    /**
      * Handle getLastStockUpdate functionality with proper error handling.
      */
-    public function getLastStockUpdate(): ?ProductHistory
+    public function getLastStockUpdate(): ?array
     {
-        return $this->latestStockUpdate;
+        return null; // ProductHistory functionality removed
     }
 
     /**
      * Handle getLastStatusChange functionality with proper error handling.
      */
-    public function getLastStatusChange(): ?ProductHistory
+    public function getLastStatusChange(): ?array
     {
-        return $this->statusHistories()->latest()->first();
-    }
-
-    /**
-     * Handle getChangeCount functionality with proper error handling.
-     */
-    public function getChangeCount(int $days = 30): int
-    {
-        return $this->histories()->recent($days)->count();
-    }
-
-    /**
-     * Handle getPriceChangeCount functionality with proper error handling.
-     */
-    public function getPriceChangeCount(int $days = 30): int
-    {
-        return $this->priceHistories()->recent($days)->count();
-    }
-
-    /**
-     * Handle getStockChangeCount functionality with proper error handling.
-     */
-    public function getStockChangeCount(int $days = 30): int
-    {
-        return $this->stockHistories()->recent($days)->count();
-    }
-
-    /**
-     * Handle hasRecentChanges functionality with proper error handling.
-     */
-    public function hasRecentChanges(int $days = 7): bool
-    {
-        return $this->histories()->recent($days)->exists();
-    }
-
-    /**
-     * Handle getChangeFrequency functionality with proper error handling.
-     */
-    public function getChangeFrequency(int $days = 30): float
-    {
-        $changeCount = $this->getChangeCount($days);
-
-        return $changeCount > 0 ? round($changeCount / $days, 2) : 0;
+        return null; // ProductHistory functionality removed
     }
 
     /**

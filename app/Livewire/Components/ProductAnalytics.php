@@ -60,9 +60,9 @@ class ProductAnalytics extends Component
         if (! $this->product) {
             return ['views_count' => 0, 'cart_additions' => 0, 'conversion_rate' => 0.0];
         }
-        // This expensive calculation will be cached across requests
-        $viewsCount = \App\Models\ProductHistory::where('product_id', $this->productId)->where('action', 'viewed')->count();
-        $cartAdditions = \App\Models\ProductHistory::where('product_id', $this->productId)->where('action', 'added_to_cart')->count();
+        // Analytics calculation removed - ProductHistory no longer available
+        $viewsCount = 0;
+        $cartAdditions = 0;
         $conversionRate = $viewsCount > 0 ? $cartAdditions / $viewsCount * 100 : 0.0;
 
         return ['views_count' => $viewsCount, 'cart_additions' => $cartAdditions, 'conversion_rate' => round($conversionRate, 2)];

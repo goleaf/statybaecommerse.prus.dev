@@ -61,9 +61,9 @@ final class Region extends Model
         return [
             'is_enabled' => 'boolean',
             'is_default' => 'boolean',
-            'level' => 'integer',
+            'level'      => 'integer',
             'sort_order' => 'integer',
-            'metadata' => 'array',
+            'metadata'   => 'array',
         ];
     }
 
@@ -151,10 +151,3 @@ final class Region extends Model
         return $this->trans('description', $locale) ?: $this->description;
     }
 }
-
-
-
-
-
-
-

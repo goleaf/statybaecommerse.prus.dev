@@ -12,7 +12,6 @@ use App\Database\Connectors\GracefulSQLiteConnector;
 use App\Domain\Product\Repositories\ProductRepositoryInterface;
 use App\Filament\Components\LiveNotificationFeed;
 use App\Infrastructure\Product\Repositories\EloquentProductRepository;
-use App\Models\ApiKey;
 use App\Models\DiscountCode;
 use App\Models\DiscountRedemption;
 use App\Models\Document;
@@ -71,7 +70,6 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Queue;
-use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\LazyCollection;
@@ -150,6 +148,9 @@ class AppServiceProvider extends ServiceProvider
 
         // Register the centralized locale service
         $this->app->singleton(\App\Services\LocaleService::class);
+
+        // Service layer bindings
+        $this->registerServiceLayerBindings();
 
         // Register the database search optimizer for production performance
         $this->app->singleton(\App\Services\Search\DatabaseSearchOptimizer::class, static fn ($app): \App\Services\Search\DatabaseSearchOptimizer => new \App\Services\Search\DatabaseSearchOptimizer($app->make('db.connection'))
@@ -556,47 +557,6 @@ class AppServiceProvider extends ServiceProvider
         } catch (Throwable) {
             // Safe fallback if Number is unavailable
         }
-
-        RateLimiter::for('partner-api', function (Request $request) {
-            $apiKey = $request->attributes->get('partner.api_key');
-
-            if (! $apiKey instanceof ApiKey) {
-                $header = trim((string) $request->header('X-Api-Key', ''));
-
-                if ($header !== '') {
-                    $apiKey = ApiKey::query()
-                        ->active()
-                        ->where('key', $header)
-                        ->first();
-                }
-            }
-
-            $signature = $apiKey instanceof ApiKey
-                ? 'partner-api:' . $apiKey->getKey()
-                : 'partner-api:anonymous:' . sha1($request->header('X-Api-Key', '') . '|' . $request->ip());
-
-            $limit = $apiKey instanceof ApiKey
-                ? $apiKey->toRateLimit()
-                : Limit::perMinute(60);
-
-            return $limit
-                ->by($signature)
-                ->response(static function (Request $request, array $headers) use ($apiKey) {
-                    $message = $apiKey instanceof ApiKey
-                        ? 'Too many requests for this partner API key.'
-                        : 'Too many partner API requests.';
-
-                    $payload = ['message' => $message];
-
-                    if (isset($headers['Retry-After'])) {
-                        $payload['retry_after'] = (int) $headers['Retry-After'];
-                    }
-
-                    return response()
-                        ->json($payload, 429)
-                        ->withHeaders($headers);
-                });
-        });
 
         // Using native Filament resources for admin panel functionality
 
@@ -1013,5 +973,28 @@ class AppServiceProvider extends ServiceProvider
         }, true, false);
 
         self::$filamentResourceAutoloaderRegistered = true;
+    }
+
+    /**
+     * Register service layer bindings for dependency injection
+     */
+    private function registerServiceLayerBindings(): void
+    {
+        // Core services - singleton for stateless services
+        $this->app->singleton(\App\Services\OrderManagementService::class);
+        $this->app->singleton(\App\Services\UserManagementService::class);
+
+        // Actions - bind as instances for stateless operations
+        $this->app->bind(\App\Actions\Orders\CreateOrderAction::class);
+        $this->app->bind(\App\Actions\Orders\UpdateOrderStatusAction::class);
+        $this->app->bind(\App\Actions\Orders\CancelOrderAction::class);
+        $this->app->bind(\App\Actions\Users\CreateUserAction::class);
+        $this->app->bind(\App\Actions\Users\UpdateUserProfileAction::class);
+        $this->app->bind(\App\Actions\Users\AssignRoleAction::class);
+
+        // Existing services that should extend BaseService can be rebound here
+        // Example: $this->app->extend(NotificationService::class, function($service, $app) {
+        //     return new EnhancedNotificationService(...);
+        // });
     }
 }

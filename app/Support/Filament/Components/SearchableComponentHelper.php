@@ -6,16 +6,16 @@ namespace App\Support\Filament\Components;
 
 use Closure;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
-use Filament\Actions\Action;
-use Filament\Actions\ActionGroup;
+use Filament\Forms\ComponentContainer;
+use Filament\Forms\Components\Component as SchemaComponent;
+use Filament\Forms\Contracts\HasForms;
+use Filament\Forms\Form;
 use Filament\Forms\Set;
-use Filament\Schemas\Components\Component as SchemaComponent;
-use Filament\Schemas\Contracts\HasSchemas;
-use Filament\Schemas\Schema;
 use Filament\Support\Contracts\TranslatableContentDriver;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
 use Livewire\Component as LivewireComponent;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionProperty;
@@ -512,7 +512,7 @@ final class SearchableComponentHelper
     }
 
     /**
-     * Ensure a schema container is available so state mutations do not trigger uninitialised property errors.
+     * Ensure a form container is available so state mutations do not trigger uninitialised property errors.
      */
     private static function ensureComponentHasContainer(SearchableInput $component): void
     {
@@ -520,44 +520,87 @@ final class SearchableComponentHelper
             return;
         }
 
-        $host = new class extends LivewireComponent implements HasSchemas
+        $host = new class extends LivewireComponent implements HasForms
         {
+            public function dispatchFormEvent(mixed ...$args): void {}
+
+            public function getActiveFormsLocale(): ?string
+            {
+                return null;
+            }
+
             public function makeFilamentTranslatableContentDriver(): ?TranslatableContentDriver
             {
                 return null;
             }
 
-            public function getOldSchemaState(string $statePath): mixed
+            public function getForm(string $name): ?Form
+            {
+                return null;
+            }
+
+            public function getFormComponentFileAttachment(string $statePath): ?TemporaryUploadedFile
+            {
+                return null;
+            }
+
+            public function getFormComponentFileAttachmentUrl(string $statePath): ?string
+            {
+                return null;
+            }
+
+            public function getFormSelectOptionLabels(string $statePath): array
+            {
+                return [];
+            }
+
+            public function getFormSelectOptionLabel(string $statePath): ?string
+            {
+                return null;
+            }
+
+            public function getFormSelectOptions(string $statePath): array
+            {
+                return [];
+            }
+
+            public function getFormSelectSearchResults(string $statePath, string $search): array
+            {
+                return [];
+            }
+
+            public function getFormUploadedFiles(string $statePath): ?array
+            {
+                return null;
+            }
+
+            public function getOldFormState(string $statePath): mixed
             {
                 return data_get($this, $statePath);
             }
 
-            public function getSchemaComponent(
-                string $key,
-                bool $withHidden = false,
-                ?SchemaComponent $skipComponentChildContainersWhileSearching = null
-            ): SchemaComponent|Action|ActionGroup|null {
-                return null;
+            public function isCachingForms(): bool
+            {
+                return false;
             }
 
-            public function getSchema(string $name): ?Schema
+            public function removeFormUploadedFile(string $statePath, string $fileKey): void {}
+
+            public function reorderFormUploadedFiles(string $statePath, array $fileKeys): void {}
+
+            public function validate($rules = null, $messages = [], $attributes = []): array
             {
-                return null;
+                return [];
             }
 
-            public function currentlyValidatingSchema(?Schema $schema): void
+            public function currentlyValidatingForm(?ComponentContainer $form): void
             {
-                // No-op for isolated schema host.
-            }
-
-            public function getDefaultTestingSchemaName(): ?string
-            {
-                return null;
+                // No-op for isolated form host.
             }
         };
 
-        Schema::make($host)
-            ->components([$component])
+        Form::make($host)
+            ->schema([$component])
             ->getComponents();
     }
 

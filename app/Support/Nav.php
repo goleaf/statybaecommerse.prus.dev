@@ -14,7 +14,6 @@ use ParseError;
 use ReflectionClass;
 use ReflectionException;
 use Throwable;
-use UnitEnum;
 
 /**
  * Central registry responsible for discovering Filament resources and exposing
@@ -533,6 +532,7 @@ final class Nav
 
         if (is_array($value)) {
             $first = reset($value);
+
             return is_string($first) ? $first : $fallback;
         }
 

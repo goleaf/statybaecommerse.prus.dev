@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use App\Models\ApiKey;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -95,26 +94,6 @@ final class ApiServiceProvider extends ServiceProvider
             return $this->layeredLimits($request, 'frontend.checkout', $this->checkoutRateLimitConfig());
         });
 
-        RateLimiter::for('partner.api', function (Request $request): array {
-            $apiKey = $this->resolvePartnerApiKey($request);
-
-            if ($apiKey === null) {
-                $ip = (string) $request->ip();
-                $identifier = $ip !== '' ? $ip : 'unknown';
-                $key = 'partner_api:anonymous:' . $identifier;
-
-                return [$this->buildLimit('partner.api.anonymous', $key, 60)];
-            }
-
-            $key = $apiKey->rateLimiterKey();
-            $limit = $apiKey->rate_limit;
-
-            if ($limit === null || $limit <= 0) {
-                return [Limit::none()->by($key)];
-            }
-
-            return [$this->buildLimit('partner.api', $key, max(1, (int) $limit))];
-        });
     }
 
     /**
@@ -615,31 +594,5 @@ final class ApiServiceProvider extends ServiceProvider
         $headerName = config('app.correlation_header', 'X-Correlation-ID');
 
         return $response->header($headerName, $this->resolveCorrelationId($request));
-    }
-
-    private function resolvePartnerApiKey(Request $request): ?ApiKey
-    {
-        $resolved = $request->attributes->get('partner_api_key');
-        if ($resolved instanceof ApiKey) {
-            return $resolved;
-        }
-
-        $headerName = (string) config('services.partner_api.header', 'X-Api-Key');
-        $header = $request->headers->get($headerName);
-        if (! is_string($header)) {
-            return null;
-        }
-
-        $trimmed = trim($header);
-        if ($trimmed === '') {
-            return null;
-        }
-
-        /** @var ApiKey|null $apiKey */
-        $apiKey = ApiKey::query()
-            ->where('key', ApiKey::hashKey($trimmed))
-            ->first();
-
-        return $apiKey;
     }
 }

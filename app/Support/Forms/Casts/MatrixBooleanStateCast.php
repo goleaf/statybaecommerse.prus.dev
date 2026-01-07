@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Support\Forms\Casts;
 
-use Filament\Schemas\Components\StateCasts\Contracts\StateCast;
+use Filament\Forms\Components\StateCasts\Contracts\StateCast;
 
 /**
  * Cast matrix field state into a predictable boolean map keyed by rows/columns.
@@ -18,8 +18,7 @@ final class MatrixBooleanStateCast implements StateCast
     public function __construct(
         private readonly array $rowKeys,
         private readonly array $columnKeys,
-    ) {
-    }
+    ) {}
 
     /**
      * Prepare dehydrated state before it is stored to the database.

@@ -6,9 +6,9 @@ namespace App\Policies;
 
 use App\Models\ProductRequest;
 use App\Models\User;
+use App\Support\Authorization\AuthorizationMatrix;
 use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
-use App\Support\Authorization\AuthorizationMatrix;
 
 final class ProductRequestPolicy
 {

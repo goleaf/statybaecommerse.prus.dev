@@ -20,7 +20,7 @@ final class BooleanMatrix extends Matrix
      * Remove the default OptionsArrayStateCast inherited from CheckboxList so complex state casts can
      * manage the nested row/column structure without triggering array-to-string conversions.
      *
-     * @return array<int, \Filament\Schemas\Components\StateCasts\Contracts\StateCast>
+     * @return array<int, \Filament\\Forms\\Components\StateCasts\Contracts\StateCast>
      */
     public function getDefaultStateCasts(): array
     {

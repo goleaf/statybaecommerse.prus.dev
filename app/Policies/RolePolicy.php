@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
+use App\Support\Authorization\AuthorizationMatrix;
 use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Spatie\Permission\Models\Role;
-use App\Support\Authorization\AuthorizationMatrix;
 
 class RolePolicy
 {

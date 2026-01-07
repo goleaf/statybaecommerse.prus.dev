@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models\Concerns;
 
+use DB;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -114,7 +115,7 @@ trait OptimizedRelationships
      */
     public function loadRelationshipsInChunks(string $relation, int $chunkSize = 100): void
     {
-        $this->{$relation}()->chunk($chunkSize, function (Collection $items) use ($relation) {
+        $this->{$relation}()->chunk($chunkSize, function (Collection $items) {
             // Process each chunk
             $items->each(function ($item) {
                 // Perform operations on each item
@@ -183,7 +184,7 @@ trait OptimizedRelationships
         return cache()->remember(
             "project_{$this->id}_task_count",
             now()->addMinutes(15),
-            fn() => $this->tasks()->count()
+            fn () => $this->tasks()->count()
         );
     }
 
@@ -238,15 +239,15 @@ trait OptimizedRelationships
     {
         $assignments = collect($taskIds)->map(function ($taskId) use ($user) {
             return [
-                'task_id' => $taskId,
-                'user_id' => $user->id,
+                'task_id'        => $taskId,
+                'user_id'        => $user->id,
                 'responsibility' => 'assignee',
-                'assigned_at' => now(),
-                'created_at' => now(),
-                'updated_at' => now(),
+                'assigned_at'    => now(),
+                'created_at'     => now(),
+                'updated_at'     => now(),
             ];
         });
 
-        \DB::table('task_user')->insert($assignments->toArray());
+        DB::table('task_user')->insert($assignments->toArray());
     }
 }

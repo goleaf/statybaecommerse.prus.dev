@@ -71,7 +71,7 @@ class UserController extends Controller
 
         $listQuery = ListQueryValidator::fromRequest($request, $definition);
 
-        $query = User::with(['addresses', 'orders', 'wishlist', 'reviews', 'partners', 'referrals']);
+        $query = User::with(['addresses', 'orders', 'reviews', 'partners', 'referrals']);
         $listQuery->applyFilters($query);
         $listQuery->applySorts($query);
 
@@ -97,7 +97,7 @@ class UserController extends Controller
     public function show(Request $request, User $user): AdminUserResource
     {
         $this->authorize('view', $user);
-        $user->load(['addresses', 'orders', 'wishlist', 'reviews', 'partners', 'referrals']);
+        $user->load(['addresses', 'orders', 'reviews', 'partners', 'referrals']);
 
         return new AdminUserResource($user);
     }
@@ -108,7 +108,7 @@ class UserController extends Controller
     public function profile(Request $request): UserResource
     {
         $user = $request->user();
-        $user->load(['addresses', 'orders', 'wishlist']);
+        $user->load(['addresses', 'orders']);
 
         return new UserResource($user);
     }
@@ -121,7 +121,7 @@ class UserController extends Controller
         $user = $request->user();
         $validated = $request->validate(['first_name' => 'sometimes|string|max:255', 'last_name' => 'sometimes|string|max:255', 'phone_number' => 'sometimes|nullable|string|max:20', 'preferred_locale' => 'sometimes|string|in:lt,en,ru,de', 'timezone' => 'sometimes|nullable|string|max:50', 'company' => 'sometimes|nullable|string|max:255', 'position' => 'sometimes|nullable|string|max:255', 'website' => 'sometimes|nullable|url|max:255', 'bio' => 'sometimes|nullable|string|max:1000', 'social_links' => 'sometimes|nullable|array', 'notification_preferences' => 'sometimes|nullable|array', 'privacy_settings' => 'sometimes|nullable|array', 'marketing_preferences' => 'sometimes|nullable|array']);
         $user->update($validated);
-        $user->load(['addresses', 'orders', 'wishlist']);
+        $user->load(['addresses', 'orders']);
 
         return new UserResource($user);
     }
@@ -143,7 +143,7 @@ class UserController extends Controller
     public function activity(Request $request, User $user): JsonResponse
     {
         $this->authorize('view', $user);
-        $activity = ['user_id' => $user->id, 'user_name' => $user->name, 'last_login_at' => $user->last_login_at?->toISOString(), 'last_activity_at' => $user->last_activity_at?->toISOString(), 'login_count' => $user->login_count, 'orders_count' => $user->orders()->count(), 'reviews_count' => $user->reviews()->count(), 'wishlist_count' => $user->wishlist()->count(), 'addresses_count' => $user->addresses()->count(), 'total_spent' => $user->total_spent, 'average_order_value' => $user->average_order_value, 'last_order_date' => $user->last_order_date, 'is_on_trial' => $user->isOnTrial(), 'has_active_subscription' => $user->hasActiveSubscription(), 'subscription_status' => $user->subscription_status, 'referral_stats' => $user->referral_stats];
+        $activity = ['user_id' => $user->id, 'user_name' => $user->name, 'last_login_at' => $user->last_login_at?->toISOString(), 'last_activity_at' => $user->last_activity_at?->toISOString(), 'login_count' => $user->login_count, 'orders_count' => $user->orders()->count(), 'reviews_count' => $user->reviews()->count(), 'addresses_count' => $user->addresses()->count(), 'total_spent' => $user->total_spent, 'average_order_value' => $user->average_order_value, 'last_order_date' => $user->last_order_date, 'is_on_trial' => $user->isOnTrial(), 'has_active_subscription' => $user->hasActiveSubscription(), 'subscription_status' => $user->subscription_status, 'referral_stats' => $user->referral_stats];
 
         return response()->json(['success' => true, 'data' => $activity, 'timestamp' => now()->toISOString()]);
     }

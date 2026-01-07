@@ -17,9 +17,9 @@ use Livewire\Component;
  *
  * Livewire component for LanguageSwitcher with reactive frontend functionality, real-time updates, and user interaction handling.
  *
- * @property array<int, string>                                                          $locales
- * @property string                                                                      $current
- * @property array<string, array{locale:string,label:string,url:string,active:bool}>     $languages
+ * @property array<int, string>                                                      $locales
+ * @property string                                                                  $current
+ * @property array<string, array{locale:string,label:string,url:string,active:bool}> $languages
  */
 class LanguageSwitcher extends Component
 {

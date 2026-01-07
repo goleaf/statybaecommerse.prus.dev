@@ -6,12 +6,12 @@ namespace App\Filament\Pages;
 
 use App\Services\Shared\ComponentPerformanceService;
 use BackedEnum;
-use Filament\Actions\Action;
 use Filament\Forms;
 use Filament\Forms\Components\Section;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Schema;
+use Filament\Tables\Actions\Action;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
@@ -24,13 +24,14 @@ final class CacheMaintenance extends Page
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations while
      * documenting the accepted union type for downstream tooling.
      */
-//    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-server-stack';
+    //    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-server-stack';
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    public static function getNavigationIcon(): string|Htmlable|null
     {
         return 'heroicon-o-server-stack';
     }
-    public static function getNavigationGroup(): BackedEnum|string|null
+
+    public static function getNavigationGroup(): ?string
     {
         return 'System'; // Keep cache tooling aligned with the broader system utilities group.
     }
@@ -89,7 +90,7 @@ final class CacheMaintenance extends Page
         return (bool) ($user->is_admin ?? false);
     }
 
-    public function form(Schema $schema): Schema
+    public function form(Form $schema): Form
     {
         // Configure the Filament resource form schema using the v4 Schema API.
         // Embrace the Filament v4 return contract so downstream tooling can rely on a `Schema` instance for hydration.

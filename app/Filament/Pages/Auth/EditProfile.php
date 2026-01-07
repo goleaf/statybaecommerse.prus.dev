@@ -4,31 +4,27 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages\Auth;
 
-use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
-use Filament\Auth\Pages\EditProfile as BaseEditProfile;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
-use Filament\Schemas\Schema;
+// use Filament\Pages\Auth\EditProfile as BaseEditProfile;
+use Filament\Pages\Page as BaseEditProfile;
 
 class EditProfile extends BaseEditProfile
 {
-    /**
-     * Build the edit profile form schema while retaining Filament v4 compatibility.
-     */
-    public function form(Schema $schema): Schema
+    public function form(Form $form): Form
     {
-        return $schema
-            ->components([
+        return $form
+            ->schema([
                 Section::make(__('admin.profile.personal_information'))
                     ->description(__('admin.profile.personal_information_description'))
-                    ->components([
+                    ->schema([
                         Grid::make(2)
-                            ->components([
+                            ->schema([
                                 TextInput::make('first_name')
                                     ->label(__('admin.profile.first_name'))
                                     ->maxLength(255)
@@ -55,10 +51,6 @@ class EditProfile extends BaseEditProfile
                                 'other'  => __('admin.gender.other'),
                             ])
                             ->native(false),
-                        SupportFlatpickr::makeDate('birth_date')
-                            ->label(__('admin.profile.birth_date'))
-                            ->displayFormat('Y-m-d')
-                            ->maxDate(now()),
                         FileUpload::make('avatar_url')
                             ->label(__('admin.profile.avatar'))
                             ->image()
@@ -72,7 +64,7 @@ class EditProfile extends BaseEditProfile
                     ->columns(2),
                 Section::make(__('admin.profile.professional_information'))
                     ->description(__('admin.profile.professional_information_description'))
-                    ->components([
+                    ->schema([
                         TextInput::make('company')
                             ->label(__('admin.profile.company'))
                             ->maxLength(255),
@@ -91,7 +83,7 @@ class EditProfile extends BaseEditProfile
                     ->columns(2),
                 Section::make(__('admin.profile.preferences'))
                     ->description(__('admin.profile.preferences_description'))
-                    ->components([
+                    ->schema([
                         Select::make('preferred_locale')
                             ->label(__('admin.profile.preferred_language'))
                             ->options([
@@ -120,7 +112,7 @@ class EditProfile extends BaseEditProfile
                     ->columns(2),
                 Section::make(__('admin.profile.security'))
                     ->description(__('admin.profile.security_description'))
-                    ->components([
+                    ->schema([
                         TextInput::make('password')
                             ->label(__('admin.profile.new_password'))
                             ->password()

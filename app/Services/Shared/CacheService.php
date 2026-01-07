@@ -222,12 +222,12 @@ final class CacheService
     /**
      * Cache a paginated result with optimized serialization.
      *
-     * @param  array<int, string> $tags
+     * @param array<int, string> $tags
      */
     public function rememberPaginator(string $key, Closure $callback, ?int $ttl = null, array $tags = []): LengthAwarePaginator
     {
         $cacheKey = "paginator:{$key}";
-        
+
         $cached = $this->supportsTags && $tags !== []
             ? Cache::tags($tags)->get($cacheKey)
             : Cache::get($cacheKey);
@@ -237,10 +237,10 @@ final class CacheService
         }
 
         $result = $callback();
-        
+
         if ($result instanceof LengthAwarePaginator) {
             $optimized = SerializationOptimizer::optimizePaginator($result);
-            
+
             if ($this->supportsTags && $tags !== []) {
                 Cache::tags($tags)->put($cacheKey, $optimized, $ttl ?? self::DEFAULT_TTL);
             } else {
@@ -254,12 +254,12 @@ final class CacheService
     /**
      * Cache a collection with optimized serialization.
      *
-     * @param  array<int, string> $tags
+     * @param array<int, string> $tags
      */
     public function rememberCollection(string $key, Closure $callback, ?int $ttl = null, array $tags = []): Collection|EloquentCollection
     {
         $cacheKey = "collection:{$key}";
-        
+
         $cached = $this->supportsTags && $tags !== []
             ? Cache::tags($tags)->get($cacheKey)
             : Cache::get($cacheKey);
@@ -269,10 +269,10 @@ final class CacheService
         }
 
         $result = $callback();
-        
+
         if ($result instanceof Collection || $result instanceof EloquentCollection) {
             $optimized = SerializationOptimizer::optimizeCollection($result);
-            
+
             if ($this->supportsTags && $tags !== []) {
                 Cache::tags($tags)->put($cacheKey, $optimized, $ttl ?? self::DEFAULT_TTL);
             } else {

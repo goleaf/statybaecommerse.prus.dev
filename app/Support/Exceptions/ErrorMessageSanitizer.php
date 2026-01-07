@@ -73,16 +73,16 @@ final class ErrorMessageSanitizer
         if (str_starts_with($filePath, $basePath)) {
             $filePath = str_replace($basePath, '[APP_ROOT]', $filePath);
         }
-        
+
         // Also handle common server paths
         $commonPaths = [
-            '/var/www/html' => '[APP_ROOT]',
-            '/home/forge' => '[APP_ROOT]',
-            '/var/www' => '[APP_ROOT]',
+            '/var/www/html'     => '[APP_ROOT]',
+            '/home/forge'       => '[APP_ROOT]',
+            '/var/www'          => '[APP_ROOT]',
             'C:\\xampp\\htdocs' => '[APP_ROOT]',
-            'C:\\wamp\\www' => '[APP_ROOT]',
+            'C:\\wamp\\www'     => '[APP_ROOT]',
         ];
-        
+
         foreach ($commonPaths as $path => $replacement) {
             if (str_starts_with($filePath, $path)) {
                 $filePath = str_replace($path, $replacement, $filePath);

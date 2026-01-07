@@ -52,7 +52,7 @@ final class EmailCampaign extends Model
         // that does not exist, effectively hiding every campaign record. Opt out of that
         // behaviour by leaving the status hint disabled so the global scope only checks
         // the `is_active` flag and campaigns remain queryable.
-        'status'    => false,
+        'status' => false,
     ];
 
     /**
@@ -98,7 +98,6 @@ final class EmailCampaign extends Model
         'completed_at',
         'is_active',
         'status',
-        'template_id',
         'created_by',
         'settings',
         'metadata',
@@ -150,14 +149,6 @@ final class EmailCampaign extends Model
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
-    }
-
-    /**
-     * Handle template functionality with proper error handling.
-     */
-    public function template(): BelongsTo
-    {
-        return $this->belongsTo(NotificationTemplate::class, 'template_id');
     }
 
     /**

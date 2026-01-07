@@ -15,9 +15,6 @@ use App\Support\Cache\TagAwareCache;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Schemas\Concerns\InteractsWithSchemas;
-use Filament\Schemas\Contracts\HasSchemas;
-use Filament\Schemas\Schema;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
@@ -42,10 +39,8 @@ use Livewire\Component;
  * @property-read EloquentCollection<int, Brand> $brands
  * @property-read EloquentCollection<int, Collection> $collections
  */
-final class Index extends Component implements HasSchemas
+final class Index extends Component
 {
-    use InteractsWithSchemas;
-
     public function __construct(
         private readonly FacetCountingService $facetCountingService
     ) {

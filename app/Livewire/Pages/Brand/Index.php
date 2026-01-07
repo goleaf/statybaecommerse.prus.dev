@@ -8,9 +8,6 @@ use App\Livewire\Pages\AbstractPageComponent;
 use App\Models\Brand;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Schemas\Concerns\InteractsWithSchemas;
-use Filament\Schemas\Contracts\HasSchemas;
-use Filament\Schemas\Schema;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Url;
@@ -25,9 +22,8 @@ use Livewire\WithPagination;
  * @property string $search
  * @property string $sortBy
  */
-final class Index extends AbstractPageComponent implements HasSchemas
+final class Index extends AbstractPageComponent
 {
-    use InteractsWithSchemas;
     use WithPagination;
 
     #[Url(except: '')]

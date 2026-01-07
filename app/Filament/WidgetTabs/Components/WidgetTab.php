@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\WidgetTabs\Components;
 
@@ -8,11 +10,11 @@ use App\Filament\WidgetTabs\Components\Concerns\HasPercentage;
 use App\Filament\WidgetTabs\Components\Concerns\HasPrecision;
 use App\Filament\WidgetTabs\Components\Concerns\HasTheme;
 use App\Filament\WidgetTabs\Components\Concerns\HasValue;
+use Closure;
 use Filament\Support\Components\Component;
 use Filament\Support\Concerns\EvaluatesClosures;
 use Filament\Support\Concerns\HasExtraAttributes;
 use Illuminate\Database\Eloquent\Builder;
-use Closure;
 
 class WidgetTab extends Component
 {
@@ -86,7 +88,7 @@ class WidgetTab extends Component
 
         /** @var Builder<\Illuminate\Database\Eloquent\Model>|null $result */
         $result = $this->evaluate($this->modifyQueryUsing, [
-            'query' => $query,
+            'query'   => $query,
             'builder' => $query,
         ]);
 

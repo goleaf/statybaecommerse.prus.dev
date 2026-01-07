@@ -13,12 +13,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 /**
  * Tag
  *
- * @property int $id
- * @property string $name
- * @property string $slug
- * @property string|null $color
- * @property string|null $description
- * @property string $type
+ * @property int                             $id
+ * @property string                          $name
+ * @property string                          $slug
+ * @property string|null                     $color
+ * @property string|null                     $description
+ * @property string                          $type
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  *
@@ -124,7 +124,7 @@ final class Tag extends Model
     public function getTaggedModels(): array
     {
         $taggables = $this->taggables()->with('taggable')->get();
-        
+
         return $taggables->groupBy('taggable_type')
             ->map(function ($group) {
                 return $group->pluck('taggable');

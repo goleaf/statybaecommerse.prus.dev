@@ -4,50 +4,39 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
-use App\Filament\Tables\Concerns\ConfiguresToggleableTableLayout;
 use App\Models\User;
-use BackedEnum;
 use Filament\Actions\Action;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Pages\Page;
-use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
-use Hydrat\TableLayoutToggle\Concerns\HasToggleableTable;
-use Illuminate\Contracts\Support\Htmlable;
 
 final class UserImpersonation extends Page implements HasTable
 {
-    use ConfiguresToggleableTableLayout;
-    use HasToggleableTable;
     use InteractsWithTable;
 
-    /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations while declaring
-     * the accepted union type via PHPDoc for downstream analyzers.
-     */
-//    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-user';
+    protected string $view = 'filament.pages.user-impersonation';
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    public static function getNavigationIcon(): string
     {
         return 'heroicon-o-user';
     }
 
-    public static function getNavigationGroup(): BackedEnum|string|null
+    public static function getNavigationGroup(): ?string
     {
-        return 'System'; // Keep impersonation tools alongside other system controls.
+        return 'System';
     }
 
     protected static ?string $title = 'User Impersonation';
 
     protected static ?string $slug = 'user-impersonation';
 
-    protected string $view = 'filament.pages.user-impersonation';
-
     public function table(Table $table): Table
     {
-        // Configure the Filament table definition for the resource.
         $table = $table
             ->query(User::query()->where('is_admin', false))
             ->columns([
@@ -63,9 +52,9 @@ final class UserImpersonation extends Page implements HasTable
                     }),
                 Action::make('send_notification')
                     ->form([
-                        Tables\Components\TextInput::make('title')->required(),
-                        Tables\Components\Textarea::make('message')->required(),
-                        Tables\Components\Select::make('type')->options([
+                        TextInput::make('title')->required(),
+                        Textarea::make('message')->required(),
+                        Select::make('type')->options([
                             'info'    => 'Info',
                             'success' => 'Success',
                             'warning' => 'Warning',
@@ -81,6 +70,6 @@ final class UserImpersonation extends Page implements HasTable
                     }),
             ]);
 
-        return $this->applyToggleableTableLayout($table); // Preserve stored table layout preferences.
+        return $this->applyToggleableTableLayout($table);
     }
 }

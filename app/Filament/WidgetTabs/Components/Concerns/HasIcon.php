@@ -1,9 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\WidgetTabs\Components\Concerns;
 
-use Filament\Support\Enums\IconSize;
 use Closure;
+use Filament\Support\Enums\IconSize;
 
 trait HasIcon
 {

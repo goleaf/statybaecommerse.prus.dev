@@ -4,273 +4,103 @@ declare(strict_types=1);
 
 namespace App\Enums;
 
-use App\Contracts\EnumInterface;
-use Illuminate\Support\Collection;
-
-/**
- * NavigationGroup
- *
- * Enumeration defining a set of named constants with type safety.
- */
-enum NavigationGroup: string implements EnumInterface
+enum NavigationGroup: string
 {
-    case Referral = 'Referral System';
-    case Products = 'Products';
-    case Orders = 'Orders';
-    case Users = 'Users';
-    case Settings = 'Settings';
-    case Analytics = 'Analytics';
-    case Content = 'Content';
-    case ContentManagement = 'Content Management';
-    case System = 'System';
-    case Marketing = 'Marketing';
-    case Inventory = 'Inventory';
-    case Reports = 'Reports';
-    case Locations = 'Locations';
-    case Discounts = 'Discounts';
-    case Campaigns = 'Campaigns';
-    case News = 'News';
+    case UserManagement = 'user-management';
+    case ContentManagement = 'content-management';
+    case Ecommerce = 'ecommerce';
+    case System = 'system';
+    case Analytics = 'analytics';
+    case Marketing = 'marketing';
+    case Reports = 'reports';
+    case Settings = 'settings';
+
+    // Additional cases used in resources
+    case Users = 'users';
+    case Products = 'products';
+    case Orders = 'orders';
+    case Inventory = 'inventory';
+    case Content = 'content';
+    case Locations = 'locations';
+    case Discounts = 'discounts';
+    case Campaigns = 'campaigns';
+    case News = 'news';
+    case Referral = 'referral';
+
+    public function getLabel(): string
+    {
+        return match ($this) {
+            self::UserManagement    => __('navigation_groups.user_management'),
+            self::ContentManagement => __('navigation_groups.content_management'),
+            self::Ecommerce         => __('navigation_groups.ecommerce'),
+            self::System            => __('navigation_groups.system'),
+            self::Analytics         => __('navigation_groups.analytics'),
+            self::Marketing         => __('navigation_groups.marketing'),
+            self::Reports           => __('navigation_groups.reports'),
+            self::Settings          => __('navigation_groups.settings'),
+            self::Users             => __('navigation_groups.users'),
+            self::Products          => __('navigation_groups.products'),
+            self::Orders            => __('navigation_groups.orders'),
+            self::Inventory         => __('navigation_groups.inventory'),
+            self::Content           => __('navigation_groups.content'),
+            self::Locations         => __('navigation_groups.locations'),
+            self::Discounts         => __('navigation_groups.discounts'),
+            self::Campaigns         => __('navigation_groups.campaigns'),
+            self::News              => __('navigation_groups.news'),
+            self::Referral          => __('navigation_groups.referral'),
+        };
+    }
 
     public function label(): string
     {
+        return $this->getLabel();
+    }
+
+    public function getIcon(): string
+    {
         return match ($this) {
-            self::Referral          => __('translations.nav_group_referral'),
-            self::Products          => __('translations.nav_group_products'),
-            self::Orders            => __('translations.nav_group_orders'),
-            self::Users             => __('translations.nav_group_users'),
-            self::Settings          => __('translations.nav_group_settings'),
-            self::Analytics         => __('translations.nav_group_analytics'),
-            self::Content           => __('translations.nav_group_content'),
-            self::ContentManagement => __('translations.nav_group_content_management'),
-            self::System            => __('translations.nav_group_system'),
-            self::Marketing         => __('translations.nav_group_marketing'),
-            self::Inventory         => __('translations.nav_group_inventory'),
-            self::Reports           => __('translations.nav_group_reports'),
-            self::Locations         => __('translations.nav_group_locations'),
-            self::Discounts         => __('translations.nav_group_discounts'),
-            self::Campaigns         => __('translations.nav_group_campaigns'),
-            self::News              => __('news.title'),
+            self::UserManagement    => 'heroicon-o-users',
+            self::ContentManagement => 'heroicon-o-document-text',
+            self::Ecommerce         => 'heroicon-o-shopping-cart',
+            self::System            => 'heroicon-o-cog-6-tooth',
+            self::Analytics         => 'heroicon-o-chart-bar',
+            self::Marketing         => 'heroicon-o-megaphone',
+            self::Reports           => 'heroicon-o-document-chart-bar',
+            self::Settings          => 'heroicon-o-adjustments-horizontal',
+            self::Users             => 'heroicon-o-users',
+            self::Products          => 'heroicon-o-cube',
+            self::Orders            => 'heroicon-o-shopping-bag',
+            self::Inventory         => 'heroicon-o-archive-box',
+            self::Content           => 'heroicon-o-document-text',
+            self::Locations         => 'heroicon-o-globe-alt',
+            self::Discounts         => 'heroicon-o-tag',
+            self::Campaigns         => 'heroicon-o-megaphone',
+            self::News              => 'heroicon-o-newspaper',
+            self::Referral          => 'heroicon-o-gift',
         };
     }
 
-    public function description(): string
+    public function getColor(): string
     {
         return match ($this) {
-            self::Referral          => __('translations.nav_group_referral_description'),
-            self::Products          => __('translations.nav_group_products_description'),
-            self::Orders            => __('translations.nav_group_orders_description'),
-            self::Users             => __('translations.nav_group_users_description'),
-            self::Settings          => __('translations.nav_group_settings_description'),
-            self::Analytics         => __('translations.nav_group_analytics_description'),
-            self::Content           => __('translations.nav_group_content_description'),
-            self::ContentManagement => __('translations.nav_group_content_management_description'),
-            self::System            => __('translations.nav_group_system_description'),
-            self::Marketing         => __('translations.nav_group_marketing_description'),
-            self::Inventory         => __('translations.nav_group_inventory_description'),
-            self::Reports           => __('translations.nav_group_reports_description'),
-            self::Locations         => __('translations.nav_group_locations_description'),
-            self::Discounts         => __('translations.nav_group_discounts_description'),
-            self::Campaigns         => __('translations.nav_group_campaigns_description'),
-            self::News              => __('news.navigation_group'),
-        };
-    }
-
-    public function icon(): string
-    {
-        return match ($this) {
-            self::Referral          => 'gift',
-            self::Products          => 'cube',
-            self::Orders            => 'shopping-bag',
-            self::Users             => 'users',
-            self::Settings          => 'cog-6-tooth',
-            self::Analytics         => 'chart-bar',
-            self::Content           => 'document-text',
-            self::ContentManagement => 'document-duplicate',
-            self::System            => 'computer-desktop',
-            self::Marketing         => 'megaphone',
-            self::Inventory         => 'archive-box',
-            self::Reports           => 'document-chart-bar',
-            self::Locations         => 'globe-alt',
-            self::Discounts         => 'tag',
-            self::Campaigns         => 'megaphone',
-            self::News              => 'newspaper',
-        };
-    }
-
-    public function color(): string
-    {
-        return match ($this) {
-            self::Referral          => 'purple',
+            self::UserManagement    => 'blue',
+            self::ContentManagement => 'green',
+            self::Ecommerce         => 'orange',
+            self::System            => 'gray',
+            self::Analytics         => 'purple',
+            self::Marketing         => 'pink',
+            self::Reports           => 'indigo',
+            self::Settings          => 'slate',
+            self::Users             => 'blue',
             self::Products          => 'blue',
             self::Orders            => 'green',
-            self::Users             => 'indigo',
-            self::Settings          => 'gray',
-            self::Analytics         => 'yellow',
-            self::Content           => 'pink',
-            self::ContentManagement => 'purple',
-            self::System            => 'red',
-            self::Marketing         => 'orange',
             self::Inventory         => 'teal',
-            self::Reports           => 'cyan',
+            self::Content           => 'green',
             self::Locations         => 'emerald',
             self::Discounts         => 'rose',
             self::Campaigns         => 'orange',
             self::News              => 'blue',
+            self::Referral          => 'purple',
         };
-    }
-
-    public function priority(): int
-    {
-        return match ($this) {
-            self::Products          => 1,
-            self::Orders            => 2,
-            self::Users             => 3,
-            self::Inventory         => 4,
-            self::Locations         => 5,
-            self::Discounts         => 6,
-            self::Campaigns         => 7,
-            self::News              => 8,
-            self::Marketing         => 9,
-            self::Analytics         => 10,
-            self::Reports           => 11,
-            self::Content           => 12,
-            self::ContentManagement => 13,
-            self::Referral          => 14,
-            self::Settings          => 15,
-            self::System            => 16,
-        };
-    }
-
-    public function isCore(): bool
-    {
-        return match ($this) {
-            self::Products, self::Orders, self::Users, self::Inventory, self::Locations, self::Discounts, self::Campaigns, self::News, self::ContentManagement => true,
-            default => false,
-        };
-    }
-
-    public function isAdminOnly(): bool
-    {
-        return match ($this) {
-            self::System, self::Analytics, self::Reports => true,
-            default => false,
-        };
-    }
-
-    public function isPublic(): bool
-    {
-        return match ($this) {
-            self::Products, self::Content, self::ContentManagement, self::Marketing, self::Locations, self::Discounts, self::Campaigns, self::News => true,
-            default => false,
-        };
-    }
-
-    public function requiresPermission(): bool
-    {
-        return match ($this) {
-            self::Users, self::Settings, self::System, self::Analytics, self::Reports => true,
-            default => false,
-        };
-    }
-
-    public function getPermission(): string
-    {
-        return match ($this) {
-            self::Users     => 'manage_users',
-            self::Settings  => 'manage_settings',
-            self::System    => 'manage_system',
-            self::Analytics => 'view_analytics',
-            self::Reports   => 'view_reports',
-            default         => 'view_' . strtolower($this->value),
-        };
-    }
-
-    public static function options(): array
-    {
-        return collect(self::cases())
-            ->sortBy(fn (self $case) => $case->priority())
-            ->mapWithKeys(fn (self $case): array => [$case->value => $case->label()])
-            ->toArray();
-    }
-
-    public static function optionsWithDescriptions(): array
-    {
-        return collect(self::cases())
-            ->sortBy(fn (self $case) => $case->priority())
-            ->mapWithKeys(function (self $case): array {
-                return [
-                    $case->value => [
-                        'label'               => $case->label(),
-                        'description'         => $case->description(),
-                        'icon'                => $case->icon(),
-                        'color'               => $case->color(),
-                        'is_core'             => $case->isCore(),
-                        'is_admin_only'       => $case->isAdminOnly(),
-                        'is_public'           => $case->isPublic(),
-                        'requires_permission' => $case->requiresPermission(),
-                        'permission'          => $case->getPermission(),
-                    ],
-                ];
-            })
-            ->toArray();
-    }
-
-    public static function core(): Collection
-    {
-        return collect(self::cases())->filter(fn ($case) => $case->isCore());
-    }
-
-    public static function adminOnly(): Collection
-    {
-        return collect(self::cases())->filter(fn ($case) => $case->isAdminOnly());
-    }
-
-    public static function public(): Collection
-    {
-        return collect(self::cases())->filter(fn ($case) => $case->isPublic());
-    }
-
-    public static function withPermissions(): Collection
-    {
-        return collect(self::cases())->filter(fn ($case) => $case->requiresPermission());
-    }
-
-    public static function ordered(): Collection
-    {
-        return collect(self::cases())
-            // Sort explicitly by the computed priority for deterministic ordering.
-            ->sortBy(fn (self $case) => $case->priority())
-            ->values();
-    }
-
-    /**
-     * Expose the enum cases as a collection to align with EnumInterface expectations.
-     */
-    public static function collection(): Collection
-    {
-        return collect(self::cases());
-    }
-
-    public static function fromLabel(string $label): ?static
-    {
-        return collect(self::cases())->first(fn ($case) => $case->label() === $label);
-    }
-
-    public static function values(): array
-    {
-        return array_map(
-            static fn (self $case): string => $case->value,
-            self::cases(),
-        );
-    }
-
-    public static function labels(): array
-    {
-        return collect(self::cases())->map(fn ($case) => $case->label())->toArray();
-    }
-
-    public function toArray(): array
-    {
-        return ['value' => $this->value, 'label' => $this->label(), 'description' => $this->description(), 'icon' => $this->icon(), 'color' => $this->color(), 'priority' => $this->priority(), 'is_core' => $this->isCore(), 'is_admin_only' => $this->isAdminOnly(), 'is_public' => $this->isPublic(), 'requires_permission' => $this->requiresPermission(), 'permission' => $this->getPermission()];
     }
 }

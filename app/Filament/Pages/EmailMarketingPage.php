@@ -14,9 +14,9 @@ final class EmailMarketingPage extends Page
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations while documenting
      * the accepted value types for static analysis and future contributors.
      */
-//    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-envelope-open';
+    //    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-envelope-open';
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    public static function getNavigationIcon(): string|Htmlable|null
     {
         return 'heroicon-o-envelope-open';
     }

@@ -55,7 +55,7 @@ final class UserController extends Controller
     {
         $user = Auth::user();
         // Get user statistics
-        $stats = ['orders_count' => $user->orders()->count(), 'total_spent' => $user->total_spent, 'reviews_count' => $user->reviews()->count(), 'wishlist_count' => $user->wishlist()->count(), 'addresses_count' => $user->addresses()->count()];
+        $stats = ['orders_count' => $user->orders()->count(), 'total_spent' => $user->total_spent, 'reviews_count' => $user->reviews()->count(), 'addresses_count' => $user->addresses()->count()];
         // Get recent orders
         $recentOrders = $user->orders()->with(['items.product'])->latest()->limit(5)->get()->skipWhile(function ($order) {
             // Skip orders that are not properly configured for display
@@ -212,14 +212,7 @@ final class UserController extends Controller
 
         return view('users.reviews', compact('reviews'));
     }
-
-    /**
-     * Handle wishlist functionality with proper error handling.
-     */
-    public function wishlist(): View
-    {
-        $user = Auth::user();
-        $wishlist = $user->wishlist()->with(['images', 'brand', 'category'])->latest()->paginate(12);
+}
 
         return view('users.wishlist', compact('wishlist'));
     }

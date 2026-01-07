@@ -88,29 +88,6 @@ abstract class BasePageComponent extends Component
     }
 
     /**
-     * Handle toggleWishlist functionality with proper error handling.
-     */
-    public function toggleWishlist(int $productId): void
-    {
-        if (! auth()->check()) {
-            $this->redirect(route('login'));
-
-            return;
-        }
-        $user = auth()->user();
-        $wishlist = $user->wishlist ?? [];
-        if (in_array($productId, $wishlist)) {
-            $wishlist = array_values(array_filter($wishlist, fn ($id) => $id !== $productId));
-            $this->notifySuccess($this->trans('shared.product_removed_from_wishlist'));
-        } else {
-            $wishlist[] = $productId;
-            $this->notifySuccess($this->trans('shared.product_added_to_wishlist'));
-        }
-        $user->update(['wishlist' => $wishlist]);
-        $this->dispatch('wishlist-updated');
-    }
-
-    /**
      * Handle addToCompare functionality with proper error handling.
      */
     public function addToCompare(int $productId): void

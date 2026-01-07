@@ -114,24 +114,23 @@ final class Inventory extends Model
         $app = Facade::getFacadeApplication();
 
         if (! $app instanceof Container) {
-            $app = new Container();
+            $app = new Container;
             Container::setInstance($app);
             Facade::setFacadeApplication($app);
         }
 
         if (! $app->bound('config')) {
             $app->instance('config', new Repository([
-                'app'          => ['fallback_locale' => 'en'],
-                'filesystems'  => ['default' => 'public'],
+                'app'         => ['fallback_locale' => 'en'],
+                'filesystems' => ['default' => 'public'],
             ]));
         }
 
         $connection = new Connection(null);
 
-        self::setConnectionResolver(new class($connection) implements ConnectionResolverInterface {
-            public function __construct(private Connection $connection)
-            {
-            }
+        self::setConnectionResolver(new class($connection) implements ConnectionResolverInterface
+        {
+            public function __construct(private Connection $connection) {}
 
             public function connection($name = null): Connection
             {

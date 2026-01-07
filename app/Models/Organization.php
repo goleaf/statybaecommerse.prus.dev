@@ -18,13 +18,13 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 /**
  * Organization
  *
- * @property int $id
- * @property string $name
- * @property string $slug
- * @property string|null $description
- * @property string $type
- * @property bool $is_active
- * @property array|null $settings
+ * @property int                             $id
+ * @property string                          $name
+ * @property string                          $slug
+ * @property string|null                     $description
+ * @property string                          $type
+ * @property bool                            $is_active
+ * @property array|null                      $settings
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  *
@@ -47,7 +47,7 @@ final class Organization extends Model
 
     protected $casts = [
         'is_active' => 'boolean',
-        'settings' => 'array',
+        'settings'  => 'array',
     ];
 
     // Relationships
@@ -192,10 +192,10 @@ final class Organization extends Model
     public function addUser(User $user, string $role = 'member', array $permissions = []): void
     {
         $this->users()->attach($user->id, [
-            'role' => $role,
+            'role'        => $role,
             'permissions' => $permissions,
-            'is_active' => true,
-            'joined_at' => now(),
+            'is_active'   => true,
+            'joined_at'   => now(),
         ]);
     }
 
@@ -206,7 +206,7 @@ final class Organization extends Model
     {
         $this->users()->updateExistingPivot($user->id, [
             'is_active' => false,
-            'left_at' => now(),
+            'left_at'   => now(),
         ]);
     }
 }

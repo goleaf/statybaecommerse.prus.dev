@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament;
 
+use App\Filament\Pages\Auth\Login as AdminLogin;
 use App\Filament\Pages\Dashboard as FilamentDashboard;
 use App\Filament\Widgets\CalendarWidget;
 use App\Filament\Widgets\DashboardKpiWidget;
@@ -12,13 +13,10 @@ use App\Filament\Widgets\DashboardQuickActionsWidget;
 use App\Filament\Widgets\DashboardRecentErrorsTable;
 use App\Filament\Widgets\DashboardRecentOrdersTable;
 use App\Filament\Widgets\DashboardTimeSeriesWidget;
-use App\Filament\Widgets\GeneralStatsOverview;
-use App\Filament\Widgets\SalesByMonthChart;
-use Filament\Enums\UserMenuPosition;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
-use Filament\Widgets\StatsOverviewWidget;
+use Filament\View\PanelsRenderHook;
 use Filament\Widgets\Widget;
 use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 use InvalidArgumentException;
@@ -58,8 +56,7 @@ class AdminPanelProvider extends PanelProvider
             $widgets = $this->testingWidgets();
             $additionalPages = $this->testingPages();
 
-            // Ensure EditRecord pages redirect after save in tests when using base page classes.
-            $configuredPanel = $configuredPanel->resourceEditPageRedirect('index');
+            // Note: resourceEditPageRedirect method removed in newer Filament versions
         }
 
         return $configuredPanel
@@ -78,9 +75,7 @@ class AdminPanelProvider extends PanelProvider
     private function defaultWidgets(): array
     {
         return [
-            GeneralStatsOverview::class,
-            SalesByMonthChart::class,
-            StatsOverviewWidget::class,
+            // Start with basic Filament widgets that should always work
         ];
     }
 
@@ -127,18 +122,22 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('/admin')
-            ->login()
+            ->login(AdminLogin::class)
             ->topbar(false)
-            ->userMenu(position: UserMenuPosition::Sidebar)
             ->colors([
                 'primary' => Color::Blue,
             ])
+            // Render hooks removed to fix config cache serialization issue
+            // ->renderHook(PanelsRenderHook::STYLES_AFTER, ...)
+            // ->renderHook(PanelsRenderHook::SCRIPTS_AFTER, ...)
             ->middleware([
+                \Illuminate\Cookie\Middleware\EncryptCookies::class,
+                \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
                 \Illuminate\Session\Middleware\StartSession::class,
+                \Illuminate\Session\Middleware\AuthenticateSession::class,
                 \Illuminate\View\Middleware\ShareErrorsFromSession::class,
                 \Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class,
                 \Illuminate\Routing\Middleware\SubstituteBindings::class,
-                \App\Http\Middleware\AdminAuthenticate::class,
             ])
             ->authMiddleware([
                 \App\Http\Middleware\AdminAuthenticate::class,

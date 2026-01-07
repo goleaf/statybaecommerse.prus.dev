@@ -65,41 +65,6 @@ final class ProductCard extends Component
     }
 
     /**
-     * Handle addToWishlist functionality with proper error handling.
-     */
-    public function addToWishlist(): void
-    {
-        $this->dispatch('add-to-wishlist', productId: $this->product->id);
-        $this->dispatch('notify', ['type' => 'success', 'message' => 'Produktas pridėtas į pageidavimų sąrašą!']);
-    }
-
-    /**
-     * Handle toggleWishlist functionality with proper error handling.
-     */
-    public function toggleWishlist(): void
-    {
-        if (! auth()->check()) {
-            $this->dispatch('notify', ['type' => 'warning', 'message' => 'Norėdami pridėti produktą į pageidavimų sąrašą, turite prisijungti.']);
-
-            return;
-        }
-        $user = auth()->user();
-        $wishlist = $user->wishlists()->where('is_default', true)->first();
-        if (! $wishlist) {
-            $wishlist = $user->wishlists()->create(['name' => 'My Wishlist', 'is_default' => true, 'is_public' => false]);
-        }
-        if ($wishlist->hasProduct($this->product->id)) {
-            $wishlist->removeProduct($this->product->id);
-            $message = 'Produktas pašalintas iš pageidavimų sąrašo!';
-        } else {
-            $wishlist->addProduct($this->product->id);
-            $message = 'Produktas pridėtas į pageidavimų sąrašą!';
-        }
-        $this->dispatch('wishlist-updated');
-        $this->dispatch('notify', ['type' => 'success', 'message' => $message]);
-    }
-
-    /**
      * Handle toggleComparison functionality with proper error handling.
      */
     public function toggleComparison(): void

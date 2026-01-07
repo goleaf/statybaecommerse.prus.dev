@@ -10,8 +10,8 @@ use App\Support\Monitoring\QueueMetricsStore;
 use Illuminate\Cache\Events\CacheHit;
 use Illuminate\Cache\Events\CacheMissed;
 use Illuminate\Contracts\Cache\Factory as CacheFactory;
-use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\QueueManager;
@@ -37,7 +37,7 @@ final class MonitoringServiceProvider extends ServiceProvider
             return new QueueMetricsStore($repository, (string) config('observability.metrics.queue_key'));
         });
 
-        $this->app->singleton(ApplicationMetrics::class, fn($app): ApplicationMetrics => new ApplicationMetrics(
+        $this->app->singleton(ApplicationMetrics::class, fn ($app): ApplicationMetrics => new ApplicationMetrics(
             $app->make(CacheMetricsStore::class),
             $app->make(QueueMetricsStore::class),
             $app->make(QueueManager::class),

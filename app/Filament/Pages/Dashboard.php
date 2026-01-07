@@ -13,14 +13,18 @@ use Illuminate\Support\Facades\Gate;
 
 class Dashboard extends BaseDashboard
 {
+    protected static string $routePath = 'dashboard';
+
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static ?int $navigationSort = 1;
 
     /**
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations while documenting
      * the supported union types via PHPDoc for tooling assistance.
      */
-//    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-home';
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    //    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-home';
+    public static function getNavigationIcon(): string|Htmlable|null
     {
         return 'heroicon-o-home';
     }
@@ -46,13 +50,7 @@ class Dashboard extends BaseDashboard
     public function getWidgets(): array
     {
         return [
-            \App\Filament\Widgets\DashboardKpiWidget::class,
-            \App\Filament\Widgets\DashboardTimeSeriesWidget::class,
-            \App\Filament\Widgets\DashboardRecentOrdersTable::class,
-            \App\Filament\Widgets\DashboardLowStockTable::class,
-            \App\Filament\Widgets\DashboardRecentErrorsTable::class,
-            \App\Filament\Widgets\DashboardQuickActionsWidget::class,
-            \App\Filament\Widgets\CalendarWidget::class,
+            // Start with no custom widgets to ensure basic functionality
         ];
     }
 

@@ -1,18 +1,20 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
 use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\Translatable\HasTranslations;
 use JsonSerializable;
+use Spatie\Translatable\HasTranslations;
 use Stringable;
 
 /**
@@ -62,12 +64,12 @@ final class SeoData extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'keywords' => 'array',
-        'meta' => 'array',
-        'meta_tags' => 'array',
+        'keywords'        => 'array',
+        'meta'            => 'array',
+        'meta_tags'       => 'array',
         'structured_data' => 'array',
-        'no_index' => 'boolean',
-        'no_follow' => 'boolean',
+        'no_index'        => 'boolean',
+        'no_follow'       => 'boolean',
     ];
 
     public array $translatable = ['title', 'description'];
@@ -121,11 +123,11 @@ final class SeoData extends Model
             }
 
             // Map friendly fields if provided
-            if (array_key_exists('url', $model->attributes) && !empty($model->attributes['url'])) {
+            if (array_key_exists('url', $model->attributes) && ! empty($model->attributes['url'])) {
                 $model->canonical_url = (string) $model->attributes['url'];
             }
             if (array_key_exists('is_indexed', $model->attributes)) {
-                $model->no_index = !(bool) $model->attributes['is_indexed'];
+                $model->no_index = ! (bool) $model->attributes['is_indexed'];
                 unset($model->attributes['is_indexed']);
             }
 
@@ -135,10 +137,10 @@ final class SeoData extends Model
             }
 
             // Allow detached records (not morphing to another model)
-            if (!array_key_exists('seoable_type', $model->attributes)) {
+            if (! array_key_exists('seoable_type', $model->attributes)) {
                 $model->seoable_type = 'page';
             }
-            if (!array_key_exists('seoable_id', $model->attributes)) {
+            if (! array_key_exists('seoable_id', $model->attributes)) {
                 $model->seoable_id = null;
             }
         });
@@ -150,7 +152,7 @@ final class SeoData extends Model
     protected function keywords(): Attribute
     {
         return Attribute::make(
-            get: fn(mixed $value): array => $this->normalizeKeywordsValue($value),
+            get: fn (mixed $value): array => $this->normalizeKeywordsValue($value),
             set: function (mixed $value): string {
                 $normalized = $this->normalizeKeywordsValue($value);
 
@@ -166,8 +168,8 @@ final class SeoData extends Model
     protected function meta(): Attribute
     {
         return Attribute::make(
-            get: fn(mixed $value, array $attributes): array => $this->normalizeMetaValue($value ?? ($attributes['meta_tags'] ?? null)),
-            set: fn(mixed $value): array => ['meta_tags' => $this->normalizeMetaValue($value)],
+            get: fn (mixed $value, array $attributes): array => $this->normalizeMetaValue($value ?? ($attributes['meta_tags'] ?? null)),
+            set: fn (mixed $value): array => ['meta_tags' => $this->normalizeMetaValue($value)],
         );
     }
 
@@ -177,8 +179,8 @@ final class SeoData extends Model
     protected function slug(): Attribute
     {
         return Attribute::make(
-            get: fn(mixed $value): ?string => is_string($value) ? $value : null,
-            set: fn(mixed $value): array => [],
+            get: fn (mixed $value): ?string => is_string($value) ? $value : null,
+            set: fn (mixed $value): array => [],
         );
     }
 
@@ -203,8 +205,8 @@ final class SeoData extends Model
 
         if (is_array($value)) {
             return array_values(array_filter(
-                array_map(static fn($item): string => trim((string) $item), $value),
-                static fn($item): bool => $item !== ''
+                array_map(static fn ($item): string => trim((string) $item), $value),
+                static fn ($item): bool => $item !== ''
             ));
         }
 
@@ -397,7 +399,7 @@ final class SeoData extends Model
      */
     public function getStructuredDataJsonAttribute(): ?string
     {
-        if (!$this->structured_data) {
+        if (! $this->structured_data) {
             return null;
         }
 
@@ -418,10 +420,10 @@ final class SeoData extends Model
     public function getSeoableTypeNameAttribute(): string
     {
         return match ($this->seoable_type) {
-            Product::class => 'Product',
+            Product::class  => 'Product',
             Category::class => 'Category',
-            Brand::class => 'Brand',
-            default => class_basename($this->seoable_type),
+            Brand::class    => 'Brand',
+            default         => class_basename($this->seoable_type),
         };
     }
 
@@ -431,8 +433,8 @@ final class SeoData extends Model
     public function getLocaleNameAttribute(): string
     {
         return match ($this->locale) {
-            'lt' => 'Lietuvių',
-            'en' => 'English',
+            'lt'    => 'Lietuvių',
+            'en'    => 'English',
             default => strtoupper($this->locale),
         };
     }
@@ -554,7 +556,7 @@ final class SeoData extends Model
         return match (true) {
             $this->seo_score >= 80 => 'success',
             $this->seo_score >= 60 => 'warning',
-            default => 'danger',
+            default                => 'danger',
         };
     }
 }

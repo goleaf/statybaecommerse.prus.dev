@@ -10,15 +10,16 @@ use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\ContentLinkSearch;
 use BackedEnum;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
-use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\TextInput;
@@ -27,10 +28,9 @@ use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
 use Filament\Support\Enums\Size;
 use Filament\Support\Enums\Width;
+use Filament\Tables\Actions\Action;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Str;
 
@@ -42,9 +42,9 @@ class SliderManagement extends Page implements HasActions, HasForms
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations while stating the
      * expected union type via PHPDoc so Filament tooling remains satisfied.
      */
-//    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
+    //    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    public static function getNavigationIcon(): string|Htmlable|null
     {
         return 'heroicon-o-rectangle-stack';
     }
@@ -57,7 +57,7 @@ class SliderManagement extends Page implements HasActions, HasForms
 
     protected static ?int $navigationSort = 1;
 
-    public static function getNavigationGroup(): BackedEnum|string|null
+    public static function getNavigationGroup(): ?string
     {
         return 'Content'; // Keep slider tooling with the rest of the content curation pages.
     }
@@ -83,8 +83,8 @@ class SliderManagement extends Page implements HasActions, HasForms
             ->size(Size::Large)
             ->form([
                 Section::make(__('translations.basic_information'))
-                    ->components([
-                        Grid::make(2)->components([
+                    ->schema([
+                        Grid::make(2)->schema([
                             TextInput::make('title')
                                 ->label(__('translations.title'))
                                 ->required()
@@ -120,7 +120,7 @@ class SliderManagement extends Page implements HasActions, HasForms
                                 'amber'   => '#f59e0b',
                                 'slate'   => '#475569',
                             ]),
-                        Grid::make(3)->components([
+                        Grid::make(3)->schema([
                             TextInput::make('button_text')
                                 ->label(__('translations.button_text'))
                                 ->maxLength(255),
@@ -155,7 +155,7 @@ class SliderManagement extends Page implements HasActions, HasForms
                     ])
                     ->collapsible(),
                 Section::make(__('translations.media'))
-                    ->components([
+                    ->schema([
                         FileUpload::make('slider_image')
                             ->label(__('translations.slider_image'))
                             ->image()
@@ -178,8 +178,8 @@ class SliderManagement extends Page implements HasActions, HasForms
                     ])
                     ->collapsible(),
                 Section::make(__('translations.design'))
-                    ->components([
-                        Grid::make(3)->components([
+                    ->schema([
+                        Grid::make(3)->schema([
                             ColorPicker::make('background_color')
                                 ->label(__('translations.background_color'))
                                 ->default('#ffffff'),
@@ -190,7 +190,7 @@ class SliderManagement extends Page implements HasActions, HasForms
                                 ->label(__('translations.button_color'))
                                 ->default('#007bff'),
                         ]),
-                        Grid::make(2)->components([
+                        Grid::make(2)->schema([
                             Select::make('text_alignment')
                                 ->label(__('translations.text_alignment'))
                                 ->options([
@@ -217,8 +217,8 @@ class SliderManagement extends Page implements HasActions, HasForms
                     ])
                     ->collapsible(),
                 Section::make(__('translations.animation_settings'))
-                    ->components([
-                        Grid::make(2)->components([
+                    ->schema([
+                        Grid::make(2)->schema([
                             Select::make('animation_type')
                                 ->label(__('translations.animation_type'))
                                 ->options([
@@ -239,7 +239,7 @@ class SliderManagement extends Page implements HasActions, HasForms
                                 ->minValue(1000)
                                 ->maxValue(30000),
                         ]),
-                        Grid::make(2)->components([
+                        Grid::make(2)->schema([
                             Toggle::make('autoplay')
                                 ->label(__('translations.autoplay'))
                                 ->default(true)
@@ -260,8 +260,8 @@ class SliderManagement extends Page implements HasActions, HasForms
                     ])
                     ->collapsible(),
                 Section::make(__('translations.scheduling'))
-                    ->components([
-                        Grid::make(2)->components([
+                    ->schema([
+                        Grid::make(2)->schema([
                             SupportFlatpickr::makeDateTime('start_date')
                                 ->label(__('translations.start_date'))
                                 ->default(now()),
@@ -276,8 +276,8 @@ class SliderManagement extends Page implements HasActions, HasForms
                     ])
                     ->collapsible(),
                 Section::make(__('translations.advanced_settings'))
-                    ->components([
-                        Grid::make(2)->components([
+                    ->schema([
+                        Grid::make(2)->schema([
                             TextInput::make('sort_order')
                                 ->label(__('translations.sort_order'))
                                 ->numeric()
@@ -302,7 +302,7 @@ class SliderManagement extends Page implements HasActions, HasForms
                             ->valueLabel(__('translations.attribute_value')),
                         Repeater::make('slides')
                             ->label(__('translations.additional_slides'))
-                            ->components([
+                            ->schema([
                                 TextInput::make('title')
                                     ->label(__('translations.slide_title'))
                                     ->required(),
@@ -337,8 +337,8 @@ class SliderManagement extends Page implements HasActions, HasForms
                     ])
                     ->collapsible(),
                 Section::make(__('translations.status'))
-                    ->components([
-                        Grid::make(2)->components([
+                    ->schema([
+                        Grid::make(2)->schema([
                             Toggle::make('is_active')
                                 ->label(__('translations.is_active'))
                                 ->default(true),
@@ -604,7 +604,7 @@ class SliderManagement extends Page implements HasActions, HasForms
             ->color('gray')
             ->form([
                 Section::make(__('translations.global_settings'))
-                    ->components([
+                    ->schema([
                         Toggle::make('auto_optimize_images')
                             ->label(__('translations.auto_optimize_images'))
                             ->default(true),

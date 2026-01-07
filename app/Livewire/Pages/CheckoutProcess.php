@@ -179,9 +179,9 @@ final class CheckoutProcess extends Component
     public function validateCurrentStep(): void
     {
         match ($this->currentStep) {
-            1       => $this->validate($this->addressStepRules()),
-            2       => $this->validate($this->deliveryStepRules()),
-            3       => $this->validate([
+            1 => $this->validate($this->addressStepRules()),
+            2 => $this->validate($this->deliveryStepRules()),
+            3 => $this->validate([
                 'selectedPaymentMethod' => [
                     'required',
                     Rule::in(array_keys($this->paymentMethods)),
@@ -228,7 +228,6 @@ final class CheckoutProcess extends Component
     {
         $this->placeOrder();
     }
-
 
     /**
      * @param EloquentCollection<int, CartItem> $cartItems

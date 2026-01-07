@@ -11,18 +11,13 @@ use App\Support\Cache\CacheTagHelper;
 use App\Support\Cache\CacheTags;
 use App\Support\Cache\TagAwareCache;
 use Filament\Infolists\Components\ViewEntry;
-use Filament\Schemas\Concerns\InteractsWithSchemas;
-use Filament\Schemas\Contracts\HasSchemas;
-use Filament\Schemas\Schema;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
-final class CollectionsShowcase extends Component implements HasSchemas
+final class CollectionsShowcase extends Component
 {
-    use InteractsWithSchemas;
-
     public function mount(): void
     {
         // Mount method can be empty or contain other initialization logic

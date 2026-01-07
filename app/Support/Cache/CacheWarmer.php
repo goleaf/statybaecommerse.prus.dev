@@ -87,7 +87,7 @@ final class CacheWarmer
                 ->with(['products', 'translations'])
                 ->whereHas('products', function ($query) {
                     $query->where('is_visible', true)
-                          ->whereNotNull('published_at');
+                        ->whereNotNull('published_at');
                 })
                 ->limit(12)
                 ->get(),
@@ -136,31 +136,31 @@ final class CacheWarmer
                     'brands' => Brand::query()
                         ->whereHas('products', function ($query) {
                             $query->where('is_visible', true)
-                                  ->whereNotNull('published_at');
+                                ->whereNotNull('published_at');
                         })
                         ->withCount(['products' => function ($query) {
                             $query->where('is_visible', true)
-                                  ->whereNotNull('published_at');
+                                ->whereNotNull('published_at');
                         }])
                         ->get()
                         ->pluck('products_count', 'id')
                         ->toArray(),
-                    
+
                     'collections' => Collection::query()
                         ->where('is_visible', true)
                         ->where('is_enabled', true)
                         ->withCount(['products' => function ($query) {
                             $query->where('is_visible', true)
-                                  ->whereNotNull('published_at');
+                                ->whereNotNull('published_at');
                         }])
                         ->get()
                         ->pluck('products_count', 'id')
                         ->toArray(),
-                        
+
                     'categories' => Category::query()
                         ->withCount(['products' => function ($query) {
                             $query->where('is_visible', true)
-                                  ->whereNotNull('published_at');
+                                ->whereNotNull('published_at');
                         }])
                         ->get()
                         ->pluck('products_count', 'id')
@@ -192,7 +192,7 @@ final class CacheWarmer
         ];
 
         foreach ($criticalKeys as $key) {
-            if (!Cache::has($key)) {
+            if (! Cache::has($key)) {
                 return false;
             }
         }
@@ -206,7 +206,7 @@ final class CacheWarmer
     public function shouldUpdateCache(string $key, mixed $newData): bool
     {
         $existing = Cache::get($key);
-        
+
         if ($existing === null) {
             return true;
         }

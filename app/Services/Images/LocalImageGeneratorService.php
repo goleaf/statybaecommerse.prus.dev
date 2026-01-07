@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace App\Services\Images;
 
 use Illuminate\Support\Str;
+use Imagick;
+use ImagickDraw;
+use ImagickPixel;
 use InvalidArgumentException;
 use RuntimeException;
 use Throwable;
@@ -278,18 +281,18 @@ final class LocalImageGeneratorService
      */
     private function createImageUsingImagick(string $text, int $width, int $height, string $targetPath, string $format, array $backgroundColor, array $textColor): bool
     {
-        if (! class_exists(\Imagick::class)) {
+        if (! class_exists(Imagick::class)) {
             return false;
         }
 
         try {
-            $image = new \Imagick();
-            $image->newImage($width, $height, new \ImagickPixel($this->toRgbString($backgroundColor)));
+            $image = new Imagick;
+            $image->newImage($width, $height, new ImagickPixel($this->toRgbString($backgroundColor)));
             $image->setImageFormat($format === 'jpg' ? 'jpeg' : $format);
 
-            $draw = new \ImagickDraw();
-            $draw->setFillColor(new \ImagickPixel($this->toRgbString($textColor)));
-            $draw->setTextAlignment(\Imagick::ALIGN_CENTER);
+            $draw = new ImagickDraw;
+            $draw->setFillColor(new ImagickPixel($this->toRgbString($textColor)));
+            $draw->setTextAlignment(Imagick::ALIGN_CENTER);
             $draw->setFontSize((float) max(14, min($width, $height) / 6));
 
             $lines = $this->wrapTextForImagick($draw, $text, (float) ($width * 0.8));
@@ -340,9 +343,9 @@ final class LocalImageGeneratorService
 
         $writeResult = match ($format) {
             'jpg', 'jpeg' => imagejpeg($image, $targetPath, 85),
-            'png'         => imagepng($image, $targetPath, 6),
-            'webp'        => function_exists('imagewebp') ? imagewebp($image, $targetPath, self::WEBP_QUALITY) : false,
-            default       => false,
+            'png'   => imagepng($image, $targetPath, 6),
+            'webp'  => function_exists('imagewebp') ? imagewebp($image, $targetPath, self::WEBP_QUALITY) : false,
+            default => false,
         };
 
         imagedestroy($image);

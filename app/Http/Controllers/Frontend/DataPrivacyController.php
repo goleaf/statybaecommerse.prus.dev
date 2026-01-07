@@ -11,8 +11,6 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Review;
 use App\Models\User;
-use App\Models\UserWishlist;
-use App\Models\WishlistItem;
 use App\Support\Audit\AdminActivityLogger;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Database\Eloquent\Collection;
@@ -107,70 +105,6 @@ final class DataPrivacyController extends Controller
                 'updated_at',
             ]);
 
-        /** @var Collection<int, UserWishlist> $wishlists */
-        $wishlists = UserWishlist::query()
-            ->withTrashed()
-            ->with([
-                'items' => static function ($itemQuery): void {
-                    /** @var \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\WishlistItem, \App\Models\UserWishlist> $itemQuery */
-                    $itemQuery
-                        ->select([
-                            'id',
-                            'wishlist_id',
-                            'product_id',
-                            'variant_id',
-                            'quantity',
-                            'notes',
-                            'created_at',
-                            'updated_at',
-                        ])
-                        ->with(['product' => static function ($productQuery): void {
-                            /** @var \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Product, \App\Models\WishlistItem> $productQuery */
-                            $productQuery->select([
-                                'id',
-                                'name',
-                                'slug',
-                            ]);
-                        }]);
-                },
-            ])
-            ->where('user_id', $user->getKey())
-            ->orderByDesc('is_default')
-            ->orderBy('name')
-            ->get([
-                'id',
-                'user_id',
-                'name',
-                'description',
-                'is_public',
-                'is_default',
-                'created_at',
-                'updated_at',
-                'deleted_at',
-            ]);
-
-        $wishlistProducts = $wishlists
-            ->flatMap(static function (UserWishlist $wishlist) {
-                /** @var Collection<int, WishlistItem> $items */
-                $items = $wishlist->items;
-
-                return $items->map(static function (WishlistItem $item) use ($wishlist): array {
-                    $product = $item->product;
-
-                    return [
-                        'wishlist_id'   => $wishlist->getKey(),
-                        'wishlist_name' => $wishlist->getAttribute('name'),
-                        'product_id'    => $product?->getKey(),
-                        'product_name'  => $product?->getAttribute('name'),
-                        'variant_id'    => $item->getAttribute('variant_id'),
-                        'quantity'      => $item->getAttribute('quantity'),
-                        'notes'         => $item->getAttribute('notes'),
-                        'added_at'      => $item->created_at?->toAtomString(),
-                    ];
-                });
-            })
-            ->values();
-
         $payload = [
             'meta' => [
                 'generated_at' => now()->toAtomString(),
@@ -247,7 +181,6 @@ final class DataPrivacyController extends Controller
                     'updated_at' => $review->updated_at?->toAtomString(),
                 ];
             })->values(),
-            'wishlist' => $wishlistProducts,
         ];
 
         $userKey = $user->getKey();
@@ -270,7 +203,6 @@ final class DataPrivacyController extends Controller
                     'addresses' => $addresses->count(),
                     'orders'    => $orders->count(),
                     'reviews'   => $reviews->count(),
-                    'wishlist'  => $wishlistProducts->count(),
                 ],
             ],
             [

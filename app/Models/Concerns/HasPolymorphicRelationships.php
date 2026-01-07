@@ -7,7 +7,6 @@ namespace App\Models\Concerns;
 use App\Models\Comment;
 use App\Models\File;
 use App\Models\Tag;
-use App\Models\Taggable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
@@ -18,7 +17,7 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 trait HasPolymorphicRelationships
 {
     /**
-     * Comments relationship (polymorphic).
+     * Comments relationship (polymorphic) - optimized for composite index usage.
      */
     public function comments(): MorphMany
     {
@@ -27,19 +26,37 @@ trait HasPolymorphicRelationships
     }
 
     /**
-     * Approved comments only.
+     * Approved comments only - uses composite index efficiently.
      */
     public function approvedComments(): MorphMany
     {
-        return $this->comments()->where('is_approved', true);
+        return $this->morphMany(Comment::class, 'commentable')
+            ->approved()
+            ->orderBy('is_pinned', 'desc')
+            ->orderBy('created_at', 'desc');
     }
 
     /**
-     * Root comments (no parent).
+     * Root comments (no parent) - optimized with composite index.
      */
     public function rootComments(): MorphMany
     {
-        return $this->comments()->whereNull('parent_id');
+        return $this->morphMany(Comment::class, 'commentable')
+            ->rootComments()
+            ->approved()
+            ->with(['user:id,name'])
+            ->orderBy('is_pinned', 'desc')
+            ->orderBy('created_at', 'desc');
+    }
+
+    /**
+     * Paginated comments with efficient loading.
+     */
+    public function paginatedComments(int $perPage = 15)
+    {
+        return $this->morphMany(Comment::class, 'commentable')
+            ->paginatedForEntity($this, $perPage)
+            ->paginate($perPage);
     }
 
     /**
@@ -89,24 +106,6 @@ trait HasPolymorphicRelationships
         return $this->tags()->where('type', $type);
     }
 
-    /**
-     * Activity logs (polymorphic).
-     */
-    public function activityLogs(): MorphMany
-    {
-        return $this->morphMany(\App\Models\ActivityLog::class, 'subject')
-            ->orderBy('created_at', 'desc');
-    }
-
-    /**
-     * Recent activity logs.
-     */
-    public function recentActivityLogs(int $days = 30): MorphMany
-    {
-        return $this->activityLogs()
-            ->where('created_at', '>=', now()->subDays($days));
-    }
-
     // Helper methods for polymorphic relationships
 
     /**
@@ -115,9 +114,9 @@ trait HasPolymorphicRelationships
     public function addComment(string $content, \App\Models\User $user, ?Comment $parent = null): Comment
     {
         return $this->comments()->create([
-            'content' => $content,
-            'user_id' => $user->id,
-            'parent_id' => $parent?->id,
+            'content'     => $content,
+            'user_id'     => $user->id,
+            'parent_id'   => $parent?->id,
             'is_approved' => true,
         ]);
     }
@@ -163,7 +162,7 @@ trait HasPolymorphicRelationships
                 'tagged_at' => now(),
             ];
         }
-        
+
         $this->tags()->sync($syncData);
     }
 

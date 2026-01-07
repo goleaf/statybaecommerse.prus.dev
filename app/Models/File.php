@@ -15,18 +15,18 @@ use Illuminate\Support\Facades\Storage;
 /**
  * File
  *
- * @property int $id
- * @property string $name
- * @property string $original_name
- * @property string $path
- * @property string $disk
- * @property string $mime_type
- * @property int $size
- * @property string|null $hash
- * @property string $fileable_type
- * @property int $fileable_id
- * @property int $uploaded_by
- * @property array|null $metadata
+ * @property int                             $id
+ * @property string                          $name
+ * @property string                          $original_name
+ * @property string                          $path
+ * @property string                          $disk
+ * @property string                          $mime_type
+ * @property int                             $size
+ * @property string|null                     $hash
+ * @property string                          $fileable_type
+ * @property int                             $fileable_id
+ * @property int                             $uploaded_by
+ * @property array|null                      $metadata
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  *
@@ -53,7 +53,7 @@ final class File extends Model
     ];
 
     protected $casts = [
-        'size' => 'integer',
+        'size'     => 'integer',
         'metadata' => 'array',
     ];
 
@@ -133,11 +133,11 @@ final class File extends Model
     {
         $bytes = $this->size;
         $units = ['B', 'KB', 'MB', 'GB', 'TB'];
-        
+
         for ($i = 0; $bytes > 1024 && $i < count($units) - 1; $i++) {
             $bytes /= 1024;
         }
-        
+
         return round($bytes, 2) . ' ' . $units[$i];
     }
 

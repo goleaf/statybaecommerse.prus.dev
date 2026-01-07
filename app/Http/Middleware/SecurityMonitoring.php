@@ -23,7 +23,7 @@ final class SecurityMonitoring
         // Check if IP is blocked
         if ($this->securityService->shouldBlockIp($request->ip())) {
             return response()->json([
-                'message' => 'Access denied due to security policy.',
+                'message'    => 'Access denied due to security policy.',
                 'error_code' => 'IP_BLOCKED',
             ], 403);
         }
@@ -32,7 +32,7 @@ final class SecurityMonitoring
         $threats = $this->securityService->monitorRequest($request);
 
         // Add threat information to request for logging
-        if (!empty($threats)) {
+        if (! empty($threats)) {
             $request->attributes->set('security_threats', $threats);
         }
 

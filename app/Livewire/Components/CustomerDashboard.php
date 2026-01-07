@@ -51,7 +51,6 @@ final class CustomerDashboard extends Component
             'completed_orders' => $this->user->orders()->whereIn('status', ['delivered', 'completed'])->count(),
             'pending_orders'   => $this->user->orders()->where('status', 'pending')->count(),
             'total_spent'      => $this->user->orders()->whereIn('status', ['delivered', 'completed'])->sum('total'),
-            'wishlist_items'   => $this->user->wishlist()->count(),
             'reviews_written'  => $this->user->reviews()->count(),
             'member_since'     => $this->user->created_at->format('Y'),
             'last_order'       => $this->user->orders()->latest()->first()?->created_at?->diffForHumans(),
@@ -65,15 +64,6 @@ final class CustomerDashboard extends Component
     public function recentOrders(): Collection
     {
         return $this->user->orders()->with(['items.product'])->latest()->limit(5)->get();
-    }
-
-    /**
-     * Handle wishlistItems functionality with proper error handling.
-     */
-    #[Computed]
-    public function wishlistItems(): Collection
-    {
-        return $this->user->wishlist()->with(['media', 'brand'])->limit(6)->get();
     }
 
     /**
@@ -91,16 +81,6 @@ final class CustomerDashboard extends Component
     }
 
     /**
-     * Handle removeFromWishlist functionality with proper error handling.
-     */
-    public function removeFromWishlist(int $productId): void
-    {
-        $this->user->wishlist()->detach($productId);
-        $this->dispatch('wishlist-updated');
-        $this->dispatch('notify', ['type' => 'success', 'message' => __('ecommerce.removed_from_wishlist')]);
-    }
-
-    /**
      * Handle addToCart functionality with proper error handling.
      */
     public function addToCart(int $productId): void
@@ -113,6 +93,6 @@ final class CustomerDashboard extends Component
      */
     public function render(): View
     {
-        return view('livewire.components.customer-dashboard', ['stats' => $this->stats, 'recentOrders' => $this->recentOrders, 'wishlistItems' => $this->wishlistItems, 'recommendedProducts' => $this->recommendedProducts]);
+        return view('livewire.components.customer-dashboard', ['stats' => $this->stats, 'recentOrders' => $this->recentOrders, 'recommendedProducts' => $this->recommendedProducts]);
     }
 }

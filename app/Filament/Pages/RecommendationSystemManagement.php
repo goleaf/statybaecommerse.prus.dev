@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Filament\Pages;
 
 use App\Models\ProductSimilarity;
-use App\Models\RecommendationAnalytics;
 use App\Models\RecommendationBlock;
 use App\Models\RecommendationCache;
 use App\Models\RecommendationConfig;
@@ -28,7 +27,7 @@ final class RecommendationSystemManagement extends Page
 
     protected static ?string $slug = 'recommendation-system-management';
 
-    public static function getNavigationGroup(): BackedEnum|string|null
+    public static function getNavigationGroup(): ?string
     {
         return 'Analytics'; // Group recommendation insights with the analytics tooling.
     }
@@ -39,9 +38,9 @@ final class RecommendationSystemManagement extends Page
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations while declaring
      * the union type through PHPDoc to satisfy Filament v4 styling requirements.
      */
-//    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-sparkles';
+    //    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-sparkles';
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    public static function getNavigationIcon(): string|Htmlable|null
     {
         return 'heroicon-o-sparkles';
     }
@@ -207,48 +206,15 @@ final class RecommendationSystemManagement extends Page
             return [];
         }
 
-        try {
-            /** @var Collection<int, RecommendationAnalytics> $analytics */
-            $analytics = RecommendationAnalytics::query()
-                ->whereIn('block_id', $blockIds)
-                ->get();
-        } catch (Throwable $exception) {
-            Log::debug('Failed to load recommendation analytics', ['error' => $exception->getMessage()]);
-
-            return [];
-        }
-
-        if ($analytics->isEmpty()) {
-            return [];
-        }
-
-        return $analytics
-            ->groupBy('block_id')
-            ->map(function (Collection $records): array {
-                $totalRequests = (int) $records->sum(function (RecommendationAnalytics $record): int {
-                    $requests = data_get($record->metrics, 'requests');
-
-                    if (is_numeric($requests)) {
-                        return (int) $requests;
-                    }
-
-                    return 1;
-                });
-
-                $avgCtr = (float) $records->avg(
-                    fn (RecommendationAnalytics $record): float => (float) ($record->ctr ?? 0)
-                );
-
-                $avgConversion = (float) $records->avg(
-                    fn (RecommendationAnalytics $record): float => (float) ($record->conversion_rate ?? 0)
-                );
-
-                return [
-                    'total_requests' => $totalRequests,
-                    'avg_ctr'        => $avgCtr,
-                    'avg_conversion' => $avgConversion,
-                ];
-            })
-            ->all();
+        // RecommendationAnalytics removed - return empty metrics
+        return collect($blockIds)->mapWithKeys(function (int $blockId): array {
+            return [
+                $blockId => [
+                    'total_requests' => 0,
+                    'avg_ctr'        => 0.0,
+                    'avg_conversion' => 0.0,
+                ],
+            ];
+        })->toArray();
     }
 }
