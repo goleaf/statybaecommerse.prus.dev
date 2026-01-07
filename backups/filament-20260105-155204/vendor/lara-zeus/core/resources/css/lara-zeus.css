@@ -1,0 +1,32 @@
+@import 'tailwindcss';
+@import './_checkbox-cards.css';
+@import './theme.css';
+
+@source '../../../**/*.php';
+
+@variant dark (&:where(.dark, .dark *));
+
+/* debug tool 😜 */
+.bord {
+    border: solid 1px chocolate;
+}
+
+.compact-timeline .fi-timeline-item-heading {
+    @apply flex-col items-start md:space-y-0 md:space-x-0 gap-2 md:flex-col;
+}
+
+.compact-timeline .fi-timeline-section-content {
+    @apply p-0;
+}
+
+.compact-timeline {
+    @apply ring-0;
+}
+
+.field-type .choices__list--single {
+    @apply !w-full;
+}
+
+.field-type .choices__list--single .tip, .field-type .choices__list--single .field-desc {
+    @apply !hidden;
+}
