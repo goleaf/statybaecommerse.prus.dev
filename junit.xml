@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="/Users/andrejprus/Library/CloudStorage/Dropbox/projects/egistatyba/phpunit.xml" tests="1" assertions="3" errors="0" failures="0" skipped="0" time="4.867951">
-    <testsuite name="Feature" tests="1" assertions="3" errors="0" failures="0" skipped="0" time="4.867951">
-      <testsuite name="Tests\Feature\Filament\MobileResponsivenessPropertyTest" file="Mobile Responsiveness Property (Tests\Feature\Filament\MobileResponsivenessProperty)" tests="1" assertions="3" errors="0" failures="0" skipped="0" time="4.867951">
-        <testcase name="Admin interface has proper touch target sizes" file="Mobile Responsiveness Property (Tests\Feature\Filament\MobileResponsivenessProperty)::Admin interface has proper touch target sizes" class="Tests\Feature\Filament\MobileResponsivenessPropertyTest" classname="Tests.Feature.Filament.MobileResponsivenessPropertyTest" assertions="3" time="4.867951"/>
-      </testsuite>
-    </testsuite>
+  <testsuite name="Tests\AdminWorkflowMinimalIntegrationTest" file="Admin Workflow Minimal Integration (Tests\AdminWorkflowMinimalIntegration)" tests="7" assertions="78" errors="0" failures="0" skipped="0" time="0.034212">
+    <testcase name="Mobile responsiveness configuration files" file="Admin Workflow Minimal Integration (Tests\AdminWorkflowMinimalIntegration)::Mobile responsiveness configuration files" class="Tests\AdminWorkflowMinimalIntegrationTest" classname="Tests.AdminWorkflowMinimalIntegrationTest" assertions="3" time="0.008947"/>
+    <testcase name="Complete workflow integration points" file="Admin Workflow Minimal Integration (Tests\AdminWorkflowMinimalIntegration)::Complete workflow integration points" class="Tests\AdminWorkflowMinimalIntegrationTest" classname="Tests.AdminWorkflowMinimalIntegrationTest" assertions="4" time="0.013368"/>
+    <testcase name="Admin panel configuration files exist" file="Admin Workflow Minimal Integration (Tests\AdminWorkflowMinimalIntegration)::Admin panel configuration files exist" class="Tests\AdminWorkflowMinimalIntegrationTest" classname="Tests.AdminWorkflowMinimalIntegrationTest" assertions="6" time="0.000306"/>
+    <testcase name="Error handling configuration" file="Admin Workflow Minimal Integration (Tests\AdminWorkflowMinimalIntegration)::Error handling configuration" class="Tests\AdminWorkflowMinimalIntegrationTest" classname="Tests.AdminWorkflowMinimalIntegrationTest" assertions="2" time="0.002527"/>
+    <testcase name="Translation files exist" file="Admin Workflow Minimal Integration (Tests\AdminWorkflowMinimalIntegration)::Translation files exist" class="Tests\AdminWorkflowMinimalIntegrationTest" classname="Tests.AdminWorkflowMinimalIntegrationTest" assertions="26" time="0.004425"/>
+    <testcase name="Admin resource classes exist" file="Admin Workflow Minimal Integration (Tests\AdminWorkflowMinimalIntegration)::Admin resource classes exist" class="Tests\AdminWorkflowMinimalIntegrationTest" classname="Tests.AdminWorkflowMinimalIntegrationTest" assertions="30" time="0.003341"/>
+    <testcase name="Navigation group enum structure" file="Admin Workflow Minimal Integration (Tests\AdminWorkflowMinimalIntegration)::Navigation group enum structure" class="Tests\AdminWorkflowMinimalIntegrationTest" classname="Tests.AdminWorkflowMinimalIntegrationTest" assertions="7" time="0.001299"/>
   </testsuite>
 </testsuites>

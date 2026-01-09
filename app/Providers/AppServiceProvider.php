@@ -26,7 +26,6 @@ use App\Services\DocumentService;
 use App\Services\StaticCurrencyRateProvider;
 use App\Support\Cache\RateLimiter as ExtendedRateLimiter;
 use App\Support\Filament\SearchableComponentHelper;
-use App\Support\Filesystem\GracefulFilesystem;
 use App\Support\Health\HealthReporter;
 use App\Support\Html\HtmlSanitizer;
 use App\Support\Livewire\Hooks\PropagateValidationExceptionHook;
@@ -110,9 +109,8 @@ class AppServiceProvider extends ServiceProvider
         // Share a single sanitizer instance so every consumer reuses the same allow-list configuration.
         $this->app->singleton(HtmlSanitizer::class, static fn (): HtmlSanitizer => new HtmlSanitizer);
 
-        // Replace the default filesystem binding with the graceful shim for deterministic backup tests.
-        $this->app->singleton(Filesystem::class, static fn (): Filesystem => new GracefulFilesystem);
-        $this->app->alias(Filesystem::class, 'files');
+        // Register enhanced filesystem services
+        $this->app->register(\App\Support\Filesystem\FilesystemServiceProvider::class);
 
         // Ensure SQLite connections eagerly prepare database files for test reliability.
         $this->app->bind('db.connector.sqlite', static fn (): GracefulSQLiteConnector => new GracefulSQLiteConnector);

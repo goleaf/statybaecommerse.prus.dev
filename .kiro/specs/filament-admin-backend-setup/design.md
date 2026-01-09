@@ -126,14 +126,16 @@ The admin system will provide CRUD interfaces for existing models:
 - MenuItem
 
 **E-commerce Models**:
-- Product
+- Product (✅ Resource created, needs testing)
 - ProductVariant
-- Category
-- Brand
+- Category (✅ Resource created, needs testing)
+- Brand (✅ Resource created, needs testing)
 - Order
 - OrderItem
 - Customer
-- Inventory
+- Inventory (✅ Resource created, needs testing)
+- Price (✅ Resource created, needs testing)
+- Discount (✅ Resource created, needs testing)
 
 **System Models**:
 - Setting
@@ -198,6 +200,14 @@ Consistent table layouts:
 *For any* admin interface component (forms, tables, navigation), it should display and function correctly on mobile devices
 **Validates: Requirements 9.1, 9.2, 9.3, 9.4**
 
+### Property 9: SearchableInput Component Compatibility
+*For any* SearchableInput component usage in the admin system, it should work without fatal errors regardless of the SearchableInput package version
+**Validates: Requirements 10.1, 10.2, 10.3, 10.4**
+
+### Property 10: Admin Resource Completeness
+*For any* created admin resource (Product, Brand, Category, Inventory, Price, Discount), it should provide complete CRUD functionality with proper validation and user interface
+**Validates: Requirements 11.1, 11.2, 11.3, 11.4, 11.5, 11.6, 11.7, 11.8**
+
 ## Error Handling
 
 ### Compatibility Error Resolution
@@ -207,6 +217,12 @@ Consistent table layouts:
 2. Update imports to use correct Filament 4 namespaces
 3. Modify method signatures to match Filament 4 expectations
 4. Test the fix across all affected resources
+
+**SearchableInput Compatibility**: Handle SearchableInput package version differences:
+1. Check for method existence before calling (hasMacro, macro methods)
+2. Implement graceful fallbacks for missing methods
+3. Use reflection or method_exists checks for version-specific functionality
+4. Ensure macro registration works across different package versions
 
 **Resource Loading Failures**: When admin resources fail to load:
 1. Check for missing dependencies or incorrect configurations
