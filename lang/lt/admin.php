@@ -809,7 +809,7 @@ return [
             'pdf'  => 'PDF',
             'docx' => 'DOCX',
         ],
-        'form' => [
+        'document_form' => [
             'sections' => [
                 'basic_information' => 'Pagrindinė informacija',
                 'organization'      => 'Organizacija',
@@ -965,7 +965,6 @@ return [
             'optional' => 'Neprivalomas',
             // Mobile form translations
             'go_back'              => 'Grįžti',
-            'toggle_menu'          => 'Perjungti meniu',
             'click_to_upload'      => 'Spustelėkite įkelti',
             'or_drag_and_drop'     => 'arba nuvilkite',
             'file_help'            => 'PNG, JPG, GIF iki 10MB',

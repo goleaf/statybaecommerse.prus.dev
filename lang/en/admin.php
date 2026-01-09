@@ -536,7 +536,7 @@ return [
             'pdf'  => 'PDF',
             'docx' => 'DOCX',
         ],
-        'form' => [
+        'document_form' => [
             'sections' => [
                 'basic_information' => 'Basic Information',
                 'organization'      => 'Organization',
@@ -946,7 +946,6 @@ return [
             'optional' => 'Optional',
             // Mobile form translations
             'go_back'              => 'Go back',
-            'toggle_menu'          => 'Toggle menu',
             'click_to_upload'      => 'Click to upload',
             'or_drag_and_drop'     => 'or drag and drop',
             'file_help'            => 'PNG, JPG, GIF up to 10MB',
