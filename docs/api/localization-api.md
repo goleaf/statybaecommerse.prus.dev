@@ -448,4 +448,4 @@ $translations = app('translator')->get('categories', [], 'lt');
 - [Laravel Localization](https://laravel.com/docs/12.x/localization)
 - [Filament Localization](https://filamentphp.com/docs/4.x/panels/configuration#localization)
 - [Component Documentation](../components/category-ui.md)
-- [Testing Guidelines](../testing/localization-tests.md)
+- [Localization Architecture](../architecture/localization-architecture.md)

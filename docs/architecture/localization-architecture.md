@@ -537,4 +537,4 @@ php artisan config:clear
 - [Translation File Documentation](../localization/categories-translations.md)
 - [API Documentation](../api/localization-api.md)
 - [Component Documentation](../components/category-ui.md)
-- [Testing Guidelines](../testing/localization-tests.md)
+- [Localization Guidelines](../../.kiro/steering/localization-guidelines.md)

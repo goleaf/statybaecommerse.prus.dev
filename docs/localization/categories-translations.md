@@ -210,8 +210,8 @@ test('categories translations exist for both locales', function () {
 
 - [Laravel Localization](https://laravel.com/docs/12.x/localization)
 - [Filament Localization](https://filamentphp.com/docs/4.x/panels/configuration#localization)
-- [Accessibility Guidelines](../accessibility/guidelines.md)
-- [UI Component Documentation](../components/categories.md)
+- [Category UI Components](../components/category-ui.md)
+- [Localization Architecture](../architecture/localization-architecture.md)
 
 ## Changelog
 
