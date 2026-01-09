@@ -48,6 +48,13 @@ return [
         'document_templates'        => 'Dokumentų šablonai',
         'enhanced_settings'         => 'Nustatymai',
         'system_settings'           => 'Sistemos nustatymai',
+        // Mobile navigation
+        'toggle_menu'               => 'Perjungti meniu',
+        'close_menu'                => 'Uždaryti meniu',
+        'user'                      => 'Naudotojas',
+        'admin'                     => 'Administratorius',
+        'logout'                    => 'Atsijungti',
+        'example_item'              => 'Pavyzdžio elementas',
         'sales'                     => 'Pardavimai',
     ],
     'system_settings' => [
@@ -394,6 +401,20 @@ return [
     'table' => [
         'orders'   => 'užsakymai',
         'in_stock' => 'sandėlyje',
+        // Mobile table translations
+        'records'              => 'Įrašai',
+        'toggle_search'        => 'Perjungti paiešką',
+        'toggle_filters'       => 'Perjungti filtrus',
+        'toggle_view'          => 'Perjungti vaizdą',
+        'search_placeholder'   => 'Ieškoti...',
+        'all_statuses'         => 'Visi statusai',
+        'active'               => 'Aktyvus',
+        'inactive'             => 'Neaktyvus',
+        'clear_filters'        => 'Išvalyti filtrus',
+        'apply_filters'        => 'Pritaikyti filtrus',
+        'no_records'           => 'Įrašų nerasta',
+        'no_records_description' => 'Pradėkite sukurdami naują įrašą.',
+        'selected'             => 'pasirinkta',
     ],
     'dashboard' => [
         'welcome'         => 'Sveiki atvykę į administravimo panelę',
@@ -942,6 +963,13 @@ return [
             'create'   => 'Sukurti',
             'required' => 'Privalomas laukas',
             'optional' => 'Neprivalomas',
+            // Mobile form translations
+            'go_back'              => 'Grįžti',
+            'toggle_menu'          => 'Perjungti meniu',
+            'click_to_upload'      => 'Spustelėkite įkelti',
+            'or_drag_and_drop'     => 'arba nuvilkite',
+            'file_help'            => 'PNG, JPG, GIF iki 10MB',
+            'files_selected'       => 'failai pasirinkti',
         ],
         'modal' => [
             'close'   => 'Uždaryti',

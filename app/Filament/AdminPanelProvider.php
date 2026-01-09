@@ -19,6 +19,7 @@ use Filament\Support\Colors\Color;
 use Filament\View\PanelsRenderHook;
 use Filament\Widgets\Widget;
 use Illuminate\Contracts\Foundation\Application as ApplicationContract;
+use Illuminate\Contracts\View\View;
 use InvalidArgumentException;
 
 class AdminPanelProvider extends PanelProvider
@@ -75,7 +76,11 @@ class AdminPanelProvider extends PanelProvider
     private function defaultWidgets(): array
     {
         return [
-            // Start with basic Filament widgets that should always work
+            DashboardKpiWidget::class,
+            DashboardQuickActionsWidget::class,
+            DashboardRecentOrdersTable::class,
+            DashboardLowStockTable::class,
+            DashboardRecentErrorsTable::class,
         ];
     }
 
@@ -132,12 +137,24 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->homeUrl('/admin/dashboard')
             ->userMenuItems([
-                'profile' => \Filament\Pages\Auth\EditProfile::class,
-                'logout' => \Filament\Pages\Auth\Logout::class,
+                // Remove the problematic user menu items configuration
+                // These will be handled by Filament's default behavior
             ])
-            // Render hooks removed to fix config cache serialization issue
-            // ->renderHook(PanelsRenderHook::STYLES_AFTER, ...)
-            // ->renderHook(PanelsRenderHook::SCRIPTS_AFTER, ...)
+            // Add language switcher render hook
+            ->renderHook(
+                PanelsRenderHook::USER_MENU_PROFILE_AFTER,
+                fn (): View => view('filament.hooks.language-switcher'),
+            )
+            // Add mobile navigation render hook
+            ->renderHook(
+                PanelsRenderHook::BODY_START,
+                fn (): View => view('filament.components.mobile-navigation'),
+            )
+            // Add mobile CSS render hook
+            ->renderHook(
+                PanelsRenderHook::HEAD_END,
+                fn (): string => '<link rel="stylesheet" href="' . asset('css/filament/admin-mobile.css') . '">',
+            )
             ->middleware([
                 \Illuminate\Cookie\Middleware\EncryptCookies::class,
                 \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
@@ -146,6 +163,7 @@ class AdminPanelProvider extends PanelProvider
                 \Illuminate\View\Middleware\ShareErrorsFromSession::class,
                 \Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class,
                 \Illuminate\Routing\Middleware\SubstituteBindings::class,
+                \App\Http\Middleware\SetLocale::class,
             ])
             ->authMiddleware([
                 \App\Http\Middleware\AdminAuthenticate::class,

@@ -46,6 +46,13 @@ return [
         'system_settings'           => 'System Settings',
         'product_requests'          => 'Product Requests',
         'sales'                     => 'Sales',
+        // Mobile navigation
+        'toggle_menu'               => 'Toggle menu',
+        'close_menu'                => 'Close menu',
+        'user'                      => 'User',
+        'admin'                     => 'Admin',
+        'logout'                    => 'Logout',
+        'example_item'              => 'Example Item',
     ],
     'system_settings' => [
         'condition_value'             => 'Condition Value',
@@ -863,6 +870,20 @@ return [
     'table' => [
         'orders'   => 'orders',
         'in_stock' => 'in stock',
+        // Mobile table translations
+        'records'              => 'Records',
+        'toggle_search'        => 'Toggle search',
+        'toggle_filters'       => 'Toggle filters',
+        'toggle_view'          => 'Toggle view',
+        'search_placeholder'   => 'Search...',
+        'all_statuses'         => 'All statuses',
+        'active'               => 'Active',
+        'inactive'             => 'Inactive',
+        'clear_filters'        => 'Clear filters',
+        'apply_filters'        => 'Apply filters',
+        'no_records'           => 'No records found',
+        'no_records_description' => 'Get started by creating a new record.',
+        'selected'             => 'selected',
     ],
     'auth' => [
         'login'            => 'Login',
@@ -923,6 +944,13 @@ return [
             'create'   => 'Create',
             'required' => 'Required field',
             'optional' => 'Optional',
+            // Mobile form translations
+            'go_back'              => 'Go back',
+            'toggle_menu'          => 'Toggle menu',
+            'click_to_upload'      => 'Click to upload',
+            'or_drag_and_drop'     => 'or drag and drop',
+            'file_help'            => 'PNG, JPG, GIF up to 10MB',
+            'files_selected'       => 'files selected',
         ],
         'modal' => [
             'close'   => 'Close',

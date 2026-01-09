@@ -101,7 +101,7 @@ return [
     ],
 
     // UI Labels
-    'index_close' => 'Close',
+    'index_close'         => 'Close',
     'show_adjust_filters' => 'Adjust your filters to find the perfect products',
 
     // Help

@@ -91,7 +91,7 @@ return [
     ],
 
     // UI Labels
-    'index_close' => 'Uždaryti',
+    'index_close'         => 'Uždaryti',
     'show_adjust_filters' => 'Koreguokite filtrus, kad rastumėte tobulus produktus',
     // Help
     'help' => [

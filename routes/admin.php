@@ -17,11 +17,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
 
-// Admin language switching
-Route::post('/admin/language/switch', [App\Http\Controllers\Admin\LanguageController::class, 'switch'])
-    ->name('admin.language.switch')
-    ->middleware('auth');
-
 // Admin impersonation routes
 Route::middleware('auth')->group(function (): void {
     Route::get('/admin/variant-combinations', ListVariantCombinations::class)

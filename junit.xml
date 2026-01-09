@@ -1,11 +1,747 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="Tests\Feature\AdminAuthenticationTest" file="tests/Feature/AdminAuthenticationTest.php" tests="6" assertions="8" errors="0" failures="0" skipped="0" time="20.058250">
-    <testcase name="it allows admin users to access admin panel" file="tests/Feature/AdminAuthenticationTest.php::it allows admin users to access admin panel" class="Tests\Feature\AdminAuthenticationTest" classname="Tests.Feature.AdminAuthenticationTest" assertions="1" time="10.368482"/>
-    <testcase name="it enforces role-based permissions for resources" file="tests/Feature/AdminAuthenticationTest.php::it enforces role-based permissions for resources" class="Tests\Feature\AdminAuthenticationTest" classname="Tests.Feature.AdminAuthenticationTest" assertions="2" time="1.904388"/>
-    <testcase name="it allows authenticated admin users to access admin panel" file="tests/Feature/AdminAuthenticationTest.php::it allows authenticated admin users to access admin panel" class="Tests\Feature\AdminAuthenticationTest" classname="Tests.Feature.AdminAuthenticationTest" assertions="1" time="1.419312"/>
-    <testcase name="it allows users with admin role to access admin panel" file="tests/Feature/AdminAuthenticationTest.php::it allows users with admin role to access admin panel" class="Tests\Feature\AdminAuthenticationTest" classname="Tests.Feature.AdminAuthenticationTest" assertions="1" time="2.246284"/>
-    <testcase name="it redirects unauthenticated users to login" file="tests/Feature/AdminAuthenticationTest.php::it redirects unauthenticated users to login" class="Tests\Feature\AdminAuthenticationTest" classname="Tests.Feature.AdminAuthenticationTest" assertions="2" time="2.010975"/>
-    <testcase name="it denies access to users without admin privileges" file="tests/Feature/AdminAuthenticationTest.php::it denies access to users without admin privileges" class="Tests\Feature\AdminAuthenticationTest" classname="Tests.Feature.AdminAuthenticationTest" assertions="1" time="2.108810"/>
+  <testsuite name="Tests\Feature\Filament\MobileResponsivenessImplementationTest" file="Mobile Responsiveness Implementation (Tests\Feature\Filament\MobileResponsivenessImplementation)" tests="13" assertions="22" errors="1" failures="5" skipped="0" time="16.850361">
+    <testcase name="Mobile css file exists" file="Mobile Responsiveness Implementation (Tests\Feature\Filament\MobileResponsivenessImplementation)::Mobile css file exists" class="Tests\Feature\Filament\MobileResponsivenessImplementationTest" classname="Tests.Feature.Filament.MobileResponsivenessImplementationTest" assertions="1" time="5.699413"/>
+    <testcase name="Mobile navigation component exists" file="Mobile Responsiveness Implementation (Tests\Feature\Filament\MobileResponsivenessImplementation)::Mobile navigation component exists" class="Tests\Feature\Filament\MobileResponsivenessImplementationTest" classname="Tests.Feature.Filament.MobileResponsivenessImplementationTest" assertions="1" time="0.668196"/>
+    <testcase name="Mobile table component exists" file="Mobile Responsiveness Implementation (Tests\Feature\Filament\MobileResponsivenessImplementation)::Mobile table component exists" class="Tests\Feature\Filament\MobileResponsivenessImplementationTest" classname="Tests.Feature.Filament.MobileResponsivenessImplementationTest" assertions="1" time="0.683747"/>
+    <testcase name="Mobile form component exists" file="Mobile Responsiveness Implementation (Tests\Feature\Filament\MobileResponsivenessImplementation)::Mobile form component exists" class="Tests\Feature\Filament\MobileResponsivenessImplementationTest" classname="Tests.Feature.Filament.MobileResponsivenessImplementationTest" assertions="1" time="0.765750"/>
+    <testcase name="Mobile translations exist in english" file="Mobile Responsiveness Implementation (Tests\Feature\Filament\MobileResponsivenessImplementation)::Mobile translations exist in english" class="Tests\Feature\Filament\MobileResponsivenessImplementationTest" classname="Tests.Feature.Filament.MobileResponsivenessImplementationTest" assertions="1" time="0.851752">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Mobile translations exist in englishFailed asserting that an array has the key 'toggle_menu'.
+at tests/Feature/Filament/MobileResponsivenessImplementationTest.php:66</failure>
+    </testcase>
+    <testcase name="Mobile translations exist in lithuanian" file="Mobile Responsiveness Implementation (Tests\Feature\Filament\MobileResponsivenessImplementation)::Mobile translations exist in lithuanian" class="Tests\Feature\Filament\MobileResponsivenessImplementationTest" classname="Tests.Feature.Filament.MobileResponsivenessImplementationTest" assertions="1" time="0.939854">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Mobile translations exist in lithuanianFailed asserting that an array has the key 'toggle_menu'.
+at tests/Feature/Filament/MobileResponsivenessImplementationTest.php:76</failure>
+    </testcase>
+    <testcase name="Mobile table translations exist" file="Mobile Responsiveness Implementation (Tests\Feature\Filament\MobileResponsivenessImplementation)::Mobile table translations exist" class="Tests\Feature\Filament\MobileResponsivenessImplementationTest" classname="Tests.Feature.Filament.MobileResponsivenessImplementationTest" assertions="1" time="1.571936">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Mobile table translations existFailed asserting that an array has the key 'toggle_search'.
+at tests/Feature/Filament/MobileResponsivenessImplementationTest.php:88</failure>
+    </testcase>
+    <testcase name="Mobile form translations exist" file="Mobile Responsiveness Implementation (Tests\Feature\Filament\MobileResponsivenessImplementation)::Mobile form translations exist" class="Tests\Feature\Filament\MobileResponsivenessImplementationTest" classname="Tests.Feature.Filament.MobileResponsivenessImplementationTest" assertions="0" time="1.587643">
+      <error type="TypeError">Mobile form translations existTypeError: PHPUnit\Framework\Assert::assertArrayHasKey(): Argument #2 ($array) must be of type ArrayAccess|array, string given, called in /Users/andrejprus/Library/CloudStorage/Dropbox/projects/egistatyba/tests/Feature/Filament/MobileResponsivenessImplementationTest.php on line 104
+at tests/Feature/Filament/MobileResponsivenessImplementationTest.php:104</error>
+    </testcase>
+    <testcase name="Admin panel provider includes mobile hooks" file="Mobile Responsiveness Implementation (Tests\Feature\Filament\MobileResponsivenessImplementation)::Admin panel provider includes mobile hooks" class="Tests\Feature\Filament\MobileResponsivenessImplementationTest" classname="Tests.Feature.Filament.MobileResponsivenessImplementationTest" assertions="2" time="0.914655"/>
+    <testcase name="Mobile css contains responsive styles" file="Mobile Responsiveness Implementation (Tests\Feature\Filament\MobileResponsivenessImplementation)::Mobile css contains responsive styles" class="Tests\Feature\Filament\MobileResponsivenessImplementationTest" classname="Tests.Feature.Filament.MobileResponsivenessImplementationTest" assertions="4" time="0.841008">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Mobile css contains responsive stylesFailed asserting that '/* =============================================================================\n
+ * FILAMENT ADMIN MOBILE RESPONSIVENESS ENHANCEMENTS\n
+ * =============================================================================\n
+ * This file contains mobile-specific enhancements for the Filament admin panel\n
+ * to ensure optimal user experience on mobile devices.\n
+ */\n
+\n
+/* Mobile-first responsive design for Filament admin */\n
+@media (max-width: 768px) {\n
+  /* Navigation improvements for mobile */\n
+  .fi-sidebar {\n
+    transform: translateX(-100%);\n
+    transition: transform 0.3s ease-in-out;\n
+  }\n
+  \n
+  .fi-sidebar.open {\n
+    transform: translateX(0);\n
+  }\n
+  \n
+  /* Mobile navigation toggle */\n
+  .fi-topbar .fi-topbar-nav-toggle {\n
+    display: block !important;\n
+  }\n
+  \n
+  /* Table responsiveness */\n
+  .fi-table {\n
+    overflow-x: auto;\n
+    -webkit-overflow-scrolling: touch;\n
+  }\n
+  \n
+  .fi-table-container {\n
+    border-radius: 0.5rem;\n
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);\n
+  }\n
+  \n
+  /* Form improvements for mobile */\n
+  .fi-form .fi-form-component-container {\n
+    margin-bottom: 1.5rem;\n
+  }\n
+  \n
+  .fi-input, .fi-select, .fi-textarea {\n
+    min-height: 44px; /* Touch-friendly minimum size */\n
+    font-size: 16px; /* Prevent zoom on iOS */\n
+  }\n
+  \n
+  /* Button improvements */\n
+  .fi-btn {\n
+    min-height: 44px;\n
+    padding: 0.75rem 1rem;\n
+    font-size: 1rem;\n
+  }\n
+  \n
+  /* Modal improvements */\n
+  .fi-modal {\n
+    margin: 1rem;\n
+    max-height: calc(100vh - 2rem);\n
+    overflow-y: auto;\n
+  }\n
+  \n
+  .fi-modal-content {\n
+    padding: 1.5rem;\n
+  }\n
+  \n
+  /* Dashboard widget improvements */\n
+  .fi-widget {\n
+    margin-bottom: 1rem;\n
+  }\n
+  \n
+  .fi-widget-content {\n
+    padding: 1rem;\n
+  }\n
+  \n
+  /* Dropdown improvements */\n
+  .fi-dropdown-panel {\n
+    max-width: calc(100vw - 2rem);\n
+    max-height: 50vh;\n
+    overflow-y: auto;\n
+  }\n
+}\n
+\n
+/* Tablet-specific adjustments */\n
+@media (min-width: 769px) and (max-width: 1024px) {\n
+  .fi-sidebar {\n
+    width: 240px;\n
+  }\n
+  \n
+  .fi-main {\n
+    margin-left: 240px;\n
+  }\n
+  \n
+  .fi-table {\n
+    font-size: 0.875rem;\n
+  }\n
+  \n
+  .fi-form .fi-form-component-container {\n
+    margin-bottom: 1.25rem;\n
+  }\n
+}\n
+\n
+/* Touch-friendly improvements for all mobile devices */\n
+@media (hover: none) and (pointer: coarse) {\n
+  /* Increase touch targets */\n
+  .fi-btn, .fi-link, .fi-table-action {\n
+    min-height: 44px;\n
+    min-width: 44px;\n
+    padding: 0.75rem;\n
+  }\n
+  \n
+  /* Remove hover effects on touch devices */\n
+  .fi-btn:hover,\n
+  .fi-link:hover,\n
+  .fi-table-row:hover {\n
+    background-color: initial;\n
+    transform: none;\n
+  }\n
+  \n
+  /* Add active states for touch feedback */\n
+  .fi-btn:active {\n
+    transform: scale(0.98);\n
+    transition: transform 0.1s ease;\n
+  }\n
+  \n
+  .fi-table-row:active {\n
+    background-color: rgba(0, 0, 0, 0.05);\n
+  }\n
+}\n
+\n
+/* Landscape orientation adjustments */\n
+@media (orientation: landscape) and (max-height: 600px) {\n
+  .fi-topbar {\n
+    height: 3rem;\n
+  }\n
+  \n
+  .fi-main {\n
+    padding-top: 3rem;\n
+  }\n
+  \n
+  .fi-modal {\n
+    max-height: calc(100vh - 1rem);\n
+    margin: 0.5rem;\n
+  }\n
+}\n
+\n
+/* High DPI display adjustments */\n
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {\n
+  .fi-icon {\n
+    image-rendering: -webkit-optimize-contrast;\n
+    image-rendering: crisp-edges;\n
+  }\n
+}\n
+\n
+/* Accessibility improvements for mobile */\n
+@media (prefers-reduced-motion: reduce) {\n
+  .fi-sidebar {\n
+    transition: none;\n
+  }\n
+  \n
+  .fi-btn:active {\n
+    transform: none;\n
+  }\n
+}\n
+\n
+/* Dark mode mobile adjustments */\n
+@media (prefers-color-scheme: dark) {\n
+  .fi-table-container {\n
+    background-color: #1f2937;\n
+    border-color: #374151;\n
+  }\n
+  \n
+  .fi-modal-content {\n
+    background-color: #1f2937;\n
+    color: #f9fafb;\n
+  }\n
+}\n
+\n
+/* Print styles for mobile */\n
+@media print {\n
+  .fi-sidebar,\n
+  .fi-topbar,\n
+  .fi-table-actions,\n
+  .fi-btn {\n
+    display: none !important;\n
+  }\n
+  \n
+  .fi-main {\n
+    margin: 0 !important;\n
+    padding: 0 !important;\n
+  }\n
+  \n
+  .fi-table {\n
+    font-size: 12px;\n
+  }\n
+}\n
+\n
+/* Custom utility classes for mobile responsiveness */\n
+.mobile-hidden {\n
+  @media (max-width: 768px) {\n
+    display: none !important;\n
+  }\n
+}\n
+\n
+.mobile-only {\n
+  display: none !important;\n
+  \n
+  @media (max-width: 768px) {\n
+    display: block !important;\n
+  }\n
+}\n
+\n
+.mobile-flex {\n
+  @media (max-width: 768px) {\n
+    display: flex !important;\n
+  }\n
+}\n
+\n
+.mobile-grid {\n
+  @media (max-width: 768px) {\n
+    display: grid !important;\n
+  }\n
+}\n
+\n
+.mobile-full-width {\n
+  @media (max-width: 768px) {\n
+    width: 100% !important;\n
+  }\n
+}\n
+\n
+.mobile-text-center {\n
+  @media (max-width: 768px) {\n
+    text-align: center !important;\n
+  }\n
+}\n
+\n
+.mobile-p-4 {\n
+  @media (max-width: 768px) {\n
+    padding: 1rem !important;\n
+  }\n
+}\n
+\n
+.mobile-m-2 {\n
+  @media (max-width: 768px) {\n
+    margin: 0.5rem !important;\n
+  }\n
+}\n
+\n
+/* Scrollbar improvements for mobile */\n
+.fi-table::-webkit-scrollbar {\n
+  height: 8px;\n
+}\n
+\n
+.fi-table::-webkit-scrollbar-track {\n
+  background: #f1f5f9;\n
+  border-radius: 4px;\n
+}\n
+\n
+.fi-table::-webkit-scrollbar-thumb {\n
+  background: #cbd5e1;\n
+  border-radius: 4px;\n
+}\n
+\n
+.fi-table::-webkit-scrollbar-thumb:hover {\n
+  background: #94a3b8;\n
+}\n
+\n
+/* Mobile-specific loading states */\n
+.fi-loading-mobile {\n
+  @media (max-width: 768px) {\n
+    padding: 2rem 1rem;\n
+    text-align: center;\n
+  }\n
+}\n
+\n
+/* Mobile-specific error states */\n
+.fi-error-mobile {\n
+  @media (max-width: 768px) {\n
+    padding: 1rem;\n
+    margin: 1rem;\n
+    border-radius: 0.5rem;\n
+    background-color: #fef2f2;\n
+    border: 1px solid #fecaca;\n
+    color: #991b1b;\n
+  }\n
+}\n
+\n
+/* Mobile-specific success states */\n
+.fi-success-mobile {\n
+  @media (max-width: 768px) {\n
+    padding: 1rem;\n
+    margin: 1rem;\n
+    border-radius: 0.5rem;\n
+    background-color: #f0fdf4;\n
+    border: 1px solid #bbf7d0;\n
+    color: #166534;\n
+  }\n
+}' [ASCII](length: 5560) contains "touch-action: manipulation" [ASCII](length: 26).
+at tests/Feature/Filament/MobileResponsivenessImplementationTest.php:138</failure>
+    </testcase>
+    <testcase name="Mobile navigation includes javascript" file="Mobile Responsiveness Implementation (Tests\Feature\Filament\MobileResponsivenessImplementation)::Mobile navigation includes javascript" class="Tests\Feature\Filament\MobileResponsivenessImplementationTest" classname="Tests.Feature.Filament.MobileResponsivenessImplementationTest" assertions="3" time="0.757910"/>
+    <testcase name="Mobile table includes responsive features" file="Mobile Responsiveness Implementation (Tests\Feature\Filament\MobileResponsivenessImplementation)::Mobile table includes responsive features" class="Tests\Feature\Filament\MobileResponsivenessImplementationTest" classname="Tests.Feature.Filament.MobileResponsivenessImplementationTest" assertions="4" time="0.682147"/>
+    <testcase name="Mobile form includes touch friendly inputs" file="Mobile Responsiveness Implementation (Tests\Feature\Filament\MobileResponsivenessImplementation)::Mobile form includes touch friendly inputs" class="Tests\Feature\Filament\MobileResponsivenessImplementationTest" classname="Tests.Feature.Filament.MobileResponsivenessImplementationTest" assertions="2" time="0.886350">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Mobile form includes touch friendly inputsFailed asserting that '{{-- Mobile-Responsive Form Component for Filament Admin --}}\n
+@props([\n
+    'title' =&gt; '',\n
+    'description' =&gt; '',\n
+    'sections' =&gt; [],\n
+    'actions' =&gt; [],\n
+    'sticky' =&gt; true,\n
+])\n
+\n
+&lt;div class="fi-mobile-form-container"&gt;\n
+    {{-- Mobile Form Header --}}\n
+    &lt;div class="fi-mobile-form-header bg-white border-b border-gray-200 p-4 lg:hidden {{ $sticky ? 'sticky top-0 z-10' : '' }}"&gt;\n
+        &lt;div class="flex items-center justify-between"&gt;\n
+            &lt;div class="flex items-center space-x-3"&gt;\n
+                &lt;button \n
+                    type="button"\n
+                    class="p-2 text-gray-400 hover:text-gray-600 rounded-md lg:hidden"\n
+                    onclick="history.back()"\n
+                    aria-label="{{ __('admin.form.go_back') }}"\n
+                &gt;\n
+                    &lt;svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"&gt;\n
+                        &lt;path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"&gt;&lt;/path&gt;\n
+                    &lt;/svg&gt;\n
+                &lt;/button&gt;\n
+                &lt;div&gt;\n
+                    &lt;h1 class="text-lg font-semibold text-gray-900"&gt;{{ $title }}&lt;/h1&gt;\n
+                    @if($description)\n
+                        &lt;p class="text-sm text-gray-500 mt-1"&gt;{{ $description }}&lt;/p&gt;\n
+                    @endif\n
+                &lt;/div&gt;\n
+            &lt;/div&gt;\n
+            \n
+            {{-- Mobile Form Actions --}}\n
+            &lt;div class="flex items-center space-x-2"&gt;\n
+                @foreach($actions as $action)\n
+                    @if($action['primary'] ?? false)\n
+                        &lt;button \n
+                            type="{{ $action['type'] ?? 'button' }}"\n
+                            class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"\n
+                            {{ isset($action['disabled']) &amp;&amp; $action['disabled'] ? 'disabled' : '' }}\n
+                        &gt;\n
+                            {{ $action['label'] }}\n
+                        &lt;/button&gt;\n
+                    @endif\n
+                @endforeach\n
+                \n
+                {{-- Mobile Menu Toggle --}}\n
+                &lt;button \n
+                    type="button"\n
+                    class="p-2 text-gray-400 hover:text-gray-600 rounded-md"\n
+                    onclick="toggleMobileFormMenu()"\n
+                    aria-label="{{ __('admin.form.toggle_menu') }}"\n
+                &gt;\n
+                    &lt;svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"&gt;\n
+                        &lt;path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"&gt;&lt;/path&gt;\n
+                    &lt;/svg&gt;\n
+                &lt;/button&gt;\n
+            &lt;/div&gt;\n
+        &lt;/div&gt;\n
+\n
+        {{-- Mobile Form Menu --}}\n
+        &lt;div id="mobile-form-menu" class="hidden mt-4 pt-4 border-t border-gray-200"&gt;\n
+            &lt;div class="grid grid-cols-2 gap-2"&gt;\n
+                @foreach($actions as $action)\n
+                    @if(!($action['primary'] ?? false))\n
+                        &lt;button \n
+                            type="{{ $action['type'] ?? 'button' }}"\n
+                            class="px-3 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"\n
+                            {{ isset($action['disabled']) &amp;&amp; $action['disabled'] ? 'disabled' : '' }}\n
+                        &gt;\n
+                            {{ $action['label'] }}\n
+                        &lt;/button&gt;\n
+                    @endif\n
+                @endforeach\n
+            &lt;/div&gt;\n
+        &lt;/div&gt;\n
+    &lt;/div&gt;\n
+\n
+    {{-- Desktop Form (hidden on mobile) --}}\n
+    &lt;div class="hidden lg:block"&gt;\n
+        {{ $slot }}\n
+    &lt;/div&gt;\n
+\n
+    {{-- Mobile Form Content --}}\n
+    &lt;div class="lg:hidden"&gt;\n
+        &lt;div class="space-y-6 p-4"&gt;\n
+            @if(count($sections) &gt; 0)\n
+                @foreach($sections as $section)\n
+                    &lt;div class="bg-white rounded-lg border border-gray-200 overflow-hidden"&gt;\n
+                        {{-- Section Header --}}\n
+                        @if(isset($section['title']) || isset($section['description']))\n
+                            &lt;div class="px-4 py-3 border-b border-gray-200 bg-gray-50"&gt;\n
+                                @if(isset($section['title']))\n
+                                    &lt;h3 class="text-base font-medium text-gray-900"&gt;{{ $section['title'] }}&lt;/h3&gt;\n
+                                @endif\n
+                                @if(isset($section['description']))\n
+                                    &lt;p class="text-sm text-gray-500 mt-1"&gt;{{ $section['description'] }}&lt;/p&gt;\n
+                                @endif\n
+                            &lt;/div&gt;\n
+                        @endif\n
+\n
+                        {{-- Section Content --}}\n
+                        &lt;div class="p-4 space-y-4"&gt;\n
+                            @if(isset($section['fields']))\n
+                                @foreach($section['fields'] as $field)\n
+                                    &lt;div class="fi-mobile-form-field"&gt;\n
+                                        {{-- Field Label --}}\n
+                                        @if(isset($field['label']))\n
+                                            &lt;label class="block text-sm font-medium text-gray-700 mb-2"&gt;\n
+                                                {{ $field['label'] }}\n
+                                                @if($field['required'] ?? false)\n
+                                                    &lt;span class="text-red-500"&gt;*&lt;/span&gt;\n
+                                                @endif\n
+                                            &lt;/label&gt;\n
+                                        @endif\n
+\n
+                                        {{-- Field Input --}}\n
+                                        @switch($field['type'] ?? 'text')\n
+                                            @case('text')\n
+                                            @case('email')\n
+                                            @case('password')\n
+                                            @case('number')\n
+                                                &lt;input \n
+                                                    type="{{ $field['type'] }}"\n
+                                                    name="{{ $field['name'] }}"\n
+                                                    id="{{ $field['name'] }}"\n
+                                                    class="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"\n
+                                                    placeholder="{{ $field['placeholder'] ?? '' }}"\n
+                                                    value="{{ $field['value'] ?? '' }}"\n
+                                                    {{ ($field['required'] ?? false) ? 'required' : '' }}\n
+                                                    {{ ($field['disabled'] ?? false) ? 'disabled' : '' }}\n
+                                                &gt;\n
+                                                @break\n
+\n
+                                            @case('textarea')\n
+                                                &lt;textarea \n
+                                                    name="{{ $field['name'] }}"\n
+                                                    id="{{ $field['name'] }}"\n
+                                                    rows="{{ $field['rows'] ?? 4 }}"\n
+                                                    class="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base resize-y"\n
+                                                    placeholder="{{ $field['placeholder'] ?? '' }}"\n
+                                                    {{ ($field['required'] ?? false) ? 'required' : '' }}\n
+                                                    {{ ($field['disabled'] ?? false) ? 'disabled' : '' }}\n
+                                                &gt;{{ $field['value'] ?? '' }}&lt;/textarea&gt;\n
+                                                @break\n
+\n
+                                            @case('select')\n
+                                                &lt;select \n
+                                                    name="{{ $field['name'] }}"\n
+                                                    id="{{ $field['name'] }}"\n
+                                                    class="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"\n
+                                                    {{ ($field['required'] ?? false) ? 'required' : '' }}\n
+                                                    {{ ($field['disabled'] ?? false) ? 'disabled' : '' }}\n
+                                                &gt;\n
+                                                    @if(isset($field['placeholder']))\n
+                                                        &lt;option value=""&gt;{{ $field['placeholder'] }}&lt;/option&gt;\n
+                                                    @endif\n
+                                                    @if(isset($field['options']))\n
+                                                        @foreach($field['options'] as $value =&gt; $label)\n
+                                                            &lt;option \n
+                                                                value="{{ $value }}"\n
+                                                                {{ ($field['value'] ?? '') == $value ? 'selected' : '' }}\n
+                                                            &gt;\n
+                                                                {{ $label }}\n
+                                                            &lt;/option&gt;\n
+                                                        @endforeach\n
+                                                    @endif\n
+                                                &lt;/select&gt;\n
+                                                @break\n
+\n
+                                            @case('checkbox')\n
+                                                &lt;div class="flex items-center"&gt;\n
+                                                    &lt;input \n
+                                                        type="checkbox"\n
+                                                        name="{{ $field['name'] }}"\n
+                                                        id="{{ $field['name'] }}"\n
+                                                        class="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"\n
+                                                        value="{{ $field['checkbox_value'] ?? '1' }}"\n
+                                                        {{ ($field['checked'] ?? false) ? 'checked' : '' }}\n
+                                                        {{ ($field['disabled'] ?? false) ? 'disabled' : '' }}\n
+                                                    &gt;\n
+                                                    @if(isset($field['checkbox_label']))\n
+                                                        &lt;label for="{{ $field['name'] }}" class="ml-3 text-sm text-gray-700"&gt;\n
+                                                            {{ $field['checkbox_label'] }}\n
+                                                        &lt;/label&gt;\n
+                                                    @endif\n
+                                                &lt;/div&gt;\n
+                                                @break\n
+\n
+                                            @case('radio')\n
+                                                @if(isset($field['options']))\n
+                                                    &lt;div class="space-y-3"&gt;\n
+                                                        @foreach($field['options'] as $value =&gt; $label)\n
+                                                            &lt;div class="flex items-center"&gt;\n
+                                                                &lt;input \n
+                                                                    type="radio"\n
+                                                                    name="{{ $field['name'] }}"\n
+                                                                    id="{{ $field['name'] }}_{{ $value }}"\n
+                                                                    class="h-5 w-5 text-blue-600 border-gray-300 focus:ring-blue-500"\n
+                                                                    value="{{ $value }}"\n
+                                                                    {{ ($field['value'] ?? '') == $value ? 'checked' : '' }}\n
+                                                                    {{ ($field['disabled'] ?? false) ? 'disabled' : '' }}\n
+                                                                &gt;\n
+                                                                &lt;label for="{{ $field['name'] }}_{{ $value }}" class="ml-3 text-sm text-gray-700"&gt;\n
+                                                                    {{ $label }}\n
+                                                                &lt;/label&gt;\n
+                                                            &lt;/div&gt;\n
+                                                        @endforeach\n
+                                                    &lt;/div&gt;\n
+                                                @endif\n
+                                                @break\n
+\n
+                                            @case('file')\n
+                                                &lt;div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors"&gt;\n
+                                                    &lt;input \n
+                                                        type="file"\n
+                                                        name="{{ $field['name'] }}"\n
+                                                        id="{{ $field['name'] }}"\n
+                                                        class="hidden"\n
+                                                        {{ isset($field['accept']) ? 'accept=' . $field['accept'] : '' }}\n
+                                                        {{ ($field['multiple'] ?? false) ? 'multiple' : '' }}\n
+                                                        {{ ($field['required'] ?? false) ? 'required' : '' }}\n
+                                                        {{ ($field['disabled'] ?? false) ? 'disabled' : '' }}\n
+                                                        onchange="updateFileLabel(this)"\n
+                                                    &gt;\n
+                                                    &lt;label for="{{ $field['name'] }}" class="cursor-pointer"&gt;\n
+                                                        &lt;svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48"&gt;\n
+                                                            &lt;path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /&gt;\n
+                                                        &lt;/svg&gt;\n
+                                                        &lt;div class="mt-4"&gt;\n
+                                                            &lt;p class="text-sm text-gray-600"&gt;\n
+                                                                &lt;span class="font-medium text-blue-600 hover:text-blue-500"&gt;{{ __('admin.form.click_to_upload') }}&lt;/span&gt;\n
+                                                                {{ __('admin.form.or_drag_and_drop') }}\n
+                                                            &lt;/p&gt;\n
+                                                            &lt;p class="text-xs text-gray-500 mt-1" id="{{ $field['name'] }}_label"&gt;\n
+                                                                {{ $field['help'] ?? __('admin.form.file_help') }}\n
+                                                            &lt;/p&gt;\n
+                                                        &lt;/div&gt;\n
+                                                    &lt;/label&gt;\n
+                                                &lt;/div&gt;\n
+                                                @break\n
+                                        @endswitch\n
+\n
+                                        {{-- Field Help Text --}}\n
+                                        @if(isset($field['help']) &amp;&amp; $field['type'] !== 'file')\n
+                                            &lt;p class="text-xs text-gray-500 mt-1"&gt;{{ $field['help'] }}&lt;/p&gt;\n
+                                        @endif\n
+\n
+                                        {{-- Field Error --}}\n
+                                        @if(isset($field['error']))\n
+                                            &lt;p class="text-xs text-red-600 mt-1"&gt;{{ $field['error'] }}&lt;/p&gt;\n
+                                        @endif\n
+                                    &lt;/div&gt;\n
+                                @endforeach\n
+                            @endif\n
+                        &lt;/div&gt;\n
+                    &lt;/div&gt;\n
+                @endforeach\n
+            @else\n
+                {{-- Default slot content for mobile --}}\n
+                &lt;div class="bg-white rounded-lg border border-gray-200 p-4"&gt;\n
+                    {{ $slot }}\n
+                &lt;/div&gt;\n
+            @endif\n
+        &lt;/div&gt;\n
+\n
+        {{-- Mobile Form Footer --}}\n
+        &lt;div class="sticky bottom-0 bg-white border-t border-gray-200 p-4 lg:hidden"&gt;\n
+            &lt;div class="flex space-x-3"&gt;\n
+                @foreach($actions as $action)\n
+                    @if($action['primary'] ?? false)\n
+                        &lt;button \n
+                            type="{{ $action['type'] ?? 'button' }}"\n
+                            class="flex-1 px-4 py-3 bg-blue-600 text-white text-base font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"\n
+                            {{ isset($action['disabled']) &amp;&amp; $action['disabled'] ? 'disabled' : '' }}\n
+                        &gt;\n
+                            {{ $action['label'] }}\n
+                        &lt;/button&gt;\n
+                    @else\n
+                        &lt;button \n
+                            type="{{ $action['type'] ?? 'button' }}"\n
+                            class="px-4 py-3 border border-gray-300 text-gray-700 text-base font-medium rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"\n
+                            {{ isset($action['disabled']) &amp;&amp; $action['disabled'] ? 'disabled' : '' }}\n
+                        &gt;\n
+                            {{ $action['label'] }}\n
+                        &lt;/button&gt;\n
+                    @endif\n
+                @endforeach\n
+            &lt;/div&gt;\n
+        &lt;/div&gt;\n
+    &lt;/div&gt;\n
+&lt;/div&gt;\n
+\n
+{{-- Mobile Form JavaScript --}}\n
+&lt;script&gt;\n
+function toggleMobileFormMenu() {\n
+    const menu = document.getElementById('mobile-form-menu');\n
+    menu.classList.toggle('hidden');\n
+}\n
+\n
+function updateFileLabel(input) {\n
+    const label = document.getElementById(input.id + '_label');\n
+    if (input.files &amp;&amp; input.files.length &gt; 0) {\n
+        if (input.files.length === 1) {\n
+            label.textContent = input.files[0].name;\n
+        } else {\n
+            label.textContent = `${input.files.length} {{ __('admin.form.files_selected') }}`;\n
+        }\n
+    } else {\n
+        label.textContent = '{{ __('admin.form.file_help') }}';\n
+    }\n
+}\n
+\n
+// Auto-resize textareas\n
+document.addEventListener('input', function(event) {\n
+    if (event.target.tagName === 'TEXTAREA') {\n
+        event.target.style.height = 'auto';\n
+        event.target.style.height = event.target.scrollHeight + 'px';\n
+    }\n
+});\n
+\n
+// Close mobile form menu when clicking outside\n
+document.addEventListener('click', function(event) {\n
+    const menu = document.getElementById('mobile-form-menu');\n
+    const toggle = event.target.closest('[onclick*="toggleMobileFormMenu"]');\n
+    \n
+    if (!menu.contains(event.target) &amp;&amp; !toggle) {\n
+        menu.classList.add('hidden');\n
+    }\n
+});\n
+\n
+// Handle form validation on mobile\n
+document.addEventListener('invalid', function(event) {\n
+    event.preventDefault();\n
+    \n
+    // Scroll to first invalid field\n
+    const firstInvalid = document.querySelector(':invalid');\n
+    if (firstInvalid) {\n
+        firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });\n
+        firstInvalid.focus();\n
+    }\n
+}, true);\n
+\n
+// Prevent zoom on iOS when focusing inputs\n
+if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {\n
+    const inputs = document.querySelectorAll('input, select, textarea');\n
+    inputs.forEach(input =&gt; {\n
+        if (input.style.fontSize !== '16px') {\n
+            input.style.fontSize = '16px';\n
+        }\n
+    });\n
+}\n
+&lt;/script&gt;\n
+\n
+{{-- Mobile Form Styles --}}\n
+&lt;style&gt;\n
+.fi-mobile-form-container {\n
+    -webkit-overflow-scrolling: touch;\n
+}\n
+\n
+.fi-mobile-form-container input,\n
+.fi-mobile-form-container select,\n
+.fi-mobile-form-container textarea,\n
+.fi-mobile-form-container button {\n
+    touch-action: manipulation;\n
+    -webkit-tap-highlight-color: transparent;\n
+}\n
+\n
+.fi-mobile-form-container button:active {\n
+    transform: scale(0.98);\n
+}\n
+\n
+/* Improve touch targets */\n
+@media (hover: none) and (pointer: coarse) {\n
+    .fi-mobile-form-container input,\n
+    .fi-mobile-form-container select,\n
+    .fi-mobile-form-container textarea,\n
+    .fi-mobile-form-container button {\n
+        min-height: 44px;\n
+    }\n
+    \n
+    .fi-mobile-form-container input[type="checkbox"],\n
+    .fi-mobile-form-container input[type="radio"] {\n
+        min-width: 44px;\n
+        min-height: 44px;\n
+        transform: scale(1.5);\n
+        margin: 8px;\n
+    }\n
+}\n
+\n
+/* Smooth transitions */\n
+.fi-mobile-form-container * {\n
+    transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;\n
+}\n
+\n
+/* Auto-resize textareas */\n
+.fi-mobile-form-container textarea {\n
+    resize: none;\n
+    overflow: hidden;\n
+}\n
+\n
+/* File upload drag and drop */\n
+.fi-mobile-form-container input[type="file"] + label {\n
+    transition: border-color 0.2s ease, background-color 0.2s ease;\n
+}\n
+\n
+.fi-mobile-form-container input[type="file"]:focus + label {\n
+    border-color: #3b82f6;\n
+    background-color: #eff6ff;\n
+}\n
+\n
+/* Mobile form spacing */\n
+@media (max-width: 768px) {\n
+    .fi-mobile-form-container {\n
+        padding-bottom: 80px; /* Space for sticky footer */\n
+    }\n
+}\n
+&lt;/style&gt;' [ASCII](length: 22529) contains "font-size: 16px" [ASCII](length: 15).
+at tests/Feature/Filament/MobileResponsivenessImplementationTest.php:166</failure>
+    </testcase>
   </testsuite>
 </testsuites>
