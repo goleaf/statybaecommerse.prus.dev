@@ -680,33 +680,6 @@ final class TestingDatabase
             });
         }
 
-        if (! $schema->hasTable('activity_log')) {
-            $schema->create('activity_log', function (Blueprint $table): void {
-                $table->id();
-                $table->string('log_name')->nullable();
-                $table->text('description')->nullable();
-                $table->string('event')->nullable();
-                $table->string('subject_type')->nullable();
-                $table->unsignedBigInteger('subject_id')->nullable();
-                $table->string('causer_type')->nullable();
-                $table->unsignedBigInteger('causer_id')->nullable();
-                $table->json('properties')->nullable();
-                $table->uuid('batch_uuid')->nullable();
-                $table->string('ip_address', 45)->nullable();
-                $table->text('user_agent')->nullable();
-                $table->string('device_type')->nullable();
-                $table->string('browser')->nullable();
-                $table->string('os')->nullable();
-                $table->string('country', 2)->nullable();
-                $table->boolean('is_important')->default(false);
-                $table->boolean('is_system')->default(false);
-                $table->string('severity')->nullable();
-                $table->string('category')->nullable();
-                $table->text('notes')->nullable();
-                $table->timestamps();
-            });
-        }
-
         if (! $schema->hasTable('cart_items')) {
             $schema->create('cart_items', function (Blueprint $table): void {
                 $table->id();

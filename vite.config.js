@@ -50,9 +50,6 @@ const collectScssInputs = (directory) => {
  */
 const filamentNordThemePath = 'vendor/andreia/filament-nord-theme/resources/css/theme.css';
 const absoluteFilamentNordThemePath = path.resolve(process.cwd(), filamentNordThemePath);
-const filamentFullCalendarCssPath = 'vendor/saade/filament-fullcalendar/resources/css/filament-fullcalendar.css';
-const absoluteFilamentFullCalendarCssPath = path.resolve(process.cwd(), filamentFullCalendarCssPath);
-const fallbackFullCalendarCssPath = path.resolve(process.cwd(), 'resources/css/vendor-fallbacks/filament-fullcalendar.css');
 const filamentComboboxCssPath = 'vendor/novadaemon/filament-combobox/resources/dist/filament-combobox.css';
 const absoluteFilamentComboboxCssPath = path.resolve(process.cwd(), filamentComboboxCssPath);
 const fallbackComboboxCssPath = path.resolve(process.cwd(), 'resources/css/vendor-fallbacks/filament-combobox.css');
@@ -74,12 +71,6 @@ export default defineConfig({
       resolveId(source) {
         // Redirect Filament vendor style imports to local fallbacks when the
         // Composer packages have not been installed yet.
-        if (source === '@filament-fullcalendar' || source.endsWith('vendor/saade/filament-fullcalendar/resources/css/filament-fullcalendar.css')) {
-          return fs.existsSync(absoluteFilamentFullCalendarCssPath)
-            ? absoluteFilamentFullCalendarCssPath
-            : fallbackFullCalendarCssPath;
-        }
-
         if (source === '@filament-combobox' || source.endsWith('vendor/novadaemon/filament-combobox/resources/dist/filament-combobox.css')) {
           return fs.existsSync(absoluteFilamentComboboxCssPath)
             ? absoluteFilamentComboboxCssPath

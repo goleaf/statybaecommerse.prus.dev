@@ -13,15 +13,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
-use JsonException;
-use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
-use Throwable;
 
 /**
  * SystemSettingCategory
@@ -42,7 +35,6 @@ final class SystemSettingCategory extends Model
 {
     use HasSlug;
     use LaravelHasFactory;
-    use LogsActivity;
     use OrdersByName;
     use SoftDeletes;
 
@@ -56,69 +48,6 @@ final class SystemSettingCategory extends Model
 
     protected $casts = ['is_active' => 'boolean', 'sort_order' => 'integer', 'parent_id' => 'integer', 'meta' => 'array'];
 
-    protected static function booted(): void
-    {
-        self::updated(function (self $category): void {
-            $connectionName = $category->getConnectionName() ?? config('database.default');
-
-            if (! is_string($connectionName)) {
-                $connectionName = config('database.default');
-            }
-
-            if (! is_string($connectionName) || $connectionName === '') {
-                return;
-            }
-
-            try {
-                $schema = Schema::connection($connectionName);
-            } catch (Throwable) {
-                return;
-            }
-
-            if (! $schema->hasTable('activity_log')) {
-                return;
-            }
-
-            $query = DB::connection($connectionName)
-                ->table('activity_log')
-                ->where('subject_type', self::class)
-                ->where('subject_id', $category->getKey())
-                ->where('event', 'updated');
-
-            if ($query->exists()) {
-                return;
-            }
-
-            $trackedKeys = ['name', 'slug', 'description', 'icon', 'color', 'sort_order', 'is_active', 'parent_id'];
-
-            $attributes = Arr::only($category->getAttributes(), $trackedKeys);
-            $original = Arr::only($category->getOriginal(), $trackedKeys);
-
-            try {
-                $properties = json_encode([
-                    'attributes' => $attributes,
-                    'old'        => $original,
-                ], JSON_THROW_ON_ERROR);
-            } catch (JsonException) {
-                $properties = json_encode([
-                    'attributes' => $attributes,
-                    'old'        => $original,
-                ]) ?: null;
-            }
-
-            DB::connection($connectionName)->table('activity_log')->insert([
-                'log_name'     => 'system_setting_categories',
-                'description'  => 'System Setting Category updated',
-                'subject_type' => self::class,
-                'subject_id'   => $category->getKey(),
-                'event'        => 'updated',
-                'properties'   => $properties,
-                'created_at'   => now(),
-                'updated_at'   => now(),
-            ]);
-        });
-    }
-
     /**
      * Handle getSlugOptions functionality with proper error handling.
      */
@@ -127,13 +56,6 @@ final class SystemSettingCategory extends Model
         return SlugOptions::create()->generateSlugsFrom('name')->saveSlugsTo('slug');
     }
 
-    /**
-     * Handle getActivitylogOptions functionality with proper error handling.
-     */
-    public function getActivitylogOptions(): LogOptions
-    {
-        return LogOptions::defaults()->logOnly(['name', 'slug', 'description', 'is_active', 'sort_order'])->logOnlyDirty()->dontSubmitEmptyLogs()->setDescriptionForEvent(fn (string $eventName): string => "System Setting Category {$eventName}")->useLogName('system_setting_categories');
-    }
 
     /**
      * Handle settings functionality with proper error handling.

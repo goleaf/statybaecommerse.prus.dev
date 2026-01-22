@@ -16,8 +16,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Traits\LogsActivity;
 
 /**
  * PriceList
@@ -39,7 +37,6 @@ final class PriceList extends Model
 {
     use HasFactory;
     use HasTranslations;
-    use LogsActivity;
     use OrdersByName;
     use SoftDeletes;
 
@@ -264,11 +261,4 @@ final class PriceList extends Model
         return $this->partners()->count();
     }
 
-    /**
-     * Handle getActivitylogOptions functionality with proper error handling.
-     */
-    public function getActivitylogOptions(): LogOptions
-    {
-        return LogOptions::defaults()->logOnly(['name', 'code', 'currency_id', 'is_enabled', 'priority', 'starts_at', 'ends_at'])->logOnlyDirty()->dontSubmitEmptyLogs();
-    }
 }

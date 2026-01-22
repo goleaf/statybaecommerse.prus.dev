@@ -38,8 +38,8 @@ trait HasConditionalRelationships
      */
     public function recentActivities(): HasMany
     {
-        return $this->hasMany(\App\Models\ActivityLog::class, 'subject_id')
-            ->where('subject_type', static::class)
+        return $this->hasMany(\App\Models\AdminActivityLog::class, 'resource_id')
+            ->where('resource_type', $this->getMorphClass())
             ->where('created_at', '>=', now()->subDays(30))
             ->orderBy('created_at', 'desc');
     }

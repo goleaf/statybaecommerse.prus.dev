@@ -166,8 +166,14 @@ final class InventoryService
      */
     private function logStockAdjustment(Product $product, int $oldQuantity, int $newQuantity, string $reason, ?string $notes): void
     {
-        // Log to activity log
-        activity()->performedOn($product)->withProperties(['old_quantity' => $oldQuantity, 'new_quantity' => $newQuantity, 'adjustment' => $newQuantity - $oldQuantity, 'reason' => $reason, 'notes' => $notes])->log('Stock adjusted');
+        Log::info('Stock adjusted', [
+            'product_id'   => $product->id,
+            'old_quantity' => $oldQuantity,
+            'new_quantity' => $newQuantity,
+            'adjustment'   => $newQuantity - $oldQuantity,
+            'reason'       => $reason,
+            'notes'        => $notes,
+        ]);
     }
 
     /**
@@ -175,7 +181,13 @@ final class InventoryService
      */
     private function logVariantStockAdjustment(ProductVariant $variant, int $oldQuantity, int $newQuantity, string $reason, ?string $notes): void
     {
-        // Log to activity log
-        activity()->performedOn($variant)->withProperties(['old_quantity' => $oldQuantity, 'new_quantity' => $newQuantity, 'adjustment' => $newQuantity - $oldQuantity, 'reason' => $reason, 'notes' => $notes])->log('Variant stock adjusted');
+        Log::info('Variant stock adjusted', [
+            'variant_id'   => $variant->id,
+            'old_quantity' => $oldQuantity,
+            'new_quantity' => $newQuantity,
+            'adjustment'   => $newQuantity - $oldQuantity,
+            'reason'       => $reason,
+            'notes'        => $notes,
+        ]);
     }
 }

@@ -308,28 +308,6 @@ final class ProductVariantAttributeMatrixServiceTest extends UnitTestCase
             });
         }
 
-        if (! $schema->hasTable('activity_log')) {
-            $schema->create('activity_log', static function (Blueprint $table): void {
-                $table->id();
-                $table->string('log_name')->nullable();
-                $table->text('description')->nullable();
-                $table->unsignedBigInteger('subject_id')->nullable();
-                $table->string('subject_type')->nullable();
-                $table->unsignedBigInteger('causer_id')->nullable();
-                $table->string('causer_type')->nullable();
-                $table->json('properties')->nullable();
-                $table->uuid('batch_uuid')->nullable();
-                $table->string('event')->nullable();
-                $table->timestamps();
-
-                $table->index('log_name');
-                $table->index(['subject_type', 'subject_id']);
-                $table->index(['causer_type', 'causer_id']);
-                $table->index('batch_uuid');
-                $table->index('event');
-            });
-        }
-
         self::$schemaEnsured = true;
     }
 }

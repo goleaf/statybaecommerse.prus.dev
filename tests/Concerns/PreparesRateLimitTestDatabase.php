@@ -55,7 +55,6 @@ trait PreparesRateLimitTestDatabase
             'orders',
             'addresses',
             'cart_items',
-            'activity_log',
             'personal_access_tokens',
             'users',
         ];
@@ -91,18 +90,6 @@ trait PreparesRateLimitTestDatabase
             $table->text('abilities')->nullable();
             $table->timestamp('last_used_at')->nullable();
             $table->timestamp('expires_at')->nullable();
-            $table->timestamps();
-        });
-
-        Schema::create('activity_log', function (Blueprint $table): void {
-            $table->bigIncrements('id');
-            $table->string('log_name')->nullable();
-            $table->text('description')->nullable();
-            $table->nullableMorphs('subject');
-            $table->nullableMorphs('causer');
-            $table->json('properties')->nullable();
-            $table->uuid('batch_uuid')->nullable();
-            $table->string('event')->nullable();
             $table->timestamps();
         });
 

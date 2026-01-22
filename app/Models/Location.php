@@ -15,8 +15,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Traits\LogsActivity;
 
 /**
  * Location
@@ -36,7 +34,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 #[ScopedBy([ActiveScope::class, EnabledScope::class])]
 final class Location extends Model
 {
-    use HasFactory, HasTranslations, LogsActivity, SoftDeletes;
+    use HasFactory, HasTranslations, SoftDeletes;
 
     public const SCOPE_COLUMN_HINTS = [
         'is_active'  => false,
@@ -91,13 +89,6 @@ final class Location extends Model
         ];
     }
 
-    /**
-     * Handle getActivitylogOptions functionality with proper error handling.
-     */
-    public function getActivitylogOptions(): LogOptions
-    {
-        return LogOptions::defaults()->logOnly(['name', 'code', 'type', 'is_enabled', 'is_default', 'address_line_1', 'city', 'country_code'])->logOnlyDirty()->dontSubmitEmptyLogs()->setDescriptionForEvent(fn (string $eventName) => "Location {$eventName}")->useLogName('location');
-    }
 
     /**
      * Handle country functionality with proper error handling.

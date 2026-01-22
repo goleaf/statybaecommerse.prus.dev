@@ -13,8 +13,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Traits\LogsActivity;
 
 /**
  * ProductRequest
@@ -37,7 +35,6 @@ final class ProductRequest extends Model
     /** @use HasFactory<ProductRequestFactory> */
     use HasFactory;
 
-    use LogsActivity;
     use SoftDeletes;
 
     /**
@@ -82,13 +79,6 @@ final class ProductRequest extends Model
      */
     protected $table = 'product_requests';
 
-    /**
-     * Handle getActivitylogOptions functionality with proper error handling.
-     */
-    public function getActivitylogOptions(): LogOptions
-    {
-        return LogOptions::defaults()->logOnly(['status', 'admin_notes', 'responded_at', 'responded_by'])->logOnlyDirty()->dontSubmitEmptyLogs()->setDescriptionForEvent(fn (string $eventName): string => "Product Request {$eventName}")->useLogName('product_request');
-    }
 
     /**
      * Handle product functionality with proper error handling.

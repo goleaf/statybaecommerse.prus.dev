@@ -531,12 +531,12 @@ final class SystemSettingTest extends TestCase
         $this->assertSoftDeleted('system_settings', ['id' => $setting->id]);
     }
 
-    public function test_system_setting_model_activity_log(): void
+    public function test_system_setting_model_saves_without_activity_log_dependency(): void
     {
         $setting = SystemSetting::factory()->create();
         $setting->name = 'Updated Name';
         $setting->save();
 
-        $this->assertTrue(true);  // If no exception is thrown, activity log works
+        $this->assertSame('Updated Name', $setting->fresh()->name);
     }
 }

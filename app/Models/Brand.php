@@ -23,8 +23,6 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Laravel\Scout\Searchable;
-use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -62,7 +60,6 @@ final class Brand extends Model implements HasMedia, TranslatableRecord
     use HasFactory;
     use HasTranslations;
     use InteractsWithMedia;
-    use LogsActivity;
 
     // Keep alphabetical listings predictable by piping queries through the shared OrdersByName scope.
     use OrdersByName;
@@ -224,13 +221,6 @@ final class Brand extends Model implements HasMedia, TranslatableRecord
         return 'slug';
     }
 
-    /**
-     * Handle getActivitylogOptions functionality with proper error handling.
-     */
-    public function getActivitylogOptions(): LogOptions
-    {
-        return LogOptions::defaults()->logOnly(['name', 'slug', 'description', 'website', 'is_enabled', 'is_visible'])->logOnlyDirty()->dontSubmitEmptyLogs()->setDescriptionForEvent(fn (string $eventName): string => "Brand {$eventName}")->useLogName('brand');
-    }
 
     /**
      * Handle flushCaches functionality with proper error handling.

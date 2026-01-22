@@ -98,25 +98,6 @@ final class News extends Model implements TranslatableRecord
         return $this->approvals()->one()->latestOfMany('decided_at');
     }
 
-    public function getActivitylogOptions(): LogOptions
-    {
-        return LogOptions::defaults()
-            ->logOnly([
-                'moderation_state',
-                'submitted_for_review_at',
-                'approved_at',
-                'approved_by_id',
-                'is_visible',
-                'is_featured',
-                'is_breaking',
-                'published_at',
-                'author_name',
-                'author_email',
-            ])
-            ->logOnlyDirty()
-            ->dontSubmitEmptyLogs();
-    }
-
     /**
      * Handle isPublished functionality with proper error handling.
      */

@@ -14,7 +14,6 @@ trait UsesApiRateLimitSchema
     {
         Schema::disableForeignKeyConstraints();
 
-        Schema::dropIfExists('activity_log');
         Schema::dropIfExists('cart_items');
         Schema::dropIfExists('user_wishlists');
         Schema::dropIfExists('products');
@@ -132,18 +131,6 @@ trait UsesApiRateLimitSchema
                 ->nullOnDelete();
         });
 
-        Schema::create('activity_log', function (Blueprint $table): void {
-            $table->bigIncrements('id');
-            $table->string('log_name')->nullable();
-            $table->text('description')->nullable();
-            $table->nullableMorphs('subject');
-            $table->nullableMorphs('causer');
-            $table->uuid('batch_uuid')->nullable();
-            $table->string('event')->nullable();
-            $table->json('properties')->nullable();
-            $table->timestamps();
-        });
-
         Schema::enableForeignKeyConstraints();
     }
 
@@ -151,7 +138,6 @@ trait UsesApiRateLimitSchema
     {
         Schema::disableForeignKeyConstraints();
 
-        Schema::dropIfExists('activity_log');
         Schema::dropIfExists('cart_items');
         Schema::dropIfExists('user_wishlists');
         Schema::dropIfExists('products');
