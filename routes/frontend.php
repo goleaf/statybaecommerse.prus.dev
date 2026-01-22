@@ -102,8 +102,6 @@ Route::middleware(['web'])->group(function () {
         Route::post('/privacy-settings', [App\Http\Controllers\Frontend\UserController::class, 'updatePrivacySettings'])->name('privacy.update');
     });
 
-
-
     // Discounts & Coupons
     Route::prefix('discounts')->name('frontend.discounts.')->group(function () {
         Route::get('/', [App\Http\Controllers\Frontend\DiscountController::class, 'index'])->name('index');

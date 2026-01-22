@@ -14,8 +14,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Translatable\HasTranslations;
 
 /**
@@ -37,7 +35,6 @@ final class ReferralCode extends Model
 {
     use HasFactory;
     use HasTranslations;
-    use LogsActivity;
     use OrdersByName;
 
     /**
@@ -58,13 +55,6 @@ final class ReferralCode extends Model
         return ['is_active' => 'boolean', 'expires_at' => 'datetime', 'metadata' => 'array', 'meta' => 'array', 'usage_limit' => 'integer', 'usage_count' => 'integer', 'reward_amount' => 'decimal:2', 'conditions' => 'array', 'tags' => 'array'];
     }
 
-    /**
-     * Handle getActivitylogOptions functionality with proper error handling.
-     */
-    public function getActivitylogOptions(): LogOptions
-    {
-        return LogOptions::defaults()->logOnly(['user_id', 'code', 'is_active', 'expires_at', 'title', 'description', 'usage_limit', 'usage_count', 'reward_amount', 'reward_type'])->logOnlyDirty()->dontSubmitEmptyLogs();
-    }
 
     /**
      * Handle user functionality with proper error handling.

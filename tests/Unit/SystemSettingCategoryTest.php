@@ -305,18 +305,12 @@ class SystemSettingCategoryTest extends TestCase
         $this->assertSoftDeleted('system_setting_categories', ['id' => $categoryId]);
     }
 
-    public function test_activity_logging(): void
+    public function test_updates_do_not_require_activity_log_table(): void
     {
         $category = SystemSettingCategory::factory()->create(['name' => 'Original Name']);
 
-        // Update the category
         $category->update(['name' => 'Updated Name']);
 
-        // Check that activity log was created
-        $this->assertDatabaseHas('activity_log', [
-            'subject_type' => SystemSettingCategory::class,
-            'subject_id'   => $category->id,
-            'event'        => 'updated',
-        ]);
+        $this->assertSame('Updated Name', $category->fresh()->name);
     }
 }

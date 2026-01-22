@@ -16,8 +16,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -41,7 +39,6 @@ final class SystemSetting extends Model implements HasMedia
 {
     use HasFactory;
     use InteractsWithMedia;
-    use LogsActivity;
     use OrdersByName;
     use SoftDeletes;
 
@@ -180,13 +177,6 @@ final class SystemSetting extends Model implements HasMedia
         });
     }
 
-    /**
-     * Handle getActivitylogOptions functionality with proper error handling.
-     */
-    public function getActivitylogOptions(): LogOptions
-    {
-        return LogOptions::defaults()->logOnly(['key', 'name', 'value', 'type', 'group', 'is_active'])->logOnlyDirty()->dontSubmitEmptyLogs()->setDescriptionForEvent(fn (string $eventName): string => "System Setting {$eventName}")->useLogName('system_settings');
-    }
 
     /**
      * Handle category functionality with proper error handling.

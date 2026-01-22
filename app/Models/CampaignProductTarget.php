@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * CampaignProductTarget Model (Deprecated)
- * 
+ *
  * @deprecated This model is deprecated as the campaigns feature has been removed.
  */
 final class CampaignProductTarget extends Model
@@ -38,8 +38,8 @@ final class CampaignProductTarget extends Model
     ];
 
     protected $casts = [
-        'conditions' => 'array',
-        'is_active' => 'boolean',
+        'conditions'  => 'array',
+        'is_active'   => 'boolean',
         'is_featured' => 'boolean',
     ];
 

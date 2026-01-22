@@ -33,8 +33,6 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use JsonException;
 use Laravel\Scout\Searchable;
-use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -81,7 +79,6 @@ final class Product extends Model implements HasMedia, TranslatableRecord
     use HasProductPricing;
     use HasTranslations;
     use InteractsWithMedia;
-    use LogsActivity;
     use OrdersByName;
     use Searchable {
         Searchable::bootSearchable as scoutBootSearchable;
@@ -252,13 +249,6 @@ final class Product extends Model implements HasMedia, TranslatableRecord
         }
     }
 
-    /**
-     * Handle getActivitylogOptions functionality with proper error handling.
-     */
-    public function getActivitylogOptions(): LogOptions
-    {
-        return LogOptions::defaults()->logOnly(['name', 'slug', 'description', 'sku', 'price', 'sale_price', 'stock_quantity', 'is_visible'])->logOnlyDirty()->dontSubmitEmptyLogs()->setDescriptionForEvent(fn (string $eventName) => "Product {$eventName}")->useLogName('product');
-    }
 
     /**
      * Handle getRouteKeyName functionality with proper error handling.

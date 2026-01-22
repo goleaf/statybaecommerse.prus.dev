@@ -6,7 +6,6 @@ namespace App\Filament;
 
 use App\Filament\Pages\Auth\Login as AdminLogin;
 use App\Filament\Pages\Dashboard as FilamentDashboard;
-use App\Filament\Widgets\CalendarWidget;
 use App\Filament\Widgets\DashboardKpiWidget;
 use App\Filament\Widgets\DashboardLowStockTable;
 use App\Filament\Widgets\DashboardQuickActionsWidget;
@@ -16,7 +15,6 @@ use App\Filament\Widgets\DashboardTimeSeriesWidget;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
-use Filament\View\PanelsRenderHook;
 use Filament\Widgets\Widget;
 use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 use InvalidArgumentException;
@@ -94,7 +92,6 @@ class AdminPanelProvider extends PanelProvider
             DashboardLowStockTable::class,
             DashboardRecentErrorsTable::class,
             DashboardQuickActionsWidget::class,
-            CalendarWidget::class,
         ];
     }
 
@@ -127,9 +124,6 @@ class AdminPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Blue,
             ])
-            // Render hooks removed to fix config cache serialization issue
-            // ->renderHook(PanelsRenderHook::STYLES_AFTER, ...)
-            // ->renderHook(PanelsRenderHook::SCRIPTS_AFTER, ...)
             ->middleware([
                 \Illuminate\Cookie\Middleware\EncryptCookies::class,
                 \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,

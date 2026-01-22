@@ -25,7 +25,6 @@ trait InteractsWithRateLimitSchema
         Schema::dropIfExists('roles');
         Schema::dropIfExists('exports');
         Schema::dropIfExists('users');
-        Schema::dropIfExists('activity_log');
         Schema::enableForeignKeyConstraints();
 
         Schema::create('users', function (Blueprint $table): void {
@@ -65,19 +64,6 @@ trait InteractsWithRateLimitSchema
             $table->text('failure_reason')->nullable();
             $table->foreignId('requested_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
-        });
-
-        Schema::create('activity_log', function (Blueprint $table): void {
-            $table->bigIncrements('id');
-            $table->string('log_name')->nullable();
-            $table->text('description');
-            $table->nullableMorphs('subject', 'subject');
-            $table->nullableMorphs('causer', 'causer');
-            $table->string('event')->nullable();
-            $table->uuid('batch_uuid')->nullable();
-            $table->json('properties')->nullable();
-            $table->timestamps();
-            $table->index('log_name');
         });
 
         Schema::create('roles', function (Blueprint $table): void {
@@ -171,7 +157,6 @@ trait InteractsWithRateLimitSchema
         Schema::dropIfExists('roles');
         Schema::dropIfExists('exports');
         Schema::dropIfExists('users');
-        Schema::dropIfExists('activity_log');
         Schema::enableForeignKeyConstraints();
 
         // Restore the shared testing database schema so subsequent tests that rely on the

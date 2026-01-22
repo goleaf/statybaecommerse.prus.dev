@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * CampaignSchedule Model (Deprecated)
- * 
+ *
  * @deprecated This model is deprecated as the campaigns feature has been removed.
  */
 final class CampaignSchedule extends Model
@@ -32,9 +32,9 @@ final class CampaignSchedule extends Model
 
     protected $casts = [
         'schedule_config' => 'array',
-        'next_run_at' => 'datetime',
-        'last_run_at' => 'datetime',
-        'is_active' => 'boolean',
+        'next_run_at'     => 'datetime',
+        'last_run_at'     => 'datetime',
+        'is_active'       => 'boolean',
     ];
 
     /**

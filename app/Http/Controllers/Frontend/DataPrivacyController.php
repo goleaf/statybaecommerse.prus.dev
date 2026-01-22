@@ -24,7 +24,7 @@ final class DataPrivacyController extends Controller
 {
     /**
      * Inject the audit logger so GDPR flows automatically register activity
-     * trail entries across both the bespoke admin logs and Spatie activity log.
+     * trail entries across the bespoke admin logs.
      */
     public function __construct(private readonly AdminActivityLogger $activityLogger) {}
 

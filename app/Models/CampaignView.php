@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * CampaignView Model (Deprecated)
- * 
+ *
  * @deprecated This model is deprecated as the campaigns feature has been removed.
  */
 final class CampaignView extends Model

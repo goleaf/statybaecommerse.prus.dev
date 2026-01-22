@@ -27,7 +27,8 @@ describe('Code Quality Maintenance Property Tests', function () {
         expect($phpFiles)->not->toBeEmpty('Should have PHP files to test');
 
         // Test that Pint style checks pass
-        $pintProcess = new Process(['vendor/bin/pint', '--test']);
+        $pintCmd = PHP_OS_FAMILY === 'Windows' ? 'vendor/bin/pint.bat' : 'vendor/bin/pint';
+        $pintProcess = new Process([$pintCmd, '--test']);
         $pintProcess->run();
 
         expect($pintProcess->getExitCode())

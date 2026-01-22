@@ -28,8 +28,6 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use RuntimeException;
 use Schema;
-use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Translatable\HasTranslations;
 use Throwable;
 use ValueError;
@@ -60,7 +58,7 @@ use ValueError;
 #[ScopedBy([StatusScope::class])]
 final class Order extends Model
 {
-    use HasFactory, HasTranslations, LogsActivity, SoftDeletes;
+    use HasFactory, HasTranslations, SoftDeletes;
 
     public array $translatable = ['notes', 'billing_address', 'shipping_address'];
 
@@ -116,13 +114,6 @@ final class Order extends Model
      */
     private static array $createdAtIndexAvailable = [];
 
-    /**
-     * Handle getActivitylogOptions functionality with proper error handling.
-     */
-    public function getActivitylogOptions(): LogOptions
-    {
-        return LogOptions::defaults()->logOnly(['number', 'status', 'total', 'notes', 'tracking_number', 'fulfillment_status'])->logOnlyDirty()->dontSubmitEmptyLogs()->setDescriptionForEvent(fn (string $eventName): string => "Order {$eventName}")->useLogName('order');
-    }
 
     /**
      * Handle user functionality with proper error handling.

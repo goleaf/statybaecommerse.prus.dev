@@ -134,6 +134,7 @@ final class Currency extends Model
 
     /**
      * Handle campaigns functionality with proper error handling.
+     *
      * @deprecated Campaigns feature has been removed
      */
     public function campaigns(): HasMany

@@ -290,7 +290,14 @@ final class UserController extends Controller
         $reason = $request->validated('reason');
 
         if ($reason) {
-            activity()->performedOn($user)->withProperties(['reason' => $reason])->log('Account deactivated by user');
+            $this->activityLogger->log(
+                $user,
+                'account_deactivated_by_user',
+                $user,
+                [],
+                ['reason' => $reason],
+                ['channel' => 'frontend']
+            );
         }
         $user->update(['is_active' => false, 'deactivated_at' => now()]);
         Auth::logout();
@@ -304,8 +311,14 @@ final class UserController extends Controller
     public function deleteAccount(DeleteAccountRequest $request): RedirectResponse
     {
         $user = Auth::user();
-        // Log account deletion
-        activity()->performedOn($user)->log('Account deleted by user');
+        $this->activityLogger->log(
+            $user,
+            'account_deleted_by_user',
+            $user,
+            [],
+            [],
+            ['channel' => 'frontend']
+        );
         // Soft delete the user
         $user->delete();
         Auth::logout();

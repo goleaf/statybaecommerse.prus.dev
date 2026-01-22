@@ -11,8 +11,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Translatable\HasTranslations;
 
 /**
@@ -33,7 +31,7 @@ use Spatie\Translatable\HasTranslations;
  */
 final class Report extends Model
 {
-    use HasFactory, HasTranslations, LogsActivity, SoftDeletes;
+    use HasFactory, HasTranslations, SoftDeletes;
 
     protected $fillable = ['name', 'slug', 'type', 'category', 'date_range', 'start_date', 'end_date', 'filters', 'description', 'content', 'is_active', 'is_public', 'is_scheduled', 'schedule_frequency', 'last_generated_at', 'generated_by', 'view_count', 'download_count', 'settings', 'metadata'];
 
@@ -41,13 +39,6 @@ final class Report extends Model
 
     protected array $translatable = ['name', 'description', 'content'];
 
-    /**
-     * Handle getActivitylogOptions functionality with proper error handling.
-     */
-    public function getActivitylogOptions(): LogOptions
-    {
-        return LogOptions::defaults()->logOnly(['name', 'type', 'category', 'is_active', 'is_public'])->logOnlyDirty()->dontSubmitEmptyLogs()->setDescriptionForEvent(fn (string $eventName): string => "Report {$eventName}")->useLogName('report');
-    }
 
     /**
      * Handle generator functionality with proper error handling.

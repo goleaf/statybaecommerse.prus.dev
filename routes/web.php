@@ -69,9 +69,6 @@ Route::middleware(['web'])->group(function () {
         Route::get('/{slug}', [NewsController::class, 'show'])->name('show');
     });
 
-
-
-
     // Referral Reward Frontend Routes
     Route::middleware(['auth'])->prefix('referral-rewards')->name('frontend.referral-rewards.')->group(function () {
         Route::get('/', [App\Http\Controllers\Frontend\ReferralRewardController::class, 'index'])->name('index');
