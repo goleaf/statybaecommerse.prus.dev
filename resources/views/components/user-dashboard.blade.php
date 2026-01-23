@@ -11,8 +11,8 @@
 
 @php
     $user = $user ?? auth()->user();
-    $title = $title ?? __('My Dashboard');
-    $subtitle = $subtitle ?? __('Welcome back, manage your account and orders');
+    $title = $title ?? __('frontend.user_dashboard.title');
+    $subtitle = $subtitle ?? __('frontend.user_dashboard.subtitle');
 
     // Get user statistics
     $totalOrders = $user->orders()->count();
@@ -44,7 +44,7 @@
                             </svg>
                         </div>
                         <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-600">{{ __('Total Orders') }}</p>
+                            <p class="text-sm font-medium text-gray-600">{{ __('frontend.user_dashboard.stats.total_orders') }}</p>
                             <p class="text-2xl font-bold text-gray-900">{{ $totalOrders }}</p>
                         </div>
                     </div>
@@ -63,7 +63,7 @@
                             </svg>
                         </div>
                         <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-600">{{ __('Total Spent') }}</p>
+                            <p class="text-sm font-medium text-gray-600">{{ __('frontend.user_dashboard.stats.total_spent') }}</p>
                             <p class="text-2xl font-bold text-gray-900">
                                 {{ \Illuminate\Support\Number::currency($totalSpent, current_currency(), app()->getLocale()) }}
                             </p>
@@ -83,7 +83,7 @@
                             </svg>
                         </div>
                         <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-600">{{ __('Wishlist Items') }}</p>
+                            <p class="text-sm font-medium text-gray-600">{{ __('frontend.user_dashboard.stats.wishlist_items') }}</p>
                             <p class="text-2xl font-bold text-gray-900">{{ $wishlistCount }}</p>
                         </div>
                     </div>
@@ -101,8 +101,8 @@
                             </svg>
                         </div>
                         <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-600">{{ __('Account Status') }}</p>
-                            <p class="text-2xl font-bold text-gray-900">{{ __('Active') }}</p>
+                            <p class="text-sm font-medium text-gray-600">{{ __('frontend.user_dashboard.stats.account_status') }}</p>
+                            <p class="text-2xl font-bold text-gray-900">{{ __('frontend.user_dashboard.status.active') }}</p>
                         </div>
                     </div>
                 </div>
@@ -111,7 +111,7 @@
 
         {{-- Quick Actions --}}
         <div class="bg-white border border-gray-200 rounded-2xl p-6 mb-8">
-            <h2 class="text-xl font-semibold text-gray-900 mb-6">{{ __('Quick Actions') }}</h2>
+            <h2 class="text-xl font-semibold text-gray-900 mb-6">{{ __('frontend.user_dashboard.quick_actions.title') }}</h2>
 
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <a href="{{ route('orders.index', ['locale' => app()->getLocale()]) ?? '/orders' }}"
@@ -121,7 +121,7 @@
                               d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
                         </path>
                     </svg>
-                    <span class="text-sm font-medium text-gray-900">{{ __('View Orders') }}</span>
+                    <span class="text-sm font-medium text-gray-900">{{ __('frontend.user_dashboard.quick_actions.view_orders') }}</span>
                 </a>
 
                 <a href="{{ route('frontend.wishlist.index') }}"
@@ -131,7 +131,7 @@
                               d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
                         </path>
                     </svg>
-                    <span class="text-sm font-medium text-gray-900">{{ __('Wishlist') }}</span>
+                    <span class="text-sm font-medium text-gray-900">{{ __('frontend.user_dashboard.quick_actions.wishlist') }}</span>
                 </a>
 
                 <a href="{{ route('addresses.index', ['locale' => app()->getLocale()]) ?? '/addresses' }}"
@@ -141,7 +141,7 @@
                               d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z">
                         </path>
                     </svg>
-                    <span class="text-sm font-medium text-gray-900">{{ __('Addresses') }}</span>
+                    <span class="text-sm font-medium text-gray-900">{{ __('frontend.user_dashboard.quick_actions.addresses') }}</span>
                 </a>
 
                 <a href="{{ route('profile.edit', ['locale' => app()->getLocale()]) ?? '/profile/edit' }}"
@@ -150,7 +150,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                               d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                     </svg>
-                    <span class="text-sm font-medium text-gray-900">{{ __('Edit Profile') }}</span>
+                    <span class="text-sm font-medium text-gray-900">{{ __('frontend.user_dashboard.quick_actions.edit_profile') }}</span>
                 </a>
             </div>
         </div>
@@ -160,10 +160,10 @@
             @if ($showRecentOrders)
                 <div class="bg-white border border-gray-200 rounded-2xl p-6">
                     <div class="flex items-center justify-between mb-6">
-                        <h2 class="text-xl font-semibold text-gray-900">{{ __('Recent Orders') }}</h2>
+                        <h2 class="text-xl font-semibold text-gray-900">{{ __('frontend.user_dashboard.recent_orders.title') }}</h2>
                         <a href="{{ route('orders.index', ['locale' => app()->getLocale()]) ?? '/orders' }}"
                            class="text-blue-600 hover:text-blue-700 font-medium text-sm">
-                            {{ __('View All') }}
+                            {{ __('frontend.user_dashboard.actions.view_all') }}
                         </a>
                     </div>
 
@@ -214,11 +214,11 @@
                                       d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
                                 </path>
                             </svg>
-                            <h3 class="text-lg font-medium text-gray-900 mb-2">{{ __('No orders yet') }}</h3>
-                            <p class="text-gray-600 mb-4">{{ __('Start shopping to see your orders here') }}</p>
+                            <h3 class="text-lg font-medium text-gray-900 mb-2">{{ __('frontend.user_dashboard.recent_orders.empty_title') }}</h3>
+                            <p class="text-gray-600 mb-4">{{ __('frontend.user_dashboard.recent_orders.empty_description') }}</p>
                             <a href="{{ route('products.index', ['locale' => app()->getLocale()]) ?? '/products' }}"
                                class="btn-gradient px-6 py-2 rounded-xl font-medium text-sm">
-                                {{ __('Start Shopping') }}
+                                {{ __('frontend.user_dashboard.recent_orders.cta') }}
                             </a>
                         </div>
                     @endif
@@ -228,7 +228,7 @@
             {{-- Account Information --}}
             @if ($showProfile)
                 <div class="bg-white border border-gray-200 rounded-2xl p-6">
-                    <h2 class="text-xl font-semibold text-gray-900 mb-6">{{ __('Account Information') }}</h2>
+                    <h2 class="text-xl font-semibold text-gray-900 mb-6">{{ __('frontend.user_dashboard.account.title') }}</h2>
 
                     <div class="space-y-4">
                         <div class="flex items-center gap-4">
@@ -245,7 +245,7 @@
                             <div>
                                 <h3 class="text-lg font-semibold text-gray-900">{{ $user->name }}</h3>
                                 <p class="text-gray-600">{{ $user->email }}</p>
-                                <p class="text-sm text-gray-500">{{ __('Member since') }}
+                                <p class="text-sm text-gray-500">{{ __('frontend.user_dashboard.account.member_since') }}
                                     {{ $user->created_at->format('M Y') }}</p>
                             </div>
                         </div>
@@ -253,13 +253,13 @@
                         <div class="pt-4 border-t border-gray-200">
                             <div class="grid grid-cols-2 gap-4 text-sm">
                                 <div>
-                                    <span class="text-gray-600">{{ __('Phone') }}:</span>
-                                    <p class="font-medium">{{ $user->phone ?? __('Not provided') }}</p>
+                                    <span class="text-gray-600">{{ __('frontend.user_dashboard.account.phone') }}:</span>
+                                    <p class="font-medium">{{ $user->phone ?? __('frontend.user_dashboard.account.not_provided') }}</p>
                                 </div>
                                 <div>
-                                    <span class="text-gray-600">{{ __('Birthday') }}:</span>
+                                    <span class="text-gray-600">{{ __('frontend.user_dashboard.account.birthday') }}:</span>
                                     <p class="font-medium">
-                                        {{ $user->birthday ? $user->birthday->format('M d, Y') : __('Not provided') }}
+                                        {{ $user->birthday ? $user->birthday->format('M d, Y') : __('frontend.user_dashboard.account.not_provided') }}
                                     </p>
                                 </div>
                             </div>
@@ -268,7 +268,7 @@
                         <div class="pt-4">
                             <a href="{{ route('profile.edit', ['locale' => app()->getLocale()]) ?? '/profile/edit' }}"
                                class="w-full btn-gradient py-2 rounded-xl font-medium text-center block">
-                                {{ __('Edit Profile') }}
+                                {{ __('frontend.user_dashboard.account.edit_profile') }}
                             </a>
                         </div>
                     </div>
@@ -282,10 +282,10 @@
             @if ($showWishlist && $user->wishlist()->count() > 0)
                 <div class="bg-white border border-gray-200 rounded-2xl p-6">
                     <div class="flex items-center justify-between mb-6">
-                        <h2 class="text-xl font-semibold text-gray-900">{{ __('Wishlist') }}</h2>
+                        <h2 class="text-xl font-semibold text-gray-900">{{ __('frontend.user_dashboard.wishlist.title') }}</h2>
                         <a href="{{ route('frontend.wishlist.index') }}"
                            class="text-blue-600 hover:text-blue-700 font-medium text-sm">
-                            {{ __('View All') }}
+                            {{ __('frontend.user_dashboard.actions.view_all') }}
                         </a>
                     </div>
 
@@ -311,10 +311,10 @@
             @if ($showAddresses)
                 <div class="bg-white border border-gray-200 rounded-2xl p-6">
                     <div class="flex items-center justify-between mb-6">
-                        <h2 class="text-xl font-semibold text-gray-900">{{ __('Addresses') }}</h2>
+                        <h2 class="text-xl font-semibold text-gray-900">{{ __('frontend.user_dashboard.addresses.title') }}</h2>
                         <a href="{{ route('addresses.index', ['locale' => app()->getLocale()]) ?? '/addresses' }}"
                            class="text-blue-600 hover:text-blue-700 font-medium text-sm">
-                            {{ __('Manage') }}
+                            {{ __('frontend.user_dashboard.addresses.manage') }}
                         </a>
                     </div>
 
@@ -332,7 +332,7 @@
                                             @if ($address->is_default)
                                                 <span
                                                       class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 mt-2">
-                                                    {{ __('Default') }}
+                                                    {{ __('frontend.user_dashboard.addresses.default') }}
                                                 </span>
                                             @endif
                                         </div>
@@ -349,11 +349,11 @@
                                       d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z">
                                 </path>
                             </svg>
-                            <h3 class="text-lg font-medium text-gray-900 mb-2">{{ __('No addresses yet') }}</h3>
-                            <p class="text-gray-600 mb-4">{{ __('Add an address for faster checkout') }}</p>
+                            <h3 class="text-lg font-medium text-gray-900 mb-2">{{ __('frontend.user_dashboard.addresses.empty_title') }}</h3>
+                            <p class="text-gray-600 mb-4">{{ __('frontend.user_dashboard.addresses.empty_description') }}</p>
                             <a href="{{ route('addresses.create', ['locale' => app()->getLocale()]) ?? '/addresses/create' }}"
                                class="btn-gradient px-6 py-2 rounded-xl font-medium text-sm">
-                                {{ __('Add Address') }}
+                                {{ __('frontend.user_dashboard.addresses.add') }}
                             </a>
                         </div>
                     @endif

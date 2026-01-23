@@ -17,34 +17,34 @@
 
 @extends('errors.layout', [
     'code' => '429',
-    'title' => __('Too Many Requests'),
-    'description' => __('We are receiving too many requests right now. Take a short break and try again in a moment.'),
+    'title' => __('frontend.errors.429.title'),
+    'description' => __('frontend.errors.429.description'),
     'primaryAction' => [
-        'label' => __('Try Again'),
+        'label' => __('frontend.errors.actions.try_again'),
         'type' => 'refresh',
     ],
     'secondaryAction' => [
-        'label' => __('Return Home'),
+        'label' => __('frontend.errors.actions.return_home'),
         'url' => $homeUrl,
     ],
     'links' => [
         [
-            'label' => __('Check System Status'),
+            'label' => __('frontend.errors.actions.check_system_status'),
             'url' => $statusUrl,
             'icon' => 'status',
         ],
         [
-            'label' => __('Browse Products'),
+            'label' => __('frontend.errors.actions.browse_products'),
             'url' => $productsUrl,
             'icon' => 'products',
         ],
         [
-            'label' => __('Support Center'),
+            'label' => __('frontend.errors.actions.visit_support_center'),
             'url' => $supportUrl,
             'icon' => 'support',
         ],
         [
-            'label' => __('Read the Latest News'),
+            'label' => __('frontend.errors.429.links.read_news'),
             'url' => $newsUrl,
             'icon' => 'refresh',
         ],

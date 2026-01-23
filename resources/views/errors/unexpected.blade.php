@@ -30,17 +30,17 @@
     ],
     'links' => [
         [
-            'label' => __('Visit Help Center'),
+            'label' => __('frontend.errors.actions.visit_help_center'),
             'url' => $supportUrl,
             'icon' => 'support',
         ],
         [
-            'label' => __('View System Status'),
+            'label' => __('frontend.errors.actions.view_system_status'),
             'url' => $statusUrl,
             'icon' => 'status',
         ],
         [
-            'label' => __('Back to Home'),
+            'label' => __('frontend.errors.actions.back_to_home'),
             'url' => $homeUrl,
             'icon' => 'categories',
         ],

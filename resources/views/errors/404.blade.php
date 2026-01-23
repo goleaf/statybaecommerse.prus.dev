@@ -76,20 +76,20 @@
         array_filter(
             [
                 [
-                    'label' => __('Contact Support'),
+                    'label' => __('frontend.errors.actions.contact_support'),
                     'url' => $supportUrl,
                     'style' => 'primary',
                 ],
                 $resolvedSupportEmail
                     ? [
-                        'label' => __('Email Us'),
+                        'label' => __('frontend.errors.404.actions.email_us'),
                         'url' => 'mailto:' . $resolvedSupportEmail,
                         'style' => 'secondary',
                     ]
                     : null,
                 Route::has('localized.contact.index')
                     ? [
-                        'label' => __('Visit Contact Page'),
+                        'label' => __('frontend.errors.404.actions.visit_contact'),
                         'url' => $contactUrl . '#contact-form',
                         'style' => 'secondary',
                     ]
@@ -102,46 +102,46 @@
 
 @extends('errors.4xx', [
     'code' => '404',
-    'title' => __('We couldn\'t find that page'),
-    'description' => __('The page you are looking for may have been moved or no longer exists. Double-check the address or explore one of the helpful links below.'),
+    'title' => __('frontend.errors.404.title'),
+    'description' => __('frontend.errors.404.description'),
     'showSearch' => true,
-    'searchTitle' => __('Search our catalog'),
-    'searchPlaceholder' => __('Search for products, brands, or help'),
+    'searchTitle' => __('frontend.errors.404.search_title'),
+    'searchPlaceholder' => __('frontend.errors.404.search_placeholder'),
     'topCategories' => $topCategories->toArray(),
-    'topCategoriesTitle' => __('Explore top categories'),
+    'topCategoriesTitle' => __('frontend.errors.404.top_categories_title'),
     'primaryAction' => [
-        'label' => __('Go Home'),
+        'label' => __('frontend.errors.actions.go_home'),
         'url' => route('localized.home', ['locale' => $locale]) ?? url('/'),
     ],
     'secondaryAction' => [
-        'label' => __('Go Back'),
+        'label' => __('frontend.errors.actions.go_back'),
         'type' => 'back',
     ],
-    'supportTitle' => __('Need directions?'),
-    'supportDescription' => __('Share the reference ID below with our support team and we\'ll help you get to the right place.'),
+    'supportTitle' => __('frontend.errors.404.support_title'),
+    'supportDescription' => __('frontend.errors.404.support_description'),
     'contactCta' => [
-        'title' => __('Need a personal recommendation?'),
-        'description' => __('Our team can guide you to the right product or answer questions about availability and delivery.'),
+        'title' => __('frontend.errors.404.contact_cta.title'),
+        'description' => __('frontend.errors.404.contact_cta.description'),
         'actions' => $contactActions,
     ],
     'links' => [
         [
-            'label' => __('Browse Categories'),
+            'label' => __('frontend.errors.actions.browse_categories'),
             'url' => route('localized.categories.index', ['locale' => $locale]),
             'icon' => 'categories',
         ],
         [
-            'label' => __('Shop Products'),
+            'label' => __('frontend.errors.actions.shop_products'),
             'url' => Route::has('frontend.products.index') ? route('frontend.products.index', ['locale' => $locale]) : url('/products'),
             'icon' => 'products',
         ],
         [
-            'label' => __('Discover Brands'),
+            'label' => __('frontend.errors.actions.discover_brands'),
             'url' => route('localized.brands.index', ['locale' => $locale]),
             'icon' => 'brands',
         ],
         [
-            'label' => __('View Cart'),
+            'label' => __('frontend.errors.actions.view_cart'),
             'url' => Route::has('frontend.cart.index') ? route('frontend.cart.index') : url('/cart'),
             'icon' => 'cart',
         ],
