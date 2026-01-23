@@ -7,42 +7,41 @@ namespace App\Policies;
 use App\Models\AdminUser;
 use App\Models\Brand;
 use App\Models\User;
-use App\Support\Authorization\AuthorizationMatrix;
 
 final class BrandPolicy
 {
     public function viewAny(AdminUser|User $user): bool
     {
-        return AuthorizationMatrix::check('brands', 'viewAny', $user);
+        return $user instanceof AdminUser;
     }
 
     public function view(AdminUser|User $user, Brand $brand): bool
     {
-        return AuthorizationMatrix::check('brands', 'view', $user);
+        return $user instanceof AdminUser;
     }
 
     public function create(AdminUser|User $user): bool
     {
-        return AuthorizationMatrix::check('brands', 'create', $user);
+        return $user instanceof AdminUser;
     }
 
     public function update(AdminUser|User $user, Brand $brand): bool
     {
-        return AuthorizationMatrix::check('brands', 'update', $user);
+        return $user instanceof AdminUser;
     }
 
     public function delete(AdminUser|User $user, Brand $brand): bool
     {
-        return AuthorizationMatrix::check('brands', 'delete', $user);
+        return $user instanceof AdminUser;
     }
 
     public function restore(AdminUser|User $user, Brand $brand): bool
     {
-        return AuthorizationMatrix::check('brands', 'update', $user);
+        return $user instanceof AdminUser;
     }
 
     public function forceDelete(AdminUser|User $user, Brand $brand): bool
     {
-        return AuthorizationMatrix::check('brands', 'delete', $user);
+        return $user instanceof AdminUser;
     }
 }

@@ -6,7 +6,6 @@ namespace App\Filament\Pages;
 
 use App\Models\ProductSimilarity;
 use App\Models\RecommendationBlock;
-use App\Models\RecommendationCache;
 use App\Models\RecommendationConfig;
 use App\Models\UserBehavior;
 use App\Models\UserProductInteraction;
@@ -108,7 +107,6 @@ final class RecommendationSystemManagement extends Page
             'active_blocks'        => $this->countSafely(fn (): int => RecommendationBlock::query()->where('is_active', true)->count()),
             'total_configs'        => $this->countSafely(fn (): int => RecommendationConfig::query()->count()),
             'active_configs'       => $this->countSafely(fn (): int => RecommendationConfig::query()->where('is_active', true)->count()),
-            'cache_entries'        => $this->countSafely(fn (): int => RecommendationCache::query()->count()),
             'user_behaviors'       => $this->countModelRecords(UserBehavior::class),
             'product_similarities' => $this->countModelRecords(ProductSimilarity::class),
             'user_interactions'    => $this->countModelRecords(UserProductInteraction::class),

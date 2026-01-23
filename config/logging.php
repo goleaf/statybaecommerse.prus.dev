@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use App\Logging\CustomizeFormatter;
 use Monolog\Formatter\JsonFormatter;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
@@ -13,9 +12,7 @@ $dsnRaw = env('SENTRY_LARAVEL_DSN', env('SENTRY_DSN', ''));
 $sentryDsn = is_string($dsnRaw) ? $dsnRaw : '';
 $sentryAvailable = $sentryDsn !== '' && class_exists(\Sentry\Laravel\Integration::class);
 
-$rawStack = env('LOG_STACK', 'daily');
-$stackString = is_string($rawStack) ? $rawStack : 'daily';
-$configuredStackChannels = array_filter(explode(',', $stackString));
+$configuredStackChannels = ['daily'];
 
 // Retention is configured directly in channel definitions below.
 
@@ -82,7 +79,6 @@ return [
             'driver'            => 'stack',
             'channels'          => $stackChannels,
             'ignore_exceptions' => false,
-            'tap'               => [App\Logging\ConfigureContextProcessors::class],
         ],
 
         'production' => [
@@ -101,7 +97,6 @@ return [
                 'batch_mode'     => JsonFormatter::BATCH_MODE_JSON,
                 'append_newline' => true,
             ],
-            'tap' => [App\Logging\ConfigureContextProcessors::class],
         ],
 
         'daily' => [
@@ -110,9 +105,6 @@ return [
             'level'                => env('LOG_LEVEL', 'debug'),
             'days'                 => env('LOG_DAILY_DAYS', 14),
             'replace_placeholders' => true,
-            'tap'                  => [
-                CustomizeFormatter::class,
-            ],
         ],
 
         'security' => [
@@ -121,9 +113,6 @@ return [
             'level'                => env('LOG_SECURITY_LEVEL', 'notice'),
             'days'                 => env('LOG_SECURITY_DAYS', 30),
             'replace_placeholders' => true,
-            'tap'                  => [
-                CustomizeFormatter::class,
-            ],
         ],
 
         'performance' => [
@@ -132,16 +121,13 @@ return [
             'level'                => env('LOG_PERFORMANCE_LEVEL', 'warning'),
             'days'                 => env('LOG_PERFORMANCE_DAYS', 7),
             'replace_placeholders' => true,
-            'tap'                  => [
-                CustomizeFormatter::class,
-            ],
         ],
 
         'slack' => [
             'driver'               => 'slack',
-            'url'                  => env('LOG_SLACK_WEBHOOK_URL'),
-            'username'             => env('LOG_SLACK_USERNAME', 'Laravel Log'),
-            'emoji'                => env('LOG_SLACK_EMOJI', ':boom:'),
+            'url'                  => null,
+            'username'             => 'Laravel Log',
+            'emoji'                => ':boom:',
             'level'                => env('LOG_LEVEL', 'critical'),
             'replace_placeholders' => true,
         ],
@@ -149,14 +135,13 @@ return [
         'papertrail' => [
             'driver'       => 'monolog',
             'level'        => env('LOG_LEVEL', 'debug'),
-            'handler'      => env('LOG_PAPERTRAIL_HANDLER', SyslogUdpHandler::class),
+            'handler'      => SyslogUdpHandler::class,
             'handler_with' => [
                 'host'             => env('PAPERTRAIL_URL'),
                 'port'             => env('PAPERTRAIL_PORT'),
                 'connectionString' => 'tls://' . env('PAPERTRAIL_URL') . ':' . env('PAPERTRAIL_PORT'),
             ],
             'processors' => [PsrLogMessageProcessor::class],
-            'tap'        => [App\Logging\ConfigureContextProcessors::class],
         ],
 
         'stderr' => [
@@ -166,9 +151,7 @@ return [
             'handler_with' => [
                 'stream' => 'php://stderr',
             ],
-            'formatter'  => env('LOG_STDERR_FORMATTER'),
             'processors' => [PsrLogMessageProcessor::class],
-            'tap'        => [App\Logging\ConfigureContextProcessors::class],
         ],
 
         'sentry' => [
@@ -179,7 +162,7 @@ return [
         'syslog' => [
             'driver'               => 'syslog',
             'level'                => env('LOG_LEVEL', 'debug'),
-            'facility'             => env('LOG_SYSLOG_FACILITY', LOG_USER),
+            'facility'             => LOG_USER,
             'replace_placeholders' => true,
         ],
 
@@ -205,7 +188,6 @@ return [
                 'batch_mode'     => JsonFormatter::BATCH_MODE_JSON,
                 'append_newline' => true,
             ],
-            'tap' => [App\Logging\ConfigureContextProcessors::class],
         ],
 
         'emergency' => [

@@ -45,7 +45,7 @@ abstract class TestCase extends BaseTestCase
     protected function setUp(): void
     {
         // Increase the memory limit for the feature-rich Filament panel tests so resource discovery doesn't exhaust CLI limits.
-        ini_set('memory_limit', '1536M');
+        ini_set('memory_limit', '-1');
 
         if (! class_exists(TestingDatabase::class) && file_exists(__DIR__ . '/Support/TestingDatabase.php')) {
             require_once __DIR__ . '/Support/TestingDatabase.php';
@@ -88,9 +88,7 @@ abstract class TestCase extends BaseTestCase
         Config::set('cache.default', 'array');
         Config::set('app.key', 'base64:' . base64_encode(random_bytes(32)));
         Config::set('app.debug', false);
-        // Ensure Telescope doesn't use MySQL during tests and avoid watchers overhead.
-        Config::set('telescope.enabled', false);
-        Config::set('telescope.storage.database.connection', 'sqlite');
+
         $this->ensureViteManifest();
         $this->refreshTranslationLoader();
         app()->instance('request', Request::create('/'));
@@ -98,9 +96,6 @@ abstract class TestCase extends BaseTestCase
         $this->withoutMiddleware([
             \App\Http\Middleware\ZoneDetector::class,
             \App\Http\Middleware\SetLocale::class,
-            \Spatie\Permission\Middleware\PermissionMiddleware::class,
-            \Spatie\Permission\Middleware\RoleMiddleware::class,
-            \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
         ]);
 
         if (function_exists('activity')) {
@@ -460,11 +455,6 @@ abstract class TestCase extends BaseTestCase
                 'file'    => 'assets/app.js',
                 'isEntry' => true,
                 'src'     => 'resources/js/app.js',
-            ],
-            'resources/css/filament/admin/theme.scss' => [
-                'file'    => 'assets/filament-admin-theme.css',
-                'isEntry' => false,
-                'src'     => 'resources/css/filament/admin/theme.scss',
             ],
         ];
 

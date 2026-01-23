@@ -716,18 +716,6 @@ final class SystemSettingsSeeder extends Seeder
                 'is_public'   => false,
                 'sort_order'  => 4,
             ],
-            [
-                'category_id' => $securityCategory->id,
-                'key'         => 'security.two_factor_auth',
-                'name'        => 'Enable Two-Factor Authentication',
-                'value'       => false,
-                'type'        => 'boolean',
-                'group'       => 'security',
-                'description' => 'Enable two-factor authentication for admin users',
-                'help_text'   => 'Admin users will be required to use 2FA',
-                'is_public'   => false,
-                'sort_order'  => 5,
-            ],
         ];
 
         $this->createSettingsWithTranslations($settings);

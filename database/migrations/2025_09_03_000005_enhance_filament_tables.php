@@ -62,11 +62,8 @@ return new class extends Migration
                 if (! Schema::hasColumn('users', 'accepts_marketing')) {
                     $table->boolean('accepts_marketing')->default(false)->after('is_active');
                 }
-                if (! Schema::hasColumn('users', 'two_factor_enabled')) {
-                    $table->boolean('two_factor_enabled')->default(false)->after('accepts_marketing');
-                }
                 if (! Schema::hasColumn('users', 'last_login_at')) {
-                    $table->timestamp('last_login_at')->nullable()->after('two_factor_enabled');
+                    $table->timestamp('last_login_at')->nullable()->after('accepts_marketing');
                 }
                 if (! Schema::hasColumn('users', 'preferences')) {
                     $table->json('preferences')->nullable()->after('last_login_at');
@@ -374,7 +371,6 @@ return new class extends Migration
                 'preferred_locale',
                 'is_active',
                 'accepts_marketing',
-                'two_factor_enabled',
                 'last_login_at',
                 'preferences',
             ]);

@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use App\Http\Controllers\Api\AuditLogController;
 use App\Http\Controllers\Api\AuthenticatedUserController;
 use App\Http\Controllers\Api\AutocompleteSearchController;
 use App\Http\Controllers\Api\CategoryController;
@@ -14,7 +13,6 @@ use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\Api\V1\SearchController;
 use App\Http\Controllers\Webhooks\PaymentWebhookController;
 use App\Models\Category;
-use App\Support\Authorization\AuthorizationMatrix;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('webhooks')
@@ -51,10 +49,6 @@ Route::prefix('products')
         Route::get('/', [ProductController::class, 'index'])
             ->middleware('throttle:api.read')
             ->name('index');
-
-        Route::get('search', [ProductController::class, 'search'])
-            ->middleware('throttle:api.read')
-            ->name('search');
 
         Route::get('catalog', [ProductController::class, 'index'])
             ->middleware('throttle:api.read')
@@ -134,11 +128,3 @@ Route::prefix('v1')
 Route::get('exports/download/{export:uuid}', ExportDownloadController::class)
     ->middleware(['signed', 'throttle:api.exports'])
     ->name('api.exports.download');
-
-Route::get('audit-logs', [AuditLogController::class, 'index'])
-    ->middleware([
-        'auth:sanctum',
-        'permission:' . AuthorizationMatrix::ability('audit_logs', 'viewAny'),
-        'throttle:api.read',
-    ])
-    ->name('api.audit-logs.index');

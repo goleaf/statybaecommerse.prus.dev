@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Autoload;
 
-use App\Application\Product\DTOs\PaginationDto;
 use App\Filament\AdminPanelProvider;
 use App\Livewire\Components\Navigation;
 use App\Models\Product;
@@ -24,8 +23,5 @@ final class AutoloadingWorksTest extends PhpUnitTestCase
     {
         $nav = new Navigation;
         $this->assertInstanceOf(Navigation::class, $nav);
-
-        $dto = new PaginationDto(100, 10, 1);
-        $this->assertSame(100, $dto->getTotal());
     }
 }

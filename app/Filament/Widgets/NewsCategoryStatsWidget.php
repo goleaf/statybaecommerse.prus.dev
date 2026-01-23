@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Filament\Widgets;
 
 use App\Models\News;
-use App\Models\NewsCategory;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
@@ -13,11 +12,12 @@ final class NewsCategoryStatsWidget extends BaseWidget
 {
     protected function getStats(): array
     {
-        $totalCategories = NewsCategory::count();
-        $visibleCategories = NewsCategory::where('is_visible', true)->count();
-        $categoriesWithNews = NewsCategory::has('news')->count();
+        // News category functionality has been removed
+        $totalCategories = 0;
+        $visibleCategories = 0;
+        $categoriesWithNews = 0;
         $totalNews = News::count();
-        $averageNewsPerCategory = $categoriesWithNews > 0 ? round($totalNews / $categoriesWithNews, 1) : 0;
+        $averageNewsPerCategory = 0;
 
         return [
             Stat::make(__('Total Categories'), $totalCategories)

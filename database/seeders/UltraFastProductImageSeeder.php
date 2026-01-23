@@ -54,7 +54,7 @@ final class UltraFastProductImageSeeder extends Seeder
         // Process in ultra-fast batches without transactions for maximum speed
         $this->processProductsUltraFast();
 
-        $this->displayPerformanceMetrics();
+        $this->displaySummary();
         $this->cleanupResources();
 
         $this->command->info('✅ Ultra greitas produktų paveikslėlių generavimas baigtas!');
@@ -362,7 +362,7 @@ final class UltraFastProductImageSeeder extends Seeder
         }
     }
 
-    private function displayPerformanceMetrics(): void
+    private function displaySummary(): void
     {
         $totalTime = microtime(true) - $this->startTime;
         $avgBatchTime = ! empty($this->batchTimes) ? array_sum($this->batchTimes) / count($this->batchTimes) : 0;

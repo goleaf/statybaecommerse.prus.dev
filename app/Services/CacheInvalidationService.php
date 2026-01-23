@@ -9,7 +9,6 @@ use App\Models\Category;
 use App\Models\Collection;
 use App\Models\Product;
 use App\Models\Slider;
-use App\Observers\Concerns\ResolvesSupportedLocales;
 use App\Support\Cache\CacheInvalidator;
 use App\Support\Cache\CacheKeys;
 use App\Support\Cache\CacheTagHelper;
@@ -30,8 +29,6 @@ use Throwable;
  */
 final class CacheInvalidationService
 {
-    use ResolvesSupportedLocales;
-
     /**
      * Flush cache tags for a specific model instance.
      */
@@ -88,11 +85,6 @@ final class CacheInvalidationService
 
         $this->flushTags($productTags);
 
-        // Execute the dedicated invalidator to clear any cache entries that
-        // may have been written without tag metadata (e.g. array stores or
-        // bespoke helpers that bypass the Cache facade helpers).
-        app(\App\UseCases\Cache\InvalidateProductCache::class)($product);
-
         // Clear product payloads cached via the shared cache service which
         // relies on array stores during tests and in certain queue contexts.
         $this->flushSharedProductCaches($product);
@@ -120,9 +112,6 @@ final class CacheInvalidationService
 
         $this->flushTags($categoryTags);
 
-        // Always run the fallback invalidator to remove non-tagged payloads
-        // such as legacy navigation trees populated directly via Cache::put().
-        app(\App\UseCases\Cache\InvalidateCategoryCache::class)();
     }
 
     /**
@@ -233,12 +222,10 @@ final class CacheInvalidationService
         foreach ($ranges as $range) {
             Cache::forget(CacheKeys::dashboardStats($range));
             Cache::forget(CacheKeys::dashboardActivity($range));
-            Cache::forget(CacheKeys::dashboardPerformance($range));
 
             if (CacheTagHelper::supportsTags()) {
                 Cache::tags(CacheTagHelper::dashboards())->forget(CacheKeys::dashboardStats($range));
                 Cache::tags(CacheTagHelper::dashboards())->forget(CacheKeys::dashboardActivity($range));
-                Cache::tags(CacheTagHelper::dashboards())->forget(CacheKeys::dashboardPerformance($range));
             }
         }
 
@@ -372,5 +359,21 @@ final class CacheInvalidationService
         }
 
         return false;
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function supportedLocales(): array
+    {
+        $configured = config('app.supported_locales', 'en');
+        $locales = is_string($configured) ? explode(',', (string) $configured) : $configured;
+
+        return collect($locales)
+            ->map(static fn ($locale) => trim((string) $locale))
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
     }
 }

@@ -12,7 +12,6 @@ use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\ApiDocsController;
 use App\Http\Controllers\Frontend\UserController;
 use App\Http\Controllers\LocaleController;
-use App\Http\Controllers\MailPreviewController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\SecureMediaDownloadController;
 use App\Http\Controllers\TestResultsController;
@@ -42,16 +41,6 @@ Route::middleware(['web'])
 
 Route::middleware(['web'])->group(function () {
     Route::get('/docs/api', ApiDocsController::class)->name('docs.api');
-
-    if (config('app.debug') || app()->environment(['local', 'development', 'testing'])) {
-        Route::middleware(['auth', 'can:viewMailPreviews'])
-            ->prefix('telescope/mail')
-            ->as('mail-previews.')
-            ->group(function () {
-                Route::get('/', [MailPreviewController::class, 'index'])->name('index');
-                Route::get('/{mail}', [MailPreviewController::class, 'show'])->name('show');
-            });
-    }
 
     // Live Demo Route
     Route::get('/live-demo', App\Livewire\Pages\LiveDemo::class)->name('live-demo');
@@ -467,14 +456,6 @@ Route::get('/legal/{slug}', function ($slug) {
     return redirect('/' . app()->getLocale() . '/legal/' . $slug);
 })->name('legal.show.legacy');
 
-// Cpanel routes
-Route::get('/cpanel/login', function () {
-    return response('Cpanel Login Page', 200);
-})->name('cpanel.login');
-Route::get('/cpanel/{path?}', function ($path = null) {
-    return response('Cpanel Page: ' . ($path ?? 'index'), 200);
-})->where('path', '.*')->name('cpanel.any');
-
 // Auth routes
 require __DIR__ . '/auth.php';
 
@@ -485,10 +466,7 @@ Route::middleware('auth')->group(function (): void {
         return redirect()->route('localized.order.confirmed', ['locale' => app()->getLocale(), 'number' => $number]);
     })->name('checkout.confirmation');
     Route::get('/orders', Pages\Account\Orders::class)->name('orders.index');
-    Route::get('/account', function () {
-        return redirect()->route('account.orders');
-    })->name('account');
-    Route::get('/account/orders', Pages\Account\Orders::class)->name('account.orders');
+    // Account routes are defined in routes/auth.php.
 
     // Hardened endpoint for avatar uploads to ensure sanitised filenames and secure storage.
     Route::post('/user/avatar', [UserController::class, 'updateAvatar'])
@@ -503,7 +481,6 @@ Route::middleware('auth')->group(function (): void {
 // API routes for frontend
 Route::prefix('api')->group(function (): void {
     Route::get('/products', [App\Http\Controllers\Api\ProductController::class, 'index'])->name('api.products.index');
-    Route::get('/products/search', [App\Http\Controllers\Api\ProductController::class, 'search'])->name('api.products.search');
     Route::get('/products/catalog', [App\Http\Controllers\Api\ProductController::class, 'index'])->name('api.products.catalog');
     Route::get('/products/{product:slug}', [App\Http\Controllers\Api\ProductController::class, 'show'])->name('api.products.show');
     Route::get('/categories', [App\Http\Controllers\Api\CategoryController::class, 'index'])->name('api.categories.index');
@@ -824,14 +801,6 @@ Route::prefix('{locale}')
         // Collections routes
         Route::get('/collections', \App\Livewire\Pages\Collection\Index::class)->name('localized.collections.index');
         Route::get('/collections/{collection}', \App\Livewire\Pages\Collection\Show::class)->name('localized.collections.show');
-
-        // Cpanel redirects to non-localized versions
-        Route::get('/cpanel', function () {
-            return redirect('/cpanel/login');
-        })->name('localized.cpanel');
-        Route::get('/cpanel/{path?}', function ($locale, $path = null) {
-            return redirect('/cpanel/' . ($path ?? ''));
-        })->where('path', '.*')->name('localized.cpanel.any');
 
         // Order confirmation by number (must be authed in tests)
         Route::middleware('auth')->get('/order/confirmed/{number}', function (string $locale, string $number) {

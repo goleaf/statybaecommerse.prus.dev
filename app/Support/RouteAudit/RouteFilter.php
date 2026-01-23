@@ -38,7 +38,6 @@ final class RouteFilter
     {
         return [
             '#^_ignition#',
-            '#^telescope#',
             '#^horizon#',
             '#^debugbar#',
             '#^sanctum/csrf-cookie$#',
@@ -57,7 +56,6 @@ final class RouteFilter
     {
         return [
             '#^ignition#',
-            '#^telescope#',
             '#^horizon#',
             '#^debugbar#',
             '#^sanctum\.csrf-cookie$#',

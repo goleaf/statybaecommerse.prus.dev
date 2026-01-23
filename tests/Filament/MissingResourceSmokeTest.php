@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Filament;
 
-use App\Filament\Resources\AuditTrailResource;
 use App\Filament\Resources\BrandResource;
 use App\Filament\Resources\CampaignResource;
 use App\Filament\Resources\CityResource;
@@ -20,7 +19,6 @@ use App\Filament\Resources\SystemSettingResource;
 use App\Filament\Resources\UserManagementResource;
 use App\Filament\Resources\UserPreferenceResource;
 use App\Filament\Resources\VariantStockResource;
-use App\Models\AuditTrail;
 use App\Models\Brand;
 use App\Models\Campaign;
 use App\Models\City;
@@ -99,28 +97,7 @@ final class MissingResourceSmokeTest extends TestCase
     public static function resourceDataProvider(): array
     {
         return [
-            'audit_trails' => [
-                'resource' => AuditTrailResource::class,
-                'page'     => \App\Filament\Resources\AuditTrailResource\Pages\ListAuditTrails::class,
-                'factory'  => static function (): array {
-                    // Capture a user record to associate with the audit entry for realistic payloads.
-                    $auditable = User::factory()->create();
-
-                    return [
-                        AuditTrail::query()->create([
-                            'auditable_type' => $auditable->getMorphClass(),
-                            'auditable_id'   => $auditable->getKey(),
-                            'event'          => 'updated',
-                            'diff'           => [
-                                'name' => [
-                                    'previous' => 'Before',
-                                    'current'  => 'After',
-                                ],
-                            ],
-                        ]),
-                    ];
-                },
-            ],
+            // Audit trail functionality has been removed
             'brands' => [
                 'resource' => BrandResource::class,
                 'page'     => \App\Filament\Resources\BrandResource\Pages\ListBrands::class,

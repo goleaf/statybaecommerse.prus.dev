@@ -46,26 +46,7 @@
                 @endif
 
                 <dl class="hidden space-y-6 border-t border-white/10 pt-6 text-sm font-medium text-white lg:block">
-                    <div class="flex items-center justify-between">
-                        <dt class="text-gray-300">{{ __('Sub total') }}</dt>
-                        <dd>
-                            {{ \Illuminate\Support\Number::currency($subtotal, current_currency(), app()->getLocale()) }}
-                        </dd>
-                    </div>
-
-                    <div class="flex items-center justify-between">
-                        <dt class="text-gray-300">{{ __('Shipping') }}</dt>
-                        <livewire:components.shipping-price />
-                    </div>
-
-                    <div class="flex items-center justify-between">
-                        <dt class="text-gray-300">{{ __('Taxes') }}</dt>
-                        <livewire:components.tax-price />
-                    </div>
-
-                    <div class="border-t border-white/10 pt-6">
-                        <livewire:components.cart-total />
-                    </div>
+                    <livewire:components.price-breakdown />
                 </dl>
 
                 <div class="lg:hidden">
@@ -125,22 +106,7 @@
                                  @click.away="open = false"
                                  x-cloak>
                                 <dl class="mx-auto max-w-lg space-y-6">
-                                    <div class="flex items-center justify-between">
-                                        <dt class="text-gray-400">{{ __('Sub total') }}</dt>
-                                        <dd>
-                                            {{ \Illuminate\Support\Number::currency($subtotal, current_currency(), app()->getLocale()) }}
-                                        </dd>
-                                    </div>
-
-                                    <div class="flex items-center justify-between">
-                                        <dt class="text-gray-400">{{ __('Shipping') }}</dt>
-                                        <livewire:components.shipping-price />
-                                    </div>
-
-                                    <div class="flex items-center justify-between">
-                                        <dt class="text-gray-400">{{ __('Taxes') }}</dt>
-                                        <livewire:components.tax-price />
-                                    </div>
+                                    <livewire:components.price-breakdown variant="mobile" :show-total="false" />
                                 </dl>
                             </div>
                         </div>

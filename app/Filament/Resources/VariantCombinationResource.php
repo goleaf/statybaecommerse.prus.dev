@@ -20,7 +20,6 @@ use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
-use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Schemas\Schema;
@@ -35,7 +34,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
 
-final class VariantCombinationResource extends Resource
+final class VariantCombinationResource extends BaseResource
 {
     protected static ?string $model = \App\Models\VariantCombination::class;
 
@@ -53,20 +52,27 @@ final class VariantCombinationResource extends Resource
 
     protected static ?int $navigationSort = 19;
 
+    /**
+     * Override the authorization resource name for this resource.
+     */
+    protected static function getAuthorizationResource(): string
+    {
+        return 'products'; // Use products permissions for variant combinations
+    }
+
     public static function getNavigationLabel(): string
     {
-        // Return translation keys so tests can assert deterministically
-        return 'admin.variant_combinations.navigation_label';
+        return __('admin.variant_combinations.navigation_label');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return 'admin.variant_combinations.plural_model_label';
+        return __('admin.variant_combinations.plural_model_label');
     }
 
     public static function getModelLabel(): string
     {
-        return 'admin.variant_combinations.model_label';
+        return __('admin.variant_combinations.model_label');
     }
 
     public static function form(Schema $schema): Schema
@@ -85,8 +91,8 @@ final class VariantCombinationResource extends Resource
     public static function formComponents(): array
     {
         return [
-            SchemaSection::make('admin.variant_combinations.basic_information')
-                ->description('admin.variant_combinations.basic_information_description')
+            SchemaSection::make(__('admin.variant_combinations.basic_information'))
+                ->description(__('admin.variant_combinations.basic_information_description'))
                 ->schema([
                     SchemaGrid::make(2)
                         ->schema([
@@ -108,8 +114,8 @@ final class VariantCombinationResource extends Resource
                                 ->helperText(__('admin.variant_combinations.is_available_help')),
                         ]),
                 ]),
-            SchemaSection::make('admin.variant_combinations.attribute_combinations')
-                ->description('admin.variant_combinations.attribute_combinations_description')
+            SchemaSection::make(__('admin.variant_combinations.attribute_combinations'))
+                ->description(__('admin.variant_combinations.attribute_combinations_description'))
                 ->schema([
                     KeyValue::make('attribute_combinations')
                         ->label(__('admin.variant_combinations.attribute_combinations'))
@@ -122,8 +128,8 @@ final class VariantCombinationResource extends Resource
                         ->deleteActionLabel(__('admin.variant_combinations.remove_attribute'))
                         ->reorderable(),
                 ]),
-            SchemaSection::make('admin.variant_combinations.additional_information')
-                ->description('admin.variant_combinations.additional_information_description')
+            SchemaSection::make(__('admin.variant_combinations.additional_information'))
+                ->description(__('admin.variant_combinations.additional_information_description'))
                 ->schema([
                     Placeholder::make('combination_hash')
                         ->label(__('admin.variant_combinations.combination_hash'))

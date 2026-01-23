@@ -8,10 +8,8 @@ use App\Contracts\TranslatableRecord;
 use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
-use App\Observers\BrandObserver;
 use App\Traits\HasTranslations;
 use DB;
-use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -52,8 +50,6 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  *
  * @mixin \Eloquent
  */
-// Attach the cache-aware observer so brand changes invalidate storefront data.
-#[ObservedBy([BrandObserver::class])]
 #[ScopedBy([ActiveScope::class, EnabledScope::class])]
 final class Brand extends Model implements HasMedia, TranslatableRecord
 {
@@ -220,7 +216,6 @@ final class Brand extends Model implements HasMedia, TranslatableRecord
     {
         return 'slug';
     }
-
 
     /**
      * Handle flushCaches functionality with proper error handling.

@@ -9,11 +9,9 @@ use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
 use App\Models\Scopes\StatusScope;
-use App\Observers\ProductVariantObserver;
 use App\Services\Pricing\VariantPriceService;
 use App\Traits\HasProductPricing;
 use App\Traits\HasTranslations;
-use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -45,7 +43,6 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  *
  * @mixin \Eloquent
  */
-#[ObservedBy([ProductVariantObserver::class])]
 #[ScopedBy([ActiveScope::class, EnabledScope::class, StatusScope::class])]
 final class ProductVariant extends Model implements HasMedia, TranslatableRecord
 {
@@ -232,22 +229,6 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
     {
         // Reuse the attribute pivot so attribute data remains consistent across accessors.
         return $this->attributes();
-    }
-
-    /**
-     * Handle priceHistory functionality with proper error handling.
-     */
-    public function priceHistory(): HasMany
-    {
-        return $this->hasMany(VariantPriceHistory::class, 'variant_id');
-    }
-
-    /**
-     * Handle stockHistory functionality with proper error handling.
-     */
-    public function stockHistory(): HasMany
-    {
-        return $this->hasMany(VariantStockHistory::class, 'variant_id');
     }
 
     /**
@@ -809,47 +790,6 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
         }
 
         return false;
-    }
-
-    /**
-     * Record price change in history.
-     */
-    public function recordPriceChange(
-        float $oldPrice,
-        ?string $changeReason = null,
-        ?int $changedBy = null
-    ): VariantPriceHistory {
-        return VariantPriceHistory::recordPriceChange(
-            $this->id,
-            $oldPrice,
-            $this->price,
-            'regular',
-            $changeReason,
-            $changedBy
-        );
-    }
-
-    /**
-     * Record stock change in history.
-     */
-    public function recordStockChange(
-        int $oldQuantity,
-        string $changeType = 'adjustment',
-        ?string $changeReason = null,
-        ?int $changedBy = null,
-        ?string $referenceType = null,
-        ?int $referenceId = null
-    ): VariantStockHistory {
-        return VariantStockHistory::recordStockChange(
-            $this->id,
-            $oldQuantity,
-            $this->stock_quantity,
-            $changeType,
-            $changeReason,
-            $changedBy,
-            $referenceType,
-            $referenceId
-        );
     }
 
     /**

@@ -40,7 +40,7 @@ class OrderFactory extends Factory
         $sequence = $this->nextSequence();
 
         $subtotal = round(random_int(1000, 100000) / 100, 2);
-        $taxAmount = round($subtotal * 0.21, 2);  // 21% VAT
+        $taxAmount = round($subtotal * 0.0, 2);  // 0% VAT
         $shippingAmount = round(random_int(0, 2000) / 100, 2);
         $discountAmount = round($subtotal * (random_int(0, 10) / 100), 2);  // Max 10% discount
         $total = round($subtotal + $taxAmount + $shippingAmount - $discountAmount, 2);

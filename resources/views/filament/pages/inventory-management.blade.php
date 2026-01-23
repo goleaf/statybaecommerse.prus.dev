@@ -1,6 +1,6 @@
 <div>
     <div class="p-4">
-        <h1 class="text-xl font-semibold">Inventory Management</h1>
+        <h1 class="text-xl font-semibold">{{ __('admin.inventory_management.title') }}</h1>
     </div>
 </div>
 

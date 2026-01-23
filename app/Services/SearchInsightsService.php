@@ -32,26 +32,24 @@ final class SearchInsightsService
 
             return Cache::remember($cacheKey, self::INSIGHTS_CACHE_TTL, function () use ($query, $context) {
                 return [
-                    'query_analysis'      => $this->analyzeQuery($query),
-                    'search_trends'       => $this->getSearchTrends($query),
-                    'user_behavior'       => $this->getUserBehavior($query, $context),
-                    'performance_metrics' => $this->getPerformanceMetrics($query),
-                    'recommendations'     => $this->getRecommendations($query, $context),
-                    'related_searches'    => $this->getRelatedSearches($query),
-                    'search_suggestions'  => $this->getSearchSuggestions($query),
+                    'query_analysis'     => $this->analyzeQuery($query),
+                    'search_trends'      => $this->getSearchTrends($query),
+                    'user_behavior'      => $this->getUserBehavior($query, $context),
+                    'recommendations'    => $this->getRecommendations($query, $context),
+                    'related_searches'   => $this->getRelatedSearches($query),
+                    'search_suggestions' => $this->getSearchSuggestions($query),
                 ];
             });
         } catch (Exception $e) {
             Log::warning('Search insights generation failed: ' . $e->getMessage());
 
             return [
-                'query_analysis'      => [],
-                'search_trends'       => [],
-                'user_behavior'       => [],
-                'performance_metrics' => [],
-                'recommendations'     => [],
-                'related_searches'    => [],
-                'search_suggestions'  => [],
+                'query_analysis'     => [],
+                'search_trends'      => [],
+                'user_behavior'      => [],
+                'recommendations'    => [],
+                'related_searches'   => [],
+                'search_suggestions' => [],
             ];
         }
     }
@@ -129,30 +127,6 @@ final class SearchInsightsService
             ];
         } catch (Exception $e) {
             Log::warning('User behavior analysis failed: ' . $e->getMessage());
-
-            return [];
-        }
-    }
-
-    /**
-     * Handle getPerformanceMetrics functionality with proper error handling.
-     */
-    private function getPerformanceMetrics(string $query): array
-    {
-        try {
-            $performanceService = app(SearchPerformanceService::class);
-
-            return [
-                'average_response_time'      => $this->getAverageResponseTime($query),
-                'cache_hit_rate'             => $this->getCacheHitRate($query),
-                'error_rate'                 => $this->getErrorRate($query),
-                'throughput'                 => $this->getThroughput($query),
-                'memory_usage'               => $this->getMemoryUsage($query),
-                'database_queries'           => $this->getDatabaseQueries($query),
-                'optimization_opportunities' => $this->getOptimizationOpportunities($query),
-            ];
-        } catch (Exception $e) {
-            Log::warning('Performance metrics analysis failed: ' . $e->getMessage());
 
             return [];
         }
@@ -595,113 +569,6 @@ final class SearchInsightsService
                 'most_common_search_time'     => '14:00',
                 'preferred_search_types'      => ['products' => 70, 'categories' => 20, 'brands' => 10],
             ];
-        } catch (Exception $e) {
-            return [];
-        }
-    }
-
-    /**
-     * Handle getAverageResponseTime functionality with proper error handling.
-     */
-    private function getAverageResponseTime(string $query): float
-    {
-        try {
-            $performanceService = app(SearchPerformanceService::class);
-
-            // This would typically get average response time from performance data
-            return 0.25; // 250ms
-        } catch (Exception $e) {
-            return 0.0;
-        }
-    }
-
-    /**
-     * Handle getCacheHitRate functionality with proper error handling.
-     */
-    private function getCacheHitRate(string $query): float
-    {
-        try {
-            // This would typically calculate cache hit rate
-            return 0.85; // 85% cache hit rate
-        } catch (Exception $e) {
-            return 0.0;
-        }
-    }
-
-    /**
-     * Handle getErrorRate functionality with proper error handling.
-     */
-    private function getErrorRate(string $query): float
-    {
-        try {
-            // This would typically calculate error rate
-            return 0.02; // 2% error rate
-        } catch (Exception $e) {
-            return 0.0;
-        }
-    }
-
-    /**
-     * Handle getThroughput functionality with proper error handling.
-     */
-    private function getThroughput(string $query): float
-    {
-        try {
-            // This would typically calculate queries per second
-            return 150.0; // 150 QPS
-        } catch (Exception $e) {
-            return 0.0;
-        }
-    }
-
-    /**
-     * Handle getMemoryUsage functionality with proper error handling.
-     */
-    private function getMemoryUsage(string $query): float
-    {
-        try {
-            // This would typically get memory usage in MB
-            return 45.2; // 45.2 MB
-        } catch (Exception $e) {
-            return 0.0;
-        }
-    }
-
-    /**
-     * Handle getDatabaseQueries functionality with proper error handling.
-     */
-    private function getDatabaseQueries(string $query): int
-    {
-        try {
-            // This would typically count database queries
-            return 3; // 3 database queries
-        } catch (Exception $e) {
-            return 0;
-        }
-    }
-
-    /**
-     * Handle getOptimizationOpportunities functionality with proper error handling.
-     */
-    private function getOptimizationOpportunities(string $query): array
-    {
-        try {
-            $opportunities = [];
-
-            // Check for common optimization opportunities
-            if (strlen($query) > 50) {
-                $opportunities[] = 'Query is very long, consider shortening';
-            }
-
-            if (preg_match('/\b(and|or|the|a|an)\b/i', $query)) {
-                $opportunities[] = 'Query contains stop words, consider removing';
-            }
-
-            if (strpos($query, ' ') === false) {
-                $opportunities[] = 'Single word query, consider adding context';
-            }
-
-            return $opportunities;
         } catch (Exception $e) {
             return [];
         }

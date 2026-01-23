@@ -111,11 +111,7 @@
                     "icon": "heroicon-o-share",
                     "sort": 17
                 },
-                {
-                    "class": "App\\Filament\\Resources\\CampaignClickResource",
-                    "icon": "heroicon-o-chart-bar",
-                    "sort": null
-                },
+                
                 {
                     "class": "App\\Filament\\Resources\\CampaignCustomerSegmentResource",
                     "icon": "heroicon-o-users",
@@ -172,11 +168,7 @@
                     "icon": null,
                     "sort": 10
                 },
-                {
-                    "class": "App\\Filament\\Resources\\RecommendationConfigResource",
-                    "icon": null,
-                    "sort": 11
-                },
+                
                 {
                     "class": "App\\Filament\\Resources\\ReferralCodeUsageLogResource",
                     "icon": null,
@@ -240,11 +232,7 @@
                     "icon": "heroicon-o-document",
                     "sort": 20
                 },
-                {
-                    "class": "App\\Filament\\Resources\\VariantPriceHistoryResource",
-                    "icon": "heroicon-o-currency-euro",
-                    "sort": 20
-                },
+                
                 {
                     "class": "App\\Filament\\Resources\\SystemResource",
                     "icon": "heroicon-o-cog-6-tooth",
@@ -459,13 +447,7 @@
             "label_key": "Security",
             "icon": null,
             "sort": null,
-            "resources": [
-                {
-                    "class": "App\\Filament\\Resources\\AuditTrailResource",
-                    "icon": "heroicon-o-clipboard-document-check",
-                    "sort": null
-                }
-            ]
+            "resources": []
         },
         {
             "label": "Analitika",
@@ -569,11 +551,7 @@
             "icon": null,
             "sort": 2
         },
-        {
-            "class": "App\\Filament\\Resources\\NewsCategoryResource",
-            "icon": null,
-            "sort": 2
-        },
+        
         {
             "class": "App\\Filament\\Resources\\PostResource",
             "icon": null,
@@ -599,16 +577,7 @@
             "icon": null,
             "sort": 3
         },
-        {
-            "class": "App\\Filament\\Resources\\ShippingOptionResource",
-            "icon": null,
-            "sort": 3
-        },
-        {
-            "class": "App\\Filament\\Resources\\VariantStockHistoryResource",
-            "icon": null,
-            "sort": 3
-        },
+        
         {
             "class": "App\\Filament\\Resources\\NewsImageResource",
             "icon": null,
@@ -654,11 +623,7 @@
             "icon": null,
             "sort": 15
         },
-        {
-            "class": "App\\Filament\\Resources\\RecommendationCacheResource",
-            "icon": null,
-            "sort": 20
-        },
+        
         {
             "class": "App\\Filament\\Resources\\AddressResource",
             "icon": "heroicon-o-map-pin",

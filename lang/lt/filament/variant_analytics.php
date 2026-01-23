@@ -32,7 +32,6 @@ return [
     'variant_analytics_updated'           => 'Varianto analitika sėkmingai atnaujinta',
     'variant_analytics_deleted'           => 'Varianto analitika sėkmingai ištrinta',
     'analytics_data'                      => 'Analitikos duomenys',
-    'performance_metrics'                 => 'Veiklos metrikos',
     'click_through_rate'                  => 'Paspaudimo peržiūros rodiklis',
     'add_to_cart_rate'                    => 'Į krepšelį įdėjimo rodiklis',
     'purchase_conversion_rate'            => 'Pirkimo konversijos rodiklis',

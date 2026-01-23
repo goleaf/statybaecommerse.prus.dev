@@ -39,11 +39,7 @@ class UserFactory extends Factory
         );
 
         $state = [
-            'name' => $firstName . ' ' . $lastName,
-            // Store decomposed name parts so seeders and UI components can reuse
-            // deterministic values without re-parsing the combined name.
-            'first_name'        => $firstName,
-            'last_name'         => $lastName,
+            'name'              => $firstName . ' ' . $lastName,
             'email'             => $email,
             'email_verified_at' => now(),
             // Use a strong default so SecurePasswordHandling validates before hashing.
@@ -52,6 +48,15 @@ class UserFactory extends Factory
             'is_admin'         => false,
             'remember_token'   => Str::random(10),
         ];
+
+        // Store decomposed name parts only when the schema supports them.
+        if ($this->tableExists('users') && $this->tableHasColumn('users', 'first_name')) {
+            $state['first_name'] = $firstName;
+        }
+
+        if ($this->tableExists('users') && $this->tableHasColumn('users', 'last_name')) {
+            $state['last_name'] = $lastName;
+        }
 
         // Some test runs (e.g. partial migrations, in-memory DBs) may not yet
         // include recently added columns. Only set optional flags when present.

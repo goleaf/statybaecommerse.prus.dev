@@ -74,7 +74,6 @@ return [
     'view_all'             => 'View All',
     'no_recent_orders'     => 'No recent orders',
     'no_recent_reviews'    => 'No recent reviews',
-    'performance_metrics'  => 'Performance Metrics',
     'page_views'           => 'Page Views',
     'bounce_rate'          => 'Bounce Rate',
     'avg_session_duration' => 'Avg Session Duration',

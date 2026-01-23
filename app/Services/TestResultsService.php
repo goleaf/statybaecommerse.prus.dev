@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\ViewModels\TestResultsViewModel;
+use App\Data\TestResultsData;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\File;
 use Throwable;
@@ -54,7 +54,7 @@ final class TestResultsService
         private readonly ?string $resultsPath = null
     ) {}
 
-    public function buildViewModel(): TestResultsViewModel
+    public function buildViewModel(): TestResultsData
     {
         $raw = $this->readRawDataset();
 
@@ -66,7 +66,7 @@ final class TestResultsService
         $progressSegments = $this->progressSegments($summary);
         $meta = $this->formatMeta($raw['meta'], $summary, $orderedTests);
 
-        return new TestResultsViewModel(
+        return new TestResultsData(
             meta: $meta,
             tests: $orderedTests,
             summary: $summary,

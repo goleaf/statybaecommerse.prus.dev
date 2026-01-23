@@ -1,10 +1,4 @@
-<?php
-use function Livewire\Volt\{layout, title};
-
-layout('components.layouts.templates.account');
-title(__('Profile'));
-
-?>
+{{-- Account Profile Component --}}
 
 <div class="space-y-10">
     <x-breadcrumbs :items="[['label' => __('My account'), 'url' => route('account.index')], ['label' => __('Profile')]]" />

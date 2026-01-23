@@ -1,0 +1,295 @@
+/* =============================================================================
+ * FILAMENT ADMIN MOBILE RESPONSIVENESS ENHANCEMENTS
+ * =============================================================================
+ * This file contains mobile-specific enhancements for the Filament admin panel
+ * to ensure optimal user experience on mobile devices.
+ */
+
+/* Mobile-first responsive design for Filament admin */
+@media (max-width: 768px) {
+  /* Navigation improvements for mobile */
+  .fi-sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+  }
+  
+  .fi-sidebar.open {
+    transform: translateX(0);
+  }
+  
+  /* Mobile navigation toggle */
+  .fi-topbar .fi-topbar-nav-toggle {
+    display: block !important;
+  }
+  
+  /* Table responsiveness */
+  .fi-table {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .fi-table-container {
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Form improvements for mobile */
+  .fi-form .fi-form-component-container {
+    margin-bottom: 1.5rem;
+  }
+  
+  .fi-input, .fi-select, .fi-textarea {
+    min-height: 44px; /* Touch-friendly minimum size */
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+  
+  /* Button improvements */
+  .fi-btn {
+    min-height: 44px;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+  }
+  
+  /* Modal improvements */
+  .fi-modal {
+    margin: 1rem;
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
+  }
+  
+  .fi-modal-content {
+    padding: 1.5rem;
+  }
+  
+  /* Dashboard widget improvements */
+  .fi-widget {
+    margin-bottom: 1rem;
+  }
+  
+  .fi-widget-content {
+    padding: 1rem;
+  }
+  
+  /* Dropdown improvements */
+  .fi-dropdown-panel {
+    max-width: calc(100vw - 2rem);
+    max-height: 50vh;
+    overflow-y: auto;
+  }
+}
+
+/* Tablet-specific adjustments */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .fi-sidebar {
+    width: 240px;
+  }
+  
+  .fi-main {
+    margin-left: 240px;
+  }
+  
+  .fi-table {
+    font-size: 0.875rem;
+  }
+  
+  .fi-form .fi-form-component-container {
+    margin-bottom: 1.25rem;
+  }
+}
+
+/* Touch-friendly improvements for all mobile devices */
+@media (hover: none) and (pointer: coarse) {
+  /* Increase touch targets */
+  .fi-btn, .fi-link, .fi-table-action {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 0.75rem;
+  }
+  
+  /* Remove hover effects on touch devices */
+  .fi-btn:hover,
+  .fi-link:hover,
+  .fi-table-row:hover {
+    background-color: initial;
+    transform: none;
+  }
+  
+  /* Add active states for touch feedback */
+  .fi-btn:active {
+    transform: scale(0.98);
+    transition: transform 0.1s ease;
+  }
+  
+  .fi-table-row:active {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+}
+
+/* Landscape orientation adjustments */
+@media (orientation: landscape) and (max-height: 600px) {
+  .fi-topbar {
+    height: 3rem;
+  }
+  
+  .fi-main {
+    padding-top: 3rem;
+  }
+  
+  .fi-modal {
+    max-height: calc(100vh - 1rem);
+    margin: 0.5rem;
+  }
+}
+
+/* High DPI display adjustments */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .fi-icon {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
+/* Accessibility improvements for mobile */
+@media (prefers-reduced-motion: reduce) {
+  .fi-sidebar {
+    transition: none;
+  }
+  
+  .fi-btn:active {
+    transform: none;
+  }
+}
+
+/* Dark mode mobile adjustments */
+@media (prefers-color-scheme: dark) {
+  .fi-table-container {
+    background-color: #1f2937;
+    border-color: #374151;
+  }
+  
+  .fi-modal-content {
+    background-color: #1f2937;
+    color: #f9fafb;
+  }
+}
+
+/* Print styles for mobile */
+@media print {
+  .fi-sidebar,
+  .fi-topbar,
+  .fi-table-actions,
+  .fi-btn {
+    display: none !important;
+  }
+  
+  .fi-main {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  .fi-table {
+    font-size: 12px;
+  }
+}
+
+/* Custom utility classes for mobile responsiveness */
+.mobile-hidden {
+  @media (max-width: 768px) {
+    display: none !important;
+  }
+}
+
+.mobile-only {
+  display: none !important;
+  
+  @media (max-width: 768px) {
+    display: block !important;
+  }
+}
+
+.mobile-flex {
+  @media (max-width: 768px) {
+    display: flex !important;
+  }
+}
+
+.mobile-grid {
+  @media (max-width: 768px) {
+    display: grid !important;
+  }
+}
+
+.mobile-full-width {
+  @media (max-width: 768px) {
+    width: 100% !important;
+  }
+}
+
+.mobile-text-center {
+  @media (max-width: 768px) {
+    text-align: center !important;
+  }
+}
+
+.mobile-p-4 {
+  @media (max-width: 768px) {
+    padding: 1rem !important;
+  }
+}
+
+.mobile-m-2 {
+  @media (max-width: 768px) {
+    margin: 0.5rem !important;
+  }
+}
+
+/* Scrollbar improvements for mobile */
+.fi-table::-webkit-scrollbar {
+  height: 8px;
+}
+
+.fi-table::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.fi-table::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.fi-table::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Mobile-specific loading states */
+.fi-loading-mobile {
+  @media (max-width: 768px) {
+    padding: 2rem 1rem;
+    text-align: center;
+  }
+}
+
+/* Mobile-specific error states */
+.fi-error-mobile {
+  @media (max-width: 768px) {
+    padding: 1rem;
+    margin: 1rem;
+    border-radius: 0.5rem;
+    background-color: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #991b1b;
+  }
+}
+
+/* Mobile-specific success states */
+.fi-success-mobile {
+  @media (max-width: 768px) {
+    padding: 1rem;
+    margin: 1rem;
+    border-radius: 0.5rem;
+    background-color: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    color: #166534;
+  }
+}

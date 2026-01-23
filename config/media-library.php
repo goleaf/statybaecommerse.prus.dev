@@ -184,7 +184,7 @@ return [
      * The engine that should perform the image conversions.
      * Should be either `gd` or `imagick`.
      */
-    'image_driver' => env('IMAGE_DRIVER', 'gd'),
+    'image_driver' => 'gd',
 
     /*
      * FFMPEG & FFProbe binaries paths, only used if you try to generate video
@@ -266,7 +266,7 @@ return [
      * the Media Library Pro Vue and React components to move uploaded files
      * in a S3 bucket to their right place.
      */
-    'enable_vapor_uploads' => env('ENABLE_MEDIA_LIBRARY_VAPOR_UPLOADS', false),
+    'enable_vapor_uploads' => false,
 
     /*
      * When converting Media instances to response the media library will add

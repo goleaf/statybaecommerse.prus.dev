@@ -40,34 +40,20 @@ return [
     ],
     'rate_limiting' => [
         'defaults' => [
-            'minute' => (int) env('API_RATE_LIMIT_DEFAULT_FALLBACK', 60),
+            'minute' => 60,
         ],
         'api' => [
             'default' => [
-                'per_user' => (int) env('API_RATE_LIMIT_DEFAULT_PER_USER', (int) env('API_RATE_LIMIT_DEFAULT', 60)),
-                'per_ip'   => (int) env('API_RATE_LIMIT_DEFAULT_PER_IP', (int) env('API_RATE_LIMIT_DEFAULT', 60)),
+                'per_user' => 60,
+                'per_ip'   => 60,
             ],
             'read' => [
-                'per_user' => (int) env('API_RATE_LIMIT_READ_PER_USER', (int) env('API_RATE_LIMIT_DEFAULT_PER_USER', (int) env('API_RATE_LIMIT_DEFAULT', 60))),
-                'per_ip'   => (int) env('API_RATE_LIMIT_READ_PER_IP', (int) env('API_RATE_LIMIT_DEFAULT_PER_IP', (int) env('API_RATE_LIMIT_DEFAULT', 60))),
+                'per_user' => 60,
+                'per_ip'   => 60,
             ],
             'write' => [
-                'per_user' => (int) env('API_RATE_LIMIT_WRITE_PER_USER', (int) env('API_RATE_LIMIT_DEFAULT_PER_USER', (int) env('API_RATE_LIMIT_DEFAULT', 60))),
-                'per_ip'   => (int) env('API_RATE_LIMIT_WRITE_PER_IP', (int) env('API_RATE_LIMIT_DEFAULT_PER_IP', (int) env('API_RATE_LIMIT_DEFAULT', 60))),
-            ],
-            'notifications' => [
-                'read' => [
-                    'per_user' => (int) env('API_RATE_LIMIT_NOTIFICATIONS_READ_PER_USER', (int) env('API_RATE_LIMIT_NOTIFICATIONS', 60)),
-                    'per_ip'   => (int) env('API_RATE_LIMIT_NOTIFICATIONS_READ_PER_IP', (int) env('API_RATE_LIMIT_NOTIFICATIONS', 60)),
-                ],
-                'write' => [
-                    'per_user' => (int) env('API_RATE_LIMIT_NOTIFICATIONS_WRITE_PER_USER', (int) env('API_RATE_LIMIT_NOTIFICATIONS', 60)),
-                    'per_ip'   => (int) env('API_RATE_LIMIT_NOTIFICATIONS_WRITE_PER_IP', (int) env('API_RATE_LIMIT_NOTIFICATIONS', 60)),
-                ],
-            ],
-            'autocomplete' => [
-                'per_user' => (int) env('API_RATE_LIMIT_AUTOCOMPLETE_PER_USER', (int) env('API_RATE_LIMIT_AUTOCOMPLETE', 30)),
-                'per_ip'   => (int) env('API_RATE_LIMIT_AUTOCOMPLETE_PER_IP', (int) env('API_RATE_LIMIT_AUTOCOMPLETE', 30)),
+                'per_user' => 60,
+                'per_ip'   => 60,
             ],
             'search' => [
                 'per_user' => env('API_RATE_LIMIT_SEARCH_PER_USER') !== null
@@ -93,12 +79,6 @@ return [
                 'decay_seconds' => (int) env('AUTH_RATE_LIMIT_LOGIN_DECAY', 60),
             ],
             'password_reset' => $passwordResetRateLimit,
-            // Apply the same guardrails to two-factor verification attempts so brute forcing
-            // recovery codes or TOTPs is rate limited to five per minute by default.
-            'two_factor' => [
-                'max_attempts'  => (int) env('AUTH_RATE_LIMIT_TWO_FACTOR_ATTEMPTS', 5),
-                'decay_seconds' => (int) env('AUTH_RATE_LIMIT_TWO_FACTOR_DECAY', 60),
-            ],
         ],
     ],
     'captcha' => [

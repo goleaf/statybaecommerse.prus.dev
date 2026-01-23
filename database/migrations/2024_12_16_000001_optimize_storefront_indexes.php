@@ -99,13 +99,6 @@ return new class extends Migration
             });
         }
 
-        // Optimize performance metrics queries
-        if (Schema::hasTable('performance_metrics')) {
-            Schema::table('performance_metrics', function (Blueprint $table) {
-                // Index for performance monitoring queries
-                $table->index(['page_route', 'created_at'], 'performance_metrics_route_time_idx');
-            });
-        }
     }
 
     /**
@@ -175,10 +168,5 @@ return new class extends Migration
             });
         }
 
-        if (Schema::hasTable('performance_metrics')) {
-            Schema::table('performance_metrics', function (Blueprint $table) {
-                $table->dropIndex('performance_metrics_route_time_idx');
-            });
-        }
     }
 };

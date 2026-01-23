@@ -7,7 +7,6 @@ namespace App\Policies;
 use App\Models\AdminUser;
 use App\Models\DiscountCondition;
 use App\Models\User;
-use App\Support\Authorization\AuthorizationMatrix;
 
 /**
  * DiscountConditionPolicy
@@ -22,8 +21,7 @@ final class DiscountConditionPolicy
      */
     public function viewAny(AdminUser|User $user): bool
     {
-        // Lean on the central authorization matrix to keep permissions consistent.
-        return AuthorizationMatrix::check('discount_conditions', 'viewAny', $user);
+        return $user instanceof AdminUser;
     }
 
     /**
@@ -31,7 +29,6 @@ final class DiscountConditionPolicy
      */
     public function view(AdminUser|User $user, DiscountCondition $discountCondition): bool
     {
-        // Reuse the read permission for single-resource lookups and API helpers.
-        return AuthorizationMatrix::check('discount_conditions', 'view', $user);
+        return $user instanceof AdminUser;
     }
 }

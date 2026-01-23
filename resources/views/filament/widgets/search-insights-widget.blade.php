@@ -88,31 +88,6 @@
                         </div>
                     </div>
 
-                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
-                        <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                            {{ __('admin.performance_metrics') }}
-                        </h4>
-                        <div class="space-y-3">
-                            <div class="flex justify-between items-center">
-                                <span class="text-sm text-gray-600 dark:text-gray-400">{{ __('admin.response_time') }}</span>
-                                <span class="font-semibold text-gray-900 dark:text-white">
-                                    {{ number_format($insights['performance_metrics']['average_response_time'] ?? 0, 3) }}s
-                                </span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-sm text-gray-600 dark:text-gray-400">{{ __('admin.cache_hit_rate') }}</span>
-                                <span class="font-semibold text-gray-900 dark:text-white">
-                                    {{ number_format(($insights['performance_metrics']['cache_hit_rate'] ?? 0) * 100, 1) }}%
-                                </span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-sm text-gray-600 dark:text-gray-400">{{ __('admin.error_rate') }}</span>
-                                <span class="font-semibold text-gray-900 dark:text-white">
-                                    {{ number_format(($insights['performance_metrics']['error_rate'] ?? 0) * 100, 2) }}%
-                                </span>
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
                 <!-- Recommendations -->

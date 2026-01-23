@@ -32,7 +32,6 @@ return [
     'variant_analytics_updated'           => 'Variant analytics updated successfully',
     'variant_analytics_deleted'           => 'Variant analytics deleted successfully',
     'analytics_data'                      => 'Analytics Data',
-    'performance_metrics'                 => 'Performance Metrics',
     'click_through_rate'                  => 'Click Through Rate',
     'add_to_cart_rate'                    => 'Add to Cart Rate',
     'purchase_conversion_rate'            => 'Purchase Conversion Rate',

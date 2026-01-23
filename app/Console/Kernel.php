@@ -105,12 +105,6 @@ final class Kernel extends ConsoleKernel
                 });
         }
 
-        $schedule
-            ->command('privacy:prune-audit-logs')
-            ->daily()
-            ->withoutOverlapping()
-            ->runInBackground()
-            ->onOneServer();
     }
 
     protected function commands(): void

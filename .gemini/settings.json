@@ -1,0 +1,23 @@
+{
+    "tools": {
+        "autoAccept": true
+    },
+    "mcpServers": {
+        "laravel-boost": {
+            "command": "php",
+            "args": [
+                "artisan",
+                "boost:mcp"
+            ]
+        },
+        "herd": {
+            "command": "php",
+            "args": [
+                "/Applications/Herd.app/Contents/Resources/herd-mcp.phar"
+            ],
+            "env": {
+                "SITE_PATH": "/Users/andrejprus/Library/CloudStorage/Dropbox/projects/elatray/web-laravel"
+            }
+        }
+    }
+}

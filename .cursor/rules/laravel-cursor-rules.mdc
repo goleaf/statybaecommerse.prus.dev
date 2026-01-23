@@ -42,7 +42,6 @@
   - Implement proper error handling and logging using Laravel's exception handler and logging facade
   - Utilize Laravel's validation features, including Form Requests, for data integrity
   - Implement database indexing and use Laravel's query optimization features for better performance
-  - Use Laravel Telescope for debugging and performance monitoring in development
   - Leverage Laravel Nova or Filament for rapid admin panel development
   - Implement proper security measures, including CSRF protection, XSS prevention, and input sanitization
 

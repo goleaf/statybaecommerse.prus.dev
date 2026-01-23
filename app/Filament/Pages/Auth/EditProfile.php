@@ -105,9 +105,6 @@ class EditProfile extends BaseEditProfile
                         Toggle::make('accepts_marketing')
                             ->label(__('admin.profile.accepts_marketing'))
                             ->default(false),
-                        Toggle::make('two_factor_enabled')
-                            ->label(__('admin.profile.two_factor_enabled'))
-                            ->default(false),
                     ])
                     ->columns(2),
                 Section::make(__('admin.profile.security'))

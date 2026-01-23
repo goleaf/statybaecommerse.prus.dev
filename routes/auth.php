@@ -13,9 +13,6 @@ Route::middleware('guest')->group(function (): void {
     Route::get('login', \App\Livewire\Auth\Login::class)
         ->middleware('throttle:auth.login')
         ->name('login');
-    Route::get('two-factor-challenge', \App\Livewire\Auth\TwoFactorChallenge::class)
-        ->middleware('throttle:auth.two-factor')
-        ->name('two-factor.challenge');
     Route::get('forgot-password', \App\Livewire\Pages\Auth\ForgotPassword::class)
         ->middleware('throttle:auth.password-reset')
         ->name('password.request');
@@ -37,30 +34,24 @@ Route::middleware('auth')->group(function (): void {
 
     Route::view('confirm-password', 'livewire.pages.auth.confirm-password')->name('password.confirm');
 
-    // Account dashboard route is defined in routes/web.php
+    // Account dashboard routes are defined below to keep them under auth middleware.
 
     Route::prefix('account')->as('account.')->group(function (): void {
+        // Use Livewire component for account index
+        Route::get('/', \App\Livewire\Pages\Account\Index::class)->name('index');
         Route::get('profile', \App\Livewire\Pages\Account\Profile::class)->name('profile');
         Route::get('addresses', Pages\Account\Addresses::class)->name('addresses');
         Route::get('orders', Pages\Account\Orders::class)->name('orders');
         // Orders invoice view
         Route::view('orders/{number}/invoice', 'livewire.pages.account.orders.invoice')->name('orders.invoice');
-        // Ensure Volt is available before registering Volt routes to avoid CLI context errors
-        if (class_exists(\Livewire\Volt\Volt::class)) {
-            \Livewire\Volt\Volt::route('orders/{number}', 'pages.account.orders.detail')->name('orders.detail');
-        } else {
-            Route::view('orders/{number}', 'livewire.pages.account.orders.detail')->name('orders.detail');
-        }
+        // Order details page
+        Route::get('orders/{number}', \App\Livewire\Pages\Account\Orders\Detail::class)->name('orders.detail');
         // Alias name to satisfy route index: account.order.show
         Route::get('order/{number}', function (string $number) {
             return redirect()->route('account.orders.detail', ['number' => $number]);
         })->name('order.show');
         // Account reviews page (list user's reviews)
-        if (class_exists(\Livewire\Volt\Volt::class)) {
-            \Livewire\Volt\Volt::route('reviews', 'pages.account.reviews')->name('reviews');
-        } else {
-            Route::view('reviews', 'livewire.pages.account.reviews')->name('reviews');
-        }
+        Route::get('reviews', \App\Livewire\Pages\Account\Reviews::class)->name('reviews');
 
         // Documents page
         Route::view('documents', 'livewire.pages.account.documents')->name('documents');

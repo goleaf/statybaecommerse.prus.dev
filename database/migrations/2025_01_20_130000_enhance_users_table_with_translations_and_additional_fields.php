@@ -55,17 +55,8 @@ return new class extends Migration
             if (! Schema::hasColumn('users', 'phone_verified_at')) {
                 $table->timestamp('phone_verified_at')->nullable()->after('last_activity_at');
             }
-            if (! Schema::hasColumn('users', 'two_factor_secret')) {
-                $table->text('two_factor_secret')->nullable()->after('phone_verified_at');
-            }
-            if (! Schema::hasColumn('users', 'two_factor_recovery_codes')) {
-                $table->json('two_factor_recovery_codes')->nullable()->after('two_factor_secret');
-            }
-            if (! Schema::hasColumn('users', 'two_factor_confirmed_at')) {
-                $table->timestamp('two_factor_confirmed_at')->nullable()->after('two_factor_recovery_codes');
-            }
             if (! Schema::hasColumn('users', 'api_token')) {
-                $table->string('api_token', 80)->nullable()->unique()->after('two_factor_confirmed_at');
+                $table->string('api_token', 80)->nullable()->unique()->after('phone_verified_at');
             }
             if (! Schema::hasColumn('users', 'stripe_customer_id')) {
                 $table->string('stripe_customer_id')->nullable()->after('api_token');
@@ -121,9 +112,6 @@ return new class extends Migration
             'login_count',
             'last_activity_at',
             'phone_verified_at',
-            'two_factor_secret',
-            'two_factor_recovery_codes',
-            'two_factor_confirmed_at',
             'api_token',
             'stripe_customer_id',
             'stripe_account_id',

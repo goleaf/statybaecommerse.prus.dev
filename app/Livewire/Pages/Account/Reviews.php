@@ -36,6 +36,8 @@ final class Reviews extends Component
      */
     public function render(): View
     {
-        return view('livewire.pages.account.reviews');
+        return view('livewire.pages.account.reviews')
+            ->layout('components.layouts.templates.account')
+            ->title(__('My reviews'));
     }
 }

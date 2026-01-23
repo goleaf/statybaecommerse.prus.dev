@@ -41,22 +41,7 @@
     </x-container>
 @endsection
 
-<?php
-// Using App\Models\Order for order management
-
-use function Livewire\Volt\{mount, state, layout};
-
-layout('components.layouts.base');
-
-state(['order' => null]);
-
-mount(function (string $number): void {
-    $this->order = Order::with(['items', 'items.product', 'shippingOption', 'paymentMethod'])
-        ->where('number', $number)
-        ->firstOrFail();
-});
-
-?>
+{{-- Order Confirmed Page --}}
 
 <x-container class="py-16 sm:pb-32 sm:pt-24 lg:max-w-4xl">
     <!-- Session Status -->

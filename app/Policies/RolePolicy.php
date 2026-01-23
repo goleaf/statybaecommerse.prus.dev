@@ -4,67 +4,44 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
-use App\Support\Authorization\AuthorizationMatrix;
-use Illuminate\Auth\Access\HandlesAuthorization;
-use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
-use Spatie\Permission\Models\Role;
+use App\Models\AdminUser;
+use App\Models\Role;
+use App\Models\User;
 
-class RolePolicy
+final class RolePolicy
 {
-    use HandlesAuthorization;
-
-    public function viewAny(AuthenticatableContract $authUser): bool
+    public function viewAny(AdminUser|User $user): bool
     {
-        return AuthorizationMatrix::check('roles', 'viewAny', $authUser);
+        return $user instanceof AdminUser;
     }
 
-    public function view(AuthenticatableContract $authUser, Role $role): bool
+    public function view(AdminUser|User $user, Role $role): bool
     {
-        return AuthorizationMatrix::check('roles', 'view', $authUser);
+        return $user instanceof AdminUser;
     }
 
-    public function create(AuthenticatableContract $authUser): bool
+    public function create(AdminUser|User $user): bool
     {
-        return AuthorizationMatrix::check('roles', 'create', $authUser);
+        return $user instanceof AdminUser;
     }
 
-    public function update(AuthenticatableContract $authUser, Role $role): bool
+    public function update(AdminUser|User $user, Role $role): bool
     {
-        return AuthorizationMatrix::check('roles', 'update', $authUser);
+        return $user instanceof AdminUser;
     }
 
-    public function delete(AuthenticatableContract $authUser, Role $role): bool
+    public function delete(AdminUser|User $user, Role $role): bool
     {
-        return AuthorizationMatrix::check('roles', 'delete', $authUser);
+        return $user instanceof AdminUser;
     }
 
-    public function restore(AuthenticatableContract $authUser, Role $role): bool
+    public function restore(AdminUser|User $user, Role $role): bool
     {
-        return AuthorizationMatrix::check('roles', 'restore', $authUser);
+        return $user instanceof AdminUser;
     }
 
-    public function forceDelete(AuthenticatableContract $authUser, Role $role): bool
+    public function forceDelete(AdminUser|User $user, Role $role): bool
     {
-        return AuthorizationMatrix::check('roles', 'forceDelete', $authUser);
-    }
-
-    public function forceDeleteAny(AuthenticatableContract $authUser): bool
-    {
-        return AuthorizationMatrix::check('roles', 'forceDeleteAny', $authUser);
-    }
-
-    public function restoreAny(AuthenticatableContract $authUser): bool
-    {
-        return AuthorizationMatrix::check('roles', 'restoreAny', $authUser);
-    }
-
-    public function replicate(AuthenticatableContract $authUser, Role $role): bool
-    {
-        return AuthorizationMatrix::check('roles', 'replicate', $authUser);
-    }
-
-    public function reorder(AuthenticatableContract $authUser): bool
-    {
-        return AuthorizationMatrix::check('roles', 'reorder', $authUser);
+        return $user instanceof AdminUser;
     }
 }

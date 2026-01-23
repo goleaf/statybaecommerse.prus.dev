@@ -338,30 +338,4 @@
         </div>
     </div>
 
-    <!-- Performance Metrics -->
-    <div class="mt-8 bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-            <div class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-            {{ __('translations.performance_metrics') }}
-        </h3>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div class="text-center">
-                <p class="text-2xl font-bold text-gray-900">{{ number_format($this->performanceMetrics['page_views']) }}</p>
-                <p class="text-sm text-gray-600">{{ __('translations.page_views') }}</p>
-            </div>
-            <div class="text-center">
-                <p class="text-2xl font-bold text-gray-900">{{ $this->performanceMetrics['bounce_rate'] }}%</p>
-                <p class="text-sm text-gray-600">{{ __('translations.bounce_rate') }}</p>
-            </div>
-            <div class="text-center">
-                <p class="text-2xl font-bold text-gray-900">{{ number_format($this->performanceMetrics['avg_session_duration'] / 60, 1) }}m</p>
-                <p class="text-sm text-gray-600">{{ __('translations.avg_session_duration') }}</p>
-            </div>
-            <div class="text-center">
-                <p class="text-2xl font-bold text-gray-900">{{ $this->performanceMetrics['conversion_rate'] }}%</p>
-                <p class="text-sm text-gray-600">{{ __('translations.conversion_rate') }}</p>
-            </div>
-        </div>
-    </div>
 </div>

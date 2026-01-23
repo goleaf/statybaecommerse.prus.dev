@@ -89,7 +89,6 @@
                     "required": [
                         "is_email_verified",
                         "is_phone_verified",
-                        "has_two_factor",
                         "is_on_trial",
                         "has_active_subscription"
                     ],
@@ -98,9 +97,6 @@
                             "type": "boolean"
                         },
                         "is_phone_verified": {
-                            "type": "boolean"
-                        },
-                        "has_two_factor": {
                             "type": "boolean"
                         },
                         "is_on_trial": {

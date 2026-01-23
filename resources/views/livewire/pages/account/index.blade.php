@@ -1,9 +1,5 @@
-<?php
-use function Livewire\Volt\{layout, title};
-
-layout('components.layouts.templates.account');
-title(__('Overview'));
-
+{{-- Account Index Page --}}
+@php
 // Build links without Volt computed to avoid test-time Volt closure issues
 $links = [
     [
@@ -55,7 +51,7 @@ $links = [
         'icon' => 'untitledui-phone',
     ],
 ];
-?>
+@endphp
 
 <div class="space-y-10">
     <x-breadcrumbs :items="[['label' => __('My account')]]" />

@@ -9,13 +9,11 @@ use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\PublishedScope;
 use App\Models\Scopes\VisibleScope;
-use App\Observers\ProductObserver;
 use App\Support\Html\HtmlSanitizer;
 use App\Traits\HasProductPricing;
 use App\Traits\HasTranslations;
 use DateTimeInterface;
 use Illuminate\Container\Container;
-use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
@@ -71,7 +69,6 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  *
  * @mixin \Eloquent
  */
-#[ObservedBy([ProductObserver::class])]
 #[ScopedBy([ActiveScope::class, PublishedScope::class, VisibleScope::class])]
 final class Product extends Model implements HasMedia, TranslatableRecord
 {
@@ -248,7 +245,6 @@ final class Product extends Model implements HasMedia, TranslatableRecord
             return is_string($fallback) ? $fallback : '{}';
         }
     }
-
 
     /**
      * Handle getRouteKeyName functionality with proper error handling.

@@ -24,12 +24,10 @@
         "laravel/sanctum": "^4.0",
         "laravel/scout": "^10.19",
         "laravel/tinker": "^2.10.1",
-        "livewire/volt": "^1.0",
         "phpoffice/phpspreadsheet": "^1.30",
         "predis/predis": "^3.2",
         "spatie/laravel-data": "^4.17",
         "spatie/laravel-medialibrary": "^11",
-        "spatie/laravel-permission": "^6.21",
         "spatie/laravel-sluggable": "^3.7",
         "spatie/laravel-translatable": "^6.11",
         "tapp/filament-value-range-filter": "dev-filament4"

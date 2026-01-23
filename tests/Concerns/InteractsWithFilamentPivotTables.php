@@ -16,9 +16,7 @@ trait InteractsWithFilamentPivotTables
     {
         if (
             ! self::$pivotTestSchemaMigrated
-            || ! Schema::hasTable('news_categories')
             || ! Schema::hasTable('news')
-            || ! Schema::hasTable('news_category_translations')
         ) {
             $this->createFilamentPivotTestSchema();
             self::$pivotTestSchemaMigrated = true;
@@ -33,14 +31,13 @@ trait InteractsWithFilamentPivotTables
             'role_has_permissions',
             'permissions',
             'roles',
-            'news_category_pivot',
+
             'news_tag_pivot',
             'recommendation_block_products',
             'news_translations',
-            'news_category_translations',
+
             'news_tag_translations',
             'news',
-            'news_categories',
             'news_tags',
             'products',
             'recommendation_blocks',
@@ -148,40 +145,7 @@ trait InteractsWithFilamentPivotTables
             });
         }
 
-        if (! Schema::hasTable('news_categories')) {
-            Schema::create('news_categories', function (Blueprint $table): void {
-                $table->id();
-                $table->string('name')->nullable();
-                $table->string('slug')->nullable();
-                $table->boolean('is_visible')->default(true);
-                $table->unsignedBigInteger('parent_id')->nullable();
-                $table->unsignedInteger('sort_order')->default(0);
-                $table->string('color')->nullable();
-                $table->string('icon')->nullable();
-                $table->softDeletes();
-                $table->timestamps();
-            });
-        }
-
-        if (! Schema::hasTable('news_category_translations')) {
-            Schema::create('news_category_translations', function (Blueprint $table): void {
-                $table->id();
-                $table->foreignId('news_category_id')->constrained('news_categories')->cascadeOnDelete();
-                $table->string('locale');
-                $table->string('name');
-                $table->string('slug');
-                $table->text('description')->nullable();
-                $table->timestamps();
-            });
-        }
-
-        if (! Schema::hasTable('news_category_pivot')) {
-            Schema::create('news_category_pivot', function (Blueprint $table): void {
-                $table->unsignedBigInteger('news_id');
-                $table->unsignedBigInteger('news_category_id');
-                $table->timestamps();
-            });
-        }
+        // News category tables removed; tests should not create them.
 
         if (! Schema::hasTable('news_tags')) {
             Schema::create('news_tags', function (Blueprint $table): void {

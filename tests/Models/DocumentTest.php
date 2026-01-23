@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use App\Models\AuditLog;
 use App\Models\Document;
 use App\Models\DocumentTemplate;
 use App\Models\Order;
@@ -72,7 +71,7 @@ it('casts attributes to their expected runtime types', function (): void {
 });
 
 // Validate relationships so downstream API layers can eager load confidently.
-it('resolves related template, users, audit logs, and polymorphic parents', function (): void {
+it('resolves related template, users, and polymorphic parents', function (): void {
     $template = DocumentTemplate::factory()->create();
     $creator = User::factory()->create();
     $updater = User::factory()->create();
@@ -86,19 +85,6 @@ it('resolves related template, users, audit logs, and polymorphic parents', func
         'updated_by'           => $updater->getKey(),
     ]);
 
-    $manualAction = 'manual_entry';
-
-    AuditLog::query()->create([
-        'entity_type' => Document::class,
-        'entity_id'   => (string) $document->getKey(),
-        'action'      => $manualAction,
-        'user_id'     => $creator->getKey(),
-    ]);
-
-    $document->unsetRelation('auditLogs');
-
-    $logs = $document->auditLogs()->get();
-
     expect($document->template)->toBeInstanceOf(DocumentTemplate::class)
         ->and($document->template->is($template))->toBeTrue()
         ->and($document->creator)->toBeInstanceOf(User::class)
@@ -106,9 +92,7 @@ it('resolves related template, users, audit logs, and polymorphic parents', func
         ->and($document->updater)->toBeInstanceOf(User::class)
         ->and($document->updater->is($updater))->toBeTrue()
         ->and($document->documentable)->toBeInstanceOf(Order::class)
-        ->and($document->documentable->is($order))->toBeTrue()
-        ->and($logs)->toHaveCount(2)
-        ->and($logs->pluck('action'))->toContain($manualAction);
+        ->and($document->documentable->is($order))->toBeTrue();
 });
 
 // Guard the behaviour around optional variables storage.

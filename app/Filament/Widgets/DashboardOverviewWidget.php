@@ -7,7 +7,6 @@ namespace App\Filament\Widgets;
 use App\Models\Address;
 use App\Models\AnalyticsEvent;
 use App\Models\Campaign;
-use App\Models\CampaignClick;
 use App\Models\CampaignView;
 use App\Models\Country;
 use App\Models\Inventory;
@@ -64,8 +63,8 @@ class DashboardOverviewWidget extends BaseWidget
         $avgRating = (float) (Review::where('is_approved', true)->avg('rating') ?? 0);
         $activeCampaigns = 0; // Campaign::where('status', 'active')->count();
         $totalCampaignViews = 0; // CampaignView::sum('views_count');
-        $totalCampaignClicks = 0; // CampaignClick::sum('clicks_count');
-        $totalConversions = 0; // Removed CampaignConversion
+
+        $totalConversions = 0;
 
         // Performance Metrics
         $totalPageViews = AnalyticsEvent::where('event_type', 'page_view')->count();
@@ -130,10 +129,6 @@ class DashboardOverviewWidget extends BaseWidget
                 ->description(__('translations.total_impressions'))
                 ->descriptionIcon('heroicon-m-eye')
                 ->color('info'),
-            Stat::make(__('translations.campaign_clicks'), \Illuminate\Support\Number::format($totalCampaignClicks))
-                ->description(__('translations.total_clicks'))
-                ->descriptionIcon('heroicon-m-cursor-arrow-rays')
-                ->color('success'),
             Stat::make(__('translations.conversions'), \Illuminate\Support\Number::format($totalConversions))
                 ->description(__('translations.total_conversions'))
                 ->descriptionIcon('heroicon-m-check-circle')

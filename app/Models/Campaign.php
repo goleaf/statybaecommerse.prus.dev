@@ -86,14 +86,6 @@ final class Campaign extends Model
     }
 
     /**
-     * Get the campaign clicks.
-     */
-    public function clicks(): HasMany
-    {
-        return $this->hasMany(CampaignClick::class);
-    }
-
-    /**
      * Get the campaign views.
      */
     public function views(): HasMany
@@ -130,5 +122,38 @@ final class Campaign extends Model
             'is_active'     => false,
             'status'        => 'deprecated',
         ]);
+    }
+
+    /**
+     * Legacy method for backward compatibility.
+     * Returns 0 as click tracking has been removed.
+     *
+     * @deprecated Click tracking functionality has been removed
+     */
+    public function getTotalClicksAttribute(): int
+    {
+        return 0;
+    }
+
+    /**
+     * Legacy method for backward compatibility.
+     * Returns 0 as conversion tracking has been removed.
+     *
+     * @deprecated Conversion tracking functionality has been removed
+     */
+    public function getTotalConversionsAttribute(): int
+    {
+        return 0;
+    }
+
+    /**
+     * Legacy method for backward compatibility.
+     * Returns false as click tracking has been removed.
+     *
+     * @deprecated Click tracking functionality has been removed
+     */
+    public function getTrackConversionsAttribute(): bool
+    {
+        return false;
     }
 }

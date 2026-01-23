@@ -131,6 +131,11 @@ return [
                 'label' => 'Sign out',
             ],
         ],
+        'buttons' => [
+            'language_switcher' => [
+                'label' => 'Select Language',
+            ],
+        ],
     ],
     'pages' => [
         'dashboard' => [

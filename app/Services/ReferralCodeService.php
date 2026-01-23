@@ -20,10 +20,9 @@ final class ReferralCodeService
      */
     public function generateUniqueCode(): string
     {
-        $code = $this->generateCode();
-        ReferralCode::where('code', $code)->existsOr(function () use (&$code) {
-            $code = $this->generateUniqueCode();
-        });
+        do {
+            $code = $this->generateCode();
+        } while (ReferralCode::where('code', $code)->exists());
 
         return $code;
     }

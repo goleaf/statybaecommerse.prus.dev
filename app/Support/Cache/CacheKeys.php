@@ -52,11 +52,6 @@ final class CacheKeys
         return sprintf('dashboard:activity:%s', $range);
     }
 
-    public static function dashboardPerformance(string $range): string
-    {
-        return sprintf('dashboard:performance:%s', $range);
-    }
-
     public static function dashboardSimplifiedSummary(): string
     {
         return 'dashboard:simplified-stats:summary';

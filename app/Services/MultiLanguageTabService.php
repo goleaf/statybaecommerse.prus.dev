@@ -6,10 +6,9 @@ namespace App\Services;
 
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use SolutionForest\TabLayoutPlugin\Components\Tabs\Tab as TabLayoutTab;
-use SolutionForest\TabLayoutPlugin\Schemas\SimpleTabSchema;
 
 /**
  * MultiLanguageTabService
@@ -81,7 +80,7 @@ final class MultiLanguageTabService
                     default       => TextInput::make("{$field}_{$language['code']}")->label($config['label'] ?? ucfirst($field))->required($config['required'] ?? false),
                 };
             }
-            $tabs[] = TabLayoutTab::make($language['name'])->id("tab-{$language['code']}")->icon('heroicon-o-language')->badge($language['flag'])->schema($tabFields);
+            $tabs[] = Tab::make($language['name'])->id("tab-{$language['code']}")->icon('heroicon-o-language')->badge($language['flag'])->schema($tabFields);
         }
 
         return $tabs;
@@ -97,7 +96,7 @@ final class MultiLanguageTabService
         foreach ($languages as $language) {
             $schema = $schemaBuilder($language['code'], $language);
             $components = is_array($schema) ? $schema : [$schema];
-            $tabs[] = TabLayoutTab::make($language['name'])->id("tab-{$language['code']}")->icon('heroicon-o-language')->badge($language['flag'])->schema($components);
+            $tabs[] = Tab::make($language['name'])->id("tab-{$language['code']}")->icon('heroicon-o-language')->badge($language['flag'])->schema($components);
         }
 
         return $tabs;
@@ -124,7 +123,7 @@ final class MultiLanguageTabService
                 }
                 $sectionComponents[] = Section::make(__("translations.{$sectionName}"))->schema($sectionFields);
             }
-            $tabs[] = TabLayoutTab::make($language['name'])->id("tab-{$language['code']}")->icon('heroicon-o-language')->badge($language['flag'])->schema($sectionComponents);
+            $tabs[] = Tab::make($language['name'])->id("tab-{$language['code']}")->icon('heroicon-o-language')->badge($language['flag'])->schema($sectionComponents);
         }
 
         return $tabs;
@@ -133,17 +132,6 @@ final class MultiLanguageTabService
     /**
      * Handle createSimpleTabSchemas functionality with proper error handling.
      */
-    public static function createSimpleTabSchemas(string $componentClass, array $data = []): array
-    {
-        $languages = self::getAvailableLanguages();
-        $schemas = [];
-        foreach ($languages as $language) {
-            $schemas[] = SimpleTabSchema::make(label: $language['name'], id: "simple-tab-{$language['code']}")->livewireComponent($componentClass, array_merge($data, ['locale' => $language['code']]))->icon('heroicon-o-language')->badge($language['flag']);
-        }
-
-        return $schemas;
-    }
-
     /**
      * Handle getDefaultActiveTab functionality with proper error handling.
      */

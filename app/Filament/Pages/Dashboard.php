@@ -50,7 +50,10 @@ class Dashboard extends BaseDashboard
     public function getWidgets(): array
     {
         return [
-            // Start with no custom widgets to ensure basic functionality
+            \App\Filament\Widgets\DashboardKpiWidget::class,
+            \App\Filament\Widgets\DashboardQuickActionsWidget::class,
+            \App\Filament\Widgets\DashboardRecentOrdersTable::class,
+            \App\Filament\Widgets\DashboardLowStockTable::class,
         ];
     }
 

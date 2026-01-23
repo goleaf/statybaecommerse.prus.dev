@@ -30,7 +30,7 @@ final class InventoryManagement extends Page implements HasTable
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Products';
+        return __('admin.navigation.products');
     }
 
     public static function getSlug(?\Filament\Panel $panel = null): string
@@ -40,7 +40,7 @@ final class InventoryManagement extends Page implements HasTable
 
     public function getTitle(): string
     {
-        return 'Inventory Management';
+        return __('admin.inventory_management.title');
     }
 
     public function table(Table $table): Table
@@ -48,17 +48,18 @@ final class InventoryManagement extends Page implements HasTable
         $table = $table
             ->query(Product::query())
             ->columns([
-                TextColumn::make('name')->label('Name')->searchable(),
-                TextColumn::make('stock_quantity')->label('Stock')->numeric(),
+                TextColumn::make('name')->label(__('admin.inventory_management.columns.name'))->searchable(),
+                TextColumn::make('stock_quantity')->label(__('admin.inventory_management.columns.stock'))->numeric(),
             ])
             ->bulkActions([
                 BulkAction::make('bulk_stock_update')
-                    ->label('Bulk Stock Update')
+                    ->label(__('admin.inventory_management.bulk_stock_update.label'))
                     ->form([
                         Select::make('operation')
+                            ->label(__('admin.inventory_management.bulk_stock_update.operation'))
                             ->options([
-                                'increase' => 'Increase',
-                                'decrease' => 'Decrease',
+                                'increase' => __('admin.inventory_management.bulk_stock_update.increase'),
+                                'decrease' => __('admin.inventory_management.bulk_stock_update.decrease'),
                             ])
                             ->required(),
                         Quantity::make('quantity')

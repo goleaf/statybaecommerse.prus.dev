@@ -16,7 +16,6 @@
             "status": {
                 "is_email_verified": true,
                 "is_phone_verified": false,
-                "has_two_factor": true,
                 "is_on_trial": false,
                 "has_active_subscription": true
             },

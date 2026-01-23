@@ -26,28 +26,28 @@ class DiscountRedemptionStatsWidget extends BaseWidget
             ->first();
 
         return [
-            Stat::make('Total Redemptions', $totalRedemptions)
-                ->description('All time redemptions')
+            Stat::make(__('admin.discount_redemption_stats.total_redemptions'), $totalRedemptions)
+                ->description(__('admin.discount_redemption_stats.all_time_redemptions'))
                 ->descriptionIcon('heroicon-m-ticket')
                 ->color('primary'),
-            Stat::make('Pending Redemptions', $pendingRedemptions)
-                ->description('Awaiting processing')
+            Stat::make(__('admin.discount_redemption_stats.pending_redemptions'), $pendingRedemptions)
+                ->description(__('admin.discount_redemption_stats.awaiting_processing'))
                 ->descriptionIcon('heroicon-m-clock')
                 ->color('warning'),
-            Stat::make('Redeemed', $redeemedRedemptions)
-                ->description('Successfully redeemed')
+            Stat::make(__('admin.discount_redemption_stats.redeemed'), $redeemedRedemptions)
+                ->description(__('admin.discount_redemption_stats.successfully_redeemed'))
                 ->descriptionIcon('heroicon-m-check-circle')
                 ->color('success'),
-            Stat::make('Total Amount Saved', '€' . number_format($totalAmountSaved, 2))
-                ->description('Customer savings')
+            Stat::make(__('admin.discount_redemption_stats.total_amount_saved'), '€' . number_format($totalAmountSaved, 2))
+                ->description(__('admin.discount_redemption_stats.customer_savings'))
                 ->descriptionIcon('heroicon-m-currency-euro')
                 ->color('success'),
-            Stat::make('Recent Redemptions', $recentRedemptions)
-                ->description('Last 7 days')
+            Stat::make(__('admin.discount_redemption_stats.recent_redemptions'), $recentRedemptions)
+                ->description(__('admin.discount_redemption_stats.last_7_days'))
                 ->descriptionIcon('heroicon-m-calendar')
                 ->color('info'),
-            Stat::make('Average Amount', '€' . number_format($averageAmountSaved, 2))
-                ->description('Per redemption')
+            Stat::make(__('admin.discount_redemption_stats.average_amount'), '€' . number_format($averageAmountSaved, 2))
+                ->description(__('admin.discount_redemption_stats.per_redemption'))
                 ->descriptionIcon('heroicon-m-calculator')
                 ->color('info'),
         ];

@@ -6,7 +6,6 @@ namespace App\Policies;
 
 use App\Models\ProductRequest;
 use App\Models\User;
-use App\Support\Authorization\AuthorizationMatrix;
 use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 
@@ -16,7 +15,7 @@ final class ProductRequestPolicy
 
     public function viewAny(?AuthenticatableContract $user): bool
     {
-        return AuthorizationMatrix::check('product_requests', 'viewAny', $user);
+        return $user !== null;
     }
 
     public function view(?AuthenticatableContract $user, ProductRequest $productRequest): bool
@@ -25,12 +24,12 @@ final class ProductRequestPolicy
             return true;
         }
 
-        return AuthorizationMatrix::check('product_requests', 'view', $user);
+        return $user instanceof \App\Models\AdminUser;
     }
 
     public function create(?AuthenticatableContract $user): bool
     {
-        return AuthorizationMatrix::check('product_requests', 'create', $user);
+        return $user !== null;
     }
 
     public function update(?AuthenticatableContract $user, ProductRequest $productRequest): bool
@@ -39,17 +38,17 @@ final class ProductRequestPolicy
             return true;
         }
 
-        return AuthorizationMatrix::check('product_requests', 'update', $user);
+        return $user instanceof \App\Models\AdminUser;
     }
 
     public function delete(?AuthenticatableContract $user, ProductRequest $productRequest): bool
     {
-        return AuthorizationMatrix::check('product_requests', 'delete', $user);
+        return $user instanceof \App\Models\AdminUser;
     }
 
     public function respond(?AuthenticatableContract $user, ProductRequest $productRequest): bool
     {
-        return AuthorizationMatrix::check('product_requests', 'respond', $user);
+        return $user instanceof \App\Models\AdminUser;
     }
 
     private function isOwner(?AuthenticatableContract $user, ProductRequest $productRequest): bool

@@ -54,7 +54,6 @@ final class ApiRouteCoverageTest extends TestCase
 
         // Catalog product listings remain the backbone of the public storefront.
         yield 'products.index' => ['GET', 'api/products', 'api.products.index'];
-        yield 'products.search' => ['GET', 'api/products/search', 'api.products.search'];
         yield 'products.catalog' => ['GET', 'api/products/catalog', 'api.products.catalog'];
         yield 'products.show' => ['GET', 'api/products/{product}', 'api.products.show'];
 
@@ -103,16 +102,8 @@ final class ApiRouteCoverageTest extends TestCase
         yield 'admin.product-histories.export' => ['POST', 'api/admin/products/{product}/histories/export', 'api.admin.product-histories.export'];
 
         // Campaign click legacy routes remain until the new namespace ships.
-        yield 'campaign-clicks.index' => ['GET', 'api/campaign-clicks', null];
-        yield 'campaign-clicks.store' => ['POST', 'api/campaign-clicks', null];
-        yield 'campaign-clicks.statistics' => ['GET', 'api/campaign-clicks/statistics', null];
-        yield 'campaign-clicks.analytics' => ['GET', 'api/campaign-clicks/analytics', null];
-        yield 'campaign-clicks.export' => ['GET', 'api/campaign-clicks/export', null];
-        yield 'campaign-clicks.show' => ['GET', 'api/campaign-clicks/{campaignClick}', null];
-        yield 'campaign-clicks.update' => ['PUT', 'api/campaign-clicks/{campaignClick}', null];
-        yield 'campaign-clicks.destroy' => ['DELETE', 'api/campaign-clicks/{campaignClick}', null];
+        // Campaign clicks functionality has been removed
         yield 'campaigns.clicks.index' => ['GET', 'api/campaigns/{campaign}/clicks', null];
-        yield 'my.campaign-clicks.index' => ['GET', 'api/my/campaign-clicks', null];
     }
 
     /**

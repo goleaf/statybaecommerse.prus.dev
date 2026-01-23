@@ -55,10 +55,7 @@ class RobotsController extends Controller
         // Compose the robots.txt directives, including sitemaps for every enabled locale.
         $lines = [
             'User-agent: *',
-            'Disallow: /cpanel/',
             'Disallow: /admin/',
-            'Disallow: /horizon',
-            'Disallow: /telescope',
         ];
 
         foreach ($locales as $locale) {

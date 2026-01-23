@@ -7,13 +7,17 @@
             <ul class="space-y-2">
                 @php
                     $locale = app()->getLocale();
-                    $cats = \Illuminate\Support\Facades\DB::table('news_categories')
-                        ->join('sh_news_category_translations as ct', 'ct.news_category_id', '=', 'news_categories.id')
-                        ->where('ct.locale', $locale)
-                        ->where('news_categories.is_visible', true)
-                        ->orderBy('news_categories.sort_order')
-                        ->select(['news_categories.id', 'ct.name', 'ct.slug'])
-                        ->get();
+                    if (\Illuminate\Support\Facades\Schema::hasTable('news_categories')) {
+                        $cats = \Illuminate\Support\Facades\DB::table('news_categories')
+                            ->join('sh_news_category_translations as ct', 'ct.news_category_id', '=', 'news_categories.id')
+                            ->where('ct.locale', $locale)
+                            ->where('news_categories.is_visible', true)
+                            ->orderBy('news_categories.sort_order')
+                            ->select(['news_categories.id', 'ct.name', 'ct.slug'])
+                            ->get();
+                    } else {
+                        $cats = collect([]);
+                    }
                     $active = request()->query('cat');
                 @endphp
                 <li>

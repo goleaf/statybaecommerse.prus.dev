@@ -25,7 +25,7 @@ afterEach(function (): void {
     config()->set('authorization.testing.skip_checks', true);
 });
 
-function createUserWithRole(string $role): User
+function createFilamentUserWithRole(string $role): User
 {
     $user = User::factory()->create();
     Role::findOrCreate($role, 'web');
@@ -35,7 +35,7 @@ function createUserWithRole(string $role): User
 }
 
 it('feature: allows viewers to browse products but hides management actions', function (): void {
-    $viewer = createUserWithRole('viewer');
+    $viewer = createFilamentUserWithRole('viewer');
     $product = Product::factory()->create();
 
     $this->actingAs($viewer);
@@ -54,7 +54,7 @@ it('feature: allows viewers to browse products but hides management actions', fu
 });
 
 it('feature: allows managers to create and edit products but not delete them', function (): void {
-    $manager = createUserWithRole('manager');
+    $manager = createFilamentUserWithRole('manager');
     $product = Product::factory()->create();
 
     $this->actingAs($manager);
@@ -71,12 +71,12 @@ it('feature: allows managers to create and edit products but not delete them', f
 });
 
 it('feature: restricts user management to privileged roles', function (): void {
-    $viewer = createUserWithRole('viewer');
+    $viewer = createFilamentUserWithRole('viewer');
     $this->actingAs($viewer);
 
     $this->get(UserResource::getUrl('index'))->assertForbidden();
 
-    $admin = createUserWithRole('admin');
+    $admin = createFilamentUserWithRole('admin');
     $managedUser = User::factory()->create();
 
     $this->actingAs($admin);
@@ -89,7 +89,7 @@ it('feature: restricts user management to privileged roles', function (): void {
     $component->assertTableActionVisible('edit', $managedUser)
         ->assertTableActionVisible('delete', $managedUser);
 
-    $manager = createUserWithRole('manager');
+    $manager = createFilamentUserWithRole('manager');
     $this->actingAs($manager);
 
     $this->get(UserResource::getUrl('index'))->assertOk();

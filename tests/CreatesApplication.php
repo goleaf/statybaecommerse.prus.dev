@@ -99,10 +99,7 @@ trait CreatesApplication
         TestingDatabase::configure($app);
         TestingDatabase::migrate();
 
-        // Disable heavy debugging services and ensure Telescope persists data to the
-        // same SQLite connection so schema assertions operate on a single database.
-        config()->set('telescope.enabled', false);
-        config()->set('telescope.storage.database.connection', 'sqlite');
+        // Disable heavy debugging services during tests.
         config()->set('debugbar.enabled', false);
 
         return $app;

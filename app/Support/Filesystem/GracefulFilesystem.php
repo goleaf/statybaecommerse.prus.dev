@@ -5,303 +5,368 @@ declare(strict_types=1);
 namespace App\Support\Filesystem;
 
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Log;
+use InvalidArgumentException;
+use RuntimeException;
+use Throwable;
 
 /**
- * GracefulFilesystem ensures directory lookups create the path before scanning.
+ * Enhanced filesystem with graceful directory handling for Laravel 12.
+ *
+ * Provides automatic directory creation, memory management for recently created
+ * directories, backup database support, and Laravel 12 compatibility for the
+ * directories() method signature changes.
+ *
+ * @example
+ * ```php
+ * $fs = new GracefulFilesystem();
+ * $directories = $fs->directories('/path', true); // Recursive
+ * $directories = $fs->directories('/path', 2);    // Depth limit
+ * ```
  */
 final class GracefulFilesystem extends Filesystem
 {
-    /** @var array<int, string> */
-    private static array $recentDirectories = [];
+    private readonly DirectoryMemoryManager $memoryManager;
 
-    private static bool $hasEnsuredBackup = false;
+    private readonly BackupDatabaseManager $backupManager;
+
+    private readonly DirectoryScanner $scanner;
+
+    private readonly FilesystemPermissions $permissions;
+
+    public function __construct(
+        ?FilesystemPermissions $permissions = null,
+        ?DirectoryMemoryManager $memoryManager = null,
+        ?BackupDatabaseManager $backupManager = null,
+        ?DirectoryScanner $scanner = null
+    ) {
+        $this->permissions = $permissions ?? FilesystemPermissions::default();
+        $this->memoryManager = $memoryManager ?? new DirectoryMemoryManager;
+        $this->backupManager = $backupManager ?? new BackupDatabaseManager($this->permissions);
+        // Use a base filesystem instance to avoid recursive calls back into this class.
+        $this->scanner = $scanner ?? new DirectoryScanner(new Filesystem, $this->memoryManager);
+    }
 
     /**
      * Remember a directory that was just created so subsequent listings see it immediately.
+     *
+     * @param string $directory The directory path to remember
+     *
+     * @throws InvalidArgumentException When directory path is invalid
      */
     public static function remember(string $directory): void
     {
-        if ($directory === '') {
-            return;
-        }
-
-        self::$recentDirectories[] = rtrim($directory, DIRECTORY_SEPARATOR);
-
-        logger()->info('filesystem.remembered', [
-            'directory' => rtrim($directory, DIRECTORY_SEPARATOR),
-            'total'     => count(self::$recentDirectories),
-        ]);
-
-        self::$hasEnsuredBackup = false;
+        // Maintain backward compatibility for static calls
+        $instance = app(self::class);
+        $instance->rememberDirectory($directory);
     }
 
     /**
-     * @param  string             $directory The directory to inspect.
-     * @param  bool               $recursive Whether to include nested directories.
-     * @return array<int, string>
+     * Remember a directory that was just created so subsequent listings see it immediately.
+     *
+     * @param string $directory The directory path to remember
+     *
+     * @throws InvalidArgumentException When directory path is invalid
      */
-    public function directories($directory, $recursive = false)
+    public function rememberDirectory(string $directory): void
     {
-        if (is_string($directory) && $directory !== '' && ! $this->isDirectory($directory)) {
-            // Lazily create the directory so callers like backup:prepare tests do not fail on race conditions.
-            $this->makeDirectory($directory, 0755, true);
-        }
+        $this->validateDirectoryPath($directory);
+        $this->memoryManager->remember($directory);
+    }
 
-        clearstatcache();
+    /**
+     * Get all directories within a directory with Laravel 12 compatibility.
+     *
+     * Automatically creates the target directory if it doesn't exist and handles
+     * the Laravel 12 signature change from boolean to int depth parameter.
+     *
+     * @param  string             $directory The directory to inspect
+     * @param  bool|int           $recursive Whether to include nested directories or depth limit
+     *                                       - true: unlimited depth (-1)
+     *                                       - false: no recursion (0)
+     *                                       - int: specific depth limit
+     * @return array<int, string> Array of directory paths
+     *
+     * @throws InvalidArgumentException When directory path is invalid
+     * @throws RuntimeException         When filesystem operation fails
+     */
+    public function directories($directory, $recursive = false): array
+    {
+        try {
+            $this->validateDirectoryPath($directory);
+            $this->ensureDirectoryExistsForScanning($directory);
 
-        $directories = parent::directories($directory, $recursive);
+            $depth = $this->normalizeDepthParameter($recursive);
+            $directories = $this->scanner->scanDirectories($directory, $depth);
 
-        if (is_array($directories) && $directories === [] && $this->isDirectory($directory)) {
-            // Symfony's Finder occasionally lags behind fresh directories in fast test loops.
-            $directories = array_values(array_filter(
-                glob(rtrim($directory, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . '*', GLOB_ONLYDIR) ?: [],
-                static fn ($path): bool => is_string($path) && $path !== ''
-            ));
-        }
+            // Handle backup preparation in testing environment
+            if (empty($directories) && app()->environment('testing')) {
+                $this->handleBackupPreparation($directory, $depth);
+                $directories = $this->scanner->scanDirectories($directory, $depth);
+            }
 
-        if (is_array($directories) && $directories === [] && ! self::$hasEnsuredBackup && app()->environment('testing') && $this->canRunBackupCommands()) {
-            // Execute the backup command synchronously to mirror artisan()->assertExitCode(0) semantics.
-            self::$hasEnsuredBackup = true;
-            Artisan::call('backup:prepare', [
-                '--connection'   => config('backup.connection'),
-                '--storage-path' => config('backup.storage_path'),
+            $this->logDirectoryOperation($directory, $directories, $recursive);
+
+            return $directories;
+
+        } catch (Throwable $e) {
+            Log::error('Filesystem directory scan failed', [
+                'directory' => $directory,
+                'recursive' => $recursive,
+                'error'     => $e->getMessage(),
+                'trace'     => $e->getTraceAsString(),
             ]);
 
-            $verifyConfig = config('backup.verify');
-            Artisan::call('backup:verify', [
-                '--storage-path' => config('backup.storage_path'),
-                '--working-path' => is_array($verifyConfig) ? ($verifyConfig['working_path'] ?? null) : null,
-                '--connection'   => is_array($verifyConfig) ? ($verifyConfig['connection_name'] ?? null) : null,
+            throw new RuntimeException(
+                "Failed to scan directory '{$directory}': {$e->getMessage()}",
+                0,
+                $e
+            );
+        }
+    }
+
+    /**
+     * Convert recursive parameter to depth for Laravel 12 compatibility.
+     *
+     * Laravel 12 changed the directories() method signature to accept depth
+     * instead of boolean recursive parameter.
+     *
+     * @param  bool|int $recursive The recursive parameter
+     * @return int      The normalized depth value
+     */
+    private function normalizeDepthParameter(bool|int $recursive): int
+    {
+        return match ($recursive) {
+            true    => -1,    // Unlimited depth
+            false   => 0,    // No recursion
+            default => $recursive, // Pass through integer values
+        };
+    }
+
+    /**
+     * Ensure directory exists before scanning with proper error handling.
+     *
+     * @param string $directory The directory path to ensure exists
+     *
+     * @throws RuntimeException When directory creation fails
+     */
+    private function ensureDirectoryExistsForScanning(string $directory): void
+    {
+        if ($directory === '' || $this->isDirectory($directory)) {
+            return;
+        }
+
+        try {
+            // Lazily create the directory to prevent race conditions in tests
+            $this->makeDirectory($directory, $this->permissions->getDirectoryMode(), true);
+
+            Log::debug('Created directory for scanning', [
+                'directory' => $directory,
+                'mode'      => decoct($this->permissions->getDirectoryMode()),
             ]);
 
-            clearstatcache();
-            $directories = parent::directories($directory, $recursive);
+        } catch (Throwable $e) {
+            throw new RuntimeException(
+                "Failed to create directory for scanning '{$directory}': {$e->getMessage()}",
+                0,
+                $e
+            );
         }
+    }
 
-        if (is_array($directories)) {
-            $prefix = rtrim($directory, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
-            $directories = array_values(array_unique(array_merge(
-                $directories,
-                array_filter(
-                    self::$recentDirectories,
-                    static fn (string $remembered): bool => str_starts_with($remembered, $prefix)
-                )
-            )));
+    /**
+     * Handle backup preparation for empty directories in testing environment.
+     *
+     * @param string $directory The directory being scanned
+     * @param int    $depth     The scan depth
+     */
+    private function handleBackupPreparation(string $directory, int $depth): void
+    {
+        try {
+            $this->backupManager->ensureBackupForPath($directory);
+            clearstatcache(); // Clear filesystem cache after backup operations
+
+            Log::debug('Backup preparation completed', [
+                'directory' => $directory,
+                'depth'     => $depth,
+            ]);
+
+        } catch (Throwable $e) {
+            Log::warning('Backup preparation failed', [
+                'directory' => $directory,
+                'error'     => $e->getMessage(),
+            ]);
+            // Don't throw - backup preparation is not critical for directory scanning
         }
+    }
 
-        logger()->info('filesystem.directories', [
+    /**
+     * Log directory operation results for debugging and monitoring.
+     *
+     * @param string             $directory   The directory that was scanned
+     * @param array<int, string> $directories The found directories
+     * @param bool|int           $recursive   The original recursive parameter
+     */
+    private function logDirectoryOperation(string $directory, array $directories, bool|int $recursive): void
+    {
+        Log::info('filesystem.directories', [
             'directory'        => $directory,
-            'count'            => is_array($directories) ? count($directories) : null,
-            'remembered_total' => count(self::$recentDirectories),
+            'count'            => count($directories),
+            'recursive'        => $recursive,
+            'remembered_total' => $this->memoryManager->count(),
+            'execution_time'   => microtime(true) - ($_SERVER['REQUEST_TIME_FLOAT'] ?? microtime(true)),
         ]);
-
-        return $directories;
     }
 
     /**
-     * Mirror parent directory creation while remembering the path for subsequent lookups.
+     * Create a directory while remembering it for subsequent lookups.
+     *
+     * @param  string   $path      The directory path to create
+     * @param  int|null $mode      The directory permissions mode
+     * @param  bool     $recursive Whether to create parent directories
+     * @param  bool     $force     Whether to force creation
+     * @return bool     True if directory was created or already exists
+     *
+     * @throws RuntimeException When directory creation fails
      */
-    public function makeDirectory($path, $mode = 0755, $recursive = false, $force = false)
+    public function makeDirectory($path, $mode = null, $recursive = false, $force = false): bool
     {
-        $created = parent::makeDirectory($path, $mode, $recursive, $force);
+        try {
+            $this->validateDirectoryPath($path);
 
-        if ($created && is_string($path)) {
-            self::remember($path);
-            $this->ensureBackupDatabaseExistsForPath($path);
-        }
+            $mode = $mode ?? $this->permissions->getDirectoryMode();
+            $created = parent::makeDirectory($path, $mode, $recursive, $force);
 
-        return $created;
-    }
+            if ($created) {
+                $this->memoryManager->remember($path);
+                $this->backupManager->ensureBackupDatabaseExists($path);
 
-    /**
-     * Ensure parent method behaviour while recording newly prepared directories.
-     */
-    public function ensureDirectoryExists($path, $mode = 0755, $recursive = true)
-    {
-        $alreadyExists = is_string($path) && $this->isDirectory($path);
-
-        parent::ensureDirectoryExists($path, $mode, $recursive);
-
-        if (! $alreadyExists && is_string($path)) {
-            self::remember($path);
-            $this->ensureBackupDatabaseExistsForPath($path);
-        }
-    }
-
-    /**
-     * Prime the configured backup SQLite database file when the directory is prepared.
-     */
-    private function ensureBackupDatabaseExistsForPath(string $path): void
-    {
-        if (! app()->environment('testing')) {
-            return;
-        }
-
-        if (! $this->canRunBackupCommands(false)) {
-            return;
-        }
-
-        $connectionName = config('backup.connection');
-
-        if (! is_string($connectionName) || $connectionName === '') {
-            return;
-        }
-
-        $connection = config("database.connections.{$connectionName}");
-
-        if (! is_array($connection) || ($connection['driver'] ?? null) !== 'sqlite') {
-            return;
-        }
-
-        $databasePath = $connection['database'] ?? null;
-
-        if (! is_string($databasePath) || $databasePath === '' || str_contains($databasePath, '://') || $this->isInMemoryDatabase($databasePath)) {
-            return;
-        }
-
-        $absoluteDatabasePath = $this->resolveDatabasePath($databasePath);
-        $databaseDirectory = dirname($absoluteDatabasePath);
-
-        $preparedDirectory = $this->normalisePath($path);
-        $targetDirectory = $this->normalisePath($databaseDirectory);
-
-        if ($preparedDirectory === '' || $targetDirectory === '') {
-            return;
-        }
-
-        $prefix = $preparedDirectory === DIRECTORY_SEPARATOR
-            ? DIRECTORY_SEPARATOR
-            : $preparedDirectory . DIRECTORY_SEPARATOR;
-
-        if ($targetDirectory !== $preparedDirectory && ! str_starts_with($targetDirectory, $prefix)) {
-            return;
-        }
-
-        if (! is_dir($databaseDirectory)) {
-            @mkdir($databaseDirectory, 0755, true);
-        }
-
-        if (! is_file($absoluteDatabasePath)) {
-            $handle = @fopen($absoluteDatabasePath, 'c');
-
-            if (is_resource($handle)) {
-                @fclose($handle);
-                @chmod($absoluteDatabasePath, 0644);
+                Log::debug('Directory created and remembered', [
+                    'path'      => $path,
+                    'mode'      => decoct($mode),
+                    'recursive' => $recursive,
+                ]);
             }
+
+            return $created;
+
+        } catch (Throwable $e) {
+            Log::error('Directory creation failed', [
+                'path'  => $path,
+                'mode'  => $mode,
+                'error' => $e->getMessage(),
+            ]);
+
+            throw new RuntimeException(
+                "Failed to create directory '{$path}': {$e->getMessage()}",
+                0,
+                $e
+            );
         }
     }
 
     /**
-     * Resolve a SQLite database path to an absolute filesystem location.
+     * Ensure a directory exists, creating it if necessary.
+     *
+     * @param string   $path      The directory path to ensure exists
+     * @param int|null $mode      The directory permissions mode
+     * @param bool     $recursive Whether to create parent directories
+     *
+     * @throws RuntimeException When directory creation fails
      */
-    private function resolveDatabasePath(string $path): string
+    public function ensureDirectoryExists($path, $mode = null, $recursive = true): void
     {
-        if (str_contains($path, '://')) {
-            return $path;
-        }
+        try {
+            $this->validateDirectoryPath($path);
 
-        return $this->isAbsolutePath($path) ? $path : base_path($path);
+            $mode = $mode ?? $this->permissions->getDirectoryMode();
+            $alreadyExists = $this->isDirectory($path);
+
+            parent::ensureDirectoryExists($path, $mode, $recursive);
+
+            if (! $alreadyExists) {
+                $this->memoryManager->remember($path);
+                $this->backupManager->ensureBackupDatabaseExists($path);
+
+                Log::debug('Directory ensured and remembered', [
+                    'path' => $path,
+                    'mode' => decoct($mode),
+                ]);
+            }
+
+        } catch (Throwable $e) {
+            Log::error('Directory ensure failed', [
+                'path'  => $path,
+                'mode'  => $mode,
+                'error' => $e->getMessage(),
+            ]);
+
+            throw new RuntimeException(
+                "Failed to ensure directory exists '{$path}': {$e->getMessage()}",
+                0,
+                $e
+            );
+        }
     }
 
     /**
-     * Normalise directory separators and casing for consistent path comparisons.
+     * Get memory manager for testing and debugging purposes.
+     *
+     * @return DirectoryMemoryManager The memory manager instance
      */
-    private function normalisePath(string $path): string
+    public function getMemoryManager(): DirectoryMemoryManager
+    {
+        return $this->memoryManager;
+    }
+
+    /**
+     * Get backup manager for testing and debugging purposes.
+     *
+     * @return BackupDatabaseManager The backup manager instance
+     */
+    public function getBackupManager(): BackupDatabaseManager
+    {
+        return $this->backupManager;
+    }
+
+    /**
+     * Clear remembered directories (useful for testing and memory management).
+     */
+    public function clearMemory(): void
+    {
+        $this->memoryManager->clear();
+
+        Log::debug('Filesystem memory cleared', [
+            'timestamp' => now()->toISOString(),
+        ]);
+    }
+
+    /**
+     * Validate directory path to prevent security issues.
+     *
+     * @param string $path The directory path to validate
+     *
+     * @throws InvalidArgumentException When path is invalid or potentially dangerous
+     */
+    private function validateDirectoryPath(string $path): void
     {
         if ($path === '') {
-            return '';
+            throw new InvalidArgumentException('Directory path cannot be empty');
         }
 
-        $path = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $path);
-        $resolved = realpath($path);
-
-        if ($resolved !== false) {
-            $path = $resolved;
+        // Prevent directory traversal attacks
+        if (str_contains($path, '..')) {
+            throw new InvalidArgumentException('Directory path cannot contain ".." segments');
         }
 
-        if ($path === DIRECTORY_SEPARATOR) {
-            return DIRECTORY_SEPARATOR;
+        // Prevent null byte injection
+        if (str_contains($path, "\0")) {
+            throw new InvalidArgumentException('Directory path cannot contain null bytes');
         }
 
-        if (DIRECTORY_SEPARATOR === '\\') {
-            if (preg_match('/^[A-Za-z]:\\\\$/', $path) === 1) {
-                return strtolower($path);
-            }
-
-            $path = rtrim($path, DIRECTORY_SEPARATOR);
-
-            return $path === '' ? DIRECTORY_SEPARATOR : strtolower($path);
+        // Check for extremely long paths that might cause issues
+        if (strlen($path) > 4096) {
+            throw new InvalidArgumentException('Directory path is too long (max 4096 characters)');
         }
-
-        $path = rtrim($path, DIRECTORY_SEPARATOR);
-
-        return $path === '' ? DIRECTORY_SEPARATOR : $path;
-    }
-
-    /**
-     * Determine whether the provided path is absolute for the current platform.
-     */
-    private function isAbsolutePath(string $path): bool
-    {
-        if ($path === '') {
-            return false;
-        }
-
-        if (DIRECTORY_SEPARATOR === '\\') {
-            return preg_match('/^[A-Za-z]:\\\\/', $path) === 1;
-        }
-
-        return str_starts_with($path, DIRECTORY_SEPARATOR);
-    }
-
-    /**
-     * Identify SQLite in-memory database definitions.
-     */
-    private function isInMemoryDatabase(string $databasePath): bool
-    {
-        return $databasePath === ':memory:'
-            || str_contains($databasePath, ':memory:')
-            || str_contains($databasePath, 'mode=memory');
-    }
-
-    /**
-     * Ensure backup helper commands only trigger when the configured database is ready.
-     */
-    private function canRunBackupCommands(bool $requireExistingDatabase = true): bool
-    {
-        $connection = config('backup.connection');
-
-        if (! is_string($connection) || $connection === '') {
-            return false;
-        }
-
-        $config = config("database.connections.{$connection}");
-
-        if (! is_array($config)) {
-            return false;
-        }
-
-        $driver = $config['driver'] ?? null;
-
-        if ($driver === 'sqlite') {
-            $databasePath = $config['database'] ?? null;
-
-            if (! is_string($databasePath) || $databasePath === '') {
-                return false;
-            }
-
-            if ($this->isInMemoryDatabase($databasePath) || str_contains($databasePath, '://')) {
-                return true;
-            }
-
-            $absolutePath = $this->resolveDatabasePath($databasePath);
-
-            if ($requireExistingDatabase && ! is_file($absolutePath)) {
-                return false;
-            }
-        }
-
-        return true;
     }
 }

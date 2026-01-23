@@ -1,10 +1,4 @@
-<?php
-use function Livewire\Volt\{layout, title};
-
-layout('components.layouts.templates.account');
-title(__('Invoice'));
-
-?>
+{{-- Order Invoice Component --}}
 
 <div class="space-y-10">
     <x-breadcrumbs :items="[

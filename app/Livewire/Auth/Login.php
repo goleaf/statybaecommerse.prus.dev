@@ -24,18 +24,11 @@ final class Login extends Component
 
     public function login(): void
     {
-        $result = $this->loginForm->authenticate();
-
-        if ($result->requiresTwoFactorChallenge()) {
-            // Defer to the dedicated two-factor challenge component to finish authentication.
-            $this->redirectRoute('two-factor.challenge');
-
-            return;
-        }
+        $this->loginForm->authenticate();
 
         Session::regenerate();
 
-        $this->redirectIntended(default: route('account', absolute: false), navigate: true);
+        $this->redirectIntended(default: route('account.index', absolute: false), navigate: true);
     }
 
     public function hydrate(CaptchaManager $captchaManager): void

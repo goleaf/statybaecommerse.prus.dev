@@ -131,6 +131,11 @@ return [
                 'label' => 'Atsijungti',
             ],
         ],
+        'buttons' => [
+            'language_switcher' => [
+                'label' => 'Pasirinkti kalbą',
+            ],
+        ],
     ],
     'pages' => [
         'dashboard' => [

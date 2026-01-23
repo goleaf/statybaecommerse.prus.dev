@@ -6,7 +6,6 @@ namespace App\Services;
 
 use App\Models\Product;
 use App\Models\RecommendationBlock;
-use App\Models\RecommendationCache;
 use App\Models\User;
 use App\Services\Recommendations\BaseRecommendation;
 use App\Services\Recommendations\CategoryBasedRecommendation;
@@ -29,8 +28,6 @@ use Illuminate\Support\LazyCollection;
  * RecommendationService
  *
  * Service class containing RecommendationService business logic, external integrations, and complex operations with proper error handling and logging.
- *
- * @property array $algorithmInstances
  */
 final class RecommendationService
 {
@@ -50,23 +47,32 @@ final class RecommendationService
 
                 return $this->getFallbackRecommendations($user, $product, $context);
             }
-            // Check cache first
+
+            // Check Laravel cache first
             $cacheKey = $this->generateCacheKey($block, $user, $product, $context);
-            $cached = $this->getCachedRecommendations($cacheKey);
+            $cached = Cache::get($cacheKey);
             if ($cached) {
-                return $cached;
+                return collect($cached);
             }
+
             // Generate recommendations using configured algorithms
             $recommendations = $this->generateRecommendations($block, $user, $product, $context);
-            // Cache the results
-            $this->cacheRecommendations($cacheKey, $block, $user, $product, $context, $recommendations);
+
+            // Cache the results in Laravel cache
+            Cache::put($cacheKey, $recommendations->toArray(), now()->addSeconds($block->cache_duration ?? 3600));
+
             // Track performance
             $executionTime = microtime(true) - $startTime;
             $this->trackPerformance($blockName, $executionTime, $recommendations->count());
 
             return $recommendations;
         } catch (Exception $e) {
-            Log::error("Recommendation generation failed for block '{$blockName}'", ['error' => $e->getMessage(), 'user_id' => $user?->id, 'product_id' => $product?->id, 'context' => $context]);
+            Log::error("Recommendation generation failed for block '{$blockName}'", [
+                'error'      => $e->getMessage(),
+                'user_id'    => $user?->id,
+                'product_id' => $product?->id,
+                'context'    => $context,
+            ]);
 
             return $this->getFallbackRecommendations($user, $product, $context);
         }
@@ -89,10 +95,11 @@ final class RecommendationService
                     ];
                 });
         }
+
         $allRecommendations = collect();
         // Use LazyCollection with timeout to prevent long-running recommendation generation
         $timeout = now()->addSeconds(30);
-        // 30 second timeout for recommendation generation
+
         LazyCollection::make($configs)->takeUntilTimeout($timeout)->each(function ($config) use (&$allRecommendations, $user, $product, $context): void {
             try {
                 $algorithm = $this->getAlgorithmInstance($config->type, $config->config);
@@ -110,14 +117,14 @@ final class RecommendationService
             ->filter(function ($product): bool {
                 // Guard against unexpected payloads and ensure only high-quality, merchandisable products surface
                 return $product instanceof Product
-                    && $product->relevance_score >= 0.3
+                    && ($product->relevance_score ?? 0) >= 0.3
                     && ! empty($product->name)
                     && $product->is_visible
                     && $product->price > 0;
             })
             ->unique('id')
             ->values()
-            ->take($block->max_products);
+            ->take($block->max_products ?? 10);
     }
 
     /**
@@ -149,33 +156,18 @@ final class RecommendationService
      */
     private function generateCacheKey(RecommendationBlock $block, ?User $user = null, ?Product $product = null, array $context = []): string
     {
-        return RecommendationCache::generateCacheKey($block->name, $user?->id, $product?->id, $context['type'] ?? null, $context);
-    }
-
-    /**
-     * Handle getCachedRecommendations functionality with proper error handling.
-     */
-    private function getCachedRecommendations(string $cacheKey): ?Collection
-    {
-        $cached = RecommendationCache::where('cache_key', $cacheKey)->valid()->first();
-        if ($cached) {
-            $cached->incrementHitCount();
-
-            return collect($cached->recommendations);
+        $parts = [$block->name];
+        if ($user) {
+            $parts[] = "user:{$user->id}";
+        }
+        if ($product) {
+            $parts[] = "product:{$product->id}";
+        }
+        if ($context) {
+            $parts[] = 'context:' . md5(serialize($context));
         }
 
-        return null;
-    }
-
-    /**
-     * Handle cacheRecommendations functionality with proper error handling.
-     */
-    private function cacheRecommendations(string $cacheKey, RecommendationBlock $block, ?User $user = null, ?Product $product = null, array $context = [], ?Collection $recommendations = null): void
-    {
-        if (! $recommendations || $recommendations->isEmpty()) {
-            return;
-        }
-        RecommendationCache::updateOrCreate(['cache_key' => $cacheKey], ['block_id' => $block->id, 'user_id' => $user?->id, 'product_id' => $product?->id, 'context_type' => $context['type'] ?? null, 'context_data' => $context, 'recommendations' => $recommendations->toArray(), 'hit_count' => 0, 'expires_at' => now()->addSeconds($block->cache_duration)]);
+        return 'recommendations:' . implode('|', $parts);
     }
 
     /**
@@ -191,8 +183,6 @@ final class RecommendationService
 
     /**
      * Resolve the default algorithm stack for a recommendation block type.
-     *
-     * @return list<string>
      */
     private function resolveDefaultAlgorithms(?string $blockType): array
     {
@@ -216,7 +206,12 @@ final class RecommendationService
      */
     private function trackPerformance(string $blockName, float $executionTime, int $resultCount): void
     {
-        Log::info('Recommendation Performance', ['block' => $blockName, 'execution_time' => $executionTime, 'result_count' => $resultCount, 'timestamp' => now()]);
+        Log::info('Recommendation Performance', [
+            'block'          => $blockName,
+            'execution_time' => $executionTime,
+            'result_count'   => $resultCount,
+            'timestamp'      => now(),
+        ]);
     }
 
     /**
@@ -227,17 +222,30 @@ final class RecommendationService
         try {
             // Track in user behavior
             if (class_exists(\App\Models\UserBehavior::class)) {
-                \App\Models\UserBehavior::create(['user_id' => $user->id, 'product_id' => $product->id, 'behavior_type' => $interactionType, 'metadata' => ['rating' => $rating, 'timestamp' => now()], 'created_at' => now()]);
+                \App\Models\UserBehavior::create([
+                    'user_id'       => $user->id,
+                    'product_id'    => $product->id,
+                    'behavior_type' => $interactionType,
+                    'metadata'      => ['rating' => $rating, 'timestamp' => now()],
+                    'created_at'    => now(),
+                ]);
             }
+
             // Update collaborative filtering data
             if (class_exists(\App\Models\UserProductInteraction::class)) {
                 $collaborative = new CollaborativeFilteringRecommendation;
                 $collaborative->updateUserInteraction($user, $product, $interactionType, $rating);
             }
+
             // Update user preferences
             $this->updateUserPreferences($user, $product, $interactionType);
         } catch (Exception $e) {
-            Log::error('Failed to track user interaction', ['error' => $e->getMessage(), 'user_id' => $user->id, 'product_id' => $product->id, 'event' => $interactionType]);
+            Log::error('Failed to track user interaction', [
+                'error'      => $e->getMessage(),
+                'user_id'    => $user->id,
+                'product_id' => $product->id,
+                'event'      => $interactionType,
+            ]);
         }
     }
 
@@ -249,6 +257,7 @@ final class RecommendationService
         if (! class_exists(\App\Models\UserPreference::class)) {
             return;
         }
+
         $preferenceScore = match ($interactionType) {
             'view'     => 0.1,
             'click'    => 0.2,
@@ -258,17 +267,29 @@ final class RecommendationService
             'review'   => 0.7,
             default    => 0.1,
         };
+
         // Update category preferences
         foreach ($product->categories as $category) {
-            \App\Models\UserPreference::updateOrCreate(['user_id' => $user->id, 'preference_type' => 'category', 'preference_key' => $category->id], ['preference_score' => DB::raw("GREATEST(preference_score + {$preferenceScore}, 1.0)"), 'last_updated' => now()]);
+            \App\Models\UserPreference::updateOrCreate(
+                ['user_id' => $user->id, 'preference_type' => 'category', 'preference_key' => $category->id],
+                ['preference_score' => DB::raw("GREATEST(preference_score + {$preferenceScore}, 1.0)"), 'last_updated' => now()]
+            );
         }
+
         // Update brand preferences
         if ($product->brand_id) {
-            \App\Models\UserPreference::updateOrCreate(['user_id' => $user->id, 'preference_type' => 'brand', 'preference_key' => $product->brand_id], ['preference_score' => DB::raw("GREATEST(preference_score + {$preferenceScore}, 1.0)"), 'last_updated' => now()]);
+            \App\Models\UserPreference::updateOrCreate(
+                ['user_id' => $user->id, 'preference_type' => 'brand', 'preference_key' => $product->brand_id],
+                ['preference_score' => DB::raw("GREATEST(preference_score + {$preferenceScore}, 1.0)"), 'last_updated' => now()]
+            );
         }
+
         // Update price range preferences
         $priceRange = $this->getPriceRange($product->price);
-        \App\Models\UserPreference::updateOrCreate(['user_id' => $user->id, 'preference_type' => 'price_range', 'preference_key' => $priceRange], ['preference_score' => DB::raw("GREATEST(preference_score + {$preferenceScore}, 1.0)"), 'last_updated' => now()]);
+        \App\Models\UserPreference::updateOrCreate(
+            ['user_id' => $user->id, 'preference_type' => 'price_range', 'preference_key' => $priceRange],
+            ['preference_score' => DB::raw("GREATEST(preference_score + {$preferenceScore}, 1.0)"), 'last_updated' => now()]
+        );
     }
 
     /**
@@ -305,19 +326,12 @@ final class RecommendationService
      */
     public function clearCache(?string $blockName = null): void
     {
-        try {
-            if ($blockName) {
-                RecommendationCache::whereHas('block', function ($query) use ($blockName): void {
-                    $query->where('name', $blockName);
-                })->delete();
-            } else {
-                RecommendationCache::truncate();
-            }
-        } catch (Exception $e) {
-            // Table might not exist yet, ignore
+        // Clear Laravel cache
+        if ($blockName) {
+            Cache::forget("recommendations:{$blockName}*");
+        } else {
+            Cache::flush();
         }
-        // Clear Laravel cache as well
-        Cache::flush();
     }
 
     /**
@@ -327,28 +341,23 @@ final class RecommendationService
     {
         $block = RecommendationBlock::where('name', $blockName)->first();
         if (! $block) {
-            return ['block_name' => $blockName, 'total_requests' => 0, 'unique_requests' => 0, 'avg_products_per_request' => 0, 'cache_hit_rate' => 0];
+            return [
+                'block_name'               => $blockName,
+                'total_requests'           => 0,
+                'unique_requests'          => 0,
+                'avg_products_per_request' => 0,
+                'cache_hit_rate'           => 0,
+            ];
         }
-        try {
-            return ['block_name' => $blockName, 'total_requests' => RecommendationCache::where('block_id', $block->id)->where('created_at', '>=', now()->subDays($days))->sum('hit_count'), 'unique_requests' => RecommendationCache::where('block_id', $block->id)->where('created_at', '>=', now()->subDays($days))->count(), 'avg_products_per_request' => RecommendationCache::where('block_id', $block->id)->where('created_at', '>=', now()->subDays($days))->avg(DB::raw('JSON_LENGTH(recommendations)')), 'cache_hit_rate' => $this->calculateCacheHitRate($block->id, $days)];
-        } catch (Exception $e) {
-            return ['block_name' => $blockName, 'total_requests' => 0, 'unique_requests' => 0, 'avg_products_per_request' => 0, 'cache_hit_rate' => 0];
-        }
-    }
 
-    /**
-     * Handle calculateCacheHitRate functionality with proper error handling.
-     */
-    private function calculateCacheHitRate(int $blockId, int $days): float
-    {
-        try {
-            $totalRequests = RecommendationCache::where('block_id', $blockId)->where('created_at', '>=', now()->subDays($days))->sum('hit_count');
-            $cacheHits = RecommendationCache::where('block_id', $blockId)->where('created_at', '>=', now()->subDays($days))->where('hit_count', '>', 0)->sum('hit_count');
-
-            return $totalRequests > 0 ? $cacheHits / $totalRequests * 100 : 0;
-        } catch (Exception $e) {
-            return 0;
-        }
+        // Return basic analytics without database tracking
+        return [
+            'block_name'               => $blockName,
+            'total_requests'           => 0,
+            'unique_requests'          => 0,
+            'avg_products_per_request' => 0,
+            'cache_hit_rate'           => 0,
+        ];
     }
 
     /**
@@ -356,12 +365,9 @@ final class RecommendationService
      */
     public function optimizeRecommendations(): void
     {
-        try {
-            // Clean up expired cache entries
-            RecommendationCache::expired()->delete();
-        } catch (Exception $e) {
-            // Table might not exist yet, ignore
-        }
+        // Clear cache
+        Cache::flush();
+
         // Clean up old user behaviors (keep last 90 days)
         if (class_exists(\App\Models\UserBehavior::class)) {
             try {
@@ -370,6 +376,7 @@ final class RecommendationService
                 // Table might not exist yet, ignore
             }
         }
+
         // Clean up old product similarities (keep last 30 days)
         if (class_exists(\App\Models\ProductSimilarity::class)) {
             try {

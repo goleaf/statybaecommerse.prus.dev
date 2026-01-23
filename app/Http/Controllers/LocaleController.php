@@ -10,6 +10,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 
 final class LocaleController
@@ -24,6 +25,10 @@ final class LocaleController
         $requestedRaw = $locale ?? $request->input('locale');
         $requested = is_string($requestedRaw) ? $requestedRaw : null;
 
+        // Check if this is an admin panel request
+        $isAdminPanel = $request->is('admin') || $request->is('admin/*') ||
+                       str_contains($request->header('referer', ''), '/admin');
+
         // Create a temporary request with the locale parameter for resolution
         $tempRequest = $request->duplicate();
         if ($requested !== null) {
@@ -32,7 +37,14 @@ final class LocaleController
 
         // Use centralized locale service for resolution and persistence
         $resolved = $this->localeService->resolveAndSetLocale($tempRequest);
-        $this->localeService->persistLocale($resolved, $tempRequest);
+
+        // Store locale in appropriate session key
+        if ($isAdminPanel) {
+            Session::put('admin_locale', $resolved);
+        } else {
+            $this->localeService->persistLocale($resolved, $tempRequest);
+        }
+
         $this->localeService->applyLocaleConfiguration($resolved);
 
         // Update user preference if authenticated
@@ -46,11 +58,15 @@ final class LocaleController
             return redirect()->to($redirectTo);
         }
 
-        return redirect()->back(fallback: $this->fallbackRedirect($resolved));
+        return redirect()->back(fallback: $this->fallbackRedirect($resolved, $isAdminPanel));
     }
 
-    private function fallbackRedirect(string $locale): string
+    private function fallbackRedirect(string $locale, bool $isAdminPanel = false): string
     {
+        if ($isAdminPanel) {
+            return url('/admin');
+        }
+
         if (Route::has('localized.home')) {
             return route('localized.home', ['locale' => $locale]);
         }

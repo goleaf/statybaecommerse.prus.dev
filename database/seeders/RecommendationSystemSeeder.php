@@ -9,9 +9,7 @@ use App\Models\Product;
 use App\Models\ProductFeature;
 use App\Models\ProductSimilarity;
 use App\Models\RecommendationBlock;
-use App\Models\RecommendationCache;
 use App\Models\RecommendationConfig;
-use App\Models\RecommendationConfigSimple;
 use App\Models\User;
 use App\Models\UserBehavior;
 use App\Models\UserPreference;
@@ -66,9 +64,8 @@ class RecommendationSystemSeeder extends Seeder
         $this->createRecommendationConfigsSimple();
         $this->command->info('Created recommendation configs simple');
 
-        // Create recommendation caches
-        $this->createRecommendationCaches();
-        $this->command->info('Created recommendation caches');
+        // Recommendation cache and simple config functionality removed
+        $this->command->info('Recommendation system seeded (cache functionality removed)');
 
         // Create user behaviors
         $this->createUserBehaviors($users, $products);
@@ -350,46 +347,6 @@ class RecommendationSystemSeeder extends Seeder
                 'notes'                => 'Hybrid configuration',
             ],
         ];
-
-        foreach ($configs as $configData) {
-            RecommendationConfigSimple::factory()
-                ->state($configData)
-                ->create();
-        }
-    }
-
-    private function createRecommendationCaches(): void
-    {
-        $blocks = RecommendationBlock::all();
-        $users = User::all();
-        $products = Product::all();
-
-        RecommendationCache::factory()
-            ->count(20)
-            ->state(function () use ($blocks, $users, $products) {
-                return [
-                    'cache_key'    => 'cache_' . fake()->uuid() . '_' . now()->timestamp,
-                    'block_id'     => $blocks->random()->id,
-                    'user_id'      => $users->random()->id,
-                    'product_id'   => $products->random()->id,
-                    'context_type' => fake()->randomElement(['homepage', 'product', 'category', 'cart', 'checkout']),
-                    'context_data' => [
-                        'page_type'    => fake()->randomElement(['homepage', 'product', 'category']),
-                        'category_id'  => fake()->optional()->numberBetween(1, 5),
-                        'search_query' => fake()->optional()->words(2, true),
-                    ],
-                    'recommendations' => $products->random(5)->map(function ($product) {
-                        return [
-                            'product_id' => $product->id,
-                            'score'      => fake()->randomFloat(2, 0.1, 1.0),
-                            'reason'     => fake()->randomElement(['similar_users', 'similar_products', 'popular', 'trending']),
-                        ];
-                    })->toArray(),
-                    'hit_count'  => fake()->numberBetween(0, 100),
-                    'expires_at' => now()->addHours(fake()->numberBetween(1, 24)),
-                ];
-            })
-            ->create();
     }
 
     private function createUserBehaviors($users, $products): void

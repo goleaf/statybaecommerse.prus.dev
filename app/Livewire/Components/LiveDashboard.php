@@ -193,32 +193,6 @@ final class LiveDashboard extends Component
     }
 
     /**
-     * Handle performanceMetrics functionality with proper error handling.
-     */
-    public function performanceMetrics(): array
-    {
-        return $this->rememberDashboard(CacheKeys::dashboardPerformance($this->timeRange), CacheKeys::TTL_FIVE_MINUTES, function () {
-            return [
-                'page_views' => rand(1000, 5000),
-                // Mock data - replace with real analytics
-                'bounce_rate'          => rand(30, 70),
-                'avg_session_duration' => rand(120, 600),
-                'conversion_rate'      => rand(2, 8),
-                'top_pages'            => [['page' => 'Home', 'views' => rand(500, 2000)], ['page' => 'Products', 'views' => rand(300, 1500)], ['page' => 'Categories', 'views' => rand(200, 1000)]],
-            ];
-        }, [CacheKeys::dashboardTag()]);
-    }
-
-    /**
-     * Bridge property access for performance metrics so dashboard refreshes can
-     * compute fresh values when caches are cleared mid-request.
-     */
-    public function getPerformanceMetricsProperty(): array
-    {
-        return $this->performanceMetrics();
-    }
-
-    /**
      * Handle refreshDashboard functionality with proper error handling.
      */
     #[On('refresh-dashboard')]

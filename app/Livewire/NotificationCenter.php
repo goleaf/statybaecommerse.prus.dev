@@ -4,18 +4,24 @@ declare(strict_types=1);
 
 namespace App\Livewire;
 
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Notifications\DatabaseNotification;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Livewire\Attributes\Computed;
+use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithPagination;
 
 /**
  * NotificationCenter
  *
- * Livewire component for NotificationCenter with reactive frontend functionality, real-time updates, and user interaction handling.
+ * Livewire component for NotificationCenter with reactive frontend functionality,
+ * real-time updates, and user interaction handling.
  *
  * @property string $filter
  * @property bool   $showUnreadOnly
- * @property mixed  $listeners
  */
 final class NotificationCenter extends Component
 {
@@ -25,14 +31,44 @@ final class NotificationCenter extends Component
 
     public bool $showUnreadOnly = false;
 
-    protected $listeners = ['notificationReceived' => '$refresh'];
+    protected $listeners = [];
+
+    private const CACHE_TTL = 300; // 5 minutes
+
+    private const PAGINATION_SIZE = 10;
+
+    private const MAX_CACHE_TAGS = 50;
 
     /**
-     * Initialize the Livewire component with parameters.
+     * Real-time notification listener using Livewire 3 attributes.
+     */
+    #[On('notificationReceived')]
+    public function handleNotificationReceived(): void
+    {
+        $this->clearNotificationCache();
+        $this->resetPage();
+    }
+
+    /**
+     * Handle Echo broadcast events for real-time updates.
+     */
+    #[On('echo:notifications.{userId},NotificationSent')]
+    public function handleBroadcastNotification(): void
+    {
+        $this->handleNotificationReceived();
+    }
+
+    /**
+     * Initialize the Livewire component with parameters and security checks.
      */
     public function mount(): void
     {
         $this->filter = request()->get('filter', 'all');
+
+        // Validate user has access to notifications
+        if (! $this->getUserId()) {
+            abort(403, __('notifications.errors.unauthorized'));
+        }
     }
 
     /**
@@ -41,6 +77,7 @@ final class NotificationCenter extends Component
     public function updatedFilter(): void
     {
         $this->resetPage();
+        $this->clearNotificationCache();
     }
 
     /**
@@ -49,6 +86,7 @@ final class NotificationCenter extends Component
     public function updatedShowUnreadOnly(): void
     {
         $this->resetPage();
+        $this->clearNotificationCache();
     }
 
     /**
@@ -56,9 +94,11 @@ final class NotificationCenter extends Component
      */
     public function markAsRead(string $notificationId): void
     {
-        $notification = DatabaseNotification::find($notificationId);
-        if ($notification && $notification->notifiable_id === auth()->id()) {
+        $notification = $this->findUserNotification($notificationId);
+
+        if ($notification && $notification->unread()) {
             $notification->markAsRead();
+            $this->clearNotificationCache();
             $this->dispatch('notificationRead', $notificationId);
         }
     }
@@ -68,9 +108,11 @@ final class NotificationCenter extends Component
      */
     public function markAsUnread(string $notificationId): void
     {
-        $notification = DatabaseNotification::find($notificationId);
-        if ($notification && $notification->notifiable_id === auth()->id()) {
+        $notification = $this->findUserNotification($notificationId);
+
+        if ($notification && $notification->read()) {
             $notification->markAsUnread();
+            $this->clearNotificationCache();
             $this->dispatch('notificationUnread', $notificationId);
         }
     }
@@ -80,8 +122,13 @@ final class NotificationCenter extends Component
      */
     public function markAllAsRead(): void
     {
-        auth()->user()->unreadNotifications->markAsRead();
-        $this->dispatch('allNotificationsRead');
+        $unreadCount = auth()->user()->unreadNotifications()->count();
+
+        if ($unreadCount > 0) {
+            auth()->user()->unreadNotifications->markAsRead();
+            $this->clearNotificationCache();
+            $this->dispatch('allNotificationsRead');
+        }
     }
 
     /**
@@ -89,9 +136,11 @@ final class NotificationCenter extends Component
      */
     public function deleteNotification(string $notificationId): void
     {
-        $notification = DatabaseNotification::find($notificationId);
-        if ($notification && $notification->notifiable_id === auth()->id()) {
+        $notification = $this->findUserNotification($notificationId);
+
+        if ($notification) {
             $notification->delete();
+            $this->clearNotificationCache();
             $this->dispatch('notificationDeleted', $notificationId);
         }
     }
@@ -101,44 +150,66 @@ final class NotificationCenter extends Component
      */
     public function clearAllNotifications(): void
     {
-        auth()->user()->notifications()->delete();
-        $this->dispatch('allNotificationsCleared');
-    }
+        $deletedCount = auth()->user()->notifications()->delete();
 
-    /**
-     * Handle getNotificationsProperty functionality with proper error handling.
-     */
-    public function getNotificationsProperty()
-    {
-        $query = auth()->user()->notifications()->latest();
-        if ($this->showUnreadOnly) {
-            $query->whereNull('read_at');
+        if ($deletedCount > 0) {
+            $this->clearNotificationCache();
+            $this->dispatch('allNotificationsCleared');
         }
-        if ($this->filter !== 'all') {
-            $query->where('type', $this->filter);
-        }
-
-        return $query->paginate(10);
     }
 
     /**
-     * Handle getUnreadCountProperty functionality with proper error handling.
+     * Get notifications with optimized query and caching using Livewire 3 computed properties.
      */
-    public function getUnreadCountProperty(): int
+    #[Computed]
+    public function notifications(): LengthAwarePaginator
     {
-        return auth()->user()->unreadNotifications->count();
+        $cacheKey = $this->getNotificationsCacheKey();
+
+        return Cache::tags(['notifications', "user:{$this->getUserId()}"])
+            ->remember($cacheKey, self::CACHE_TTL, function () {
+                return $this->buildNotificationsQuery()
+                    ->paginate(self::PAGINATION_SIZE);
+            });
     }
 
     /**
-     * Handle getNotificationTypesProperty functionality with proper error handling.
+     * Get unread notifications count with caching and tenant isolation.
      */
-    public function getNotificationTypesProperty(): array
+    #[Computed]
+    public function unreadCount(): int
     {
-        return auth()->user()->notifications()->select('type')->distinct()->pluck('type')->mapWithKeys(function ($type) {
-            $shortType = class_basename($type);
+        $cacheKey = 'notifications_unread_count_' . $this->getUserId();
 
-            return [$type => $shortType];
-        })->toArray();
+        return Cache::tags(['notifications', "user:{$this->getUserId()}"])
+            ->remember($cacheKey, self::CACHE_TTL, function () {
+                return $this->getBaseNotificationsQuery()
+                    ->whereNull('read_at')
+                    ->count();
+            });
+    }
+
+    /**
+     * Get available notification types with caching and performance optimization.
+     */
+    #[Computed]
+    public function notificationTypes(): array
+    {
+        $cacheKey = 'notification_types_' . $this->getUserId();
+
+        return Cache::tags(['notifications', "user:{$this->getUserId()}"])
+            ->remember($cacheKey, 3600, function () {
+                return DB::table('notifications')
+                    ->select('type')
+                    ->where('notifiable_type', 'App\\Models\\User')
+                    ->where('notifiable_id', $this->getUserId())
+                    ->distinct()
+                    ->pluck('type')
+                    ->mapWithKeys(function ($type) {
+                        return [$type => class_basename($type)];
+                    })
+                    ->toArray();
+            });
     }
 
     /**
@@ -146,6 +217,101 @@ final class NotificationCenter extends Component
      */
     public function render()
     {
-        return view('livewire.notification-center', ['notifications' => $this->notifications, 'unreadCount' => $this->unreadCount, 'notificationTypes' => $this->notificationTypes]);
+        return view('livewire.notification-center', [
+            'notifications'     => $this->notifications,
+            'unreadCount'       => $this->unreadCount,
+            'notificationTypes' => $this->notificationTypes,
+        ]);
+    }
+
+    /**
+     * Get the current user ID with proper null handling.
+     */
+    private function getUserId(): ?int
+    {
+        return auth()->id();
+    }
+
+    /**
+     * Get base notifications query with tenant isolation.
+     */
+    private function getBaseNotificationsQuery(): Builder
+    {
+        return DB::table('notifications')
+            ->where('notifiable_type', 'App\\Models\\User')
+            ->where('notifiable_id', $this->getUserId());
+    }
+
+    /**
+     * Find a notification that belongs to the current user.
+     */
+    private function findUserNotification(string $notificationId): ?DatabaseNotification
+    {
+        return auth()->user()->notifications()->find($notificationId);
+    }
+
+    /**
+     * Build the notifications query with filters and optimizations.
+     */
+    private function buildNotificationsQuery()
+    {
+        $query = auth()->user()->notifications()
+            ->select(['id', 'type', 'data', 'read_at', 'created_at', 'notifiable_id'])
+            ->latest('created_at');
+
+        if ($this->showUnreadOnly) {
+            $query->whereNull('read_at');
+        }
+
+        if ($this->filter !== 'all') {
+            $query->where('type', $this->filter);
+        }
+
+        return $query;
+    }
+
+    /**
+     * Generate cache key for notifications.
+     */
+    private function getNotificationsCacheKey(): string
+    {
+        return sprintf(
+            'notifications_%s_%s_%s_%d',
+            $this->getUserId(),
+            $this->filter,
+            $this->showUnreadOnly ? 'unread' : 'all',
+            $this->getPage()
+        );
+    }
+
+    /**
+     * Clear notification-related cache with improved tag-based invalidation.
+     */
+    private function clearNotificationCache(): void
+    {
+        $userId = $this->getUserId();
+
+        if (! $userId) {
+            return;
+        }
+
+        // Use cache tags for more efficient invalidation
+        Cache::tags(['notifications', "user:{$userId}"])->flush();
+
+        // Also clear specific keys for backward compatibility
+        $patterns = [
+            "notifications_{$userId}_*",
+            "notification_types_{$userId}",
+            "notifications_unread_count_{$userId}",
+        ];
+
+        foreach ($patterns as $pattern) {
+            if (str_contains($pattern, '*')) {
+                // For patterns with wildcards, we'd need a more sophisticated approach
+                // For now, we rely on cache tags above
+                continue;
+            }
+            Cache::forget($pattern);
+        }
     }
 }

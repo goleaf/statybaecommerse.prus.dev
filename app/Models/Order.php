@@ -9,11 +9,9 @@ use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
 use App\Models\Scopes\StatusScope;
-use App\Observers\OrderObserver;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
 use DateTimeInterface;
-use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -54,7 +52,6 @@ use ValueError;
  *
  * @mixin \Eloquent
  */
-#[ObservedBy([OrderObserver::class])]
 #[ScopedBy([StatusScope::class])]
 final class Order extends Model
 {
@@ -113,7 +110,6 @@ final class Order extends Model
      * @var array<string, bool>
      */
     private static array $createdAtIndexAvailable = [];
-
 
     /**
      * Handle user functionality with proper error handling.

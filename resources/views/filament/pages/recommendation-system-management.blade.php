@@ -103,17 +103,6 @@
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <x-filament::button
-                    wire:click="clearCache"
-                    wire:confirm="{{ __('translations.confirm_clear_recommendation_cache') }}"
-                    color="danger"
-                    icon="heroicon-o-trash"
-                    size="lg"
-                    class="w-full"
-                >
-                    {{ __('translations.clear_recommendation_cache') }}
-                </x-filament::button>
-
-                <x-filament::button
                     wire:click="optimizeSystem"
                     color="success"
                     icon="heroicon-o-arrow-path"

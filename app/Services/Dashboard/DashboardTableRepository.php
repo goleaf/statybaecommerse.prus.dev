@@ -4,13 +4,10 @@ declare(strict_types=1);
 
 namespace App\Services\Dashboard;
 
-use App\Models\FailedJob;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\Scopes\ActiveScope;
-use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
 
 final class DashboardTableRepository
@@ -44,28 +41,5 @@ final class DashboardTableRepository
                 });
             })
             ->orderBy('stock_quantity');
-    }
-
-    public function recentFailedJobsQuery(): Builder
-    {
-        return FailedJob::query()
-            ->orderByDesc('failed_at');
-    }
-
-    public function recentFailedJobs(int $limit = 10): Collection
-    {
-        return $this->recentFailedJobsQuery()
-            ->limit($limit)
-            ->get()
-            ->map(function (FailedJob $job) {
-                return [
-                    'id'         => (int) $job->id,
-                    'connection' => $job->connection,
-                    'queue'      => $job->queue,
-                    'failed_at'  => CarbonImmutable::parse((string) $job->failed_at),
-                    'job'        => $job->job_name,
-                    'exception'  => $job->exception,
-                ];
-            });
     }
 }

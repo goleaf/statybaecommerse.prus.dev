@@ -53,14 +53,11 @@
         <env name="DB_CONNECTION" value="sqlite"/>
         <!-- Use in-memory SQLite for stable, fast tests -->
         <env name="DB_DATABASE" value=":memory:"/>
-        <!-- Use DELETE journal mode for broader FS compatibility during CI/CLI -->
-        <env name="DB_JOURNAL_MODE" value="delete"/>
         <env name="MAIL_MAILER" value="array"/>
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>
         <env name="ACTIVITY_LOGGER_ENABLED" value="false"/>
         <env name="PULSE_ENABLED" value="false"/>
-        <env name="TELESCOPE_ENABLED" value="false"/>
         <env name="LARAVEL_PARALLEL_TESTING_WITHOUT_DATABASES" value="1"/>
         <env name="SKIP_FILAMENT_BOOT" value="1"/>
         <env name="NIGHTWATCH_ENABLED" value="false"/>
