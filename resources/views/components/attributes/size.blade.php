@@ -7,12 +7,12 @@
     <div class="flex items-center justify-between">
         <h2 class="text-sm font-medium text-gray-900">{{ $option->attribute->name }}</h2>
         <button type="button" class="text-sm font-medium text-primary-600 hover:text-primary-500">
-            {{ __('Size guide') }}
+            {{ __('frontend.attributes.size.guide') }}
         </button>
     </div>
 
     <fieldset class="mt-2">
-        <legend class="sr-only">{{ __('Choose a size') }}</legend>
+        <legend class="sr-only">{{ __('frontend.attributes.size.choose') }}</legend>
         <div
             class="grid grid-cols-3 gap-3 sm:grid-cols-6"
             x-data="{

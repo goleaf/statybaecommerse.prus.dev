@@ -187,6 +187,8 @@ return [
         'addresses'        => 'Adresai',
         'wishlist'         => 'Norų sąrašas',
         'reviews'          => 'Mano atsiliepimai',
+        'documents'        => 'Dokumentai',
+        'notifications'    => 'Pranešimai',
         'settings'         => 'Nustatymai',
         'logout'           => 'Atsijungti',
         'edit_profile'     => 'Redaguoti profilį',
@@ -207,6 +209,8 @@ return [
         'addresses' => [
             'manage_title' => 'Tvarkyti adresus',
             'title' => 'Adresai',
+            'page_title' => 'Mano adresai',
+            'description' => 'Čia peržiūrėkite ir atnaujinkite pristatymo bei sąskaitų adresus.',
             'add_new' => 'Pridėti naują adresą',
             'saved' => 'Išsaugoti adresai',
             'set_default' => 'Nustatyti kaip numatytąjį adresą',
@@ -215,6 +219,14 @@ return [
             'delete' => 'Ištrinti adresą',
             'default' => 'Numatytasis',
             'empty' => 'Dar neturite išsaugotų adresų.',
+            'confirm_delete' => 'Ar tikrai norite ištrinti šį adresą?',
+            'types' => [
+                'billing' => 'Sąskaitų',
+            ],
+            'defaults' => [
+                'shipping' => 'Numatytasis pristatymo adresas',
+                'billing' => 'Numatytasis sąskaitų adresas',
+            ],
             'fields' => [
                 'type' => 'Tipas',
                 'first_name' => 'Vardas',
@@ -243,6 +255,64 @@ return [
             'description' => 'Peržiūrėkite naujausių užsakymų būseną, valdykite grąžinimus ir atsisiųskite sąskaitas.',
             'empty_message' => 'Jūs dar nieko neužsakėte. Gal šiandien tam tinkamas metas?',
             'continue_shopping' => 'Tęsti apsipirkimą',
+            'invoice' => 'Sąskaita',
+            'print' => 'Spausdinti',
+        ],
+        'order_detail' => [
+            'title' => 'Užsakymo informacija',
+            'order_number_label' => 'Užsakymo numeris',
+            'order_number_value' => '#:number',
+            'placed_on' => 'Pateikta',
+            'total' => 'Suma',
+            'status' => 'Būsena',
+            'summary' => 'Santrauka',
+            'help_message' => 'Reikia pagalbos dėl šio užsakymo? Mūsų komanda padės.',
+            'contact_us' => 'Susisiekti',
+        ],
+        'overview' => [
+            'title' => 'Apžvalga',
+            'description' => 'Paskyroje galite valdyti užsakymus ir grąžinimus, taip pat savo asmeninę informaciją.',
+        ],
+        'cards' => [
+            'orders' => [
+                'description' => 'Sekite užsakymus, grąžinkite arba pakartokite pirkimą',
+            ],
+            'reviews' => [
+                'description' => 'Peržiūrėkite ir valdykite savo atsiliepimus',
+            ],
+            'profile' => [
+                'title' => 'Asmeninė informacija',
+                'description' => 'El. pašto, vardo ir telefono numerio keitimas',
+            ],
+            'addresses' => [
+                'title' => 'Mano adresai',
+                'description' => 'Sąskaitų ir pristatymo nuostatos',
+            ],
+            'wishlist' => [
+                'description' => 'Vėlesniam laikui išsaugoti produktai',
+            ],
+            'documents' => [
+                'description' => 'Sąskaitos ir sugeneruoti dokumentai',
+            ],
+            'notifications' => [
+                'description' => 'Žinutės ir pranešimai',
+            ],
+            'contact' => [
+                'title' => 'Susisiekti',
+                'description' => 'Susisiekite su klientų aptarnavimu telefonu arba el. paštu',
+            ],
+        ],
+        'reviews_empty' => 'Dar nepalikote atsiliepimų.',
+        'reviews_fallback' => 'Atsiliepimas',
+        'documents_description' => 'Sąskaitos ir sugeneruoti dokumentai',
+        'documents_empty' => 'Dokumentų dar nėra.',
+        'notifications_description' => 'Stebėkite paskyros veiklą',
+        'documents_table' => [
+            'title' => 'Pavadinimas',
+            'status' => 'Būsena',
+            'format' => 'Formatas',
+            'generated_at' => 'Sugeneruota',
+            'download' => 'Atsisiųsti',
         ],
     ],
     'discount_redemptions' => [
@@ -388,6 +458,177 @@ return [
         'to'         => 'iki',
         'of'         => 'iš',
         'results'    => 'rezultatai',
+        'show'       => 'Rodyti',
+        'per_page'   => 'per puslapį',
+        'go_to_page' => 'Eiti į puslapį',
+        'go'         => 'Eiti',
+    ],
+    'checkout_steps' => [
+        'steps' => [
+            'cart' => 'Pirkinių krepšelis',
+            'shipping' => 'Pristatymas',
+            'payment' => 'Mokėjimas',
+            'review' => 'Peržiūra',
+        ],
+        'step' => 'Žingsnis',
+        'progress' => 'Progresas',
+        'of' => 'iš',
+    ],
+    'category_navigation' => [
+        'aria' => 'Kategorijos',
+        'subcategories' => 'subkategorijos',
+        'view_all' => 'Peržiūrėti viską',
+        'all_categories' => 'Visos kategorijos',
+    ],
+    'language_switcher' => [
+        'change' => 'Keisti kalbą',
+    ],
+    'impersonation' => [
+        'banner' => 'Jūs apsimetate',
+        'stop' => 'Baigti apsimetinėjimą',
+    ],
+    'auth' => [
+        'login' => 'Prisijungti',
+        'register' => 'Registruotis',
+    ],
+    'mobile_menu' => [
+        'toggle' => 'Perjungti mobilų meniu',
+        'title' => 'Meniu',
+        'popular_brands' => 'Populiarūs prekės ženklai',
+    ],
+    'auth_oauth' => [
+        'google' => 'Prisijungti su Google',
+        'facebook' => 'Tęsti su Facebook',
+    ],
+    'attributes' => [
+        'color' => [
+            'choose' => 'Pasirinkite spalvą',
+        ],
+        'size' => [
+            'guide' => 'Dydžių lentelė',
+            'choose' => 'Pasirinkite dydį',
+        ],
+        'value' => [
+            'choose' => 'Pasirinkite reikšmę',
+        ],
+    ],
+    'contact_info' => [
+        'address' => [
+            'label' => 'Adresas',
+            'fallback' => '123 Verslo g., Miestas, Šalis',
+            'directions' => 'Gauti nuorodas',
+        ],
+        'phone' => [
+            'label' => 'Telefonas',
+            'support' => 'Skambinkite dėl pagalbos',
+        ],
+        'email' => [
+            'label' => 'El. paštas',
+            'response' => 'Atsakome per 24 val.',
+        ],
+        'hours' => [
+            'label' => 'Darbo laikas',
+            'weekdays' => 'Pirmadienis - Penktadienis',
+            'weekdays_value' => '9:00 - 18:00',
+            'saturday' => 'Šeštadienis',
+            'saturday_value' => '10:00 - 16:00',
+            'sunday' => 'Sekmadienis',
+            'closed' => 'Uždaryta',
+            'support_note' => 'Klientų aptarnavimas darbo valandomis',
+        ],
+        'other_methods' => [
+            'title' => 'Kiti būdai susisiekti',
+            'live_chat' => [
+                'title' => 'Tiesioginis pokalbis',
+                'availability' => 'Prieinama 24/7',
+            ],
+            'whatsapp' => [
+                'title' => 'WhatsApp',
+            ],
+        ],
+    ],
+    'contact_form' => [
+        'page_title' => 'Susisiekite su mumis',
+        'page_subtitle' => 'Susisiekite su mumis. Mielai atsakysime.',
+        'form_title' => 'Parašykite mums',
+        'info_title' => 'Kontaktai',
+        'map_title' => 'Kur mus rasti',
+        'map_placeholder' => 'Čia bus rodomas interaktyvus žemėlapis',
+        'fields' => [
+            'full_name' => 'Vardas ir pavardė',
+            'email' => 'El. pašto adresas',
+            'phone' => 'Telefono numeris',
+            'subject' => 'Tema',
+            'message' => 'Žinutė',
+            'message_placeholder' => 'Prašome detaliai aprašyti užklausą...',
+        ],
+        'subjects' => [
+            'placeholder' => 'Pasirinkite temą',
+            'general' => 'Bendras klausimas',
+            'support' => 'Techninė pagalba',
+            'sales' => 'Pardavimų klausimas',
+            'billing' => 'Atsiskaitymo problema',
+            'partnership' => 'Partnerystė',
+            'other' => 'Kita',
+        ],
+        'privacy' => [
+            'prefix' => 'Sutinku su',
+            'policy' => 'Privatumo politika',
+            'suffix' => 'ir sutinku, kad būtų tvarkomi mano asmens duomenys.',
+        ],
+        'actions' => [
+            'submit' => 'Siųsti žinutę',
+            'sending' => 'Siunčiama...',
+        ],
+        'validation' => [
+            'privacy_required' => 'Prašome sutikti su privatumo politika, kad tęstumėte.',
+        ],
+        'messages' => [
+            'success' => 'Ačiū už žinutę! Netrukus su jumis susisieksime.',
+            'error' => 'Kažkas nepavyko. Bandykite dar kartą.',
+            'network_error' => 'Tinklo klaida. Patikrinkite ryšį ir bandykite dar kartą.',
+        ],
+    ],
+    'faq' => [
+        'title' => 'Dažniausiai užduodami klausimai',
+        'subtitle' => 'Raskite atsakymus į dažniausius klausimus apie mūsų produktus ir paslaugas',
+        'search_placeholder' => 'Ieškoti DUK...',
+        'filters' => [
+            'all' => 'Visi',
+        ],
+        'categories' => [
+            'shipping' => 'Pristatymas',
+            'payment' => 'Mokėjimas',
+            'returns' => 'Grąžinimai',
+            'support' => 'Pagalba',
+        ],
+        'questions' => [
+            'track_order' => 'Kaip sekti užsakymą?',
+            'payment_methods' => 'Kokius mokėjimo būdus priimate?',
+            'return_policy' => 'Kokia yra grąžinimo politika?',
+            'shipping_time' => 'Kiek trunka pristatymas?',
+            'international_shipping' => 'Ar pristatote į užsienį?',
+            'contact_support' => 'Kaip susisiekti su klientų aptarnavimu?',
+        ],
+        'answers' => [
+            'track_order' => 'Užsakymą galite sekti prisijungę prie paskyros ir apsilankę „Užsakymų istorijoje“. Taip pat gausite el. laiškus su siuntos sekimo informacija, kai užsakymas bus išsiųstas.',
+            'payment_methods' => 'Priimame pagrindines kreditines korteles (Visa, MasterCard, American Express), PayPal ir bankinius pervedimus. Visi mokėjimai apdorojami saugiai per šifruotą mokėjimų sistemą.',
+            'return_policy' => 'Siūlome 30 dienų grąžinimo politiką daugumai prekių. Produktai turi būti originalios būklės. Dėl grąžinimo susisiekite su mūsų klientų aptarnavimo komanda.',
+            'shipping_time' => 'Standartinis pristatymas trunka 3–5 darbo dienas, o greitasis – 1–2 darbo dienas. Tarptautinis pristatymas gali užtrukti 7–14 darbo dienų.',
+            'international_shipping' => 'Taip, pristatome į daugumą šalių. Kainos ir terminai priklauso nuo vietos. Tikslų įkainį matysite atsiskaitymo metu.',
+            'contact_support' => 'Su klientų aptarnavimu galite susisiekti el. paštu support@example.com, telefonu +1 (555) 123-4567 arba per svetainėje esantį pokalbių langą.',
+        ],
+        'empty' => [
+            'title' => 'DUK nerasta',
+            'description' => 'Pabandykite pakoreguoti paieškos žodžius arba filtrą',
+            'clear' => 'Išvalyti filtrus',
+        ],
+        'cta' => [
+            'title' => 'Vis dar turite klausimų?',
+            'description' => 'Mūsų komanda pasiruošusi padėti.',
+            'contact' => 'Susisiekti su pagalba',
+            'email' => 'Siųsti el. laišką',
+        ],
     ],
     'filters' => [
         'title'             => 'Filtrai',

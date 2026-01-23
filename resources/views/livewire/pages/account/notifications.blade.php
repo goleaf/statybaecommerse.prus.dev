@@ -138,12 +138,12 @@ new #[Layout('components.layouts.templates.account')] class extends Component {
 }; ?>
 
 <div class="space-y-6">
-    <x-breadcrumbs :items="[['label' => __('My account'), 'url' => route('account.index')], ['label' => __('Notifications')]]" />
+    <x-breadcrumbs :items="[['label' => __('frontend.account.nav.title'), 'url' => route('account.index')], ['label' => __('frontend.account.notifications')]]" />
     
     <div class="flex items-center justify-between">
         <div>
-            <h1 class="text-2xl font-bold text-gray-900">{{ __('Notifications') }}</h1>
-            <p class="mt-1 text-sm text-gray-500">{{ __('Stay updated with your account activity') }}</p>
+            <h1 class="text-2xl font-bold text-gray-900">{{ __('frontend.account.notifications') }}</h1>
+            <p class="mt-1 text-sm text-gray-500">{{ __('frontend.account.notifications_description') }}</p>
         </div>
         
         @if (!empty($notifications))
@@ -160,7 +160,7 @@ new #[Layout('components.layouts.templates.account')] class extends Component {
                 
                 <button 
                     wire:click="deleteAllNotifications" 
-                    wire:confirm="{{ __('Are you sure you want to delete all notifications?') }}"
+                    wire:confirm="{{ __('notifications.confirmations.delete_all') }}"
                     class="inline-flex items-center px-3 py-2 border border-red-300 shadow-sm text-sm leading-4 font-medium rounded-md text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                 >
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -185,19 +185,19 @@ new #[Layout('components.layouts.templates.account')] class extends Component {
                             class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
                         >
                         <label for="unread-only" class="ml-2 text-sm text-gray-700">
-                            {{ __('Show unread only') }}
+                            {{ __('notifications.show_unread_only') }}
                         </label>
                     </div>
                 </div>
                 
                 <div class="flex items-center space-x-2">
-                    <label for="filter" class="text-sm font-medium text-gray-700">{{ __('Filter by type') }}:</label>
+                    <label for="filter" class="text-sm font-medium text-gray-700">{{ __('notifications.filter_by_type') }}:</label>
                     <select 
                         wire:model.live="filter" 
                         id="filter" 
                         class="block w-40 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                     >
-                        <option value="all">{{ __('All types') }}</option>
+                        <option value="all">{{ __('notifications.all_types') }}</option>
                         <option value="order">{{ __('notifications.types.order') }}</option>
                         <option value="product">{{ __('notifications.types.product') }}</option>
                         <option value="user">{{ __('notifications.types.user') }}</option>
@@ -278,7 +278,7 @@ new #[Layout('components.layouts.templates.account')] class extends Component {
                                             </p>
                                             @if (!$notification['read_at'])
                                                 <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                                    {{ __('New') }}
+                                                    {{ __('notifications.labels.new') }}
                                                 </span>
                                             @endif
                                         </div>
@@ -309,7 +309,7 @@ new #[Layout('components.layouts.templates.account')] class extends Component {
                                     
                                     <button 
                                         wire:click="deleteNotification('{{ $notification['id'] }}')"
-                                        wire:confirm="{{ __('Are you sure you want to delete this notification?') }}"
+                                        wire:confirm="{{ __('notifications.confirmations.delete_one') }}"
                                         class="text-gray-400 hover:text-red-600"
                                         title="{{ __('notifications.delete_notification') }}"
                                     >

@@ -2,14 +2,14 @@
 
 <div class="space-y-10">
     <x-breadcrumbs :items="[
-        ['label' => __('My account'), 'url' => route('account.index', ['locale' => app()->getLocale()])],
-        ['label' => __('My orders'), 'url' => route('account.orders', ['locale' => app()->getLocale()])],
-        ['label' => __('Invoice')],
+        ['label' => __('frontend.account.nav.title'), 'url' => route('account.index', ['locale' => app()->getLocale()])],
+        ['label' => __('frontend.account.orders.title'), 'url' => route('account.orders', ['locale' => app()->getLocale()])],
+        ['label' => __('frontend.account.orders.invoice')],
     ]" />
 
     <div class="flex items-center justify-end">
         <x-buttons.default type="button" class="px-4 print:hidden" onclick="window.print()">
-            {{ __('Print') }}
+            {{ __('frontend.account.orders.print') }}
         </x-buttons.default>
     </div>
 

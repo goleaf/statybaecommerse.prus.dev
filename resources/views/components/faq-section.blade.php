@@ -7,51 +7,39 @@
 ])
 
 @php
-    $title = $title ?? __('Frequently Asked Questions');
-    $subtitle = $subtitle ?? __('Find answers to common questions about our products and services');
+    $title = $title ?? __('frontend.faq.title');
+    $subtitle = $subtitle ?? __('frontend.faq.subtitle');
     $faqs =
         $faqs ??
         collect([
             [
-                'question' => __('How can I track my order?'),
-                'answer' => __(
-                    'You can track your order by logging into your account and visiting the "Order History" section. You will also receive email updates with tracking information once your order ships.',
-                ),
+                'question' => __('frontend.faq.questions.track_order'),
+                'answer' => __('frontend.faq.answers.track_order'),
                 'category' => 'shipping',
             ],
             [
-                'question' => __('What payment methods do you accept?'),
-                'answer' => __(
-                    'We accept all major credit cards (Visa, MasterCard, American Express), PayPal, and bank transfers. All payments are processed securely through our encrypted payment gateway.',
-                ),
+                'question' => __('frontend.faq.questions.payment_methods'),
+                'answer' => __('frontend.faq.answers.payment_methods'),
                 'category' => 'payment',
             ],
             [
-                'question' => __('What is your return policy?'),
-                'answer' => __(
-                    'We offer a 30-day return policy for most items. Products must be in original condition with tags attached. Please contact our customer service team to initiate a return.',
-                ),
+                'question' => __('frontend.faq.questions.return_policy'),
+                'answer' => __('frontend.faq.answers.return_policy'),
                 'category' => 'returns',
             ],
             [
-                'question' => __('How long does shipping take?'),
-                'answer' => __(
-                    'Standard shipping takes 3-5 business days, while express shipping takes 1-2 business days. International shipping may take 7-14 business days depending on the destination.',
-                ),
+                'question' => __('frontend.faq.questions.shipping_time'),
+                'answer' => __('frontend.faq.answers.shipping_time'),
                 'category' => 'shipping',
             ],
             [
-                'question' => __('Do you offer international shipping?'),
-                'answer' => __(
-                    'Yes, we ship to most countries worldwide. Shipping costs and delivery times vary by location. Please check our shipping calculator during checkout for specific rates.',
-                ),
+                'question' => __('frontend.faq.questions.international_shipping'),
+                'answer' => __('frontend.faq.answers.international_shipping'),
                 'category' => 'shipping',
             ],
             [
-                'question' => __('How can I contact customer service?'),
-                'answer' => __(
-                    'You can reach our customer service team via email at support@example.com, phone at +1 (555) 123-4567, or through our live chat feature available on our website.',
-                ),
+                'question' => __('frontend.faq.questions.contact_support'),
+                'answer' => __('frontend.faq.answers.contact_support'),
                 'category' => 'support',
             ],
         ]);
@@ -78,7 +66,7 @@
                     <input type="text"
                            x-model="searchQuery"
                            @input="filterFAQs()"
-                           placeholder="{{ __('Search FAQs...') }}"
+                           placeholder="{{ __('frontend.faq.search_placeholder') }}"
                            class="w-full px-4 py-3 pl-10 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder:text-gray-500">
                     <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                         <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -98,14 +86,14 @@
                             :class="selectedCategory === 'all' ? 'bg-blue-600 text-white' :
                                 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
                             class="px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200">
-                        {{ __('All') }}
+                        {{ __('frontend.faq.filters.all') }}
                     </button>
                     @foreach ($categories as $category)
                         <button @click="selectedCategory = '{{ $category }}'; filterFAQs()"
                                 :class="selectedCategory === '{{ $category }}' ? 'bg-blue-600 text-white' :
                                     'bg-gray-100 text-gray-700 hover:bg-gray-200'"
                                 class="px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200">
-                            {{ __(ucfirst($category)) }}
+                            {{ __('frontend.faq.categories.' . $category) }}
                         </button>
                     @endforeach
                 </div>
@@ -172,26 +160,26 @@
                       d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
                 </path>
             </svg>
-            <h3 class="text-lg font-medium text-gray-900 mb-2">{{ __('No FAQs found') }}</h3>
-            <p class="text-gray-600 mb-4">{{ __('Try adjusting your search terms or category filter') }}</p>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">{{ __('frontend.faq.empty.title') }}</h3>
+            <p class="text-gray-600 mb-4">{{ __('frontend.faq.empty.description') }}</p>
             <button @click="clearFilters()" class="text-blue-600 hover:text-blue-700 font-medium">
-                {{ __('Clear all filters') }}
+                {{ __('frontend.faq.empty.clear') }}
             </button>
         </div>
 
         {{-- Contact Support --}}
         <div class="mt-12 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-8 text-center">
-            <h3 class="text-xl font-bold text-gray-900 mb-4">{{ __('Still have questions?') }}</h3>
+            <h3 class="text-xl font-bold text-gray-900 mb-4">{{ __('frontend.faq.cta.title') }}</h3>
             <p class="text-gray-600 mb-6">
-                {{ __('Our customer support team is here to help you with any questions you may have.') }}</p>
+                {{ __('frontend.faq.cta.description') }}</p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
                 <a href="{{ route('contact', ['locale' => app()->getLocale()]) ?? '/contact' }}"
                    class="btn-gradient px-6 py-3 rounded-xl font-semibold">
-                    {{ __('Contact Support') }}
+                    {{ __('frontend.faq.cta.contact') }}
                 </a>
                 <a href="mailto:support@example.com"
                    class="border-2 border-gray-300 text-gray-700 px-6 py-3 rounded-xl font-semibold hover:border-gray-400 hover:bg-gray-50 transition-colors duration-200">
-                    {{ __('Send Email') }}
+                    {{ __('frontend.faq.cta.email') }}
                 </a>
             </div>
         </div>

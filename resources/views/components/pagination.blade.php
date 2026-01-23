@@ -40,26 +40,26 @@
         @if ($showInfo)
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
                 <div class="text-sm text-gray-700 mb-4 sm:mb-0">
-                    {{ __('Showing') }}
+                    {{ __('frontend.pagination.showing') }}
                     <span class="font-medium">{{ $from }}</span>
-                    {{ __('to') }}
+                    {{ __('frontend.pagination.to') }}
                     <span class="font-medium">{{ $to }}</span>
-                    {{ __('of') }}
+                    {{ __('frontend.pagination.of') }}
                     <span class="font-medium">{{ $total }}</span>
-                    {{ __('results') }}
+                    {{ __('frontend.pagination.results') }}
                 </div>
 
                 {{-- Per Page Selector --}}
                 @if ($showPerPage)
                     <div class="flex items-center gap-2">
-                        <label for="per-page" class="text-sm text-gray-700">{{ __('Show') }}:</label>
+                        <label for="per-page" class="text-sm text-gray-700">{{ __('frontend.pagination.show') }}:</label>
                         <select id="per-page"
                                 x-data="{ perPage: {{ $perPage }} }"
                                 @change="window.location.href = updateUrlParam('per_page', $event.target.value)"
                                 class="px-3 py-1 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                             @foreach ($perPageOptions as $option)
                                 <option value="{{ $option }}" {{ $perPage == $option ? 'selected' : '' }}>
-                                    {{ $option }} {{ __('per page') }}
+                                    {{ $option }} {{ __('frontend.pagination.per_page') }}
                                 </option>
                             @endforeach
                         </select>
@@ -69,7 +69,7 @@
         @endif
 
         {{-- Pagination Navigation --}}
-        <nav class="flex items-center justify-center" aria-label="{{ __('Pagination') }}">
+        <nav class="flex items-center justify-center" aria-label="{{ __('frontend.pagination.navigation') }}">
             <div class="flex items-center space-x-1">
                 {{-- Previous Page --}}
                 @if ($currentPage > 1)
@@ -79,7 +79,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7">
                             </path>
                         </svg>
-                        {{ __('Previous') }}
+                        {{ __('frontend.pagination.previous') }}
                     </a>
                 @else
                     <span
@@ -88,7 +88,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7">
                             </path>
                         </svg>
-                        {{ __('Previous') }}
+                        {{ __('frontend.pagination.previous') }}
                     </span>
                 @endif
 
@@ -150,7 +150,7 @@
                 @if ($currentPage < $lastPage)
                     <a href="{{ $appendQueryString($paginator->nextPageUrl()) }}"
                        class="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-blue-600 transition-colors duration-200">
-                        {{ __('Next') }}
+                        {{ __('frontend.pagination.next') }}
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
                             </path>
@@ -159,7 +159,7 @@
                 @else
                     <span
                           class="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-400 bg-gray-100 border border-gray-200 rounded-lg cursor-not-allowed">
-                        {{ __('Next') }}
+                        {{ __('frontend.pagination.next') }}
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
                             </path>
@@ -171,7 +171,7 @@
 
         {{-- Quick Jump --}}
         <div class="mt-6 flex items-center justify-center gap-2">
-            <span class="text-sm text-gray-700">{{ __('Go to page') }}:</span>
+            <span class="text-sm text-gray-700">{{ __('frontend.pagination.go_to_page') }}:</span>
             <input type="number"
                    min="1"
                    max="{{ $lastPage }}"
@@ -181,7 +181,7 @@
                    class="w-16 px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
             <button @click="if(page >= 1 && page <= {{ $lastPage }}) window.location.href = updateUrlParam('page', page)"
                     class="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors duration-200">
-                {{ __('Go') }}
+                {{ __('frontend.pagination.go') }}
             </button>
         </div>
     </div>
