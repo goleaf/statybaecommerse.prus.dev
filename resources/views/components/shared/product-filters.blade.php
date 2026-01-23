@@ -11,8 +11,8 @@
 <x-shared.card padding="p-6">
     <x-slot name="header">
         <x-shared.section 
-            title="{{ __('shared.filter') }} {{ __('Products') }}"
-            description="{{ __('Narrow down your search to find exactly what you need') }}"
+            title="{{ __('frontend.filters.products_title') }}"
+            description="{{ __('frontend.filters.description') }}"
             icon="heroicon-o-funnel"
             titleSize="text-xl"
             centered="false"
@@ -26,7 +26,7 @@
                 wire:model.live.debounce.300ms="search"
                 type="search"
                 label="{{ __('shared.search') }}"
-                placeholder="{{ __('Search products...') }}"
+                placeholder="{{ __('frontend.filters.search_placeholder') }}"
                 icon="heroicon-o-magnifying-glass"
             />
         @endif
@@ -35,8 +35,8 @@
             {{-- Category Filter --}}
             <x-shared.select 
                 wire:model.live="categoryId"
-                label="{{ __('Category') }}"
-                placeholder="{{ __('All Categories') }}"
+                label="{{ __('frontend.filters.category') }}"
+                placeholder="{{ __('frontend.filters.all_categories') }}"
             >
                 @foreach($categories as $category)
                     <option value="{{ $category->id }}">{{ $category->name }}</option>
@@ -48,8 +48,8 @@
             {{-- Brand Filter --}}
             <x-shared.select 
                 wire:model.live="brandId"
-                label="{{ __('Brand') }}"
-                placeholder="{{ __('All Brands') }}"
+                label="{{ __('frontend.filters.brand') }}"
+                placeholder="{{ __('frontend.filters.all_brands') }}"
             >
                 @foreach($brands as $brand)
                     <option value="{{ $brand->id }}">{{ $brand->name }}</option>
@@ -61,13 +61,13 @@
             {{-- Sort Options --}}
             <x-shared.select 
                 wire:model.live="sortBy"
-                label="{{ __('shared.sort') }} {{ __('By') }}"
+                label="{{ __('frontend.filters.sort_by') }}"
             >
-                <option value="created_at">{{ __('Newest') }}</option>
-                <option value="name">{{ __('Name') }}</option>
-                <option value="price">{{ __('Price') }}</option>
-                <option value="popularity">{{ __('Popularity') }}</option>
-                <option value="rating">{{ __('Rating') }}</option>
+                <option value="created_at">{{ __('frontend.filters.sort.newest') }}</option>
+                <option value="name">{{ __('frontend.filters.sort.name') }}</option>
+                <option value="price">{{ __('frontend.filters.sort.price') }}</option>
+                <option value="popularity">{{ __('frontend.filters.sort.popularity') }}</option>
+                <option value="rating">{{ __('frontend.filters.sort.rating') }}</option>
             </x-shared.select>
         @endif
     </div>
@@ -78,7 +78,7 @@
             <x-shared.input 
                 wire:model.live="minPrice"
                 type="number"
-                label="{{ __('Min Price') }}"
+                label="{{ __('frontend.filters.min_price') }}"
                 placeholder="0"
                 min="0"
                 step="0.01"
@@ -86,7 +86,7 @@
             <x-shared.input 
                 wire:model.live="maxPrice"
                 type="number"
-                label="{{ __('Max Price') }}"
+                label="{{ __('frontend.filters.max_price') }}"
                 placeholder="1000"
                 min="0"
                 step="0.01"
@@ -103,7 +103,7 @@
             icon="heroicon-o-x-mark"
             size="sm"
         >
-            {{ __('shared.clear') }} {{ __('shared.filter') }}s
+            {{ __('frontend.filters.actions.clear') }}
         </x-shared.button>
         
         <x-shared.button 
@@ -112,7 +112,7 @@
             icon="heroicon-o-funnel"
             size="sm"
         >
-            {{ __('shared.apply') }} {{ __('shared.filter') }}s
-        </x-shared.button>
+            {{ __('frontend.filters.actions.apply') }}
+    </x-shared.button>
     </div>
 </x-shared.card>

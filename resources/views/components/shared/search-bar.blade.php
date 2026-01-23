@@ -77,7 +77,7 @@
                     wire:model.live="sortBy"
                     label="{{ __('shared.sort_by') }}"
                 >
-                    <option value="relevance">{{ __('Relevance') }}</option>
+                    <option value="relevance">{{ __('frontend.filters.sort.relevance') }}</option>
                     <option value="created_at">{{ __('shared.sort_newest') }}</option>
                     <option value="name">{{ __('shared.sort_name_az') }}</option>
                     <option value="price">{{ __('shared.sort_price_low') }}</option>

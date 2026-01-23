@@ -47,7 +47,7 @@
     {{-- Empty State --}}
     <x-shared.empty-state 
         :title="$emptyStateTitle ?? __('shared.no_items_found')"
-        :description="$emptyStateDescription ?? __('Try adjusting your search or browse our categories')"
+        :description="$emptyStateDescription ?? __('frontend.products_grid.empty_description')"
         icon="heroicon-o-cube"
         :actionText="$emptyStateAction ?? __('shared.browse_products')"
         :actionUrl="$emptyStateActionUrl ?? route('localized.categories.index', ['locale' => app()->getLocale()])"

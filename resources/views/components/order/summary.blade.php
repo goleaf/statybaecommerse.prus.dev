@@ -3,25 +3,25 @@
 <div class="border border-gray-200 py-4 divide-y divide-gray-200 divide-dashed">
     <dl class="space-y-4 px-4 pb-4">
         <div class="flex items-center justify-between">
-            <dt class="text-sm">{{ __('Sub total') }}</dt>
+            <dt class="text-sm">{{ __('frontend.order_summary.subtotal') }}</dt>
             <dd class="text-sm font-medium text-gray-900">
                 {{ \Illuminate\Support\Number::currency($order->total(), $order->currency_code, app()->getLocale()) }}
             </dd>
         </div>
         <div class="flex items-center justify-between">
-            <dt class="text-sm">{{ __('Shipping') }}</dt>
+            <dt class="text-sm">{{ __('frontend.order_summary.shipping') }}</dt>
             <dd class="text-sm font-medium text-gray-900">
                 {{ \Illuminate\Support\Number::currency($order->shippingOption->price, $order->currency_code, app()->getLocale()) }}
             </dd>
         </div>
         <div class="flex items-center justify-between">
-            <dt class="text-sm">{{ __('Tax') }}</dt>
+            <dt class="text-sm">{{ __('frontend.order_summary.tax') }}</dt>
             <dd class="text-sm font-medium text-gray-900">
                 {{ \Illuminate\Support\Number::currency(0, $order->currency_code, app()->getLocale()) }}
             </dd>
         </div>
         <div class="flex items-center justify-between border-t border-gray-200 pt-4">
-            <dt class="font-heading font-medium text-primary-950">{{ __('Total') }}</dt>
+            <dt class="font-heading font-medium text-primary-950">{{ __('frontend.order_summary.total') }}</dt>
             <dd class="text-base font-bold text-gray-900">
                 {{ \Illuminate\Support\Number::currency($order->total() + $order->shippingOption->price, $order->currency_code, app()->getLocale()) }}
             </dd>
@@ -29,7 +29,7 @@
     </dl>
     <dl class="grid grid-cols-2 gap-x-6 p-4 text-sm">
         <div>
-            <dt class="font-medium text-gray-900">{{ __('Shipping Address') }}</dt>
+            <dt class="font-medium text-gray-900">{{ __('frontend.order_summary.shipping_address') }}</dt>
             @php($sa = is_string($order->shipping_address) ? json_decode($order->shipping_address, true) : $order->shipping_address)
             <dd class="mt-2 text-gray-500">
                 @if ($sa)
@@ -43,12 +43,12 @@
                     <span
                           class="block">{{ $sa['country_name'] ?? ($sa['country'] ?? ($sa['country_code'] ?? '')) }}</span>
                 @else
-                    <span class="block">{{ __('Not available') }}</span>
+                    <span class="block">{{ __('frontend.order_summary.not_available') }}</span>
                 @endif
             </dd>
         </div>
         <div>
-            <dt class="font-medium text-gray-900">{{ __('Billing address') }}</dt>
+            <dt class="font-medium text-gray-900">{{ __('frontend.order_summary.billing_address') }}</dt>
             @php($ba = is_string($order->billing_address) ? json_decode($order->billing_address, true) : $order->billing_address)
             <dd class="mt-2 text-gray-500">
                 @if ($ba)
@@ -62,14 +62,14 @@
                     <span
                           class="block">{{ $ba['country_name'] ?? ($ba['country'] ?? ($ba['country_code'] ?? '')) }}</span>
                 @else
-                    <span class="block">{{ __('Not available') }}</span>
+                    <span class="block">{{ __('frontend.order_summary.not_available') }}</span>
                 @endif
             </dd>
         </div>
     </dl>
     <dl class="space-y-3 p-4">
         <dt class="text-sm leading-6 font-medium text-gray-900">
-            {{ __('Payment method') }}
+            {{ __('frontend.order_summary.payment_method') }}
         </dt>
         <dd class="text-sm flex items-center gap-2 text-gray-500">
             <x-dynamic-component class="size-5" :component="'icons.payments.' . $order->paymentMethod->slug" />
