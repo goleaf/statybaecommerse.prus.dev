@@ -52,11 +52,8 @@ return new class extends Migration
             if (! Schema::hasColumn('users', 'accepts_marketing')) {
                 $table->boolean('accepts_marketing')->default(false)->after('is_verified');
             }
-            if (! Schema::hasColumn('users', 'two_factor_enabled')) {
-                $table->boolean('two_factor_enabled')->default(false)->after('accepts_marketing');
-            }
             if (! Schema::hasColumn('users', 'is_admin')) {
-                $table->boolean('is_admin')->default(false)->after('two_factor_enabled');
+                $table->boolean('is_admin')->default(false)->after('accepts_marketing');
             }
 
             // Activity Tracking
@@ -106,7 +103,6 @@ return new class extends Migration
                 'is_active',
                 'is_verified',
                 'accepts_marketing',
-                'two_factor_enabled',
                 'is_admin',
                 'last_login_at',
                 'last_login_ip',

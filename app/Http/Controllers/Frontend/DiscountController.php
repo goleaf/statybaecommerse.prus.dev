@@ -166,9 +166,12 @@ final class DiscountController extends Controller
             $subtotal += (float) ($item['price'] ?? 0) * (int) ($item['quantity'] ?? 0);
         }
 
-        $taxRate = config('shared.tax.default_rate', 0.21);
+        $taxRate = config('shared.tax.default_rate', 0.0);
         $tax = $subtotal * $taxRate;
-        $shipping = $subtotal > 50 ? 0 : 5.99;
+        // Use pricing configuration for shipping calculations
+        $freeThreshold = config('pricing.shipping.free_threshold', 100.0);
+        $flatRate = config('pricing.shipping.flat_rate', 5.99);
+        $shipping = $subtotal >= $freeThreshold ? 0 : $flatRate;
         $discount = (float) Session::get('cart_discount', 0);
         $total = $subtotal + $tax + $shipping - $discount;
 

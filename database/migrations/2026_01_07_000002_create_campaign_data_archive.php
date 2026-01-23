@@ -45,7 +45,6 @@ return new class extends Migration
             'discount_campaigns',
             'email_campaigns',
             'referral_campaigns',
-            'campaign_clicks',
             'campaign_conversions',
             'campaign_views',
             'campaign_schedules',
@@ -56,7 +55,6 @@ return new class extends Migration
             'campaign_customer_segments',
             'campaign_product_targets',
             'campaign_discount',
-            'campaign_click_translations',
             'campaign_conversion_translations',
         ];
 

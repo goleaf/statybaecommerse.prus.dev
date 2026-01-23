@@ -5,15 +5,12 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Models\Scopes\StatusScope;
-use App\Observers\AttributionObserver;
 use App\Support\Storage\SecureStorage;
-use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 /**
@@ -36,7 +33,6 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  *
  * @mixin \Eloquent
  */
-#[ObservedBy(AttributionObserver::class)]
 #[ScopedBy([StatusScope::class])]
 final class Document extends Model
 {
@@ -161,19 +157,6 @@ final class Document extends Model
     {
         /** @var BelongsTo<User, Document> $relation */
         $relation = $this->belongsTo(User::class, 'updated_by');
-
-        return $relation;
-    }
-
-    /**
-     * Expose a chronological audit trail so the UI and API can surface changes.
-     *
-     * @return MorphMany<AuditLog, self>
-     */
-    public function auditLogs(): MorphMany
-    {
-        /** @var MorphMany<AuditLog, self> $relation */
-        $relation = $this->morphMany(AuditLog::class, 'entity')->latest('created_at');
 
         return $relation;
     }

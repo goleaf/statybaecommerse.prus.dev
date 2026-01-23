@@ -27,15 +27,13 @@ final class CacheMaintenancePageTest extends TestCase
         $this->admin = User::factory()->admin()->create();
         $this->actingAs($this->admin);
 
-        // Ensure the monitoring stores use the in-memory cache for predictable results.
-        config()->set('observability.metrics.cache_store', 'array');
         // Force the application to use the file cache driver so forget operations survive the
         // Livewire request cycle triggered during the action call.
         config()->set('cache.default', 'file');
         Cache::store('file')->flush();
         // Seed a minimal performance snapshot so the dashboard infolist renders without touching
         // external metrics collectors during the Livewire mount cycle.
-        Cache::put('component_performance_metrics', [
+        Cache::put('component_performance', [
             'demo-component' => [
                 'total_renders' => 1,
                 'total_time'    => 10,

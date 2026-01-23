@@ -35,14 +35,6 @@ final class CartService
         $this->clearCartStorage($userId, $sessionIds);
         $this->clearSessionPayload();
         $this->forgetCachedSummary($userId, $sessionIds);
-
-        if (function_exists('debug_cart')) {
-            debug_cart('clear', [
-                'session_id'  => $sessionId,
-                'user_id'     => $userId,
-                'session_ids' => $sessionIds,
-            ]);
-        }
     }
 
     /**
@@ -490,12 +482,8 @@ final class CartService
         // Resolve the discount from the same session store we mutate elsewhere to maintain consistent state.
         $discountRaw = $this->session->get('cart_discount', 0.0);
         $discount = is_numeric($discountRaw) ? max(0.0, (float) $discountRaw) : 0.0;
-        $taxRateRaw = config('shared.tax.default_rate', 0.21);
-        $taxRate = is_numeric($taxRateRaw) ? max(0.0, (float) $taxRateRaw) : 0.21;
-        $shippingThresholdRaw = config('shared.shipping.free_threshold', 50.0);
-        $shippingThreshold = is_numeric($shippingThresholdRaw) ? max(0.0, (float) $shippingThresholdRaw) : 50.0;
-        $shippingCostRaw = config('shared.shipping.flat_rate', 5.99);
-        $shippingCost = is_numeric($shippingCostRaw) ? max(0.0, (float) $shippingCostRaw) : 5.99;
+        $taxRateRaw = config('shared.tax.default_rate', 0.0);
+        $taxRate = is_numeric($taxRateRaw) ? max(0.0, (float) $taxRateRaw) : 0.0;
 
         // Ensure downstream totals never exceed the positive subtotal after accounting for discounts.
         $effectiveSubtotal = max(0.0, $subtotal);
@@ -505,19 +493,14 @@ final class CartService
         // Calculate tax on the discounted subtotal so promotional adjustments reduce tax exposure accurately.
         $tax = $netSubtotal * $taxRate;
 
-        // Free shipping applies once the discounted subtotal reaches the configured threshold.
-        $shipping = ($count === 0 || $netSubtotal <= 0.0)
-            ? 0.0
-            : ($netSubtotal >= $shippingThreshold ? 0.0 : $shippingCost);
-
-        $total = $netSubtotal + $tax + $shipping;
+        $total = $netSubtotal + $tax;
 
         return [
             'items'    => $items,
             'count'    => $count,
             'subtotal' => round($subtotal, 2),
             'tax'      => round($tax, 2),
-            'shipping' => round($shipping, 2),
+            'shipping' => 0.0,
             'discount' => round($discount, 2),
             'total'    => round($total, 2),
         ];

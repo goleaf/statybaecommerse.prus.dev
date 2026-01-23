@@ -17,7 +17,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -88,16 +87,6 @@ final class News extends Model implements TranslatableRecord
         return $this->belongsTo(User::class, 'approved_by_id');
     }
 
-    public function approvals(): HasMany
-    {
-        return $this->hasMany(NewsApproval::class);
-    }
-
-    public function latestApproval(): HasOne
-    {
-        return $this->approvals()->one()->latestOfMany('decided_at');
-    }
-
     /**
      * Handle isPublished functionality with proper error handling.
      */
@@ -120,14 +109,6 @@ final class News extends Model implements TranslatableRecord
     public function isFeatured(): bool
     {
         return (bool) $this->is_featured;
-    }
-
-    /**
-     * Handle categories functionality with proper error handling.
-     */
-    public function categories(): BelongsToMany
-    {
-        return $this->belongsToMany(NewsCategory::class, 'news_category_pivot', 'news_id', 'news_category_id');
     }
 
     /**

@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use App\ApplicationOverride;
 use App\Exceptions\Domain\DomainException;
 use App\Providers\SecurityServiceProvider;
 use App\Services\TranslationService;
@@ -35,7 +34,7 @@ if (! env('SKIP_FILAMENT_BOOT')) {
 }
 $providers[] = SecurityServiceProvider::class;
 
-$app = ApplicationOverride::configure(basePath: dirname(__DIR__))
+$app = Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__ . '/../routes/web.php',
         api: __DIR__ . '/../routes/api.php',

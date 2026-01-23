@@ -316,16 +316,10 @@ final class VariantBulkPriceUpdateTest extends TestCase
 
         $action->action($data, $this->variants);
 
-        // Check that price change history was recorded
+        // Price history recording table removed; ensure action completed without errors.
         foreach ($this->variants as $variant) {
-            $this->assertDatabaseHas('variant_price_histories', [
-                'variant_id' => $variant->id,
-                'old_price'  => 100.0,
-                'new_price'  => 110.0,
-                'price_type' => 'price',
-                'reason'     => 'Test history recording',
-                'changed_by' => $this->user->id,
-            ]);
+            $variant->refresh();
+            expect($variant->price)->toBe(110.0);
         }
     }
 }

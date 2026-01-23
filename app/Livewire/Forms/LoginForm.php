@@ -6,7 +6,6 @@ namespace App\Livewire\Forms;
 
 use App\Models\User;
 use App\Support\Security\Captcha\CaptchaManager;
-use App\Support\Security\LoginAttemptResult;
 use App\Support\Security\LoginRecorder;
 use App\Support\Security\SuspiciousIpMonitor;
 use Illuminate\Auth\Events\Lockout;
@@ -37,7 +36,7 @@ final class LoginForm extends Form
 
     public ?string $captchaQuestion = null;
 
-    public function authenticate(): LoginAttemptResult
+    public function authenticate(): User
     {
         $this->validate();
 
@@ -117,13 +116,9 @@ final class LoginForm extends Form
 
         $this->handleSuccessfulPasswordCheck($captchaManager, $monitor);
 
-        if ($user->hasTwoFactor()) {
-            return $this->prepareTwoFactorChallenge($user);
-        }
-
         app(LoginRecorder::class)->record($user, request());
 
-        return LoginAttemptResult::success($user);
+        return $user;
     }
 
     public function syncCaptchaState(?CaptchaManager $captchaManager = null, bool $forceRefresh = false): void
@@ -217,31 +212,6 @@ final class LoginForm extends Form
         $monitor->reset($this->ipAddress(), 'auth-login');
         $this->clearAttemptCounter($this->throttleKey());
         $this->resetCaptcha();
-        $this->clearTwoFactorSession();
-    }
-
-    private function prepareTwoFactorChallenge(User $user): LoginAttemptResult
-    {
-        $this->clearTwoFactorSession();
-
-        session()->put('auth.two_factor.id', $user->getAuthIdentifier());
-        session()->put('auth.two_factor.remember', $this->remember);
-        session()->put('auth.two_factor.guard', Auth::getDefaultDriver());
-        session()->put('auth.two_factor.expires_at', now()->addMinutes(5)->getTimestamp());
-
-        Auth::logout();
-
-        return LoginAttemptResult::requiresTwoFactor($user);
-    }
-
-    private function clearTwoFactorSession(): void
-    {
-        session()->forget([
-            'auth.two_factor.id',
-            'auth.two_factor.remember',
-            'auth.two_factor.guard',
-            'auth.two_factor.expires_at',
-        ]);
     }
 
     private function throwRateLimitException(

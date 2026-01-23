@@ -4,16 +4,13 @@ declare(strict_types=1);
 
 namespace App\Services\Pricing;
 
+use App\Data\Pricing\PricingContext;
 use App\Data\Pricing\VariantPriceResult;
-use App\Models\Currency;
 use App\Models\PriceListItem;
 use App\Models\ProductVariant;
-use App\Models\VariantPriceHistory;
 use App\Models\VariantPricingRule;
 use Carbon\CarbonInterface;
-use DateTimeInterface;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 
 /**
@@ -22,160 +19,50 @@ use Illuminate\Support\Collection;
  */
 final class VariantPriceService
 {
-    /**
-     * Cache currency rates in memory for the lifetime of the service instance so repeated
-     * conversions (for example when rendering variant grids) do not perform extra queries.
-     *
-     * @var array<string, float>
-     */
-    private array $currencyRateCache = [];
-
-    public function __construct(private readonly PriceConfiguration $configuration) {}
+    public function __construct(
+        private readonly PriceConfiguration $configuration,
+        private readonly CurrencyConversionService $currencyService
+    ) {}
 
     /**
-     * Calculate the final variant price using the provided context (quantity, customer groups,
-     * and preferred currency). The result always contains a full breakdown of each adjustment.
+     * Calculate the final variant price using the provided context.
      *
      * @param array{quantity?: int, customer_group_ids?: array<int>, currency?: string, base_currency?: string, now?: CarbonInterface, record_history?: bool, history_reason?: string, history_price_type?: string, changed_by?: int|null} $context
      */
     public function calculate(ProductVariant $variant, array $context = []): VariantPriceResult
     {
-        // Normalise the evaluation timestamp so scheduled sales and time-boxed rules behave deterministically.
-        $moment = $context['now'] ?? now();
-        if (! $moment instanceof CarbonInterface) {
-            $moment = now();
-        }
+        $pricingContext = PricingContext::fromArray($context);
 
-        // Quantities drive quantity-based price list items and dynamic pricing rules; enforce sane bounds.
-        $quantity = max(1, (int) ($context['quantity'] ?? 1));
+        return $this->calculateWithContext($variant, $pricingContext);
+    }
 
-        // Hydrate customer group identifiers once so the same collection can be reused throughout the routine.
-        $groupIds = Collection::make($context['customer_group_ids'] ?? [])
-            ->filter(fn ($id) => $id !== null)
-            ->map(fn ($id) => (int) $id)
-            ->values();
+    private function calculateWithContext(ProductVariant $variant, PricingContext $context): VariantPriceResult
+    {
+        // Get base pricing signals
+        $basePrices = $this->extractBasePrices($variant);
 
-        // Resolve the storage currency (base) and the requested display currency (target).
-        $baseCurrency = strtoupper((string) ($context['base_currency'] ?? $this->resolveBaseCurrency()));
-        $targetCurrency = strtoupper((string) ($context['currency'] ?? current_currency()));
-        if ($targetCurrency === '') {
-            $targetCurrency = $baseCurrency;
-        }
-        if ($baseCurrency === '') {
-            $baseCurrency = $targetCurrency;
-        }
+        // Apply price list adjustments
+        $priceListResult = $this->applyPriceListAdjustments($variant, $context, $basePrices);
 
-        // Capture the core price signals from the variant so adjustments can refer back to the source values.
-        $regularPrice = $this->configuration->round((float) $variant->price);
-        $salePrice = null;
-        if ($variant->is_on_sale && $variant->isCurrentlyOnSale()) {
-            $promo = $variant->promotional_price !== null ? (float) $variant->promotional_price : null;
-            $salePrice = $promo !== null && $promo > 0
-                ? $this->configuration->round($promo)
-                : $this->configuration->round($regularPrice);
-        }
-        $basePrice = $salePrice ?? $regularPrice;
-        $compareAt = $variant->compare_price !== null ? $this->configuration->round((float) $variant->compare_price) : null;
-        $costPrice = $variant->cost_price !== null ? $this->configuration->round((float) $variant->cost_price) : null;
+        // Apply dynamic pricing rules
+        $dynamicResult = $this->applyDynamicPricingRules(
+            $variant,
+            $context,
+            $priceListResult['workingPrice']
+        );
 
-        // Size/variant modifiers are always applied in the storage currency, but we can optionally suppress them
-        // if a variant-specific price list item already includes the adjustment.
-        $rawVariantModifier = $this->configuration->round((float) ($variant->size_price_modifier ?? 0.0));
-        $workingPrice = $basePrice;
-
-        // Look up the most applicable price list entry for the provided customer groups and quantity.
-        $priceListItem = $this->resolvePriceListItem($variant, $groupIds, $quantity, $moment);
-        $priceListOverridesVariantModifier = false;
-        $priceListPrice = null;
-        $priceListId = null;
-
-        if ($priceListItem instanceof PriceListItem) {
-            $priceListId = (int) $priceListItem->price_list_id;
-            $priceListCurrency = strtoupper((string) optional($priceListItem->priceList->currency)->code ?: $baseCurrency);
-            $netAmount = $priceListItem->net_amount ?? $priceListItem->price ?? $priceListItem->compare_amount ?? 0.0;
-            $priceListPriceBase = $this->convertAmount((float) $netAmount, $priceListCurrency, $baseCurrency);
-            $priceListPrice = $priceListPriceBase;
-            $workingPrice = $priceListPriceBase;
-            $priceListOverridesVariantModifier = $priceListItem->variant_id !== null;
-        }
-
-        $variantModifier = $priceListOverridesVariantModifier ? 0.0 : $rawVariantModifier;
-        $workingPrice += $variantModifier;
-
-        // Evaluate dynamic pricing rules (time-based, quantity-based, and per-variant overrides).
-        $dynamicAdjustments = 0.0;
-        $appliedRuleIds = [];
-        $rules = $this->fetchVariantPricingRules($variant);
-        foreach ($rules as $rule) {
-            if ($rule->customer_group_id && $groupIds->isNotEmpty() && ! $groupIds->contains((int) $rule->customer_group_id)) {
-                continue;
-            }
-
-            $modifier = $rule->calculatePriceModifier($variant, $quantity, $moment);
-            if (abs($modifier) < 0.0001) {
-                continue;
-            }
-
-            $dynamicAdjustments += $modifier;
-            $appliedRuleIds[] = (int) $rule->getKey();
-
-            if (! $rule->is_cumulative) {
-                // Non-cumulative rules short-circuit any remaining modifiers to honour exclusivity.
-                break;
-            }
-        }
-        $workingPrice += $dynamicAdjustments;
-
-        // Clamp and round the final amount in the storage currency before converting for presentation.
-        $finalPriceBase = $this->configuration->round(max(0.0, $workingPrice));
-
-        // Convert every monetary signal into the requested display currency so analytics/reporting consumers receive
-        // consistent data regardless of the visitor's locale.
-        $convertedFinal = $this->convertAmount($finalPriceBase, $baseCurrency, $targetCurrency);
-        $convertedRegular = $this->convertAmount($regularPrice, $baseCurrency, $targetCurrency);
-        $convertedSale = $salePrice !== null ? $this->convertAmount($salePrice, $baseCurrency, $targetCurrency) : null;
-        $convertedPriceList = $priceListPrice !== null ? $this->convertAmount($priceListPrice, $baseCurrency, $targetCurrency) : null;
-        $convertedVariantModifier = $this->convertAmount($variantModifier, $baseCurrency, $targetCurrency);
-        $convertedDynamic = $this->convertAmount($dynamicAdjustments, $baseCurrency, $targetCurrency);
-        $convertedCompare = $compareAt !== null ? $this->convertAmount($compareAt, $baseCurrency, $targetCurrency) : null;
-        $convertedCost = $costPrice !== null ? $this->convertAmount($costPrice, $baseCurrency, $targetCurrency) : null;
-
-        // Optionally record a price history entry so merchandising teams can audit automated changes.
-        $historyRecorded = false;
-        if (! empty($context['record_history']) && abs($finalPriceBase - (float) $variant->price) >= 0.0001) {
-            $effectiveFrom = $moment instanceof DateTimeInterface ? $moment->toDateTime() : null;
-            VariantPriceHistory::recordPriceChange(
-                variantId: (int) $variant->getKey(),
-                oldPrice: (float) $variant->price,
-                newPrice: $finalPriceBase,
-                priceType: (string) ($context['history_price_type'] ?? 'regular'),
-                changeReason: (string) ($context['history_reason'] ?? 'automatic'),
-                changedBy: Arr::get($context, 'changed_by'),
-                effectiveFrom: $effectiveFrom,
-                effectiveUntil: null
-            );
-            $historyRecorded = true;
-        }
-
-        return new VariantPriceResult(
-            regularPrice: $convertedRegular,
-            salePrice: $convertedSale,
-            priceListPrice: $convertedPriceList,
-            variantModifiers: $convertedVariantModifier,
-            dynamicAdjustments: $convertedDynamic,
-            finalPrice: $convertedFinal,
-            currency: $targetCurrency,
-            priceListId: $priceListId,
-            appliedRuleIds: $appliedRuleIds,
-            compareAtPrice: $convertedCompare,
-            costPrice: $convertedCost,
-            historyRecorded: $historyRecorded,
+        // Finalize and convert currencies
+        return $this->finalizePrice(
+            $variant,
+            $context,
+            $basePrices,
+            $priceListResult,
+            $dynamicResult
         );
     }
 
     /**
-     * Resolve the applicable price list entry for the provided context, preferring variant-specific
-     * rows and falling back to product-level defaults when required.
+     * Resolve the applicable price list entry for the provided context.
      */
     private function resolvePriceListItem(
         ProductVariant $variant,
@@ -244,57 +131,131 @@ final class VariantPriceService
     }
 
     /**
-     * Convert amounts between currencies using the exchange rates stored in the database.
+     * Extract base pricing signals from the variant.
      */
-    private function convertAmount(float $amount, string $fromCurrency, string $toCurrency): float
+    private function extractBasePrices(ProductVariant $variant): array
     {
-        if (abs($amount) < 0.0001 || $fromCurrency === $toCurrency) {
-            return $this->configuration->round($amount);
+        $regularPrice = $this->configuration->round((float) $variant->price);
+        $salePrice = null;
+
+        if ($variant->is_on_sale && $variant->isCurrentlyOnSale()) {
+            $promo = $variant->promotional_price !== null ? (float) $variant->promotional_price : null;
+            $salePrice = $promo !== null && $promo > 0
+                ? $this->configuration->round($promo)
+                : $this->configuration->round($regularPrice);
         }
 
-        $fromRate = $this->resolveCurrencyRate($fromCurrency);
-        $toRate = $this->resolveCurrencyRate($toCurrency);
-        if ($fromRate === null || $toRate === null || $fromRate <= 0.0 || $toRate <= 0.0) {
-            return $this->configuration->round($amount);
-        }
-
-        // First normalise the amount back to the base currency before converting to the target.
-        $amountInBase = $amount / $fromRate;
-        $converted = $amountInBase * $toRate;
-
-        return $this->configuration->round($converted);
+        return [
+            'regular'          => $regularPrice,
+            'sale'             => $salePrice,
+            'base'             => $salePrice ?? $regularPrice,
+            'compare_at'       => $variant->compare_price !== null ? $this->configuration->round((float) $variant->compare_price) : null,
+            'cost'             => $variant->cost_price !== null ? $this->configuration->round((float) $variant->cost_price) : null,
+            'variant_modifier' => $this->configuration->round((float) ($variant->size_price_modifier ?? 0.0)),
+        ];
     }
 
     /**
-     * Resolve the configured base currency (defaults to the pricing configuration).
+     * Apply price list adjustments to the base price.
      */
-    private function resolveBaseCurrency(): string
+    private function applyPriceListAdjustments(ProductVariant $variant, PricingContext $context, array $basePrices): array
     {
-        $configured = $this->configuration->currency();
-        if (is_string($configured) && $configured !== '') {
-            return strtoupper($configured);
+        $priceListItem = $this->resolvePriceListItem($variant, $context->customerGroupIds, $context->quantity, $context->moment);
+        $workingPrice = $basePrices['base'];
+        $priceListPrice = null;
+        $priceListId = null;
+        $priceListOverridesVariantModifier = false;
+
+        if ($priceListItem instanceof PriceListItem) {
+            $priceListId = (int) $priceListItem->price_list_id;
+            $priceListCurrency = strtoupper((string) optional($priceListItem->priceList->currency)->code ?: $context->baseCurrency);
+            $netAmount = $priceListItem->net_amount ?? $priceListItem->price ?? $priceListItem->compare_amount ?? 0.0;
+            $priceListPriceBase = $this->currencyService->convert((float) $netAmount, $priceListCurrency, $context->baseCurrency);
+            $priceListPrice = $priceListPriceBase;
+            $workingPrice = $priceListPriceBase;
+            $priceListOverridesVariantModifier = $priceListItem->variant_id !== null;
         }
 
-        $default = Currency::query()->where('is_default', true)->value('code');
+        $variantModifier = $priceListOverridesVariantModifier ? 0.0 : $basePrices['variant_modifier'];
+        $workingPrice += $variantModifier;
 
-        return is_string($default) && $default !== '' ? strtoupper($default) : 'EUR';
+        return [
+            'workingPrice'    => $workingPrice,
+            'priceListPrice'  => $priceListPrice,
+            'priceListId'     => $priceListId,
+            'variantModifier' => $variantModifier,
+        ];
     }
 
     /**
-     * Retrieve a currency's exchange rate, caching the result in memory for the request lifecycle.
+     * Apply dynamic pricing rules to the working price.
      */
-    private function resolveCurrencyRate(string $code): ?float
+    private function applyDynamicPricingRules(ProductVariant $variant, PricingContext $context, float $workingPrice): array
     {
-        $code = strtoupper($code);
-        if (array_key_exists($code, $this->currencyRateCache)) {
-            return $this->currencyRateCache[$code];
+        $dynamicAdjustments = 0.0;
+        $appliedRuleIds = [];
+        $rules = $this->fetchVariantPricingRules($variant);
+
+        foreach ($rules as $rule) {
+            if ($rule->customer_group_id && $context->customerGroupIds->isNotEmpty() && ! $context->customerGroupIds->contains((int) $rule->customer_group_id)) {
+                continue;
+            }
+
+            $modifier = $rule->calculatePriceModifier($variant, $context->quantity, $context->moment);
+            if (abs($modifier) < 0.0001) {
+                continue;
+            }
+
+            $dynamicAdjustments += $modifier;
+            $appliedRuleIds[] = (int) $rule->getKey();
+
+            if (! $rule->is_cumulative) {
+                break;
+            }
         }
 
-        $rate = Currency::query()->where('code', $code)->value('exchange_rate');
-        if ($rate === null) {
-            return $this->currencyRateCache[$code] = null;
-        }
+        return [
+            'adjustments'       => $dynamicAdjustments,
+            'appliedRuleIds'    => $appliedRuleIds,
+            'finalWorkingPrice' => $workingPrice + $dynamicAdjustments,
+        ];
+    }
 
-        return $this->currencyRateCache[$code] = (float) $rate;
+    /**
+     * Finalize the price calculation and convert to target currency.
+     */
+    private function finalizePrice(
+        ProductVariant $variant,
+        PricingContext $context,
+        array $basePrices,
+        array $priceListResult,
+        array $dynamicResult
+    ): VariantPriceResult {
+        $finalPriceBase = $this->configuration->round(max(0.0, $dynamicResult['finalWorkingPrice']));
+
+        // Convert all monetary values to target currency
+        $convertedFinal = $this->currencyService->convert($finalPriceBase, $context->baseCurrency, $context->targetCurrency);
+        $convertedRegular = $this->currencyService->convert($basePrices['regular'], $context->baseCurrency, $context->targetCurrency);
+        $convertedSale = $basePrices['sale'] !== null ? $this->currencyService->convert($basePrices['sale'], $context->baseCurrency, $context->targetCurrency) : null;
+        $convertedPriceList = $priceListResult['priceListPrice'] !== null ? $this->currencyService->convert($priceListResult['priceListPrice'], $context->baseCurrency, $context->targetCurrency) : null;
+        $convertedVariantModifier = $this->currencyService->convert($priceListResult['variantModifier'], $context->baseCurrency, $context->targetCurrency);
+        $convertedDynamic = $this->currencyService->convert($dynamicResult['adjustments'], $context->baseCurrency, $context->targetCurrency);
+        $convertedCompare = $basePrices['compare_at'] !== null ? $this->currencyService->convert($basePrices['compare_at'], $context->baseCurrency, $context->targetCurrency) : null;
+        $convertedCost = $basePrices['cost'] !== null ? $this->currencyService->convert($basePrices['cost'], $context->baseCurrency, $context->targetCurrency) : null;
+
+        return new VariantPriceResult(
+            regularPrice: $convertedRegular,
+            salePrice: $convertedSale,
+            priceListPrice: $convertedPriceList,
+            variantModifiers: $convertedVariantModifier,
+            dynamicAdjustments: $convertedDynamic,
+            finalPrice: $convertedFinal,
+            currency: $context->targetCurrency,
+            priceListId: $priceListResult['priceListId'],
+            appliedRuleIds: $dynamicResult['appliedRuleIds'],
+            compareAtPrice: $convertedCompare,
+            costPrice: $convertedCost,
+            historyRecorded: false, // Price history recording has been removed
+        );
     }
 }

@@ -12,11 +12,14 @@ use Filament\Widgets\TableWidget as BaseWidget;
 
 final class LatestOrdersWidget extends BaseWidget
 {
-    protected static ?string $heading = 'Latest Orders';
-
     protected static ?int $sort = 3;
 
     protected int|string|array $columnSpan = 'full';
+
+    public function getHeading(): string
+    {
+        return __('admin.widgets.latest_orders');
+    }
 
     public function table(Table $table): Table
     {
@@ -33,7 +36,7 @@ final class LatestOrdersWidget extends BaseWidget
                     ->sortable()
                     ->url(fn (Order $record): string => OrderResource::getUrl('view', ['record' => $record])),
                 Tables\Columns\TextColumn::make('user.email')
-                    ->label('Customer')
+                    ->label(__('admin.orders.fields.customer'))
                     ->searchable(),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
@@ -50,7 +53,7 @@ final class LatestOrdersWidget extends BaseWidget
                     ->sortable(),
                 Tables\Columns\TextColumn::make('items_count')
                     ->counts('items')
-                    ->label('Items'),
+                    ->label(__('admin.latest_orders.items')),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable(),

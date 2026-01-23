@@ -6,9 +6,6 @@ namespace App\Models;
 
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
-use App\Observers\AttributionObserver;
-use App\Observers\UserAttributionObserver;
-use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -30,9 +27,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  *
  * @mixin \Eloquent
  */
-#[ObservedBy([AttributionObserver::class])]
 #[ScopedBy([ActiveScope::class, EnabledScope::class])]
-#[ObservedBy([UserAttributionObserver::class])]
 final class FeatureFlag extends Model
 {
     use HasFactory;

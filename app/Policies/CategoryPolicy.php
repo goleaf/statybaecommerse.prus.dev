@@ -7,42 +7,41 @@ namespace App\Policies;
 use App\Models\AdminUser;
 use App\Models\Category;
 use App\Models\User;
-use App\Support\Authorization\AuthorizationMatrix;
 
 final class CategoryPolicy
 {
     public function viewAny(AdminUser|User $user): bool
     {
-        return AuthorizationMatrix::check('categories', 'viewAny', $user);
+        return $user instanceof AdminUser;
     }
 
     public function view(AdminUser|User $user, Category $category): bool
     {
-        return AuthorizationMatrix::check('categories', 'view', $user);
+        return $user instanceof AdminUser;
     }
 
     public function create(AdminUser|User $user): bool
     {
-        return AuthorizationMatrix::check('categories', 'create', $user);
+        return $user instanceof AdminUser;
     }
 
     public function update(AdminUser|User $user, Category $category): bool
     {
-        return AuthorizationMatrix::check('categories', 'update', $user);
+        return $user instanceof AdminUser;
     }
 
     public function delete(AdminUser|User $user, Category $category): bool
     {
-        return AuthorizationMatrix::check('categories', 'delete', $user);
+        return $user instanceof AdminUser;
     }
 
     public function restore(AdminUser|User $user, Category $category): bool
     {
-        return AuthorizationMatrix::check('categories', 'update', $user);
+        return $user instanceof AdminUser;
     }
 
     public function forceDelete(AdminUser|User $user, Category $category): bool
     {
-        return AuthorizationMatrix::check('categories', 'delete', $user);
+        return $user instanceof AdminUser;
     }
 }

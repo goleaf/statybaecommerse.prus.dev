@@ -16,6 +16,5 @@
     "command": "php artisan test --filter=LocalizationTest --filter=FilamentTranslationTest",
     "workingDirectory": "."
   },
-  "workspaceFolderName": "laravel",
   "shortName": "translation-test-runner"
 }

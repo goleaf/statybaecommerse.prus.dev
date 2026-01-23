@@ -7,32 +7,41 @@ namespace App\Policies;
 use App\Models\AdminUser;
 use App\Models\SystemSetting;
 use App\Models\User;
-use App\Support\Authorization\AuthorizationMatrix;
 
 final class SystemSettingPolicy
 {
-    public function viewAny(User|AdminUser $user): bool
+    public function viewAny(AdminUser|User $user): bool
     {
-        return AuthorizationMatrix::check('system_settings', 'viewAny', $user);
+        return $user instanceof AdminUser;
     }
 
-    public function view(User|AdminUser $user, SystemSetting $setting): bool
+    public function view(AdminUser|User $user, SystemSetting $systemSetting): bool
     {
-        return AuthorizationMatrix::check('system_settings', 'view', $user);
+        return $user instanceof AdminUser;
     }
 
-    public function create(User|AdminUser $user): bool
+    public function create(AdminUser|User $user): bool
     {
-        return AuthorizationMatrix::check('system_settings', 'create', $user);
+        return $user instanceof AdminUser;
     }
 
-    public function update(User|AdminUser $user, SystemSetting $setting): bool
+    public function update(AdminUser|User $user, SystemSetting $systemSetting): bool
     {
-        return AuthorizationMatrix::check('system_settings', 'update', $user);
+        return $user instanceof AdminUser;
     }
 
-    public function delete(User|AdminUser $user, SystemSetting $setting): bool
+    public function delete(AdminUser|User $user, SystemSetting $systemSetting): bool
     {
-        return AuthorizationMatrix::check('system_settings', 'delete', $user);
+        return $user instanceof AdminUser;
+    }
+
+    public function restore(AdminUser|User $user, SystemSetting $systemSetting): bool
+    {
+        return $user instanceof AdminUser;
+    }
+
+    public function forceDelete(AdminUser|User $user, SystemSetting $systemSetting): bool
+    {
+        return $user instanceof AdminUser;
     }
 }

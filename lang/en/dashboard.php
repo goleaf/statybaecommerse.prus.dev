@@ -24,5 +24,4 @@ return [
     'product_views'          => 'Product Views',
     'recent_activity'        => 'Recent Activity',
     'system_health'          => 'System Health',
-    'performance_metrics'    => 'Performance Metrics',
 ];

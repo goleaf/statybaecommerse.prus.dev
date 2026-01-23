@@ -37,7 +37,6 @@ final class DashboardPageTest extends TestCase
             \App\Filament\Widgets\DashboardTimeSeriesWidget::class,
             \App\Filament\Widgets\DashboardRecentOrdersTable::class,
             \App\Filament\Widgets\DashboardLowStockTable::class,
-            \App\Filament\Widgets\DashboardRecentErrorsTable::class,
             \App\Filament\Widgets\DashboardQuickActionsWidget::class,
         ];
 

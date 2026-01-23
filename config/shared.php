@@ -87,14 +87,7 @@ return [
 
     'tax' => [
         // Default VAT rate applied when regional overrides are not present.
-        'default_rate' => 0.21,
-    ],
-
-    'shipping' => [
-        // Orders at or above this subtotal qualify for free delivery.
-        'free_threshold' => 50.0,
-        // Flat-rate fallback applied below the free shipping threshold.
-        'flat_rate' => 5.99,
+        'default_rate' => 0.0,
     ],
 
     'validation' => [

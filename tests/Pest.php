@@ -6,8 +6,6 @@ use Filament\Facades\Filament;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Route;
 use PHPUnit\Framework\Assert;
-use Spatie\Permission\Models\Role;
-use Spatie\Permission\PermissionRegistrar;
 use Tests\Support\TestingDatabase;
 
 // Centralise dataset registrations so Pest automatically discovers shared model datasets.

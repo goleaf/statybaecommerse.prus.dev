@@ -607,63 +607,63 @@
     @if ($isIndex)
         @if ($sidebarOpen)
             <div class="fixed inset-0 z-40 lg:hidden">
-                <div class="absolute inset-0 bg-slate-900/60 bm"
-                     wire:click="$toggle('sidebarOpen')"
-                     wire:confirm="{{ __('t/div>
+                <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+                     wire:click="$toggle('sidebarOpen')"></div>
 
                 <div class="absolute inset-y-0 right-0 w-11/12 max-w-md rounded-l-3xl bg-dark shadow-2xl">
                     <div class="flex h-full flex-col overflow-y-auto">
-                        <div class30 p-6">
+                        <div class="flex items-center justify-between border-b border-sage/30 p-6">
                             <div class="space-y-2">
-                               
-                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 2rue">
-                                        <path stroke-linecap="round" str6V4z" />
+                                <span class="inline-flex items-center gap-2 rounded-full border border-sage/30 bg-sage/10 px-3 py-1 text-xs font-semibold text-sage">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                                     </svg>
-                            
-                          
-                                <h2 class) }}</h2>
+                                    {{ __('categories_index_filters_button') }}
+                                </span>
+                                <h2 class="text-xl font-semibold text-white">{{ __('categories_index_filters_title') }}</h2>
                                 <p class="text-sm leading-relaxed text-sage/80">
-                                    {{ __('categories_in}}
+                                    {{ __('categories_index_filters_description') }}
                                 </p>
                             </div>
                             <button type="button"
-                              "
-                             "
-                      
-                                    aria-label="{{ __('categories_">
-                         >
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 182" />
+                                    class="rounded-full border border-sage/30 p-2 text-sage transition hover:border-sage hover:bg-sage/10"
+                                    wire:click="$toggle('sidebarOpen')"
+                                    aria-label="{{ __('categories_index_close') }}">
+                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                 </svg>
                             </button>
-                      
-                        <div class="flex-1 space-y-6 overflow-y-aut>
-                            @le'])
+                        </div>
+                        <div class="flex-1 space-y-6 overflow-y-auto p-6">
+                            @livewire('category.filters', [
+                                'isIndex' => $isIndex,
+                                'category' => $category ?? null,
+                            ])
                         </div>
                         <div class="border-t border-sage/30 p-6">
-                            <x
-                          utton"
+                            <x-shared.button
+                                type="button"
                                 variant="primary"
-                      sm"
+                                size="sm"
                                 class="w-full"
-                                wire:clic
-                            >
+                                wire:click="$toggle('sidebarOpen')">
                                 {{ __('categories_index_apply_filters') }}
                             </x-shared.button>
                         </div>
-                    </>
+                    </div>
                 </div>
-            </
+            </div>
         @endif
     @else
-        <div x-cloak x-show="showF
-            <div @"></div>
-            <div class="ab
-                <div class="flex h-full flex-col overf">
-                    <div class="flex items-center justify-between border-b bor>
+        <div x-cloak x-show="showFilters" class="fixed inset-0 z-40 lg:hidden">
+            <div @click="showFilters = false" class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
+            <div class="absolute inset-y-0 right-0 w-11/12 max-w-md rounded-l-3xl bg-dark shadow-2xl">
+                <div class="flex h-full flex-col overflow-y-auto">
+                    <div class="flex items-center justify-between border-b border-sage/30 p-6">
                         <div class="space-y-2">
-                            <span class="inline-flex items-center gap-2 rounded-full bordee">
-">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" />
+                            <span class="inline-flex items-center gap-2 rounded-full border border-sage/30 bg-sage/10 px-3 py-1 text-xs font-semibold text-sage">
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                                 </svg>
                                 {{ __('categories_show_filter') }}
                             </span>
@@ -672,33 +672,43 @@
                                 {{ __('categories_show_adjust_filters') }}
                             </p>
                         </div>
-                        <button type="b
-                                class="rounded-full border border-sage/30 p-2 text-sage transition hover:border-sage hover:bgge/10"
+                        <button type="button"
+                                class="rounded-full border border-sage/30 p-2 text-sage transition hover:border-sage hover:bg-sage/10"
                                 @click="showFilters = false"
-                                aria-label="{{ __('categories_index_close') }}"
-                            <svg cla 24 24">
-                                <p
+                                aria-label="{{ __('categories_index_close') }}">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                             </svg>
                         </button>
                     </div>
                     <div class="flex-1 space-y-6 overflow-y-auto p-6">
-                        <div class="rounded-2xl border border-sage/30 bg-dark/50 p-4
+                        <div class="rounded-2xl border border-sage/30 bg-dark/50 p-4">
                             <h4 class="mb-3 text-sm font-semibold text-sage flex items-center gap-2">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <p
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
                                 </svg>
-                              itle') }}
+                                {{ __('categories_index_meta_title') }}
                             </h4>
                             <div class="space-y-1">
-                              
+                                <x-category.tree :nodes="$categoryTree" />
                             </div>
                         </div>
-                        @livewire('componentst')
+                        <div class="rounded-2xl border border-sage/30 bg-dark/50 p-4">
+                            <h4 class="mb-3 text-sm font-semibold text-sage flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707l-6.414 6.414A1 1 0 0014 13v6l-4-2v-4a1 1 0 00-.293-.707L3.293 6.707A1 1 0 013 6V4z"></path>
+                                </svg>
+                                {{ __('categories_show_advanced_filters') }}
+                            </h4>
+                            <div>
+                                @livewire('components.product-filter-widget')
+                            </div>
+                        </div>
                     </div>
-                    <div class="border-t >
+                    <div class="border-t border-sage/30 p-6">
                         <button type="button"
                                 @click="showFilters = false"
-                             ">
+                                class="inline-flex w-full items-center justify-center rounded-full border border-sage/30 bg-sage/10 px-4 py-2 text-sm font-semibold text-sage transition hover:border-sage hover:bg-sage/20">
                             {{ __('categories_show_apply_filters') }}
                         </button>
                     </div>

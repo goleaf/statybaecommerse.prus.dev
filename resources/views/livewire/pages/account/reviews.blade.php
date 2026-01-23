@@ -1,3 +1,4 @@
+{{-- Reviews Component --}}
 <div class="space-y-10">
     <x-breadcrumbs :items="[["label"=> __("My account"), "url" => route('account.index')], ["label" => __("My
         reviews")]]" />

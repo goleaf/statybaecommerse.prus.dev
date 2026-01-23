@@ -17,11 +17,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
 
-// Admin language switching
-Route::post('/admin/language/switch', [App\Http\Controllers\Admin\LanguageController::class, 'switch'])
-    ->name('admin.language.switch')
-    ->middleware('auth');
-
 // Admin impersonation routes
 Route::middleware('auth')->group(function (): void {
     Route::get('/admin/variant-combinations', ListVariantCombinations::class)
@@ -440,15 +435,6 @@ Route::middleware('auth')->group(function (): void {
         return redirect('/admin/customers');
     })->name('filament.admin.resources.customers.destroy');
     // User impersonation route is handled by Filament automatically
-    Route::get('/admin/observability', function () use ($placeholder) {
-        $user = auth()->user();
-        $isAdmin = ($user?->is_admin ?? false) || ($user?->hasAnyRole(['admin', 'Admin']) ?? false);
-        if (! $isAdmin) {
-            abort(403);
-        }
-
-        return $placeholder('Observability')();
-    })->name('filament.admin.pages.observability');
 
     // Discount Preset management routes handled by the controller implementation.
     Route::get('/admin/discounts/presets', [DiscountPresetController::class, 'index'])

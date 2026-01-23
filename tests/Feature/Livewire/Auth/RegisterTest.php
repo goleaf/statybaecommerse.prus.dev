@@ -4,9 +4,17 @@ declare(strict_types=1);
 
 use App\Livewire\Auth\Register;
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Livewire\Livewire;
+
+uses(RefreshDatabase::class);
+
+beforeEach(function (): void {
+    Tests\Support\TestingDatabase::migrate();
+    Tests\Support\TestingDatabase::ensureUserTestingColumns();
+});
 
 it('registers a new account and authenticates the user', function (): void {
     // Arrange: ensure we operate within a predictable locale for the preferred locale assertion.
@@ -22,7 +30,8 @@ it('registers a new account and authenticates the user', function (): void {
         ->call('register');
 
     // Assert: confirm the component emitted no validation errors during registration.
-    $component->assertHasNoErrors();
+    $component->assertHasNoErrors()
+        ->assertRedirect(route('account.index', absolute: false));
 
     // Assert: verify the user was created with a securely hashed password and correct locale.
     $user = User::where('email', 'jane@example.com')->first();
@@ -118,6 +127,7 @@ it('validates individual fields during real-time input updates', function (): vo
 
     // Provide a compliant password so the confirmation rule can run without conflicting errors.
     $component->set('registrationForm.password', 'Password123!')
+        ->set('registrationForm.password_confirmation', 'Password123!')
         ->assertHasNoErrors(['registrationForm.password']);
 
     // Act & Assert: make sure the confirmation field must be populated even during live validation cycles.

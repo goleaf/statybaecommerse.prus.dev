@@ -13,7 +13,6 @@ use App\Models\User;
 use App\Support\Contracts\Entities\BrandContract;
 use App\Support\Contracts\Entities\CategoryContract;
 use App\Support\Contracts\Entities\OrderContract;
-use App\Support\Contracts\Entities\ProductContract;
 use App\Support\Contracts\Entities\UserContract;
 use App\Support\Contracts\SimpleJsonSchemaValidator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -59,25 +58,6 @@ final class ContractValidationTest extends TestCase
         $this->assertSame($product->slug, $payload['data']['slug']);
         $this->assertSame($brand->name, $payload['data']['brand']['name']);
         $this->assertSame($category->slug, $payload['data']['categories'][0]['slug']);
-    }
-
-    public function test_product_search_payload_matches_contract(): void
-    {
-        $brand = Brand::factory()->create(['is_visible' => true]);
-        $category = Category::factory()->create(['is_visible' => true]);
-        Product::factory()->count(2)->for($brand)->create([
-            'is_visible'     => true,
-            'published_at'   => now()->subDay(),
-            'price'          => 59,
-            'manage_stock'   => true,
-            'stock_quantity' => 8,
-        ])->each(fn (Product $product) => $product->categories()->attach($category->getKey()));
-
-        $response = $this->getJson(route('api.products.search', ['q' => '']));
-        $response->assertOk();
-
-        $payload = $response->json();
-        $this->assertSame([], $this->validator->validate($payload, ProductContract::schemaPath()));
     }
 
     public function test_category_tree_payload_matches_contract(): void

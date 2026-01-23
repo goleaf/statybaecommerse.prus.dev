@@ -9,7 +9,6 @@ use App\Models\AnalyticsEvent;
 use App\Models\Attribute;
 use App\Models\Brand;
 use App\Models\Campaign;
-use App\Models\CampaignClick;
 use App\Models\CampaignView;
 use App\Models\CartItem;
 use App\Models\Category;
@@ -108,7 +107,6 @@ class UltimateStatsWidget extends BaseWidget
         $totalCampaigns = 0; // Campaign::count();
         $activeCampaigns = 0; // Campaign::where('status', 'active')->count();
         $totalCampaignViews = 0; // CampaignView::sum('views_count');
-        $totalCampaignClicks = 0; // CampaignClick::sum('clicks_count');
         $totalConversions = 0; // Removed CampaignConversion
 
         // === DISCOUNTS & COUPONS ===
@@ -230,10 +228,6 @@ class UltimateStatsWidget extends BaseWidget
                 ->description(__('translations.total_impressions'))
                 ->descriptionIcon('heroicon-m-eye')
                 ->color('info'),
-            Stat::make(__('translations.campaign_clicks'), \Illuminate\Support\Number::format($totalCampaignClicks))
-                ->description(__('translations.total_clicks'))
-                ->descriptionIcon('heroicon-m-cursor-arrow-rays')
-                ->color('success'),
             Stat::make(__('translations.conversions'), \Illuminate\Support\Number::format($totalConversions))
                 ->description(__('translations.total_conversions'))
                 ->descriptionIcon('heroicon-m-check-circle')

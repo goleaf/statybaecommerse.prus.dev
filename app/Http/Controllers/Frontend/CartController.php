@@ -427,7 +427,7 @@ final class CartController extends Controller
             subtotal: $summary['subtotal'],
             discount: $summary['discount'],
             shipping: $summary['shipping'],
-            vatRate: config('shared.tax.default_rate', 0.21)
+            vatRate: config('shared.tax.default_rate', 0.0)
         );
 
         return [

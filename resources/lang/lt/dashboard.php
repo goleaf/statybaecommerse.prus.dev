@@ -24,5 +24,4 @@ return [
     'product_views'          => 'Produktų peržiūros',
     'recent_activity'        => 'Naujausia veikla',
     'system_health'          => 'Sistemos būsena',
-    'performance_metrics'    => 'Veiklos rodikliai',
 ];

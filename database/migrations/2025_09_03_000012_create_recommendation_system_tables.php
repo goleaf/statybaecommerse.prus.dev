@@ -107,27 +107,6 @@ return new class extends Migration
             });
         }
 
-        // Cached recommendations
-        if (! Schema::hasTable('recommendation_cache')) {
-            Schema::create('recommendation_cache', function (Blueprint $table) {
-                $table->id();
-                $table->string('cache_key')->unique();
-                $table->foreignId('block_id')->nullable()->constrained('recommendation_blocks')->onDelete('cascade');
-                $table->foreignId('user_id')->nullable()->constrained()->onDelete('cascade');
-                $table->foreignId('product_id')->nullable()->constrained()->onDelete('cascade');
-                $table->string('context_type')->nullable();  // page_type, category, etc.
-                $table->json('context_data')->nullable();  // Additional context
-                $table->json('recommendations');  // Cached recommendation data
-                $table->integer('hit_count')->default(0);
-                $table->timestamp('expires_at');
-                $table->timestamps();
-
-                $table->index(['block_id', 'user_id', 'product_id']);
-                $table->index(['expires_at']);
-                $table->index(['hit_count']);
-            });
-        }
-
         // Product feature vectors for content-based recommendations
         if (! Schema::hasTable('product_features')) {
             Schema::create('product_features', function (Blueprint $table) {
@@ -172,7 +151,6 @@ return new class extends Migration
     {
         Schema::dropIfExists('user_product_interactions');
         Schema::dropIfExists('product_features');
-        Schema::dropIfExists('recommendation_cache');
         Schema::dropIfExists('recommendation_blocks');
         Schema::dropIfExists('recommendation_configs');
         Schema::dropIfExists('user_preferences');

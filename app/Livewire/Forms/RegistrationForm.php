@@ -7,7 +7,6 @@ namespace App\Livewire\Forms;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
@@ -103,8 +102,7 @@ final class RegistrationForm extends Form
         // Remove the confirmation value because it should never be stored directly.
         unset($validated['password_confirmation']);
 
-        // Hash the password to protect user credentials at rest before insertion.
-        $validated['password'] = Hash::make($validated['password']);
+        // Let the User model handle password hashing to avoid double hashing.
         $validated['preferred_locale'] = app()->getLocale();
 
         // Create the user record and trigger downstream events (email verification, etc.).

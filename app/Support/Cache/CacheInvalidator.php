@@ -7,7 +7,6 @@ namespace App\Support\Cache;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductVariant;
-use App\Observers\Concerns\ResolvesSupportedLocales;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\QueryException;
@@ -17,8 +16,6 @@ use Throwable;
 
 final class CacheInvalidator
 {
-    use ResolvesSupportedLocales;
-
     public function productChanged(Product $product): void
     {
         $categoryIds = $this->resolveCategoryIds($product);
@@ -257,5 +254,21 @@ final class CacheInvalidator
         }
 
         Cache::forget(CacheKeys::categoryNavigationTree());
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function supportedLocales(): array
+    {
+        $configured = config('app.supported_locales', 'en');
+        $locales = is_string($configured) ? explode(',', (string) $configured) : $configured;
+
+        return collect($locales)
+            ->map(static fn ($locale) => trim((string) $locale))
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
     }
 }

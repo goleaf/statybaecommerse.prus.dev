@@ -1724,7 +1724,6 @@ return [
     'popularity_score'            => 'Populiarumo balas',
     'trend_direction'             => 'Tendencijos kryptis',
     'search_frequency'            => 'Paieškos dažnis',
-    'performance_metrics'         => 'Veiklos rodikliai',
     'response_time'               => 'Atsakymo laikas',
     'cache_hit_rate'              => 'Talpyklos pataikymo rodiklis',
     'error_rate'                  => 'Klaidų rodiklis',

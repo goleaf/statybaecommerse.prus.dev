@@ -14,9 +14,7 @@ use App\Models\ProductVariant;
 use App\Models\VariantAnalytics;
 use App\Models\VariantAttributeValue;
 use App\Models\VariantInventory;
-use App\Models\VariantPriceHistory;
 use App\Models\VariantPricingRule;
-use App\Models\VariantStockHistory;
 use App\Services\ProductVariantAttributeMatrixService;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Seeder;
@@ -402,42 +400,19 @@ final class EnhancedProductVariantSeeder extends Seeder
     }
 
     /**
-     * Store historical pricing adjustments for analytical regression tests.
+     * Price history functionality has been removed.
      */
     private function seedPriceHistories(EloquentCollection $variants): void
     {
-        foreach ($variants as $variant) {
-            VariantPriceHistory::factory()
-                ->for($variant, 'variant')
-                ->state([
-                    'old_price'     => max(1, $variant->price - 5),
-                    'new_price'     => $variant->price,
-                    'price_type'    => 'regular',
-                    'reason'        => 'manual',
-                    'change_reason' => 'manual',
-                ])
-                ->create();
-        }
+        // Price history functionality removed
     }
 
     /**
-     * Capture stock history transitions for each variant.
+     * Stock history functionality has been removed.
      */
     private function seedStockHistories(EloquentCollection $variants): void
     {
-        foreach ($variants as $variant) {
-            VariantStockHistory::factory()
-                ->for($variant, 'variant')
-                ->increase()
-                ->state([
-                    'old_quantity'   => max(0, $variant->stock_quantity - 5),
-                    'new_quantity'   => $variant->stock_quantity,
-                    'change_reason'  => 'restock',
-                    'reference_type' => 'order',
-                    'reference_id'   => 1,
-                ])
-                ->create();
-        }
+        // Stock history functionality removed
     }
 
     /**

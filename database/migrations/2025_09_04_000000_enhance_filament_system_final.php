@@ -161,10 +161,6 @@ return new class extends Migration
             });
         }
 
-        // Create performance metrics table
-        // The final performance_metrics schema is defined in a later migration
-        // to keep the table definition consistent across fresh installs.
-
         // Create user preferences table
         if (! Schema::hasTable('user_preferences')) {
             Schema::create('user_preferences', function (Blueprint $table) {
@@ -203,7 +199,6 @@ return new class extends Migration
         // Drop tables in reverse order
         Schema::dropIfExists('search_logs');
         Schema::dropIfExists('user_preferences');
-        Schema::dropIfExists('performance_metrics');
         Schema::dropIfExists('system_logs');
         Schema::dropIfExists('system_notifications');
         Schema::dropIfExists('product_analytics');

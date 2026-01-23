@@ -29,7 +29,6 @@ class AdminUserResource extends JsonResource
             'avatar_url'                => $this->resource->avatar_url,
             'is_email_verified'         => $this->resource->isEmailVerified(),
             'is_phone_verified'         => $this->resource->isPhoneVerified(),
-            'has_two_factor'            => $this->resource->hasTwoFactor(),
             'is_on_trial'               => $this->resource->isOnTrial(),
             'has_active_subscription'   => $this->resource->hasActiveSubscription(),
             'subscription_status_color' => $this->resource->subscription_status_color,

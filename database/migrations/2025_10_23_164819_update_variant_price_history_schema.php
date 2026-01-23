@@ -3,8 +3,6 @@
 declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -14,25 +12,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (Schema::hasTable('variant_price_history') && ! Schema::hasTable('variant_price_histories')) {
-            Schema::rename('variant_price_history', 'variant_price_histories');
-        }
+        // Deprecated: variant price history schema migration is a no-op.
+        // Variant history tables are removed and their schema changes are managed
+        // by the centralized cleanup migration (see 2026_01_22_000002_cleanup_unused_models.php).
 
-        if (! Schema::hasTable('variant_price_histories')) {
-            return;
-        }
-
-        if (! Schema::hasColumn('variant_price_histories', 'reason')) {
-            Schema::table('variant_price_histories', function (Blueprint $table): void {
-                $table->string('reason')->nullable();
-            });
-
-            if (Schema::hasColumn('variant_price_histories', 'change_reason')) {
-                DB::table('variant_price_histories')
-                    ->whereNull('reason')
-                    ->update(['reason' => DB::raw('change_reason')]);
-            }
-        }
     }
 
     /**
@@ -40,24 +23,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        if (! Schema::hasTable('variant_price_histories')) {
-            return;
-        }
+        // No-op: this migration was deprecated when variant history tables were removed.
 
-        if (! Schema::hasColumn('variant_price_histories', 'change_reason')) {
-            Schema::table('variant_price_histories', function (Blueprint $table): void {
-                $table->string('change_reason')->nullable();
-            });
-        }
-
-        if (Schema::hasColumn('variant_price_histories', 'reason')) {
-            DB::table('variant_price_histories')
-                ->whereNull('change_reason')
-                ->update(['change_reason' => DB::raw('reason')]);
-        }
-
-        if (Schema::hasTable('variant_price_histories') && ! Schema::hasTable('variant_price_history')) {
-            Schema::rename('variant_price_histories', 'variant_price_history');
-        }
     }
 };

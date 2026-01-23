@@ -12,27 +12,16 @@ use App\Database\Connectors\GracefulSQLiteConnector;
 use App\Domain\Product\Repositories\ProductRepositoryInterface;
 use App\Filament\Components\LiveNotificationFeed;
 use App\Infrastructure\Product\Repositories\EloquentProductRepository;
-use App\Models\DiscountCode;
-use App\Models\DiscountRedemption;
-use App\Models\Document;
-use App\Models\EmailCampaign;
-use App\Models\FeatureFlag;
-use App\Models\SystemSetting;
-use App\Models\User;
-use App\Observers\UserAttributionObserver;
 use App\Services\CacheInvalidationService;
 use App\Services\CurrencyRateSyncService;
 use App\Services\DocumentService;
 use App\Services\StaticCurrencyRateProvider;
 use App\Support\Cache\RateLimiter as ExtendedRateLimiter;
 use App\Support\Filament\SearchableComponentHelper;
-use App\Support\Filesystem\GracefulFilesystem;
 use App\Support\Health\HealthReporter;
 use App\Support\Html\HtmlSanitizer;
 use App\Support\Livewire\Hooks\PropagateValidationExceptionHook;
 use App\Support\Storage\SecureStorage;
-use App\Support\Tracing\Trace;
-use App\Support\Tracing\TraceContext;
 use App\Support\Uploads\SecureUploadHandler;
 use Closure;
 use DateInterval;
@@ -59,17 +48,12 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response as HttpResponse;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Queue\Events\JobExceptionOccurred;
-use Illuminate\Queue\Events\JobFailed;
-use Illuminate\Queue\Events\JobProcessed;
-use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\LazyCollection;
@@ -87,9 +71,6 @@ use Livewire\Features\SupportTesting\Testable;
 use Livewire\Livewire;
 
 use function Livewire\store;
-
-use Spatie\Permission\Models\Role;
-
 use function str_contains;
 
 use Throwable;
@@ -110,9 +91,8 @@ class AppServiceProvider extends ServiceProvider
         // Share a single sanitizer instance so every consumer reuses the same allow-list configuration.
         $this->app->singleton(HtmlSanitizer::class, static fn (): HtmlSanitizer => new HtmlSanitizer);
 
-        // Replace the default filesystem binding with the graceful shim for deterministic backup tests.
-        $this->app->singleton(Filesystem::class, static fn (): Filesystem => new GracefulFilesystem);
-        $this->app->alias(Filesystem::class, 'files');
+        // Register enhanced filesystem services
+        $this->app->register(\App\Support\Filesystem\FilesystemServiceProvider::class);
 
         // Ensure SQLite connections eagerly prepare database files for test reliability.
         $this->app->bind('db.connector.sqlite', static fn (): GracefulSQLiteConnector => new GracefulSQLiteConnector);
@@ -128,12 +108,17 @@ class AppServiceProvider extends ServiceProvider
 
         if ($this->app->runningInConsole()) {
             // Register import utilities and override the core db:seed command with a profiled variant.
-            $this->commands([
+            $commands = [
                 \App\Console\Commands\ImportProducts::class,
                 \App\Console\Commands\ImportPrices::class,
                 \App\Console\Commands\ImportInventory::class,
                 ProfiledSeedCommand::class,
-            ]);
+            ];
+
+            $this->commands(array_values(array_filter(
+                $commands,
+                static fn (string $command): bool => class_exists($command)
+            )));
 
             $this->app->extend('command.db.seed', function ($command, $app): \App\Console\Commands\ProfiledSeedCommand {
                 /** @var Dispatcher|null $dispatcher */
@@ -186,25 +171,9 @@ class AppServiceProvider extends ServiceProvider
             // still allowing individual tests to override the configuration explicitly.
             config()->set('filament.testing.autodiscover_resources', config('filament.testing.autodiscover_resources', true));
             config()->set('filament.testing.resources', config('filament.testing.resources', []));
-
-            User::created(static function (User $user): void {
-                // Auto-grant the super admin role in tests so dashboard routes remain accessible
-                // without having to seed the entire permission matrix.
-                $role = Role::firstOrCreate(
-                    ['name' => 'super_admin', 'guard_name' => 'web'],
-                    ['name' => 'super_admin', 'guard_name' => 'web']
-                );
-
-                $user->syncRoles([$role]);
-            });
         }
 
-        $this->registerModelObservers();
-        $this->registerQueueMonitoring();
-
         $this->registerCollectionTimeoutMacros();
-
-        $this->registerQueueTracing();
 
         $this->registerSearchableInputMacros();
 
@@ -663,77 +632,6 @@ class AppServiceProvider extends ServiceProvider
         }
     }
 
-    private function registerQueueMonitoring(): void
-    {
-        Queue::createPayloadUsing(function ($connection, $queue, array $payload): array {
-            $context = Trace::current();
-
-            return [
-                'trace' => [
-                    'trace_id'       => $context->traceId(),
-                    'parent_span_id' => $context->spanId(),
-                    'correlation_id' => $context->correlationId(),
-                    'trace_flags'    => $context->traceFlags(),
-                ],
-            ];
-        });
-
-        Queue::before(function (JobProcessing $event): void {
-            $payload = $event->job->payload();
-            $trace = $payload['trace'] ?? null;
-
-            if (is_array($trace)) {
-                Trace::store(TraceContext::generate(
-                    traceId: (string) ($trace['trace_id'] ?? ''),
-                    parentSpanId: (string) ($trace['parent_span_id'] ?? ''),
-                    correlationId: (string) ($trace['correlation_id'] ?? ''),
-                    traceFlags: (string) ($trace['trace_flags'] ?? TraceContext::DEFAULT_TRACE_FLAGS),
-                ));
-            } else {
-                Trace::store(TraceContext::generate());
-            }
-        });
-
-        $cleanup = static function (): void {
-            Trace::forget();
-        };
-
-        Queue::after(function (JobProcessed $event) use ($cleanup): void {
-            $cleanup();
-        });
-
-        Queue::exceptionOccurred(function (JobExceptionOccurred $event) use ($cleanup): void {
-            $cleanup();
-        });
-
-        Queue::failing(function (JobFailed $event) use ($cleanup): void {
-            $cleanup();
-        });
-    }
-
-    private function registerQueueTracing(): void
-    {
-        if (! method_exists(Queue::class, 'macro')) {
-            return;
-        }
-
-        if (method_exists(Queue::class, 'hasMacro') && Queue::hasMacro('withTraceContext')) {
-            return;
-        }
-
-        // Provide a lightweight macro so queued jobs can opt into propagating the current trace context.
-        try {
-            Queue::macro('withTraceContext', function (?TraceContext $context = null): static {
-                /** @var \Illuminate\Queue\QueueManager $this */
-                Trace::store($context ?? Trace::childFromCurrent());
-
-                return $this;
-            });
-        } catch (Throwable) {
-            // Silently ignore macro registration failures to keep queue dispatching resilient in limited environments.
-        }
-    }
-
     /**
      * Register collection macros that honour execution timeouts across eager and lazy enumerables.
      */
@@ -788,18 +686,6 @@ class AppServiceProvider extends ServiceProvider
                 });
             });
         }
-    }
-
-    private function registerModelObservers(): void
-    {
-        $observer = UserAttributionObserver::class;
-
-        DiscountCode::observe($observer);
-        DiscountRedemption::observe($observer);
-        Document::observe($observer);
-        EmailCampaign::observe($observer);
-        FeatureFlag::observe($observer);
-        SystemSetting::observe($observer);
     }
 
     private function configureDocumentVariables(): void

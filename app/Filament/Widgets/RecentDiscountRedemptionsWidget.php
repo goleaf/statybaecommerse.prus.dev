@@ -12,13 +12,16 @@ use Filament\Widgets\TableWidget as BaseWidget;
 
 class RecentDiscountRedemptionsWidget extends BaseWidget
 {
-    protected static ?string $heading = 'Recent Redemptions';
-
     protected static ?int $sort = 3;
 
     protected int|string|array $columnSpan = 'full';
 
     protected ?string $pollingInterval = '30s';
+
+    public function getHeading(): string
+    {
+        return __('admin.widgets.recent_redemptions');
+    }
 
     public function table(Table $table): Table
     {
@@ -32,19 +35,19 @@ class RecentDiscountRedemptionsWidget extends BaseWidget
             )
             ->columns([
                 Tables\Columns\TextColumn::make('discount.name')
-                    ->label('Discount')
+                    ->label(__('discount_redemptions.fields.discount'))
                     ->weight(FontWeight::Bold)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('code.code')
-                    ->label('Code')
+                    ->label(__('discount_redemptions.fields.code'))
                     ->badge()
                     ->color('info')
                     ->copyable(),
                 Tables\Columns\TextColumn::make('user.name')
-                    ->label('User')
+                    ->label(__('discount_redemptions.fields.user'))
                     ->searchable(),
                 Tables\Columns\TextColumn::make('amount_saved')
-                    ->label('Amount Saved')
+                    ->label(__('discount_redemptions.fields.amount_saved'))
                     ->money('EUR')
                     ->weight(FontWeight::Bold)
                     ->color('success'),
@@ -57,7 +60,7 @@ class RecentDiscountRedemptionsWidget extends BaseWidget
                         'secondary' => 'cancelled',
                     ]),
                 Tables\Columns\TextColumn::make('redeemed_at')
-                    ->label('Redeemed At')
+                    ->label(__('discount_redemptions.fields.redeemed_at'))
                     ->dateTime()
                     ->since()
                     ->sortable(),

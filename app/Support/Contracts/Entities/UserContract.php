@@ -77,7 +77,6 @@ final class UserContract
             'status' => [
                 'is_email_verified'       => $user->isEmailVerified(),
                 'is_phone_verified'       => $user->isPhoneVerified(),
-                'has_two_factor'          => $user->hasTwoFactor(),
                 'is_on_trial'             => $user->isOnTrial(),
                 'has_active_subscription' => $user->hasActiveSubscription(),
             ],
@@ -110,7 +109,7 @@ final class UserContract
                 })->all()
                 : [],
             'links' => [
-                'self' => route('account'),
+                'self' => route('account.index'),
             ],
         ];
     }

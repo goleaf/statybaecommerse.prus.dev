@@ -15,7 +15,6 @@ final class OrderRequestTest extends TestCase
     {
         $user = User::factory()->create();
 
-        // Ensure a matching role exists and assign it so AuthorizationMatrix grants permissions.
         Role::query()->firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
         $user->assignRole('admin');
 

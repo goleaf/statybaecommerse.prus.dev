@@ -8,11 +8,9 @@ use App\Models\ProductVariant;
 use App\Models\User;
 use App\Services\Cart\CartService;
 
-it('builds summaries from persistent cart items including variant metadata and discounted shipping thresholds', function (): void {
+it('builds summaries from persistent cart items including variant metadata and tax calculations', function (): void {
     // Ensure deterministic configuration so the assertions capture the recalculated totals precisely.
-    config()->set('shared.shipping.free_threshold', 50.0);
-    config()->set('shared.shipping.flat_rate', 5.99);
-    config()->set('shared.tax.default_rate', 0.21);
+    config()->set('shared.tax.default_rate', 0.0);
 
     $user = User::factory()->create();
     $product = Product::factory()->create();
@@ -57,12 +55,12 @@ it('builds summaries from persistent cart items including variant metadata and d
             'custom' => 'engraving',
         ])
         ->and($summary['subtotal'])->toBe(60.0)
-        // Discounted subtotal (60 - 15) falls below the threshold so shipping should apply.
-        ->and($summary['shipping'])->toBe(5.99)
-        // Tax should apply to the discounted subtotal (45 * 0.21 = 9.45).
-        ->and($summary['tax'])->toBe(9.45)
-        // Totals reflect discounted subtotal plus tax and shipping.
-        ->and($summary['total'])->toBe(60.44);
+        // Shipping is no longer calculated
+        ->and($summary['shipping'])->toBe(0.0)
+        // Tax should be 0.0 with the new rate.
+        ->and($summary['tax'])->toBe(0.0)
+        // Totals reflect discounted subtotal with no tax.
+        ->and($summary['total'])->toBe(45.0);
 });
 
 it('normalizes session cart payloads within configured quantity limits and clamps excessive discounts', function (): void {

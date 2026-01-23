@@ -36,8 +36,6 @@ trait InteractsWithRateLimitSchema
             $table->string('first_name')->nullable();
             $table->string('last_name')->nullable();
             $table->string('preferred_locale')->nullable();
-            $table->boolean('two_factor_enabled')->default(false);
-            $table->timestamp('two_factor_confirmed_at')->nullable();
             $table->timestamp('phone_verified_at')->nullable();
             $table->rememberToken();
             $table->timestamps();

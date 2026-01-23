@@ -11,10 +11,8 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\User;
-use App\Support\Authorization\AuthorizationMatrix;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
-use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 class LithuanianBuilderShopSeeder extends Seeder
@@ -22,26 +20,25 @@ class LithuanianBuilderShopSeeder extends Seeder
     public function run(): void
     {
         // Create roles and permissions
-            $this->createRolesAndPermissions();
+        $this->createRolesAndPermissions();
 
-            // Create admin users
-            $this->createAdminUsers();
+        // Create admin users
+        $this->createAdminUsers();
 
-            // Create main categories
-            $categories = $this->createMainCategories();
+        // Create main categories
+        $categories = $this->createMainCategories();
 
-            // Create subcategories
-            $this->createSubcategories($categories);
+        // Create subcategories
+        $this->createSubcategories($categories);
 
-            // Create brands
-            $brands = $this->createBrands();
+        // Create brands
+        $brands = $this->createBrands();
 
-            // Create products
-            $this->createProducts($brands, $categories);
+        // Create products
+        $this->createProducts($brands, $categories);
 
-            // Create sample orders
-            $this->createSampleOrders();
-    }
+        // Create sample orders
+        $this->createSampleOrders();
     }
 
     private function createRolesAndPermissions(): void
@@ -49,24 +46,7 @@ class LithuanianBuilderShopSeeder extends Seeder
         $roles = [AuthorizationRole::ADMIN, AuthorizationRole::MANAGER];
 
         foreach ($roles as $role) {
-            $permissions = AuthorizationMatrix::permissionsForRole($role);
-
-            foreach ($permissions as $permission) {
-                Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']);
-            }
-
-            $roleModel = Role::firstOrCreate(['name' => $role->value, 'guard_name' => 'web']);
-            $roleModel->syncPermissions($permissions);
-        }
-
-        $additionalPermissions = ['view_reports'];
-
-        foreach ($additionalPermissions as $permission) {
-            $permissionModel = Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']);
-
-            foreach ($roles as $role) {
-                Role::findByName($role->value, 'web')->givePermissionTo($permissionModel);
-            }
+            Role::firstOrCreate(['name' => $role->value, 'guard_name' => 'web']);
         }
     }
 

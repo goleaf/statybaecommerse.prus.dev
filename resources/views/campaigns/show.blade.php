@@ -98,8 +98,7 @@
                         @if ($campaign->trans('cta_text') && $campaign->cta_url)
                             <div class="mt-8">
                                 <a href="{{ $campaign->cta_url }}"
-                                   class="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
-                                   onclick="recordCampaignClick('{{ $campaign->id }}', 'cta', '{{ $campaign->cta_url }}')">
+                                   class="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
                                     {{ $campaign->trans('cta_text') }}
                                     <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -349,23 +348,3 @@
         </div>
     </div>
 @endsection
-
-@push('scripts')
-    <script>
-        function recordCampaignClick(campaignId, clickType, clickedUrl) {
-            fetch('{{ route('frontend.campaigns.click', ':id') }}'.replace(':id', campaignId), {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                },
-                body: JSON.stringify({
-                    type: clickType,
-                    url: clickedUrl
-                })
-            }).catch(error => {
-                console.error('Error recording campaign click:', error);
-            });
-        }
-    </script>
-@endpush

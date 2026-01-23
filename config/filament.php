@@ -58,8 +58,6 @@ return [
             App\Filament\Pages\SliderManagement::class,
             App\Filament\Pages\InventoryManagement::class,
             App\Filament\Pages\AdvancedReports::class,
-            App\Filament\Pages\UserImpersonation::class,
-            App\Filament\Pages\ObservabilityDashboard::class,
         ],
     ],
 ];

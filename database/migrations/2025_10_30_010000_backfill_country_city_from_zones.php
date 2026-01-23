@@ -79,7 +79,6 @@ return new class extends Migration
         };
 
         // Core tables that previously referenced zones directly.
-        $backfill('shipping_options', 'country_id');
         $backfill('orders', 'country_id');
         $backfill('price_lists', 'country_id');
         $backfill('discounts', 'country_id');
@@ -141,7 +140,6 @@ return new class extends Migration
     public function down(): void
     {
         $targets = [
-            ['shipping_options', 'country_id'],
             ['orders', 'country_id'],
             ['price_lists', 'country_id'],
             ['discounts', 'country_id'],

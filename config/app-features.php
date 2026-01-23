@@ -27,7 +27,6 @@ return [
         'advanced_pricing' => true,
         'customer_groups'  => true,
         'partner_system'   => true,
-        'two_factor_auth'  => true,
         'comparison'       => true,
         'recommendations'  => true,
     ],

@@ -4,36 +4,40 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
-use App\Services\LocaleService;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Session;
 use Symfony\Component\HttpFoundation\Response;
 
-final class SetLocale
+class SetLocale
 {
-    public function __construct(
-        private readonly LocaleService $localeService
-    ) {}
-
+    /**
+     * Handle an incoming request.
+     */
     public function handle(Request $request, Closure $next): Response
     {
-        // Resolve and set locale using centralized service
-        $locale = $this->localeService->resolveAndSetLocale($request);
+        $supportedLocales = explode(',', config('app.supported_locales', 'lt,en'));
 
-        // Persist locale only if it has changed (optimization for Requirements 3.2)
-        $this->localeService->persistLocale($locale, $request);
+        // Check if this is an admin panel request
+        $isAdminPanel = $request->is('admin') || $request->is('admin/*');
 
-        // Apply locale-specific configuration (currency mapping, etc.)
-        $this->localeService->applyLocaleConfiguration($locale);
-
-        /** @var Response $response */
-        $response = $next($request);
-
-        if (! $response->headers->has('Content-Language')) {
-            // Ensure downstream responses advertise the language we resolved for this request.
-            $response->headers->set('Content-Language', $locale);
+        if ($isAdminPanel) {
+            // For admin panel, use English as default but allow switching
+            $locale = Session::get('admin_locale', 'en');
+            if (! in_array($locale, $supportedLocales)) {
+                $locale = 'en';
+            }
+        } else {
+            // For frontend, use Lithuanian as default
+            $locale = Session::get('locale', config('app.locale', 'lt'));
+            if (! in_array($locale, $supportedLocales)) {
+                $locale = config('app.locale', 'lt');
+            }
         }
 
-        return $response;
+        App::setLocale($locale);
+
+        return $next($request);
     }
 }

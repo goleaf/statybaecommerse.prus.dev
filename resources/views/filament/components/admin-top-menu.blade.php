@@ -36,7 +36,7 @@
                     <button
                             class="flex items-center space-x-1 px-2 py-1 rounded text-xs font-medium text-gray-600 hover:text-primary-600">
                         <x-heroicon-o-language class="h-3 w-3" />
-                        <span>{{ app()->getLocale() === 'lt' ? 'LT' : 'EN' }}</span>
+                        <span>{{ app()->getLocale() === 'lt' ? __('admin.language_switcher.short.lt') : __('admin.language_switcher.short.en') }}</span>
                     </button>
                 </div>
 
@@ -51,7 +51,7 @@
                     <div class="h-6 w-6 rounded-full bg-primary-600 flex items-center justify-center">
                         <span class="text-xs font-medium text-white">{{ substr($user->name ?? 'A', 0, 1) }}</span>
                     </div>
-                    <span class="text-sm font-medium text-gray-700">{{ $user->name ?? 'Admin' }}</span>
+                    <span class="text-sm font-medium text-gray-700">{{ $user->name ?? __('admin.navigation.admin') }}</span>
                 </div>
             </div>
         </div>

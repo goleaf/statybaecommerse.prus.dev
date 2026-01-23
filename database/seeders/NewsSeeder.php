@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use App\Models\News;
-use App\Models\NewsCategory;
 use App\Models\NewsImage;
-use App\Models\Translations\NewsCategoryTranslation;
 use App\Models\Translations\NewsTranslation;
 use Illuminate\Database\Seeder;
 
@@ -83,34 +81,7 @@ final class NewsSeeder extends Seeder
 
         $categories = collect();
 
-        foreach ($categoryNames as $index => $name) {
-            $category = NewsCategory::factory()->create([
-                'is_visible' => true,
-                'sort_order' => $index + 1,
-                'color'      => fake()->hexColor(),
-            ]);
-
-            foreach ($locales as $locale) {
-                $localizedName = $locale === 'lt'
-                    ? ['Technologijos', 'Verslas', 'Sportas', 'Pramogos', 'Sveikata', 'Mokslas',
-                        'Politika', 'Švietimas', 'Kelionės', 'Maistas', 'Mada', 'Automobiliai'][$index]
-                    : $name;
-
-                $slug = str($localizedName)->slug()->toString() . '-' . $category->id;
-
-                NewsCategoryTranslation::updateOrCreate([
-                    'news_category_id' => $category->id,
-                    'locale'           => $locale,
-                ], [
-                    'name'        => $localizedName,
-                    'slug'        => $slug,
-                    'description' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-                ]);
-            }
-
-            $categories->push($category);
-        }
-
-        return $categories;
+        // News category functionality has been removed
+        return collect();
     }
 }

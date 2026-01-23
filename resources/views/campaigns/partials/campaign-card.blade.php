@@ -93,8 +93,7 @@
         <!-- CTA Button -->
         @if($campaign->cta_text && $campaign->cta_url)
             <a href="{{ $campaign->cta_url }}" 
-               class="w-full bg-blue-600 text-white text-center py-2 px-4 rounded-md hover:bg-blue-700 transition-colors duration-200 block"
-               onclick="trackCampaignClick({{ $campaign->id }}, 'cta', '{{ $campaign->cta_url }}')">
+               class="w-full bg-blue-600 text-white text-center py-2 px-4 rounded-md hover:bg-blue-700 transition-colors duration-200 block">
                 {{ $campaign->cta_text }}
             </a>
         @else
@@ -105,24 +104,6 @@
         @endif
     </div>
 </div>
-
-@push('scripts')
-<script>
-function trackCampaignClick(campaignId, type, url) {
-    fetch(`/campaigns/${campaignId}/click`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        },
-        body: JSON.stringify({
-            type: type,
-            url: url
-        })
-    }).catch(error => console.error('Error tracking click:', error));
-}
-</script>
-@endpush
 
 
 

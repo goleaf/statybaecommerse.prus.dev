@@ -190,21 +190,6 @@ final class SystemSettingSeeder extends Seeder
                 'is_required'   => true,
                 'default_value' => 120,
             ],
-            [
-                'category'      => $securityCategory,
-                'key'           => 'enable_two_factor',
-                'name'          => 'Enable Two-Factor Authentication',
-                'description'   => 'Enable two-factor authentication for enhanced security',
-                'help_text'     => 'Users will be required to set up 2FA for their accounts',
-                'type'          => 'boolean',
-                'value'         => false,
-                'group'         => 'security',
-                'sort_order'    => 4,
-                'is_active'     => true,
-                'is_public'     => false,
-                'is_required'   => false,
-                'default_value' => false,
-            ],
             // Performance Settings
             [
                 'category'    => $performanceCategory,

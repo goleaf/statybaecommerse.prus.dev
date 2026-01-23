@@ -55,7 +55,7 @@ trait HasSafeSerialization
      */
     protected function getDefaultSensitiveFields(): array
     {
-        return ['password', 'remember_token', 'api_token', 'two_factor_secret', 'two_factor_recovery_codes', 'verification_token', 'password_reset_token', 'password_reset_expires_at', 'stripe_customer_id', 'stripe_account_id', 'last_login_ip', 'phone_verified_at', 'two_factor_confirmed_at'];
+        return ['password', 'remember_token', 'api_token', 'verification_token', 'password_reset_token', 'password_reset_expires_at', 'stripe_customer_id', 'stripe_account_id', 'last_login_ip', 'phone_verified_at'];
     }
 
     /**
@@ -71,7 +71,7 @@ trait HasSafeSerialization
      */
     protected function getAdminSensitiveFields(): array
     {
-        return ['password', 'remember_token', 'api_token', 'two_factor_secret', 'two_factor_recovery_codes', 'verification_token', 'password_reset_token', 'password_reset_expires_at'];
+        return ['password', 'remember_token', 'api_token', 'verification_token', 'password_reset_token', 'password_reset_expires_at'];
     }
 
     /**

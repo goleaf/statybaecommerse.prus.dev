@@ -7,7 +7,6 @@ namespace Tests\Feature\Performance;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Collection;
-use App\Models\PerformanceMetrics;
 use App\Models\Product;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
@@ -207,19 +206,6 @@ final class ComprehensivePerformanceValidationTest extends TestCase
 
         // Query counts should be similar regardless of locale
         expect(abs($ltQueries - $enQueries))->toBeLessThanOrEqual(50, 'Locale switching should not significantly impact query count');
-    }
-
-    public function test_performance_metrics_collection(): void
-    {
-        // Verify performance metrics are being collected
-        $initialCount = PerformanceMetrics::count();
-
-        // Make a request that should trigger metrics collection
-        $this->get('/lt');
-
-        // In test environment, metrics might be collected differently
-        // Just verify the system is set up to collect them
-        expect(config('performance.monitoring.enabled'))->toBe(true);
     }
 
     private function runHomePagePerformanceValidation(): void

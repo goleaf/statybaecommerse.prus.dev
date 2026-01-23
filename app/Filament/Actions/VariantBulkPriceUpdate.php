@@ -5,10 +5,8 @@ declare(strict_types=1);
 namespace App\Filament\Actions;
 
 use App\Models\ProductVariant;
-use App\Models\VariantPriceHistory;
 use Carbon\Carbon;
 use Closure;
-use DateTimeInterface;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Component;
 use Filament\Forms\Components\DateTimePicker;
@@ -202,33 +200,6 @@ final class VariantBulkPriceUpdate extends Action
                         }
 
                         $record->save();
-
-                        // Record price change history
-                        $saleStartDate = $data['sale_start_date'] ?? null;
-                        $saleEndDate = $data['sale_end_date'] ?? null;
-                        $historyStartDate = $saleStartDate instanceof DateTimeInterface
-                            ? Carbon::instance($saleStartDate)
-                            : (is_string($saleStartDate) && $saleStartDate !== '' ? Carbon::parse($saleStartDate) : null);
-                        $historyEndDate = $saleEndDate instanceof DateTimeInterface
-                            ? Carbon::instance($saleEndDate)
-                            : (is_string($saleEndDate) && $saleEndDate !== '' ? Carbon::parse($saleEndDate) : null);
-
-                        $variantKey = $record->getAttribute($record->getKeyName());
-                        $variantId = is_numeric($variantKey) ? (int) $variantKey : 0;
-
-                        $changedBy = auth()->id();
-                        $changedById = is_numeric($changedBy) ? (int) $changedBy : null;
-
-                        VariantPriceHistory::recordPriceChange(
-                            $variantId,
-                            $oldPrice,
-                            $newPrice,
-                            $priceType,
-                            $reason,
-                            $changedById,
-                            $historyStartDate,
-                            $historyEndDate,
-                        );
 
                         $updatedCount++;
                     }

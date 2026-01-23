@@ -153,7 +153,6 @@ final class TestingDatabase
         Config::set('database.connections.sqlite.journal_mode', null);
         Config::set('database.connections.sqlite.synchronous', null);
         Config::set('database.connections.sqlite.prefix', '');
-        Config::set('telescope.storage.database.connection', 'sqlite');
         Config::set('database.connections.testing', [
             'driver'                  => 'sqlite',
             'database'                => $databasePath,
@@ -163,9 +162,6 @@ final class TestingDatabase
             'synchronous'             => null,
             'busy_timeout'            => 60000,
         ]);
-        // Force Telescope to use the same SQLite connection so its migrations run without reaching for MySQL.
-        Config::set('telescope.storage.database.connection', 'sqlite');
-        Config::set('telescope.enabled', false);
 
         $app['config']->set('database.default', 'sqlite');
         $app['config']->set('database.connections.sqlite.database', $databasePath);
@@ -198,7 +194,6 @@ final class TestingDatabase
 
             Config::set('database.default', 'sqlite');
             Config::set('database.connections.sqlite.database', $databasePath);
-            Config::set('telescope.storage.database.connection', 'sqlite');
             // Keep environment variables aligned with the active database path so
             // nested Artisan commands resolve the same connection.
             putenv('DB_DATABASE=' . $databasePath);
@@ -256,6 +251,7 @@ final class TestingDatabase
                 }
 
                 self::ensureProductTestingTables();
+                self::ensureUserTestingColumns();
 
                 RefreshDatabaseState::$migrated = true;
                 self::$migrationsRan = true;
@@ -382,8 +378,6 @@ final class TestingDatabase
             Config::set('database.connections.sqlite.foreign_key_constraints', true);
             Config::set('database.connections.sqlite.journal_mode', null);
             Config::set('database.connections.sqlite.synchronous', null);
-            Config::set('telescope.storage.database.connection', 'sqlite');
-
             DB::purge('sqlite');
             DB::disconnect('sqlite');
 
@@ -408,6 +402,8 @@ final class TestingDatabase
 
             if (! Schema::connection('sqlite')->hasTable('users')) {
                 self::provisionFallbackSchema();
+            } else {
+                self::ensureUserTestingColumns();
             }
 
             RefreshDatabaseState::$migrated = true;
@@ -526,15 +522,51 @@ final class TestingDatabase
             $schema->create('users', function (Blueprint $table): void {
                 $table->id();
                 $table->string('name')->nullable();
+                $table->string('first_name')->nullable();
+                $table->string('last_name')->nullable();
                 $table->string('email')->unique();
                 $table->timestamp('email_verified_at')->nullable();
                 $table->string('password');
                 $table->string('preferred_locale', 5)->nullable();
                 $table->boolean('is_active')->default(true);
                 $table->boolean('is_admin')->default(false);
+                $table->timestamp('last_login_at')->nullable();
+                $table->string('last_login_ip', 45)->nullable();
+                $table->json('preferences')->nullable();
+                $table->unsignedInteger('login_count')->default(0);
                 $table->rememberToken();
                 $table->timestamps();
             });
+        } else {
+            if (! $schema->hasColumn('users', 'first_name')) {
+                $schema->table('users', function (Blueprint $table): void {
+                    $table->string('first_name')->nullable();
+                });
+            }
+
+            if (! $schema->hasColumn('users', 'last_name')) {
+                $schema->table('users', function (Blueprint $table): void {
+                    $table->string('last_name')->nullable();
+                });
+            }
+
+            if (! $schema->hasColumn('users', 'last_login_at')) {
+                $schema->table('users', function (Blueprint $table): void {
+                    $table->timestamp('last_login_at')->nullable();
+                });
+            }
+
+            if (! $schema->hasColumn('users', 'last_login_ip')) {
+                $schema->table('users', function (Blueprint $table): void {
+                    $table->string('last_login_ip', 45)->nullable();
+                });
+            }
+
+            if (! $schema->hasColumn('users', 'preferences')) {
+                $schema->table('users', function (Blueprint $table): void {
+                    $table->json('preferences')->nullable();
+                });
+            }
         }
 
         if (! $schema->hasTable('system_setting_categories')) {
@@ -1041,6 +1073,60 @@ final class TestingDatabase
 
                 $table->index(['product_id', 'sort_order']);
                 $table->index(['is_active']);
+            });
+        }
+    }
+
+    /**
+     * Ensure the user table includes columns required by authentication and profile tests.
+     */
+    public static function ensureUserTestingColumns(): void
+    {
+        $schema = Schema::connection('sqlite');
+
+        if (! $schema->hasTable('users')) {
+            return;
+        }
+
+        if (! $schema->hasColumn('users', 'first_name')) {
+            $schema->table('users', function (Blueprint $table): void {
+                $table->string('first_name')->nullable();
+            });
+        }
+
+        if (! $schema->hasColumn('users', 'last_name')) {
+            $schema->table('users', function (Blueprint $table): void {
+                $table->string('last_name')->nullable();
+            });
+        }
+
+        if (! $schema->hasColumn('users', 'is_active')) {
+            $schema->table('users', function (Blueprint $table): void {
+                $table->boolean('is_active')->default(true);
+            });
+        }
+
+        if (! $schema->hasColumn('users', 'last_login_at')) {
+            $schema->table('users', function (Blueprint $table): void {
+                $table->timestamp('last_login_at')->nullable();
+            });
+        }
+
+        if (! $schema->hasColumn('users', 'last_login_ip')) {
+            $schema->table('users', function (Blueprint $table): void {
+                $table->string('last_login_ip', 45)->nullable();
+            });
+        }
+
+        if (! $schema->hasColumn('users', 'preferences')) {
+            $schema->table('users', function (Blueprint $table): void {
+                $table->json('preferences')->nullable();
+            });
+        }
+
+        if (! $schema->hasColumn('users', 'login_count')) {
+            $schema->table('users', function (Blueprint $table): void {
+                $table->unsignedInteger('login_count')->default(0);
             });
         }
     }

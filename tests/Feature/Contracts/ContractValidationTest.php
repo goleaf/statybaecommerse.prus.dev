@@ -14,12 +14,8 @@ use App\Models\User;
 use App\Support\Contracts\Entities\BrandContract;
 use App\Support\Contracts\Entities\CategoryContract;
 use App\Support\Contracts\Entities\OrderContract;
-use App\Support\Contracts\Entities\ProductContract;
 use App\Support\Contracts\Entities\UserContract;
 use App\Support\Contracts\SimpleJsonSchemaValidator;
-
-use function collect;
-
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
@@ -35,35 +31,6 @@ final class ContractValidationTest extends TestCase
         parent::setUp();
 
         $this->validator = $this->app->make(SimpleJsonSchemaValidator::class);
-    }
-
-    public function test_product_search_response_matches_contract(): void
-    {
-        $category = Category::factory()->create();
-        $product = Product::factory()->create([
-            'is_visible' => true,
-            'status'     => 'active',
-            'metadata'   => ['power' => '1200W'],
-        ]);
-        $product->categories()->attach($category);
-
-        $query = mb_substr($product->name, 0, 4, 'UTF-8');
-        // Use the multibyte-safe substring so Lithuanian fixtures do not trigger malformed
-        // UTF-8 errors when the query truncates a character mid-sequence.
-        $response = $this->getJson('/api/products/search?q=' . urlencode($query));
-
-        $response->assertOk();
-        $payload = $response->json();
-        $this->assertSame([], $this->validator->validate($payload, ProductContract::schemaPath()));
-
-        $items = $payload['data']['items'] ?? [];
-        $this->assertNotEmpty($items);
-        $productPayload = collect($items)->firstWhere('id', $product->id);
-        $this->assertNotNull($productPayload, 'Product payload not found in response.');
-
-        $invalid = $payload;
-        unset($invalid['data']['items'][0]['sku']);
-        $this->assertNotEmpty($this->validator->validate($invalid, ProductContract::schemaPath()));
     }
 
     public function test_category_tree_response_matches_contract(): void

@@ -6,7 +6,6 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\News;
-use App\Models\NewsCategory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -95,18 +94,14 @@ final class NewsController extends Controller
     }
 
     /**
-     * Handle categories functionality with proper error handling.
+     * Handle categories functionality - removed due to NewsCategory model removal.
      */
     public function categories(): JsonResponse
     {
-        $categories = NewsCategory::active()->withCount('news')->orderBy('name')->get()->skipWhile(function ($category) {
-            // Skip categories that are not properly configured for display
-            return empty($category->name) || empty($category->slug) || ! $category->is_active || $category->news_count <= 0;
-        });
-
-        return response()->json(['success' => true, 'data' => $categories->map(function ($category) {
-            return ['id' => $category->id, 'name' => $category->name, 'slug' => $category->slug, 'description' => $category->description, 'news_count' => $category->news_count];
-        })]);
+        return response()->json([
+            'success' => false,
+            'message' => 'Categories functionality has been removed',
+        ], 404);
     }
 
     /**

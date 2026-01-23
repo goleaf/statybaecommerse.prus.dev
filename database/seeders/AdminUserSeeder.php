@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use App\Enums\AuthorizationRole;
 use App\Models\AdminUser;
 use Illuminate\Database\Seeder;
 
@@ -40,13 +39,6 @@ final class AdminUserSeeder extends Seeder
             $admin->save();
         }
 
-        // Sync the expected admin roles to guarantee panel access permissions after cleanup.
-        $admin->syncRoles([
-            AuthorizationRole::SUPER_ADMIN->value,
-            AuthorizationRole::ADMIN->value,
-            AuthorizationRole::ADMINISTRATOR->value,
-        ]);
-
-        $this->command?->info('🔐 Admin guard account ready: admin@example.com');
+        $this->command?->info('Admin guard account ready: admin@example.com');
     }
 }

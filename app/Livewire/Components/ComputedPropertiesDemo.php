@@ -119,7 +119,16 @@ class ComputedPropertiesDemo extends Component
         $analytics = $this->analyticsData;
         $globalStats = $this->globalSiteStats;
 
-        return ['filter_applied' => $this->filter, 'category_filter' => $this->selectedCategory, 'expensive_only' => $this->showExpensiveProducts, 'filtered_count' => $analytics['total_products'], 'percentage_of_total' => $globalStats['total_products'] > 0 ? round($analytics['total_products'] / $globalStats['total_products'] * 100, 2) : 0, 'average_price_vs_global' => $analytics['average_price'], 'performance_metrics' => ['cache_hits' => 'Computed properties are cached automatically', 'database_queries_reduced' => 'Multiple calls to same computed property use cache', 'memory_optimized' => 'Results stored in memory during request lifecycle']];
+        return [
+            'filter_applied'      => $this->filter,
+            'category_filter'     => $this->selectedCategory,
+            'expensive_only'      => $this->showExpensiveProducts,
+            'filtered_count'      => $analytics['total_products'],
+            'percentage_of_total' => $globalStats['total_products'] > 0
+                ? round($analytics['total_products'] / $globalStats['total_products'] * 100, 2)
+                : 0,
+            'average_price_vs_global' => $analytics['average_price'],
+        ];
     }
 
     /**

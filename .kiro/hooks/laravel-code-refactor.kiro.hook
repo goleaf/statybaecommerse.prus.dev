@@ -13,6 +13,5 @@
     "type": "askAgent",
     "prompt": ""
   },
-  "workspaceFolderName": "laravel",
   "shortName": "laravel-code-refactor"
 }

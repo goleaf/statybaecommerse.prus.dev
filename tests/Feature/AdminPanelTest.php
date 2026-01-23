@@ -86,6 +86,15 @@ final class AdminPanelTest extends TestCase
         $response->assertStatus(200);
     }
 
+    public function test_admin_login_url_matches_expected_host(): void
+    {
+        config()->set('app.url', 'https://egistatyba.test');
+
+        $this->assertSame('https://egistatyba.test/admin/login', url('/admin/login'));
+
+        $this->get('/admin/login')->assertStatus(200);
+    }
+
     private function ensureAuthorizationTables(): void
     {
         $connection = config('database.default', 'sqlite');

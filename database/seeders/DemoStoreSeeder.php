@@ -769,7 +769,7 @@ final class DemoStoreSeeder extends Seeder
 
             $shipping = $orderData['shipping'];
             $discount = $orderData['discount'];
-            $tax = round($subtotal * 0.21, 2);
+            $tax = round($subtotal * 0.0, 2);
             $total = round($subtotal + $tax + $shipping - $discount, 2);
 
             $timestamps = $this->orderTimestamps($orderData['status'], $orderData['shipping_days']);

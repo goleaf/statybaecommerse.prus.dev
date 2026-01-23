@@ -123,18 +123,6 @@
                         </dd>
                     </div>
                     <div class="flex justify-between">
-                        <dt class="text-sm text-gray-500 dark:text-gray-400">{{ __('admin.profile.two_factor') }}</dt>
-                        <dd class="text-sm font-medium">
-                            @if (auth()->user()->hasTwoFactor())
-                                <span
-                                      class="text-green-600 dark:text-green-400">{{ __('admin.profile.enabled') }}</span>
-                            @else
-                                <span
-                                      class="text-gray-600 dark:text-gray-400">{{ __('admin.profile.disabled') }}</span>
-                            @endif
-                        </dd>
-                    </div>
-                    <div class="flex justify-between">
                         <dt class="text-sm text-gray-500 dark:text-gray-400">{{ __('admin.profile.last_login') }}</dt>
                         <dd class="text-sm font-medium text-gray-900 dark:text-white">
                             {{ auth()->user()->last_login_at ? auth()->user()->last_login_at->diffForHumans() : __('admin.profile.never') }}

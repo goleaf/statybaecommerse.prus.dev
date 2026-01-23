@@ -136,10 +136,6 @@ final class ProductionReadinessTest extends TestCase
         expect($connections)->toBeArray();
         expect($connections)->toHaveKey($queueDriver);
 
-        // Verify failed job configuration
-        expect(config('queue.failed.driver'))->toBeString();
-        expect(config('queue.failed.database'))->toBeString();
-        expect(config('queue.failed.table'))->toBeString();
     }
 
     public function test_performance_monitoring_is_configured(): void

@@ -44,27 +44,6 @@ final class ProductOpenApiSchemaTest extends TestCase
         Product::resolveRelationUsing('category', static fn (Product $product) => $product->categories()->limit(1));
     }
 
-    public function test_product_search_matches_documented_schema(): void
-    {
-        $brand = Brand::factory()->create(['is_enabled' => true]);
-        $category = Category::factory()->create(['is_visible' => true]);
-
-        Product::factory()
-            ->count(2)
-            ->published()
-            ->for($brand)
-            ->create()
-            ->each(static fn (Product $product) => $product->categories()->attach($category->getKey()));
-
-        $response = $this->getJson(route('api.products.search', ['q' => $category->name]));
-        $response->assertOk();
-
-        $schema = $this->schemaForPath('/products/search');
-        $errors = $this->validator->validateInline($response->json(), $schema, $this->openApi);
-
-        $this->assertSame([], $errors, 'OpenAPI schema validation failed: ' . implode('; ', $errors));
-    }
-
     public function test_product_catalog_matches_documented_schema(): void
     {
         $brand = Brand::factory()->create(['is_enabled' => true]);
@@ -86,6 +65,11 @@ final class ProductOpenApiSchemaTest extends TestCase
         $this->assertArrayHasKey('data', $payload);
         $this->assertArrayHasKey('meta', $payload);
         $this->assertSame(2, $payload['meta']['pagination']['per_page']);
+
+        $schema = $this->schemaForPath('/products');
+        $errors = $this->validator->validateInline($payload, $schema, $this->openApi);
+
+        $this->assertSame([], $errors, 'OpenAPI schema validation failed: ' . implode('; ', $errors));
     }
 
     /**

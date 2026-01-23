@@ -21,7 +21,6 @@ return new class extends Migration
         Schema::create('campaign_conversions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('campaign_id')->nullable()->constrained('discount_campaigns')->onDelete('cascade');
-            $table->foreignId('click_id')->nullable()->constrained('campaign_clicks')->onDelete('set null');
             $table->foreignId('order_id')->nullable()->constrained('orders')->onDelete('set null');
             $table->foreignId('customer_id')->nullable()->constrained('users')->onDelete('set null');
             $table->string('conversion_type');

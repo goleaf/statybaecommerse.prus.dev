@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
-use App\Services\Shared\ComponentPerformanceService;
 use BackedEnum;
 use Filament\Forms;
 use Filament\Forms\Components\Section;
@@ -13,7 +12,6 @@ use Filament\Pages\Page;
 use Filament\Schemas\Schema;
 use Filament\Tables\Actions\Action;
 use Illuminate\Contracts\Support\Htmlable;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 use Throwable;
@@ -33,14 +31,10 @@ final class CacheMaintenance extends Page
 
     public static function getNavigationGroup(): ?string
     {
-        return 'System'; // Keep cache tooling aligned with the broader system utilities group.
+        return __('admin.navigation.system'); // Keep cache tooling aligned with the broader system utilities group.
     }
 
-    protected static ?string $title = 'Cache Maintenance';
-
     protected static ?string $slug = 'cache-maintenance';
-
-    protected static ?string $navigationLabel = 'Cache Maintenance';
 
     protected static ?int $navigationSort = 95;
 
@@ -54,18 +48,12 @@ final class CacheMaintenance extends Page
     public array $cacheTags = [];
 
     /**
-     * @var array<string, int|string|null>
-     */
-    public array $cachePerformanceSummary = [];
-
-    /**
      * @var array<int, array{label: string, description?: string, url: string}>
      */
     public array $cachePolicyLinks = [];
 
     public function mount(): void
     {
-        $this->refreshCacheMetrics();
         $this->cachePolicyLinks = $this->buildCachePolicyLinks();
     }
 
@@ -96,27 +84,37 @@ final class CacheMaintenance extends Page
         // Embrace the Filament v4 return contract so downstream tooling can rely on a `Schema` instance for hydration.
         return $schema
             ->schema([
-                Section::make('Targeted Cache Operations')
-                    ->description('Use scoped operations before clearing broad cache areas to follow CachePolicy guidance.')
+                Section::make(__('admin.cache_maintenance.targeted_cache_operations'))
+                    ->description(__('admin.cache_maintenance.targeted_cache_operations_description'))
                     ->schema([
                         Forms\Components\TextInput::make('cacheKey')
-                            ->label('Cache key')
-                            ->helperText('Provide the exact cache key to invalidate. Leave empty to skip this operation.')
+                            ->label(__('admin.cache_maintenance.cache_key'))
+                            ->helperText(__('admin.cache_maintenance.cache_key_help'))
                             ->maxLength(255),
                         Forms\Components\TagsInput::make('cacheTags')
-                            ->label('Cache tags')
-                            ->helperText('Specify one or more cache tags to flush together. Tags are matched exactly.')
-                            ->placeholder('discounts'),
+                            ->label(__('admin.cache_maintenance.cache_tags'))
+                            ->helperText(__('admin.cache_maintenance.cache_tags_help'))
+                            ->placeholder(__('admin.cache_maintenance.cache_tags_placeholder')),
                     ])
                     ->columns(1),
             ]);
+    }
+
+    public function getTitle(): string
+    {
+        return __('admin.cache_maintenance.title');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('admin.cache_maintenance.navigation_label');
     }
 
     protected function getActions(): array
     {
         return [
             Action::make('forgetCacheKey')
-                ->label('Forget Cache Key')
+                ->label(__('admin.cache_maintenance.forget_cache_key'))
                 ->icon('heroicon-o-trash')
                 ->color('warning')
                 ->action(function (): void {
@@ -125,8 +123,8 @@ final class CacheMaintenance extends Page
                         // Surface the validation feedback via the Filament notification pipeline
                         // so the action remains compatible with Livewire testing hooks.
                         Notification::make()
-                            ->title('Cache key required')
-                            ->body('Please provide a cache key to forget.')
+                            ->title(__('admin.cache_maintenance.cache_key_required_title'))
+                            ->body(__('admin.cache_maintenance.cache_key_required_body'))
                             ->danger()
                             ->send();
 
@@ -135,14 +133,13 @@ final class CacheMaintenance extends Page
 
                     Cache::forget($key);
                     Notification::make()
-                        ->title('Cache key cleared')
-                        ->body("The cache entry '{$key}' was removed successfully.")
+                        ->title(__('admin.cache_maintenance.cache_key_cleared_title'))
+                        ->body(__('admin.cache_maintenance.cache_key_cleared_body', ['key' => $key]))
                         ->success()
                         ->send();
-                    $this->refreshCacheMetrics();
                 }),
             Action::make('flushCacheTags')
-                ->label('Flush Cache Tags')
+                ->label(__('admin.cache_maintenance.flush_cache_tags'))
                 ->icon('heroicon-o-tag')
                 ->color('danger')
                 ->requiresConfirmation()
@@ -154,8 +151,8 @@ final class CacheMaintenance extends Page
 
                     if (empty($tags)) {
                         Notification::make()
-                            ->title('Cache tags required')
-                            ->body('Add at least one cache tag before flushing tagged cache entries.')
+                            ->title(__('admin.cache_maintenance.cache_tags_required_title'))
+                            ->body(__('admin.cache_maintenance.cache_tags_required_body'))
                             ->danger()
                             ->send();
 
@@ -166,8 +163,10 @@ final class CacheMaintenance extends Page
                         Cache::tags($tags)->flush();
                     } catch (Throwable $exception) {
                         Notification::make()
-                            ->title('Tagged cache unavailable')
-                            ->body('The current cache driver does not support tag operations. ' . $exception->getMessage())
+                            ->title(__('admin.cache_maintenance.tagged_cache_unavailable_title'))
+                            ->body(__('admin.cache_maintenance.tagged_cache_unavailable_body', [
+                                'message' => $exception->getMessage(),
+                            ]))
                             ->danger()
                             ->send();
 
@@ -175,29 +174,14 @@ final class CacheMaintenance extends Page
                     }
 
                     Notification::make()
-                        ->title('Tagged cache flushed')
-                        ->body('The following tags were cleared: ' . implode(', ', $tags))
+                        ->title(__('admin.cache_maintenance.tagged_cache_flushed_title'))
+                        ->body(__('admin.cache_maintenance.tagged_cache_flushed_body', [
+                            'tags' => implode(', ', $tags),
+                        ]))
                         ->success()
                         ->send();
-                    $this->refreshCacheMetrics();
                 }),
         ];
-    }
-
-    private function refreshCacheMetrics(): void
-    {
-        $service = app(ComponentPerformanceService::class);
-        $summary = $service->getPerformanceReport();
-        $this->cachePerformanceSummary = Arr::only($summary, [
-            'total_components',
-            'total_renders',
-            'avg_render_time',
-            'slowest_component',
-            'slowest_time',
-            'most_used_component',
-            'most_used_count',
-            'performance_score',
-        ]);
     }
 
     /**
@@ -209,16 +193,16 @@ final class CacheMaintenance extends Page
 
         if (Route::has('filament.admin.resources.documents.index')) {
             $links[] = [
-                'label'       => 'CachePolicy Overview',
-                'description' => 'Review the CachePolicy documentation before running destructive cache operations.',
+                'label'       => __('admin.cache_maintenance.cache_policy_overview'),
+                'description' => __('admin.cache_maintenance.cache_policy_overview_description'),
                 'url'         => route('filament.admin.resources.documents.index'),
             ];
         }
 
         if (Route::has('filament.admin.resources.documents.index')) {
             $links[] = [
-                'label'       => 'CachePolicy Checklist',
-                'description' => 'Search for "CachePolicy" within the Documents module for step-by-step guidance.',
+                'label'       => __('admin.cache_maintenance.cache_policy_checklist'),
+                'description' => __('admin.cache_maintenance.cache_policy_checklist_description'),
                 'url'         => route('filament.admin.resources.documents.index', [
                     'tableSearch' => 'CachePolicy',
                 ]),

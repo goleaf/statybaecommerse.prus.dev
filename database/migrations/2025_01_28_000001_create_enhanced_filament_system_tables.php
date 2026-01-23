@@ -129,10 +129,6 @@ return new class extends Migration
             });
         }
 
-        // Enhanced Performance Monitoring
-        // The performance_metrics table is created later with the storefront schema
-        // to avoid conflicting definitions during fresh migrations.
-
         // Enhanced Background Jobs
         if (! Schema::hasTable('job_batches_extended')) {
             Schema::create('job_batches_extended', function (Blueprint $table): void {
@@ -140,8 +136,6 @@ return new class extends Migration
                 $table->string('name');
                 $table->integer('total_jobs');
                 $table->integer('pending_jobs');
-                $table->integer('failed_jobs');
-                $table->json('failed_job_ids');
                 $table->json('options')->nullable();
                 $table->json('progress')->nullable(); // custom progress tracking
                 $table->json('results')->nullable(); // store results
@@ -187,7 +181,6 @@ return new class extends Migration
         Schema::dropIfExists('tenant_users');
         Schema::dropIfExists('tenants');
         Schema::dropIfExists('job_batches_extended');
-        Schema::dropIfExists('performance_metrics');
         Schema::dropIfExists('cache_tags');
         Schema::dropIfExists('feature_flags');
         Schema::dropIfExists('system_logs');

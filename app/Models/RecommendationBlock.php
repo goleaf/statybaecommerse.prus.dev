@@ -11,7 +11,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * RecommendationBlock
@@ -88,16 +87,6 @@ final class RecommendationBlock extends Model
     public function products(): BelongsToMany
     {
         return $this->belongsToMany(Product::class, 'recommendation_block_products', 'recommendation_block_id', 'product_id');
-    }
-
-    /**
-     * Handle cache functionality with proper error handling.
-     *
-     * @return HasMany<RecommendationCache, self>
-     */
-    public function caches(): HasMany
-    {
-        return $this->hasMany(RecommendationCache::class, 'block_id');
     }
 
     /**

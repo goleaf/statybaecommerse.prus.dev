@@ -23,7 +23,7 @@ final class Register extends Component
     {
         $this->registrationForm->register();
 
-        $this->redirect(route('account', absolute: false), navigate: true);
+        $this->redirect(route('account.index', absolute: false), navigate: true);
     }
 
     /**

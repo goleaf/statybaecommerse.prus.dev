@@ -115,3 +115,29 @@ This specification covers the setup and configuration of a fully functional Fila
 2. WHEN using mobile navigation, THE Navigation_System SHALL provide collapsible menus and touch-friendly interactions
 3. WHEN viewing forms on mobile, THE Form_Schemas SHALL stack fields appropriately and maintain usability
 4. WHEN viewing tables on mobile, THE Admin_Resources SHALL provide horizontal scrolling or responsive column handling
+
+### Requirement 10: Fix SearchableInput Component Compatibility
+
+**User Story:** As a developer, I want the SearchableInput component to work correctly with Filament 4, so that all admin tests pass and the system functions properly.
+
+#### Acceptance Criteria
+
+1. WHEN Filament tests are run, THE SearchableComponentHelper SHALL not cause fatal errors with hasMacro method calls
+2. WHEN SearchableInput components are used, THE SearchableComponentHelper SHALL properly check for macro existence before attempting to add macros
+3. WHEN admin widgets are loaded, THE SearchableInput integration SHALL work without compatibility issues
+4. WHEN the admin panel initializes, THE SearchableComponentHelper SHALL handle different versions of the SearchableInput package gracefully
+
+### Requirement 11: Complete Admin Resource Implementation
+
+**User Story:** As an administrator, I want all created admin resources to be fully functional, so that I can manage all application entities through the admin interface.
+
+#### Acceptance Criteria
+
+1. WHEN accessing ProductResource, THE Admin_Resources SHALL display complete CRUD functionality with proper forms and tables
+2. WHEN accessing BrandResource, THE Admin_Resources SHALL handle logo uploads and brand management correctly
+3. WHEN accessing CategoryResource, THE Admin_Resources SHALL support parent/child category relationships
+4. WHEN accessing InventoryResource, THE Admin_Resources SHALL provide stock management capabilities
+5. WHEN accessing PriceResource, THE Admin_Resources SHALL handle price validity date ranges
+6. WHEN accessing DiscountResource, THE Admin_Resources SHALL support both percentage and fixed amount discount types
+7. WHEN using any admin resource, THE Form_Schemas SHALL include proper validation and field configurations
+8. WHEN viewing resource tables, THE Admin_Resources SHALL provide appropriate filtering, sorting, and bulk actions

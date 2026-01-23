@@ -140,52 +140,6 @@ return new class extends Migration
             });
         }
 
-        // Create variant_price_histories table for price tracking
-        if (! Schema::hasTable('variant_price_histories')) {
-            Schema::create('variant_price_histories', function (Blueprint $table) {
-                $table->id();
-                $table->unsignedBigInteger('variant_id');
-                $table->decimal('old_price', 10, 4);
-                $table->decimal('new_price', 10, 4);
-                $table->string('price_type')->default('regular');  // regular, sale, wholesale, member
-                $table->string('reason')->nullable();
-                $table->string('change_reason')->nullable();
-                $table->unsignedBigInteger('changed_by')->nullable();
-                $table->timestamp('effective_from')->nullable();
-                $table->timestamp('effective_until')->nullable();
-                $table->timestamps();
-
-                $table->foreign('variant_id')->references('id')->on('product_variants')->onDelete('cascade');
-                $table->foreign('changed_by')->references('id')->on('users')->onDelete('set null');
-
-                $table->index(['variant_id', 'price_type', 'created_at']);
-                $table->index(['effective_from', 'effective_until']);
-            });
-        }
-
-        // Create variant_stock_history table for stock tracking
-        if (! Schema::hasTable('variant_stock_history')) {
-            Schema::create('variant_stock_history', function (Blueprint $table) {
-                $table->id();
-                $table->unsignedBigInteger('variant_id');
-                $table->integer('old_quantity');
-                $table->integer('new_quantity');
-                $table->integer('quantity_change');
-                $table->string('change_type')->default('adjustment');  // adjustment, sale, return, restock
-                $table->string('change_reason')->nullable();
-                $table->unsignedBigInteger('changed_by')->nullable();
-                $table->string('reference_type')->nullable();  // order, return, adjustment
-                $table->unsignedBigInteger('reference_id')->nullable();
-                $table->timestamps();
-
-                $table->foreign('variant_id')->references('id')->on('product_variants')->onDelete('cascade');
-                $table->foreign('changed_by')->references('id')->on('users')->onDelete('set null');
-
-                $table->index(['variant_id', 'change_type', 'created_at']);
-                $table->index(['reference_type', 'reference_id']);
-            });
-        }
-
         // Create variant_analytics table for performance tracking
         if (! Schema::hasTable('variant_analytics')) {
             Schema::create('variant_analytics', function (Blueprint $table) {
@@ -264,14 +218,6 @@ return new class extends Migration
 
         if (Schema::hasTable('variant_analytics')) {
             Schema::dropIfExists('variant_analytics');
-        }
-
-        if (Schema::hasTable('variant_stock_history')) {
-            Schema::dropIfExists('variant_stock_history');
-        }
-
-        if (Schema::hasTable('variant_price_histories')) {
-            Schema::dropIfExists('variant_price_histories');
         }
 
         if (Schema::hasTable('variant_attribute_values')) {

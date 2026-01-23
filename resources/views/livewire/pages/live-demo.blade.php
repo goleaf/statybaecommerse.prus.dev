@@ -161,31 +161,6 @@
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <!-- Performance Metrics -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4">
-                        {{ __('translations.performance_metrics') }}
-                    </h3>
-                    <div class="space-y-4">
-                        <div class="flex justify-between items-center">
-                            <span class="text-gray-600">{{ __('translations.page_load_time') }}</span>
-                            <span class="font-semibold text-green-600">< 200ms</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-gray-600">{{ __('translations.database_queries') }}</span>
-                            <span class="font-semibold text-green-600">-60%</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-gray-600">{{ __('translations.cache_hit_rate') }}</span>
-                            <span class="font-semibold text-green-600">95%+</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-gray-600">{{ __('translations.memory_usage') }}</span>
-                            <span class="font-semibold text-green-600">-40%</span>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Features List -->
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                     <h3 class="text-lg font-semibold text-gray-900 mb-4">

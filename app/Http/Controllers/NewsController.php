@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\News;
-use App\Models\NewsCategory;
 use App\Services\PaginationService;
 use App\Support\SearchQuerySanitizer;
 use Illuminate\Http\JsonResponse;
@@ -63,7 +62,8 @@ final class NewsController extends Controller
         }
 
         $news = $news->appends($appends);
-        $categories = NewsCategory::visible()->with('translations')->get();
+        // Categories functionality has been removed
+        $categories = collect();
         $featuredNews = News::published()
             ->featured()
             ->with(['categories', 'images'])
@@ -114,12 +114,9 @@ final class NewsController extends Controller
         }])->firstOrFail();
         // Increment view count
         $news->incrementViewCount();
-        // Get related news
+        // Get related news - category functionality removed
         $relatedNews = News::published()
             ->where('id', '!=', $news->id)
-            ->whereHas('categories', function ($query) use ($news): void {
-                $query->whereIn('news_category_id', $news->categories->pluck('id'));
-            })
             ->with(['categories', 'images'])
             ->limit(4)
             ->get()
@@ -133,16 +130,10 @@ final class NewsController extends Controller
     }
 
     /**
-     * Handle category functionality with proper error handling.
+     * Handle category functionality - removed due to NewsCategory model removal.
      */
     public function category(string $slug): View
     {
-        $category = NewsCategory::visible()->whereHas('translations', function ($query) use ($slug) {
-            $query->where('slug', $slug)->where('locale', app()->getLocale());
-        })->firstOrFail();
-        $news = News::published()->byCategory($category->id)->with(['categories', 'images'])->orderBy('published_at', 'desc')->paginate(12);
-        $categories = NewsCategory::visible()->with('translations')->get();
-
-        return view('news.category', compact('news', 'category', 'categories'));
+        abort(404, 'Category functionality has been removed');
     }
 }

@@ -1,21 +1,4 @@
-<?php
-use App\Models\Order;
-
-use function Livewire\Volt\{layout, mount, state, title};
-
-layout('components.layouts.templates.account');
-
-state(['order' => null]);
-
-mount(function (string $number): void {
-    $this->order = Order::with(['items', 'items.product', 'shipping'])
-        ->where('number', $number)
-        ->firstOrFail();
-});
-
-title(__('Details of your order'));
-
-?>
+{{-- Order Detail Component --}}
 
 <div>
     <x-breadcrumbs :items="[

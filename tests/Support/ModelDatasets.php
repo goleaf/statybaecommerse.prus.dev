@@ -19,9 +19,7 @@ use App\Models\ProductFeature;
 use App\Models\ProductImage;
 use App\Models\ProductVariant;
 use App\Models\RecommendationBlock;
-use App\Models\RecommendationCache;
 use App\Models\RecommendationConfig;
-use App\Models\RecommendationConfigSimple;
 use App\Models\Referral;
 use App\Models\ReferralCampaign;
 use App\Models\ReferralCode;
@@ -69,9 +67,7 @@ dataset('ordered_by_name_models', function (): array {
         [ProductFeature::class, ['feature_key', 'name']],
         [ProductImage::class, ['alt_text', 'path']],
         [RecommendationBlock::class, ['name', 'title']],
-        [RecommendationCache::class, ['cache_key', 'key', 'name']],
         [RecommendationConfig::class, ['name', 'title']],
-        [RecommendationConfigSimple::class, ['name', 'title', 'code']],
         [Referral::class, ['title', 'name']],
         [ReferralCampaign::class, ['name', 'title']],
         [ReferralCode::class, ['code', 'title', 'name']],
@@ -155,17 +151,9 @@ dataset('model_relation_matrix', function (): array {
         [RecommendationBlock::class, 'analytics', HasMany::class],
         [RecommendationBlock::class, 'caches', HasMany::class],
 
-        [RecommendationCache::class, 'block', BelongsTo::class],
-        [RecommendationCache::class, 'user', BelongsTo::class],
-        [RecommendationCache::class, 'product', BelongsTo::class],
-
         [RecommendationConfig::class, 'analytics', HasMany::class],
         [RecommendationConfig::class, 'products', BelongsToMany::class],
         [RecommendationConfig::class, 'categories', BelongsToMany::class],
-
-        [RecommendationConfigSimple::class, 'analytics', HasMany::class],
-        [RecommendationConfigSimple::class, 'products', BelongsToMany::class],
-        [RecommendationConfigSimple::class, 'categories', BelongsToMany::class],
 
         [Referral::class, 'referrer', BelongsTo::class],
         [Referral::class, 'referred', BelongsTo::class],

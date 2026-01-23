@@ -6,7 +6,6 @@ namespace App\Policies;
 
 use App\Models\Notification;
 use App\Models\User;
-use App\Support\Authorization\AuthorizationMatrix;
 use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 
@@ -16,11 +15,7 @@ final class NotificationPolicy
 
     public function viewAny(?AuthenticatableContract $user): bool
     {
-        if ($user instanceof User) {
-            return true;
-        }
-
-        return AuthorizationMatrix::check('notifications', 'viewAny', $user);
+        return $user !== null;
     }
 
     public function view(?AuthenticatableContract $user, Notification $notification): bool
@@ -29,12 +24,12 @@ final class NotificationPolicy
             return true;
         }
 
-        return AuthorizationMatrix::check('notifications', 'view', $user);
+        return $user instanceof \App\Models\AdminUser;
     }
 
     public function create(?AuthenticatableContract $user): bool
     {
-        return AuthorizationMatrix::check('notifications', 'create', $user);
+        return $user instanceof \App\Models\AdminUser;
     }
 
     public function update(?AuthenticatableContract $user, Notification $notification): bool
@@ -43,7 +38,7 @@ final class NotificationPolicy
             return true;
         }
 
-        return AuthorizationMatrix::check('notifications', 'update', $user);
+        return $user instanceof \App\Models\AdminUser;
     }
 
     public function delete(?AuthenticatableContract $user, Notification $notification): bool
@@ -52,17 +47,17 @@ final class NotificationPolicy
             return true;
         }
 
-        return AuthorizationMatrix::check('notifications', 'delete', $user);
+        return $user instanceof \App\Models\AdminUser;
     }
 
     public function restore(?AuthenticatableContract $user, Notification $notification): bool
     {
-        return AuthorizationMatrix::check('notifications', 'update', $user);
+        return $user instanceof \App\Models\AdminUser;
     }
 
     public function forceDelete(?AuthenticatableContract $user, Notification $notification): bool
     {
-        return AuthorizationMatrix::check('notifications', 'delete', $user);
+        return $user instanceof \App\Models\AdminUser;
     }
 
     public function markAsRead(?AuthenticatableContract $user, Notification $notification): bool
@@ -71,7 +66,7 @@ final class NotificationPolicy
             return true;
         }
 
-        return AuthorizationMatrix::check('notifications', 'markAsRead', $user);
+        return $user instanceof \App\Models\AdminUser;
     }
 
     public function markAsUnread(?AuthenticatableContract $user, Notification $notification): bool
@@ -80,22 +75,22 @@ final class NotificationPolicy
             return true;
         }
 
-        return AuthorizationMatrix::check('notifications', 'markAsUnread', $user);
+        return $user instanceof \App\Models\AdminUser;
     }
 
     public function duplicate(?AuthenticatableContract $user, Notification $notification): bool
     {
-        return AuthorizationMatrix::check('notifications', 'duplicate', $user);
+        return $user instanceof \App\Models\AdminUser;
     }
 
     public function bulkUpdate(?AuthenticatableContract $user): bool
     {
-        return AuthorizationMatrix::check('notifications', 'bulkUpdate', $user);
+        return $user instanceof \App\Models\AdminUser;
     }
 
     public function bulkDelete(?AuthenticatableContract $user): bool
     {
-        return AuthorizationMatrix::check('notifications', 'bulkDelete', $user);
+        return $user instanceof \App\Models\AdminUser;
     }
 
     private function isOwner(?AuthenticatableContract $user, Notification $notification): bool

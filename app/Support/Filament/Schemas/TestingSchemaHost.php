@@ -7,6 +7,8 @@ namespace App\Support\Filament\Schemas;
 use Filament\Forms\ComponentContainer;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
+use Filament\Schemas\Concerns\InteractsWithSchemas;
+use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Support\Contracts\TranslatableContentDriver;
 use Livewire\Component as LivewireComponent;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
@@ -14,8 +16,10 @@ use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 /**
  * Lightweight Livewire host so schemas can operate in testing contexts without a full Filament component.
  */
-final class TestingSchemaHost extends LivewireComponent implements HasForms
+final class TestingSchemaHost extends LivewireComponent implements HasForms, HasSchemas
 {
+    use InteractsWithSchemas;
+
     public function render(): string
     {
         return '';

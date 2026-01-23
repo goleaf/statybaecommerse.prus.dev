@@ -4,18 +4,13 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
-use App\Application\Product\DTOs\SearchProductsInputDto;
-use App\Application\Product\Presenters\ProductContractPresenter;
-use App\Application\Product\UseCases\SearchProductsUseCase;
 use App\Enums\Api\ProductSort;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\ProductIndexRequest;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
-use App\Traits\HandlesContentNegotiation;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 /**
@@ -25,32 +20,6 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
  */
 final class ProductController extends Controller
 {
-    use HandlesContentNegotiation;
-
-    public function __construct(
-        private readonly SearchProductsUseCase $searchProductsUseCase,
-    ) {
-        // Keep the search use case injectable for backwards-compatible endpoints.
-    }
-
-    /**
-     * Handle search functionality with proper error handling.
-     */
-    public function search(Request $request): JsonResponse|View|Response
-    {
-        $limit = min(max((int) $request->get('limit', 10), 1), 50);
-        $input = new SearchProductsInputDto(
-            (string) $request->get('q', ''),
-            $limit,
-            10,
-        );
-
-        $result = $this->searchProductsUseCase->execute($input);
-        $payload = ProductContractPresenter::fromSearch($result);
-
-        return $this->respondWithContract($request, $payload);
-    }
-
     /**
      * Provide a hardened product index with validated filters and eager loading.
      */

@@ -5,275 +5,304 @@ declare(strict_types=1);
 namespace App\Services;
 
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Throwable;
 
-/**
- * Optimizes database queries for better performance.
- */
-final class QueryOptimizationService
+class QueryOptimizationService
 {
-    private const BATCH_SIZE = 1000;
+    /**
+     * Analyze and optimize a query builder instance
+     */
+    public function optimizeQuery(Builder $query): array
+    {
+        $originalSql = $query->toSql();
+        $bindings = $query->getBindings();
+
+        return [
+            'original' => [
+                'sql'      => $originalSql,
+                'bindings' => $bindings,
+            ],
+            'optimizations'   => $this->generateOptimizations($query),
+            'recommendations' => $this->getRecommendations($query),
+        ];
+    }
 
     /**
-     * Optimize query with selective field loading.
+     * Generate three optimization versions
      */
-    public function selectOptimized(Builder $query, array $fields): Builder
+    private function generateOptimizations(Builder $query): array
     {
-        // Always include primary key and timestamps for Eloquent compatibility
+        return [
+            'eloquent'      => $this->optimizeEloquent($query),
+            'query_builder' => $this->optimizeQueryBuilder($query),
+            'raw_sql'       => $this->optimizeRawSql($query),
+        ];
+    }
+
+    /**
+     * OPTIMIZATION VERSION 1: Better Eloquent
+     */
+    private function optimizeEloquent(Builder $query): array
+    {
         $model = $query->getModel();
-        $keyName = $model->getKeyName();
+        $optimizations = [];
+
+        // Eager loading optimization
+        if ($this->hasRelationshipAccess($query)) {
+            $optimizations[] = [
+                'type'        => 'eager_loading',
+                'description' => 'Use eager loading to prevent N+1 queries',
+                'code'        => $this->generateEagerLoadingCode($model),
+            ];
+        }
+
+        // Select optimization
+        $optimizations[] = [
+            'type'        => 'select_optimization',
+            'description' => 'Only select needed columns',
+            'code'        => $this->generateSelectOptimization($model),
+        ];
+
+        // Chunking for large datasets
+        $optimizations[] = [
+            'type'        => 'chunking',
+            'description' => 'Use chunking for memory efficiency',
+            'code'        => $this->generateChunkingCode($model),
+        ];
+
+        return $optimizations;
+    }
+
+    /**
+     * OPTIMIZATION VERSION 2: Query Builder
+     */
+    private function optimizeQueryBuilder(Builder $query): array
+    {
+        $table = $query->getModel()->getTable();
+
+        return [
+            [
+                'type'        => 'query_builder',
+                'description' => 'Use DB facade for better performance',
+                'code'        => "DB::table('{$table}')
+    ->select(['id', 'name', 'created_at']) // Only needed columns
+    ->where('status', 'active')
+    ->whereDate('created_at', '>=', now()->subDays(30))
+    ->orderBy('created_at', 'desc')
+    ->limit(100)
+    ->get();",
+            ],
+            [
+                'type'        => 'join_optimization',
+                'description' => 'Optimize joins',
+                'code'        => "DB::table('{$table}')
+    ->join('users', '{$table}.user_id', '=', 'users.id')
+    ->select(['{$table}.id', '{$table}.name', 'users.email'])
+    ->where('{$table}.status', 'active')
+    ->get();",
+            ],
+        ];
+    }
+
+    /**
+     * OPTIMIZATION VERSION 3: Raw SQL
+     */
+    private function optimizeRawSql(Builder $query): array
+    {
+        $table = $query->getModel()->getTable();
+
+        return [
+            [
+                'type'        => 'raw_sql',
+                'description' => 'Direct SQL for maximum performance',
+                'code'        => "DB::select('
+                    SELECT id, name, created_at 
+                    FROM {$table} 
+                    WHERE status = ? 
+                        AND created_at >= ? 
+                    ORDER BY created_at DESC 
+                    LIMIT 100
+                ', ['active', now()->subDays(30)]);",
+            ],
+            [
+                'type'        => 'prepared_statement',
+                'description' => 'Use prepared statements for repeated queries',
+                'code'        => "\$stmt = DB::getPdo()->prepare('
+                    SELECT * FROM {$table} 
+                    WHERE status = ? AND user_id = ?
+                ');
+                \$stmt->execute(['active', \$userId]);
+                \$results = \$stmt->fetchAll();",
+            ],
+        ];
+    }
+
+    /**
+     * Generate recommendations based on query analysis
+     */
+    private function getRecommendations(Builder $query): array
+    {
+        $recommendations = [];
+        $model = $query->getModel();
         $table = $model->getTable();
 
-        $optimizedFields = array_unique(array_merge(
-            [$table . '.' . $keyName],
-            $this->qualifyFields($fields, $table),
-            $model->usesTimestamps() ? [
-                $table . '.' . $model->getCreatedAtColumn(),
-                $table . '.' . $model->getUpdatedAtColumn(),
-            ] : []
-        ));
+        // Index recommendations
+        $recommendations[] = [
+            'category'    => 'indexing',
+            'title'       => 'Add Composite Index',
+            'description' => 'Create composite index for frequently queried columns',
+            'code'        => "Schema::table('{$table}', function (Blueprint \$table) {
+    \$table->index(['status', 'created_at', 'user_id']);
+});",
+            'impact' => 'High - Can reduce query time by 80-95%',
+        ];
 
-        return $query->select($optimizedFields);
+        // Caching recommendations
+        $recommendations[] = [
+            'category'    => 'caching',
+            'title'       => 'Implement Query Caching',
+            'description' => 'Cache expensive queries with appropriate TTL',
+            'code'        => "Cache::remember('expensive_query_' . \$params, 3600, function () use (\$params) {
+    return {$model->getClass()}::where('status', \$params['status'])
+        ->with('relations')
+        ->get();
+});",
+            'impact' => 'Very High - Eliminates database hits for cached data',
+        ];
+
+        // Pagination recommendations
+        $recommendations[] = [
+            'category'    => 'pagination',
+            'title'       => 'Use Cursor Pagination',
+            'description' => 'Replace OFFSET pagination with cursor-based for large datasets',
+            'code'        => "{$model->getClass()}::where('id', '>', \$lastId)
+    ->orderBy('id')
+    ->limit(20)
+    ->get();",
+            'impact' => 'High - Maintains consistent performance regardless of page number',
+        ];
+
+        return $recommendations;
     }
 
     /**
-     * Batch process large datasets to prevent memory exhaustion.
+     * Generate index creation SQL based on query patterns
      */
-    public function batchProcess(Builder $query, callable $callback, ?int $batchSize = null): int
+    public function generateIndexRecommendations(string $table, array $whereColumns, array $orderColumns = []): array
     {
-        $batchSize ??= self::BATCH_SIZE;
-        $processed = 0;
+        $indexes = [];
 
-        try {
-            $query->chunk($batchSize, function (Collection $items) use ($callback, &$processed) {
-                $callback($items);
-                $processed += $items->count();
-            });
-        } catch (Throwable $e) {
-            Log::error('Batch processing failed', [
-                'processed' => $processed,
-                'error'     => $e->getMessage(),
-            ]);
-
-            throw $e;
-        }
-
-        return $processed;
-    }
-
-    /**
-     * Optimize eager loading to prevent N+1 queries.
-     */
-    public function eagerLoadOptimized(Builder $query, array $relations): Builder
-    {
-        $optimizedRelations = [];
-
-        foreach ($relations as $relation => $callback) {
-            if (is_numeric($relation)) {
-                // Simple relation name
-                $optimizedRelations[] = $callback;
-            } else {
-                // Relation with constraints - optimize the callback
-                $optimizedRelations[$relation] = function ($q) use ($callback) {
-                    if (is_callable($callback)) {
-                        $callback($q);
-                    }
-
-                    // Add select optimization if not already specified
-                    if (! $this->hasSelectClause($q)) {
-                        $this->optimizeRelationSelect($q);
-                    }
-                };
-            }
-        }
-
-        return $query->with($optimizedRelations);
-    }
-
-    /**
-     * Create optimized aggregation queries.
-     */
-    public function aggregateOptimized(string $table, array $groupBy, array $aggregates): array
-    {
-        try {
-            $query = DB::table($table);
-
-            // Add group by clauses
-            if (! empty($groupBy)) {
-                $query->groupBy($groupBy);
-            }
-
-            // Add aggregate functions
-            $selectClauses = $groupBy;
-            foreach ($aggregates as $alias => $aggregate) {
-                if (is_array($aggregate)) {
-                    $function = $aggregate['function'] ?? 'count';
-                    $column = $aggregate['column'] ?? '*';
-                    $selectClauses[] = DB::raw("{$function}({$column}) as {$alias}");
-                } else {
-                    $selectClauses[] = DB::raw($aggregate);
-                }
-            }
-
-            $query->select($selectClauses);
-
-            return $query->get()->toArray();
-        } catch (Throwable $e) {
-            Log::error('Aggregate optimization failed', [
-                'table'      => $table,
-                'groupBy'    => $groupBy,
-                'aggregates' => $aggregates,
-                'error'      => $e->getMessage(),
-            ]);
-
-            return [];
-        }
-    }
-
-    /**
-     * Optimize index usage for queries.
-     */
-    public function optimizeIndexUsage(Builder $query, array $conditions): Builder
-    {
-        // Sort conditions by selectivity (most selective first)
-        $sortedConditions = $this->sortConditionsBySelectivity($conditions);
-
-        foreach ($sortedConditions as $condition) {
-            $column = $condition['column'];
-            $operator = $condition['operator'] ?? '=';
-            $value = $condition['value'];
-
-            // Use appropriate query method based on operator
-            switch ($operator) {
-                case '=':
-                    $query->where($column, $value);
-                    break;
-                case 'in':
-                    $query->whereIn($column, (array) $value);
-                    break;
-                case 'between':
-                    $query->whereBetween($column, (array) $value);
-                    break;
-                case 'like':
-                    // Optimize LIKE queries
-                    if (str_starts_with($value, '%')) {
-                        Log::info('Non-optimized LIKE query detected', ['column' => $column, 'value' => $value]);
-                    }
-                    $query->where($column, 'like', $value);
-                    break;
-                default:
-                    $query->where($column, $operator, $value);
-            }
-        }
-
-        return $query;
-    }
-
-    /**
-     * Get query performance statistics.
-     */
-    public function getQueryStats(): array
-    {
-        try {
-            // Get slow query log if available
-            $slowQueries = DB::select("SHOW VARIABLES LIKE 'slow_query_log'");
-            $longQueryTime = DB::select("SHOW VARIABLES LIKE 'long_query_time'");
-
-            return [
-                'slow_query_log_enabled' => $slowQueries[0]->Value ?? 'unknown',
-                'long_query_time'        => $longQueryTime[0]->Value ?? 'unknown',
-                'connection_count'       => DB::select("SHOW STATUS LIKE 'Threads_connected'")[0]->Value ?? 0,
-                'query_cache_hits'       => DB::select("SHOW STATUS LIKE 'Qcache_hits'")[0]->Value ?? 0,
-            ];
-        } catch (Throwable $e) {
-            Log::warning('Failed to get query statistics', [
-                'error' => $e->getMessage(),
-            ]);
-
-            return [
-                'slow_query_log_enabled' => 'unknown',
-                'long_query_time'        => 'unknown',
-                'connection_count'       => 0,
-                'query_cache_hits'       => 0,
+        // Single column indexes
+        foreach ($whereColumns as $column) {
+            $indexes[] = [
+                'type'        => 'single',
+                'sql'         => "CREATE INDEX idx_{$table}_{$column} ON {$table} ({$column});",
+                'description' => "Index for filtering by {$column}",
             ];
         }
-    }
 
-    /**
-     * Qualify field names with table prefix.
-     */
-    private function qualifyFields(array $fields, string $table): array
-    {
-        return array_map(function ($field) use ($table) {
-            if (str_contains($field, '.')) {
-                return $field; // Already qualified
-            }
+        // Composite index for WHERE + ORDER BY
+        if (! empty($whereColumns) && ! empty($orderColumns)) {
+            $allColumns = array_merge($whereColumns, $orderColumns);
+            $columnList = implode(', ', $allColumns);
+            $indexName = 'idx_' . $table . '_' . implode('_', $allColumns);
 
-            return $table . '.' . $field;
-        }, $fields);
-    }
-
-    /**
-     * Check if query has select clause.
-     */
-    private function hasSelectClause($query): bool
-    {
-        return ! empty($query->getQuery()->columns);
-    }
-
-    /**
-     * Optimize relation select clause.
-     */
-    private function optimizeRelationSelect($query): void
-    {
-        $model = $query->getModel();
-
-        if ($model instanceof Model) {
-            $table = $model->getTable();
-            $keyName = $model->getKeyName();
-
-            // Select only essential fields for relations
-            $essentialFields = [
-                $table . '.' . $keyName,
-                $table . '.name', // Common field
+            $indexes[] = [
+                'type'        => 'composite',
+                'sql'         => "CREATE INDEX {$indexName} ON {$table} ({$columnList});",
+                'description' => 'Composite index for filtering and sorting',
             ];
-
-            // Add foreign key if this is a pivot relation
-            if (method_exists($model, 'getForeignKey')) {
-                $essentialFields[] = $table . '.' . $model->getForeignKey();
-            }
-
-            $query->select(array_filter($essentialFields));
         }
+
+        // Covering index recommendation
+        $indexes[] = [
+            'type' => 'covering',
+            'sql'  => "-- PostgreSQL covering index
+CREATE INDEX idx_{$table}_covering ON {$table} ({$whereColumns[0]}) INCLUDE (id, name, created_at);
+
+-- MySQL covering index  
+CREATE INDEX idx_{$table}_covering ON {$table} ({$whereColumns[0]}, id, name, created_at);",
+            'description' => 'Covering index to avoid table lookups',
+        ];
+
+        return $indexes;
     }
 
     /**
-     * Sort conditions by selectivity (most selective first).
+     * Benchmark query performance
      */
-    private function sortConditionsBySelectivity(array $conditions): array
+    public function benchmarkQuery(callable $queryCallback, int $iterations = 10): array
     {
-        // Simple heuristic: exact matches first, then ranges, then LIKE
-        usort($conditions, function ($a, $b) {
-            $aOperator = $a['operator'] ?? '=';
-            $bOperator = $b['operator'] ?? '=';
+        $times = [];
+        $memoryUsages = [];
+        $queryCounts = [];
 
-            $selectivityOrder = [
-                '='       => 1,
-                'in'      => 2,
-                'between' => 3,
-                'like'    => 4,
-            ];
+        for ($i = 0; $i < $iterations; $i++) {
+            DB::enableQueryLog();
+            $startTime = microtime(true);
+            $startMemory = memory_get_usage();
+            $startQueries = count(DB::getQueryLog());
 
-            $aScore = $selectivityOrder[$aOperator] ?? 5;
-            $bScore = $selectivityOrder[$bOperator] ?? 5;
+            $result = $queryCallback();
 
-            return $aScore <=> $bScore;
-        });
+            $endTime = microtime(true);
+            $endMemory = memory_get_usage();
+            $endQueries = count(DB::getQueryLog());
 
-        return $conditions;
+            $times[] = ($endTime - $startTime) * 1000; // Convert to ms
+            $memoryUsages[] = ($endMemory - $startMemory) / 1024 / 1024; // Convert to MB
+            $queryCounts[] = $endQueries - $startQueries;
+
+            DB::flushQueryLog();
+        }
+
+        return [
+            'avg_time'    => round(array_sum($times) / count($times), 2),
+            'min_time'    => round(min($times), 2),
+            'max_time'    => round(max($times), 2),
+            'avg_memory'  => round(array_sum($memoryUsages) / count($memoryUsages), 2),
+            'avg_queries' => round(array_sum($queryCounts) / count($queryCounts), 1),
+            'iterations'  => $iterations,
+        ];
+    }
+
+    /**
+     * Helper methods
+     */
+    private function hasRelationshipAccess(Builder $query): bool
+    {
+        // This is a simplified check - in practice, you'd analyze the actual query
+        return true;
+    }
+
+    private function generateEagerLoadingCode(Model $model): string
+    {
+        $class = get_class($model);
+
+        return "{$class}::with(['user', 'orders', 'comments'])
+    ->where('status', 'active')
+    ->get();";
+    }
+
+    private function generateSelectOptimization(Model $model): string
+    {
+        $class = get_class($model);
+
+        return "{$class}::select(['id', 'name', 'status', 'created_at'])
+    ->where('status', 'active')
+    ->get();";
+    }
+
+    private function generateChunkingCode(Model $model): string
+    {
+        $class = get_class($model);
+
+        return "{$class}::where('status', 'active')
+    ->chunk(1000, function (\$records) {
+        foreach (\$records as \$record) {
+            // Process record
+        }
+    });";
     }
 }

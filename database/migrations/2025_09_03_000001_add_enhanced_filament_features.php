@@ -18,9 +18,6 @@ return new class extends Migration
             if (! Schema::hasColumn('users', 'accepts_marketing')) {
                 $table->boolean('accepts_marketing')->default(false)->after('is_active');
             }
-            if (! Schema::hasColumn('users', 'two_factor_enabled')) {
-                $table->boolean('two_factor_enabled')->default(false)->after('accepts_marketing');
-            }
             if (! Schema::hasColumn('users', 'phone')) {
                 $table->string('phone')->nullable()->after('email');
             }
@@ -114,7 +111,7 @@ return new class extends Migration
         });
 
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn(['is_active', 'accepts_marketing', 'two_factor_enabled', 'phone', 'date_of_birth']);
+            $table->dropColumn(['is_active', 'accepts_marketing', 'phone', 'date_of_birth']);
         });
     }
 };

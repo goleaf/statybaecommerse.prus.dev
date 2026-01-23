@@ -29,13 +29,6 @@ class DiscountEngine
         $eligibleDiscounts = $this->filterEligibility($candidateDiscounts, $context, $now);
         $calculated = $this->computeEffects($eligibleDiscounts, $context, $now);
         $final = $this->applyStackingAndPriority($calculated, $context);
-        // Debug logging
-        if (app()->bound('debugbar.discount')) {
-            $collector = app('debugbar.discount');
-            foreach ($final as $discount) {
-                $collector->logDiscountApplication($discount['code'] ?? 'unknown', $context, true, $discount['amount'] ?? 0);
-            }
-        }
 
         return $final;
     }
@@ -55,10 +48,6 @@ class DiscountEngine
         if ($supportsTags) {
             $cached = Cache::tags(['discounts'])->get($cacheKey);
             $isHit = $cached !== null;
-            // Debug cache operation
-            if (app()->bound('debugbar.discount') && method_exists(app('debugbar.discount'), 'logCacheOperation')) {
-                app('debugbar.discount')->logCacheOperation($cacheKey, $isHit, $cached);
-            }
 
             return Cache::tags(['discounts'])->remember($cacheKey, now()->addMinutes(3), fn (): \Illuminate\Support\Collection => collect(DB::table('discounts')->where('status', 'active')->where(function ($q) use ($now): void {
                 $q->whereNull('starts_at')->orWhere('starts_at', '<=', $now);
@@ -69,10 +58,6 @@ class DiscountEngine
             // Fallback for cache stores that don't support tagging
             $cached = Cache::get($cacheKey);
             $isHit = $cached !== null;
-            // Debug cache operation
-            if (app()->bound('debugbar.discount') && method_exists(app('debugbar.discount'), 'logCacheOperation')) {
-                app('debugbar.discount')->logCacheOperation($cacheKey, $isHit, $cached);
-            }
 
             return Cache::remember($cacheKey, now()->addMinutes(3), fn (): \Illuminate\Support\Collection => collect(DB::table('discounts')->where('status', 'active')->where(function ($q) use ($now): void {
                 $q->whereNull('starts_at')->orWhere('starts_at', '<=', $now);

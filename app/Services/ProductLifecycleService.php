@@ -6,7 +6,6 @@ namespace App\Services;
 
 use App\Models\Product;
 use App\Services\Images\GradientImageService;
-use App\UseCases\Cache\InvalidateProductCache;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
@@ -18,7 +17,6 @@ final class ProductLifecycleService
     public function __construct(
         private readonly CacheInvalidationService $cacheInvalidationService,
         private readonly GradientImageService $gradientImageService,
-        private readonly InvalidateProductCache $invalidateProductCache,
     ) {}
 
     /**
@@ -31,8 +29,6 @@ final class ProductLifecycleService
 
         // Keep test suites lightweight by skipping placeholder generation while still invalidating caches.
         if (app()->environment('testing')) {
-            ($this->invalidateProductCache)();
-
             return;
         }
 
@@ -41,8 +37,6 @@ final class ProductLifecycleService
 
             if ($product->getMedia($collection)->isNotEmpty()) {
                 // A media item already exists; refresh the aggregate caches and exit early.
-                ($this->invalidateProductCache)();
-
                 return;
             }
 
@@ -61,9 +55,6 @@ final class ProductLifecycleService
                 'error'      => $exception->getMessage(),
             ]);
         }
-
-        // Ensure any caches populated without tags are also cleared after media attachments.
-        ($this->invalidateProductCache)();
     }
 
     /**

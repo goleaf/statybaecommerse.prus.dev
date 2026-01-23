@@ -63,11 +63,11 @@ final class SystemSettingCategoryResourceTest extends TestCase
         // Submit the creation form without an explicit slug to exercise the auto-generation hook.
         Livewire::test(CreateSystemSettingCategory::class)
             ->fillForm([
-                'name'        => 'Observability',
+                'name'        => 'Security',
                 'slug'        => '',
-                'description' => 'Monitoring and alerting settings.',
-                'icon'        => 'heroicon-o-chart-bar',
-                'color'       => '#2563eb',
+                'description' => 'Security and access control settings.',
+                'icon'        => 'heroicon-o-shield-check',
+                'color'       => '#dc2626',
                 'sort_order'  => 5,
                 'is_active'   => true,
             ])
@@ -75,8 +75,8 @@ final class SystemSettingCategoryResourceTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('system_setting_categories', [
-            'name' => 'Observability',
-            'slug' => 'observability',
+            'name' => 'Security',
+            'slug' => 'security',
         ]);
     }
 

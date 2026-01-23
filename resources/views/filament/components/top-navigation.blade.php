@@ -240,7 +240,7 @@
                     <button
                             class="flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50">
                         <x-heroicon-o-language class="h-4 w-4" />
-                        <span>{{ app()->getLocale() === 'lt' ? 'LT' : 'EN' }}</span>
+                        <span>{{ app()->getLocale() === 'lt' ? __('admin.language_switcher.short.lt') : __('admin.language_switcher.short.en') }}</span>
                     </button>
                 </div>
 
@@ -270,7 +270,7 @@
                         <div class="h-8 w-8 rounded-full bg-primary-600 flex items-center justify-center">
                             <span class="text-sm font-medium text-white">{{ substr($user->name ?? 'A', 0, 1) }}</span>
                         </div>
-                        <span>{{ $user->name ?? 'Admin' }}</span>
+                        <span>{{ $user->name ?? __('admin.navigation.admin') }}</span>
                         <x-heroicon-o-chevron-down class="h-3 w-3" />
                     </button>
                 </div>
