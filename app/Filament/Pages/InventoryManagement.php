@@ -8,7 +8,7 @@ use App\Filament\Forms\Components\Quantity;
 use App\Models\Product;
 use Filament\Forms\Components\Select;
 use Filament\Pages\Page;
-use Filament\Tables\Actions\BulkAction;
+use Filament\Actions\BulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
