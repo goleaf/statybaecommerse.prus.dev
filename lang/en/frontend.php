@@ -238,6 +238,12 @@ return [
             'documents'     => 'Documents',
             'notifications' => 'Notifications',
         ],
+        'orders' => [
+            'title' => 'My orders',
+            'description' => 'Check the status of recent orders, manage returns and download invoices.',
+            'empty_message' => 'You haven\'t ordered anything from us yet. Is this the day to change that?',
+            'continue_shopping' => 'Continue shopping',
+        ],
     ],
     'discount_redemptions' => [
         'redeem_title' => 'Redeem Discount Code',

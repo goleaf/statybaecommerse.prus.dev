@@ -238,6 +238,12 @@ return [
             'documents'     => 'Dokumentai',
             'notifications' => 'Pranešimai',
         ],
+        'orders' => [
+            'title' => 'Mano užsakymai',
+            'description' => 'Peržiūrėkite naujausių užsakymų būseną, valdykite grąžinimus ir atsisiųskite sąskaitas.',
+            'empty_message' => 'Jūs dar nieko neužsakėte. Gal šiandien tam tinkamas metas?',
+            'continue_shopping' => 'Tęsti apsipirkimą',
+        ],
     ],
     'discount_redemptions' => [
         'redeem_title' => 'Panaudoti nuolaidos kodą',

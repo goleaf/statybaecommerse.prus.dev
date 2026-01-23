@@ -1,11 +1,11 @@
 <div class="space-y-10">
     <x-breadcrumbs :items="[
-        ['label' => __('My account'), 'url' => route('account.index', ['locale' => app()->getLocale()])],
-        ['label' => __('My orders')],
+        ['label' => __('frontend.account.nav.title'), 'url' => route('account.index', ['locale' => app()->getLocale()])],
+        ['label' => __('frontend.account.orders.title')],
     ]" />
     <x-page-heading
-                    :title="__('My orders')"
-                    :description="__('Check the status of recent orders, manage returns and download invoices.')" />
+                    :title="__('frontend.account.orders.title')"
+                    :description="__('frontend.account.orders.description')" />
     @if ($orders->isEmpty())
         <div class="flex flex-col items-center py-6 space-y-5">
             <x-untitledui-shopping-bag
@@ -13,10 +13,10 @@
                                        stroke-width="1"
                                        aria-hidden="true" />
             <p class="max-w-3xl mx-auto text-sm text-gray-500">
-                {{ __("You haven't ordered anything from us yet. Is this the day to change that?") }}
+                {{ __('frontend.account.orders.empty_message') }}
             </p>
             <x-buttons.primary :href="route('home', ['locale' => app()->getLocale()])" class="px-4 text-sm">
-                {{ __('Continue shopping') }}
+                {{ __('frontend.account.orders.continue_shopping') }}
             </x-buttons.primary>
         </div>
     @else
