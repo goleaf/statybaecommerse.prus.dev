@@ -177,6 +177,26 @@ return [
         'delete'      => 'Ištrinti',
         'view_all'    => 'Peržiūrėti visus pranešimus',
     ],
+    'categories' => [
+        'title' => 'Kategorijos',
+        'search_placeholder' => 'Ieškoti kategorijų...',
+        'table' => [
+            'name' => 'Pavadinimas',
+            'description' => 'Aprašymas',
+            'created' => 'Sukurta',
+            'status' => 'Būsena',
+            'actions' => 'Veiksmai',
+        ],
+        'status' => [
+            'active' => 'Aktyvi',
+            'inactive' => 'Neaktyvi',
+        ],
+        'actions' => [
+            'edit' => 'Redaguoti',
+            'delete' => 'Ištrinti',
+        ],
+        'empty' => 'Kategorijų nerasta.',
+    ],
     'inventory_summary' => [
         'stock_status_overview'     => 'Atsargų būsenos apžvalga',
         'in_stock'                  => 'Yra atsargose',

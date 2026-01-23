@@ -16,8 +16,8 @@
         ? route('status.page', ['locale' => $locale])
         : url('/status');
 
-    $supportTitle = $supportTitle ?? __('Need some help?');
-    $supportDescription = $supportDescription ?? __('If this keeps happening, contact our support team and include the reference ID below so we can investigate quickly.');
+    $supportTitle = $supportTitle ?? __('frontend.errors.4xx.support_title');
+    $supportDescription = $supportDescription ?? __('frontend.errors.4xx.support_description');
 
     $resolvedCode = isset($exception) && method_exists($exception, 'getStatusCode')
         ? (string) $exception->getStatusCode()
@@ -54,14 +54,14 @@
 
 @extends('errors.layout', [
     'code' => $resolvedCode,
-    'title' => $title ?? __('We can\'t complete that request'),
-    'description' => $description ?? __('The page you requested could not be processed right now. Please check the address or try again.'),
+    'title' => $title ?? __('frontend.errors.4xx.title'),
+    'description' => $description ?? __('frontend.errors.4xx.description'),
     'primaryAction' => $primaryAction ?? [
-        'label' => __('Return Home'),
+        'label' => __('frontend.errors.actions.return_home'),
         'url' => $homeUrl,
     ],
     'secondaryAction' => $secondaryAction ?? [
-        'label' => __('Contact Support'),
+        'label' => __('frontend.errors.actions.contact_support'),
         'url' => $contactUrl,
     ],
     'correlationId' => $correlationId,
@@ -70,29 +70,29 @@
     'supportPageUrl' => $supportUrl,
     'statusPageUrl' => $statusUrl,
     'showSearch' => $showSearch ?? false,
-    'searchTitle' => $searchTitle ?? __('Search for what you need'),
-    'searchPlaceholder' => $searchPlaceholder ?? __('Search products...'),
+    'searchTitle' => $searchTitle ?? __('frontend.errors.search.title'),
+    'searchPlaceholder' => $searchPlaceholder ?? __('frontend.errors.search.placeholder'),
     'topCategories' => $topCategories ?? [],
-    'topCategoriesTitle' => $topCategoriesTitle ?? __('Top Categories'),
+    'topCategoriesTitle' => $topCategoriesTitle ?? __('frontend.errors.top_categories.title'),
     'contactCta' => $contactCta ?? null,
     'links' => $links ?? [
         [
-            'label' => __('Visit Support Center'),
+            'label' => __('frontend.errors.actions.visit_support_center'),
             'url' => $supportUrl,
             'icon' => 'support',
         ],
         [
-            'label' => __('Check System Status'),
+            'label' => __('frontend.errors.actions.check_system_status'),
             'url' => $statusUrl,
             'icon' => 'status',
         ],
         [
-            'label' => __('Browse Products'),
+            'label' => __('frontend.errors.actions.browse_products'),
             'url' => $productsUrl,
             'icon' => 'products',
         ],
         [
-            'label' => __('Go Home'),
+            'label' => __('frontend.errors.actions.go_home'),
             'url' => $homeUrl,
             'icon' => 'categories',
         ],
