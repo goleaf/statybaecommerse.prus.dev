@@ -12,15 +12,15 @@
 
 @php
     $query = $query ?? request('q');
-    $title = $title ?? __('Search Results');
-    $subtitle = $subtitle ?? __('Search results for') . ' "' . $query . '"';
+    $title = $title ?? __('frontend.search_results.title');
+    $subtitle = $subtitle ?? __('frontend.search_results.subtitle', ['query' => $query]);
     $results = $results ?? collect([]);
 
     // Get search suggestions
     $suggestions = collect([
-        'Popular searches' => ['laptop', 'smartphone', 'headphones', 'camera', 'tablet'],
-        'Categories' => ['Electronics', 'Clothing', 'Home & Garden', 'Sports', 'Books'],
-        'Brands' => ['Apple', 'Samsung', 'Sony', 'Nike', 'Adidas'],
+        __('frontend.search_results.suggestions.popular_title') => ['laptop', 'smartphone', 'headphones', 'camera', 'tablet'],
+        __('frontend.search_results.suggestions.categories_title') => ['Electronics', 'Clothing', 'Home & Garden', 'Sports', 'Books'],
+        __('frontend.search_results.suggestions.brands_title') => ['Apple', 'Samsung', 'Sony', 'Nike', 'Adidas'],
     ]);
 
     // Get recent searches from session
@@ -39,7 +39,7 @@
         <div class="max-w-2xl mx-auto mb-8">
             <form @submit.prevent="performSearch()" class="relative">
                 <div class="relative">
-                    <input type="text" x-model="searchQuery" placeholder="{{ __('Search for products...') }}"
+                    <input type="text" x-model="searchQuery" placeholder="{{ __('frontend.search_results.search_placeholder') }}"
                            class="w-full px-6 py-4 pl-12 pr-16 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder:text-gray-500">
 
                     {{-- Search Icon --}}
@@ -54,7 +54,7 @@
                     <button type="submit"
                             class="absolute inset-y-0 right-0 flex items-center pr-4">
                         <span class="btn-gradient px-6 py-2 rounded-xl font-medium text-sm">
-                            {{ __('Search') }}
+                            {{ __('frontend.search_results.search_action') }}
                         </span>
                     </button>
                 </div>
@@ -65,22 +65,22 @@
             {{-- Results Summary --}}
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
                 <div class="text-sm text-gray-600">
-                    {{ __('Found') }} <span class="font-medium">{{ $results->count() }}</span> {{ __('results for') }}
+                    {{ __('frontend.search_results.found') }} <span class="font-medium">{{ $results->count() }}</span> {{ __('frontend.search_results.results_for') }}
                     <span class="font-medium">"{{ $query }}"</span>
                 </div>
 
                 @if ($showSorting)
                     <div class="flex items-center gap-2">
-                        <span class="text-sm text-gray-600">{{ __('Sort by') }}:</span>
+                        <span class="text-sm text-gray-600">{{ __('frontend.search_results.sort_by') }}:</span>
                         <select x-model="sortBy" @change="applySorting()"
                                 class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                            <option value="relevance">{{ __('Relevance') }}</option>
-                            <option value="price_asc">{{ __('Price: Low to High') }}</option>
-                            <option value="price_desc">{{ __('Price: High to Low') }}</option>
-                            <option value="name_asc">{{ __('Name: A to Z') }}</option>
-                            <option value="name_desc">{{ __('Name: Z to A') }}</option>
-                            <option value="rating_desc">{{ __('Highest Rated') }}</option>
-                            <option value="newest">{{ __('Newest First') }}</option>
+                            <option value="relevance">{{ __('frontend.search_results.sort.relevance') }}</option>
+                            <option value="price_asc">{{ __('frontend.search_results.sort.price_low_high') }}</option>
+                            <option value="price_desc">{{ __('frontend.search_results.sort.price_high_low') }}</option>
+                            <option value="name_asc">{{ __('frontend.search_results.sort.name_a_z') }}</option>
+                            <option value="name_desc">{{ __('frontend.search_results.sort.name_z_a') }}</option>
+                            <option value="rating_desc">{{ __('frontend.search_results.sort.highest_rated') }}</option>
+                            <option value="newest">{{ __('frontend.search_results.sort.newest_first') }}</option>
                         </select>
                     </div>
                 @endif
@@ -89,18 +89,18 @@
             {{-- Filters --}}
             @if ($showFilters)
                 <div class="bg-white border border-gray-200 rounded-xl p-6 mb-8">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4">{{ __('Refine Results') }}</h3>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">{{ __('frontend.search_results.refine_title') }}</h3>
 
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
                         {{-- Price Range --}}
                         <div>
-                            <h4 class="text-sm font-semibold text-gray-900 mb-3">{{ __('Price Range') }}</h4>
+                            <h4 class="text-sm font-semibold text-gray-900 mb-3">{{ __('frontend.search_results.filters.price_range') }}</h4>
                             <div class="space-y-2">
                                 <div class="flex items-center gap-2">
-                                    <input type="number" x-model="filters.priceMin" placeholder="{{ __('Min') }}"
+                                    <input type="number" x-model="filters.priceMin" placeholder="{{ __('frontend.search_results.filters.min') }}"
                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                                     <span class="text-gray-500">-</span>
-                                    <input type="number" x-model="filters.priceMax" placeholder="{{ __('Max') }}"
+                                    <input type="number" x-model="filters.priceMax" placeholder="{{ __('frontend.search_results.filters.max') }}"
                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                                 </div>
                             </div>
@@ -108,7 +108,7 @@
 
                         {{-- Categories --}}
                         <div>
-                            <h4 class="text-sm font-semibold text-gray-900 mb-3">{{ __('Categories') }}</h4>
+                            <h4 class="text-sm font-semibold text-gray-900 mb-3">{{ __('frontend.search_results.filters.categories') }}</h4>
                             <div class="space-y-2 max-h-32 overflow-y-auto">
                                 @foreach (\App\Models\Category::where('is_active', true)->get() as $category)
                                     <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-1 rounded">
@@ -122,7 +122,7 @@
 
                         {{-- Brands --}}
                         <div>
-                            <h4 class="text-sm font-semibold text-gray-900 mb-3">{{ __('Brands') }}</h4>
+                            <h4 class="text-sm font-semibold text-gray-900 mb-3">{{ __('frontend.search_results.filters.brands') }}</h4>
                             <div class="space-y-2 max-h-32 overflow-y-auto">
                                 @foreach (\App\Models\Brand::where('is_active', true)->get() as $brand)
                                     <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-1 rounded">
@@ -136,7 +136,7 @@
 
                         {{-- Rating --}}
                         <div>
-                            <h4 class="text-sm font-semibold text-gray-900 mb-3">{{ __('Rating') }}</h4>
+                            <h4 class="text-sm font-semibold text-gray-900 mb-3">{{ __('frontend.search_results.filters.rating') }}</h4>
                             <div class="space-y-2">
                                 @for ($i = 5; $i >= 1; $i--)
                                     <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-1 rounded">
@@ -161,11 +161,11 @@
                     <div class="flex gap-2 mt-4">
                         <button @click="applyFilters()"
                                 class="btn-gradient px-6 py-2 rounded-lg font-medium text-sm">
-                            {{ __('Apply Filters') }}
+                            {{ __('frontend.search_results.filters.apply') }}
                         </button>
                         <button @click="clearFilters()"
                                 class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg font-medium text-sm hover:bg-gray-50 transition-colors duration-200">
-                            {{ __('Clear All') }}
+                            {{ __('frontend.search_results.filters.clear') }}
                         </button>
                     </div>
                 </div>
@@ -183,7 +183,7 @@
                 <div class="text-center">
                     <button @click="loadMore()"
                             class="btn-gradient px-8 py-3 rounded-xl font-semibold">
-                        {{ __('Load More Results') }}
+                        {{ __('frontend.search_results.load_more') }}
                     </button>
                 </div>
             @endif
@@ -195,17 +195,17 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                 </svg>
-                <h3 class="text-2xl font-bold text-gray-900 mb-4">{{ __('No results found') }}</h3>
+                <h3 class="text-2xl font-bold text-gray-900 mb-4">{{ __('frontend.search_results.empty.title') }}</h3>
                 <p class="text-gray-600 mb-8 max-w-md mx-auto">
-                    {{ __('Sorry, we couldn\'t find any products matching your search. Try different keywords or browse our categories.') }}
+                    {{ __('frontend.search_results.empty.description') }}
                 </p>
 
                 {{-- Search Suggestions --}}
                 @if ($showSuggestions)
                     <div class="max-w-2xl mx-auto">
-                        <h4 class="text-lg font-semibold text-gray-900 mb-4">{{ __('Try searching for') }}:</h4>
+                        <h4 class="text-lg font-semibold text-gray-900 mb-4">{{ __('frontend.search_results.empty.try_searching_for') }}:</h4>
                         <div class="flex flex-wrap gap-2 justify-center">
-                            @foreach ($suggestions['Popular searches'] as $suggestion)
+                            @foreach ($suggestions[__('frontend.search_results.suggestions.popular_title')] as $suggestion)
                                 <button @click="searchFor('{{ $suggestion }}')"
                                         class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200">
                                     {{ $suggestion }}
@@ -220,14 +220,14 @@
         {{-- Search Suggestions --}}
         @if ($showSuggestions && $results->count() > 0)
             <div class="mt-12 bg-gray-50 rounded-2xl p-8">
-                <h3 class="text-xl font-semibold text-gray-900 mb-6">{{ __('You might also like') }}</h3>
+                <h3 class="text-xl font-semibold text-gray-900 mb-6">{{ __('frontend.search_results.suggestions.title') }}</h3>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {{-- Popular Searches --}}
                     <div>
-                        <h4 class="font-semibold text-gray-900 mb-3">{{ __('Popular Searches') }}</h4>
+                        <h4 class="font-semibold text-gray-900 mb-3">{{ __('frontend.search_results.suggestions.popular_title') }}</h4>
                         <div class="space-y-2">
-                            @foreach ($suggestions['Popular searches'] as $suggestion)
+                            @foreach ($suggestions[__('frontend.search_results.suggestions.popular_title')] as $suggestion)
                                 <button @click="searchFor('{{ $suggestion }}')"
                                         class="block w-full text-left px-3 py-2 text-sm text-gray-600 hover:bg-white hover:text-blue-600 rounded-lg transition-colors duration-200">
                                     {{ $suggestion }}
@@ -238,9 +238,9 @@
 
                     {{-- Categories --}}
                     <div>
-                        <h4 class="font-semibold text-gray-900 mb-3">{{ __('Browse Categories') }}</h4>
+                        <h4 class="font-semibold text-gray-900 mb-3">{{ __('frontend.search_results.suggestions.browse_categories') }}</h4>
                         <div class="space-y-2">
-                            @foreach ($suggestions['Categories'] as $category)
+                            @foreach ($suggestions[__('frontend.search_results.suggestions.categories_title')] as $category)
                                 <a href="{{ route('localized.categories.index', ['locale' => app()->getLocale()]) }}"
                                    class="block px-3 py-2 text-sm text-gray-600 hover:bg-white hover:text-blue-600 rounded-lg transition-colors duration-200">
                                     {{ $category }}
@@ -252,7 +252,7 @@
                     {{-- Recent Searches --}}
                     @if (count($recentSearches) > 0)
                         <div>
-                            <h4 class="font-semibold text-gray-900 mb-3">{{ __('Recent Searches') }}</h4>
+                            <h4 class="font-semibold text-gray-900 mb-3">{{ __('frontend.search_results.suggestions.recent_searches') }}</h4>
                             <div class="space-y-2">
                                 @foreach ($recentSearches as $recent)
                                     <button @click="searchFor('{{ $recent }}')"

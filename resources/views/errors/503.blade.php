@@ -17,36 +17,36 @@
 
 @extends('errors.layout', [
     'code' => '503',
-    'title' => __('We\'ll Be Right Back'),
-    'description' => __('We are temporarily offline for maintenance. Thanks for your patience while we improve your experience.'),
+    'title' => __('frontend.errors.503.title'),
+    'description' => __('frontend.errors.503.description'),
     'primaryAction' => [
-        'label' => __('View Status Page'),
+        'label' => __('frontend.errors.actions.view_status_page'),
         'url' => $statusUrl,
     ],
     'secondaryAction' => [
-        'label' => __('Return Home'),
+        'label' => __('frontend.errors.actions.return_home'),
         'url' => $homeUrl,
     ],
-    'supportTitle' => __('Need an update?'),
-    'supportDescription' => __('Check our status page or reach out to support and we will notify you as soon as we are back.'),
+    'supportTitle' => __('frontend.errors.503.support_title'),
+    'supportDescription' => __('frontend.errors.503.support_description'),
     'links' => [
         [
-            'label' => __('Browse Products'),
+            'label' => __('frontend.errors.actions.browse_products'),
             'url' => $productsUrl,
             'icon' => 'products',
         ],
         [
-            'label' => __('Visit Support Center'),
+            'label' => __('frontend.errors.actions.visit_support_center'),
             'url' => $supportUrl,
             'icon' => 'support',
         ],
         [
-            'label' => __('Read Updates'),
+            'label' => __('frontend.errors.actions.read_updates'),
             'url' => $newsUrl,
             'icon' => 'refresh',
         ],
         [
-            'label' => __('Check System Status'),
+            'label' => __('frontend.errors.actions.check_system_status'),
             'url' => $statusUrl,
             'icon' => 'status',
         ],

@@ -53,6 +53,8 @@ return [
         'admin'        => 'Admin',
         'logout'       => 'Logout',
         'example_item' => 'Example Item',
+        'admin_panel'  => 'Admin Panel',
+        'notifications'=> 'Notifications',
     ],
     'system_settings' => [
         'condition_value'             => 'Condition Value',
@@ -1927,6 +1929,36 @@ return [
     ],
     'list_group' => [
         'no_quick_links' => 'No quick links available',
+    ],
+    'quick_actions' => [
+        'title' => 'Quick Actions',
+    ],
+    'autocomplete' => [
+        'no_results' => 'No results found',
+    ],
+    'notifications_feed' => [
+        'clear_all'   => 'Clear All',
+        'mark_as_read'=> 'Mark as read',
+        'delete'      => 'Delete',
+        'view_all'    => 'View all notifications',
+    ],
+    'inventory_summary' => [
+        'stock_status_overview'     => 'Stock Status Overview',
+        'in_stock'                  => 'In Stock',
+        'low_stock'                 => 'Low Stock',
+        'out_of_stock'              => 'Out of Stock',
+        'not_tracked'               => 'Not Tracked',
+        'statistics'                => 'Inventory Statistics',
+        'total_products'            => 'Total Products',
+        'tracked_products'          => 'Tracked Products',
+        'tracking_rate'             => 'Tracking Rate',
+        'stock_health'              => 'Stock Health',
+        'stock_health_distribution' => 'Stock Health Distribution',
+    ],
+    'notification_feed_page' => [
+        'title'           => 'Live Notification Feed',
+        'description'     => 'This page demonstrates the live notification feed component. The notification bell in the top navigation provides real-time updates.',
+        'component_title' => 'Notification Feed Component',
     ],
     'variant_analytics'           => [
         'navigation_label'                 => 'Variant Analytics',

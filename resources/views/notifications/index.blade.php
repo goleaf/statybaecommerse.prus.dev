@@ -1,6 +1,6 @@
 @extends('components.layouts.base')
 
-@section('title', __('Notifications'))
+@section('title', __('frontend.notifications.title'))
 
 @section('content')
 <div class="min-h-screen bg-gray-50">
@@ -10,10 +10,10 @@
             <div class="md:flex md:items-center md:justify-between">
                 <div class="flex-1 min-w-0">
                     <h1 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
-                        {{ __('Notifications') }}
+                        {{ __('frontend.notifications.title') }}
                     </h1>
                     <p class="mt-1 text-sm text-gray-500">
-                        {{ __('Manage your notifications and stay updated with the latest information.') }}
+                        {{ __('frontend.notifications.subtitle') }}
                     </p>
                 </div>
                 
@@ -25,7 +25,7 @@
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                         </svg>
-                        {{ __('Refresh') }}
+                        {{ __('frontend.notifications.actions.refresh') }}
                     </a>
                 </div>
             </div>
@@ -50,10 +50,10 @@
                         <div class="ml-5 w-0 flex-1">
                             <dl>
                                 <dt class="text-sm font-medium text-gray-500 truncate">
-                                    {{ __('Mark All Read') }}
+                                    {{ __('frontend.notifications.actions.mark_all_read') }}
                                 </dt>
                                 <dd class="text-lg font-medium text-gray-900">
-                                    {{ __('Quick action to mark all notifications as read') }}
+                                    {{ __('frontend.notifications.actions.mark_all_read_help') }}
                                 </dd>
                             </dl>
                         </div>
@@ -65,7 +65,7 @@
                             wire:click="markAllAsRead"
                             class="font-medium text-green-600 hover:text-green-500"
                         >
-                            {{ __('Mark all as read') }}
+                            {{ __('frontend.notifications.actions.mark_all_as_read') }}
                         </button>
                     </div>
                 </div>
@@ -83,10 +83,10 @@
                         <div class="ml-5 w-0 flex-1">
                             <dl>
                                 <dt class="text-sm font-medium text-gray-500 truncate">
-                                    {{ __('Clear All') }}
+                                    {{ __('frontend.notifications.actions.clear_all') }}
                                 </dt>
                                 <dd class="text-lg font-medium text-gray-900">
-                                    {{ __('Remove all notifications permanently') }}
+                                    {{ __('frontend.notifications.actions.clear_all_help') }}
                                 </dd>
                             </dl>
                         </div>
@@ -96,10 +96,10 @@
                     <div class="text-sm">
                         <button 
                             wire:click="clearAllNotifications"
-                            wire:confirm="{{ __('Are you sure you want to clear all notifications? This action cannot be undone.') }}"
+                            wire:confirm="{{ __('frontend.notifications.confirm.clear_all') }}"
                             class="font-medium text-red-600 hover:text-red-500"
                         >
-                            {{ __('Clear all notifications') }}
+                            {{ __('frontend.notifications.actions.clear_all_confirm') }}
                         </button>
                     </div>
                 </div>
@@ -118,10 +118,10 @@
                         <div class="ml-5 w-0 flex-1">
                             <dl>
                                 <dt class="text-sm font-medium text-gray-500 truncate">
-                                    {{ __('Settings') }}
+                                    {{ __('frontend.notifications.actions.settings') }}
                                 </dt>
                                 <dd class="text-lg font-medium text-gray-900">
-                                    {{ __('Manage notification preferences') }}
+                                    {{ __('frontend.notifications.actions.settings_help') }}
                                 </dd>
                             </dl>
                         </div>
@@ -133,7 +133,7 @@
                             href="{{ route('account.profile') }}"
                             class="font-medium text-blue-600 hover:text-blue-500"
                         >
-                            {{ __('Go to settings') }}
+                            {{ __('frontend.notifications.actions.go_to_settings') }}
                         </a>
                     </div>
                 </div>

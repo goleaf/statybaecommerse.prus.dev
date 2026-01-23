@@ -56,6 +56,8 @@ return [
         'logout'       => 'Atsijungti',
         'example_item' => 'Pavyzdžio elementas',
         'sales'        => 'Pardavimai',
+        'admin_panel'  => 'Administravimo skydelis',
+        'notifications'=> 'Pranešimai',
     ],
     'system_settings' => [
         'condition_value'             => 'Sąlygos reikšmė',
@@ -162,6 +164,36 @@ return [
     ],
     'list_group' => [
         'no_quick_links' => 'Greitų nuorodų nėra',
+    ],
+    'quick_actions' => [
+        'title' => 'Greiti veiksmai',
+    ],
+    'autocomplete' => [
+        'no_results' => 'Rezultatų nerasta',
+    ],
+    'notifications_feed' => [
+        'clear_all'   => 'Išvalyti viską',
+        'mark_as_read'=> 'Pažymėti kaip perskaitytą',
+        'delete'      => 'Ištrinti',
+        'view_all'    => 'Peržiūrėti visus pranešimus',
+    ],
+    'inventory_summary' => [
+        'stock_status_overview'     => 'Atsargų būsenos apžvalga',
+        'in_stock'                  => 'Yra atsargose',
+        'low_stock'                 => 'Mažos atsargos',
+        'out_of_stock'              => 'Išparduota',
+        'not_tracked'               => 'Nesekama',
+        'statistics'                => 'Atsargų statistika',
+        'total_products'            => 'Iš viso produktų',
+        'tracked_products'          => 'Sekami produktai',
+        'tracking_rate'             => 'Sekimo rodiklis',
+        'stock_health'              => 'Atsargų būklė',
+        'stock_health_distribution' => 'Atsargų būklės pasiskirstymas',
+    ],
+    'notification_feed_page' => [
+        'title'           => 'Tiesioginių pranešimų srautas',
+        'description'     => 'Šis puslapis demonstruoja tiesioginių pranešimų srautą. Pranešimų varpelis viršutinėje juostoje pateikia atnaujinimus realiu laiku.',
+        'component_title' => 'Pranešimų srauto komponentas',
     ],
     'search_explorer' => [
         'result'             => 'Rezultatas',

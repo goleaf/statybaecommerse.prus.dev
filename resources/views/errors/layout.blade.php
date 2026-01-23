@@ -1,14 +1,14 @@
 @php
     $code = $code ?? 'Error';
-    $title = $title ?? __('Something went wrong');
-    $description = $description ?? __('An unexpected error occurred.');
+    $title = $title ?? __('frontend.errors.defaults.title');
+    $description = $description ?? __('frontend.errors.defaults.description');
     $primaryAction = $primaryAction ?? null;
     $secondaryAction = $secondaryAction ?? null;
     $showSearch = $showSearch ?? false;
-    $searchTitle = $searchTitle ?? __('Search for what you need');
-    $searchPlaceholder = $searchPlaceholder ?? __('Search products...');
+    $searchTitle = $searchTitle ?? __('frontend.errors.search.title');
+    $searchPlaceholder = $searchPlaceholder ?? __('frontend.errors.search.placeholder');
     $links = $links ?? [];
-    $topCategoriesTitle = $topCategoriesTitle ?? __('Top Categories');
+    $topCategoriesTitle = $topCategoriesTitle ?? __('frontend.errors.top_categories.title');
     $topCategories = collect($topCategories ?? [])
         ->filter(static fn ($category) => is_array($category) && filled($category['label'] ?? null) && filled($category['url'] ?? null))
         ->values();
@@ -80,8 +80,8 @@
         : $fallbackSupportEmail;
 
     $supportEmail = $supportEmail ?? $resolvedSupportEmail;
-    $supportTitle = $supportTitle ?? __('Need more help?');
-    $supportDescription = $supportDescription ?? __('If the problem continues, contact our support team and share the trace ID below so we can assist you quickly.');
+    $supportTitle = $supportTitle ?? __('frontend.errors.support.title');
+    $supportDescription = $supportDescription ?? __('frontend.errors.support.description');
     $statusPageUrl = $statusPageUrl ?? (\Illuminate\Support\Facades\Route::has('status.page')
         ? route('status.page', ['locale' => $locale])
         : url('/status'));
@@ -128,17 +128,17 @@
                         @if($primaryType === 'refresh')
                             <button onclick="window.location.reload()"
                                     class="btn-gradient px-8 py-3 rounded-xl font-semibold text-center">
-                                {{ $primaryAction['label'] ?? __('Refresh Page') }}
+                                {{ $primaryAction['label'] ?? __('frontend.errors.actions.refresh_page') }}
                             </button>
                         @elseif($primaryType === 'back')
                             <button onclick="history.back()"
                                     class="btn-gradient px-8 py-3 rounded-xl font-semibold text-center">
-                                {{ $primaryAction['label'] ?? __('Go Back') }}
+                                {{ $primaryAction['label'] ?? __('frontend.errors.actions.go_back') }}
                             </button>
                         @else
                             <a href="{{ $primaryAction['url'] ?? $homeRoute }}"
                                class="btn-gradient px-8 py-3 rounded-xl font-semibold text-center">
-                                {{ $primaryAction['label'] ?? __('Go Home') }}
+                                {{ $primaryAction['label'] ?? __('frontend.errors.actions.go_home') }}
                             </a>
                         @endif
                     @endif
@@ -148,17 +148,17 @@
                         @if($secondaryType === 'back')
                             <button onclick="history.back()"
                                     class="border-2 border-gray-200 text-gray-700 px-8 py-3 rounded-xl font-semibold hover:border-gray-400 hover:bg-gray-50 transition-colors duration-200">
-                                {{ $secondaryAction['label'] ?? __('Go Back') }}
+                                {{ $secondaryAction['label'] ?? __('frontend.errors.actions.go_back') }}
                             </button>
                         @elseif($secondaryType === 'refresh')
                             <button onclick="window.location.reload()"
                                     class="border-2 border-gray-200 text-gray-700 px-8 py-3 rounded-xl font-semibold hover:border-gray-400 hover:bg-gray-50 transition-colors duration-200">
-                                {{ $secondaryAction['label'] ?? __('Refresh Page') }}
+                                {{ $secondaryAction['label'] ?? __('frontend.errors.actions.refresh_page') }}
                             </button>
                         @else
                             <a href="{{ $secondaryAction['url'] ?? $homeRoute }}"
                                class="border-2 border-gray-200 text-gray-700 px-8 py-3 rounded-xl font-semibold hover:border-gray-400 hover:bg-gray-50 transition-colors duration-200">
-                                {{ $secondaryAction['label'] ?? __('Contact Support') }}
+                                {{ $secondaryAction['label'] ?? __('frontend.errors.actions.contact_support') }}
                             </a>
                         @endif
                     @endif
@@ -213,13 +213,13 @@
 
                 @if(!empty($links))
                     <div class="mt-12">
-                        <h3 class="text-lg font-semibold text-gray-700 mb-6">{{ __('Popular Pages') }}</h3>
+                        <h3 class="text-lg font-semibold text-gray-700 mb-6">{{ __('frontend.errors.popular_pages.title') }}</h3>
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                             @foreach($links as $link)
                                 <a href="{{ $link['url'] ?? $homeRoute }}"
                                    class="text-center p-4 bg-white rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-soft transition-all duration-200">
                                     {!! $iconLibrary[$link['icon'] ?? 'categories'] ?? '' !!}
-                                    <span class="block text-sm font-medium text-gray-700">{{ $link['label'] ?? __('Explore') }}</span>
+                                    <span class="block text-sm font-medium text-gray-700">{{ $link['label'] ?? __('frontend.errors.popular_pages.explore') }}</span>
                                 </a>
                             @endforeach
                         </div>
@@ -230,8 +230,8 @@
                     <div class="mt-12">
                         <div class="bg-blue-50 border border-blue-100 rounded-3xl p-8 text-left sm:flex sm:items-center sm:justify-between sm:gap-8">
                             <div class="max-w-xl">
-                                <h3 class="text-2xl font-semibold text-gray-900 mb-3">{{ $contactCta['title'] ?? __('Need more help?') }}</h3>
-                                <p class="text-sm text-gray-600">{{ $contactCta['description'] ?? __('Reach out to our support team and we will guide you to the right place.') }}</p>
+                                <h3 class="text-2xl font-semibold text-gray-900 mb-3">{{ $contactCta['title'] ?? __('frontend.errors.contact_cta.title') }}</h3>
+                                <p class="text-sm text-gray-600">{{ $contactCta['description'] ?? __('frontend.errors.contact_cta.description') }}</p>
                             </div>
                             @if(!empty($contactCta['actions']) && is_array($contactCta['actions']))
                                 <div class="mt-6 sm:mt-0 flex flex-col sm:flex-row gap-3">
@@ -260,7 +260,7 @@
                     @if($traceId !== null)
                         <div class="mt-6 flex items-center justify-center">
                             <div class="inline-flex flex-col sm:flex-row sm:items-center gap-2 bg-gray-50 border border-gray-200 rounded-xl px-5 py-3">
-                                <span class="text-xs font-semibold uppercase tracking-wide text-gray-500">{{ __('Trace ID') }}</span>
+                                <span class="text-xs font-semibold uppercase tracking-wide text-gray-500">{{ __('frontend.errors.trace_id') }}</span>
                                 <span class="font-mono text-sm text-gray-800">{{ $traceId }}</span>
                             </div>
                         </div>
@@ -270,22 +270,22 @@
                         @if(is_string($supportEmail) && $supportEmail !== '')
                             <a href="mailto:{{ $supportEmail }}"
                                class="border-2 border-gray-200 text-gray-700 px-6 py-3 rounded-xl font-semibold hover:border-gray-400 hover:bg-gray-50 transition-colors duration-200">
-                                {{ __('Email Support') }}
+                                {{ __('frontend.errors.support.email_support') }}
                             </a>
                         @endif
 
                         <a href="{{ $supportPageUrl }}"
                            class="border-2 border-gray-200 text-gray-700 px-6 py-3 rounded-xl font-semibold hover:border-gray-400 hover:bg-gray-50 transition-colors duration-200">
-                            {{ __('Visit Help Center') }}
+                            {{ __('frontend.errors.support.visit_help_center') }}
                         </a>
 
                         <a href="{{ $statusPageUrl }}"
                            class="border-2 border-gray-200 text-gray-700 px-6 py-3 rounded-xl font-semibold hover:border-gray-400 hover:bg-gray-50 transition-colors duration-200">
-                            {{ __('View System Status') }}
+                            {{ __('frontend.errors.support.view_system_status') }}
                         </a>
                     </div>
 
-                    <p class="mt-6 text-xs text-gray-400 text-center">{{ __('Share the trace ID with our support team so we can find your request faster.') }}</p>
+                    <p class="mt-6 text-xs text-gray-400 text-center">{{ __('frontend.errors.support.share_trace_id') }}</p>
                 </div>
             </div>
         </div>
