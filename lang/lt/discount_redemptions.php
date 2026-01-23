@@ -44,4 +44,9 @@ return [
         'redeemed_until' => 'Panaudota iki',
         'has_order'      => 'Turi užsakymą',
     ],
+    'currencies' => [
+        'eur' => 'EUR - Euras',
+        'usd' => 'USD - JAV doleris',
+        'gbp' => 'GBP - Britų svaras',
+    ],
 ];

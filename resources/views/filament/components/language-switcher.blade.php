@@ -1,6 +1,11 @@
 @php
     $currentLocale = app()->getLocale();
-    $availableLocales = ['lt' => 'Lietuvių', 'en' => 'English', 'ru' => 'Русский', 'de' => 'Deutsch'];
+    $availableLocales = [
+        'lt' => __('admin.language_switcher.locales.lt'),
+        'en' => __('admin.language_switcher.locales.en'),
+        'ru' => __('admin.language_switcher.locales.ru'),
+        'de' => __('admin.language_switcher.locales.de'),
+    ];
 @endphp
 
 <div class="filament-language-switcher">
@@ -10,7 +15,7 @@
                                 color="gray"
                                 icon="heroicon-o-language"
                                 size="sm">
-                {{ $availableLocales[$currentLocale] ?? 'Language' }}
+                {{ $availableLocales[$currentLocale] ?? __('admin.language_switcher.language') }}
             </x-filament::button>
         </x-slot>
 

@@ -44,4 +44,9 @@ return [
         'redeemed_until' => 'Redeemed Until',
         'has_order'      => 'Has Order',
     ],
+    'currencies' => [
+        'eur' => 'EUR - Euro',
+        'usd' => 'USD - US Dollar',
+        'gbp' => 'GBP - British Pound',
+    ],
 ];

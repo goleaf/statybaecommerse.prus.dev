@@ -198,11 +198,11 @@
                             <label for="country_code" class="block text-sm font-medium text-gray-700">{{ __('translations.country') }} *</label>
                             <select name="country_code" id="country_code" 
                                     class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                                <option value="LT" {{ old('country_code', 'LT') === 'LT' ? 'selected' : '' }}>Lietuva</option>
-                                <option value="LV" {{ old('country_code') === 'LV' ? 'selected' : '' }}>Latvija</option>
-                                <option value="EE" {{ old('country_code') === 'EE' ? 'selected' : '' }}>Eesti</option>
-                                <option value="PL" {{ old('country_code') === 'PL' ? 'selected' : '' }}>Polska</option>
-                                <option value="DE" {{ old('country_code') === 'DE' ? 'selected' : '' }}>Deutschland</option>
+                                <option value="LT" {{ old('country_code', 'LT') === 'LT' ? 'selected' : '' }}>{{ __('addresses.countries.lt') }}</option>
+                                <option value="LV" {{ old('country_code') === 'LV' ? 'selected' : '' }}>{{ __('addresses.countries.lv') }}</option>
+                                <option value="EE" {{ old('country_code') === 'EE' ? 'selected' : '' }}>{{ __('addresses.countries.ee') }}</option>
+                                <option value="PL" {{ old('country_code') === 'PL' ? 'selected' : '' }}>{{ __('addresses.countries.pl') }}</option>
+                                <option value="DE" {{ old('country_code') === 'DE' ? 'selected' : '' }}>{{ __('addresses.countries.de') }}</option>
                             </select>
                             @error('country_code')
                                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>

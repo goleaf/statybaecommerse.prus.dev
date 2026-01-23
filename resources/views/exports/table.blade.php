@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Export</title>
+    <title>{{ __('admin.exports.title') }}</title>
     <style>
         body { font-family: DejaVu Sans, sans-serif; font-size: 12px; }
         table { width: 100%; border-collapse: collapse; }
@@ -28,7 +28,7 @@
         </tr>
     @empty
         <tr>
-            <td colspan="{{ count($headers) }}">No data</td>
+            <td colspan="{{ count($headers) }}">{{ __('admin.exports.no_data') }}</td>
         </tr>
     @endforelse
     </tbody>

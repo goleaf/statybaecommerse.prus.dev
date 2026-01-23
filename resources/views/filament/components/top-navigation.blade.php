@@ -36,7 +36,7 @@
             <div class="flex items-center">
                 <a href="{{ route('filament.admin.pages.dashboard') }}" class="flex items-center space-x-2">
                     <x-heroicon-o-cube class="h-8 w-8 text-primary-600" />
-                    <span class="text-xl font-bold text-gray-900">{{ __('admin_panel') }}</span>
+                    <span class="text-xl font-bold text-gray-900">{{ __('admin.navigation.admin_panel') }}</span>
                 </a>
             </div>
 
@@ -253,7 +253,7 @@
                 >
                     <button
                             type="button"
-                            aria-label="{{ __('Notifications') }}"
+                            aria-label="{{ __('admin.navigation.notifications') }}"
                             class="relative p-2 text-gray-400 hover:text-gray-500"
                     >
                         <x-heroicon-o-bell class="h-5 w-5" />

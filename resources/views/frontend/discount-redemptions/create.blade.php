@@ -1,6 +1,6 @@
 @extends('frontend.layouts.app')
 
-@section('title', __('Redeem Discount Code'))
+@section('title', __('frontend.discount_redemptions.redeem_title'))
 
 @section('content')
     <div class="container mx-auto px-4 py-8">
@@ -8,10 +8,10 @@
             <!-- Header -->
             <div class="mb-8">
                 <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
-                    {{ __('Redeem Discount Code') }}
+                    {{ __('frontend.discount_redemptions.redeem_title') }}
                 </h1>
                 <p class="mt-2 text-gray-600 dark:text-gray-400">
-                    {{ __('Enter your discount code to redeem it and save money on your purchase.') }}
+                    {{ __('frontend.discount_redemptions.redeem_subtitle') }}
                 </p>
             </div>
 
@@ -19,7 +19,7 @@
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
                 <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                     <h2 class="text-lg font-medium text-gray-900 dark:text-white">
-                        {{ __('Enter Discount Code') }}
+                        {{ __('frontend.discount_redemptions.form_title') }}
                     </h2>
                 </div>
 
@@ -31,7 +31,7 @@
                         <div>
                             <label for="discount_code"
                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                {{ __('Discount Code') }} <span class="text-red-500">*</span>
+                                {{ __('frontend.discount_redemptions.fields.code') }} <span class="text-red-500">*</span>
                             </label>
                             <div class="relative">
                                 <input type="text"
@@ -39,7 +39,7 @@
                                        id="discount_code"
                                        value="{{ old('discount_code') }}"
                                        class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white @error('discount_code') border-red-500 @enderror"
-                                       placeholder="{{ __('Enter your discount code here') }}"
+                                       placeholder="{{ __('frontend.discount_redemptions.placeholders.code') }}"
                                        required
                                        autofocus>
                                 <div class="absolute inset-y-0 right-0 flex items-center pr-3">
@@ -55,26 +55,26 @@
                                 <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                             @enderror
                             <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                {{ __('Enter the discount code exactly as it appears on your coupon or email.') }}
+                                {{ __('frontend.discount_redemptions.help.code') }}
                             </p>
                         </div>
 
                         <!-- Order ID (Optional) -->
                         <div>
                             <label for="order_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                {{ __('Order ID') }} <span class="text-gray-500">({{ __('Optional') }})</span>
+                                {{ __('frontend.discount_redemptions.fields.order_id') }} <span class="text-gray-500">({{ __('frontend.discount_redemptions.optional') }})</span>
                             </label>
                             <input type="text"
                                    name="order_id"
                                    id="order_id"
                                    value="{{ old('order_id') }}"
                                    class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white @error('order_id') border-red-500 @enderror"
-                                   placeholder="{{ __('Enter order ID if applicable') }}">
+                                   placeholder="{{ __('frontend.discount_redemptions.placeholders.order_id') }}">
                             @error('order_id')
                                 <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                             @enderror
                             <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                {{ __('If you have an existing order, enter the order ID to apply the discount.') }}
+                                {{ __('frontend.discount_redemptions.help.order_id') }}
                             </p>
                         </div>
 
@@ -91,15 +91,14 @@
                                 </div>
                                 <div class="ml-3">
                                     <h3 class="text-sm font-medium text-blue-800 dark:text-blue-200">
-                                        {{ __('How it works') }}
+                                        {{ __('frontend.discount_redemptions.how_it_works.title') }}
                                     </h3>
                                     <div class="mt-2 text-sm text-blue-700 dark:text-blue-300">
                                         <ul class="list-disc list-inside space-y-1">
-                                            <li>{{ __('Enter your discount code in the field above') }}</li>
-                                            <li>{{ __('The system will validate your code and show the discount amount') }}
-                                            </li>
-                                            <li>{{ __('Your discount will be applied to your account') }}</li>
-                                            <li>{{ __('You can use the discount on your next purchase') }}</li>
+                                            <li>{{ __('frontend.discount_redemptions.how_it_works.step_1') }}</li>
+                                            <li>{{ __('frontend.discount_redemptions.how_it_works.step_2') }}</li>
+                                            <li>{{ __('frontend.discount_redemptions.how_it_works.step_3') }}</li>
+                                            <li>{{ __('frontend.discount_redemptions.how_it_works.step_4') }}</li>
                                         </ul>
                                     </div>
                                 </div>
@@ -109,21 +108,16 @@
                         <!-- Terms and Conditions -->
                         <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
                             <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-2">
-                                {{ __('Terms and Conditions') }}
+                                {{ __('frontend.discount_redemptions.terms.title') }}
                             </h3>
                             <div class="text-sm text-gray-600 dark:text-gray-400 space-y-2">
-                                <p>{{ __('By redeeming a discount code, you agree to the following terms:') }}</p>
+                                <p>{{ __('frontend.discount_redemptions.terms.intro') }}</p>
                                 <ul class="list-disc list-inside space-y-1 ml-4">
-                                    <li>{{ __('Discount codes are subject to availability and may have expiration dates') }}
-                                    </li>
-                                    <li>{{ __('Each discount code can only be used once per user unless otherwise specified') }}
-                                    </li>
-                                    <li>{{ __('Discount codes cannot be combined with other offers unless explicitly stated') }}
-                                    </li>
-                                    <li>{{ __('We reserve the right to modify or cancel discount codes at any time') }}
-                                    </li>
-                                    <li>{{ __('Discount codes are non-transferable and cannot be exchanged for cash') }}
-                                    </li>
+                                    <li>{{ __('frontend.discount_redemptions.terms.bullet_1') }}</li>
+                                    <li>{{ __('frontend.discount_redemptions.terms.bullet_2') }}</li>
+                                    <li>{{ __('frontend.discount_redemptions.terms.bullet_3') }}</li>
+                                    <li>{{ __('frontend.discount_redemptions.terms.bullet_4') }}</li>
+                                    <li>{{ __('frontend.discount_redemptions.terms.bullet_5') }}</li>
                                 </ul>
                             </div>
                         </div>
@@ -133,11 +127,11 @@
                     <div class="mt-8 flex justify-end space-x-3">
                         <a href="{{ route('frontend.discount-redemptions.index') }}"
                            class="px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-150 ease-in-out">
-                            {{ __('Cancel') }}
+                            {{ __('frontend.discount_redemptions.actions.cancel') }}
                         </a>
                         <button type="submit"
                                 class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                            {{ __('Redeem Code') }}
+                            {{ __('frontend.discount_redemptions.actions.redeem') }}
                         </button>
                     </div>
                 </form>
@@ -147,32 +141,32 @@
             <div class="mt-8 bg-white dark:bg-gray-800 rounded-lg shadow">
                 <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                     <h2 class="text-lg font-medium text-gray-900 dark:text-white">
-                        {{ __('Need Help?') }}
+                        {{ __('frontend.discount_redemptions.help_section.title') }}
                     </h2>
                 </div>
                 <div class="p-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-2">
-                                {{ __('Common Issues') }}
+                                {{ __('frontend.discount_redemptions.help_section.common_issues') }}
                             </h3>
                             <ul class="text-sm text-gray-600 dark:text-gray-400 space-y-1">
-                                <li>• {{ __('Make sure you enter the code exactly as shown') }}</li>
-                                <li>• {{ __('Check that the code hasn\'t expired') }}</li>
-                                <li>• {{ __('Ensure you haven\'t already used this code') }}</li>
-                                <li>• {{ __('Verify the code is still active') }}</li>
+                                <li>• {{ __('frontend.discount_redemptions.help_section.issue_1') }}</li>
+                                <li>• {{ __('frontend.discount_redemptions.help_section.issue_2') }}</li>
+                                <li>• {{ __('frontend.discount_redemptions.help_section.issue_3') }}</li>
+                                <li>• {{ __('frontend.discount_redemptions.help_section.issue_4') }}</li>
                             </ul>
                         </div>
                         <div>
                             <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-2">
-                                {{ __('Contact Support') }}
+                                {{ __('frontend.discount_redemptions.help_section.contact_support') }}
                             </h3>
                             <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                                {{ __('If you\'re having trouble redeeming your code, please contact our support team.') }}
+                                {{ __('frontend.discount_redemptions.help_section.contact_support_description') }}
                             </p>
                             <a href="{{ route('frontend.contact.index') }}"
                                class="inline-flex items-center text-sm text-blue-600 dark:text-blue-400 hover:underline">
-                                {{ __('Contact Support') }}
+                                {{ __('frontend.discount_redemptions.help_section.contact_support') }}
                                 <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
                                     </path>

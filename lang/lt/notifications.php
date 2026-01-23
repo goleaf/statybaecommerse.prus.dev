@@ -194,6 +194,13 @@ return [
     'admin' => [
         'admin_message_footer' => 'Šis pranešimas išsiųstas iš sistemos administracijos.',
     ],
+    'email' => [
+        'urgent'            => '⚠️ SKUBUS PRANEŠIMAS',
+        'tags'              => 'Žymos',
+        'view_notification' => 'Peržiūrėti pranešimą',
+        'sent_from'         => 'Šis pranešimas buvo išsiųstas iš :app.',
+        'preferences_hint'  => 'Jei nebenorite gauti šių pranešimų, galite atnaujinti nustatymus savo paskyroje.',
+    ],
     'low_stock' => [
         'alert_title'       => 'Mažos atsargos',
         'alert_message'     => 'Produktas :name turi mažai atsargų (:stock vienetų liko)',

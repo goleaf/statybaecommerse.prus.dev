@@ -3,8 +3,9 @@
 declare(strict_types=1);
 
 return [
-    'single' => 'Analitikos Įvykis',
-    'plural' => 'Analitikos Įvykiai',
+    'single'        => 'Analitikos Įvykis',
+    'plural'        => 'Analitikos Įvykiai',
+    'event_details' => 'Įvykio detalės',
     // Basic Information
     'basic_information' => 'Pagrindinė Informacija',
     'event_name'        => 'Įvykio Pavadinimas',
@@ -53,13 +54,20 @@ return [
     'user_name'        => 'Vartotojo Vardas',
     'session_id'       => 'Sesijos ID',
     'session_id_help'  => 'Unikalus sesijos identifikatorius',
+    'user_id_short'    => 'ID: :id',
+    'user_id_only'     => 'Vartotojo ID: :id',
+    'anonymous'        => 'Anonimas',
     'user_agent'       => 'Vartotojo Agentas',
     'user_agent_help'  => 'Naršyklės vartotojo agento eilutė',
     // Event Data
     'event_data'           => 'Įvykio Duomenys',
+    'event_properties'     => 'Įvykio savybės',
     'event_data_key'       => 'Raktas',
     'event_data_value'     => 'Reikšmė',
     'add_event_data_field' => 'Pridėti Įvykio Duomenų Lauką',
+    'url'                  => 'URL',
+    'referrer'             => 'Nukreipėjas',
+    'country_code'         => 'Šalies kodas',
     // Context Information
     'context_information' => 'Konteksto Informacija',
     'ip_address'          => 'IP Adresas',

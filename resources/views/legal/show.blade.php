@@ -69,7 +69,7 @@
                             @if ($document->is_required)
                                 <span
                                       class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                    Privalomas
+                                    {{ __('frontend.legal.required') }}
                                 </span>
                             @endif
 
@@ -85,22 +85,22 @@
                             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                                 @if (isset($document->meta_data['version']))
                                     <div>
-                                        <span class="font-medium text-gray-700">Versija:</span>
+                                        <span class="font-medium text-gray-700">{{ __('frontend.legal.version') }}:</span>
                                         <span class="text-gray-600">{{ $document->meta_data['version'] }}</span>
-                                        <span class="sr-only">Versija: {{ $document->meta_data['version'] }}</span>
+                                        <span class="sr-only">{{ __('frontend.legal.version') }}: {{ $document->meta_data['version'] }}</span>
                                     </div>
                                 @endif
 
                                 @if (isset($document->meta_data['effective_date']))
                                     <div>
-                                        <span class="text-gray-700">Įsigaliojimo data:
+                                        <span class="text-gray-700">{{ __('frontend.legal.effective_date') }}:
                                             {{ $document->meta_data['effective_date'] }}</span>
                                     </div>
                                 @endif
 
                                 @if (isset($document->meta_data['last_reviewed']))
                                     <div>
-                                        <span class="text-gray-700">Peržiūros data:
+                                        <span class="text-gray-700">{{ __('frontend.legal.last_reviewed') }}:
                                             {{ $document->meta_data['last_reviewed'] }}</span>
                                     </div>
                                 @endif
@@ -148,13 +148,13 @@
             <!-- Related Documents -->
             @if ($relatedDocuments->isNotEmpty() || $otherDocuments->isNotEmpty())
                 <div class="mb-4">
-                    <h2 class="text-2xl font-semibold text-gray-900">Susiję dokumentai</h2>
+                    <h2 class="text-2xl font-semibold text-gray-900">{{ __('frontend.legal.related_documents') }}</h2>
                 </div>
                 <div class="grid md:grid-cols-2 gap-8">
                     @if ($relatedDocuments->isNotEmpty())
                         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                             <h3 class="text-xl font-semibold text-gray-900 mb-4">
-                                Susiję dokumentai
+                                {{ __('frontend.legal.related_documents') }}
                             </h3>
                             <div class="space-y-3">
                                 @foreach ($relatedDocuments as $relatedDocument)

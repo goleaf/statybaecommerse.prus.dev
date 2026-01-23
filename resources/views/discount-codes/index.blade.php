@@ -1,14 +1,14 @@
 @extends('components.layouts.base')
 
-@section('title', __('discount_codes'))
+@section('title', __('discount_codes.title'))
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
     <div class="max-w-4xl mx-auto">
         <!-- Header -->
         <div class="text-center mb-8">
-            <h1 class="text-3xl font-bold text-gray-900 mb-4">{{ __('discount_codes') }}</h1>
-            <p class="text-gray-600">{{ __('Find and apply discount codes to save on your purchases') }}</p>
+            <h1 class="text-3xl font-bold text-gray-900 mb-4">{{ __('discount_codes.title') }}</h1>
+            <p class="text-gray-600">{{ __('discount_codes.page.subtitle') }}</p>
         </div>
 
         <!-- Search and Filter -->
@@ -18,7 +18,7 @@
                     <input 
                         type="text" 
                         id="code-search" 
-                        placeholder="{{ __('Enter discount code') }}"
+                        placeholder="{{ __('discount_codes.page.search_placeholder') }}"
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
                 </div>
@@ -26,7 +26,7 @@
                     id="validate-code" 
                     class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                 >
-                    {{ __('discount_code_validate') }}
+                    {{ __('discount_codes.page.validate') }}
                 </button>
             </div>
             
@@ -36,7 +36,7 @@
 
         <!-- Available Codes -->
         <div class="bg-white rounded-lg shadow-md p-6">
-            <h2 class="text-xl font-semibold text-gray-900 mb-4">{{ __('Available Discount Codes') }}</h2>
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">{{ __('discount_codes.page.available_title') }}</h2>
             
             <div id="available-codes" class="space-y-4">
                 <!-- Codes will be loaded here -->
@@ -44,7 +44,7 @@
             
             <div id="loading-codes" class="text-center py-8">
                 <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                <p class="mt-2 text-gray-600">{{ __('Loading discount codes...') }}</p>
+                <p class="mt-2 text-gray-600">{{ __('discount_codes.page.loading') }}</p>
             </div>
         </div>
     </div>
@@ -55,7 +55,7 @@
     <div class="flex items-center justify-center min-h-screen p-4">
         <div class="bg-white rounded-lg max-w-md w-full p-6">
             <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-semibold">{{ __('Discount Code Details') }}</h3>
+                <h3 class="text-lg font-semibold">{{ __('discount_codes.page.details_title') }}</h3>
                 <button id="close-modal" class="text-gray-400 hover:text-gray-600">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -89,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function() {
     validateBtn.addEventListener('click', function() {
         const code = codeSearch.value.trim();
         if (!code) {
-            showValidationResult('error', '{{ __("Please enter a discount code") }}');
+            showValidationResult('error', '{{ __("discount_codes.page.errors.enter_code") }}');
             return;
         }
 
@@ -117,13 +117,13 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .catch(error => {
                 loadingCodes.classList.add('hidden');
-                availableCodes.innerHTML = '<p class="text-red-600">{{ __("Failed to load discount codes") }}</p>';
+                availableCodes.innerHTML = '<p class="text-red-600">{{ __("discount_codes.page.errors.load_failed") }}</p>';
             });
     }
 
     function displayAvailableCodes(codes) {
         if (codes.length === 0) {
-            availableCodes.innerHTML = '<p class="text-gray-600 text-center py-8">{{ __("No discount codes available at the moment") }}</p>';
+            availableCodes.innerHTML = '<p class="text-gray-600 text-center py-8">{{ __("discount_codes.page.empty") }}</p>';
             return;
         }
 
@@ -138,16 +138,16 @@ document.addEventListener('DOMContentLoaded', function() {
                                 ${code.discount.name}
                             </span>
                             <span class="inline-block bg-green-100 text-green-800 text-sm px-2 py-1 rounded ml-2">
-                                ${code.discount.value}${code.discount.type === 'percentage' ? '%' : '€'} ${code.discount.type === 'percentage' ? '{{ __("off") }}' : '{{ __("off") }}'}
+                                ${code.discount.value}${code.discount.type === 'percentage' ? '%' : '€'} ${code.discount.type === 'percentage' ? '{{ __("discount_codes.page.off") }}' : '{{ __("discount_codes.page.off") }}'}
                             </span>
                         </div>
-                        ${code.expires_at ? `<p class="text-sm text-gray-500 mt-2">{{ __("Expires") }}: ${code.expires_at}</p>` : ''}
+                        ${code.expires_at ? `<p class="text-sm text-gray-500 mt-2">{{ __("discount_codes.page.expires") }}: ${code.expires_at}</p>` : ''}
                     </div>
                     <button 
                         onclick="showCodeDetails('${code.code}')"
                         class="ml-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                     >
-                        {{ __('View Details') }}
+                        {{ __('discount_codes.page.view_details') }}
                     </button>
                 </div>
             </div>
@@ -173,7 +173,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         })
         .catch(error => {
-            showValidationResult('error', '{{ __("Something went wrong. Please try again.") }}');
+            showValidationResult('error', '{{ __("discount_codes.page.errors.generic") }}');
         });
     }
 
@@ -197,11 +197,11 @@ document.addEventListener('DOMContentLoaded', function() {
             modalContent.innerHTML = `
                 <div class="space-y-4">
                     <div>
-                        <h4 class="font-semibold text-gray-900">{{ __('Code') }}:</h4>
+                        <h4 class="font-semibold text-gray-900">{{ __('discount_codes.code') }}:</h4>
                         <p class="text-2xl font-mono bg-gray-100 p-2 rounded">${codeText}</p>
                     </div>
                     <div>
-                        <h4 class="font-semibold text-gray-900">{{ __('Description') }}:</h4>
+                        <h4 class="font-semibold text-gray-900">{{ __('discount_codes.description') }}:</h4>
                         <p class="text-gray-600">${description}</p>
                     </div>
                     <div class="flex gap-2">
@@ -209,13 +209,13 @@ document.addEventListener('DOMContentLoaded', function() {
                             onclick="copyCode('${codeText}')"
                             class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                         >
-                            {{ __('discount_code_copy') }}
+                            {{ __('discount_codes.page.copy') }}
                         </button>
                         <button 
                             onclick="applyCode('${codeText}')"
                             class="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
                         >
-                            {{ __('discount_code_apply') }}
+                            {{ __('discount_codes.page.apply') }}
                         </button>
                     </div>
                 </div>
@@ -227,7 +227,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     window.copyCode = function(code) {
         navigator.clipboard.writeText(code).then(() => {
-            showValidationResult('success', '{{ __("Code copied to clipboard") }}');
+            showValidationResult('success', '{{ __("discount_codes.page.copied") }}');
         });
     };
 
@@ -250,11 +250,10 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         })
         .catch(error => {
-            showValidationResult('error', '{{ __("Something went wrong. Please try again.") }}');
+            showValidationResult('error', '{{ __("discount_codes.page.errors.generic") }}');
         });
     };
 });
 </script>
 @endpush
 @endsection
-

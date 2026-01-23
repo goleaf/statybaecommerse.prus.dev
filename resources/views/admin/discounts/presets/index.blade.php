@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Discount Presets</title>
+    <title>{{ __('admin.discount_presets.title') }}</title>
     <!-- Basic styling keeps the page readable without relying on external assets. -->
     <style>
         body { font-family: Arial, sans-serif; margin: 2rem; background-color: #f9fafb; color: #1f2933; }
@@ -21,7 +21,7 @@
     </style>
 </head>
 <body>
-    <h1>Discount Presets</h1>
+    <h1>{{ __('admin.discount_presets.title') }}</h1>
 
     @if (session('status'))
         <div class="status">
@@ -33,12 +33,12 @@
     <table>
         <thead>
             <tr>
-                <th>Name</th>
-                <th>Description</th>
-                <th>Type</th>
-                <th>Value</th>
-                <th>Conditions</th>
-                <th>Created</th>
+                <th>{{ __('admin.discount_presets.columns.name') }}</th>
+                <th>{{ __('admin.discount_presets.columns.description') }}</th>
+                <th>{{ __('admin.discount_presets.columns.type') }}</th>
+                <th>{{ __('admin.discount_presets.columns.value') }}</th>
+                <th>{{ __('admin.discount_presets.columns.conditions') }}</th>
+                <th>{{ __('admin.discount_presets.columns.created') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -56,14 +56,14 @@
                                 @endforeach
                             </ul>
                         @else
-                            <span>—</span>
+                            <span>{{ __('admin.common.not_available') }}</span>
                         @endif
                     </td>
                     <td>{{ \Carbon\Carbon::parse($preset['created_at'])->format('Y-m-d H:i') }}</td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="6">No discount presets available yet.</td>
+                    <td colspan="6">{{ __('admin.discount_presets.empty') }}</td>
                 </tr>
             @endforelse
         </tbody>
@@ -72,41 +72,41 @@
     <form method="POST" action="{{ route('admin.discounts.presets.store') }}">
         @csrf
         <!-- Form allows administrators to add new preset definitions. -->
-        <label for="name">Name</label>
+        <label for="name">{{ __('admin.discount_presets.form.name') }}</label>
         <input id="name" name="name" type="text" value="{{ old('name') }}" required>
         @error('name')
             <div>{{ $message }}</div>
         @enderror
 
-        <label for="description">Description</label>
+        <label for="description">{{ __('admin.discount_presets.form.description') }}</label>
         <textarea id="description" name="description" rows="3">{{ old('description') }}</textarea>
         @error('description')
             <div>{{ $message }}</div>
         @enderror
 
-        <label for="type">Type</label>
+        <label for="type">{{ __('admin.discount_presets.form.type') }}</label>
         <select id="type" name="type" required>
-            <option value="percentage" @selected(old('type', 'percentage') === 'percentage')>Percentage</option>
-            <option value="fixed" @selected(old('type') === 'fixed')>Fixed Amount</option>
+            <option value="percentage" @selected(old('type', 'percentage') === 'percentage')>{{ __('admin.discount_presets.types.percentage') }}</option>
+            <option value="fixed" @selected(old('type') === 'fixed')>{{ __('admin.discount_presets.types.fixed') }}</option>
         </select>
         @error('type')
             <div>{{ $message }}</div>
         @enderror
 
-        <label for="value">Value</label>
+        <label for="value">{{ __('admin.discount_presets.form.value') }}</label>
         <input id="value" name="value" type="number" min="0" step="0.01" value="{{ old('value', 0) }}" required>
         @error('value')
             <div>{{ $message }}</div>
         @enderror
 
-        <label for="conditions">Conditions</label>
-        <textarea id="conditions" name="conditions" rows="2" placeholder="Enter one condition per line">{{ old('conditions') }}</textarea>
-        <p class="conditions-help">Example conditions: <code>applies_to:seasonal</code>, <code>customer_group:vip</code></p>
+        <label for="conditions">{{ __('admin.discount_presets.form.conditions') }}</label>
+        <textarea id="conditions" name="conditions" rows="2" placeholder="{{ __('admin.discount_presets.form.conditions_placeholder') }}">{{ old('conditions') }}</textarea>
+        <p class="conditions-help">{{ __('admin.discount_presets.form.conditions_help') }}</p>
         @error('conditions')
             <div>{{ $message }}</div>
         @enderror
 
-        <button type="submit">Save Preset</button>
+        <button type="submit">{{ __('admin.discount_presets.form.submit') }}</button>
     </form>
 </body>
 </html>

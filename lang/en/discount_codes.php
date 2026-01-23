@@ -76,4 +76,24 @@ return [
     'bulk_deactivated_success' => 'Selected records deactivated successfully',
 
     'free_shipping' => 'Free Shipping',
+    'page' => [
+        'subtitle'          => 'Find and apply discount codes to save on your purchases',
+        'search_placeholder'=> 'Enter discount code',
+        'validate'          => 'Validate code',
+        'available_title'   => 'Available Discount Codes',
+        'loading'           => 'Loading discount codes...',
+        'details_title'     => 'Discount Code Details',
+        'view_details'      => 'View Details',
+        'expires'           => 'Expires',
+        'off'               => 'off',
+        'empty'             => 'No discount codes available at the moment',
+        'copy'              => 'Copy code',
+        'apply'             => 'Apply code',
+        'copied'            => 'Code copied to clipboard',
+        'errors'            => [
+            'enter_code' => 'Please enter a discount code',
+            'load_failed'=> 'Failed to load discount codes',
+            'generic'    => 'Something went wrong. Please try again.',
+        ],
+    ],
 ];
