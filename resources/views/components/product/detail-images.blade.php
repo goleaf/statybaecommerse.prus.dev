@@ -49,11 +49,11 @@
                     {{ __('translations.image_dimensions') }}:
                 </span>
                 <div class="flex flex-wrap gap-2">
-                    <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">150×150 (XS)</span>
-                    <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">300×300 (SM)</span>
-                    <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">500×500 (MD)</span>
-                    <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">800×800 (LG)</span>
-                    <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">1200×1200 (XL)</span>
+                    <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">{{ __('frontend.images.sizes.xs') }}</span>
+                    <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">{{ __('frontend.images.sizes.sm') }}</span>
+                    <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">{{ __('frontend.images.sizes.md') }}</span>
+                    <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">{{ __('frontend.images.sizes.lg') }}</span>
+                    <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">{{ __('frontend.images.sizes.xl') }}</span>
                 </div>
             </div>
 
@@ -68,7 +68,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a9 9 0 117.072 0l-.548.547A3.374 3.374 0 0014.846 21H9.154a3.374 3.374 0 00-3.182-2.263l-.548-.547z"></path>
                         </svg>
                         <span class="text-green-700 dark:text-green-300 text-sm font-medium">
-                            {{ $generatedImages->count() }} {{ __('translations.random_image') }}{{ $generatedImages->count() > 1 ? 's' : '' }}
+                            {{ trans_choice('frontend.images.generated_images_count', $generatedImages->count(), ['count' => $generatedImages->count()]) }}
                         </span>
                     </div>
                 </div>
@@ -107,7 +107,7 @@
 
                         {{-- WebP Badge --}}
                         <div class="absolute bottom-2 right-2 bg-blue-500 text-white px-1 py-0.5 rounded text-xs">
-                            WebP
+                            {{ __('frontend.images.webp_badge') }}
                         </div>
                     </div>
                 @endforeach

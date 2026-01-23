@@ -194,6 +194,13 @@ return [
     'admin' => [
         'admin_message_footer' => 'This message was sent from the system administration.',
     ],
+    'email' => [
+        'urgent'            => '⚠️ URGENT NOTIFICATION',
+        'tags'              => 'Tags',
+        'view_notification' => 'View Notification',
+        'sent_from'         => 'This notification was sent from :app.',
+        'preferences_hint'  => 'If you no longer wish to receive these notifications, you can update your preferences in your account settings.',
+    ],
     'low_stock' => [
         'alert_title'       => 'Low Stock Alert',
         'alert_message'     => 'Product :name is running low on stock (:stock units remaining)',

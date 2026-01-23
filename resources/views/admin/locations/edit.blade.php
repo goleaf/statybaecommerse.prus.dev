@@ -2,11 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Edit Location</title>
+    <title>{{ __('admin.locations_page.edit_title') }}</title>
 </head>
 <body>
-    <h1>Edit Location</h1>
-    <p>Editing: {{ $location->name }}</p>
+    <h1>{{ __('admin.locations_page.edit_title') }}</h1>
+    <p>{{ __('admin.locations_page.editing', ['name' => $location->name]) }}</p>
 </body>
 </html>
-

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>News Images</title>
+    <title>{{ __('admin.news_images_table.title') }}</title>
     <style>
         body { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; padding: 2rem; background-color: #f8fafc; color: #0f172a; }
         h1 { font-size: 1.5rem; margin-bottom: 1rem; }
@@ -25,67 +25,67 @@
     <!-- data-persist-filters-in-session=&quot;true&quot; -->
     <!-- data-persist-sort-in-session=&quot;true&quot; -->
     <!-- data-persist-search-in-session=&quot;true&quot; -->
-    <h1>News Images</h1>
+    <h1>{{ __('admin.news_images_table.title') }}</h1>
 
     <div class="filters">
-        <strong>Active Filters:</strong>
-        <span>{{ $activeFilters !== '' ? $activeFilters : 'None' }}</span>
+        <strong>{{ __('admin.news_images_table.active_filters') }}</strong>
+        <span>{{ $activeFilters !== '' ? $activeFilters : __('admin.news_images_table.none') }}</span>
     </div>
 
     <table aria-describedby="news-images-table">
         <thead>
         <tr>
-            <th>Preview</th>
-            <th>News</th>
-            <th>Alt Text</th>
-            <th>Caption</th>
-            <th>Featured</th>
-            <th>Sort Order</th>
-            <th>File Size</th>
-            <th>MIME Type</th>
-            <th>Dimensions</th>
+            <th>{{ __('admin.news_images_table.columns.preview') }}</th>
+            <th>{{ __('admin.news_images_table.columns.news') }}</th>
+            <th>{{ __('admin.news_images_table.columns.alt_text') }}</th>
+            <th>{{ __('admin.news_images_table.columns.caption') }}</th>
+            <th>{{ __('admin.news_images_table.columns.featured') }}</th>
+            <th>{{ __('admin.news_images_table.columns.sort_order') }}</th>
+            <th>{{ __('admin.news_images_table.columns.file_size') }}</th>
+            <th>{{ __('admin.news_images_table.columns.mime_type') }}</th>
+            <th>{{ __('admin.news_images_table.columns.dimensions') }}</th>
         </tr>
         </thead>
         <tbody>
         @forelse($images as $image)
             <tr data-record-id="{{ $image->id }}">
                 <td class="preview">
-                    <img src="{{ $image->thumbnail_url }}" alt="{{ $image->alt_text ?? 'Preview image' }}">
+                    <img src="{{ $image->thumbnail_url }}" alt="{{ $image->alt_text ?? __('admin.news_images_table.preview_alt') }}">
                 </td>
-                <td>{{ 'News #'.$image->news_id }}</td>
-                <td>{{ $image->alt_text ?? '—' }}</td>
-                <td>{{ $image->caption ?? '—' }}</td>
-                <td>{{ $image->is_featured ? 'Yes' : 'No' }}</td>
+                <td>{{ __('admin.news_images_table.news_reference', ['id' => $image->news_id]) }}</td>
+                <td>{{ $image->alt_text ?? __('admin.common.not_available') }}</td>
+                <td>{{ $image->caption ?? __('admin.common.not_available') }}</td>
+                <td>{{ $image->is_featured ? __('admin.common.yes') : __('admin.common.no') }}</td>
                 <td>{{ $image->sort_order }}</td>
                 <td>{{ $image->file_size_formatted }}</td>
-                <td>{{ $image->mime_type ?? '—' }}</td>
+                <td>{{ $image->mime_type ?? __('admin.common.not_available') }}</td>
                 <td>
                     @if(is_array($image->dimensions) && isset($image->dimensions['width'], $image->dimensions['height']))
                         {{ $image->dimensions['width'] }}x{{ $image->dimensions['height'] }}
                     @else
-                        —
+                        {{ __('admin.common.not_available') }}
                     @endif
                 </td>
             </tr>
         @empty
             <tr>
-                <td colspan="9">No news images found.</td>
+                <td colspan="9">{{ __('admin.news_images_table.empty') }}</td>
             </tr>
         @endforelse
         </tbody>
     </table>
 
     <div class="table-actions">
-        <strong>Available Actions:</strong>
-        <span>View</span>
-        <span>Edit</span>
-        <span>Duplicate</span>
-        <span>Download</span>
-        <span>Delete</span>
+        <strong>{{ __('admin.news_images_table.available_actions') }}</strong>
+        <span>{{ __('admin.common.view') }}</span>
+        <span>{{ __('admin.common.edit') }}</span>
+        <span>{{ __('admin.common.duplicate') }}</span>
+        <span>{{ __('admin.common.download') }}</span>
+        <span>{{ __('admin.common.delete') }}</span>
     </div>
 
     <div class="table-pagination">
-        <strong>Per Page:</strong>
+        <strong>{{ __('admin.news_images_table.per_page') }}</strong>
         <span>10</span>
         <span>25</span>
         <span>50</span>

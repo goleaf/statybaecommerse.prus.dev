@@ -5,6 +5,7 @@ declare(strict_types=1);
 return [
     'single' => 'Analytics Event',
     'plural' => 'Analytics Events',
+    'event_details' => 'Event Details',
     // Basic Information
     'basic_information' => 'Basic Information',
     'event_name'        => 'Event Name',
@@ -53,13 +54,20 @@ return [
     'user_name'        => 'User Name',
     'session_id'       => 'Session ID',
     'session_id_help'  => 'Unique session identifier',
+    'user_id_short'    => 'ID: :id',
+    'user_id_only'     => 'User ID: :id',
+    'anonymous'        => 'Anonymous',
     'user_agent'       => 'User Agent',
     'user_agent_help'  => 'Browser user agent string',
     // Event Data
     'event_data'           => 'Event Data',
+    'event_properties'     => 'Event Properties',
     'event_data_key'       => 'Key',
     'event_data_value'     => 'Value',
     'add_event_data_field' => 'Add Event Data Field',
+    'url'                  => 'URL',
+    'referrer'             => 'Referrer',
+    'country_code'         => 'Country Code',
     // Context Information
     'context_information' => 'Context Information',
     'ip_address'          => 'IP Address',

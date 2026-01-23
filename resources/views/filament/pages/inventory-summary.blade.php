@@ -2,31 +2,31 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <!-- Stock Status Overview -->
         <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-6">
-            <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-4">{{ __('Stock Status Overview') }}</h4>
+            <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-4">{{ __('admin.inventory_summary.stock_status_overview') }}</h4>
             <div class="space-y-3">
                 <div class="flex justify-between items-center">
-                    <span class="text-sm text-gray-600 dark:text-gray-400">{{ __('In Stock') }}</span>
+                    <span class="text-sm text-gray-600 dark:text-gray-400">{{ __('admin.inventory_summary.in_stock') }}</span>
                     <div class="flex items-center">
                         <div class="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
                         <span class="font-medium text-gray-900 dark:text-white">{{ number_format($summary['in_stock']) }}</span>
                     </div>
                 </div>
                 <div class="flex justify-between items-center">
-                    <span class="text-sm text-gray-600 dark:text-gray-400">{{ __('Low Stock') }}</span>
+                    <span class="text-sm text-gray-600 dark:text-gray-400">{{ __('admin.inventory_summary.low_stock') }}</span>
                     <div class="flex items-center">
                         <div class="w-3 h-3 bg-yellow-500 rounded-full mr-2"></div>
                         <span class="font-medium text-gray-900 dark:text-white">{{ number_format($summary['low_stock']) }}</span>
                     </div>
                 </div>
                 <div class="flex justify-between items-center">
-                    <span class="text-sm text-gray-600 dark:text-gray-400">{{ __('Out of Stock') }}</span>
+                    <span class="text-sm text-gray-600 dark:text-gray-400">{{ __('admin.inventory_summary.out_of_stock') }}</span>
                     <div class="flex items-center">
                         <div class="w-3 h-3 bg-red-500 rounded-full mr-2"></div>
                         <span class="font-medium text-gray-900 dark:text-white">{{ number_format($summary['out_of_stock']) }}</span>
                     </div>
                 </div>
                 <div class="flex justify-between items-center">
-                    <span class="text-sm text-gray-600 dark:text-gray-400">{{ __('Not Tracked') }}</span>
+                    <span class="text-sm text-gray-600 dark:text-gray-400">{{ __('admin.inventory_summary.not_tracked') }}</span>
                     <div class="flex items-center">
                         <div class="w-3 h-3 bg-gray-500 rounded-full mr-2"></div>
                         <span class="font-medium text-gray-900 dark:text-white">{{ number_format($summary['not_tracked']) }}</span>
@@ -37,24 +37,24 @@
 
         <!-- Inventory Statistics -->
         <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-6">
-            <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-4">{{ __('Inventory Statistics') }}</h4>
+            <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-4">{{ __('admin.inventory_summary.statistics') }}</h4>
             <div class="space-y-3">
                 <div class="flex justify-between items-center">
-                    <span class="text-sm text-gray-600 dark:text-gray-400">{{ __('Total Products') }}</span>
+                    <span class="text-sm text-gray-600 dark:text-gray-400">{{ __('admin.inventory_summary.total_products') }}</span>
                     <span class="font-medium text-gray-900 dark:text-white">{{ number_format($summary['total_products']) }}</span>
                 </div>
                 <div class="flex justify-between items-center">
-                    <span class="text-sm text-gray-600 dark:text-gray-400">{{ __('Tracked Products') }}</span>
+                    <span class="text-sm text-gray-600 dark:text-gray-400">{{ __('admin.inventory_summary.tracked_products') }}</span>
                     <span class="font-medium text-gray-900 dark:text-white">{{ number_format($summary['tracked_products']) }}</span>
                 </div>
                 <div class="flex justify-between items-center">
-                    <span class="text-sm text-gray-600 dark:text-gray-400">{{ __('Tracking Rate') }}</span>
+                    <span class="text-sm text-gray-600 dark:text-gray-400">{{ __('admin.inventory_summary.tracking_rate') }}</span>
                     <span class="font-medium text-gray-900 dark:text-white">
                         {{ $summary['total_products'] > 0 ? number_format(($summary['tracked_products'] / $summary['total_products']) * 100, 1) : 0 }}%
                     </span>
                 </div>
                 <div class="flex justify-between items-center">
-                    <span class="text-sm text-gray-600 dark:text-gray-400">{{ __('Stock Health') }}</span>
+                    <span class="text-sm text-gray-600 dark:text-gray-400">{{ __('admin.inventory_summary.stock_health') }}</span>
                     <span class="font-medium text-gray-900 dark:text-white">
                         @php
                             $totalTracked = $summary['tracked_products'];
@@ -69,7 +69,7 @@
 
     <!-- Stock Health Chart -->
     <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-6">
-        <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-4">{{ __('Stock Health Distribution') }}</h4>
+        <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-4">{{ __('admin.inventory_summary.stock_health_distribution') }}</h4>
         <div class="space-y-4">
             @php
                 $totalTracked = $summary['tracked_products'];
@@ -80,7 +80,7 @@
             
             <div>
                 <div class="flex justify-between text-sm mb-1">
-                    <span class="text-gray-600 dark:text-gray-400">{{ __('In Stock') }}</span>
+                    <span class="text-gray-600 dark:text-gray-400">{{ __('admin.inventory_summary.in_stock') }}</span>
                     <span class="text-gray-900 dark:text-white">{{ number_format($inStockPercent, 1) }}%</span>
                 </div>
                 <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
@@ -90,7 +90,7 @@
 
             <div>
                 <div class="flex justify-between text-sm mb-1">
-                    <span class="text-gray-600 dark:text-gray-400">{{ __('Low Stock') }}</span>
+                    <span class="text-gray-600 dark:text-gray-400">{{ __('admin.inventory_summary.low_stock') }}</span>
                     <span class="text-gray-900 dark:text-white">{{ number_format($lowStockPercent, 1) }}%</span>
                 </div>
                 <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
@@ -100,7 +100,7 @@
 
             <div>
                 <div class="flex justify-between text-sm mb-1">
-                    <span class="text-gray-600 dark:text-gray-400">{{ __('Out of Stock') }}</span>
+                    <span class="text-gray-600 dark:text-gray-400">{{ __('admin.inventory_summary.out_of_stock') }}</span>
                     <span class="text-gray-900 dark:text-white">{{ number_format($outOfStockPercent, 1) }}%</span>
                 </div>
                 <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">

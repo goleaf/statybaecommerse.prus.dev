@@ -3,7 +3,7 @@
 <div class="relative" x-data="{ open: false }">
     <button @click="open = !open"
             class="relative p-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-lg transition-colors duration-200"
-            aria-label="{{ __('Shopping Cart') }} ({{ $count }} {{ __('items') }})">
+            aria-label="{{ __('frontend.cart.title') }} ({{ $count }} {{ trans_choice('frontend.cart.items', $count) }})">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01">
@@ -32,7 +32,7 @@
 
         <div class="p-4">
             <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-semibold text-gray-900">{{ __('Shopping Cart') }}</h3>
+                <h3 class="text-lg font-semibold text-gray-900">{{ __('frontend.cart.title') }}</h3>
                 <button @click="open = false" class="text-gray-400 hover:text-gray-600">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
@@ -47,11 +47,11 @@
                     {{-- Sample cart item - replace with actual cart items --}}
                     <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                         <img src="{{ product_placeholder_url('thumb') }}"
-                             alt="Product"
+                             alt="{{ __('frontend.cart.sample_product_alt') }}"
                              class="w-12 h-12 object-cover rounded-lg">
                         <div class="flex-1">
-                            <h4 class="text-sm font-medium text-gray-900">Sample Product</h4>
-                            <p class="text-sm text-gray-600">€29.99 × 2</p>
+                            <h4 class="text-sm font-medium text-gray-900">{{ __('frontend.cart.sample_product') }}</h4>
+                            <p class="text-sm text-gray-600">{{ __('frontend.cart.sample_line_item', ['price' => '€29.99', 'quantity' => 2]) }}</p>
                         </div>
                         <button class="text-red-500 hover:text-red-700">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -65,22 +65,22 @@
                 {{-- Cart Summary --}}
                 <div class="border-t border-gray-200 pt-4">
                     <div class="flex justify-between items-center mb-4">
-                        <span class="text-lg font-semibold text-gray-900">{{ __('Total') }}:</span>
+                        <span class="text-lg font-semibold text-gray-900">{{ __('frontend.cart.total') }}:</span>
                         <span class="text-lg font-bold text-blue-600">€59.98</span>
                     </div>
 
                     <div class="flex gap-2">
                         <a wire:navigate
                            {{-- Navigate via Livewire so drawer metrics remain hydrated --}}
-                           href="{{ route('cart.index', ['locale' => app()->getLocale()]) ?? '/cart' }}"
+                            href="{{ route('cart.index', ['locale' => app()->getLocale()]) ?? '/cart' }}"
                            class="flex-1 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-center font-medium hover:bg-gray-200 transition-colors duration-200">
-                            {{ __('View Cart') }}
+                            {{ __('frontend.cart.view_cart') }}
                         </a>
                         <a wire:navigate
                            {{-- Preserve cart totals when moving straight into checkout --}}
-                           href="{{ route('checkout.index', ['locale' => app()->getLocale()]) ?? '/checkout' }}"
+                            href="{{ route('checkout.index', ['locale' => app()->getLocale()]) ?? '/checkout' }}"
                            class="flex-1 btn-gradient px-4 py-2 rounded-lg text-center font-medium">
-                            {{ __('Checkout') }}
+                            {{ __('frontend.cart.checkout') }}
                         </a>
                     </div>
                 </div>
@@ -93,15 +93,14 @@
                               d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01">
                         </path>
                     </svg>
-                    <h4 class="text-lg font-medium text-gray-900 mb-2">{{ __('Your cart is empty') }}</h4>
-                    <p class="text-gray-600 mb-4">{{ __('Add some products to get started') }}</p>
+                    <h4 class="text-lg font-medium text-gray-900 mb-2">{{ __('frontend.cart.empty') }}</h4>
+                    <p class="text-gray-600 mb-4">{{ __('frontend.cart.empty_description') }}</p>
                     <a href="{{ route('products.index', ['locale' => app()->getLocale()]) ?? '/products' }}"
                        class="btn-gradient px-6 py-2 rounded-lg font-medium">
-                        {{ __('Start Shopping') }}
+                        {{ __('frontend.cart.start_shopping') }}
                     </a>
                 </div>
             @endif
         </div>
     </div>
 </div>
-

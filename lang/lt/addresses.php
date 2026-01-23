@@ -97,4 +97,11 @@ return [
     'updated_at' => 'Atnaujinta',
     'full_name'  => 'Pilnas vardas',
     'address'    => 'Adresas',
+    'countries' => [
+        'lt' => 'Lietuva',
+        'lv' => 'Latvija',
+        'ee' => 'Estija',
+        'pl' => 'Lenkija',
+        'de' => 'Vokietija',
+    ],
 ];

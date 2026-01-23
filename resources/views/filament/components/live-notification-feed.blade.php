@@ -46,7 +46,7 @@
                 <button
                         wire:click="clearAllNotifications"
                         class="text-sm text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">
-                    {{ __('Clear All') }}
+                    {{ __('admin.notifications_feed.clear_all') }}
                 </button>
             </div>
         </div>
@@ -113,13 +113,13 @@
                                             <button
                                                     wire:click="markAsRead({{ $notification['id'] }})"
                                                     class="text-xs text-primary-600 hover:text-primary-700 dark:text-primary-400">
-                                                {{ __('Mark as read') }}
+                                                {{ __('admin.notifications_feed.mark_as_read') }}
                                             </button>
                                         @endif
                                         <button
                                                 wire:click="deleteNotification({{ $notification['id'] }})"
                                                 class="text-xs text-red-600 hover:text-red-700 dark:text-red-400">
-                                            {{ __('Delete') }}
+                                            {{ __('admin.notifications_feed.delete') }}
                                         </button>
                                     </div>
                                 </div>
@@ -153,7 +153,7 @@
                 <a
                    href="{{ route('notifications.index') }}"
                    class="text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300">
-                    {{ __('View all notifications') }}
+                    {{ __('admin.notifications_feed.view_all') }}
                 </a>
             </div>
         @endif

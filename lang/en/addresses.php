@@ -97,4 +97,11 @@ return [
     'updated_at' => 'Updated At',
     'full_name'  => 'Full Name',
     'address'    => 'Address',
+    'countries' => [
+        'lt' => 'Lithuania',
+        'lv' => 'Latvia',
+        'ee' => 'Estonia',
+        'pl' => 'Poland',
+        'de' => 'Germany',
+    ],
 ];

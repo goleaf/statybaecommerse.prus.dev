@@ -49,7 +49,7 @@
 
             <div x-show="searchResults.length === 0 && searchQuery.length >= minSearchLength"
                  class="px-4 py-2 text-gray-500 text-sm">
-                {{ __('No results found') }}
+                {{ __('admin.autocomplete.no_results') }}
             </div>
         </div>
     </div>

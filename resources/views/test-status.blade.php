@@ -10,8 +10,8 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
             </div>
-            <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-2">Test Status Dashboard</h1>
-            <p class="text-lg text-gray-600 dark:text-gray-400">Monitor your test suite execution in real-time</p>
+            <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-2">{{ __('frontend.test_status.title') }}</h1>
+            <p class="text-lg text-gray-600 dark:text-gray-400">{{ __('frontend.test_status.subtitle') }}</p>
         </div>
 
         @php
@@ -47,7 +47,7 @@
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 border-t-4 border-indigo-500">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Tests</p>
+                        <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ __('frontend.test_status.cards.total') }}</p>
                         <p class="text-3xl font-bold text-gray-900 dark:text-white">{{ $meta['total'] }}</p>
                     </div>
                     <div class="w-12 h-12 bg-indigo-100 dark:bg-indigo-900 rounded-full flex items-center justify-center">
@@ -62,7 +62,7 @@
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 border-t-4 border-green-500">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Passed</p>
+                        <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ __('frontend.test_status.cards.passed') }}</p>
                         <p class="text-3xl font-bold text-green-600 dark:text-green-400">{{ $passedCount }}</p>
                     </div>
                     <div class="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
@@ -77,7 +77,7 @@
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 border-t-4 border-red-500">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Failed</p>
+                        <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ __('frontend.test_status.cards.failed') }}</p>
                         <p class="text-3xl font-bold text-red-600 dark:text-red-400">{{ $failedCount }}</p>
                     </div>
                     <div class="w-12 h-12 bg-red-100 dark:bg-red-900 rounded-full flex items-center justify-center">
@@ -92,7 +92,7 @@
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 border-t-4 border-yellow-500">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Running</p>
+                        <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ __('frontend.test_status.cards.running') }}</p>
                         <p class="text-3xl font-bold text-yellow-600 dark:text-yellow-400">{{ $runningCount }}</p>
                     </div>
                     <div class="w-12 h-12 bg-yellow-100 dark:bg-yellow-900 rounded-full flex items-center justify-center">
@@ -107,7 +107,7 @@
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 border-t-4 border-gray-500">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Pending</p>
+                        <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ __('frontend.test_status.cards.pending') }}</p>
                         <p class="text-3xl font-bold text-gray-600 dark:text-gray-400">{{ $pendingCount }}</p>
                     </div>
                     <div class="w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center">
@@ -123,7 +123,7 @@
         @if ($meta['is_running'])
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
             <div class="flex items-center justify-between mb-2">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Test Progress</h3>
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ __('frontend.test_status.progress_title') }}</h3>
                 <span class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ $progress }}%</span>
             </div>
             <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 mb-4">
@@ -131,8 +131,11 @@
             </div>
             @if ($meta['current_test'])
             <p class="text-sm text-gray-600 dark:text-gray-400">
-                Currently running: <span class="font-mono text-indigo-600 dark:text-indigo-400">{{ $meta['current_test'] }}</span>
-                ({{ $meta['current_index'] }} / {{ $meta['total'] }})
+                {{ __('frontend.test_status.currently_running', [
+                    'test' => $meta['current_test'],
+                    'current' => $meta['current_index'],
+                    'total' => $meta['total'],
+                ]) }}
             </p>
             @endif
         </div>
@@ -142,7 +145,7 @@
         @if (count($results) > 0)
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Test Results</h3>
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ __('frontend.test_status.results_title') }}</h3>
             </div>
             <div class="divide-y divide-gray-200 dark:divide-gray-700 max-h-[600px] overflow-y-auto">
                 @foreach($results as $test)
@@ -180,7 +183,7 @@
                             @if(isset($test['output']) && $test['output'] !== '')
                             <div class="mt-2 ml-9">
                                 <details class="text-xs">
-                                    <summary class="cursor-pointer text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300">Show output</summary>
+                                    <summary class="cursor-pointer text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300">{{ __('frontend.test_status.show_output') }}</summary>
                                     <pre class="mt-2 p-3 bg-gray-100 dark:bg-gray-900 rounded text-gray-700 dark:text-gray-300 overflow-x-auto">{{ $test['output'] }}</pre>
                                 </details>
                             </div>
@@ -206,8 +209,8 @@
             <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
             </svg>
-            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No test results available</h3>
-            <p class="text-gray-600 dark:text-gray-400 mb-4">Run the test command to see results here</p>
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">{{ __('frontend.test_status.empty_title') }}</h3>
+            <p class="text-gray-600 dark:text-gray-400 mb-4">{{ __('frontend.test_status.empty_description') }}</p>
             <code class="inline-block px-4 py-2 bg-gray-100 dark:bg-gray-900 rounded text-sm font-mono text-gray-700 dark:text-gray-300">php artisan project:test</code>
         </div>
         @endif
@@ -219,7 +222,7 @@
                 <svg class="inline-block w-4 h-4 mr-1 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                 </svg>
-                Tests are running... Page will auto-refresh every 3 seconds
+                {{ __('frontend.test_status.auto_refresh', ['seconds' => 3]) }}
             </p>
         </div>
         <script>
@@ -231,4 +234,3 @@
     </div>
 </div>
 @endsection
-

@@ -18,7 +18,7 @@
         <h1>{{ $title }}</h1>
         @if ($urgent)
             <p class="email-urgent-notice">
-                ⚠️ URGENT NOTIFICATION
+                {{ __('notifications.email.urgent') }}
             </p>
         @endif
     </div>
@@ -37,7 +37,7 @@
 
         @if (!empty($tags))
             <div class="email-tags">
-                <strong>Tags:</strong>
+                <strong>{{ __('notifications.email.tags') }}:</strong>
                 @foreach ($tags as $tag)
                     <span class="email-tag">{{ $tag }}</span>
                 @endforeach
@@ -47,15 +47,14 @@
         <div class="email-center">
             <a href="{{ \App\Filament\Resources\NotificationResource::getUrl('view', ['record' => $notification]) }}"
                class="email-button">
-                View Notification
+                {{ __('notifications.email.view_notification') }}
             </a>
         </div>
     </div>
 
     <div class="email-footer">
-        <p>This notification was sent from {{ config('app.name') }}.</p>
-        <p>If you no longer wish to receive these notifications, you can update your preferences in your account
-            settings.</p>
+        <p>{{ __('notifications.email.sent_from', ['app' => config('app.name')]) }}</p>
+        <p>{{ __('notifications.email.preferences_hint') }}</p>
     </div>
 </body>
 

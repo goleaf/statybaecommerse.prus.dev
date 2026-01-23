@@ -212,9 +212,9 @@
                             </p>
                             <div
                                  class="inline-flex items-center gap-3 rounded-full bg-slate-800/60 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-slate-200">
-                                <code>php artisan project:test</code>
+                                <code>{{ __('frontend.test_results.meta.command') }}</code>
                                 <span
-                                      class="rounded-full bg-slate-900 px-2 py-1 text-[10px] font-bold text-emerald-300">CLI</span>
+                                      class="rounded-full bg-slate-900 px-2 py-1 text-[10px] font-bold text-emerald-300">{{ __('frontend.test_results.meta.cli_label') }}</span>
                             </div>
                         </div>
                     </div>

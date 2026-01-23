@@ -76,4 +76,24 @@ return [
     'bulk_deactivated_success' => 'Sėkmingai deaktyvuoti pasirinkti įrašai',
 
     'free_shipping' => 'Nemokamas pristatymas',
+    'page' => [
+        'subtitle'          => 'Raskite ir pritaikykite nuolaidų kodus, kad sutaupytumėte',
+        'search_placeholder'=> 'Įveskite nuolaidos kodą',
+        'validate'          => 'Tikrinti kodą',
+        'available_title'   => 'Galimi nuolaidų kodai',
+        'loading'           => 'Kraunami nuolaidų kodai...',
+        'details_title'     => 'Nuolaidos kodo detalės',
+        'view_details'      => 'Peržiūrėti detales',
+        'expires'           => 'Galioja iki',
+        'off'               => 'nuolaida',
+        'empty'             => 'Šiuo metu nėra galimų nuolaidų kodų',
+        'copy'              => 'Kopijuoti kodą',
+        'apply'             => 'Pritaikyti kodą',
+        'copied'            => 'Kodas nukopijuotas į iškarpinę',
+        'errors'            => [
+            'enter_code' => 'Prašome įvesti nuolaidos kodą',
+            'load_failed'=> 'Nepavyko įkelti nuolaidų kodų',
+            'generic'    => 'Kažkas nepavyko. Bandykite dar kartą.',
+        ],
+    ],
 ];

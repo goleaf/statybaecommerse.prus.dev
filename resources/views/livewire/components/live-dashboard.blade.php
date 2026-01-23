@@ -97,7 +97,7 @@
     >
         {{-- Communicate that analytics widgets are refreshing --}}
         <x-loading-dots class="text-primary-600" aria-hidden="true" />
-        <span>{{ __('Loading analytics...') }}</span>
+        <span>{{ __('translations.loading_analytics') }}</span>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8" wire:loading.remove>

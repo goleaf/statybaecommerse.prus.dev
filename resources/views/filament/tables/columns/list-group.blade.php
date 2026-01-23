@@ -41,5 +41,5 @@
         @endforeach
     </ul>
 @else
-    <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('No quick links available') }}</span>
+    <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('admin.list_group.no_quick_links') }}</span>
 @endif

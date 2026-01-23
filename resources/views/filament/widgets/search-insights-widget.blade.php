@@ -46,7 +46,9 @@
                             {{ __('admin.language') }}
                         </div>
                         <div class="text-2xl font-bold text-purple-900 dark:text-purple-100">
-                            {{ strtoupper($insights['query_analysis']['language_detection'] ?? 'unknown') }}
+                            {{ isset($insights['query_analysis']['language_detection'])
+                                ? strtoupper($insights['query_analysis']['language_detection'])
+                                : __('admin.search_insights_labels.unknown') }}
                         </div>
                     </div>
                     
@@ -55,7 +57,7 @@
                             {{ __('admin.intent') }}
                         </div>
                         <div class="text-2xl font-bold text-orange-900 dark:text-orange-100">
-                            {{ ucfirst($insights['query_analysis']['intent_classification'] ?? 'general') }}
+                            {{ __('admin.search_insights_labels.intents.' . ($insights['query_analysis']['intent_classification'] ?? 'general')) }}
                         </div>
                     </div>
                 </div>
@@ -76,7 +78,7 @@
                             <div class="flex justify-between items-center">
                                 <span class="text-sm text-gray-600 dark:text-gray-400">{{ __('admin.trend_direction') }}</span>
                                 <span class="font-semibold text-gray-900 dark:text-white">
-                                    {{ ucfirst($insights['search_trends']['trend_direction'] ?? 'stable') }}
+                                    {{ __('admin.search_insights_labels.trend_directions.' . ($insights['search_trends']['trend_direction'] ?? 'stable')) }}
                                 </span>
                             </div>
                             <div class="flex justify-between items-center">
@@ -103,7 +105,7 @@
                                         {{ $search['query'] }}
                                     </div>
                                     <div class="text-xs text-gray-500 dark:text-gray-400">
-                                        {{ number_format($search['similarity_score'] * 100, 1) }}% similarity
+                                        {{ number_format($search['similarity_score'] * 100, 1) }}% {{ __('admin.search_insights_labels.similarity') }}
                                     </div>
                                 </div>
                             @endforeach
@@ -128,7 +130,7 @@
                                             @if($trend['trend_direction'] === 'rising') bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200
                                             @elseif($trend['trend_direction'] === 'falling') bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200
                                             @else bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200 @endif">
-                                            {{ ucfirst($trend['trend_direction']) }}
+                                            {{ __('admin.search_insights_labels.trend_directions.' . $trend['trend_direction']) }}
                                         </span>
                                     </div>
                                 </div>
