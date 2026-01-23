@@ -13,7 +13,7 @@
         
         <!-- Button Text -->
         <span class="font-semibold text-gray-700 group-hover:text-gray-900 transition-colors duration-200">
-            {{ __('Sign in with Google') }}
+            {{ __('frontend.auth_oauth.google') }}
         </span>
         
         <!-- Hover Effect Overlay -->
@@ -29,7 +29,7 @@
             </svg>
         </span>
         <span class="font-semibold text-gray-700 group-hover:text-gray-900 transition-colors duration-200">
-            {{ __('Continue with Facebook') }}
+            {{ __('frontend.auth_oauth.facebook') }}
         </span>
     </a>
     -->

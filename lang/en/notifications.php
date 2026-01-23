@@ -63,6 +63,13 @@ return [
     'bulk_actions'       => 'Bulk Actions',
     'export'             => 'Export',
     'cleanup_old'        => 'Cleanup Old',
+    'delete_notification' => 'Delete notification',
+    'delete_all_notifications' => 'Delete all notifications',
+    'show_unread_only' => 'Show unread only',
+    'filter_by_type' => 'Filter by type',
+    'all_types' => 'All types',
+    'no_notifications' => 'No notifications',
+    'check_later' => 'Check back later for updates.',
     // Confirmations
     'mark_as_read_confirmation'       => 'Are you sure you want to mark this notification as read?',
     'mark_as_unread_confirmation'     => 'Are you sure you want to mark this notification as unread?',
@@ -71,6 +78,10 @@ return [
     'mark_all_as_unread_confirmation' => 'Are you sure you want to mark all notifications as unread?',
     'delete_old_confirmation'         => 'Are you sure you want to delete old notifications (older than 30 days)?',
     'cleanup_old_confirmation'        => 'Are you sure you want to cleanup old notifications (older than 30 days)?',
+    'confirmations' => [
+        'delete_all' => 'Are you sure you want to delete all notifications?',
+        'delete_one' => 'Are you sure you want to delete this notification?',
+    ],
     // Messages
     'marked_as_read'    => 'Notification marked as read',
     'marked_as_unread'  => 'Notification marked as unread',
@@ -81,6 +92,18 @@ return [
     // Errors
     'errors' => [
         'not_found' => 'Notification not found',
+    ],
+    'labels' => [
+        'new' => 'New',
+    ],
+    'time' => [
+        'just_now' => 'Just now',
+        'minutes_ago' => '{1}:count minute ago|[2,*]:count minutes ago',
+        'hours_ago' => '{1}:count hour ago|[2,*]:count hours ago',
+        'days_ago' => '{1}:count day ago|[2,*]:count days ago',
+        'weeks_ago' => '{1}:count week ago|[2,*]:count weeks ago',
+        'months_ago' => '{1}:count month ago|[2,*]:count months ago',
+        'years_ago' => '{1}:count year ago|[2,*]:count years ago',
     ],
     // Form sections
     'form' => [

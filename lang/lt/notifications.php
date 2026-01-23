@@ -63,6 +63,13 @@ return [
     'bulk_actions'       => 'Masiniai veiksmai',
     'export'             => 'Eksportuoti',
     'cleanup_old'        => 'Išvalyti senus',
+    'delete_notification' => 'Ištrinti pranešimą',
+    'delete_all_notifications' => 'Ištrinti visus pranešimus',
+    'show_unread_only' => 'Rodyti tik neperskaitytus',
+    'filter_by_type' => 'Filtruoti pagal tipą',
+    'all_types' => 'Visi tipai',
+    'no_notifications' => 'Pranešimų nėra',
+    'check_later' => 'Patikrinkite vėliau.',
     // Confirmations
     'mark_as_read_confirmation'       => 'Ar tikrai norite pažymėti šį pranešimą kaip perskaitytą?',
     'mark_as_unread_confirmation'     => 'Ar tikrai norite pažymėti šį pranešimą kaip neperskaitytą?',
@@ -71,6 +78,10 @@ return [
     'mark_all_as_unread_confirmation' => 'Ar tikrai norite pažymėti visus pranešimus kaip neperskaitytus?',
     'delete_old_confirmation'         => 'Ar tikrai norite ištrinti senus pranešimus (senesnius nei 30 dienų)?',
     'cleanup_old_confirmation'        => 'Ar tikrai norite išvalyti senus pranešimus (senesnius nei 30 dienų)?',
+    'confirmations' => [
+        'delete_all' => 'Ar tikrai norite ištrinti visus pranešimus?',
+        'delete_one' => 'Ar tikrai norite ištrinti šį pranešimą?',
+    ],
     // Messages
     'marked_as_read'    => 'Pranešimas pažymėtas kaip perskaitytas',
     'marked_as_unread'  => 'Pranešimas pažymėtas kaip neperskaitytas',
@@ -81,6 +92,18 @@ return [
     // Errors
     'errors' => [
         'not_found' => 'Pranešimas nerastas',
+    ],
+    'labels' => [
+        'new' => 'Naujas',
+    ],
+    'time' => [
+        'just_now' => 'Ką tik',
+        'minutes_ago' => '{1}prieš :count minutę|[2,*]prieš :count minutes',
+        'hours_ago' => '{1}prieš :count valandą|[2,*]prieš :count valandas',
+        'days_ago' => '{1}prieš :count dieną|[2,*]prieš :count dienas',
+        'weeks_ago' => '{1}prieš :count savaitę|[2,*]prieš :count savaites',
+        'months_ago' => '{1}prieš :count mėnesį|[2,*]prieš :count mėnesius',
+        'years_ago' => '{1}prieš :count metus|[2,*]prieš :count metus',
     ],
     // Form sections
     'form' => [

@@ -1,7 +1,7 @@
 @props(['items' => []])
 
 @if (count($items) > 0)
-    <nav class="flex items-center space-x-2 text-sm text-gray-500 mb-6" aria-label="{{ __('Breadcrumb') }}">
+<nav class="flex items-center space-x-2 text-sm text-gray-500 mb-6" aria-label="{{ __('frontend.navigation.breadcrumbs') }}">
         <a href="{{ route('localized.home', ['locale' => app()->getLocale()]) ?? url('/') }}"
            class="flex items-center hover:text-blue-600 transition-colors duration-200">
             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -28,4 +28,3 @@
         @endforeach
     </nav>
 @endif
-

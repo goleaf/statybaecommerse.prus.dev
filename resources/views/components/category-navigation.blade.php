@@ -16,7 +16,7 @@
 
 <div class="bg-white border-b border-gray-200">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <nav class="flex space-x-8 overflow-x-auto py-4" aria-label="{{ __('Categories') }}">
+        <nav class="flex space-x-8 overflow-x-auto py-4" aria-label="{{ __('frontend.category_navigation.aria') }}">
             @foreach ($categories as $category)
                 <div class="relative group flex-shrink-0" x-data="{ open: false }">
                     {{-- Main Category Link --}}
@@ -67,7 +67,7 @@
                             <div class="px-4 py-2 border-b border-gray-100">
                                 <h3 class="text-sm font-semibold text-gray-900">{{ $category->name }}</h3>
                                 <p class="text-xs text-gray-600">{{ $category->children->count() }}
-                                    {{ __('subcategories') }}</p>
+                                    {{ __('frontend.category_navigation.subcategories') }}</p>
                             </div>
 
                             <div class="py-2">
@@ -97,17 +97,17 @@
                                 @endforeach
 
                                 @if ($category->children->count() > 5)
-                                    <div class="border-t border-gray-100 mt-2 pt-2">
-                                        <a href="{{ route('localized.categories.show', ['locale' => app()->getLocale(), 'category' => $category->slug]) }}"
-                                           class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 transition-colors duration-200">
-                                            <span>{{ __('View All') }} {{ $category->name }}</span>
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                 viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                      d="M9 5l7 7-7 7"></path>
-                                            </svg>
-                                        </a>
-                                    </div>
+                                            <div class="border-t border-gray-100 mt-2 pt-2">
+                                                <a href="{{ route('localized.categories.show', ['locale' => app()->getLocale(), 'category' => $category->slug]) }}"
+                                                   class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 transition-colors duration-200">
+                                                    <span>{{ __('frontend.category_navigation.view_all') }} {{ $category->name }}</span>
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                         viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                              d="M9 5l7 7-7 7"></path>
+                                                    </svg>
+                                                </a>
+                                            </div>
                                 @endif
                             </div>
                         </div>
@@ -123,7 +123,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                               d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
                     </svg>
-                    <span>{{ __('All Categories') }}</span>
+                    <span>{{ __('frontend.category_navigation.all_categories') }}</span>
                 </a>
             </div>
         </nav>

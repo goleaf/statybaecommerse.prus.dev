@@ -7,8 +7,8 @@
 ])
 
 @php
-    $title = $title ?? __('Contact Us');
-    $subtitle = $subtitle ?? __('Get in touch with us. We\'d love to hear from you.');
+    $title = $title ?? __('frontend.contact_form.page_title');
+    $subtitle = $subtitle ?? __('frontend.contact_form.page_subtitle');
 @endphp
 
 <div class="contact-form" x-data="contactForm()">
@@ -22,14 +22,14 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
             {{-- Contact Form --}}
             <div class="bg-white border border-gray-200 rounded-2xl p-8">
-                <h2 class="text-2xl font-bold text-gray-900 mb-6">{{ __('Send us a Message') }}</h2>
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">{{ __('frontend.contact_form.form_title') }}</h2>
 
                 <form @submit.prevent="submitForm()" class="space-y-6">
                     {{-- Name and Email --}}
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
-                                {{ __('Full Name') }} <span class="text-red-500">*</span>
+                                {{ __('frontend.contact_form.fields.full_name') }} <span class="text-red-500">*</span>
                             </label>
                             <input type="text"
                                    id="name"
@@ -40,7 +40,7 @@
 
                         <div>
                             <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
-                                {{ __('Email Address') }} <span class="text-red-500">*</span>
+                                {{ __('frontend.contact_form.fields.email') }} <span class="text-red-500">*</span>
                             </label>
                             <input type="email"
                                    id="email"
@@ -54,7 +54,7 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">
-                                {{ __('Phone Number') }}
+                                {{ __('frontend.contact_form.fields.phone') }}
                             </label>
                             <input type="tel"
                                    id="phone"
@@ -64,19 +64,19 @@
 
                         <div>
                             <label for="subject" class="block text-sm font-medium text-gray-700 mb-2">
-                                {{ __('Subject') }} <span class="text-red-500">*</span>
+                                {{ __('frontend.contact_form.fields.subject') }} <span class="text-red-500">*</span>
                             </label>
                             <select id="subject"
                                     x-model="form.subject"
                                     required
                                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900">
-                                <option value="">{{ __('Select a subject') }}</option>
-                                <option value="general">{{ __('General Inquiry') }}</option>
-                                <option value="support">{{ __('Technical Support') }}</option>
-                                <option value="sales">{{ __('Sales Question') }}</option>
-                                <option value="billing">{{ __('Billing Issue') }}</option>
-                                <option value="partnership">{{ __('Partnership') }}</option>
-                                <option value="other">{{ __('Other') }}</option>
+                                <option value="">{{ __('frontend.contact_form.subjects.placeholder') }}</option>
+                                <option value="general">{{ __('frontend.contact_form.subjects.general') }}</option>
+                                <option value="support">{{ __('frontend.contact_form.subjects.support') }}</option>
+                                <option value="sales">{{ __('frontend.contact_form.subjects.sales') }}</option>
+                                <option value="billing">{{ __('frontend.contact_form.subjects.billing') }}</option>
+                                <option value="partnership">{{ __('frontend.contact_form.subjects.partnership') }}</option>
+                                <option value="other">{{ __('frontend.contact_form.subjects.other') }}</option>
                             </select>
                         </div>
                     </div>
@@ -84,14 +84,14 @@
                     {{-- Message --}}
                     <div>
                         <label for="message" class="block text-sm font-medium text-gray-700 mb-2">
-                            {{ __('Message') }} <span class="text-red-500">*</span>
+                            {{ __('frontend.contact_form.fields.message') }} <span class="text-red-500">*</span>
                         </label>
                         <textarea id="message"
                                   x-model="form.message"
                                   rows="6"
                                   required
                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder:text-gray-500"
-                                  placeholder="{{ __('Please describe your inquiry in detail...') }}"></textarea>
+                                  placeholder="{{ __('frontend.contact_form.fields.message_placeholder') }}"></textarea>
                     </div>
 
                     {{-- Privacy Consent --}}
@@ -102,12 +102,12 @@
                                required
                                class="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
                         <label for="privacy" class="text-sm text-gray-700">
-                            {{ __('I agree to the') }}
+                            {{ __('frontend.contact_form.privacy.prefix') }}
                             <a href="{{ route('privacy', ['locale' => app()->getLocale()]) ?? '/privacy' }}"
                                class="text-blue-600 hover:text-blue-700 underline">
-                                {{ __('Privacy Policy') }}
+                                {{ __('frontend.contact_form.privacy.policy') }}
                             </a>
-                            {{ __('and consent to the processing of my personal data.') }}
+                            {{ __('frontend.contact_form.privacy.suffix') }}
                         </label>
                     </div>
 
@@ -115,14 +115,14 @@
                     <button type="submit"
                             :disabled="loading"
                             class="w-full btn-gradient py-3 rounded-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed">
-                        <span x-show="!loading">{{ __('Send Message') }}</span>
+                        <span x-show="!loading">{{ __('frontend.contact_form.actions.submit') }}</span>
                         <span x-show="loading" class="flex items-center justify-center gap-2">
                             <svg class="animate-spin w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                       d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
                                 </path>
                             </svg>
-                            {{ __('Sending...') }}
+                            {{ __('frontend.contact_form.actions.sending') }}
                         </span>
                     </button>
                 </form>
@@ -160,7 +160,7 @@
                 {{-- Contact Details --}}
                 @if ($showContactInfo)
                     <div class="bg-white border border-gray-200 rounded-2xl p-8">
-                        <h2 class="text-2xl font-bold text-gray-900 mb-6">{{ __('Get in Touch') }}</h2>
+                        <h2 class="text-2xl font-bold text-gray-900 mb-6">{{ __('frontend.contact_form.info_title') }}</h2>
 
                         <div class="space-y-6">
                             {{-- Address --}}
@@ -175,9 +175,9 @@
                                     </svg>
                                 </div>
                                 <div>
-                                    <h3 class="font-semibold text-gray-900 mb-1">{{ __('Address') }}</h3>
+                                    <h3 class="font-semibold text-gray-900 mb-1">{{ __('frontend.contact_info.address.label') }}</h3>
                                     <p class="text-gray-600">
-                                        {{ app_setting('company_address') ?? __('123 Business Street, City, Country') }}
+                                        {{ app_setting('company_address') ?? __('frontend.contact_info.address.fallback') }}
                                     </p>
                                 </div>
                             </div>
@@ -194,7 +194,7 @@
                                     </svg>
                                 </div>
                                 <div>
-                                    <h3 class="font-semibold text-gray-900 mb-1">{{ __('Phone') }}</h3>
+                                    <h3 class="font-semibold text-gray-900 mb-1">{{ __('frontend.contact_info.phone.label') }}</h3>
                                     <p class="text-gray-600">
                                         <a href="tel:{{ app_setting('company_phone') ?? '+1 (555) 123-4567' }}"
                                            class="hover:text-blue-600 transition-colors duration-200">
@@ -216,7 +216,7 @@
                                     </svg>
                                 </div>
                                 <div>
-                                    <h3 class="font-semibold text-gray-900 mb-1">{{ __('Email') }}</h3>
+                                    <h3 class="font-semibold text-gray-900 mb-1">{{ __('frontend.contact_info.email.label') }}</h3>
                                     <p class="text-gray-600">
                                         <a href="mailto:{{ app_setting('company_email') ?? 'info@example.com' }}"
                                            class="hover:text-blue-600 transition-colors duration-200">
@@ -232,20 +232,20 @@
                 {{-- Business Hours --}}
                 @if ($showBusinessHours)
                     <div class="bg-white border border-gray-200 rounded-2xl p-8">
-                        <h2 class="text-2xl font-bold text-gray-900 mb-6">{{ __('Business Hours') }}</h2>
+                        <h2 class="text-2xl font-bold text-gray-900 mb-6">{{ __('frontend.contact_info.hours.label') }}</h2>
 
                         <div class="space-y-3">
                             <div class="flex justify-between">
-                                <span class="text-gray-600">{{ __('Monday - Friday') }}</span>
-                                <span class="font-medium text-gray-900">{{ __('9:00 AM - 6:00 PM') }}</span>
+                                <span class="text-gray-600">{{ __('frontend.contact_info.hours.weekdays') }}</span>
+                                <span class="font-medium text-gray-900">{{ __('frontend.contact_info.hours.weekdays_value') }}</span>
                             </div>
                             <div class="flex justify-between">
-                                <span class="text-gray-600">{{ __('Saturday') }}</span>
-                                <span class="font-medium text-gray-900">{{ __('10:00 AM - 4:00 PM') }}</span>
+                                <span class="text-gray-600">{{ __('frontend.contact_info.hours.saturday') }}</span>
+                                <span class="font-medium text-gray-900">{{ __('frontend.contact_info.hours.saturday_value') }}</span>
                             </div>
                             <div class="flex justify-between">
-                                <span class="text-gray-600">{{ __('Sunday') }}</span>
-                                <span class="font-medium text-gray-900">{{ __('Closed') }}</span>
+                                <span class="text-gray-600">{{ __('frontend.contact_info.hours.sunday') }}</span>
+                                <span class="font-medium text-gray-900">{{ __('frontend.contact_info.hours.closed') }}</span>
                             </div>
                         </div>
                     </div>
@@ -254,7 +254,7 @@
                 {{-- Map --}}
                 @if ($showMap)
                     <div class="bg-white border border-gray-200 rounded-2xl p-8">
-                        <h2 class="text-2xl font-bold text-gray-900 mb-6">{{ __('Find Us') }}</h2>
+                        <h2 class="text-2xl font-bold text-gray-900 mb-6">{{ __('frontend.contact_form.map_title') }}</h2>
                         <div class="w-full h-64 bg-gray-100 rounded-lg flex items-center justify-center">
                             <div class="text-center">
                                 <svg class="w-12 h-12 text-gray-400 mx-auto mb-2" fill="none"
@@ -263,7 +263,7 @@
                                           d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z">
                                     </path>
                                 </svg>
-                                <p class="text-gray-500">{{ __('Interactive map will be displayed here') }}</p>
+                                <p class="text-gray-500">{{ __('frontend.contact_form.map_placeholder') }}</p>
                             </div>
                         </div>
                     </div>
@@ -290,7 +290,7 @@
 
             async submitForm() {
                 if (!this.form.privacyConsent) {
-                    this.showMessage('{{ __('Please accept the privacy policy to continue.') }}', 'error');
+                    this.showMessage('{{ __('frontend.contact_form.validation.privacy_required') }}', 'error');
                     return;
                 }
 
@@ -311,15 +311,15 @@
                     const data = await response.json();
 
                     if (response.ok) {
-                        this.showMessage('{{ __('Thank you for your message! We will get back to you soon.') }}',
+                        this.showMessage('{{ __('frontend.contact_form.messages.success') }}',
                             'success');
                         this.resetForm();
                     } else {
-                        this.showMessage(data.message || '{{ __('Something went wrong. Please try again.') }}',
+                        this.showMessage(data.message || '{{ __('frontend.contact_form.messages.error') }}',
                             'error');
                     }
                 } catch (error) {
-                    this.showMessage('{{ __('Network error. Please check your connection and try again.') }}',
+                    this.showMessage('{{ __('frontend.contact_form.messages.network_error') }}',
                         'error');
                 } finally {
                     this.loading = false;
@@ -349,4 +349,3 @@
         }
     }
 </script>
-

@@ -3,22 +3,22 @@
     'steps' => [
         'cart' => [
             'number' => 1,
-            'title' => 'Shopping Cart',
+            'title' => 'frontend.checkout_steps.steps.cart',
             'icon' =>
                 'M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01',
         ],
         'shipping' => [
             'number' => 2,
-            'title' => 'Shipping',
+            'title' => 'frontend.checkout_steps.steps.shipping',
             'icon' =>
                 'M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z',
         ],
         'payment' => [
             'number' => 3,
-            'title' => 'Payment',
+            'title' => 'frontend.checkout_steps.steps.payment',
             'icon' => 'M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z',
         ],
-        'review' => ['number' => 4, 'title' => 'Review', 'icon' => 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'],
+        'review' => ['number' => 4, 'title' => 'frontend.checkout_steps.steps.review', 'icon' => 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'],
     ],
 ])
 
@@ -79,7 +79,7 @@
                                 {{ __($step['title']) }}
                             </p>
                             <p class="text-xs text-gray-500 mt-1">
-                                {{ __('Step') }} {{ $step['number'] }}
+                                {{ __('frontend.checkout_steps.step') }} {{ $step['number'] }}
                             </p>
                         </div>
                     </div>
@@ -102,8 +102,8 @@
                      data-width="{{ ($currentStep / count($steps)) * 100 }}"></div>
             </div>
             <div class="flex justify-between text-xs text-gray-500 mt-2">
-                <span>{{ __('Progress') }}</span>
-                <span>{{ $currentStep }} {{ __('of') }} {{ count($steps) }}</span>
+                <span>{{ __('frontend.checkout_steps.progress') }}</span>
+                <span>{{ $currentStep }} {{ __('frontend.checkout_steps.of') }} {{ count($steps) }}</span>
             </div>
         </div>
     </div>

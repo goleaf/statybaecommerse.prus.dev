@@ -30,24 +30,24 @@ new #[Layout('components.layouts.templates.account')] class extends Component {
 }; ?>
 
 <div class="space-y-10">
-    <x-breadcrumbs :items="[['label' => __('My account'), 'url' => route('account.index')], ['label' => __('Documents')]]" />
-    <x-page-heading :title="__('Documents')" :description="__('Invoices and generated documents')" />
+    <x-breadcrumbs :items="[['label' => __('frontend.account.nav.title'), 'url' => route('account.index')], ['label' => __('frontend.account.documents')]]" />
+    <x-page-heading :title="__('frontend.account.documents')" :description="__('frontend.account.documents_description')" />
 
     @if (empty($documents))
-        <p class="text-sm text-gray-500">{{ __('No documents yet.') }}</p>
+        <p class="text-sm text-gray-500">{{ __('frontend.account.documents_empty') }}</p>
     @else
         <div class="overflow-hidden rounded border border-gray-200">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
                         <th class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                            {{ __('Title') }}</th>
+                            {{ __('frontend.account.documents_table.title') }}</th>
                         <th class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                            {{ __('Status') }}</th>
+                            {{ __('frontend.account.documents_table.status') }}</th>
                         <th class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                            {{ __('Format') }}</th>
+                            {{ __('frontend.account.documents_table.format') }}</th>
                         <th class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                            {{ __('Generated at') }}</th>
+                            {{ __('frontend.account.documents_table.generated_at') }}</th>
                         <th class="px-4 py-2"></th>
                     </tr>
                 </thead>
@@ -61,7 +61,7 @@ new #[Layout('components.layouts.templates.account')] class extends Component {
                             <td class="px-4 py-2 text-right">
                                 @if (!empty($doc['url']))
                                     <x-buttons.default :href="$doc['url']" target="_blank"
-                                                       class="px-3 text-sm">{{ __('Download') }}</x-buttons.default>
+                                                       class="px-3 text-sm">{{ __('frontend.account.documents_table.download') }}</x-buttons.default>
                                 @endif
                             </td>
                         </tr>
