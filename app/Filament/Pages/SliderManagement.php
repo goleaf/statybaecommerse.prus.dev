@@ -30,7 +30,7 @@ use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Support\Enums\Size;
 use Filament\Support\Enums\Width;
-use Filament\Tables\Actions\Action;
+use Filament\Actions\Action;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Str;
 
