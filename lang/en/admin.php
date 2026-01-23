@@ -1942,6 +1942,26 @@ return [
         'delete'      => 'Delete',
         'view_all'    => 'View all notifications',
     ],
+    'categories' => [
+        'title' => 'Categories',
+        'search_placeholder' => 'Search categories...',
+        'table' => [
+            'name' => 'Name',
+            'description' => 'Description',
+            'created' => 'Created',
+            'status' => 'Status',
+            'actions' => 'Actions',
+        ],
+        'status' => [
+            'active' => 'Active',
+            'inactive' => 'Inactive',
+        ],
+        'actions' => [
+            'edit' => 'Edit',
+            'delete' => 'Delete',
+        ],
+        'empty' => 'No categories found.',
+    ],
     'inventory_summary' => [
         'stock_status_overview'     => 'Stock Status Overview',
         'in_stock'                  => 'In Stock',

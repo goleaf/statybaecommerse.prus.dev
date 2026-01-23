@@ -1,6 +1,6 @@
 @extends('components.layouts.base')
 
-@section('title', __('Edit profile'))
+@section('title', __('frontend.profile.edit.title'))
 
 @section('content')
     <div class="container mx-auto px-4 py-8">
@@ -11,17 +11,17 @@
                     <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
                     </svg>
-                    {{ __('Back to profile') }}
+                    {{ __('frontend.profile.edit.back') }}
                 </a>
             </div>
 
             <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm">
                 <div class="px-6 py-5 border-b border-gray-200 dark:border-gray-700">
                     <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">
-                        {{ __('Update your details') }}
+                        {{ __('frontend.profile.edit.heading') }}
                     </h1>
                     <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                        {{ __('Keep your account information up to date to receive accurate communication and billing details.') }}
+                        {{ __('frontend.profile.edit.description') }}
                     </p>
                 </div>
 
@@ -32,7 +32,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label for="first_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                {{ __('First name') }}
+                                {{ __('frontend.profile.fields.first_name') }}
                             </label>
                             <input type="text"
                                    id="first_name"
@@ -46,7 +46,7 @@
                         </div>
                         <div>
                             <label for="last_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                {{ __('Last name') }}
+                                {{ __('frontend.profile.fields.last_name') }}
                             </label>
                             <input type="text"
                                    id="last_name"
@@ -63,7 +63,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                {{ __('Email address') }}
+                                {{ __('frontend.profile.fields.email') }}
                             </label>
                             <input type="email"
                                    id="email"
@@ -77,7 +77,7 @@
                         </div>
                         <div>
                             <label for="phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                {{ __('Phone number') }}
+                                {{ __('frontend.profile.fields.phone') }}
                             </label>
                             <input type="text"
                                    id="phone"
@@ -92,7 +92,7 @@
 
                     <div>
                         <label for="address" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            {{ __('Billing address line') }}
+                            {{ __('frontend.profile.fields.billing_address') }}
                         </label>
                         <input type="text"
                                id="address"
@@ -107,7 +107,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label for="postal_code" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                {{ __('Postal code') }}
+                                {{ __('frontend.profile.fields.postal_code') }}
                             </label>
                             <input type="text"
                                    id="postal_code"
@@ -120,12 +120,12 @@
                         </div>
                         <div>
                             <label for="country_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                {{ __('Country') }}
+                                {{ __('frontend.profile.fields.country') }}
                             </label>
                             <select id="country_id"
                                     name="country_id"
                                     class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                                <option value="">{{ __('Select a country') }}</option>
+                                <option value="">{{ __('frontend.profile.fields.country_placeholder') }}</option>
                                 @foreach($countries as $country)
                                     <option value="{{ $country->id }}" @selected(old('country_id', $customer->country_id ?? $user->country_id ?? '') == $country->id)>
                                         {{ $country->name }} ({{ $country->cca2 }})
@@ -141,11 +141,11 @@
                     <div class="flex justify-end gap-3">
                         <a href="{{ route('frontend.profile.index') }}"
                            class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                            {{ __('Cancel') }}
+                            {{ __('frontend.profile.edit.actions.cancel') }}
                         </a>
                         <button type="submit"
                                 class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                            {{ __('Save changes') }}
+                            {{ __('frontend.profile.edit.actions.save') }}
                         </button>
                     </div>
                 </form>
