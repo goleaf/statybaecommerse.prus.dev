@@ -17,34 +17,34 @@
 
 @extends('errors.layout', [
     'code' => '419',
-    'title' => __('Session Expired'),
-    'description' => __('Your session has expired due to inactivity or a security check. Please refresh the page and try again.'),
+    'title' => __('frontend.errors.419.title'),
+    'description' => __('frontend.errors.419.description'),
     'primaryAction' => [
-        'label' => __('Refresh Page'),
+        'label' => __('frontend.errors.actions.refresh_page'),
         'type' => 'refresh',
     ],
     'secondaryAction' => [
-        'label' => __('Return Home'),
+        'label' => __('frontend.errors.actions.return_home'),
         'url' => $homeUrl,
     ],
     'links' => [
         [
-            'label' => __('Review Cart'),
+            'label' => __('frontend.errors.419.links.review_cart'),
             'url' => $cartUrl,
             'icon' => 'cart',
         ],
         [
-            'label' => __('Browse Products'),
+            'label' => __('frontend.errors.actions.browse_products'),
             'url' => $productsUrl,
             'icon' => 'products',
         ],
         [
-            'label' => __('Track Orders'),
+            'label' => __('frontend.errors.419.links.track_orders'),
             'url' => $ordersUrl,
             'icon' => 'status',
         ],
         [
-            'label' => __('Support Center'),
+            'label' => __('frontend.errors.actions.visit_support_center'),
             'url' => $supportUrl,
             'icon' => 'support',
         ],
