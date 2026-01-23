@@ -13,8 +13,8 @@
         ? route('localized.contact.index', ['locale' => $locale])
         : url('/contact');
 
-    $supportTitle = $supportTitle ?? __('Our team is already looking into this');
-    $supportDescription = $supportDescription ?? __('Share the reference ID with our support specialists so we can investigate the issue and keep you updated.');
+    $supportTitle = $supportTitle ?? __('frontend.errors.5xx.support_title');
+    $supportDescription = $supportDescription ?? __('frontend.errors.5xx.support_description');
 
     $resolvedCode = isset($exception) && method_exists($exception, 'getStatusCode')
         ? (string) $exception->getStatusCode()
@@ -51,14 +51,14 @@
 
 @extends('errors.layout', [
     'code' => $resolvedCode,
-    'title' => $title ?? __('Something went wrong on our side'),
-    'description' => $description ?? __('We hit an unexpected error while handling your request. Our team has been alerted and is already looking into it.'),
+    'title' => $title ?? __('frontend.errors.5xx.title'),
+    'description' => $description ?? __('frontend.errors.5xx.description'),
     'primaryAction' => $primaryAction ?? [
-        'label' => __('Try Again'),
+        'label' => __('frontend.errors.actions.try_again'),
         'type' => 'refresh',
     ],
     'secondaryAction' => $secondaryAction ?? [
-        'label' => __('Check System Status'),
+        'label' => __('frontend.errors.actions.check_system_status'),
         'url' => $statusUrl,
     ],
     'correlationId' => $correlationId,
@@ -68,22 +68,22 @@
     'statusPageUrl' => $statusUrl,
     'links' => $links ?? [
         [
-            'label' => __('Check System Status'),
+            'label' => __('frontend.errors.actions.check_system_status'),
             'url' => $statusUrl,
             'icon' => 'status',
         ],
         [
-            'label' => __('Visit Support Center'),
+            'label' => __('frontend.errors.actions.visit_support_center'),
             'url' => $supportUrl,
             'icon' => 'support',
         ],
         [
-            'label' => __('Contact Support'),
+            'label' => __('frontend.errors.actions.contact_support'),
             'url' => $contactUrl,
             'icon' => 'refresh',
         ],
         [
-            'label' => __('Go Home'),
+            'label' => __('frontend.errors.actions.go_home'),
             'url' => $homeUrl,
             'icon' => 'categories',
         ],

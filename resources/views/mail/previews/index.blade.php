@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ __('Mail previews') }}</title>
+    <title>{{ __('frontend.mail_previews.title') }}</title>
     <style>
         :root {
             color-scheme: light dark;
@@ -83,11 +83,11 @@
 </head>
 <body>
 <div class="container">
-    <h1>{{ __('Transactional mail previews') }}</h1>
-    <p>{{ __('Quickly inspect the rendered HTML for key transactional emails. Open any preview in a new tab to review the final markup sent to users.') }}</p>
+    <h1>{{ __('frontend.mail_previews.heading') }}</h1>
+    <p>{{ __('frontend.mail_previews.description') }}</p>
 
     <form class="locale-selector" method="get">
-        <label for="locale">{{ __('Locale') }}</label>
+        <label for="locale">{{ __('frontend.mail_previews.locale_label') }}</label>
         <select id="locale" name="locale" onchange="this.form.submit()">
             @foreach ($availableLocales as $locale)
                 <option value="{{ $locale }}" @selected($locale === $selectedLocale)>{{ strtoupper($locale) }}</option>

@@ -1,12 +1,12 @@
 @extends('components.layouts.base')
 
-@section('title', __('Inventory Management'))
+@section('title', __('frontend.inventory.title'))
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
     <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ __('Inventory Management') }}</h1>
-        <p class="mt-2 text-gray-600 dark:text-gray-400">{{ __('Monitor and manage your product inventory') }}</p>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ __('frontend.inventory.title') }}</h1>
+        <p class="mt-2 text-gray-600 dark:text-gray-400">{{ __('frontend.inventory.subtitle') }}</p>
     </div>
 
     <!-- Inventory Dashboard -->
@@ -17,7 +17,7 @@
     <!-- Inventory Table -->
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-            <h2 class="text-xl font-semibold text-gray-900 dark:text-white">{{ __('Product Inventory') }}</h2>
+            <h2 class="text-xl font-semibold text-gray-900 dark:text-white">{{ __('frontend.inventory.table_title') }}</h2>
         </div>
         
         <div class="overflow-x-auto">
@@ -25,25 +25,25 @@
                 <thead class="bg-gray-50 dark:bg-gray-700">
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                            {{ __('Product') }}
+                            {{ __('frontend.inventory.columns.product') }}
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                            {{ __('SKU') }}
+                            {{ __('frontend.inventory.columns.sku') }}
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                            {{ __('Brand') }}
+                            {{ __('frontend.inventory.columns.brand') }}
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                            {{ __('Stock') }}
+                            {{ __('frontend.inventory.columns.stock') }}
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                            {{ __('Status') }}
+                            {{ __('frontend.inventory.columns.status') }}
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                            {{ __('Price') }}
+                            {{ __('frontend.inventory.columns.price') }}
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                            {{ __('Actions') }}
+                            {{ __('frontend.inventory.columns.actions') }}
                         </th>
                     </tr>
                 </thead>
@@ -77,7 +77,7 @@
                                 @if($product->manage_stock)
                                     {{ $product->stock_quantity }}
                                 @else
-                                    <span class="text-gray-400">{{ __('Unlimited') }}</span>
+                                    <span class="text-gray-400">{{ __('frontend.inventory.unlimited') }}</span>
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
@@ -103,13 +103,13 @@
                                 <div class="flex space-x-2">
                                     <a href="{{ route('products.show', $product) }}" 
                                        class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
-                                        {{ __('View') }}
+                                        {{ __('frontend.inventory.actions.view') }}
                                     </a>
                                     @auth
                                         @if(auth()->user()->can('manage_inventory'))
                                             <a href="{{ route('admin.inventory.edit', $product) }}" 
                                                class="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300">
-                                                {{ __('Manage') }}
+                                                {{ __('frontend.inventory.actions.manage') }}
                                             </a>
                                         @endif
                                     @endauth
@@ -119,7 +119,7 @@
                     @empty
                         <tr>
                             <td colspan="7" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
-                                {{ __('No products found') }}
+                                {{ __('frontend.inventory.empty') }}
                             </td>
                         </tr>
                     @endforelse

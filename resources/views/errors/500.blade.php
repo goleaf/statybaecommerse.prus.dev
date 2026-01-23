@@ -19,36 +19,36 @@
 
 @extends('errors.layout', [
     'code' => '500',
-    'title' => __('Something Went Wrong'),
-    'description' => __('We hit an unexpected error. Our team has been notified and is already working on a fix.'),
+    'title' => __('frontend.errors.500.title'),
+    'description' => __('frontend.errors.500.description'),
     'primaryAction' => [
-        'label' => __('Return Home'),
+        'label' => __('frontend.errors.actions.return_home'),
         'url' => $homeUrl,
     ],
     'secondaryAction' => [
-        'label' => __('Contact Support'),
+        'label' => __('frontend.errors.actions.contact_support'),
         'url' => $contactUrl,
     ],
-    'supportTitle' => __('Need immediate assistance?'),
-    'supportDescription' => __('Share the reference ID below with our engineers so we can restore your experience as quickly as possible.'),
+    'supportTitle' => __('frontend.errors.500.support_title'),
+    'supportDescription' => __('frontend.errors.500.support_description'),
     'links' => [
         [
-            'label' => __('Check System Status'),
+            'label' => __('frontend.errors.actions.check_system_status'),
             'url' => $statusUrl,
             'icon' => 'status',
         ],
         [
-            'label' => __('Visit Support Center'),
+            'label' => __('frontend.errors.actions.visit_support_center'),
             'url' => $supportUrl,
             'icon' => 'support',
         ],
         [
-            'label' => __('Read Updates'),
+            'label' => __('frontend.errors.actions.read_updates'),
             'url' => $newsUrl,
             'icon' => 'refresh',
         ],
         [
-            'label' => __('Back to Home'),
+            'label' => __('frontend.errors.actions.back_to_home'),
             'url' => $homeUrl,
             'icon' => 'categories',
         ],
