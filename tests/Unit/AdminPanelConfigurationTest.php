@@ -19,7 +19,7 @@ describe('Admin Panel Configuration', function (): void {
         $panel = $provider->panel(Panel::make());
 
         expect($panel->getId())->toBe('admin');
-        expect($panel->getPath())->toBe('/admin');
+        expect($panel->getPath())->toBe('admin');
         expect($panel->getHomeUrl())->toStartWith('/admin');
         expect($panel->hasTopbar())->toBeFalse();
     });

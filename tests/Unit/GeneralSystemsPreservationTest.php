@@ -10,7 +10,7 @@ use App\Models\Taggable;
 use App\Models\Task;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use ReflectionClass;
+
 
 uses(RefreshDatabase::class);
 
@@ -65,20 +65,20 @@ function assertGeneralTagSystemWorks(): void
 
     // Test tagging functionality for each entity type
     $entities = [
-        'user'         => $user,
-        'task'         => $task,
-        'project'      => $project,
+        'user' => $user,
+        'task' => $task,
+        'project' => $project,
         'organization' => $organization,
     ];
 
     foreach ($entities as $entityType => $entity) {
         // Create taggable relationship manually
         $taggable = new Taggable([
-            'tag_id'        => $tag->id,
+            'tag_id' => $tag->id,
             'taggable_type' => get_class($entity),
-            'taggable_id'   => $entity->id,
-            'tagged_by'     => $user->id,
-            'tagged_at'     => now(),
+            'taggable_id' => $entity->id,
+            'tagged_by' => $user->id,
+            'tagged_at' => now(),
         ]);
         $taggable->save();
 
@@ -104,29 +104,29 @@ function assertGeneralCommentSystemWorks(): void
 
     // Test Comment functionality for each entity type
     $entities = [
-        'task'         => $task,
-        'project'      => $project,
+        'task' => $task,
+        'project' => $project,
         'organization' => $organization,
     ];
 
     foreach ($entities as $entityType => $entity) {
         // Create root comment
         $rootComment = Comment::factory()->create([
-            'content'          => "Root comment for {$entityType}",
-            'user_id'          => $user->id,
+            'content' => "Root comment for {$entityType}",
+            'user_id' => $user->id,
             'commentable_type' => get_class($entity),
-            'commentable_id'   => $entity->id,
-            'is_approved'      => true,
+            'commentable_id' => $entity->id,
+            'is_approved' => true,
         ]);
 
         // Create reply comment
         $replyComment = Comment::factory()->create([
-            'content'          => "Reply to {$entityType} comment",
-            'user_id'          => $user->id,
+            'content' => "Reply to {$entityType} comment",
+            'user_id' => $user->id,
             'commentable_type' => get_class($entity),
-            'commentable_id'   => $entity->id,
-            'parent_id'        => $rootComment->id,
-            'is_approved'      => true,
+            'commentable_id' => $entity->id,
+            'parent_id' => $rootComment->id,
+            'is_approved' => true,
         ]);
 
         // Test comment relationships and methods
@@ -151,11 +151,20 @@ function assertTagAndCommentModelsIntact(): void
 {
     // Test Tag model has all expected methods
     $tagReflection = new ReflectionClass(Tag::class);
-    $tagMethods = array_map(fn ($method) => $method->getName(), $tagReflection->getMethods());
+    $tagMethods = array_map(fn($method) => $method->getName(), $tagReflection->getMethods());
 
     $expectedTagMethods = [
-        'taggables', 'users', 'organizations', 'projects', 'tasks', 'comments', 'files',
-        'scopeByType', 'scopePopular', 'getUsageCount', 'getTaggedModels',
+        'taggables',
+        'users',
+        'organizations',
+        'projects',
+        'tasks',
+        'comments',
+        'files',
+        'scopeByType',
+        'scopePopular',
+        'getUsageCount',
+        'getTaggedModels',
     ];
 
     foreach ($expectedTagMethods as $method) {
@@ -164,14 +173,34 @@ function assertTagAndCommentModelsIntact(): void
 
     // Test Comment model has all expected methods
     $commentReflection = new ReflectionClass(Comment::class);
-    $commentMethods = array_map(fn ($method) => $method->getName(), $commentReflection->getMethods());
+    $commentMethods = array_map(fn($method) => $method->getName(), $commentReflection->getMethods());
 
     $expectedCommentMethods = [
-        'user', 'commentable', 'parent', 'children', 'descendants', 'files', 'tags',
-        'scopeApproved', 'scopePinned', 'scopeRootComments', 'scopeReplies',
-        'scopeByUser', 'scopeRecent', 'scopeForEntity', 'scopePaginatedForEntity',
-        'scopeApprovedForEntity', 'isRoot', 'isReply', 'getDepth', 'getRootComment',
-        'getHierarchyPath', 'getTotalRepliesCount', 'approve', 'pin', 'unpin',
+        'user',
+        'commentable',
+        'parent',
+        'children',
+        'descendants',
+        'files',
+        'tags',
+        'scopeApproved',
+        'scopePinned',
+        'scopeRootComments',
+        'scopeReplies',
+        'scopeByUser',
+        'scopeRecent',
+        'scopeForEntity',
+        'scopePaginatedForEntity',
+        'scopeApprovedForEntity',
+        'isRoot',
+        'isReply',
+        'getDepth',
+        'getRootComment',
+        'getHierarchyPath',
+        'getTotalRepliesCount',
+        'approve',
+        'pin',
+        'unpin',
     ];
 
     foreach ($expectedCommentMethods as $method) {
@@ -187,11 +216,11 @@ function assertPolymorphicRelationshipsWork(): void
 
     // Test polymorphic tagging
     $taggable = new Taggable([
-        'tag_id'        => $tag->id,
+        'tag_id' => $tag->id,
         'taggable_type' => Task::class,
-        'taggable_id'   => $task->id,
-        'tagged_by'     => $user->id,
-        'tagged_at'     => now(),
+        'taggable_id' => $task->id,
+        'tagged_by' => $user->id,
+        'tagged_at' => now(),
     ]);
     $taggable->save();
 
@@ -205,10 +234,10 @@ function assertPolymorphicRelationshipsWork(): void
 
     // Test polymorphic commenting
     $comment = Comment::factory()->create([
-        'content'          => 'Test polymorphic comment',
-        'user_id'          => $user->id,
+        'content' => 'Test polymorphic comment',
+        'user_id' => $user->id,
         'commentable_type' => Task::class,
-        'commentable_id'   => $task->id,
+        'commentable_id' => $task->id,
     ]);
 
     expect($comment->user)->toBeInstanceOf(User::class);

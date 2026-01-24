@@ -27,8 +27,8 @@ uses(TestCase::class);
 // Provide each place where the slider link lookup exists so the shared assertion can exercise all entry points.
 dataset('slider_searchable_input_resolvers', [
     'quick actions widget' => resolveQuickActionComponent(...),
-    'management page'      => resolveManagementComponent(...),
-    'resource form'        => resolveResourceComponent(...),
+    'management page' => resolveManagementComponent(...),
+    'resource form' => resolveResourceComponent(...),
 ]);
 
 it('clears the slider link lookup state and payload when the search input is emptied', function (SearchableInput $component, DummyLivewireComponent $livewire, RecordingSet $set): void {
@@ -86,7 +86,7 @@ function resolveComponentFromAction(Action $action): array
     $schema = $action->getSchema(Form::make($livewire));
 
     // Fail fast if the action does not expose a schema instance, mirroring the runtime expectation for Filament actions.
-    if (! $schema instanceof Schema) {
+    if (!$schema instanceof Schema) {
         throw new RuntimeException('Unable to resolve schema from slider action.');
     }
 
@@ -143,7 +143,7 @@ function resolveAfterStateUpdatedHook(SearchableInput $component): Closure
 
     $callback = $callbacks[array_key_last($callbacks)];
 
-    if (! $callback instanceof Closure) {
+    if (!$callback instanceof Closure) {
         throw new RuntimeException('SearchableInput hook stack contained a non-closure callback.');
     }
 
@@ -154,7 +154,7 @@ function resolveSearchableComponent(Schema|Form $schema, string $statePath): Sea
 {
     $components = $schema->getFlatComponents(withActions: false, withHidden: true);
 
-    $component = collect($components)->first(fn ($component): bool => $component instanceof SearchableInput
+    $component = collect($components)->first(fn($component): bool => $component instanceof SearchableInput
         && $component->getStatePath() === $statePath);
 
     return $component instanceof SearchableInput
@@ -180,7 +180,7 @@ final class DummyLivewireComponent extends LivewireComponent implements HasSchem
         return data_get($this, $statePath);
     }
 
-    public function getSchemaComponent(string $key, bool $withHidden = false, ?Component $skipComponentChildContainersWhileSearching = null): Component|Action|ActionGroup|null
+    public function getSchemaComponent(string $key, bool $withHidden = false, array $skipComponentsChildContainersWhileSearching = []): Component|Action|ActionGroup|null
     {
         return null;
     }
@@ -190,7 +190,9 @@ final class DummyLivewireComponent extends LivewireComponent implements HasSchem
         return null;
     }
 
-    public function currentlyValidatingSchema(?Schema $schema): void {}
+    public function currentlyValidatingSchema(?Schema $schema): void
+    {
+    }
 
     public function getDefaultTestingSchemaName(): ?string
     {
@@ -205,7 +207,7 @@ final class DummyLivewireComponent extends LivewireComponent implements HasSchem
     public function __set(mixed $name, mixed $value): void
     {
         // Ensure array keys remain strings so the fake store mirrors Livewire's property bag behaviour.
-        if (! is_string($name)) {
+        if (!is_string($name)) {
             throw new RuntimeException('DummyLivewireComponent expects string property names.');
         }
 
@@ -214,7 +216,7 @@ final class DummyLivewireComponent extends LivewireComponent implements HasSchem
 
     public function __get(mixed $name): mixed
     {
-        if (! is_string($name)) {
+        if (!is_string($name)) {
             throw new RuntimeException('DummyLivewireComponent expects string property names.');
         }
 
