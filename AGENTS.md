@@ -18,7 +18,6 @@
 - `composer run test` runs the Pest test suite.
 - `composer run test:ci` runs PHPUnit with JUnit and coverage output.
 - `composer run analyze` runs PHPStan; `composer run lint:php` / `composer run fix:php` run Pint.
-- `npm run e2e:smoke` runs a lightweight Playwright smoke check.
 
 ## Coding Style & Naming Conventions
 - Indentation is 4 spaces, LF line endings, and final newlines (`.editorconfig`).

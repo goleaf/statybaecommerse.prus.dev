@@ -129,9 +129,6 @@ export default defineConfig({
       output: {
         manualChunks(id) {
           if (id.includes('node_modules')) {
-            if (id.includes('shiki')) return 'vendor-shiki';
-            if (id.includes('@shikijs')) return 'vendor-shiki';
-            if (id.includes('sortablejs')) return 'vendor-sortable';
             return 'vendor';
           }
         },
@@ -140,8 +137,5 @@ export default defineConfig({
     esbuild: {
       drop: ['console', 'debugger'],
     },
-  },
-  optimizeDeps: {
-    include: ['treeselectjs'],
   },
 });
