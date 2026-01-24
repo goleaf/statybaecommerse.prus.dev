@@ -17,20 +17,31 @@ final class NotificationPayloadDataTest extends TestCase
         $now = CarbonImmutable::parse('2024-01-01T12:00:00Z');
         $notification = new Notification;
         $notification->forceFill([
-            'id'   => (string) Str::uuid(),
+            'id' => (string) Str::uuid(),
             'type' => 'App\\Notifications\\OrderCreatedNotification',
             'data' => [
-                'type'              => 'order',
-                'title'             => 'Order created',
-                'message'           => 'Order #123 created',
-                'urgent'            => true,
-                'color'             => 'blue',
-                'tags'              => ['primary', '', ''],
-                'extra'             => 'value',
+                'type' => 'order',
+                'title' => 'Order created',
+                'message' => 'Order #123 created',
+                'urgent' => true,
+                'color' => 'blue',
+                'tags' => ['primary', '', ''],
+                'extra' => 'value',
                 'notification_type' => 'order',
             ],
-            'read_at'    => $now,
+            'read_at' => $now,
             'created_at' => $now,
+        ]);
+
+        config()->set('notifications.categories.order', [
+            'label' => 'Order Updates',
+            'aliases' => ['order_created', 'order_updates'],
+            'description' => 'Status changes',
+        ]);
+        config()->set('notifications.categories.order_updates', [
+            'label' => 'Order Updates',
+            'aliases' => ['order'],
+            'description' => 'Status changes',
         ]);
 
         $payload = NotificationPayloadData::fromModel($notification);
@@ -52,10 +63,10 @@ final class NotificationPayloadDataTest extends TestCase
     {
         $notification = new Notification;
         $notification->forceFill([
-            'id'   => (string) Str::uuid(),
+            'id' => (string) Str::uuid(),
             'type' => 'App\\Notifications\\StockAlertNotification',
             'data' => [
-                'title'   => 'Low stock',
+                'title' => 'Low stock',
                 'message' => 'Inventory low',
             ],
         ]);

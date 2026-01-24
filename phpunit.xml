@@ -29,7 +29,7 @@
         </testsuite>
         <testsuite name="Feature">
             <directory suffix="Test.php">tests/Feature</directory>
-            <directory suffix="Test.php">tests/Admin</directory>
+            <directory suffix="Test.php">tests/Filament</directory>
         </testsuite>
         <testsuite name="Performance">
             <directory suffix="Test.php">tests/Performance</directory>

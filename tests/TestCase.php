@@ -47,7 +47,7 @@ abstract class TestCase extends BaseTestCase
         // Increase the memory limit for the feature-rich Filament panel tests so resource discovery doesn't exhaust CLI limits.
         ini_set('memory_limit', '-1');
 
-        if (! class_exists(TestingDatabase::class) && file_exists(__DIR__ . '/Support/TestingDatabase.php')) {
+        if (!class_exists(TestingDatabase::class) && file_exists(__DIR__ . '/Support/TestingDatabase.php')) {
             require_once __DIR__ . '/Support/TestingDatabase.php';
         }
 
@@ -71,7 +71,7 @@ abstract class TestCase extends BaseTestCase
         $appBasePath = dirname(__DIR__);
         $envFile = $appBasePath . '/.env';
 
-        if (! file_exists($envFile)) {
+        if (!file_exists($envFile)) {
             file_put_contents($envFile, '');
             $this->createdEnvFile = true;
         } else {
@@ -119,7 +119,7 @@ abstract class TestCase extends BaseTestCase
 
             // Normalise the expected keys using Filament's internal record key helper so soft deletes and UUIDs behave.
             $expectedKeys = collect($records)
-                ->map(fn ($record) => (string) $component->getTableRecordKey($record))
+                ->map(fn($record) => (string) $component->getTableRecordKey($record))
                 ->all();
 
             $query = $component->getFilteredSortedTableQuery();
@@ -135,7 +135,7 @@ abstract class TestCase extends BaseTestCase
 
             // Pull the sorted keys from the active table query so pagination and filters are respected.
             $sortedKeys = collect((clone $query)->pluck($keyName)->all())
-                ->map(fn ($key) => (string) $key)
+                ->map(fn($key) => (string) $key)
                 ->all();
 
             $actualKeys = array_values(array_intersect($sortedKeys, $expectedKeys));
@@ -157,7 +157,7 @@ abstract class TestCase extends BaseTestCase
             return;
         }
 
-        if (! FilamentNotification::hasMacro('fake')) {
+        if (!FilamentNotification::hasMacro('fake')) {
             FilamentNotification::macro(
                 'fake',
                 static function (): void {
@@ -206,6 +206,11 @@ abstract class TestCase extends BaseTestCase
 
         Auth::forgetGuards();
 
+        app_setting_flush_cache();
+        if (function_exists('current_currency_flush')) {
+            current_currency_flush();
+        }
+
         parent::tearDown();
 
     }
@@ -242,13 +247,13 @@ abstract class TestCase extends BaseTestCase
                     TestingDatabase::migrate();
 
                     try {
-                        if (! Schema::connection('sqlite')->hasTable('users')) {
+                        if (!Schema::connection('sqlite')->hasTable('users')) {
                             $shouldRetry = true;
                         }
                     } catch (Throwable $schemaException) {
                         $message = strtolower($schemaException->getMessage());
 
-                        if (! str_contains($message, 'database disk image is malformed') && ! str_contains($message, 'database is locked')) {
+                        if (!str_contains($message, 'database disk image is malformed') && !str_contains($message, 'database is locked')) {
                             throw $schemaException;
                         }
 
@@ -257,14 +262,14 @@ abstract class TestCase extends BaseTestCase
                 } catch (Throwable $exception) {
                     $message = strtolower($exception->getMessage());
 
-                    if (! str_contains($message, 'database disk image is malformed') && ! str_contains($message, 'database is locked')) {
+                    if (!str_contains($message, 'database disk image is malformed') && !str_contains($message, 'database is locked')) {
                         throw $exception;
                     }
 
                     $shouldRetry = true;
                 }
 
-                if (! $shouldRetry) {
+                if (!$shouldRetry) {
                     return;
                 }
 
@@ -311,7 +316,7 @@ abstract class TestCase extends BaseTestCase
         }
 
         if (is_array($value)) {
-            $value = array_map(fn ($item) => $this->canonicalizeValue($item), $value);
+            $value = array_map(fn($item) => $this->canonicalizeValue($item), $value);
 
             if (array_is_list($value)) {
                 sort($value);
@@ -333,7 +338,7 @@ abstract class TestCase extends BaseTestCase
 
         $panel = Filament::getPanel('admin');
 
-        if (! $panel instanceof Panel) {
+        if (!$panel instanceof Panel) {
             self::fail('The admin panel must be registered for Filament tests.');
         }
 
@@ -439,7 +444,7 @@ abstract class TestCase extends BaseTestCase
 
         $directory = dirname($this->viteManifestPath);
 
-        if (! is_dir($directory)) {
+        if (!is_dir($directory)) {
             // Ensure the build directory exists before attempting to write the manifest file.
             mkdir($directory, 0o755, true);
         }
@@ -447,14 +452,14 @@ abstract class TestCase extends BaseTestCase
         $manifest = [
             // Provide minimal asset mappings so Blade's @vite directive resolves without throwing.
             'resources/css/app.scss' => [
-                'file'    => 'assets/app.css',
+                'file' => 'assets/app.css',
                 'isEntry' => true,
-                'src'     => 'resources/css/app.scss',
+                'src' => 'resources/css/app.scss',
             ],
             'resources/js/app.js' => [
-                'file'    => 'assets/app.js',
+                'file' => 'assets/app.js',
                 'isEntry' => true,
-                'src'     => 'resources/js/app.js',
+                'src' => 'resources/js/app.js',
             ],
         ];
 

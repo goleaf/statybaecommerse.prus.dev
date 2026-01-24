@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use App\Filament\Concerns\HasResizableColumns;
-use Mockery;
+
 use Tests\TestCase;
 
 uses(TestCase::class);
@@ -114,7 +114,7 @@ final class HasResizableColumnsHarness
     /**
      * @var array<string, int>
      */
-    public array $columnWidths = ['orders.id' => 240];
+
 
     public ?int $fakeUserId = null;
 
