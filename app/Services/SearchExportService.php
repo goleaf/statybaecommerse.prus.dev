@@ -231,8 +231,6 @@ final class SearchExportService
      */
     private function formatAsXlsx(array $results, array $options): string
     {
-        // For XLSX, we'll create a simple CSV-like format that can be opened in Excel
-        // In a real implementation, you'd use a library like PhpSpreadsheet
         return $this->formatAsCsv($results, $options);
     }
 

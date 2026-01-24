@@ -62,6 +62,5 @@
         <env name="SKIP_FILAMENT_BOOT" value="1"/>
         <env name="NIGHTWATCH_ENABLED" value="false"/>
         <!-- Avoid SQLite write-contention across processes -->
-        <env name="PARATEST_PROCESSES" value="1"/>
     </php>
 </phpunit>

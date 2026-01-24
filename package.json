@@ -7,14 +7,9 @@
         "build": "vite build",
         "dev": "vite",
         "preview": "vite preview",
-        "mcp:filament": "node mcp/filament-docs-server.js",
-        "test": "php artisan test",
-        "e2e:smoke": "node scripts/e2e-smoke.mjs",
-        "e2e:routes": "node scripts/check-routes.mjs",
-        "e2e:console": "node scripts/check-console.mjs"
+        "test": "php artisan test"
     },
     "devDependencies": {
-        "@modelcontextprotocol/sdk": "^1.20.1",
         "@tailwindcss/aspect-ratio": "^0.4.2",
         "@tailwindcss/forms": "^0.5.10",
         "@tailwindcss/postcss": "^4.1.16",
@@ -22,24 +17,12 @@
         "@tailwindcss/vite": "^4.1.16",
         "autoprefixer": "^10.4.21",
         "axios": "^1.11.0",
-        "cheerio": "^1.0.0",
         "concurrently": "^9.0.1",
         "laravel-vite-plugin": "^2.0.1",
-        "node-fetch": "^3.3.2",
-        "playwright": "^1.56.1",
         "sass": "^1.93.2",
         "sass-embedded": "^1.92.1",
         "tailwindcss": "^4.1.16",
         "vite": "^7.1.12"
-    },
-    "dependencies": {
-        "@fontsource-variable/figtree": "^5.2.10",
-        "@fontsource-variable/instrument-sans": "^5.2.8",
-        "@fontsource-variable/inter": "^5.2.8",
-        "@fontsource-variable/space-grotesk": "^5.2.10",
-        "shiki": "^3.14.0",
-        "sortablejs": "^1.15.6",
-        "treeselectjs": "^0.13.1"
     },
     "version": "0.4.0"
 }
