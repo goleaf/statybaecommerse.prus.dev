@@ -57,14 +57,6 @@ final class Report extends Model
     }
 
     /**
-     * Handle analyticsEvents functionality with proper error handling.
-     */
-    public function analyticsEvents(): HasMany
-    {
-        return $this->hasMany(AnalyticsEvent::class, 'trackable_id')->where('trackable_type', self::class);
-    }
-
-    /**
      * Handle scopeByType functionality with proper error handling.
      *
      * @param mixed $query
