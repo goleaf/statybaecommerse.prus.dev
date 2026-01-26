@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Builder;
 final class InventoryManagement extends Page implements HasTable
 {
     use InteractsWithTable;
+    use \App\Filament\Tables\Concerns\ConfiguresToggleableTableLayout;
 
     protected string $view = 'filament.pages.inventory-management';
 

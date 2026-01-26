@@ -1,7 +1,7 @@
-<x-layouts.base title="{{ __('Home') }}">
+<x-layouts.base title="{{ __('frontend/home.home.title') }}">
     <div class="max-w-7xl mx-auto px-4 py-10 space-y-12">
         <section>
-            <h1 class="text-3xl font-semibold mb-4">{{ __('Featured products') }}</h1>
+            <h1 class="text-3xl font-semibold mb-4">{{ __('frontend/home.featured_products') }}</h1>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 @forelse ($featuredProducts as $product)
                     <div class="p-4 border border-gray-200 rounded-xl bg-white shadow-sm dark:bg-gray-900 dark:border-white/10">
@@ -9,16 +9,16 @@
                         <p class="text-sm text-gray-500 dark:text-gray-400">{{ $product->brand?->name }}</p>
                         <p class="mt-2 text-primary-600 font-semibold">{{ app_money_format($product->sale_price ?? $product->price ?? 0) }}</p>
                         <a class="mt-3 inline-flex items-center text-sm text-primary-700 hover:text-primary-800"
-                           href="{{ route('frontend.products.show', $product) }}">{{ __('View product') }}</a>
+                           href="{{ route('frontend.products.show', $product) }}">{{ __('frontend/products.view_product') }}</a>
                     </div>
                 @empty
-                    <p class="text-gray-500 dark:text-gray-400">{{ __('No featured products available.') }}</p>
+                    <p class="text-gray-500 dark:text-gray-400">{{ __('frontend/home.featured_empty') }}</p>
                 @endforelse
             </div>
         </section>
 
         <section>
-            <h2 class="text-2xl font-semibold mb-4">{{ __('Latest arrivals') }}</h2>
+            <h2 class="text-2xl font-semibold mb-4">{{ __('frontend/home.latest_arrivals') }}</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 @forelse ($latestProducts as $product)
                     <div class="p-4 rounded-xl border border-gray-200 bg-white dark:bg-gray-900 dark:border-white/10">
@@ -27,7 +27,7 @@
                         <div class="mt-2 text-primary-600 font-medium">{{ app_money_format($product->sale_price ?? $product->price ?? 0) }}</div>
                     </div>
                 @empty
-                    <p class="text-gray-500 dark:text-gray-400">{{ __('Products will appear here soon.') }}</p>
+                    <p class="text-gray-500 dark:text-gray-400">{{ __('frontend/home.latest_empty') }}</p>
                 @endforelse
             </div>
         </section>

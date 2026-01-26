@@ -705,6 +705,11 @@ final class Product extends Model implements HasMedia, TranslatableRecord
         return $this->belongsToMany(Category::class, 'product_categories');
     }
 
+    public function category(): HasOne
+    {
+        return $this->hasOne(Category::class, 'id', 'category_id')->withDefault();
+    }
+
     /**
      * Handle collections functionality with proper error handling.
      */

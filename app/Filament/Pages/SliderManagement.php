@@ -124,21 +124,12 @@ class SliderManagement extends Page implements HasActions, HasForms
                             TextInput::make('button_text')
                                 ->label(__('translations.button_text'))
                                 ->maxLength(255),
-                            SearchableInput::make('button_url')
+                            TextInput::make('button_url')
                                 ->label(__('translations.button_url'))
                                 ->placeholder(__('translations.slider_link_placeholder'))
                                 ->maxLength(255)
-                                ->searchUsing(fn (string $value): array => ContentLinkSearch::results($value))
-                                ->dehydrateStateUsing(fn (?string $state): ?string => $state !== null && $state !== '' ? $state : null)
-                                ->afterStateHydrated(function (SearchableInput $component, ?string $state): void {
-                                    // Hydrate via the shared helper so documented metadata rules stay consistent.
-                                    SearchableInputHelper::hydrate(
-                                        $component,
-                                        $state,
-                                        static fn (string $value): ?array => ['value' => $value, 'label' => $value],
-                                    );
-                                })
-                                ->afterStateUpdated(function (SearchableInput $component, ?string $state, callable $set): void {
+                                ->helperText('Search functionality temporarily disabled due to missing component.')
+                                ->afterStateUpdated(function (TextInput $component, ?string $state, callable $set): void {
                                     if ($state !== null && $state !== '') {
                                         return;
                                     }
