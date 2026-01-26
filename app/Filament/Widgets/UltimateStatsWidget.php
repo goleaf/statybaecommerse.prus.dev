@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Filament\Widgets;
 
 use App\Models\Address;
-use App\Models\AnalyticsEvent;
 use App\Models\Attribute;
 use App\Models\Brand;
 use App\Models\Campaign;
@@ -116,9 +115,9 @@ class UltimateStatsWidget extends BaseWidget
         // $activeDiscountCodes = DiscountCode::where('is_active', true)->count(); // Commented out - table doesn't exist
 
         // === ANALYTICS & TRACKING ===
-        $totalPageViews = AnalyticsEvent::where('event_type', 'page_view')->count();
-        $totalSearches = AnalyticsEvent::where('event_type', 'search')->count();
-        $totalCartAdds = AnalyticsEvent::where('event_type', 'add_to_cart')->count();
+        $totalPageViews = 0;
+        $totalSearches = 0;
+        $totalCartAdds = 0;
         $totalUserBehaviors = UserBehavior::count();
         $totalVariantAnalytics = VariantAnalytics::count();
 

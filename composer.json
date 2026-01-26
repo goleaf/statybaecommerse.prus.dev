@@ -194,9 +194,6 @@
         "filament:fix-simple": [
             "@php artisan filament:fix-simple-issues"
         ],
-        "app:test-analytics": [
-            "@php vendor/bin/phpunit --testsuite=Unit --filter=AnalyticsEventDiagnosticsTest"
-        ],
         "app:test-brand": [
             "@php vendor/bin/phpunit --testsuite=Unit --filter=BrandResourceMetadataTest"
         ],

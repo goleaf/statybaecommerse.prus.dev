@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        Schema::dropIfExists('orders');
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->string('number')->unique();
@@ -29,6 +30,7 @@ return new class extends Migration
             $table->timestamp('delivered_at')->nullable();
             // Relationships references - simplified for now as constrained dependencies might not exist in factory test context unless full migration runs
             $table->unsignedBigInteger('channel_id')->nullable();
+            $table->unsignedBigInteger('country_id')->nullable();
             $table->unsignedBigInteger('shipping_option_id')->nullable();
             $table->unsignedBigInteger('partner_id')->nullable();
             $table->unsignedBigInteger('coupon_id')->nullable();

@@ -1,55 +1,7 @@
-@php
-    // Ensure locale is set from route before rendering (mirror SetLocale middleware logic)
-    $request = request();
-    $supportedConfig = config('app.supported_locales', 'lt,en');
-    $supportedLocales = is_array($supportedConfig) 
-        ? $supportedConfig 
-        : array_map('trim', explode(',', (string) $supportedConfig));
-    $supportedLocales = array_values(array_filter($supportedLocales, function($locale) {
-        return is_string($locale) && $locale !== '';
-    }));
-    
-    $routeLocale = $request->route('locale');
-    $locale = $routeLocale;
-    
-    // If no route parameter or invalid, try session, cookie, or default
-    if (!$locale || !in_array($locale, $supportedLocales, true)) {
-        $candidateLocales = array_filter([
-            session('locale'),
-            session('app.locale'),
-            $request->cookie('app_locale'),
-            config('app.locale', 'lt'),
-        ], function($candidate) {
-            return is_string($candidate) && $candidate !== '';
-        });
-        
-        foreach ($candidateLocales as $candidate) {
-            if (in_array($candidate, $supportedLocales, true)) {
-                $locale = $candidate;
-                break;
-            }
-        }
-    }
-    
-    // Ensure we have a valid locale
-    if (!$locale || !in_array($locale, $supportedLocales, true)) {
-        $locale = config('app.locale', 'lt');
-    }
-    
-    // Set the locale explicitly
-    app()->setLocale($locale);
-    app()->instance('request_locale', $locale);
-    
-    // Determine if this is category index or category show
-    $isIndex = !isset($category);
-    $pageTitle = $isIndex ? __('messages.categories_index_meta_title') : $category->name;
-    $pageDescription = $isIndex ? __('messages.categories_index_meta_description') : ($category->description ?? '');
-@endphp
-
 @section('meta')
     <x-meta
-        :title="$pageTitle . ' - ' . config('app.name')"
-        :description="$pageDescription"
+        :title="$this->pageTitle . ' - ' . config('app.name')"
+        :description="$this->pageDescription"
         canonical="{{ url()->current() }}" />
 @endsection
 
@@ -69,7 +21,7 @@
                         </a>
                     </li>
                     <li class="text-sage/60">/</li>
-                    @if (!$isIndex)
+                    @if (!$this->isIndex)
                         <li>
                             <a href="{{ route('localized.categories.index', ['locale' => app()->getLocale()]) }}"
                                class="text-sage transition hover:text-white">
@@ -87,14 +39,14 @@
             <div class="mt-8 flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
                 <div class="max-w-2xl space-y-5">
                     <span class="inline-flex items-center gap-2 rounded-full border border-sage bg-sage px-4 py-1 text-[11px] font-semibold uppercase tracking-[0.35em] text-dark">
-                        @if ($isIndex)
+                        @if ($this->isIndex)
                             {{ __('messages.categories_index_badge') }}
                         @else
                             {{ __('messages.categories_show_badge') }}
                         @endif
                     </span>
                     <h1 class="text-3xl font-bold leading-tight text-white sm:text-4xl md:text-5xl">
-                        @if ($isIndex)
+                        @if ($this->isIndex)
                             {{ __('messages.categories_index_title') }}
                         @else
                             {{ $category->name }}
@@ -175,55 +127,6 @@
     </div>
 
     <x-container class="px-4 pb-16 pt-12">
-        @php
-            $roots = \App\Models\Category::query()
-                ->where('is_visible', true)
-                ->whereNull('parent_id')
-                ->with([
-                    'children' => function ($q) {
-                        $q->where('is_visible', true)
-                            ->orderBy('sort_order')
-                            ->orderBy('name')
-                            ->with([
-                                'children' => function ($qq) {
-                                    $qq->where('is_visible', true)->orderBy('sort_order')->orderBy('name');
-                                },
-                            ]);
-                    },
-                ])
-                ->orderBy('sort_order')
-                ->orderBy('name')
-                ->get();
-
-            $categoryTree = $roots
-                ->map(function ($cat) {
-                    return [
-                        'id' => $cat->id,
-                        'name' => $cat->name,
-                        'slug' => $cat->slug,
-                        'children' => $cat->children
-                            ->map(function ($child) {
-                                return [
-                                    'id' => $child->id,
-                                    'name' => $child->name,
-                                    'slug' => $child->slug,
-                                    'children' => $child->children
-                                        ->map(function ($gc) {
-                                            return [
-                                                'id' => $gc->id,
-                                                'name' => $gc->name,
-                                                'slug' => $gc->slug,
-                                            ];
-                                        })
-                                        ->values(),
-                                ];
-                            })
-                            ->values(),
-                    ];
-                })
-                ->values();
-        @endphp
-
         <div class="grid gap-8 lg:grid-cols-12">
             <aside class="hidden lg:col-span-3 lg:block">
                 <div class="rounded-3xl border border-sage/30 bg-dark p-6 shadow-lg">
@@ -232,21 +135,21 @@
                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                             </svg>
-                            @if ($isIndex)
+                            @if ($this->isIndex)
                                 {{ __('messages.categories_index_filters_button') }}
                             @else
                                 {{ __('messages.categories_show_filter') }}
                             @endif
                         </span>
                         <h2 class="text-xl font-semibold text-white">
-                            @if ($isIndex)
+                            @if ($this->isIndex)
                                 {{ __('messages.categories_index_filters_title') }}
                             @else
                                 {{ __('messages.categories_show_filters_title') }}
                             @endif
                         </h2>
                         <p class="text-sm leading-relaxed text-sage/80">
-                            @if ($isIndex)
+                            @if ($this->isIndex)
                                 {{ __('messages.categories_index_filters_description') }}
                             @else
                                 {{ __('messages.categories_show_filters_description') }}
@@ -254,7 +157,7 @@
                         </p>
                     </div>
                     <div class="space-y-6">
-                        @if ($isIndex)
+                        @if ($this->isIndex)
                             @include('livewire.pages.category.partials.filters', ['variant' => 'desktop'])
                         @else
                             <!-- Categories Filter -->

@@ -37,19 +37,77 @@ final class Show extends Component implements HasActions, HasForms
 
     public Category $category;
 
+    public bool $isIndex = false;
+
     public string $sortBy = 'created_at';
 
     public string $sortDirection = 'desc';
 
-    public function mount(Category $category): void
+    public function mount(?Category $category = null): void
     {
-        abort_if(! $category->is_visible, 404);
+        if ($category && $category->exists) {
+            abort_if(! $category->is_visible, 404);
 
-        if (! $category->relationLoaded('media') || ! $category->relationLoaded('translations')) {
-            $category->load(['media', 'translations']);
+            if (! $category->relationLoaded('media') || ! $category->relationLoaded('translations')) {
+                $category->load(['media', 'translations']);
+            }
+
+            $this->category = $category;
+            $this->isIndex = false;
+        } else {
+            $this->isIndex = true;
         }
+    }
 
-        $this->category = $category;
+    #[Computed]
+    public function pageTitle(): string
+    {
+        return $this->isIndex ? __('messages.categories_index_meta_title') : $this->category->name;
+    }
+
+    #[Computed]
+    public function pageDescription(): string
+    {
+        return $this->isIndex ? __('messages.categories_index_meta_description') : ($this->category->description ?? '');
+    }
+
+    #[Computed]
+    public function categoryTree(): \Illuminate\Support\Collection
+    {
+        $roots = Category::query()
+            ->where('is_visible', true)
+            ->whereNull('parent_id')
+            ->with([
+                'children' => function ($q) {
+                    $q->where('is_visible', true)
+                        ->orderBy('sort_order')
+                        ->orderBy('name')
+                        ->with([
+                            'children' => function ($qq) {
+                                $qq->where('is_visible', true)->orderBy('sort_order')->orderBy('name');
+                            },
+                        ]);
+                },
+            ])
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->get();
+
+        return $roots->map(fn ($cat) => [
+            'id' => $cat->id,
+            'name' => $cat->name,
+            'slug' => $cat->slug,
+            'children' => $cat->children->map(fn ($child) => [
+                'id' => $child->id,
+                'name' => $child->name,
+                'slug' => $child->slug,
+                'children' => $child->children->map(fn ($gc) => [
+                    'id' => $gc->id,
+                    'name' => $gc->name,
+                    'slug' => $gc->slug,
+                ])->values(),
+            ])->values(),
+        ])->values();
     }
 
     /**

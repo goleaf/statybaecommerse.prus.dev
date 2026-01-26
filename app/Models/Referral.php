@@ -83,14 +83,6 @@ final class Referral extends Model
     }
 
     /**
-     * Handle analyticsEvents functionality with proper error handling.
-     */
-    public function analyticsEvents(): MorphMany
-    {
-        return $this->morphMany(AnalyticsEvent::class, 'trackable');
-    }
-
-    /**
      * Handle referredOrders functionality with proper error handling.
      */
     public function referredOrders(): HasMany

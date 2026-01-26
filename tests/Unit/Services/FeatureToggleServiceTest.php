@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Services;
 
-use App\Models\AnalyticsEvent;
 use App\Models\FeatureFlag;
 use App\Models\User;
 use App\Services\FeatureToggleService;
@@ -78,9 +77,6 @@ final class FeatureToggleServiceTest extends TestCase
         self::assertContains('JPY', $currencies);
         self::assertContains('KRW', $currencies);
         self::assertCount(2, array_unique($currencies));
-
-        // Analytics should capture the evaluation once thanks to the internal cache guard.
-        self::assertSame(1, AnalyticsEvent::query()->count());
     }
 
     #[Test]

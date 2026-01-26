@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreReferralRequest;
-use App\Models\AnalyticsEvent;
 use App\Models\Referral;
 use App\Models\ReferralCode;
 use App\Models\ReferralStatistics;
@@ -214,7 +213,7 @@ final class ReferralController extends Controller
     public function show(Referral $referral): View
     {
         $this->authorize('view', $referral);
-        $referral->load(['referrer', 'referred', 'rewards', 'analyticsEvents']);
+        $referral->load(['referrer', 'referred', 'rewards']);
 
         return view('referrals.show', compact('referral'));
     }
@@ -268,8 +267,6 @@ final class ReferralController extends Controller
         }
         // Store referral code in session for registration
         session(['referral_code' => $code]);
-        // Track the click
-        $this->trackReferralClick($referralCode, $request);
 
         return redirect()->route('register')->with('success', __('referrals.code_applied'));
     }
@@ -309,23 +306,6 @@ final class ReferralController extends Controller
     {
         $stats = ReferralStatistics::getOrCreateForUserAndDate($userId, $date);
         $stats->incrementReferrals();
-    }
-
-    /**
-     * Handle trackReferralClick functionality with proper error handling.
-     */
-    private function trackReferralClick(ReferralCode $referralCode, Request $request): void
-    {
-        // Track analytics event
-        AnalyticsEvent::create([
-            'user_id'    => $referralCode->user_id,
-            'event_type' => 'referral_click',
-            'session_id' => $request->session()->getId(),
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-            'referrer'   => $request->header('referer'),
-            'properties' => ['referral_code' => $referralCode->code],
-        ]);
     }
 
     /**

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
-use App\Models\AnalyticsEvent;
 use App\Models\CampaignView;
 use App\Models\Order;
 use App\Models\Product;
@@ -85,21 +84,15 @@ class ComprehensiveAnalyticsWidget extends ChartWidget
             $wishlistData[] = $wishlist;
 
             // Page Views
-            $pageViews = AnalyticsEvent::where('event_type', 'page_view')
-                ->whereDate('created_at', $date)
-                ->count();
+            $pageViews = 0;
             $pageViewsData[] = $pageViews;
 
             // Searches
-            $searches = AnalyticsEvent::where('event_type', 'search')
-                ->whereDate('created_at', $date)
-                ->count();
+            $searches = 0;
             $searchesData[] = $searches;
 
             // Cart Adds
-            $cartAdds = AnalyticsEvent::where('event_type', 'add_to_cart')
-                ->whereDate('created_at', $date)
-                ->count();
+            $cartAdds = 0;
             $cartAddsData[] = $cartAdds;
 
             // Campaign Views

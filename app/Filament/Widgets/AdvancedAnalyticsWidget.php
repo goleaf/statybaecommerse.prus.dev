@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
-use App\Models\AnalyticsEvent;
 use App\Models\Order;
 use App\Models\User;
 use Carbon\Carbon;
@@ -53,9 +52,7 @@ class AdvancedAnalyticsWidget extends ChartWidget
             $usersData[] = $users;
 
             // Page Views
-            $pageViews = AnalyticsEvent::where('event_type', 'page_view')
-                ->whereDate('created_at', $date)
-                ->count();
+            $pageViews = 0;
             $pageViewsData[] = $pageViews;
 
             // Conversions (removed)

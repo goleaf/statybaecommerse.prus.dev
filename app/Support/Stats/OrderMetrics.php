@@ -69,8 +69,7 @@ final class OrderMetrics
                 ? ((clone $ordersQuery)->whereIn('payment_status', ['refunded', 'partially_refunded'])->count() / $ordersCount) * 100
                 : 0.0;
 
-            $sessions = TrafficMetrics::sessionsCount($from, $to);
-            $conversionRate = $sessions > 0 ? ($ordersCount / $sessions) * 100 : 0.0;
+            $conversionRate = 0.0;
 
             $newCustomers = Customer::query()
                 ->whereBetween('created_at', [$from, $to])

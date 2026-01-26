@@ -134,13 +134,4 @@ final class ReferralFactory extends Factory
                 ->create(['user_id' => $referral->referred_id]);
         });
     }
-
-    public function withAnalytics(): static
-    {
-        return $this->afterCreating(function (Referral $referral) {
-            \App\Models\AnalyticsEvent::factory()
-                ->count($this->faker->numberBetween(1, 10))
-                ->create(['referral_id' => $referral->id]);
-        });
-    }
 }

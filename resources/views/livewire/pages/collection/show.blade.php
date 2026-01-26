@@ -1,35 +1,15 @@
 @section('meta')
-    @php($ogImage = $collection->getFirstMediaUrl(config('media.storage.collection_name'), 'large') ?: $collection->getFirstMediaUrl(config('media.storage.collection_name')))
-    @php
-        $firstProduct = $products->first();
-        $cname = config('media.storage.collection_name');
-        $preSmall = $firstProduct?->getFirstMediaUrl($cname, 'small');
-        $preMedium = $firstProduct?->getFirstMediaUrl($cname, 'medium');
-        $preLarge = $firstProduct?->getFirstMediaUrl($cname, 'large');
-        $preSrc = $preMedium ?: ($preLarge ?: ($preSmall ?: null));
-        $preSrcset = [];
-        if ($preSmall) {
-            $preSrcset[] = $preSmall . ' 300w';
-        }
-        if ($preMedium) {
-            $preSrcset[] = $preMedium . ' 500w';
-        }
-        if ($preLarge) {
-            $preSrcset[] = $preLarge . ' 800w';
-        }
-        $preSizes = '(max-width: 640px) 45vw, (max-width: 1024px) 22vw, 200px';
-    @endphp
     <x-meta
             :title="$collection->trans('name') ?? $collection->name"
             :description="$collection->trans('description')
                 ? Str::limit(strip_tags($collection->trans('description')), 150)
                 : ''"
-            :og-image="$ogImage"
+            :og-image="$this->ogImage"
             :prev="$products->previousPageUrl()"
             :next="$products->nextPageUrl()"
-            :preload-image="(string) $preSrc"
-            :preload-srcset="implode(', ', $preSrcset)"
-            :preload-sizes="$preSizes"
+            :preload-image="$this->preloadData['src']"
+            :preload-srcset="$this->preloadData['srcset']"
+            :preload-sizes="$this->preloadData['sizes']"
             canonical="{{ url()->current() }}" />
 @endsection
 
@@ -71,29 +51,20 @@
     </div>
 
     @if ($collection->trans('description') ?? $collection->description)
-        @php
-            $collectionDescription = $collection->trans('description') ?? $collection->description ?? '';
-        @endphp
-        <x-sanitized-html class="prose max-w-none mb-8" :content="$collectionDescription" />
+        <x-sanitized-html class="prose max-w-none mb-8" :content="$collection->trans('description') ?? $collection->description ?? ''" />
     @endif
 
     <div class="mb-4">
         <h2 class="text-xl font-semibold mb-2">{{ __('Filter by brand') }}</h2>
-        @php
-            $brandOptions = $brandOptions ?? [];
-            $activeBrandIds = $activeBrandIds ?? [];
-            $brandLookup = collect($brandOptions)->keyBy('id');
-        @endphp
         <div class="flex flex-wrap items-center gap-2 mb-2">
             @foreach ($activeBrandIds as $brandId)
-                @php($brand = $brandLookup->get($brandId))
-                @if ($brand)
+                @if ($brand = $this->filterValueLookup->get($brandId))
                     <button type="button"
                             wire:key="active-brand-{{ $brandId }}"
                             wire:click="removeBrandFilter({{ $brandId }})"
                             wire:confirm="{{ __('translations.confirm_remove_brand_filter') }}"
                             class="inline-flex items-center gap-1 text-xs rounded-full bg-gray-100 px-2 py-1">
-                        <span>{{ $brand['name'] }}</span>
+                        <span>{{ $brand['label'] ?? $brand['name'] ?? '' }}</span>
                         <span aria-hidden="true">×</span>
                     </button>
                 @endif
@@ -130,14 +101,13 @@
             <h2 class="text-xl font-semibold mb-2">{{ __('Filter by') }}</h2>
             <div class="flex flex-wrap items-center gap-2 mb-2">
                 @foreach ($activeValueIds as $valueId)
-                    @php($selected = $filterValueLookup->get($valueId))
-                    @if ($selected)
+                    @if ($selected = $this->filterValueLookup->get($valueId))
                         <button type="button"
                                 wire:key="active-filter-{{ (int) $valueId }}"
                                 wire:click="removeAttributeFilter({{ (int) $valueId }})"
                                 wire:confirm="{{ __('translations.confirm_remove_attribute_filter') }}"
                                 class="inline-flex items-center gap-1 text-xs rounded-full bg-gray-100 px-2 py-1">
-                            <span>{{ data_get($selected, 'label') }}</span>
+                            <span>{{ $selected['label'] ?? '' }}</span>
                             <span aria-hidden="true">×</span>
                         </button>
                     @endif
@@ -153,23 +123,17 @@
             </div>
             <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
                 @foreach ($filterGroups as $group)
-                    @php
-                        $attribute = $group['attribute'] ?? [];
-                        $attributeId = (int) ($attribute['id'] ?? 0);
-                        $attributeName = $attribute['name'] ?? __('Filters');
-                    @endphp
-                    <div wire:key="filter-group-{{ $attributeId ?: uniqid('attr-', false) }}">
+                    <div wire:key="filter-group-{{ (int) ($group['attribute']['id'] ?? 0) ?: uniqid('attr-', false) }}">
                         <h3 class="text-sm font-semibold text-gray-900 mb-3">
-                            {{ $attributeName }}
+                            {{ $group['attribute']['name'] ?? __('Filters') }}
                         </h3>
                         <ul class="flex flex-wrap gap-2">
                             @foreach ($group['values'] ?? [] as $value)
-                                @php($valueId = (int) ($value['id'] ?? 0))
-                                <li wire:key="filter-{{ $attributeId }}-{{ $valueId }}">
+                                <li wire:key="filter-{{ (int) ($group['attribute']['id'] ?? 0) }}-{{ (int) ($value['id'] ?? 0) }}">
                                     <button
                                         type="button"
                                         class="inline-flex items-center gap-1 rounded-full px-3 py-1 text-sm transition {{ ! empty($value['selected']) ? 'bg-primary-600 text-white shadow-sm' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}"
-                                        wire:click="toggleFilter({{ $attributeId }}, {{ $valueId }})"
+                                        wire:click="toggleFilter({{ (int) ($group['attribute']['id'] ?? 0) }}, {{ (int) ($value['id'] ?? 0) }})"
                                     >
                                         <span>{{ $value['label'] ?? '' }}</span>
                                         @if (! empty($value['selected']))

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Livewire\Components;
 
-use App\Models\AnalyticsEvent;
 use App\Models\Product;
 use App\Models\ProductComparison;
 use App\Models\User;
@@ -52,25 +51,5 @@ final class EnhancedProductCardTest extends TestCase
             'session_id' => $sessionId,
         ]);
     }
-
-    public function test_analytics_event_structure_for_product_view(): void
-    {
-        $user = User::factory()->create();
-        $product = Product::factory()->create();
-
-        AnalyticsEvent::create([
-            'event_type' => 'product_view',
-            'user_id'    => $user->id,
-            'session_id' => 'session-id',
-            'properties' => [
-                'product_id' => $product->id,
-                'view_type'  => 'quick_view',
-            ],
-        ]);
-
-        $this->assertDatabaseHas('analytics_events', [
-            'event_type' => 'product_view',
-            'user_id'    => $user->id,
-        ]);
-    }
+}
 }

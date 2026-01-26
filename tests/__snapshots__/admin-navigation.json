@@ -522,11 +522,6 @@
             "sort": 1
         },
         {
-            "class": "App\\Filament\\Resources\\AnalyticsEventResource",
-            "icon": null,
-            "sort": 1
-        },
-        {
             "class": "App\\Filament\\Resources\\CountryResource",
             "icon": null,
             "sort": 1
@@ -627,11 +622,6 @@
         {
             "class": "App\\Filament\\Resources\\AddressResource",
             "icon": "heroicon-o-map-pin",
-            "sort": null
-        },
-        {
-            "class": "App\\Filament\\Resources\\AnalyticsResource",
-            "icon": null,
             "sort": null
         },
         {

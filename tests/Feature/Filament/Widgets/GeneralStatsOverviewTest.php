@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Tests\Feature\Filament\Widgets;
 
 use App\Filament\Widgets\GeneralStatsOverview;
-use App\Models\AnalyticsEvent;
 use App\Models\Subscriber;
 use Carbon\CarbonImmutable;
 use EightyNine\FilamentAdvancedWidget\AdvancedStatsOverviewWidget\Stat;
@@ -56,22 +55,6 @@ final class GeneralStatsOverviewTest extends TestCase
             'updated_at' => now()->subDay(),
         ]);
 
-        AnalyticsEvent::query()->create([
-            'event_type'    => 'page_view',
-            'session_id'    => 'session-1',
-            'is_conversion' => true,
-            'created_at'    => now()->subDay(),
-            'updated_at'    => now()->subDay(),
-        ]);
-
-        AnalyticsEvent::query()->create([
-            'event_type'    => 'page_view',
-            'session_id'    => 'session-2',
-            'is_conversion' => false,
-            'created_at'    => now()->subDay(),
-            'updated_at'    => now()->subDay(),
-        ]);
-
         Cache::clear();
 
         $widget = app(GeneralStatsOverview::class);
@@ -106,7 +89,6 @@ final class GeneralStatsOverviewTest extends TestCase
         Schema::dropIfExists('order_items');
         Schema::dropIfExists('orders');
         Schema::dropIfExists('customers');
-        Schema::dropIfExists('analytics_events');
         Schema::dropIfExists('subscribers');
         Schema::dropIfExists('users');
 
@@ -151,16 +133,6 @@ final class GeneralStatsOverviewTest extends TestCase
             $table->string('name')->nullable();
             $table->integer('quantity')->default(1);
             $table->decimal('total', 12, 2)->default(0);
-            $table->timestamps();
-        });
-
-        Schema::create('analytics_events', function (Blueprint $table): void {
-            $table->id();
-            $table->string('event_type');
-            $table->string('session_id')->nullable();
-            $table->boolean('is_conversion')->default(false);
-            $table->decimal('conversion_value', 12, 2)->nullable();
-            $table->string('conversion_currency', 3)->default('EUR');
             $table->timestamps();
         });
 

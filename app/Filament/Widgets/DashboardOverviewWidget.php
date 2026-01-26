@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Filament\Widgets;
 
 use App\Models\Address;
-use App\Models\AnalyticsEvent;
 use App\Models\Campaign;
 use App\Models\CampaignView;
 use App\Models\Country;
@@ -67,9 +66,9 @@ class DashboardOverviewWidget extends BaseWidget
         $totalConversions = 0;
 
         // Performance Metrics
-        $totalPageViews = AnalyticsEvent::where('event_type', 'page_view')->count();
-        $totalSearches = AnalyticsEvent::where('event_type', 'search')->count();
-        $totalCartAdds = AnalyticsEvent::where('event_type', 'add_to_cart')->count();
+        $totalPageViews = 0;
+        $totalSearches = 0;
+        $totalCartAdds = 0;
         $totalWishlistAdds = WishlistItem::count();
 
         // Geographic & System Metrics

@@ -49,19 +49,6 @@ final class ProductCard extends Component
         if (! $added) {
             return;
         }
-
-        // Track analytics only after we know the cart mutation succeeded.
-        \App\Models\AnalyticsEvent::create([
-            'event_type' => 'add_to_cart',
-            'user_id'    => auth()->id(),
-            'session_id' => session()->getId(),
-            'properties' => [
-                'product_id'    => $this->product->id,
-                'product_name'  => $this->product->name,
-                'product_price' => $this->product->price,
-            ],
-            'created_at' => now(),
-        ]);
     }
 
     /**
@@ -88,8 +75,6 @@ final class ProductCard extends Component
     public function quickView(): void
     {
         $this->dispatch('open-quick-view', product_id: $this->product->id);
-        // Track analytics
-        \App\Models\AnalyticsEvent::create(['event_type' => 'product_view', 'user_id' => auth()->id(), 'session_id' => session()->getId(), 'properties' => ['product_id' => $this->product->id, 'product_name' => $this->product->name, 'product_price' => $this->product->price, 'view_type' => 'quick_view'], 'created_at' => now()]);
     }
 
     /**
@@ -97,8 +82,6 @@ final class ProductCard extends Component
      */
     public function viewProduct(): void
     {
-        // Track analytics
-        \App\Models\AnalyticsEvent::create(['event_type' => 'product_view', 'user_id' => auth()->id(), 'session_id' => session()->getId(), 'properties' => ['product_id' => $this->product->id, 'product_name' => $this->product->name, 'product_price' => $this->product->price, 'view_type' => 'full_page'], 'created_at' => now()]);
         $this->redirect(route('product.show', $this->product));
     }
 

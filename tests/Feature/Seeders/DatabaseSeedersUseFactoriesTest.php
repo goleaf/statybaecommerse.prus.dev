@@ -33,11 +33,10 @@ afterEach(function (): void {
     config()->set('database.connections.sqlite.database', $this->originalSqliteDatabase);
 });
 
-it('seeds attributes, brands, and analytics via factories', function (): void {
+it('seeds attributes and brands via factories', function (): void {
     // Execute the required seeders so the assertions can verify factory-backed data instead of static fixtures.
     $this->seed(Database\Seeders\AttributeSeeder::class);
     $this->seed(Database\Seeders\BrandSeeder::class);
-    $this->seed(Database\Seeders\AnalyticsEventsSeeder::class);
     $this->seed(Database\Seeders\AttributeValueSeeder::class);
     $this->seed(Database\Seeders\BasicFilamentSeeder::class);
 
@@ -46,8 +45,4 @@ it('seeds attributes, brands, and analytics via factories', function (): void {
     $this->assertDatabaseCount('attribute_translations', 48);
     $this->assertDatabaseCount('brands', 10);
     $this->assertDatabaseCount('brand_translations', 20);
-
-    // Ensure analytics events seeded through factories match the key event types tracked by the application.
-    $this->assertDatabaseHas('analytics_events', ['event_type' => 'product_view']);
-    $this->assertDatabaseHas('analytics_events', ['event_type' => 'add_to_cart']);
 });
