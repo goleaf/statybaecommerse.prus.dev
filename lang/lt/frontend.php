@@ -969,25 +969,7 @@ return [
                 'title' => 'Formų komponentai',
                 'description' => 'Įvesties ir pasirinkimo komponentai su validacija',
             ],
-    'notifications' => [
-        'title' => 'Pranešimai',
-        'subtitle' => 'Tvarkykite pranešimus ir sekite naujausią informaciją.',
-        'actions' => [
-            'refresh' => 'Atnaujinti',
-            'mark_all_read' => 'Pažymėti visus kaip perskaitytus',
-            'mark_all_read_help' => 'Greitas veiksmas visiems pranešimams pažymėti kaip perskaityti',
-            'mark_all_as_read' => 'Pažymėti visus kaip perskaitytus',
-            'clear_all' => 'Išvalyti viską',
-            'clear_all_help' => 'Pašalinti visus pranešimus visam laikui',
-            'clear_all_confirm' => 'Išvalyti visus pranešimus',
-            'settings' => 'Nustatymai',
-            'settings_help' => 'Tvarkyti pranešimų nustatymus',
-            'go_to_settings' => 'Eiti į nustatymus',
-        ],
-        'confirm' => [
-            'clear_all' => 'Ar tikrai norite išvalyti visus pranešimus? Šio veiksmo atšaukti negalima.',
-        ],
-    ],
+            'notifications' => [
                 'title' => 'Pranešimai',
                 'description' => 'Įspėjimų pranešimų sistema',
             ],
@@ -1082,6 +1064,25 @@ return [
             'code_reduction' => 'Kodo sumažinimas',
             'translation_keys' => 'Vertimų raktai',
             'frontend_operational' => 'Veikiantis frontend',
+        ],
+    ],
+    'notifications' => [
+        'title' => 'Pranešimai',
+        'subtitle' => 'Tvarkykite pranešimus ir sekite naujausią informaciją.',
+        'actions' => [
+            'refresh' => 'Atnaujinti',
+            'mark_all_read' => 'Pažymėti visus kaip perskaitytus',
+            'mark_all_read_help' => 'Greitas veiksmas visiems pranešimams pažymėti kaip perskaityti',
+            'mark_all_as_read' => 'Pažymėti visus kaip perskaitytus',
+            'clear_all' => 'Išvalyti viską',
+            'clear_all_help' => 'Pašalinti visus pranešimus visam laikui',
+            'clear_all_confirm' => 'Išvalyti visus pranešimus',
+            'settings' => 'Nustatymai',
+            'settings_help' => 'Tvarkyti pranešimų nustatymus',
+            'go_to_settings' => 'Eiti į nustatymus',
+        ],
+        'confirm' => [
+            'clear_all' => 'Ar tikrai norite išvalyti visus pranešimus? Šio veiksmo atšaukti negalima.',
         ],
     ],
     'test_status' => [
