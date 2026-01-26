@@ -147,6 +147,18 @@ class Cart extends Component
         $this->refreshTotals();
     }
 
+    public function getItemThumbnail($item): ?string
+    {
+        $model = $item->associatedModel ?? null;
+        if ($model && method_exists($model, 'getFirstMediaUrl')) {
+            return $model->getFirstMediaUrl(config('media.storage.thumbnail_collection')) 
+                ?: $model->getFirstMediaUrl(config('media.storage.collection_name'), 'small') 
+                ?: $model->getFirstMediaUrl(config('media.storage.collection_name'), 'medium') 
+                ?: $model->getFirstMediaUrl(config('media.storage.collection_name'));
+        }
+        return null;
+    }
+
     /**
      * Render the Livewire component view with current state.
      */

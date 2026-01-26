@@ -64,18 +64,8 @@
                                     <div class="cart-item p-6 hover:bg-dark/70 transition-colors">
                                         <div class="flex items-center gap-4">
                                             <!-- Product Image -->
-                                            @php
-                                                $model = $item->associatedModel ?? null;
-                                                $thumb = null;
-                                                if ($model && method_exists($model, 'getFirstMediaUrl')) {
-                                                    $thumb = $model->getFirstMediaUrl(config('media.storage.thumbnail_collection')) 
-                                                        ?: $model->getFirstMediaUrl(config('media.storage.collection_name'), 'small') 
-                                                        ?: $model->getFirstMediaUrl(config('media.storage.collection_name'), 'medium') 
-                                                        ?: $model->getFirstMediaUrl(config('media.storage.collection_name'));
-                                                }
-                                            @endphp
                                             <div class="flex-shrink-0">
-                                            @if ($thumb)
+                                            @if ($thumb = $this->getItemThumbnail($item))
                                                     <img src="{{ $thumb }}" alt="{{ $item->name }}" class="h-20 w-20 object-cover rounded-xl" />
                                                 @else
                                                     <div class="h-20 w-20 bg-gray-100 rounded-xl flex items-center justify-center">
@@ -83,7 +73,7 @@
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                                         </svg>
                                                     </div>
-                                        @endif
+                                            @endif
                                             </div>
 
                                             <!-- Product Details -->

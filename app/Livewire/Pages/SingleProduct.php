@@ -49,6 +49,146 @@ final class SingleProduct extends Component
      */
     public ?string $productRouteKey = null;
 
+    public ?string $ogImage = null;
+
+    #[Computed]
+    public function specifications(): \Illuminate\Support\Collection
+    {
+        return $this->product->attributes
+            ->filter(fn($attribute) => $attribute->pivot->attribute_value_id !== null)
+            ->map(function ($attribute) {
+                $valueId = $attribute->pivot->attribute_value_id;
+                $valueModel = $attribute->values->firstWhere('id', $valueId);
+                return [
+                    'label' => $attribute->trans('name') ?? $attribute->name,
+                    'value' => $valueModel ? ($valueModel->trans('value') ?? $valueModel->value) : null,
+                    'icon' => $attribute->icon,
+                ];
+            })
+            ->filter(fn($spec) => $spec['value'] !== null)
+            ->values();
+    }
+
+    #[Computed]
+    public function productSchema(): array
+    {
+        $priceData = $this->product->getPrice();
+        $brandName = $this->product->brand?->trans('name') ?? $this->product->brand?->name;
+        
+        $schema = [
+            '@context' => 'https://schema.org',
+            '@type' => 'Product',
+            'name' => $this->product->trans('name') ?? $this->product->name,
+            'image' => $this->ogImage ? [$this->ogImage] : [],
+            'description' => Str::limit(strip_tags($this->product->trans('description') ?? $this->product->description), 300),
+        ];
+
+        if ($brandName) {
+            $schema['brand'] = [
+                '@type' => 'Brand',
+                'name' => $brandName,
+            ];
+        }
+
+        if ($priceData) {
+            $schema['offers'] = [
+                '@type' => 'Offer',
+                'priceCurrency' => function_exists('current_currency') ? current_currency() : 'EUR',
+                'price' => number_format((float) ($priceData->value->amount ?? $priceData->value), 2, '.', ''),
+                'availability' => 'https://schema.org/' . ($this->product->isPublished() ? 'InStock' : 'OutOfStock'),
+                'url' => url()->current(),
+            ];
+        }
+
+        return $schema;
+    }
+
+    #[Computed]
+    public function reviewsSchema(): ?array
+    {
+        $recentReviews = $this->recentApprovedReviewsLimited;
+        
+        if ($recentReviews->isEmpty()) {
+            return null;
+        }
+
+        return [
+            '@context' => 'https://schema.org',
+            '@type' => 'ItemList',
+            'itemListElement' => $recentReviews
+                ->map(fn ($r) => [
+                    '@type' => 'Review',
+                    'name' => $r->title,
+                    'reviewBody' => Str::limit(strip_tags($r->content), 300),
+                    'reviewRating' => [
+                        '@type' => 'Rating',
+                        'ratingValue' => (int) $r->rating,
+                        'bestRating' => '5',
+                    ],
+                    'datePublished' => optional($r->created_at)->toDateString(),
+                ])
+                ->toArray(),
+        ];
+    }
+
+    #[Computed]
+    public function contactUrl(): string
+    {
+        return Route::has('frontend.contact.index')
+            ? route('frontend.contact.index')
+            : 'mailto:' . (config('mail.from.address') ?? 'info@example.com');
+    }
+
+    #[Computed]
+    public function brandLabel(): ?string
+    {
+        return $this->product->brand?->trans('name') ?? $this->product->brand?->name;
+    }
+
+    #[Computed]
+    public function categoryLabels(): \Illuminate\Support\Collection
+    {
+        return $this->product->categories
+            ->map(fn($category) => $category->trans('name') ?? $category->name)
+            ->filter()
+            ->values();
+    }
+
+    #[Computed]
+    public function averageRating(): float
+    {
+        return round((float) ($this->product->approved_reviews_avg_rating ?? 0), 1);
+    }
+
+    #[Computed]
+    public function reviewCount(): int
+    {
+        return (int) ($this->product->approved_reviews_count ?? 0);
+    }
+
+    #[Computed]
+    public function shortDescription(): ?string
+    {
+        return $this->product->trans('short_description') ?? $this->product->short_description;
+    }
+
+    #[Computed]
+    public function stockToneClass(): string
+    {
+        return match ($this->stockStatus) {
+            'in_stock' => 'text-emerald-600',
+            'low_stock' => 'text-amber-600',
+            'out_of_stock', 'unavailable' => 'text-rose-600',
+            default => 'text-slate-600',
+        };
+    }
+
+    #[Computed]
+    public function availableQuantity(): int
+    {
+        return (int) ($this->inventorySummary['available'] ?? 0);
+    }
+
     /**
      * Structured pricing summary for the currently selected context (product or variant).
      *
@@ -161,6 +301,9 @@ final class SingleProduct extends Component
 
         $this->activeVariantId = $this->determineDefaultVariantId();
         $this->refreshVariantState($this->activeVariantId);
+
+        $this->ogImage = $this->product->getFirstMediaUrl(config('media.storage.collection_name'), 'large') 
+            ?: $this->product->getFirstMediaUrl(config('media.storage.collection_name'));
     }
 
     /**
@@ -180,22 +323,6 @@ final class SingleProduct extends Component
         // Keep only last 10 viewed products
         $viewedProducts = array_slice($viewedProducts, 0, 10);
         session(['recently_viewed' => $viewedProducts]);
-        // Track analytics event if analytics is enabled
-        if (class_exists(\App\Models\AnalyticsEvent::class)) {
-            \App\Models\AnalyticsEvent::create([
-                'event_type' => 'product_view',
-                'event_data' => [
-                    'product_id'       => $this->product->id,
-                    'product_name'     => $this->product->name,
-                    'product_category' => $this->product->categories->pluck('name')->join(', '),
-                    'user_id'          => auth()->id(),
-                    'session_id'       => session()->getId(),
-                    'referrer'         => request()->header('referer'),
-                ],
-                'user_id'    => auth()->id(),
-                'session_id' => session()->getId(),
-            ]);
-        }
     }
 
     /**

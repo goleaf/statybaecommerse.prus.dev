@@ -135,7 +135,6 @@ return [
         App\Models\ProductComparison::class,
         App\Models\ProductRequest::class,
         App\Models\CouponUsage::class,
-        App\Models\AnalyticsEvent::class,
         App\Models\DiscountRedemption::class,
         App\Models\OrderShipping::class,
         App\Models\ReferralCode::class,

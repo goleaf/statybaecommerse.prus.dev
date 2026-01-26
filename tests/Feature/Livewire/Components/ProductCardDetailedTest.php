@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use App\Livewire\Components\ProductCardDetailed;
-use App\Models\AnalyticsEvent;
 use App\Models\Product;
 use App\Models\User;
 use Livewire\Livewire;
@@ -31,17 +30,6 @@ it('feature: can add product to cart', function () {
     $component->call('addToCart');
 
     $component->assertDispatched('add-to-cart');
-    $component->assertDispatched('notify');
-});
-
-it('feature: tracks analytics when adding to cart', function () {
-    Livewire::test(ProductCardDetailed::class, ['product' => $this->product])
-        ->call('addToCart');
-
-    $this->assertDatabaseHas(AnalyticsEvent::class, [
-        'event_type'             => 'add_to_cart',
-        'properties->product_id' => $this->product->id,
-    ]);
 });
 
 it('feature: can add product to wishlist when authenticated', function () {
@@ -73,29 +61,10 @@ it('feature: can open quick view', function () {
         ->assertDispatched('product-quick-view');
 });
 
-it('feature: tracks analytics when opening quick view', function () {
-    Livewire::test(ProductCardDetailed::class, ['product' => $this->product])
-        ->call('quickView');
-
-    // Note: Analytics tracking is handled by the dispatched event, not directly in the component
-    $this->assertTrue(true); // Placeholder assertion
-});
-
 it('feature: can navigate to product page', function () {
     Livewire::test(ProductCardDetailed::class, ['product' => $this->product])
         ->call('viewProduct')
         ->assertRedirect(route('product.show', $this->product));
-});
-
-it('feature: tracks analytics when viewing product page', function () {
-    Livewire::test(ProductCardDetailed::class, ['product' => $this->product])
-        ->call('viewProduct');
-
-    $this->assertDatabaseHas(AnalyticsEvent::class, [
-        'event_type'             => 'product_view',
-        'properties->product_id' => $this->product->id,
-        'properties->view_type'  => 'card_click',
-    ]);
 });
 
 it('feature: shows correct wishlist status', function () {

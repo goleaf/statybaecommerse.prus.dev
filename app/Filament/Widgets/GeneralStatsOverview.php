@@ -6,7 +6,6 @@ namespace App\Filament\Widgets;
 
 use App\Filament\Support\InteractsWithDateFilter;
 use App\Support\Stats\OrderMetrics;
-use App\Support\Stats\TrafficMetrics;
 use EightyNine\FilamentAdvancedWidget\AdvancedStatsOverviewWidget as BaseWidget;
 use EightyNine\FilamentAdvancedWidget\AdvancedStatsOverviewWidget\Stat;
 use Illuminate\Support\Number;
@@ -49,7 +48,6 @@ final class GeneralStatsOverview extends BaseWidget
         [$from, $to] = $this->getDateRange($this->filter);
 
         $orderMetrics = OrderMetrics::forRange($from, $to);
-        $trafficMetrics = TrafficMetrics::forRange($from, $to);
 
         $revenueChange = $orderMetrics['revenueChange'];
         $ordersChange = $orderMetrics['ordersChange'];
@@ -87,7 +85,7 @@ final class GeneralStatsOverview extends BaseWidget
                 ->iconBackgroundColor('danger')
                 ->valueColor('danger'),
             Stat::make(__('New customers'), Number::format($orderMetrics['newCustomers']))
-                ->description(__('New sign-ups: :count users', ['count' => Number::format($trafficMetrics['newUsers'])]))
+                ->description(__('New sign-ups'))
                 ->icon('heroicon-o-user-plus')
                 ->iconBackgroundColor('secondary')
                 ->valueColor('secondary'),

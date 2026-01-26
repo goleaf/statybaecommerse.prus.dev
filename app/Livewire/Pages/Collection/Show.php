@@ -89,6 +89,62 @@ class Show extends Component
         }
     }
 
+    #[Computed]
+    public function ogImage(): ?string
+    {
+        return $this->collection->getFirstMediaUrl(config('media.storage.collection_name'), 'large') 
+            ?: $this->collection->getFirstMediaUrl(config('media.storage.collection_name'));
+    }
+
+    #[Computed]
+    public function preloadData(): array
+    {
+        $firstProduct = $this->products->first();
+        $cname = config('media.storage.collection_name');
+        $preSmall = $firstProduct?->getFirstMediaUrl($cname, 'small');
+        $preMedium = $firstProduct?->getFirstMediaUrl($cname, 'medium');
+        $preLarge = $firstProduct?->getFirstMediaUrl($cname, 'large');
+        $preSrc = $preMedium ?: ($preLarge ?: ($preSmall ?: null));
+        $preSrcset = [];
+        if ($preSmall) {
+            $preSrcset[] = $preSmall . ' 300w';
+        }
+        if ($preMedium) {
+            $preSrcset[] = $preMedium . ' 500w';
+        }
+        if ($preLarge) {
+            $preSrcset[] = $preLarge . ' 800w';
+        }
+        
+        return [
+            'src' => (string) $preSrc,
+            'srcset' => implode(', ', $preSrcset),
+            'sizes' => '(max-width: 640px) 45vw, (max-width: 1024px) 22vw, 200px',
+        ];
+    }
+
+    #[Computed]
+    public function collectionSchema(): array
+    {
+        $elements = [];
+        $position = 1;
+        $locale = app()->getLocale();
+
+        foreach ($this->products as $p) {
+            $elements[] = [
+                '@type'    => 'ListItem',
+                'position' => $position++,
+                'url'      => route('product.show', $p->trans('slug', $locale) ?? $p->slug),
+            ];
+        }
+
+        return [
+            '@context'        => 'https://schema.org',
+            '@type'           => 'ItemList',
+            'itemListElement' => $elements,
+        ];
+    }
+
     /**
      * Resolve the paginated product list for the current collection context.
      *

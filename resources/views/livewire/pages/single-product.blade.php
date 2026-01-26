@@ -1,53 +1,8 @@
-@php
-    // Ensure locale is set before using translations
-    $request = request();
-    $supportedConfig = config('app.supported_locales', 'lt,en');
-    $supportedLocales = [];
-    if (is_array($supportedConfig)) {
-        $supportedLocales = array_filter($supportedConfig, fn ($locale): bool => is_string($locale) && $locale !== '');
-    } elseif (is_string($supportedConfig)) {
-        $supportedLocales = array_filter(
-            array_map(fn (string $locale): string => trim($locale), explode(',', $supportedConfig)),
-            fn (string $locale): bool => $locale !== ''
-        );
-    }
-    $supportedLocales = array_values(array_map(fn (string $locale): string => trim($locale), $supportedLocales));
-    
-    $routeLocale = $request->route('locale');
-    $queryLocale = $request->query('locale');
-    $defaultLocale = config('app.locale', 'lt');
-    
-    $candidateLocales = array_values(array_filter([
-        $routeLocale,
-        $queryLocale,
-        session('locale'),
-        session('app.locale'),
-        $request->cookie('app_locale'),
-        auth()->check() ? (auth()->user()->preferred_locale ?? null) : null,
-    ], fn ($candidate): bool => is_string($candidate) && $candidate !== ''));
-    
-    $locale = $defaultLocale;
-    foreach ($candidateLocales as $candidate) {
-        if (in_array($candidate, $supportedLocales, true)) {
-            $locale = $candidate;
-            break;
-        }
-    }
-    
-    if (!in_array($locale, $supportedLocales, true)) {
-        $fallbackLocale = config('app.fallback_locale', $defaultLocale);
-        $locale = in_array($fallbackLocale, $supportedLocales, true) ? $fallbackLocale : ($supportedLocales[0] ?? $defaultLocale);
-    }
-    
-    app()->setLocale($locale);
-@endphp
 <div class="bg-gradient-to-b from-slate-50 via-white to-white" wire:loading.attr="aria-busy" aria-busy="false">
+    @php
+        $locale = app()->getLocale();
+    @endphp
     @section('meta')
-        @php
-            $ogImage =
-                $product->getFirstMediaUrl(config('media.storage.collection_name'), 'large') ?:
-                $product->getFirstMediaUrl(config('media.storage.collection_name'));
-        @endphp
         <x-meta
                 :title="$product->trans('seo_title') ?? $product->name"
                 :description="$product->trans('seo_description') ?? Str::limit(strip_tags($product->description), 150)"
@@ -73,7 +28,7 @@
                     'url' => route('localized.products.index', ['locale' => $locale]),
                 ],
                 [
-                    'label' => $product->brand?->trans('name') ?? $product->brand?->name,
+                    'label' => $this->brandLabel,
                     'url' =>
                         $product->brand && function_exists('route') && Route::has('localized.brands.show')
                             ? route('localized.brands.show', [
@@ -84,37 +39,6 @@
                 ],
                 ['label' => $product->trans('name') ?? $product->name],
             ]" aria-label="{{ __('frontend.navigation.breadcrumbs') }}" />
-
-            @php
-                $brandLabel = $product->brand?->trans('name') ?? $product->brand?->name;
-                $categoryLabels = $product->categories
-                    ->map(fn($category) => $category->trans('name') ?? $category->name)
-                    ->filter()
-                    ->values();
-                $averageRating = round((float) ($product->average_rating ?? 0), 1);
-                $reviewCount = (int) ($product->reviews_count ?? 0);
-                $pricing = $pricingSummary;
-                $currentCurrency = $pricing['currency'] ?? (function_exists('current_currency') ? current_currency() : null);
-                $currentPrice = $pricing['current'] ?? null;
-                $comparePrice = $pricing['compare'] ?? null;
-                $discountPercent = $pricing['discount'] ?? null;
-                $inventorySnapshot = $inventorySummary;
-                $availableQuantity = $inventorySnapshot['available'] ?? $product->availableQuantity();
-                $reservedQuantity = $inventorySnapshot['reserved'] ?? $product->reservedQuantity();
-                $shortDescription = $product->trans('short_description') ?? $product->short_description;
-                $recentHistories = $this->recentHistories;
-                $contactUrl = Route::has('frontend.contact.index')
-                    ? route('frontend.contact.index')
-                    : 'mailto:' . (config('mail.from.address') ?? 'info@example.com');
-                $activeStockStatus = $stockStatus ?? 'out_of_stock';
-                $activeStockMessage = $stockMessage ?? '';
-                $stockToneClass = match ($activeStockStatus) {
-                    'in_stock' => 'text-emerald-600',
-                    'low_stock' => 'text-amber-600',
-                    'out_of_stock' => 'text-rose-600',
-                    default => 'text-slate-500',
-                };
-            @endphp
 
             <div class="grid gap-10 lg:grid-cols-12">
                 <div class="lg:col-span-7 space-y-8">
@@ -127,13 +51,13 @@
                     <section class="rounded-3xl border border-slate-100 bg-white shadow-sm">
                         <div class="space-y-6 p-6 lg:p-8">
                             <div class="flex flex-wrap items-center gap-3">
-                                @if ($brandLabel)
+                                @if ($this->brandLabel)
                                     <span
                                           class="inline-flex items-center rounded-full bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-700">
-                                        {{ $brandLabel }}
+                                        {{ $this->brandLabel }}
                                     </span>
                                 @endif
-                                @foreach ($categoryLabels as $categoryName)
+                                @foreach ($this->categoryLabels as $categoryName)
                                     <span
                                           class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
                                         {{ $categoryName }}
@@ -148,17 +72,17 @@
                                 <div class="mt-3 flex flex-wrap items-center gap-4 text-sm text-slate-600">
                                     <div class="flex items-center gap-1">
                                         @for ($i = 1; $i <= 5; $i++)
-                                            @if ($averageRating >= $i - 0.25)
+                                            @if ($this->averageRating >= $i - 0.25)
                                                 <x-heroicon-s-star class="h-4 w-4 text-amber-500" />
                                             @else
                                                 <x-heroicon-o-star class="h-4 w-4 text-slate-200" />
                                             @endif
                                         @endfor
                                         <span
-                                              class="ml-2 font-semibold text-slate-700">{{ number_format($averageRating, 1) }}</span>
+                                              class="ml-2 font-semibold text-slate-700">{{ number_format($this->averageRating, 1) }}</span>
                                     </div>
                                     <span class="text-slate-300">•</span>
-                                    <span class="font-medium text-slate-600">{{ $reviewCount }}
+                                    <span class="font-medium text-slate-600">{{ $this->reviewCount }}
                                         {{ __('translations.reviews') }}</span>
                                     @if ($product->sku)
                                         <span class="text-slate-300">•</span>
@@ -170,27 +94,27 @@
 
                             <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                                 <div>
-                                    @if ($currentPrice)
+                                    @if ($this->pricingSummary['current'])
                                         <p class="text-4xl font-semibold text-primary-600">
-                                            {{ \Illuminate\Support\Number::currency((float) $currentPrice, $currentCurrency, $locale) }}
+                                            {{ \Illuminate\Support\Number::currency((float) $this->pricingSummary['current'], $this->pricingSummary['currency'], $locale) }}
                                         </p>
                                     @endif
-                                    @if ($comparePrice && $currentPrice && $comparePrice > $currentPrice)
+                                    @if ($this->pricingSummary['compare'] && $this->pricingSummary['current'] && $this->pricingSummary['compare'] > $this->pricingSummary['current'])
                                         <p class="flex items-center gap-2 text-sm text-slate-500">
                                             <span class="line-through">
-                                                {{ \Illuminate\Support\Number::currency((float) $comparePrice, $currentCurrency, $locale) }}
+                                                {{ \Illuminate\Support\Number::currency((float) $this->pricingSummary['compare'], $this->pricingSummary['currency'], $locale) }}
                                             </span>
-                                            @if ($discountPercent)
+                                            @if ($this->pricingSummary['discount'])
                                                 <span
                                                       class="inline-flex items-center rounded-full bg-red-50 px-2 py-0.5 text-xs font-semibold text-red-600">
-                                                    -{{ number_format($discountPercent, 0) }}%
+                                                    -{{ number_format($this->pricingSummary['discount'], 0) }}%
                                                 </span>
                                             @endif
                                         </p>
                                     @endif
-                                    @if ($activeStockMessage)
-                                        <p class="text-sm font-medium {{ $stockToneClass }}">
-                                            {{ $activeStockMessage }}
+                                    @if ($this->stockMessage)
+                                        <p class="text-sm font-medium {{ $this->stockToneClass }}">
+                                            {{ $this->stockMessage }}
                                         </p>
                                     @endif
                                 </div>
@@ -198,14 +122,14 @@
                                     <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
                                         {{ __('translations.available') }}</p>
                                     <p class="text-lg font-semibold text-slate-900">
-                                        {{ \Illuminate\Support\Number::format((float) $availableQuantity) }}
+                                        {{ \Illuminate\Support\Number::format((float) $this->availableQuantity) }}
                                     </p>
                                 </div>
                             </div>
 
-                            @if ($shortDescription)
+                            @if ($this->shortDescription)
                                 <p class="text-base leading-relaxed text-slate-600">
-                                    {{ $shortDescription }}
+                                    {{ $this->shortDescription }}
                                 </p>
                             @endif
                         </div>
@@ -396,18 +320,13 @@
                                             <p class="text-sm font-semibold text-slate-800">{{ $group['name'] }}</p>
                                             <div class="flex flex-wrap gap-3">
                                                 @foreach ($group['values'] as $value)
-                                                    @php
-                                                        $valueIsActive = $value['is_active'] ?? false;
-                                                        $valueIsAvailable = $value['is_available'] ?? false;
-                                                        $valueVariantId = $value['primary_variant_id'] ?? null;
-                                                    @endphp
                                                     <div class="flex flex-col items-start">
                                                         <button
                                                             type="button"
-                                                            @if ($valueVariantId) wire:click="selectVariant({{ $valueVariantId }})" @endif
-                                                            class="flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium transition focus:outline-none focus-visible:ring focus-visible:ring-primary-400 {{ $valueIsActive ? 'border-primary-500 bg-primary-50 text-primary-700' : 'border-slate-200 bg-white text-slate-600 hover:border-primary-300 hover:text-primary-600' }} {{ ! $valueIsAvailable ? 'opacity-60' : '' }}"
-                                                            aria-pressed="{{ $valueIsActive ? 'true' : 'false' }}"
-                                                            @disabled(! $valueVariantId)
+                                                            @if ($value['primary_variant_id'] ?? null) wire:click="selectVariant({{ $value['primary_variant_id'] }})" @endif
+                                                            class="flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium transition focus:outline-none focus-visible:ring focus-visible:ring-primary-400 {{ ($value['is_active'] ?? false) ? 'border-primary-500 bg-primary-50 text-primary-700' : 'border-slate-200 bg-white text-slate-600 hover:border-primary-300 hover:text-primary-600' }} {{ ! ($value['is_available'] ?? false) ? 'opacity-60' : '' }}"
+                                                            aria-pressed="{{ ($value['is_active'] ?? false) ? 'true' : 'false' }}"
+                                                            @disabled(! ($value['primary_variant_id'] ?? null))
                                                         >
                                                             @if ($value['hex_color'])
                                                                 <span
@@ -420,7 +339,7 @@
                                                         @if ($value['price_hint'])
                                                             <span class="mt-1 text-[11px] text-slate-400">{{ $value['price_hint'] }}</span>
                                                         @endif
-                                                        @if (! $valueIsAvailable)
+                                                        @if (! ($value['is_available'] ?? false))
                                                             <span class="mt-0.5 text-[11px] font-medium text-rose-500">{{ __('translations.out_of_stock') }}</span>
                                                         @endif
                                                     </div>
@@ -534,11 +453,11 @@
                                     <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
                                         {{ __('translations.brand') }}</p>
                                     <p class="text-lg font-semibold text-slate-900">
-                                        {{ $brandLabel ?? __('product_page.unknown_brand') }}</p>
+                                        {{ $this->brandLabel ?? __('product_page.unknown_brand') }}</p>
                                 </div>
-                                @if ($currentPrice)
+                                @if ($this->pricingSummary['current'])
                                     <p class="text-3xl font-semibold text-primary-600">
-                                        {{ \Illuminate\Support\Number::currency((float) $currentPrice, $currentCurrency, $locale) }}
+                                        {{ \Illuminate\Support\Number::currency((float) $this->pricingSummary['current'], $this->pricingSummary['currency'], $locale) }}
                                     </p>
                                 @endif
                             </div>
@@ -643,60 +562,8 @@
 
 
 @push('scripts')
-    @php
-        $price = $product->getPrice();
-        $image =
-            $product->getFirstMediaUrl(config('media.storage.collection_name'), 'large') ?:
-            $product->getFirstMediaUrl(config('media.storage.collection_name'));
-        $brandName = $product->brand?->trans('name') ?? $product->brand?->name;
-        $productSchema = [
-            '@context' => 'https://schema.org',
-            '@type' => 'Product',
-            'name' => $product->trans('name') ?? $product->name,
-            'image' => $image ? [$image] : [],
-            'description' => Str::limit(strip_tags($product->trans('description') ?? $product->description), 300),
-        ];
-        if ($brandName) {
-            $productSchema['brand'] = [
-                '@type' => 'Brand',
-                'name' => $brandName,
-            ];
-        }
-        if ($price) {
-            $productSchema['offers'] = [
-                '@type' => 'Offer',
-                'priceCurrency' => current_currency(),
-                'price' => number_format($price->value->amount, 2, '.', ''),
-                'availability' => 'https://schema.org/' . ($product->isPublished() ? 'InStock' : 'OutOfStock'),
-                'url' => url()->current(),
-            ];
-        }
-        $recentReviews = $this->recentApprovedReviewsLimited;
-        $reviewsSchema = null;
-        if ($recentReviews->isNotEmpty()) {
-            $reviewsSchema = [
-                '@context' => 'https://schema.org',
-                '@type' => 'ItemList',
-                'itemListElement' => $recentReviews
-                    ->map(function ($r) {
-                        return [
-                            '@type' => 'Review',
-                            'name' => $r->title,
-                            'reviewBody' => Str::limit(strip_tags($r->content), 300),
-                            'reviewRating' => [
-                                '@type' => 'Rating',
-                                'ratingValue' => (int) $r->rating,
-                                'bestRating' => '5',
-                            ],
-                            'datePublished' => optional($r->created_at)->toDateString(),
-                        ];
-                    })
-                    ->toArray(),
-            ];
-        }
-    @endphp
-    <script type="application/ld+json">{!! json_encode($productSchema, JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE) !!}</script>
-    @if ($reviewsSchema)
-        <script type="application/ld+json">{!! json_encode($reviewsSchema, JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE) !!}</script>
+    <script type="application/ld+json">{!! json_encode($this->productSchema, JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE) !!}</script>
+    @if ($this->reviewsSchema)
+        <script type="application/ld+json">{!! json_encode($this->reviewsSchema, JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE) !!}</script>
     @endif
 @endpush

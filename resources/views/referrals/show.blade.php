@@ -74,20 +74,6 @@
                         </div>
                     </div>
                     @endif
-
-                    @if($referral->analyticsEvents->count() > 0)
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">{{ __('referrals.analytics_events') }}</label>
-                        <div class="mt-2 space-y-2">
-                            @foreach($referral->analyticsEvents as $event)
-                            <div class="bg-gray-50 p-3 rounded">
-                                <div class="text-sm font-medium">{{ $event->event_type }}</div>
-                                <div class="text-xs text-gray-500">{{ $event->created_at->format('d.m.Y H:i') }}</div>
-                            </div>
-                            @endforeach
-                        </div>
-                    </div>
-                    @endif
                 </div>
             </div>
 

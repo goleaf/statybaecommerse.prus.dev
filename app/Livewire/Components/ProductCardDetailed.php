@@ -69,20 +69,6 @@ final class ProductCardDetailed extends Component
         if (! $added) {
             return;
         }
-
-        if (class_exists(\App\Models\AnalyticsEvent::class)) {
-            \App\Models\AnalyticsEvent::create([
-                'event_type' => 'add_to_cart',
-                'user_id'    => auth()->id(),
-                'session_id' => session()->getId(),
-                'properties' => [
-                    'product_id'    => $this->product->id,
-                    'product_name'  => $this->product->name,
-                    'product_price' => $this->product->price,
-                ],
-                'created_at' => now(),
-            ]);
-        }
     }
 
     /**
@@ -90,11 +76,6 @@ final class ProductCardDetailed extends Component
      */
     public function viewProduct()
     {
-        // Track analytics
-        if (class_exists(\App\Models\AnalyticsEvent::class)) {
-            \App\Models\AnalyticsEvent::create(['event_type' => 'product_view', 'user_id' => auth()->id(), 'session_id' => session()->getId(), 'properties' => ['product_id' => $this->product->id, 'product_name' => $this->product->name, 'view_type' => 'card_click'], 'created_at' => now()]);
-        }
-
         return $this->redirect(route('product.show', $this->product));
     }
 

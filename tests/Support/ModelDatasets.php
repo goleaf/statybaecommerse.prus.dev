@@ -158,7 +158,6 @@ dataset('model_relation_matrix', function (): array {
         [Referral::class, 'referrer', BelongsTo::class],
         [Referral::class, 'referred', BelongsTo::class],
         [Referral::class, 'rewards', HasMany::class],
-        [Referral::class, 'analyticsEvents', MorphMany::class],
         [Referral::class, 'referredOrders', HasMany::class],
         [Referral::class, 'translations', HasMany::class],
         [Referral::class, 'latestReward', HasOne::class],

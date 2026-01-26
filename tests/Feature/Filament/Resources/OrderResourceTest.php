@@ -1,6 +1,6 @@
 <?php
 
-use App\Filament\Resources\Orders\OrderResource;
+use App\Filament\Resources\OrderResource;
 use App\Models\Order;
 use App\Models\User;
 use Filament\Pages\Actions\DeleteAction;

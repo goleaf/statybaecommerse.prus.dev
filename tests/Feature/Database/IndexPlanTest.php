@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Database;
 
-use App\Models\AnalyticsEvent;
 use App\Models\Category;
 use App\Models\Menu;
 use App\Models\MenuItem;
@@ -17,25 +16,6 @@ use Tests\TestCase;
 final class IndexPlanTest extends TestCase
 {
     use RefreshDatabase;
-
-    public function test_analytics_event_time_range_query_uses_indexes(): void
-    {
-        AnalyticsEvent::factory()->count(5)->create([
-            'event_type' => 'product_view',
-            'created_at' => Carbon::now()->subDay(),
-            'updated_at' => Carbon::now()->subDay(),
-        ]);
-
-        $start = Carbon::now()->subDays(7)->toDateTimeString();
-        $end = Carbon::now()->toDateTimeString();
-
-        $plan = DB::select(
-            $this->explain('SELECT event_type, COUNT(*) AS aggregate FROM analytics_events WHERE event_type = ? AND created_at BETWEEN ? AND ? GROUP BY event_type'),
-            ['product_view', $start, $end]
-        );
-
-        $this->assertPlanUsesIndex($plan);
-    }
 
     public function test_category_and_product_lookup_queries_use_indexes(): void
     {

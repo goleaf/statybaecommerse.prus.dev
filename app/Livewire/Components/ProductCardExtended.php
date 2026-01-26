@@ -6,7 +6,6 @@ namespace App\Livewire\Components;
 
 use App\Livewire\Concerns\WithCart;
 use App\Livewire\Concerns\WithNotifications;
-use App\Models\AnalyticsEvent;
 use App\Models\Product;
 use App\Models\ProductComparison;
 use Livewire\Attributes\On;
@@ -59,12 +58,6 @@ final class ProductCardExtended extends Component
         if (! $added) {
             return;
         }
-
-        AnalyticsEvent::track('add_to_cart', [
-            'product_id'    => $this->product->id,
-            'product_name'  => $this->product->name,
-            'product_price' => $this->product->price,
-        ]);
     }
 
     /**
@@ -99,8 +92,6 @@ final class ProductCardExtended extends Component
      */
     public function quickView(): void
     {
-        // Track analytics
-        AnalyticsEvent::track('product_view', ['product_id' => $this->product->id, 'product_name' => $this->product->name, 'view_type' => 'quick_view']);
         $this->dispatch('open-quick-view', ['product_id' => $this->product->id]);
     }
 
@@ -109,9 +100,6 @@ final class ProductCardExtended extends Component
      */
     public function viewProduct()
     {
-        // Track analytics
-        AnalyticsEvent::track('product_view', ['product_id' => $this->product->id, 'product_name' => $this->product->name, 'view_type' => 'full_page']);
-
         return $this->redirect(route('product.show', $this->product));
     }
 
