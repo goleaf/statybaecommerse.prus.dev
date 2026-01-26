@@ -12,7 +12,7 @@
             <h2 class="text-xl font-semibold mb-4">{{ __('Order summary') }}</h2>
             <dl class="space-y-2 text-sm text-gray-600 dark:text-gray-300">
                 <div class="flex justify-between">
-                    <dt>{{ __('Subtotal') }}</dt>
+                    <dt>{{ __('messages.subtotal') }}</dt>
                     <dd>{{ app_money_format($order->subtotal) }}</dd>
                 </div>
                 <div class="flex justify-between">
@@ -20,15 +20,15 @@
                     <dd>{{ app_money_format($order->tax_amount) }}</dd>
                 </div>
                 <div class="flex justify-between">
-                    <dt>{{ __('Shipping') }}</dt>
+                    <dt>{{ __('messages.shipping') }}</dt>
                     <dd>{{ app_money_format($order->shipping_amount) }}</dd>
                 </div>
                 <div class="flex justify-between text-primary-700">
-                    <dt>{{ __('Discount') }}</dt>
+                    <dt>{{ __('messages.discount') }}</dt>
                     <dd>-{{ app_money_format($order->discount_amount) }}</dd>
                 </div>
                 <div class="flex justify-between text-lg font-semibold text-primary-700">
-                    <dt>{{ __('Total') }}</dt>
+                    <dt>{{ __('messages.total') }}</dt>
                     <dd>{{ app_money_format($order->total) }}</dd>
                 </div>
             </dl>

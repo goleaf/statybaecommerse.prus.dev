@@ -85,8 +85,8 @@ final class CategoryPageDataProvider
     public function breadcrumbs(Category $category): array
     {
         $breadcrumbs = [
-            ['label' => __('Home'), 'url' => route('home')],
-            ['label' => __('Categories'), 'url' => route('frontend.categories.index')],
+            ['label' => __('messages.home'), 'url' => route('home')],
+            ['label' => __('messages.categories'), 'url' => route('frontend.categories.index')],
         ];
 
         $ancestors = collect();

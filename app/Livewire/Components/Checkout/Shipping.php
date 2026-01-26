@@ -157,7 +157,7 @@ class Shipping extends StepComponent
     public function stepInfo(): array
     {
         return [
-            'label'    => __('Address'),
+            'label'    => __('messages.address'),
             'complete' => session()->exists('checkout') && data_get(session()->get('checkout'), 'shipping_address') !== null,
         ];
     }

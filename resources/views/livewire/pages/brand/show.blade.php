@@ -183,7 +183,7 @@
                                     size="sm"
                                     class="w-full"
                                 >
-                                    {{ __('View All Products') }}
+                                    {{ __('messages.view_all_products') }}
                                 </x-shared.button>
                             @endif
                         </x-slot>
@@ -212,7 +212,7 @@
             </x-shared.sidebar-layout>
         @else
             <x-shared.empty-state
-                title="{{ __('No products found') }}"
+                title="{{ __('messages.no_products_found') }}"
                 description="{{ __('No products are available for this brand yet.') }}"
                 icon="heroicon-o-cube"
             />

@@ -30,7 +30,7 @@
             <div>
                 {{-- Hero title summarises the current search intent --}}
                 <h1 class="text-3xl font-semibold tracking-tight md:text-4xl">
-                    {{ __('nav_search') }}
+                    {{ __('messages.nav_search') }}
                 </h1>
                 <p class="mt-3 max-w-2xl text-sm text-blue-100 md:text-base">
                     {{ __('search_help') }}
@@ -112,7 +112,7 @@
                     :enable-suggestions="true"
                     :enable-recent-searches="true"
                     :enable-popular-searches="true"
-                    placeholder="{{ __('search_products') }}"
+                    placeholder="{{ __('messages.search_products') }}"
                 />
             </div>
 
@@ -320,7 +320,7 @@
         $preSizes = '(max-width: 640px) 45vw, (max-width: 1024px) 22vw, 200px';
     @endphp
     <x-meta
-            :title="__('nav_search') . ' - ' . config('app.name')"
+            :title="__('messages.nav_search') . ' - ' . config('app.name')"
             :description="__('search_help')"
             robots="noindex,follow"
             :og-image="$ogImage"

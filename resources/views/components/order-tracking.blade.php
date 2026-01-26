@@ -174,7 +174,7 @@
                                         {{ $item->product->name }}
                                     </a>
                                 </h3>
-                                <p class="text-sm text-gray-600">{{ __('Quantity') }}: {{ $item->quantity }}</p>
+                                <p class="text-sm text-gray-600">{{ __('messages.quantity') }}: {{ $item->quantity }}</p>
                                 @if ($item->variant)
                                     <p class="text-sm text-gray-600">{{ __('Variant') }}: {{ $item->variant }}</p>
                                 @endif
@@ -198,13 +198,13 @@
                 <div class="mt-6 pt-6 border-t border-gray-200">
                     <div class="space-y-2">
                         <div class="flex justify-between">
-                            <span class="text-gray-600">{{ __('Subtotal') }}</span>
+                            <span class="text-gray-600">{{ __('messages.subtotal') }}</span>
                             <span class="font-medium">
                                 {{ \Illuminate\Support\Number::currency($order->subtotal ?? 0, current_currency(), app()->getLocale()) }}
                             </span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-gray-600">{{ __('Shipping') }}</span>
+                            <span class="text-gray-600">{{ __('messages.shipping') }}</span>
                             <span class="font-medium">
                                 {{ \Illuminate\Support\Number::currency($order->shipping_cost ?? 0, current_currency(), app()->getLocale()) }}
                             </span>
@@ -216,7 +216,7 @@
                             </span>
                         </div>
                         <div class="flex justify-between text-lg font-semibold pt-2 border-t border-gray-200">
-                            <span>{{ __('Total') }}</span>
+                            <span>{{ __('messages.total') }}</span>
                             <span>
                                 {{ \Illuminate\Support\Number::currency($order->total ?? 0, current_currency(), app()->getLocale()) }}
                             </span>

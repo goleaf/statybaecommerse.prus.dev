@@ -10,17 +10,17 @@
 <div class="rounded-2xl border border-sage/30 bg-dark/50 {{ $cardShadow }} {{ $cardPadding }} space-y-4">
     <div class="flex items-center justify-between">
         <h3 class="text-sm font-semibold uppercase tracking-wider text-sage/60">
-            {{ __('Refine results') }}
+            {{ __('messages.refine_results') }}
         </h3>
         <a href="{{ route('localized.categories.index', ['locale' => app()->getLocale()]) }}"
            class="text-xs font-semibold text-sage hover:text-white">
-            {{ __('Clear all') }}
+            {{ __('messages.clear_all') }}
         </a>
     </div>
 
     <div class="flex flex-col gap-3">
         <label for="category-search-{{ $variant }}" class="text-xs font-semibold uppercase tracking-wide text-sage/60">
-            {{ __('Search categories') }}
+            {{ __('messages.search_categories') }}
         </label>
         <div class="flex items-center gap-2 overflow-hidden rounded-xl border border-sage/30 bg-dark/30 focus-within:border-sage focus-within:ring-2 focus-within:ring-sage/20">
             <span class="px-3 text-sage/60">
@@ -31,7 +31,7 @@
             <input id="category-search-{{ $variant }}"
                    type="search"
                    wire:model.live.debounce.400ms="search"
-                   placeholder="{{ __('Type to filter categories...') }}"
+                   placeholder="{{ __('messages.type_to_filter_categories') }}"
                    class="w-full border-0 bg-transparent py-2 pr-3 text-sm text-sage placeholder:text-sage/50 focus:outline-none focus:ring-0" />
         </div>
     </div>
@@ -39,45 +39,45 @@
 
 <div class="rounded-2xl border border-sage/30 bg-dark/50 {{ $cardShadow }} {{ $cardPadding }} space-y-3">
     <h3 class="text-xs font-semibold uppercase tracking-wider text-sage/60">
-        {{ __('Availability') }}
+        {{ __('messages.availability') }}
     </h3>
 
     <label class="flex items-center justify-between rounded-xl border border-sage/30 bg-dark/30 px-3 py-2 text-sm font-medium text-white transition hover:border-sage hover:bg-sage/10">
         <div class="flex items-center gap-3">
             <input type="checkbox" wire:model.live="inStock" class="rounded border-sage/30 text-sage focus:ring-sage">
-            <span class="text-white">{{ __('In stock only') }}</span>
+            <span class="text-white">{{ __('messages.in_stock_only') }}</span>
         </div>
-        <span class="text-xs text-sage/60">{{ __('Real-time') }}</span>
+        <span class="text-xs text-sage/60">{{ __('messages.real_time') }}</span>
     </label>
 
     <label class="flex items-center justify-between rounded-xl border border-sage/30 bg-dark/30 px-3 py-2 text-sm font-medium text-white transition hover:border-sage hover:bg-sage/10">
         <div class="flex items-center gap-3">
             <input type="checkbox" wire:model.live="onSale" class="rounded border-sage/30 text-sage focus:ring-sage">
-            <span class="text-white">{{ __('Promotions') }}</span>
+            <span class="text-white">{{ __('messages.promotions') }}</span>
         </div>
         <span class="inline-flex items-center gap-1 rounded-full border border-sage/30 bg-sage px-2 py-0.5 text-[11px] font-semibold text-dark">
-            {{ __('Hot') }}
+            {{ __('messages.hot') }}
         </span>
     </label>
 
     <label class="flex items-center justify-between rounded-xl border border-sage/30 bg-dark/30 px-3 py-2 text-sm font-medium text-white transition hover:border-sage hover:bg-sage/10">
         <div class="flex items-center gap-3">
             <input type="checkbox" wire:model.live="hasProducts" class="rounded border-sage/30 text-sage focus:ring-sage">
-            <span class="text-white">{{ __('With active listings') }}</span>
+            <span class="text-white">{{ __('messages.with_active_listings') }}</span>
         </div>
-        <span class="text-xs text-sage/60">{{ __('Verified content') }}</span>
+        <span class="text-xs text-sage/60">{{ __('messages.verified_content') }}</span>
     </label>
 </div>
 
 <div class="rounded-2xl border border-sage/30 bg-dark/50 {{ $cardShadow }} {{ $cardPadding }} space-y-4">
     <h3 class="text-xs font-semibold uppercase tracking-wider text-sage/60">
-        {{ __('Price range (EUR)') }}
+        {{ __('messages.price_range_eur') }}
     </h3>
 
     <div class="grid grid-cols-2 gap-3">
         <div class="flex flex-col gap-2">
             <label for="price-min-{{ $variant }}" class="text-xs font-semibold uppercase tracking-wide text-sage/60">
-                {{ __('Min') }}
+                {{ __('messages.min') }}
             </label>
             <input id="price-min-{{ $variant }}"
                    type="number"
@@ -89,7 +89,7 @@
         </div>
         <div class="flex flex-col gap-2">
             <label for="price-max-{{ $variant }}" class="text-xs font-semibold uppercase tracking-wide text-sage/60">
-                {{ __('Max') }}
+                {{ __('messages.max') }}
             </label>
             <input id="price-max-{{ $variant }}"
                    type="number"
@@ -104,7 +104,7 @@
 
 <details class="group rounded-2xl border border-sage/30 bg-dark/50 {{ $cardShadow }}" open>
     <summary class="flex cursor-pointer items-center justify-between {{ $summaryPaddingX }} {{ $summaryPaddingY }} text-sm font-semibold text-white transition hover:text-sage">
-        <span>{{ __('categories_index_filters_brands') }}</span>
+        <span>{{ __('messages.categories_index_filters_brands') }}</span>
         <svg class="h-4 w-4 text-sage/60 transition-transform duration-200 group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6" />
         </svg>
@@ -124,14 +124,14 @@
                 </span>
             </label>
         @empty
-            <p class="text-xs text-sage/60">{{ __('No brands to filter yet.') }}</p>
+            <p class="text-xs text-sage/60">{{ __('messages.no_brands_to_filter_yet') }}</p>
         @endforelse
     </div>
 </details>
 
 <details class="group rounded-2xl border border-sage/30 bg-dark/50 {{ $cardShadow }}" open>
     <summary class="flex cursor-pointer items-center justify-between {{ $summaryPaddingX }} {{ $summaryPaddingY }} text-sm font-semibold text-white transition hover:text-sage">
-        <span>{{ __('categories_index_filters_collections') }}</span>
+        <span>{{ __('messages.categories_index_filters_collections') }}</span>
         <svg class="h-4 w-4 text-sage/60 transition-transform duration-200 group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6" />
         </svg>
@@ -151,14 +151,14 @@
                 </span>
             </label>
         @empty
-            <p class="text-xs text-sage/60">{{ __('No collections available yet.') }}</p>
+            <p class="text-xs text-sage/60">{{ __('messages.no_collections_available_yet') }}</p>
         @endforelse
     </div>
 </details>
 
 <details class="group rounded-2xl border border-sage/30 bg-dark/50 {{ $cardShadow }}" open>
     <summary class="flex cursor-pointer items-center justify-between {{ $summaryPaddingX }} {{ $summaryPaddingY }} text-sm font-semibold text-white transition hover:text-sage">
-        <span>{{ __('categories_index_filters_categories') }}</span>
+        <span>{{ __('messages.categories_index_filters_categories') }}</span>
         <svg class="h-4 w-4 text-sage/60 transition-transform duration-200 group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6" />
         </svg>
@@ -178,7 +178,7 @@
                 </span>
             </label>
         @empty
-            <p class="text-xs text-sage/60">{{ __('No nested categories available.') }}</p>
+            <p class="text-xs text-sage/60">{{ __('messages.no_nested_categories_available') }}</p>
         @endforelse
     </div>
 </details>

@@ -25,14 +25,14 @@
         <div class="grid grid-cols-2 gap-x-4">
             <div class="text-sm">
                 <dt class="font-medium text-gray-900">
-                    {{ __('Total') }}
+                    {{ __('messages.total') }}
                 </dt>
                 <dd class="mt-1 text-gray-500">
                     {{ \Illuminate\Support\Number::currency($order->total() + $order->shippingOption?->price, $order->currency_code, app()->getLocale()) }}
                 </dd>
             </div>
             <div class="text-sm">
-                <dt class="font-medium text-gray-900">{{ __('Status') }}</dt>
+                <dt class="font-medium text-gray-900">{{ __('messages.status') }}</dt>
                 <dd class="mt-1 text-gray-500">
                     <x-order.status :status="$order->status" />
                 </dd>

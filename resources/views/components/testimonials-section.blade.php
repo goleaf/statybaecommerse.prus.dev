@@ -159,7 +159,7 @@
                                         {{-- Product Info --}}
                                         @if (isset($testimonial['product']))
                                             <div class="mb-4">
-                                                <span class="text-sm text-gray-500">{{ __('Product') }}:</span>
+                                                <span class="text-sm text-gray-500">{{ __('messages.product') }}:</span>
                                                 <span
                                                       class="text-sm font-medium text-gray-900 ml-1">{{ $testimonial['product'] }}</span>
                                             </div>

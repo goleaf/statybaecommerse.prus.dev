@@ -69,7 +69,7 @@ final class LowStockAlertsWidget extends BaseWidget
                     }),
                 Action::make('edit'),
             ])
-            ->emptyStateHeading(__('No Low Stock Items'))
-            ->emptyStateDescription(__('All products are well stocked!'));
+            ->emptyStateHeading(__('messages.no_low_stock_items'))
+            ->emptyStateDescription(__('messages.all_products_are_well_stocked'));
     }
 }

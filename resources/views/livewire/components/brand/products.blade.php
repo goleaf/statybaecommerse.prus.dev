@@ -5,7 +5,7 @@
         @endfor
     </div>
     @if ($products->isEmpty())
-        <div class="text-slate-500" aria-live="polite">{{ __('No products for this brand yet.') }}</div>
+        <div class="text-slate-500" aria-live="polite">{{ __('messages.no_products_for_this_brand_yet') }}</div>
     @else
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             @foreach ($products as $product)

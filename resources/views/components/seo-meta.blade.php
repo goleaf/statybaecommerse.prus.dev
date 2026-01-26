@@ -11,7 +11,7 @@
 
 @php
     $title = $title ?? config('app.name');
-    $description = $description ?? __('meta_description_home');
+    $description = $description ?? __('messages.meta_description_home');
     $keywords = $keywords ?? __('meta_keywords');
     $image = $image ?? og_placeholder_url();
     $canonical = $canonical ?? url()->current();

@@ -15,7 +15,7 @@
                     wire:click="apply"
                     wire:loading.attr="disabled"
                     class="px-6 py-3 bg-brand-primary text-white rounded-xl font-medium hover:bg-brand-primary/90 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
-                <span wire:loading.remove>{{ __('Apply') }}</span>
+                <span wire:loading.remove>{{ __('messages.apply') }}</span>
                 <span wire:loading>{{ __('Applying...') }}</span>
             </button>
         </div>
@@ -35,7 +35,7 @@
                         wire:confirm="{{ __('translations.confirm_remove_coupon') }}"
                         wire:loading.attr="disabled"
                         class="text-sm text-red-600 hover:text-red-700 hover:underline transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-                    {{ __('Remove') }}
+                    {{ __('messages.remove') }}
                 </button>
             </div>
         </div>

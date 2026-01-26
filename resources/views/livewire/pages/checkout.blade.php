@@ -61,7 +61,7 @@
                                         class="flex w-full items-center py-6 font-medium"
                                         aria-expanded="false"
                                         @click="open = !open">
-                                    <span class="mr-auto text-base">{{ __('Total') }}</span>
+                                    <span class="mr-auto text-base">{{ __('messages.total') }}</span>
                                     <span class="mr-2 text-base">
                                         <livewire:components.cart-total />
                                     </span>

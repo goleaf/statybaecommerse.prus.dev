@@ -30,14 +30,14 @@
                            x-model="filters.priceMin"
                            :min="priceRange.min"
                            :max="priceRange.max"
-                           placeholder="{{ __('Min') }}"
+                           placeholder="{{ __('messages.min') }}"
                            class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                     <span class="text-gray-500">-</span>
                     <input type="number"
                            x-model="filters.priceMax"
                            :min="priceRange.min"
                            :max="priceRange.max"
-                           placeholder="{{ __('Max') }}"
+                           placeholder="{{ __('messages.max') }}"
                            class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                 </div>
 
@@ -58,7 +58,7 @@
 
         {{-- Categories --}}
         <div>
-            <h4 class="text-sm font-semibold text-gray-900 mb-3">{{ __('Categories') }}</h4>
+            <h4 class="text-sm font-semibold text-gray-900 mb-3">{{ __('messages.categories') }}</h4>
             <div class="space-y-2 max-h-48 overflow-y-auto">
                 @foreach ($categories as $category)
                     <label
@@ -76,7 +76,7 @@
 
         {{-- Brands --}}
         <div>
-            <h4 class="text-sm font-semibold text-gray-900 mb-3">{{ __('Brands') }}</h4>
+            <h4 class="text-sm font-semibold text-gray-900 mb-3">{{ __('messages.brands') }}</h4>
             <div class="space-y-2 max-h-48 overflow-y-auto">
                 @foreach ($brands as $brand)
                     <label
@@ -120,14 +120,14 @@
 
         {{-- Availability --}}
         <div>
-            <h4 class="text-sm font-semibold text-gray-900 mb-3">{{ __('Availability') }}</h4>
+            <h4 class="text-sm font-semibold text-gray-900 mb-3">{{ __('messages.availability') }}</h4>
             <div class="space-y-2">
                 <label
                        class="flex items-center gap-3 cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors duration-200">
                     <input type="checkbox"
                            x-model="filters.inStock"
                            class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                    <span class="text-sm text-gray-700">{{ __('In Stock') }}</span>
+                    <span class="text-sm text-gray-700">{{ __('messages.in_stock') }}</span>
                 </label>
                 <label
                        class="flex items-center gap-3 cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors duration-200">

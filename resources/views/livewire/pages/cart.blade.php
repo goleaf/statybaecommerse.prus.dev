@@ -4,14 +4,14 @@
         <x-container class="px-4 py-16">
             <div class="max-w-[1320px] mx-auto w-full space-y-6 text-dark text-center">
                 <p class="uppercase text-3xl md:text-4xl font-medium">
-                    {{ __('Your Cart') }}
+                    {{ __('messages.your_cart') }}
                 </p>
                 <p class="text-sm max-w-2xl mx-auto">
-                    {{ __('Review your selected items and proceed to checkout') }}
+                    {{ __('messages.review_your_selected_items_and_proceed_to_checkout') }}
                 </p>
                 @if (isset($items) && !$items->isEmpty())
                     <p class="uppercase font-semibold text-2xl sm:text-3xl md:text-4xl">
-                        {{ $items->count() }} {{ __('Items') }}
+                        {{ $items->count() }} {{ __('messages.items') }}
                     </p>
                 @endif
             </div>
@@ -38,14 +38,14 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
                         </svg>
                     </div>
-                    <h2 class="text-2xl font-semibold text-dark mb-4">{{ __('Your cart is empty') }}</h2>
-                    <p class="text-gray-600 mb-8">{{ __('Start adding items to your cart to see them here') }}</p>
+                    <h2 class="text-2xl font-semibold text-dark mb-4">{{ __('messages.your_cart_is_empty') }}</h2>
+                    <p class="text-gray-600 mb-8">{{ __('messages.start_adding_items_to_your_cart_to_see_them_here') }}</p>
                     <a href="{{ route('localized.home', ['locale' => app()->getLocale()]) }}" 
                        class="btn-hero-primary inline-flex items-center gap-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                         </svg>
-                        {{ __('Continue Shopping') }}
+                        {{ __('messages.continue_shopping') }}
                     </a>
                 </div>
             @else
@@ -55,8 +55,8 @@
                     <div class="lg:col-span-9 space-y-6">
                         <div class="bg-dark rounded-2xl shadow-soft border border-sage/30 overflow-hidden">
                             <div class="p-6 border-b border-sage/30">
-                                <h3 class="text-lg font-semibold text-white">{{ __('Cart Items') }}</h3>
-                                <p class="text-sm text-sage/80">{{ $items->count() }} {{ __('items in your cart') }}</p>
+                                <h3 class="text-lg font-semibold text-white">{{ __('messages.cart_items') }}</h3>
+                                <p class="text-sm text-sage/80">{{ $items->count() }} {{ __('messages.items_in_your_cart') }}</p>
                             </div>
                             
                             <div class="divide-y divide-sage/30 text-sage">
@@ -91,11 +91,11 @@
                                                 <h4 class="text-lg font-semibold mb-2">
                                                     <span class="text-white">{{ $item->name }}</span>
                                                 </h4>
-                                                <p class="text-sm text-sage/80 mb-3">{{ __('Unit Price') }}: {{ \Illuminate\Support\Number::currency((float) $item->price, current_currency(), app()->getLocale()) }}</p>
+                                                <p class="text-sm text-sage/80 mb-3">{{ __('messages.unit_price') }}: {{ \Illuminate\Support\Number::currency((float) $item->price, current_currency(), app()->getLocale()) }}</p>
                                                 
                                                 <!-- Quantity Controls -->
                                                 <div class="flex items-center gap-3">
-                                                    <span class="text-sm font-medium text-sage">{{ __('Quantity') }}:</span>
+                                                    <span class="text-sm font-medium text-sage">{{ __('messages.quantity') }}:</span>
                                                     <div class="flex items-center gap-2">
                                                         <button type="button" 
                                                                 wire:click="decrementItem({{ (int) $item->id }})" 
@@ -138,7 +138,7 @@
                                                         class="inline-flex items-center gap-2 text-sm text-red-400 hover:text-red-300 hover:underline transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                                         title="{{ __('Remove item from cart') }}">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                                                    {{ __('Remove') }}
+                                                    {{ __('messages.remove') }}
                                                 </button>
                                             </div>
                                         </div>
@@ -185,7 +185,7 @@
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                                 </svg>
-                                {{ __('Continue Shopping') }}
+                                {{ __('messages.continue_shopping') }}
                             </a>
                             <p class="text-center text-xs text-gray-600">{{ __('Secure checkout • Encrypted payments') }}</p>
                         </div>

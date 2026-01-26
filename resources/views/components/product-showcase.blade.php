@@ -12,7 +12,7 @@
 ])
 
 @php
-    $title = $title ?? __('Products');
+    $title = $title ?? __('messages.products');
     $subtitle = $subtitle ?? __('Discover our amazing collection of products');
     $products = $products ?? collect([]);
 
@@ -41,7 +41,7 @@
             {{-- View Toggle --}}
             @if ($showViewToggle)
                 <div class="flex items-center gap-2">
-                    <span class="text-sm text-gray-600">{{ __('View') }}:</span>
+                    <span class="text-sm text-gray-600">{{ __('messages.view') }}:</span>
                     <div class="flex border border-gray-300 rounded-lg overflow-hidden">
                         <button @click="viewMode = 'grid'"
                                 :class="viewMode === 'grid' ? 'bg-blue-600 text-white' :
@@ -80,10 +80,10 @@
                             <h4 class="text-sm font-semibold text-gray-900 mb-3">{{ __('Price Range') }}</h4>
                             <div class="space-y-3">
                                 <div class="flex items-center gap-2">
-                                    <input type="number" x-model="filters.priceMin" placeholder="{{ __('Min') }}"
+                                    <input type="number" x-model="filters.priceMin" placeholder="{{ __('messages.min') }}"
                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                                     <span class="text-gray-500">-</span>
-                                    <input type="number" x-model="filters.priceMax" placeholder="{{ __('Max') }}"
+                                    <input type="number" x-model="filters.priceMax" placeholder="{{ __('messages.max') }}"
                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                                 </div>
                                 <div class="relative">
@@ -95,7 +95,7 @@
 
                         {{-- Categories --}}
                         <div class="mb-6">
-                            <h4 class="text-sm font-semibold text-gray-900 mb-3">{{ __('Categories') }}</h4>
+                            <h4 class="text-sm font-semibold text-gray-900 mb-3">{{ __('messages.categories') }}</h4>
                             <div class="space-y-2 max-h-48 overflow-y-auto">
                                 @foreach (\App\Models\Category::where('is_active', true)->get() as $category)
                                     <label
@@ -110,7 +110,7 @@
 
                         {{-- Brands --}}
                         <div class="mb-6">
-                            <h4 class="text-sm font-semibold text-gray-900 mb-3">{{ __('Brands') }}</h4>
+                            <h4 class="text-sm font-semibold text-gray-900 mb-3">{{ __('messages.brands') }}</h4>
                             <div class="space-y-2 max-h-48 overflow-y-auto">
                                 @foreach (\App\Models\Brand::where('is_active', true)->get() as $brand)
                                     <label
@@ -150,13 +150,13 @@
 
                         {{-- Availability --}}
                         <div class="mb-6">
-                            <h4 class="text-sm font-semibold text-gray-900 mb-3">{{ __('Availability') }}</h4>
+                            <h4 class="text-sm font-semibold text-gray-900 mb-3">{{ __('messages.availability') }}</h4>
                             <div class="space-y-2">
                                 <label
                                        class="flex items-center gap-3 cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors duration-200">
                                     <input type="checkbox" x-model="filters.inStock"
                                            class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                                    <span class="text-sm text-gray-700">{{ __('In Stock') }}</span>
+                                    <span class="text-sm text-gray-700">{{ __('messages.in_stock') }}</span>
                                 </label>
                                 <label
                                        class="flex items-center gap-3 cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors duration-200">
@@ -194,16 +194,16 @@
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
                     <div class="text-sm text-gray-600">
                         {{ __('Showing') }} <span class="font-medium">{{ $products->count() }}</span>
-                        {{ __('products') }}
+                        {{ __('messages.products') }}
                     </div>
 
                     @if ($showSorting)
                         <div class="flex items-center gap-2">
-                            <span class="text-sm text-gray-600">{{ __('Sort by') }}:</span>
+                            <span class="text-sm text-gray-600">{{ __('messages.sort_by') }}:</span>
                             <select x-model="sortBy" @change="applySorting()"
                                     class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                                 <option value="relevance">{{ __('Relevance') }}</option>
-                                <option value="price_asc">{{ __('Price: Low to High') }}</option>
+                                <option value="price_asc">{{ __('messages.price_low_to_high') }}</option>
                                 <option value="price_desc">{{ __('Price: High to Low') }}</option>
                                 <option value="name_asc">{{ __('Name: A to Z') }}</option>
                                 <option value="name_desc">{{ __('Name: Z to A') }}</option>
@@ -312,7 +312,7 @@
 
                                                     <button @click="openQuickView({{ $product->id }})"
                                                             class="w-full text-blue-600 hover:text-blue-700 py-2 font-medium">
-                                                        {{ __('Quick View') }}
+                                                        {{ __('messages.quick_view') }}
                                                     </button>
                                                 </div>
                                             </div>
@@ -337,7 +337,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                   d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
                         </svg>
-                        <h3 class="text-2xl font-bold text-gray-900 mb-4">{{ __('No products found') }}</h3>
+                        <h3 class="text-2xl font-bold text-gray-900 mb-4">{{ __('messages.no_products_found') }}</h3>
                         <p class="text-gray-600 mb-8">{{ __('Try adjusting your filters or search terms') }}</p>
                         <button @click="clearFilters()"
                                 class="btn-gradient px-8 py-3 rounded-xl font-semibold">
@@ -411,7 +411,7 @@
                 <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
                     <div class="p-6">
                         <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-xl font-semibold text-gray-900">{{ __('Quick View') }}</h3>
+                            <h3 class="text-xl font-semibold text-gray-900">{{ __('messages.quick_view') }}</h3>
                             <button onclick="this.closest('.fixed').remove()" class="text-gray-400 hover:text-gray-600">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>

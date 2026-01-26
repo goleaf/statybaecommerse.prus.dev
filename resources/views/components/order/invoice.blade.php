@@ -2,15 +2,15 @@
 
 <div class="max-w-2xl mx-auto p-6 text-sm text-gray-900">
     <h1 class="text-xl font-semibold mb-4">{{ __('Invoice') }} #{{ $order->number }}</h1>
-    <p class="mb-2">{{ __('Date') }}: {{ format_datetime($order->created_at) }}</p>
-    <p class="mb-6">{{ __('Total') }}: {{ format_money($order->grand_total_amount, $order->currency_code) }}</p>
+    <p class="mb-2">{{ __('messages.date') }}: {{ format_datetime($order->created_at) }}</p>
+    <p class="mb-6">{{ __('messages.total') }}: {{ format_money($order->grand_total_amount, $order->currency_code) }}</p>
 
     <table class="w-full text-left border-t border-b border-gray-200">
         <thead>
             <tr>
-                <th class="py-2">{{ __('Product') }}</th>
-                <th class="py-2">{{ __('Qty') }}</th>
-                <th class="py-2 text-right">{{ __('Price') }}</th>
+                <th class="py-2">{{ __('messages.product') }}</th>
+                <th class="py-2">{{ __('messages.qty') }}</th>
+                <th class="py-2 text-right">{{ __('messages.price') }}</th>
             </tr>
         </thead>
         <tbody>

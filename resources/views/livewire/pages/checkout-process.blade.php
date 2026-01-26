@@ -11,7 +11,7 @@
             'description' => __('Contact & billing details'),
         ],
         2 => [
-            'label'       => __('Shipping'),
+            'label'       => __('messages.shipping'),
             'description' => __('Delivery options'),
         ],
         3 => [
@@ -81,7 +81,7 @@
             class="mt-10 rounded-xl border border-dashed border-gray-300 bg-white p-10 text-center shadow-sm"
             aria-live="polite"
         >
-            <h2 class="text-xl font-semibold text-gray-900">{{ __('Your cart is empty') }}</h2>
+            <h2 class="text-xl font-semibold text-gray-900">{{ __('messages.your_cart_is_empty') }}</h2>
             <p class="mt-2 text-sm text-gray-600">
                 {{ __('Add some products to your cart before proceeding through checkout.') }}
             </p>

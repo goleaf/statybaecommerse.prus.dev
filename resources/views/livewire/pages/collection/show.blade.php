@@ -51,7 +51,7 @@
         </x-alert>
     @endif
     <x-breadcrumbs :items="[
-        ['label' => __('Collections'), 'url' => route('localized.collections.index', ['locale' => app()->getLocale()])],
+        ['label' => __('messages.collections'), 'url' => route('localized.collections.index', ['locale' => app()->getLocale()])],
         ['label' => $collection->trans('name') ?? $collection->name],
     ]" />
     <div class="flex items-center justify-between mb-6">
@@ -59,9 +59,9 @@
         <div class="flex items-center gap-2">
             <label for="sort" class="sr-only">{{ __('Sort') }}</label>
             <select id="sort" wire:model.live="sort" class="rounded-md border-gray-300 text-sm">
-                <option value="">{{ __('Newest') }}</option>
-                <option value="name_asc">{{ __('Name (A–Z)') }}</option>
-                <option value="name_desc">{{ __('Name (Z–A)') }}</option>
+                <option value="">{{ __('messages.newest') }}</option>
+                <option value="name_asc">{{ __('messages.name_a_z') }}</option>
+                <option value="name_desc">{{ __('messages.name_z_a') }}</option>
             </select>
         </div>
     </div>
@@ -103,7 +103,7 @@
                         wire:click="clearBrandFilters"
                         wire:confirm="{{ __('translations.confirm_clear_brand_filters') }}"
                         class="text-xs underline">
-                    {{ __('Clear all') }}
+                    {{ __('messages.clear_all') }}
                 </button>
             @endif
         </div>
@@ -147,7 +147,7 @@
                             wire:click="clearAttributeFilters"
                             wire:confirm="{{ __('translations.confirm_clear_attribute_filters') }}"
                             class="text-xs underline">
-                        {{ __('Clear all') }}
+                        {{ __('messages.clear_all') }}
                     </button>
                 @endif
             </div>
@@ -185,7 +185,7 @@
         </div>
     @endif
 
-    <h2 class="text-xl font-semibold mb-4">{{ __('Products') }}</h2>
+    <h2 class="text-xl font-semibold mb-4">{{ __('messages.products') }}</h2>
     <div wire:loading class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-6" role="status"
          aria-live="polite">
         @for ($i = 0; $i < 8; $i++)
@@ -193,7 +193,7 @@
         @endfor
     </div>
     @if ($products->isEmpty())
-        <div class="text-slate-500" aria-live="polite">{{ __('No products in this collection yet.') }}</div>
+        <div class="text-slate-500" aria-live="polite">{{ __('messages.no_products_in_this_collection_yet') }}</div>
     @else
         <p class="text-sm text-gray-600 mb-2" aria-live="polite">
             {{ trans_choice(':count result found|:count results found', $products->total() ?? $products->count(), ['count' => $products->total() ?? $products->count()]) }}

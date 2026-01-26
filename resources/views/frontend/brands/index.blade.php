@@ -1,6 +1,6 @@
 @extends('frontend.layouts.app')
 
-@section('title', __('Brands'))
+@section('title', __('messages.brands'))
 @section('description', __('Meet the manufacturers and labels powering the catalogue with professional-grade inventory.'))
 
 @section('content')
@@ -28,7 +28,7 @@
 
             <section class="mt-10 grid gap-8 lg:grid-cols-[1fr_320px]">
                 <div class="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
-                    <h2 class="text-xl font-semibold text-gray-900">{{ __('All brands') }}</h2>
+                    <h2 class="text-xl font-semibold text-gray-900">{{ __('messages.all_brands') }}</h2>
                     <ul class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                         @foreach ($brands as $brand)
                             <li class="group flex flex-col justify-between rounded-2xl border border-gray-200 bg-gray-50 p-5 transition hover:border-rose-500 hover:bg-white">
@@ -39,7 +39,7 @@
                                     @endif
                                 </div>
                                 <div class="mt-4 flex items-center justify-between text-xs font-semibold uppercase tracking-wide text-gray-500">
-                                    <span>{{ __('Products') }}</span>
+                                    <span>{{ __('messages.products') }}</span>
                                     <span class="rounded-full bg-gray-200 px-2 py-0.5 text-gray-700">{{ number_format($brand->published_products_count ?? 0) }}</span>
                                 </div>
                             </li>

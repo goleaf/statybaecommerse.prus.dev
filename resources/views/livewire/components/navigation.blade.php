@@ -51,38 +51,38 @@
         $quickLinks = collect([
             [
                 'key' => 'categories',
-                'label' => __('nav_categories'),
+                'label' => __('messages.nav_categories'),
                 'url' => Route::has('localized.categories.index')
                     ? route('localized.categories.index', ['locale' => $locale])
                     : url('/' . $locale . '/categories'),
             ],
             [
                 'key' => 'collections',
-                'label' => __('nav_collections'),
+                'label' => __('messages.nav_collections'),
                 'url' => Route::has('localized.collections.index')
                     ? route('localized.collections.index', ['locale' => $locale])
                     : url('/' . $locale . '/collections'),
             ],
             [
                 'key' => 'brands',
-                'label' => __('nav_brands'),
+                'label' => __('messages.nav_brands'),
                 'url' => Route::has('localized.brands.index')
                     ? route('localized.brands.index', ['locale' => $locale])
                     : url('/' . $locale . '/brands'),
             ],
             [
                 'key' => 'downloads',
-                'label' => __('nav_downloads'),
+                'label' => __('messages.nav_downloads'),
                 'url' => '#',
             ],
             [
                 'key' => 'vendor_catalogs',
-                'label' => __('nav_vendor_catalogs'),
+                'label' => __('messages.nav_vendor_catalogs'),
                 'url' => '#',
             ],
             [
                 'key' => 'support',
-                'label' => __('nav_support_center'),
+                'label' => __('messages.nav_support_center'),
                 'url' => 'mailto:support@statybae.com',
             ],
         ])->filter(fn($link) => !empty($link['url']));
@@ -140,7 +140,7 @@
                 <div class="flex justify-between items-center">
                     {{-- Logo section - Made bigger --}}
                     <div class="flex-shrink-0 flex items-center">
-                        <a href="{{ $homeUrl }}" class="group" aria-label="{{ __('nav_home') }}">
+                        <a href="{{ $homeUrl }}" class="group" aria-label="{{ __('messages.nav_home') }}">
                             <img src="/images/logo/logo.png" 
                                  alt="{{ config('app.name') }}" 
                                  class="h-16 w-auto object-contain">
@@ -174,7 +174,7 @@
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.749 0-5.353-.62-7.499-1.632z" />
                                     </svg>
-                                    <span>{{ __('auth_register') }}</span>
+                                    <span>{{ __('messages.auth_register') }}</span>
                                 </a>
                             @endif
                         @endguest
@@ -184,7 +184,7 @@
                             <button type="button"
                                     class="text-dark hover:text-stone focus:outline-none"
                                     wire:click="toggleMobileMenu"
-                                    aria-label="{{ __('nav_toggle') }}">
+                                    aria-label="{{ __('messages.nav_toggle') }}">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
                                 </svg>

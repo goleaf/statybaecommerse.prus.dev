@@ -20,7 +20,7 @@
                         </span>
                     @elseif($product->is_featured)
                         <span class="absolute left-4 top-4 inline-flex items-center rounded-full bg-indigo-500/90 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white">
-                            {{ __('Featured') }}
+                            {{ __('messages.featured') }}
                         </span>
                     @endif
                 </div>

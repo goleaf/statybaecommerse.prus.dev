@@ -20,7 +20,7 @@
 
 <section class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
     <header class="space-y-1">
-        <h2 class="text-lg font-semibold text-gray-900">{{ __('Shipping') }}</h2>
+        <h2 class="text-lg font-semibold text-gray-900">{{ __('messages.shipping') }}</h2>
         <p class="text-sm text-gray-500">
             {{ __('Confirm where we should send your order and choose a delivery option that works best for you.') }}
         </p>

@@ -18,7 +18,7 @@
                         {{ __('frontend/about.hero.subtitle') }}
                     </p>
                     <p class="text-base font-medium text-blue-700 dark:text-blue-300">
-                        {{ __('footer_tagline') }}
+                        {{ __('messages.footer_tagline') }}
                     </p>
                     <div>
                         <a href="{{ route('frontend.contact.index') }}"

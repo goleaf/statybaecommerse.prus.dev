@@ -19,9 +19,9 @@
 
                 <!-- Category Filter -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">{{ __('Category') }}</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">{{ __('messages.category') }}</label>
                     <select wire:model.live="selectedCategory" class="w-full border border-gray-300 rounded-md px-3 py-2">
-                        <option value="">{{ __('All Categories') }}</option>
+                        <option value="">{{ __('messages.all_categories') }}</option>
                         @foreach($categories as $category)
                             <option value="{{ $category->id }}">{{ $category->name }}</option>
                         @endforeach
@@ -50,11 +50,11 @@
                 <p class="text-2xl font-bold text-green-900">{{ $stats['products'] }}</p>
             </div>
             <div class="bg-purple-50 rounded-lg p-4">
-                <h3 class="text-sm font-medium text-purple-600">{{ __('Categories') }}</h3>
+                <h3 class="text-sm font-medium text-purple-600">{{ __('messages.categories') }}</h3>
                 <p class="text-2xl font-bold text-purple-900">{{ $stats['categories'] }}</p>
             </div>
             <div class="bg-yellow-50 rounded-lg p-4">
-                <h3 class="text-sm font-medium text-yellow-600">{{ __('Brands') }}</h3>
+                <h3 class="text-sm font-medium text-yellow-600">{{ __('messages.brands') }}</h3>
                 <p class="text-2xl font-bold text-yellow-900">{{ $stats['brands'] }}</p>
             </div>
             <div class="bg-red-50 rounded-lg p-4">
@@ -151,7 +151,7 @@
                                 @endif
                                 <div class="flex-1">
                                     <h4 class="font-medium text-sm text-gray-900">{{ $brand['name'] }}</h4>
-                                    <p class="text-xs text-gray-600">{{ $brand['products_count'] }} {{ __('products') }}</p>
+                                    <p class="text-xs text-gray-600">{{ $brand['products_count'] }} {{ __('messages.products') }}</p>
                                 </div>
                             </div>
                         @endforeach
@@ -166,15 +166,15 @@
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div class="text-center">
                     <p class="text-2xl font-bold text-green-900">{{ $globalSiteStats['total_products'] }}</p>
-                    <p class="text-sm text-green-700">{{ __('Products') }}</p>
+                    <p class="text-sm text-green-700">{{ __('messages.products') }}</p>
                 </div>
                 <div class="text-center">
                     <p class="text-2xl font-bold text-green-900">{{ $globalSiteStats['total_categories'] }}</p>
-                    <p class="text-sm text-green-700">{{ __('Categories') }}</p>
+                    <p class="text-sm text-green-700">{{ __('messages.categories') }}</p>
                 </div>
                 <div class="text-center">
                     <p class="text-2xl font-bold text-green-900">{{ $globalSiteStats['total_brands'] }}</p>
-                    <p class="text-sm text-green-700">{{ __('Brands') }}</p>
+                    <p class="text-sm text-green-700">{{ __('messages.brands') }}</p>
                 </div>
                 <div class="text-center">
                     <p class="text-2xl font-bold text-green-900">{{ number_format($globalSiteStats['average_rating'], 1) }}</p>
@@ -182,7 +182,7 @@
                 </div>
             </div>
             <p class="text-xs text-green-600 mt-2 text-center">
-                {{ __('Last updated') }}: {{ \Carbon\Carbon::parse($globalSiteStats['last_updated'])->format('M d, Y H:i') }}
+                {{ __('messages.last_updated') }}: {{ \Carbon\Carbon::parse($globalSiteStats['last_updated'])->format('M d, Y H:i') }}
             </p>
         </div>
 
@@ -194,7 +194,7 @@
                     <h3 class="font-medium text-gray-900 mb-2">{{ __('Current Filters') }}</h3>
                     <ul class="text-sm text-gray-600 space-y-1">
                         <li>{{ __('Time Filter') }}: {{ ucfirst($summaryReport['filter_applied']) }}</li>
-                        <li>{{ __('Category') }}: {{ $summaryReport['category_filter'] ?: __('All') }}</li>
+                        <li>{{ __('messages.category') }}: {{ $summaryReport['category_filter'] ?: __('All') }}</li>
                         <li>{{ __('Expensive Only') }}: {{ $summaryReport['expensive_only'] ? __('Yes') : __('No') }}</li>
                     </ul>
                 </div>

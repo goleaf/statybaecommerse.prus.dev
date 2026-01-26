@@ -1,7 +1,7 @@
 <div class="space-y-4">
     <!-- Subtotal -->
     <div class="flex items-center justify-between py-3 border-b border-ash/20">
-        <span class="text-gray-600 font-medium">{{ __('Subtotal') }}</span>
+        <span class="text-gray-600 font-medium">{{ __('messages.subtotal') }}</span>
         <span class="text-lg font-semibold text-dark">
             {{ \Illuminate\Support\Number::currency($subtotal, current_currency(), app()->getLocale()) }}
         </span>
@@ -10,7 +10,7 @@
     <!-- Discount -->
 		@if($discount > 0)
         <div class="flex items-center justify-between py-3 border-b border-ash/20">
-            <span class="text-gray-600 font-medium">{{ __('Discount') }}</span>
+            <span class="text-gray-600 font-medium">{{ __('messages.discount') }}</span>
             <span class="text-lg font-semibold text-green-600">
                 -{{ \Illuminate\Support\Number::currency($discount, current_currency(), app()->getLocale()) }}
             </span>
@@ -27,7 +27,7 @@
 
     <!-- Total -->
     <div class="flex items-center justify-between py-4 bg-brand-primary/5 rounded-xl px-4">
-        <span class="text-xl font-bold text-dark">{{ __('Total') }}</span>
+        <span class="text-xl font-bold text-dark">{{ __('messages.total') }}</span>
         <span class="text-2xl font-bold text-brand-primary">
             {{ \Illuminate\Support\Number::currency($total, current_currency(), app()->getLocale()) }}
         </span>

@@ -172,7 +172,7 @@ final class Home extends Component
         $product = app(ProductRepository::class)->findPublishedById($productId);
 
         if (! $product || ($product->stock_quantity ?? 0) < 1) {
-            $this->notifyWarning(__('product_unavailable'));
+            $this->notifyWarning(__('messages.product_unavailable'));
 
             return;
         }
@@ -191,7 +191,7 @@ final class Home extends Component
             'latestProducts'   => $this->latestProducts,
             'latestReviews'    => $this->latestReviews,
         ])->layout('components.layouts.base', [
-            'title' => __('home_homepage') . ' - ' . (is_string($appName) ? $appName : ''),
+            'title' => __('messages.home_homepage') . ' - ' . (is_string($appName) ? $appName : ''),
         ]);
     }
 }

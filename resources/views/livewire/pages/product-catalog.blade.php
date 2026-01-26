@@ -2,8 +2,8 @@
     <x-container class="py-8">
         {{-- Page Header --}}
         <x-shared.section 
-            title="{{ __('Products') }}"
-            description="{{ __('product_catalog_description') }}"
+            title="{{ __('messages.products') }}"
+            description="{{ __('messages.product_catalog_description') }}"
             icon="heroicon-o-cube"
             titleSize="text-3xl"
             centered="true"
@@ -34,15 +34,15 @@
             {{-- Products Grid --}}
             <x-shared.products-grid 
                 :products="$products"
-                title="{{ __('products_found', ['count' => $products->total()]) }}"
+                title="{{ __('messages.products_found', ['count' => $products->total()]) }}"
                 :showQuickAdd="true"
                 :showWishlist="true"
                 :showCompare="true"
                 :showPagination="true"
                 columns="xl:grid-cols-4"
-                emptyStateTitle="{{ __('No products found') }}"
-                emptyStateDescription="{{ __('Try adjusting your search or filter criteria') }}"
-                emptyStateAction="{{ __('browse_categories') }}"
+                emptyStateTitle="{{ __('messages.no_products_found') }}"
+                emptyStateDescription="{{ __('messages.try_adjusting_your_search_or_filter_criteria') }}"
+                emptyStateAction="{{ __('messages.browse_categories') }}"
                 emptyStateActionUrl="{{ route('localized.categories.index', ['locale' => app()->getLocale()]) }}"
             />
         </x-shared.sidebar-layout>

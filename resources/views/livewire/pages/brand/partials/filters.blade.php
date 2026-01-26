@@ -6,7 +6,7 @@
     <div class="rounded-2xl border border-sage/30 bg-dark/50 p-6 shadow-sm space-y-4">
         <div class="flex items-center justify-between">
             <h3 class="text-sm font-semibold uppercase tracking-wider text-sage/60">
-                {{ __('brands_index_search_label') }}
+                {{ __('messages.brands_index_search_label') }}
             </h3>
             @if(filled($this->search))
                 <button type="button"
@@ -19,7 +19,7 @@
 
         <div class="flex flex-col gap-3">
             <label for="brand-search-{{ $variant }}" class="text-xs font-semibold uppercase tracking-wide text-sage/60">
-                {{ __('brands_index_search_label') }}
+                {{ __('messages.brands_index_search_label') }}
             </label>
             <div class="flex items-center gap-2 overflow-hidden rounded-xl border border-sage/30 bg-dark/30 focus-within:border-sage focus-within:ring-2 focus-within:ring-sage/20">
                 <span class="px-3 text-sage/60">
@@ -30,7 +30,7 @@
                 <input id="brand-search-{{ $variant }}"
                        type="search"
                        wire:model.live.debounce.400ms="search"
-                       placeholder="{{ __('brands_index_search_placeholder') }}"
+                       placeholder="{{ __('messages.brands_index_search_placeholder') }}"
                        class="w-full border-0 bg-transparent py-2 pr-3 text-sm text-sage placeholder:text-sage/50 focus:outline-none focus:ring-0" />
             </div>
         </div>
@@ -38,12 +38,12 @@
 
     <div class="rounded-2xl border border-sage/30 bg-dark/50 p-6 shadow-sm space-y-3">
         <h3 class="text-xs font-semibold uppercase tracking-wider text-sage/60">
-            {{ __('brands_index_sort_label') }}
+            {{ __('messages.brands_index_sort_label') }}
         </h3>
 
         <div class="flex flex-col gap-3">
             <label for="brand-sort-{{ $variant }}" class="text-xs font-semibold uppercase tracking-wide text-sage/60">
-                {{ __('brands_index_sort_label') }}
+                {{ __('messages.brands_index_sort_label') }}
             </label>
             <div class="flex items-center gap-2 overflow-hidden rounded-xl border border-sage/30 bg-dark/30 focus-within:border-sage focus-within:ring-2 focus-within:ring-sage/20">
                 <span class="px-3 text-sage/60">
@@ -54,11 +54,11 @@
                 <select id="brand-sort-{{ $variant }}"
                         wire:model.live="sortBy"
                         class="w-full border-0 bg-transparent py-2 pr-3 text-sm font-medium text-sage focus:outline-none focus:ring-0">
-                    <option value="name" class="bg-dark text-sage">{{ __('brands_index_sort_option_name') }}</option>
-                    <option value="name_desc" class="bg-dark text-sage">{{ __('brands_index_sort_option_name_desc') }}</option>
-                    <option value="products_count" class="bg-dark text-sage">{{ __('brands_index_sort_option_products') }}</option>
-                    <option value="created_at" class="bg-dark text-sage">{{ __('brands_index_sort_option_newest') }}</option>
-                    <option value="featured" class="bg-dark text-sage">{{ __('brands_index_sort_option_featured') }}</option>
+                    <option value="name" class="bg-dark text-sage">{{ __('messages.brands_index_sort_option_name') }}</option>
+                    <option value="name_desc" class="bg-dark text-sage">{{ __('messages.brands_index_sort_option_name_desc') }}</option>
+                    <option value="products_count" class="bg-dark text-sage">{{ __('messages.brands_index_sort_option_products') }}</option>
+                    <option value="created_at" class="bg-dark text-sage">{{ __('messages.brands_index_sort_option_newest') }}</option>
+                    <option value="featured" class="bg-dark text-sage">{{ __('messages.brands_index_sort_option_featured') }}</option>
                 </select>
             </div>
         </div>
@@ -66,7 +66,7 @@
 
     <div class="rounded-2xl border border-sage/30 bg-dark/50 p-6 shadow-sm space-y-3">
         <h3 class="text-xs font-semibold uppercase tracking-wider text-sage/60">
-            {{ __('brands_index_quick_actions') }}
+            {{ __('messages.brands_index_quick_actions') }}
         </h3>
 
         <div class="grid gap-2">
@@ -76,7 +76,7 @@
                 class="group relative flex items-center justify-between overflow-hidden rounded-lg border border-sage/30 bg-dark/30 px-4 py-2 text-sm font-medium text-sage transition hover:border-sage hover:bg-sage/10 hover:text-dark"
                 wire:class="{ 'border-sage bg-sage text-dark': $wire.sortBy === 'featured' }"
             >
-                <span>{{ __('brands_index_quick_featured') }}</span>
+                <span>{{ __('messages.brands_index_quick_featured') }}</span>
                 <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                     <path d="M12 17.3 6.18 20l1.11-6.45L2 8.9l6.5-.94L12 2l2.5 5.96 6.5.94-4.7 4.65L17.82 20 12 17.3z" />
                 </svg>
@@ -87,7 +87,7 @@
                 class="group relative flex items-center justify-between overflow-hidden rounded-lg border border-sage/30 bg-dark/30 px-4 py-2 text-sm font-medium text-sage transition hover:border-sage hover:bg-sage/10 hover:text-dark"
                 wire:class="{ 'border-sage bg-sage text-dark': $wire.sortBy === 'products_count' }"
             >
-                <span>{{ __('brands_index_quick_products') }}</span>
+                <span>{{ __('messages.brands_index_quick_products') }}</span>
                 <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M3 7h7v6H3V7zm11 0h7v6h-7V7zM3 15h7v6H3v-6zm11 0h7v6h-7v-6z" />
                 </svg>
@@ -108,14 +108,14 @@
                 {{ trans_choice('brands_index_status', $activeFilterCount, ['count' => $activeFilterCount]) }}
             </span>
             <span class="mt-1 block text-xs text-sage/60">
-                {{ __('brands_index_status_hint_some') }}
+                {{ __('messages.brands_index_status_hint_some') }}
             </span>
         @else
             <span class="font-semibold text-sage">
-                {{ __('brands_index_status_none') }}
+                {{ __('messages.brands_index_status_none') }}
             </span>
             <span class="mt-1 block text-xs text-sage/60">
-                {{ __('brands_index_status_hint_none') }}
+                {{ __('messages.brands_index_status_hint_none') }}
             </span>
         @endif
     </div>
@@ -129,7 +129,7 @@
             <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
-            {{ __('brands_index_reset_filters') }}
+            {{ __('messages.brands_index_reset_filters') }}
         </button>
     </div>
 </div>

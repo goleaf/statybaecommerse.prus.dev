@@ -1,6 +1,6 @@
 @extends('frontend.layouts.app')
 
-@section('title', __('Categories'))
+@section('title', __('messages.categories'))
 @section('description', __('Navigate the full taxonomy of products and find the collections built for your next project.'))
 
 @section('content')
@@ -39,7 +39,7 @@
                                     @endif
                                 </div>
                                 <div class="mt-4 flex items-center justify-between text-xs font-semibold uppercase tracking-wide text-gray-500">
-                                    <span>{{ __('Products') }}</span>
+                                    <span>{{ __('messages.products') }}</span>
                                     <span class="rounded-full bg-gray-200 px-2 py-0.5 text-gray-700">{{ number_format($category->published_products_count ?? 0) }}</span>
                                 </div>
                             </li>

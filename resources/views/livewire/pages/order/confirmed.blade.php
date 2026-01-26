@@ -6,17 +6,17 @@
 
 @section('content')
     <x-container class="py-16">
-        <h1 class="text-2xl font-semibold">{{ __('Thank you! Your order is confirmed.') }}</h1>
-        <p class="mt-2 text-gray-600">{{ __('Order number:') }} {{ $order->number }}</p>
+        <h1 class="text-2xl font-semibold">{{ __('messages.thank_you_your_order_is_confirmed') }}</h1>
+        <p class="mt-2 text-gray-600">{{ __('messages.order_number') }} {{ $order->number }}</p>
 
         <div class="mt-8 space-y-4">
             <div class="flex items-center justify-between">
-                <span class="text-gray-500">{{ __('Subtotal') }}</span>
+                <span class="text-gray-500">{{ __('messages.subtotal') }}</span>
                 <span>{{ \Illuminate\Support\Number::currency($order->subtotal_amount, $order->currency_code, app()->getLocale()) }}</span>
             </div>
             @if (($order->discount_total_amount ?? 0) > 0)
                 <div class="flex items-center justify-between">
-                    <span class="text-gray-500">{{ __('Discounts') }}</span>
+                    <span class="text-gray-500">{{ __('messages.discounts') }}</span>
                     <span>-{{ \Illuminate\Support\Number::currency($order->discount_total_amount, $order->currency_code, app()->getLocale()) }}</span>
                 </div>
                 @if (isset($redemptions) && $redemptions->isNotEmpty())
@@ -30,11 +30,11 @@
                 @endif
             @endif
             <div class="flex items-center justify-between">
-                <span class="text-gray-500">{{ __('Shipping') }}</span>
+                <span class="text-gray-500">{{ __('messages.shipping') }}</span>
                 <span>{{ \Illuminate\Support\Number::currency($order->shipping_total_amount, $order->currency_code, app()->getLocale()) }}</span>
             </div>
             <div class="flex items-center justify-between font-semibold border-t border-gray-200 pt-4">
-                <span>{{ __('Total') }}</span>
+                <span>{{ __('messages.total') }}</span>
                 <span>{{ \Illuminate\Support\Number::currency($order->grand_total_amount, $order->currency_code, app()->getLocale()) }}</span>
             </div>
         </div>
@@ -89,7 +89,7 @@
                         </dd>
                     </div>
                     <div class="flex justify-between pt-4 font-medium text-gray-900 lg:block md:pt-0">
-                        <dt class="font-semibold">{{ __('Total') }}</dt>
+                        <dt class="font-semibold">{{ __('messages.total') }}</dt>
                         <dd class="md:mt-1">
                             {{ \Illuminate\Support\Number::currency($order->total() + $order->shippingOption->price, $order->currency_code, app()->getLocale()) }}
                         </dd>
@@ -100,11 +100,11 @@
                         'locale' => app()->getLocale(),
                         'number' => $order->number,
                     ])" class="flex w-full px-4 py-2 text-sm md:w-auto">
-                        {{ __('Detail') }}
+                        {{ __('messages.detail') }}
                         <span class="sr-only">{{ $order->number }}</span>
                     </x-buttons.default>
                     <x-buttons.default class="flex w-full px-4 py-2 text-sm md:w-auto">
-                        {{ __('View invoice') }}
+                        {{ __('messages.view_invoice') }}
                         <span class="sr-only">
                             {{ __('For the order :number', ['number' => $order->number]) }}
                         </span>
@@ -136,7 +136,7 @@
                     <p class="mt-3 text-sm pl-8">
                         <x-link :href="route('account.orders', ['locale' => app()->getLocale()])"
                                 class="whitespace-nowrap font-medium text-gray-700 hover:text-gray-600">
-                            {{ __('My orders') }}
+                            {{ __('messages.my_orders') }}
                             <span aria-hidden="true"> &rarr;</span>
                         </x-link>
                     </p>

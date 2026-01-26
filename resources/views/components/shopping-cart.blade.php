@@ -73,7 +73,7 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                       d="M5 13l4 4L19 7"></path>
                                             </svg>
-                                            {{ __('In Stock') }}
+                                            {{ __('messages.in_stock') }}
                                         </span>
                                     @else
                                         <span class="inline-flex items-center gap-1 text-sm text-red-600">
@@ -82,7 +82,7 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                       d="M6 18L18 6M6 6l12 12"></path>
                                             </svg>
-                                            {{ __('Out of Stock') }}
+                                            {{ __('messages.out_of_stock') }}
                                         </span>
                                     @endif
                                 @endif
@@ -146,7 +146,7 @@
                 {{-- Subtotal --}}
                 @if ($showSubtotal)
                     <div class="flex justify-between text-gray-700">
-                        <span>{{ __('Subtotal') }}</span>
+                        <span>{{ __('messages.subtotal') }}</span>
                         <span>{{ \Illuminate\Support\Number::currency($subtotal, current_currency(), app()->getLocale()) }}</span>
                     </div>
                 @endif
@@ -162,7 +162,7 @@
                 {{-- Shipping --}}
                 @if ($showShipping)
                     <div class="flex justify-between text-gray-700">
-                        <span>{{ __('Shipping') }}</span>
+                        <span>{{ __('messages.shipping') }}</span>
                         <span>
                             @if ($shipping > 0)
                                 {{ \Illuminate\Support\Number::currency($shipping, current_currency(), app()->getLocale()) }}
@@ -179,7 +179,7 @@
                 {{-- Total --}}
                 @if ($showTotal)
                     <div class="flex justify-between text-lg font-bold text-gray-900">
-                        <span>{{ __('Total') }}</span>
+                        <span>{{ __('messages.total') }}</span>
                         <span>{{ \Illuminate\Support\Number::currency($total, current_currency(), app()->getLocale()) }}</span>
                     </div>
                 @endif
@@ -196,7 +196,7 @@
 
                 <a href="{{ route('localized.products.index', ['locale' => app()->getLocale()]) }}"
                    class="w-full border-2 border-gray-300 text-gray-700 py-3 rounded-xl font-semibold text-center block hover:border-gray-400 hover:bg-gray-50 transition-colors duration-200">
-                    {{ __('Continue Shopping') }}
+                    {{ __('messages.continue_shopping') }}
                 </a>
             </div>
         </div>
@@ -209,7 +209,7 @@
                 </path>
             </svg>
 
-            <h3 class="text-2xl font-bold text-gray-900 mb-4">{{ __('Your cart is empty') }}</h3>
+            <h3 class="text-2xl font-bold text-gray-900 mb-4">{{ __('messages.your_cart_is_empty') }}</h3>
             <p class="text-gray-600 mb-8 max-w-md mx-auto">
                 {{ __('Looks like you haven\'t added any items to your cart yet. Start shopping to fill it up!') }}
             </p>
@@ -217,7 +217,7 @@
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
                 <a href="{{ route('products.index', ['locale' => app()->getLocale()]) ?? '/products' }}"
                    class="btn-gradient px-8 py-3 rounded-xl font-semibold">
-                    {{ __('Start Shopping') }}
+                    {{ __('messages.start_shopping') }}
                 </a>
 
                 <a href="{{ route('localized.categories.index', ['locale' => app()->getLocale()]) }}"

@@ -458,7 +458,7 @@ class Show extends Component
             'brandOptions'      => $this->brandOptions,
             'activeBrandIds'    => array_map('intval', array_filter($this->brandIds)),
             'activeValueIds'    => array_map('intval', array_filter($this->selectedValues)),
-        ])->title($this->collection?->name ?? __('Collection'));
+        ])->title($this->collection?->name ?? __('messages.collection'));
     }
 
     /**
