@@ -3,7 +3,7 @@
 <div class="relative" x-data="{ open: false }">
     <button @click="open = !open"
             class="relative p-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-lg transition-colors duration-200"
-            aria-label="{{ __('frontend.cart.title') }} ({{ $count }} {{ trans_choice('frontend.cart.items', $count) }})">
+            aria-label="{{ __('messages.frontend) }} ({{ $count }} {{ trans_choice('messages.frontend, $count) }})">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01">
@@ -32,7 +32,7 @@
 
         <div class="p-4">
             <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-semibold text-gray-900">{{ __('frontend.cart.title') }}</h3>
+                <h3 class="text-lg font-semibold text-gray-900">{{ __('messages.frontend) }}</h3>
                 <button @click="open = false" class="text-gray-400 hover:text-gray-600">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
@@ -65,7 +65,7 @@
                 {{-- Cart Summary --}}
                 <div class="border-t border-gray-200 pt-4">
                     <div class="flex justify-between items-center mb-4">
-                        <span class="text-lg font-semibold text-gray-900">{{ __('frontend.cart.total') }}:</span>
+                        <span class="text-lg font-semibold text-gray-900">{{ __('messages.frontend) }}:</span>
                         <span class="text-lg font-bold text-blue-600">€59.98</span>
                     </div>
 
@@ -80,7 +80,7 @@
                            {{-- Preserve cart totals when moving straight into checkout --}}
                             href="{{ route('checkout.index', ['locale' => app()->getLocale()]) ?? '/checkout' }}"
                            class="flex-1 btn-gradient px-4 py-2 rounded-lg text-center font-medium">
-                            {{ __('frontend.cart.checkout') }}
+                            {{ __('messages.frontend) }}
                         </a>
                     </div>
                 </div>
@@ -93,7 +93,7 @@
                               d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01">
                         </path>
                     </svg>
-                    <h4 class="text-lg font-medium text-gray-900 mb-2">{{ __('frontend.cart.empty') }}</h4>
+                    <h4 class="text-lg font-medium text-gray-900 mb-2">{{ __('messages.frontend) }}</h4>
                     <p class="text-gray-600 mb-4">{{ __('frontend.cart.empty_description') }}</p>
                     <a href="{{ route('products.index', ['locale' => app()->getLocale()]) ?? '/products' }}"
                        class="btn-gradient px-6 py-2 rounded-lg font-medium">

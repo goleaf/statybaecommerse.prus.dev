@@ -779,11 +779,11 @@ final class Attribute extends Model
     public function getStatusLabelAttribute(): string
     {
         return match ($this->status_badge) {
-            'disabled'   => __('attributes.disabled'),
-            'required'   => __('attributes.required'),
-            'filterable' => __('attributes.filterable'),
-            'standard'   => __('attributes.standard'),
-            default      => __('attributes.unknown'),
+            'disabled'   => __('messages.attributes),
+            'required'   => __('messages.attributes),
+            'filterable' => __('messages.attributes),
+            'standard'   => __('messages.attributes),
+            default      => __('messages.attributes),
         };
     }
 

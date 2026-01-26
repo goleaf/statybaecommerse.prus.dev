@@ -24,7 +24,7 @@
             <x-shared.input
                 wire:model.live.debounce.300ms="search"
                 type="search"
-                label="{{ __('shared.search') }}"
+                label="{{ __('messages.shared) }}"
                 placeholder="{{ __('shared.search_placeholder') }}"
                 icon="heroicon-o-magnifying-glass"
             />
@@ -100,14 +100,14 @@
             {{-- Stock Filter --}}
             @if($showStockFilter)
                 <div class="space-y-4">
-                    <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('shared.in_stock') }}</h3>
+                    <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('messages.shared) }}</h3>
                     <label class="flex items-center">
                         <input 
                             wire:model.live="inStock"
                             type="checkbox"
                             class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                         />
-                        <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">{{ __('shared.in_stock') }}</span>
+                        <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">{{ __('messages.shared) }}</span>
                     </label>
                 </div>
             @endif
@@ -115,14 +115,14 @@
             {{-- Sale Filter --}}
             @if($showSaleFilter)
                 <div class="space-y-4">
-                    <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('shared.sale') }}</h3>
+                    <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('messages.shared) }}</h3>
                     <label class="flex items-center">
                         <input 
                             wire:model.live="onSale"
                             type="checkbox"
                             class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                         />
-                        <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">{{ __('shared.sale') }}</span>
+                        <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">{{ __('messages.shared) }}</span>
                     </label>
                 </div>
             @endif

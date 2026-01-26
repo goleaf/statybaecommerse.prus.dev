@@ -5,7 +5,7 @@
 @section('meta')
     <meta name="description"
           content="{{ $translation->seo_description ?: Str::limit(strip_tags($translation->content), 160) }}">
-    <meta name="keywords" content="{{ $document->type }}, {{ __('frontend.legal.meta_keywords') }}">
+    <meta name="keywords" content="{{ $document->type }}, {{ __('messages.frontend_legal) }}">
 
     @if ($document->meta_data && isset($document->meta_data['version']))
         <meta name="document-version" content="{{ $document->meta_data['version'] }}">
@@ -28,7 +28,7 @@
                 <ol class="flex items-center space-x-2 text-sm text-gray-500">
                     <li>
                         <a href="{{ route('home') }}" class="hover:text-gray-700">
-                            {{ __('frontend.legal.home') }}
+                            {{ __('messages.frontend_legal) }}
                         </a>
                     </li>
                     <li class="flex items-center">
@@ -38,7 +38,7 @@
                                   clip-rule="evenodd"></path>
                         </svg>
                         <a href="{{ route('legal.index') }}" class="hover:text-gray-700">
-                            {{ __('frontend.legal.legal') }}
+                            {{ __('messages.frontend_legal) }}
                         </a>
                     </li>
                     <li class="flex items-center">
@@ -69,11 +69,11 @@
                             @if ($document->is_required)
                                 <span
                                       class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                    {{ __('frontend.legal.required') }}
+                                    {{ __('messages.frontend_legal) }}
                                 </span>
                             @endif
 
-                            <span>{{ __('frontend.legal.last_updated') }}:
+                            <span>{{ __('messages.frontend_legal) }}:
                                 {{ $document->updated_at->format('Y-m-d') }}</span>
 
                             @if ($translation->getReadingTime() > 0)
@@ -85,15 +85,15 @@
                             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                                 @if (isset($document->meta_data['version']))
                                     <div>
-                                        <span class="font-medium text-gray-700">{{ __('frontend.legal.version') }}:</span>
+                                        <span class="font-medium text-gray-700">{{ __('messages.frontend_legal) }}:</span>
                                         <span class="text-gray-600">{{ $document->meta_data['version'] }}</span>
-                                        <span class="sr-only">{{ __('frontend.legal.version') }}: {{ $document->meta_data['version'] }}</span>
+                                        <span class="sr-only">{{ __('messages.frontend_legal) }}: {{ $document->meta_data['version'] }}</span>
                                     </div>
                                 @endif
 
                                 @if (isset($document->meta_data['effective_date']))
                                     <div>
-                                        <span class="text-gray-700">{{ __('frontend.legal.effective_date') }}:
+                                        <span class="text-gray-700">{{ __('messages.frontend_legal) }}:
                                             {{ $document->meta_data['effective_date'] }}</span>
                                     </div>
                                 @endif
@@ -106,7 +106,7 @@
                                 @endif
 
                                 <div>
-                                    <span class="font-medium text-gray-700">{{ __('frontend.legal.word_count') }}:</span>
+                                    <span class="font-medium text-gray-700">{{ __('messages.frontend_legal) }}:</span>
                                     <span class="text-gray-600">{{ $translation->getWordCount() }}</span>
                                 </div>
                             </div>
@@ -123,7 +123,7 @@
                                       d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z">
                                 </path>
                             </svg>
-                            {{ __('frontend.legal.print_document') }}
+                            {{ __('messages.frontend_legal) }}
                         </button>
 
                         <a
@@ -134,7 +134,7 @@
                                       d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
                                 </path>
                             </svg>
-                            {{ __('frontend.legal.download_pdf') }}
+                            {{ __('messages.frontend_legal) }}
                         </a>
                     </div>
                 </div>
@@ -148,13 +148,13 @@
             <!-- Related Documents -->
             @if ($relatedDocuments->isNotEmpty() || $otherDocuments->isNotEmpty())
                 <div class="mb-4">
-                    <h2 class="text-2xl font-semibold text-gray-900">{{ __('frontend.legal.related_documents') }}</h2>
+                    <h2 class="text-2xl font-semibold text-gray-900">{{ __('messages.frontend_legal) }}</h2>
                 </div>
                 <div class="grid md:grid-cols-2 gap-8">
                     @if ($relatedDocuments->isNotEmpty())
                         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                             <h3 class="text-xl font-semibold text-gray-900 mb-4">
-                                {{ __('frontend.legal.related_documents') }}
+                                {{ __('messages.frontend_legal) }}
                             </h3>
                             <div class="space-y-3">
                                 @foreach ($relatedDocuments as $relatedDocument)
@@ -181,7 +181,7 @@
                     @if ($otherDocuments->isNotEmpty())
                         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                             <h3 class="text-xl font-semibold text-gray-900 mb-4">
-                                {{ __('frontend.legal.other_documents') }}
+                                {{ __('messages.frontend_legal) }}
                             </h3>
                             <div class="space-y-3">
                                 @foreach ($otherDocuments as $otherDocument)
@@ -216,7 +216,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18">
                         </path>
                     </svg>
-                    {{ __('frontend.legal.back_to_top') }}
+                    {{ __('messages.frontend_legal) }}
                 </button>
             </div>
         </div>

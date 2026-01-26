@@ -143,7 +143,7 @@ final class Report extends Model
      */
     public function getReportTypes(): array
     {
-        return ['sales' => __('admin.reports.types.sales'), 'products' => __('admin.reports.types.products'), 'customers' => __('admin.reports.types.customers'), 'inventory' => __('admin.reports.types.inventory'), 'analytics' => __('admin.reports.types.analytics'), 'financial' => __('admin.reports.types.financial'), 'marketing' => __('admin.reports.types.marketing'), 'custom' => __('admin.reports.types.custom')];
+        return ['sales' => __('messages.admin), 'products' => __('messages.admin), 'customers' => __('messages.admin), 'inventory' => __('messages.admin), 'analytics' => __('messages.admin), 'financial' => __('messages.admin), 'marketing' => __('messages.admin), 'custom' => __('messages.admin)];
     }
 
     /**
@@ -151,7 +151,7 @@ final class Report extends Model
      */
     public function getReportCategories(): array
     {
-        return ['sales' => __('admin.reports.categories.sales'), 'marketing' => __('admin.reports.categories.marketing'), 'operations' => __('admin.reports.categories.operations'), 'finance' => __('admin.reports.categories.finance'), 'customer_service' => __('admin.reports.categories.customer_service'), 'inventory' => __('admin.reports.categories.inventory'), 'analytics' => __('admin.reports.categories.analytics')];
+        return ['sales' => __('messages.admin), 'marketing' => __('messages.admin), 'operations' => __('messages.admin), 'finance' => __('messages.admin), 'customer_service' => __('admin.reports.categories.customer_service'), 'inventory' => __('messages.admin), 'analytics' => __('messages.admin)];
     }
 
     /**

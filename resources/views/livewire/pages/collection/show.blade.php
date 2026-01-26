@@ -37,7 +37,7 @@
     <div class="flex items-center justify-between mb-6">
         <h1 class="text-2xl font-semibold">{{ $collection->trans('name') ?? $collection->name }}</h1>
         <div class="flex items-center gap-2">
-            <label for="sort" class="sr-only">{{ __('Sort') }}</label>
+            <label for="sort" class="sr-only">{{ __('messages.Sort') }}</label>
             <select id="sort" wire:model.live="sort" class="rounded-md border-gray-300 text-sm">
                 <option value="">{{ __('messages.newest') }}</option>
                 <option value="name_asc">{{ __('messages.name_a_z') }}</option>

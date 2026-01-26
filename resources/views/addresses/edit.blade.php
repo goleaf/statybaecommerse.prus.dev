@@ -43,7 +43,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                     <div>
                         <label for="first_name" class="block text-sm font-medium text-gray-700 mb-2">
-                            {{ __('translations.first_name') }} <span class="text-red-500">*</span>
+                            {{ __('messages.translations) }} <span class="text-red-500">*</span>
                         </label>
                         <input type="text" name="first_name" id="first_name" 
                                value="{{ old('first_name', $address->first_name) }}"
@@ -56,7 +56,7 @@
 
                     <div>
                         <label for="last_name" class="block text-sm font-medium text-gray-700 mb-2">
-                            {{ __('translations.last_name') }} <span class="text-red-500">*</span>
+                            {{ __('messages.translations) }} <span class="text-red-500">*</span>
                         </label>
                         <input type="text" name="last_name" id="last_name" 
                                value="{{ old('last_name', $address->last_name) }}"
@@ -84,7 +84,7 @@
 
                     <div>
                         <label for="company_vat" class="block text-sm font-medium text-gray-700 mb-2">
-                            {{ __('translations.company_vat') }}
+                            {{ __('messages.translations) }}
                         </label>
                         <input type="text" name="company_vat" id="company_vat" 
                                value="{{ old('company_vat', $address->company_vat) }}"
@@ -98,7 +98,7 @@
                 <!-- Address Information -->
                 <div class="mb-6">
                     <label for="address_line_1" class="block text-sm font-medium text-gray-700 mb-2">
-                        {{ __('translations.address_line_1') }} <span class="text-red-500">*</span>
+                        {{ __('messages.translations) }} <span class="text-red-500">*</span>
                     </label>
                     <input type="text" name="address_line_1" id="address_line_1" 
                            value="{{ old('address_line_1', $address->address_line_1) }}"
@@ -111,7 +111,7 @@
 
                 <div class="mb-6">
                     <label for="address_line_2" class="block text-sm font-medium text-gray-700 mb-2">
-                        {{ __('translations.address_line_2') }}
+                        {{ __('messages.translations) }}
                     </label>
                     <input type="text" name="address_line_2" id="address_line_2" 
                            value="{{ old('address_line_2', $address->address_line_2) }}"
@@ -125,7 +125,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                     <div>
                         <label for="apartment" class="block text-sm font-medium text-gray-700 mb-2">
-                            {{ __('translations.apartment') }}
+                            {{ __('messages.translations) }}
                         </label>
                         <input type="text" name="apartment" id="apartment" 
                                value="{{ old('apartment', $address->apartment) }}"
@@ -137,7 +137,7 @@
 
                     <div>
                         <label for="floor" class="block text-sm font-medium text-gray-700 mb-2">
-                            {{ __('translations.floor') }}
+                            {{ __('messages.translations) }}
                         </label>
                         <input type="text" name="floor" id="floor" 
                                value="{{ old('floor', $address->floor) }}"
@@ -149,7 +149,7 @@
 
                     <div>
                         <label for="building" class="block text-sm font-medium text-gray-700 mb-2">
-                            {{ __('translations.building') }}
+                            {{ __('messages.translations) }}
                         </label>
                         <input type="text" name="building" id="building" 
                                value="{{ old('building', $address->building) }}"
@@ -164,7 +164,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                     <div>
                         <label for="city" class="block text-sm font-medium text-gray-700 mb-2">
-                            {{ __('translations.city') }} <span class="text-red-500">*</span>
+                            {{ __('messages.translations) }} <span class="text-red-500">*</span>
                         </label>
                         <input type="text" name="city" id="city" 
                                value="{{ old('city', $address->city) }}"
@@ -177,7 +177,7 @@
 
                     <div>
                         <label for="postal_code" class="block text-sm font-medium text-gray-700 mb-2">
-                            {{ __('translations.postal_code') }} <span class="text-red-500">*</span>
+                            {{ __('messages.translations) }} <span class="text-red-500">*</span>
                         </label>
                         <input type="text" name="postal_code" id="postal_code" 
                                value="{{ old('postal_code', $address->postal_code) }}"
@@ -190,7 +190,7 @@
 
                     <div>
                         <label for="country_code" class="block text-sm font-medium text-gray-700 mb-2">
-                            {{ __('translations.country') }} <span class="text-red-500">*</span>
+                            {{ __('messages.translations) }} <span class="text-red-500">*</span>
                         </label>
                         <select name="country_code" id="country_code" 
                                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @error('country_code') border-red-500 @enderror"
@@ -211,7 +211,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                     <div>
                         <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">
-                            {{ __('translations.phone') }}
+                            {{ __('messages.translations) }}
                         </label>
                         <input type="tel" name="phone" id="phone" 
                                value="{{ old('phone', $address->phone) }}"
@@ -223,7 +223,7 @@
 
                     <div>
                         <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
-                            {{ __('translations.email') }}
+                            {{ __('messages.translations) }}
                         </label>
                         <input type="email" name="email" id="email" 
                                value="{{ old('email', $address->email) }}"
@@ -238,7 +238,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                     <div>
                         <label for="landmark" class="block text-sm font-medium text-gray-700 mb-2">
-                            {{ __('translations.landmark') }}
+                            {{ __('messages.translations) }}
                         </label>
                         <input type="text" name="landmark" id="landmark" 
                                value="{{ old('landmark', $address->landmark) }}"
@@ -267,7 +267,7 @@
                                {{ old('is_default', $address->is_default) ? 'checked' : '' }}
                                class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
                         <label for="is_default" class="ml-2 block text-sm text-gray-700">
-                            {{ __('translations.set_as_default') }}
+                            {{ __('messages.translations) }}
                         </label>
                     </div>
 
@@ -305,7 +305,7 @@
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
-                        {{ __('translations.cancel') }}
+                        {{ __('messages.translations) }}
                     </a>
                 </div>
             </div>

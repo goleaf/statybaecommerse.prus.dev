@@ -25,7 +25,7 @@ final class RealtimeAnalyticsWidget extends ChartWidget
 
     public function getHeading(): ?string
     {
-        return __('admin.widgets.realtime_analytics');
+        return __('messages.admin.widgets.realtime_analytics');
     }
 
     public function mount(): void
@@ -77,7 +77,7 @@ final class RealtimeAnalyticsWidget extends ChartWidget
                 ->color($revenueChange >= 0 ? 'success' : 'danger'),
             Stat::make(__('admin.widgets.active_campaigns'), $activeCampaigns)
                 ->color('primary'),
-            Stat::make(__('admin.widgets.total_products'), $totalProducts)
+            Stat::make(__('messages.admin.widgets.total_products'), $totalProducts)
                 ->color('info'),
         ];
     }

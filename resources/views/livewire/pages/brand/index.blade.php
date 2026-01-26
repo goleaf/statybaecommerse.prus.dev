@@ -1,54 +1,3 @@
-@php
-    // Ensure locale is set from route before rendering (mirror SetLocale middleware logic)
-    $request = request();
-    $supportedConfig = config('app.supported_locales', 'lt,en');
-    $supportedLocales = is_array($supportedConfig) 
-        ? $supportedConfig 
-        : array_map('trim', explode(',', (string) $supportedConfig));
-    $supportedLocales = array_values(array_filter($supportedLocales, function($locale) {
-        return is_string($locale) && $locale !== '';
-    }));
-    
-    $routeLocale = $request->route('locale');
-    $locale = $routeLocale;
-    
-    // If no route parameter or invalid, try session, cookie, or default
-    if (!$locale || !in_array($locale, $supportedLocales, true)) {
-        $candidateLocales = array_filter([
-            session('locale'),
-            session('app.locale'),
-            $request->cookie('app_locale'),
-            config('app.locale', 'lt'),
-        ], function($candidate) {
-            return is_string($candidate) && $candidate !== '';
-        });
-        
-        foreach ($candidateLocales as $candidate) {
-            if (in_array($candidate, $supportedLocales, true)) {
-                $locale = $candidate;
-                break;
-            }
-        }
-    }
-    
-    // Ensure we have a valid locale
-    if (!$locale || !in_array($locale, $supportedLocales, true)) {
-        $locale = config('app.locale', 'lt');
-    }
-    
-    // Set the locale explicitly
-    app()->setLocale($locale);
-    app()->instance('request_locale', $locale);
-    
-    /** @var \Illuminate\Pagination\LengthAwarePaginator $paginator */
-    $paginator = $this->brands;
-    $totalBrands = $paginator->total();
-    $activeFilterCount = collect([
-        filled($this->search ?? ''),
-        ($this->sortBy ?? 'name') !== 'name',
-    ])->filter()->count();
-@endphp
-
 @section('meta')
     <x-meta
         :title="__('messages.brands_index_meta_title') . ' - ' . config('app.name')"
@@ -59,7 +8,7 @@
 <div class="bg-sage">
     <div class="bg-dark text-sage">
         <x-container class="px-4 py-12 sm:py-16">
-            <nav class="text-xs font-medium uppercase tracking-[0.3em] text-sage/80" aria-label="{{ __('shared.breadcrumb') }}">
+            <nav class="text-xs font-medium uppercase tracking-[0.3em] text-sage/80" aria-label="{{ __('messages.shared) }}">
                 <ol class="flex items-center gap-3">
                     <li>
                         <a href="{{ route('localized.home', ['locale' => app()->getLocale()]) }}"
@@ -67,11 +16,11 @@
                             <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h12a1 1 0 001-1V10" />
                             </svg>
-                            {{ __('frontend.navigation.home') }}
+                            {{ __('messages.frontend) }}
                         </a>
                     </li>
                     <li class="text-sage/60">/</li>
-                    <li class="text-white">{{ __('shared.brands') }}</li>
+                    <li class="text-white">{{ __('messages.shared) }}</li>
                 </ol>
             </nav>
 
@@ -201,31 +150,22 @@
                     @if ($paginator->count() > 0)
                         <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" :class="view === 'list' ? 'sm:grid-cols-1 xl:grid-cols-1' : 'sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'">
                             @foreach ($paginator as $brand)
-                                @php
-                                    $slug = $brand->slug ?? '';
-                                    $name = $brand->name ?? '';
-                                    $description = $brand->description ?? '';
-                                    $logo = $brand->getFirstMediaUrl('logo');
-                                    $productCount = $brand->products_count ?? 0;
-                                    $isFeatured = $brand->is_featured ?? false;
-                                @endphp
-
                                 <article class="group flex flex-col overflow-hidden rounded-3xl border border-ash/30 bg-white shadow-sm transition hover:-translate-y-1 hover:border-ash/60 hover:shadow-xl"
                                          :class="view === 'list' ? 'sm:flex-row' : ''">
                                     <div class="relative h-48 overflow-hidden sm:h-52" :class="view === 'list' ? 'sm:h-auto sm:w-64' : ''">
-                                        @if ($logo)
+                                        @if ($brand->getFirstMediaUrl('logo'))
                                             <div class="flex h-full w-full items-center justify-center bg-ash/10 p-8">
-                                                <img src="{{ $logo }}"
-                                                     alt="{{ $name }}"
+                                                <img src="{{ $brand->getFirstMediaUrl('logo') }}"
+                                                     alt="{{ $brand->name ?? '' }}"
                                                     loading="lazy"
-                                                     class="max-h-24 object-contain transition duration-500 group-hover:scale-105" />
+                                                      class="max-h-24 object-contain transition duration-500 group-hover:scale-105" />
                                             </div>
-                                            @else
+                                        @else
                                             <div class="flex h-full w-full items-center justify-center bg-ash/10 text-4xl font-semibold text-dark">
-                                                {{ mb_strtoupper(mb_substr($name, 0, 2)) }}
+                                                {{ mb_strtoupper(mb_substr($brand->name ?? '', 0, 2)) }}
                                             </div>
-                                            @endif
-                                        @if ($isFeatured)
+                                        @endif
+                                        @if ($brand->is_featured ?? false)
                                             <div class="absolute left-4 top-4">
                                                 <span class="inline-flex items-center gap-1 rounded-full bg-brand-primary px-3 py-1 text-xs font-semibold text-white shadow-sm">
                                                     <svg class="h-3 w-3" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -237,19 +177,19 @@
                                         @endif
                                         <div class="absolute inset-x-0 bottom-0 flex items-center justify-between bg-gradient-to-t from-black/70 to-transparent px-5 pb-4 pt-12">
                                             <h3 class="text-lg font-semibold text-white drop-shadow-lg">
-                                                {{ $name }}
+                                                {{ $brand->name ?? '' }}
                                             </h3>
                                             <span class="inline-flex items-center gap-1 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-dark shadow-sm">
-                                                {{ $productCount }}
-                                                <span class="text-ash">{{ trans_choice('products', $productCount) }}</span>
+                                                {{ $brand->products_count ?? 0 }}
+                                                <span class="text-ash">{{ trans_choice('products', $brand->products_count ?? 0) }}</span>
                                             </span>
                                         </div>
                                             </div>
 
                                     <div class="flex flex-1 flex-col justify-between gap-4 px-5 py-6">
-                                        @if ($description)
+                                        @if ($brand->description)
                                             <p class="text-sm leading-relaxed text-stone line-clamp-3">
-                                                {{ \Illuminate\Support\Str::limit(strip_tags($description), 180) }}
+                                                {{ \Illuminate\Support\Str::limit(strip_tags($brand->description), 180) }}
                                             </p>
                                         @else
                                             <p class="text-sm text-ash">
@@ -258,7 +198,7 @@
                                         @endif
 
                                         <div class="flex items-center justify-center">
-                                            <a href="{{ route('localized.brands.show', ['locale' => app()->getLocale(), 'slug' => $slug]) }}"
+                                            <a href="{{ route('localized.brands.show', ['locale' => app()->getLocale(), 'slug' => $brand->slug ?? '']) }}"
                                                class="inline-flex items-center gap-2 rounded-full bg-sage px-4 py-2 text-sm font-semibold text-dark transition hover:bg-sage/90">
                                                 {{ __('messages.brands_index_visit_brand') }}
                                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
@@ -273,20 +213,6 @@
 
                         @if ($paginator->hasPages())
                             <div class="mt-12 rounded-3xl border border-sage/30 bg-dark p-6 shadow-lg">
-                                @php
-                                    $queryParameters = request()->query();
-                                    unset($queryParameters['page']);
-                                    $appendQueryString = static function (?string $url) use ($queryParameters): ?string {
-                                        if ($url === null) {
-                                            return null;
-                                        }
-                                        if ($queryParameters === []) {
-                                            return $url;
-                                        }
-                                        $queryString = http_build_query($queryParameters);
-                                        return $url . (str_contains($url, '?') ? '&' : '?') . $queryString;
-                                    };
-                                @endphp
                                 <nav class="flex items-center justify-center" aria-label="{{ __('messages.brands_index_pagination_navigation') }}">
                                     <div class="flex items-center justify-center">
                                         <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
@@ -297,7 +223,7 @@
                                                     </svg>
                                                 </span>
                                             @else
-                                                <a href="{{ $appendQueryString($paginator->previousPageUrl()) }}" class="relative inline-flex items-center rounded-l-md px-2 py-2 text-sage ring-1 ring-inset ring-sage/30 hover:bg-sage/10 hover:text-white focus:z-20 focus:outline-offset-0">
+                                                <a href="{{ $this->paginationUrl($paginator->previousPageUrl()) }}" class="relative inline-flex items-center rounded-l-md px-2 py-2 text-sage ring-1 ring-inset ring-sage/30 hover:bg-sage/10 hover:text-white focus:z-20 focus:outline-offset-0">
                                                     <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                                         <path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clip-rule="evenodd" />
                                                     </svg>
@@ -310,14 +236,14 @@
                                                         {{ $page }}
                                                     </span>
                                                 @else
-                                                    <a href="{{ $appendQueryString($url) }}" class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-sage ring-1 ring-inset ring-sage/30 hover:bg-sage/10 hover:text-white focus:z-20 focus:outline-offset-0">
+                                                    <a href="{{ $this->paginationUrl($url) }}" class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-sage ring-1 ring-inset ring-sage/30 hover:bg-sage/10 hover:text-white focus:z-20 focus:outline-offset-0">
                                                         {{ $page }}
                                                     </a>
                                                 @endif
                                             @endforeach
 
                                             @if ($paginator->hasMorePages())
-                                                <a href="{{ $appendQueryString($paginator->nextPageUrl()) }}" class="relative inline-flex items-center rounded-r-md px-2 py-2 text-sage ring-1 ring-inset ring-sage/30 hover:bg-sage/10 hover:text-white focus:z-20 focus:outline-offset-0">
+                                                <a href="{{ $this->paginationUrl($paginator->nextPageUrl()) }}" class="relative inline-flex items-center rounded-r-md px-2 py-2 text-sage ring-1 ring-inset ring-sage/30 hover:bg-sage/10 hover:text-white focus:z-20 focus:outline-offset-0">
                                                     <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                                         <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
                                                     </svg>

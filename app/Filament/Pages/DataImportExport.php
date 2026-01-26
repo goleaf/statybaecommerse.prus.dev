@@ -67,7 +67,7 @@ final class DataImportExport extends Page
                                     ->label(__('translations.download_images'))
                                     ->default(true),
                             ]),
-                        Fieldset::make(__('translations.export'))
+                        Fieldset::make(__('messages.translations))
                             ->schema([
                                 Forms\Components\TextInput::make('exportPath')
                                     ->label(__('translations.export_path'))
@@ -115,7 +115,7 @@ final class DataImportExport extends Page
                     $this->dispatch('imported', created: $res['categories']['created'] + $res['products']['created']);
                 }),
             Action::make('export')
-                ->label(__('translations.export'))
+                ->label(__('messages.translations))
                 ->action(function (): void {
                     $provider = ProviderRegistry::get($this->provider ?? 'xml');
                     if (! $provider) {

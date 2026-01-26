@@ -1,7 +1,7 @@
 @extends('components.layouts.base')
 
-@section('title', __('customers.title'))
-@section('description', __('customers.description'))
+@section('title', __('messages.customers))
+@section('description', __('messages.customers))
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
@@ -10,10 +10,10 @@
         <div class="flex flex-col md:flex-row md:items-center md:justify-between">
             <div>
                 <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
-                    {{ __('customers.title') }}
+                    {{ __('messages.customers) }}
                 </h1>
                 <p class="mt-2 text-gray-600 dark:text-gray-400">
-                    {{ __('customers.description') }}
+                    {{ __('messages.customers) }}
                 </p>
             </div>
             <div class="mt-4 md:mt-0">

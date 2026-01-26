@@ -59,12 +59,12 @@ final class ProductRequestFormRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'product_id'         => __('translations.product'),
-            'name'               => __('translations.name'),
-            'email'              => __('translations.email'),
-            'phone'              => __('translations.phone'),
+            'product_id'         => __('messages.translations),
+            'name'               => __('messages.translations),
+            'email'              => __('messages.translations),
+            'phone'              => __('messages.translations),
             'message'            => __('translations.message'),
-            'requested_quantity' => __('translations.quantity'),
+            'requested_quantity' => __('messages.translations),
         ];
     }
 }

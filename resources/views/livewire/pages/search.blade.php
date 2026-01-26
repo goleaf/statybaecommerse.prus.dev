@@ -5,7 +5,7 @@
 >
     {{-- Skip link keeps the refactored layout accessible --}}
     <a href="#results" class="sr-only focus:not-sr-only focus:underline">
-        {{ __('search_skip_to_results') }}
+        {{ __('messages.search_skip_to_results') }}
     </a>
 
     {{-- Surface flash messages from search filters or cart actions --}}
@@ -33,12 +33,12 @@
                     {{ __('messages.nav_search') }}
                 </h1>
                 <p class="mt-3 max-w-2xl text-sm text-blue-100 md:text-base">
-                    {{ __('search_help') }}
+                    {{ __('messages.search_help') }}
                 </p>
                 @if ($term)
                     <p class="mt-4 inline-flex items-center rounded-full bg-white/15 px-4 py-2 text-sm font-medium text-white">
                         <x-heroicon-o-magnifying-glass class="mr-2 h-4 w-4" />
-                        {{ __('search_for') }}
+                        {{ __('messages.search_for') }}
                         <span class="ml-1 font-semibold">“{{ $term }}”</span>
                     </p>
                 @endif
@@ -62,13 +62,13 @@
                     <span class="font-semibold">
                         @switch($sort)
                             @case('name_asc')
-                                {{ __('search_name_asc') }}
+                                {{ __('messages.search_name_asc') }}
                                 @break
                             @case('name_desc')
-                                {{ __('search_name_desc') }}
+                                {{ __('messages.search_name_desc') }}
                                 @break
                             @default
-                                {{ __('search_newest') }}
+                                {{ __('messages.search_newest') }}
                         @endswitch
                     </span>
                 </div>
@@ -90,16 +90,16 @@
                 </div>
                 <div class="flex items-center gap-3">
                     <label for="sort" class="text-sm font-medium text-slate-600 dark:text-slate-300">
-                        {{ __('search_sort') }}
+                        {{ __('messages.search_sort') }}
                     </label>
                     <select
                         id="sort"
                         wire:model.live="sort"
                         class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
                     >
-                        <option value="">{{ __('search_newest') }}</option>
-                        <option value="name_asc">{{ __('search_name_asc') }}</option>
-                        <option value="name_desc">{{ __('search_name_desc') }}</option>
+                        <option value="">{{ __('messages.search_newest') }}</option>
+                        <option value="name_asc">{{ __('messages.search_name_asc') }}</option>
+                        <option value="name_desc">{{ __('messages.search_name_desc') }}</option>
                     </select>
                 </div>
             </header>
@@ -190,10 +190,10 @@
             {{-- Empty state informs the shopper how to recover --}}
             <x-heroicon-o-face-frown class="mx-auto h-12 w-12 text-slate-400" />
             <h2 class="mt-4 text-xl font-semibold text-slate-900 dark:text-white">
-                {{ __('search_no_results_found') }}
+                {{ __('messages.search_no_results_found') }}
             </h2>
             <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">
-                {{ __('frontend.try_different_search') }}
+                {{ __('messages.frontend) }}
             </p>
             <div class="mt-6 flex flex-wrap justify-center gap-3">
                 <button
@@ -218,9 +218,9 @@
             <header class="flex flex-col gap-2 md:flex-row md:items-baseline md:justify-between">
                 {{-- Result summary anchors the layout for screen readers too --}}
                 <p class="text-sm text-slate-600 dark:text-slate-400" aria-live="polite">
-                    {{ trans_choice(__('search_result_count'), $products->total() ?? $products->count(), ['count' => $products->total() ?? $products->count()]) }}
+                    {{ trans_choice(__('messages.search_result_count'), $products->total() ?? $products->count(), ['count' => $products->total() ?? $products->count()]) }}
                     @if ($term)
-                        — {{ __('search_for') }} "{{ $term }}"
+                        — {{ __('messages.search_for') }} "{{ $term }}"
                     @endif
                 </p>
                 <div class="flex flex-wrap items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
@@ -242,7 +242,7 @@
                 @endforeach
             </div>
 
-            <nav class="mt-8 flex justify-center" aria-label="{{ __('search_pagination') }}">
+            <nav class="mt-8 flex justify-center" aria-label="{{ __('messages.search_pagination') }}">
                 {{ $products->links() }}
             </nav>
         </section>
@@ -321,7 +321,7 @@
     @endphp
     <x-meta
             :title="__('messages.nav_search') . ' - ' . config('app.name')"
-            :description="__('search_help')"
+            :description="__('messages.search_help')"
             robots="noindex,follow"
             :og-image="$ogImage"
             :prev="$products instanceof \Illuminate\Contracts\Pagination\Paginator ||

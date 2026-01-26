@@ -312,7 +312,7 @@ final class Collection extends Model implements HasMedia, TranslatableRecord
      */
     public function getTranslatedMetaKeywords(?string $locale = null): ?array
     {
-        $translated = $this->trans('meta_keywords', $locale);
+        $translated = $this->trans('messages.meta_keywords', $locale);
 
         return $translated ?: $this->meta_keywords;
     }

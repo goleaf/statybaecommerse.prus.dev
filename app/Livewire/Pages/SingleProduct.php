@@ -671,7 +671,7 @@ final class SingleProduct extends Component
                             $currency = $value['price_currency_hint'];
 
                             if ($currency) {
-                                $priceHint = __('product_page.variant_option_from_price', [
+                                $priceHint = __('messages.product_page, [
                                     'price' => Number::currency((float) $minPrice, $currency, app()->getLocale()),
                                 ]);
                             }
@@ -923,13 +923,13 @@ final class SingleProduct extends Component
     protected function resolveStockMessage(): string
     {
         if (! $this->product->manage_stock) {
-            return __('translations.in_stock');
+            return __('messages.translations);
         }
 
         $available = $this->product->availableQuantity();
 
         if ($available <= 0) {
-            return __('translations.out_of_stock');
+            return __('messages.translations);
         }
 
         $threshold = (int) ($this->product->low_stock_threshold ?? 0);
@@ -953,13 +953,13 @@ final class SingleProduct extends Component
             ->implode(', ');
 
         $facts = [
-            ['label' => __('translations.brand'), 'value' => $brandName],
-            ['label' => __('translations.category'), 'value' => $categoryNames],
-            ['label' => __('translations.sku'), 'value' => $this->product->sku],
-            ['label' => __('translations.availability'), 'value' => $this->product->isInStock() ? __('translations.in_stock') : __('translations.out_of_stock')],
-            ['label' => __('translations.weight'), 'value' => $this->formatMeasurement($this->product->weight, $this->product->weight_unit?->value ?? null)],
-            ['label' => __('translations.dimensions'), 'value' => $this->product->getDimensions()],
-            ['label' => __('translations.last_updated'), 'value' => $this->product->updated_at?->diffForHumans()],
+            ['label' => __('messages.translations), 'value' => $brandName],
+            ['label' => __('messages.translations), 'value' => $categoryNames],
+            ['label' => __('messages.translations), 'value' => $this->product->sku],
+            ['label' => __('messages.translations), 'value' => $this->product->isInStock() ? __('messages.translations) : __('messages.translations)],
+            ['label' => __('messages.translations), 'value' => $this->formatMeasurement($this->product->weight, $this->product->weight_unit?->value ?? null)],
+            ['label' => __('messages.translations), 'value' => $this->product->getDimensions()],
+            ['label' => __('messages.translations), 'value' => $this->product->updated_at?->diffForHumans()],
         ];
 
         return array_values(array_filter($facts, fn (array $fact) => filled($fact['value'])));

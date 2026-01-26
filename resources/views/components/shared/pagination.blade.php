@@ -25,26 +25,26 @@
 @endphp
 
 @if ($paginator->hasPages())
-    <nav class="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6 dark:border-gray-700 dark:bg-gray-800" aria-label="{{ __('frontend.pagination.navigation') }}">
+    <nav class="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6 dark:border-gray-700 dark:bg-gray-800" aria-label="{{ __('messages.frontend) }}">
         @if($showInfo)
             <div class="flex flex-1 justify-between sm:hidden">
                 @if ($paginator->onFirstPage())
                     <span class="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-400">
-                        {{ __('frontend.pagination.previous') }}
+                        {{ __('messages.frontend) }}
                     </span>
                 @else
                     <a href="{{ $appendQueryString($paginator->previousPageUrl()) }}" class="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600">
-                        {{ __('frontend.pagination.previous') }}
+                        {{ __('messages.frontend) }}
                     </a>
                 @endif
 
                 @if ($paginator->hasMorePages())
                     <a href="{{ $appendQueryString($paginator->nextPageUrl()) }}" class="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600">
-                        {{ __('frontend.pagination.next') }}
+                        {{ __('messages.frontend) }}
                     </a>
                 @else
                     <span class="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-400">
-                        {{ __('frontend.pagination.next') }}
+                        {{ __('messages.frontend) }}
                     </span>
                 @endif
             </div>
@@ -54,13 +54,13 @@
             @if($showInfo)
                 <div>
                     <p class="text-sm text-gray-700 dark:text-gray-300">
-                        {{ __('frontend.pagination.showing') }}
+                        {{ __('messages.frontend) }}
                         <span class="font-medium">{{ $paginator->firstItem() ?? 0 }}</span>
-                        {{ __('frontend.pagination.to') }}
+                        {{ __('messages.frontend) }}
                         <span class="font-medium">{{ $paginator->lastItem() ?? 0 }}</span>
-                        {{ __('frontend.pagination.of') }}
+                        {{ __('messages.frontend) }}
                         <span class="font-medium">{{ $paginator->total() }}</span>
-                        {{ __('frontend.pagination.results') }}
+                        {{ __('messages.frontend) }}
                     </p>
                 </div>
             @endif

@@ -1,6 +1,6 @@
 @extends('components.layouts.base')
 
-@section('title', __('translations.address_details'))
+@section('title', __('messages.translations))
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
@@ -12,14 +12,14 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                 </svg>
             </a>
-            <h1 class="text-3xl font-bold text-gray-900">{{ __('translations.address_details') }}</h1>
+            <h1 class="text-3xl font-bold text-gray-900">{{ __('messages.translations) }}</h1>
         </div>
 
         <div class="bg-white rounded-lg shadow-lg p-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Address Information -->
                 <div>
-                    <h2 class="text-xl font-semibold text-gray-800 mb-4">{{ __('translations.address_information') }}</h2>
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4">{{ __('messages.translations) }}</h2>
                     
                     <div class="space-y-3">
                         <div>
@@ -46,7 +46,7 @@
 
                         @if($address->company_vat)
                         <div>
-                            <label class="block text-sm font-medium text-gray-600">{{ __('translations.company_vat') }}</label>
+                            <label class="block text-sm font-medium text-gray-600">{{ __('messages.translations) }}</label>
                             <p class="text-gray-900">{{ $address->company_vat }}</p>
                         </div>
                         @endif
@@ -55,29 +55,29 @@
 
                 <!-- Contact Information -->
                 <div>
-                    <h2 class="text-xl font-semibold text-gray-800 mb-4">{{ __('translations.contact_information') }}</h2>
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4">{{ __('messages.translations) }}</h2>
                     
                     <div class="space-y-3">
                         <div>
-                            <label class="block text-sm font-medium text-gray-600">{{ __('translations.first_name') }}</label>
+                            <label class="block text-sm font-medium text-gray-600">{{ __('messages.translations) }}</label>
                             <p class="text-gray-900">{{ $address->first_name }}</p>
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-gray-600">{{ __('translations.last_name') }}</label>
+                            <label class="block text-sm font-medium text-gray-600">{{ __('messages.translations) }}</label>
                             <p class="text-gray-900">{{ $address->last_name }}</p>
                         </div>
 
                         @if($address->phone)
                         <div>
-                            <label class="block text-sm font-medium text-gray-600">{{ __('translations.phone') }}</label>
+                            <label class="block text-sm font-medium text-gray-600">{{ __('messages.translations) }}</label>
                             <p class="text-gray-900">{{ $address->phone }}</p>
                         </div>
                         @endif
 
                         @if($address->email)
                         <div>
-                            <label class="block text-sm font-medium text-gray-600">{{ __('translations.email') }}</label>
+                            <label class="block text-sm font-medium text-gray-600">{{ __('messages.translations) }}</label>
                             <p class="text-gray-900">{{ $address->email }}</p>
                         </div>
                         @endif
@@ -88,33 +88,33 @@
             <!-- Additional Information -->
             @if($address->apartment || $address->floor || $address->building || $address->landmark || $address->instructions)
             <div class="mt-6 pt-6 border-t border-gray-200">
-                <h2 class="text-xl font-semibold text-gray-800 mb-4">{{ __('translations.additional_information') }}</h2>
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">{{ __('messages.translations) }}</h2>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     @if($address->apartment)
                     <div>
-                        <label class="block text-sm font-medium text-gray-600">{{ __('translations.apartment') }}</label>
+                        <label class="block text-sm font-medium text-gray-600">{{ __('messages.translations) }}</label>
                         <p class="text-gray-900">{{ $address->apartment }}</p>
                     </div>
                     @endif
 
                     @if($address->floor)
                     <div>
-                        <label class="block text-sm font-medium text-gray-600">{{ __('translations.floor') }}</label>
+                        <label class="block text-sm font-medium text-gray-600">{{ __('messages.translations) }}</label>
                         <p class="text-gray-900">{{ $address->floor }}</p>
                     </div>
                     @endif
 
                     @if($address->building)
                     <div>
-                        <label class="block text-sm font-medium text-gray-600">{{ __('translations.building') }}</label>
+                        <label class="block text-sm font-medium text-gray-600">{{ __('messages.translations) }}</label>
                         <p class="text-gray-900">{{ $address->building }}</p>
                     </div>
                     @endif
 
                     @if($address->landmark)
                     <div>
-                        <label class="block text-sm font-medium text-gray-600">{{ __('translations.landmark') }}</label>
+                        <label class="block text-sm font-medium text-gray-600">{{ __('messages.translations) }}</label>
                         <p class="text-gray-900">{{ $address->landmark }}</p>
                     </div>
                     @endif
@@ -135,23 +135,23 @@
                 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-600">{{ __('translations.is_default') }}</label>
+                        <label class="block text-sm font-medium text-gray-600">{{ __('messages.translations) }}</label>
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $address->is_default ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
-                            {{ $address->is_default ? __('translations.yes') : __('translations.no') }}
+                            {{ $address->is_default ? __('messages.translations) : __('messages.translations) }}
                         </span>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-600">{{ __('translations.is_billing') }}</label>
+                        <label class="block text-sm font-medium text-gray-600">{{ __('messages.translations) }}</label>
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $address->is_billing ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800' }}">
-                            {{ $address->is_billing ? __('translations.yes') : __('translations.no') }}
+                            {{ $address->is_billing ? __('messages.translations) : __('messages.translations) }}
                         </span>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-600">{{ __('translations.is_shipping') }}</label>
+                        <label class="block text-sm font-medium text-gray-600">{{ __('messages.translations) }}</label>
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $address->is_shipping ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800' }}">
-                            {{ $address->is_shipping ? __('translations.yes') : __('translations.no') }}
+                            {{ $address->is_shipping ? __('messages.translations) : __('messages.translations) }}
                         </span>
                     </div>
                 </div>

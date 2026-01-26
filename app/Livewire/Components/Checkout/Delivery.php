@@ -336,7 +336,7 @@ final class Delivery extends StepComponent
         if ($finalAmount <= 0.0) {
             $badges[] = [
                 'type'  => 'free',
-                'label' => __('ecommerce.free_shipping'),
+                'label' => __('messages.ecommerce),
             ];
 
             return $badges;

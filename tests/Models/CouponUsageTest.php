@@ -175,10 +175,10 @@ describe('CouponUsage model', function (): void {
         $oldUsage = CouponUsage::factory()->create(['used_at' => now()->subMonths(3)]);
 
         // Assert: ensure each record resolves to the appropriate translation key.
-        expect($todayUsage->usage_period)->toBe(__('admin.coupon_usages.periods.today'));
+        expect($todayUsage->usage_period)->toBe(__('messages.admin_coupon_usages));
         expect($weekUsage->usage_period)->toBe(__('admin.coupon_usages.periods.this_week'));
         expect($monthUsage->usage_period)->toBe(__('admin.coupon_usages.periods.this_month'));
-        expect($oldUsage->usage_period)->toBe(__('admin.coupon_usages.periods.older'));
+        expect($oldUsage->usage_period)->toBe(__('messages.admin_coupon_usages));
         Carbon::setTestNow();
     });
 

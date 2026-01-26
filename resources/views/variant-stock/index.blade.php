@@ -1,16 +1,16 @@
 @extends('components.layouts.base')
 
-@section('title', __('inventory.variant_stock'))
-@section('description', __('inventory.subtitle'))
+@section('title', __('messages.inventory))
+@section('description', __('messages.inventory))
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
     <div class="mb-8">
         <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            {{ __('inventory.variant_stock') }}
+            {{ __('messages.inventory) }}
         </h1>
         <p class="text-gray-600 dark:text-gray-400">
-            {{ __('inventory.subtitle') }}
+            {{ __('messages.inventory) }}
         </p>
     </div>
 
@@ -19,24 +19,24 @@
         <form method="GET" action="{{ route('frontend.variant-stock.index') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
                 <label for="search" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    {{ __('translations.search') }}
+                    {{ __('messages.translations) }}
                 </label>
                 <input type="text" 
                        id="search" 
                        name="search" 
                        value="{{ request('search') }}"
-                       placeholder="{{ __('inventory.search_placeholder') }}"
+                       placeholder="{{ __('messages.inventory) }}"
                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
             </div>
 
             <div>
                 <label for="location" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    {{ __('inventory.location') }}
+                    {{ __('messages.inventory) }}
                 </label>
                 <select id="location" 
                         name="location"
                         class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
-                    <option value="">{{ __('inventory.all_locations') }}</option>
+                    <option value="">{{ __('messages.inventory) }}</option>
                     @foreach($locations as $location)
                         <option value="{{ $location->id }}" {{ request('location') == $location->id ? 'selected' : '' }}>
                             {{ $location->name }}
@@ -47,23 +47,23 @@
 
             <div>
                 <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    {{ __('inventory.status') }}
+                    {{ __('messages.inventory) }}
                 </label>
                 <select id="status" 
                         name="status"
                         class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
-                    <option value="">{{ __('inventory.all_statuses') }}</option>
+                    <option value="">{{ __('messages.inventory) }}</option>
                     <option value="low_stock" {{ request('status') == 'low_stock' ? 'selected' : '' }}>
-                        {{ __('inventory.low_stock') }}
+                        {{ __('messages.inventory) }}
                     </option>
                     <option value="out_of_stock" {{ request('status') == 'out_of_stock' ? 'selected' : '' }}>
-                        {{ __('inventory.out_of_stock') }}
+                        {{ __('messages.inventory) }}
                     </option>
                     <option value="needs_reorder" {{ request('status') == 'needs_reorder' ? 'selected' : '' }}>
-                        {{ __('inventory.needs_reorder') }}
+                        {{ __('messages.inventory) }}
                     </option>
                     <option value="expiring_soon" {{ request('status') == 'expiring_soon' ? 'selected' : '' }}>
-                        {{ __('inventory.expiring_soon') }}
+                        {{ __('messages.inventory) }}
                     </option>
                 </select>
             </div>
@@ -71,7 +71,7 @@
             <div class="flex items-end">
                 <button type="submit" 
                         class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition duration-200">
-                    {{ __('translations.filter') }}
+                    {{ __('messages.translations) }}
                 </button>
             </div>
         </form>
@@ -87,7 +87,7 @@
                     </svg>
                 </div>
                 <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ __('inventory.total_stock') }}</p>
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ __('messages.inventory) }}</p>
                     <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ $variantStocks->total() }}</p>
                 </div>
             </div>
@@ -101,7 +101,7 @@
                     </svg>
                 </div>
                 <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ __('inventory.in_stock') }}</p>
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ __('messages.inventory) }}</p>
                     <p class="text-2xl font-semibold text-gray-900 dark:text-white">
                         {{ $variantStocks->where('stock_status', 'in_stock')->count() }}
                     </p>
@@ -117,7 +117,7 @@
                     </svg>
                 </div>
                 <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ __('inventory.low_stock') }}</p>
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ __('messages.inventory) }}</p>
                     <p class="text-2xl font-semibold text-gray-900 dark:text-white">
                         {{ $variantStocks->where('stock_status', 'low_stock')->count() }}
                     </p>
@@ -133,7 +133,7 @@
                     </svg>
                 </div>
                 <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ __('inventory.out_of_stock') }}</p>
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ __('messages.inventory) }}</p>
                     <p class="text-2xl font-semibold text-gray-900 dark:text-white">
                         {{ $variantStocks->where('stock_status', 'out_of_stock')->count() }}
                     </p>
@@ -146,7 +146,7 @@
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-                {{ __('inventory.variant_stock') }}
+                {{ __('messages.inventory) }}
             </h2>
         </div>
 
@@ -156,25 +156,25 @@
                     <thead class="bg-gray-50 dark:bg-gray-700">
                         <tr>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                {{ __('inventory.product') }}
+                                {{ __('messages.inventory) }}
                             </th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                {{ __('inventory.variant') }}
+                                {{ __('messages.inventory) }}
                             </th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                {{ __('inventory.location') }}
+                                {{ __('messages.inventory) }}
                             </th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                {{ __('inventory.stock') }}
+                                {{ __('messages.inventory) }}
                             </th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                {{ __('inventory.available') }}
+                                {{ __('messages.inventory) }}
                             </th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                {{ __('inventory.status') }}
+                                {{ __('messages.inventory) }}
                             </th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                {{ __('inventory.actions') }}
+                                {{ __('messages.inventory) }}
                             </th>
                         </tr>
                     </thead>
@@ -205,7 +205,7 @@
                                     </div>
                                     @if($stock->reserved > 0)
                                         <div class="text-sm text-gray-500 dark:text-gray-400">
-                                            {{ __('inventory.reserved') }}: {{ number_format($stock->reserved) }}
+                                            {{ __('messages.inventory) }}: {{ number_format($stock->reserved) }}
                                         </div>
                                     @endif
                                 </td>
@@ -227,7 +227,7 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     <a href="{{ route('frontend.variant-stock.show', $stock) }}" 
                                        class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
-                                        {{ __('translations.view') }}
+                                        {{ __('messages.translations) }}
                                     </a>
                                 </td>
                             </tr>
@@ -246,10 +246,10 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
                 </svg>
                 <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">
-                    {{ __('inventory.no_stock_found') }}
+                    {{ __('messages.inventory) }}
                 </h3>
                 <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                    {{ __('inventory.try_adjusting_filters') }}
+                    {{ __('messages.inventory) }}
                 </p>
             </div>
         @endif

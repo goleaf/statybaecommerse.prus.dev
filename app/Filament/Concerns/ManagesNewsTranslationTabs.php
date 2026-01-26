@@ -78,7 +78,7 @@ trait ManagesNewsTranslationTabs
 
             if ($query->exists()) {
                 throw ValidationException::withMessages([
-                    "slug.$locale" => __('validation.unique', ['attribute' => __('news.fields.slug') . ' (' . $locale . ')']),
+                    "slug.$locale" => __('messages.validation, ['attribute' => __('messages.news) . ' (' . $locale . ')']),
                 ]);
             }
         }

@@ -29,7 +29,7 @@ final class ProductResourceFrontendTest extends TestCase
     {
         $this->assertSame(Nav::groupForResource(ProductResource::class), ProductResource::getNavigationGroup());
         $this->assertSame(Nav::iconForResource(ProductResource::class), ProductResource::getNavigationIcon());
-        $this->assertSame(__('products.title'), ProductResource::getNavigationLabel());
+        $this->assertSame(__('messages.products), ProductResource::getNavigationLabel());
     }
 
     public function test_resource_pages_are_registered(): void

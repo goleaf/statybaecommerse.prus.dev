@@ -8,10 +8,10 @@
     <section class="rounded-3xl border border-slate-100 bg-white shadow-sm">
         <div class="space-y-4 p-6 lg:p-8">
             <h2 class="text-base font-semibold text-slate-900">
-                {{ __('product_page.need_tailored_offer') }}
+                {{ __('messages.product_page) }}
             </h2>
             <p class="text-sm text-slate-600">
-                {{ __('product_page.tailored_offer_desc') }}
+                {{ __('messages.product_page) }}
             </p>
             @if ($product->request_message)
                 <p class="text-xs text-slate-500">
@@ -24,7 +24,7 @@
                 class="inline-flex items-center justify-center rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
             >
                 <x-heroicon-o-phone class="mr-2 h-4 w-4" />
-                {{ $showForm ? __('frontend.product.cancel') : __('translations.contact_specialists_cta') }}
+                {{ $showForm ? __('messages.frontend) : __('messages.translations) }}
             </button>
         </div>
     </section>
@@ -40,7 +40,7 @@
                     <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                         <div>
                             <label for="name" class="mb-1 block text-sm font-medium text-slate-700">
-                                {{ __('frontend.product.name') }} <span class="text-red-500">*</span>
+                                {{ __('messages.frontend) }} <span class="text-red-500">*</span>
                             </label>
                             <input
                                 type="text"
@@ -56,7 +56,7 @@
 
                         <div>
                             <label for="email" class="mb-1 block text-sm font-medium text-slate-700">
-                                {{ __('frontend.product.email') }} <span class="text-red-500">*</span>
+                                {{ __('messages.frontend) }} <span class="text-red-500">*</span>
                             </label>
                             <input
                                 type="email"
@@ -72,7 +72,7 @@
 
                         <div>
                             <label for="phone" class="mb-1 block text-sm font-medium text-slate-700">
-                                {{ __('frontend.product.phone') }}
+                                {{ __('messages.frontend) }}
                             </label>
                             <input
                                 type="tel"
@@ -106,7 +106,7 @@
 
                     <div>
                         <label for="message" class="mb-1 block text-sm font-medium text-slate-700">
-                            {{ __('frontend.product.message') }}
+                            {{ __('messages.frontend) }}
                         </label>
                         <textarea
                             id="message"
@@ -126,7 +126,7 @@
                             wire:click="toggleForm"
                             class="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 transition hover:border-slate-300 hover:text-slate-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
                         >
-                            {{ __('frontend.product.cancel') }}
+                            {{ __('messages.frontend) }}
                         </button>
                         <button
                             type="submit"

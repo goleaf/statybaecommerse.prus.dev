@@ -34,7 +34,7 @@ final class PasswordResetMail extends Mailable implements ShouldQueue
         $this->locale($locale); // Ensure translations respect the intended locale.
 
         return new Envelope(
-            subject: __('mail.reset_password_subject', [], $locale)
+            subject: __('messages.mail, [], $locale)
         );
     }
 

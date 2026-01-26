@@ -1,7 +1,7 @@
 {{-- Reviews Component --}}
 <div class="space-y-10">
-    <x-breadcrumbs :items="[['label' => __('frontend.account.nav.title'), 'url' => route('account.index')], ['label' => __('frontend.account.reviews')]]" />
-        <x-page-heading :title="__('frontend.account.reviews')" />
+    <x-breadcrumbs :items="[['label' => __('messages.frontend), 'url' => route('account.index')], ['label' => __('messages.frontend)]]" />
+        <x-page-heading :title="__('messages.frontend)" />
 
         @if ($reviews->isEmpty())
             <p class="text-gray-500">{{ __('frontend.account.reviews_empty') }}</p>

@@ -77,7 +77,7 @@
                             @endif
                             <div class="flex items-center justify-between">
                                 <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                    {{ __('admin.system_settings.value') }}:
+                                    {{ __('messages.admin_system_settings) }}:
                                 </span>
                                 <span class="text-sm text-gray-900 dark:text-white font-mono">
                                     {{ $setting->getFormattedValue() }}

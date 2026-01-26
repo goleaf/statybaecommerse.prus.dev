@@ -1,6 +1,6 @@
 @extends('components.layouts.base')
 
-@section('title', __('inventory.stock_management'))
+@section('title', __('messages.inventory))
 
 @section('content')
 @php
@@ -24,10 +24,10 @@
     <div class="flex justify-between items-center mb-8">
         <div>
             <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
-                {{ __('inventory.stock_management') }}
+                {{ __('messages.inventory) }}
             </h1>
             <p class="text-gray-600 dark:text-gray-400 mt-2">
-                {{ __('inventory.stock_management_description') }}
+                {{ __('messages.inventory) }}
             </p>
         </div>
         
@@ -37,7 +37,7 @@
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
                 </svg>
-                <span>{{ __('inventory.stock_report') }}</span>
+                <span>{{ __('messages.inventory) }}</span>
             </a>
             
             <form method="POST" action="{{ route('stock.export') }}" class="inline-block">
@@ -47,7 +47,7 @@
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                     </svg>
-                    <span>{{ __('inventory.export_stock') }}</span>
+                    <span>{{ __('messages.inventory) }}</span>
                 </button>
             </form>
         </div>
@@ -58,24 +58,24 @@
         <form method="GET" action="{{ route('stock.index') }}" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
             <div>
                 <label for="search" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    {{ __('inventory.search') }}
+                    {{ __('messages.inventory) }}
                 </label>
                 <input type="text"
                        id="search"
                        name="search"
                        value="{{ $normalizedSearch }}"
-                       placeholder="{{ __('inventory.search_placeholder') }}"
+                       placeholder="{{ __('messages.inventory) }}"
                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
             </div>
 
             <div>
                 <label for="location_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    {{ __('inventory.location') }}
+                    {{ __('messages.inventory) }}
                 </label>
                 <select id="location_id" 
                         name="location_id"
                         class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
-                    <option value="">{{ __('inventory.all_locations') }}</option>
+                    <option value="">{{ __('messages.inventory) }}</option>
                     @foreach($locations as $location)
                         <option value="{{ $location->id }}" {{ $normalizedLocationId === (string) $location->id ? 'selected' : '' }}>
                             {{ $location->name }}
@@ -86,12 +86,12 @@
 
             <div>
                 <label for="supplier_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    {{ __('inventory.supplier') }}
+                    {{ __('messages.inventory) }}
                 </label>
                 <select id="supplier_id" 
                         name="supplier_id"
                         class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
-                    <option value="">{{ __('inventory.all_suppliers') }}</option>
+                    <option value="">{{ __('messages.inventory) }}</option>
                     @foreach($suppliers as $supplier)
                         <option value="{{ $supplier->id }}" {{ $normalizedSupplierId === (string) $supplier->id ? 'selected' : '' }}>
                             {{ $supplier->name }}
@@ -102,23 +102,23 @@
 
             <div>
                 <label for="stock_status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    {{ __('inventory.stock_status') }}
+                    {{ __('messages.inventory) }}
                 </label>
                 <select id="stock_status" 
                         name="stock_status"
                         class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
-                    <option value="">{{ __('inventory.all_statuses') }}</option>
+                    <option value="">{{ __('messages.inventory) }}</option>
                     <option value="low_stock" {{ $normalizedStockStatus === 'low_stock' ? 'selected' : '' }}>
-                        {{ __('inventory.low_stock') }}
+                        {{ __('messages.inventory) }}
                     </option>
                     <option value="out_of_stock" {{ $normalizedStockStatus === 'out_of_stock' ? 'selected' : '' }}>
-                        {{ __('inventory.out_of_stock') }}
+                        {{ __('messages.inventory) }}
                     </option>
                     <option value="needs_reorder" {{ $normalizedStockStatus === 'needs_reorder' ? 'selected' : '' }}>
-                        {{ __('inventory.needs_reorder') }}
+                        {{ __('messages.inventory) }}
                     </option>
                     <option value="expiring_soon" {{ $normalizedStockStatus === 'expiring_soon' ? 'selected' : '' }}>
-                        {{ __('inventory.expiring_soon') }}
+                        {{ __('messages.inventory) }}
                     </option>
                 </select>
             </div>
@@ -129,7 +129,7 @@
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                     </svg>
-                    <span>{{ __('inventory.filter') }}</span>
+                    <span>{{ __('messages.inventory) }}</span>
                 </button>
             </div>
         </form>
@@ -142,25 +142,25 @@
                 <thead class="bg-gray-50 dark:bg-gray-700">
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                            {{ __('inventory.product') }}
+                            {{ __('messages.inventory) }}
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                            {{ __('inventory.location') }}
+                            {{ __('messages.inventory) }}
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                            {{ __('inventory.stock') }}
+                            {{ __('messages.inventory) }}
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                            {{ __('inventory.available') }}
+                            {{ __('messages.inventory) }}
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                            {{ __('inventory.status') }}
+                            {{ __('messages.inventory) }}
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                            {{ __('inventory.stock_value') }}
+                            {{ __('messages.inventory) }}
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                            {{ __('inventory.actions') }}
+                            {{ __('messages.inventory) }}
                         </th>
                     </tr>
                 </thead>
@@ -189,7 +189,7 @@
                                     <span class="font-medium">{{ $item->stock }}</span>
                                     @if($item->reserved > 0)
                                         <span class="text-xs text-orange-600 dark:text-orange-400">
-                                            ({{ $item->reserved }} {{ __('inventory.reserved') }})
+                                            ({{ $item->reserved }} {{ __('messages.inventory) }})
                                         </span>
                                     @endif
                                 </div>
@@ -217,7 +217,7 @@
                                 <div class="font-medium">€{{ number_format($item->stock_value, 2) }}</div>
                                 @if($item->cost_per_unit)
                                     <div class="text-xs text-gray-500 dark:text-gray-400">
-                                        €{{ number_format($item->cost_per_unit, 2) }}/{{ __('inventory.unit') }}
+                                        €{{ number_format($item->cost_per_unit, 2) }}/{{ __('messages.inventory) }}
                                     </div>
                                 @endif
                             </td>
@@ -225,11 +225,11 @@
                                 <div class="flex space-x-2">
                                     <a href="{{ route('stock.show', $item) }}" 
                                        class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
-                                        {{ __('inventory.view') }}
+                                        {{ __('messages.inventory) }}
                                     </a>
                                     <button onclick="adjustStock({{ $item->id }})" 
                                             class="text-yellow-600 hover:text-yellow-900 dark:text-yellow-400 dark:hover:text-yellow-300">
-                                        {{ __('inventory.adjust') }}
+                                        {{ __('messages.inventory) }}
                                     </button>
                                 </div>
                             </td>
@@ -237,7 +237,7 @@
                     @empty
                         <tr>
                             <td colspan="7" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
-                                {{ __('inventory.no_stock_items_found') }}
+                                {{ __('messages.inventory) }}
                             </td>
                         </tr>
                     @endforelse
@@ -259,14 +259,14 @@
     <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800">
         <div class="mt-3">
             <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
-                {{ __('inventory.adjust_stock') }}
+                {{ __('messages.inventory) }}
             </h3>
             
             <form id="adjustStockForm">
                 @csrf
                 <div class="mb-4">
                     <label for="adjustment_quantity" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        {{ __('inventory.adjustment_quantity') }}
+                        {{ __('messages.inventory) }}
                     </label>
                     <input type="number" 
                            id="adjustment_quantity" 
@@ -274,31 +274,31 @@
                            required
                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
                     <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                        {{ __('inventory.adjustment_quantity_help') }}
+                        {{ __('messages.inventory) }}
                     </p>
                 </div>
 
                 <div class="mb-4">
                     <label for="adjustment_reason" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        {{ __('inventory.adjustment_reason') }}
+                        {{ __('messages.inventory) }}
                     </label>
                     <select id="adjustment_reason" 
                             name="reason" 
                             required
                             class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
-                        <option value="">{{ __('inventory.select_reason') }}</option>
-                        <option value="manual_adjustment">{{ __('inventory.reason_manual_adjustment') }}</option>
-                        <option value="damage">{{ __('inventory.reason_damage') }}</option>
-                        <option value="theft">{{ __('inventory.reason_theft') }}</option>
-                        <option value="return">{{ __('inventory.reason_return') }}</option>
-                        <option value="restock">{{ __('inventory.reason_restock') }}</option>
-                        <option value="transfer">{{ __('inventory.reason_transfer') }}</option>
+                        <option value="">{{ __('messages.inventory) }}</option>
+                        <option value="manual_adjustment">{{ __('messages.inventory) }}</option>
+                        <option value="damage">{{ __('messages.inventory) }}</option>
+                        <option value="theft">{{ __('messages.inventory) }}</option>
+                        <option value="return">{{ __('messages.inventory) }}</option>
+                        <option value="restock">{{ __('messages.inventory) }}</option>
+                        <option value="transfer">{{ __('messages.inventory) }}</option>
                     </select>
                 </div>
 
                 <div class="mb-6">
                     <label for="adjustment_notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        {{ __('inventory.adjustment_notes') }}
+                        {{ __('messages.inventory) }}
                     </label>
                     <textarea id="adjustment_notes" 
                               name="notes" 
@@ -310,11 +310,11 @@
                     <button type="button" 
                             onclick="closeAdjustStockModal()"
                             class="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-md">
-                        {{ __('inventory.cancel') }}
+                        {{ __('messages.inventory) }}
                     </button>
                     <button type="submit" 
                             class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md">
-                        {{ __('inventory.adjust') }}
+                        {{ __('messages.inventory) }}
                     </button>
                 </div>
             </form>
@@ -359,7 +359,7 @@ document.getElementById('adjustStockForm').addEventListener('submit', function(e
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('{{ __("inventory.error_occurred") }}');
+        alert('{{ __("messages.inventory) }}');
     });
     
     closeAdjustStockModal();

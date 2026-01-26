@@ -19,8 +19,8 @@
 
 @extends('errors.layout', [
     'code' => '500',
-    'title' => __('frontend.errors.500.title'),
-    'description' => __('frontend.errors.500.description'),
+    'title' => __('messages.frontend),
+    'description' => __('messages.frontend),
     'primaryAction' => [
         'label' => __('frontend.errors.actions.return_home'),
         'url' => $homeUrl,

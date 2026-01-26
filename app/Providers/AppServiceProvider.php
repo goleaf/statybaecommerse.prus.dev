@@ -586,7 +586,7 @@ class AppServiceProvider extends ServiceProvider
 
             return (new MailMessage)
                 ->locale($locale)
-                ->subject(__('mail.reset_password_subject', [], $locale))
+                ->subject(__('messages.mail, [], $locale))
                 ->markdown('emails.auth.password-reset', [
                     'url'     => $url,
                     'minutes' => $minutes,

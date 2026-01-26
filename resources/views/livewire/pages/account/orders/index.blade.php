@@ -1,11 +1,11 @@
 <div class="space-y-10">
     <x-breadcrumbs :items="[
-        ['label' => __('frontend.account.nav.title'), 'url' => route('account.index', ['locale' => app()->getLocale()])],
-        ['label' => __('frontend.account.orders.title')],
+        ['label' => __('messages.frontend), 'url' => route('account.index', ['locale' => app()->getLocale()])],
+        ['label' => __('messages.frontend)],
     ]" />
     <x-page-heading
-                    :title="__('frontend.account.orders.title')"
-                    :description="__('frontend.account.orders.description')" />
+                    :title="__('messages.frontend)"
+                    :description="__('messages.frontend)" />
     @if ($orders->isEmpty())
         <div class="flex flex-col items-center py-6 space-y-5">
             <x-untitledui-shopping-bag

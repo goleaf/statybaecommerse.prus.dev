@@ -66,28 +66,28 @@
                                             <a href="{{ route('filament.admin.resources.products.index') }}"
                                                class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                                                 <x-heroicon-o-cube class="h-4 w-4 mr-3" />
-                                                {{ __('admin.models.products') }}
+                                                {{ __('messages.admin) }}
                                             </a>
                                         @endif
                                         @if (Route::has('filament.admin.resources.categories.index'))
                                             <a href="{{ route('filament.admin.resources.categories.index') }}"
                                                class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                                                 <x-heroicon-o-tag class="h-4 w-4 mr-3" />
-                                                {{ __('admin.models.categories') }}
+                                                {{ __('messages.admin) }}
                                             </a>
                                         @endif
                                         @if (Route::has('filament.admin.resources.brands.index'))
                                             <a href="{{ route('filament.admin.resources.brands.index') }}"
                                                class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                                                 <x-heroicon-o-star class="h-4 w-4 mr-3" />
-                                                {{ __('admin.models.brands') }}
+                                                {{ __('messages.admin) }}
                                             </a>
                                         @endif
                                         @if (Route::has('filament.admin.resources.collections.index'))
                                             <a href="{{ route('filament.admin.resources.collections.index') }}"
                                                class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                                                 <x-heroicon-o-folder class="h-4 w-4 mr-3" />
-                                                {{ __('admin.models.collections') }}
+                                                {{ __('messages.admin) }}
                                             </a>
                                         @endif
                                     @elseif($group->value === 'Orders')
@@ -176,15 +176,7 @@
                                             <a href="{{ route('filament.admin.resources.coupons.index') }}"
                                                class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                                                 <x-heroicon-o-gift class="h-4 w-4 mr-3" />
-                                                {{ __('admin.models.coupons') }}
-                                            </a>
-                                        @endif
-                                    @elseif($group->value === 'Analytics')
-                                        @if (Route::has('filament.admin.resources.analytics-events.index'))
-                                            <a href="{{ route('filament.admin.resources.analytics-events.index') }}"
-                                               class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                                                <x-heroicon-o-chart-bar class="h-4 w-4 mr-3" />
-                                                {{ __('admin.models.analytics_events') }}
+                                                {{ __('messages.admin) }}
                                             </a>
                                         @endif
                                     @elseif($group->value === 'Reports')
@@ -200,14 +192,14 @@
                                             <a href="{{ route('filament.admin.resources.news.index') }}"
                                                class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                                                 <x-heroicon-o-newspaper class="h-4 w-4 mr-3" />
-                                                {{ __('admin.models.news') }}
+                                                {{ __('messages.admin) }}
                                             </a>
                                         @endif
                                         @if (Route::has('filament.admin.resources.posts.index'))
                                             <a href="{{ route('filament.admin.resources.posts.index') }}"
                                                class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                                                 <x-heroicon-o-document-text class="h-4 w-4 mr-3" />
-                                                {{ __('admin.models.posts') }}
+                                                {{ __('messages.admin) }}
                                             </a>
                                         @endif
                                         @if (Route::has('filament.admin.resources.legal.index'))
@@ -253,7 +245,7 @@
                 >
                     <button
                             type="button"
-                            aria-label="{{ __('admin.navigation.notifications') }}"
+                            aria-label="{{ __('messages.admin) }}"
                             class="relative p-2 text-gray-400 hover:text-gray-500"
                     >
                         <x-heroicon-o-bell class="h-5 w-5" />
@@ -270,7 +262,7 @@
                         <div class="h-8 w-8 rounded-full bg-primary-600 flex items-center justify-center">
                             <span class="text-sm font-medium text-white">{{ substr($user->name ?? 'A', 0, 1) }}</span>
                         </div>
-                        <span>{{ $user->name ?? __('admin.navigation.admin') }}</span>
+                        <span>{{ $user->name ?? __('messages.admin) }}</span>
                         <x-heroicon-o-chevron-down class="h-3 w-3" />
                     </button>
                 </div>

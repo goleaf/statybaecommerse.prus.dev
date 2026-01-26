@@ -77,7 +77,7 @@
                     wire:model.live="sortBy"
                     label="{{ __('shared.sort_by') }}"
                 >
-                    <option value="relevance">{{ __('frontend.filters.sort.relevance') }}</option>
+                    <option value="relevance">{{ __('messages.frontend) }}</option>
                     <option value="created_at">{{ __('shared.sort_newest') }}</option>
                     <option value="name">{{ __('shared.sort_name_az') }}</option>
                     <option value="price">{{ __('shared.sort_price_low') }}</option>
@@ -90,7 +90,7 @@
                     variant="secondary"
                     size="sm"
                 >
-                    {{ __('shared.close') }}
+                    {{ __('messages.shared) }}
                 </x-shared.button>
                 
                 <div class="flex gap-2">
@@ -100,7 +100,7 @@
                         variant="secondary"
                         size="sm"
                     >
-                        {{ __('shared.clear') }}
+                        {{ __('messages.shared) }}
                     </x-shared.button>
                     
                     <x-shared.button 
@@ -108,7 +108,7 @@
                         variant="primary"
                         size="sm"
                     >
-                        {{ __('shared.search') }}
+                        {{ __('messages.shared) }}
                     </x-shared.button>
                 </div>
             </div>

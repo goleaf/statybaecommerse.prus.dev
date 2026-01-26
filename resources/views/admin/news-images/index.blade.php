@@ -55,7 +55,7 @@
                 <td>{{ __('admin.news_images_table.news_reference', ['id' => $image->news_id]) }}</td>
                 <td>{{ $image->alt_text ?? __('admin.common.not_available') }}</td>
                 <td>{{ $image->caption ?? __('admin.common.not_available') }}</td>
-                <td>{{ $image->is_featured ? __('admin.common.yes') : __('admin.common.no') }}</td>
+                <td>{{ $image->is_featured ? __('messages.admin) : __('messages.admin) }}</td>
                 <td>{{ $image->sort_order }}</td>
                 <td>{{ $image->file_size_formatted }}</td>
                 <td>{{ $image->mime_type ?? __('admin.common.not_available') }}</td>
@@ -77,11 +77,11 @@
 
     <div class="table-actions">
         <strong>{{ __('admin.news_images_table.available_actions') }}</strong>
-        <span>{{ __('admin.common.view') }}</span>
-        <span>{{ __('admin.common.edit') }}</span>
-        <span>{{ __('admin.common.duplicate') }}</span>
-        <span>{{ __('admin.common.download') }}</span>
-        <span>{{ __('admin.common.delete') }}</span>
+        <span>{{ __('messages.admin) }}</span>
+        <span>{{ __('messages.admin) }}</span>
+        <span>{{ __('messages.admin) }}</span>
+        <span>{{ __('messages.admin) }}</span>
+        <span>{{ __('messages.admin) }}</span>
     </div>
 
     <div class="table-pagination">

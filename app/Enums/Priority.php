@@ -15,11 +15,11 @@ enum Priority: string
     public function getLabel(): string
     {
         return match ($this) {
-            self::LOW      => __('enums.priority.low'),
-            self::MEDIUM   => __('enums.priority.medium'),
-            self::HIGH     => __('enums.priority.high'),
-            self::URGENT   => __('enums.priority.urgent'),
-            self::CRITICAL => __('enums.priority.critical'),
+            self::LOW      => __('messages.enums),
+            self::MEDIUM   => __('messages.enums),
+            self::HIGH     => __('messages.enums),
+            self::URGENT   => __('messages.enums),
+            self::CRITICAL => __('messages.enums),
         };
     }
 

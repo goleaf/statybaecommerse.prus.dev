@@ -1,9 +1,9 @@
 <div class="container mx-auto px-4 py-8">
-    <h1 class="text-2xl font-semibold mb-6">{{ __('frontend.navigation.news') }}</h1>
+    <h1 class="text-2xl font-semibold mb-6">{{ __('messages.frontend) }}</h1>
 
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
         <aside class="lg:col-span-3">
-            <h2 class="text-sm font-semibold text-gray-700 mb-3">{{ __('frontend.navigation.categories') }}</h2>
+            <h2 class="text-sm font-semibold text-gray-700 mb-3">{{ __('messages.frontend) }}</h2>
             <ul class="space-y-2">
                 @php
                     $locale = app()->getLocale();

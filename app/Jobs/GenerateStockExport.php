@@ -74,18 +74,18 @@ final class GenerateStockExport implements ShouldQueue
         }
 
         fputcsv($stream, [
-            __('inventory.product'),
-            __('inventory.variant'),
-            __('inventory.location'),
-            __('inventory.supplier'),
-            __('inventory.current_stock'),
-            __('inventory.reserved'),
-            __('inventory.available'),
-            __('inventory.cost_per_unit'),
-            __('inventory.stock_value'),
-            __('inventory.status'),
-            __('inventory.expiry_date'),
-            __('inventory.created_at'),
+            __('messages.inventory),
+            __('messages.inventory),
+            __('messages.inventory),
+            __('messages.inventory),
+            __('messages.inventory),
+            __('messages.inventory),
+            __('messages.inventory),
+            __('messages.inventory),
+            __('messages.inventory),
+            __('messages.inventory),
+            __('messages.inventory),
+            __('messages.inventory),
         ]);
 
         $timeout = now()->addMinutes(15);

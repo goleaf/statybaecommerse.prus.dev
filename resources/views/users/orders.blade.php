@@ -59,17 +59,17 @@
                             class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                         <option value="">{{ __('users.all_statuses') }}</option>
                         <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>
-                            {{ __('orders.status.pending') }}</option>
+                            {{ __('messages.orders) }}</option>
                         <option value="processing" {{ request('status') == 'processing' ? 'selected' : '' }}>
-                            {{ __('orders.status.processing') }}</option>
+                            {{ __('messages.orders) }}</option>
                         <option value="shipped" {{ request('status') == 'shipped' ? 'selected' : '' }}>
-                            {{ __('orders.status.shipped') }}</option>
+                            {{ __('messages.orders) }}</option>
                         <option value="delivered" {{ request('status') == 'delivered' ? 'selected' : '' }}>
-                            {{ __('orders.status.delivered') }}</option>
+                            {{ __('messages.orders) }}</option>
                         <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>
-                            {{ __('orders.status.cancelled') }}</option>
+                            {{ __('messages.orders) }}</option>
                         <option value="refunded" {{ request('status') == 'refunded' ? 'selected' : '' }}>
-                            {{ __('orders.status.refunded') }}</option>
+                            {{ __('messages.orders) }}</option>
                     </select>
                 </div>
 

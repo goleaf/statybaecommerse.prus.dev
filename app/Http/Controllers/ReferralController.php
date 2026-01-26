@@ -129,7 +129,7 @@ final class ReferralController extends Controller
         $user = $this->resolveAuthenticatedUser();
 
         if (! Referral::canUserRefer($user->id)) {
-            return redirect()->route('referrals.index')->with('error', __('referrals.referral_limit_reached'));
+            return redirect()->route('referrals.index')->with('error', __('messages.referrals));
         }
         $referralCode = $user->activeReferralCode();
 
@@ -144,7 +144,7 @@ final class ReferralController extends Controller
         $user = $this->resolveAuthenticatedUser();
 
         if (! Referral::canUserRefer($user->id)) {
-            return redirect()->route('referrals.index')->with('error', __('referrals.referral_limit_reached'));
+            return redirect()->route('referrals.index')->with('error', __('messages.referrals));
         }
         $validated = $request->validated();
         $referredUser = User::query()->where('email', $validated['referred_email'])->first();
@@ -153,22 +153,22 @@ final class ReferralController extends Controller
             // Surface a validation style error so the customer can correct the
             // email if the account was removed between validation and storage.
             return redirect()->back()->withErrors([
-                'referred_email' => __('validation.exists', ['attribute' => __('referrals.email')]),
+                'referred_email' => __('validation.exists', ['attribute' => __('messages.referrals)]),
             ])->withInput();
         }
 
         if ($referredUser->is($user)) {
-            return redirect()->back()->with('error', __('referrals.cannot_refer_yourself'));
+            return redirect()->back()->with('error', __('messages.referrals));
         }
         if (Referral::userAlreadyReferred($referredUser->id)) {
-            return redirect()->back()->with('error', __('referrals.user_already_referred'));
+            return redirect()->back()->with('error', __('messages.referrals));
         }
 
         // Normalise the optional marketing copy so both locales stay in sync.
-        $title = $validated['title'] ?? __('referrals.default_title');
-        $titleLt = $validated['title'] ?? __('referrals.default_title', [], 'lt');
-        $description = $validated['description'] ?? __('referrals.default_description');
-        $descriptionLt = $validated['description'] ?? __('referrals.default_description', [], 'lt');
+        $title = $validated['title'] ?? __('messages.referrals);
+        $titleLt = $validated['title'] ?? __('messages.referrals, [], 'lt');
+        $description = $validated['description'] ?? __('messages.referrals);
+        $descriptionLt = $validated['description'] ?? __('messages.referrals, [], 'lt');
 
         try {
             DB::beginTransaction();
@@ -201,10 +201,10 @@ final class ReferralController extends Controller
 
             report($exception);
 
-            return redirect()->back()->with('error', __('referrals.referral_creation_failed'));
+            return redirect()->back()->with('error', __('messages.referrals));
         }
 
-        return redirect()->route('referrals.index')->with('success', __('referrals.referral_created'));
+        return redirect()->route('referrals.index')->with('success', __('messages.referrals));
     }
 
     /**
@@ -225,14 +225,14 @@ final class ReferralController extends Controller
     {
         $user = $this->resolveAuthenticatedUser();
         if ($user->hasActiveReferralCode()) {
-            return redirect()->route('referrals.index')->with('info', __('referrals.code_already_exists'));
+            return redirect()->route('referrals.index')->with('info', __('messages.referrals));
         }
         $code = ReferralCode::generateUniqueCode();
         ReferralCode::create(['user_id' => $user->id, 'code' => $code, 'is_active' => true]);
         // Update user's referral code
         $user->update(['referral_code' => $code, 'referral_code_generated_at' => now()]);
 
-        return redirect()->route('referrals.index')->with('success', __('referrals.code_generated'));
+        return redirect()->route('referrals.index')->with('success', __('messages.referrals));
     }
 
     /**
@@ -243,10 +243,10 @@ final class ReferralController extends Controller
         $user = $this->resolveAuthenticatedUser();
         $referralCode = $user->activeReferralCode();
         if (! $referralCode) {
-            return redirect()->route('referrals.create')->with('info', __('referrals.no_active_code'));
+            return redirect()->route('referrals.create')->with('info', __('messages.referrals));
         }
         $shareUrl = $referralCode->referral_url;
-        $shareText = __('referrals.share_text', ['code' => $referralCode->code, 'url' => $shareUrl]);
+        $shareText = __('messages.referrals, ['code' => $referralCode->code, 'url' => $shareUrl]);
 
         return view('referrals.share', [
             'user'         => $user,
@@ -263,12 +263,12 @@ final class ReferralController extends Controller
     {
         $referralCode = ReferralCode::findByCode($code);
         if (! $referralCode || ! $referralCode->isValid()) {
-            return redirect()->route('register')->with('error', __('referrals.invalid_code'));
+            return redirect()->route('register')->with('error', __('messages.referrals));
         }
         // Store referral code in session for registration
         session(['referral_code' => $code]);
 
-        return redirect()->route('register')->with('success', __('referrals.code_applied'));
+        return redirect()->route('register')->with('success', __('messages.referrals));
     }
 
     /**

@@ -226,28 +226,28 @@ final class InfiniteScrollSearch extends Component
     public function getSortOptionsProperty(): array
     {
         return [
-            'relevance' => __('frontend.sort_by_relevance'),
-            'name'      => __('frontend.sort_by_name'),
-            'price'     => __('frontend.sort_by_price'),
-            'date'      => __('frontend.sort_by_date'),
-            'rating'    => __('frontend.sort_by_rating'),
+            'relevance' => __('messages.frontend),
+            'name'      => __('messages.frontend),
+            'price'     => __('messages.frontend),
+            'date'      => __('messages.frontend),
+            'rating'    => __('messages.frontend),
         ];
     }
 
     public function getTypeOptionsProperty(): array
     {
         return [
-            'products'    => __('frontend.products'),
+            'products'    => __('messages.frontend),
             'categories'  => __('frontend.categories'),
             'brands'      => __('frontend.brands'),
             'collections' => __('frontend.collections'),
             'attributes'  => __('frontend.attributes'),
-            'locations'   => __('frontend.locations'),
+            'locations'   => __('messages.frontend),
             'countries'   => __('frontend.countries'),
-            'cities'      => __('frontend.cities'),
-            'orders'      => __('frontend.orders'),
-            'customers'   => __('frontend.customers'),
-            'addresses'   => __('frontend.addresses'),
+            'cities'      => __('messages.frontend),
+            'orders'      => __('messages.frontend),
+            'customers'   => __('messages.frontend),
+            'addresses'   => __('messages.frontend),
         ];
     }
 }

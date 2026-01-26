@@ -1,7 +1,7 @@
 @extends('components.layouts.base')
 
-@section('title', __('frontend.system_settings.title'))
-@section('description', __('frontend.system_settings.description'))
+@section('title', __('messages.frontend_system_settings))
+@section('description', __('messages.frontend_system_settings))
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
@@ -9,10 +9,10 @@
         <!-- Header -->
         <div class="mb-8">
             <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-                {{ __('frontend.system_settings.title') }}
+                {{ __('messages.frontend_system_settings) }}
             </h1>
             <p class="text-lg text-gray-600 dark:text-gray-300">
-                {{ __('frontend.system_settings.description') }}
+                {{ __('messages.frontend_system_settings) }}
             </p>
         </div>
 
@@ -23,7 +23,7 @@
                     <input type="text" 
                            name="q" 
                            value="{{ request('q') }}"
-                           placeholder="{{ __('frontend.system_settings.search_placeholder') }}"
+                           placeholder="{{ __('messages.frontend_system_settings) }}"
                            class="w-full px-4 py-2 pl-10 pr-4 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white dark:border-gray-600">
                     <div class="absolute inset-y-0 left-0 flex items-center pl-3">
                         <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -38,11 +38,11 @@
         <div class="mb-8 flex flex-wrap gap-4">
             <div class="flex items-center space-x-2">
                 <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    {{ __('frontend.system_settings.filter_by_category') }}:
+                    {{ __('messages.frontend_system_settings) }}:
                 </label>
                 <select onchange="window.location.href = this.value" class="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white dark:border-gray-600">
                     <option value="{{ route('frontend.system-settings.index') }}">
-                        {{ __('frontend.system_settings.all_categories') }}
+                        {{ __('messages.frontend_system_settings) }}
                     </option>
                     @foreach($categories as $category)
                         <option value="{{ route('frontend.system-settings.category', $category->slug) }}" 
@@ -55,11 +55,11 @@
 
             <div class="flex items-center space-x-2">
                 <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    {{ __('frontend.system_settings.filter_by_group') }}:
+                    {{ __('messages.frontend_system_settings) }}:
                 </label>
                 <select onchange="window.location.href = this.value" class="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white dark:border-gray-600">
                     <option value="{{ route('frontend.system-settings.index') }}">
-                        {{ __('frontend.system_settings.all_groups') }}
+                        {{ __('messages.frontend_system_settings) }}
                     </option>
                     @foreach(['general', 'ecommerce', 'email', 'payment', 'shipping', 'seo', 'security', 'api', 'appearance', 'notifications'] as $group)
                         <option value="{{ route('frontend.system-settings.group', $group) }}" 
@@ -75,7 +75,7 @@
         @if($categories->isNotEmpty())
         <div class="mb-12">
             <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-                {{ __('frontend.system_settings.categories') }}
+                {{ __('messages.frontend_system_settings) }}
             </h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 @foreach($categories as $category)
@@ -91,7 +91,7 @@
                                     {{ $category->getTranslatedName() }}
                                 </h3>
                                 <p class="text-sm text-gray-500 dark:text-gray-400">
-                                    {{ $category->settings->count() }} {{ __('frontend.system_settings.settings') }}
+                                    {{ $category->settings->count() }} {{ __('messages.frontend_system_settings) }}
                                 </p>
                             </div>
                         </div>
@@ -102,7 +102,7 @@
                         @endif
                         <a href="{{ route('frontend.system-settings.category', $category->slug) }}" 
                            class="inline-flex items-center text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
-                            {{ __('frontend.system_settings.view_category') }}
+                            {{ __('messages.frontend_system_settings) }}
                             <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                             </svg>
@@ -116,7 +116,7 @@
         <!-- Settings List -->
         <div>
             <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-                {{ __('frontend.system_settings.all_settings') }}
+                {{ __('messages.frontend_system_settings) }}
             </h2>
             
             @if($settings->isNotEmpty())
@@ -159,7 +159,7 @@
                                 <div class="ml-4">
                                     <a href="{{ route('frontend.system-settings.show', $setting->key) }}" 
                                        class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                                        {{ __('frontend.system_settings.view_setting') }}
+                                        {{ __('messages.frontend_system_settings) }}
                                         <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                                         </svg>
@@ -182,10 +182,10 @@
                         </svg>
                     </div>
                     <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                        {{ __('frontend.system_settings.no_settings_found') }}
+                        {{ __('messages.frontend_system_settings) }}
                     </h3>
                     <p class="text-gray-500 dark:text-gray-400">
-                        {{ __('frontend.system_settings.no_settings_description') }}
+                        {{ __('messages.frontend_system_settings) }}
                     </p>
                 </div>
             @endif

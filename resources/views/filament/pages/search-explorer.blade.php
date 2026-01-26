@@ -60,7 +60,7 @@
                     </div>
                     <div>
                         <span class="font-semibold text-gray-900">{{ __('admin.search_explorer.cached') }}</span>
-                        <div>{{ ($meta['cached'] ?? false) ? __('admin.common.yes') : __('admin.common.no') }}</div>
+                        <div>{{ ($meta['cached'] ?? false) ? __('messages.admin) : __('messages.admin) }}</div>
                     </div>
                     <div>
                         <span class="font-semibold text-gray-900">{{ __('admin.search_explorer.per_page_cap') }}</span>

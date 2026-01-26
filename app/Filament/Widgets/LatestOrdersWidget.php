@@ -36,7 +36,7 @@ final class LatestOrdersWidget extends BaseWidget
                     ->sortable()
                     ->url(fn (Order $record): string => OrderResource::getUrl('view', ['record' => $record])),
                 Tables\Columns\TextColumn::make('user.email')
-                    ->label(__('admin.orders.fields.customer'))
+                    ->label(__('messages.admin))
                     ->searchable(),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()

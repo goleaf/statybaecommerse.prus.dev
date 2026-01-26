@@ -1,15 +1,15 @@
 @extends('components.layouts.base')
 
-@section('title', __('seo_data.statistics'))
+@section('title', __('messages.seo_data))
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
     <div class="mb-8">
         <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-            {{ __('seo_data.statistics') }}
+            {{ __('messages.seo_data) }}
         </h1>
         <p class="text-gray-600 dark:text-gray-400">
-            {{ __('seo_data.statistics_description') }}
+            {{ __('messages.seo_data) }}
         </p>
     </div>
 
@@ -26,7 +26,7 @@
                 </div>
                 <div class="ml-4">
                     <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
-                        {{ __('seo_data.total_seo_data') }}
+                        {{ __('messages.seo_data) }}
                     </p>
                     <p class="text-2xl font-semibold text-gray-900 dark:text-white">
                         {{ number_format($statistics['total']) }}
@@ -46,7 +46,7 @@
                 </div>
                 <div class="ml-4">
                     <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
-                        {{ __('seo_data.complete_seo') }}
+                        {{ __('messages.seo_data) }}
                     </p>
                     <p class="text-2xl font-semibold text-gray-900 dark:text-white">
                         {{ number_format($statistics['complete_seo']) }}
@@ -66,7 +66,7 @@
                 </div>
                 <div class="ml-4">
                     <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
-                        {{ __('seo_data.needs_optimization') }}
+                        {{ __('messages.seo_data) }}
                     </p>
                     <p class="text-2xl font-semibold text-gray-900 dark:text-white">
                         {{ number_format($statistics['needs_optimization']) }}
@@ -86,7 +86,7 @@
                 </div>
                 <div class="ml-4">
                     <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
-                        {{ __('seo_data.avg_seo_score') }}
+                        {{ __('messages.seo_data) }}
                     </p>
                     <p class="text-2xl font-semibold text-gray-900 dark:text-white">
                         {{ number_format($statistics['avg_score'], 1) }}
@@ -100,7 +100,7 @@
         <!-- By Locale -->
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
             <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                {{ __('seo_data.by_locale') }}
+                {{ __('messages.seo_data) }}
             </h3>
             
             <div class="space-y-4">
@@ -110,7 +110,7 @@
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
                                 @if($locale === 'lt') bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200
                                 @else bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 @endif">
-                                {{ $locale === 'lt' ? __('seo_data.lithuanian') : __('seo_data.english') }}
+                                {{ $locale === 'lt' ? __('messages.seo_data) : __('messages.seo_data) }}
                             </span>
                         </div>
                         <div class="flex items-center space-x-2">
@@ -129,7 +129,7 @@
         <!-- By Type -->
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
             <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                {{ __('seo_data.by_type') }}
+                {{ __('messages.seo_data) }}
             </h3>
             
             <div class="space-y-4">
@@ -139,13 +139,13 @@
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200">
                                 @switch($type)
                                     @case('App\Models\Product')
-                                        {{ __('seo_data.products') }}
+                                        {{ __('messages.seo_data) }}
                                         @break
                                     @case('App\Models\Category')
-                                        {{ __('seo_data.categories') }}
+                                        {{ __('messages.seo_data) }}
                                         @break
                                     @case('App\Models\Brand')
-                                        {{ __('seo_data.brands') }}
+                                        {{ __('messages.seo_data) }}
                                         @break
                                     @default
                                         {{ $type }}
@@ -169,23 +169,23 @@
     <!-- Quick Actions -->
     <div class="mt-8 bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
         <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-            {{ __('seo_data.quick_actions') }}
+            {{ __('messages.seo_data) }}
         </h3>
         
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <a href="{{ route('seo-data.index') }}" 
                class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-md transition duration-200 text-center">
-                {{ __('seo_data.view_all_seo_data') }}
+                {{ __('messages.seo_data) }}
             </a>
             
             <a href="{{ route('seo-data.by-type', 'App\Models\Product') }}" 
                class="bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-4 rounded-md transition duration-200 text-center">
-                {{ __('seo_data.view_product_seo') }}
+                {{ __('messages.seo_data) }}
             </a>
             
             <a href="{{ route('seo-data.by-type', 'App\Models\Category') }}" 
                class="bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 px-4 rounded-md transition duration-200 text-center">
-                {{ __('seo_data.view_category_seo') }}
+                {{ __('messages.seo_data) }}
             </a>
         </div>
     </div>

@@ -18,7 +18,7 @@
                 <div class="flex items-center">
                     <i class="fas fa-chevron-right text-gray-400 mx-1"></i>
                     <a href="{{ route('attributes.index') }}" class="ml-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ml-2 dark:text-gray-400 dark:hover:text-white">
-                        {{ __('attributes.title') }}
+                        {{ __('messages.attributes) }}
                     </a>
                 </div>
             </li>
@@ -76,7 +76,7 @@
                                 </span>
                                 @if($attribute->is_required)
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
-                                        {{ __('attributes.required') }}
+                                        {{ __('messages.attributes) }}
                                     </span>
                                 @endif
                                 <span>
@@ -117,7 +117,7 @@
                                         </span>
                                     @else
                                         <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200">
-                                            {{ __('attributes.disabled') }}
+                                            {{ __('messages.attributes) }}
                                         </span>
                                     @endif
                                 </div>
@@ -164,12 +164,12 @@
             <!-- Attribute Info -->
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                    {{ __('attributes.attribute_info') }}
+                    {{ __('messages.attributes) }}
                 </h3>
                 
                 <div class="space-y-3">
                     <div class="flex justify-between">
-                        <span class="text-gray-600 dark:text-gray-300">{{ __('attributes.type') }}:</span>
+                        <span class="text-gray-600 dark:text-gray-300">{{ __('messages.attributes) }}:</span>
                         <span class="font-medium text-gray-900 dark:text-white">
                             {{ __('attributes.' . $attribute->type) }}
                         </span>
@@ -177,7 +177,7 @@
                     
                     @if($attribute->group_name)
                         <div class="flex justify-between">
-                            <span class="text-gray-600 dark:text-gray-300">{{ __('attributes.group_name') }}:</span>
+                            <span class="text-gray-600 dark:text-gray-300">{{ __('messages.attributes) }}:</span>
                             <span class="font-medium text-gray-900 dark:text-white">
                                 {{ $attribute->group_name }}
                             </span>
@@ -185,21 +185,21 @@
                     @endif
                     
                     <div class="flex justify-between">
-                        <span class="text-gray-600 dark:text-gray-300">{{ __('attributes.values_count') }}:</span>
+                        <span class="text-gray-600 dark:text-gray-300">{{ __('messages.attributes) }}:</span>
                         <span class="font-medium text-gray-900 dark:text-white">
                             {{ $attribute->getValuesCount() }}
                         </span>
                     </div>
                     
                     <div class="flex justify-between">
-                        <span class="text-gray-600 dark:text-gray-300">{{ __('attributes.usage_count') }}:</span>
+                        <span class="text-gray-600 dark:text-gray-300">{{ __('messages.attributes) }}:</span>
                         <span class="font-medium text-gray-900 dark:text-white">
                             {{ $attribute->getUsageCount() }}
                         </span>
                     </div>
                     
                     <div class="flex justify-between">
-                        <span class="text-gray-600 dark:text-gray-300">{{ __('attributes.popularity_score') }}:</span>
+                        <span class="text-gray-600 dark:text-gray-300">{{ __('messages.attributes) }}:</span>
                         <span class="font-medium text-gray-900 dark:text-white">
                             {{ $attribute->getPopularityScore() }}/100
                         </span>
@@ -210,19 +210,19 @@
             <!-- Attribute Properties -->
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                    {{ __('attributes.attribute_properties') }}
+                    {{ __('messages.attributes) }}
                 </h3>
                 
                 <div class="space-y-3">
                     <div class="flex justify-between">
-                        <span class="text-gray-600 dark:text-gray-300">{{ __('attributes.required') }}:</span>
+                        <span class="text-gray-600 dark:text-gray-300">{{ __('messages.attributes) }}:</span>
                         <span class="font-medium {{ $attribute->is_required ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-white' }}">
                             {{ $attribute->is_required ? __('common.yes') : __('common.no') }}
                         </span>
                     </div>
                     
                     <div class="flex justify-between">
-                        <span class="text-gray-600 dark:text-gray-300">{{ __('attributes.filterable') }}:</span>
+                        <span class="text-gray-600 dark:text-gray-300">{{ __('messages.attributes) }}:</span>
                         <span class="font-medium {{ $attribute->is_filterable ? 'text-blue-600 dark:text-blue-400' : 'text-gray-900 dark:text-white' }}">
                             {{ $attribute->is_filterable ? __('common.yes') : __('common.no') }}
                         </span>

@@ -1,13 +1,13 @@
 @extends('components.layouts.base')
 
-@section('title', __('referrals.referral_details'))
+@section('title', __('messages.referrals))
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
     <div class="max-w-4xl mx-auto">
         <div class="bg-white rounded-lg shadow-md p-6">
             <div class="flex items-center justify-between mb-6">
-                <h1 class="text-2xl font-bold text-gray-900">{{ __('referrals.referral_details') }}</h1>
+                <h1 class="text-2xl font-bold text-gray-900">{{ __('messages.referrals) }}</h1>
                 <a href="{{ route('referrals.index') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                     {{ __('common.back') }}
                 </a>
@@ -16,12 +16,12 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">{{ __('referrals.referral_code') }}</label>
+                        <label class="block text-sm font-medium text-gray-700">{{ __('messages.referrals) }}</label>
                         <p class="mt-1 text-sm text-gray-900 font-mono bg-gray-100 p-2 rounded">{{ $referral->referral_code }}</p>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">{{ __('referrals.status') }}</label>
+                        <label class="block text-sm font-medium text-gray-700">{{ __('messages.referrals) }}</label>
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
                             @if($referral->status === 'pending') bg-yellow-100 text-yellow-800
                             @elseif($referral->status === 'completed') bg-green-100 text-green-800
@@ -32,7 +32,7 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">{{ __('referrals.referred_user') }}</label>
+                        <label class="block text-sm font-medium text-gray-700">{{ __('messages.referrals) }}</label>
                         <p class="mt-1 text-sm text-gray-900">
                             @if($referral->referred)
                                 {{ $referral->referred->name }} ({{ $referral->referred->email }})
@@ -43,13 +43,13 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">{{ __('referrals.created_at') }}</label>
+                        <label class="block text-sm font-medium text-gray-700">{{ __('messages.referrals) }}</label>
                         <p class="mt-1 text-sm text-gray-900">{{ $referral->created_at->format('d.m.Y H:i') }}</p>
                     </div>
 
                     @if($referral->expires_at)
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">{{ __('referrals.expires_at') }}</label>
+                        <label class="block text-sm font-medium text-gray-700">{{ __('messages.referrals) }}</label>
                         <p class="mt-1 text-sm text-gray-900">{{ $referral->expires_at->format('d.m.Y H:i') }}</p>
                     </div>
                     @endif
@@ -58,7 +58,7 @@
                 <div class="space-y-4">
                     @if($referral->rewards->count() > 0)
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">{{ __('referrals.rewards') }}</label>
+                        <label class="block text-sm font-medium text-gray-700">{{ __('messages.referrals) }}</label>
                         <div class="mt-2 space-y-2">
                             @foreach($referral->rewards as $reward)
                             <div class="bg-gray-50 p-3 rounded">

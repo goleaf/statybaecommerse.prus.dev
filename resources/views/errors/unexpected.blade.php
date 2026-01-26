@@ -18,14 +18,14 @@
 
 @extends('errors.layout', [
     'code' => '500',
-    'title' => __('errors.pages.unexpected.title'),
-    'description' => __('errors.pages.unexpected.description'),
+    'title' => __('messages.errors),
+    'description' => __('messages.errors),
     'primaryAction' => [
-        'label' => __('errors.pages.unexpected.primary'),
+        'label' => __('messages.errors),
         'url' => $homeUrl,
     ],
     'secondaryAction' => [
-        'label' => __('errors.pages.unexpected.secondary'),
+        'label' => __('messages.errors),
         'url' => $contactUrl,
     ],
     'links' => [

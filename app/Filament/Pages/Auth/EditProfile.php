@@ -35,7 +35,7 @@ class EditProfile extends BaseEditProfile
                                     ->required(),
                             ]),
                         TextInput::make('email')
-                            ->label(__('admin.profile.email'))
+                            ->label(__('messages.admin))
                             ->email()
                             ->required()
                             ->unique(ignoreRecord: true),
@@ -44,15 +44,15 @@ class EditProfile extends BaseEditProfile
                             ->tel()
                             ->maxLength(20),
                         Select::make('gender')
-                            ->label(__('admin.profile.gender'))
+                            ->label(__('messages.admin))
                             ->options([
-                                'male'   => __('admin.gender.male'),
-                                'female' => __('admin.gender.female'),
-                                'other'  => __('admin.gender.other'),
+                                'male'   => __('messages.admin),
+                                'female' => __('messages.admin),
+                                'other'  => __('messages.admin),
                             ])
                             ->native(false),
                         FileUpload::make('avatar_url')
-                            ->label(__('admin.profile.avatar'))
+                            ->label(__('messages.admin))
                             ->image()
                             ->imageEditor()
                             ->imageEditorAspectRatios([
@@ -66,34 +66,34 @@ class EditProfile extends BaseEditProfile
                     ->description(__('admin.profile.professional_information_description'))
                     ->schema([
                         TextInput::make('company')
-                            ->label(__('admin.profile.company'))
+                            ->label(__('messages.admin))
                             ->maxLength(255),
                         TextInput::make('position')
-                            ->label(__('admin.profile.position'))
+                            ->label(__('messages.admin))
                             ->maxLength(255),
                         TextInput::make('website')
-                            ->label(__('admin.profile.website'))
+                            ->label(__('messages.admin))
                             ->url()
                             ->maxLength(255),
                         Textarea::make('bio')
-                            ->label(__('admin.profile.bio'))
+                            ->label(__('messages.admin))
                             ->maxLength(1000)
                             ->rows(3),
                     ])
                     ->columns(2),
-                Section::make(__('admin.profile.preferences'))
+                Section::make(__('messages.admin))
                     ->description(__('admin.profile.preferences_description'))
                     ->schema([
                         Select::make('preferred_locale')
                             ->label(__('admin.profile.preferred_language'))
                             ->options([
-                                'lt' => __('admin.locales.lithuanian'),
-                                'en' => __('admin.locales.english'),
+                                'lt' => __('messages.admin),
+                                'en' => __('messages.admin),
                             ])
                             ->native(false)
                             ->required(),
                         Select::make('timezone')
-                            ->label(__('admin.profile.timezone'))
+                            ->label(__('messages.admin))
                             ->options([
                                 'Europe/Vilnius'   => 'Europe/Vilnius (GMT+2)',
                                 'Europe/London'    => 'Europe/London (GMT+0)',
@@ -107,7 +107,7 @@ class EditProfile extends BaseEditProfile
                             ->default(false),
                     ])
                     ->columns(2),
-                Section::make(__('admin.profile.security'))
+                Section::make(__('messages.admin))
                     ->description(__('admin.profile.security_description'))
                     ->schema([
                         TextInput::make('password')

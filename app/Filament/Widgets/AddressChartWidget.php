@@ -38,7 +38,7 @@ final class AddressChartWidget extends ChartWidget
                     'borderWidth'     => 2,
                 ],
                 [
-                    'label'           => __('translations.active_addresses'),
+                    'label'           => __('messages.translations),
                     'data'            => $data['active_addresses'],
                     'backgroundColor' => 'rgba(34, 197, 94, 0.1)',
                     'borderColor'     => 'rgba(34, 197, 94, 1)',

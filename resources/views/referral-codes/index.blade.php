@@ -1,11 +1,11 @@
 @extends('components.layouts.base')
 
-@section('title', __('referral_codes.pages.index.title'))
+@section('title', __('messages.referral_codes))
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
     <div class="flex justify-between items-center mb-8">
-        <h1 class="text-3xl font-bold text-gray-900">{{ __('referral_codes.pages.index.title') }}</h1>
+        <h1 class="text-3xl font-bold text-gray-900">{{ __('messages.referral_codes) }}</h1>
         <a href="{{ route('frontend.referral-codes.create') }}" 
            class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200">
             {{ __('referral_codes.actions.create_new') }}
@@ -83,10 +83,10 @@
                     <thead class="bg-gray-50">
                         <tr>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                {{ __('referral_codes.fields.code') }}
+                                {{ __('messages.referral_codes) }}
                             </th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                {{ __('referral_codes.fields.title') }}
+                                {{ __('messages.referral_codes) }}
                             </th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 {{ __('referral_codes.fields.status') }}
@@ -128,11 +128,11 @@
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     @if($referralCode->is_active)
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                            {{ __('referral_codes.status.active') }}
+                                            {{ __('messages.referral_codes) }}
                                         </span>
                                     @else
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                            {{ __('referral_codes.status.inactive') }}
+                                            {{ __('messages.referral_codes) }}
                                         </span>
                                     @endif
                                 </td>
@@ -152,7 +152,7 @@
                                             <div class="text-xs text-gray-500">{{ __('referral_codes.reward_types.' . $referralCode->reward_type) }}</div>
                                         @endif
                                     @else
-                                        <span class="text-gray-400">{{ __('referral_codes.no_reward') }}</span>
+                                        <span class="text-gray-400">{{ __('messages.referral_codes) }}</span>
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -170,7 +170,7 @@
                                         </a>
                                         <button onclick="toggleCode({{ $referralCode->id }})" 
                                                 class="text-yellow-600 hover:text-yellow-900">
-                                            {{ $referralCode->is_active ? __('referral_codes.actions.deactivate') : __('referral_codes.actions.activate') }}
+                                            {{ $referralCode->is_active ? __('messages.referral_codes) : __('messages.referral_codes) }}
                                         </button>
                                     </div>
                                 </td>

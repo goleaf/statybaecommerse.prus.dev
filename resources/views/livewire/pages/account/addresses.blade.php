@@ -1,11 +1,11 @@
 <div class="space-y-10">
     <x-breadcrumbs :items="[
-        ['label' => __('frontend.account.nav.title'), 'url' => route('account.index', ['locale' => app()->getLocale()])],
-        ['label' => __('frontend.account.addresses.title')],
+        ['label' => __('messages.frontend), 'url' => route('account.index', ['locale' => app()->getLocale()])],
+        ['label' => __('messages.frontend)],
     ]" />
     <x-page-heading
                     :title="__('frontend.account.addresses.page_title')"
-                    :description="__('frontend.account.addresses.description')" />
+                    :description="__('messages.frontend)" />
 
     <div class="space-y-8">
         <button
@@ -27,7 +27,7 @@
             </div>
         @else
             <p class="text-sm text-gray-500">
-                {{ __('frontend.account.addresses.empty') }}
+                {{ __('messages.frontend) }}
             </p>
         @endif
     </div>

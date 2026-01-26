@@ -1,16 +1,16 @@
 @extends('components.layouts.base')
 
-@section('title', __('reports.title'))
+@section('title', __('messages.reports))
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
     <!-- Header -->
     <div class="mb-8">
         <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-            {{ __('reports.title') }}
+            {{ __('messages.reports) }}
         </h1>
         <p class="text-gray-600 dark:text-gray-400">
-            {{ __('reports.description') }}
+            {{ __('messages.reports) }}
         </p>
     </div>
 
@@ -21,7 +21,7 @@
                 <!-- Search -->
                 <div>
                     <label for="search" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        {{ __('reports.filters.search') }}
+                        {{ __('messages.reports) }}
                     </label>
                     <input type="text" 
                            id="search" 
@@ -34,7 +34,7 @@
                 <!-- Type Filter -->
                 <div>
                     <label for="type" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        {{ __('reports.filters.type') }}
+                        {{ __('messages.reports) }}
                     </label>
                     <select id="type"
                             name="type"
@@ -51,7 +51,7 @@
                 <!-- Category Filter -->
                 <div>
                     <label for="report_category" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        {{ __('reports.filters.category') }}
+                        {{ __('messages.reports) }}
                     </label>
                     <select id="report_category"
                             name="report_category"
@@ -68,7 +68,7 @@
                 <!-- Sort -->
                 <div>
                     <label for="sort" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        {{ __('reports.filters.sort') }}
+                        {{ __('messages.reports) }}
                     </label>
                     <select id="sort" 
                             name="sort" 
@@ -92,12 +92,12 @@
             <div class="flex justify-between items-center">
                 <button type="submit" 
                         class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition duration-200">
-                    {{ __('reports.filters.apply') }}
+                    {{ __('messages.reports) }}
                 </button>
                 
                 <a href="{{ route('reports.index') }}" 
                    class="text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200">
-                    {{ __('reports.filters.clear') }}
+                    {{ __('messages.reports) }}
                 </a>
             </div>
         </form>
@@ -161,13 +161,13 @@
                         <div class="flex items-center justify-between">
                             <a href="{{ route('reports.show', $report) }}" 
                                class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium text-sm">
-                                {{ __('reports.actions.view') }}
+                                {{ __('messages.reports) }}
                             </a>
                             
                             @if($report->isGenerated())
                                 <a href="{{ route('reports.download', $report) }}" 
                                    class="bg-green-600 hover:bg-green-700 text-white font-medium py-1 px-3 rounded-md text-sm transition duration-200">
-                                    {{ __('reports.actions.download') }}
+                                    {{ __('messages.reports) }}
                                 </a>
                             @endif
                         </div>
@@ -187,10 +187,10 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
             </svg>
             <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">
-                {{ __('reports.empty.title') }}
+                {{ __('messages.reports) }}
             </h3>
             <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                {{ __('reports.empty.description') }}
+                {{ __('messages.reports) }}
             </p>
         </div>
     @endif

@@ -38,7 +38,7 @@
                 @if(isset($category['description']) && $category['description'])
                     <span class="popup-subtitle">{{ Str::limit($category['description'], 50) }}</span>
                 @else
-                    <span class="popup-subtitle">{{ __('home.browse_categories') }}</span>
+                    <span class="popup-subtitle">{{ __('messages.home) }}</span>
                 @endif
             </div>
             <div class="popup-list level-2-list">
@@ -76,7 +76,7 @@
                                     @if(isset($child['description']) && $child['description'])
                                         <span class="popup-subtitle">{{ Str::limit($child['description'], 50) }}</span>
                                     @else
-                                        <span class="popup-subtitle">{{ __('home.browse_categories') }}</span>
+                                        <span class="popup-subtitle">{{ __('messages.home) }}</span>
                                     @endif
                                 </div>
                                 <div class="popup-list level-3-list">

@@ -19,7 +19,7 @@
                 @endforeach
                 @if($article->is_featured)
                     <span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">
-                        {{ __('news.featured_news') }}
+                        {{ __('messages.news) }}
                     </span>
                 @endif
             </div>
@@ -37,8 +37,8 @@
                     <span>{{ $article->published_at->format('Y-m-d') }}</span>
                 </div>
                 <div class="flex items-center space-x-2">
-                    <span>{{ $article->view_count }} {{ __('news.view_count') }}</span>
-                    <span>{{ $article->comments_count }} {{ __('news.comments') }}</span>
+                    <span>{{ $article->view_count }} {{ __('messages.news) }}</span>
+                    <span>{{ $article->comments_count }} {{ __('messages.news) }}</span>
                 </div>
             </div>
         </div>

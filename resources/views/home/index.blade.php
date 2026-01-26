@@ -1,13 +1,13 @@
 @extends('frontend.layouts.app')
 
-@section('title', __('frontend.home.title'))
+@section('title', __('messages.frontend))
 
 @section('content')
     <div class="container mx-auto px-4 space-y-12" x-data>
         <section class="grid gap-8 lg:grid-cols-2 items-center">
             <div class="space-y-4">
                 <h1 class="text-4xl font-bold text-gray-900 dark:text-white">
-                    {{ __('frontend.home.hero_title') }}
+                    {{ __('messages.frontend_home) }}
                 </h1>
                 <p class="text-lg text-gray-600 dark:text-gray-300">
                     {{ __('frontend.home.hero_description') }}

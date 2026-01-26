@@ -11,7 +11,7 @@
                 <li>
                     <a href="{{ route('frontend.campaigns.index') }}"
                        class="text-blue-600 dark:text-blue-400 hover:underline">
-                        {{ __('campaigns.navigation.campaigns') }}
+                        {{ __('messages.campaigns) }}
                     </a>
                 </li>
                 <li class="text-gray-500 dark:text-gray-400">/</li>
@@ -142,7 +142,7 @@
                         @if ($campaign->budget)
                             <div>
                                 <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                    {{ __('campaigns.fields.budget') }}
+                                    {{ __('messages.campaigns) }}
                                 </dt>
                                 <dd class="mt-1 text-sm text-gray-900 dark:text-white">
                                     €{{ number_format($campaign->budget, 2) }}

@@ -1,10 +1,10 @@
 @extends('components.layouts.base')
 
-@section('title', __('frontend.legal.legal_documents'))
+@section('title', __('messages.frontend_legal))
 
 @section('meta')
-    <meta name="description" content="{{ __('frontend.legal.meta_description') }}">
-    <meta name="keywords" content="{{ __('frontend.legal.meta_keywords') }}">
+    <meta name="description" content="{{ __('messages.frontend_legal) }}">
+    <meta name="keywords" content="{{ __('messages.frontend_legal) }}">
 @endsection
 
 @section('content')
@@ -13,10 +13,10 @@
             <!-- Header -->
             <div class="text-center mb-12">
                 <h1 class="text-4xl font-bold text-gray-900 mb-4">
-                    {{ __('frontend.legal.legal_documents') }}
+                    {{ __('messages.frontend_legal) }}
                 </h1>
                 <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-                    {{ __('frontend.legal.meta_description') }}
+                    {{ __('messages.frontend_legal) }}
                 </p>
             </div>
 
@@ -69,7 +69,7 @@
                                                 @if ($document->is_required)
                                                     <span
                                                           class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                                        {{ __('frontend.legal.required') }}
+                                                        {{ __('messages.frontend_legal) }}
                                                     </span>
                                                 @endif
                                             </div>
@@ -82,13 +82,13 @@
 
                                             <div class="flex items-center justify-between text-sm text-gray-500 mb-4">
                                                 <span>
-                                                    {{ __('frontend.legal.last_updated') }}:
+                                                    {{ __('messages.frontend_legal) }}:
                                                     {{ $document->updated_at->format('Y-m-d') }}
                                                 </span>
                                                 @if ($translation->getReadingTime() > 0)
                                                     <span>
                                                         {{ $translation->getReadingTime() }}
-                                                        {{ __('frontend.legal.minutes') }}
+                                                        {{ __('messages.frontend_legal) }}
                                                     </span>
                                                 @endif
                                             </div>
@@ -96,7 +96,7 @@
                                             <a
                                                href="{{ route('legal.show', $document->key) }}"
                                                class="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium">
-                                                {{ __('frontend.legal.read_more') }}
+                                                {{ __('messages.frontend_legal) }}
                                                 <svg class="ml-1 w-4 h-4" fill="none" stroke="currentColor"
                                                      viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -130,19 +130,19 @@
                     Turite klausimų apie teisinius dokumentus?
                 </h3>
                 <p class="text-gray-600 mb-4">
-                    {{ __('frontend.legal.contact_us') }}
+                    {{ __('messages.frontend_legal) }}
                 </p>
                 @if (\Illuminate\Support\Facades\Route::has('contact'))
                     <a
                        href="{{ route('contact') }}"
                        class="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                        {{ __('frontend.legal.contact_us') }}
+                        {{ __('messages.frontend_legal) }}
                     </a>
                 @else
                     <a
                        href="#"
                        class="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                        {{ __('frontend.legal.contact_us') }}
+                        {{ __('messages.frontend_legal) }}
                     </a>
                 @endif
             </div>

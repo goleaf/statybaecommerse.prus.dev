@@ -1,17 +1,17 @@
 @extends('components.layouts.base')
 
-@section('title', __('attributes.title'))
-@section('description', __('attributes.description'))
+@section('title', __('messages.attributes))
+@section('description', __('messages.attributes))
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
     <!-- Header -->
     <div class="mb-8">
         <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-            {{ __('attributes.title') }}
+            {{ __('messages.attributes) }}
         </h1>
         <p class="text-gray-600 dark:text-gray-300">
-            {{ __('attributes.description') }}
+            {{ __('messages.attributes) }}
         </p>
     </div>
 
@@ -32,32 +32,32 @@
 
             <div>
                 <label for="type" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    {{ __('attributes.filters.type') }}
+                    {{ __('messages.attributes) }}
                 </label>
                 <select id="type" 
                         name="type"
                         class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
                     <option value="">{{ __('attributes.filters.all_types') }}</option>
                     <option value="text" {{ request('type') === 'text' ? 'selected' : '' }}>
-                        {{ __('attributes.text') }}
+                        {{ __('messages.attributes) }}
                     </option>
                     <option value="number" {{ request('type') === 'number' ? 'selected' : '' }}>
-                        {{ __('attributes.number') }}
+                        {{ __('messages.attributes) }}
                     </option>
                     <option value="boolean" {{ request('type') === 'boolean' ? 'selected' : '' }}>
-                        {{ __('attributes.boolean') }}
+                        {{ __('messages.attributes) }}
                     </option>
                     <option value="select" {{ request('type') === 'select' ? 'selected' : '' }}>
-                        {{ __('attributes.select') }}
+                        {{ __('messages.attributes) }}
                     </option>
                     <option value="multiselect" {{ request('type') === 'multiselect' ? 'selected' : '' }}>
-                        {{ __('attributes.multiselect') }}
+                        {{ __('messages.attributes) }}
                     </option>
                     <option value="color" {{ request('type') === 'color' ? 'selected' : '' }}>
-                        {{ __('attributes.color') }}
+                        {{ __('messages.attributes) }}
                     </option>
                     <option value="date" {{ request('type') === 'date' ? 'selected' : '' }}>
-                        {{ __('attributes.date') }}
+                        {{ __('messages.attributes) }}
                     </option>
                 </select>
             </div>
@@ -86,12 +86,12 @@
                     <label class="flex items-center">
                         <input type="checkbox" name="required" value="1" {{ request('required') ? 'checked' : '' }}
                                class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
-                        <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">{{ __('attributes.required') }}</span>
+                        <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">{{ __('messages.attributes) }}</span>
                     </label>
                     <label class="flex items-center">
                         <input type="checkbox" name="filterable" value="1" {{ request('filterable') ? 'checked' : '' }}
                                class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
-                        <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">{{ __('attributes.filterable') }}</span>
+                        <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">{{ __('messages.attributes) }}</span>
                     </label>
                 </div>
             </div>
@@ -135,7 +135,7 @@
                             </div>
                             @if($attribute->is_required)
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
-                                    {{ __('attributes.required') }}
+                                    {{ __('messages.attributes) }}
                                 </span>
                             @endif
                         </div>
@@ -171,7 +171,7 @@
                                 @if($attribute->is_filterable)
                                     <span class="flex items-center">
                                         <i class="fas fa-filter mr-1"></i>
-                                        {{ __('attributes.filterable') }}
+                                        {{ __('messages.attributes) }}
                                     </span>
                                 @endif
                                 @if($attribute->is_searchable)
@@ -190,7 +190,7 @@
 
                         <a href="{{ route('attributes.show', $attribute) }}" 
                            class="w-full bg-blue-600 text-white text-center px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors inline-block">
-                            {{ __('attributes.actions.view') }}
+                            {{ __('messages.attributes) }}
                         </a>
                     </div>
                 </div>

@@ -114,9 +114,9 @@ final class StockMovement extends Model
     public function getTypeLabelAttribute(): string
     {
         return match ($this->type) {
-            'in'    => __('inventory.stock_in'),
-            'out'   => __('inventory.stock_out'),
-            default => __('inventory.unknown'),
+            'in'    => __('messages.inventory),
+            'out'   => __('messages.inventory),
+            default => __('messages.inventory),
         };
     }
 
@@ -126,14 +126,14 @@ final class StockMovement extends Model
     public function getReasonLabelAttribute(): string
     {
         return match ($this->reason) {
-            'sale'              => __('inventory.reason_sale'),
-            'return'            => __('inventory.reason_return'),
-            'adjustment'        => __('inventory.reason_adjustment'),
-            'manual_adjustment' => __('inventory.reason_manual_adjustment'),
-            'restock'           => __('inventory.reason_restock'),
-            'damage'            => __('inventory.reason_damage'),
-            'theft'             => __('inventory.reason_theft'),
-            'transfer'          => __('inventory.reason_transfer'),
+            'sale'              => __('messages.inventory),
+            'return'            => __('messages.inventory),
+            'adjustment'        => __('messages.inventory),
+            'manual_adjustment' => __('messages.inventory),
+            'restock'           => __('messages.inventory),
+            'damage'            => __('messages.inventory),
+            'theft'             => __('messages.inventory),
+            'transfer'          => __('messages.inventory),
             default             => $this->reason,
         };
     }

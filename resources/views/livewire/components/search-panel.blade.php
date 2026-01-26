@@ -3,19 +3,19 @@
     <div class="mb-8">
         <h1 class="text-3xl font-bold text-gray-900 mb-4">
             @if($query)
-                {{ __('translations.search_results_for') }}: "{{ $query }}"
+                {{ __('messages.translations) }}: "{{ $query }}"
             @else
-                {{ __('translations.all_products') }}
+                {{ __('messages.translations) }}
             @endif
         </h1>
         
         <!-- Results Count -->
         <p class="text-gray-600">
-            {{ __('translations.showing') }} {{ $products->firstItem() ?? 0 }} - {{ $products->lastItem() ?? 0 }}
-            {{ __('translations.of') }} {{ $products->total() }} {{ __('translations.results') }}
+            {{ __('messages.translations) }} {{ $products->firstItem() ?? 0 }} - {{ $products->lastItem() ?? 0 }}
+            {{ __('messages.translations) }} {{ $products->total() }} {{ __('messages.translations) }}
             @if($activeFiltersCount > 0)
                 <span class="ml-2">
-                    ({{ $activeFiltersCount }} {{ __('translations.filters_applied') }})
+                    ({{ $activeFiltersCount }} {{ __('messages.translations) }})
                 </span>
             @endif
         </p>
@@ -26,26 +26,26 @@
         <div class="lg:col-span-1">
             <div class="bg-white rounded-lg shadow-sm border p-6 sticky top-4">
                 <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-semibold text-gray-900">{{ __('translations.filters') }}</h3>
+                    <h3 class="text-lg font-semibold text-gray-900">{{ __('messages.translations) }}</h3>
                     @if($activeFiltersCount > 0)
                         <button 
                             wire:click="clearFilters"
                             wire:confirm="{{ __('translations.confirm_clear_search_filters') }}"
                             class="text-sm text-blue-600 hover:text-blue-800"
                         >
-                            {{ __('translations.clear_all_filters') }}
+                            {{ __('messages.translations) }}
                         </button>
                     @endif
                 </div>
 
                 <!-- Price Range -->
                 <div class="mb-6">
-                    <h4 class="font-medium text-gray-900 mb-3">{{ __('translations.price_range') }}</h4>
+                    <h4 class="font-medium text-gray-900 mb-3">{{ __('messages.translations) }}</h4>
                     <div class="grid grid-cols-2 gap-2">
                         <input 
                             type="number" 
                             wire:model.live.debounce.500ms="minPrice"
-                            placeholder="{{ __('translations.min') }}"
+                            placeholder="{{ __('messages.translations) }}"
                             min="{{ $priceRange['min'] }}"
                             max="{{ $priceRange['max'] }}"
                             class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
@@ -53,7 +53,7 @@
                         <input 
                             type="number" 
                             wire:model.live.debounce.500ms="maxPrice"
-                            placeholder="{{ __('translations.max') }}"
+                            placeholder="{{ __('messages.translations) }}"
                             min="{{ $priceRange['min'] }}"
                             max="{{ $priceRange['max'] }}"
                             class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
@@ -67,7 +67,7 @@
                 <!-- Categories -->
                 @if($categories->count() > 0)
                     <div class="mb-6">
-                        <h4 class="font-medium text-gray-900 mb-3">{{ __('translations.categories') }}</h4>
+                        <h4 class="font-medium text-gray-900 mb-3">{{ __('messages.translations) }}</h4>
                         <div class="space-y-2 max-h-48 overflow-y-auto">
                             @foreach($categories as $category)
                                 <label class="flex items-center">
@@ -90,7 +90,7 @@
                 <!-- Brands -->
                 @if($brands->count() > 0)
                     <div class="mb-6">
-                        <h4 class="font-medium text-gray-900 mb-3">{{ __('translations.brands') }}</h4>
+                        <h4 class="font-medium text-gray-900 mb-3">{{ __('messages.translations) }}</h4>
                         <div class="space-y-2 max-h-48 overflow-y-auto">
                             @foreach($brands as $brand)
                                 <label class="flex items-center">
@@ -141,7 +141,7 @@
                             wire:model.live="inStock"
                             class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                         >
-                        <span class="ml-2 text-sm text-gray-700">{{ __('translations.in_stock_only') }}</span>
+                        <span class="ml-2 text-sm text-gray-700">{{ __('messages.translations) }}</span>
                     </label>
                     
                     <label class="flex items-center">
@@ -150,7 +150,7 @@
                             wire:model.live="onSale"
                             class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                         >
-                        <span class="ml-2 text-sm text-gray-700">{{ __('translations.on_sale') }}</span>
+                        <span class="ml-2 text-sm text-gray-700">{{ __('messages.translations) }}</span>
                     </label>
                 </div>
             </div>
@@ -183,22 +183,22 @@
 
                     <!-- Per Page -->
                     <select wire:model.live="perPage" class="border border-gray-300 rounded px-3 py-2 text-sm">
-                        <option value="12">12 {{ __('translations.per_page') }}</option>
-                        <option value="24">24 {{ __('translations.per_page') }}</option>
-                        <option value="48">48 {{ __('translations.per_page') }}</option>
+                        <option value="12">12 {{ __('messages.translations) }}</option>
+                        <option value="24">24 {{ __('messages.translations) }}</option>
+                        <option value="48">48 {{ __('messages.translations) }}</option>
                     </select>
                 </div>
 
                 <!-- Sort Options -->
                 <div class="flex items-center space-x-2">
-                    <label class="text-sm text-gray-600">{{ __('translations.sort_by') }}:</label>
+                    <label class="text-sm text-gray-600">{{ __('messages.translations) }}:</label>
                     <select wire:model.live="sortBy" class="border border-gray-300 rounded px-3 py-2 text-sm">
-                        <option value="relevance">{{ __('translations.relevance') }}</option>
-                        <option value="name">{{ __('translations.name') }}</option>
-                        <option value="price_asc">{{ __('translations.price_low_high') }}</option>
-                        <option value="price_desc">{{ __('translations.price_high_low') }}</option>
-                        <option value="created_at">{{ __('translations.newest') }}</option>
-                        <option value="rating">{{ __('translations.best_rated') }}</option>
+                        <option value="relevance">{{ __('messages.translations) }}</option>
+                        <option value="name">{{ __('messages.translations) }}</option>
+                        <option value="price_asc">{{ __('messages.translations) }}</option>
+                        <option value="price_desc">{{ __('messages.translations) }}</option>
+                        <option value="created_at">{{ __('messages.translations) }}</option>
+                        <option value="rating">{{ __('messages.translations) }}</option>
                     </select>
                 </div>
             </div>
@@ -233,7 +233,7 @@
                                             €{{ number_format($product->variants->first()?->price ?? 0, 2) }}
                                         </div>
                                         <button class="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700">
-                                            {{ __('translations.add_to_cart') }}
+                                            {{ __('messages.translations) }}
                                         </button>
                                     </div>
                                 </div>
@@ -252,15 +252,15 @@
                     <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                     </svg>
-                    <h3 class="mt-2 text-sm font-medium text-gray-900">{{ __('translations.no_products_found') }}</h3>
-                    <p class="mt-1 text-sm text-gray-500">{{ __('translations.adjust_search_filters') }}</p>
+                    <h3 class="mt-2 text-sm font-medium text-gray-900">{{ __('messages.translations) }}</h3>
+                    <p class="mt-1 text-sm text-gray-500">{{ __('messages.translations) }}</p>
                     @if($activeFiltersCount > 0)
                         <button 
                             wire:click="clearFilters"
                             wire:confirm="{{ __('translations.confirm_clear_search_filters') }}"
                             class="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
                         >
-                            {{ __('translations.clear_filters') }}
+                            {{ __('messages.translations) }}
                         </button>
                     @endif
                 </div>

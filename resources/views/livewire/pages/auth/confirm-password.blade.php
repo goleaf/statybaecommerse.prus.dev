@@ -23,7 +23,7 @@ new #[Layout('components.layouts.base')] class extends Component {
             ])
         ) {
             throw ValidationException::withMessages([
-                'password' => __('auth.password'),
+                'password' => __('messages.auth),
             ]);
         }
 

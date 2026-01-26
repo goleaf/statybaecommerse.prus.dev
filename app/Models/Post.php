@@ -288,7 +288,7 @@ final class Post extends Model implements HasMedia
     public function getStatusLabelAttribute(): string
     {
         if ($this->status === 'archived') {
-            return __('posts.status.archived');
+            return __('messages.posts);
         }
 
         return $this->resolveModerationState()->label();

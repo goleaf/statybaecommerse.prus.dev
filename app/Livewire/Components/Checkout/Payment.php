@@ -66,7 +66,7 @@ class Payment extends StepComponent
      */
     public function stepInfo(): array
     {
-        return ['label' => __('Payment'), 'complete' => session()->exists('checkout') && data_get(session()->get('checkout'), 'payment') !== null];
+        return ['label' => __('messages.Payment'), 'complete' => session()->exists('checkout') && data_get(session()->get('checkout'), 'payment') !== null];
     }
 
     /**

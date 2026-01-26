@@ -16,7 +16,7 @@
     <button
         @click="open = !open"
         class="relative p-2 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
-        aria-label="{{ __('Notifications') }}"
+        aria-label="{{ __('messages.Notifications') }}"
     >
         <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM4 19h6v-6H4v6zM4 5h6V1H4v4zM15 3h5l-5-5v5z"></path>
@@ -46,7 +46,7 @@
         <div class="px-4 py-3 border-b border-gray-200">
             <div class="flex items-center justify-between">
                 <h3 class="text-sm font-medium text-gray-900">
-                    {{ __('Notifications') }}
+                    {{ __('messages.Notifications') }}
                 </h3>
                 @if($isAuthenticated && $unreadCount > 0)
                     <button

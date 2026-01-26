@@ -87,6 +87,18 @@ final class Index extends Component implements HasSchemas
 
     public bool $sidebarOpen = false;
 
+    #[Computed]
+    public function pageTitle(): string
+    {
+        return __('messages.categories_index_meta_title');
+    }
+
+    #[Computed]
+    public function pageDescription(): string
+    {
+        return __('messages.categories_index_meta_description');
+    }
+
     public function mount(): void
     {
         // Normalize legacy single brand parameter to the modern multi-select input.
@@ -377,7 +389,7 @@ final class Index extends Component implements HasSchemas
     {
         return view('livewire.pages.category.show')
             ->layout('components.layouts.base', [
-                'title' => __('messages.categories_index_meta_title'),
+                'title' => $this->pageTitle(),
             ]);
     }
 

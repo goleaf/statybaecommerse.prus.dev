@@ -73,11 +73,11 @@ final class NewsletterSubscription extends Component
                     $existingSubscriber->resubscribe();
                     $this->isSubscribed = true;
                     $this->showSuccess = true;
-                    session()->flash('success', __('newsletter.resubscribed_successfully'));
+                    session()->flash('success', __('messages.newsletter));
                 } else {
                     // Already subscribed
                     $this->isSubscribed = true;
-                    session()->flash('info', __('newsletter.already_subscribed'));
+                    session()->flash('info', __('messages.newsletter));
                 }
             } else {
                 // Create new subscriber
@@ -85,14 +85,14 @@ final class NewsletterSubscription extends Component
                 Subscriber::subscribe($subscriberData);
                 $this->isSubscribed = true;
                 $this->showSuccess = true;
-                session()->flash('success', __('newsletter.subscribed_successfully'));
+                session()->flash('success', __('messages.newsletter));
                 // Dispatch event for other components to listen
                 $this->dispatch('subscriber-added', ['email' => $this->email, 'name' => trim($this->first_name . ' ' . $this->last_name)]);
             }
             $this->resetForm();
         } catch (Exception $e) {
             Log::error('Newsletter subscription error: ' . $e->getMessage());
-            session()->flash('error', __('newsletter.subscription_error'));
+            session()->flash('error', __('messages.newsletter));
         }
     }
 

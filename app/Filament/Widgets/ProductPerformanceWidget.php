@@ -23,7 +23,7 @@ final class ProductPerformanceWidget extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label'           => __('dashboard.product_views'),
+                    'label'           => __('messages.dashboard),
                     'data'            => $products->pluck('views_count')->toArray(),
                     'backgroundColor' => [
                         '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6',

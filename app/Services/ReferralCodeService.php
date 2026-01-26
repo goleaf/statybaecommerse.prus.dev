@@ -153,8 +153,8 @@ final class ReferralCodeService
     {
         $referralUrl = urlencode($this->getReferralUrl($code));
         $shareTargets = config('referral.share_targets', []);
-        $subject = rawurlencode($message ?? __('referrals.share.subject'));
-        $body = rawurlencode(($message ?? __('referrals.share.body')) . ' ' . $this->getReferralUrl($code));
+        $subject = rawurlencode($message ?? __('messages.referrals));
+        $body = rawurlencode(($message ?? __('messages.referrals)) . ' ' . $this->getReferralUrl($code));
 
         // Map each configured target into a concrete share link while keeping
         // the code resilient to partial configuration overrides.

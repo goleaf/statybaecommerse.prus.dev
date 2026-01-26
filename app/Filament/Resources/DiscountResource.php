@@ -55,29 +55,29 @@ final class DiscountResource extends BaseResource
                     SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('name')
-                                ->label(__('admin.discounts.name'))
+                                ->label(__('messages.admin))
                                 ->required()
                                 ->maxLength(255),
                             TextInput::make('code')
-                                ->label(__('admin.discounts.code'))
+                                ->label(__('messages.admin))
                                 ->required()
                                 ->unique(ignoreRecord: true)
                                 ->maxLength(50),
                         ]),
                     RichEditor::make('description')
-                        ->label(__('admin.discounts.description'))
+                        ->label(__('messages.admin))
                         ->columnSpanFull(),
                     SchemaGrid::make(3)
                         ->schema([
                             Select::make('type')
-                                ->label(__('admin.discounts.type'))
+                                ->label(__('messages.admin))
                                 ->options([
-                                    'percentage' => __('admin.discounts.percentage'),
+                                    'percentage' => __('messages.admin),
                                     'fixed'      => __('admin.discounts.fixed_amount'),
                                 ])
                                 ->required(),
                             TextInput::make('value')
-                                ->label(__('admin.discounts.value'))
+                                ->label(__('messages.admin))
                                 ->required()
                                 ->numeric()
                                 ->minValue(0),
@@ -86,7 +86,7 @@ final class DiscountResource extends BaseResource
                                 ->default(true),
                         ]),
                 ]),
-            SchemaSection::make(__('admin.discounts.validity'))
+            SchemaSection::make(__('messages.admin))
                 ->description(__('admin.discounts.validity_description'))
                 ->schema([
                     SchemaGrid::make(2)
@@ -119,23 +119,23 @@ final class DiscountResource extends BaseResource
         return $table
             ->columns([
                 TextColumn::make('name')
-                    ->label(__('admin.discounts.name'))
+                    ->label(__('messages.admin))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('code')
-                    ->label(__('admin.discounts.code'))
+                    ->label(__('messages.admin))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('type')
-                    ->label(__('admin.discounts.type'))
+                    ->label(__('messages.admin))
                     ->formatStateUsing(fn ($state) => match ($state) {
-                        'percentage' => __('admin.discounts.percentage'),
+                        'percentage' => __('messages.admin),
                         'fixed'      => __('admin.discounts.fixed_amount'),
                         default      => $state,
                     })
                     ->sortable(),
                 TextColumn::make('value')
-                    ->label(__('admin.discounts.value'))
+                    ->label(__('messages.admin))
                     ->formatStateUsing(fn ($state, $record) => $record->type === 'percentage'
                             ? $state . '%'
                             : '€' . number_format($state, 2)

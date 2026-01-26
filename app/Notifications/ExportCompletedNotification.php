@@ -36,11 +36,11 @@ final class ExportCompletedNotification extends Notification implements ShouldQu
         $expiresIn = (int) config('export.download_url_ttl', 60);
 
         return (new MailMessage)
-            ->subject(__('exports.notifications.completed.subject', ['name' => $this->export->name]))
-            ->line(__('exports.notifications.completed.intro'))
-            ->line(__('exports.notifications.completed.format', ['format' => strtoupper($this->export->format)]))
-            ->action(__('exports.notifications.completed.action'), $this->downloadUrl)
-            ->line(__('exports.notifications.completed.expires', ['minutes' => $expiresIn]));
+            ->subject(__('messages.exports, ['name' => $this->export->name]))
+            ->line(__('messages.exports))
+            ->line(__('messages.exports, ['format' => strtoupper($this->export->format)]))
+            ->action(__('messages.exports), $this->downloadUrl)
+            ->line(__('messages.exports, ['minutes' => $expiresIn]));
     }
 
     /**

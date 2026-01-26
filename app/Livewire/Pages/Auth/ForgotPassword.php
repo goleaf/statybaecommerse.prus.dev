@@ -171,7 +171,7 @@ final class ForgotPassword extends Component
             $seconds = $this->decaySeconds();
         }
 
-        $message = trans('auth.throttle', [
+        $message = trans('messages.auth, [
             'seconds' => $seconds,
             'minutes' => (int) ceil($seconds / 60),
         ]);

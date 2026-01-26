@@ -58,7 +58,7 @@ final class CheckoutController extends Controller
 
             return $this->respondError(
                 $request,
-                __('auth.throttle', [
+                __('messages.auth, [
                     'seconds' => $seconds,
                     'minutes' => (int) ceil($seconds / 60),
                 ]),
@@ -152,7 +152,7 @@ final class CheckoutController extends Controller
                 'exception' => $exception,
             ]);
 
-            return $this->respondError($request, __('ecommerce.payment_failed'), 500);
+            return $this->respondError($request, __('messages.ecommerce), 500);
         }
 
         $cartLifecycleService->clearAfterCheckout(
@@ -173,7 +173,7 @@ final class CheckoutController extends Controller
         if ($request->wantsJson()) {
             return response()->json([
                 'success'  => true,
-                'message'  => __('ecommerce.order_placed_successfully'),
+                'message'  => __('messages.ecommerce),
                 'order_id' => $order->getKey(),
                 'order'    => [
                     'id'     => $order->getKey(),
@@ -182,7 +182,7 @@ final class CheckoutController extends Controller
             ], 201);
         }
 
-        return redirect()->route('frontend.checkout.success')->with('status', __('ecommerce.order_placed_successfully'));
+        return redirect()->route('frontend.checkout.success')->with('status', __('messages.ecommerce));
     }
 
     public function success(Request $request): View

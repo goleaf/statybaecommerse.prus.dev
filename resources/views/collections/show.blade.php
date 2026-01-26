@@ -47,11 +47,11 @@
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
                                 {{ $collection->is_automatic ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' }}">
                                 <i class="fas {{ $collection->is_automatic ? 'fa-cog' : 'fa-hand' }} mr-1"></i>
-                                {{ $collection->is_automatic ? __('collections.types.automatic') : __('collections.types.manual') }}
+                                {{ $collection->is_automatic ? __('messages.collections) : __('messages.collections) }}
                             </span>
                             <span>
                                 <i class="fas fa-box mr-1"></i>
-                                {{ $collection->getProductsCountAttribute() }} {{ __('collections.products') }}
+                                {{ $collection->getProductsCountAttribute() }} {{ __('messages.collections) }}
                             </span>
                             <span>
                                 <i class="fas fa-eye mr-1"></i>
@@ -142,26 +142,26 @@
             <!-- Collection Info -->
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                    {{ __('collections.collection_info') }}
+                    {{ __('messages.collections) }}
                 </h3>
                 
                 <div class="space-y-3">
                     <div class="flex justify-between">
-                        <span class="text-gray-600 dark:text-gray-300">{{ __('collections.type') }}:</span>
+                        <span class="text-gray-600 dark:text-gray-300">{{ __('messages.collections) }}:</span>
                         <span class="font-medium text-gray-900 dark:text-white">
-                            {{ $collection->is_automatic ? __('collections.types.automatic') : __('collections.types.manual') }}
+                            {{ $collection->is_automatic ? __('messages.collections) : __('messages.collections) }}
                         </span>
                     </div>
                     
                     <div class="flex justify-between">
-                        <span class="text-gray-600 dark:text-gray-300">{{ __('collections.products_count') }}:</span>
+                        <span class="text-gray-600 dark:text-gray-300">{{ __('messages.collections) }}:</span>
                         <span class="font-medium text-gray-900 dark:text-white">
                             {{ $collection->getProductsCountAttribute() }}
                         </span>
                     </div>
                     
                     <div class="flex justify-between">
-                        <span class="text-gray-600 dark:text-gray-300">{{ __('collections.display_type') }}:</span>
+                        <span class="text-gray-600 dark:text-gray-300">{{ __('messages.collections) }}:</span>
                         <span class="font-medium text-gray-900 dark:text-white">
                             {{ __('collections.display_types.' . $collection->display_type) }}
                         </span>
@@ -169,7 +169,7 @@
                     
                     @if($collection->products_per_page)
                         <div class="flex justify-between">
-                            <span class="text-gray-600 dark:text-gray-300">{{ __('collections.products_per_page') }}:</span>
+                            <span class="text-gray-600 dark:text-gray-300">{{ __('messages.collections) }}:</span>
                             <span class="font-medium text-gray-900 dark:text-white">
                                 {{ $collection->products_per_page }}
                             </span>
@@ -177,7 +177,7 @@
                     @endif
                     
                     <div class="flex justify-between">
-                        <span class="text-gray-600 dark:text-gray-300">{{ __('collections.show_filters') }}:</span>
+                        <span class="text-gray-600 dark:text-gray-300">{{ __('messages.collections) }}:</span>
                         <span class="font-medium text-gray-900 dark:text-white">
                             {{ $collection->show_filters ? __('common.yes') : __('common.no') }}
                         </span>
@@ -210,7 +210,7 @@
                                         {{ $relatedCollection->getTranslatedName() }}
                                     </h4>
                                     <p class="text-xs text-gray-500 dark:text-gray-400">
-                                        {{ $relatedCollection->getProductsCountAttribute() }} {{ __('collections.products') }}
+                                        {{ $relatedCollection->getProductsCountAttribute() }} {{ __('messages.collections) }}
                                     </p>
                                 </div>
                                 

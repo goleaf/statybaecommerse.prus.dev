@@ -78,7 +78,7 @@ final class InventoryManagementPageTest extends TestCase
     {
         // Verify the navigation metadata remains aligned with the product tooling group.
         $this->assertSame('heroicon-o-archive-box', InventoryManagement::getNavigationIcon());
-        $this->assertSame(__('admin.navigation.products'), InventoryManagement::getNavigationGroup());
+        $this->assertSame(__('messages.admin), InventoryManagement::getNavigationGroup());
         $this->assertSame('inventory-management', InventoryManagement::getSlug());
     }
 }

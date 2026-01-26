@@ -31,7 +31,7 @@ final class CacheMaintenance extends Page
 
     public static function getNavigationGroup(): ?string
     {
-        return __('admin.navigation.system'); // Keep cache tooling aligned with the broader system utilities group.
+        return __('messages.admin); // Keep cache tooling aligned with the broader system utilities group.
     }
 
     protected static ?string $slug = 'cache-maintenance';
