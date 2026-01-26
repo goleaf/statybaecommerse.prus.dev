@@ -116,6 +116,7 @@
             </div>
 
             <div class="hidden md:flex items-center gap-5">
+                <x-language-switcher class="!text-dark hover:!text-stone hover:!bg-transparent !p-0" />
                 <a href="#" class="flex items-center group gap-2 hover:text-stone transition-colors">
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 5h16v14H4zM8 9h8M8 13h5" />

@@ -23,7 +23,7 @@
 
 <div class="relative" x-data="{ open: false }">
     <button @click="open = !open"
-            class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-700 hover:text-blue-600 hover:bg-blue-50 transition-colors duration-200"
+            {{ $attributes->merge(['class' => 'flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-700 hover:text-blue-600 hover:bg-blue-50 transition-colors duration-200']) }}
             aria-label="{{ __('frontend.language_switcher.change') }}"
             aria-expanded="false"
             aria-haspopup="true">
