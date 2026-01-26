@@ -19,8 +19,10 @@ use Illuminate\Database\Eloquent\Builder;
 
 final class InventoryManagement extends Page implements HasTable
 {
-    use InteractsWithTable;
-    use \App\Filament\Tables\Concerns\ConfiguresToggleableTableLayout;
+    use InteractsWithTable {
+        paginateTableQuery as basePaginateTableQuery;
+    }
+
 
     protected string $view = 'filament.pages.inventory-management';
 
@@ -87,7 +89,7 @@ final class InventoryManagement extends Page implements HasTable
                     }),
             ]);
 
-        return $this->applyToggleableTableLayout($table);
+        return $table;
     }
 
     protected function paginateTableQuery(Builder $query): Paginator|CursorPaginator

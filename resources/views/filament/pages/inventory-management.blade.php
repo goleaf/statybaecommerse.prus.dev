@@ -1,8 +1,3 @@
-<div>
-    <div class="p-4">
-        <h1 class="text-xl font-semibold">{{ __('admin.inventory_management.title') }}</h1>
-    </div>
-</div>
 
 <x-filament-panels::page>
     <div class="space-y-6">
