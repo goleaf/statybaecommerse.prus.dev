@@ -211,6 +211,6 @@ class Search extends Component
      */
     public function render(): View
     {
-        return view('livewire.pages.search', ['products' => $this->searchResults, 'term' => $this->q])->title(__('messages.frontend));
+        return view('livewire.pages.search', ['products' => $this->searchResults, 'term' => $this->q])->title(__('messages.frontend'));
     }
 }
