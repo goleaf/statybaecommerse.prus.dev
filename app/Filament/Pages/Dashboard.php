@@ -33,12 +33,12 @@ class Dashboard extends BaseDashboard
 
     public static function getNavigationLabel(): string
     {
-        return trans('messages.admin);
+        return trans('messages.admin');
     }
 
     public function getTitle(): string
     {
-        return trans('messages.admin);
+        return trans('messages.admin');
     }
 
     public function getHeading(): string

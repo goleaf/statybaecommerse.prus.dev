@@ -304,7 +304,7 @@ return [
     'categories_show_sort_newest' => 'Newest',
     'categories_show_sort_price' => 'Price',
     'categories_show_sort_rating' => 'Rating',
-    'categories_show_try_different_search' => 'Try adjusting your filters or search terms to find what you\',
+    'categories_show_try_different_search' => 'Try adjusting your filters or search terms to find what you\'re looking for.',
     'categories_show_view_all_products' => 'View All Products',
     'categories_show_view_grid' => 'Grid',
     'categories_show_view_list' => 'List',

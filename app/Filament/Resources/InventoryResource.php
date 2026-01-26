@@ -51,13 +51,13 @@ final class InventoryResource extends BaseResource
                     SchemaGrid::make(2)
                         ->schema([
                             Select::make('product_id')
-                                ->label(__('messages.admin))
+                                ->label(__('messages.product'))
                                 ->relationship('product', 'name')
                                 ->required()
                                 ->searchable()
                                 ->preload(),
                             TextInput::make('quantity')
-                                ->label(__('messages.admin))
+                                ->label(__('messages.quantity'))
                                 ->required()
                                 ->numeric()
                                 ->minValue(0),
@@ -84,15 +84,15 @@ final class InventoryResource extends BaseResource
         return $table
             ->columns([
                 TextColumn::make('product.name')
-                    ->label(__('messages.admin))
+                    ->label(__('messages.product'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('product.sku')
-                    ->label(__('messages.admin))
+                    ->label(__('messages.sku'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('quantity')
-                    ->label(__('messages.admin))
+                    ->label(__('messages.quantity'))
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('reserved_quantity')

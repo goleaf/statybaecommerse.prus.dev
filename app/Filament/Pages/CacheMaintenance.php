@@ -7,6 +7,7 @@ namespace App\Filament\Pages;
 use BackedEnum;
 use Filament\Forms;
 use Filament\Forms\Components\Section;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Schema;
@@ -31,7 +32,7 @@ final class CacheMaintenance extends Page
 
     public static function getNavigationGroup(): ?string
     {
-        return __('messages.admin); // Keep cache tooling aligned with the broader system utilities group.
+        return __('messages.system'); // Keep cache tooling aligned with the broader system utilities group.
     }
 
     protected static ?string $slug = 'cache-maintenance';

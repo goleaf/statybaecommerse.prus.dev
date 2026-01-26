@@ -54,22 +54,22 @@ final class CategoryResource extends BaseResource
                     SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('name')
-                                ->label(__('messages.admin))
+                                ->label(__('messages.name'))
                                 ->required()
                                 ->maxLength(255),
                             TextInput::make('slug')
-                                ->label(__('messages.admin))
+                                ->label(__('messages.slug'))
                                 ->required()
                                 ->unique(ignoreRecord: true)
                                 ->maxLength(255),
                         ]),
                     RichEditor::make('description')
-                        ->label(__('messages.admin))
+                        ->label(__('messages.description'))
                         ->columnSpanFull(),
                     SchemaGrid::make(2)
                         ->schema([
                             Select::make('parent_id')
-                                ->label(__('messages.admin))
+                                ->label(__('messages.category'))
                                 ->relationship('parent', 'name')
                                 ->searchable()
                                 ->preload(),
@@ -86,15 +86,15 @@ final class CategoryResource extends BaseResource
         return $table
             ->columns([
                 TextColumn::make('name')
-                    ->label(__('messages.admin))
+                    ->label(__('messages.name'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('slug')
-                    ->label(__('messages.admin))
+                    ->label(__('messages.slug'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('parent.name')
-                    ->label(__('messages.admin))
+                    ->label(__('messages.category'))
                     ->sortable(),
                 ToggleColumn::make('is_active')
                     ->label(__('admin.categories.is_active')),

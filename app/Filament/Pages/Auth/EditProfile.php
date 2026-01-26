@@ -11,6 +11,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
 // use Filament\Pages\Auth\EditProfile as BaseEditProfile;
 use Filament\Pages\Page as BaseEditProfile;
 
@@ -35,24 +36,24 @@ class EditProfile extends BaseEditProfile
                                     ->required(),
                             ]),
                         TextInput::make('email')
-                            ->label(__('messages.admin))
+                            ->label(__('messages.email'))
                             ->email()
                             ->required()
-                            ->unique(ignoreRecord: true),
+                            ->unique(null, null, null, true),
                         TextInput::make('phone_number')
                             ->label(__('admin.profile.phone_number'))
                             ->tel()
                             ->maxLength(20),
                         Select::make('gender')
-                            ->label(__('messages.admin))
+                            ->label(__('Gender'))
                             ->options([
-                                'male'   => __('messages.admin),
-                                'female' => __('messages.admin),
-                                'other'  => __('messages.admin),
+                                'male'   => __('Male'),
+                                'female' => __('Female'),
+                                'other'  => __('Other'),
                             ])
                             ->native(false),
                         FileUpload::make('avatar_url')
-                            ->label(__('messages.admin))
+                            ->label(__('Avatar'))
                             ->image()
                             ->imageEditor()
                             ->imageEditorAspectRatios([
@@ -66,34 +67,34 @@ class EditProfile extends BaseEditProfile
                     ->description(__('admin.profile.professional_information_description'))
                     ->schema([
                         TextInput::make('company')
-                            ->label(__('messages.admin))
+                            ->label(__('Company'))
                             ->maxLength(255),
                         TextInput::make('position')
-                            ->label(__('messages.admin))
+                            ->label(__('Position'))
                             ->maxLength(255),
                         TextInput::make('website')
-                            ->label(__('messages.admin))
+                            ->label(__('Website'))
                             ->url()
                             ->maxLength(255),
                         Textarea::make('bio')
-                            ->label(__('messages.admin))
+                            ->label(__('Bio'))
                             ->maxLength(1000)
                             ->rows(3),
                     ])
                     ->columns(2),
-                Section::make(__('messages.admin))
+                Section::make(__('Preferences'))
                     ->description(__('admin.profile.preferences_description'))
                     ->schema([
                         Select::make('preferred_locale')
                             ->label(__('admin.profile.preferred_language'))
                             ->options([
-                                'lt' => __('messages.admin),
-                                'en' => __('messages.admin),
+                                'lt' => __('Lithuanian'),
+                                'en' => __('English'),
                             ])
                             ->native(false)
                             ->required(),
                         Select::make('timezone')
-                            ->label(__('messages.admin))
+                            ->label(__('Timezone'))
                             ->options([
                                 'Europe/Vilnius'   => 'Europe/Vilnius (GMT+2)',
                                 'Europe/London'    => 'Europe/London (GMT+0)',
@@ -107,7 +108,7 @@ class EditProfile extends BaseEditProfile
                             ->default(false),
                     ])
                     ->columns(2),
-                Section::make(__('messages.admin))
+                Section::make(__('Security'))
                     ->description(__('admin.profile.security_description'))
                     ->schema([
                         TextInput::make('password')

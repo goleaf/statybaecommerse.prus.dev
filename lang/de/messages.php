@@ -604,4 +604,6 @@ return [
     'your_cart' => 'Ihr Warenkorb',
     'your_cart_is_empty' => 'Ihr Warenkorb ist leer',
     'zone' => 'Zone',
+    'checkout_terms_acknowledgement' => 'Mit der Bestellung stimmen Sie unseren Verkaufs- und Rückgabebedingungen zu und bestätigen, dass Ihre Kontaktdaten für Lieferupdates korrekt sind.',
+    'same_as_delivery_address' => 'Gleich wie Lieferadresse',
 ];
