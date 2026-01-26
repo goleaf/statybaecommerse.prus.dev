@@ -56,27 +56,27 @@ final class ProductResource extends BaseResource
                     SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('name')
-                                ->label(__('messages.admin))
+                                ->label(__('messages.name'))
                                 ->required()
                                 ->maxLength(255),
                             TextInput::make('sku')
-                                ->label(__('messages.admin))
+                                ->label(__('messages.sku'))
                                 ->required()
                                 ->unique(ignoreRecord: true)
                                 ->maxLength(100),
                         ]),
                     RichEditor::make('description')
-                        ->label(__('messages.admin))
+                        ->label(__('messages.description'))
                         ->columnSpanFull(),
                     SchemaGrid::make(2)
                         ->schema([
                             Select::make('brand_id')
-                                ->label(__('messages.admin))
+                                ->label(__('messages.brand'))
                                 ->relationship('brand', 'name')
                                 ->searchable()
                                 ->preload(),
                             Select::make('category_id')
-                                ->label(__('messages.admin))
+                                ->label(__('messages.category'))
                                 ->relationship('category', 'name')
                                 ->searchable()
                                 ->preload(),
@@ -85,11 +85,11 @@ final class ProductResource extends BaseResource
                         ->label(__('admin.products.is_active'))
                         ->default(true),
                 ]),
-            SchemaSection::make(__('messages.admin))
+            SchemaSection::make(__('messages.media'))
                 ->description(__('admin.products.images_description'))
                 ->schema([
                     FileUpload::make('images')
-                        ->label(__('messages.admin))
+                        ->label(__('messages.image'))
                         ->multiple()
                         ->image()
                         ->reorderable()
@@ -104,23 +104,23 @@ final class ProductResource extends BaseResource
         return $table
             ->columns([
                 ImageColumn::make('images')
-                    ->label(__('messages.admin))
+                    ->label(__('messages.image'))
                     ->circular()
                     ->stacked()
                     ->limit(3),
                 TextColumn::make('name')
-                    ->label(__('messages.admin))
+                    ->label(__('messages.name'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('sku')
-                    ->label(__('messages.admin))
+                    ->label(__('messages.sku'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('brand.name')
-                    ->label(__('messages.admin))
+                    ->label(__('messages.brand'))
                     ->sortable(),
                 TextColumn::make('category.name')
-                    ->label(__('messages.admin))
+                    ->label(__('messages.category'))
                     ->sortable(),
                 ToggleColumn::make('is_active')
                     ->label(__('admin.products.is_active')),

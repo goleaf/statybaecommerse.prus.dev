@@ -11,6 +11,7 @@ use Filament\Forms;
 use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Tables\Actions\Action;
@@ -67,7 +68,7 @@ final class DataImportExport extends Page
                                     ->label(__('translations.download_images'))
                                     ->default(true),
                             ]),
-                        Fieldset::make(__('messages.translations))
+                        Fieldset::make(__('Export'))
                             ->schema([
                                 Forms\Components\TextInput::make('exportPath')
                                     ->label(__('translations.export_path'))
@@ -115,7 +116,7 @@ final class DataImportExport extends Page
                     $this->dispatch('imported', created: $res['categories']['created'] + $res['products']['created']);
                 }),
             Action::make('export')
-                ->label(__('messages.translations))
+                ->label(__('Export'))
                 ->action(function (): void {
                     $provider = ProviderRegistry::get($this->provider ?? 'xml');
                     if (! $provider) {

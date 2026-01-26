@@ -33,7 +33,7 @@ final class InventoryManagement extends Page implements HasTable
 
     public static function getNavigationGroup(): ?string
     {
-        return __('messages.admin);
+        return __('messages.inventory');
     }
 
     public static function getSlug(?\Filament\Panel $panel = null): string
