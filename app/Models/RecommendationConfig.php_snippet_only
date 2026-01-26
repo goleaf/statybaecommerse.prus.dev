@@ -1,0 +1,4 @@
+    public function analytics(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(\App\Models\Analytics::class);
+    }
