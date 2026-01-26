@@ -8,26 +8,26 @@
             <div class="space-y-4 max-w-2xl">
                 <span
                       class="inline-flex items-center gap-2 rounded-full border border-gray-300 bg-gray-100 px-4 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-gray-600">
-                    {{ __('home.catalog_categories') }}
+                    {{ __('messages.home) }}
                 </span>
                 <h2 id="home-categories-heading"
                     class="text-3xl sm:text-4xl font-heading font-semibold leading-tight text-gray-900">
-                    {{ __('home.explore_store_sections') }}
+                    {{ __('messages.home) }}
                 </h2>
                 <p class="text-sm sm:text-base text-gray-600 leading-relaxed">
-                    {{ __('home.browse_categories_description') }}
+                    {{ __('messages.home) }}
                 </p>
             </div>
             <a href="{{ route('localized.categories.index', ['locale' => app()->getLocale()]) }}"
                class="inline-flex items-center gap-2 self-start rounded-full border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-50">
-                {{ __('home.all_categories') }}
+                {{ __('messages.home) }}
                 <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
                 </svg>
             </a>
         </div>
 
-        <div aria-label="{{ __('home.categories_grid') }}">
+        <div aria-label="{{ __('messages.home) }}">
             {!! $this->getSchema('categories')?->toEmbeddedHtml() !!}
         </div>
     </div>

@@ -66,7 +66,7 @@
                                 @if ($attributeValue->is_required)
                                     <span
                                           class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100">
-                                        {{ __('attributes.required') }}
+                                        {{ __('messages.attributes) }}
                                     </span>
                                 @endif
 

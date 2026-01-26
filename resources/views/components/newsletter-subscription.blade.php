@@ -6,8 +6,8 @@
 ])
 
 @php
-    $title = $title ?? __('newsletter.title');
-    $subtitle = $subtitle ?? __('newsletter.subtitle');
+    $title = $title ?? __('messages.newsletter);
+    $subtitle = $subtitle ?? __('messages.newsletter);
     $isHero = $variant === 'hero';
     $isCompact = $variant === 'compact';
 @endphp
@@ -46,7 +46,7 @@
                     <input
                            type="email"
                            x-model="email"
-                           placeholder="{{ __('newsletter.email_placeholder') }}"
+                           placeholder="{{ __('messages.newsletter) }}"
                            class="w-full {{ $isHero ? 'px-6 py-4 rounded-2xl border-0 focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-blue-600 text-gray-900 placeholder:text-gray-500 shadow-large' : 'px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder:text-gray-500' }} {{ $isCompact ? 'px-3 py-2 text-sm' : '' }}"
                            required
                            :disabled="loading">
@@ -66,14 +66,14 @@
                         :disabled="loading || !email"
                         class="{{ $isHero ? 'bg-white text-blue-700 px-8 py-4 rounded-2xl font-semibold hover:bg-gray-50 transition-all duration-300 shadow-large hover:shadow-glow-lg transform hover:scale-105' : 'btn-gradient px-6 py-3 rounded-xl font-semibold' }} {{ $isCompact ? 'px-4 py-2 text-sm' : '' }} disabled:opacity-50 disabled:cursor-not-allowed">
 
-                    <span x-show="!loading">{{ __('newsletter.subscribe_button') }}</span>
+                    <span x-show="!loading">{{ __('messages.newsletter) }}</span>
                     <span x-show="loading" class="flex items-center gap-2">
                         <svg class="animate-spin w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                   d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
                             </path>
                         </svg>
-                        {{ __('newsletter.subscribing') }}
+                        {{ __('messages.newsletter) }}
                     </span>
 
                     @if (!$isCompact)
@@ -89,7 +89,7 @@
             @if ($showPrivacy)
                 <p
                    class="{{ $isHero ? 'text-sm text-white/70 mt-6' : 'text-sm text-gray-500 mt-4' }} {{ $isCompact ? 'text-xs mt-3' : '' }}">
-                    {{ __('newsletter.privacy_notice') }}
+                    {{ __('messages.newsletter) }}
                 </p>
             @endif
 
@@ -153,11 +153,11 @@
 
                     if (response.ok) {
                         this.messageType = 'success';
-                        this.message = data.message || '{{ __('newsletter.subscribed_successfully') }}';
+                        this.message = data.message || '{{ __('messages.newsletter) }}';
                         this.email = '';
                     } else {
                         this.messageType = 'error';
-                        this.message = data.message || '{{ __('newsletter.subscription_error') }}';
+                        this.message = data.message || '{{ __('messages.newsletter) }}';
                     }
                 } catch (error) {
                     this.messageType = 'error';

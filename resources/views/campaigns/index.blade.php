@@ -1,6 +1,6 @@
 @extends('components.layouts.base')
 
-@section('title', __('campaigns.navigation.campaigns'))
+@section('title', __('messages.campaigns))
 @section('description', __('campaigns.index.description'))
 
 @section('content')
@@ -8,7 +8,7 @@
         <!-- Header -->
         <div class="mb-8">
             <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-                {{ __('campaigns.navigation.campaigns') }}
+                {{ __('messages.campaigns) }}
             </h1>
             <p class="text-gray-600 dark:text-gray-300">
                 {{ __('campaigns.index.description') }}

@@ -17,11 +17,11 @@
     <div class="pdf-report-info">
         <table>
             <tr>
-                <td>{{ __('reports.pdf.type') }}:</td>
+                <td>{{ __('messages.reports) }}:</td>
                 <td>{{ __("admin.reports.types.{$report->type}") }}</td>
             </tr>
             <tr>
-                <td>{{ __('reports.pdf.category') }}:</td>
+                <td>{{ __('messages.reports) }}:</td>
                 <td>{{ __("admin.reports.categories.{$report->category}") }}</td>
             </tr>
             @if($report->date_range)
@@ -32,7 +32,7 @@
             @endif
             @if($report->start_date && $report->end_date)
                 <tr>
-                    <td>{{ __('reports.pdf.period') }}:</td>
+                    <td>{{ __('messages.reports) }}:</td>
                     <td>{{ $report->start_date->format('Y-m-d') }} - {{ $report->end_date->format('Y-m-d') }}</td>
                 </tr>
             @endif
@@ -41,7 +41,7 @@
                 <td>{{ $generated_by }}</td>
             </tr>
             <tr>
-                <td>{{ __('reports.pdf.created') }}:</td>
+                <td>{{ __('messages.reports) }}:</td>
                 <td>{{ $report->created_at->format('F d, Y') }}</td>
             </tr>
         </table>
@@ -49,7 +49,7 @@
 
     @if($report->description)
         <div class="pdf-content">
-            <h2>{{ __('reports.pdf.description') }}</h2>
+            <h2>{{ __('messages.reports) }}</h2>
             <p>{{ $report->description }}</p>
         </div>
     @endif
@@ -57,28 +57,28 @@
     <div class="pdf-stats">
         <div class="pdf-stat-item">
             <div class="pdf-stat-value">{{ $report->view_count }}</div>
-            <div class="pdf-stat-label">{{ __('reports.pdf.views') }}</div>
+            <div class="pdf-stat-label">{{ __('messages.reports) }}</div>
         </div>
         <div class="pdf-stat-item">
             <div class="pdf-stat-value">{{ $report->download_count }}</div>
-            <div class="pdf-stat-label">{{ __('reports.pdf.downloads') }}</div>
+            <div class="pdf-stat-label">{{ __('messages.reports) }}</div>
         </div>
         <div class="pdf-stat-item">
-            <div class="pdf-stat-value">{{ $report->is_active ? __('reports.pdf.active') : __('reports.pdf.inactive') }}</div>
-            <div class="pdf-stat-label">{{ __('reports.pdf.status') }}</div>
+            <div class="pdf-stat-value">{{ $report->is_active ? __('messages.reports) : __('messages.reports) }}</div>
+            <div class="pdf-stat-label">{{ __('messages.reports) }}</div>
         </div>
     </div>
 
     @if($report->content)
         <div class="pdf-content">
-            <h2>{{ __('reports.pdf.content') }}</h2>
+            <h2>{{ __('messages.reports) }}</h2>
             {!! strip_tags($report->content, '<p><br><strong><em><ul><ol><li>') !!}
         </div>
     @endif
 
     @if($report->filters && count($report->filters) > 0)
         <div class="pdf-content">
-            <h2>{{ __('reports.pdf.filters') }}</h2>
+            <h2>{{ __('messages.reports) }}</h2>
             <table>
                 @foreach($report->filters as $key => $value)
                     <tr>
@@ -91,7 +91,7 @@
     @endif
 
     <div class="pdf-footer">
-        <p>{{ __('reports.pdf.footer', ['name' => $report->name, 'date' => $generated_at->format('Y-m-d H:i')]) }}</p>
+        <p>{{ __('messages.reports, ['name' => $report->name, 'date' => $generated_at->format('Y-m-d H:i')]) }}</p>
     </div>
 </body>
 </html>

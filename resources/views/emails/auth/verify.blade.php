@@ -1,14 +1,14 @@
 @component('mail::message')
-    # {{ __('mail.verify_email_title') }}
+    # {{ __('messages.mail) }}
 
-    {{ __('mail.verify_email_intro') }}
+    {{ __('messages.mail) }}
 
     @component('mail::button', ['url' => $url])
-        {{ __('mail.verify_email_button') }}
+        {{ __('messages.mail) }}
     @endcomponent
 
-    {{ __('mail.verify_email_no_action') }}
+    {{ __('messages.mail) }}
 
-    {{ __('mail.regards') }},<br>
+    {{ __('messages.mail) }},<br>
     {{ config('app.name') }}
 @endcomponent

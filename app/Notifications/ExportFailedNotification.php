@@ -34,10 +34,10 @@ final class ExportFailedNotification extends Notification implements ShouldQueue
         $reason = $this->export->failure_reason ?? __('exports.notifications.failed.unknown_reason');
 
         return (new MailMessage)
-            ->subject(__('exports.notifications.failed.subject', ['name' => $this->export->name]))
-            ->line(__('exports.notifications.failed.intro'))
-            ->line(__('exports.notifications.failed.reason', ['reason' => $reason]))
-            ->line(__('exports.notifications.failed.support'));
+            ->subject(__('messages.exports, ['name' => $this->export->name]))
+            ->line(__('messages.exports))
+            ->line(__('messages.exports, ['reason' => $reason]))
+            ->line(__('messages.exports));
     }
 
     /**

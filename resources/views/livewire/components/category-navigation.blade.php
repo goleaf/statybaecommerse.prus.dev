@@ -2,7 +2,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16">
             <div class="flex items-center space-x-8">
-                <h2 class="text-lg font-semibold text-gray-900">{{ __('translations.categories') }}</h2>
+                <h2 class="text-lg font-semibold text-gray-900">{{ __('messages.translations) }}</h2>
 
                 <nav class="hidden md:flex space-x-6" x-data="{ openDropdown: null }">
                     @foreach ($this->categoryTree as $category)
@@ -40,7 +40,7 @@
                                         <a
                                            href="{{ route('localized.categories.show', ['locale' => app()->getLocale(), 'category' => $category['slug']]) }}"
                                            class="block px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-50 border-b border-gray-100">
-                                            {{ __('translations.view_all') }} {{ $category['name'] }}
+                                            {{ __('messages.translations) }} {{ $category['name'] }}
                                         </a>
 
                                         @foreach ($category['children'] as $child)
@@ -73,7 +73,7 @@
                 <a
                    href="{{ route('localized.categories.index', ['locale' => app()->getLocale()]) }}"
                    class="text-sm font-medium text-indigo-600 hover:text-indigo-500">
-                    {{ __('translations.view_all_categories') }}
+                    {{ __('messages.translations) }}
                 </a>
             </div>
         </div>

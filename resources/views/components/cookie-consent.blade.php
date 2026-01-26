@@ -9,20 +9,20 @@
      class="fixed inset-x-0 bottom-4 z-[9999] mx-auto max-w-5xl rounded-lg border border-sage/30 bg-dark shadow-2xl shadow-black/40 px-6 py-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
      role="dialog"
      aria-live="polite"
-     aria-label="{{ __('translations.cookie_prompt_label') }}"
+     aria-label="{{ __('messages.translations) }}"
      hidden>
     <div class="space-y-2 text-sm text-white">
         <p class="font-semibold">
-            {{ __('translations.cookie_prompt_title') }}
+            {{ __('messages.translations) }}
         </p>
         <p class="text-sage/80">
-            {{ __('translations.cookie_prompt_description') }}
+            {{ __('messages.translations) }}
             <a href="{{ $privacyRoute }}" class="font-medium text-sage hover:text-white underline transition-colors duration-200">
-                {{ __('translations.cookie_privacy_link') }}
+                {{ __('messages.translations) }}
             </a>
             <span class="text-sage/50"> · </span>
             <a href="{{ $cookieRoute }}" class="font-medium text-sage hover:text-white underline transition-colors duration-200">
-                {{ __('translations.cookie_policy_link') }}
+                {{ __('messages.translations) }}
             </a>
         </p>
     </div>
@@ -30,12 +30,12 @@
         <button type="button"
                 data-cookie-action="reject"
                 class="inline-flex items-center justify-center rounded-lg border border-sage/30 px-4 py-2 text-sm font-medium text-sage hover:bg-sage/20 hover:text-white focus:outline-none focus:ring-2 focus:ring-sage/40 focus:ring-offset-2 focus:ring-offset-dark transition-all duration-200">
-            {{ __('translations.cookie_prompt_reject') }}
+            {{ __('messages.translations) }}
         </button>
         <button type="button"
                 data-cookie-action="accept"
                 class="inline-flex items-center justify-center rounded-lg bg-sage px-4 py-2 text-sm font-medium text-dark shadow hover:bg-sage/90 focus:outline-none focus:ring-2 focus:ring-sage/50 focus:ring-offset-2 focus:ring-offset-dark transition-all duration-200">
-            {{ __('translations.cookie_prompt_accept') }}
+            {{ __('messages.translations) }}
         </button>
     </div>
 </div>

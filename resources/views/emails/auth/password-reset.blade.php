@@ -1,17 +1,17 @@
 @component('mail::message')
-    # {{ __('mail.reset_password_title') }}
+    # {{ __('messages.mail) }}
 
-    {{ __('mail.reset_password_intro') }}
+    {{ __('messages.mail) }}
 
     @component('mail::button', ['url' => $url])
-        {{ __('mail.reset_password_button') }}
+        {{ __('messages.mail) }}
     @endcomponent
 
     @php($expiresIn = (int) ($minutes ?? config('auth.passwords.' . config('auth.defaults.passwords') . '.expire')))
-    {{ trans_choice('mail.reset_password_expire', $expiresIn, ['count' => $expiresIn]) }}
+    {{ trans_choice('messages.mail, $expiresIn, ['count' => $expiresIn]) }}
 
-    {{ __('mail.reset_password_no_action') }}
+    {{ __('messages.mail) }}
 
-    {{ __('mail.regards') }},<br>
+    {{ __('messages.mail) }},<br>
     {{ config('app.name') }}
 @endcomponent

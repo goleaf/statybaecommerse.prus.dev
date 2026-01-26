@@ -23,7 +23,7 @@
     <!-- Breadcrumb -->
     <nav class="mb-6">
         <ol class="flex items-center space-x-2 text-sm text-gray-500">
-            <li><a href="{{ route('news.index') }}" class="hover:text-blue-600">{{ __('news.title') }}</a></li>
+            <li><a href="{{ route('news.index') }}" class="hover:text-blue-600">{{ __('messages.news) }}</a></li>
             <li class="flex items-center">
                 <svg class="w-4 h-4 mx-2" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
@@ -57,7 +57,7 @@
                         @endforeach
                         @if($news->is_featured)
                         <span class="px-3 py-1 bg-yellow-100 text-yellow-800 text-sm rounded-full">
-                            {{ __('news.featured_news') }}
+                            {{ __('messages.news) }}
                         </span>
                         @endif
                     </div>
@@ -84,13 +84,13 @@
                                 <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"></path>
                                 <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"></path>
                             </svg>
-                            <span>{{ $news->view_count }} {{ __('news.view_count') }}</span>
+                            <span>{{ $news->view_count }} {{ __('messages.news) }}</span>
                         </div>
                         <div class="flex items-center">
                             <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd"></path>
                             </svg>
-                            <span>{{ $news->comments->count() }} {{ __('news.comments') }}</span>
+                            <span>{{ $news->comments->count() }} {{ __('messages.news) }}</span>
                         </div>
                     </div>
 
@@ -109,7 +109,7 @@
                     <!-- Tags -->
                     @if($news->tags->count() > 0)
                     <div class="mt-8 pt-6 border-t border-gray-200">
-                        <h3 class="text-sm font-medium text-gray-900 mb-3">{{ __('news.tags') }}:</h3>
+                        <h3 class="text-sm font-medium text-gray-900 mb-3">{{ __('messages.news) }}:</h3>
                         <div class="flex flex-wrap gap-2">
                             @foreach($news->tags as $tag)
                             <a href="{{ route('news.tag', $tag->slug) }}" 
@@ -123,7 +123,7 @@
 
                     <!-- Share Section -->
                     <div class="mt-8 pt-6 border-t border-gray-200">
-                        <h3 class="text-sm font-medium text-gray-900 mb-3">{{ __('news.share_this_news') }}:</h3>
+                        <h3 class="text-sm font-medium text-gray-900 mb-3">{{ __('messages.news) }}:</h3>
                         <div class="flex space-x-4">
                             <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(route('news.show', $news->slug)) }}" 
                                target="_blank" 
@@ -149,7 +149,7 @@
             <!-- Comments Section -->
             @if($news->comments->count() > 0)
             <div class="mt-8 bg-white rounded-lg shadow-md p-6">
-                <h3 class="text-xl font-semibold text-gray-900 mb-6">{{ __('news.comments') }} ({{ $news->comments->count() }})</h3>
+                <h3 class="text-xl font-semibold text-gray-900 mb-6">{{ __('messages.news) }} ({{ $news->comments->count() }})</h3>
                 
                 <div class="space-y-6">
                     @foreach($news->comments as $comment)
@@ -185,7 +185,7 @@
 
             <!-- Add Comment Form -->
             <div class="mt-8 bg-white rounded-lg shadow-md p-6">
-                <h3 class="text-xl font-semibold text-gray-900 mb-6">{{ __('news.add_comment') }}</h3>
+                <h3 class="text-xl font-semibold text-gray-900 mb-6">{{ __('messages.news) }}</h3>
                 
                 <form action="{{ route('news.comments.store', $news->slug) }}" method="POST" class="space-y-4">
                     @csrf
@@ -193,7 +193,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label for="author_name" class="block text-sm font-medium text-gray-700 mb-1">
-                                {{ __('news.comment_name') }} *
+                                {{ __('messages.news) }} *
                             </label>
                             <input type="text" 
                                    id="author_name" 
@@ -208,7 +208,7 @@
                         
                         <div>
                             <label for="author_email" class="block text-sm font-medium text-gray-700 mb-1">
-                                {{ __('news.comment_email') }} *
+                                {{ __('messages.news) }} *
                             </label>
                             <input type="email" 
                                    id="author_email" 
@@ -224,7 +224,7 @@
                     
                     <div>
                         <label for="content" class="block text-sm font-medium text-gray-700 mb-1">
-                            {{ __('news.comment_content') }} *
+                            {{ __('messages.news) }} *
                         </label>
                         <textarea id="content" 
                                   name="content" 
@@ -239,7 +239,7 @@
                     <div class="flex justify-end">
                         <button type="submit" 
                                 class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            {{ __('news.submit_comment') }}
+                            {{ __('messages.news) }}
                         </button>
                     </div>
                 </form>
@@ -251,7 +251,7 @@
             <!-- Related News -->
             @if($relatedNews->count() > 0)
             <div class="bg-white rounded-lg shadow-md p-6 mb-8">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">{{ __('news.related_news') }}</h3>
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">{{ __('messages.news) }}</h3>
                 <div class="space-y-4">
                     @foreach($relatedNews as $related)
                     <article class="flex space-x-3">
@@ -278,15 +278,15 @@
 
             <!-- Newsletter Signup -->
             <div class="bg-blue-50 rounded-lg p-6">
-                <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ __('news.newsletter') }}</h3>
-                <p class="text-sm text-gray-600 mb-4">{{ __('news.subscribe_newsletter') }}</p>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ __('messages.news) }}</h3>
+                <p class="text-sm text-gray-600 mb-4">{{ __('messages.news) }}</p>
                 <form class="space-y-3">
                     <input type="email" 
-                           placeholder="{{ __('news.newsletter_email') }}"
+                           placeholder="{{ __('messages.news) }}"
                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <button type="submit" 
                             class="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        {{ __('news.newsletter_subscribe') }}
+                        {{ __('messages.news) }}
                     </button>
                 </form>
             </div>

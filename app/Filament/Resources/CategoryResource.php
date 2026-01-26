@@ -54,22 +54,22 @@ final class CategoryResource extends BaseResource
                     SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('name')
-                                ->label(__('admin.categories.name'))
+                                ->label(__('messages.admin))
                                 ->required()
                                 ->maxLength(255),
                             TextInput::make('slug')
-                                ->label(__('admin.categories.slug'))
+                                ->label(__('messages.admin))
                                 ->required()
                                 ->unique(ignoreRecord: true)
                                 ->maxLength(255),
                         ]),
                     RichEditor::make('description')
-                        ->label(__('admin.categories.description'))
+                        ->label(__('messages.admin))
                         ->columnSpanFull(),
                     SchemaGrid::make(2)
                         ->schema([
                             Select::make('parent_id')
-                                ->label(__('admin.categories.parent'))
+                                ->label(__('messages.admin))
                                 ->relationship('parent', 'name')
                                 ->searchable()
                                 ->preload(),
@@ -86,15 +86,15 @@ final class CategoryResource extends BaseResource
         return $table
             ->columns([
                 TextColumn::make('name')
-                    ->label(__('admin.categories.name'))
+                    ->label(__('messages.admin))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('slug')
-                    ->label(__('admin.categories.slug'))
+                    ->label(__('messages.admin))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('parent.name')
-                    ->label(__('admin.categories.parent'))
+                    ->label(__('messages.admin))
                     ->sortable(),
                 ToggleColumn::make('is_active')
                     ->label(__('admin.categories.is_active')),

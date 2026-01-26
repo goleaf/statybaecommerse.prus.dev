@@ -1,13 +1,13 @@
 @extends('components.layouts.base')
 
-@section('title', __('cities.plural_model_label'))
+@section('title', __('messages.cities))
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
     <!-- Header -->
     <div class="mb-8">
         <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            {{ __('cities.plural_model_label') }}
+            {{ __('messages.cities) }}
         </h1>
         <p class="text-gray-600 dark:text-gray-400">
             {{ __('cities.frontend_description', 'Browse and search cities from around the world') }}
@@ -19,24 +19,24 @@
         <form method="GET" action="{{ route('cities.index') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
                 <label for="search" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    {{ __('cities.search_cities') }}
+                    {{ __('messages.cities) }}
                 </label>
                 <input type="text" 
                        id="search" 
                        name="search" 
                        value="{{ request('search') }}"
                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                       placeholder="{{ __('cities.search_cities') }}">
+                       placeholder="{{ __('messages.cities) }}">
             </div>
 
             <div>
                 <label for="country" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    {{ __('cities.country') }}
+                    {{ __('messages.cities) }}
                 </label>
                 <select id="country" 
                         name="country" 
                         class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
-                    <option value="">{{ __('cities.filter_all') }}</option>
+                    <option value="">{{ __('messages.cities) }}</option>
                     @foreach($countries as $country)
                         <option value="{{ $country->id }}" {{ request('country') == $country->id ? 'selected' : '' }}>
                             {{ $country->translated_name }}
@@ -47,16 +47,16 @@
 
             <div>
                 <label for="level" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    {{ __('cities.level') }}
+                    {{ __('messages.cities) }}
                 </label>
                 <select id="level" 
                         name="level" 
                         class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
-                    <option value="">{{ __('cities.filter_all') }}</option>
-                    <option value="0" {{ request('level') == '0' ? 'selected' : '' }}>{{ __('cities.level_city') }}</option>
-                    <option value="1" {{ request('level') == '1' ? 'selected' : '' }}>{{ __('cities.level_district') }}</option>
-                    <option value="2" {{ request('level') == '2' ? 'selected' : '' }}>{{ __('cities.level_neighborhood') }}</option>
-                    <option value="3" {{ request('level') == '3' ? 'selected' : '' }}>{{ __('cities.level_suburb') }}</option>
+                    <option value="">{{ __('messages.cities) }}</option>
+                    <option value="0" {{ request('level') == '0' ? 'selected' : '' }}>{{ __('messages.cities) }}</option>
+                    <option value="1" {{ request('level') == '1' ? 'selected' : '' }}>{{ __('messages.cities) }}</option>
+                    <option value="2" {{ request('level') == '2' ? 'selected' : '' }}>{{ __('messages.cities) }}</option>
+                    <option value="3" {{ request('level') == '3' ? 'selected' : '' }}>{{ __('messages.cities) }}</option>
                 </select>
             </div>
 
@@ -90,7 +90,7 @@
                                     <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                                     </svg>
-                                    {{ __('cities.is_capital') }}
+                                    {{ __('messages.cities) }}
                                 </span>
                             @endif
                         </div>
@@ -120,7 +120,7 @@
                                     <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                         <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
                                     </svg>
-                                    {{ number_format($city->population) }} {{ __('cities.population') }}
+                                    {{ number_format($city->population) }} {{ __('messages.cities) }}
                                 </div>
                             @endif
 
@@ -138,7 +138,7 @@
                         <div class="flex space-x-2">
                             <a href="{{ route('cities.show', $city) }}" 
                                class="flex-1 bg-blue-600 text-white text-center px-3 py-2 rounded-md hover:bg-blue-700 transition duration-200 text-sm">
-                                {{ __('cities.view') }}
+                                {{ __('messages.cities) }}
                             </a>
                         </div>
                     </div>
@@ -155,7 +155,7 @@
             <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
             </svg>
-            <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('cities.no_cities_found') }}</h3>
+            <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('messages.cities) }}</h3>
             <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
                 {{ __('cities.no_cities_found_description', 'Try adjusting your search or filter criteria.') }}
             </p>

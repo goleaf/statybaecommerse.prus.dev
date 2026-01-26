@@ -97,7 +97,7 @@
             </div>
 
             <div class="space-y-2">
-                    <x-forms.label for="email" :value="__('auth_email')" />
+                    <x-forms.label for="email" :value="__('messages.auth_email')" />
                 <x-forms.input
                     id="email"
                     type="email"
@@ -111,7 +111,7 @@
 
             <div class="grid gap-5 sm:grid-cols-2">
                 <div class="space-y-2">
-                        <x-forms.label for="password" :value="__('auth_password')" />
+                        <x-forms.label for="password" :value="__('messages.auth_password')" />
                     <x-forms.input
                         id="password"
                         type="password"

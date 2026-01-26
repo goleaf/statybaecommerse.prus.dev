@@ -17,8 +17,8 @@
 
 @extends('errors.layout', [
     'code' => '503',
-    'title' => __('frontend.errors.503.title'),
-    'description' => __('frontend.errors.503.description'),
+    'title' => __('messages.frontend),
+    'description' => __('messages.frontend),
     'primaryAction' => [
         'label' => __('frontend.errors.actions.view_status_page'),
         'url' => $statusUrl,

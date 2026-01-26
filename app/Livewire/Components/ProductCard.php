@@ -169,16 +169,16 @@ final class ProductCard extends Component
     public function stockStatus(): string
     {
         if (! $this->product->track_inventory) {
-            return __('translations.in_stock');
+            return __('messages.translations);
         }
         if ($this->product->stock_quantity <= 0) {
-            return __('translations.out_of_stock');
+            return __('messages.translations);
         }
         if ($this->product->low_stock_threshold && $this->product->stock_quantity <= $this->product->low_stock_threshold) {
-            return $this->product->stock_quantity . ' ' . __('translations.left');
+            return $this->product->stock_quantity . ' ' . __('messages.translations);
         }
 
-        return __('translations.in_stock');
+        return __('messages.translations);
     }
 
     /**

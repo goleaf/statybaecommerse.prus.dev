@@ -29,10 +29,10 @@ final class ContactMessageSubmitted extends Mailable implements ShouldQueue
         $locale = $this->resolveLocale();
         $this->locale($locale); // Ensure translations render in the resolved language.
 
-        $subject = (string) ($this->contactMessage->subject ?: __('mail.contact_message_subject_fallback', [], $locale));
+        $subject = (string) ($this->contactMessage->subject ?: __('messages.mail, [], $locale));
 
         return new Envelope(
-            subject: __('mail.contact_message_subject', ['subject' => $subject], $locale)
+            subject: __('messages.mail, ['subject' => $subject], $locale)
         );
     }
 

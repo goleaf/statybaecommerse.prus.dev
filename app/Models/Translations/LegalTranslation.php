@@ -118,7 +118,7 @@ final class LegalTranslation extends Model
      */
     public function getFormattedTitleAttribute(): string
     {
-        return $this->title ?: __('legal.untitled_document');
+        return $this->title ?: __('messages.legal);
     }
 
     /**

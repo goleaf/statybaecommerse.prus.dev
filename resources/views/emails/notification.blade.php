@@ -18,7 +18,7 @@
         <h1>{{ $title }}</h1>
         @if ($urgent)
             <p class="email-urgent-notice">
-                {{ __('notifications.email.urgent') }}
+                {{ __('messages.notifications) }}
             </p>
         @endif
     </div>
@@ -37,7 +37,7 @@
 
         @if (!empty($tags))
             <div class="email-tags">
-                <strong>{{ __('notifications.email.tags') }}:</strong>
+                <strong>{{ __('messages.notifications) }}:</strong>
                 @foreach ($tags as $tag)
                     <span class="email-tag">{{ $tag }}</span>
                 @endforeach

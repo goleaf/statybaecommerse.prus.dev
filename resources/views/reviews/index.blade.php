@@ -12,7 +12,7 @@
             @guest
                 {{-- Highlight the login pathway so guests understand how to contribute reviews. --}}
                 <div class="mt-4 rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm text-blue-700">
-                    {{ __('translations.login_to_review') }}
+                    {{ __('messages.translations) }}
                     <a href="{{ route('login') }}" class="font-semibold underline decoration-blue-500">
                         {{ __('auth.login') }}
                     </a>

@@ -24,10 +24,16 @@ final class Locales
      */
     public static function supported(): array
     {
-        // Prefer the explicit configuration flag when it is available because business stakeholders
-        // treat config/app.php as the canonical list that feeds storefront and admin experiences.
-        $configured = config('app.supported_locales');
+        // Prefer the canonical locales config block because it is the single source of truth.
+        $configured = config('app.locales', []);
         $locales = [];
+
+        if (is_array($configured) && $configured !== []) {
+            $locales = array_keys($configured);
+        }
+
+        // Fall back to the legacy supported_locales config for backwards compatibility.
+        $configured = $locales === [] ? config('app.supported_locales') : $configured;
 
         if (is_string($configured)) {
             $configured = array_filter(array_map('trim', explode(',', $configured)));

@@ -18,7 +18,7 @@ trait WithCart
      * Attempt to add the given product to the active cart session.
      *
      * Returns false when the action bails out (e.g. missing product or insufficient stock)
-     * so consuming components can avoid firing auxiliary side effects like analytics events.
+     * so consuming components can avoid firing auxiliary side effects.
      */
     public function addToCart(int $productId, int $quantity = 1, ?string $successMessage = null): bool
     {

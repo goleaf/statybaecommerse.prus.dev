@@ -12,7 +12,7 @@
 @php
     $title = $title ?? config('app.name');
     $description = $description ?? __('messages.meta_description_home');
-    $keywords = $keywords ?? __('meta_keywords');
+    $keywords = $keywords ?? __('messages.meta_keywords');
     $image = $image ?? og_placeholder_url();
     $canonical = $canonical ?? url()->current();
     $currentLocale = app()->getLocale();

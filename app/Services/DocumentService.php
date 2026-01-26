@@ -121,7 +121,7 @@ final class DocumentService implements DocumentServiceContract
                     $value = get_debug_type($value);
                 }
             } elseif (is_bool($value)) {
-                $value = $value ? __('documents.yes') : __('documents.no');
+                $value = $value ? __('messages.documents) : __('messages.documents);
             }
 
             assert(is_scalar($value) || $value === null);

@@ -58,16 +58,16 @@ final class DocumentGenerated extends Notification implements ShouldQueue
         $displayName = $this->resolveNotifiableName($notifiable);
 
         $message = (new MailMessage)
-            ->subject(__('documents.email.subject', ['title' => $this->document->title], $locale))
-            ->greeting(__('documents.email.greeting', ['name' => $displayName], $locale))
+            ->subject(__('messages.documents, ['title' => $this->document->title], $locale))
+            ->greeting(__('messages.documents, ['name' => $displayName], $locale))
             ->line(
-                __('documents.email.generated', [
+                __('messages.documents, [
                     'title' => $this->document->title,
                     'type'  => __('documents.types.' . $this->document->template->type, [], $locale),
                 ], $locale)
             )
             ->line(
-                __('documents.email.details', [
+                __('messages.documents, [
                     'date'   => $this->document->generated_at?->format('Y-m-d H:i'),
                     'status' => __('documents.statuses.' . $this->document->status, [], $locale),
                 ], $locale)
@@ -95,7 +95,7 @@ final class DocumentGenerated extends Notification implements ShouldQueue
         }
 
         // Always end with a small footer reminder.
-        return $message->line(__('documents.email.footer', [], $locale));
+        return $message->line(__('messages.documents, [], $locale));
     }
 
     /**
@@ -112,7 +112,7 @@ final class DocumentGenerated extends Notification implements ShouldQueue
             'document_type'   => $this->document->template->type,
             'document_status' => $this->document->status,
             'generated_at'    => $this->document->generated_at?->toIso8601String(),
-            'message'         => __('documents.notification.generated', ['title' => $this->document->title]),
+            'message'         => __('messages.documents, ['title' => $this->document->title]),
         ];
     }
 

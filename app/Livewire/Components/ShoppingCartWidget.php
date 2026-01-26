@@ -93,7 +93,7 @@ final class ShoppingCartWidget extends Component
         $this->calculateCartSummary();
         $this->dispatch('add-to-cart', productId: (int) $productId, quantity: $quantity);
         $this->dispatch('cart-updated');
-        $this->dispatch('notify', ['type' => 'success', 'message' => __('translations.product_added_to_cart')]);
+        $this->dispatch('notify', ['type' => 'success', 'message' => __('messages.translations)]);
     }
 
     /**
@@ -130,7 +130,7 @@ final class ShoppingCartWidget extends Component
         CartItem::where('id', $cartItemId)->where('session_id', Session::getId())->delete();
         $this->calculateCartSummary();
         $this->dispatch('cart-updated');
-        $this->dispatch('notify', ['type' => 'success', 'message' => __('translations.item_removed_from_cart')]);
+        $this->dispatch('notify', ['type' => 'success', 'message' => __('messages.translations)]);
     }
 
     /**

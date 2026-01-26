@@ -53,7 +53,7 @@ final class RequestExportBulkAction
                     ->label(__('Filters'))
                     ->helperText(__('Provide optional key/value filters, e.g. status => paid or created_from => 2024-01-01.'))
                     ->keyLabel(__('Field'))
-                    ->valueLabel(__('Value')),
+                    ->valueLabel(__('messages.Value')),
             ])
             ->action(function (Collection $records, array $data, ExportService $exportService) use ($type): void {
                 $user = auth()->user();

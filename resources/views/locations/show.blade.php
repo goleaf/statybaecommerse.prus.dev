@@ -1,7 +1,7 @@
 @extends('components.layouts.base')
 
-@section('title', $location->translated_name . ' - ' . __('locations.title'))
-@section('description', $location->translated_description ?: __('locations.subtitle'))
+@section('title', $location->translated_name . ' - ' . __('messages.locations))
+@section('description', $location->translated_description ?: __('messages.locations))
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
@@ -10,7 +10,7 @@
         <ol class="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
             <li>
                 <a href="{{ route('locations.index') }}" class="hover:text-blue-600 dark:hover:text-blue-400">
-                    {{ __('locations.title') }}
+                    {{ __('messages.locations) }}
                 </a>
             </li>
             <li class="flex items-center">
@@ -62,20 +62,20 @@
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div class="text-center">
                         <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">{{ $location->code }}</div>
-                        <div class="text-sm text-gray-600 dark:text-gray-400">{{ __('locations.fields.code') }}</div>
+                        <div class="text-sm text-gray-600 dark:text-gray-400">{{ __('messages.locations) }}</div>
                     </div>
                     
                     <div class="text-center">
                         <div class="text-2xl font-bold text-green-600 dark:text-green-400">
                             {{ __('locations.type_' . $location->type) }}
                         </div>
-                        <div class="text-sm text-gray-600 dark:text-gray-400">{{ __('locations.fields.type') }}</div>
+                        <div class="text-sm text-gray-600 dark:text-gray-400">{{ __('messages.locations) }}</div>
                     </div>
                     
                     @if($location->city)
                         <div class="text-center">
                             <div class="text-2xl font-bold text-purple-600 dark:text-purple-400">{{ $location->city }}</div>
-                            <div class="text-sm text-gray-600 dark:text-gray-400">{{ __('locations.fields.city') }}</div>
+                            <div class="text-sm text-gray-600 dark:text-gray-400">{{ __('messages.locations) }}</div>
                         </div>
                     @endif
                     
@@ -84,7 +84,7 @@
                             <div class="text-2xl font-bold text-green-600 dark:text-green-400">
                                 <i class="fas fa-circle text-green-500"></i>
                             </div>
-                            <div class="text-sm text-gray-600 dark:text-gray-400">{{ __('locations.status.open') }}</div>
+                            <div class="text-sm text-gray-600 dark:text-gray-400">{{ __('messages.locations) }}</div>
                         </div>
                     @endif
                 </div>
@@ -105,7 +105,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            {{ __('locations.fields.name') }}
+                            {{ __('messages.locations) }}
                         </label>
                         <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ $location->translated_name }}</p>
                     </div>
@@ -113,7 +113,7 @@
                     @if($location->code)
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                {{ __('locations.fields.code') }}
+                                {{ __('messages.locations) }}
                             </label>
                             <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ $location->code }}</p>
                         </div>
@@ -121,7 +121,7 @@
                     
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            {{ __('locations.fields.type') }}
+                            {{ __('messages.locations) }}
                         </label>
                         <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ __('locations.type_' . $location->type) }}</p>
                     </div>
@@ -219,11 +219,11 @@
                                 </span>
                                 <span class="text-sm text-gray-600 dark:text-gray-400">
                                     @if($hours['is_closed'])
-                                        {{ __('locations.status.closed') }}
+                                        {{ __('messages.locations) }}
                                     @elseif($hours['open_time'] && $hours['close_time'])
                                         {{ $hours['open_time'] }} - {{ $hours['close_time'] }}
                                     @else
-                                        {{ __('locations.status.closed') }}
+                                        {{ __('messages.locations) }}
                                     @endif
                                 </span>
                             </div>
@@ -236,7 +236,7 @@
             @if($location->translated_description)
                 <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
                     <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                        {{ __('locations.fields.description') }}
+                        {{ __('messages.locations) }}
                     </h2>
                     <p class="text-gray-700 dark:text-gray-300 leading-relaxed">
                         {{ $location->translated_description }}
@@ -255,7 +255,7 @@
                 
                 <div class="space-y-3">
                     <div class="flex justify-between">
-                        <span class="text-sm text-gray-600 dark:text-gray-400">{{ __('locations.fields.type') }}:</span>
+                        <span class="text-sm text-gray-600 dark:text-gray-400">{{ __('messages.locations) }}:</span>
                         <span class="text-sm font-medium text-gray-900 dark:text-white">
                             {{ __('locations.type_' . $location->type) }}
                         </span>
@@ -267,12 +267,12 @@
                             @if($location->is_enabled)
                                 <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
                                     <i class="fas fa-check mr-1"></i>
-                                    {{ __('locations.fields.yes') }}
+                                    {{ __('messages.locations) }}
                                 </span>
                             @else
                                 <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200">
                                     <i class="fas fa-times mr-1"></i>
-                                    {{ __('locations.fields.no') }}
+                                    {{ __('messages.locations) }}
                                 </span>
                             @endif
                         </span>
@@ -280,10 +280,10 @@
                     
                     @if($location->has_coordinates)
                         <div class="flex justify-between">
-                            <span class="text-sm text-gray-600 dark:text-gray-400">{{ __('locations.fields.coordinates') }}:</span>
+                            <span class="text-sm text-gray-600 dark:text-gray-400">{{ __('messages.locations) }}:</span>
                             <span class="text-sm font-medium text-gray-900 dark:text-white">
                                 <i class="fas fa-map-marker-alt text-green-500 mr-1"></i>
-                                {{ __('locations.fields.yes') }}
+                                {{ __('messages.locations) }}
                             </span>
                         </div>
                     @endif
@@ -293,7 +293,7 @@
                             <span class="text-sm text-gray-600 dark:text-gray-400">{{ __('locations.fields.opening_hours') }}:</span>
                             <span class="text-sm font-medium text-gray-900 dark:text-white">
                                 <i class="fas fa-clock text-blue-500 mr-1"></i>
-                                {{ __('locations.fields.yes') }}
+                                {{ __('messages.locations) }}
                             </span>
                         </div>
                     @endif
@@ -303,7 +303,7 @@
             <!-- Actions -->
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                    {{ __('locations.details.actions') }}
+                    {{ __('messages.locations) }}
                 </h3>
                 
                 <div class="space-y-3">
@@ -344,7 +344,7 @@
                                 </span>
                                 <a href="{{ route('locations.show', $relatedLocation) }}" 
                                    class="text-blue-600 dark:text-blue-400 hover:underline text-xs">
-                                    {{ __('locations.actions.view') }}
+                                    {{ __('messages.locations) }}
                                 </a>
                             </div>
                         @endforeach

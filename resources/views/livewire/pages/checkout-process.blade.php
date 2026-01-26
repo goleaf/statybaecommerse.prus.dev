@@ -15,7 +15,7 @@
             'description' => __('Delivery options'),
         ],
         3 => [
-            'label'       => __('Payment'),
+            'label'       => __('messages.Payment'),
             'description' => __('Review & pay'),
         ],
     ];

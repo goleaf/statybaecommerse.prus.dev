@@ -1033,9 +1033,9 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     public function getGenderTextAttribute(): ?string
     {
         return match ($this->gender) {
-            'male'   => __('admin.gender.male'),
-            'female' => __('admin.gender.female'),
-            'other'  => __('admin.gender.other'),
+            'male'   => __('messages.admin),
+            'female' => __('messages.admin),
+            'other'  => __('messages.admin),
             default  => null,
         };
     }
@@ -1046,8 +1046,8 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     public function getLocaleTextAttribute(): string
     {
         return match ($this->preferred_locale) {
-            'en'    => __('admin.locales.english'),
-            'lt'    => __('admin.locales.lithuanian'),
+            'en'    => __('messages.admin),
+            'lt'    => __('messages.admin),
             default => $this->preferred_locale,
         };
     }

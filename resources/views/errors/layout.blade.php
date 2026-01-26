@@ -1,12 +1,12 @@
 @php
     $code = $code ?? 'Error';
-    $title = $title ?? __('frontend.errors.defaults.title');
-    $description = $description ?? __('frontend.errors.defaults.description');
+    $title = $title ?? __('messages.frontend);
+    $description = $description ?? __('messages.frontend);
     $primaryAction = $primaryAction ?? null;
     $secondaryAction = $secondaryAction ?? null;
     $showSearch = $showSearch ?? false;
-    $searchTitle = $searchTitle ?? __('frontend.errors.search.title');
-    $searchPlaceholder = $searchPlaceholder ?? __('frontend.errors.search.placeholder');
+    $searchTitle = $searchTitle ?? __('messages.frontend);
+    $searchPlaceholder = $searchPlaceholder ?? __('messages.frontend);
     $links = $links ?? [];
     $topCategoriesTitle = $topCategoriesTitle ?? __('frontend.errors.top_categories.title');
     $topCategories = collect($topCategories ?? [])
@@ -80,8 +80,8 @@
         : $fallbackSupportEmail;
 
     $supportEmail = $supportEmail ?? $resolvedSupportEmail;
-    $supportTitle = $supportTitle ?? __('frontend.errors.support.title');
-    $supportDescription = $supportDescription ?? __('frontend.errors.support.description');
+    $supportTitle = $supportTitle ?? __('messages.frontend);
+    $supportDescription = $supportDescription ?? __('messages.frontend);
     $statusPageUrl = $statusPageUrl ?? (\Illuminate\Support\Facades\Route::has('status.page')
         ? route('status.page', ['locale' => $locale])
         : url('/status'));
@@ -197,7 +197,7 @@
                                             <div class="flex items-center justify-between gap-2">
                                                 <span class="text-base font-semibold text-gray-900">{{ $category['label'] }}</span>
                                                 @if(!empty($category['product_count']))
-                                                    <span class="text-xs font-medium text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full">{{ trans_choice(__('frontend.collections.stats.products'), (int) $category['product_count'], ['count' => (int) $category['product_count']]) }}</span>
+                                                    <span class="text-xs font-medium text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full">{{ trans_choice(__('messages.frontend_collections), (int) $category['product_count'], ['count' => (int) $category['product_count']]) }}</span>
                                                 @endif
                                             </div>
                                             @if(!empty($category['description']))

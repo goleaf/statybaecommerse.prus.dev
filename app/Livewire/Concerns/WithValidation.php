@@ -16,7 +16,7 @@ trait WithValidation
 {
     protected function getValidationMessages(): array
     {
-        return ['required' => __('shared.required_field'), 'email' => __('validation.email'), 'min' => __('validation.min.string'), 'max' => __('validation.max.string'), 'numeric' => __('validation.numeric'), 'integer' => __('validation.integer'), 'url' => __('validation.url'), 'confirmed' => __('validation.confirmed'), 'unique' => __('validation.unique'), 'exists' => __('validation.exists')];
+        return ['required' => __('messages.shared), 'email' => __('messages.validation), 'min' => __('messages.validation), 'max' => __('messages.validation), 'numeric' => __('validation.numeric'), 'integer' => __('validation.integer'), 'url' => __('validation.url'), 'confirmed' => __('messages.validation), 'unique' => __('messages.validation), 'exists' => __('validation.exists')];
     }
 
     protected function getValidationAttributes(): array
@@ -37,7 +37,7 @@ trait WithValidation
             $this->notifyError(__('Please fix the validation errors'));
             throw $e;
         } catch (Exception $e) {
-            $this->notifyError(__('shared.operation_failed'));
+            $this->notifyError(__('messages.shared));
             throw $e;
         }
     }

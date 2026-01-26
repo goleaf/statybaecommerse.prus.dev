@@ -4,6 +4,6 @@
         <path d="M12 7L7 10v5c0 2.76 1.92 4.87 5 5.5 3.08-.63 5-2.74 5-5.5v-5l-5-3z" fill="white" />
     </svg>
     <span class="text-xl font-bold text-gray-800 dark:text-white">
-        {{ __('admin.brand_name') }}
+        {{ __('messages.admin) }}
     </span>
 </div>

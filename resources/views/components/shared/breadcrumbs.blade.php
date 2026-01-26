@@ -5,7 +5,7 @@
 ])
 
 @if(!empty($items) || $showHome)
-    <nav class="flex" aria-label="{{ __('frontend.navigation.breadcrumbs') }}">
+    <nav class="flex" aria-label="{{ __('messages.frontend) }}">
         <ol class="flex items-center space-x-2 text-sm">
             @if($showHome)
                 <li>

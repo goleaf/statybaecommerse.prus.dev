@@ -32,19 +32,19 @@ final class AddressStatsWidget extends BaseWidget
                 ->description(__('translations.total_addresses_description'))
                 ->descriptionIcon('heroicon-m-map-pin')
                 ->color('primary'),
-            Stat::make(__('translations.active_addresses'), $activeAddresses)
+            Stat::make(__('messages.translations), $activeAddresses)
                 ->description(__('translations.active_addresses_description'))
                 ->descriptionIcon('heroicon-m-check-circle')
                 ->color('success'),
-            Stat::make(__('translations.default_addresses'), $defaultAddresses)
+            Stat::make(__('messages.translations), $defaultAddresses)
                 ->description(__('translations.default_addresses_description'))
                 ->descriptionIcon('heroicon-m-star')
                 ->color('warning'),
-            Stat::make(__('translations.billing_addresses'), $billingAddresses)
+            Stat::make(__('messages.translations), $billingAddresses)
                 ->description(__('translations.billing_addresses_description'))
                 ->descriptionIcon('heroicon-m-credit-card')
                 ->color('info'),
-            Stat::make(__('translations.shipping_addresses'), $shippingAddresses)
+            Stat::make(__('messages.translations), $shippingAddresses)
                 ->description(__('translations.shipping_addresses_description'))
                 ->descriptionIcon('heroicon-m-truck')
                 ->color('success'),

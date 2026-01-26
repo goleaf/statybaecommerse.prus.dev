@@ -1,7 +1,7 @@
 @extends('frontend.layouts.app')
 
 @php
-    $defaultTitle = __('frontend.legal.shipping_policy');
+    $defaultTitle = __('messages.frontend_legal);
     $pageTitle = $legal?->getTranslatedSeoTitle() ?? $legal?->getTranslatedTitle() ?? $defaultTitle;
     $pageDescription = $legal?->getTranslatedSeoDescription() ?? __('frontend.legal.descriptions.shipping');
 @endphp
@@ -19,7 +19,7 @@
                 'legal' => $legal,
                 'heading' => $legal?->getTranslatedTitle() ?? $defaultTitle,
                 'description' => $pageDescription,
-                'emptyMessage' => __('frontend.legal.document_unavailable'),
+                'emptyMessage' => __('messages.frontend_legal),
                 'fallbackKey' => 'shipping',
             ])
         </div>

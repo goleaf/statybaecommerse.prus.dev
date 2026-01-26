@@ -49,7 +49,7 @@
                     @if ($attributeValue->getDisplayDescription())
                         <div class="mb-6">
                             <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                                {{ __('attributes.description') }}
+                                {{ __('messages.attributes) }}
                             </h3>
                             <p class="text-gray-600 dark:text-gray-400">
                                 {{ $attributeValue->getDisplayDescription() }}
@@ -82,7 +82,7 @@
                                 {{ $attributeValue->sort_order }}
                             </div>
                             <div class="text-sm text-gray-600 dark:text-gray-400">
-                                {{ __('attributes.sort_order') }}
+                                {{ __('messages.attributes) }}
                             </div>
                         </div>
 
@@ -91,7 +91,7 @@
                                 {{ $attributeValue->translations()->count() }}
                             </div>
                             <div class="text-sm text-gray-600 dark:text-gray-400">
-                                {{ __('translations.translations') }}
+                                {{ __('messages.translations) }}
                             </div>
                         </div>
                     </div>
@@ -108,7 +108,7 @@
                         @if ($attributeValue->is_required)
                             <span
                                   class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100">
-                                {{ __('attributes.required') }}
+                                {{ __('messages.attributes) }}
                             </span>
                         @endif
 
@@ -177,7 +177,7 @@
                 @if ($attributeValue->translations()->count() > 0)
                     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
                         <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                            {{ __('translations.translations') }}
+                            {{ __('messages.translations) }}
                         </h3>
                         <div class="space-y-3">
                             @foreach ($attributeValue->translations as $translation)
@@ -185,9 +185,9 @@
                                     <div class="flex items-center justify-between mb-2">
                                         <span class="text-sm font-medium text-gray-900 dark:text-white">
                                             {{ match ($translation->locale) {
-                                                'lt' => __('translations.lithuanian'),
-                                                'en' => __('translations.english'),
-                                                'de' => __('translations.german'),
+                                                'lt' => __('messages.translations),
+                                                'en' => __('messages.translations),
+                                                'de' => __('messages.translations),
                                                 default => $translation->locale,
                                             } }}
                                         </span>
@@ -202,7 +202,7 @@
                                     @endif
                                     @if ($translation->description)
                                         <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                                            <strong>{{ __('attributes.description') }}:</strong>
+                                            <strong>{{ __('messages.attributes) }}:</strong>
                                             {{ $translation->description }}
                                         </p>
                                     @endif
@@ -223,7 +223,7 @@
                 @if (count($metadata) > 0)
                     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
                         <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                            {{ __('attributes.meta_data') }}
+                            {{ __('messages.attributes) }}
                         </h3>
                         <div class="space-y-2">
                             @foreach ($metadata as $key => $value)

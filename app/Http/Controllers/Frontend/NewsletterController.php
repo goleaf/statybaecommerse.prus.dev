@@ -42,14 +42,14 @@ final class NewsletterController extends Controller
                     'unsubscribed_at' => null,
                 ]));
 
-                return $this->respondWithMessage($request, 'success', __('newsletter.resubscribed_successfully'));
+                return $this->respondWithMessage($request, 'success', __('messages.newsletter));
             }
 
             if ($attributes !== []) {
                 $subscriber->update($attributes);
             }
 
-            return $this->respondWithMessage($request, 'info', __('newsletter.already_subscribed'));
+            return $this->respondWithMessage($request, 'info', __('messages.newsletter));
         }
 
         $payload = array_merge([
@@ -62,7 +62,7 @@ final class NewsletterController extends Controller
 
         Subscriber::subscribe($payload);
 
-        return $this->respondWithMessage($request, 'success', __('newsletter.subscribed_successfully'));
+        return $this->respondWithMessage($request, 'success', __('messages.newsletter));
     }
 
     public function unsubscribe(Request $request): JsonResponse|RedirectResponse
@@ -78,14 +78,14 @@ final class NewsletterController extends Controller
         $subscriber = $this->findSubscriberByEmail($validator->validated()['email']);
 
         if (! $subscriber) {
-            return $this->respondWithMessage($request, 'error', __('newsletter.subscription_error'), 404);
+            return $this->respondWithMessage($request, 'error', __('messages.newsletter), 404);
         }
 
         if ($subscriber->status !== 'unsubscribed') {
             $subscriber->unsubscribe();
         }
 
-        return $this->respondWithMessage($request, 'success', __('subscribers.unsubscribed_successfully'));
+        return $this->respondWithMessage($request, 'success', __('messages.subscribers));
     }
 
     private function handleValidationFailure(Request $request, ValidatorContract $validator): JsonResponse|RedirectResponse

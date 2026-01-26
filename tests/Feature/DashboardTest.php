@@ -51,6 +51,6 @@ class DashboardTest extends TestCase
 
         $response->assertStatus(200);
         // Check for the translated title
-        $response->assertSee(__('admin.navigation.dashboard'));
+        $response->assertSee(__('messages.admin));
     }
 }

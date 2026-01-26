@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Filament\Widgets;
 
 use App\Models\Product;
-use Carbon\Carbon;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -32,29 +31,15 @@ final class TopProductsWidget extends BaseWidget
 
     public function getHeading(): ?string
     {
-        return __('analytics.top_products');
+        return __('messages.analytics);
     }
 
     public function table(Table $table): Table
     {
         // Configure the widget table to meet the Filament v4 return type contract.
-        $since = Carbon::now()->subDays(7);
-
         $query = Product::query()
             ->withoutGlobalScopes()
             ->select(['products.*'])
-            ->selectRaw(
-                '(SELECT COUNT(*) FROM analytics_events '
-                    . 'WHERE event_type = ? AND analytics_events.created_at >= ? '
-                    . "AND JSON_EXTRACT(properties, '\$.product_id') = products.id) AS views_count",
-                ['product_view', $since]
-            )
-            ->selectRaw(
-                '(SELECT COUNT(*) FROM analytics_events '
-                    . 'WHERE event_type = ? AND analytics_events.created_at >= ? '
-                    . "AND JSON_EXTRACT(properties, '\$.product_id') = products.id) AS cart_adds_count",
-                ['add_to_cart', $since]
-            )
             ->selectRaw(
                 '(SELECT COALESCE(SUM(quantity), 0) FROM order_items '
                     . 'JOIN orders ON orders.id = order_items.order_id '
@@ -82,12 +67,6 @@ final class TopProductsWidget extends BaseWidget
                 TextColumn::make('price')
                     ->label(__('analytics.price'))
                     ->money('EUR')
-                    ->sortable(),
-                TextColumn::make('views_count')
-                    ->label(__('analytics.views'))
-                    ->sortable(),
-                TextColumn::make('cart_adds_count')
-                    ->label(__('analytics.cart_adds'))
                     ->sortable(),
                 TextColumn::make('total_sold')
                     ->label(__('analytics.total_sold'))

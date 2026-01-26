@@ -33,7 +33,7 @@ final class VerifyEmailMail extends Mailable implements ShouldQueue
         $this->locale($locale); // Ensure Markdown components use the same locale as the subject.
 
         return new Envelope(
-            subject: __('mail.verify_email_subject', [], $locale)
+            subject: __('messages.mail, [], $locale)
         );
     }
 

@@ -255,17 +255,17 @@ final class DiscountCondition extends Model
     public function getTypeLabel(): string
     {
         return match ($this->type) {
-            'product'         => __('discount_conditions.types.product'),
-            'category'        => __('discount_conditions.types.category'),
-            'brand'           => __('discount_conditions.types.brand'),
-            'collection'      => __('discount_conditions.types.collection'),
+            'product'         => __('messages.discount_conditions),
+            'category'        => __('messages.discount_conditions),
+            'brand'           => __('messages.discount_conditions),
+            'collection'      => __('messages.discount_conditions),
             'attribute_value' => __('discount_conditions.types.attribute_value'),
             'cart_total'      => __('discount_conditions.types.cart_total'),
             'item_qty'        => __('discount_conditions.types.item_qty'),
-            'channel'         => __('discount_conditions.types.channel'),
-            'currency'        => __('discount_conditions.types.currency'),
+            'channel'         => __('messages.discount_conditions),
+            'currency'        => __('messages.discount_conditions),
             'customer_group'  => __('discount_conditions.types.customer_group'),
-            'user'            => __('discount_conditions.types.user'),
+            'user'            => __('messages.discount_conditions),
             'partner_tier'    => __('discount_conditions.types.partner_tier'),
             'first_order'     => __('discount_conditions.types.first_order'),
             'day_time'        => __('discount_conditions.types.day_time'),
@@ -288,11 +288,11 @@ final class DiscountCondition extends Model
             'greater_than_or_equal' => __('discount_conditions.operators.greater_than_or_equal'),
             'starts_with'           => __('discount_conditions.operators.starts_with'),
             'ends_with'             => __('discount_conditions.operators.ends_with'),
-            'contains'              => __('discount_conditions.operators.contains'),
+            'contains'              => __('messages.discount_conditions),
             'not_contains'          => __('discount_conditions.operators.not_contains'),
             'in_array'              => __('discount_conditions.operators.in_array'),
             'not_in_array'          => __('discount_conditions.operators.not_in_array'),
-            'regex'                 => __('discount_conditions.operators.regex'),
+            'regex'                 => __('messages.discount_conditions),
             'not_regex'             => __('discount_conditions.operators.not_regex'),
             default                 => $this->operator,
         };
@@ -303,7 +303,7 @@ final class DiscountCondition extends Model
      */
     public static function getTypes(): array
     {
-        return ['product' => __('discount_conditions.types.product'), 'category' => __('discount_conditions.types.category'), 'brand' => __('discount_conditions.types.brand'), 'collection' => __('discount_conditions.types.collection'), 'attribute_value' => __('discount_conditions.types.attribute_value'), 'cart_total' => __('discount_conditions.types.cart_total'), 'item_qty' => __('discount_conditions.types.item_qty'), 'channel' => __('discount_conditions.types.channel'), 'currency' => __('discount_conditions.types.currency'), 'customer_group' => __('discount_conditions.types.customer_group'), 'user' => __('discount_conditions.types.user'), 'partner_tier' => __('discount_conditions.types.partner_tier'), 'first_order' => __('discount_conditions.types.first_order'), 'day_time' => __('discount_conditions.types.day_time'), 'custom_script' => __('discount_conditions.types.custom_script')];
+        return ['product' => __('messages.discount_conditions), 'category' => __('messages.discount_conditions), 'brand' => __('messages.discount_conditions), 'collection' => __('messages.discount_conditions), 'attribute_value' => __('discount_conditions.types.attribute_value'), 'cart_total' => __('discount_conditions.types.cart_total'), 'item_qty' => __('discount_conditions.types.item_qty'), 'channel' => __('messages.discount_conditions), 'currency' => __('messages.discount_conditions), 'customer_group' => __('discount_conditions.types.customer_group'), 'user' => __('messages.discount_conditions), 'partner_tier' => __('discount_conditions.types.partner_tier'), 'first_order' => __('discount_conditions.types.first_order'), 'day_time' => __('discount_conditions.types.day_time'), 'custom_script' => __('discount_conditions.types.custom_script')];
     }
 
     /**
@@ -311,7 +311,7 @@ final class DiscountCondition extends Model
      */
     public static function getOperators(): array
     {
-        return ['equals_to' => __('discount_conditions.operators.equals_to'), 'not_equals_to' => __('discount_conditions.operators.not_equals_to'), 'less_than' => __('discount_conditions.operators.less_than'), 'greater_than' => __('discount_conditions.operators.greater_than'), 'less_than_or_equal' => __('discount_conditions.operators.less_than_or_equal'), 'greater_than_or_equal' => __('discount_conditions.operators.greater_than_or_equal'), 'starts_with' => __('discount_conditions.operators.starts_with'), 'ends_with' => __('discount_conditions.operators.ends_with'), 'contains' => __('discount_conditions.operators.contains'), 'not_contains' => __('discount_conditions.operators.not_contains'), 'in_array' => __('discount_conditions.operators.in_array'), 'not_in_array' => __('discount_conditions.operators.not_in_array'), 'regex' => __('discount_conditions.operators.regex'), 'not_regex' => __('discount_conditions.operators.not_regex')];
+        return ['equals_to' => __('discount_conditions.operators.equals_to'), 'not_equals_to' => __('discount_conditions.operators.not_equals_to'), 'less_than' => __('discount_conditions.operators.less_than'), 'greater_than' => __('discount_conditions.operators.greater_than'), 'less_than_or_equal' => __('discount_conditions.operators.less_than_or_equal'), 'greater_than_or_equal' => __('discount_conditions.operators.greater_than_or_equal'), 'starts_with' => __('discount_conditions.operators.starts_with'), 'ends_with' => __('discount_conditions.operators.ends_with'), 'contains' => __('messages.discount_conditions), 'not_contains' => __('discount_conditions.operators.not_contains'), 'in_array' => __('discount_conditions.operators.in_array'), 'not_in_array' => __('discount_conditions.operators.not_in_array'), 'regex' => __('messages.discount_conditions), 'not_regex' => __('discount_conditions.operators.not_regex')];
     }
 
     /**
@@ -320,7 +320,7 @@ final class DiscountCondition extends Model
     public static function getOperatorsForType(string $type): array
     {
         $numericOperators = ['equals_to' => __('discount_conditions.operators.equals_to'), 'not_equals_to' => __('discount_conditions.operators.not_equals_to'), 'less_than' => __('discount_conditions.operators.less_than'), 'greater_than' => __('discount_conditions.operators.greater_than'), 'less_than_or_equal' => __('discount_conditions.operators.less_than_or_equal'), 'greater_than_or_equal' => __('discount_conditions.operators.greater_than_or_equal')];
-        $stringOperators = ['equals_to' => __('discount_conditions.operators.equals_to'), 'not_equals_to' => __('discount_conditions.operators.not_equals_to'), 'starts_with' => __('discount_conditions.operators.starts_with'), 'ends_with' => __('discount_conditions.operators.ends_with'), 'contains' => __('discount_conditions.operators.contains'), 'not_contains' => __('discount_conditions.operators.not_contains'), 'regex' => __('discount_conditions.operators.regex'), 'not_regex' => __('discount_conditions.operators.not_regex')];
+        $stringOperators = ['equals_to' => __('discount_conditions.operators.equals_to'), 'not_equals_to' => __('discount_conditions.operators.not_equals_to'), 'starts_with' => __('discount_conditions.operators.starts_with'), 'ends_with' => __('discount_conditions.operators.ends_with'), 'contains' => __('messages.discount_conditions), 'not_contains' => __('discount_conditions.operators.not_contains'), 'regex' => __('messages.discount_conditions), 'not_regex' => __('discount_conditions.operators.not_regex')];
         $arrayOperators = ['in_array' => __('discount_conditions.operators.in_array'), 'not_in_array' => __('discount_conditions.operators.not_in_array')];
 
         return match ($type) {

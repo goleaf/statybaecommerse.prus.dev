@@ -90,7 +90,7 @@ final class ProductCardDetailed extends Component
             return;
         }
         $this->dispatch('add-to-wishlist', productId: $this->product->id);
-        $this->dispatch('notify', ['type' => 'success', 'message' => __('translations.product_added_to_wishlist', ['name' => $this->product->name])]);
+        $this->dispatch('notify', ['type' => 'success', 'message' => __('messages.translations, ['name' => $this->product->name])]);
     }
 
     /**
@@ -99,7 +99,7 @@ final class ProductCardDetailed extends Component
     public function toggleComparison(): void
     {
         $this->dispatch('add-to-comparison', productId: $this->product->id);
-        $this->dispatch('notify', ['type' => 'success', 'message' => __('translations.product_added_to_comparison', ['name' => $this->product->name])]);
+        $this->dispatch('notify', ['type' => 'success', 'message' => __('messages.translations, ['name' => $this->product->name])]);
     }
 
     /**

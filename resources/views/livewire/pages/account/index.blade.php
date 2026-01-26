@@ -3,50 +3,50 @@
 // Build links without Volt computed to avoid test-time Volt closure issues
 $links = [
     [
-        'title' => __('frontend.account.orders.title'),
-        'description' => __('frontend.account.cards.orders.description'),
+        'title' => __('messages.frontend),
+        'description' => __('messages.frontend),
         'href' => route('account.orders'),
         'icon' => 'untitledui-shopping-bag',
     ],
     [
-        'title' => __('frontend.account.reviews'),
-        'description' => __('frontend.account.cards.reviews.description'),
+        'title' => __('messages.frontend),
+        'description' => __('messages.frontend),
         'href' => route('account.reviews'),
         'icon' => 'untitledui-star-07',
     ],
     [
-        'title' => __('frontend.account.cards.profile.title'),
-        'description' => __('frontend.account.cards.profile.description'),
+        'title' => __('messages.frontend),
+        'description' => __('messages.frontend),
         'href' => route('account.profile'),
         'icon' => 'untitledui-shield-tick',
     ],
     [
-        'title' => __('frontend.account.cards.addresses.title'),
-        'description' => __('frontend.account.cards.addresses.description'),
+        'title' => __('messages.frontend),
+        'description' => __('messages.frontend),
         'href' => route('account.addresses'),
         'icon' => 'untitledui-globe-05',
     ],
     [
-        'title' => __('frontend.account.wishlist'),
-        'description' => __('frontend.account.cards.wishlist.description'),
+        'title' => __('messages.frontend),
+        'description' => __('messages.frontend),
         'href' => route('account.wishlist'),
         'icon' => 'untitledui-heart',
     ],
     [
-        'title' => __('frontend.account.documents'),
-        'description' => __('frontend.account.cards.documents.description'),
+        'title' => __('messages.frontend),
+        'description' => __('messages.frontend),
         'href' => route('account.documents'),
         'icon' => 'untitledui-file-02',
     ],
     [
-        'title' => __('frontend.account.notifications'),
-        'description' => __('frontend.account.cards.notifications.description'),
+        'title' => __('messages.frontend),
+        'description' => __('messages.frontend),
         'href' => route('account.notifications'),
         'icon' => 'untitledui-bell-01',
     ],
     [
-        'title' => __('frontend.account.cards.contact.title'),
-        'description' => __('frontend.account.cards.contact.description'),
+        'title' => __('messages.frontend),
+        'description' => __('messages.frontend),
         'href' => route('account.index'),
         'icon' => 'untitledui-phone',
     ],
@@ -54,10 +54,10 @@ $links = [
 @endphp
 
 <div class="space-y-10">
-    <x-breadcrumbs :items="[['label' => __('frontend.account.nav.title')]]" />
+    <x-breadcrumbs :items="[['label' => __('messages.frontend)]]" />
     <x-page-heading
-                    :title="__('frontend.account.overview.title')"
-                    :description="__('frontend.account.overview.description')" />
+                    :title="__('messages.frontend)"
+                    :description="__('messages.frontend)" />
 
     <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:max-w-5xl lg:grid-cols-3">
         @foreach ($links as $link)

@@ -74,7 +74,7 @@
             <form wire:submit="login" class="space-y-6">
                 <div class="space-y-5">
                     <div class="space-y-2">
-                        <x-forms.label for="email" :value="__('auth_email')" />
+                        <x-forms.label for="email" :value="__('messages.auth_email')" />
                         <x-forms.input
                             id="email"
                             type="email"
@@ -89,9 +89,9 @@
 
                     <div class="space-y-2">
                         <div class="flex items-center justify-between">
-                            <x-forms.label for="password" :value="__('auth_password')" />
+                            <x-forms.label for="password" :value="__('messages.auth_password')" />
                             <x-link :href="route('password.request')" class="text-sm font-semibold text-dark hover:text-stone">
-                                {{ __('auth_forgot_password') }}
+                                {{ __('messages.auth_forgot_password') }}
                             </x-link>
                         </div>
                             <x-forms.input
@@ -113,7 +113,7 @@
                             wire:model.defer="loginForm.remember"
                             class="h-4 w-4 rounded border-ash text-dark focus:ring-dark"
                         >
-                        <span>{{ __('auth_remember_me') }}</span>
+                        <span>{{ __('messages.auth_remember_me') }}</span>
                     </label>
 
                     <p class="text-xs text-slate-500">{{ __('auth_secure_notice') }}</p>

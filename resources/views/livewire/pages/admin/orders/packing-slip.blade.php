@@ -8,7 +8,7 @@
                 {{ optional($order->created_at)->timezone(config('app.timezone'))->format('Y-m-d H:i') }}</p>
             <p class="text-sm text-gray-600 mt-1">
                 {{ __('messages.status') }}: <strong>{{ $order->status }}</strong> ·
-                {{ __('Payment') }}: <strong>{{ $order->payment_status ?? __('pending') }}</strong>
+                {{ __('messages.Payment') }}: <strong>{{ $order->payment_status ?? __('pending') }}</strong>
             </p>
             <p class="mt-2">
                 <x-link :href="route('admin.orders.status.edit', ['number' => $order->number])" class="text-sm">

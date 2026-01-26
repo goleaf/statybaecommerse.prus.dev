@@ -14,7 +14,7 @@
         @yield('meta')
     @else
         <meta name="description" content="{{ $description ?? __('messages.meta_description_home') }}">
-        <meta name="keywords" content="{{ $keywords ?? __('meta_keywords') }}">
+        <meta name="keywords" content="{{ $keywords ?? __('messages.meta_keywords') }}">
     @endhasSection
 
     {{-- Canonical URL --}}
@@ -82,7 +82,7 @@
     {{-- Skip to content link for accessibility --}}
     <a href="#main-content"
        class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-blue-600 text-white px-4 py-2 rounded-md z-50">
-        {{ __('skip_to_results') }}
+        {{ __('messages.skip_to_results') }}
     </a>
 
     {{-- Header --}}

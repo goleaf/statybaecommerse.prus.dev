@@ -2,8 +2,8 @@
 
 <div>
     <x-breadcrumbs :items="[
-        ['label' => __('frontend.account.nav.title'), 'url' => route('account.index')],
-        ['label' => __('frontend.account.orders.title'), 'url' => route('account.orders')],
+        ['label' => __('messages.frontend), 'url' => route('account.index')],
+        ['label' => __('messages.frontend), 'url' => route('account.orders')],
         ['label' => __('frontend.account.order_detail.title')],
     ]" />
     <h1 class="text-xl font-semibold text-gray-900 font-heading lg:text-2xl">

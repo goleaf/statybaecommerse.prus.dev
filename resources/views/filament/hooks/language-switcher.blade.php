@@ -1,9 +1,3 @@
-@php
-    $locales = config('app.locales', []);
-    $supportedLocaleCodes = array_map('trim', explode(',', config('app.supported_locales', 'lt,en')));
-    $supportedLocales = array_intersect_key($locales, array_flip($supportedLocaleCodes));
-@endphp
-
 <div>
     <x-filament::dropdown
         maxHeight="250px"
@@ -29,7 +23,7 @@
         </x-filament::dropdown.header>
 
         <x-filament::dropdown.list>
-            @foreach ($supportedLocales as $locale => $data)
+            @foreach (array_intersect_key(config('app.locales', []), array_flip(\App\Support\Locales::supported())) as $locale => $data)
                 <x-filament::dropdown.list.item
                     :color="(app()->getLocale() === $locale) ? 'primary' : null"
                     icon="heroicon-m-chevron-right"

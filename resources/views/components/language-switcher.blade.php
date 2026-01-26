@@ -1,10 +1,3 @@
-@php
-    $currentLocale = app()->getLocale();
-    $locales = config('app.locales', []);
-    $supportedLocaleCodes = array_map('trim', explode(',', config('app.supported_locales', 'lt,en')));
-    $supportedLocales = array_intersect_key($locales, array_flip($supportedLocaleCodes));
-@endphp
-
 <div class="relative" x-data="{ open: false }">
     <button @click="open = !open"
             {{ $attributes->merge(['class' => 'flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-700 hover:text-blue-600 hover:bg-blue-50 transition-colors duration-200']) }}
@@ -31,24 +24,10 @@
          class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-large border border-slate-200 py-2 z-50">
         @foreach ($supportedLocales as $locale => $data)
             @if ($locale !== $currentLocale)
-                @php
-                    $route = request()->route();
-                    $targetUrl = null;
-
-                    if ($route && ($name = $route->getName()) && str_starts_with($name, 'localized.')) {
-                        $parameters = $route->parameters();
-                        $parameters['locale'] = $locale;
-                        $targetUrl = route($name, $parameters, false);
-                    } elseif (Route::has('localized.home')) {
-                        $targetUrl = route('localized.home', ['locale' => $locale], false);
-                    }
-
-                    $targetUrl ??= url('/' . ltrim($locale, '/'));
-                @endphp
                 <form method="POST" action="{{ route('locale.switch') }}">
                     @csrf
                     <input type="hidden" name="locale" value="{{ $locale }}">
-                    <input type="hidden" name="redirect_to" value="{{ $targetUrl }}">
+                    <input type="hidden" name="redirect_to" value="{{ $localeLinks[$locale] ?? url('/' . ltrim($locale, '/')) }}">
                     <button type="submit"
                             class="w-full flex items-center gap-3 px-4 py-3 text-left text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200">
                         <span class="text-lg">{{ $data['flag'] ?? '🌐' }}</span>

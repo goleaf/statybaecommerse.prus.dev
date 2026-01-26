@@ -13,9 +13,9 @@ enum ModerationState: string
     public function label(): string
     {
         return match ($this) {
-            self::Draft     => __('moderation.states.draft'),
-            self::Review    => __('moderation.states.review'),
-            self::Published => __('moderation.states.published'),
+            self::Draft     => __('messages.moderation),
+            self::Review    => __('messages.moderation),
+            self::Published => __('messages.moderation),
         };
     }
 

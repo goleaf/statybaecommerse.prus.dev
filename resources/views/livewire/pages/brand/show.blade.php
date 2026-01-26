@@ -34,7 +34,7 @@
                                 <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
                             </svg>
                             <a href="{{ route('localized.brands.index', ['locale' => app()->getLocale()]) }}" class="ml-1 text-blue-100 hover:text-white md:ml-2">
-                                {{ __('shared.brands') }}
+                                {{ __('messages.shared) }}
                             </a>
                         </div>
                     </li>

@@ -1,6 +1,6 @@
 @extends('components.layouts.base')
 
-@section('title', __('frontend.profile.edit.title'))
+@section('title', __('messages.frontend))
 
 @section('content')
     <div class="container mx-auto px-4 py-8">
@@ -11,17 +11,17 @@
                     <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
                     </svg>
-                    {{ __('frontend.profile.edit.back') }}
+                    {{ __('messages.frontend) }}
                 </a>
             </div>
 
             <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm">
                 <div class="px-6 py-5 border-b border-gray-200 dark:border-gray-700">
                     <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">
-                        {{ __('frontend.profile.edit.heading') }}
+                        {{ __('messages.frontend) }}
                     </h1>
                     <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                        {{ __('frontend.profile.edit.description') }}
+                        {{ __('messages.frontend) }}
                     </p>
                 </div>
 
@@ -63,7 +63,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                {{ __('frontend.profile.fields.email') }}
+                                {{ __('messages.frontend) }}
                             </label>
                             <input type="email"
                                    id="email"
@@ -77,7 +77,7 @@
                         </div>
                         <div>
                             <label for="phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                {{ __('frontend.profile.fields.phone') }}
+                                {{ __('messages.frontend) }}
                             </label>
                             <input type="text"
                                    id="phone"
@@ -120,7 +120,7 @@
                         </div>
                         <div>
                             <label for="country_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                {{ __('frontend.profile.fields.country') }}
+                                {{ __('messages.frontend) }}
                             </label>
                             <select id="country_id"
                                     name="country_id"
@@ -141,11 +141,11 @@
                     <div class="flex justify-end gap-3">
                         <a href="{{ route('frontend.profile.index') }}"
                            class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                            {{ __('frontend.profile.edit.actions.cancel') }}
+                            {{ __('messages.frontend) }}
                         </a>
                         <button type="submit"
                                 class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                            {{ __('frontend.profile.edit.actions.save') }}
+                            {{ __('messages.frontend) }}
                         </button>
                     </div>
                 </form>

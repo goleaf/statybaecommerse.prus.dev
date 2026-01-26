@@ -9,7 +9,7 @@
                     </div>
                     <div class="ml-4">
                         <p class="text-sm font-medium text-gray-500 dark:text-gray-400">
-                            {{ __('translations.total_sliders') }}</p>
+                            {{ __('messages.translations) }}</p>
                         <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ $sliders->count() }}</p>
                     </div>
                 </div>
@@ -22,7 +22,7 @@
                     </div>
                     <div class="ml-4">
                         <p class="text-sm font-medium text-gray-500 dark:text-gray-400">
-                            {{ __('translations.active_sliders') }}</p>
+                            {{ __('messages.translations) }}</p>
                         <p class="text-2xl font-semibold text-gray-900 dark:text-white">
                             {{ $sliders->where('is_active', true)->count() }}</p>
                     </div>
@@ -36,7 +36,7 @@
                     </div>
                     <div class="ml-4">
                         <p class="text-sm font-medium text-gray-500 dark:text-gray-400">
-                            {{ __('translations.inactive_sliders') }}</p>
+                            {{ __('messages.translations) }}</p>
                         <p class="text-2xl font-semibold text-gray-900 dark:text-white">
                             {{ $sliders->where('is_active', false)->count() }}</p>
                     </div>
@@ -50,7 +50,7 @@
                     </div>
                     <div class="ml-4">
                         <p class="text-sm font-medium text-gray-500 dark:text-gray-400">
-                            {{ __('translations.recent_sliders') }}</p>
+                            {{ __('messages.translations) }}</p>
                         <p class="text-2xl font-semibold text-gray-900 dark:text-white">
                             {{ $sliders->where('created_at', '>=', now()->subWeek())->count() }}</p>
                     </div>
@@ -82,7 +82,7 @@
                                     <span
                                           class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
                                         <x-heroicon-o-check-circle class="h-3 w-3 mr-1" />
-                                        {{ __('translations.active') }}
+                                        {{ __('messages.translations) }}
                                     </span>
                                 @else
                                     <span
@@ -110,19 +110,19 @@
                             <div class="space-y-2 mb-4">
                                 <div class="flex items-center justify-between text-sm">
                                     <span
-                                          class="text-gray-500 dark:text-gray-400">{{ __('translations.sort_order') }}:</span>
+                                          class="text-gray-500 dark:text-gray-400">{{ __('messages.translations) }}:</span>
                                     <span class="font-medium">{{ $slider->sort_order }}</span>
                                 </div>
 
                                 <div class="flex items-center justify-between text-sm">
                                     <span
-                                          class="text-gray-500 dark:text-gray-400">{{ __('translations.animation') }}:</span>
+                                          class="text-gray-500 dark:text-gray-400">{{ __('messages.translations) }}:</span>
                                     <span class="font-medium capitalize">{{ $slider->getAnimationType() }}</span>
                                 </div>
 
                                 <div class="flex items-center justify-between text-sm">
                                     <span
-                                          class="text-gray-500 dark:text-gray-400">{{ __('translations.duration') }}:</span>
+                                          class="text-gray-500 dark:text-gray-400">{{ __('messages.translations) }}:</span>
                                     <span class="font-medium">{{ $slider->getDuration() }}ms</span>
                                 </div>
                             </div>
@@ -131,11 +131,11 @@
                             <div class="flex items-center space-x-2 mb-4">
                                 <div class="flex items-center space-x-1">
                                     <div class="w-4 h-4 rounded border bg-var" data-color="{{ $slider->getEffectiveBackgroundColor() }}"></div>
-                                    <span class="text-xs text-gray-500">{{ __('translations.background') }}</span>
+                                    <span class="text-xs text-gray-500">{{ __('messages.translations) }}</span>
                                 </div>
                                 <div class="flex items-center space-x-1">
                                     <div class="w-4 h-4 rounded border bg-var" data-color="{{ $slider->getEffectiveTextColor() }}"></div>
-                                    <span class="text-xs text-gray-500">{{ __('translations.text') }}</span>
+                                    <span class="text-xs text-gray-500">{{ __('messages.translations) }}</span>
                                 </div>
                             </div>
 
@@ -150,7 +150,7 @@
                                     <a href="{{ route('filament.admin.resources.sliders.edit', $slider) }}"
                                        class="inline-flex items-center px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md text-xs font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
                                         <x-heroicon-o-pencil class="h-3 w-3 mr-1" />
-                                        {{ __('translations.edit') }}
+                                        {{ __('messages.translations) }}
                                     </a>
 
                                     {{ $this->deleteSliderAction($slider) }}
@@ -164,10 +164,10 @@
             <!-- Empty State -->
             <div class="text-center py-12">
                 <x-heroicon-o-rectangle-stack class="mx-auto h-12 w-12 text-gray-400" />
-                <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('translations.no_sliders') }}
+                <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('messages.translations) }}
                 </h3>
                 <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                    {{ __('translations.no_sliders_description') }}</p>
+                    {{ __('messages.translations) }}</p>
                 <div class="mt-6">
                     {{ $this->createSliderAction() }}
                 </div>

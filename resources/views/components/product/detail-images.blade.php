@@ -26,10 +26,10 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                 <div>
                     <span class="font-medium text-gray-700 dark:text-gray-300">
-                        {{ __('frontend.images.images') }}:
+                        {{ __('messages.frontend) }}:
                     </span>
                     <span class="text-gray-600 dark:text-gray-400">
-                        {{ count($images) }} {{ __('frontend.images.images') }}
+                        {{ count($images) }} {{ __('messages.frontend) }}
                     </span>
                 </div>
                 
@@ -49,11 +49,11 @@
                     {{ __('translations.image_dimensions') }}:
                 </span>
                 <div class="flex flex-wrap gap-2">
-                    <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">{{ __('frontend.images.sizes.xs') }}</span>
-                    <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">{{ __('frontend.images.sizes.sm') }}</span>
-                    <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">{{ __('frontend.images.sizes.md') }}</span>
-                    <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">{{ __('frontend.images.sizes.lg') }}</span>
-                    <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">{{ __('frontend.images.sizes.xl') }}</span>
+                    <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">{{ __('messages.frontend) }}</span>
+                    <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">{{ __('messages.frontend) }}</span>
+                    <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">{{ __('messages.frontend) }}</span>
+                    <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">{{ __('messages.frontend) }}</span>
+                    <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">{{ __('messages.frontend) }}</span>
                 </div>
             </div>
 
@@ -101,7 +101,7 @@
                         {{-- Generated Badge --}}
                         @if($image['generated'])
                             <div class="absolute top-2 right-2 bg-green-500 text-white px-2 py-1 rounded text-xs">
-                                {{ __('translations.random_image') }}
+                                {{ __('messages.translations) }}
                             </div>
                         @endif
 

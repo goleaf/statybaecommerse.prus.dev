@@ -415,10 +415,10 @@ final class Review extends Model
     public function getStatusLabel(): string
     {
         return match ($this->getStatus()) {
-            'approved' => __('admin.reviews.status.approved'),
-            'rejected' => __('admin.reviews.status.rejected'),
-            'pending'  => __('admin.reviews.status.pending'),
-            default    => __('admin.reviews.status.unknown'),
+            'approved' => __('messages.admin_reviews),
+            'rejected' => __('messages.admin_reviews),
+            'pending'  => __('messages.admin_reviews),
+            default    => __('messages.admin_reviews),
         };
     }
 
@@ -428,12 +428,12 @@ final class Review extends Model
     public function getRatingLabel(): string
     {
         return match ($this->rating) {
-            1       => __('admin.reviews.ratings.poor'),
-            2       => __('admin.reviews.ratings.fair'),
-            3       => __('admin.reviews.ratings.good'),
+            1       => __('messages.admin_reviews),
+            2       => __('messages.admin_reviews),
+            3       => __('messages.admin_reviews),
             4       => __('admin.reviews.ratings.very_good'),
-            5       => __('admin.reviews.ratings.excellent'),
-            default => __('admin.reviews.ratings.unknown'),
+            5       => __('messages.admin_reviews),
+            default => __('messages.admin_reviews),
         };
     }
 

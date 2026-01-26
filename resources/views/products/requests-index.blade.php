@@ -21,16 +21,16 @@
                         <thead class="bg-gray-50">
                             <tr>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    {{ __('translations.product') }}
+                                    {{ __('messages.translations) }}
                                 </th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    {{ __('translations.quantity') }}
+                                    {{ __('messages.translations) }}
                                 </th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    {{ __('translations.status') }}
+                                    {{ __('messages.translations) }}
                                 </th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    {{ __('translations.date') }}
+                                    {{ __('messages.translations) }}
                                 </th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     {{ __('translations.actions') }}
@@ -77,7 +77,7 @@
                                         <div class="flex space-x-2">
                                             <a href="{{ route('product-requests.show', $request) }}" 
                                                class="text-blue-600 hover:text-blue-900 transition-colors">
-                                                {{ __('translations.view') }}
+                                                {{ __('messages.translations) }}
                                             </a>
                                             
                                             @if($request->isPending() || $request->isInProgress())
@@ -89,7 +89,7 @@
                                                     @method('PATCH')
                                                     <button type="submit" 
                                                             class="text-red-600 hover:text-red-900 transition-colors">
-                                                        {{ __('translations.cancel') }}
+                                                        {{ __('messages.translations) }}
                                                     </button>
                                                 </form>
                                             @endif
@@ -122,7 +122,7 @@
                 </p>
                 <a href="{{ route('shop.index') }}" 
                    class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
-                    {{ __('translations.browse_products') }}
+                    {{ __('messages.translations) }}
                 </a>
             </div>
         @endif

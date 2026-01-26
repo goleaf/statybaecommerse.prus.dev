@@ -58,7 +58,7 @@
                 <h2 class="text-lg font-semibold text-gray-900 mb-4">{{ __('translations.personal_information') }}</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label for="first_name" class="block text-sm font-medium text-gray-700">{{ __('translations.first_name') }}</label>
+                        <label for="first_name" class="block text-sm font-medium text-gray-700">{{ __('messages.translations) }}</label>
                         <input type="text" name="first_name" id="first_name" 
                                value="{{ old('first_name') }}"
                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
@@ -68,7 +68,7 @@
                     </div>
                     
                     <div>
-                        <label for="last_name" class="block text-sm font-medium text-gray-700">{{ __('translations.last_name') }}</label>
+                        <label for="last_name" class="block text-sm font-medium text-gray-700">{{ __('messages.translations) }}</label>
                         <input type="text" name="last_name" id="last_name" 
                                value="{{ old('last_name') }}"
                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
@@ -94,7 +94,7 @@
                     </div>
                     
                     <div>
-                        <label for="company_vat" class="block text-sm font-medium text-gray-700">{{ __('translations.company_vat') }}</label>
+                        <label for="company_vat" class="block text-sm font-medium text-gray-700">{{ __('messages.translations) }}</label>
                         <input type="text" name="company_vat" id="company_vat" 
                                value="{{ old('company_vat') }}"
                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
@@ -107,10 +107,10 @@
 
             <!-- Address Details -->
             <div class="bg-white rounded-lg shadow p-6">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">{{ __('translations.address_details') }}</h2>
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">{{ __('messages.translations) }}</h2>
                 <div class="space-y-4">
                     <div>
-                        <label for="address_line_1" class="block text-sm font-medium text-gray-700">{{ __('translations.address_line_1') }} *</label>
+                        <label for="address_line_1" class="block text-sm font-medium text-gray-700">{{ __('messages.translations) }} *</label>
                         <input type="text" name="address_line_1" id="address_line_1" 
                                value="{{ old('address_line_1') }}"
                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
@@ -120,7 +120,7 @@
                     </div>
                     
                     <div>
-                        <label for="address_line_2" class="block text-sm font-medium text-gray-700">{{ __('translations.address_line_2') }}</label>
+                        <label for="address_line_2" class="block text-sm font-medium text-gray-700">{{ __('messages.translations) }}</label>
                         <input type="text" name="address_line_2" id="address_line_2" 
                                value="{{ old('address_line_2') }}"
                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
@@ -131,7 +131,7 @@
                     
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
-                            <label for="apartment" class="block text-sm font-medium text-gray-700">{{ __('translations.apartment') }}</label>
+                            <label for="apartment" class="block text-sm font-medium text-gray-700">{{ __('messages.translations) }}</label>
                             <input type="text" name="apartment" id="apartment" 
                                    value="{{ old('apartment') }}"
                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
@@ -141,7 +141,7 @@
                         </div>
                         
                         <div>
-                            <label for="floor" class="block text-sm font-medium text-gray-700">{{ __('translations.floor') }}</label>
+                            <label for="floor" class="block text-sm font-medium text-gray-700">{{ __('messages.translations) }}</label>
                             <input type="text" name="floor" id="floor" 
                                    value="{{ old('floor') }}"
                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
@@ -151,7 +151,7 @@
                         </div>
                         
                         <div>
-                            <label for="building" class="block text-sm font-medium text-gray-700">{{ __('translations.building') }}</label>
+                            <label for="building" class="block text-sm font-medium text-gray-700">{{ __('messages.translations) }}</label>
                             <input type="text" name="building" id="building" 
                                    value="{{ old('building') }}"
                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
@@ -163,7 +163,7 @@
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label for="city" class="block text-sm font-medium text-gray-700">{{ __('translations.city') }} *</label>
+                            <label for="city" class="block text-sm font-medium text-gray-700">{{ __('messages.translations) }} *</label>
                             <input type="text" name="city" id="city" 
                                    value="{{ old('city') }}"
                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
@@ -173,7 +173,7 @@
                         </div>
                         
                         <div>
-                            <label for="state" class="block text-sm font-medium text-gray-700">{{ __('translations.state') }}</label>
+                            <label for="state" class="block text-sm font-medium text-gray-700">{{ __('messages.translations) }}</label>
                             <input type="text" name="state" id="state" 
                                    value="{{ old('state') }}"
                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
@@ -185,7 +185,7 @@
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label for="postal_code" class="block text-sm font-medium text-gray-700">{{ __('translations.postal_code') }} *</label>
+                            <label for="postal_code" class="block text-sm font-medium text-gray-700">{{ __('messages.translations) }} *</label>
                             <input type="text" name="postal_code" id="postal_code" 
                                    value="{{ old('postal_code') }}"
                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
@@ -195,14 +195,14 @@
                         </div>
                         
                         <div>
-                            <label for="country_code" class="block text-sm font-medium text-gray-700">{{ __('translations.country') }} *</label>
+                            <label for="country_code" class="block text-sm font-medium text-gray-700">{{ __('messages.translations) }} *</label>
                             <select name="country_code" id="country_code" 
                                     class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                                <option value="LT" {{ old('country_code', 'LT') === 'LT' ? 'selected' : '' }}>{{ __('addresses.countries.lt') }}</option>
-                                <option value="LV" {{ old('country_code') === 'LV' ? 'selected' : '' }}>{{ __('addresses.countries.lv') }}</option>
-                                <option value="EE" {{ old('country_code') === 'EE' ? 'selected' : '' }}>{{ __('addresses.countries.ee') }}</option>
-                                <option value="PL" {{ old('country_code') === 'PL' ? 'selected' : '' }}>{{ __('addresses.countries.pl') }}</option>
-                                <option value="DE" {{ old('country_code') === 'DE' ? 'selected' : '' }}>{{ __('addresses.countries.de') }}</option>
+                                <option value="LT" {{ old('country_code', 'LT') === 'LT' ? 'selected' : '' }}>{{ __('messages.addresses) }}</option>
+                                <option value="LV" {{ old('country_code') === 'LV' ? 'selected' : '' }}>{{ __('messages.addresses) }}</option>
+                                <option value="EE" {{ old('country_code') === 'EE' ? 'selected' : '' }}>{{ __('messages.addresses) }}</option>
+                                <option value="PL" {{ old('country_code') === 'PL' ? 'selected' : '' }}>{{ __('messages.addresses) }}</option>
+                                <option value="DE" {{ old('country_code') === 'DE' ? 'selected' : '' }}>{{ __('messages.addresses) }}</option>
                             </select>
                             @error('country_code')
                                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
@@ -214,10 +214,10 @@
 
             <!-- Contact Information -->
             <div class="bg-white rounded-lg shadow p-6">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">{{ __('translations.contact_information') }}</h2>
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">{{ __('messages.translations) }}</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label for="phone" class="block text-sm font-medium text-gray-700">{{ __('translations.phone') }}</label>
+                        <label for="phone" class="block text-sm font-medium text-gray-700">{{ __('messages.translations) }}</label>
                         <input type="tel" name="phone" id="phone" 
                                value="{{ old('phone') }}"
                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
@@ -227,7 +227,7 @@
                     </div>
                     
                     <div>
-                        <label for="email" class="block text-sm font-medium text-gray-700">{{ __('translations.email') }}</label>
+                        <label for="email" class="block text-sm font-medium text-gray-700">{{ __('messages.translations) }}</label>
                         <input type="email" name="email" id="email" 
                                value="{{ old('email') }}"
                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
@@ -238,7 +238,7 @@
                 </div>
                 
                 <div class="mt-4">
-                    <label for="landmark" class="block text-sm font-medium text-gray-700">{{ __('translations.landmark') }}</label>
+                    <label for="landmark" class="block text-sm font-medium text-gray-700">{{ __('messages.translations) }}</label>
                     <input type="text" name="landmark" id="landmark" 
                            value="{{ old('landmark') }}"
                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
@@ -250,10 +250,10 @@
 
             <!-- Additional Information -->
             <div class="bg-white rounded-lg shadow p-6">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">{{ __('translations.additional_information') }}</h2>
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">{{ __('messages.translations) }}</h2>
                 <div class="space-y-4">
                     <div>
-                        <label for="notes" class="block text-sm font-medium text-gray-700">{{ __('translations.notes') }}</label>
+                        <label for="notes" class="block text-sm font-medium text-gray-700">{{ __('messages.translations) }}</label>
                         <textarea name="notes" id="notes" rows="3"
                                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">{{ old('notes') }}</textarea>
                         @error('notes')
@@ -262,7 +262,7 @@
                     </div>
                     
                     <div>
-                        <label for="instructions" class="block text-sm font-medium text-gray-700">{{ __('translations.instructions') }}</label>
+                        <label for="instructions" class="block text-sm font-medium text-gray-700">{{ __('messages.translations) }}</label>
                         <textarea name="instructions" id="instructions" rows="3"
                                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">{{ old('instructions') }}</textarea>
                         @error('instructions')
@@ -274,7 +274,7 @@
 
             <!-- Settings -->
             <div class="bg-white rounded-lg shadow p-6">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">{{ __('translations.settings') }}</h2>
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">{{ __('messages.translations) }}</h2>
                 <div class="space-y-4">
                     <div class="flex items-center">
                         <input type="checkbox" name="is_default" id="is_default" value="1" 
@@ -309,7 +309,7 @@
             <div class="flex justify-end space-x-4">
                 <a href="{{ route('frontend.addresses.index') }}" 
                    class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">
-                    {{ __('translations.cancel') }}
+                    {{ __('messages.translations) }}
                 </a>
                 <button type="submit" 
                         class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">

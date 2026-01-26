@@ -96,7 +96,7 @@ final class LoginForm extends Form
             $this->syncCaptchaState($captchaManager, true);
 
             throw ValidationException::withMessages([
-                'loginForm.email' => trans('auth.failed'),
+                'loginForm.email' => trans('messages.auth),
             ]);
         }
 
@@ -106,7 +106,7 @@ final class LoginForm extends Form
             Auth::logout();
 
             $exception = ValidationException::withMessages([
-                'loginForm.email' => trans('auth.failed'),
+                'loginForm.email' => trans('messages.auth),
             ]);
 
             $exception->status = 422;
@@ -243,7 +243,7 @@ final class LoginForm extends Form
         }
 
         $exception = ValidationException::withMessages([
-            'loginForm.email' => trans('auth.throttle', [
+            'loginForm.email' => trans('messages.auth, [
                 'seconds' => $seconds,
                 'minutes' => (int) ceil($seconds / 60),
             ]),

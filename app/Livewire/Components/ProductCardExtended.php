@@ -77,11 +77,11 @@ final class ProductCardExtended extends Component
         if ($comparison) {
             $comparison->delete();
             $this->isInComparison = false;
-            $message = __('translations.product_removed_from_comparison');
+            $message = __('messages.translations);
         } else {
             ProductComparison::create(['session_id' => $sessionId, 'user_id' => $userId, 'product_id' => $this->product->id]);
             $this->isInComparison = true;
-            $message = __('translations.product_added_to_comparison');
+            $message = __('messages.translations);
         }
         $this->dispatch('notify', ['type' => 'success', 'message' => $message]);
         $this->dispatch('comparison-updated');

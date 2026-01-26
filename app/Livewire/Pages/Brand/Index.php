@@ -11,7 +11,6 @@ use Filament\Forms\Components\TextInput;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Url;
-use Livewire\Component;
 use Livewire\WithPagination;
 
 /**
@@ -104,6 +103,21 @@ final class Index extends AbstractPageComponent
         return $query->paginate(12);
     }
 
+    #[Computed]
+    public function totalBrands(): int
+    {
+        return $this->brands->total();
+    }
+
+    #[Computed]
+    public function activeFilterCount(): int
+    {
+        return collect([
+            filled($this->search),
+            $this->sortBy !== 'name',
+        ])->filter()->count();
+    }
+
     /**
      * Handle getPageTitle functionality with proper error handling.
      */
@@ -129,11 +143,31 @@ final class Index extends AbstractPageComponent
         $this->resetPage();
     }
 
+    public function paginationUrl(?string $url): ?string
+    {
+        if ($url === null) {
+            return null;
+        }
+
+        $queryParameters = request()->except('page');
+        if ($queryParameters === []) {
+            return $url;
+        }
+
+        $queryString = http_build_query($queryParameters);
+
+        return $url . (str_contains($url, '?') ? '&' : '?') . $queryString;
+    }
+
     /**
      * Render the Livewire component view with current state.
      */
     public function render(): View
     {
-        return view('livewire.pages.brand.index')->title(__('messages.brands_index_meta_title') . ' - ' . config('app.name'));
+        return view('livewire.pages.brand.index', [
+            'paginator' => $this->brands,
+            'totalBrands' => $this->totalBrands(),
+            'activeFilterCount' => $this->activeFilterCount(),
+        ])->title(__('messages.brands_index_meta_title') . ' - ' . config('app.name'));
     }
 }

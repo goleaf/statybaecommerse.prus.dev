@@ -1,7 +1,7 @@
 @extends('components.layouts.base')
 
-@section('title', $region->translated_name . ' - ' . __('regions.title'))
-@section('description', $region->translated_description ?: __('regions.subtitle'))
+@section('title', $region->translated_name . ' - ' . __('messages.regions))
+@section('description', $region->translated_description ?: __('messages.regions))
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
@@ -10,7 +10,7 @@
         <ol class="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
             <li>
                 <a href="{{ route('regions.index') }}" class="hover:text-blue-600 dark:hover:text-blue-400">
-                    {{ __('regions.title') }}
+                    {{ __('messages.regions) }}
                 </a>
             </li>
             <li class="flex items-center">
@@ -46,13 +46,13 @@
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div class="text-center">
                         <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">{{ $region->level }}</div>
-                        <div class="text-sm text-gray-600 dark:text-gray-400">{{ __('regions.fields.level') }}</div>
+                        <div class="text-sm text-gray-600 dark:text-gray-400">{{ __('messages.regions) }}</div>
                     </div>
                     
                     @if($region->code)
                         <div class="text-center">
                             <div class="text-2xl font-bold text-green-600 dark:text-green-400">{{ $region->code }}</div>
-                            <div class="text-sm text-gray-600 dark:text-gray-400">{{ __('regions.fields.code') }}</div>
+                            <div class="text-sm text-gray-600 dark:text-gray-400">{{ __('messages.regions) }}</div>
                         </div>
                     @endif
                     
@@ -85,7 +85,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            {{ __('regions.fields.name') }}
+                            {{ __('messages.regions) }}
                         </label>
                         <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ $region->translated_name }}</p>
                     </div>
@@ -93,7 +93,7 @@
                     @if($region->code)
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                {{ __('regions.fields.code') }}
+                                {{ __('messages.regions) }}
                             </label>
                             <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ $region->code }}</p>
                         </div>
@@ -101,7 +101,7 @@
                     
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            {{ __('regions.fields.level') }}
+                            {{ __('messages.regions) }}
                         </label>
                         <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ __('regions.levels.' . $region->level) }}</p>
                     </div>
@@ -109,7 +109,7 @@
                     @if($region->country)
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                {{ __('regions.fields.country') }}
+                                {{ __('messages.regions) }}
                             </label>
                             <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ $region->country->translated_name }}</p>
                         </div>
@@ -118,7 +118,7 @@
                     @if($region->parent)
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                {{ __('regions.fields.parent') }}
+                                {{ __('messages.regions) }}
                             </label>
                             <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ $region->parent->translated_name }}</p>
                         </div>
@@ -155,12 +155,12 @@
                             @if($region->is_root)
                                 <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
                                     <i class="fas fa-check mr-1"></i>
-                                    {{ __('regions.fields.yes') }}
+                                    {{ __('messages.regions) }}
                                 </span>
                             @else
                                 <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200">
                                     <i class="fas fa-times mr-1"></i>
-                                    {{ __('regions.fields.no') }}
+                                    {{ __('messages.regions) }}
                                 </span>
                             @endif
                         </p>
@@ -174,12 +174,12 @@
                             @if($region->children->count() > 0)
                                 <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
                                     <i class="fas fa-check mr-1"></i>
-                                    {{ __('regions.fields.yes') }} ({{ $region->children->count() }})
+                                    {{ __('messages.regions) }} ({{ $region->children->count() }})
                                 </span>
                             @else
                                 <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200">
                                     <i class="fas fa-times mr-1"></i>
-                                    {{ __('regions.fields.no') }}
+                                    {{ __('messages.regions) }}
                                 </span>
                             @endif
                         </p>
@@ -191,7 +191,7 @@
             @if($region->translated_description)
                 <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
                     <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                        {{ __('regions.fields.description') }}
+                        {{ __('messages.regions) }}
                     </h2>
                     <p class="text-gray-700 dark:text-gray-300 leading-relaxed">
                         {{ $region->translated_description }}
@@ -245,7 +245,7 @@
                                 </span>
                                 @if($city->is_capital)
                                     <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
-                                        {{ __('regions.fields.capital') }}
+                                        {{ __('messages.regions) }}
                                     </span>
                                 @endif
                             </div>
@@ -263,7 +263,7 @@
             <!-- Actions -->
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                    {{ __('regions.details.actions') }}
+                    {{ __('messages.regions) }}
                 </h3>
                 
                 <div class="space-y-3">

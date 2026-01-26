@@ -9,7 +9,7 @@
     </div>
 
     <fieldset class="mt-2">
-        <legend class="sr-only">{{ __('frontend.attributes.value.choose') }}</legend>
+        <legend class="sr-only">{{ __('messages.frontend) }}</legend>
         <div
             class="grid grid-cols-3 gap-3 sm:grid-cols-6"
             x-data="{

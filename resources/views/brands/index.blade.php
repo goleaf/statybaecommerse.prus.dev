@@ -1,14 +1,14 @@
 @extends('frontend.layouts.app')
 
-@section('title', __('frontend.brands.index.title'))
+@section('title', __('messages.frontend))
 
 @section('content')
     <div class="container mx-auto px-4">
         <div class="mb-8 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div>
-                <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ __('frontend.brands.index.title') }}</h1>
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ __('messages.frontend) }}</h1>
                 <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">
-                    {{ __('frontend.brands.index.description') }}
+                    {{ __('messages.frontend) }}
                 </p>
             </div>
             <form method="GET" action="{{ route('frontend.brands.index') }}" class="flex w-full flex-col gap-3 sm:flex-row sm:items-end sm:justify-end">

@@ -30,7 +30,7 @@ final class PriceResource extends BaseResource
 
     public static function getNavigationLabel(): string
     {
-        return __('admin.prices.navigation_label');
+        return __('messages.admin_prices);
     }
 
     public static function getPluralModelLabel(): string
@@ -52,13 +52,13 @@ final class PriceResource extends BaseResource
                     SchemaGrid::make(2)
                         ->schema([
                             Select::make('product_id')
-                                ->label(__('admin.prices.product'))
+                                ->label(__('messages.admin))
                                 ->relationship('product', 'name')
                                 ->required()
                                 ->searchable()
                                 ->preload(),
                             TextInput::make('price')
-                                ->label(__('admin.prices.price'))
+                                ->label(__('messages.admin))
                                 ->required()
                                 ->numeric()
                                 ->minValue(0)
@@ -81,15 +81,15 @@ final class PriceResource extends BaseResource
         return $table
             ->columns([
                 TextColumn::make('product.name')
-                    ->label(__('admin.prices.product'))
+                    ->label(__('messages.admin))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('product.sku')
-                    ->label(__('admin.prices.sku'))
+                    ->label(__('messages.admin))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('price')
-                    ->label(__('admin.prices.price'))
+                    ->label(__('messages.admin))
                     ->money('EUR')
                     ->sortable(),
                 TextColumn::make('valid_from')

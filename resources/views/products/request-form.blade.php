@@ -43,7 +43,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
-                            {{ __('translations.name') }} <span class="text-red-500">*</span>
+                            {{ __('messages.translations) }} <span class="text-red-500">*</span>
                         </label>
                         <input type="text" 
                                id="name" 
@@ -58,7 +58,7 @@
 
                     <div>
                         <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
-                            {{ __('translations.email') }} <span class="text-red-500">*</span>
+                            {{ __('messages.translations) }} <span class="text-red-500">*</span>
                         </label>
                         <input type="email" 
                                id="email" 
@@ -75,7 +75,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">
-                            {{ __('translations.phone') }}
+                            {{ __('messages.translations) }}
                         </label>
                         <input type="tel" 
                                id="phone" 
@@ -89,7 +89,7 @@
 
                     <div>
                         <label for="requested_quantity" class="block text-sm font-medium text-gray-700 mb-2">
-                            {{ __('translations.quantity') }} <span class="text-red-500">*</span>
+                            {{ __('messages.translations) }} <span class="text-red-500">*</span>
                         </label>
                         <input type="number" 
                                id="requested_quantity" 
