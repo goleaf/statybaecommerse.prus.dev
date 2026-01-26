@@ -13,7 +13,7 @@
                     </li>
                     <li>/</li>
                     <li>
-                        <a href="{{ route('frontend.products.index') }}" class="text-blue-600 hover:text-blue-700">{{ __('Products') }}</a>
+                        <a href="{{ route('frontend.products.index') }}" class="text-blue-600 hover:text-blue-700">{{ __('messages.products') }}</a>
                     </li>
                     <li>/</li>
                     <li class="text-gray-700">{{ $product->name }}</li>

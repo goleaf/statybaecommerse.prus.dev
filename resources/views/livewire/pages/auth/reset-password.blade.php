@@ -94,7 +94,7 @@ new #[Layout('components.layouts.base')] class extends Component {
             <form wire:submit="resetPassword" class="mt-6 space-y-4">
                 <!-- Email Address -->
                 <div>
-                    <x-forms.label for="email" :value="__('Email')" />
+                    <x-forms.label for="email" :value="__('messages.email')" />
                     <x-forms.input wire:model="email" id="email" class="block mt-1 w-full" type="email"
                                    name="email" required autofocus autocomplete="username" />
                     <x-forms.errors :messages="$errors->get('email')" class="mt-2" />

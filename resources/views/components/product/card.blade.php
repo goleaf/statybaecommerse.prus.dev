@@ -27,7 +27,7 @@
                 {{ __('Reserved') }}: {{ $product->reservedQuantity() }}
                 <span class="ml-2">{{ __('Available') }}: {{ $product->availableQuantity() }}</span>
                 @if ($product->isOutOfStock())
-                    <span class="ml-2 text-red-600 font-medium">{{ __('Out of stock') }}</span>
+                    <span class="ml-2 text-red-600 font-medium">{{ __('messages.out_of_stock') }}</span>
                 @endif
             </p>
         </div>
@@ -36,7 +36,7 @@
 
     @if ($product->variants_count > 0)
         <p class="mt-3 text-sm text-gray-500">
-            {{ __('+:count variants', ['count' => $product->variants_count]) }}
+            {{ __('messages.count_variants', ['count' => $product->variants_count]) }}
         </p>
     @endif
 </div>

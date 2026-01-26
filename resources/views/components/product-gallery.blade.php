@@ -100,7 +100,7 @@
                 <div class="absolute top-4 left-4 flex flex-col gap-2">
                     @if ($product->is_new ?? false)
                         <span class="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
-                            {{ __('New') }}
+                            {{ __('messages.new') }}
                         </span>
                     @endif
                     @if ($product->sale_price && $product->sale_price < $product->price)

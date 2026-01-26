@@ -6,9 +6,9 @@
     <div class="container mx-auto px-4">
         <nav class="mb-6 text-sm text-gray-500 dark:text-gray-400" aria-label="Breadcrumb">
             <ol class="flex flex-wrap items-center gap-1">
-                <li><a href="{{ route('home') }}" class="hover:text-blue-600 dark:hover:text-blue-300">{{ __('Home') }}</a></li>
+                <li><a href="{{ route('home') }}" class="hover:text-blue-600 dark:hover:text-blue-300">{{ __('messages.home') }}</a></li>
                 <li aria-hidden="true" class="px-1">/</li>
-                <li><a href="{{ route('frontend.products.index') }}" class="hover:text-blue-600 dark:hover:text-blue-300">{{ __('Products') }}</a></li>
+                <li><a href="{{ route('frontend.products.index') }}" class="hover:text-blue-600 dark:hover:text-blue-300">{{ __('messages.products') }}</a></li>
                 @foreach ($product->categories as $category)
                     <li aria-hidden="true" class="px-1">/</li>
                 <li><a href="{{ route('frontend.categories.show', $category) }}" class="hover:text-blue-600 dark:hover:text-blue-300">{{ $category->trans('name') ?? $category->name }}</a></li>

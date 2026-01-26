@@ -21,7 +21,7 @@ trait WithValidation
 
     protected function getValidationAttributes(): array
     {
-        return ['name' => __('Name'), 'email' => __('Email'), 'password' => __('Password'), 'password_confirmation' => __('Password Confirmation'), 'phone' => __('Phone'), 'address' => __('Address'), 'city' => __('City'), 'postal_code' => __('Postal Code'), 'country' => __('Country'), 'description' => __('Description'), 'title' => __('Title'), 'content' => __('Content'), 'rating' => __('Rating'), 'quantity' => __('Quantity'), 'price' => __('Price')];
+        return ['name' => __('messages.name'), 'email' => __('messages.email'), 'password' => __('Password'), 'password_confirmation' => __('Password Confirmation'), 'phone' => __('messages.phone'), 'address' => __('messages.address'), 'city' => __('City'), 'postal_code' => __('Postal Code'), 'country' => __('Country'), 'description' => __('messages.description'), 'title' => __('Title'), 'content' => __('Content'), 'rating' => __('Rating'), 'quantity' => __('messages.quantity'), 'price' => __('messages.price')];
     }
 
     public function validateAndSave(array $rules, ?callable $saveCallback = null): bool

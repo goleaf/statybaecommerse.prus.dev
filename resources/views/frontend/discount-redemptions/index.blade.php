@@ -94,7 +94,7 @@
                           class="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div>
                             <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                {{ __('Status') }}
+                                {{ __('messages.status') }}
                             </label>
                             <select name="status" id="status"
                                     class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
@@ -213,12 +213,12 @@
                                                     </span>
                                                 </div>
                                                 <p class="text-sm text-gray-600 dark:text-gray-400">
-                                                    {{ __('Code') }}: <span
+                                                    {{ __('messages.code') }}: <span
                                                           class="font-mono">{{ $redemption->code->code }}</span>
                                                 </p>
                                                 @if ($redemption->order)
                                                     <p class="text-sm text-gray-600 dark:text-gray-400">
-                                                        {{ __('Order') }}: #{{ $redemption->order->id }}
+                                                        {{ __('messages.order') }}: #{{ $redemption->order->id }}
                                                     </p>
                                                 @endif
                                             </div>

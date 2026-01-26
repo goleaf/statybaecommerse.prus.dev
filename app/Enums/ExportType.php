@@ -14,7 +14,7 @@ enum ExportType: string
     {
         return match ($this) {
             self::ORDERS   => __('Orders'),
-            self::PRODUCTS => __('Products'),
+            self::PRODUCTS => __('messages.products'),
             self::USERS    => __('Users'),
         };
     }

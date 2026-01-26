@@ -1,6 +1,6 @@
 <x-layouts.base :title="__('Update Order')">
     <x-container class="py-8">
-        <x-breadcrumbs :items="[['label' => __('Orders')], ['label' => $order->number], ['label' => __('Update')]]" />
+        <x-breadcrumbs :items="[['label' => __('Orders')], ['label' => $order->number], ['label' => __('messages.update')]]" />
 
         @if (session('status'))
             <x-alert type="success" class="mb-4">{{ session('status') }}</x-alert>
@@ -8,7 +8,7 @@
 
         <div class="flex items-center justify-between max-w-xl mb-4">
             <div class="text-sm text-gray-600">
-                {{ __('Order') }} #{{ $order->number }} — {{ __('Current status') }}:
+                {{ __('messages.order') }} #{{ $order->number }} — {{ __('Current status') }}:
                 <strong>{{ $order->status }}</strong>
             </div>
             <x-link :href="route('admin.orders.packing-slip', ['number' => $order->number])">{{ __('Packing slip') }}</x-link>
@@ -36,7 +36,7 @@
                     </div>
                 </div>
                 <div class="mt-6">
-                    <x-buttons.primary type="submit">{{ __('Save') }}</x-buttons.primary>
+                    <x-buttons.primary type="submit">{{ __('messages.save') }}</x-buttons.primary>
                 </div>
             </form>
         </div>

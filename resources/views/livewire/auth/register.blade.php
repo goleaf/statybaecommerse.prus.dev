@@ -1,7 +1,7 @@
 @section('meta')
     <x-meta
-        :title="__('auth_register_title') . ' - ' . config('app.name')"
-        :description="__('auth_register_subtitle')"
+        :title="__('messages.auth_register_title') . ' - ' . config('app.name')"
+        :description="__('messages.auth_register_subtitle')"
         canonical="{{ url()->current() }}" />
 @endsection
 
@@ -36,9 +36,9 @@
 
             <div class="mt-10 rounded-2xl border border-ash bg-white/70 p-6">
                 <p class="text-sm text-slate-800">
-                    {{ __('auth_already_have_account') }}
+                    {{ __('messages.auth_already_have_account') }}
                     <x-link :href="route('login')" class="ml-1 font-semibold text-dark hover:text-black/80">
-                        {{ __('auth_login_link') }}
+                        {{ __('messages.auth_login_link') }}
                     </x-link>
                 </p>
             </div>
@@ -59,10 +59,10 @@
                     {{ __('auth_join_statbae') }}
                 </span>
                 <h1 class="text-3xl font-extrabold tracking-tight text-dark sm:text-4xl">
-                    {{ __('auth_register_title') }}
+                    {{ __('messages.auth_register_title') }}
                 </h1>
                 <p class="mx-auto max-w-xl text-sm text-slate-600">
-                    {{ __('auth_register_subtitle') }}
+                    {{ __('messages.auth_register_subtitle') }}
                 </p>
             </div>
         </div>
@@ -156,7 +156,7 @@
                     class="group relative flex w-full items-center justify-center gap-2 rounded-xl bg-dark px-5 py-3.5 text-base font-semibold text-sage shadow-lg transition hover:bg-stone hover:text-dark focus:outline-none focus:ring-2 focus:ring-dark/20 focus:ring-offset-2 focus:ring-offset-white disabled:cursor-not-allowed disabled:opacity-70"
             >
                 <span wire:loading.remove>
-                        {{ __('auth_register') }}
+                        {{ __('messages.auth_register') }}
                 </span>
                 <span wire:loading class="inline-flex items-center gap-2">
                     <svg class="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24">

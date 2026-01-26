@@ -77,7 +77,7 @@ final class ProductCatalog extends Component
     public function applyFilters(): void
     {
         $this->resetPage();
-        $this->notifySuccess(__('Filters applied successfully'));
+        $this->notifySuccess(__('messages.filters_applied_successfully'));
     }
 
     /**
@@ -85,6 +85,6 @@ final class ProductCatalog extends Component
      */
     public function render()
     {
-        return view('livewire.pages.product-catalog', ['products' => $this->products, 'categories' => $this->categories, 'brands' => $this->brands])->layout('components.layouts.base', ['title' => __('Products')]);
+        return view('livewire.pages.product-catalog', ['products' => $this->products, 'categories' => $this->categories, 'brands' => $this->brands])->layout('components.layouts.base', ['title' => __('messages.products')]);
     }
 }

@@ -28,7 +28,7 @@
             <div class="flex items-center gap-4">
                 <button type="button" wire:click="$set('confirmUserDeletion', false)" wire:loading.attr="disabled"
                         class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">
-                    {{ __('Cancel') }}
+                    {{ __('messages.cancel') }}
                 </button>
 
                 <button type="button" wire:click="deleteUser" 

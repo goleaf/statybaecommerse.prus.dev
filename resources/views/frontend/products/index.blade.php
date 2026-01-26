@@ -1,6 +1,6 @@
 @extends('frontend.layouts.app')
 
-@section('title', __('Products'))
+@section('title', __('messages.products'))
 @section('description', __('Browse the latest additions, featured picks, and trusted tools across every category.'))
 
 @section('content')
@@ -12,7 +12,7 @@
                         <h2 class="text-lg font-semibold text-gray-900">{{ __('Search catalogue') }}</h2>
                         <form method="get" class="mt-4 space-y-4">
                             <div>
-                                <label for="search" class="block text-sm font-medium text-gray-700">{{ __('Search') }}</label>
+                                <label for="search" class="block text-sm font-medium text-gray-700">{{ __('messages.search') }}</label>
                                 <div class="mt-1 flex rounded-full border border-gray-200 bg-gray-50 px-4 py-2 focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500">
                                     <input id="search" name="q" type="search" value="{{ $searchTerm }}" placeholder="{{ __('Search products') }}" class="w-full border-none bg-transparent text-sm focus:outline-none" />
                                     <x-untitledui-search-sm class="h-5 w-5 text-gray-400" />
@@ -84,13 +84,13 @@
                                 @foreach (request()->except('sort') as $key => $value)
                                     <input type="hidden" name="{{ $key }}" value="{{ $value }}" />
                                 @endforeach
-                                <label for="sort" class="text-sm font-medium text-white/80">{{ __('Sort by') }}</label>
+                                <label for="sort" class="text-sm font-medium text-white/80">{{ __('messages.sort_by') }}</label>
                                 <select id="sort" name="sort" class="rounded-full border border-white/30 bg-white/10 px-4 py-2 text-sm font-semibold text-white shadow-inner focus:border-white focus:outline-none">
                                     @foreach ($availableSorts as $key => $label)
                                         <option value="{{ $key }}" @selected($activeSort === $key)>{{ $label }}</option>
                                     @endforeach
                                 </select>
-                                <button type="submit" class="rounded-full bg-white px-4 py-2 text-sm font-semibold text-indigo-600 shadow-sm transition hover:bg-blue-50">{{ __('Update') }}</button>
+                                <button type="submit" class="rounded-full bg-white px-4 py-2 text-sm font-semibold text-indigo-600 shadow-sm transition hover:bg-blue-50">{{ __('messages.update') }}</button>
                             </form>
                         </div>
                     </header>

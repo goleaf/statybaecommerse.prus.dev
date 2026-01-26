@@ -15,7 +15,7 @@
                     <span class="text-gray-500">{{ __('Unit price') }}</span> : {{ \Illuminate\Support\Number::currency($item->unit_price_amount, $currency_code, app()->getLocale()) }}
                 </p>
                 <p class="text-sm text-gray-700">
-                    <span class="text-gray-500">{{ __('Quantity') }}</span> : {{ $item->quantity }}
+                    <span class="text-gray-500">{{ __('messages.quantity') }}</span> : {{ $item->quantity }}
                 </p>
             </div>
         </div>

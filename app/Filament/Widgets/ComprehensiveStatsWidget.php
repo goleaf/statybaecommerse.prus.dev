@@ -74,7 +74,7 @@ final class ComprehensiveStatsWidget extends BaseStatsOverviewWidget
                 ->descriptionIcon($ordersChange >= 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
                 ->color($ordersChange >= 0 ? 'success' : 'danger')
                 ->chart($this->getOrdersChart()),
-            Stat::make(__('Products'), number_format($totalProducts))
+            Stat::make(__('messages.products'), number_format($totalProducts))
                 ->description(number_format($activeProducts) . ' ' . __('active'))
                 ->descriptionIcon('heroicon-m-cube')
                 ->color('info'),

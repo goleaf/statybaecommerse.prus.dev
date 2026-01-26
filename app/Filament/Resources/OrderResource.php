@@ -1,14 +1,15 @@
 <?php
 
-namespace App\Filament\Resources\Orders;
+namespace App\Filament\Resources;
 
-use App\Filament\Resources\Orders\Pages\CreateOrder;
-use App\Filament\Resources\Orders\Pages\EditOrder;
-use App\Filament\Resources\Orders\Pages\ListOrders;
-use App\Filament\Resources\Orders\Pages\ViewOrder;
-use App\Filament\Resources\Orders\Schemas\OrderForm;
-use App\Filament\Resources\Orders\Schemas\OrderInfolist;
-use App\Filament\Resources\Orders\Tables\OrdersTable;
+use App\Enums\NavigationGroup;
+use App\Filament\Resources\OrderResource\Pages\CreateOrder;
+use App\Filament\Resources\OrderResource\Pages\EditOrder;
+use App\Filament\Resources\OrderResource\Pages\ListOrders;
+use App\Filament\Resources\OrderResource\Pages\ViewOrder;
+use App\Filament\Resources\OrderResource\Schemas\OrderForm;
+use App\Filament\Resources\OrderResource\Schemas\OrderInfolist;
+use App\Filament\Resources\OrderResource\Tables\OrdersTable;
 use App\Models\Order;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -17,14 +18,22 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use UnitEnum;
 
-class OrderResource extends Resource
+class OrderResource extends BaseResource
 {
     protected static ?string $model = Order::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-shopping-bag';
 
-    protected static ?string $recordTitleAttribute = 'number';
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroup::Orders;
+
+    protected static ?int $navigationSort = 1;
+
+    public static function getNavigationLabel(): string
+    {
+        return 'Orders';
+    }
 
     public static function form(Schema $schema): Schema
     {
@@ -44,7 +53,7 @@ class OrderResource extends Resource
     public static function getRelations(): array
     {
         return [
-            \App\Filament\Resources\Orders\RelationManagers\ItemsRelationManager::class,
+            \App\Filament\Resources\OrderResource\RelationManagers\ItemsRelationManager::class,
         ];
     }
 

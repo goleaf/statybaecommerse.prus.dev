@@ -36,7 +36,7 @@
                     <svg class="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m0 0h7M7 18h10" />
                     </svg>
-                    <h3 class="text-lg font-medium text-gray-900 mb-2">{{ __('Your cart is empty') }}</h3>
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">{{ __('messages.your_cart_is_empty') }}</h3>
                     <p class="text-gray-500 mb-6">{{ __('Browse our product catalog to find your perfect match.') }}</p>
                     
                     <a 
@@ -46,7 +46,7 @@
                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
                         </svg>
-                        {{ __('Start Shopping') }}
+                        {{ __('messages.start_shopping') }}
                     </a>
                 </div>
             @endif
@@ -65,7 +65,7 @@
                 <p class="text-right">{{ __('Calculated at the time of payment') }}</p>
             </div>
             <div class="flex items-center justify-between pt-1 pb-1 mb-3 border-b border-gray-200">
-                <p>{{ __('Subtotal') }}</p>
+                <p>{{ __('messages.subtotal') }}</p>
                 <p class="text-base text-right text-gray-950">
                     {{ \Illuminate\Support\Number::currency($subtotal, current_currency(), app()->getLocale()) }}
                 </p>
@@ -81,7 +81,7 @@
             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
             </svg>
-            {{ __('Proceed to checkout') }}
+            {{ __('messages.proceed_to_checkout') }}
         </a>
     </div>
 </div>

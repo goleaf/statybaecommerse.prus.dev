@@ -13,7 +13,7 @@
     @hasSection('meta')
         @yield('meta')
     @else
-        <meta name="description" content="{{ $description ?? __('meta_description_home') }}">
+        <meta name="description" content="{{ $description ?? __('messages.meta_description_home') }}">
         <meta name="keywords" content="{{ $keywords ?? __('meta_keywords') }}">
     @endhasSection
 

@@ -41,7 +41,7 @@
     app()->instance('request_locale', $locale);
 @endphp
 
-<main class="bg-sage text-gray-900" aria-label="{{ __('home_homepage') }}">
+<main class="bg-sage text-gray-900" aria-label="{{ __('messages.home_homepage') }}">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 gap-8 py-8 lg:grid-cols-4">
             <aside class="lg:col-span-1">
@@ -61,8 +61,8 @@
                     <livewire:home.product-shelf
                         :preset="'featured'"
                         :limit="8"
-                        :title="__('home_products_featured_title')"
-                        :subtitle="__('home_products_featured_subtitle')"
+                        :title="__('messages.home_products_featured_title')"
+                        :subtitle="__('messages.home_products_featured_subtitle')"
                     />
                 </section>
 
@@ -70,20 +70,20 @@
                     <livewire:home.product-shelf
                         :preset="'latest'"
                         :limit="8"
-                        :title="__('home_products_latest_title')"
-                        :subtitle="__('home_products_latest_subtitle')"
+                        :title="__('messages.home_products_latest_title')"
+                        :subtitle="__('messages.home_products_latest_subtitle')"
                     />
                     <livewire:home.product-shelf
                         :preset="'trending'"
                         :limit="8"
-                        :title="__('home_products_trending_title')"
-                        :subtitle="__('home_products_trending_subtitle')"
+                        :title="__('messages.home_products_trending_title')"
+                        :subtitle="__('messages.home_products_trending_subtitle')"
                     />
                     <livewire:home.product-shelf
                         :preset="'sale'"
                         :limit="12"
-                        :title="__('home_products_sale_title')"
-                        :subtitle="__('home_products_sale_subtitle')"
+                        :title="__('messages.home_products_sale_title')"
+                        :subtitle="__('messages.home_products_sale_subtitle')"
                     />
                 </section>
 

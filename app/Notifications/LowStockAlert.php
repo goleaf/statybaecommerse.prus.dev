@@ -47,12 +47,12 @@ final class LowStockAlert extends Notification implements ShouldQueue
     {
         // Compose a concise summary showing current stock levels and thresholds.
         return (new MailMessage)
-            ->subject(__('Low Stock Alert: :product', ['product' => $this->product->name]))
-            ->line(__('Product :name is running low on stock.', ['name' => $this->product->name]))
-            ->line(__('Current stock: :stock units', ['stock' => $this->product->stock_quantity]))
-            ->line(__('Threshold: :threshold units', ['threshold' => $this->product->low_stock_threshold]))
+            ->subject(__('messages.low_stock_alert_product', ['product' => $this->product->name]))
+            ->line(__('messages.product_name_is_running_low_on_stock', ['name' => $this->product->name]))
+            ->line(__('messages.current_stock_stock_units', ['stock' => $this->product->stock_quantity]))
+            ->line(__('messages.threshold_threshold_units', ['threshold' => $this->product->low_stock_threshold]))
             ->action(__('Manage Product'), route('filament.admin.resources.products.edit', $this->product))
-            ->line(__('Please restock this product to avoid stockouts.'));
+            ->line(__('messages.please_restock_this_product_to_avoid_stockouts'));
     }
 
     /**
@@ -69,7 +69,7 @@ final class LowStockAlert extends Notification implements ShouldQueue
             'product_sku'   => $this->product->sku,
             'current_stock' => $this->product->stock_quantity,
             'threshold'     => $this->product->low_stock_threshold,
-            'message'       => __('Low stock alert for :product', ['product' => $this->product->name]),
+            'message'       => __('messages.low_stock_alert_for_product', ['product' => $this->product->name]),
         ];
     }
 
@@ -80,8 +80,8 @@ final class LowStockAlert extends Notification implements ShouldQueue
     {
         // Provide a quick action so administrators can jump straight to the edit screen.
         return FilamentNotification::make()
-            ->title(__('Low Stock Alert'))
-            ->body(__('Product :name is running low on stock (:stock units remaining)', [
+            ->title(__('messages.low_stock_alert'))
+            ->body(__('messages.product_name_is_running_low_on_stock_stock_units_remaining', [
                 'name'  => $this->product->name,
                 'stock' => $this->product->stock_quantity,
             ]))
@@ -89,7 +89,7 @@ final class LowStockAlert extends Notification implements ShouldQueue
             ->iconColor('warning')
             ->actions([
                 Action::make('view')
-                    ->label(__('View Product'))
+                    ->label(__('messages.view_product'))
                     ->url(route('filament.admin.resources.products.edit', $this->product))
                     ->markAsRead(),
             ]);

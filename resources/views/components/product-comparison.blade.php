@@ -19,16 +19,16 @@ if ($products->count() > $maxProducts) {
 
 // Define comparison attributes
 $comparisonAttributes = [
-    'price' => ['label' => __('Price'), 'type' => 'currency'],
-    'brand' => ['label' => __('Brand'), 'type' => 'text'],
-    'category' => ['label' => __('Category'), 'type' => 'text'],
+    'price' => ['label' => __('messages.price'), 'type' => 'currency'],
+    'brand' => ['label' => __('messages.brand'), 'type' => 'text'],
+    'category' => ['label' => __('messages.category'), 'type' => 'text'],
     'rating' => ['label' => __('Rating'), 'type' => 'rating'],
     'reviews_count' => ['label' => __('Reviews'), 'type' => 'number'],
-    'stock_quantity' => ['label' => __('Stock'), 'type' => 'number'],
+    'stock_quantity' => ['label' => __('messages.stock'), 'type' => 'number'],
     'weight' => ['label' => __('Weight'), 'type' => 'text'],
     'dimensions' => ['label' => __('Dimensions'), 'type' => 'text'],
     'warranty' => ['label' => __('Warranty'), 'type' => 'text'],
-    'shipping' => ['label' => __('Shipping'), 'type' => 'text'],
+    'shipping' => ['label' => __('messages.shipping'), 'type' => 'text'],
     ];
 @endphp
 
@@ -72,7 +72,7 @@ $comparisonAttributes = [
                                             {{-- Remove Button --}}
                                             <button @click="removeProduct({{ $product->id }})"
                                                     class="text-red-600 hover:text-red-700 text-sm font-medium mb-3">
-                                                {{ __('Remove') }}
+                                                {{ __('messages.remove') }}
                                             </button>
                                         </div>
                                     </th>
@@ -84,7 +84,7 @@ $comparisonAttributes = [
                             {{-- Price Row --}}
                             <tr class="hover:bg-gray-50">
                                 <td class="px-6 py-4 text-sm font-medium text-gray-900">
-                                    {{ __('Price') }}
+                                    {{ __('messages.price') }}
                                 </td>
                                 @foreach ($products as $product)
                                     <td class="px-6 py-4 text-center">
@@ -103,7 +103,7 @@ $comparisonAttributes = [
                             {{-- Brand Row --}}
                             <tr class="hover:bg-gray-50">
                                 <td class="px-6 py-4 text-sm font-medium text-gray-900">
-                                    {{ __('Brand') }}
+                                    {{ __('messages.brand') }}
                                 </td>
                                 @foreach ($products as $product)
                                     <td class="px-6 py-4 text-center">
@@ -117,7 +117,7 @@ $comparisonAttributes = [
                             {{-- Category Row --}}
                             <tr class="hover:bg-gray-50">
                                 <td class="px-6 py-4 text-sm font-medium text-gray-900">
-                                    {{ __('Category') }}
+                                    {{ __('messages.category') }}
                                 </td>
                                 @foreach ($products as $product)
                                     <td class="px-6 py-4 text-center">
@@ -154,7 +154,7 @@ $comparisonAttributes = [
                             {{-- Stock Row --}}
                             <tr class="hover:bg-gray-50">
                                 <td class="px-6 py-4 text-sm font-medium text-gray-900">
-                                    {{ __('Availability') }}
+                                    {{ __('messages.availability') }}
                                 </td>
                                 @foreach ($products as $product)
                                     <td class="px-6 py-4 text-center">
@@ -166,7 +166,7 @@ $comparisonAttributes = [
                                                     <path stroke-linecap="round" stroke-linejoin="round"
                                                           stroke-width="2" d="M5 13l4 4L19 7"></path>
                                                 </svg>
-                                                {{ __('In Stock') }}
+                                                {{ __('messages.in_stock') }}
                                             </span>
                                         @else
                                             <span
@@ -176,7 +176,7 @@ $comparisonAttributes = [
                                                     <path stroke-linecap="round" stroke-linejoin="round"
                                                           stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                                                 </svg>
-                                                {{ __('Out of Stock') }}
+                                                {{ __('messages.out_of_stock') }}
                                             </span>
                                         @endif
                                     </td>
@@ -186,7 +186,7 @@ $comparisonAttributes = [
                             {{-- Description Row --}}
                             <tr class="hover:bg-gray-50">
                                 <td class="px-6 py-4 text-sm font-medium text-gray-900">
-                                    {{ __('Description') }}
+                                    {{ __('messages.description') }}
                                 </td>
                                 @foreach ($products as $product)
                                     <td class="px-6 py-4 text-center">

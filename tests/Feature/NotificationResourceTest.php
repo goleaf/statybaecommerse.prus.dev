@@ -350,7 +350,7 @@ final class NotificationResourceTest extends TestCase
     {
         // The HasNav trait proxies metadata to the Nav helper; ensure the helper returns the expected values.
         $this->assertSame('System', Nav::groupKeyForResource(NotificationResource::class));
-        $this->assertSame(__('System'), Nav::groupForResource(NotificationResource::class));
+        $this->assertSame(__('messages.system'), Nav::groupForResource(NotificationResource::class));
         $this->assertSame('heroicon-o-bell', Nav::iconForResource(NotificationResource::class));
         $this->assertSame(3, Nav::sortForResource(NotificationResource::class));
     }

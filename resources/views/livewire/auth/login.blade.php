@@ -1,7 +1,7 @@
 @section('meta')
     <x-meta
-        :title="__('auth_login_title') . ' - ' . config('app.name')"
-        :description="__('auth_login_subtitle')"
+        :title="__('messages.auth_login_title') . ' - ' . config('app.name')"
+        :description="__('messages.auth_login_subtitle')"
         canonical="{{ url()->current() }}" />
 @endsection
 
@@ -36,10 +36,10 @@
 
             <div class="mt-10 rounded-2xl border border-ash bg-white/70 p-6">
                 <p class="text-sm text-slate-800">
-                    <span class="font-semibold">{{ __('auth_new_user') }}</span>
-                    {{ __('auth_new_user_description') }}
+                    <span class="font-semibold">{{ __('messages.auth_new_user') }}</span>
+                    {{ __('messages.auth_new_user_description') }}
                     <x-link :href="route('register')" class="ml-1 font-semibold text-dark hover:text-black/80">
-                        {{ __('auth_create_account_link') }}
+                        {{ __('messages.auth_create_account_link') }}
                     </x-link>
                 </p>
             </div>
@@ -125,7 +125,7 @@
                     class="group relative flex w-full items-center justify-center gap-2 rounded-xl bg-dark px-5 py-3.5 text-base font-semibold text-sage shadow-lg transition hover:bg-stone hover:text-dark focus:outline-none focus:ring-2 focus:ring-dark/20 focus:ring-offset-2 focus:ring-offset-white disabled:cursor-not-allowed disabled:opacity-70"
                 >
                     <span wire:loading.remove>
-                        {{ __('auth_login') }}
+                        {{ __('messages.auth_login') }}
                     </span>
                     <span wire:loading class="inline-flex items-center gap-2">
                         <svg class="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24">

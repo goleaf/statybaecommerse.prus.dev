@@ -47,7 +47,7 @@
                         @endif
 
                         <span class="inline-flex items-center gap-2 rounded-full border border-sage bg-sage px-4 py-1 text-[11px] font-semibold uppercase tracking-[0.35em] text-dark">
-                            {{ __('brand_spotlight') }}
+                            {{ __('messages.brand_spotlight') }}
                         </span>
                         
                         <h1 class="text-3xl font-bold leading-tight text-white sm:text-4xl md:text-5xl">
@@ -74,10 +74,10 @@
 
                     <div class="flex flex-col items-start gap-2 sm:flex-row sm:items-end sm:gap-4">
                         <div class="rounded-2xl border border-sage/30 bg-sage/10 px-3 py-2 text-sm font-semibold text-white shadow-sm">
-                            {{ number_format($products->count()) }} {{ __('Products') }}
+                            {{ number_format($products->count()) }} {{ __('messages.products') }}
                         </div>
                         <div class="rounded-2xl border border-sage/30 bg-sage/10 px-3 py-2 text-sm text-white/80 shadow-sm">
-                            {{ number_format($relatedCategories->count()) }} {{ __('Subcategories') }}
+                            {{ number_format($relatedCategories->count()) }} {{ __('messages.subcategories') }}
                         </div>
                     </div>
                 </div>
@@ -86,7 +86,7 @@
                 @if($relatedCategories->count() > 0)
                     <div class="border-t border-sage/30 pt-3 mt-6">
                         <div class="mb-2">
-                            <h2 class="text-base font-bold text-white mb-0.5">{{ __('categories_brand_powers') }}</h2>
+                            <h2 class="text-base font-bold text-white mb-0.5">{{ __('messages.categories_brand_powers') }}</h2>
                         </div>
                         
                         <div class="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
@@ -96,7 +96,7 @@
                                         {{ $category->name }}
                                     </h3>
                                     <p class="text-[10px] text-white/60 mt-0.5 leading-tight">
-                                        {{ number_format($category->published_products_count ?? 0) }} {{ __('Products') }}
+                                        {{ number_format($category->published_products_count ?? 0) }} {{ __('messages.products') }}
                                     </p>
                                 </a>
                             @endforeach
@@ -114,7 +114,7 @@
             <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
                 {{-- Quick Filters --}}
                 <form method="get" class="flex flex-wrap items-center gap-3 text-sm font-medium">
-                    <span class="text-white/80 font-semibold">{{ __('quick_filters') }}</span>
+                    <span class="text-white/80 font-semibold">{{ __('messages.quick_filters') }}</span>
                         @foreach ($availableFilters as $key => $label)
                         <label class="inline-flex items-center gap-2 rounded-full border border-sage/30 bg-sage/10 px-4 py-2 text-dark transition hover:border-sage hover:bg-sage/20 cursor-pointer">
                             <input type="radio" name="filter" value="{{ $key }}" @checked($activeFilter === $key) class="h-4 w-4 text-dark focus:ring-dark" />
@@ -123,10 +123,10 @@
                     @endforeach
                     <label class="inline-flex items-center gap-2 rounded-full border border-sage/30 bg-sage/10 px-4 py-2 text-dark transition hover:border-sage hover:bg-sage/20 cursor-pointer">
                         <input type="radio" name="filter" value="" @checked(! $activeFilter) class="h-4 w-4 text-dark focus:ring-dark" />
-                        <span class="text-dark font-medium">{{ __('all_products') }}</span>
+                        <span class="text-dark font-medium">{{ __('messages.all_products') }}</span>
                     </label>
                     <button type="submit" class="rounded-full border border-sage bg-sage px-4 py-2 text-sm font-semibold text-dark shadow-sm hover:bg-sage/90 transition-colors">
-                        {{ __('Apply') }}
+                        {{ __('messages.apply') }}
                     </button>
                     </form>
 
@@ -135,14 +135,14 @@
                         @foreach (request()->except('sort') as $key => $value)
                             <input type="hidden" name="{{ $key }}" value="{{ $value }}" />
                         @endforeach
-                    <label for="sort" class="text-white/80 font-semibold">{{ __('Sort by') }}</label>
+                    <label for="sort" class="text-white/80 font-semibold">{{ __('messages.sort_by') }}</label>
                     <select id="sort" name="sort" class="rounded-full border border-sage/30 bg-sage/10 px-4 py-2 text-sm font-medium text-white focus:border-sage focus:outline-none focus:ring-2 focus:ring-sage">
                             @foreach ($availableSorts as $key => $label)
                             <option value="{{ $key }}" @selected($activeSort === $key) class="bg-dark text-white">{{ $label }}</option>
                             @endforeach
                         </select>
                     <button type="submit" class="rounded-full border border-sage bg-sage px-4 py-2 text-sm font-semibold text-dark shadow-sm hover:bg-sage/90 transition-colors">
-                        {{ __('Update') }}
+                        {{ __('messages.update') }}
                     </button>
                     </form>
                 </div>
@@ -168,7 +168,7 @@
             </div>
         @else
             <div class="rounded-3xl border border-dashed border-sage/30 bg-dark/50 p-12 text-center mb-8">
-                <p class="text-white/60">{{ __('no_products_brand') }}</p>
+                <p class="text-white/60">{{ __('messages.no_products_brand') }}</p>
             </div>
         @endif
     </div>

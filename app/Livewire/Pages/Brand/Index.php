@@ -52,19 +52,19 @@ final class Index extends AbstractPageComponent
     {
         return $schema->components([
             TextInput::make('search')
-                ->label(__('brands_index_search_label'))
-                ->placeholder(__('brands_index_search_placeholder'))
+                ->label(__('messages.brands_index_search_label'))
+                ->placeholder(__('messages.brands_index_search_placeholder'))
                 ->live(debounce: 300)
                 ->afterStateUpdated(fn () => $this->resetPage())
                 ->prefixIcon('heroicon-o-magnifying-glass'),
             Select::make('sortBy')
-                ->label(__('brands_index_sort_label'))
+                ->label(__('messages.brands_index_sort_label'))
                 ->options([
-                    'name'           => __('brands_index_sort_option_name'),
-                    'name_desc'      => __('brands_index_sort_option_name_desc'),
-                    'products_count' => __('brands_index_sort_option_products'),
-                    'created_at'     => __('brands_index_sort_option_newest'),
-                    'featured'       => __('brands_index_sort_option_featured'),
+                    'name'           => __('messages.brands_index_sort_option_name'),
+                    'name_desc'      => __('messages.brands_index_sort_option_name_desc'),
+                    'products_count' => __('messages.brands_index_sort_option_products'),
+                    'created_at'     => __('messages.brands_index_sort_option_newest'),
+                    'featured'       => __('messages.brands_index_sort_option_featured'),
                 ])
                 ->live()
                 ->afterStateUpdated(fn () => $this->resetPage())
@@ -109,7 +109,7 @@ final class Index extends AbstractPageComponent
      */
     protected function getPageTitle(): string
     {
-        return __('brands_index_meta_title');
+        return __('messages.brands_index_meta_title');
     }
 
     /**
@@ -117,7 +117,7 @@ final class Index extends AbstractPageComponent
      */
     protected function getPageDescription(): ?string
     {
-        return __('brands_index_meta_description');
+        return __('messages.brands_index_meta_description');
     }
 
     /**
@@ -134,6 +134,6 @@ final class Index extends AbstractPageComponent
      */
     public function render(): View
     {
-        return view('livewire.pages.brand.index')->title(__('brands_index_meta_title') . ' - ' . config('app.name'));
+        return view('livewire.pages.brand.index')->title(__('messages.brands_index_meta_title') . ' - ' . config('app.name'));
     }
 }

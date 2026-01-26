@@ -60,8 +60,8 @@ final class BrandShowcaseDataProvider
     public function breadcrumbs(Brand $brand): array
     {
         return [
-            ['label' => __('Home'), 'url' => route('home')],
-            ['label' => __('Brands'), 'url' => route('frontend.brands.index')],
+            ['label' => __('messages.home'), 'url' => route('home')],
+            ['label' => __('messages.brands'), 'url' => route('frontend.brands.index')],
             ['label' => $brand->name, 'url' => route('frontend.brands.show', $brand)],
         ];
     }

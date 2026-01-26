@@ -3,11 +3,11 @@
 
     <div class="mt-6 grid grid-cols-2 gap-6">
         <div>
-            <h2 class="font-medium">{{ __('Order') }} #{{ $order->number }}</h2>
+            <h2 class="font-medium">{{ __('messages.order') }} #{{ $order->number }}</h2>
             <p class="text-sm text-gray-600">{{ __('Placed at') }}:
                 {{ optional($order->created_at)->timezone(config('app.timezone'))->format('Y-m-d H:i') }}</p>
             <p class="text-sm text-gray-600 mt-1">
-                {{ __('Status') }}: <strong>{{ $order->status }}</strong> ·
+                {{ __('messages.status') }}: <strong>{{ $order->status }}</strong> ·
                 {{ __('Payment') }}: <strong>{{ $order->payment_status ?? __('pending') }}</strong>
             </p>
             <p class="mt-2">
@@ -35,7 +35,7 @@
                 <p>{{ $sa['postal_code'] ?? '' }} {{ $sa['city'] ?? '' }},
                     {{ $sa['country_code'] ?? ($sa['country_name'] ?? ($sa['country'] ?? '')) }}</p>
                 @if (!empty($sa['phone'] ?? ($sa['phone_number'] ?? null)))
-                    <p>{{ __('Phone') }}: {{ $sa['phone'] ?? $sa['phone_number'] }}</p>
+                    <p>{{ __('messages.phone') }}: {{ $sa['phone'] ?? $sa['phone_number'] }}</p>
                 @endif
             @endif
         </div>
@@ -51,7 +51,7 @@
                 <p>{{ $ba['postal_code'] ?? '' }} {{ $ba['city'] ?? '' }},
                     {{ $ba['country_code'] ?? ($ba['country_name'] ?? ($ba['country'] ?? '')) }}</p>
                 @if (!empty($ba['phone'] ?? ($ba['phone_number'] ?? null)))
-                    <p>{{ __('Phone') }}: {{ $ba['phone'] ?? $ba['phone_number'] }}</p>
+                    <p>{{ __('messages.phone') }}: {{ $ba['phone'] ?? $ba['phone_number'] }}</p>
                 @endif
             @endif
         </div>
@@ -60,9 +60,9 @@
     <table class="mt-8 w-full text-sm">
         <thead>
             <tr class="text-left border-b">
-                <th class="py-2">{{ __('Product') }}</th>
-                <th class="py-2">{{ __('SKU') }}</th>
-                <th class="py-2 text-right">{{ __('Qty') }}</th>
+                <th class="py-2">{{ __('messages.product') }}</th>
+                <th class="py-2">{{ __('messages.sku') }}</th>
+                <th class="py-2 text-right">{{ __('messages.qty') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -78,7 +78,7 @@
 
     <div class="mt-10 text-center print:hidden">
         <button onclick="window.print()" class="inline-flex items-center rounded-md bg-gray-900 px-4 py-2 text-white">
-            {{ __('Print') }}
+            {{ __('messages.print') }}
         </button>
     </div>
 </div>

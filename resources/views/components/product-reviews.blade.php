@@ -108,7 +108,7 @@
             {{-- Sort and Filter --}}
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
                 <div class="flex items-center gap-4">
-                    <span class="text-sm text-gray-600">{{ __('Sort by') }}:</span>
+                    <span class="text-sm text-gray-600">{{ __('messages.sort_by') }}:</span>
                     <select x-model="sortBy" @change="applySorting()"
                             class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                         <option value="newest">{{ __('Newest First') }}</option>

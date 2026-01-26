@@ -88,17 +88,17 @@ final class BrandController extends Controller
 
         // Provide default values for filter/sort options
         $availableSorts = [
-            'featured'    => __('sort_featured'),
-            'latest'      => __('sort_latest'),
-            'price_asc'   => __('sort_price_low'),
-            'price_desc'  => __('sort_price_high'),
-            'bestsellers' => __('sort_bestsellers'),
+            'featured'    => __('messages.sort_featured'),
+            'latest'      => __('messages.sort_latest'),
+            'price_asc'   => __('messages.sort_price_low'),
+            'price_desc'  => __('messages.sort_price_high'),
+            'bestsellers' => __('messages.sort_bestsellers'),
         ];
 
         $availableFilters = [
-            'featured' => __('filter_featured'),
-            'sale'     => __('filter_sale'),
-            'in_stock' => __('filter_in_stock'),
+            'featured' => __('messages.filter_featured'),
+            'sale'     => __('messages.filter_sale'),
+            'in_stock' => __('messages.filter_in_stock'),
         ];
 
         return view('frontend.brands.show', [

@@ -24,7 +24,7 @@
         @endforeach
 
         <p class="text-xs text-center text-primary-700">
-            {{ __('Recalculating delivery options…') }}
+            {{ __('messages.recalculating_delivery_options') }}
         </p>
     </div>
 
@@ -50,7 +50,7 @@
                         <circle class="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
                         <path class="opacity-90" d="M22 12a10 10 0 0 1-10 10" stroke="currentColor" stroke-width="4" stroke-linecap="round" />
                     </svg>
-                    <span>{{ __('Recalculating delivery options…') }}</span>
+                    <span>{{ __('messages.recalculating_delivery_options') }}</span>
                 </div>
             @endif
 

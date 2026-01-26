@@ -99,36 +99,36 @@ final class Index extends Component implements HasSchemas
     {
         return $schema->components([
             TextInput::make('search')
-                ->label(__('Search'))
-                ->placeholder(__('Search categories...'))
+                ->label(__('messages.search'))
+                ->placeholder(__('messages.search_categories'))
                 ->live(debounce: 400),
             Select::make('brandId')
-                ->label(__('Brand'))
-                ->placeholder(__('All brands'))
+                ->label(__('messages.brand'))
+                ->placeholder(__('messages.all_brands'))
                 ->options($this->getBrandOptions())
                 ->live(),
             TextInput::make('priceMin')
-                ->label(__('Min price'))
+                ->label(__('messages.min_price'))
                 ->numeric()
                 ->step(0.01)
                 ->minValue(0)
                 ->live(debounce: 500),
             TextInput::make('priceMax')
-                ->label(__('Max price'))
+                ->label(__('messages.max_price'))
                 ->numeric()
                 ->step(0.01)
                 ->minValue(0)
                 ->live(debounce: 500),
             Checkbox::make('hasProducts')
-                ->label(__('Only categories with products'))
+                ->label(__('messages.only_categories_with_products'))
                 ->live(),
             Select::make('sort')
-                ->label(__('Sort by'))
+                ->label(__('messages.sort_by'))
                 ->options([
-                    'name_asc'      => __('Name (A–Z)'),
-                    'name_desc'     => __('Name (Z–A)'),
-                    'products_desc' => __('Most products'),
-                    'products_asc'  => __('Fewest products'),
+                    'name_asc'      => __('messages.name_a_z'),
+                    'name_desc'     => __('messages.name_z_a'),
+                    'products_desc' => __('messages.most_products'),
+                    'products_asc'  => __('messages.fewest_products'),
                 ])
                 ->live(),
         ]);
@@ -377,7 +377,7 @@ final class Index extends Component implements HasSchemas
     {
         return view('livewire.pages.category.show')
             ->layout('components.layouts.base', [
-                'title' => __('categories_index_meta_title'),
+                'title' => __('messages.categories_index_meta_title'),
             ]);
     }
 

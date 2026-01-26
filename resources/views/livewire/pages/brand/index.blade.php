@@ -51,8 +51,8 @@
 
 @section('meta')
     <x-meta
-        :title="__('brands_index_meta_title') . ' - ' . config('app.name')"
-        :description="__('brands_index_meta_description')"
+        :title="__('messages.brands_index_meta_title') . ' - ' . config('app.name')"
+        :description="__('messages.brands_index_meta_description')"
         canonical="{{ url()->current() }}" />
 @endsection
 
@@ -78,25 +78,25 @@
             <div class="mt-8 flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
                 <div class="max-w-2xl space-y-5">
                     <span class="inline-flex items-center gap-2 rounded-full border border-sage bg-sage px-4 py-1 text-[11px] font-semibold uppercase tracking-[0.35em] text-dark">
-                        {{ __('brands_index_badge') }}
+                        {{ __('messages.brands_index_badge') }}
                     </span>
                     <h1 class="text-3xl font-bold leading-tight text-white sm:text-4xl md:text-5xl">
-                        {{ __('brands_index_title') }}
+                        {{ __('messages.brands_index_title') }}
                     </h1>
                     <p class="text-base text-sage sm:text-lg">
-                        {{ __('brands_index_description') }}
+                        {{ __('messages.brands_index_description') }}
                     </p>
                 </div>
 
                 <div class="flex flex-col items-start gap-3 sm:flex-row sm:items-end sm:gap-6">
                     <div class="rounded-2xl border border-sage/30 bg-sage/10 px-4 py-3 text-sm font-semibold text-sage shadow-sm">
-                        {{ __('brands_index_catalogue_count', ['count' => number_format($totalBrands)]) }}
+                        {{ __('messages.brands_index_catalogue_count', ['count' => number_format($totalBrands)]) }}
                     </div>
                     <div class="rounded-2xl border border-sage/30 bg-sage/10 px-4 py-3 text-sm text-sage/80 shadow-sm">
                         @if ($activeFilterCount > 0)
                             {{ trans_choice('brands_index_status', $activeFilterCount, ['count' => $activeFilterCount]) }}
                         @else
-                            {{ __('brands_index_status_none') }}
+                            {{ __('messages.brands_index_status_none') }}
                         @endif
             </div>
                     <button type="button"
@@ -106,7 +106,7 @@
                         <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M3 5h6M3 12h6m-6 7h6M13 5h8M13 12h8m-8 7h8" />
                         </svg>
-                        {{ __('brands_index_filters_button') }}
+                        {{ __('messages.brands_index_filters_button') }}
                     </button>
             </div>
             </div>
@@ -122,12 +122,12 @@
                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                             </svg>
-                            {{ __('brands_index_filters_button') }}
+                            {{ __('messages.brands_index_filters_button') }}
                             </span>
-                        <h2 class="text-xl font-semibold text-white">{{ __('brands_index_filters_title') }}</h2>
-                        @if(__('brands_index_filters_description'))
+                        <h2 class="text-xl font-semibold text-white">{{ __('messages.brands_index_filters_title') }}</h2>
+                        @if(__('messages.brands_index_filters_description'))
                             <p class="text-sm leading-relaxed text-sage/80">
-                                {{ __('brands_index_filters_description') }}
+                                {{ __('messages.brands_index_filters_description') }}
                             </p>
                         @endif
                     </div>
@@ -146,26 +146,26 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2" />
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
-                                {{ __('brands_index_real_time_results') }}
+                                {{ __('messages.brands_index_real_time_results') }}
                             </span>
                             @if ($paginator->count() > 0)
-                                <span class="text-sage/80">{{ __('brands_index_showing_results', ['from' => $paginator->firstItem() ?? 0, 'to' => $paginator->lastItem() ?? 0, 'total' => $totalBrands]) }}</span>
+                                <span class="text-sage/80">{{ __('messages.brands_index_showing_results', ['from' => $paginator->firstItem() ?? 0, 'to' => $paginator->lastItem() ?? 0, 'total' => $totalBrands]) }}</span>
                             @else
-                                <span class="text-sage/80">{{ __('brands_index_no_results') }}</span>
+                                <span class="text-sage/80">{{ __('messages.brands_index_no_results') }}</span>
                             @endif
                         </div>
 
                         <div class="flex flex-wrap items-center gap-3">
                             <div class="flex items-center gap-2 rounded-xl border border-sage/30 bg-dark/30 px-3 py-2 text-sm text-sage">
                                 <label for="sort" class="text-xs font-semibold uppercase tracking-wide text-sage/60">
-                                    {{ __('brands_index_sort_label') }}
+                                    {{ __('messages.brands_index_sort_label') }}
                                 </label>
                                 <select id="sort" wire:model.live="sortBy" class="border-0 bg-transparent text-sm font-medium text-sage focus:outline-none focus:ring-0">
-                                    <option value="name" class="bg-dark text-sage">{{ __('brands_index_sort_option_name') }}</option>
-                                    <option value="name_desc" class="bg-dark text-sage">{{ __('brands_index_sort_option_name_desc') }}</option>
-                                    <option value="products_count" class="bg-dark text-sage">{{ __('brands_index_sort_option_products') }}</option>
-                                    <option value="created_at" class="bg-dark text-sage">{{ __('brands_index_sort_option_newest') }}</option>
-                                    <option value="featured" class="bg-dark text-sage">{{ __('brands_index_sort_option_featured') }}</option>
+                                    <option value="name" class="bg-dark text-sage">{{ __('messages.brands_index_sort_option_name') }}</option>
+                                    <option value="name_desc" class="bg-dark text-sage">{{ __('messages.brands_index_sort_option_name_desc') }}</option>
+                                    <option value="products_count" class="bg-dark text-sage">{{ __('messages.brands_index_sort_option_products') }}</option>
+                                    <option value="created_at" class="bg-dark text-sage">{{ __('messages.brands_index_sort_option_newest') }}</option>
+                                    <option value="featured" class="bg-dark text-sage">{{ __('messages.brands_index_sort_option_featured') }}</option>
                                 </select>
                             </div>
 
@@ -177,7 +177,7 @@
                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h7v7H4V6zm9 0h7v7h-7V6zM4 13h7v7H4v-7zm9 0h7v7h-7v-7z" />
                                     </svg>
-                                    {{ __('brands_index_view_grid') }}
+                                    {{ __('messages.brands_index_view_grid') }}
                                 </button>
                                 <button type="button"
                                         @click="view = 'list'"
@@ -186,7 +186,7 @@
                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
                                     </svg>
-                                    {{ __('brands_index_view_list') }}
+                                    {{ __('messages.brands_index_view_list') }}
                                 </button>
                             </div>
                         </div>
@@ -231,7 +231,7 @@
                                                     <svg class="h-3 w-3" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                                                         <path d="M12 17.3 6.18 20l1.11-6.45L2 8.9l6.5-.94L12 2l2.5 5.96 6.5.94-4.7 4.65L17.82 20 12 17.3z" />
                                                     </svg>
-                                                    {{ __('sort_featured') }}
+                                                    {{ __('messages.sort_featured') }}
                                                 </span>
                                             </div>
                                         @endif
@@ -253,14 +253,14 @@
                                             </p>
                                         @else
                                             <p class="text-sm text-ash">
-                                                {{ __('brands_index_description_placeholder') }}
+                                                {{ __('messages.brands_index_description_placeholder') }}
                                                     </p>
                                         @endif
 
                                         <div class="flex items-center justify-center">
                                             <a href="{{ route('localized.brands.show', ['locale' => app()->getLocale(), 'slug' => $slug]) }}"
                                                class="inline-flex items-center gap-2 rounded-full bg-sage px-4 py-2 text-sm font-semibold text-dark transition hover:bg-sage/90">
-                                                {{ __('brands_index_visit_brand') }}
+                                                {{ __('messages.brands_index_visit_brand') }}
                                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
                                                 </svg>
@@ -287,7 +287,7 @@
                                         return $url . (str_contains($url, '?') ? '&' : '?') . $queryString;
                                     };
                                 @endphp
-                                <nav class="flex items-center justify-center" aria-label="{{ __('brands_index_pagination_navigation') }}">
+                                <nav class="flex items-center justify-center" aria-label="{{ __('messages.brands_index_pagination_navigation') }}">
                                     <div class="flex items-center justify-center">
                                         <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
                                             @if ($paginator->onFirstPage())
@@ -336,10 +336,10 @@
                         @endif
                 @else
                     <x-shared.empty-state
-                            title="{{ __('brands_index_empty_title') }}"
-                            description="{{ __('brands_index_empty_description') }}"
+                            title="{{ __('messages.brands_index_empty_title') }}"
+                            description="{{ __('messages.brands_index_empty_description') }}"
                             icon="heroicon-o-archive-box"
-                            :action-text="__('brands_index_reset_filters')"
+                            :action-text="__('messages.brands_index_reset_filters')"
                             :action-url="route('localized.brands.index', ['locale' => app()->getLocale()])"
                     />
                 @endif
@@ -362,9 +362,9 @@
                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                                 </svg>
-                                {{ __('brands_index_filters_button') }}
+                                {{ __('messages.brands_index_filters_button') }}
                             </span>
-                            <h2 class="text-xl font-semibold text-white">{{ __('brands_index_filters_title') }}</h2>
+                            <h2 class="text-xl font-semibold text-white">{{ __('messages.brands_index_filters_title') }}</h2>
                         </div>
                         <button type="button"
                                 class="rounded-full border border-sage/30 p-2 text-sage transition hover:border-sage hover:bg-sage/10"
@@ -387,7 +387,7 @@
                             class="w-full"
                             wire:click="$toggle('sidebarOpen')"
                         >
-                            {{ __('brands_index_apply_filters') }}
+                            {{ __('messages.brands_index_apply_filters') }}
                         </x-shared.button>
                     </div>
                 </div>

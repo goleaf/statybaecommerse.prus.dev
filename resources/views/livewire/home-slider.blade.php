@@ -25,7 +25,7 @@
          }"
         role="region"
         aria-roledescription="carousel"
-        aria-label="{{ __('home_slider_tagline') }}">
+        aria-label="{{ __('messages.home_slider_tagline') }}">
     
     @if($this->sliders->count() > 0)
         <div class="space-y-14 py-16">
@@ -34,7 +34,7 @@
                 <!-- Line 1: Tagline with autoplay toggle -->
                 <div class="mb-8 flex items-center justify-between">
                     <h1 class="uppercase text-4xl font-medium text-dark" style="font-family: 'Montserrat', sans-serif;">
-                        {{ __('home_slider_tagline') }}
+                        {{ __('messages.home_slider_tagline') }}
                     </h1>
                     @if($this->sliders->count() > 1)
                         <button @click="autoPlay = !autoPlay" 
@@ -47,8 +47,8 @@
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" x-show="autoPlay">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6"></path>
                             </svg>
-                            <span class="text-sm font-semibold" x-show="!autoPlay">{{ __('home_slider_autoplay_start') }}</span>
-                            <span class="text-sm font-semibold" x-show="autoPlay">{{ __('home_slider_autoplay_stop') }}</span>
+                            <span class="text-sm font-semibold" x-show="!autoPlay">{{ __('messages.home_slider_autoplay_start') }}</span>
+                            <span class="text-sm font-semibold" x-show="autoPlay">{{ __('messages.home_slider_autoplay_stop') }}</span>
                         </button>
                     @endif
                 </div>
@@ -57,12 +57,12 @@
                 <div class="flex flex-col md:flex-row items-end gap-8 md:gap-16">
                     <div class="w-full md:w-1/4">
                         <p class="text-sm leading-tight text-dark" style="font-family: 'Montserrat', sans-serif;">
-                            {{ __('home_slider_description') }}
+                            {{ __('messages.home_slider_description') }}
                         </p>
                     </div>
                     <div class="w-full md:w-3/4 text-center">
                         <h2 class="uppercase font-bold text-3xl sm:text-4xl md:text-5xl lg:text-[3rem] xl:text-[3.5rem] 2xl:text-[4rem] tracking-widest leading-none text-dark" style="font-family: 'Montserrat', sans-serif;">
-                            {{ __('home_slider_title') }}
+                            {{ __('messages.home_slider_title') }}
                         </h2>
                     </div>
                 </div>
@@ -74,14 +74,14 @@
                     <div class="pointer-events-none absolute top-1/2 left-0 right-0 z-30 -translate-y-1/2 transform flex items-center justify-between px-4 md:px-6">
                         <button @click="prevSlide()" 
                                 class="pointer-events-auto bg-white/90 hover:bg-white text-dark p-3 md:p-4 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl backdrop-blur-sm border-2 border-dark/20 hover:border-dark/40"
-                                aria-label="{{ __('home_slider_previous_slide') }}">
+                                aria-label="{{ __('messages.home_slider_previous_slide') }}">
                             <svg class="w-6 h-6 md:w-7 md:h-7" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
                             </svg>
                         </button>
                         <button @click="nextSlide()" 
                                 class="pointer-events-auto bg-white/90 hover:bg-white text-dark p-3 md:p-4 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl backdrop-blur-sm border-2 border-dark/20 hover:border-dark/40"
-                                aria-label="{{ __('home_slider_next_slide') }}">
+                                aria-label="{{ __('messages.home_slider_next_slide') }}">
                             <svg class="w-6 h-6 md:w-7 md:h-7" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path>
                             </svg>
@@ -101,7 +101,7 @@
                                  loading="lazy">
                         @else
                             <div class="w-full h-full bg-gray-300 flex items-center justify-center">
-                                <span class="text-gray-500">{{ __('home_slider_placeholder_alt') }}</span>
+                                <span class="text-gray-500">{{ __('messages.home_slider_placeholder_alt') }}</span>
                             </div>
                     @endif
 
@@ -155,7 +155,7 @@
                     <button @click="goToSlide({{ $index }})"
                             class="w-3 h-3 rounded-full transition-all duration-300 bg-dark"
                             :class="currentSlide === {{ $index }} ? 'opacity-100' : 'opacity-50'">
-                        <span class="sr-only">{{ __('home_slider_tagline') }} {{ $index + 1 }}</span>
+                        <span class="sr-only">{{ __('messages.home_slider_tagline') }} {{ $index + 1 }}</span>
                     </button>
                 @endforeach
             </div>
@@ -168,7 +168,7 @@
                 <!-- Line 1: Tagline -->
                 <div class="mb-8">
                     <h1 class="uppercase text-4xl font-medium text-dark" style="font-family: 'Montserrat', sans-serif;">
-                        {{ __('home_slider_tagline') }}
+                        {{ __('messages.home_slider_tagline') }}
                     </h1>
                 </div>
                 
@@ -176,12 +176,12 @@
                 <div class="flex flex-col md:flex-row items-end gap-8 md:gap-16">
                     <div class="w-full md:w-1/4">
                         <p class="text-sm leading-tight text-dark" style="font-family: 'Montserrat', sans-serif;">
-                            {{ __('home_slider_description') }}
+                            {{ __('messages.home_slider_description') }}
                         </p>
                     </div>
                     <div class="w-full md:w-3/4 text-center">
                         <h2 class="uppercase font-bold text-3xl sm:text-4xl md:text-5xl lg:text-[3rem] xl:text-[3.5rem] 2xl:text-[4rem] tracking-widest leading-none text-dark" style="font-family: 'Montserrat', sans-serif;">
-                            {{ __('home_slider_title') }}
+                            {{ __('messages.home_slider_title') }}
                         </h2>
                     </div>
                 </div>
@@ -190,7 +190,7 @@
             <!-- Placeholder Image -->
             <div class="relative w-full h-max aspect-[16/9] md:aspect-[16/6] overflow-hidden">
                 <div class="w-full h-full bg-gray-300 flex items-center justify-center">
-                    <span class="text-gray-500">{{ __('home_slider_placeholder_alt') }}</span>
+                    <span class="text-gray-500">{{ __('messages.home_slider_placeholder_alt') }}</span>
                 </div>
                 
                 <!-- Decorative Elements -->

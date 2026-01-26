@@ -11,7 +11,7 @@
                     <ol class="flex flex-wrap items-center gap-2">
                         <li><a href="{{ route('home') }}" class="text-blue-600 hover:text-blue-700">{{ __('frontend.navigation.home') }}</a></li>
                         <li>/</li>
-                        <li><a href="{{ route('frontend.categories.index') }}" class="text-blue-600 hover:text-blue-700">{{ __('Categories') }}</a></li>
+                        <li><a href="{{ route('frontend.categories.index') }}" class="text-blue-600 hover:text-blue-700">{{ __('messages.categories') }}</a></li>
                         <li>/</li>
                         <li class="text-gray-700">{{ $category->name }}</li>
                     </ol>
@@ -36,7 +36,7 @@
                             <span class="text-lg font-semibold text-white">{{ number_format($products->total()) }}</span>
                         </div>
                         <div class="flex items-center justify-between">
-                            <span>{{ __('Subcategories') }}</span>
+                            <span>{{ __('messages.subcategories') }}</span>
                             <span class="text-lg font-semibold text-white">{{ number_format($relatedCategories->count()) }}</span>
                         </div>
                         <div class="flex items-center justify-between">
@@ -61,20 +61,20 @@
                             <input type="radio" name="filter" value="" @checked(! $activeFilter) class="h-4 w-4 text-indigo-600" />
                             <span>{{ __('All products') }}</span>
                         </label>
-                        <button type="submit" class="rounded-full bg-indigo-600 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-white shadow-sm hover:bg-indigo-700">{{ __('Apply') }}</button>
+                        <button type="submit" class="rounded-full bg-indigo-600 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-white shadow-sm hover:bg-indigo-700">{{ __('messages.apply') }}</button>
                     </form>
 
                     <form method="get" class="flex items-center gap-3 text-sm">
                         @foreach (request()->except('sort') as $key => $value)
                             <input type="hidden" name="{{ $key }}" value="{{ $value }}" />
                         @endforeach
-                        <label for="sort" class="text-gray-500">{{ __('Sort by') }}</label>
+                        <label for="sort" class="text-gray-500">{{ __('messages.sort_by') }}</label>
                         <select id="sort" name="sort" class="rounded-full border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 focus:border-indigo-500 focus:outline-none">
                             @foreach ($availableSorts as $key => $label)
                                 <option value="{{ $key }}" @selected($activeSort === $key)>{{ $label }}</option>
                             @endforeach
                         </select>
-                        <button type="submit" class="rounded-full border border-indigo-500 px-4 py-2 text-sm font-semibold text-indigo-600 hover:bg-indigo-50">{{ __('Update') }}</button>
+                        <button type="submit" class="rounded-full border border-indigo-500 px-4 py-2 text-sm font-semibold text-indigo-600 hover:bg-indigo-50">{{ __('messages.update') }}</button>
                     </form>
                 </div>
 

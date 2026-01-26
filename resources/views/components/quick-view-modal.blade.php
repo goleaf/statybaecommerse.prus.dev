@@ -16,7 +16,7 @@
     <div class="bg-white rounded-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto" @click.stop>
         {{-- Header --}}
         <div class="flex items-center justify-between p-6 border-b border-gray-200">
-            <h2 class="text-2xl font-bold text-gray-900">{{ __('Quick View') }}</h2>
+            <h2 class="text-2xl font-bold text-gray-900">{{ __('messages.quick_view') }}</h2>
             <button @click="closeModal()" class="text-gray-400 hover:text-gray-600 transition-colors duration-200">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
@@ -108,7 +108,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                           d="M5 13l4 4L19 7"></path>
                                 </svg>
-                                {{ __('In Stock') }}
+                                {{ __('messages.in_stock') }}
                             </span>
                             <span class="text-sm text-gray-600">
                                 ({{ $product->stock_quantity }} {{ __('available') }})
@@ -119,7 +119,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                           d="M6 18L18 6M6 6l12 12"></path>
                                 </svg>
-                                {{ __('Out of Stock') }}
+                                {{ __('messages.out_of_stock') }}
                             </span>
                         @endif
                     </div>
@@ -127,7 +127,7 @@
                     {{-- Description --}}
                     @if ($product->description)
                         <div>
-                            <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ __('Description') }}</h3>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ __('messages.description') }}</h3>
                             <p class="text-gray-700 leading-relaxed">{{ $product->description }}</p>
                         </div>
                     @endif
@@ -157,7 +157,7 @@
 
                     {{-- Quantity --}}
                     <div>
-                        <label class="block text-sm font-medium text-gray-900 mb-2">{{ __('Quantity') }}</label>
+                        <label class="block text-sm font-medium text-gray-900 mb-2">{{ __('messages.quantity') }}</label>
                         <div class="flex items-center gap-2">
                             <button @click="decreaseQuantity()" :disabled="quantity <= 1"
                                     class="w-10 h-10 border border-gray-300 rounded-lg flex items-center justify-center text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">

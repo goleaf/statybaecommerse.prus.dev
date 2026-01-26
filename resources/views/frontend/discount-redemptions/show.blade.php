@@ -69,7 +69,7 @@
                                 @if ($redemption->discount->description)
                                     <div>
                                         <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                            {{ __('Description') }}</dt>
+                                            {{ __('messages.description') }}</dt>
                                         <dd class="text-sm text-gray-900 dark:text-white">
                                             {{ $redemption->discount->description }}</dd>
                                     </div>
@@ -112,7 +112,7 @@
                                     </dd>
                                 </div>
                                 <div>
-                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('Status') }}
+                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('messages.status') }}
                                     </dt>
                                     <dd class="text-sm text-gray-900 dark:text-white">{{ ucfirst($redemption->status) }}
                                     </dd>
@@ -120,7 +120,7 @@
                                 @if ($redemption->order)
                                     <div>
                                         <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                            {{ __('Order') }}</dt>
+                                            {{ __('messages.order') }}</dt>
                                         <dd class="text-sm text-gray-900 dark:text-white">
                                             <a href="{{ route('frontend.orders.show', $redemption->order) }}"
                                                class="text-blue-600 dark:text-blue-400 hover:underline">

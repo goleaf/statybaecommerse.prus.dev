@@ -17,16 +17,16 @@
         <div class="space-y-4 max-w-3xl">
             <span
                   class="inline-flex items-center gap-2 rounded-full border border-sage bg-transparent px-4 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-black">
-                {{ $preset === 'sale' ? __('home_sale') : ($preset === 'latest' ? __('home_new') : ($preset === 'trending' ? __('home_trending') : __('home_featured'))) }}
+                {{ $preset === 'sale' ? __('messages.home_sale') : ($preset === 'latest' ? __('messages.home_new') : ($preset === 'trending' ? __('messages.home_trending') : __('messages.home_featured'))) }}
             </span>
             <h2 id="home-products-heading-{{ $preset }}"
                 class="text-3xl sm:text-4xl font-heading font-semibold leading-tight text-gray-900">
                 {{ $title ??
                     match ($preset) {
-                        'sale' => __('home_sale_products'),
-                        'latest' => __('home_latest_products'),
-                        'trending' => __('home_trending_products'),
-                        default => __('home_featured_products'),
+                        'sale' => __('messages.home_sale_products'),
+                        'latest' => __('messages.home_latest_products'),
+                        'trending' => __('messages.home_trending_products'),
+                        default => __('messages.home_featured_products'),
                     } }}
             </h2>
             @if ($subtitle)
@@ -36,7 +36,7 @@
             @endif
         </div>
 
-        <div aria-label="{{ __('home_products_grid') }}">
+        <div aria-label="{{ __('messages.home_products_grid') }}">
             {!! $this->getSchema('productShelf')?->toEmbeddedHtml() !!}
         </div>
     </div>

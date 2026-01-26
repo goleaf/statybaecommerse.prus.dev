@@ -31,7 +31,7 @@
                 <div>
                     <p class="font-medium text-gray-900">{{ $name }}</p>
                     @if ($sku)
-                        <p class="text-xs text-gray-500">{{ __('SKU') }}: {{ $sku }}</p>
+                        <p class="text-xs text-gray-500">{{ __('messages.sku') }}: {{ $sku }}</p>
                     @endif
                     <p class="mt-1 text-xs text-gray-500">
                         {{ trans_choice('Quantity: :count piece|Quantity: :count pieces', $quantity, ['count' => $quantity]) }}
@@ -46,14 +46,14 @@
 
     <dl class="space-y-3 text-sm text-gray-600">
         <div class="flex justify-between">
-            <dt>{{ __('Subtotal') }}</dt>
+            <dt>{{ __('messages.subtotal') }}</dt>
             <dd class="font-medium text-gray-900">
                 {{ $summary['formatted_subtotal'] ?? app_money_format($summary['subtotal'] ?? 0) }}
             </dd>
         </div>
 
         <div class="flex justify-between">
-            <dt>{{ __('Shipping') }}</dt>
+            <dt>{{ __('messages.shipping') }}</dt>
             <dd class="font-medium text-gray-900">
                 {{ $summary['formatted_shipping_amount'] ?? app_money_format($summary['shipping_amount'] ?? 0) }}
             </dd>
@@ -68,7 +68,7 @@
 
         @if (($summary['discount_amount'] ?? 0) > 0)
             <div class="flex justify-between text-green-600">
-                <dt>{{ __('Discount') }}</dt>
+                <dt>{{ __('messages.discount') }}</dt>
                 <dd class="font-medium">
                     −{{ $summary['formatted_discount_amount'] ?? app_money_format($summary['discount_amount'], $summary['currency'] ?? current_currency()) }}
                 </dd>
@@ -76,7 +76,7 @@
         @endif
 
         <div class="flex justify-between border-t border-gray-200 pt-3 text-base font-semibold text-gray-900">
-            <dt>{{ __('Total') }}</dt>
+            <dt>{{ __('messages.total') }}</dt>
             <dd>{{ $summary['formatted_total'] ?? app_money_format($summary['total'] ?? 0) }}</dd>
         </div>
     </dl>
