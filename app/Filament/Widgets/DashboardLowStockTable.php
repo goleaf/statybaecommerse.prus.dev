@@ -43,31 +43,31 @@ final class DashboardLowStockTable extends BaseTableWidget
             ->query(fn () => $this->getTableRepository()->lowStockProductsQuery()->limit(10))
             ->columns([
                 TextColumn::make('sku')
-                    ->label(trans('messages.inventory))
+                    ->label(trans('messages.inventory'))
                     ->sortable()
                     ->searchable(),
                 TextColumn::make('name')
-                    ->label(trans('messages.inventory))
+                    ->label(trans('messages.inventory'))
                     ->wrap()
                     ->limit(30)
                     ->tooltip(fn ($record) => $record->name)
                     ->sortable(),
                 TextColumn::make('stock_quantity')
-                    ->label(trans('messages.inventory))
+                    ->label(trans('messages.inventory'))
                     ->formatStateUsing(fn ($state) => Number::format((int) $state, locale: app()->getLocale()))
                     ->color('danger')
                     ->sortable(),
                 TextColumn::make('low_stock_threshold')
-                    ->label(trans('messages.inventory))
+                    ->label(trans('messages.inventory'))
                     ->formatStateUsing(fn ($state) => Number::format((int) ($state ?? config('inventory.low_stock_threshold')), locale: app()->getLocale()))
                     ->sortable(),
                 IconColumn::make('is_in_stock')
-                    ->label(trans('messages.inventory))
+                    ->label(trans('messages.inventory'))
                     ->boolean(),
             ])
             ->actions([
                 Tables\Actions\Action::make('manage')
-                    ->label(trans('messages.inventory))
+                    ->label(trans('messages.inventory'))
                     ->icon('heroicon-m-adjustments-horizontal')
                     ->url(fn ($record) => route('filament.admin.resources.products.edit', $record))
                     ->openUrlInNewTab(),
