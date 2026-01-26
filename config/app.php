@@ -90,6 +90,42 @@ return [
 
     /*
      * |--------------------------------------------------------------------------
+     * | Locales Configuration
+     * |--------------------------------------------------------------------------
+     * |
+     * | Detailed configuration for all supported locales including names,
+     * | flags, and direction.
+     * |
+     */
+    'locales' => [
+        'lt' => [
+            'name'      => 'Lietuvių',
+            'native'    => 'Lietuvių',
+            'flag'      => '🇱🇹',
+            'direction' => 'ltr',
+        ],
+        'en' => [
+            'name'      => 'English',
+            'native'    => 'English',
+            'flag'      => '🇺🇸',
+            'direction' => 'ltr',
+        ],
+        'ru' => [
+            'name'      => 'Russian',
+            'native'    => 'Русский',
+            'flag'      => '🇷🇺',
+            'direction' => 'ltr',
+        ],
+        'de' => [
+            'name'      => 'German',
+            'native'    => 'Deutsch',
+            'flag'      => '🇩🇪',
+            'direction' => 'ltr',
+        ],
+    ],
+
+    /*
+     * |--------------------------------------------------------------------------
      * | Locale Mapping (Optional)
      * |--------------------------------------------------------------------------
      * |

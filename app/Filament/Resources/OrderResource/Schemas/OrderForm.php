@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\Orders\Schemas;
+namespace App\Filament\Resources\OrderResource\Schemas;
 
 use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
