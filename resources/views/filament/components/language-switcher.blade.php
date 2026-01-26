@@ -5,17 +5,17 @@
                                 color="gray"
                                 icon="heroicon-o-language"
                                 size="sm">
-                {{ $availableLocales[$currentLocale] ?? __('admin.language_switcher.language') }}
+                {{ \App\Support\Locales::label(app()->getLocale()) }}
             </x-filament::button>
         </x-slot>
 
         <x-filament::dropdown.list>
-            @foreach ($availableLocales as $locale => $name)
+            @foreach (\App\Support\Locales::supported() as $locale)
                 <x-filament::dropdown.list.item
-                                                :href="$localeLinks[$locale] ?? url('/' . ltrim($locale, '/'))"
-                                                :active="$currentLocale === $locale"
+                                                :href="\App\Support\Locales::urlForLocale($locale)"
+                                                :active="app()->getLocale() === $locale"
                                                 icon="heroicon-o-globe-alt">
-                    {{ $name }}
+                    {{ \App\Support\Locales::label($locale) }}
                 </x-filament::dropdown.list.item>
             @endforeach
         </x-filament::dropdown.list>

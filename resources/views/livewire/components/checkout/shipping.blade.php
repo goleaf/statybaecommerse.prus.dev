@@ -76,7 +76,7 @@
                         <div>
                             <label for="same_as_shipping" class="inline-flex items-center">
                                 <input wire:model.live="sameAsShipping" id="same_as_shipping" type="checkbox" class="border-gray-300 text-primary-500 focus:ring-primary-500" name="same_as_shipping">
-                                <span class="text-sm text-gray-600 ms-2">{{ __("Same to delivery address") }}</span>
+                                <span class="text-sm text-gray-600 ms-2">{{ __('messages.same_as_delivery_address') }}</span>
                             </label>
                         </div>
 
