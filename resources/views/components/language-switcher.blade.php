@@ -1,24 +1,8 @@
 @php
     $currentLocale = app()->getLocale();
-    $supportedLocales = config('app.supported_locales', ['lt', 'en', 'de', 'ru']);
-    
-    // Ensure supportedLocales is always an array
-    if (is_string($supportedLocales)) {
-        $supportedLocales = array_map('trim', explode(',', $supportedLocales));
-    }
-    
-    $localeNames = [
-        'lt' => 'Lietuvių',
-        'en' => 'English',
-        'de' => 'Deutsch',
-        'ru' => 'Русский',
-    ];
-    $localeFlags = [
-        'lt' => '🇱🇹',
-        'en' => '🇺🇸',
-        'de' => '🇩🇪',
-        'ru' => '🇷🇺',
-    ];
+    $locales = config('app.locales', []);
+    $supportedLocaleCodes = array_map('trim', explode(',', config('app.supported_locales', 'lt,en')));
+    $supportedLocales = array_intersect_key($locales, array_flip($supportedLocaleCodes));
 @endphp
 
 <div class="relative" x-data="{ open: false }">
@@ -27,8 +11,8 @@
             aria-label="{{ __('frontend.language_switcher.change') }}"
             aria-expanded="false"
             aria-haspopup="true">
-        <span class="text-lg">{{ $localeFlags[$currentLocale] ?? '🌐' }}</span>
-        <span class="hidden sm:inline">{{ $localeNames[$currentLocale] ?? strtoupper($currentLocale) }}</span>
+        <span class="text-lg">{{ $supportedLocales[$currentLocale]['flag'] ?? '🌐' }}</span>
+        <span class="hidden sm:inline">{{ $supportedLocales[$currentLocale]['native'] ?? strtoupper($currentLocale) }}</span>
         <svg class="w-4 h-4 transition-transform duration-200" :class="{ 'rotate-180': open }" fill="none"
              stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
@@ -45,7 +29,7 @@
          x-transition:leave-end="opacity-0 scale-95"
          x-cloak
          class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-large border border-slate-200 py-2 z-50">
-        @foreach ($supportedLocales as $locale)
+        @foreach ($supportedLocales as $locale => $data)
             @if ($locale !== $currentLocale)
                 @php
                     $route = request()->route();
@@ -67,8 +51,8 @@
                     <input type="hidden" name="redirect_to" value="{{ $targetUrl }}">
                     <button type="submit"
                             class="w-full flex items-center gap-3 px-4 py-3 text-left text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200">
-                        <span class="text-lg">{{ $localeFlags[$locale] ?? '🌐' }}</span>
-                        <span>{{ $localeNames[$locale] ?? strtoupper($locale) }}</span>
+                        <span class="text-lg">{{ $data['flag'] ?? '🌐' }}</span>
+                        <span>{{ $data['native'] ?? strtoupper($locale) }}</span>
                     </button>
                 </form>
             @endif

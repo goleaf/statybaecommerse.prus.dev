@@ -57,6 +57,13 @@ class OrderResource extends BaseResource
         ];
     }
 
+    public static function getWidgets(): array
+    {
+        return [
+            \App\Filament\Resources\OrderResource\Widgets\OrderStats::class,
+        ];
+    }
+
     public static function getPages(): array
     {
         return [

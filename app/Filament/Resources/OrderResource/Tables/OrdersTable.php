@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\Orders\Tables;
+namespace App\Filament\Resources\OrderResource\Tables;
 
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;

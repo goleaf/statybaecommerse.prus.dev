@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\Orders\RelationManagers;
+namespace App\Filament\Resources\OrderResource\RelationManagers;
 
 use App\Models\Product;
 use Filament\Actions\BulkActionGroup;

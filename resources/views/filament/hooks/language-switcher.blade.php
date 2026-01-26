@@ -1,3 +1,9 @@
+@php
+    $locales = config('app.locales', []);
+    $supportedLocaleCodes = array_map('trim', explode(',', config('app.supported_locales', 'lt,en')));
+    $supportedLocales = array_intersect_key($locales, array_flip($supportedLocaleCodes));
+@endphp
+
 <div>
     <x-filament::dropdown
         maxHeight="250px"
@@ -23,41 +29,16 @@
         </x-filament::dropdown.header>
 
         <x-filament::dropdown.list>
-            <x-filament::dropdown.list.item
-                :color="(app()->getLocale() === 'en') ? 'primary' : null"
-                icon="heroicon-m-chevron-right"
-                :href="url('lang/en')"
-                tag="a"
-            >
-                🇺🇸 English
-            </x-filament::dropdown.list.item>
-
-            <x-filament::dropdown.list.item
-                :color="(app()->getLocale() === 'lt') ? 'primary' : null"
-                icon="heroicon-m-chevron-right"
-                :href="url('lang/lt')"
-                tag="a"
-            >
-                🇱🇹 Lietuvių
-            </x-filament::dropdown.list.item>
-
-            <x-filament::dropdown.list.item
-                :color="(app()->getLocale() === 'ru') ? 'primary' : null"
-                icon="heroicon-m-chevron-right"
-                :href="url('lang/ru')"
-                tag="a"
-            >
-                🇷🇺 Русский
-            </x-filament::dropdown.list.item>
-
-            <x-filament::dropdown.list.item
-                :color="(app()->getLocale() === 'de') ? 'primary' : null"
-                icon="heroicon-m-chevron-right"
-                :href="url('lang/de')"
-                tag="a"
-            >
-                🇩🇪 Deutsch
-            </x-filament::dropdown.list.item>
+            @foreach ($supportedLocales as $locale => $data)
+                <x-filament::dropdown.list.item
+                    :color="(app()->getLocale() === $locale) ? 'primary' : null"
+                    icon="heroicon-m-chevron-right"
+                    :href="url('lang/' . $locale)"
+                    tag="a"
+                >
+                    {{ $data['flag'] ?? '' }} {{ $data['native'] }}
+                </x-filament::dropdown.list.item>
+            @endforeach
         </x-filament::dropdown.list>
     </x-filament::dropdown>
 </div>

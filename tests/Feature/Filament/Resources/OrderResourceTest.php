@@ -12,7 +12,7 @@ uses(RefreshDatabase::class);
 beforeEach(function () {
     $this->user = User::factory()->create([
         'email' => 'admin@example.com',
-        'role' => 'admin', // Adjust based on your Auth logic
+        'is_admin' => true,
     ]);
     
     // Acting as admin

@@ -246,6 +246,10 @@
                                 <p class="capitalize font-normal font-montserrat">{{ $link['label'] }}</p>
                             </a>
                         @endforeach
+                        
+                        <div class="pt-4 mt-4 border-t border-dark/20">
+                            <x-language-switcher class="w-full justify-between !text-dark hover:!bg-dark/5" />
+                        </div>
                     </div>
                 </div>
             </div>
