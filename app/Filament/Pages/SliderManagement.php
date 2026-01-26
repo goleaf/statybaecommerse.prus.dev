@@ -9,7 +9,7 @@ use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\ContentLinkSearch;
 use BackedEnum;
-use DefStudio\SearchableInput\Forms\Components\SearchableInput;
+
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Components\CheckboxList;
@@ -301,12 +301,12 @@ class SliderManagement extends Page implements HasActions, HasForms
                                     ->label(__('translations.slide_image'))
                                     ->image()
                                     ->directory('sliders/slides'),
-                                SearchableInput::make('link')
+                                TextInput::make('link')
                                     ->label(__('translations.slide_link'))
                                     ->placeholder(__('translations.slider_link_placeholder'))
                                     ->searchUsing(fn (string $value): array => ContentLinkSearch::results($value))
                                     ->dehydrateStateUsing(fn (?string $state): ?string => $state !== null && $state !== '' ? $state : null)
-                                    ->afterStateHydrated(function (SearchableInput $component, ?string $state): void {
+                                    ->afterStateHydrated(function (TextInput $component, ?string $state): void {
                                         // Reuse helper hydration so repeater slides follow documented metadata lifecycle.
                                         SearchableInputHelper::hydrate(
                                             $component,
@@ -314,7 +314,7 @@ class SliderManagement extends Page implements HasActions, HasForms
                                             static fn (string $value): ?array => ['value' => $value, 'label' => $value],
                                         );
                                     })
-                                    ->afterStateUpdated(function (SearchableInput $component, ?string $state, callable $set): void {
+                                    ->afterStateUpdated(function (TextInput $component, ?string $state, callable $set): void {
                                         if ($state !== null && $state !== '') {
                                             return;
                                         }
