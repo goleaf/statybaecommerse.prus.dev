@@ -858,6 +858,36 @@ final class TestingDatabase
             });
         }
 
+        if (! $schema->hasTable('channels')) {
+            $schema->create('channels', function (Blueprint $table): void {
+                $table->id();
+                $table->string('name');
+                $table->string('code')->nullable();
+                $table->timestamps();
+                $table->softDeletes();
+            });
+        }
+
+        if (! $schema->hasTable('partners')) {
+            $schema->create('partners', function (Blueprint $table): void {
+                $table->id();
+                $table->string('name');
+                $table->string('code')->nullable();
+                $table->string('email')->nullable();
+                $table->timestamps();
+                $table->softDeletes();
+            });
+        }
+
+        if (! $schema->hasTable('coupons')) {
+            $schema->create('coupons', function (Blueprint $table): void {
+                $table->id();
+                $table->string('code')->unique();
+                $table->timestamps();
+                $table->softDeletes();
+            });
+        }
+
         if (! $schema->hasTable('orders')) {
             $schema->create('orders', function (Blueprint $table): void {
                 $table->id();
