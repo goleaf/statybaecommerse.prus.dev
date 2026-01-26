@@ -16,7 +16,6 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator as Paginator;
 use Livewire\Attributes\Computed;
-use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -44,40 +43,28 @@ final class ProductSearchWidget extends Component
 {
     use WithPagination;
 
-    #[Url(except: '')]
     public string $search = '';
 
-    #[Url(except: [])]
     public array $categories = [];
 
-    #[Url(except: [])]
     public array $brands = [];
 
-    #[Url(except: [])]
     public array $selectedAttributes = [];
 
-    #[Url(except: null)]
     public ?float $minPrice = null;
 
-    #[Url(except: null)]
     public ?float $maxPrice = null;
 
-    #[Url(except: 'relevance')]
     public string $sortBy = 'relevance';
 
-    #[Url(except: 'desc')]
     public string $sortDirection = 'desc';
 
-    #[Url(except: false)]
     public bool $inStock = false;
 
-    #[Url(except: false)]
     public bool $onSale = false;
 
-    #[Url(except: false)]
     public bool $featured = false;
 
-    #[Url(except: 'grid')]
     public string $viewMode = 'grid';
 
     public int $perPage = 12;

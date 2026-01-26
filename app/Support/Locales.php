@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Support;
 
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 
 /**
@@ -69,5 +70,35 @@ final class Locales
 
         // Normalise casing for safety because downstream translation lookups are case sensitive.
         return array_map(static fn (string $locale): string => Str::lower($locale), $locales);
+    }
+
+    public static function label(string $locale): string
+    {
+        $key = 'admin.language_switcher.locales.' . $locale;
+        $label = __($key);
+
+        if ($label !== $key) {
+            return $label;
+        }
+
+        $locales = config('app.locales', []);
+
+        return $locales[$locale]['native'] ?? $locales[$locale]['name'] ?? strtoupper($locale);
+    }
+
+    public static function urlForLocale(string $locale): string
+    {
+        $route = request()->route();
+        $targetUrl = null;
+
+        if ($route && ($name = $route->getName()) && str_starts_with($name, 'localized.')) {
+            $parameters = $route->parameters();
+            $parameters['locale'] = $locale;
+            $targetUrl = route($name, $parameters, true);
+        } elseif (Route::has('localized.home')) {
+            $targetUrl = route('localized.home', ['locale' => $locale], true);
+        }
+
+        return $targetUrl ?? url('/' . ltrim($locale, '/'));
     }
 }

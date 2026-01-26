@@ -9,12 +9,10 @@ use Filament\Support\Facades\FilamentView;
 use Filament\View\PanelsRenderHook;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\View\View;
-use Livewire\Attributes\Url;
 use ReflectionMethod;
 
 trait HasWidgetTabs
 {
-    #[Url(as: 'activeTab')]
     public ?string $activeWidgetTab = null;
 
     /**

@@ -44,10 +44,10 @@ enum NavigationGroup: string
             self::Inventory         => __('messages.navigation_groups.inventory'),
             self::Content           => __('messages.navigation_groups.content'),
             self::Locations         => __('messages.navigation_groups.locations'),
-            self::Discounts         => __('messages.navigation_groups),
+            self::Discounts         => __('messages.navigation_groups.discounts'),
             self::Campaigns         => __('messages.navigation_groups.campaigns'),
             self::News              => __('messages.navigation_groups.news'),
-            self::Referral          => __('messages.navigation_groups),
+            self::Referral          => __('messages.navigation_groups.referral'),
         };
     }
 

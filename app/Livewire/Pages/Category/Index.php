@@ -22,7 +22,6 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Livewire\Attributes\Computed;
-use Livewire\Attributes\Url;
 use Livewire\Component;
 
 /**
@@ -46,43 +45,33 @@ final class Index extends Component implements HasSchemas
 {
     use InteractsWithSchemas;
 
-    #[Url(except: '')]
     public string $search = '';
 
     /**
      * @var array<int, int>
      */
-    #[Url(except: [])]
     public array $selectedBrandIds = [];
 
     /**
      * @var array<int, int>
      */
-    #[Url(except: [])]
     public array $selectedCollectionIds = [];
 
     /**
      * @var array<int, int>
      */
-    #[Url(except: [])]
     public array $selectedCategoryIds = [];
 
-    #[Url(except: null)]
     public ?float $priceMin = null;
 
-    #[Url(except: null)]
     public ?float $priceMax = null;
 
-    #[Url(except: false)]
     public bool $inStock = false;
 
-    #[Url(except: false)]
     public bool $onSale = false;
 
-    #[Url(except: false)]
     public bool $hasProducts = false;
 
-    #[Url(except: 'name_asc')]
     public string $sort = 'name_asc';
 
     public bool $sidebarOpen = false;

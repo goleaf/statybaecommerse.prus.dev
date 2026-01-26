@@ -10,7 +10,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Computed;
-use Livewire\Attributes\Url;
 use Livewire\WithPagination;
 
 /**
@@ -25,10 +24,8 @@ final class Index extends AbstractPageComponent
 {
     use WithPagination;
 
-    #[Url(except: '')]
     public string $search = '';
 
-    #[Url(except: 'name')]
     public string $sortBy = 'name';
 
     public bool $sidebarOpen = false;

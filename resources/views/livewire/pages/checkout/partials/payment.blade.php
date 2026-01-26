@@ -50,7 +50,7 @@
         </div>
 
         <p class="text-xs leading-5 text-gray-500">
-            {{ __("By placing your order you agree to our terms of sale, returns policy, and confirm that your contact details are correct for delivery updates.") }}
+            {{ __('messages.checkout_terms_acknowledgement') }}
         </p>
 
         <div class="flex flex-wrap justify-between gap-3 pt-2">

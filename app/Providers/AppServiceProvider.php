@@ -41,6 +41,7 @@ use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Cache\RateLimiter as BaseRateLimiter;
 use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Contracts\Auth\MustVerifyEmail as MustVerifyEmailContract;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Filesystem\Filesystem;
@@ -60,6 +61,7 @@ use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Number;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
+use App\Mail\Auth\VerifyEmailMail;
 
 use function in_array;
 
@@ -586,14 +588,14 @@ class AppServiceProvider extends ServiceProvider
 
             return (new MailMessage)
                 ->locale($locale)
-                ->subject(__('messages.mail, [], $locale))
+                ->subject(__('messages.email_password_reset', [], $locale))
                 ->markdown('emails.auth.password-reset', [
                     'url'     => $url,
                     'minutes' => $minutes,
                 ]);
         });
 
-        VerifyEmail::toMailUsing(function ($notifiable, string $url): \App\Providers\VerifyEmailMail {
+        VerifyEmail::toMailUsing(function ($notifiable, string $url): VerifyEmailMail {
             if (! $notifiable instanceof MustVerifyEmailContract) {
                 return new VerifyEmailMail($url, app()->getLocale());
             }
