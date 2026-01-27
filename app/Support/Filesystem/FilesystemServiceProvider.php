@@ -42,7 +42,7 @@ final class FilesystemServiceProvider extends ServiceProvider
                 $app->make(FilesystemPermissions::class),
                 $app->make(DirectoryMemoryManager::class),
                 $app->make(BackupDatabaseManager::class),
-                $app->make(DirectoryScanner::class)
+                // $app->make(DirectoryScanner::class)
             );
         });
 

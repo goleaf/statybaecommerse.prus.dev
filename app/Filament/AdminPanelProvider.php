@@ -80,7 +80,7 @@ class AdminPanelProvider extends PanelProvider
             DashboardQuickActionsWidget::class,
             DashboardRecentOrdersTable::class,
             DashboardLowStockTable::class,
-            DashboardRecentErrorsTable::class,
+            // DashboardRecentErrorsTable::class,
         ];
     }
 
@@ -97,9 +97,9 @@ class AdminPanelProvider extends PanelProvider
             DashboardTimeSeriesWidget::class,
             DashboardRecentOrdersTable::class,
             DashboardLowStockTable::class,
-            DashboardRecentErrorsTable::class,
+            // DashboardRecentErrorsTable::class,
             DashboardQuickActionsWidget::class,
-            CalendarWidget::class,
+            // CalendarWidget::class,
         ];
     }
 

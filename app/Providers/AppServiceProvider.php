@@ -166,6 +166,7 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        echo "AppServiceProvider boot\n";
 
         if ($this->app->runningUnitTests()) {
             // Ensure Filament keeps the full resource registry during tests so snapshot
@@ -616,7 +617,7 @@ class AppServiceProvider extends ServiceProvider
 
         // Configure document service global variables for e-commerce (skip during console commands)
         if (! $this->app->runningInConsole() && ! in_array(PHP_SAPI, ['cli', 'phpdbg'], true)) {
-            $this->configureDocumentVariables();
+            // $this->configureDocumentVariables();
         }
 
         // Testing-only response assertion macros to support Filament table tests

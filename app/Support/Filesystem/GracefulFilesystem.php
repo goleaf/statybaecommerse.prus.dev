@@ -40,7 +40,7 @@ final class GracefulFilesystem extends Filesystem
         ?BackupDatabaseManager $backupManager = null,
         ?DirectoryScanner $scanner = null
     ) {
-        parent::__construct();
+        // parent::__construct();
 
         $this->permissions = $permissions ?? FilesystemPermissions::default();
         $this->memoryManager = $memoryManager ?? new DirectoryMemoryManager;

@@ -93,6 +93,39 @@ final class NotificationService
         $notification->delete();
     }
 
+    public function markAllAsRead(User $user): int
+    {
+        return Notification::markAllAsReadForUser($user->id);
+    }
+
+    public function deleteNotification(User $user, string $notificationId): bool
+    {
+        $notification = Notification::query()
+            ->forUser($user->id)
+            ->find($notificationId);
+
+        if (! $notification) {
+            return false;
+        }
+
+        return (bool) $notification->delete();
+    }
+
+    public function deleteAllNotifications(User $user): int
+    {
+        return Notification::query()
+            ->forUser($user->id)
+            ->delete();
+    }
+
+    public function getUnreadCount(User $user): int
+    {
+        return Notification::query()
+            ->forUser($user->id)
+            ->unread()
+            ->count();
+    }
+
     public function markAllAsReadForUser(User $user): int
     {
         return Notification::markAllAsReadForUser($user->id);

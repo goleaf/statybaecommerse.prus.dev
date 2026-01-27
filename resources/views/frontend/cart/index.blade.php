@@ -11,8 +11,9 @@
                     {{ __('frontend.cart.review_prompt') }}
                 </p>
                 @if (!empty($items))
+                    @php($itemCount = (int) data_get($summary ?? [], 'item_count', 0))
                     <p class="uppercase font-semibold text-2xl sm:text-3xl md:text-4xl">
-                        {{ (int) ($summary['item_count'] ?? 0) }} {{ trans_choice('messages.frontend', (int) ($summary['item_count'] ?? 0)) }}
+                        {{ $itemCount }} {{ trans_choice('frontend.cart.items', $itemCount) }}
                     </p>
                 @endif
             </div>
