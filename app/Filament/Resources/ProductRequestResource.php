@@ -4,20 +4,19 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\BaseResource;
 use App\Filament\Resources\ProductRequestResource\Pages;
 use App\Models\ProductRequest;
+use BackedEnum;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use UnitEnum;
-use BackedEnum;
 
 final class ProductRequestResource extends BaseResource
 {
@@ -52,10 +51,10 @@ final class ProductRequestResource extends BaseResource
                     ->numeric(),
                 Select::make('status')
                     ->options([
-                        ProductRequest::STATUS_PENDING => 'Pending',
+                        ProductRequest::STATUS_PENDING     => 'Pending',
                         ProductRequest::STATUS_IN_PROGRESS => 'In Progress',
-                        ProductRequest::STATUS_COMPLETED => 'Completed',
-                        ProductRequest::STATUS_CANCELLED => 'Cancelled',
+                        ProductRequest::STATUS_COMPLETED   => 'Completed',
+                        ProductRequest::STATUS_CANCELLED   => 'Cancelled',
                     ])
                     ->required(),
                 Textarea::make('admin_notes')
@@ -80,11 +79,11 @@ final class ProductRequestResource extends BaseResource
                 TextColumn::make('status')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        ProductRequest::STATUS_PENDING => 'warning',
+                        ProductRequest::STATUS_PENDING     => 'warning',
                         ProductRequest::STATUS_IN_PROGRESS => 'info',
-                        ProductRequest::STATUS_COMPLETED => 'success',
-                        ProductRequest::STATUS_CANCELLED => 'danger',
-                        default => 'secondary',
+                        ProductRequest::STATUS_COMPLETED   => 'success',
+                        ProductRequest::STATUS_CANCELLED   => 'danger',
+                        default                            => 'secondary',
                     }),
                 TextColumn::make('created_at')
                     ->dateTime()
@@ -105,9 +104,9 @@ final class ProductRequestResource extends BaseResource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListProductRequests::route('/'),
+            'index'  => Pages\ListProductRequests::route('/'),
             'create' => Pages\CreateProductRequest::route('/create'),
-            'edit' => Pages\EditProductRequest::route('/{record}/edit'),
+            'edit'   => Pages\EditProductRequest::route('/{record}/edit'),
         ];
     }
 }

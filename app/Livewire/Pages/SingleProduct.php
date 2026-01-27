@@ -172,7 +172,6 @@ final class SingleProduct extends Component
         'available' => null,
     ];
 
-    protected ?SupportCollection $recentHistoriesCollection = null;
 
     /**
      * Initialize the Livewire component with parameters.
@@ -218,18 +217,6 @@ final class SingleProduct extends Component
             $productTags
         );
 
-        $this->recentHistoriesCollection = TagAwareCache::remember(
-            CacheKeys::productRecentHistories($productId),
-            120,
-            function (): SupportCollection {
-                return $this->product
-                    ->recentHistories()
-                    ->orderByDesc('created_at')
-                    ->limit(4)
-                    ->get(['id', 'product_id', 'action', 'field_name', 'old_value', 'new_value', 'description', 'created_at']);
-            },
-            $productTags
-        );
 
         $this->trackProductView();
         $this->trackProductViewHistory();
@@ -641,11 +628,6 @@ final class SingleProduct extends Component
             ->values();
     }
 
-    #[Computed]
-    public function recentHistories(): SupportCollection
-    {
-        return $this->recentHistoriesCollection ??= collect();
-    }
 
     #[On('variant.selected')]
     public function handleVariantSelected(?int $variantId): void

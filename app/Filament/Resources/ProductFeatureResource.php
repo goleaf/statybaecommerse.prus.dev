@@ -4,23 +4,22 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\BaseResource;
 use App\Filament\Resources\ProductFeatureResource\Pages as FeaturePages;
 use App\Models\ProductFeature;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Schema;
+use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use UnitEnum;
-use BackedEnum;
 
 final class ProductFeatureResource extends BaseResource
 {
@@ -95,9 +94,9 @@ final class ProductFeatureResource extends BaseResource
     public static function getPages(): array
     {
         return [
-            'index' => FeaturePages\ListProductFeatures::route('/'),
+            'index'  => FeaturePages\ListProductFeatures::route('/'),
             'create' => FeaturePages\CreateProductFeature::route('/create'),
-            'edit' => FeaturePages\EditProductFeature::route('/{record}/edit'),
+            'edit'   => FeaturePages\EditProductFeature::route('/{record}/edit'),
         ];
     }
 }

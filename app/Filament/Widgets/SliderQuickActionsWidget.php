@@ -9,6 +9,7 @@ use App\Support\Filament\Components\SearchableInput;
 use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\ContentLinkSearch;
 use Exception;
+use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Components\ColorPicker;
@@ -18,7 +19,6 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
-use Filament\Actions\Action;
 use Filament\Widgets\Widget;
 
 final class SliderQuickActionsWidget extends Widget implements HasActions, HasForms

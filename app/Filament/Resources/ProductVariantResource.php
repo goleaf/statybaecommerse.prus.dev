@@ -4,21 +4,20 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\BaseResource;
 use App\Filament\Resources\ProductVariantResource\Pages;
 use App\Models\ProductVariant;
+use BackedEnum;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Schema;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
 use UnitEnum;
-use BackedEnum;
 
 final class ProductVariantResource extends BaseResource
 {
@@ -88,9 +87,9 @@ final class ProductVariantResource extends BaseResource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListProductVariants::route('/'),
+            'index'  => Pages\ListProductVariants::route('/'),
             'create' => Pages\CreateProductVariants::route('/create'),
-            'edit' => Pages\EditProductVariants::route('/{record}/edit'),
+            'edit'   => Pages\EditProductVariants::route('/{record}/edit'),
         ];
     }
 }

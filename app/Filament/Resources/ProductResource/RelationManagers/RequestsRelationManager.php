@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace App\Filament\Resources\ProductResource\RelationManagers;
 
 use App\Models\ProductRequest;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
-use Filament\Schemas\Schema;
-use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -43,10 +43,10 @@ class RequestsRelationManager extends RelationManager
                     ->numeric(),
                 Select::make('status')
                     ->options([
-                        ProductRequest::STATUS_PENDING => 'Pending',
+                        ProductRequest::STATUS_PENDING     => 'Pending',
                         ProductRequest::STATUS_IN_PROGRESS => 'In Progress',
-                        ProductRequest::STATUS_COMPLETED => 'Completed',
-                        ProductRequest::STATUS_CANCELLED => 'Cancelled',
+                        ProductRequest::STATUS_COMPLETED   => 'Completed',
+                        ProductRequest::STATUS_CANCELLED   => 'Cancelled',
                     ])
                     ->required(),
                 Textarea::make('admin_notes')
@@ -68,11 +68,11 @@ class RequestsRelationManager extends RelationManager
                 TextColumn::make('status')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        ProductRequest::STATUS_PENDING => 'warning',
+                        ProductRequest::STATUS_PENDING     => 'warning',
                         ProductRequest::STATUS_IN_PROGRESS => 'info',
-                        ProductRequest::STATUS_COMPLETED => 'success',
-                        ProductRequest::STATUS_CANCELLED => 'danger',
-                        default => 'secondary',
+                        ProductRequest::STATUS_COMPLETED   => 'success',
+                        ProductRequest::STATUS_CANCELLED   => 'danger',
+                        default                            => 'secondary',
                     }),
                 TextColumn::make('created_at')
                     ->dateTime()

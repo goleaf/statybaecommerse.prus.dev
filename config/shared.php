@@ -21,7 +21,6 @@ return [
         'default_input_size'          => 'md',
         'default_pagination_per_page' => 12,
         'max_products_per_page'       => 48,
-        'max_compare_products'        => 4,
     ],
 
     'cache' => [
@@ -70,7 +69,6 @@ return [
     ],
 
     'features' => [
-        'compare_enabled'    => true,
         'reviews_enabled'    => false,
         'ratings_enabled'    => true,
         'newsletter_enabled' => true,

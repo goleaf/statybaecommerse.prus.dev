@@ -18,10 +18,6 @@ final class LiveNotificationProvider extends PanelProvider
 
     public function boot(): void
     {
-        // Inject the live notification feed into the Filament layout
-        FilamentView::registerRenderHook(
-            'panels::topbar.end',
-            fn (): View => view('filament.hooks.live-notification-feed-hook')
-        );
+        //
     }
 }

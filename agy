@@ -1,0 +1,43 @@
+#!/bin/bash
+
+if [ -z "$1" ]; then
+    echo "Antigravity Kit CLI"
+    echo ""
+    echo "Usage: agy [command]"
+    echo ""
+    echo "Available commands:"
+    echo "  checklist [args]   Run the master validation checklist"
+    echo "  verify [args]      Run the comprehensive verification suite"
+    echo "  help               Show this help message"
+    echo ""
+    exit 0
+fi
+
+CMD=$1
+shift
+
+case "$CMD" in
+    checklist)
+        python .agent/scripts/checklist.py "$@"
+        ;;
+    verify)
+        python .agent/scripts/verify_all.py "$@"
+        ;;
+    help)
+        echo "Antigravity Kit CLI"
+        echo ""
+        echo "Commands:"
+        echo "  checklist"
+        echo "    Runs: python .agent/scripts/checklist.py"
+        echo "    Use: agy checklist ."
+        echo ""
+        echo "  verify"
+        echo "    Runs: python .agent/scripts/verify_all.py"
+        echo "    Use: agy verify . --url http://localhost:8000"
+        ;;
+    *)
+        echo "Unknown command: $CMD"
+        echo "Try 'agy help'"
+        exit 1
+        ;;
+esac

@@ -2699,7 +2699,7 @@ return [
     'admin.news_tags.bulk_activated_successfully'     => 'Žymės sėkmingai aktyvuotos',
     'admin.news_tags.bulk_deactivated_successfully'   => 'Žymės sėkmingai deaktyvuotos',
     'admin.news_tags.bulk_duplicated_successfully'    => 'Žymės sėkmingai nukopijuotos',
-];
+
     // Product Resource translations
     'products' => [
         'navigation_label' => 'Produktai',

@@ -4,19 +4,18 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\BaseResource;
 use App\Filament\Resources\ProductSimilarityResource\Pages;
 use App\Models\ProductSimilarity;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
-use Filament\Schemas\Schema;
+use BackedEnum;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use UnitEnum;
-use BackedEnum;
 
 final class ProductSimilarityResource extends BaseResource
 {
@@ -83,9 +82,9 @@ final class ProductSimilarityResource extends BaseResource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListProductSimilarities::route('/'),
+            'index'  => Pages\ListProductSimilarities::route('/'),
             'create' => Pages\CreateProductSimilarity::route('/create'),
-            'edit' => Pages\EditProductSimilarity::route('/{record}/edit'),
+            'edit'   => Pages\EditProductSimilarity::route('/{record}/edit'),
         ];
     }
 }

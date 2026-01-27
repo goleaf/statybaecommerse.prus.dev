@@ -220,22 +220,4 @@ final class AttributeController extends Controller
 
         return response()->json($attributes);
     }
-
-    /**
-     * Handle getAttributeComparison functionality with proper error handling.
-     */
-    public function getAttributeComparison(Request $request)
-    {
-        $attributeIds = $request->get('attribute_ids', []);
-        if (empty($attributeIds) || count($attributeIds) < 2) {
-            return response()->json(['error' => 'At least 2 attribute IDs are required']);
-        }
-        $attributes = Attribute::whereIn('id', $attributeIds)->with(['values', 'products'])->get()->map(function ($attribute) {
-            return ['id' => $attribute->id, 'name' => $attribute->name, 'type' => $attribute->type, 'type_label' => __('attributes.' . $attribute->type), 'group_name' => $attribute->group_name, 'statistics' => $attribute->getStatistics(), 'values' => $attribute->values->map(function ($value) {
-                return ['id' => $value->id, 'value' => $value->value, 'display_value' => $value->display_value ?: $value->value, 'usage_count' => $value->products()->count()];
-            })];
-        });
-
-        return response()->json($attributes);
-    }
 }

@@ -2653,7 +2653,7 @@ return [
     'admin.news_tags.bulk_activated_successfully'     => 'Tags activated successfully',
     'admin.news_tags.bulk_deactivated_successfully'   => 'Tags deactivated successfully',
     'admin.news_tags.bulk_duplicated_successfully'    => 'Tags duplicated successfully',
-];
+
     // Product Resource translations
     'products' => [
         'navigation_label' => 'Products',

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\BaseResource;
 use App\Filament\Resources\ProductImageResource\Pages as ImagePages;
 use App\Models\ProductImage;
+use BackedEnum;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -19,7 +19,6 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
 use UnitEnum;
-use BackedEnum;
 
 final class ProductImageResource extends BaseResource
 {
@@ -80,9 +79,9 @@ final class ProductImageResource extends BaseResource
     public static function getPages(): array
     {
         return [
-            'index' => ImagePages\ListProductImages::route('/'),
+            'index'  => ImagePages\ListProductImages::route('/'),
             'create' => ImagePages\CreateProductImage::route('/create'),
-            'edit' => ImagePages\EditProductImage::route('/{record}/edit'),
+            'edit'   => ImagePages\EditProductImage::route('/{record}/edit'),
         ];
     }
 }

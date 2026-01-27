@@ -97,10 +97,10 @@ final class ProductResource extends BaseResource
                             Select::make('status')
                                 ->label(__('admin.products.status'))
                                 ->options([
-                                    'draft' => __('admin.products.status_draft'),
-                                    'pending' => __('admin.products.status_pending'),
+                                    'draft'     => __('admin.products.status_draft'),
+                                    'pending'   => __('admin.products.status_pending'),
                                     'published' => __('admin.products.status_published'),
-                                    'archived' => __('admin.products.status_archived'),
+                                    'archived'  => __('admin.products.status_archived'),
                                 ])
                                 ->default('draft')
                                 ->required(),
@@ -283,10 +283,10 @@ final class ProductResource extends BaseResource
                 SelectFilter::make('status')
                     ->label(__('admin.products.status'))
                     ->options([
-                        'draft' => __('admin.products.status_draft'),
-                        'pending' => __('admin.products.status_pending'),
+                        'draft'     => __('admin.products.status_draft'),
+                        'pending'   => __('admin.products.status_pending'),
                         'published' => __('admin.products.status_published'),
-                        'archived' => __('admin.products.status_archived'),
+                        'archived'  => __('admin.products.status_archived'),
                     ]),
                 TernaryFilter::make('is_visible')
                     ->label(__('admin.products.is_visible')),
@@ -305,8 +305,8 @@ final class ProductResource extends BaseResource
                         ->action(function (Collection $records): void {
                             $records->each(static function (Product $product): void {
                                 $product->forceFill([
-                                    'status' => 'published',
-                                    'is_visible' => true,
+                                    'status'       => 'published',
+                                    'is_visible'   => true,
                                     'published_at' => $product->published_at ?? now(),
                                 ])->save();
                             });
@@ -322,7 +322,7 @@ final class ProductResource extends BaseResource
                         ->action(function (Collection $records): void {
                             $records->each(static function (Product $product): void {
                                 $product->forceFill([
-                                    'status' => 'draft',
+                                    'status'     => 'draft',
                                     'is_visible' => false,
                                 ])->save();
                             });
@@ -368,7 +368,7 @@ final class ProductResource extends BaseResource
 
                             $records->each(static function (Product $product) use ($stockQuantity, $lowStockThreshold): void {
                                 $product->forceFill([
-                                    'stock_quantity' => $stockQuantity,
+                                    'stock_quantity'      => $stockQuantity,
                                     'low_stock_threshold' => $lowStockThreshold,
                                 ])->save();
                             });
@@ -421,10 +421,10 @@ final class ProductResource extends BaseResource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListProducts::route('/'),
+            'index'  => Pages\ListProducts::route('/'),
             'create' => Pages\CreateProduct::route('/create'),
-            'view' => Pages\ViewProduct::route('/{record}'),
-            'edit' => Pages\EditProduct::route('/{record}/edit'),
+            'view'   => Pages\ViewProduct::route('/{record}'),
+            'edit'   => Pages\EditProduct::route('/{record}/edit'),
         ];
     }
 }
