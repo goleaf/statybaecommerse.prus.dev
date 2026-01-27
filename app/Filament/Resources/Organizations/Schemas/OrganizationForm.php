@@ -23,17 +23,11 @@ class OrganizationForm
                     ->schema([
                         TextInput::make('name')
                             ->required()
-                            ->maxLength(255)
-                            ->live(onBlur: true)
-                            ->afterStateUpdated(fn (Set $set, ?string $state) => $set('slug', Str::slug($state))),
-                        TextInput::make('slug')
-                            ->required()
-                            ->maxLength(255)
-                            ->unique(ignoreRecord: true),
+                            ->maxLength(255),
                         TextInput::make('type')
                             ->required()
                             ->maxLength(255),
-                    ])->columns(3),
+                    ])->columns(2),
 
                 Section::make('Description')
                     ->schema([
@@ -45,7 +39,6 @@ class OrganizationForm
                     ->schema([
                         Toggle::make('is_active')
                             ->required(),
-                        KeyValue::make('settings'),
                     ]),
             ]);
     }

@@ -49,6 +49,26 @@ final class Organization extends Model
         'settings'  => 'array',
     ];
 
+    /**
+     * Bootstrap the model and ensure the slug column is automatically maintained.
+     */
+    protected static function booted(): void
+    {
+        // Generate a slug automatically when creating a record
+        self::creating(static function (Organization $organization): void {
+            if (! $organization->slug) {
+                $organization->slug = \Illuminate\Support\Str::slug($organization->name);
+            }
+        });
+
+        // Update slug when name changes
+        self::updating(static function (Organization $organization): void {
+            if ($organization->isDirty('name')) {
+                $organization->slug = \Illuminate\Support\Str::slug($organization->name);
+            }
+        });
+    }
+
     // Relationships
 
     /**

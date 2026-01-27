@@ -1,7 +1,8 @@
-<?php
+
+
 declare(strict_types=1);
 
-return [
+return array (
   'activate' => 'Activate',
   'active_addresses' => 'Active Addresses',
   'active_addresses_description' => 'Addresses currently in use.',
@@ -12,6 +13,17 @@ return [
   'active_discounts' => 'Active Discounts',
   'active_products' => 'Active Products',
   'active_sliders' => 'Active Sliders',
+  'address_created_successfully' => 'Address created successfully',
+  'address_deleted_successfully' => 'Address deleted successfully',
+  'address_details' => 'Address details',
+  'address_duplicated' => 'Address duplicated',
+  'address_information' => 'Address information',
+  'address_line_1' => 'Address line 1',
+  'address_line_2' => 'Address line 2',
+  'address_set_as_default' => 'Address set as default',
+  'address_type' => 'Address type',
+  'address_updated_successfully' => 'Address updated successfully',
+  'add_new_address' => 'Add new address',
   'add_tags' => 'Add Tags',
   'add_to_cart_events' => 'Add to Cart Events',
   'added_this_week' => 'Added This Week',
@@ -90,6 +102,10 @@ return [
   'download_images' => 'Download Images',
   'duplicate' => 'Duplicate',
   'duration' => 'Duration',
+  'email' => 'Email',
+  'email_invalid' => 'The email address is invalid',
+  'email_max_length' => 'The email address is too long',
+  'email_required' => 'The email address is required',
   'end_date' => 'End Date',
   'excel' => 'Excel',
   'export' => 'Export',
@@ -123,7 +139,11 @@ return [
   'low' => 'Low',
   'low_stock' => 'Low Stock',
   'media' => 'Media',
+  'message_max_length' => 'The message is too long',
   'mobile_image' => 'Mobile Image',
+  'name' => 'Name',
+  'name_max_length' => 'The name is too long',
+  'name_required' => 'The name is required',
   'new_customers_this_month' => 'New Customers This Month',
   'new_customers_today' => 'New Customers Today',
   'new_users' => 'New Users',
@@ -236,4 +256,5 @@ return [
   'xml_file' => 'XML File',
   'yes' => 'Yes',
   'zoom' => 'Zoom',
-];
+  'slider_management' => 'Slider Management',
+);

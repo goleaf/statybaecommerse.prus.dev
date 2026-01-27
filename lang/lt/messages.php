@@ -1,8 +1,8 @@
-<?php
+
 
 declare(strict_types=1);
 
-return [
+return array (
   'API' => 'API',
   'Appearance' => 'Appearance',
   'Array' => 'Array',
@@ -71,7 +71,7 @@ return [
   'admin.widgets.total_products' => 'Admin widgets total products',
   'admin.widgets.total_revenue' => 'Admin widgets total revenue',
   'admin_admin_users' => 'Admin admin users',
-  'admin_brands' => 'Admin brands',
+  'admin_brands' => 'Prekės ženklai',
   'admin_campaign_schedules' => 'Admin campaign schedules',
   'admin_channels' => 'Admin channels',
   'admin_collection_rules' => 'Admin collection rules',
@@ -382,9 +382,9 @@ return [
   'delivered_at' => 'Pristatymo data',
   'demo_store' => 'Demo store',
   'description' => 'Aprašymas',
+  'details' => 'Detalės',
   'detail' => 'Detail',
   'detailed_description_coming_soon' => 'Išsamus aprašymas bus netrukus.',
-  'details' => 'Detalės',
   'disabled' => 'Išjungta',
   'discount' => 'Nuolaida',
   'discount_amount' => 'Nuolaidos suma',
@@ -469,7 +469,7 @@ return [
   'footer_instagram' => 'Footer instagram',
   'footer_powered_by_filament' => 'Footer powered by filament',
   'footer_returns_refunds' => 'Footer returns refunds',
-  'footer_secure_payment' => 'Saugus apmokėjimas',
+  'footer_secure_payment' => 'Saugus atsiskaitymas',
   'footer_shop' => 'Footer shop',
   'footer_subscribe_button' => 'Prenumeruoti',
   'footer_subscribe_desc' => 'Gaukite pranešimus apie naujas prekes ir specialius pasiūlymus',
@@ -653,7 +653,11 @@ return [
   'nav_toggle' => 'Perjungti meniu',
   'nav_vendor_catalogs' => 'Nav vendor catalogs',
   'navigation' => 'Navigation',
-  'navigation_groups' => 'Navigation groups',
+  'navigation_groups' => 
+  array (
+    'default' => 'Navigation groups',
+    'content' => 'Turinys',
+  ),
   'navigation_groups.analytics' => 'Navigation groups analytics',
   'navigation_groups.api' => 'Navigation groups api',
   'navigation_groups.attributes' => 'Navigation groups attributes',
@@ -800,6 +804,7 @@ return [
   'proceed_to_checkout' => 'Proceed to checkout',
   'product' => 'Prekė',
   'product_brand' => 'Prekės ženklas',
+  'product_in_stock' => 'Yra sandėlyje',
   'product_catalog_description' => 'Product catalog description',
   'product_category' => 'Product category',
   'product_description' => 'Product description',
@@ -807,13 +812,12 @@ return [
   'product_histories' => 'Pakeitimai per paskutines 7 dienas',
   'product_history' => 'Prekės istorija',
   'product_images' => 'Product images',
-  'product_in_stock' => 'Product in stock',
   'product_low_stock' => 'Product low stock',
   'product_management' => 'Product management',
   'product_name' => 'Product name',
   'product_name_is_running_low_on_stock' => 'Product name is running low on stock',
   'product_name_is_running_low_on_stock_stock_units_remaining' => 'Product name is running low on stock stock units remaining',
-  'product_out_of_stock' => 'Product out of stock',
+  'product_out_of_stock' => 'Nėra sandėlyje',
   'product_page' => 'Peržiūrėti visą istoriją',
   'product_price' => 'Product price',
   'product_related' => 'Product related',
@@ -821,13 +825,13 @@ return [
   'product_reviews' => 'Prekių apžvalgos',
   'product_sale_price' => 'Product sale price',
   'product_similarities' => 'Pearson koreliacija',
-  'product_sku' => 'Product sku',
-  'product_specifications' => 'Specifikacijos',
+  'product_sku' => 'Prekės kodas (SKU)',
+  'product_specifications' => 'Produkto specifikacijos',
   'product_stock' => 'Product stock',
   'product_unavailable' => 'Product unavailable',
   'product_variant_has_been_added_to_your_cart' => 'Product variant has been added to your cart',
   'product_variants' => 'Variantai sėkmingai išjungti.',
-  'product_weight' => 'Product weight',
+  'product_weight' => 'Prekės svoris',
   'products' => 'Prekės',
   'products_found' => 'Products found',
   'productvariant' => 'Voluptatum Voluptas',
@@ -1014,4 +1018,4 @@ return [
   'your_cart_is_empty' => 'Your cart is empty',
   'zip_code' => 'Pašto kodas',
   'zone' => 'Zone',
-];
+);

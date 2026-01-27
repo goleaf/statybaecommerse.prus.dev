@@ -1,8 +1,8 @@
-<?php
+
 
 declare(strict_types=1);
 
-return [
+return array (
   'API' => 'API',
   'Appearance' => 'Appearance',
   'Array' => 'Array',
@@ -71,7 +71,7 @@ return [
   'admin.widgets.total_products' => 'Admin widgets total products',
   'admin.widgets.total_revenue' => 'Admin widgets total revenue',
   'admin_admin_users' => 'Admin admin users',
-  'admin_brands' => 'Admin brands',
+  'admin_brands' => 'Brands',
   'admin_campaign_schedules' => 'Admin campaign schedules',
   'admin_categories' => 'Categories',
   'admin_channels' => 'Admin channels',
@@ -655,7 +655,11 @@ return [
   'nav_toggle' => 'Toggle navigation',
   'nav_vendor_catalogs' => 'Nav vendor catalogs',
   'navigation' => 'Navigation',
-  'navigation_groups' => 'Navigation groups',
+  'navigation_groups' => 
+  array (
+    'default' => 'Navigation groups',
+    'content' => 'Content',
+  ),
   'navigation_groups.analytics' => 'Navigation groups analytics',
   'navigation_groups.api' => 'Navigation groups api',
   'navigation_groups.attributes' => 'Navigation groups attributes',
@@ -1019,4 +1023,4 @@ return [
   'your_cart_is_empty' => 'Your cart is empty',
   'zip_code' => 'Zip Code',
   'zone' => 'Zone',
-];
+);

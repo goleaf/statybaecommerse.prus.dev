@@ -42,7 +42,17 @@ final class ProductRequestForm extends Component
 
     protected $rules = ['name' => 'required|string|max:255', 'email' => 'required|email|max:255', 'phone' => 'nullable|string|max:20', 'message' => 'nullable|string|max:1000', 'requested_quantity' => 'required|integer|min:1|max:999'];
 
-    protected $messages = ['name.required' => 'Vardas yra privalomas', 'email.required' => 'El. paštas yra privalomas', 'email.email' => 'El. paštas turi būti teisingas', 'requested_quantity.required' => 'Kiekis yra privalomas', 'requested_quantity.min' => 'Kiekis turi būti bent 1', 'requested_quantity.max' => 'Kiekis negali viršyti 999'];
+    public function messages(): array
+    {
+        return [
+            'name.required' => __('translations.name_required'),
+            'email.required' => __('translations.email_required'),
+            'email.email' => __('translations.email_invalid'),
+            'requested_quantity.required' => __('translations.quantity_required'),
+            'requested_quantity.min' => __('translations.quantity_min_value', ['min' => 1]),
+            'requested_quantity.max' => __('translations.quantity_max_value', ['max' => 999]),
+        ];
+    }
 
     /**
      * Initialize the Livewire component with parameters.
