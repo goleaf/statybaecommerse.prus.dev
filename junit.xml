@@ -1,127 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="Tests\Unit\Models\RelationshipTest" file="tests\Unit\Models\RelationshipTest.php" tests="11" assertions="18" errors="4" failures="1" skipped="0" time="22.984799">
-    <testcase name="`Project Relationships` → project can add members" file="tests\Unit\Models\RelationshipTest.php::`Project Relationships` → project can add members" class="Tests\Unit\Models\RelationshipTest" classname="Tests.Unit.Models.RelationshipTest" assertions="0" time="20.822389">
-      <error type="Illuminate\Database\QueryException">`Project Relationships` → project can add membersIlluminate\Database\QueryException: Array to string conversion (Connection: sqlite, Database: :memory:, SQL: insert into "project_user" ("created_at", "joined_at", "permissions", "project_id", "role", "updated_at", "user_id") values (2026-01-27 17:35:22, 2026-01-27 17:35:22, ?, 1, lead, 2026-01-27 17:35:22, 1))&#13;
-at vendor\laravel\framework\src\Illuminate\Foundation\Bootstrap\HandleExceptions.php:258
-at vendor\laravel\framework\src\Illuminate\Database\Connection.php:734
-at vendor\laravel\framework\src\Illuminate\Database\Connection.php:580
-at vendor\laravel\framework\src\Illuminate\Database\Connection.php:827
-at vendor\laravel\framework\src\Illuminate\Database\Connection.php:794
-at vendor\laravel\framework\src\Illuminate\Database\Connection.php:573
-at vendor\laravel\framework\src\Illuminate\Database\Connection.php:537
-at vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php:4002
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithPivotTable.php:274
-at app\Models\Project.php:195
-at tests\Unit\Models\RelationshipTest.php:45
-Caused by
-ErrorException: Array to string conversion
-
-at vendor\laravel\framework\src\Illuminate\Foundation\Bootstrap\HandleExceptions.php:258
-at vendor\laravel\framework\src\Illuminate\Database\Connection.php:734
-at vendor\laravel\framework\src\Illuminate\Database\Connection.php:580
-at vendor\laravel\framework\src\Illuminate\Database\Connection.php:827
-at vendor\laravel\framework\src\Illuminate\Database\Connection.php:794
-at vendor\laravel\framework\src\Illuminate\Database\Connection.php:573
-at vendor\laravel\framework\src\Illuminate\Database\Connection.php:537
-at vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php:4002
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithPivotTable.php:274
-at app\Models\Project.php:195
-at tests\Unit\Models\RelationshipTest.php:45</error>
+  <testsuite name="Tests\Unit\CustomerGroupResourceTest" file="tests\Unit\CustomerGroupResourceTest.php" tests="9" assertions="2" errors="7" failures="1" skipped="0" time="24.127723">
+    <testcase name="it unit: can load CustomerGroupResource class" file="tests\Unit\CustomerGroupResourceTest.php::it unit: can load CustomerGroupResource class" class="Tests\Unit\CustomerGroupResourceTest" classname="Tests.Unit.CustomerGroupResourceTest" assertions="1" time="22.827062">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">it unit: can load CustomerGroupResource classFailed asserting that false is true.&#13;
+at tests\Unit\CustomerGroupResourceTest.php:10</failure>
     </testcase>
-    <testcase name="`Organization Relationships` → organization can check user membership" file="tests\Unit\Models\RelationshipTest.php::`Organization Relationships` → organization can check user membership" class="Tests\Unit\Models\RelationshipTest" classname="Tests.Unit.Models.RelationshipTest" assertions="0" time="0.362702">
-      <error type="Illuminate\Database\QueryException">`Organization Relationships` → organization can check user membershipIlluminate\Database\QueryException: Array to string conversion (Connection: sqlite, Database: C:\Dropbox\projects\egistatyba/database/testing/databases\testing_parallel_pid_2728.sqlite, SQL: insert into "organization_user" ("created_at", "is_active", "joined_at", "organization_id", "permissions", "role", "updated_at", "user_id") values (2026-01-27 17:35:23, 1, 2026-01-27 17:35:23, 1, ?, member, 2026-01-27 17:35:23, 1))&#13;
-at vendor\laravel\framework\src\Illuminate\Foundation\Bootstrap\HandleExceptions.php:258
-at vendor\laravel\framework\src\Illuminate\Database\Connection.php:734
-at vendor\laravel\framework\src\Illuminate\Database\Connection.php:580
-at vendor\laravel\framework\src\Illuminate\Database\Connection.php:827
-at vendor\laravel\framework\src\Illuminate\Database\Connection.php:794
-at vendor\laravel\framework\src\Illuminate\Database\Connection.php:573
-at vendor\laravel\framework\src\Illuminate\Database\Connection.php:537
-at vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php:4002
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithPivotTable.php:274
-at app\Models\Organization.php:169
-at tests\Unit\Models\RelationshipTest.php:31
-Caused by
-ErrorException: Array to string conversion
-
-at vendor\laravel\framework\src\Illuminate\Foundation\Bootstrap\HandleExceptions.php:258
-at vendor\laravel\framework\src\Illuminate\Database\Connection.php:734
-at vendor\laravel\framework\src\Illuminate\Database\Connection.php:580
-at vendor\laravel\framework\src\Illuminate\Database\Connection.php:827
-at vendor\laravel\framework\src\Illuminate\Database\Connection.php:794
-at vendor\laravel\framework\src\Illuminate\Database\Connection.php:573
-at vendor\laravel\framework\src\Illuminate\Database\Connection.php:537
-at vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php:4002
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithPivotTable.php:274
-at app\Models\Organization.php:169
-at tests\Unit\Models\RelationshipTest.php:31</error>
+    <testcase name="it unit: can load CustomerGroup model class" file="tests\Unit\CustomerGroupResourceTest.php::it unit: can load CustomerGroup model class" class="Tests\Unit\CustomerGroupResourceTest" classname="Tests.Unit.CustomerGroupResourceTest" assertions="1" time="0.193255"/>
+    <testcase name="it unit: can get CustomerGroupResource model" file="tests\Unit\CustomerGroupResourceTest.php::it unit: can get CustomerGroupResource model" class="Tests\Unit\CustomerGroupResourceTest" classname="Tests.Unit.CustomerGroupResourceTest" assertions="0" time="0.145640">
+      <error type="Error">it unit: can get CustomerGroupResource modelError: Class "App\Filament\Resources\CustomerGroupResource" not found&#13;
+at tests\Unit\CustomerGroupResourceTest.php:18</error>
     </testcase>
-    <testcase name="`Complex Queries` → can get user projects across organizations" file="tests\Unit\Models\RelationshipTest.php::`Complex Queries` → can get user projects across organizations" class="Tests\Unit\Models\RelationshipTest" classname="Tests.Unit.Models.RelationshipTest" assertions="0" time="0.244673">
-      <error type="Illuminate\Database\QueryException">`Complex Queries` → can get user projects across organizationsIlluminate\Database\QueryException: Array to string conversion (Connection: sqlite, Database: C:\Dropbox\projects\egistatyba/database/testing/databases\testing_parallel_pid_2728.sqlite, SQL: insert into "organization_user" ("created_at", "is_active", "joined_at", "organization_id", "permissions", "role", "updated_at", "user_id") values (2026-01-27 17:35:23, 1, 2026-01-27 17:35:23, 2, ?, member, 2026-01-27 17:35:23, 2))&#13;
-at vendor\laravel\framework\src\Illuminate\Foundation\Bootstrap\HandleExceptions.php:258
-at vendor\laravel\framework\src\Illuminate\Database\Connection.php:734
-at vendor\laravel\framework\src\Illuminate\Database\Connection.php:580
-at vendor\laravel\framework\src\Illuminate\Database\Connection.php:827
-at vendor\laravel\framework\src\Illuminate\Database\Connection.php:794
-at vendor\laravel\framework\src\Illuminate\Database\Connection.php:573
-at vendor\laravel\framework\src\Illuminate\Database\Connection.php:537
-at vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php:4002
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithPivotTable.php:274
-at app\Models\Organization.php:169
-at tests\Unit\Models\RelationshipTest.php:129
-Caused by
-ErrorException: Array to string conversion
-
-at vendor\laravel\framework\src\Illuminate\Foundation\Bootstrap\HandleExceptions.php:258
-at vendor\laravel\framework\src\Illuminate\Database\Connection.php:734
-at vendor\laravel\framework\src\Illuminate\Database\Connection.php:580
-at vendor\laravel\framework\src\Illuminate\Database\Connection.php:827
-at vendor\laravel\framework\src\Illuminate\Database\Connection.php:794
-at vendor\laravel\framework\src\Illuminate\Database\Connection.php:573
-at vendor\laravel\framework\src\Illuminate\Database\Connection.php:537
-at vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php:4002
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithPivotTable.php:274
-at app\Models\Organization.php:169
-at tests\Unit\Models\RelationshipTest.php:129</error>
+    <testcase name="it unit: can get CustomerGroupResource navigation group" file="tests\Unit\CustomerGroupResourceTest.php::it unit: can get CustomerGroupResource navigation group" class="Tests\Unit\CustomerGroupResourceTest" classname="Tests.Unit.CustomerGroupResourceTest" assertions="0" time="0.154045">
+      <error type="Error">it unit: can get CustomerGroupResource navigation groupError: Class "App\Filament\Resources\CustomerGroupResource" not found&#13;
+at tests\Unit\CustomerGroupResourceTest.php:22</error>
     </testcase>
-    <testcase name="`Organization Relationships` → organization has users with roles" file="tests\Unit\Models\RelationshipTest.php::`Organization Relationships` → organization has users with roles" class="Tests\Unit\Models\RelationshipTest" classname="Tests.Unit.Models.RelationshipTest" assertions="0" time="0.233674">
-      <error type="Illuminate\Database\QueryException">`Organization Relationships` → organization has users with rolesIlluminate\Database\QueryException: Array to string conversion (Connection: sqlite, Database: C:\Dropbox\projects\egistatyba/database/testing/databases\testing_parallel_pid_2728.sqlite, SQL: insert into "organization_user" ("created_at", "is_active", "joined_at", "organization_id", "permissions", "role", "updated_at", "user_id") values (2026-01-27 17:35:23, 1, 2026-01-27 17:35:23, 3, ?, admin, 2026-01-27 17:35:23, 3))&#13;
-at vendor\laravel\framework\src\Illuminate\Foundation\Bootstrap\HandleExceptions.php:258
-at vendor\laravel\framework\src\Illuminate\Database\Connection.php:734
-at vendor\laravel\framework\src\Illuminate\Database\Connection.php:580
-at vendor\laravel\framework\src\Illuminate\Database\Connection.php:827
-at vendor\laravel\framework\src\Illuminate\Database\Connection.php:794
-at vendor\laravel\framework\src\Illuminate\Database\Connection.php:573
-at vendor\laravel\framework\src\Illuminate\Database\Connection.php:537
-at vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php:4002
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithPivotTable.php:274
-at app\Models\Organization.php:169
-at tests\Unit\Models\RelationshipTest.php:18
-Caused by
-ErrorException: Array to string conversion
-
-at vendor\laravel\framework\src\Illuminate\Foundation\Bootstrap\HandleExceptions.php:258
-at vendor\laravel\framework\src\Illuminate\Database\Connection.php:734
-at vendor\laravel\framework\src\Illuminate\Database\Connection.php:580
-at vendor\laravel\framework\src\Illuminate\Database\Connection.php:827
-at vendor\laravel\framework\src\Illuminate\Database\Connection.php:794
-at vendor\laravel\framework\src\Illuminate\Database\Connection.php:573
-at vendor\laravel\framework\src\Illuminate\Database\Connection.php:537
-at vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php:4002
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithPivotTable.php:274
-at app\Models\Organization.php:169
-at tests\Unit\Models\RelationshipTest.php:18</error>
+    <testcase name="it unit: can get CustomerGroupResource navigation label" file="tests\Unit\CustomerGroupResourceTest.php::it unit: can get CustomerGroupResource navigation label" class="Tests\Unit\CustomerGroupResourceTest" classname="Tests.Unit.CustomerGroupResourceTest" assertions="0" time="0.149460">
+      <error type="Error">it unit: can get CustomerGroupResource navigation labelError: Class "App\Filament\Resources\CustomerGroupResource" not found&#13;
+at tests\Unit\CustomerGroupResourceTest.php:28</error>
     </testcase>
-    <testcase name="`Project Relationships` → project scopes work correctly" file="tests\Unit\Models\RelationshipTest.php::`Project Relationships` → project scopes work correctly" class="Tests\Unit\Models\RelationshipTest" classname="Tests.Unit.Models.RelationshipTest" assertions="2" time="0.206409">
-      <failure type="PHPUnit\Framework\ExpectationFailedException">`Project Relationships` → project scopes work correctlyFailed asserting that 4 is identical to 1.&#13;
-at tests\Unit\Models\RelationshipTest.php:56</failure>
+    <testcase name="it unit: can get CustomerGroupResource plural model label" file="tests\Unit\CustomerGroupResourceTest.php::it unit: can get CustomerGroupResource plural model label" class="Tests\Unit\CustomerGroupResourceTest" classname="Tests.Unit.CustomerGroupResourceTest" assertions="0" time="0.156961">
+      <error type="Error">it unit: can get CustomerGroupResource plural model labelError: Class "App\Filament\Resources\CustomerGroupResource" not found&#13;
+at tests\Unit\CustomerGroupResourceTest.php:32</error>
     </testcase>
-    <testcase name="`Project Relationships` → project belongs to organization" file="tests\Unit\Models\RelationshipTest.php::`Project Relationships` → project belongs to organization" class="Tests\Unit\Models\RelationshipTest" classname="Tests.Unit.Models.RelationshipTest" assertions="1" time="0.175359"/>
-    <testcase name="`Polymorphic Relationships` → models can have files" file="tests\Unit\Models\RelationshipTest.php::`Polymorphic Relationships` → models can have files" class="Tests\Unit\Models\RelationshipTest" classname="Tests.Unit.Models.RelationshipTest" assertions="3" time="0.196307"/>
-    <testcase name="`Organization Relationships` → organization has projects" file="tests\Unit\Models\RelationshipTest.php::`Organization Relationships` → organization has projects" class="Tests\Unit\Models\RelationshipTest" classname="Tests.Unit.Models.RelationshipTest" assertions="2" time="0.172403"/>
-    <testcase name="`Polymorphic Relationships` → models can have comments" file="tests\Unit\Models\RelationshipTest.php::`Polymorphic Relationships` → models can have comments" class="Tests\Unit\Models\RelationshipTest" classname="Tests.Unit.Models.RelationshipTest" assertions="3" time="0.182060"/>
-    <testcase name="`Nested Comments` → comments can have replies" file="tests\Unit\Models\RelationshipTest.php::`Nested Comments` → comments can have replies" class="Tests\Unit\Models\RelationshipTest" classname="Tests.Unit.Models.RelationshipTest" assertions="4" time="0.188181"/>
-    <testcase name="`Nested Comments` → comment hierarchy methods work" file="tests\Unit\Models\RelationshipTest.php::`Nested Comments` → comment hierarchy methods work" class="Tests\Unit\Models\RelationshipTest" classname="Tests.Unit.Models.RelationshipTest" assertions="3" time="0.200643"/>
+    <testcase name="it unit: can get CustomerGroupResource model label" file="tests\Unit\CustomerGroupResourceTest.php::it unit: can get CustomerGroupResource model label" class="Tests\Unit\CustomerGroupResourceTest" classname="Tests.Unit.CustomerGroupResourceTest" assertions="0" time="0.170013">
+      <error type="Error">it unit: can get CustomerGroupResource model labelError: Class "App\Filament\Resources\CustomerGroupResource" not found&#13;
+at tests\Unit\CustomerGroupResourceTest.php:36</error>
+    </testcase>
+    <testcase name="it unit: can get CustomerGroupResource pages" file="tests\Unit\CustomerGroupResourceTest.php::it unit: can get CustomerGroupResource pages" class="Tests\Unit\CustomerGroupResourceTest" classname="Tests.Unit.CustomerGroupResourceTest" assertions="0" time="0.172902">
+      <error type="Error">it unit: can get CustomerGroupResource pagesError: Class "App\Filament\Resources\CustomerGroupResource" not found&#13;
+at tests\Unit\CustomerGroupResourceTest.php:40</error>
+    </testcase>
+    <testcase name="it unit: can get CustomerGroupResource relations" file="tests\Unit\CustomerGroupResourceTest.php::it unit: can get CustomerGroupResource relations" class="Tests\Unit\CustomerGroupResourceTest" classname="Tests.Unit.CustomerGroupResourceTest" assertions="0" time="0.158385">
+      <error type="Error">it unit: can get CustomerGroupResource relationsError: Class "App\Filament\Resources\CustomerGroupResource" not found&#13;
+at tests\Unit\CustomerGroupResourceTest.php:49</error>
+    </testcase>
   </testsuite>
 </testsuites>

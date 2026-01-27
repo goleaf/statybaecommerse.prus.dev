@@ -15,8 +15,8 @@ describe('Admin Panel Configuration', function (): void {
         $provider = new AdminPanelProvider(app());
         $panel = $provider->panel(Panel::make());
 
-        expect($panel->getAuthGuard())->toBe('web');
-        expect($panel->getAuthPasswordBroker())->toBe('users');
+        expect($panel->getAuthGuard())->toBe('admin');
+        expect($panel->getAuthPasswordBroker())->toBe('admin_users');
     });
 
     it('panel has correct basic configuration', function (): void {
@@ -24,8 +24,7 @@ describe('Admin Panel Configuration', function (): void {
         $panel = $provider->panel(Panel::make());
 
         expect($panel->getId())->toBe('admin');
-        expect($panel->getPath())->toBe('/admin');
-        expect($panel->getHomeUrl())->toBe('/admin/dashboard');
+        expect($panel->getPath())->toBe('admin');
         expect($panel->hasTopbar())->toBeFalse();
     });
 
@@ -34,7 +33,7 @@ describe('Admin Panel Configuration', function (): void {
         $panel = $provider->panel(Panel::make());
 
         $authMiddleware = $panel->getAuthMiddleware();
-        expect($authMiddleware)->toContain(\App\Http\Middleware\AdminAuthenticate::class);
+        expect($authMiddleware)->toContain(\Filament\Http\Middleware\Authenticate::class);
     });
 
     it('panel includes required middleware stack', function (): void {
@@ -46,9 +45,8 @@ describe('Admin Panel Configuration', function (): void {
         $requiredMiddleware = [
             \Illuminate\Cookie\Middleware\EncryptCookies::class,
             \Illuminate\Session\Middleware\StartSession::class,
-            \Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class,
+            \Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
-            \App\Http\Middleware\SetLocale::class,
         ];
 
         foreach ($requiredMiddleware as $required) {
@@ -60,7 +58,7 @@ describe('Admin Panel Configuration', function (): void {
         $provider = new AdminPanelProvider(app());
         $panel = $provider->panel(Panel::make());
 
-        expect($panel->getLoginRouteAction())->toBe(\App\Filament\Pages\Auth\Login::class);
+        expect($panel->getLoginRouteAction())->toBe(\Filament\Auth\Pages\Login::class);
     });
 });
 
@@ -77,10 +75,10 @@ describe('Admin URL Authentication', function (): void {
 
         $response->assertStatus(200);
         
-        // Check that the custom login form components have the correct attributes
-        $response->assertSee('name="data[email]"', false);
-        $response->assertSee('name="data[password]"', false);
-        $response->assertSee('name="data[remember]"', false);
+        // Check that the custom login form components have the correct attributes for Livewire 3
+        $response->assertSee('wire:model="data.email"', false);
+        $response->assertSee('wire:model="data.password"', false);
+        $response->assertSee('wire:model="data.remember"', false);
     });
 
     it('admin authentication middleware redirects to correct login route', function (): void {

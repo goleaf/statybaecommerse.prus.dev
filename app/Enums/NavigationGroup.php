@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Enums;
 
+use Illuminate\Support\Collection;
+
 enum NavigationGroup: string
 {
     case UserManagement = 'user-management';
@@ -58,6 +60,11 @@ enum NavigationGroup: string
         return $this->getLabel();
     }
 
+    public function description(): ?string
+    {
+        return null;
+    }
+
     public function getIcon(): string
     {
         return match ($this) {
@@ -85,7 +92,7 @@ enum NavigationGroup: string
 
     public function icon(): string
     {
-        return str_replace('heroicon-o-', '', $this->getIcon());
+        return $this->getIcon();
     }
 
     public function priority(): int
@@ -113,6 +120,11 @@ enum NavigationGroup: string
         };
     }
 
+    public function color(): string
+    {
+        return $this->getColor();
+    }
+
     public function getColor(): string
     {
         return match ($this) {
@@ -136,5 +148,90 @@ enum NavigationGroup: string
             self::News              => 'blue',
             self::Referral          => 'purple',
         };
+    }
+
+    public function isCore(): bool
+    {
+        return in_array($this, [self::System, self::Settings, self::UserManagement]);
+    }
+
+    public function isAdminOnly(): bool
+    {
+        return $this === self::System || $this === self::Settings;
+    }
+
+    public function isPublic(): bool
+    {
+        return ! $this->isAdminOnly();
+    }
+
+    public function requiresPermission(): bool
+    {
+        return $this->isAdminOnly();
+    }
+
+    public function getPermission(): ?string
+    {
+        return $this->requiresPermission() ? 'access_' . str_replace('-', '_', $this->value) : null;
+    }
+
+    public static function options(): array
+    {
+        return collect(self::cases())
+            ->mapWithKeys(fn (self $case) => [$case->value => $case->label()])
+            ->all();
+    }
+
+    public static function optionsWithDescriptions(): array
+    {
+        return collect(self::cases())
+            ->mapWithKeys(fn (self $case) => [$case->value => ['label' => $case->label(), 'description' => $case->description()]])
+            ->all();
+    }
+
+    public static function core(): Collection
+    {
+        return collect(self::cases())->filter(fn (self $case) => $case->isCore());
+    }
+
+    public static function adminOnly(): Collection
+    {
+        return collect(self::cases())->filter(fn (self $case) => $case->isAdminOnly());
+    }
+
+    public static function public(): Collection
+    {
+        return collect(self::cases())->filter(fn (self $case) => $case->isPublic());
+    }
+
+    public static function withPermissions(): Collection
+    {
+        return collect(self::cases())->filter(fn (self $case) => $case->requiresPermission());
+    }
+
+    public static function ordered(): Collection
+    {
+        return collect(self::cases())->sortBy(fn (self $case) => $case->priority());
+    }
+
+    public static function fromLabel(string $label): ?self
+    {
+        foreach (self::cases() as $case) {
+            if ($case->label() === $label) {
+                return $case;
+            }
+        }
+
+        return null;
+    }
+
+    public static function values(): array
+    {
+        return collect(self::cases())->map(fn (self $case) => $case->value)->all();
+    }
+
+    public static function labels(): array
+    {
+        return collect(self::cases())->map(fn (self $case) => $case->label())->all();
     }
 }

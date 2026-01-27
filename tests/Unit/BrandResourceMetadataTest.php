@@ -6,6 +6,7 @@ namespace Tests\Unit;
 
 use App\Filament\Resources\BrandResource;
 use App\Models\Brand;
+use App\Support\Filament\Schemas\TestingSchemaHost;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Schema;
@@ -50,10 +51,9 @@ final class BrandResourceMetadataTest extends TestCase
      */
     public function test_form_registers_social_links_repeater(): void
     {
-        $schema = BrandResource::form(Schema::make());
+        $schema = BrandResource::form(Schema::make(new TestingSchemaHost));
 
-        $hasRepeater = collect($schema->getComponents())
-            ->flatMap(fn ($component) => method_exists($component, 'getComponents') ? $component->getComponents() : [])
+        $hasRepeater = collect($schema->getFlatComponents())
             ->contains(fn ($component) => $component instanceof Repeater && $component->getName() === 'social_links');
 
         $this->assertTrue($hasRepeater, 'The brand form should surface a social_links repeater component.');
@@ -64,11 +64,9 @@ final class BrandResourceMetadataTest extends TestCase
      */
     public function test_form_includes_premium_toggle(): void
     {
-        $schema = BrandResource::form(Schema::make());
+        $schema = BrandResource::form(Schema::make(new TestingSchemaHost));
 
-        $hasPremiumToggle = collect($schema->getComponents())
-            ->flatMap(fn ($component) => method_exists($component, 'getComponents') ? $component->getComponents() : [])
-            ->flatMap(fn ($component) => method_exists($component, 'getComponents') ? $component->getComponents() : [$component])
+        $hasPremiumToggle = collect($schema->getFlatComponents())
             ->contains(fn ($component) => $component instanceof Toggle && $component->getName() === 'is_premium');
 
         $this->assertTrue($hasPremiumToggle, 'The settings grid must include an is_premium toggle.');

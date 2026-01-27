@@ -39,7 +39,7 @@ return [
                 'customer' => [
                     'label'    => 'Customer',
                     'type'     => 'string',
-                    'resolver' => 'user.name',
+                    'resolver' => fn (Order $order) => $order->user?->name,
                 ],
                 'items' => [
                     'label'    => 'Items',

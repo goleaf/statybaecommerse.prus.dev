@@ -50,32 +50,32 @@ final class ActiveScope implements Scope
         $hasStatus = $metadata['columns']['status'] ?? false;
 
         if ($hasIsActive && $hasIsVisible) {
-            $builder->where('is_active', true)->where('is_visible', true);
+            $builder->where($model->qualifyColumn('is_active'), true)->where($model->qualifyColumn('is_visible'), true);
 
             return;
         }
 
         if ($hasIsActive) {
-            $builder->where('is_active', true);
+            $builder->where($model->qualifyColumn('is_active'), true);
 
             return;
         }
 
         if ($hasIsEnabled) {
-            $builder->where('is_enabled', true);
+            $builder->where($model->qualifyColumn('is_enabled'), true);
 
             return;
         }
 
         if ($hasIsVisible) {
-            $builder->where('is_visible', true);
+            $builder->where($model->qualifyColumn('is_visible'), true);
         } elseif ($hasStatus) {
             // Defer to model-specific allowlists instead of defaulting to a hard-coded
             // "active" value so enums such as orders remain queryable in diagnostics.
             $defaultStatuses = $this->getDefaultStatuses($model);
 
             if ($defaultStatuses !== []) {
-                $builder->whereIn('status', $defaultStatuses);
+                $builder->whereIn($model->qualifyColumn('status'), $defaultStatuses);
             }
         }
     }

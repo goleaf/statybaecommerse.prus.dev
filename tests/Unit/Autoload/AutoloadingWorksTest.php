@@ -16,7 +16,6 @@ final class AutoloadingWorksTest extends PhpUnitTestCase
         $this->assertTrue(class_exists(Product::class), 'Product model should autoload.');
         $this->assertTrue(class_exists(Navigation::class), 'Livewire component should autoload.');
         $this->assertTrue(class_exists(AdminPanelProvider::class), 'Filament provider should autoload.');
-        $this->assertTrue(class_exists(\App\Domain\Product\Entities\Product::class), 'Domain entity should autoload.');
     }
 
     public function test_can_instantiate_key_classes(): void

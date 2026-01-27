@@ -9,7 +9,9 @@ use App\Filament\Resources\BrandResource\Pages;
 use App\Models\Brand;
 use BackedEnum;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Grid as SchemaGrid;
@@ -19,6 +21,7 @@ use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 
 final class BrandResource extends BaseResource
@@ -67,9 +70,15 @@ final class BrandResource extends BaseResource
                     RichEditor::make('description')
                         ->label(__('messages.description'))
                         ->columnSpanFull(),
-                    Toggle::make('is_active')
-                        ->label(__('admin.brands.is_active'))
-                        ->default(true),
+                    SchemaGrid::make(2)
+                        ->schema([
+                            Toggle::make('is_active')
+                                ->label(__('admin.brands.is_active'))
+                                ->default(true),
+                            Toggle::make('is_premium')
+                                ->label(__('admin.brands.is_premium'))
+                                ->default(false),
+                        ]),
                 ]),
             SchemaSection::make(__('messages.media'))
                 ->description(__('admin.brands.media_description'))
@@ -80,7 +89,30 @@ final class BrandResource extends BaseResource
                         ->columnSpanFull(),
                 ])
                 ->collapsible(),
+            SchemaSection::make(__('admin.brands.social_links'))
+                ->schema([
+                    Repeater::make('social_links')
+                        ->schema([
+                            Select::make('platform')
+                                ->options(array_combine(Brand::SOCIAL_LINK_PLATFORMS, array_map('ucfirst', Brand::SOCIAL_LINK_PLATFORMS)))
+                                ->required(),
+                            TextInput::make('url')
+                                ->url()
+                                ->required(),
+                        ])
+                        ->columns(2),
+                ])
+                ->collapsible(),
         ]);
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                \App\Models\Scopes\ActiveScope::class,
+                \App\Models\Scopes\EnabledScope::class,
+            ]);
     }
 
     public static function table(Table $table): Table

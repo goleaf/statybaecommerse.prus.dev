@@ -57,6 +57,7 @@ final class Organization extends Model
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'organization_user')
+            ->using(\App\Models\Pivots\OrganizationUser::class)
             ->withPivot(['role', 'permissions', 'is_active', 'joined_at', 'left_at'])
             ->withTimestamps()
             ->wherePivot('is_active', true);
@@ -68,6 +69,7 @@ final class Organization extends Model
     public function allUsers(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'organization_user')
+            ->using(\App\Models\Pivots\OrganizationUser::class)
             ->withPivot(['role', 'permissions', 'is_active', 'joined_at', 'left_at'])
             ->withTimestamps();
     }
