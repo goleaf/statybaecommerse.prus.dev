@@ -18,31 +18,7 @@ return [
     'plural_model_label' => 'Marken',
     'products_count' => 'Anzahl der Produkte',
   ],
-  'cache_maintenance' => 
-  [
-    'cache_key' => 'Cache-Schlüssel',
-    'cache_key_cleared_title' => 'Cache-Schlüssel gelöscht',
-    'cache_key_help' => 'Geben Sie den spezifischen Cache-Schlüssel ein, den Sie vergessen möchten.',
-    'cache_key_required_body' => 'Bitte geben Sie einen Cache-Schlüssel an.',
-    'cache_key_required_title' => 'Cache-Schlüssel erforderlich',
-    'cache_policy_checklist' => 'Cache-Richtlinien-Checkliste',
-    'cache_policy_checklist_description' => 'Cache-Richtlinien überprüfen und aktualisieren.',
-    'cache_policy_overview' => 'Cache-Richtlinien-Übersicht',
-    'cache_policy_overview_description' => 'Aktuelle Cache-Richtlinien und Status.',
-    'cache_tags' => 'Cache-Tags',
-    'cache_tags_help' => 'Kommagetrennte Liste von Tags.',
-    'cache_tags_placeholder' => 'tag1, tag2',
-    'cache_tags_required_body' => 'Bitte geben Sie Cache-Tags an.',
-    'cache_tags_required_title' => 'Cache-Tags erforderlich',
-    'flush_cache_tags' => 'Cache-Tags leeren',
-    'forget_cache_key' => 'Cache-Schlüssel vergessen',
-    'navigation_label' => 'Cache-Wartung',
-    'tagged_cache_flushed_title' => 'Markierter Cache geleert',
-    'tagged_cache_unavailable_title' => 'Markierter Cache nicht verfügbar',
-    'targeted_cache_operations' => 'Gezielte Cache-Operationen',
-    'targeted_cache_operations_description' => 'Führen Sie spezifische Cache-Operationen aus.',
-    'title' => 'Cache-Wartung',
-  ],
+
   'categories' => 
   [
     'basic_information' => 'Basisinformationen',

@@ -9,7 +9,7 @@ use App\Support\Filament\Components\SearchableInput;
 use Filament\Forms\ComponentContainer;
 use Filament\Forms\Components\Component as SchemaComponent;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Forms\Set;
 use Filament\Support\Contracts\TranslatableContentDriver;
 use Illuminate\Contracts\Support\Arrayable;
@@ -534,7 +534,7 @@ final class SearchableComponentHelper
                 return null;
             }
 
-            public function getForm(string $name): ?Form
+            public function getForm(string $name): ?Schema
             {
                 return null;
             }
@@ -599,7 +599,7 @@ final class SearchableComponentHelper
             }
         };
 
-        Form::make($host)
+        Schema::make($host)
             ->schema([$component])
             ->getComponents();
     }

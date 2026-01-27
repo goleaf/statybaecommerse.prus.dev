@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\BaseResource;
+use App\Filament\Resources\ProductSimilarityResource\Pages;
 use App\Models\ProductSimilarity;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -14,14 +15,16 @@ use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use UnitEnum;
+use BackedEnum;
 
 final class ProductSimilarityResource extends BaseResource
 {
     protected static ?string $model = ProductSimilarity::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-sparkles';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-sparkles';
 
-    protected static ?string $navigationGroup = 'Inventory';
+    protected static string|UnitEnum|null $navigationGroup = 'Inventory';
 
     public static function form(Schema $schema): Schema
     {

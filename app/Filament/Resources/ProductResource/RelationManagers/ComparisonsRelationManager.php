@@ -6,7 +6,7 @@ namespace App\Filament\Resources\ProductResource\RelationManagers;
 
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Actions\CreateAction;
 use Filament\Tables\Actions\DeleteAction;
@@ -19,9 +19,9 @@ class ComparisonsRelationManager extends RelationManager
 
     protected static ?string $recordTitleAttribute = 'session_id';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Select::make('user_id')
                     ->relationship('user', 'name')

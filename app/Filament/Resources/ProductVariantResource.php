@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\BaseResource;
+use App\Filament\Resources\ProductVariantResource\Pages;
 use App\Models\ProductVariant;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -16,14 +17,16 @@ use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
+use UnitEnum;
+use BackedEnum;
 
 final class ProductVariantResource extends BaseResource
 {
     protected static ?string $model = ProductVariant::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-list-bullet';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-list-bullet';
 
-    protected static ?string $navigationGroup = 'Inventory';
+    protected static string|UnitEnum|null $navigationGroup = 'Inventory';
 
     public static function form(Schema $schema): Schema
     {

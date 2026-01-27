@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\BaseResource;
+use App\Filament\Resources\ProductFeatureResource\Pages as FeaturePages;
 use App\Models\ProductFeature;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -18,14 +19,16 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use UnitEnum;
+use BackedEnum;
 
 final class ProductFeatureResource extends BaseResource
 {
     protected static ?string $model = ProductFeature::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-tag';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-tag';
 
-    protected static ?string $navigationGroup = 'Inventory';
+    protected static string|UnitEnum|null $navigationGroup = 'Inventory';
 
     public static function form(Schema $schema): Schema
     {
@@ -92,9 +95,9 @@ final class ProductFeatureResource extends BaseResource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListProductFeatures::route('/'),
-            'create' => Pages\CreateProductFeature::route('/create'),
-            'edit' => Pages\EditProductFeature::route('/{record}/edit'),
+            'index' => FeaturePages\ListProductFeatures::route('/'),
+            'create' => FeaturePages\CreateProductFeature::route('/create'),
+            'edit' => FeaturePages\EditProductFeature::route('/{record}/edit'),
         ];
     }
 }

@@ -6,7 +6,7 @@ namespace App\Support\Filament\Schemas;
 
 use Filament\Forms\ComponentContainer;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Schemas\Concerns\InteractsWithSchemas;
 use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Support\Contracts\TranslatableContentDriver;
@@ -37,7 +37,7 @@ final class TestingSchemaHost extends LivewireComponent implements HasForms, Has
         return null;
     }
 
-    public function getForm(string $name): ?Form
+    public function getForm(string $name): ?Schema
     {
         return null;
     }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\BaseResource;
+use App\Filament\Resources\ProductImageResource\Pages as ImagePages;
 use App\Models\ProductImage;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -17,14 +18,16 @@ use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
+use UnitEnum;
+use BackedEnum;
 
 final class ProductImageResource extends BaseResource
 {
     protected static ?string $model = ProductImage::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-photo';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-photo';
 
-    protected static ?string $navigationGroup = 'Inventory';
+    protected static string|UnitEnum|null $navigationGroup = 'Inventory';
 
     public static function form(Schema $schema): Schema
     {
@@ -77,9 +80,9 @@ final class ProductImageResource extends BaseResource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListProductImages::route('/'),
-            'create' => Pages\CreateProductImage::route('/create'),
-            'edit' => Pages\EditProductImage::route('/{record}/edit'),
+            'index' => ImagePages\ListProductImages::route('/'),
+            'create' => ImagePages\CreateProductImage::route('/create'),
+            'edit' => ImagePages\EditProductImage::route('/{record}/edit'),
         ];
     }
 }

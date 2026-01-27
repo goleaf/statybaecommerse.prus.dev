@@ -18,31 +18,7 @@ return [
     'plural_model_label' => 'Бренды',
     'products_count' => 'Количество товаров',
   ],
-  'cache_maintenance' => 
-  [
-    'cache_key' => 'Ключ кэша',
-    'cache_key_cleared_title' => 'Ключ кэша очищен',
-    'cache_key_help' => 'Введите конкретный ключ кэша, который нужно удалить.',
-    'cache_key_required_body' => 'Пожалуйста, укажите ключ кэша.',
-    'cache_key_required_title' => 'Требуется ключ кэша',
-    'cache_policy_checklist' => 'Контрольный список политики кэширования',
-    'cache_policy_checklist_description' => 'Просмотр и обновление политик кэширования.',
-    'cache_policy_overview' => 'Обзор политики кэширования',
-    'cache_policy_overview_description' => 'Текущие политики кэширования и их статусы.',
-    'cache_tags' => 'Теги кэша',
-    'cache_tags_help' => 'Список тегов через запятую.',
-    'cache_tags_placeholder' => 'tag1, tag2',
-    'cache_tags_required_body' => 'Пожалуйста, укажите теги кэша.',
-    'cache_tags_required_title' => 'Требуются теги кэша',
-    'flush_cache_tags' => 'Очистить теги кэша',
-    'forget_cache_key' => 'Удалить ключ кэша',
-    'navigation_label' => 'Обслуживание кэша',
-    'tagged_cache_flushed_title' => 'Тегированный кэш очищен',
-    'tagged_cache_unavailable_title' => 'Тегированный кэш недоступен',
-    'targeted_cache_operations' => 'Целевые операции с кэшем',
-    'targeted_cache_operations_description' => 'Выполнение конкретных операций с кэшем.',
-    'title' => 'Обслуживание кэша',
-  ],
+
   'categories' => 
   [
     'basic_information' => 'Основная информация',
