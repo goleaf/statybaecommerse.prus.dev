@@ -6,7 +6,6 @@ namespace App\Providers;
 
 use App\Models\Address;
 use App\Models\AdminUser;
-use App\Models\AuditLog;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Country;
@@ -16,7 +15,6 @@ use App\Models\Export;
 use App\Models\Legal;
 use App\Models\Notification;
 use App\Models\Order;
-use App\Models\Product;
 use App\Models\ProductRequest;
 use App\Models\Referral;
 use App\Models\ReferralCode;
@@ -25,7 +23,6 @@ use App\Models\SystemSetting;
 use App\Models\User;
 use App\Models\VariantCombination;
 use App\Policies\AddressPolicy;
-use App\Policies\AuditLogPolicy;
 use App\Policies\BrandPolicy;
 use App\Policies\CategoryPolicy;
 use App\Policies\CountryPolicy;
@@ -35,7 +32,6 @@ use App\Policies\ExportPolicy;
 use App\Policies\LegalPolicy;
 use App\Policies\NotificationPolicy;
 use App\Policies\OrderPolicy;
-use App\Policies\ProductPolicy;
 use App\Policies\ProductRequestPolicy;
 use App\Policies\ReferralCodePolicy;
 use App\Policies\ReferralPolicy;
@@ -55,24 +51,22 @@ final class AuthServiceProvider extends ServiceProvider
      * @var array<class-string, class-string>
      */
     protected $policies = [
-        Address::class           => AddressPolicy::class,
-        AuditLog::class          => AuditLogPolicy::class,
-        Brand::class             => BrandPolicy::class,
-        Category::class          => CategoryPolicy::class,
-        Country::class           => CountryPolicy::class,
-        Customer::class          => CustomerPolicy::class,
-        DiscountCondition::class => DiscountConditionPolicy::class,
-        Export::class            => ExportPolicy::class,
-        Legal::class             => LegalPolicy::class,
-        Notification::class      => NotificationPolicy::class,
-        Order::class             => OrderPolicy::class,
-        Product::class           => ProductPolicy::class,
-        ProductRequest::class    => ProductRequestPolicy::class,
-        Referral::class          => ReferralPolicy::class,
-        ReferralCode::class      => ReferralCodePolicy::class,
-        Role::class              => RolePolicy::class,
-        SystemSetting::class     => SystemSettingPolicy::class,
-        User::class              => UserPolicy::class,
+        Address::class            => AddressPolicy::class,
+        Brand::class              => BrandPolicy::class,
+        Category::class           => CategoryPolicy::class,
+        Country::class            => CountryPolicy::class,
+        Customer::class           => CustomerPolicy::class,
+        DiscountCondition::class  => DiscountConditionPolicy::class,
+        Export::class             => ExportPolicy::class,
+        Legal::class              => LegalPolicy::class,
+        Notification::class       => NotificationPolicy::class,
+        Order::class              => OrderPolicy::class,
+        ProductRequest::class     => ProductRequestPolicy::class,
+        Referral::class           => ReferralPolicy::class,
+        ReferralCode::class       => ReferralCodePolicy::class,
+        Role::class               => RolePolicy::class,
+        SystemSetting::class      => SystemSettingPolicy::class,
+        User::class               => UserPolicy::class,
         VariantCombination::class => VariantCombinationPolicy::class,
     ];
 
@@ -96,19 +90,13 @@ final class AuthServiceProvider extends ServiceProvider
             });
         }
 
-        // Allow privileged admin roles to bypass granular authorization checks
+        // Allow privileged admin users to bypass authorization checks
         Gate::before(function ($user, ?string $ability = null): ?true {
             if (! $user instanceof AdminUser) {
                 return null;
             }
 
-            if (! method_exists($user, 'hasRole')) {
-                return null;
-            }
-
-            return $user->hasAnyRole(['administrator', 'super_admin'])
-                ? true
-                : null;
+            return (bool) ($user->is_admin ?? false) ? true : null;
         });
 
         Gate::define('viewMailPreviews', static function (?Authenticatable $user = null): bool {
@@ -123,14 +111,10 @@ final class AuthServiceProvider extends ServiceProvider
             return property_exists($user, 'is_admin') && $user->is_admin !== null && (bool) $user->is_admin;
         });
 
-        $permissions = (array) config('dashboard.permissions');
+        $permissions = (array) config('dashboard.permissions', []);
 
         foreach ($permissions as $permission) {
-            Gate::define($permission, static function ($user) use ($permission): bool {
-                if (method_exists($user, 'getAllPermissions') && $user->getAllPermissions()->contains('name', $permission)) {
-                    return true;
-                }
-
+            Gate::define($permission, static function ($user): bool {
                 return property_exists($user, 'is_admin') && (bool) $user->is_admin;
             });
         }

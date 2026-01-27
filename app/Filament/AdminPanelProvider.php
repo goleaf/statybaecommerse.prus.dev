@@ -4,43 +4,28 @@ declare(strict_types=1);
 
 namespace App\Filament;
 
-use App\Filament\Pages\Auth\Login as AdminLogin;
 use App\Filament\Pages\Dashboard as FilamentDashboard;
-use App\Filament\Widgets\CalendarWidget;
 use App\Filament\Widgets\DashboardKpiWidget;
 use App\Filament\Widgets\DashboardLowStockTable;
 use App\Filament\Widgets\DashboardQuickActionsWidget;
-use App\Filament\Widgets\DashboardRecentErrorsTable;
 use App\Filament\Widgets\DashboardRecentOrdersTable;
 use App\Filament\Widgets\DashboardTimeSeriesWidget;
+use Filament\Http\Middleware\Authenticate;
+use Filament\Http\Middleware\AuthenticateSession;
+use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
-use Filament\View\PanelsRenderHook;
 use Filament\Widgets\Widget;
-use Illuminate\Contracts\Foundation\Application as ApplicationContract;
-use Illuminate\Contracts\View\View;
-use InvalidArgumentException;
+use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
+use Illuminate\Cookie\Middleware\EncryptCookies;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Illuminate\Routing\Middleware\SubstituteBindings;
+use Illuminate\Session\Middleware\StartSession;
+use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class AdminPanelProvider extends PanelProvider
 {
-    public function __construct(?ApplicationContract $app = null)
-    {
-        if (! $app instanceof ApplicationContract) {
-            $resolved = function_exists('app') ? app() : null;
-
-            if ($resolved instanceof ApplicationContract) {
-                $app = $resolved;
-            }
-        }
-
-        if (! $app instanceof ApplicationContract) {
-            throw new InvalidArgumentException('A Laravel application instance is required to construct the admin panel provider.');
-        }
-
-        parent::__construct($app);
-    }
-
     public function panel(Panel $panel): Panel
     {
         $configuredPanel = $this->applyBaseConfiguration($panel);
@@ -63,7 +48,7 @@ class AdminPanelProvider extends PanelProvider
         return $configuredPanel
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
-            // ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
+            // Widget discovery is disabled until the optional tab layout plugin is installed.
             ->pages($additionalPages)
             ->widgets($widgets);
     }
@@ -80,7 +65,6 @@ class AdminPanelProvider extends PanelProvider
             DashboardQuickActionsWidget::class,
             DashboardRecentOrdersTable::class,
             DashboardLowStockTable::class,
-            // DashboardRecentErrorsTable::class,
         ];
     }
 
@@ -97,9 +81,7 @@ class AdminPanelProvider extends PanelProvider
             DashboardTimeSeriesWidget::class,
             DashboardRecentOrdersTable::class,
             DashboardLowStockTable::class,
-            // DashboardRecentErrorsTable::class,
             DashboardQuickActionsWidget::class,
-            // CalendarWidget::class,
         ];
     }
 
@@ -124,49 +106,29 @@ class AdminPanelProvider extends PanelProvider
     private function applyBaseConfiguration(Panel $panel): Panel
     {
         return $panel
+            ->default()
             ->id('admin')
-            ->path('/admin')
-            ->login(AdminLogin::class)
+            ->path('admin')
+            ->login()
+            ->authGuard('admin')
+            ->authPasswordBroker('admin_users')
             ->topbar(false)
+            ->darkMode(false)
             ->colors([
                 'primary' => Color::Blue,
             ])
-            // Configure authentication guard and user model
-            ->authGuard('web')
-            ->authPasswordBroker('users')
-            ->default()
-            ->homeUrl('/admin/dashboard')
-            ->userMenuItems([
-                // Remove the problematic user menu items configuration
-                // These will be handled by Filament's default behavior
-            ])
-            // Add language switcher render hook
-            ->renderHook(
-                PanelsRenderHook::USER_MENU_PROFILE_AFTER,
-                fn (): View => view('filament.hooks.language-switcher'),
-            )
-            // Add mobile navigation render hook
-            ->renderHook(
-                PanelsRenderHook::BODY_START,
-                fn (): View => view('filament.components.mobile-navigation'),
-            )
-            // Add mobile CSS render hook
-            ->renderHook(
-                PanelsRenderHook::HEAD_END,
-                fn (): string => '<link rel="stylesheet" href="' . asset('css/filament/admin-mobile.css') . '">',
-            )
             ->middleware([
-                \Illuminate\Cookie\Middleware\EncryptCookies::class,
-                \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
-                \Illuminate\Session\Middleware\StartSession::class,
-                \Illuminate\Session\Middleware\AuthenticateSession::class,
-                \Illuminate\View\Middleware\ShareErrorsFromSession::class,
-                \Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class,
-                \Illuminate\Routing\Middleware\SubstituteBindings::class,
-                \App\Http\Middleware\SetLocale::class,
+                EncryptCookies::class,
+                AddQueuedCookiesToResponse::class,
+                StartSession::class,
+                AuthenticateSession::class,
+                ShareErrorsFromSession::class,
+                VerifyCsrfToken::class,
+                SubstituteBindings::class,
+                DispatchServingFilamentEvent::class,
             ])
             ->authMiddleware([
-                \App\Http\Middleware\AdminAuthenticate::class,
+                Authenticate::class,
             ]);
     }
 }

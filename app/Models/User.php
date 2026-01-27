@@ -7,7 +7,6 @@ namespace App\Models;
 use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\ApprovedScope;
-use App\Observers\UserObserver;
 use App\Support\Storage\SecureStorage;
 use App\Traits\HasSafeSerialization;
 use App\Traits\SecurePasswordHandling;
@@ -16,7 +15,6 @@ use Filament\Panel;
 use Illuminate\Auth\Notifications\ResetPassword as ResetPasswordNotification;
 use Illuminate\Auth\Notifications\VerifyEmail as VerifyEmailNotification;
 use Illuminate\Contracts\Translation\HasLocalePreference as HasLocalePreferenceContract;
-use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -31,7 +29,6 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Arr;
 use JsonException;
 use Laravel\Sanctum\HasApiTokens;
-use Spatie\Permission\Traits\HasRoles;
 use Spatie\Translatable\HasTranslations;
 
 /**
@@ -50,12 +47,11 @@ use Spatie\Translatable\HasTranslations;
  *
  * @mixin \Eloquent
  */
-#[ObservedBy([UserObserver::class])]
 #[ScopedBy([ActiveScope::class])]
 final class User extends Authenticatable implements FilamentUser, HasLocalePreferenceContract
 {
     use HasApiTokens;
-    use HasFactory, HasRoles, HasSafeSerialization, HasTranslations, Notifiable, OrdersByName, SoftDeletes;
+    use HasFactory, HasSafeSerialization, HasTranslations, Notifiable, OrdersByName, SoftDeletes;
 
     // Allow issuing API tokens for Sanctum-protected endpoints.
     use SecurePasswordHandling;
@@ -80,23 +76,23 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     // keep core identity columns (first/last name) stored as simple strings for authentication flows.
     public array $translatable = ['bio', 'company', 'position', 'website'];
 
-    protected $fillable = ['name', 'email', 'preferred_locale', 'preferred_currency', 'newsletter_subscription', 'sms_notifications', 'email_verified_at', 'first_name', 'last_name', 'gender', 'phone_number', 'birth_date', 'timezone', 'opt_in', 'phone', 'date_of_birth', 'is_active', 'accepts_marketing', 'two_factor_enabled', 'last_login_at', 'preferences', 'avatar_url', 'last_login_ip', 'is_admin', 'is_verified', 'company', 'job_title', 'bio', 'company', 'position', 'website', 'social_links', 'notification_preferences', 'privacy_settings', 'marketing_preferences', 'permissions_matrix', 'login_count', 'last_activity_at', 'email_verified_at', 'phone_verified_at', 'two_factor_secret', 'two_factor_recovery_codes', 'two_factor_confirmed_at', 'remember_token', 'api_token', 'stripe_customer_id', 'stripe_account_id', 'subscription_status', 'subscription_plan', 'subscription_ends_at', 'trial_ends_at', 'status', 'verification_token', 'password_reset_token', 'password_reset_expires_at', 'referral_code', 'referral_code_generated_at', 'referral_settings'];
+    protected $fillable = ['name', 'email', 'password', 'preferred_locale', 'preferred_currency', 'newsletter_subscription', 'sms_notifications', 'email_verified_at', 'first_name', 'last_name', 'gender', 'phone_number', 'birth_date', 'timezone', 'opt_in', 'phone', 'date_of_birth', 'is_active', 'accepts_marketing', 'last_login_at', 'preferences', 'avatar_url', 'last_login_ip', 'is_admin', 'is_verified', 'company', 'job_title', 'bio', 'company', 'position', 'website', 'social_links', 'notification_preferences', 'privacy_settings', 'marketing_preferences', 'login_count', 'last_activity_at', 'email_verified_at', 'phone_verified_at', 'remember_token', 'api_token', 'stripe_customer_id', 'stripe_account_id', 'subscription_status', 'subscription_plan', 'subscription_ends_at', 'trial_ends_at', 'status', 'verification_token', 'password_reset_token', 'password_reset_expires_at', 'referral_code', 'referral_code_generated_at', 'referral_settings'];
 
-    protected $hidden = ['password', 'remember_token', 'two_factor_secret', 'two_factor_recovery_codes', 'verification_token', 'password_reset_token', 'api_token'];
+    protected $hidden = ['password', 'remember_token', 'verification_token', 'password_reset_token', 'api_token'];
 
     /**
      * The accessors to append to the model's array form.
      *
      * @var array<int, string>
      */
-    protected $appends = ['full_name', 'initials', 'total_spent', 'average_order_value', 'last_order_date', 'orders_count', 'reviews_count', 'average_rating', 'subscription_status_color', 'status_color', 'status_text', 'age', 'gender_text', 'locale_text', 'avatar_url', 'social_links', 'notification_preferences', 'privacy_settings', 'marketing_preferences', 'roles_label'];
+    protected $appends = ['full_name', 'initials', 'total_spent', 'average_order_value', 'last_order_date', 'orders_count', 'subscription_status_color', 'status_color', 'status_text', 'age', 'gender_text', 'locale_text', 'avatar_url', 'social_links', 'notification_preferences', 'privacy_settings', 'marketing_preferences'];
 
     /**
      * Handle casts functionality with proper error handling.
      */
     protected function casts(): array
     {
-        return ['email_verified_at' => 'datetime', 'phone_verified_at' => 'datetime', 'two_factor_confirmed_at' => 'datetime', 'password' => 'hashed', 'is_active' => 'boolean', 'is_verified' => 'boolean', 'accepts_marketing' => 'boolean', 'two_factor_enabled' => 'boolean', 'is_admin' => 'boolean', 'last_login_at' => 'datetime', 'last_activity_at' => 'datetime', 'social_links' => 'array', 'privacy_settings' => 'array', 'marketing_preferences' => 'array', 'permissions_matrix' => 'array', 'two_factor_recovery_codes' => 'array', 'subscription_ends_at' => 'datetime', 'trial_ends_at' => 'datetime', 'password_reset_expires_at' => 'datetime', 'birth_date' => 'date', 'date_of_birth' => 'date'];
+        return ['email_verified_at' => 'datetime', 'phone_verified_at' => 'datetime', 'password' => 'hashed', 'is_active' => 'boolean', 'is_verified' => 'boolean', 'accepts_marketing' => 'boolean', 'is_admin' => 'boolean', 'last_login_at' => 'datetime', 'last_activity_at' => 'datetime', 'social_links' => 'array', 'privacy_settings' => 'array', 'marketing_preferences' => 'array', 'subscription_ends_at' => 'datetime', 'trial_ends_at' => 'datetime', 'password_reset_expires_at' => 'datetime', 'birth_date' => 'date', 'date_of_birth' => 'date'];
     }
 
     protected function preferredCurrency(): Attribute
@@ -272,22 +268,6 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     }
 
     /**
-     * Handle rolesLabel functionality with proper error handling.
-     */
-    protected function rolesLabel(): Attribute
-    {
-        return Attribute::make(get: function (): string {
-            $roles = Arr::from($this->roles()->pluck('name')->filter(fn ($value) => is_string($value) && $value !== '')->values());
-            if (count($roles) === 0) {
-                return 'N/A';
-            }
-            $labels = array_map(fn ($item) => ucwords((string) $item), $roles);
-
-            return implode(', ', $labels);
-        });
-    }
-
-    /**
      * Handle orders functionality with proper error handling.
      */
     public function orders(): HasMany
@@ -349,64 +329,6 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
 
     /**
      * Handle cartItems functionality with proper error handling.
-     */
-    public function cartItems(): HasMany
-    {
-        return $this->hasMany(CartItem::class);
-    }
-
-    /**
-     * Handle reviews functionality with proper error handling.
-     */
-    public function reviews(): HasMany
-    {
-        return $this->hasMany(Review::class)->withoutGlobalScopes([ApprovedScope::class, ActiveScope::class]);
-    }
-
-    /**
-     * Handle latestReview functionality with proper error handling.
-     */
-    public function latestReview(): HasOne
-    {
-        return $this->reviews()->one()->latestOfMany();
-    }
-
-    /**
-     * Handle oldestReview functionality with proper error handling.
-     */
-    public function oldestReview(): HasOne
-    {
-        return $this->reviews()->one()->oldestOfMany();
-    }
-
-    /**
-     * Handle highestRatedReview functionality with proper error handling.
-     */
-    public function highestRatedReview(): HasOne
-    {
-        return $this->reviews()->one()->ofMany('rating', 'max');
-    }
-
-    /**
-     * Handle lowestRatedReview functionality with proper error handling.
-     */
-    public function lowestRatedReview(): HasOne
-    {
-        return $this->reviews()->one()->ofMany('rating', 'min');
-    }
-
-    // Explicit alias for clarity in code: reviews authored by this customer
-
-    /**
-     * Handle authoredReviews functionality with proper error handling.
-     */
-    public function authoredReviews(): HasMany
-    {
-        return $this->hasMany(Review::class, 'user_id');
-    }
-
-    /**
-     * Handle customerGroups functionality with proper error handling.
      */
     public function customerGroups(): BelongsToMany
     {
@@ -563,18 +485,13 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
      */
     public function canAccessPanel(Panel $panel): bool
     {
-        // Allow access in unit tests unless specifically disabled
-        if (app()->runningUnitTests() && config('authorization.testing.skip_checks', true)) {
+        // Allow access in unit tests
+        if (app()->runningUnitTests()) {
             return true;
         }
 
         // Users with is_admin flag always have access
-        if ((bool) ($this->is_admin ?? false)) {
-            return true;
-        }
-
-        // Check if user has panel access permission through AuthorizationMatrix
-        return \App\Support\Authorization\AuthorizationMatrix::check('panel', 'access', $this);
+        return (bool) ($this->is_admin ?? false);
     }
 
     // Referral relationships
@@ -846,18 +763,6 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     }
 
     /**
-     * Handle scopeByRole functionality with proper error handling.
-     *
-     * @param mixed $query
-     */
-    public function scopeByRole($query, string $role)
-    {
-        return $query->whereHas('roles', function ($q) use ($role): void {
-            $q->where('name', $role);
-        });
-    }
-
-    /**
      * Handle scopeByGender functionality with proper error handling.
      *
      * @param mixed $query
@@ -960,22 +865,6 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     }
 
     /**
-     * Handle getReviewsCountAttribute functionality with proper error handling.
-     */
-    public function getReviewsCountAttribute(): int
-    {
-        return $this->reviews()->count();
-    }
-
-    /**
-     * Handle getAverageRatingAttribute functionality with proper error handling.
-     */
-    public function getAverageRatingAttribute(): float
-    {
-        return $this->reviews()->avg('rating') ?? 0;
-    }
-
-    /**
      * Handle isEmailVerified functionality with proper error handling.
      */
     public function isEmailVerified(): bool
@@ -989,14 +878,6 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     public function isPhoneVerified(): bool
     {
         return ! is_null($this->phone_verified_at);
-    }
-
-    /**
-     * Handle hasTwoFactor functionality with proper error handling.
-     */
-    public function hasTwoFactor(): bool
-    {
-        return $this->two_factor_enabled && ! is_null($this->two_factor_confirmed_at);
     }
 
     /**
@@ -1091,9 +972,9 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     public function getLocaleTextAttribute(): string
     {
         return match ($this->preferred_locale) {
-            'en'    => __('admin.locales.english'),
-            'lt'    => __('admin.locales.lithuanian'),
-            default => $this->preferred_locale,
+            'en'    => __('admin.locale.en'),
+            'lt'    => __('admin.locale.lt'),
+            default => $this->preferred_locale ?? '',
         };
     }
 

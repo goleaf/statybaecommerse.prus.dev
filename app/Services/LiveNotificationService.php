@@ -109,4 +109,13 @@ final class LiveNotificationService implements SystemNotificationSender
         $this->sendToAdmins($title, $message, 'success');
     }
 
+    /**
+     * Handle sendReviewNotification functionality with proper error handling.
+     */
+    public function sendReviewNotification(string $productName, int $rating): void
+    {
+        $title = 'Naujas atsiliepimas';
+        $message = "Prekė \"{$productName}\" gavo naują atsiliepimą: {$rating}/5 žvaigždučių";
+        $this->sendToAdmins($title, $message, 'info');
+    }
 }

@@ -51,7 +51,7 @@ final class CustomerDashboard extends Component
             'completed_orders' => $this->user->orders()->whereIn('status', ['delivered', 'completed'])->count(),
             'pending_orders'   => $this->user->orders()->where('status', 'pending')->count(),
             'total_spent'      => $this->user->orders()->whereIn('status', ['delivered', 'completed'])->sum('total'),
-            'reviews_written'  => 0,
+            'reviews_written'  => $this->user->reviews()->count(),
             'member_since'     => $this->user->created_at->format('Y'),
             'last_order'       => $this->user->orders()->latest()->first()?->created_at?->diffForHumans(),
         ];

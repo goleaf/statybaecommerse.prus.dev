@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Models\Scopes\ActiveScope;
-use App\Support\Authorization\AuthorizationMatrix;
 use App\Traits\SecurePasswordHandling;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
@@ -14,7 +13,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Spatie\Permission\Traits\HasRoles;
 
 /**
  * AdminUser
@@ -36,7 +34,6 @@ final class AdminUser extends Authenticatable implements FilamentUser
     /** @use HasFactory<\Database\Factories\AdminUserFactory> */
     use HasFactory;
 
-    use HasRoles;
     use Notifiable;
     use SecurePasswordHandling;
 
@@ -75,13 +72,7 @@ final class AdminUser extends Authenticatable implements FilamentUser
      */
     public function canAccessPanel(Panel $panel): bool
     {
-        // Allow access in unit tests unless specifically disabled
-        if (app()->runningUnitTests() && config('authorization.testing.skip_checks', true)) {
-            return true;
-        }
-
-        // Check if admin user has panel access permission through AuthorizationMatrix
-        return \App\Support\Authorization\AuthorizationMatrix::check('panel', 'access', $this);
+        return true;
     }
 
     /**

@@ -141,7 +141,6 @@ final class Home extends Component
             'stats'            => $this->stats->toArray(),
             'featuredProducts' => $this->featuredProducts,
             'latestProducts'   => $this->latestProducts,
-            'latestReviews'    => collect(),
         ])->layout('components.layouts.base', [
             'title' => __('messages.home_homepage') . ' - ' . (is_string($appName) ? $appName : ''),
         ]);

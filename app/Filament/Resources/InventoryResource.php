@@ -7,8 +7,13 @@ namespace App\Filament\Resources;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\InventoryResource\Pages;
 use App\Models\Inventory;
+use App\Models\Product;
+use App\Support\Filament\Components\SearchableInput;
+use App\Support\Filament\SearchableInputHelper;
+use App\Support\Search\ProductSearch;
+use App\Support\Search\SearchResult;
+use App\Support\Search\SearchResultPayload;
 use BackedEnum;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
@@ -50,14 +55,47 @@ final class InventoryResource extends BaseResource
                 ->schema([
                     SchemaGrid::make(2)
                         ->schema([
-                            Select::make('product_id')
-                                ->label(__('admin.inventory.product'))
-                                ->relationship('product', 'name')
+                            SearchableInput::make('product_id')
+                                ->label(__('messages.product'))
                                 ->required()
                                 ->searchable()
-                                ->preload(),
+                                ->searchUsing(static fn (string $search): array => ProductSearch::complex($search))
+                                ->dehydrateStateUsing(static fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
+                                ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
+                                    SearchableInputHelper::hydrate(
+                                        $component,
+                                        $state,
+                                        static function (int $value): ?SearchResult {
+                                            $product = Product::query()
+                                                ->select(['id', 'sku', 'name', 'price'])
+                                                ->find($value);
+
+                                            if (! $product instanceof Product) {
+                                                return null;
+                                            }
+
+                                            $name = $product->getAttribute('name');
+                                            if (is_array($name)) {
+                                                $locale = app()->getLocale();
+                                                $name = $name[$locale] ?? reset($name);
+                                            }
+
+                                            $result = SearchResult::make(
+                                                (string) $product->getKey(),
+                                                ProductSearch::label($product),
+                                            );
+
+                                            return SearchResultPayload::normalise($result, [
+                                                'product_id' => $product->getKey(),
+                                                'sku'        => (string) ($product->getAttribute('sku') ?? ''),
+                                                'name'       => is_string($name) ? $name : '',
+                                                'price'      => is_numeric($product->getAttribute('price')) ? (float) $product->getAttribute('price') : 0.0,
+                                            ]);
+                                        },
+                                    );
+                                }),
                             TextInput::make('quantity')
-                                ->label(__('admin.inventory.quantity'))
+                                ->label(__('messages.quantity'))
                                 ->required()
                                 ->numeric()
                                 ->minValue(0),
@@ -84,15 +122,15 @@ final class InventoryResource extends BaseResource
         return $table
             ->columns([
                 TextColumn::make('product.name')
-                    ->label(__('admin.inventory.product'))
+                    ->label(__('messages.product'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('product.sku')
-                    ->label(__('admin.inventory.sku'))
+                    ->label(__('messages.sku'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('quantity')
-                    ->label(__('admin.inventory.quantity'))
+                    ->label(__('messages.quantity'))
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('reserved_quantity')
