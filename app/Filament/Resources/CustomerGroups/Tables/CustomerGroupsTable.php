@@ -12,6 +12,7 @@ use Filament\Tables\Columns\ColorColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
+use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 
 class CustomerGroupsTable
@@ -36,7 +37,7 @@ class CustomerGroupsTable
                     ->label(__('messages.Color'))
                     ->toggleable(isToggledHiddenByDefault: true),
                 IconColumn::make('icon')
-                    ->label(__('admin.news_images.image'))
+                    ->label(__('common.Icon'))
                     ->toggleable(isToggledHiddenByDefault: true),
                 ToggleColumn::make('is_active')
                     ->label(__('messages.active'))
@@ -61,7 +62,7 @@ class CustomerGroupsTable
                 ViewAction::make(),
                 EditAction::make(),
             ])
-            ->toolbarActions([
+            ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                     ForceDeleteBulkAction::make(),
