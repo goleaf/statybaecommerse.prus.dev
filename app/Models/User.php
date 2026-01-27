@@ -692,6 +692,22 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
         return $this->morphMany(\App\Models\File::class, 'fileable');
     }
 
+    /**
+     * Determine if the user has the given role.
+     */
+    public function hasRole(string $role): bool
+    {
+        if ($role === 'admin') {
+            return (bool) $this->is_admin;
+        }
+
+        if ($role === 'super_admin') {
+            return (bool) $this->is_admin;
+        }
+
+        return false;
+    }
+
     // Scopes for filtering
 
     /**

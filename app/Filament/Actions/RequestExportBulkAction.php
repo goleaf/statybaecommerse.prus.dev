@@ -14,7 +14,7 @@ use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
-use Filament\Tables\Actions\BulkAction;
+use Filament\Actions\BulkAction;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 

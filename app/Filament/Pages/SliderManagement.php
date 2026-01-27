@@ -587,16 +587,6 @@ class SliderManagement extends Page implements HasActions, HasForms
             });
     }
 
-    public function analyticsAction(): Action
-    {
-        return Action::make('analytics')
-            ->label(__('translations.analytics'))
-            ->icon('heroicon-o-chart-bar')
-            ->color('warning')
-            ->url(route('filament.admin.pages.slider-analytics'))
-            ->openUrlInNewTab();
-    }
-
     public function settingsAction(): Action
     {
         return Action::make('settings')
@@ -639,7 +629,6 @@ class SliderManagement extends Page implements HasActions, HasForms
             $this->createSliderAction(),
             $this->bulkImportAction(),
             $this->exportSlidersAction(),
-            $this->analyticsAction(),
             $this->settingsAction(),
             $this->toggleAllSlidersAction(),
             $this->reorderSlidersAction(),

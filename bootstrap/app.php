@@ -26,7 +26,7 @@ use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 // Load the Filament compatibility shims before the application boots so the
 // legacy class aliases are always available during early package discovery.
-// require_once __DIR__ . '/filament_compat.php';
+require_once __DIR__ . '/filament_compat.php';
 
 $providers[] = App\Providers\LocaleServiceProvider::class;
 if (! env('SKIP_FILAMENT_BOOT')) {

@@ -822,14 +822,6 @@ final class Product extends Model implements HasMedia, TranslatableRecord
     }
 
     /**
-     * Manage product comparisons associated with this product.
-     */
-    public function comparisons(): HasMany
-    {
-        return $this->hasMany(ProductComparison::class);
-    }
-
-    /**
      * Similarity scores where this product is the source product.
      */
     public function similarities(): HasMany

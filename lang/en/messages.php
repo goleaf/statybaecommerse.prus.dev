@@ -805,7 +805,6 @@ return [
   'product_brand' => 'Product brand',
   'product_catalog_description' => 'Product catalog description',
   'product_category' => 'Product category',
-  'product_comparisons' => 'Created Until',
   'product_description' => 'Product description',
   'product_dimensions' => 'Product dimensions',
   'product_histories' => 'Changes in the last 7 days',

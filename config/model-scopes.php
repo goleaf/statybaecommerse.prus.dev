@@ -130,7 +130,6 @@ return [
         App\Models\UserBehavior::class,
         App\Models\UserPreference::class,
         App\Models\UserProductInteraction::class,
-        App\Models\ProductComparison::class,
         App\Models\ProductRequest::class,
         App\Models\CouponUsage::class,
         App\Models\DiscountRedemption::class,

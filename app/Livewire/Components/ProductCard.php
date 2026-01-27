@@ -52,24 +52,6 @@ final class ProductCard extends Component
     }
 
     /**
-     * Handle toggleComparison functionality with proper error handling.
-     */
-    public function toggleComparison(): void
-    {
-        $sessionId = session()->getId();
-        $existing = \App\Models\ProductComparison::where('session_id', $sessionId)->where('product_id', $this->product->id)->first();
-        if ($existing) {
-            $existing->delete();
-            $message = 'Produktas pašalintas iš palyginimo!';
-        } else {
-            \App\Models\ProductComparison::create(['session_id' => $sessionId, 'product_id' => $this->product->id]);
-            $message = 'Produktas pridėtas į palyginimą!';
-        }
-        $this->dispatch('comparison-updated');
-        $this->dispatch('notify', ['type' => 'success', 'message' => $message]);
-    }
-
-    /**
      * Handle quickView functionality with proper error handling.
      */
     public function quickView(): void
@@ -134,17 +116,6 @@ final class ProductCard extends Component
     }
 
     /**
-     * Handle isInComparison functionality with proper error handling.
-     */
-    #[Computed]
-    public function isInComparison(): bool
-    {
-        $sessionId = session()->getId();
-
-        return \App\Models\ProductComparison::where('session_id', $sessionId)->where('product_id', $this->product->id)->exists();
-    }
-
-    /**
      * Handle discountPercentage functionality with proper error handling.
      */
     #[Computed]
@@ -195,7 +166,7 @@ final class ProductCard extends Component
      */
     protected function getListeners(): array
     {
-        return ['wishlist-updated' => '$refresh', 'comparison-updated' => '$refresh'];
+        return ['wishlist-updated' => '$refresh'];
     }
 
     /**

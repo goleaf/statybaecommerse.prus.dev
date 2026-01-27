@@ -15,7 +15,7 @@ use Filament\Forms\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
-use Filament\Tables\Actions\Action;
+use Filament\Actions\Action;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Facades\Storage;
 

@@ -9,8 +9,8 @@ use Closure;
 use Filament\Forms\Components\Component;
 // Allow grouped actions to appear within quick-edit schema arrays.
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\ActionGroup;
+use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Tables\Table;
 use Hydrat\TableLayoutToggle\Concerns\HasToggleableTable;
 use Illuminate\Contracts\Support\Htmlable;

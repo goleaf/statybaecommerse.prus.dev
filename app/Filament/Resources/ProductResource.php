@@ -6,7 +6,6 @@ namespace App\Filament\Resources;
 
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\ProductResource\Pages;
-use App\Filament\Resources\ProductResource\RelationManagers\ComparisonsRelationManager;
 use App\Filament\Resources\ProductResource\RelationManagers\FeaturesRelationManager;
 use App\Filament\Resources\ProductResource\RelationManagers\ImagesRelationManager;
 use App\Filament\Resources\ProductResource\RelationManagers\RequestsRelationManager;
@@ -416,7 +415,6 @@ final class ProductResource extends BaseResource
             FeaturesRelationManager::class,
             RequestsRelationManager::class,
             SimilaritiesRelationManager::class,
-            ComparisonsRelationManager::class,
         ];
     }
 

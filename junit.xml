@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Unit\Models\RelationshipTest" file="tests\Unit\Models\RelationshipTest.php" tests="11" assertions="18" errors="4" failures="1" skipped="0" time="23.400467">
+    <testcase name="`Organization Relationships` → organization has users with roles" file="tests\Unit\Models\RelationshipTest.php::`Organization Relationships` → organization has users with roles" class="Tests\Unit\Models\RelationshipTest" classname="Tests.Unit.Models.RelationshipTest" assertions="0" time="21.796135">
+      <error type="Illuminate\Database\QueryException">`Organization Relationships` → organization has users with rolesIlluminate\Database\QueryException: Array to string conversion (Connection: sqlite, Database: C:\Dropbox\projects\egistatyba/database/testing/databases\testing_parallel_pid_7828.sqlite, SQL: insert into "organization_user" ("created_at", "is_active", "joined_at", "organization_id", "permissions", "role", "updated_at", "user_id") values (2026-01-27 14:45:41, 1, 2026-01-27 14:45:41, 1, ?, admin, 2026-01-27 14:45:41, 1))&#13;
+at vendor\laravel\framework\src\Illuminate\Foundation\Bootstrap\HandleExceptions.php:258
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:734
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:580
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:827
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:794
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:573
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:537
+at vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php:4002
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithPivotTable.php:274
+at app\Models\Organization.php:169
+at tests\Unit\Models\RelationshipTest.php:18
+Caused by
+ErrorException: Array to string conversion
+
+at vendor\laravel\framework\src\Illuminate\Foundation\Bootstrap\HandleExceptions.php:258
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:734
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:580
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:827
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:794
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:573
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:537
+at vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php:4002
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithPivotTable.php:274
+at app\Models\Organization.php:169
+at tests\Unit\Models\RelationshipTest.php:18</error>
+    </testcase>
+    <testcase name="`Organization Relationships` → organization has projects" file="tests\Unit\Models\RelationshipTest.php::`Organization Relationships` → organization has projects" class="Tests\Unit\Models\RelationshipTest" classname="Tests.Unit.Models.RelationshipTest" assertions="2" time="0.204375"/>
+    <testcase name="`Organization Relationships` → organization can check user membership" file="tests\Unit\Models\RelationshipTest.php::`Organization Relationships` → organization can check user membership" class="Tests\Unit\Models\RelationshipTest" classname="Tests.Unit.Models.RelationshipTest" assertions="0" time="0.152476">
+      <error type="Illuminate\Database\QueryException">`Organization Relationships` → organization can check user membershipIlluminate\Database\QueryException: Array to string conversion (Connection: sqlite, Database: C:\Dropbox\projects\egistatyba/database/testing/databases\testing_parallel_pid_7828.sqlite, SQL: insert into "organization_user" ("created_at", "is_active", "joined_at", "organization_id", "permissions", "role", "updated_at", "user_id") values (2026-01-27 14:45:42, 1, 2026-01-27 14:45:42, 3, ?, member, 2026-01-27 14:45:42, 3))&#13;
+at vendor\laravel\framework\src\Illuminate\Foundation\Bootstrap\HandleExceptions.php:258
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:734
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:580
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:827
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:794
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:573
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:537
+at vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php:4002
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithPivotTable.php:274
+at app\Models\Organization.php:169
+at tests\Unit\Models\RelationshipTest.php:31
+Caused by
+ErrorException: Array to string conversion
+
+at vendor\laravel\framework\src\Illuminate\Foundation\Bootstrap\HandleExceptions.php:258
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:734
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:580
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:827
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:794
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:573
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:537
+at vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php:4002
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithPivotTable.php:274
+at app\Models\Organization.php:169
+at tests\Unit\Models\RelationshipTest.php:31</error>
+    </testcase>
+    <testcase name="`Project Relationships` → project belongs to organization" file="tests\Unit\Models\RelationshipTest.php::`Project Relationships` → project belongs to organization" class="Tests\Unit\Models\RelationshipTest" classname="Tests.Unit.Models.RelationshipTest" assertions="1" time="0.151068"/>
+    <testcase name="`Project Relationships` → project can add members" file="tests\Unit\Models\RelationshipTest.php::`Project Relationships` → project can add members" class="Tests\Unit\Models\RelationshipTest" classname="Tests.Unit.Models.RelationshipTest" assertions="0" time="0.148657">
+      <error type="Illuminate\Database\QueryException">`Project Relationships` → project can add membersIlluminate\Database\QueryException: Array to string conversion (Connection: sqlite, Database: C:\Dropbox\projects\egistatyba/database/testing/databases\testing_parallel_pid_7828.sqlite, SQL: insert into "project_user" ("created_at", "joined_at", "permissions", "project_id", "role", "updated_at", "user_id") values (2026-01-27 14:45:42, 2026-01-27 14:45:42, ?, 5, lead, 2026-01-27 14:45:42, 5))&#13;
+at vendor\laravel\framework\src\Illuminate\Foundation\Bootstrap\HandleExceptions.php:258
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:734
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:580
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:827
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:794
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:573
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:537
+at vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php:4002
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithPivotTable.php:274
+at app\Models\Project.php:195
+at tests\Unit\Models\RelationshipTest.php:45
+Caused by
+ErrorException: Array to string conversion
+
+at vendor\laravel\framework\src\Illuminate\Foundation\Bootstrap\HandleExceptions.php:258
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:734
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:580
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:827
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:794
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:573
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:537
+at vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php:4002
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithPivotTable.php:274
+at app\Models\Project.php:195
+at tests\Unit\Models\RelationshipTest.php:45</error>
+    </testcase>
+    <testcase name="`Project Relationships` → project scopes work correctly" file="tests\Unit\Models\RelationshipTest.php::`Project Relationships` → project scopes work correctly" class="Tests\Unit\Models\RelationshipTest" classname="Tests.Unit.Models.RelationshipTest" assertions="2" time="0.165637">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">`Project Relationships` → project scopes work correctlyFailed asserting that 6 is identical to 1.&#13;
+at tests\Unit\Models\RelationshipTest.php:56</failure>
+    </testcase>
+    <testcase name="`Polymorphic Relationships` → models can have comments" file="tests\Unit\Models\RelationshipTest.php::`Polymorphic Relationships` → models can have comments" class="Tests\Unit\Models\RelationshipTest" classname="Tests.Unit.Models.RelationshipTest" assertions="3" time="0.150556"/>
+    <testcase name="`Polymorphic Relationships` → models can have files" file="tests\Unit\Models\RelationshipTest.php::`Polymorphic Relationships` → models can have files" class="Tests\Unit\Models\RelationshipTest" classname="Tests.Unit.Models.RelationshipTest" assertions="3" time="0.147986"/>
+    <testcase name="`Nested Comments` → comments can have replies" file="tests\Unit\Models\RelationshipTest.php::`Nested Comments` → comments can have replies" class="Tests\Unit\Models\RelationshipTest" classname="Tests.Unit.Models.RelationshipTest" assertions="4" time="0.166208"/>
+    <testcase name="`Nested Comments` → comment hierarchy methods work" file="tests\Unit\Models\RelationshipTest.php::`Nested Comments` → comment hierarchy methods work" class="Tests\Unit\Models\RelationshipTest" classname="Tests.Unit.Models.RelationshipTest" assertions="3" time="0.171104"/>
+    <testcase name="`Complex Queries` → can get user projects across organizations" file="tests\Unit\Models\RelationshipTest.php::`Complex Queries` → can get user projects across organizations" class="Tests\Unit\Models\RelationshipTest" classname="Tests.Unit.Models.RelationshipTest" assertions="0" time="0.146265">
+      <error type="Illuminate\Database\QueryException">`Complex Queries` → can get user projects across organizationsIlluminate\Database\QueryException: Array to string conversion (Connection: sqlite, Database: C:\Dropbox\projects\egistatyba/database/testing/databases\testing_parallel_pid_7828.sqlite, SQL: insert into "organization_user" ("created_at", "is_active", "joined_at", "organization_id", "permissions", "role", "updated_at", "user_id") values (2026-01-27 14:45:43, 1, 2026-01-27 14:45:43, 12, ?, member, 2026-01-27 14:45:43, 11))&#13;
+at vendor\laravel\framework\src\Illuminate\Foundation\Bootstrap\HandleExceptions.php:258
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:734
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:580
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:827
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:794
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:573
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:537
+at vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php:4002
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithPivotTable.php:274
+at app\Models\Organization.php:169
+at tests\Unit\Models\RelationshipTest.php:129
+Caused by
+ErrorException: Array to string conversion
+
+at vendor\laravel\framework\src\Illuminate\Foundation\Bootstrap\HandleExceptions.php:258
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:734
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:580
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:827
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:794
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:573
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:537
+at vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php:4002
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithPivotTable.php:274
+at app\Models\Organization.php:169
+at tests\Unit\Models\RelationshipTest.php:129</error>
+    </testcase>
+  </testsuite>
+</testsuites>

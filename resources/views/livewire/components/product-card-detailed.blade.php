@@ -59,21 +59,6 @@
                 </button>
             @endif
 
-            @if($showCompare)
-                <button 
-                    wire:click="toggleComparison"
-                    wire:confirm="{{ __('translations.confirm_toggle_comparison') }}"
-                    class="w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center hover:bg-gray-50 transition-colors duration-200 {{ $isInComparison ? 'text-blue-500' : 'text-gray-400 hover:text-blue-500' }}"
-                    title="{{ $isInComparison ? __('translations.remove_from_comparison') : __('translations.add_to_comparison') }}"
-                >
-                    @if($isInComparison)
-                        <x-heroicon-s-scale class="w-5 h-5" />
-                    @else
-                        <x-heroicon-o-scale class="w-5 h-5" />
-                    @endif
-                </button>
-            @endif
-
             @if($showQuickView)
                 <button 
                     wire:click="quickView"

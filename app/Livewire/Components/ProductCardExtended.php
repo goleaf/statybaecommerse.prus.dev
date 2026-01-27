@@ -7,7 +7,6 @@ namespace App\Livewire\Components;
 use App\Livewire\Concerns\WithCart;
 use App\Livewire\Concerns\WithNotifications;
 use App\Models\Product;
-use App\Models\ProductComparison;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
@@ -33,19 +32,15 @@ final class ProductCardExtended extends Component
 
     public bool $showQuickView = false;
 
-    public bool $showCompare = true;
-
     public string $layout = 'grid';
 
     // grid, list, minimal
-    public bool $isInComparison = false;
 
     /**
      * Initialize the Livewire component with parameters.
      */
     public function mount(): void
     {
-        $this->checkComparisonStatus();
     }
 
     /**
@@ -58,33 +53,6 @@ final class ProductCardExtended extends Component
         if (! $added) {
             return;
         }
-    }
-
-    /**
-     * Handle toggleComparison functionality with proper error handling.
-     */
-    public function toggleComparison(): void
-    {
-        $sessionId = session()->getId();
-        $userId = auth()->id();
-        $comparison = ProductComparison::where(function ($query) use ($sessionId, $userId) {
-            if ($userId) {
-                $query->where('user_id', $userId);
-            } else {
-                $query->where('session_id', $sessionId);
-            }
-        })->where('product_id', $this->product->id)->first();
-        if ($comparison) {
-            $comparison->delete();
-            $this->isInComparison = false;
-            $message = __('translations.product_added_to_cart');
-        } else {
-            ProductComparison::create(['session_id' => $sessionId, 'user_id' => $userId, 'product_id' => $this->product->id]);
-            $this->isInComparison = true;
-            $message = __('translations.login_required_for_wishlist');
-        }
-        $this->dispatch('notify', ['type' => 'success', 'message' => $message]);
-        $this->dispatch('comparison-updated');
     }
 
     /**
@@ -101,31 +69,6 @@ final class ProductCardExtended extends Component
     public function viewProduct()
     {
         return $this->redirect(route('product.show', $this->product));
-    }
-
-    /**
-     * Handle refreshComparisonStatus functionality with proper error handling.
-     */
-    #[On('comparison-updated')]
-    public function refreshComparisonStatus(): void
-    {
-        $this->checkComparisonStatus();
-    }
-
-    /**
-     * Handle checkComparisonStatus functionality with proper error handling.
-     */
-    private function checkComparisonStatus(): void
-    {
-        $sessionId = session()->getId();
-        $userId = auth()->id();
-        $this->isInComparison = ProductComparison::where(function ($query) use ($sessionId, $userId) {
-            if ($userId) {
-                $query->where('user_id', $userId);
-            } else {
-                $query->where('session_id', $sessionId);
-            }
-        })->where('product_id', $this->product->id)->exists();
     }
 
     /**

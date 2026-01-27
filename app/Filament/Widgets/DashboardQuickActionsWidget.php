@@ -9,7 +9,7 @@ use App\Jobs\RebuildSearchIndexJob;
 use App\Jobs\RunMinimalSeedJob;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
-use Filament\Tables\Actions\Action;
+use Filament\Actions\Action;
 use Filament\Widgets\Widget;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;

@@ -802,7 +802,6 @@ return [
   'product_brand' => 'Prekės ženklas',
   'product_catalog_description' => 'Product catalog description',
   'product_category' => 'Product category',
-  'product_comparisons' => 'Sukurta iki',
   'product_description' => 'Product description',
   'product_dimensions' => 'Product dimensions',
   'product_histories' => 'Pakeitimai per paskutines 7 dienas',

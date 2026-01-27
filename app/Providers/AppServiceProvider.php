@@ -504,13 +504,6 @@ class AppServiceProvider extends ServiceProvider
             );
         }
 
-        // Aliases for Filament resource Livewire components used in tests
-        if ($this->app->environment('testing')) {
-            Livewire::component('filament.admin.resources.product-comparisons.index', \App\Filament\Resources\ProductComparisonResource\Pages\ListProductComparisons::class);
-            Livewire::component('filament.admin.resources.product-comparisons.create', \App\Filament\Resources\ProductComparisonResource\Pages\CreateProductComparison::class);
-            Livewire::component('filament.admin.resources.product-comparisons.edit', \App\Filament\Resources\ProductComparisonResource\Pages\EditProductComparison::class);
-        }
-
         // Surface our bespoke Filament view components (for example the widget tab
         // partials) under the `x-filament.components.*` namespace so Blade can
         // resolve them during Livewire driven feature tests without relying on

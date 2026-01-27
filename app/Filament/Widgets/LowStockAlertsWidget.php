@@ -6,7 +6,7 @@ namespace App\Filament\Widgets;
 
 use App\Models\Product;
 use Filament\Forms\Components\TextInput;
-use Filament\Tables\Actions\Action;
+use Filament\Actions\Action;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;

@@ -99,4 +99,14 @@ final class AdminUser extends Authenticatable implements FilamentUser
             'email_verified_at' => now(),
         ])->save();
     }
+
+    /**
+     * Determine if the user has the given role.
+     */
+    public function hasRole(string $role): bool
+    {
+        // Since AdminUser is explicitly an administrator entity,
+        // we grant 'admin' and 'super_admin' roles by definition.
+        return in_array($role, ['admin', 'super_admin']);
+    }
 }
