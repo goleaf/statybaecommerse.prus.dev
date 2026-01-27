@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Livewire\Concerns;
 
 use App\Models\Product;
+use App\Models\ProductVariant;
 use App\Services\Cart\CartService;
 
 /**
@@ -20,7 +21,7 @@ trait WithCart
      * Returns false when the action bails out (e.g. missing product or insufficient stock)
      * so consuming components can avoid firing auxiliary side effects.
      */
-    public function addToCart(int $productId, int $quantity = 1, ?string $successMessage = null): bool
+    public function addToCart(int $productId, int $quantity = 1, ?string $successMessage = null, ?int $variantId = null): bool
     {
         $product = Product::query()->find($productId);
 
@@ -38,13 +39,37 @@ trait WithCart
 
         $normalizedQuantity = max(1, $quantity);
 
-        if ($product->availableQuantity() < $normalizedQuantity) {
+        $variant = null;
+
+        if ($variantId !== null) {
+            $variant = ProductVariant::query()
+                ->where('product_id', $product->getKey())
+                ->find($variantId);
+
+            if ($variant === null) {
+                $this->notifyError(__('The selected variant is no longer available.'));
+
+                return false;
+            }
+
+            if (! $variant->isAvailableForPurchase()) {
+                $this->notifyWarning(__('This variant is not available for purchase.'));
+
+                return false;
+            }
+
+            if ($variant->track_inventory && $variant->availableQuantity() < $normalizedQuantity) {
+                $this->notifyError(__('Not enough stock available'));
+
+                return false;
+            }
+        } elseif ($product->availableQuantity() < $normalizedQuantity) {
             $this->notifyError(__('Not enough stock available'));
 
             return false;
         }
 
-        $this->persistCartItem($product, $normalizedQuantity, $successMessage);
+        $this->persistCartItem($product, $normalizedQuantity, $successMessage, $variant);
 
         return true;
     }
@@ -52,19 +77,43 @@ trait WithCart
     /**
      * Persist the cart item snapshot and trigger downstream UI updates.
      */
-    protected function persistCartItem(Product $product, int $quantity = 1, ?string $successMessage = null): void
+    protected function persistCartItem(Product $product, int $quantity = 1, ?string $successMessage = null, ?ProductVariant $variant = null): void
     {
         $cartItems = session()->get('cart', []);
+        $cartKey = $this->resolveCartKey($product->getKey(), $variant?->getKey());
+        $unitPrice = $variant ? (float) $variant->getCurrentPrice() : (float) ($product->sale_price ?? $product->price);
+        $variantAttributes = [];
 
-        if (isset($cartItems[$product->getKey()])) {
-            $cartItems[$product->getKey()]['quantity'] += $quantity;
+        if ($variant !== null) {
+            $attributeValues = $variant->attributes()->with('attribute')->get();
+
+            if ($attributeValues->isNotEmpty()) {
+                $variantAttributes = $attributeValues
+                    ->mapWithKeys(static function ($value): array {
+                        $attribute = $value->attribute;
+
+                        if ($attribute === null || $attribute->name === null) {
+                            return [];
+                        }
+
+                        return [(string) $attribute->name => (string) $value->value];
+                    })
+                    ->toArray();
+            }
+        }
+
+        if (isset($cartItems[$cartKey])) {
+            $cartItems[$cartKey]['quantity'] += $quantity;
         } else {
-            $cartItems[$product->getKey()] = [
-                'name'     => $product->name,
-                'price'    => $product->price,
+            $cartItems[$cartKey] = [
+                'product_id' => $product->getKey(),
+                'variant_id' => $variant?->getKey(),
+                'name'       => $variant?->name ?: $product->name,
+                'price'      => $unitPrice,
                 'quantity' => $quantity,
                 'image'    => $product->getFirstMediaUrl('images'),
-                'sku'      => $product->sku,
+                'sku'      => $variant?->sku ?? $product->sku,
+                'attributes' => $variantAttributes,
             ];
         }
 
@@ -73,28 +122,30 @@ trait WithCart
         $this->dispatch(
             'add-to-cart',
             productId: (int) $product->getKey(),
-            quantity: $quantity
+            quantity: $quantity,
+            variantId: $variant?->getKey()
         );
 
         $this->dispatch('cart-updated');
         $this->notifySuccess($successMessage ?? __('Product added to cart'));
     }
 
-    public function removeFromCart(int $productId): void
+    public function removeFromCart(int $productId, ?int $variantId = null): void
     {
         $cartItems = session()->get('cart', []);
-        if (isset($cartItems[$productId])) {
-            unset($cartItems[$productId]);
+        $cartKey = $this->resolveCartKey($productId, $variantId);
+        if (isset($cartItems[$cartKey])) {
+            unset($cartItems[$cartKey]);
             session()->put('cart', $cartItems);
             $this->dispatch('cart-updated');
             $this->notifySuccess(__('Product removed from cart'));
         }
     }
 
-    public function updateCartQuantity(int $productId, int $quantity): void
+    public function updateCartQuantity(int $productId, int $quantity, ?int $variantId = null): void
     {
         if ($quantity <= 0) {
-            $this->removeFromCart($productId);
+            $this->removeFromCart($productId, $variantId);
 
             return;
         }
@@ -105,8 +156,9 @@ trait WithCart
             return;
         }
         $cartItems = session()->get('cart', []);
-        if (isset($cartItems[$productId])) {
-            $cartItems[$productId]['quantity'] = $quantity;
+        $cartKey = $this->resolveCartKey($productId, $variantId);
+        if (isset($cartItems[$cartKey])) {
+            $cartItems[$cartKey]['quantity'] = $quantity;
             session()->put('cart', $cartItems);
             $this->dispatch('cart-updated');
         }
@@ -133,5 +185,10 @@ trait WithCart
         session()->forget('cart');
         $this->dispatch('cart-updated');
         $this->notifySuccess(__('Cart cleared'));
+    }
+
+    private function resolveCartKey(int $productId, ?int $variantId): string
+    {
+        return $variantId === null ? (string) $productId : $productId . ':' . $variantId;
     }
 }

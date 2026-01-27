@@ -49,7 +49,6 @@ final class RelationshipServiceProvider extends ServiceProvider
             'order'      => \App\Models\Order::class,
             'legal'      => \App\Models\Legal::class,
             'news'       => \App\Models\News::class,
-            'review'     => \App\Models\Review::class,
             'brand'      => \App\Models\Brand::class,
             'category'   => \App\Models\Category::class,
             'collection' => \App\Models\Collection::class,

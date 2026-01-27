@@ -6,7 +6,6 @@ namespace App\Filament\Widgets;
 
 use App\Models\Order;
 use App\Models\Product;
-use App\Models\Review;
 use App\Models\User;
 use BackedEnum;
 use Filament\Widgets\StatsOverviewWidget;
@@ -50,7 +49,6 @@ final class EnhancedEcommerceOverview extends StatsOverviewWidget
             Stat::make($translations['total_customers'], $this->getTotalCustomers()),
             Stat::make($translations['average_order_value'], $this->getAverageOrderValue()),
             Stat::make($translations['total_products'], $this->getTotalProducts()),
-            Stat::make($translations['average_rating'], $this->getAverageRating()),
         ];
     }
 
@@ -87,13 +85,6 @@ final class EnhancedEcommerceOverview extends StatsOverviewWidget
     public function getTotalProducts(): string
     {
         return (string) Product::query()->where('is_visible', true)->count();
-    }
-
-    public function getAverageRating(): string
-    {
-        $average = (float) Review::query()->avg('rating');
-
-        return number_format($average, 1) . '/5';
     }
 
     private function getRevenueDelta(): float

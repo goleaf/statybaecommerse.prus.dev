@@ -105,34 +105,6 @@ final class SingleProduct extends Component
     }
 
     #[Computed]
-    public function reviewsSchema(): ?array
-    {
-        $recentReviews = $this->recentApprovedReviewsLimited;
-
-        if ($recentReviews->isEmpty()) {
-            return null;
-        }
-
-        return [
-            '@context'        => 'https://schema.org',
-            '@type'           => 'ItemList',
-            'itemListElement' => $recentReviews
-                ->map(fn ($r) => [
-                    '@type'        => 'Review',
-                    'name'         => $r->title,
-                    'reviewBody'   => Str::limit(strip_tags($r->content), 300),
-                    'reviewRating' => [
-                        '@type'       => 'Rating',
-                        'ratingValue' => (int) $r->rating,
-                        'bestRating'  => '5',
-                    ],
-                    'datePublished' => optional($r->created_at)->toDateString(),
-                ])
-                ->toArray(),
-        ];
-    }
-
-    #[Computed]
     public function contactUrl(): string
     {
         return Route::has('frontend.contact.index')
@@ -153,18 +125,6 @@ final class SingleProduct extends Component
             ->map(fn ($category) => $category->trans('name') ?? $category->name)
             ->filter()
             ->values();
-    }
-
-    #[Computed]
-    public function averageRating(): float
-    {
-        return round((float) ($this->product->approved_reviews_avg_rating ?? 0), 1);
-    }
-
-    #[Computed]
-    public function reviewCount(): int
-    {
-        return (int) ($this->product->approved_reviews_count ?? 0);
     }
 
     #[Computed]
@@ -214,8 +174,6 @@ final class SingleProduct extends Component
 
     protected ?SupportCollection $recentHistoriesCollection = null;
 
-    protected ?SupportCollection $recentApprovedReviewsCollection = null;
-
     /**
      * Initialize the Livewire component with parameters.
      */
@@ -255,12 +213,6 @@ final class SingleProduct extends Component
                             'variantAttributeValues.attribute.translations',
                         ]),
                     ])
-                    ->withCount([
-                        'reviews as approved_reviews_count' => fn ($query) => $query->approved(),
-                    ])
-                    ->withAvg([
-                        'reviews as approved_reviews_avg_rating' => fn ($query) => $query->approved(),
-                    ], 'rating')
                     ->firstOrFail();
             },
             $productTags
@@ -277,24 +229,6 @@ final class SingleProduct extends Component
                     ->get(['id', 'product_id', 'action', 'field_name', 'old_value', 'new_value', 'description', 'created_at']);
             },
             $productTags
-        );
-
-        $this->recentApprovedReviewsCollection = TagAwareCache::remember(
-            CacheKeys::productRecentReviews($productId),
-            120,
-            function (): SupportCollection {
-                return $this->product
-                    ->reviews()
-                    ->latest('id')
-                    ->limit(5)
-                    ->get(['id', 'product_id', 'title', 'content', 'rating', 'created_at']);
-            },
-            [
-                CacheTags::locale($locale),
-                CacheTags::reviews(),
-                CacheTags::products(),
-                ...CacheTags::productIds([$productId]),
-            ]
         );
 
         $this->trackProductView();
@@ -711,12 +645,6 @@ final class SingleProduct extends Component
     public function recentHistories(): SupportCollection
     {
         return $this->recentHistoriesCollection ??= collect();
-    }
-
-    #[Computed]
-    public function recentApprovedReviewsLimited(): SupportCollection
-    {
-        return $this->recentApprovedReviewsCollection ??= collect();
     }
 
     #[On('variant.selected')]

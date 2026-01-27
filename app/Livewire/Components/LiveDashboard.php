@@ -6,7 +6,6 @@ namespace App\Livewire\Components;
 
 use App\Models\Order;
 use App\Models\Product;
-use App\Models\Review;
 use App\Models\User;
 use App\Services\CacheInvalidationService;
 use App\Support\Cache\CacheKeys;
@@ -35,7 +34,7 @@ final class LiveDashboard extends Component
     public int $refreshInterval = 30;
 
     // seconds
-    public array $selectedMetrics = ['products', 'orders', 'users', 'reviews'];
+    public array $selectedMetrics = ['products', 'orders', 'users'];
 
     public string $timeRange = '24h';
 
@@ -112,10 +111,10 @@ final class LiveDashboard extends Component
                     'active'    => User::where('last_activity_at', '>=', Carbon::now()->subHours(24))->count(),
                 ],
                 'reviews' => [
-                    'total'      => Review::where('is_approved', true)->count(),
-                    'today'      => Review::where('is_approved', true)->where('created_at', '>=', $since)->count(),
-                    'pending'    => Review::where('is_approved', false)->count(),
-                    'avg_rating' => Review::where('is_approved', true)->avg('rating') ?? 0,
+                    'total'      => 0,
+                    'today'      => 0,
+                    'pending'    => 0,
+                    'avg_rating' => 0,
                 ],
             ];
         });
@@ -152,32 +151,17 @@ final class LiveDashboard extends Component
                         'status'     => $order->status,
                         'created_at' => $order->created_at->diffForHumans(),
                     ]),
-                'recent_reviews' => Review::with(['product', 'user'])
-                    ->where('is_approved', true)
-                    ->where('created_at', '>=', $since)
-                    ->orderBy('created_at', 'desc')
-                    ->limit(5)
-                    ->get()
-                    ->map(fn ($review) => [
-                        'id'           => $review->id,
-                        'product_name' => $review->product?->name ?? 'Unknown',
-                        'user_name'    => $review->user?->name ?? 'Anonymous',
-                        'rating'       => $review->rating,
-                        'created_at'   => $review->created_at->diffForHumans(),
-                    ]),
+                'recent_reviews' => collect(),
                 'popular_products' => Product::with(['brand'])
                     ->where('is_visible', true)
-                    ->whereHas('reviews')
-                    ->withCount('reviews')
-                    ->orderBy('reviews_count', 'desc')
+                    ->latest('published_at')
                     ->limit(5)
                     ->get()
                     ->map(fn ($product) => [
-                        'id'            => $product->id,
-                        'name'          => $product->name,
-                        'brand'         => $product->brand?->name,
-                        'reviews_count' => $product->reviews_count,
-                        'price'         => $product->price,
+                        'id'    => $product->id,
+                        'name'  => $product->name,
+                        'brand' => $product->brand?->name,
+                        'price' => $product->price,
                     ]),
             ];
         });

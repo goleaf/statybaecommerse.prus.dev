@@ -24,16 +24,7 @@ trait BuildsProductCatalogueQuery
                 'brand:id,name,slug',
                 'media',
             ])
-            ->withAvg([
-                'reviews as approved_reviews_avg_rating' => static function (Builder $query): void {
-                    $query->where('is_approved', true);
-                },
-            ], 'rating')
-            ->withCount([
-                'reviews as approved_reviews_count' => static function (Builder $query): void {
-                    $query->where('is_approved', true);
-                },
-            ]);
+            ;
     }
 
     /**

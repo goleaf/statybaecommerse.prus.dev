@@ -96,14 +96,6 @@ final class Customer extends Model
         return $this->hasMany(Address::class);
     }
 
-    /**
-     * Handle reviews relationship with proper error handling.
-     */
-    public function reviews(): HasMany
-    {
-        return $this->hasMany(Review::class);
-    }
-
     // Scopes
 
     /**

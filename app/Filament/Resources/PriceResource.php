@@ -60,7 +60,7 @@ final class PriceResource extends BaseResource
                                 ->label(__('messages.product'))
                                 ->required()
                                 ->searchable()
-                                ->searchUsing(static fn (string $value): array => ProductSearch::complex($value))
+                                ->searchUsing(static fn (string $search): array => ProductSearch::complex($search))
                                 ->dehydrateStateUsing(static fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
                                 ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
                                     SearchableInputHelper::hydrate(

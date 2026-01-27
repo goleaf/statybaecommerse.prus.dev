@@ -6,7 +6,6 @@ namespace App\Filament\Widgets;
 
 use App\Models\Order;
 use App\Models\Product;
-use App\Models\Review;
 use App\Models\User;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -39,10 +38,6 @@ final class EcommerceStatsWidget extends BaseWidget
                 ->description(__('admin.dashboard.stats.pending_orders_desc'))
                 ->descriptionIcon('heroicon-m-clock')
                 ->color('danger'),
-            Stat::make(__('admin.dashboard.stats.average_rating'), $this->getAverageRating())
-                ->description(__('admin.dashboard.stats.average_rating_desc'))
-                ->descriptionIcon('heroicon-m-star')
-                ->color('success'),
         ];
     }
 
@@ -55,13 +50,6 @@ final class EcommerceStatsWidget extends BaseWidget
             ->sum('total') ?? 0);
 
         return '€' . number_format($revenue, 2);
-    }
-
-    private function getAverageRating(): string
-    {
-        $average = (float) (Review::where('is_approved', true)->avg('rating') ?? 0);
-
-        return number_format($average, 1) . '/5';
     }
 
     private function getOrdersChart(): array

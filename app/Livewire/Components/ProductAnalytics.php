@@ -34,7 +34,7 @@ class ProductAnalytics extends Component
     #[Computed]
     public function product(): ?Product
     {
-        return Product::with(['brand', 'categories', 'media', 'reviews'])->find($this->productId);
+        return Product::with(['brand', 'categories', 'media'])->find($this->productId);
     }
 
     /**
@@ -46,9 +46,7 @@ class ProductAnalytics extends Component
         if (! $this->product) {
             return ['total_reviews' => 0, 'average_rating' => 0.0, 'rating_distribution' => []];
         }
-        $reviews = $this->product->reviews()->where('is_approved', true)->get();
-
-        return ['total_reviews' => $reviews->count(), 'average_rating' => $reviews->avg('rating') ?? 0.0, 'rating_distribution' => $reviews->groupBy('rating')->map->count()->toArray()];
+        return ['total_reviews' => 0, 'average_rating' => 0.0, 'rating_distribution' => []];
     }
 
     /**

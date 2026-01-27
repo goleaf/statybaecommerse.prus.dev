@@ -12,7 +12,6 @@ use App\Models\Inventory;
 use App\Models\Location;
 use App\Models\Order;
 use App\Models\Product;
-use App\Models\Review;
 use App\Models\SystemSetting;
 use App\Models\User;
 use App\Models\UserBehavior;
@@ -58,8 +57,6 @@ class DashboardOverviewWidget extends BaseWidget
 
         // Advanced Metrics
         $avgOrderValue = $totalOrders > 0 ? $totalRevenue / $totalOrders : 0;
-        $totalReviews = Review::where('is_approved', true)->count();
-        $avgRating = (float) (Review::where('is_approved', true)->avg('rating') ?? 0);
         $activeCampaigns = 0; // Campaign::where('status', 'active')->count();
         $totalCampaignViews = 0; // CampaignView::sum('views_count');
 
@@ -107,10 +104,6 @@ class DashboardOverviewWidget extends BaseWidget
                 ->description(__('translations.per_order'))
                 ->descriptionIcon('heroicon-m-shopping-cart')
                 ->color('info'),
-            Stat::make(__('translations.average_rating'), number_format($avgRating, 1) . '/5')
-                ->description(__('translations.customer_satisfaction'))
-                ->descriptionIcon('heroicon-m-star')
-                ->color($avgRating >= 4 ? 'success' : ($avgRating >= 3 ? 'warning' : 'danger')),
             Stat::make(__('translations.low_stock'), \Illuminate\Support\Number::format($lowStockProducts))
                 ->description(__('translations.products_need_restocking'))
                 ->descriptionIcon('heroicon-m-exclamation-triangle')

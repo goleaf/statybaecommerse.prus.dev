@@ -42,8 +42,8 @@ class AdminUserResource extends JsonResource
             'average_order_value'       => $this->resource->average_order_value,
             'last_order_date'           => $this->resource->last_order_date,
             'orders_count'              => $this->resource->orders_count,
-            'reviews_count'             => $this->resource->reviews_count,
-            'average_rating'            => $this->resource->average_rating,
+            'reviews_count'             => 0,
+            'average_rating'            => 0,
         ]);
 
         if ($this->resource->relationLoaded('addresses')) {
@@ -66,13 +66,6 @@ class AdminUserResource extends JsonResource
             $meta['wishlist'] = $this->resource->wishlist->map(static function ($product): array {
                 // Wishlist entries are simple product arrays, so return them as-is.
                 return $product->toArray();
-            })->toArray();
-        }
-
-        if ($this->resource->relationLoaded('reviews')) {
-            $meta['reviews'] = $this->resource->reviews->map(static function ($review): array {
-                // Remove the user pointer to keep the payload clean for reviews too.
-                return Arr::except($review->toArray(), ['user_id']);
             })->toArray();
         }
 

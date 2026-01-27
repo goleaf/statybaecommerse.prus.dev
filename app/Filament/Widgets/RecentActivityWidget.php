@@ -7,7 +7,6 @@ namespace App\Filament\Widgets;
 use App\Models\Campaign;
 use App\Models\Order;
 use App\Models\Product;
-use App\Models\Review;
 use App\Models\Slider;
 use App\Models\SystemSetting;
 use App\Models\User;
@@ -36,7 +35,6 @@ class RecentActivityWidget extends BaseWidget
                         'Order'          => 'success',
                         'Product'        => 'primary',
                         'User'           => 'info',
-                        'Review'         => 'warning',
                         'Campaign'       => 'danger',
                         'News'           => 'secondary',
                         'Slider'         => 'gray',
@@ -124,21 +122,6 @@ class RecentActivityWidget extends BaseWidget
             updated_at
         ")->where('created_at', '>=', Carbon::now()->subDays(7));
 
-        // Get recent reviews - SQLite compatible
-        $recentReviews = Review::selectRaw("
-            'Review' as type,
-            'Review for Product #' || product_id as title,
-            'Rating: ' || rating || '/5 - ' || COALESCE(substr(content, 1, 50), 'No content') as description,
-            CASE 
-                WHEN is_approved = 1 THEN 'approved'
-                ELSE 'pending'
-            END as status,
-            created_at,
-            updated_at
-        ")
-            ->where('created_at', '>=', Carbon::now()->subDays(7))
-            ->where('is_approved', true);
-
         // Get recent campaigns - SQLite compatible
         $recentCampaigns = Campaign::selectRaw("
             'Campaign' as type,
@@ -179,7 +162,6 @@ class RecentActivityWidget extends BaseWidget
         return $recentOrders
             ->union($recentProducts)
             ->union($recentUsers)
-            ->union($recentReviews)
             ->union($recentCampaigns)
             ->union($recentSliders)
             ->union($recentSettings)

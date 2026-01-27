@@ -8,12 +8,10 @@ use App\Http\Controllers\Controller;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
-use App\Models\Review;
 use App\Support\Frontend\DataProviders\BrandCatalogueDataProvider;
 use App\Support\Frontend\DataProviders\CategoryCatalogueDataProvider;
 use App\Support\Frontend\DataProviders\ProductCatalogueDataProvider;
 use Illuminate\Contracts\View\View;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 final class ProductController extends Controller
@@ -59,28 +57,4 @@ final class ProductController extends Controller
         return view('frontend.products.show', $data);
     }
 
-    public function addReview(Request $request, Product $product): RedirectResponse
-    {
-        $validated = $request->validate([
-            'rating'  => ['required', 'integer', 'min:1', 'max:5'],
-            'title'   => ['nullable', 'string', 'max:255'],
-            'content' => ['required', 'string'],
-        ]);
-
-        $user = $request->user();
-
-        Review::create([
-            'product_id'     => $product->getKey(),
-            'user_id'        => $user?->getKey(),
-            'rating'         => (int) $validated['rating'],
-            'title'          => $validated['title'] ?? null,
-            'content'        => $validated['content'],
-            'reviewer_name'  => $user?->name,
-            'reviewer_email' => $user?->email,
-            'locale'         => app()->getLocale(),
-            'is_approved'    => false,
-        ]);
-
-        return redirect()->route('frontend.products.show', $product);
-    }
 }

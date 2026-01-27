@@ -10,7 +10,6 @@ use App\Livewire\Concerns\WithNotifications;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
-use App\Models\Review;
 use App\Repositories\ProductRepository;
 use App\Support\Cache\CacheKeys;
 use App\Support\Cache\CacheTags;
@@ -24,7 +23,6 @@ use Livewire\Component;
  * @property-read HomeStatsData $stats
  * @property-read Collection<int, Product> $featuredProducts
  * @property-read Collection<int, Product> $latestProducts
- * @property-read Collection<int, Review> $latestReviews
  */
 final class Home extends Component
 {
@@ -50,8 +48,8 @@ final class Home extends Component
                     'products_count'   => Product::query()->where('is_visible', true)->count(),
                     'categories_count' => Category::query()->where('is_visible', true)->count(),
                     'brands_count'     => Brand::query()->where('is_enabled', true)->count(),
-                    'reviews_count'    => Review::query()->where('is_approved', true)->count(),
-                    'avg_rating'       => (float) (Review::query()->where('is_approved', true)->avg('rating') ?? 0),
+                    'reviews_count'    => 0,
+                    'avg_rating'       => 0.0,
                 ];
             },
             [
@@ -60,7 +58,6 @@ final class Home extends Component
                 CacheTags::products(),
                 CacheTags::categories(),
                 CacheTags::brands(),
-                CacheTags::reviews(),
                 CacheKeys::productAggregateTag(),
             ]
         );
@@ -135,51 +132,6 @@ final class Home extends Component
         return $products;
     }
 
-    /**
-     * @return Collection<int, Review>
-     */
-    #[Computed]
-    public function latestReviews(): Collection
-    {
-        $locale = app()->getLocale();
-
-        /** @var Collection<int, Review> $reviews */
-        $reviews = TagAwareCache::remember(
-            CacheKeys::homeLatestReviews($locale),
-            now()->addSeconds(60),
-            static function (): Collection {
-                return Review::query()
-                    ->where('is_approved', true)
-                    ->with(['product' => static fn ($query) => $query->select('id', 'name', 'slug')])
-                    ->latest('created_at')
-                    ->limit(6)
-                    ->get();
-            },
-            [
-                CacheTags::home(),
-                CacheTags::locale($locale),
-                CacheTags::reviews(),
-                CacheTags::products(),
-                CacheKeys::homeTag(),
-            ]
-        );
-
-        return $reviews;
-    }
-
-    public function addToCart(int $productId): void
-    {
-        $product = app(ProductRepository::class)->findPublishedById($productId);
-
-        if (! $product || ($product->stock_quantity ?? 0) < 1) {
-            $this->notifyWarning(__('messages.product_unavailable'));
-
-            return;
-        }
-
-        $this->persistCartItem($product);
-    }
-
     public function render(): View
     {
         $appName = config('app.name');
@@ -189,7 +141,7 @@ final class Home extends Component
             'stats'            => $this->stats->toArray(),
             'featuredProducts' => $this->featuredProducts,
             'latestProducts'   => $this->latestProducts,
-            'latestReviews'    => $this->latestReviews,
+            'latestReviews'    => collect(),
         ])->layout('components.layouts.base', [
             'title' => __('messages.home_homepage') . ' - ' . (is_string($appName) ? $appName : ''),
         ]);

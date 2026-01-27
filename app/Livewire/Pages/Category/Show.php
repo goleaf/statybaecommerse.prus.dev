@@ -140,8 +140,6 @@ final class Show extends Component implements HasActions, HasForms
                 ->where('is_visible', true)
                 ->forProductList()
                 ->withListRelations()
-                ->withCount('reviews')
-                ->withAvg('reviews', 'rating')
                 ->orderBy('products.' . $this->sortBy, $this->sortDirection)
                 ->paginate(12);
 

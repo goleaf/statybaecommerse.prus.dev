@@ -98,7 +98,7 @@ final class ProductComparison extends Component
             return collect();
         }
 
-        return Product::whereIn('id', $this->compareProducts)->with(['brand', 'categories', 'media', 'attributes.values', 'reviews'])->get();
+        return Product::whereIn('id', $this->compareProducts)->with(['brand', 'categories', 'media', 'attributes.values'])->get();
     }
 
     /**

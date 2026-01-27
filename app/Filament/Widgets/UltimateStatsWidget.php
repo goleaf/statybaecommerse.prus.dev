@@ -25,7 +25,6 @@ use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\Referral;
 use App\Models\ReferralCode;
-use App\Models\Review;
 use App\Models\Slider;
 use App\Models\StockMovement;
 use App\Models\SystemSetting;
@@ -94,12 +93,6 @@ class UltimateStatsWidget extends BaseWidget
         // $totalCartItems = CartItem::count(); // Commented out - column issues
         // $totalWishlistItems = WishlistItem::count(); // Commented out - column issues
         $avgOrderValue = $totalOrders > 0 ? $totalRevenue / $totalOrders : 0;
-
-        // === REVIEWS & RATINGS ===
-        $totalReviews = Review::count();
-        $approvedReviews = Review::where('is_approved', true)->count();
-        $avgRating = (float) (Review::where('is_approved', true)->avg('rating') ?? 0);
-        $pendingReviews = Review::where('is_approved', false)->count();
 
         // === CAMPAIGNS & MARKETING === (DEPRECATED)
         // Campaign functionality has been removed - using fallback values
@@ -205,19 +198,6 @@ class UltimateStatsWidget extends BaseWidget
                 ->description(__('translations.total_value'))
                 ->descriptionIcon('heroicon-m-banknotes')
                 ->color('success'),
-            // === REVIEWS & RATINGS ===
-            Stat::make(__('translations.total_reviews'), \Illuminate\Support\Number::format($totalReviews))
-                ->description(__('translations.approved_reviews') . ': ' . \Illuminate\Support\Number::format($approvedReviews))
-                ->descriptionIcon('heroicon-m-star')
-                ->color('warning'),
-            Stat::make(__('translations.average_rating'), number_format($avgRating, 1) . '/5')
-                ->description(__('translations.customer_satisfaction'))
-                ->descriptionIcon('heroicon-m-star')
-                ->color($avgRating >= 4 ? 'success' : ($avgRating >= 3 ? 'warning' : 'danger')),
-            Stat::make(__('translations.pending_reviews'), \Illuminate\Support\Number::format($pendingReviews))
-                ->description(__('translations.awaiting_approval'))
-                ->descriptionIcon('heroicon-m-clock')
-                ->color($pendingReviews > 0 ? 'warning' : 'success'),
             // === CAMPAIGNS & MARKETING ===
             Stat::make(__('translations.total_campaigns'), \Illuminate\Support\Number::format($totalCampaigns))
                 ->description(__('translations.active_campaigns') . ': ' . \Illuminate\Support\Number::format($activeCampaigns))

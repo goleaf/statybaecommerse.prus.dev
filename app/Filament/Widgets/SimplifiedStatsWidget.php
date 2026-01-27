@@ -6,7 +6,6 @@ namespace App\Filament\Widgets;
 
 use App\Models\Order;
 use App\Models\Product;
-use App\Models\Review;
 use App\Models\User;
 use App\Support\Cache\CacheKeys;
 use App\Support\Cache\CacheTagHelper;
@@ -48,10 +47,6 @@ class SimplifiedStatsWidget extends BaseWidget
         $activeProducts = $stats['products']['active_products'];
         $totalCategories = $stats['catalog']['total_categories'];
         $totalBrands = $stats['catalog']['total_brands'];
-        $totalReviews = $stats['reviews']['total_reviews'];
-        $approvedReviews = $stats['reviews']['approved_reviews'];
-        $avgRating = $stats['reviews']['avg_rating'];
-
         $revenueGrowth = $lastMonthRevenue > 0 ? (($totalRevenue - $lastMonthRevenue) / $lastMonthRevenue) * 100 : 0;
         $orderGrowth = $lastMonthOrders > 0 ? (($totalOrders - $lastMonthOrders) / $lastMonthOrders) * 100 : 0;
         $userGrowth = $newUsersThisMonth > 0 ? ($newUsersThisMonth / max($totalUsers - $newUsersThisMonth, 1)) * 100 : 0;
@@ -97,16 +92,6 @@ class SimplifiedStatsWidget extends BaseWidget
                 ->descriptionIcon('heroicon-m-building-storefront')
                 ->color('primary'),
 
-            // === REVIEWS & RATINGS ===
-            Stat::make(__('translations.total_reviews'), \Illuminate\Support\Number::format($totalReviews))
-                ->description(__('translations.approved_reviews') . ': ' . \Illuminate\Support\Number::format($approvedReviews))
-                ->descriptionIcon('heroicon-m-star')
-                ->color('warning'),
-
-            Stat::make(__('translations.average_rating'), number_format((float) $avgRating, 1) . '/5')
-                ->description(__('translations.customer_satisfaction'))
-                ->descriptionIcon('heroicon-m-star')
-                ->color($avgRating >= 4 ? 'success' : ($avgRating >= 3 ? 'warning' : 'danger')),
         ];
     }
 
@@ -206,7 +191,6 @@ class SimplifiedStatsWidget extends BaseWidget
      *     users: array<string, int>,
      *     products: array<string, int>,
      *     catalog: array<string, int>,
-     *     reviews: array<string, int|float>
      * }
      */
     protected function getSummaryStats(): array
@@ -222,7 +206,6 @@ class SimplifiedStatsWidget extends BaseWidget
                 CacheTags::products(),
                 CacheTags::categories(),
                 CacheTags::brands(),
-                CacheTags::reviews(),
             ],
             CacheKeys::dashboardSimplifiedSummary(),
             now()->addSeconds(300),
@@ -261,17 +244,6 @@ class SimplifiedStatsWidget extends BaseWidget
                     ->toBase()
                     ->first();
 
-                $reviewStats = Review::query()
-                    ->selectRaw(
-                        '
-                        COUNT(*) as total_reviews,
-                        SUM(CASE WHEN is_approved = 1 THEN 1 ELSE 0 END) as approved_reviews,
-                        AVG(CASE WHEN is_approved = 1 THEN rating END) as avg_rating
-                    '
-                    )
-                    ->toBase()
-                    ->first();
-
                 $categoryCount = (int) DB::table('categories')->count();
                 $brandCount = (int) DB::table('brands')->count();
 
@@ -293,11 +265,6 @@ class SimplifiedStatsWidget extends BaseWidget
                     'catalog' => [
                         'total_categories' => $categoryCount,
                         'total_brands'     => $brandCount,
-                    ],
-                    'reviews' => [
-                        'total_reviews'    => (int) ($reviewStats->total_reviews ?? 0),
-                        'approved_reviews' => (int) ($reviewStats->approved_reviews ?? 0),
-                        'avg_rating'       => (float) ($reviewStats->avg_rating ?? 0),
                     ],
                 ];
             }

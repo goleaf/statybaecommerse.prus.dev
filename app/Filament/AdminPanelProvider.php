@@ -113,6 +113,7 @@ class AdminPanelProvider extends PanelProvider
             ->authGuard('admin')
             ->authPasswordBroker('admin_users')
             ->topbar(false)
+            ->darkMode(false)
             ->colors([
                 'primary' => Color::Blue,
             ])

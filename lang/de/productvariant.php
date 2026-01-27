@@ -589,6 +589,7 @@ return array (
   'sed_et' => 'Sed Et',
   'sed_qui' => 'Sed Qui',
   'sit_rerum' => 'Sit Rerum',
+  'size_l' => 'Size L',
   'sm_ginis_gr_tuvas_family_pack_m_black' => 'Smūginis gręžtuvas - Family Pack / M / Black',
   'sm_ginis_gr_tuvas_family_pack_m_raudona' => 'Smūginis gręžtuvas - Family Pack / M / Raudona',
   'sm_ginis_gr_tuvas_family_pack_s_black' => 'Smūginis gręžtuvas - Family Pack / S / Black',

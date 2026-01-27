@@ -50,7 +50,6 @@ final class SliderQuickActionsWidget extends Widget implements HasActions, HasFo
                 SearchableInput::make('button_url')
                     ->label(__('translations.button_url'))
                     ->placeholder(__('translations.slider_link_placeholder'))
-                    ->maxLength(255)
                     ->searchUsing(fn (string $value): array => ContentLinkSearch::results($value))
                     ->dehydrateStateUsing(fn (?string $state): ?string => $state !== null && $state !== '' ? $state : null)
                     ->afterStateHydrated(function (SearchableInput $component, ?string $state): void {

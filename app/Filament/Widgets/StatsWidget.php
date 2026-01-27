@@ -8,7 +8,6 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Order;
 use App\Models\Product;
-use App\Models\Review;
 use App\Models\User;
 use Filament\Widgets\StatsOverviewWidget as BaseStatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -28,8 +27,6 @@ final class StatsWidget extends BaseStatsOverviewWidget
         $activeCustomers = (int) User::whereHas('orders')->count();
         $visibleCategories = (int) Category::where('is_visible', true)->count();
         $enabledBrands = (int) Brand::where('is_enabled', true)->count();
-        $approvedReviews = (int) Review::where('is_approved', true)->count();
-        $avgRating = (float) (Review::where('is_approved', true)->avg('rating') ?? 0);
         $avgOrderValue = $totalOrders > 0 ? $totalRevenue / $totalOrders : 0.0;
         $monthOrders = (int) Order::createdThisMonth()->count();
 
@@ -42,8 +39,6 @@ final class StatsWidget extends BaseStatsOverviewWidget
             Stat::make(__('analytics.categories'), $visibleCategories)->color('info'),
             Stat::make(__('analytics.brands'), $enabledBrands)->color('info'),
             Stat::make(__('analytics.content'), $visibleCategories + $enabledBrands)->color('info'),
-            Stat::make(__('messages.analytics), $approvedReviews)->color('), $approvedReviews)->color('warning'),
-            Stat::make(__('analytics.average_rating'), number_format($avgRating, 1) . '/5')->color('warning'),
             Stat::make(__('analytics.average_order_value'), '€' . number_format($avgOrderValue, 2))->color('info'),
             Stat::make(__('analytics.month_orders'), $monthOrders)->color('primary'),
         ];

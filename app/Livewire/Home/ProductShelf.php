@@ -75,8 +75,6 @@ final class ProductShelf extends Component implements HasSchemas
             $query = Product::query()
                 ->forProductList()
                 ->withListRelations()
-                ->withAvg(['reviews as average_rating' => fn ($q) => $q->where('is_approved', true)], 'rating')
-                ->withCount(['reviews' => fn ($q) => $q->where('is_approved', true)])
                 ->where('is_visible', true)
                 ->whereNotNull('published_at')
                 ->where('published_at', '<=', now())
@@ -100,7 +98,6 @@ final class ProductShelf extends Component implements HasSchemas
                 'trending' => $query
                     ->withSum('orderItems as orders_quantity', 'quantity')
                     ->orderByDesc('orders_quantity')
-                    ->orderByDesc('reviews_count')
                     ->orderByDesc('published_at'),
                 default => $query
                     ->where('is_featured', true)

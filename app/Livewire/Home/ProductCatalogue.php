@@ -99,8 +99,6 @@ final class ProductCatalogue extends Component implements HasSchemas
         $query = Product::query()
             ->forProductList()
             ->withListRelations()
-            ->withAvg(['reviews as average_rating' => fn ($q) => $q->where('is_approved', true)], 'rating')
-            ->withCount(['reviews' => fn ($q) => $q->where('is_approved', true)])
             ->where('is_visible', true)
             ->whereNotNull('published_at')
             ->where('published_at', '<=', now());
@@ -120,7 +118,7 @@ final class ProductCatalogue extends Component implements HasSchemas
         $query = match ($this->sort) {
             'price_asc'  => $query->orderBy('price'),
             'price_desc' => $query->orderByDesc('price'),
-            'popular'    => $query->withSum('orderItems as orders_quantity', 'quantity')->orderByDesc('orders_quantity')->orderByDesc('reviews_count')->orderByDesc('published_at'),
+            'popular'    => $query->withSum('orderItems as orders_quantity', 'quantity')->orderByDesc('orders_quantity')->orderByDesc('published_at'),
             default      => $query->orderByDesc('published_at'),
         };
 

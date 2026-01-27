@@ -46,7 +46,7 @@ final class ProductQuickView extends Component
     #[On('product-quick-view')]
     public function showProduct(int $productId): void
     {
-        $this->product = Product::with(['media', 'brand', 'categories', 'variants.attributeValues', 'reviews'])->findOrFail($productId);
+        $this->product = Product::with(['media', 'brand', 'categories', 'variants.attributeValues'])->findOrFail($productId);
         $this->quantity = 1;
         $this->selectedVariantId = null;
         $this->selectedAttributes = [];
@@ -125,7 +125,7 @@ final class ProductQuickView extends Component
             return 0;
         }
 
-        return $this->product->reviews()->where('is_approved', true)->avg('rating') ?? 0;
+        return 0;
     }
 
     /**
@@ -138,7 +138,7 @@ final class ProductQuickView extends Component
             return 0;
         }
 
-        return $this->product->reviews()->where('is_approved', true)->count();
+        return 0;
     }
 
     /**

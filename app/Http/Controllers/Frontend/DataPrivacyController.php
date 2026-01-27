@@ -9,7 +9,6 @@ use App\Http\Requests\Frontend\DeleteAccountRequest;
 use App\Models\Address;
 use App\Models\Order;
 use App\Models\OrderItem;
-use App\Models\Review;
 use App\Models\User;
 use App\Support\Audit\AdminActivityLogger;
 use Illuminate\Contracts\Auth\StatefulGuard;
@@ -92,19 +91,6 @@ final class DataPrivacyController extends Controller
                 'updated_at',
             ]);
 
-        /** @var Collection<int, Review> $reviews */
-        $reviews = $user->reviews()
-            ->orderByDesc('created_at')
-            ->get([
-                'id',
-                'product_id',
-                'rating',
-                'title',
-                'body',
-                'created_at',
-                'updated_at',
-            ]);
-
         $payload = [
             'meta' => [
                 'generated_at' => now()->toAtomString(),
@@ -170,17 +156,6 @@ final class DataPrivacyController extends Controller
                     })->values(),
                 ];
             })->values(),
-            'reviews' => $reviews->map(static function (Review $review): array {
-                return [
-                    'id'         => $review->getKey(),
-                    'product_id' => $review->product_id,
-                    'rating'     => $review->rating,
-                    'title'      => $review->title,
-                    'body'       => $review->getAttribute('body'),
-                    'created_at' => $review->created_at?->toAtomString(),
-                    'updated_at' => $review->updated_at?->toAtomString(),
-                ];
-            })->values(),
         ];
 
         $userKey = $user->getKey();
@@ -202,7 +177,7 @@ final class DataPrivacyController extends Controller
                 'exported_records' => [
                     'addresses' => $addresses->count(),
                     'orders'    => $orders->count(),
-                    'reviews'   => $reviews->count(),
+                    'reviews'   => 0,
                 ],
             ],
             [
@@ -233,8 +208,6 @@ final class DataPrivacyController extends Controller
             $account = $user;
 
             $account->addresses()->delete();
-            $account->reviews()->delete();
-
             $accountKey = $account->getKey();
             if (! is_scalar($accountKey)) {
                 $accountKey = $account->getAttribute($account->getKeyName());
