@@ -82,8 +82,6 @@ final class ComponentShowcase extends Component
                 return Product::query()
                     ->forProductList()
                     ->withListRelations()
-                    ->withAvg(['reviews as average_rating' => static fn ($query) => $query->where('is_approved', true)], 'rating')
-                    ->withCount(['reviews' => static fn ($query) => $query->where('is_approved', true)])
                     ->where('is_visible', true)
                     ->where('is_featured', true)
                     ->latest('published_at')

@@ -213,7 +213,7 @@ final class UserPreferenceModelTest extends TestCase
         // Act: create a record using the stock factory to ensure it hydrates the expected attributes.
         $preference = $this->createPreference();
 
-        // Assert: confirm the defaults look reasonable for downstream analytics and recommendation engines.
+        // Assert: confirm the defaults look reasonable for downstream analytics consumers.
         $this->assertSame($this->user->id, $preference->user_id);
         $this->assertNotNull($preference->name);
         $this->assertNotNull($preference->key);

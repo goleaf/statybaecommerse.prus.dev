@@ -59,8 +59,7 @@ final class CommentPerformanceService
                     'time_ms' => round($paginatedTime * 1000, 2),
                 ],
             ],
-            'query_plans'     => $explainResults,
-            'recommendations' => $this->generateRecommendations($basicTime, $approvedTime, $paginatedTime, $basicCount),
+            'query_plans' => $explainResults,
         ];
     }
 
@@ -96,67 +95,6 @@ final class CommentPerformanceService
         }
 
         return $plans;
-    }
-
-    /**
-     * Generate performance recommendations based on metrics.
-     */
-    private function generateRecommendations(float $basicTime, float $approvedTime, float $paginatedTime, int $commentCount): array
-    {
-        $recommendations = [];
-
-        // Check for slow queries
-        if ($basicTime > 0.1) {
-            $recommendations[] = [
-                'type'     => 'performance',
-                'severity' => 'high',
-                'message'  => 'Basic entity query is slow (' . round($basicTime * 1000, 2) . 'ms). Consider adding composite indexes.',
-            ];
-        }
-
-        if ($approvedTime > 0.15) {
-            $recommendations[] = [
-                'type'     => 'performance',
-                'severity' => 'high',
-                'message'  => 'Approved entity query is slow (' . round($approvedTime * 1000, 2) . 'ms). Ensure composite index includes is_approved column.',
-            ];
-        }
-
-        if ($paginatedTime > 0.2) {
-            $recommendations[] = [
-                'type'     => 'performance',
-                'severity' => 'medium',
-                'message'  => 'Paginated query is slow (' . round($paginatedTime * 1000, 2) . 'ms). Consider optimizing eager loading.',
-            ];
-        }
-
-        // Check for large datasets without pagination
-        if ($commentCount > 1000) {
-            $recommendations[] = [
-                'type'     => 'optimization',
-                'severity' => 'medium',
-                'message'  => 'Large comment dataset (' . $commentCount . ' comments). Consider implementing pagination or limiting results.',
-            ];
-        }
-
-        // Performance ratio checks
-        if ($approvedTime > $basicTime * 2) {
-            $recommendations[] = [
-                'type'     => 'index',
-                'severity' => 'medium',
-                'message'  => 'Approved query is significantly slower than basic query. Check composite index coverage.',
-            ];
-        }
-
-        if (empty($recommendations)) {
-            $recommendations[] = [
-                'type'     => 'success',
-                'severity' => 'info',
-                'message'  => 'Comment queries are performing well within acceptable thresholds.',
-            ];
-        }
-
-        return $recommendations;
     }
 
     /**

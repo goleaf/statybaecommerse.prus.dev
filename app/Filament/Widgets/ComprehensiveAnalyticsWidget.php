@@ -44,7 +44,6 @@ class ComprehensiveAnalyticsWidget extends ChartWidget
         $campaignClicksData = [];
         $conversionsData = [];
         $userBehaviorsData = [];
-        $recommendationsData = [];
 
         for ($i = 29; $i >= 0; $i--) {
             $date = $now->copy()->subDays($i);
@@ -106,9 +105,6 @@ class ComprehensiveAnalyticsWidget extends ChartWidget
             $userBehaviors = UserBehavior::whereDate('created_at', $date)->count();
             $userBehaviorsData[] = $userBehaviors;
 
-            // Recommendations (analytics removed)
-            $recommendations = 0; // RecommendationAnalytics removed
-            $recommendationsData[] = $recommendations;
         }
 
         return [
@@ -226,15 +222,6 @@ class ComprehensiveAnalyticsWidget extends ChartWidget
                     'data'            => $userBehaviorsData,
                     'borderColor'     => 'rgb(107, 114, 128)',
                     'backgroundColor' => 'rgba(107, 114, 128, 0.1)',
-                    'fill'            => true,
-                    'tension'         => 0.4,
-                    'yAxisID'         => 'y1',
-                ],
-                [
-                    'label'           => 'Recommendations',
-                    'data'            => $recommendationsData,
-                    'borderColor'     => 'rgb(139, 69, 19)',
-                    'backgroundColor' => 'rgba(139, 69, 19, 0.1)',
                     'fill'            => true,
                     'tension'         => 0.4,
                     'yAxisID'         => 'y1',

@@ -40,7 +40,6 @@ final class Nav
         'News'                  => ['icon' => 'heroicon-o-newspaper', 'sort' => 420],
         'Orders'                => ['icon' => 'heroicon-o-shopping-bag', 'sort' => 200],
         'Products'              => ['icon' => 'heroicon-o-cube', 'sort' => 100],
-        'Recommendation System' => ['icon' => 'heroicon-o-sparkles', 'sort' => 520],
         'Referral'              => ['icon' => 'heroicon-o-gift', 'sort' => 330],
         'Referral System'       => ['icon' => 'heroicon-o-gift', 'sort' => 330],
         'Reports'               => ['icon' => 'heroicon-o-document-chart-bar', 'sort' => 510],

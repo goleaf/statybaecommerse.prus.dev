@@ -76,27 +76,6 @@ return new class extends Migration
         // Enhanced Notification System - REMOVED
         // NotificationTemplate functionality has been removed from the system
 
-        // Enhanced Audit Log
-        if (! Schema::hasTable('system_logs')) {
-            Schema::create('system_logs', function (Blueprint $table): void {
-                $table->id();
-                $table->string('level'); // info, warning, error, critical
-                $table->string('channel')->default('system');
-                $table->text('message');
-                $table->json('context')->nullable();
-                $table->json('extra')->nullable();
-                $table->string('user_id')->nullable();
-                $table->string('ip_address')->nullable();
-                $table->string('user_agent')->nullable();
-                $table->timestamp('logged_at');
-                $table->timestamps();
-
-                $table->index(['level', 'logged_at']);
-                $table->index(['channel', 'logged_at']);
-                $table->index(['user_id']);
-            });
-        }
-
         // Enhanced Feature Flags
         if (! Schema::hasTable('feature_flags')) {
             Schema::create('feature_flags', function (Blueprint $table): void {
@@ -183,7 +162,6 @@ return new class extends Migration
         Schema::dropIfExists('job_batches_extended');
         Schema::dropIfExists('cache_tags');
         Schema::dropIfExists('feature_flags');
-        Schema::dropIfExists('system_logs');
         // notification_templates table removed - no longer needed
         Schema::dropIfExists('media_collections');
         // Drop translations before the parent table to avoid foreign key complaints during teardown.

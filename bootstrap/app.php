@@ -48,9 +48,6 @@ $app = Application::configure(basePath: dirname(__DIR__))
             // Load admin routes
             Route::middleware('web')
                 ->group(base_path('routes/admin.php'));
-            // Load reports routes
-            Route::middleware('web')
-                ->group(base_path('routes/reports.php'));
             Route::middleware('api')
                 ->group(base_path('routes/monitoring.php'));
             // api.categories.tree route is defined in routes/web.php to avoid conflicts

@@ -358,8 +358,6 @@ final class EagerLoadingCompletenessTest extends TestCase
         $loadedProduct = Product::query()
             ->forProductList()
             ->withListRelations()
-            ->withCount(['reviews' => fn ($q) => $q->where('is_approved', true)])
-            ->withAvg(['reviews as average_rating' => fn ($q) => $q->where('is_approved', true)], 'rating')
             ->find($product->id);
 
         $this->assertNotNull($loadedProduct);

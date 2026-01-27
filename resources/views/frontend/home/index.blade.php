@@ -178,13 +178,6 @@
                         </p>
                         <ul class="grid gap-4 sm:grid-cols-2">
                             <li class="flex items-start gap-3 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
-                                <x-untitledui-bulb class="mt-1 h-6 w-6 text-amber-500" />
-                                <div>
-                                    <p class="text-sm font-semibold text-gray-900">{{ __('frontend/home.sections.discovery.items.recommendations.title') }}</p>
-                                    <p class="mt-1 text-sm text-gray-600">{{ __('frontend/home.sections.discovery.items.recommendations.subtitle') }}</p>
-                                </div>
-                            </li>
-                            <li class="flex items-start gap-3 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
                                 <x-untitledui-shield-tick class="mt-1 h-6 w-6 text-emerald-500" />
                                 <div>
                                     <p class="text-sm font-semibold text-gray-900">{{ __('frontend/home.sections.discovery.items.security.title') }}</p>

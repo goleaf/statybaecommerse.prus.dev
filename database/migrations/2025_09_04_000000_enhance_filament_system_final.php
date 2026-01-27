@@ -141,26 +141,6 @@ return new class extends Migration
             });
         }
 
-        // Create enhanced system logs table
-        if (! Schema::hasTable('system_logs')) {
-            Schema::create('system_logs', function (Blueprint $table) {
-                $table->id();
-                $table->string('level'); // debug, info, warning, error, critical
-                $table->string('message');
-                $table->json('context')->nullable();
-                $table->string('channel')->nullable();
-                $table->timestamp('logged_at');
-                $table->string('ip_address')->nullable();
-                $table->string('user_agent')->nullable();
-                $table->foreignId('user_id')->nullable()->constrained()->cascadeOnDelete();
-                $table->timestamps();
-
-                $table->index(['level', 'logged_at']);
-                $table->index(['channel', 'logged_at']);
-                $table->index(['user_id', 'logged_at']);
-            });
-        }
-
         // Create user preferences table
         if (! Schema::hasTable('user_preferences')) {
             Schema::create('user_preferences', function (Blueprint $table) {
@@ -199,7 +179,6 @@ return new class extends Migration
         // Drop tables in reverse order
         Schema::dropIfExists('search_logs');
         Schema::dropIfExists('user_preferences');
-        Schema::dropIfExists('system_logs');
         Schema::dropIfExists('system_notifications');
         Schema::dropIfExists('product_analytics');
 

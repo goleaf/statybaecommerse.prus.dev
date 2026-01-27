@@ -162,27 +162,6 @@ return new class extends Migration
             });
         }
 
-        // Create variant_recommendations table for related variants
-        if (! Schema::hasTable('variant_recommendations')) {
-            Schema::create('variant_recommendations', function (Blueprint $table) {
-                $table->id();
-                $table->unsignedBigInteger('variant_id');
-                $table->unsignedBigInteger('recommended_variant_id');
-                $table->string('recommendation_type')->default('similar');  // similar, complementary, upsell, cross_sell
-                $table->decimal('confidence_score', 3, 2)->default(0);
-                $table->integer('sort_order')->default(0);
-                $table->boolean('is_active')->default(true);
-                $table->timestamps();
-
-                $table->foreign('variant_id')->references('id')->on('product_variants')->onDelete('cascade');
-                $table->foreign('recommended_variant_id')->references('id')->on('product_variants')->onDelete('cascade');
-
-                $table->unique(['variant_id', 'recommended_variant_id']);
-                $table->index(['recommendation_type', 'confidence_score'], 'variant_recommend_type_idx');
-                $table->index(['is_active', 'sort_order']);
-            });
-        }
-
         // Create variant_bundles table for bundle products
         if (! Schema::hasTable('variant_bundles')) {
             Schema::create('variant_bundles', function (Blueprint $table) {
@@ -210,10 +189,6 @@ return new class extends Migration
         // Drop new tables
         if (Schema::hasTable('variant_bundles')) {
             Schema::dropIfExists('variant_bundles');
-        }
-
-        if (Schema::hasTable('variant_recommendations')) {
-            Schema::dropIfExists('variant_recommendations');
         }
 
         if (Schema::hasTable('variant_analytics')) {

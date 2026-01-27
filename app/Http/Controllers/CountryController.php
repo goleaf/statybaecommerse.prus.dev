@@ -92,7 +92,6 @@ final class CountryController extends Controller
             },
         ]);
 
-        // Fetch a curated list of related countries in the same region for recommendation blocks.
         $relatedCountries = Country::query()
             ->where('region', $country->region)
             ->where('id', '!=', $country->id)

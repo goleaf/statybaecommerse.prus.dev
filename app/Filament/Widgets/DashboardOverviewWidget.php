@@ -74,8 +74,6 @@ class DashboardOverviewWidget extends BaseWidget
         $totalAddresses = Address::count();
         $totalSystemSettings = SystemSetting::count();
 
-        // Recommendation System (analytics removed)
-        $totalRecommendations = 0; // RecommendationAnalytics removed
         $totalUserBehaviors = UserBehavior::count();
         $totalVariantAnalytics = VariantAnalytics::count();
 
@@ -139,10 +137,6 @@ class DashboardOverviewWidget extends BaseWidget
                 ->descriptionIcon('heroicon-m-home')
                 ->color('info'),
             // Advanced System Metrics
-            Stat::make(__('translations.recommendations'), \Illuminate\Support\Number::format($totalRecommendations))
-                ->description(__('translations.total_recommendations'))
-                ->descriptionIcon('heroicon-m-light-bulb')
-                ->color('success'),
             Stat::make(__('translations.user_behaviors'), \Illuminate\Support\Number::format($totalUserBehaviors))
                 ->description(__('translations.tracked_behaviors'))
                 ->descriptionIcon('heroicon-m-chart-bar')

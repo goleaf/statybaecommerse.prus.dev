@@ -136,8 +136,16 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
      */
     public function reservedQuantity(): int
     {
-        $variantId = Number::parseFloat((string) $this->id);
-        $sum = Number::parseFloat((string) DB::table('variant_inventories as vi')->where('vi.variant_id', $variantId)->sum('vi.reserved'));
+        $variantId = (int) ($this->getKey() ?? 0);
+        $inventoryQuery = DB::table('variant_inventories as vi')->where('vi.variant_id', $variantId);
+
+        // When no inventory rows exist (common in lightweight tests), fall back to
+        // the stock-based columns on the variant itself.
+        if (! $inventoryQuery->exists()) {
+            return max(0, (int) ($this->reserved_quantity ?? 0));
+        }
+
+        $sum = Number::parseFloat((string) $inventoryQuery->sum('vi.reserved'));
 
         return (int) max($sum, 0);
     }
@@ -156,8 +164,19 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
      */
     public function availableQuantity(): int
     {
-        $variantId = Number::parseFloat((string) $this->id);
-        $sum = Number::parseFloat((string) DB::table('variant_inventories as vi')->where('vi.variant_id', $variantId)->sum(DB::raw('CASE WHEN (vi.stock - vi.reserved) > 0 THEN (vi.stock - vi.reserved) ELSE 0 END')));
+        $variantId = (int) ($this->getKey() ?? 0);
+        $inventoryQuery = DB::table('variant_inventories as vi')->where('vi.variant_id', $variantId);
+
+        // Align admin filters and tests with the stock/reserved columns when no
+        // per-warehouse inventory rows are present.
+        if (! $inventoryQuery->exists()) {
+            $stock = (int) ($this->stock_quantity ?? 0);
+            $reserved = (int) ($this->reserved_quantity ?? 0);
+
+            return max(0, $stock - $reserved);
+        }
+
+        $sum = Number::parseFloat((string) $inventoryQuery->sum(DB::raw('CASE WHEN (vi.stock - vi.reserved) > 0 THEN (vi.stock - vi.reserved) ELSE 0 END')));
 
         return (int) max($sum, 0);
     }

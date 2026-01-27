@@ -267,24 +267,10 @@ final class EagerLoadingTest extends TestCase
 
         $product->categories()->attach($category->id);
 
-        // Create some reviews to ensure aggregates have data
-        $product->reviews()->create([
-            'rating'      => 5,
-            'content'     => 'Great product!',
-            'is_approved' => true,
-        ]);
-        $product->reviews()->create([
-            'rating'      => 4,
-            'content'     => 'Good product',
-            'is_approved' => true,
-        ]);
-
         // Load product with proper eager loading
         $loadedProduct = Product::query()
             ->forProductList()
             ->withListRelations()
-            ->withAvg(['reviews as average_rating' => fn ($q) => $q->where('is_approved', true)], 'rating')
-            ->withCount(['reviews' => fn ($q) => $q->where('is_approved', true)])
             ->find($product->id);
 
         $this->assertNotNull($loadedProduct);

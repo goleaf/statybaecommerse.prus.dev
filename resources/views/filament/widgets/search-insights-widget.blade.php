@@ -92,53 +92,6 @@
 
                 </div>
 
-                <!-- Recommendations -->
-                @if(!empty($recommendations['similar_searches']))
-                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
-                        <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                            {{ __('messages.admin') }}
-                        </h4>
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                            @foreach(array_slice($recommendations['similar_searches'], 0, 6) as $search)
-                                <div class="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                                    <div class="text-sm font-medium text-gray-900 dark:text-white">
-                                        {{ $search['query'] }}
-                                    </div>
-                                    <div class="text-xs text-gray-500 dark:text-gray-400">
-                                        {{ number_format($search['similarity_score'] * 100, 1) }}% {{ __('admin.search_insights_labels.similarity') }}
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-                @endif
-
-                @if(!empty($recommendations['trending_searches']))
-                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
-                        <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                            {{ __('messages.admin') }}
-                        </h4>
-                        <div class="space-y-2">
-                            @foreach(array_slice($recommendations['trending_searches'], 0, 5) as $trend)
-                                <div class="flex justify-between items-center p-2 bg-gray-50 dark:bg-gray-700 rounded">
-                                    <span class="text-sm text-gray-900 dark:text-white">{{ $trend['query'] }}</span>
-                                    <div class="flex items-center space-x-2">
-                                        <span class="text-xs text-gray-500 dark:text-gray-400">
-                                            {{ number_format($trend['growth_rate'], 1) }}%
-                                        </span>
-                                        <span class="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full
-                                            @if($trend['trend_direction'] === 'rising') bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200
-                                            @elseif($trend['trend_direction'] === 'falling') bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200
-                                            @else bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200 @endif">
-                                            {{ __('admin.search_insights_labels.trend_directions.' . $trend['trend_direction']) }}
-                                        </span>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-                @endif
-
             @else
                 <!-- Default State -->
                 <div class="text-center py-12">

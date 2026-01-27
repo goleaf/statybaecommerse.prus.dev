@@ -18,8 +18,6 @@ use App\Models\Product;
 use App\Models\ProductFeature;
 use App\Models\ProductImage;
 use App\Models\ProductVariant;
-use App\Models\RecommendationBlock;
-use App\Models\RecommendationConfig;
 use App\Models\Referral;
 use App\Models\ReferralCampaign;
 use App\Models\ReferralCode;
@@ -66,8 +64,6 @@ dataset('ordered_by_name_models', function (): array {
         [PriceListItem::class, ['name']],
         [ProductFeature::class, ['feature_key', 'name']],
         [ProductImage::class, ['alt_text', 'path']],
-        [RecommendationBlock::class, ['name', 'title']],
-        [RecommendationConfig::class, ['name', 'title']],
         [Referral::class, ['title', 'name']],
         [ReferralCampaign::class, ['name', 'title']],
         [ReferralCode::class, ['code', 'title', 'name']],
@@ -146,14 +142,6 @@ dataset('model_relation_matrix', function (): array {
         [EmailCampaignRecipient::class, 'campaign', BelongsTo::class],
         [EmailCampaignRecipient::class, 'user', BelongsTo::class],
         [EmailCampaignRecipient::class, 'subscriber', BelongsTo::class],
-
-        [RecommendationBlock::class, 'products', BelongsToMany::class],
-        [RecommendationBlock::class, 'analytics', HasMany::class],
-        [RecommendationBlock::class, 'caches', HasMany::class],
-
-        [RecommendationConfig::class, 'analytics', HasMany::class],
-        [RecommendationConfig::class, 'products', BelongsToMany::class],
-        [RecommendationConfig::class, 'categories', BelongsToMany::class],
 
         [Referral::class, 'referrer', BelongsTo::class],
         [Referral::class, 'referred', BelongsTo::class],

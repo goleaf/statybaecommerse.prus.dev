@@ -15,7 +15,6 @@ use App\Http\Requests\Frontend\UpdateUserProfileRequest;
 use App\Http\Requests\Frontend\UpdateUserSocialLinksRequest;
 use App\Models\Document;
 use App\Models\User;
-use App\Support\Audit\AdminActivityLogger;
 use App\Support\Storage\SecureStorage;
 use App\Support\Uploads\SecureUpload;
 use Illuminate\Http\JsonResponse;
@@ -33,11 +32,6 @@ use Illuminate\View\View;
  */
 final class UserController extends Controller
 {
-    /**
-     * Centralise audit logging so preference updates surface in admin reports.
-     */
-    public function __construct(private readonly AdminActivityLogger $activityLogger) {}
-
     /**
      * Handle profile functionality with proper error handling.
      */
@@ -152,21 +146,9 @@ final class UserController extends Controller
         /** @var User $user */
         $user = Auth::user();
 
-        // Capture the prior settings before persisting the update to construct
-        // a meaningful audit diff for compliance reviews.
-        $previousSettings = (array) $user->getAttribute('privacy_settings');
         $newSettings = $request->validated('privacy_settings', []);
 
         $user->update(['privacy_settings' => $newSettings]);
-
-        $this->activityLogger->log(
-            $user,
-            'privacy_settings_updated',
-            $user,
-            ['privacy_settings' => $previousSettings],
-            ['privacy_settings' => $newSettings],
-            ['channel'          => 'frontend']
-        );
 
         return redirect()->route('users.profile')->with('success', __('users.privacy_settings_updated_successfully'));
     }
@@ -269,19 +251,6 @@ final class UserController extends Controller
     public function deactivateAccount(DeactivateAccountRequest $request): RedirectResponse
     {
         $user = Auth::user();
-        // Log deactivation reason if provided
-        $reason = $request->validated('reason');
-
-        if ($reason) {
-            $this->activityLogger->log(
-                $user,
-                'account_deactivated_by_user',
-                $user,
-                [],
-                ['reason'  => $reason],
-                ['channel' => 'frontend']
-            );
-        }
         $user->update(['is_active' => false, 'deactivated_at' => now()]);
         Auth::logout();
 
@@ -294,14 +263,6 @@ final class UserController extends Controller
     public function deleteAccount(DeleteAccountRequest $request): RedirectResponse
     {
         $user = Auth::user();
-        $this->activityLogger->log(
-            $user,
-            'account_deleted_by_user',
-            $user,
-            [],
-            [],
-            ['channel' => 'frontend']
-        );
         // Soft delete the user
         $user->delete();
         Auth::logout();

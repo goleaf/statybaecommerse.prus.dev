@@ -33,14 +33,12 @@ trait InteractsWithFilamentPivotTables
             'roles',
 
             'news_tag_pivot',
-            'recommendation_block_products',
             'news_translations',
 
             'news_tag_translations',
             'news',
             'news_tags',
             'products',
-            'recommendation_blocks',
             'users',
         ] as $table) {
             if (Schema::hasTable($table)) {
@@ -210,35 +208,5 @@ trait InteractsWithFilamentPivotTables
             });
         }
 
-        if (! Schema::hasTable('recommendation_blocks')) {
-            Schema::create('recommendation_blocks', function (Blueprint $table): void {
-                $table->id();
-                $table->string('name')->unique();
-                $table->string('title');
-                $table->text('description')->nullable();
-                $table->string('type');
-                $table->string('position');
-                $table->boolean('is_active')->default(true);
-                $table->boolean('is_default')->default(false);
-                $table->boolean('show_title')->default(true);
-                $table->boolean('show_description')->default(false);
-                $table->unsignedInteger('max_products')->default(10);
-                $table->unsignedInteger('sort_order')->default(0);
-                $table->json('config_ids')->nullable();
-                $table->unsignedInteger('cache_duration')->default(0);
-                $table->json('display_settings')->nullable();
-                $table->softDeletes();
-                $table->timestamps();
-            });
-        }
-
-        if (! Schema::hasTable('recommendation_block_products')) {
-            Schema::create('recommendation_block_products', function (Blueprint $table): void {
-                $table->id();
-                $table->foreignId('recommendation_block_id')->constrained('recommendation_blocks')->cascadeOnDelete();
-                $table->foreignId('product_id')->constrained('products')->cascadeOnDelete();
-                $table->timestamps();
-            });
-        }
     }
 }

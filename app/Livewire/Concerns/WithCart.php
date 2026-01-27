@@ -63,6 +63,28 @@ trait WithCart
 
                 return false;
             }
+        } elseif ($product->isVariant()) {
+            // For variant products, fall back to a sensible default variant when none is selected.
+            $variant = ProductVariant::query()
+                ->where('product_id', $product->getKey())
+                ->orderByDesc('is_default_variant')
+                ->orderByDesc('is_default')
+                ->orderBy('id')
+                ->get()
+                ->first(static function (ProductVariant $candidate) use ($normalizedQuantity): bool {
+                    if (! $candidate->isAvailableForPurchase()) {
+                        return false;
+                    }
+
+                    return ! $candidate->track_inventory
+                        || $candidate->availableQuantity() >= $normalizedQuantity;
+                });
+
+            if ($variant === null) {
+                $this->notifyWarning(__('This product is not available for purchase.'));
+
+                return false;
+            }
         } elseif ($product->availableQuantity() < $normalizedQuantity) {
             $this->notifyError(__('Not enough stock available'));
 

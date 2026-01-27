@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Data\Notifications;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 
 final class NotificationFilterData
@@ -61,11 +62,20 @@ final class NotificationFilterData
     public function apply(Builder $builder): Builder
     {
         if ($this->type !== null) {
-            $builder->byType($this->type);
+            $normalizedType = trim($this->type);
+            $studlyType = Str::studly($normalizedType);
+
+            $builder->where(static function (Builder $query) use ($normalizedType, $studlyType): void {
+                $query->whereJsonContains('data->notification_type', $normalizedType)
+                    ->orWhereJsonContains('data->type', $normalizedType)
+                    ->orWhere('type', 'like', sprintf('%%%sNotification', $studlyType));
+            });
         }
 
         if ($this->read !== null) {
-            $this->read ? $builder->read() : $builder->unread();
+            $this->read
+                ? $builder->whereNotNull('read_at')
+                : $builder->whereNull('read_at');
         }
 
         return $builder;

@@ -24,7 +24,9 @@ use Livewire\Component;
 final class ProductShelf extends Component implements HasSchemas
 {
     use InteractsWithSchemas;
-    use WithCart;
+    use WithCart {
+        addToCart as performAddToCart;
+    }
     use WithNotifications;
 
     public string $preset = 'featured';
@@ -135,6 +137,11 @@ final class ProductShelf extends Component implements HasSchemas
                     'preset'   => $this->preset,
                 ]),
         ]);
+    }
+
+    public function addToCart(int $productId, int $quantity = 1, ?int $variantId = null): void
+    {
+        $this->performAddToCart($productId, $quantity, null, $variantId);
     }
 
     public function render(): View

@@ -61,7 +61,6 @@ return [
         App\Models\Referral::class,
         App\Models\ReferralCampaign::class,
         App\Models\ReferralCode::class,
-        App\Models\RecommendationBlock::class,
         App\Models\ReferralReward::class,
         App\Models\ReferralRewardLog::class,
     ],

@@ -6,6 +6,8 @@ namespace App\Providers;
 
 use App\Filament\Testing\ViewRecordTableStub;
 use App\Livewire\Hooks\AssignFilamentResourceHook;
+use Filament\Facades\Filament;
+use Filament\Panel;
 use Filament\Resources\Pages\ViewRecord;
 
 use function htmlspecialchars;
@@ -117,6 +119,17 @@ final class LivewireTestingServiceProvider extends ServiceProvider
         if ($this->app->runningUnitTests()) {
             Livewire::component(ViewRecord::class, ViewRecordTableStub::class);
             $this->ensureViteManifestExists();
+
+            // Ensure a Filament panel is always active during tests, even when a
+            // specific test forgets to call resolveAdminPanel().
+            $this->app->booted(function (): void {
+                $panel = Filament::getPanel('admin');
+
+                if ($panel instanceof Panel) {
+                    Filament::setCurrentPanel($panel);
+                    Filament::setServingStatus(true);
+                }
+            });
         }
     }
 

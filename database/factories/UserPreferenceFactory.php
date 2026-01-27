@@ -51,7 +51,7 @@ final class UserPreferenceFactory extends Factory
             'preference_score' => fake()->randomFloat(6, 0, 1),
             'last_updated'     => fake()->dateTimeBetween('-30 days', 'now'),
             'metadata'         => [
-                'source'     => fake()->randomElement(['purchase_history', 'browsing', 'search', 'recommendation']),
+                'source'     => fake()->randomElement(['purchase_history', 'browsing', 'search']),
                 'frequency'  => fake()->randomElement(['low', 'medium', 'high']),
                 'confidence' => fake()->randomFloat(2, 0.5, 1.0),
             ],

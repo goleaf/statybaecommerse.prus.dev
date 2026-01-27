@@ -23,8 +23,7 @@ class QueryOptimizationService
                 'sql'      => $originalSql,
                 'bindings' => $bindings,
             ],
-            'optimizations'   => $this->generateOptimizations($query),
-            'recommendations' => $this->getRecommendations($query),
+            'optimizations' => $this->generateOptimizations($query),
         ];
     }
 
@@ -136,97 +135,6 @@ class QueryOptimizationService
                 \$results = \$stmt->fetchAll();",
             ],
         ];
-    }
-
-    /**
-     * Generate recommendations based on query analysis
-     */
-    private function getRecommendations(Builder $query): array
-    {
-        $recommendations = [];
-        $model = $query->getModel();
-        $table = $model->getTable();
-
-        // Index recommendations
-        $recommendations[] = [
-            'category'    => 'indexing',
-            'title'       => 'Add Composite Index',
-            'description' => 'Create composite index for frequently queried columns',
-            'code'        => "Schema::table('{$table}', function (Blueprint \$table) {
-    \$table->index(['status', 'created_at', 'user_id']);
-});",
-            'impact' => 'High - Can reduce query time by 80-95%',
-        ];
-
-        // Caching recommendations
-        $recommendations[] = [
-            'category'    => 'caching',
-            'title'       => 'Implement Query Caching',
-            'description' => 'Cache expensive queries with appropriate TTL',
-            'code'        => "Cache::remember('expensive_query_' . \$params, 3600, function () use (\$params) {
-    return {$model->getClass()}::where('status', \$params['status'])
-        ->with('relations')
-        ->get();
-});",
-            'impact' => 'Very High - Eliminates database hits for cached data',
-        ];
-
-        // Pagination recommendations
-        $recommendations[] = [
-            'category'    => 'pagination',
-            'title'       => 'Use Cursor Pagination',
-            'description' => 'Replace OFFSET pagination with cursor-based for large datasets',
-            'code'        => "{$model->getClass()}::where('id', '>', \$lastId)
-    ->orderBy('id')
-    ->limit(20)
-    ->get();",
-            'impact' => 'High - Maintains consistent performance regardless of page number',
-        ];
-
-        return $recommendations;
-    }
-
-    /**
-     * Generate index creation SQL based on query patterns
-     */
-    public function generateIndexRecommendations(string $table, array $whereColumns, array $orderColumns = []): array
-    {
-        $indexes = [];
-
-        // Single column indexes
-        foreach ($whereColumns as $column) {
-            $indexes[] = [
-                'type'        => 'single',
-                'sql'         => "CREATE INDEX idx_{$table}_{$column} ON {$table} ({$column});",
-                'description' => "Index for filtering by {$column}",
-            ];
-        }
-
-        // Composite index for WHERE + ORDER BY
-        if (! empty($whereColumns) && ! empty($orderColumns)) {
-            $allColumns = array_merge($whereColumns, $orderColumns);
-            $columnList = implode(', ', $allColumns);
-            $indexName = 'idx_' . $table . '_' . implode('_', $allColumns);
-
-            $indexes[] = [
-                'type'        => 'composite',
-                'sql'         => "CREATE INDEX {$indexName} ON {$table} ({$columnList});",
-                'description' => 'Composite index for filtering and sorting',
-            ];
-        }
-
-        // Covering index recommendation
-        $indexes[] = [
-            'type' => 'covering',
-            'sql'  => "-- PostgreSQL covering index
-CREATE INDEX idx_{$table}_covering ON {$table} ({$whereColumns[0]}) INCLUDE (id, name, created_at);
-
--- MySQL covering index  
-CREATE INDEX idx_{$table}_covering ON {$table} ({$whereColumns[0]}, id, name, created_at);",
-            'description' => 'Covering index to avoid table lookups',
-        ];
-
-        return $indexes;
     }
 
     /**

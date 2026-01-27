@@ -814,6 +814,38 @@ final class Product extends Model implements HasMedia, TranslatableRecord
     }
 
     /**
+     * Manage feature rows that describe the product (specifications, benefits, etc.).
+     */
+    public function features(): HasMany
+    {
+        return $this->hasMany(ProductFeature::class);
+    }
+
+    /**
+     * Manage product comparisons associated with this product.
+     */
+    public function comparisons(): HasMany
+    {
+        return $this->hasMany(ProductComparison::class);
+    }
+
+    /**
+     * Similarity scores where this product is the source product.
+     */
+    public function similarities(): HasMany
+    {
+        return $this->hasMany(ProductSimilarity::class, 'product_id');
+    }
+
+    /**
+     * Similarity scores where this product is the similar/target product.
+     */
+    public function similarTo(): HasMany
+    {
+        return $this->hasMany(ProductSimilarity::class, 'similar_product_id');
+    }
+
+    /**
      * Handle latestRequest functionality with proper error handling.
      */
     public function latestRequest(): HasOne

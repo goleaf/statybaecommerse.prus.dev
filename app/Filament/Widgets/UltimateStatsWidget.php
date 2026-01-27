@@ -114,8 +114,6 @@ class UltimateStatsWidget extends BaseWidget
         $totalUserBehaviors = UserBehavior::count();
         $totalVariantAnalytics = VariantAnalytics::count();
 
-        // === RECOMMENDATION SYSTEM ===
-        $totalRecommendations = 0; // RecommendationAnalytics removed
         $totalReferrals = Referral::count();
         $totalReferralCodes = ReferralCode::count();
 
@@ -237,11 +235,6 @@ class UltimateStatsWidget extends BaseWidget
             //     ->description(__('translations.total_wishlist_items'))
             //     ->descriptionIcon('heroicon-m-heart')
             //     ->color('danger'), // Commented out - column issues
-            // === RECOMMENDATION SYSTEM ===
-            Stat::make(__('translations.recommendations'), \Illuminate\Support\Number::format($totalRecommendations))
-                ->description(__('translations.total_recommendations'))
-                ->descriptionIcon('heroicon-m-light-bulb')
-                ->color('success'),
             Stat::make(__('translations.referrals'), \Illuminate\Support\Number::format($totalReferrals))
                 ->description(__('translations.total_referrals'))
                 ->descriptionIcon('heroicon-m-share')

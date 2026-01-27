@@ -121,7 +121,6 @@ final class NewsController extends Controller
             ->limit(4)
             ->get()
             ->filter(function (News $related): bool {
-                // Avoid surfacing drafts or entries missing the assets required for the recommendation rail.
                 return $related->isReadyForFrontend();
             })
             ->values();

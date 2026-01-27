@@ -141,26 +141,6 @@ final class FeatureFlagSeeder extends Seeder
             ],
         ]);
 
-        // Performance Category Feature Flags
-        FeatureFlag::factory()->create([
-            'name'        => 'AI Recommendations',
-            'key'         => 'ai_recommendations',
-            'description' => 'Enable AI-powered product recommendations',
-            'is_active'   => true,
-            'is_enabled'  => true,
-            'is_global'   => false,
-            'environment' => 'production',
-            'category'    => 'performance',
-            'priority'    => 50,
-            'conditions'  => [
-                'user_role' => ['customer'],
-            ],
-            'metadata' => [
-                'version' => '1.0',
-                'author'  => 'AI Team',
-            ],
-        ]);
-
         FeatureFlag::factory()->create([
             'name'        => 'Real-time Notifications',
             'key'         => 'real_time_notifications',

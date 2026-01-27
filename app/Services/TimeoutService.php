@@ -59,16 +59,6 @@ final class TimeoutService
     }
 
     /**
-     * Handle forRecommendations functionality with proper error handling.
-     */
-    public static function forRecommendations(LazyCollection $collection, int $seconds = 30): LazyCollection
-    {
-        $timeout = now()->addSeconds($seconds);
-
-        return $collection->takeUntilTimeout($timeout);
-    }
-
-    /**
      * Handle forBackgroundJob functionality with proper error handling.
      */
     public static function forBackgroundJob(LazyCollection $collection, int $minutes = 5): LazyCollection

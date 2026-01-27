@@ -68,25 +68,6 @@ final class DataFilteringService
     }
 
     /**
-     * Handle filterNewRecommendations functionality with proper error handling.
-     */
-    public function filterNewRecommendations(Collection $recommendations, array $userInteractions = []): Collection
-    {
-        return $recommendations
-            ->filter(function ($recommendation) use ($userInteractions) {
-                // Keep recommendations for products the user has not interacted with.
-                $productId = $this->extractValue($recommendation, 'id');
-
-                if ($productId === null) {
-                    return false;
-                }
-
-                return ! in_array($productId, $userInteractions, true);
-            })
-            ->values();
-    }
-
-    /**
      * Handle filterActiveCategories functionality with proper error handling.
      */
     public function filterActiveCategories(Collection $categories): Collection

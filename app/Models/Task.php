@@ -22,7 +22,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
  * @property string|null                     $description
  * @property string                          $status
  * @property string                          $priority
- * @property int                             $project_id
+ * @property int                             $organization_id
  * @property int                             $created_by
  * @property int|null                        $parent_task_id
  * @property \Illuminate\Support\Carbon|null $due_date
@@ -45,7 +45,7 @@ final class Task extends Model
         'description',
         'status',
         'priority',
-        'project_id',
+        'organization_id',
         'created_by',
         'parent_task_id',
         'due_date',
@@ -62,11 +62,11 @@ final class Task extends Model
     // Relationships
 
     /**
-     * Project this task belongs to.
+     * Organization this task belongs to.
      */
-    public function project(): BelongsTo
+    public function organization(): BelongsTo
     {
-        return $this->belongsTo(Project::class);
+        return $this->belongsTo(Organization::class);
     }
 
     /**
@@ -157,14 +157,6 @@ final class Task extends Model
     public function tags(): MorphMany
     {
         return $this->morphMany(Taggable::class, 'taggable');
-    }
-
-    /**
-     * Organization through project (has-one-through).
-     */
-    public function organization(): BelongsTo
-    {
-        return $this->project()->getRelated()->organization();
     }
 
     /**

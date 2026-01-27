@@ -42,11 +42,6 @@ return [
                 'label' => 'admin.navigation.system',
                 'icon'  => 'heroicon-o-cog-6-tooth',
             ],
-            [
-                'key'   => 'recommendation-system',
-                'label' => 'translations.recommendation_system',
-                'icon'  => 'heroicon-o-sparkles',
-            ],
         ],
         'resources' => [
             App\Filament\Resources\SystemSettingResource::class,

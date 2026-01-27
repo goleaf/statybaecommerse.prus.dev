@@ -35,7 +35,6 @@ final class SearchInsightsService
                     'query_analysis'     => $this->analyzeQuery($query),
                     'search_trends'      => $this->getSearchTrends($query),
                     'user_behavior'      => $this->getUserBehavior($query, $context),
-                    'recommendations'    => $this->getRecommendations($query, $context),
                     'related_searches'   => $this->getRelatedSearches($query),
                     'search_suggestions' => $this->getSearchSuggestions($query),
                 ];
@@ -47,7 +46,6 @@ final class SearchInsightsService
                 'query_analysis'     => [],
                 'search_trends'      => [],
                 'user_behavior'      => [],
-                'recommendations'    => [],
                 'related_searches'   => [],
                 'search_suggestions' => [],
             ];
@@ -127,27 +125,6 @@ final class SearchInsightsService
             ];
         } catch (Exception $e) {
             Log::warning('User behavior analysis failed: ' . $e->getMessage());
-
-            return [];
-        }
-    }
-
-    /**
-     * Handle getRecommendations functionality with proper error handling.
-     */
-    private function getRecommendations(string $query, array $context): array
-    {
-        try {
-            return [
-                'query_optimization'           => $this->getQueryOptimizationRecommendations($query),
-                'content_suggestions'          => $this->getContentSuggestions($query),
-                'feature_recommendations'      => $this->getFeatureRecommendations($query, $context),
-                'performance_improvements'     => $this->getPerformanceImprovements($query),
-                'user_experience_enhancements' => $this->getUXEnhancements($query, $context),
-                'seo_recommendations'          => $this->getSEORecommendations($query),
-            ];
-        } catch (Exception $e) {
-            Log::warning('Recommendations generation failed: ' . $e->getMessage());
 
             return [];
         }
@@ -275,8 +252,6 @@ final class SearchInsightsService
             return 'compare';
         } elseif (preg_match('/\b(how|what|where|when|why)\b/', $query)) {
             return 'informational';
-        } elseif (preg_match('/\b(best|top|recommend)\b/', $query)) {
-            return 'recommendation';
         }
 
         return 'general';
@@ -575,32 +550,6 @@ final class SearchInsightsService
     }
 
     /**
-     * Handle getQueryOptimizationRecommendations functionality with proper error handling.
-     */
-    private function getQueryOptimizationRecommendations(string $query): array
-    {
-        try {
-            $recommendations = [];
-
-            if (strlen($query) < 3) {
-                $recommendations[] = 'Query is too short, add more specific terms';
-            }
-
-            if (preg_match('/\d+/', $query)) {
-                $recommendations[] = 'Query contains numbers, consider adding units or context';
-            }
-
-            if (strpos($query, ' ') === false) {
-                $recommendations[] = 'Single word query, try adding descriptive terms';
-            }
-
-            return $recommendations;
-        } catch (Exception $e) {
-            return [];
-        }
-    }
-
-    /**
      * Handle getContentSuggestions functionality with proper error handling.
      */
     private function getContentSuggestions(string $query): array
@@ -611,32 +560,6 @@ final class SearchInsightsService
                 'content_gaps'               => $this->getContentGaps($query),
                 'optimization_opportunities' => $this->getContentOptimizationOpportunities($query),
             ];
-        } catch (Exception $e) {
-            return [];
-        }
-    }
-
-    /**
-     * Handle getFeatureRecommendations functionality with proper error handling.
-     */
-    private function getFeatureRecommendations(string $query, array $context): array
-    {
-        try {
-            $recommendations = [];
-
-            if (strlen($query) > 20) {
-                $recommendations[] = 'Consider implementing query suggestions for long queries';
-            }
-
-            if (isset($context['user_id'])) {
-                $recommendations[] = 'Implement personalized search results';
-            }
-
-            if (preg_match('/\b(compare|vs|versus)\b/i', $query)) {
-                $recommendations[] = 'Add comparison feature for this query type';
-            }
-
-            return $recommendations;
         } catch (Exception $e) {
             return [];
         }
@@ -681,22 +604,6 @@ final class SearchInsightsService
             }
 
             return $enhancements;
-        } catch (Exception $e) {
-            return [];
-        }
-    }
-
-    /**
-     * Handle getSEORecommendations functionality with proper error handling.
-     */
-    private function getSEORecommendations(string $query): array
-    {
-        try {
-            return [
-                'meta_keywords'           => $this->generateMetaKeywords($query),
-                'title_suggestions'       => $this->generateTitleSuggestions($query),
-                'description_suggestions' => $this->generateDescriptionSuggestions($query),
-            ];
         } catch (Exception $e) {
             return [];
         }

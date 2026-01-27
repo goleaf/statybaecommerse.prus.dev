@@ -145,19 +145,4 @@ final class DataFilteringServiceTest extends TestCase
         $this->assertSame([0], array_values($filtered->keys()->all()));
     }
 
-    public function test_filter_new_recommendations_uses_strict_comparisons(): void
-    {
-        $recommendations = Collection::make([
-            // Integer identifier should be filtered out when the user interacted with the same integer.
-            ['id' => 1],
-            // String identifier should remain when only integer interactions are recorded.
-            ['id' => '1'],
-            // Null identifier should be discarded by guard clause.
-            ['foo' => 'bar'],
-        ]);
-
-        $filtered = $this->service->filterNewRecommendations($recommendations, [1]);
-
-        $this->assertSame(['1'], $filtered->pluck('id')->all());
-    }
 }

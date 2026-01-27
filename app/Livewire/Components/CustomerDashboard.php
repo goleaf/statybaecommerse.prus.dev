@@ -6,7 +6,6 @@ namespace App\Livewire\Components;
 
 use App\Livewire\Concerns\WithCart;
 use App\Livewire\Concerns\WithNotifications;
-use App\Models\Product;
 use App\Models\User;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection;
@@ -51,7 +50,8 @@ final class CustomerDashboard extends Component
             'completed_orders' => $this->user->orders()->whereIn('status', ['delivered', 'completed'])->count(),
             'pending_orders'   => $this->user->orders()->where('status', 'pending')->count(),
             'total_spent'      => $this->user->orders()->whereIn('status', ['delivered', 'completed'])->sum('total'),
-            'reviews_written'  => $this->user->reviews()->count(),
+            // Reviews are no longer supported, so keep the legacy stat stable at zero.
+            'reviews_written'  => 0,
             'member_since'     => $this->user->created_at->format('Y'),
             'last_order'       => $this->user->orders()->latest()->first()?->created_at?->diffForHumans(),
         ];
@@ -67,20 +67,6 @@ final class CustomerDashboard extends Component
     }
 
     /**
-     * Handle recommendedProducts functionality with proper error handling.
-     */
-    #[Computed(persist: true)]
-    public function recommendedProducts(): Collection
-    {
-        // Simple recommendation based on previous purchases
-        $purchasedCategories = $this->user->orders()->with('items.product.categories')->whereIn('status', ['delivered', 'completed'])->get()->pluck('items')->flatten()->pluck('product.categories')->flatten()->pluck('id')->unique();
-
-        return Product::query()->with(['media', 'brand'])->where('is_visible', true)->whereHas('categories', function ($query) use ($purchasedCategories) {
-            $query->whereIn('categories.id', $purchasedCategories);
-        })->whereNotIn('id', $this->user->orders()->with('items')->get()->pluck('items')->flatten()->pluck('product_id'))->inRandomOrder()->limit(4)->get();
-    }
-
-    /**
      * Handle addToCart functionality with proper error handling.
      */
     public function addToCart(int $productId): void
@@ -93,6 +79,9 @@ final class CustomerDashboard extends Component
      */
     public function render(): View
     {
-        return view('livewire.components.customer-dashboard', ['stats' => $this->stats, 'recentOrders' => $this->recentOrders, 'recommendedProducts' => $this->recommendedProducts]);
+        return view('livewire.components.customer-dashboard', [
+            'stats'        => $this->stats,
+            'recentOrders' => $this->recentOrders,
+        ]);
     }
 }

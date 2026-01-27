@@ -20,7 +20,6 @@ use App\Models\OrderItem;
 use App\Models\OrderShipping;
 use App\Models\Product;
 use App\Models\ProductVariant;
-use App\Models\RecommendationBlock;
 use App\Models\ReferralReward;
 use App\Models\SeoData;
 use App\Models\Slider;
@@ -98,9 +97,6 @@ final class AdminSeeder extends Seeder
 
                 // Create sliders
                 $this->createSliders();
-
-                // Create recommendation blocks
-                // $this->createRecommendationBlocks();
 
                 // Create SEO data
                 $this->createSeoData();
@@ -782,45 +778,6 @@ final class AdminSeeder extends Seeder
             Slider::updateOrCreate(
                 ['title' => $slider['title']],
                 $slider
-            );
-        }
-    }
-
-    private function createRecommendationBlocks(): void
-    {
-        $this->logInfo('💡 Creating recommendation blocks...');
-
-        $blocks = [
-            [
-                'name'         => 'featured',
-                'title'        => 'Featured Products',
-                'description'  => 'Our top-rated products',
-                'config_ids'   => [],
-                'is_active'    => true,
-                'max_products' => 10,
-            ],
-            [
-                'name'         => 'bestsellers',
-                'title'        => 'Best Sellers',
-                'description'  => 'Most popular items',
-                'config_ids'   => [],
-                'is_active'    => true,
-                'max_products' => 10,
-            ],
-            [
-                'name'         => 'new_arrivals',
-                'title'        => 'New Arrivals',
-                'description'  => 'Latest products in store',
-                'config_ids'   => [],
-                'is_active'    => true,
-                'max_products' => 10,
-            ],
-        ];
-
-        foreach ($blocks as $block) {
-            RecommendationBlock::updateOrCreate(
-                ['title' => $block['title']],
-                $block
             );
         }
     }

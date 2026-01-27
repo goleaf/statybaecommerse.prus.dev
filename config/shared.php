@@ -71,7 +71,7 @@ return [
 
     'features' => [
         'compare_enabled'    => true,
-        'reviews_enabled'    => true,
+        'reviews_enabled'    => false,
         'ratings_enabled'    => true,
         'newsletter_enabled' => true,
         'search_suggestions' => true,

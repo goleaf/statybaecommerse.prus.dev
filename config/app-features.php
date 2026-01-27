@@ -28,7 +28,6 @@ return [
         'customer_groups'  => true,
         'partner_system'   => true,
         'comparison'       => true,
-        'recommendations'  => true,
     ],
 
     /*

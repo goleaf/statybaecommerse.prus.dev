@@ -461,32 +461,6 @@ final class AdminSeederTest extends TestCase
     }
 
     #[Test]
-    public function it_creates_recommendation_blocks_correctly(): void
-    {
-        $this->seed(AdminSeeder::class);
-
-        $this->assertDatabaseCount('recommendation_blocks', 3);
-
-        $this->assertDatabaseHas('recommendation_blocks', [
-            'title'     => 'Featured Products',
-            'name'      => 'featured',
-            'is_active' => true,
-        ]);
-
-        $this->assertDatabaseHas('recommendation_blocks', [
-            'title'     => 'Best Sellers',
-            'name'      => 'bestsellers',
-            'is_active' => true,
-        ]);
-
-        $this->assertDatabaseHas('recommendation_blocks', [
-            'title'     => 'New Arrivals',
-            'name'      => 'new_arrivals',
-            'is_active' => true,
-        ]);
-    }
-
-    #[Test]
     public function it_creates_seo_data_correctly(): void
     {
         $this->seed(AdminSeeder::class);
@@ -685,7 +659,6 @@ final class AdminSeederTest extends TestCase
         $this->assertDatabaseCount('order_shippings', 5);
         // Documents and discount codes are temporarily disabled in the seeder
         $this->assertDatabaseCount('sliders', 3);
-        $this->assertDatabaseCount('recommendation_blocks', 3);
         $this->assertDatabaseCount('seo_data', 2);
         $this->assertDatabaseCount('subscribers', 5);
         // Referral rewards are temporarily disabled in the seeder

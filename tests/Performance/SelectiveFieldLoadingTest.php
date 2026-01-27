@@ -252,8 +252,6 @@ final class SelectiveFieldLoadingTest extends TestCase
         $loadedProduct = Product::query()
             ->forProductList()
             ->withListRelations()
-            ->withAvg(['reviews as average_rating' => fn ($q) => $q->where('is_approved', true)], 'rating')
-            ->withCount(['reviews' => fn ($q) => $q->where('is_approved', true)])
             ->find($product->id);
 
         $this->assertNotNull($loadedProduct);
