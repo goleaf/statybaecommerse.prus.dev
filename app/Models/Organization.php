@@ -12,7 +12,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 /**
@@ -114,22 +113,6 @@ final class Organization extends Model
     }
 
     /**
-     * Tasks through projects (has-many-through).
-     */
-    public function tasks(): HasManyThrough
-    {
-        return $this->hasManyThrough(Task::class, Project::class);
-    }
-
-    /**
-     * Active tasks through projects.
-     */
-    public function activeTasks(): HasManyThrough
-    {
-        return $this->tasks()->whereIn('status', ['pending', 'in_progress']);
-    }
-
-    /**
      * Comments on organization (polymorphic).
      */
     public function comments(): MorphMany
@@ -143,14 +126,6 @@ final class Organization extends Model
     public function files(): MorphMany
     {
         return $this->morphMany(File::class, 'fileable');
-    }
-
-    /**
-     * Tags for organization (polymorphic many-to-many).
-     */
-    public function tags(): MorphMany
-    {
-        return $this->morphMany(Taggable::class, 'taggable');
     }
 
     // Scopes

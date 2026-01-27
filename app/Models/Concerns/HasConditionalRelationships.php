@@ -45,38 +45,6 @@ trait HasConditionalRelationships
     }
 
     /**
-     * Get tasks assigned to specific user.
-     */
-    public function tasksAssignedTo(\App\Models\User $user): HasMany
-    {
-        return $this->hasMany(\App\Models\Task::class)
-            ->whereHas('assignees', function (Builder $query) use ($user) {
-                $query->where('user_id', $user->id)
-                    ->where('responsibility', 'assignee');
-            });
-    }
-
-    /**
-     * Get overdue tasks.
-     */
-    public function overdueTasks(): HasMany
-    {
-        return $this->hasMany(\App\Models\Task::class)
-            ->where('due_date', '<', now())
-            ->whereNotIn('status', ['completed', 'cancelled']);
-    }
-
-    /**
-     * Get high priority tasks.
-     */
-    public function highPriorityTasks(): HasMany
-    {
-        return $this->hasMany(\App\Models\Task::class)
-            ->whereIn('priority', ['high', 'urgent'])
-            ->whereIn('status', ['pending', 'in_progress']);
-    }
-
-    /**
      * Get membership table name based on model.
      */
     protected function getMembershipTable(): string

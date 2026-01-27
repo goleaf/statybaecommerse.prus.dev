@@ -6,10 +6,8 @@ namespace App\Models\Concerns;
 
 use App\Models\Comment;
 use App\Models\File;
-use App\Models\Tag;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 /**
  * Trait for standardized polymorphic relationships.
@@ -88,24 +86,6 @@ trait HasPolymorphicRelationships
         ]);
     }
 
-    /**
-     * Tags relationship (polymorphic many-to-many).
-     */
-    public function tags(): MorphToMany
-    {
-        return $this->morphToMany(Tag::class, 'taggable', 'taggables')
-            ->withPivot(['tagged_by', 'tagged_at'])
-            ->withTimestamps();
-    }
-
-    /**
-     * Tags by type.
-     */
-    public function tagsByType(string $type): MorphToMany
-    {
-        return $this->tags()->where('type', $type);
-    }
-
     // Helper methods for polymorphic relationships
 
     /**
@@ -132,41 +112,6 @@ trait HasPolymorphicRelationships
     }
 
     /**
-     * Add tag to model.
-     */
-    public function addTag(Tag $tag, ?\App\Models\User $tagger = null): void
-    {
-        $this->tags()->attach($tag->id, [
-            'tagged_by' => $tagger?->id,
-            'tagged_at' => now(),
-        ]);
-    }
-
-    /**
-     * Remove tag from model.
-     */
-    public function removeTag(Tag $tag): void
-    {
-        $this->tags()->detach($tag->id);
-    }
-
-    /**
-     * Sync tags for model.
-     */
-    public function syncTags(array $tagIds, ?\App\Models\User $tagger = null): void
-    {
-        $syncData = [];
-        foreach ($tagIds as $tagId) {
-            $syncData[$tagId] = [
-                'tagged_by' => $tagger?->id,
-                'tagged_at' => now(),
-            ];
-        }
-
-        $this->tags()->sync($syncData);
-    }
-
-    /**
      * Get comment count.
      */
     public function getCommentCount(): int
@@ -180,14 +125,6 @@ trait HasPolymorphicRelationships
     public function getFileCount(): int
     {
         return $this->files()->count();
-    }
-
-    /**
-     * Get tag names as array.
-     */
-    public function getTagNames(): array
-    {
-        return $this->tags()->pluck('name')->toArray();
     }
 
     // Scopes for polymorphic queries
@@ -206,23 +143,5 @@ trait HasPolymorphicRelationships
     public function scopeWithFiles(Builder $query): Builder
     {
         return $query->whereHas('files');
-    }
-
-    /**
-     * Scope for models with specific tags.
-     */
-    public function scopeWithTags(Builder $query, array $tagNames): Builder
-    {
-        return $query->whereHas('tags', function (Builder $tagQuery) use ($tagNames) {
-            $tagQuery->whereIn('name', $tagNames);
-        });
-    }
-
-    /**
-     * Scope for models without any tags.
-     */
-    public function scopeWithoutTags(Builder $query): Builder
-    {
-        return $query->whereDoesntHave('tags');
     }
 }

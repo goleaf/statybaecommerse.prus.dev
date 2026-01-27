@@ -11,10 +11,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 /**
  * Project
@@ -106,39 +103,6 @@ final class Project extends Model
     }
 
     /**
-     * Tasks in this project.
-     */
-    public function tasks(): HasMany
-    {
-        return $this->hasMany(Task::class);
-    }
-
-    /**
-     * Active tasks only.
-     */
-    public function activeTasks(): HasMany
-    {
-        return $this->tasks()->whereIn('status', ['pending', 'in_progress']);
-    }
-
-    /**
-     * Root tasks (no parent).
-     */
-    public function rootTasks(): HasMany
-    {
-        return $this->tasks()->whereNull('parent_task_id');
-    }
-
-    /**
-     * Comments through tasks (has-many-through).
-     */
-    public function taskComments(): HasManyThrough
-    {
-        return $this->hasManyThrough(Comment::class, Task::class, 'project_id', 'commentable_id')
-            ->where('commentable_type', Task::class);
-    }
-
-    /**
      * Organization owner through organization (has-one-through).
      */
     public function organizationOwner(): HasOneThrough
@@ -156,30 +120,6 @@ final class Project extends Model
                 ->where('organization_user.role', 'owner')
                 ->where('organization_user.is_active', true);
         });
-    }
-
-    /**
-     * Comments on project (polymorphic).
-     */
-    public function comments(): MorphMany
-    {
-        return $this->morphMany(Comment::class, 'commentable');
-    }
-
-    /**
-     * Files attached to project (polymorphic).
-     */
-    public function files(): MorphMany
-    {
-        return $this->morphMany(File::class, 'fileable');
-    }
-
-    /**
-     * Tags for project (polymorphic many-to-many).
-     */
-    public function tags(): MorphMany
-    {
-        return $this->morphMany(Taggable::class, 'taggable');
     }
 
     // Scopes
@@ -215,20 +155,6 @@ final class Project extends Model
                     $orgQuery->where('user_id', $user->id);
                 });
         });
-    }
-
-    public function scopeWithLatestTask(Builder $query): Builder
-    {
-        return $query->addSelect([
-            'latest_task_id' => Task::select('id')
-                ->whereColumn('project_id', 'projects.id')
-                ->orderBy('created_at', 'desc')
-                ->limit(1),
-            'latest_task_title' => Task::select('title')
-                ->whereColumn('project_id', 'projects.id')
-                ->orderBy('created_at', 'desc')
-                ->limit(1),
-        ]);
     }
 
     // Helper methods

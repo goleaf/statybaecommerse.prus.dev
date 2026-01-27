@@ -75,14 +75,6 @@ final class File extends Model
         return $this->belongsTo(User::class, 'uploaded_by');
     }
 
-    /**
-     * Tags for this file (polymorphic many-to-many).
-     */
-    public function tags(): MorphMany
-    {
-        return $this->morphMany(Taggable::class, 'taggable');
-    }
-
     // Scopes
 
     public function scopeByMimeType(Builder $query, string $mimeType): Builder
@@ -180,3 +172,4 @@ final class File extends Model
         return Storage::disk($this->disk)->exists($this->path);
     }
 }
+

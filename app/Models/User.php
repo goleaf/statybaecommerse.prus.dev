@@ -685,14 +685,6 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     }
 
     /**
-     * Handle tags functionality with proper error handling.
-     */
-    public function tags(): MorphMany
-    {
-        return $this->morphMany(\App\Models\Tag::class, 'taggable');
-    }
-
-    /**
      * Handle files functionality with proper error handling.
      */
     public function files(): MorphMany
@@ -1062,3 +1054,5 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
         return is_array($preferences) ? $preferences : [];
     }
 }
+
+

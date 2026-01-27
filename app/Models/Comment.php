@@ -111,14 +111,6 @@ final class Comment extends Model
         return $this->morphMany(File::class, 'fileable');
     }
 
-    /**
-     * Tags for this comment (polymorphic many-to-many).
-     */
-    public function tags(): MorphMany
-    {
-        return $this->morphMany(Taggable::class, 'taggable');
-    }
-
     // Scopes
 
     public function scopeApproved(Builder $query): Builder
@@ -298,3 +290,4 @@ final class Comment extends Model
         return 'parent_id';
     }
 }
+
