@@ -7,7 +7,6 @@ namespace App\Support\Frontend\DataProviders;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
-use App\Models\Review;
 use App\Services\Shared\CacheService as SharedCacheService;
 use App\Support\Cache\CacheKeys;
 use App\Support\Cache\CacheTagHelper;
@@ -34,8 +33,8 @@ final class HomepageCatalogueDataProvider
                     'products_count'   => Product::query()->count(),
                     'categories_count' => Category::query()->count(),
                     'brands_count'     => Brand::query()->count(),
-                    'reviews_count'    => Review::query()->where('is_approved', true)->count(),
-                    'avg_rating'       => (float) (Review::query()->where('is_approved', true)->avg('rating') ?? 0.0),
+                    'reviews_count'    => 0,
+                    'avg_rating'       => 0.0,
                 ];
             },
             CacheKeys::TTL_ONE_HOUR,
@@ -78,7 +77,6 @@ final class HomepageCatalogueDataProvider
             function (): Collection {
                 return $this->baseProductQuery()
                     ->orderByDesc('requests_count')
-                    ->orderByDesc('approved_reviews_count')
                     ->orderByDesc('published_at')
                     ->limit(8)
                     ->get();

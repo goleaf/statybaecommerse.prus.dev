@@ -168,12 +168,12 @@ final class VariantComparisonTable extends Component
 
     public function getVariantRating(ProductVariant $variant): float
     {
-        return $variant->product->average_rating ?? 0;
+        return 0;
     }
 
     public function getVariantReviewsCount(ProductVariant $variant): int
     {
-        return $variant->product->reviews_count ?? 0;
+        return 0;
     }
 
     public function getVariantWeight(ProductVariant $variant): float

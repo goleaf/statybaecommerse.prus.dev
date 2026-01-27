@@ -76,7 +76,7 @@ it('feature: exposes product search results through the form component', functio
 
     expect($results)
         ->not()->toBeEmpty()
-        ->and($results[0]->value())
+        ->and($results[0]['value'] ?? null)
         ->toBeString();
 
     $normalised = SearchResultPayload::hydrate($results[0]);

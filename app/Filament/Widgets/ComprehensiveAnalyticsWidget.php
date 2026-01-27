@@ -8,7 +8,6 @@ use App\Models\CampaignView;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\ProductVariant;
-use App\Models\Review;
 use App\Models\User;
 use App\Models\UserBehavior;
 use App\Models\WishlistItem;
@@ -37,7 +36,6 @@ class ComprehensiveAnalyticsWidget extends ChartWidget
         $usersData = [];
         $productsData = [];
         $variantsData = [];
-        $reviewsData = [];
         $wishlistData = [];
         $pageViewsData = [];
         $searchesData = [];
@@ -74,10 +72,6 @@ class ComprehensiveAnalyticsWidget extends ChartWidget
             // New Variants
             $variants = ProductVariant::whereDate('created_at', $date)->count();
             $variantsData[] = $variants;
-
-            // New Reviews
-            $reviews = Review::whereDate('created_at', $date)->count();
-            $reviewsData[] = $reviews;
 
             // Wishlist Items
             $wishlist = WishlistItem::whereDate('created_at', $date)->count();
@@ -160,15 +154,6 @@ class ComprehensiveAnalyticsWidget extends ChartWidget
                     'data'            => $variantsData,
                     'borderColor'     => 'rgb(239, 68, 68)',
                     'backgroundColor' => 'rgba(239, 68, 68, 0.1)',
-                    'fill'            => true,
-                    'tension'         => 0.4,
-                    'yAxisID'         => 'y1',
-                ],
-                [
-                    'label'           => 'Reviews',
-                    'data'            => $reviewsData,
-                    'borderColor'     => 'rgb(16, 185, 129)',
-                    'backgroundColor' => 'rgba(16, 185, 129, 0.1)',
                     'fill'            => true,
                     'tension'         => 0.4,
                     'yAxisID'         => 'y1',

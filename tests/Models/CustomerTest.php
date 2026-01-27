@@ -10,7 +10,6 @@ use App\Models\Company;
 use App\Models\Country;
 use App\Models\Customer;
 use App\Models\Order;
-use App\Models\Review;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -111,16 +110,6 @@ final class CustomerTest extends TestCase
         // Assert that the relationship matches the expected type and target model.
         $this->assertInstanceOf(HasMany::class, $relationship);
         $this->assertSame(Address::class, $relationship->getRelated()::class);
-    }
-
-    public function test_reviews_relationship_definition(): void
-    {
-        // Resolve the relationship instance to ensure it is configured correctly.
-        $relationship = (new Customer)->reviews();
-
-        // Assert that the relationship matches the expected type and target model.
-        $this->assertInstanceOf(HasMany::class, $relationship);
-        $this->assertSame(Review::class, $relationship->getRelated()::class);
     }
 
     public function test_scope_active_filters_inactive_records(): void

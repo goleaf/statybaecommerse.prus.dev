@@ -12,7 +12,7 @@
                 </p>
                 @if (!empty($items))
                     <p class="uppercase font-semibold text-2xl sm:text-3xl md:text-4xl">
-                        {{ (int)($summary['item_count'] ?? 0) }} {{ trans_choice('messages.frontend, (int)($summary['item_count'] ?? 0)) }}
+                        {{ (int) ($summary['item_count'] ?? 0) }} {{ trans_choice('messages.frontend', (int) ($summary['item_count'] ?? 0)) }}
                     </p>
                 @endif
             </div>

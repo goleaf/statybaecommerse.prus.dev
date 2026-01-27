@@ -87,6 +87,11 @@ test('clear helper flushes dependent keys', function (): void {
     $component = MockeryFacade::mock(SearchableInput::class);
 
     $component
+        ->shouldReceive('getStatePath')
+        ->once()
+        ->andReturn('product_id');
+
+    $component
         ->shouldReceive('state')
         ->once()
         ->with(null)
@@ -109,8 +114,9 @@ test('clear helper flushes dependent keys', function (): void {
         'name'       => 'Example',
     ]);
 
-    expect($calls)->toBe([
+    expect($calls)->toMatchArray([
         'product_id' => null,
+        'product_id_payload' => [],
         'name'       => 'Example',
     ]);
 });

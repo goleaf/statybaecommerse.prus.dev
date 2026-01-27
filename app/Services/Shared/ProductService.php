@@ -197,9 +197,7 @@ final class ProductService
             $q->where('locale', $locale);
         }, 'media', 'prices' => function ($pq) use ($currency): void {
             $pq->whereRelation('currency', 'code', $currency);
-        }, 'prices.currency:id,code,symbol', 'categories:id,name,slug', 'reviews' => function ($q): void {
-            $q->where('is_approved', true);
-        }];
+        }, 'prices.currency:id,code,symbol', 'categories:id,name,slug'];
     }
 
     /**
@@ -269,7 +267,7 @@ final class ProductService
             'created_at' => $query->orderBy('created_at', $direction),
             'updated_at' => $query->orderBy('updated_at', $direction),
             'popularity' => $query->withCount('orderItems')->orderBy('order_items_count', $direction),
-            'rating'     => $query->withAvg('reviews', 'rating')->orderBy('reviews_avg_rating', $direction),
+            'rating'     => $query->orderBy('created_at', $direction),
             default      => $query->orderBy('created_at', $direction),
         };
 

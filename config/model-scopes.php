@@ -102,7 +102,6 @@ return [
     ],
 
     ApprovedScope::class => [
-        App\Models\Review::class,
     ],
 
     StatusScope::class => [

@@ -70,22 +70,7 @@
                                     {{ $product->trans('name') ?? $product->name }}
                                 </h1>
                                 <div class="mt-3 flex flex-wrap items-center gap-4 text-sm text-slate-600">
-                                    <div class="flex items-center gap-1">
-                                        @for ($i = 1; $i <= 5; $i++)
-                                            @if ($this->averageRating >= $i - 0.25)
-                                                <x-heroicon-s-star class="h-4 w-4 text-amber-500" />
-                                            @else
-                                                <x-heroicon-o-star class="h-4 w-4 text-slate-200" />
-                                            @endif
-                                        @endfor
-                                        <span
-                                              class="ml-2 font-semibold text-slate-700">{{ number_format($this->averageRating, 1) }}</span>
-                                    </div>
-                                    <span class="text-slate-300">•</span>
-                                    <span class="font-medium text-slate-600">{{ $this->reviewCount }}
-                                        {{ __('messages.reviews') }}</span>
                                     @if ($product->sku)
-                                        <span class="text-slate-300">•</span>
                                         <span class="text-slate-500">{{ __('messages.sku') }}:
                                             {{ $product->sku }}</span>
                                     @endif
@@ -434,15 +419,6 @@
                         </section>
                     @endif
 
-                    @if ((bool) (config('app-features.features.review') ?? true))
-                        <section class="rounded-3xl border border-slate-100 bg-white shadow-sm">
-                            <div class="space-y-6 p-6 lg:p-8">
-                                <h2 class="text-lg font-semibold text-slate-900">
-                                    {{ __('messages.product_reviews') }}</h2>
-                                <livewire:components.product-reviews :product="$product" />
-                            </div>
-                        </section>
-                    @endif
                 </div>
 
                 <div class="lg:col-span-5 space-y-6">
@@ -563,7 +539,4 @@
 
 @push('scripts')
     <script type="application/ld+json">{!! json_encode($this->productSchema, JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE) !!}</script>
-    @if ($this->reviewsSchema)
-        <script type="application/ld+json">{!! json_encode($this->reviewsSchema, JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE) !!}</script>
-    @endif
 @endpush

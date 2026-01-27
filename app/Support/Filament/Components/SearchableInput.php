@@ -18,6 +18,11 @@ class SearchableInput extends Select
      */
     protected array $meta = [];
 
+    /**
+     * @var array<int, array{value: string, label: string, data: array<string, mixed>}>
+     */
+    protected array $lastSearchResults = [];
+
     public function payload(array $payload): static
     {
         $this->payload = $payload;
@@ -64,6 +69,67 @@ class SearchableInput extends Select
     public function searchUsing(?\Closure $callback): static
     {
         return $this->getSearchResultsUsing($callback);
+    }
+
+    public function getSearchResults(string $search): array
+    {
+        $results = parent::getSearchResults($search);
+        $this->lastSearchResults = [];
+
+        if ($results === []) {
+            return $results;
+        }
+
+        if (array_is_list($results) && $results[0] instanceof \App\Support\Search\SearchResult) {
+            $this->lastSearchResults = array_map(
+                static fn (\App\Support\Search\SearchResult $result): array => $result->toArray(),
+                $results,
+            );
+
+            return array_reduce(
+                $results,
+                static function (array $options, \App\Support\Search\SearchResult $result): array {
+                    $options[$result->value()] = $result->label();
+
+                    return $options;
+                },
+                [],
+            );
+        }
+
+        if (array_is_list($results) && is_array($results[0]) && array_key_exists('value', $results[0])) {
+            /** @var array<int, array{value: string, label: string, data?: array<string, mixed>}> $results */
+            $this->lastSearchResults = $results;
+
+            return array_reduce(
+                $results,
+                static function (array $options, array $result): array {
+                    $options[(string) $result['value']] = (string) $result['label'];
+
+                    return $options;
+                },
+                [],
+            );
+        }
+
+        return $results;
+    }
+
+    public function getSearchResultsForJs(string $search): array
+    {
+        $options = $this->getSearchResults($search);
+
+        if ($this->lastSearchResults !== []) {
+            return array_map(static function (array $result): array {
+                return [
+                    'label' => (string) ($result['label'] ?? ''),
+                    'value' => (string) ($result['value'] ?? ''),
+                    'data'  => is_array($result['data'] ?? null) ? $result['data'] : [],
+                ];
+            }, $this->lastSearchResults);
+        }
+
+        return parent::getSearchResultsForJs($search);
     }
 
     /**

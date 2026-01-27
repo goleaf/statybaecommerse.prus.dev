@@ -29,8 +29,7 @@ final class ProductController extends Controller
 
         // Construct the base query with all relations required by the resource to avoid N+1 issues.
         $query = Product::query()
-            ->with(['media', 'variants', 'categories', 'brand'])
-            ->withCount('reviews');
+            ->with(['media', 'variants', 'categories', 'brand']);
 
         // Apply an allow-listed search term if supplied by the caller.
         if (is_string($filters['q']) && $filters['q'] !== '') {
@@ -96,7 +95,7 @@ final class ProductController extends Controller
     public function show(Request $request, Product $product): JsonResponse
     {
         // Always ensure the product payload includes the relations our resource expects.
-        $product->loadMissing(['media', 'variants', 'categories', 'brand'])->loadCount('reviews');
+        $product->loadMissing(['media', 'variants', 'categories', 'brand']);
 
         // Abort for soft-deleted or unpublished products to prevent leaking draft catalogue data.
         if ($product->trashed() || ! $product->isPublished()) {
@@ -111,7 +110,7 @@ final class ProductController extends Controller
         $etagPayload = implode('|', [
             $product->getKey(),
             optional($product->updated_at)?->toIsoString(),
-            (string) $product->reviews_count,
+            '0',
         ]);
         $etag = sha1($etagPayload);
 

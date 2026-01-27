@@ -7,7 +7,6 @@ namespace App\Services\Frontend;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
-use App\Models\Review;
 use App\Services\Shared\CacheService;
 use App\Services\Shared\ProductService;
 use App\Support\Cache\CacheKeys;
@@ -31,8 +30,8 @@ final class HomepageDataProvider
                     'products'       => Product::query()->where('is_visible', true)->count(),
                     'categories'     => Category::query()->where('is_visible', true)->count(),
                     'brands'         => Brand::query()->where('is_enabled', true)->count(),
-                    'reviews'        => Review::query()->where('is_approved', true)->count(),
-                    'average_rating' => (float) (Review::query()->where('is_approved', true)->avg('rating') ?? 0.0),
+                    'reviews'        => 0,
+                    'average_rating' => 0.0,
                 ];
             }
         );
@@ -65,12 +64,10 @@ final class HomepageDataProvider
                         'prices.currency',
                     ])
                     ->withSum('orderItems as orders_quantity', 'quantity')
-                    ->withAvg('reviews', 'rating')
                     ->where('is_visible', true)
                     ->whereNotNull('published_at')
                     ->where('published_at', '<=', now())
                     ->orderByDesc('orders_quantity')
-                    ->orderByDesc('reviews_avg_rating')
                     ->orderByDesc('published_at')
                     ->limit($limit)
                     ->get();

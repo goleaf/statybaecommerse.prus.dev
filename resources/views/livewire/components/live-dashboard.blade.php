@@ -206,40 +206,6 @@
             </div>
         @endif
 
-        @if(in_array('reviews', $selectedMetrics))
-            <div
-                wire:key="analytics-reviews"
-                class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200"
-            >
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm font-medium text-gray-600">{{ __('translations.today') }}</p>
-                        <p class="text-3xl font-bold text-gray-900">{{ number_format($this->realTimeStats['reviews']['total']) }}</p>
-                        <p class="text-sm text-green-600 flex items-center gap-1 mt-1">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                            </svg>
-                            +{{ $this->realTimeStats['reviews']['today'] }} {{ __('translations.avg_rating') }}
-                        </p>
-                    </div>
-                    <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
-                        <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                        </svg>
-                    </div>
-                </div>
-                <div class="mt-4 grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                        <span class="text-gray-500">{{ __('translations.pending') }}:</span>
-                        <span class="font-semibold text-yellow-600">{{ number_format($this->realTimeStats['reviews']['avg_rating'], 1) }}/5</span>
-                    </div>
-                    <div>
-                        <span class="text-gray-500">{{ __('translations.recent_orders') }}:</span>
-                        <span class="font-semibold text-orange-600">{{ $this->realTimeStats['reviews']['pending'] }}</span>
-                    </div>
-                </div>
-            </div>
-        @endif
     </div>
 
     <!-- Live Activity Feed -->
@@ -292,50 +258,6 @@
             </div>
         </div>
 
-        <!-- Recent Reviews -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                    <div class="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></div>
-                    {{ __('translations.view_all') }}
-                </h3>
-                <a href="{{ route('reviews.index') }}" class="text-sm text-blue-600 hover:text-blue-800 font-medium">
-                    {{ __('translations.no_recent_reviews') }}
-                </a>
-            </div>
-            
-            <div class="space-y-3">
-                @forelse($this->liveActivity['recent_reviews'] as $review)
-                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200">
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
-                                <svg class="w-4 h-4 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                </svg>
-                            </div>
-                            <div>
-                                <p class="text-sm font-medium text-gray-900">{{ $review['product_name'] }}</p>
-                                <p class="text-xs text-gray-500">{{ $review['user_name'] }} • {{ $review['created_at'] }}</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-1">
-                            @for($i = 1; $i <= 5; $i++)
-                                <svg class="w-3 h-3 {{ $i <= $review['rating'] ? 'text-yellow-400' : 'text-gray-300' }}" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                </svg>
-                            @endfor
-                        </div>
-                    </div>
-                @empty
-                    <div class="text-center py-8 text-gray-500">
-                        <svg class="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                        </svg>
-                        <p>{{ __('translations.performance_metrics') }}</p>
-                    </div>
-                @endforelse
-            </div>
-        </div>
     </div>
 
 </div>

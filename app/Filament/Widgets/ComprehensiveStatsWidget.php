@@ -6,7 +6,6 @@ namespace App\Filament\Widgets;
 
 use App\Models\Order;
 use App\Models\Product;
-use App\Models\Review;
 use App\Models\User;
 use Filament\Widgets\StatsOverviewWidget as BaseStatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -56,9 +55,6 @@ final class ComprehensiveStatsWidget extends BaseStatsOverviewWidget
 
         $averageOrderValue = $totalOrders > 0 ? $totalRevenue / $totalOrders : 0;
 
-        $totalReviews = (int) Review::count();
-        $averageRating = (float) (Review::avg('rating') ?? 0);
-
         return [
             Stat::make(__('translations.total_revenue'), '€' . number_format($totalRevenue, 2))
                 ->description($revenueChange >= 0 ? '+' . number_format($revenueChange, 1) . '%' : number_format($revenueChange, 1) . '%')
@@ -86,10 +82,6 @@ final class ComprehensiveStatsWidget extends BaseStatsOverviewWidget
                 ->description(__('translations.per_order'))
                 ->descriptionIcon('heroicon-m-calculator')
                 ->color('info'),
-            Stat::make(__('translations.total_reviews'), number_format($totalReviews))
-                ->description(number_format($averageRating, 1) . ' ' . __('translations.average_rating'))
-                ->descriptionIcon('heroicon-m-star')
-                ->color('warning'),
             Stat::make(__('translations.conversions'), '2.4%')
                 ->description('+0.3% ' . __('translations.from_last_month'))
                 ->descriptionIcon('heroicon-m-arrow-trending-up')

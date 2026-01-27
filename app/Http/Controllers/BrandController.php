@@ -51,8 +51,6 @@ final class BrandController extends Controller
                 ->where('is_visible', true)
                 ->whereNotNull('published_at')
                 ->where('published_at', '<=', now())
-                ->withCount('reviews')
-                ->withAvg('reviews', 'rating')
                 ->orderByDesc('published_at')
                 ->get()
                 ->filter(function ($product) {

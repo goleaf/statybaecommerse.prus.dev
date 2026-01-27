@@ -7,7 +7,6 @@ namespace App\Livewire\Components;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
-use App\Models\Review;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection;
 use Livewire\Attributes\Computed;
@@ -36,7 +35,7 @@ class ComputedPropertiesDemo extends Component
     #[Computed]
     public function stats(): array
     {
-        return ['users' => \App\Models\User::count(), 'products' => Product::where('is_visible', true)->count(), 'categories' => Category::where('is_visible', true)->count(), 'brands' => Brand::where('is_enabled', true)->count(), 'reviews' => Review::where('is_approved', true)->count()];
+        return ['users' => \App\Models\User::count(), 'products' => Product::where('is_visible', true)->count(), 'categories' => Category::where('is_visible', true)->count(), 'brands' => Brand::where('is_enabled', true)->count(), 'reviews' => 0];
     }
 
     /**
@@ -85,7 +84,7 @@ class ComputedPropertiesDemo extends Component
     public function expensiveAnalytics(): array
     {
         // This expensive calculation will be cached across requests
-        $topProducts = Product::query()->where('is_visible', true)->whereHas('reviews')->withCount('reviews')->orderByDesc('reviews_count')->limit(5)->get();
+        $topProducts = Product::query()->where('is_visible', true)->orderByDesc('created_at')->limit(5)->get();
         $topBrands = Brand::query()->where('is_enabled', true)->whereHas('products', function ($query) {
             $query->where('is_visible', true);
         })->withCount(['products' => function ($query) {
@@ -93,7 +92,7 @@ class ComputedPropertiesDemo extends Component
         }])->orderByDesc('products_count')->limit(5)->get();
 
         return ['top_products' => $topProducts->map(function ($product) {
-            return ['id' => $product->id, 'name' => $product->name, 'reviews_count' => $product->reviews_count, 'image' => $product->getFirstMediaUrl('images')];
+            return ['id' => $product->id, 'name' => $product->name, 'reviews_count' => 0, 'image' => $product->getFirstMediaUrl('images')];
         }), 'top_brands' => $topBrands->map(function ($brand) {
             return ['id' => $brand->id, 'name' => $brand->name, 'products_count' => $brand->products_count, 'image' => $brand->getFirstMediaUrl('logo')];
         })];
@@ -106,7 +105,7 @@ class ComputedPropertiesDemo extends Component
     public function globalSiteStats(): array
     {
         // This will be cached globally across all instances
-        return ['total_products' => Product::where('is_visible', true)->count(), 'total_categories' => Category::where('is_visible', true)->count(), 'total_brands' => Brand::where('is_enabled', true)->count(), 'total_reviews' => Review::where('is_approved', true)->count(), 'average_rating' => Review::where('is_approved', true)->avg('rating') ?? 0, 'last_updated' => now()->toISOString()];
+        return ['total_products' => Product::where('is_visible', true)->count(), 'total_categories' => Category::where('is_visible', true)->count(), 'total_brands' => Brand::where('is_enabled', true)->count(), 'total_reviews' => 0, 'average_rating' => 0, 'last_updated' => now()->toISOString()];
     }
 
     /**

@@ -7,7 +7,6 @@ namespace App\Support\Frontend\DataProviders;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
-use App\Models\Review;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 
@@ -24,8 +23,8 @@ final class HomePageDataProvider
                 'products_count'   => $this->countPublishedProducts(),
                 'categories_count' => Category::query()->count(),
                 'brands_count'     => $this->countVisibleBrands(),
-                'reviews_count'    => Review::query()->where('is_approved', true)->count(),
-                'avg_rating'       => (float) (Review::query()->where('is_approved', true)->avg('rating') ?? 0.0),
+                'reviews_count'    => 0,
+                'avg_rating'       => 0.0,
             ];
         });
 

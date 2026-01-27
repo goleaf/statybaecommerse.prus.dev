@@ -37,12 +37,10 @@ class OptimizedProductService
             ])
             // Use aggregate functions instead of separate queries
             ->withCount([
-                'reviews',
                 'variants as active_variants_count' => function ($query) {
                     $query->where('status', 'active');
                 },
             ])
-            ->withAvg('reviews', 'rating')
             ->withSum('variants', 'stock_quantity')
             // Use subquery selects for complex calculations
             ->addSelect([
@@ -103,14 +101,10 @@ class OptimizedProductService
                     'variants.attributeValues.attribute:id,name,type,display_name',
                     'variants.inventory:variant_id,quantity,reserved_quantity,location',
                     'images:id,product_id,path,alt_text,sort_order',
-                    'reviews:id,product_id,user_id,rating,comment,created_at',
-                    'reviews.user:id,name,avatar_path',
                     'tags:id,name,slug,color',
                     'relatedProducts:id,name,slug,price',
                     'relatedProducts.productImages:id,product_id,path,alt_text',
                 ])
-                    ->withCount(['reviews'])
-                    ->withAvg('reviews', 'rating')
                     ->find($productId);
             }
         );
@@ -129,8 +123,6 @@ class OptimizedProductService
             'variants:id,product_id,price,stock_quantity',
             'images:id,product_id,path,alt_text',
         ])
-            ->withCount('reviews')
-            ->withAvg('reviews', 'rating')
             ->addSelect([
                 'min_price' => function ($query) {
                     $query->select(DB::raw('MIN(price)'))
@@ -161,8 +153,6 @@ class OptimizedProductService
                     'variants:id,product_id,price,stock_quantity',
                     'images:id,product_id,path,alt_text',
                 ])
-                    ->withCount('reviews')
-                    ->withAvg('reviews', 'rating')
                     ->addSelect([
                         'min_price' => function ($query) {
                             $query->select(DB::raw('MIN(price)'))

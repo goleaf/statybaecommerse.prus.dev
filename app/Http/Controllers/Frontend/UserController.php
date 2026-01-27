@@ -55,19 +55,13 @@ final class UserController extends Controller
     {
         $user = Auth::user();
         // Get user statistics
-        $stats = ['orders_count' => $user->orders()->count(), 'total_spent' => $user->total_spent, 'reviews_count' => $user->reviews()->count(), 'addresses_count' => $user->addresses()->count()];
+        $stats = ['orders_count' => $user->orders()->count(), 'total_spent' => $user->total_spent, 'reviews_count' => 0, 'addresses_count' => $user->addresses()->count()];
         // Get recent orders
         $recentOrders = $user->orders()->with(['items.product'])->latest()->limit(5)->get()->skipWhile(function ($order) {
             // Skip orders that are not properly configured for display
             return empty($order->number) || empty($order->status) || $order->total_amount <= 0 || empty($order->items);
         });
-        // Get recent reviews
-        $recentReviews = $user->reviews()->with('product')->latest()->limit(3)->get()->skipWhile(function ($review) {
-            // Skip reviews that are not properly configured for display
-            return empty($review->title) || empty($review->comment) || $review->rating <= 0 || ! $review->is_approved;
-        });
-
-        return view('users.dashboard', compact('user', 'stats', 'recentOrders', 'recentReviews'));
+        return view('users.dashboard', compact('user', 'stats', 'recentOrders'));
     }
 
     /**
@@ -203,17 +197,6 @@ final class UserController extends Controller
     }
 
     /**
-     * Handle reviews functionality with proper error handling.
-     */
-    public function reviews(): View
-    {
-        $user = Auth::user();
-        $reviews = $user->reviews()->with('product')->latest()->paginate(10);
-
-        return view('users.reviews', compact('reviews'));
-    }
-
-    /**
      * Handle wishlist functionality with proper error handling.
      */
     public function wishlist(): View
@@ -271,7 +254,7 @@ final class UserController extends Controller
                 'total_spent'         => $user->total_spent,
                 'average_order_value' => $user->average_order_value,
             ],
-            'reviews'   => ['total' => $user->reviews()->count(), 'average_rating' => $user->average_rating],
+            'reviews'   => ['total' => 0, 'average_rating' => 0],
             'wishlist'  => ['total' => $user->wishlist()->count()],
             'addresses' => ['total' => $user->addresses()->count()],
             'documents' => ['total' => $user->documents()->count()],

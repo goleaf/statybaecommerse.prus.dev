@@ -74,7 +74,7 @@ class ProductResource extends JsonResource
                 'is_visible'  => (bool) $product->is_visible,
                 'is_featured' => (bool) $product->is_featured,
             ],
-            'reviews_count' => $product->reviews_count ?? 0,
+            'reviews_count' => 0,
             'links'         => [
                 'self' => route('product.show', $product->slug),
             ],

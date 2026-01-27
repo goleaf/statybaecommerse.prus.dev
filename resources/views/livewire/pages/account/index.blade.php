@@ -11,12 +11,6 @@ $links = [
     [
         'title' => __('messages.frontend'),
         'description' => __('messages.frontend'),
-        'href' => route('account.reviews'),
-        'icon' => 'untitledui-star-07',
-    ],
-    [
-        'title' => __('messages.frontend'),
-        'description' => __('messages.frontend'),
         'href' => route('account.profile'),
         'icon' => 'untitledui-shield-tick',
     ],
