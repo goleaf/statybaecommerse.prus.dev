@@ -9,7 +9,7 @@
 
     $cardPreset = $preset ?? 'featured';
     
-    // Brand colors from app.scss
+    // Brand colors from app.css
     $brandPrimary = '#262523';
     $brandPrimaryLight = '#81817d';
     $brandPrimaryLighter = '#b3b2ae';

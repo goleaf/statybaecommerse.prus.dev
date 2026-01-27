@@ -26,7 +26,7 @@ class OrderResource extends BaseResource
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-shopping-bag';
 
-    protected static string|UnitEnum|null $navigationGroup = NavigationGroup::Orders;
+    protected static string|UnitEnum|null $navigationGroup = null;
 
     protected static ?int $navigationSort = 1;
 

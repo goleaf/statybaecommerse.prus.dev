@@ -433,7 +433,7 @@
                             <h2 class="text-base font-semibold text-slate-900">
                                 {{ __('product_page.need_tailored_offer') }}</h2>
                             <p class="text-sm text-slate-600">{{ __('product_page.contact_us_description') }}</p>
-                            <a href="{{ $contactUrl }}"
+                            <a href="{{ $this->contactUrl }}"
                                class="inline-flex items-center justify-center rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700">
                                 <x-heroicon-o-phone class="mr-2 h-4 w-4" />
                                 {{ __('product_page.need_tailored_offer') }}

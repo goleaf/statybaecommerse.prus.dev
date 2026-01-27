@@ -251,14 +251,6 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
     }
 
     /**
-     * Handle analytics functionality with proper error handling.
-     */
-    public function analytics(): HasMany
-    {
-        return $this->hasMany(VariantAnalytics::class, 'variant_id');
-    }
-
-    /**
      * Handle inventories functionality with proper error handling.
      */
     public function inventories(): HasMany
@@ -747,71 +739,6 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
     }
 
     /**
-     * Record a view for analytics.
-     */
-    public function recordView(): bool
-    {
-        $this->increment('views_count');
-
-        // Record daily analytics
-        $this->recordDailyAnalytics('views');
-
-        return true;
-    }
-
-    /**
-     * Record a click for analytics.
-     */
-    public function recordClick(): bool
-    {
-        $this->increment('clicks_count');
-
-        // Record daily analytics
-        $this->recordDailyAnalytics('clicks');
-
-        return true;
-    }
-
-    /**
-     * Record daily analytics data.
-     */
-    public function recordDailyAnalytics(string $metric, int $amount = 1): void
-    {
-        $timestamp = now();
-        $metrics = [$metric => $amount];
-
-        VariantAnalytics::recordAnalytics(
-            $this->id,
-            $timestamp,
-            $metrics,
-            VariantAnalytics::BUCKET_DAILY,
-            $this->product_id
-        );
-
-        VariantAnalytics::recordAnalytics(
-            $this->id,
-            $timestamp,
-            $metrics,
-            VariantAnalytics::BUCKET_WEEKLY,
-            $this->product_id
-        );
-    }
-
-    /**
-     * Update conversion rate.
-     */
-    public function updateConversionRate(): bool
-    {
-        if ($this->views_count > 0) {
-            $this->conversion_rate = ($this->sold_quantity / $this->views_count) * 100;
-
-            return $this->save();
-        }
-
-        return false;
-    }
-
-    /**
      * Update available quantity.
      */
     public function updateAvailableQuantity(): bool
@@ -929,5 +856,25 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
     public function translations(): HasMany
     {
         return $this->hasMany(\App\Models\Translations\ProductVariantTranslation::class);
+    }
+
+    /**
+     * Get translated field value for the specified locale.
+     * Uses the eager-loaded translations relationship to avoid N+1 queries.
+     */
+    public function trans(string $field, ?string $locale = null): mixed
+    {
+        $locale ??= app()->getLocale();
+
+        // If translations are loaded, use them to avoid additional queries
+        if ($this->relationLoaded('translations')) {
+            $translation = $this->translations->firstWhere('locale', $locale);
+            if ($translation && isset($translation->{$field})) {
+                return $translation->{$field};
+            }
+        }
+
+        // Fallback to the base field value
+        return $this->{$field} ?? null;
     }
 }

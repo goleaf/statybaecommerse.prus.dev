@@ -21,8 +21,6 @@
         "concurrently": "^9.0.1",
         "laravel-vite-plugin": "^2.0.1",
         "opencode-ai": "^1.1.36",
-        "sass": "^1.93.2",
-        "sass-embedded": "^1.92.1",
         "tailwindcss": "^4.1.16",
         "vite": "^7.1.12"
     },

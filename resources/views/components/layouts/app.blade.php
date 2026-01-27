@@ -54,13 +54,13 @@
     @php
         $manifestPath = public_path('build/manifest.json');
         $manifest = file_exists($manifestPath) ? json_decode(file_get_contents($manifestPath), true) : null;
-        $cssFile = $manifest['resources/css/app.scss']['file'] ?? null;
+        $cssFile = $manifest['resources/css/app.css']['file'] ?? null;
         $jsFile = $manifest['resources/js/app.js']['file'] ?? null;
         $useViteDev = app()->environment('local') && \App\Support\ViteManifest::isPopulated();
     @endphp
 
     @if ($useViteDev)
-        @vite(['resources/css/app.scss', 'resources/js/app.js'])
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
     @elseif ($cssFile && $jsFile)
         {{-- Use compiled assets in production --}}
         <link rel="stylesheet" href="{{ asset('build/' . $cssFile) }}">

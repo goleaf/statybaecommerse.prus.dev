@@ -15,7 +15,6 @@ use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Panel;
 use Filament\PanelProvider;
-use Filament\Support\Colors\Color;
 use Filament\Widgets\Widget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -112,9 +111,7 @@ class AdminPanelProvider extends PanelProvider
             ->login()
             ->authGuard('admin')
             ->authPasswordBroker('admin_users')
-            ->colors([
-                'primary' => Color::Blue,
-            ])
+            ->darkMode(false)
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,

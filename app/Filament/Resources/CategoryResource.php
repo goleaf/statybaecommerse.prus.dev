@@ -29,7 +29,7 @@ final class CategoryResource extends BaseResource
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-folder';
 
-    protected static string|UnitEnum|null $navigationGroup = NavigationGroup::Inventory;
+    protected static string|UnitEnum|null $navigationGroup = null;
 
     protected static ?int $navigationSort = 3;
 

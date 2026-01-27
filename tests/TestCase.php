@@ -451,10 +451,10 @@ abstract class TestCase extends BaseTestCase
 
         $manifest = [
             // Provide minimal asset mappings so Blade's @vite directive resolves without throwing.
-            'resources/css/app.scss' => [
+            'resources/css/app.css' => [
                 'file'    => 'assets/app.css',
                 'isEntry' => true,
-                'src'     => 'resources/css/app.scss',
+                'src'     => 'resources/css/app.css',
             ],
             'resources/js/app.js' => [
                 'file'    => 'assets/app.js',

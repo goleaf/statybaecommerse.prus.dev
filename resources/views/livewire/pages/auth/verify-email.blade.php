@@ -1,38 +1,3 @@
-<?php
-use App\Livewire\Actions\Logout;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Session;
-use Livewire\Attributes\Layout;
-use Livewire\Volt\Component;
-
-new #[Layout('components.layouts.base')] class extends Component {
-    /**
-     * Send an email verification notification to the user.
-     */
-    public function sendVerification(): void
-    {
-        if (Auth::user()->hasVerifiedEmail()) {
-            $this->redirectIntended(default: route('account.index', absolute: false), navigate: true);
-
-            return;
-        }
-
-        Auth::user()->sendEmailVerificationNotification();
-
-        Session::flash('status', 'verification-link-sent');
-    }
-
-    /**
-     * Log the current user out of the application.
-     */
-    public function logout(Logout $logout): void
-    {
-        $logout();
-
-        $this->redirect('/', navigate: true);
-    }
-}; ?>
-
 <div class="relative">
     <svg
          class="absolute inset-0 -z-10 h-full w-full stroke-gray-100 [mask-image:radial-gradient(100%_100%_at_top_right,white,transparent)]"

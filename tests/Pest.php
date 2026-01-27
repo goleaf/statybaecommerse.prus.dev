@@ -47,9 +47,9 @@ beforeAll(function (): void {
     }
     if (! file_exists($manifestPath)) {
         file_put_contents($manifestPath, json_encode([
-            'resources/css/app.scss' => [
+            'resources/css/app.css' => [
                 'file'    => 'css/app.css',
-                'src'     => 'resources/css/app.scss',
+                'src'     => 'resources/css/app.css',
                 'isEntry' => true,
             ],
             'resources/js/app.js' => [

@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Filament\Pages;
 
 use App\Enums\NavigationGroup;
+use App\Models\News as NewsModel;
 use App\Models\Slider;
 use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use App\Support\Filament\Components\SearchableInput;
 use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\ContentLinkSearch;
-use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
@@ -66,7 +66,7 @@ class SliderManagement extends Page implements HasActions, HasForms
 
     public static function getNavigationGroup(): ?string
     {
-        return NavigationGroup::Content->label(); // Keep slider tooling with the rest of the content curation pages.
+        return null;
     }
 
     public function mount(): void

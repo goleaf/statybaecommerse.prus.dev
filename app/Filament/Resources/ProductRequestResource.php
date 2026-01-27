@@ -24,7 +24,7 @@ final class ProductRequestResource extends BaseResource
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-inbox';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Inventory';
+    protected static string|UnitEnum|null $navigationGroup = null;
 
     public static function form(Schema $schema): Schema
     {

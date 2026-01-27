@@ -126,6 +126,7 @@ return array (
   'profesional_s_statybos_rankiai_ir_ranga_nuo_stanley_tools_lithuania_patikimi_sprendimai_statybininkams' => 'Profesionalūs statybos įrankiai ir įranga nuo Stanley Tools Lithuania. Patikimi sprendimai statybininkams.',
   'profesional_s_statybos_rankiai_ir_ranga_nuo_stihl_baltic_patikimi_sprendimai_statybininkams' => 'Profesionalūs statybos įrankiai ir įranga nuo STIHL Baltic. Patikimi sprendimai statybininkams.',
   'profesional_s_statybos_rankiai_ir_ranga_nuo_tremco_baltic_patikimi_sprendimai_statybininkams' => 'Profesionalūs statybos įrankiai ir įranga nuo Tremco Baltic. Patikimi sprendimai statybininkams.',
+  'profesional_s_statybos_rankiai_ir_ranga_nuo_w_rth_lietuva_patikimi_sprendimai_statybininkams' => 'Profesionalūs statybos įrankiai ir įranga nuo Würth Lietuva. Patikimi sprendimai statybininkams.',
   'rockwool_baltics' => 'Rockwool Baltics',
   'ryobi_baltics' => 'Ryobi Baltics',
   'sika_lietuva' => 'Sika Lietuva',

@@ -26,7 +26,7 @@ final class SearchExplorer extends Page
 
     public static function getNavigationGroup(): ?string
     {
-        return NavigationGroup::Search->label(); // Keep discovery tooling under the dedicated search navigation bucket.
+        return null;
     }
 
     public function getTitle(): string|Htmlable

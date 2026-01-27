@@ -52,7 +52,6 @@ return [
             App\Filament\Pages\Dashboard::class,
             App\Filament\Pages\SliderManagement::class,
             App\Filament\Pages\InventoryManagement::class,
-            App\Filament\Pages\AdvancedReports::class,
         ],
     ],
 ];

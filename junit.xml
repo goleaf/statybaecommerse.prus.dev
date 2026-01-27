@@ -1,164 +1,127 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="C:\Dropbox\projects\egistatyba\phpunit.xml" tests="14" assertions="10" errors="9" failures="1" skipped="0" time="22.553477">
-    <testsuite name="Unit" tests="3" assertions="6" errors="0" failures="1" skipped="0" time="21.587770">
-      <testsuite name="Tests\Unit\Filament\ProductResourceFormTest" file="tests\Unit\Filament\ProductResourceFormTest.php" tests="3" assertions="6" errors="0" failures="1" skipped="0" time="21.587770">
-        <testcase name="it respects an existing schema host that was already assigned" file="tests\Unit\Filament\ProductResourceFormTest.php::it respects an existing schema host that was already assigned" class="Tests\Unit\Filament\ProductResourceFormTest" classname="Tests.Unit.Filament.ProductResourceFormTest" assertions="2" time="21.229538"/>
-        <testcase name="it bootstraps a testing schema host when none is provided" file="tests\Unit\Filament\ProductResourceFormTest.php::it bootstraps a testing schema host when none is provided" class="Tests\Unit\Filament\ProductResourceFormTest" classname="Tests.Unit.Filament.ProductResourceFormTest" assertions="2" time="0.193156"/>
-        <testcase name="it product resource form returns a Schema instance and includes images field" file="tests\Unit\Filament\ProductResourceFormTest.php::it product resource form returns a Schema instance and includes images field" class="Tests\Unit\Filament\ProductResourceFormTest" classname="Tests.Unit.Filament.ProductResourceFormTest" assertions="2" time="0.165076">
-          <failure type="PHPUnit\Framework\ExpectationFailedException">it product resource form returns a Schema instance and includes images fieldFailed asserting that false is true.&#13;
-at tests\Unit\Filament\ProductResourceFormTest.php:30</failure>
-        </testcase>
-      </testsuite>
-    </testsuite>
-    <testsuite name="Feature" tests="11" assertions="4" errors="9" failures="0" skipped="0" time="0.965707">
-      <testsuite name="Tests\Filament\VariantInventoryResourceTest" file="tests\Filament\VariantInventoryResourceTest.php" tests="3" assertions="0" errors="3" failures="0" skipped="0" time="0.005283">
-        <testcase name="it normalises the variant payload including related product metadata" file="tests\Filament\VariantInventoryResourceTest.php::it normalises the variant payload including related product metadata" class="Tests\Filament\VariantInventoryResourceTest" classname="Tests.Filament.VariantInventoryResourceTest" assertions="0" time="0.003886">
-          <error type="Illuminate\Contracts\Container\BindingResolutionException">it normalises the variant payload including related product metadataIlluminate\Contracts\Container\BindingResolutionException: Target class [config] does not exist.&#13;
-at vendor\laravel\framework\src\Illuminate\Container\Container.php:1122
-at vendor\laravel\framework\src\Illuminate\Container\Container.php:933
-at vendor\laravel\framework\src\Illuminate\Foundation\Application.php:1078
-at vendor\laravel\framework\src\Illuminate\Container\Container.php:864
-at vendor\laravel\framework\src\Illuminate\Foundation\Application.php:1058
-at vendor\laravel\framework\src\Illuminate\Container\Container.php:1809
-at vendor\laravel\framework\src\Illuminate\Database\DatabaseManager.php:384
-at vendor\laravel\framework\src\Illuminate\Database\DatabaseManager.php:95
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1980
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1946
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1713
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1611
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1647
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1600
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:2540
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:2556
-at tests\Filament\VariantInventoryResourceTest.php:64
+  <testsuite name="Tests\Unit\Models\RelationshipTest" file="tests\Unit\Models\RelationshipTest.php" tests="11" assertions="18" errors="4" failures="1" skipped="0" time="22.984799">
+    <testcase name="`Project Relationships` → project can add members" file="tests\Unit\Models\RelationshipTest.php::`Project Relationships` → project can add members" class="Tests\Unit\Models\RelationshipTest" classname="Tests.Unit.Models.RelationshipTest" assertions="0" time="20.822389">
+      <error type="Illuminate\Database\QueryException">`Project Relationships` → project can add membersIlluminate\Database\QueryException: Array to string conversion (Connection: sqlite, Database: :memory:, SQL: insert into "project_user" ("created_at", "joined_at", "permissions", "project_id", "role", "updated_at", "user_id") values (2026-01-27 17:35:22, 2026-01-27 17:35:22, ?, 1, lead, 2026-01-27 17:35:22, 1))&#13;
+at vendor\laravel\framework\src\Illuminate\Foundation\Bootstrap\HandleExceptions.php:258
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:734
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:580
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:827
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:794
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:573
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:537
+at vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php:4002
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithPivotTable.php:274
+at app\Models\Project.php:195
+at tests\Unit\Models\RelationshipTest.php:45
 Caused by
-ReflectionException: Class "config" does not exist
+ErrorException: Array to string conversion
 
-at vendor\laravel\framework\src\Illuminate\Container\Container.php:1122
-at vendor\laravel\framework\src\Illuminate\Container\Container.php:933
-at vendor\laravel\framework\src\Illuminate\Foundation\Application.php:1078
-at vendor\laravel\framework\src\Illuminate\Container\Container.php:864
-at vendor\laravel\framework\src\Illuminate\Foundation\Application.php:1058
-at vendor\laravel\framework\src\Illuminate\Container\Container.php:1809
-at vendor\laravel\framework\src\Illuminate\Database\DatabaseManager.php:384
-at vendor\laravel\framework\src\Illuminate\Database\DatabaseManager.php:95
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1980
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1946
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1713
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1611
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1647
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1600
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:2540
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:2556
-at tests\Filament\VariantInventoryResourceTest.php:64</error>
-        </testcase>
-        <testcase name="it clears lookup payload when the variant and location inputs are emptied" file="tests\Filament\VariantInventoryResourceTest.php::it clears lookup payload when the variant and location inputs are emptied" class="Tests\Filament\VariantInventoryResourceTest" classname="Tests.Filament.VariantInventoryResourceTest" assertions="0" time="0.000426">
-          <error type="Error">it clears lookup payload when the variant and location inputs are emptiedError: Class "App\Filament\Resources\VariantInventoryResource" not found&#13;
-at tests\Filament\VariantInventoryResourceTest.php:25</error>
-        </testcase>
-        <testcase name="it casts arbitrary location attributes into the expected payload shape" file="tests\Filament\VariantInventoryResourceTest.php::it casts arbitrary location attributes into the expected payload shape" class="Tests\Filament\VariantInventoryResourceTest" classname="Tests.Filament.VariantInventoryResourceTest" assertions="0" time="0.000970">
-          <error type="Illuminate\Contracts\Container\BindingResolutionException">it casts arbitrary location attributes into the expected payload shapeIlluminate\Contracts\Container\BindingResolutionException: Target class [config] does not exist.&#13;
-at vendor\laravel\framework\src\Illuminate\Container\Container.php:1122
-at vendor\laravel\framework\src\Illuminate\Container\Container.php:933
-at vendor\laravel\framework\src\Illuminate\Foundation\Application.php:1078
-at vendor\laravel\framework\src\Illuminate\Container\Container.php:864
-at vendor\laravel\framework\src\Illuminate\Foundation\Application.php:1058
-at vendor\laravel\framework\src\Illuminate\Container\Container.php:1809
-at vendor\laravel\framework\src\Illuminate\Database\DatabaseManager.php:384
-at vendor\laravel\framework\src\Illuminate\Database\DatabaseManager.php:95
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1980
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1946
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1713
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1611
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1647
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1600
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:2540
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:2556
-at tests\Filament\VariantInventoryResourceTest.php:101
+at vendor\laravel\framework\src\Illuminate\Foundation\Bootstrap\HandleExceptions.php:258
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:734
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:580
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:827
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:794
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:573
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:537
+at vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php:4002
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithPivotTable.php:274
+at app\Models\Project.php:195
+at tests\Unit\Models\RelationshipTest.php:45</error>
+    </testcase>
+    <testcase name="`Organization Relationships` → organization can check user membership" file="tests\Unit\Models\RelationshipTest.php::`Organization Relationships` → organization can check user membership" class="Tests\Unit\Models\RelationshipTest" classname="Tests.Unit.Models.RelationshipTest" assertions="0" time="0.362702">
+      <error type="Illuminate\Database\QueryException">`Organization Relationships` → organization can check user membershipIlluminate\Database\QueryException: Array to string conversion (Connection: sqlite, Database: C:\Dropbox\projects\egistatyba/database/testing/databases\testing_parallel_pid_2728.sqlite, SQL: insert into "organization_user" ("created_at", "is_active", "joined_at", "organization_id", "permissions", "role", "updated_at", "user_id") values (2026-01-27 17:35:23, 1, 2026-01-27 17:35:23, 1, ?, member, 2026-01-27 17:35:23, 1))&#13;
+at vendor\laravel\framework\src\Illuminate\Foundation\Bootstrap\HandleExceptions.php:258
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:734
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:580
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:827
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:794
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:573
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:537
+at vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php:4002
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithPivotTable.php:274
+at app\Models\Organization.php:169
+at tests\Unit\Models\RelationshipTest.php:31
 Caused by
-ReflectionException: Class "config" does not exist
+ErrorException: Array to string conversion
 
-at vendor\laravel\framework\src\Illuminate\Container\Container.php:1122
-at vendor\laravel\framework\src\Illuminate\Container\Container.php:933
-at vendor\laravel\framework\src\Illuminate\Foundation\Application.php:1078
-at vendor\laravel\framework\src\Illuminate\Container\Container.php:864
-at vendor\laravel\framework\src\Illuminate\Foundation\Application.php:1058
-at vendor\laravel\framework\src\Illuminate\Container\Container.php:1809
-at vendor\laravel\framework\src\Illuminate\Database\DatabaseManager.php:384
-at vendor\laravel\framework\src\Illuminate\Database\DatabaseManager.php:95
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1980
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1946
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1713
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1611
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1647
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1600
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:2540
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:2556
-at tests\Filament\VariantInventoryResourceTest.php:101</error>
-        </testcase>
-      </testsuite>
-      <testsuite name="Tests\Filament\BaseListRecordsTest" file="tests\Filament\BaseListRecordsTest.php" tests="3" assertions="4" errors="1" failures="0" skipped="0" time="0.352517">
-        <testcase name="it boots and touches the table records when loadTable runs without prior Livewire lifecycle" file="tests\Filament\BaseListRecordsTest.php::it boots and touches the table records when loadTable runs without prior Livewire lifecycle" class="Tests\Filament\BaseListRecordsTest" classname="Tests.Filament.BaseListRecordsTest" assertions="0" time="0.121719">
-          <error type="TypeError">it boots and touches the table records when loadTable runs without prior Livewire lifecycleTypeError: Cannot assign null to property Filament\Resources\Pages\ListRecords::$table of type Filament\Tables\Table&#13;
-at tests\Filament\BaseListRecordsTest.php:78
-at tests\Filament\BaseListRecordsTest.php:16</error>
-        </testcase>
-        <testcase name="it mounts the create action when no action is already active" file="tests\Filament\BaseListRecordsTest.php::it mounts the create action when no action is already active" class="Tests\Filament\BaseListRecordsTest" classname="Tests.Filament.BaseListRecordsTest" assertions="2" time="0.115484"/>
-        <testcase name="it executes the mounted create action when the modal is already open" file="tests\Filament\BaseListRecordsTest.php::it executes the mounted create action when the modal is already open" class="Tests\Filament\BaseListRecordsTest" classname="Tests.Filament.BaseListRecordsTest" assertions="2" time="0.115314"/>
-      </testsuite>
-      <testsuite name="Tests\Filament\HasResizableColumnsTest" file="tests\Filament\HasResizableColumnsTest.php" tests="5" assertions="0" errors="5" failures="0" skipped="0" time="0.607907">
-        <testcase name="it skips persisting column widths when no admin guard is authenticated" file="tests\Filament\HasResizableColumnsTest.php::it skips persisting column widths when no admin guard is authenticated" class="Tests\Filament\HasResizableColumnsTest" classname="Tests.Filament.HasResizableColumnsTest" assertions="0" time="0.123419">
-          <error type="Mockery\Exception">it skips persisting column widths when no admin guard is authenticatedMockery\Exception: The class \HasResizableColumnsHarness is marked final and its methods cannot be replaced. Classes marked final can be passed in to \Mockery::mock() as instantiated objects to create a partial mock, but only if the mock is not subject to type hinting checks.&#13;
-at vendor\mockery\mockery\library\Mockery\Generator\MockConfiguration.php:367
-at vendor\mockery\mockery\library\Mockery\Generator\MockConfiguration.php:182
-at vendor\mockery\mockery\library\Mockery\Generator\StringManipulationGenerator.php:66
-at vendor\mockery\mockery\library\Mockery\Generator\CachingGenerator.php:41
-at vendor\mockery\mockery\library\Mockery\Container.php:395
-at vendor\mockery\mockery\library\Mockery.php:477
-at tests\Filament\HasResizableColumnsTest.php:18</error>
-        </testcase>
-        <testcase name="it persists column widths once the admin guard is available" file="tests\Filament\HasResizableColumnsTest.php::it persists column widths once the admin guard is available" class="Tests\Filament\HasResizableColumnsTest" classname="Tests.Filament.HasResizableColumnsTest" assertions="0" time="0.114440">
-          <error type="Mockery\Exception">it persists column widths once the admin guard is availableMockery\Exception: The class \HasResizableColumnsHarness is marked final and its methods cannot be replaced. Classes marked final can be passed in to \Mockery::mock() as instantiated objects to create a partial mock, but only if the mock is not subject to type hinting checks.&#13;
-at vendor\mockery\mockery\library\Mockery\Generator\MockConfiguration.php:367
-at vendor\mockery\mockery\library\Mockery\Generator\MockConfiguration.php:182
-at vendor\mockery\mockery\library\Mockery\Generator\StringManipulationGenerator.php:66
-at vendor\mockery\mockery\library\Mockery\Generator\CachingGenerator.php:41
-at vendor\mockery\mockery\library\Mockery\Container.php:395
-at vendor\mockery\mockery\library\Mockery.php:477
-at tests\Filament\HasResizableColumnsTest.php:31</error>
-        </testcase>
-        <testcase name="it clears cached widths instead of hitting the database for guests" file="tests\Filament\HasResizableColumnsTest.php::it clears cached widths instead of hitting the database for guests" class="Tests\Filament\HasResizableColumnsTest" classname="Tests.Filament.HasResizableColumnsTest" assertions="0" time="0.117721">
-          <error type="Mockery\Exception">it clears cached widths instead of hitting the database for guestsMockery\Exception: The class \HasResizableColumnsHarness is marked final and its methods cannot be replaced. Classes marked final can be passed in to \Mockery::mock() as instantiated objects to create a partial mock, but only if the mock is not subject to type hinting checks.&#13;
-at vendor\mockery\mockery\library\Mockery\Generator\MockConfiguration.php:367
-at vendor\mockery\mockery\library\Mockery\Generator\MockConfiguration.php:182
-at vendor\mockery\mockery\library\Mockery\Generator\StringManipulationGenerator.php:66
-at vendor\mockery\mockery\library\Mockery\Generator\CachingGenerator.php:41
-at vendor\mockery\mockery\library\Mockery\Container.php:395
-at vendor\mockery\mockery\library\Mockery.php:477
-at tests\Filament\HasResizableColumnsTest.php:44</error>
-        </testcase>
-        <testcase name="it loads persisted widths when the admin guard is populated" file="tests\Filament\HasResizableColumnsTest.php::it loads persisted widths when the admin guard is populated" class="Tests\Filament\HasResizableColumnsTest" classname="Tests.Filament.HasResizableColumnsTest" assertions="0" time="0.126189">
-          <error type="Mockery\Exception">it loads persisted widths when the admin guard is populatedMockery\Exception: The class \HasResizableColumnsHarness is marked final and its methods cannot be replaced. Classes marked final can be passed in to \Mockery::mock() as instantiated objects to create a partial mock, but only if the mock is not subject to type hinting checks.&#13;
-at vendor\mockery\mockery\library\Mockery\Generator\MockConfiguration.php:367
-at vendor\mockery\mockery\library\Mockery\Generator\MockConfiguration.php:182
-at vendor\mockery\mockery\library\Mockery\Generator\StringManipulationGenerator.php:66
-at vendor\mockery\mockery\library\Mockery\Generator\CachingGenerator.php:41
-at vendor\mockery\mockery\library\Mockery\Container.php:395
-at vendor\mockery\mockery\library\Mockery.php:477
-at tests\Filament\HasResizableColumnsTest.php:60</error>
-        </testcase>
-        <testcase name="it scopes the session cache key by panel identifier and admin id" file="tests\Filament\HasResizableColumnsTest.php::it scopes the session cache key by panel identifier and admin id" class="Tests\Filament\HasResizableColumnsTest" classname="Tests.Filament.HasResizableColumnsTest" assertions="0" time="0.126138">
-          <error type="Mockery\Exception">it scopes the session cache key by panel identifier and admin idMockery\Exception: The class \HasResizableColumnsHarness is marked final and its methods cannot be replaced. Classes marked final can be passed in to \Mockery::mock() as instantiated objects to create a partial mock, but only if the mock is not subject to type hinting checks.&#13;
-at vendor\mockery\mockery\library\Mockery\Generator\MockConfiguration.php:367
-at vendor\mockery\mockery\library\Mockery\Generator\MockConfiguration.php:182
-at vendor\mockery\mockery\library\Mockery\Generator\StringManipulationGenerator.php:66
-at vendor\mockery\mockery\library\Mockery\Generator\CachingGenerator.php:41
-at vendor\mockery\mockery\library\Mockery\Container.php:395
-at vendor\mockery\mockery\library\Mockery.php:477
-at tests\Filament\HasResizableColumnsTest.php:73</error>
-        </testcase>
-      </testsuite>
-    </testsuite>
+at vendor\laravel\framework\src\Illuminate\Foundation\Bootstrap\HandleExceptions.php:258
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:734
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:580
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:827
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:794
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:573
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:537
+at vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php:4002
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithPivotTable.php:274
+at app\Models\Organization.php:169
+at tests\Unit\Models\RelationshipTest.php:31</error>
+    </testcase>
+    <testcase name="`Complex Queries` → can get user projects across organizations" file="tests\Unit\Models\RelationshipTest.php::`Complex Queries` → can get user projects across organizations" class="Tests\Unit\Models\RelationshipTest" classname="Tests.Unit.Models.RelationshipTest" assertions="0" time="0.244673">
+      <error type="Illuminate\Database\QueryException">`Complex Queries` → can get user projects across organizationsIlluminate\Database\QueryException: Array to string conversion (Connection: sqlite, Database: C:\Dropbox\projects\egistatyba/database/testing/databases\testing_parallel_pid_2728.sqlite, SQL: insert into "organization_user" ("created_at", "is_active", "joined_at", "organization_id", "permissions", "role", "updated_at", "user_id") values (2026-01-27 17:35:23, 1, 2026-01-27 17:35:23, 2, ?, member, 2026-01-27 17:35:23, 2))&#13;
+at vendor\laravel\framework\src\Illuminate\Foundation\Bootstrap\HandleExceptions.php:258
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:734
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:580
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:827
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:794
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:573
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:537
+at vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php:4002
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithPivotTable.php:274
+at app\Models\Organization.php:169
+at tests\Unit\Models\RelationshipTest.php:129
+Caused by
+ErrorException: Array to string conversion
+
+at vendor\laravel\framework\src\Illuminate\Foundation\Bootstrap\HandleExceptions.php:258
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:734
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:580
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:827
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:794
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:573
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:537
+at vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php:4002
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithPivotTable.php:274
+at app\Models\Organization.php:169
+at tests\Unit\Models\RelationshipTest.php:129</error>
+    </testcase>
+    <testcase name="`Organization Relationships` → organization has users with roles" file="tests\Unit\Models\RelationshipTest.php::`Organization Relationships` → organization has users with roles" class="Tests\Unit\Models\RelationshipTest" classname="Tests.Unit.Models.RelationshipTest" assertions="0" time="0.233674">
+      <error type="Illuminate\Database\QueryException">`Organization Relationships` → organization has users with rolesIlluminate\Database\QueryException: Array to string conversion (Connection: sqlite, Database: C:\Dropbox\projects\egistatyba/database/testing/databases\testing_parallel_pid_2728.sqlite, SQL: insert into "organization_user" ("created_at", "is_active", "joined_at", "organization_id", "permissions", "role", "updated_at", "user_id") values (2026-01-27 17:35:23, 1, 2026-01-27 17:35:23, 3, ?, admin, 2026-01-27 17:35:23, 3))&#13;
+at vendor\laravel\framework\src\Illuminate\Foundation\Bootstrap\HandleExceptions.php:258
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:734
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:580
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:827
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:794
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:573
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:537
+at vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php:4002
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithPivotTable.php:274
+at app\Models\Organization.php:169
+at tests\Unit\Models\RelationshipTest.php:18
+Caused by
+ErrorException: Array to string conversion
+
+at vendor\laravel\framework\src\Illuminate\Foundation\Bootstrap\HandleExceptions.php:258
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:734
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:580
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:827
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:794
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:573
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:537
+at vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php:4002
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithPivotTable.php:274
+at app\Models\Organization.php:169
+at tests\Unit\Models\RelationshipTest.php:18</error>
+    </testcase>
+    <testcase name="`Project Relationships` → project scopes work correctly" file="tests\Unit\Models\RelationshipTest.php::`Project Relationships` → project scopes work correctly" class="Tests\Unit\Models\RelationshipTest" classname="Tests.Unit.Models.RelationshipTest" assertions="2" time="0.206409">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">`Project Relationships` → project scopes work correctlyFailed asserting that 4 is identical to 1.&#13;
+at tests\Unit\Models\RelationshipTest.php:56</failure>
+    </testcase>
+    <testcase name="`Project Relationships` → project belongs to organization" file="tests\Unit\Models\RelationshipTest.php::`Project Relationships` → project belongs to organization" class="Tests\Unit\Models\RelationshipTest" classname="Tests.Unit.Models.RelationshipTest" assertions="1" time="0.175359"/>
+    <testcase name="`Polymorphic Relationships` → models can have files" file="tests\Unit\Models\RelationshipTest.php::`Polymorphic Relationships` → models can have files" class="Tests\Unit\Models\RelationshipTest" classname="Tests.Unit.Models.RelationshipTest" assertions="3" time="0.196307"/>
+    <testcase name="`Organization Relationships` → organization has projects" file="tests\Unit\Models\RelationshipTest.php::`Organization Relationships` → organization has projects" class="Tests\Unit\Models\RelationshipTest" classname="Tests.Unit.Models.RelationshipTest" assertions="2" time="0.172403"/>
+    <testcase name="`Polymorphic Relationships` → models can have comments" file="tests\Unit\Models\RelationshipTest.php::`Polymorphic Relationships` → models can have comments" class="Tests\Unit\Models\RelationshipTest" classname="Tests.Unit.Models.RelationshipTest" assertions="3" time="0.182060"/>
+    <testcase name="`Nested Comments` → comments can have replies" file="tests\Unit\Models\RelationshipTest.php::`Nested Comments` → comments can have replies" class="Tests\Unit\Models\RelationshipTest" classname="Tests.Unit.Models.RelationshipTest" assertions="4" time="0.188181"/>
+    <testcase name="`Nested Comments` → comment hierarchy methods work" file="tests\Unit\Models\RelationshipTest.php::`Nested Comments` → comment hierarchy methods work" class="Tests\Unit\Models\RelationshipTest" classname="Tests.Unit.Models.RelationshipTest" assertions="3" time="0.200643"/>
   </testsuite>
 </testsuites>

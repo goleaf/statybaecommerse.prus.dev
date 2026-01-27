@@ -7,20 +7,12 @@ namespace App\Livewire\Pages\Account;
 use App\Services\NotificationService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Schema;
+use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithPagination;
 
-/**
- * Notifications
- *
- * Livewire component for Notifications with reactive frontend functionality, real-time updates, and user interaction handling.
- *
- * @property array  $notifications
- * @property string $filter
- * @property bool   $showUnreadOnly
- * @property mixed  $listeners
- */
-final class Notifications extends Component
+#[Layout('components.layouts.templates.account')]
+class Notifications extends Component
 {
     use WithPagination;
 
@@ -32,17 +24,11 @@ final class Notifications extends Component
 
     protected $listeners = ['refreshNotifications' => 'loadNotifications'];
 
-    /**
-     * Initialize the Livewire component with parameters.
-     */
     public function mount(): void
     {
         $this->loadNotifications();
     }
 
-    /**
-     * Handle loadNotifications functionality with proper error handling.
-     */
     public function loadNotifications(): void
     {
         $user = auth()->user();
@@ -51,27 +37,43 @@ final class Notifications extends Component
 
             return;
         }
+
         $query = $user->notifications()->latest();
+
         if ($this->showUnreadOnly) {
             $query->whereNull('read_at');
         }
+
         if ($this->filter !== 'all') {
             $query->whereJsonContains('data->type', $this->filter);
         }
-        $this->notifications = $query->limit(100)->get(['id', 'type', 'data', 'read_at', 'created_at'])->map(function ($n) {
-            $data = $n->data ?? [];
 
-            return ['id' => $n->id, 'type' => $data['type'] ?? 'info', 'action' => $data['action'] ?? 'updated', 'title' => $data['title'] ?? __('notifications.types.info'), 'message' => $data['message'] ?? '', 'data' => $data, 'read_at' => $n->read_at, 'created_at' => $n->created_at, 'time_ago' => $this->getTimeAgo($n->created_at)];
-        })->toArray();
+        $this->notifications = $query
+            ->limit(100)
+            ->get(['id', 'type', 'data', 'read_at', 'created_at'])
+            ->map(function ($n) {
+                $data = $n->data ?? [];
+
+                return [
+                    'id' => $n->id,
+                    'type' => $data['type'] ?? 'info',
+                    'action' => $data['action'] ?? 'updated',
+                    'title' => $data['title'] ?? __('notifications.types.info'),
+                    'message' => $data['message'] ?? '',
+                    'data' => $data,
+                    'read_at' => $n->read_at,
+                    'created_at' => $n->created_at,
+                    'time_ago' => $this->getTimeAgo($n->created_at),
+                ];
+            })
+            ->toArray();
     }
 
-    /**
-     * Handle markAsRead functionality with proper error handling.
-     */
     public function markAsRead(string $notificationId): void
     {
         $user = auth()->user();
         $notification = $user->notifications()->find($notificationId);
+
         if ($notification && ! $notification->read_at) {
             $notification->markAsRead();
             $this->loadNotifications();
@@ -79,9 +81,6 @@ final class Notifications extends Component
         }
     }
 
-    /**
-     * Handle markAllAsRead functionality with proper error handling.
-     */
     public function markAllAsRead(): void
     {
         $user = auth()->user();
@@ -90,22 +89,17 @@ final class Notifications extends Component
         $this->dispatch('all-notifications-marked-read');
     }
 
-    /**
-     * Handle deleteNotification functionality with proper error handling.
-     */
     public function deleteNotification(string $notificationId): void
     {
         $user = auth()->user();
         $deleted = app(NotificationService::class)->deleteNotification($user, $notificationId);
+
         if ($deleted) {
             $this->loadNotifications();
             $this->dispatch('notification-deleted');
         }
     }
 
-    /**
-     * Handle deleteAllNotifications functionality with proper error handling.
-     */
     public function deleteAllNotifications(): void
     {
         $user = auth()->user();
@@ -114,31 +108,21 @@ final class Notifications extends Component
         $this->dispatch('all-notifications-deleted');
     }
 
-    /**
-     * Handle updatedFilter functionality with proper error handling.
-     */
     public function updatedFilter(): void
     {
         $this->loadNotifications();
     }
 
-    /**
-     * Handle updatedShowUnreadOnly functionality with proper error handling.
-     */
     public function updatedShowUnreadOnly(): void
     {
         $this->loadNotifications();
     }
 
-    /**
-     * Handle getTimeAgo functionality with proper error handling.
-     *
-     * @param mixed $datetime
-     */
     private function getTimeAgo($datetime): string
     {
         $now = now();
         $diff = $now->diffInMinutes($datetime);
+
         if ($diff < 1) {
             return __('notifications.time.just_now');
         } elseif ($diff < 60) {
@@ -166,9 +150,6 @@ final class Notifications extends Component
         }
     }
 
-    /**
-     * Handle getUnreadCount functionality with proper error handling.
-     */
     public function getUnreadCount(): int
     {
         $user = auth()->user();
@@ -176,9 +157,6 @@ final class Notifications extends Component
         return $user ? app(NotificationService::class)->getUnreadCount($user) : 0;
     }
 
-    /**
-     * Render the Livewire component view with current state.
-     */
     public function render(): View
     {
         return view('livewire.pages.account.notifications');

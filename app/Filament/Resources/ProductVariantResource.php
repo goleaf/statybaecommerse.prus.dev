@@ -25,7 +25,7 @@ final class ProductVariantResource extends BaseResource
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-list-bullet';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Inventory';
+    protected static string|UnitEnum|null $navigationGroup = null;
 
     public static function form(Schema $schema): Schema
     {

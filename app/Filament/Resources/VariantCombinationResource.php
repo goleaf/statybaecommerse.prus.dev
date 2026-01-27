@@ -48,7 +48,7 @@ final class VariantCombinationResource extends BaseResource
      * Match Filament's required union type so sidebar grouping works with native enums while still
      * supporting plain string labels during configuration overrides.
      */
-    protected static string|UnitEnum|null $navigationGroup = NavigationGroup::Inventory;
+    protected static string|UnitEnum|null $navigationGroup = null;
 
     protected static ?int $navigationSort = 19;
 

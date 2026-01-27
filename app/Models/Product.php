@@ -720,11 +720,6 @@ final class Product extends Model implements HasMedia, TranslatableRecord
         return $this->belongsToMany(Collection::class, 'product_collections');
     }
 
-    public function userBehaviors(): HasMany
-    {
-        return $this->hasMany(UserBehavior::class);
-    }
-
     /**
      * Handle images functionality with proper error handling.
      */

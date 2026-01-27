@@ -35,7 +35,7 @@ final class DataImportExport extends Page
 
     public static function getNavigationGroup(): ?string
     {
-        return NavigationGroup::System->label();
+        return null;
     }
 
     public function getTitle(): string|Htmlable

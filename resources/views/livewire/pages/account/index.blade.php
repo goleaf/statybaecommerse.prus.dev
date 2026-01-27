@@ -1,6 +1,5 @@
 {{-- Account Index Page --}}
 @php
-// Build links without Volt computed to avoid test-time Volt closure issues
 $links = [
     [
         'title' => __('messages.frontend'),

@@ -6,8 +6,6 @@ use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Livewire\Pages;
 use Illuminate\Support\Facades\Route;
 
-// Avoid importing Volt directly; resolve via FQCN checks to prevent CLI context failures
-
 Route::middleware('guest')->group(function (): void {
     Route::get('register', \App\Livewire\Auth\Register::class)->name('register');
     Route::get('login', \App\Livewire\Auth\Login::class)
@@ -16,7 +14,7 @@ Route::middleware('guest')->group(function (): void {
     Route::get('forgot-password', \App\Livewire\Pages\Auth\ForgotPassword::class)
         ->middleware('throttle:auth.password-reset')
         ->name('password.request');
-    Route::view('reset-password/{token}', 'livewire.pages.auth.reset-password')
+    Route::get('reset-password/{token}', \App\Livewire\Pages\Auth\ResetPassword::class)
         ->middleware('throttle:auth.password-reset')
         ->name('password.reset');
 });
@@ -26,13 +24,13 @@ Route::middleware('auth')->group(function (): void {
     Route::post('logout', \App\Livewire\Actions\Logout::class)->name('logout');
     // Graceful GET logout for direct URL visits
     Route::get('logout', \App\Livewire\Actions\Logout::class)->name('logout.get');
-    Route::view('verify-email', 'livewire.pages.auth.verify-email')->name('verification.notice');
+    Route::get('verify-email', \App\Livewire\Pages\Auth\VerifyEmail::class)->name('verification.notice');
 
     Route::get('verify-email/{id}/{hash}', VerifyEmailController::class)
         ->middleware(['signed', 'throttle:6,1'])
         ->name('verification.verify');
 
-    Route::view('confirm-password', 'livewire.pages.auth.confirm-password')->name('password.confirm');
+    Route::get('confirm-password', \App\Livewire\Pages\Auth\ConfirmPassword::class)->name('password.confirm');
 
     // Account dashboard routes are defined below to keep them under auth middleware.
 
@@ -52,9 +50,9 @@ Route::middleware('auth')->group(function (): void {
         })->name('order.show');
 
         // Documents page
-        Route::view('documents', 'livewire.pages.account.documents')->name('documents');
+        Route::get('documents', \App\Livewire\Pages\Account\Documents::class)->name('documents');
 
         // Notifications page (graceful if DB notifications not set up)
-        Route::view('notifications', 'livewire.pages.account.notifications')->name('notifications');
+        Route::get('notifications', \App\Livewire\Pages\Account\Notifications::class)->name('notifications');
     });
 });

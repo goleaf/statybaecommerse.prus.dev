@@ -35,6 +35,7 @@ return array (
   'porro_voluptas' => 'Porro Voluptas',
   'quia_dicta' => 'Quia Dicta',
   'quia_non' => 'Quia Non',
+  'repellendus_et' => 'Repellendus Et',
   'rerum_tempora' => 'Rerum Tempora',
   'sapiente_pariatur' => 'Sapiente Pariatur',
   'size_l' => 'Size L',
