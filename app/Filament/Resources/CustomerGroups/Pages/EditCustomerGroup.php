@@ -1,19 +1,17 @@
 <?php
 
-declare(strict_types=1);
+namespace App\Filament\Resources\CustomerGroups\Pages;
 
-namespace App\Filament\Resources\OrderResource\Pages;
-
-use App\Filament\Resources\OrderResource;
+use App\Filament\Resources\CustomerGroups\CustomerGroupResource;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
 
-class EditOrder extends EditRecord
+class EditCustomerGroup extends EditRecord
 {
-    protected static string $resource = OrderResource::class;
+    protected static string $resource = CustomerGroupResource::class;
 
     protected function getHeaderActions(): array
     {

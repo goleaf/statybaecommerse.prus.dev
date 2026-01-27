@@ -62,6 +62,8 @@ use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Number;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
+use Kirschbaum\Loop\Facades\Loop;
+use Kirschbaum\Loop\Filament\FilamentToolkit;
 
 use function in_array;
 
@@ -166,6 +168,10 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // Register Laravel Loop Filament Toolkit
+        if (class_exists(Loop::class) && class_exists(FilamentToolkit::class)) {
+            Loop::toolkit(FilamentToolkit::make());
+        }
 
         if ($this->app->runningUnitTests()) {
             // Ensure Filament keeps the full resource registry during tests so snapshot

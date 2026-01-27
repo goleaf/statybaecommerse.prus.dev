@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
 use App\Filament\Resources\BrandResource\Pages;
 use App\Models\Brand;
 use BackedEnum;

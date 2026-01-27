@@ -10,7 +10,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseTableWidget;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Number;
+use Illuminate\Support\Number;
 
 final class DashboardRecentOrdersTable extends BaseTableWidget
 {

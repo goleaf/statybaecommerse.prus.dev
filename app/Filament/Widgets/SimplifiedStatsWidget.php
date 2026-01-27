@@ -271,21 +271,10 @@ class SimplifiedStatsWidget extends BaseWidget
         );
     }
 
-    private function rememberDashboard(string $key, int $ttl, callable $callback): array
-    {
-        $store = Cache::getStore();
-
-        if ($store instanceof TaggableStore) {
-            return Cache::tags(CacheTagHelper::dashboards())->remember($key, $ttl, $callback);
-        }
-
-        return Cache::remember($key, $ttl, $callback);
-    }
+    /**
+     * Remember dashboard fragments while gracefully falling back when tags are unsupported.
 
     /**
-     * Remember dashboard cache entries while applying dashboard tags when supported.
-     *
-     * @return array<string, mixed>
      */
     protected function getReferenceTime(): Carbon
     {

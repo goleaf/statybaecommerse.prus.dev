@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
 use App\Filament\Resources\PriceResource\Pages;
 use App\Models\Price;
 use App\Models\Product;
@@ -66,10 +65,10 @@ final class PriceResource extends BaseResource
                                     SearchableInputHelper::hydrate(
                                         $component,
                                         $state,
-                                        static function (int $value): ?SearchResult {
+                                        static function (int|string $value): ?SearchResult {
                                             $product = Product::query()
                                                 ->select(['id', 'sku', 'name', 'price'])
-                                                ->find($value);
+                                                ->find((int) $value);
 
                                             if (! $product instanceof Product) {
                                                 return null;

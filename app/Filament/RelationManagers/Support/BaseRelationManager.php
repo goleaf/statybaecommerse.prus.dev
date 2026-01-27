@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\RelationManagers\Support;
 
+use App\Filament\Tables\Concerns\ConfiguresToggleableTableLayout;
 use Closure;
 // Support action-based schema entries in downstream implementations.
 use Filament\Actions\Action;
@@ -12,12 +13,11 @@ use Filament\Actions\ActionGroup;
 use Filament\Forms\Components\Component;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Table;
-use Hydrat\TableLayoutToggle\Concerns\HasToggleableTable;
 use Illuminate\Contracts\Support\Htmlable;
 
 abstract class BaseRelationManager extends RelationManager
 {
-    // Temporarily removed HasToggleableTable trait due to package compatibility
+    use ConfiguresToggleableTableLayout;
 
     public function table(Table $table): Table
     {

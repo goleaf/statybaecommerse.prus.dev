@@ -57,7 +57,7 @@ final class SliderQuickActionsWidget extends Widget implements HasActions, HasFo
                         SearchableInputHelper::hydrate(
                             $component,
                             $state,
-                            static fn (string $value): ?array => ['value' => $value, 'label' => $value],
+                            static fn (int|string $value): ?array => ['value' => $value, 'label' => $value],
                         );
                     })
                     ->afterStateUpdated(function (SearchableInput $component, ?string $state, callable $set): void {

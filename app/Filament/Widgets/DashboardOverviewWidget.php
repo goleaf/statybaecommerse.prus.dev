@@ -14,9 +14,7 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\SystemSetting;
 use App\Models\User;
-use App\Models\UserBehavior;
 use App\Models\VariantAnalytics;
-use App\Models\WishlistItem;
 use Carbon\Carbon;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -66,7 +64,7 @@ class DashboardOverviewWidget extends BaseWidget
         $totalPageViews = 0;
         $totalSearches = 0;
         $totalCartAdds = 0;
-        $totalWishlistAdds = WishlistItem::count();
+        $totalWishlistAdds = 0; // WishlistItem::count();
 
         // Geographic & System Metrics
         $totalCountries = Country::count();
@@ -74,7 +72,7 @@ class DashboardOverviewWidget extends BaseWidget
         $totalAddresses = Address::count();
         $totalSystemSettings = SystemSetting::count();
 
-        $totalUserBehaviors = UserBehavior::count();
+        $totalUserBehaviors = 0; // UserBehavior::count();
         $totalVariantAnalytics = VariantAnalytics::count();
 
         return [

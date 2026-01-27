@@ -10,22 +10,12 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
-use OpenApi\Attributes as OA;
 use Throwable;
 
-#[OA\Tag(
-    name: 'Autocomplete',
-    description: 'Endpoints providing autocomplete suggestions for various storefront resources.'
-)]
 final class AutocompleteController extends Controller
 {
     public function __construct(private readonly AutocompleteService $autocompleteService) {}
 
-    #[OA\Get(
-        path: '/api/autocomplete/search',
-        summary: 'Search across autocomplete resources.',
-        tags: ['Autocomplete']
-    )]
     public function search(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
@@ -94,21 +84,11 @@ final class AutocompleteController extends Controller
         }
     }
 
-    #[OA\Get(
-        path: '/api/autocomplete/products',
-        summary: 'Search for product suggestions.',
-        tags: ['Autocomplete']
-    )]
     public function products(Request $request): JsonResponse
     {
         return $this->handleTypedSearch($request, fn (string $query, int $limit): array => $this->autocompleteService->searchProducts($query, $limit), 'products');
     }
 
-    #[OA\Get(
-        path: '/api/autocomplete/categories',
-        summary: 'Search for category suggestions.',
-        tags: ['Autocomplete']
-    )]
     public function categories(Request $request): JsonResponse
     {
         return $this->handleTypedSearch($request, fn (string $query, int $limit): array => $this->autocompleteService->searchCategories($query, $limit), 'categories');

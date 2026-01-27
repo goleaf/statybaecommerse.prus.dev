@@ -8,7 +8,7 @@ use App\Filament\Resources\InventoryResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
-class ListInventory extends ListRecords
+class ListInventories extends ListRecords
 {
     protected static string $resource = InventoryResource::class;
 
@@ -17,5 +17,17 @@ class ListInventory extends ListRecords
         return [
             Actions\CreateAction::make(),
         ];
+    }
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            \App\Filament\Widgets\InventoryStats::class,
+        ];
+    }
+
+    public function getHeaderWidgetsColumns(): int | array
+    {
+        return 5;
     }
 }

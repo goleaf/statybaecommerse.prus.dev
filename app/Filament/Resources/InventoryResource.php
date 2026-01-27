@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
 use App\Filament\Resources\InventoryResource\Pages;
 use App\Models\Inventory;
 use App\Models\Product;
@@ -32,14 +31,16 @@ final class InventoryResource extends BaseResource
 
     protected static ?int $navigationSort = 10;
 
+    protected static ?string $slug = 'inventory-management';
+
     public static function getNavigationLabel(): string
     {
-        return __('admin.inventory.navigation_label');
+        return __('admin.inventory_management.title');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return __('admin.inventory.plural_model_label');
+        return __('admin.inventory_management.title');
     }
 
     public static function getModelLabel(): string
@@ -65,10 +66,10 @@ final class InventoryResource extends BaseResource
                                     SearchableInputHelper::hydrate(
                                         $component,
                                         $state,
-                                        static function (int $value): ?SearchResult {
+                                        static function (int|string $value): ?SearchResult {
                                             $product = Product::query()
                                                 ->select(['id', 'sku', 'name', 'price'])
-                                                ->find($value);
+                                                ->find((int) $value);
 
                                             if (! $product instanceof Product) {
                                                 return null;
@@ -153,13 +154,48 @@ final class InventoryResource extends BaseResource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->defaultSort('updated_at', 'desc');
+            ->defaultSort('updated_at', 'desc')
+            ->bulkActions([
+                \Filament\Tables\Actions\BulkAction::make('bulk_stock_update')
+                    ->label(__('admin.inventory_management.bulk_stock_update.label'))
+                    ->form([
+                        \Filament\Forms\Components\Select::make('operation')
+                            ->label(__('admin.inventory_management.bulk_stock_update.operation'))
+                            ->options([
+                                'increase' => __('admin.inventory_management.bulk_stock_update.increase'),
+                                'decrease' => __('admin.inventory_management.bulk_stock_update.decrease'),
+                            ])
+                            ->required(),
+                        \App\Filament\Forms\Components\Quantity::make('quantity')
+                            ->minValue(0)
+                            ->steps(1)
+                            ->default(0)
+                            ->required(),
+                    ])
+                    ->action(function (array $data, $records): void {
+                        foreach ($records as $inventory) {
+                            if (! $inventory instanceof Inventory) {
+                                continue;
+                            }
+
+                            $delta = (int) ($data['quantity'] ?? 0);
+
+                            if (($data['operation'] ?? 'increase') === 'decrease') {
+                                $delta = -$delta;
+                            }
+
+                            $inventory->qty = max(0, (int) $inventory->qty + $delta);
+                            $inventory->save();
+                        }
+                    }),
+                \Filament\Tables\Actions\DeleteBulkAction::make(),
+            ]);
     }
 
     public static function getPages(): array
     {
         return [
-            'index'  => Pages\ListInventory::route('/'),
+            'index'  => Pages\ListInventories::route('/'),
             'create' => Pages\CreateInventory::route('/create'),
             'view'   => Pages\ViewInventory::route('/{record}'),
             'edit'   => Pages\EditInventory::route('/{record}/edit'),

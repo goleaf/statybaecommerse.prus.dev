@@ -9,7 +9,7 @@ use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Number;
+use Illuminate\Support\Number;
 use Throwable;
 
 final class DashboardKpiWidget extends StatsOverviewWidget

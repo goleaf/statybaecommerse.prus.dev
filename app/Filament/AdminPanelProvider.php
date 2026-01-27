@@ -15,7 +15,6 @@ use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Panel;
 use Filament\PanelProvider;
-use Filament\Support\Colors\Color;
 use Filament\Widgets\Widget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -48,6 +47,7 @@ class AdminPanelProvider extends PanelProvider
         return $configuredPanel
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
+            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             // Widget discovery is disabled until the optional tab layout plugin is installed.
             ->pages($additionalPages)
             ->widgets($widgets);
@@ -113,10 +113,6 @@ class AdminPanelProvider extends PanelProvider
             ->authGuard('admin')
             ->authPasswordBroker('admin_users')
             ->darkMode(false)
-            ->topbar(false)
-            ->colors([
-                'primary' => Color::Blue,
-            ])
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,

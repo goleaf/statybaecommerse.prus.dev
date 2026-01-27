@@ -116,6 +116,7 @@ return array (
   'profesional_s_statybos_rankiai_ir_ranga_nuo_hilti_lithuania_patikimi_sprendimai_statybininkams' => 'Profesionalūs statybos įrankiai ir įranga nuo Hilti Lithuania. Patikimi sprendimai statybininkams.',
   'profesional_s_statybos_rankiai_ir_ranga_nuo_husqvarna_lithuania_patikimi_sprendimai_statybininkams' => 'Profesionalūs statybos įrankiai ir įranga nuo Husqvarna Lithuania. Patikimi sprendimai statybininkams.',
   'profesional_s_statybos_rankiai_ir_ranga_nuo_isover_lithuania_patikimi_sprendimai_statybininkams' => 'Profesionalūs statybos įrankiai ir įranga nuo Isover Lithuania. Patikimi sprendimai statybininkams.',
+  'profesional_s_statybos_rankiai_ir_ranga_nuo_k_rcher_lietuva_patikimi_sprendimai_statybininkams' => 'Profesionalūs statybos įrankiai ir įranga nuo Kärcher Lietuva. Patikimi sprendimai statybininkams.',
   'profesional_s_statybos_rankiai_ir_ranga_nuo_knauf_lithuania_patikimi_sprendimai_statybininkams' => 'Profesionalūs statybos įrankiai ir įranga nuo Knauf Lithuania. Patikimi sprendimai statybininkams.',
   'profesional_s_statybos_rankiai_ir_ranga_nuo_makita_tools_lt_patikimi_sprendimai_statybininkams' => 'Profesionalūs statybos įrankiai ir įranga nuo Makita Tools LT. Patikimi sprendimai statybininkams.',
   'profesional_s_statybos_rankiai_ir_ranga_nuo_mapei_baltic_patikimi_sprendimai_statybininkams' => 'Profesionalūs statybos įrankiai ir įranga nuo Mapei Baltic. Patikimi sprendimai statybininkams.',

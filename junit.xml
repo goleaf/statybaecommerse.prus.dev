@@ -1,38 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="Tests\Unit\CustomerGroupResourceTest" file="tests\Unit\CustomerGroupResourceTest.php" tests="9" assertions="2" errors="7" failures="1" skipped="0" time="24.127723">
-    <testcase name="it unit: can load CustomerGroupResource class" file="tests\Unit\CustomerGroupResourceTest.php::it unit: can load CustomerGroupResource class" class="Tests\Unit\CustomerGroupResourceTest" classname="Tests.Unit.CustomerGroupResourceTest" assertions="1" time="22.827062">
-      <failure type="PHPUnit\Framework\ExpectationFailedException">it unit: can load CustomerGroupResource classFailed asserting that false is true.&#13;
-at tests\Unit\CustomerGroupResourceTest.php:10</failure>
+  <testsuite name="Tests\Feature\Filament\InventoryManagementPageTest" file="Inventory Management Page (Tests\Feature\Filament\InventoryManagementPage)" tests="3" assertions="5" errors="0" failures="2" skipped="0" time="23.253422">
+    <testcase name="Navigation metadata exposes expected icon" file="Inventory Management Page (Tests\Feature\Filament\InventoryManagementPage)::Navigation metadata exposes expected icon" class="Tests\Feature\Filament\InventoryManagementPageTest" classname="Tests.Feature.Filament.InventoryManagementPageTest" assertions="3" time="22.478216"/>
+    <testcase name="Bulk stock update increases quantity" file="Inventory Management Page (Tests\Feature\Filament\InventoryManagementPage)::Bulk stock update increases quantity" class="Tests\Feature\Filament\InventoryManagementPageTest" classname="Tests.Feature.Filament.InventoryManagementPageTest" assertions="1" time="0.451066">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Bulk stock update increases quantityComponent has errors: "mountedActions.0.data.operation"
+Failed asserting that false is true.&#13;
+at vendor\livewire\livewire\src\Features\SupportValidation\TestsValidation.php:109
+at vendor\filament\forms\src\Testing\TestsForms.php:138
+at vendor\laravel\framework\src\Illuminate\Macroable\Traits\Macroable.php:126
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:398
+at vendor\filament\tables\src\Testing\TestsActions.php:385
+at vendor\laravel\framework\src\Illuminate\Macroable\Traits\Macroable.php:126
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:398
+at tests\Feature\Filament\InventoryManagementPageTest.php:49</failure>
     </testcase>
-    <testcase name="it unit: can load CustomerGroup model class" file="tests\Unit\CustomerGroupResourceTest.php::it unit: can load CustomerGroup model class" class="Tests\Unit\CustomerGroupResourceTest" classname="Tests.Unit.CustomerGroupResourceTest" assertions="1" time="0.193255"/>
-    <testcase name="it unit: can get CustomerGroupResource model" file="tests\Unit\CustomerGroupResourceTest.php::it unit: can get CustomerGroupResource model" class="Tests\Unit\CustomerGroupResourceTest" classname="Tests.Unit.CustomerGroupResourceTest" assertions="0" time="0.145640">
-      <error type="Error">it unit: can get CustomerGroupResource modelError: Class "App\Filament\Resources\CustomerGroupResource" not found&#13;
-at tests\Unit\CustomerGroupResourceTest.php:18</error>
-    </testcase>
-    <testcase name="it unit: can get CustomerGroupResource navigation group" file="tests\Unit\CustomerGroupResourceTest.php::it unit: can get CustomerGroupResource navigation group" class="Tests\Unit\CustomerGroupResourceTest" classname="Tests.Unit.CustomerGroupResourceTest" assertions="0" time="0.154045">
-      <error type="Error">it unit: can get CustomerGroupResource navigation groupError: Class "App\Filament\Resources\CustomerGroupResource" not found&#13;
-at tests\Unit\CustomerGroupResourceTest.php:22</error>
-    </testcase>
-    <testcase name="it unit: can get CustomerGroupResource navigation label" file="tests\Unit\CustomerGroupResourceTest.php::it unit: can get CustomerGroupResource navigation label" class="Tests\Unit\CustomerGroupResourceTest" classname="Tests.Unit.CustomerGroupResourceTest" assertions="0" time="0.149460">
-      <error type="Error">it unit: can get CustomerGroupResource navigation labelError: Class "App\Filament\Resources\CustomerGroupResource" not found&#13;
-at tests\Unit\CustomerGroupResourceTest.php:28</error>
-    </testcase>
-    <testcase name="it unit: can get CustomerGroupResource plural model label" file="tests\Unit\CustomerGroupResourceTest.php::it unit: can get CustomerGroupResource plural model label" class="Tests\Unit\CustomerGroupResourceTest" classname="Tests.Unit.CustomerGroupResourceTest" assertions="0" time="0.156961">
-      <error type="Error">it unit: can get CustomerGroupResource plural model labelError: Class "App\Filament\Resources\CustomerGroupResource" not found&#13;
-at tests\Unit\CustomerGroupResourceTest.php:32</error>
-    </testcase>
-    <testcase name="it unit: can get CustomerGroupResource model label" file="tests\Unit\CustomerGroupResourceTest.php::it unit: can get CustomerGroupResource model label" class="Tests\Unit\CustomerGroupResourceTest" classname="Tests.Unit.CustomerGroupResourceTest" assertions="0" time="0.170013">
-      <error type="Error">it unit: can get CustomerGroupResource model labelError: Class "App\Filament\Resources\CustomerGroupResource" not found&#13;
-at tests\Unit\CustomerGroupResourceTest.php:36</error>
-    </testcase>
-    <testcase name="it unit: can get CustomerGroupResource pages" file="tests\Unit\CustomerGroupResourceTest.php::it unit: can get CustomerGroupResource pages" class="Tests\Unit\CustomerGroupResourceTest" classname="Tests.Unit.CustomerGroupResourceTest" assertions="0" time="0.172902">
-      <error type="Error">it unit: can get CustomerGroupResource pagesError: Class "App\Filament\Resources\CustomerGroupResource" not found&#13;
-at tests\Unit\CustomerGroupResourceTest.php:40</error>
-    </testcase>
-    <testcase name="it unit: can get CustomerGroupResource relations" file="tests\Unit\CustomerGroupResourceTest.php::it unit: can get CustomerGroupResource relations" class="Tests\Unit\CustomerGroupResourceTest" classname="Tests.Unit.CustomerGroupResourceTest" assertions="0" time="0.158385">
-      <error type="Error">it unit: can get CustomerGroupResource relationsError: Class "App\Filament\Resources\CustomerGroupResource" not found&#13;
-at tests\Unit\CustomerGroupResourceTest.php:49</error>
+    <testcase name="Bulk stock update never drops below zero" file="Inventory Management Page (Tests\Feature\Filament\InventoryManagementPage)::Bulk stock update never drops below zero" class="Tests\Feature\Filament\InventoryManagementPageTest" classname="Tests.Feature.Filament.InventoryManagementPageTest" assertions="1" time="0.324140">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Bulk stock update never drops below zeroComponent has errors: "mountedActions.0.data.operation"
+Failed asserting that false is true.&#13;
+at vendor\livewire\livewire\src\Features\SupportValidation\TestsValidation.php:109
+at vendor\filament\forms\src\Testing\TestsForms.php:138
+at vendor\laravel\framework\src\Illuminate\Macroable\Traits\Macroable.php:126
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:398
+at vendor\filament\tables\src\Testing\TestsActions.php:385
+at vendor\laravel\framework\src\Illuminate\Macroable\Traits\Macroable.php:126
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:398
+at tests\Feature\Filament\InventoryManagementPageTest.php:70</failure>
     </testcase>
   </testsuite>
 </testsuites>

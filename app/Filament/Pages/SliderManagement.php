@@ -39,6 +39,11 @@ class SliderManagement extends Page implements HasActions, HasForms
     use InteractsWithActions, InteractsWithForms;
 
     /**
+     * @var \Illuminate\Database\Eloquent\Collection<int, \App\Models\Slider>
+     */
+    public $sliders;
+
+    /**
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations while stating the
      * expected union type via PHPDoc so Filament tooling remains satisfied.
      */
@@ -65,7 +70,7 @@ class SliderManagement extends Page implements HasActions, HasForms
 
     public static function getNavigationGroup(): ?string
     {
-        return null;
+        return NavigationGroup::Content->label(); // Keep slider tooling with the rest of the content curation pages.
     }
 
     public function mount(): void
@@ -139,7 +144,7 @@ class SliderManagement extends Page implements HasActions, HasForms
                                     SearchableInputHelper::hydrate(
                                         $component,
                                         $state,
-                                        static fn (string $value): ?array => ['value' => $value, 'label' => $value],
+                                        static fn (int|string $value): ?array => ['value' => $value, 'label' => $value],
                                     );
                                 })
                                 ->afterStateUpdated(function (SearchableInput $component, ?string $state, callable $set): void {
@@ -319,7 +324,7 @@ class SliderManagement extends Page implements HasActions, HasForms
                                         SearchableInputHelper::hydrate(
                                             $component,
                                             $state,
-                                            static fn (string $value): ?array => ['value' => $value, 'label' => $value],
+                                            static fn (int|string $value): ?array => ['value' => $value, 'label' => $value],
                                         );
                                     })
                                     ->afterStateUpdated(function (SearchableInput $component, ?string $state, callable $set): void {

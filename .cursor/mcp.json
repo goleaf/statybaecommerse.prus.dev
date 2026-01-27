@@ -6,6 +6,13 @@
                 "artisan",
                 "boost:mcp"
             ]
+        },
+        "laravel-loop-mcp": {
+            "command": "php",
+            "args": [
+                "artisan",
+                "loop:mcp:start"
+            ]
         }
     }
 }

@@ -4,17 +4,13 @@ declare(strict_types=1);
 
 namespace App\Filament\Actions;
 
-use App\Models\ProductVariant;
-use Carbon\Carbon;
-use Closure;
-use Filament\Actions\Action;
+use Filament\Forms\Components\Component as FormComponent;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
-use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Illuminate\Database\Eloquent\Collection;
@@ -222,19 +218,19 @@ final class VariantBulkPriceUpdate extends Action
      *
      * @param Closure(): Carbon $default
      */
-    private static function makeSalePeriodPicker(string $name, string $label, Closure $default)
+    private static function makeSalePeriodPicker(string $name, string $label, Closure $default): FormComponent
     {
         $componentClass = class_exists(self::FLATPICKR_COMPONENT)
             ? self::FLATPICKR_COMPONENT
             : DateTimePicker::class;
 
-        /** @var Component $component */
+        /** @var FormComponent $component */
         $component = $componentClass::make($name)
             ->label($label)
             ->default($default);
 
         if ($componentClass === self::FLATPICKR_COMPONENT) {
-            /** @var Component $component */
+            /** @var mixed $component */
             $component = $component
                 ->time(true)
                 ->time24hr(true)

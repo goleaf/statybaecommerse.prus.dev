@@ -468,7 +468,7 @@ Route::middleware('auth')->prefix('admin')->group(function (): void {
         ->whereNumber('location')
         ->name('admin.locations.destroy');
 
-    Route::post('/inventories', function (Request $request) {
+    Route::post('/inventory-management', function (Request $request) {
         $validated = $request->validate([
             'product_id'  => ['required', 'integer', 'exists:products,id'],
             'location_id' => ['required', 'integer', 'exists:locations,id'],
@@ -489,10 +489,10 @@ Route::middleware('auth')->prefix('admin')->group(function (): void {
             'is_tracked'  => (bool) ($validated['is_tracked'] ?? false),
         ]);
 
-        return redirect('/admin/inventories');
-    })->name('filament.admin.resources.inventories.store');
+        return redirect('/admin/inventory-management');
+    })->name('filament.admin.resources.inventory-management.store');
 
-    Route::put('/inventories/{inventory}', function (Request $request, Inventory $inventory) {
+    Route::put('/inventory-management/{inventory}', function (Request $request, Inventory $inventory) {
         $validated = $request->validate([
             'product_id'  => ['required', 'integer', 'exists:products,id'],
             'location_id' => ['required', 'integer', 'exists:locations,id'],
@@ -513,19 +513,19 @@ Route::middleware('auth')->prefix('admin')->group(function (): void {
             'is_tracked'  => (bool) ($validated['is_tracked'] ?? $inventory->is_tracked),
         ]);
 
-        return redirect('/admin/inventories/' . $inventory->getKey() . '/edit');
-    })->name('filament.admin.resources.inventories.update');
+        return redirect('/admin/inventory-management/' . $inventory->getKey() . '/edit');
+    })->name('filament.admin.resources.inventory-management.update');
 
-    Route::delete('/inventories/{inventory}', function (Inventory $inventory) {
+    Route::delete('/inventory-management/{inventory}', function (Inventory $inventory) {
         $inventory->delete();
 
-        return redirect('/admin/inventories');
-    })->name('filament.admin.resources.inventories.destroy');
+        return redirect('/admin/inventory-management');
+    })->name('filament.admin.resources.inventory-management.destroy');
 
-    Route::post('/inventories/bulk-adjust-stock', function (Request $request) {
+    Route::post('/inventory-management/bulk-adjust-stock', function (Request $request) {
         $data = $request->validate([
             'records'   => ['required', 'array', 'min:1'],
-            'records.*' => ['integer', 'exists:inventories,id'],
+            'records.*' => ['integer', 'exists:inventory-management,id'],
             'quantity'  => ['required', 'integer', 'min:0'],
             'reserved'  => ['nullable', 'integer', 'min:0'],
             'incoming'  => ['nullable', 'integer', 'min:0'],
@@ -541,13 +541,13 @@ Route::middleware('auth')->prefix('admin')->group(function (): void {
             ]);
         });
 
-        return redirect('/admin/inventories');
-    })->name('filament.admin.resources.inventories.bulk-adjust');
+        return redirect('/admin/inventory-management');
+    })->name('filament.admin.resources.inventory-management.bulk-adjust');
 
-    Route::post('/inventories/bulk-add-stock', function (Request $request) {
+    Route::post('/inventory-management/bulk-add-stock', function (Request $request) {
         $data = $request->validate([
             'records'      => ['required', 'array', 'min:1'],
-            'records.*'    => ['integer', 'exists:inventories,id'],
+            'records.*'    => ['integer', 'exists:inventory-management,id'],
             'add_quantity' => ['required', 'integer', 'min:1'],
         ]);
 
@@ -555,13 +555,13 @@ Route::middleware('auth')->prefix('admin')->group(function (): void {
             $inventory->increment('quantity', (int) $data['add_quantity']);
         });
 
-        return redirect('/admin/inventories');
-    })->name('filament.admin.resources.inventories.bulk-add');
+        return redirect('/admin/inventory-management');
+    })->name('filament.admin.resources.inventory-management.bulk-add');
 
-    Route::post('/inventories/bulk-toggle-tracking', function (Request $request) {
+    Route::post('/inventory-management/bulk-toggle-tracking', function (Request $request) {
         $data = $request->validate([
             'records'    => ['required', 'array', 'min:1'],
-            'records.*'  => ['integer', 'exists:inventories,id'],
+            'records.*'  => ['integer', 'exists:inventory-management,id'],
             'is_tracked' => ['required', 'boolean'],
         ]);
 
@@ -569,13 +569,13 @@ Route::middleware('auth')->prefix('admin')->group(function (): void {
             'is_tracked' => (bool) $data['is_tracked'],
         ]);
 
-        return redirect('/admin/inventories');
-    })->name('filament.admin.resources.inventories.bulk-toggle-tracking');
+        return redirect('/admin/inventory-management');
+    })->name('filament.admin.resources.inventory-management.bulk-toggle-tracking');
 });
 
 if (app()->runningUnitTests()) {
     Route::middleware('auth')->prefix('admin')->group(function (): void {
-        Route::get('/inventories', function (Request $request) {
+        Route::get('/inventory-management', function (Request $request) {
             $query = Inventory::query()
                 ->with([
                     'product'  => static fn ($builder) => $builder->withoutGlobalScopes(),
@@ -613,7 +613,7 @@ if (app()->runningUnitTests()) {
                 );
             }
 
-            $inventories = $query
+            $inventoryManagement = $query
                 ->orderBy('id')
                 ->get()
                 ->map(static function (Inventory $inventory): array {
@@ -635,7 +635,7 @@ if (app()->runningUnitTests()) {
                     ];
                 });
 
-            $content = $inventories
+            $content = $inventory-management
                 ->map(static function (array $inventory): string {
                     return '<div class="inventory" data-id="' . e((string) $inventory['id']) . '">'
                         . '<span class="product">' . e($inventory['product']) . '</span>'
@@ -650,13 +650,13 @@ if (app()->runningUnitTests()) {
                 })
                 ->implode('');
 
-            return response($content !== '' ? $content : '<div class="inventory-empty">No inventories</div>');
-        })->name('filament.admin.resources.inventories.index');
+            return response($content !== '' ? $content : '<div class="inventory-empty">No inventory-management</div>');
+        })->name('filament.admin.resources.inventory-management.index');
 
-        Route::get('/inventories/create', fn () => response('<div class="inventory-create">ok</div>'))
-            ->name('filament.admin.resources.inventories.create');
+        Route::get('/inventory-management/create', fn () => response('<div class="inventory-create">ok</div>'))
+            ->name('filament.admin.resources.inventory-management.create');
 
-        Route::get('/inventories/{inventory}', function (Inventory $inventory) {
+        Route::get('/inventory-management/{inventory}', function (Inventory $inventory) {
             $inventory->loadMissing([
                 'product'  => static fn ($builder) => $builder->withoutGlobalScopes(),
                 'location' => static fn ($builder) => $builder->withoutGlobalScopes(),
@@ -675,11 +675,11 @@ if (app()->runningUnitTests()) {
 
             return response($content);
         })->whereNumber('inventory')
-            ->name('filament.admin.resources.inventories.view');
+            ->name('filament.admin.resources.inventory-management.view');
 
-        Route::get('/inventories/{inventory}/edit', fn (Inventory $inventory) => response(
+        Route::get('/inventory-management/{inventory}/edit', fn (Inventory $inventory) => response(
             '<div class="inventory-edit" data-id="' . e((string) $inventory->getKey()) . '">Edit</div>',
         ))->whereNumber('inventory')
-            ->name('filament.admin.resources.inventories.edit');
+            ->name('filament.admin.resources.inventory-management.edit');
     });
 }

@@ -682,23 +682,22 @@
                         </button>
                     </div>
                     <div class="flex-1 space-y-6 overflow-y-auto p-6">
-                        <div class="rounded-2xl border border-sage/30 bg-dark/50 p-4
+                        <div class="rounded-2xl border border-sage/30 bg-dark/50 p-4">
                             <h4 class="mb-3 text-sm font-semibold text-sage flex items-center gap-2">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <p
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                                 </svg>
-                              itle') }}
+                                {{ __('categories_show_filters_title') }}
                             </h4>
                             <div class="space-y-1">
-                              
+                                @livewire('components.product-filter-widget')
                             </div>
                         </div>
-                        @livewire('componentst')
                     </div>
-                    <div class="border-t >
+                    <div class="border-t border-sage/30 p-6">
                         <button type="button"
                                 @click="showFilters = false"
-                             ">
+                                class="w-full rounded-2xl bg-sage px-6 py-4 text-center text-sm font-bold text-dark transition hover:bg-sage/90">
                             {{ __('categories_show_apply_filters') }}
                         </button>
                     </div>

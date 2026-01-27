@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Filament\Pages;
 
 use App\Data\SearchQueryData;
-use App\Enums\NavigationGroup;
 use App\Services\SearchService;
 use BackedEnum;
 use Filament\Pages\Page;
