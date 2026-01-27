@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Tests\Feature\Filament;
 
 use App\Models\User;
-use Exception;
 use Filament\Resources\Resource;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\File;
@@ -56,15 +55,15 @@ final class MobileResponsivenessPropertyTest extends TestCase
 
         // Test with mobile viewport dimensions
         $response = $this->get('/admin', [
-            'User-Agent' => 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1',
+            'User-Agent' => 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1'
         ]);
 
         $response->assertStatus(200);
-
+        
         // Check for mobile-friendly navigation elements
         $response->assertSee('fi-sidebar', false); // Filament sidebar component
         $response->assertSee('fi-topbar', false); // Filament topbar component
-
+        
         // Verify responsive navigation classes are present
         $content = $response->getContent();
         $this->assertStringContainsString('lg:hidden', $content, 'Mobile navigation toggle should be present');
@@ -81,18 +80,18 @@ final class MobileResponsivenessPropertyTest extends TestCase
         $resourceClasses = $this->getAllFilamentResourceClasses();
 
         foreach ($resourceClasses as $resourceClass) {
-            if (! $this->resourceHasCreatePage($resourceClass)) {
+            if (!$this->resourceHasCreatePage($resourceClass)) {
                 continue;
             }
 
             $createRoute = $this->getResourceCreateRoute($resourceClass);
-            if (! $createRoute) {
+            if (!$createRoute) {
                 continue;
             }
 
             // Test form page with mobile user agent
             $response = $this->get($createRoute, [
-                'User-Agent' => 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1',
+                'User-Agent' => 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1'
             ]);
 
             if ($response->status() !== 200) {
@@ -100,10 +99,10 @@ final class MobileResponsivenessPropertyTest extends TestCase
             }
 
             $content = $response->getContent();
-
+            
             // Check for responsive form classes
             $this->assertStringContainsString('fi-form', $content, "Resource {$resourceClass} should have Filament form classes");
-
+            
             // Check for mobile-friendly input spacing and sizing
             $this->assertTrue(
                 str_contains($content, 'sm:') || str_contains($content, 'md:') || str_contains($content, 'lg:'),
@@ -123,13 +122,13 @@ final class MobileResponsivenessPropertyTest extends TestCase
 
         foreach ($resourceClasses as $resourceClass) {
             $indexRoute = $this->getResourceIndexRoute($resourceClass);
-            if (! $indexRoute) {
+            if (!$indexRoute) {
                 continue;
             }
 
             // Test table page with mobile user agent
             $response = $this->get($indexRoute, [
-                'User-Agent' => 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1',
+                'User-Agent' => 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1'
             ]);
 
             if ($response->status() !== 200) {
@@ -137,13 +136,13 @@ final class MobileResponsivenessPropertyTest extends TestCase
             }
 
             $content = $response->getContent();
-
+            
             // Check for responsive table classes
             $this->assertStringContainsString('fi-table', $content, "Resource {$resourceClass} should have Filament table classes");
-
+            
             // Check for mobile table responsiveness features
             $this->assertTrue(
-                str_contains($content, 'overflow-x-auto') ||
+                str_contains($content, 'overflow-x-auto') || 
                 str_contains($content, 'scroll') ||
                 str_contains($content, 'fi-table-responsive'),
                 "Resource {$resourceClass} tables should have mobile scroll/responsive features"
@@ -166,16 +165,16 @@ final class MobileResponsivenessPropertyTest extends TestCase
 
         // Test dashboard with mobile user agent
         $response = $this->get('/admin/dashboard', [
-            'User-Agent' => 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1',
+            'User-Agent' => 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1'
         ]);
 
         $response->assertStatus(200);
 
         $content = $response->getContent();
-
+        
         // Check for responsive dashboard layout
         $this->assertStringContainsString('fi-dashboard', $content, 'Dashboard should have Filament dashboard classes');
-
+        
         // Check for responsive grid/widget layout
         $this->assertTrue(
             str_contains($content, 'grid') || str_contains($content, 'fi-widget'),
@@ -204,13 +203,13 @@ final class MobileResponsivenessPropertyTest extends TestCase
 
         // Test a page that likely has modals (dashboard with widgets)
         $response = $this->get('/admin/dashboard', [
-            'User-Agent' => 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1',
+            'User-Agent' => 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1'
         ]);
 
         $response->assertStatus(200);
 
         $content = $response->getContent();
-
+        
         // Check for mobile-friendly modal classes
         if (str_contains($content, 'fi-modal') || str_contains($content, 'modal')) {
             $this->assertTrue(
@@ -226,7 +225,7 @@ final class MobileResponsivenessPropertyTest extends TestCase
 
         // Check for touch-friendly interaction elements
         $this->assertTrue(
-            str_contains($content, 'touch-') ||
+            str_contains($content, 'touch-') || 
             str_contains($content, 'cursor-pointer') ||
             str_contains($content, 'hover:'),
             'Interface should have touch-friendly interaction classes'
@@ -241,7 +240,7 @@ final class MobileResponsivenessPropertyTest extends TestCase
         $this->actingAs($this->adminUser);
 
         $response = $this->get('/admin', [
-            'User-Agent' => 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1',
+            'User-Agent' => 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1'
         ]);
 
         // Accept both 200 (direct access) and 302 (redirect within admin panel)
@@ -255,7 +254,7 @@ final class MobileResponsivenessPropertyTest extends TestCase
             $response = $this->followRedirects($response);
             $content = $response->getContent();
         }
-
+        
         // Check for adequate button/link sizes (minimum 44px recommended)
         $this->assertTrue(
             str_contains($content, 'h-10') || // 40px height
@@ -269,7 +268,7 @@ final class MobileResponsivenessPropertyTest extends TestCase
 
         // Check for proper spacing between interactive elements
         $this->assertTrue(
-            str_contains($content, 'space-x-') ||
+            str_contains($content, 'space-x-') || 
             str_contains($content, 'space-y-') ||
             str_contains($content, 'gap-'),
             'Interactive elements should have proper spacing for touch interaction'
@@ -284,16 +283,16 @@ final class MobileResponsivenessPropertyTest extends TestCase
         $this->actingAs($this->adminUser);
 
         $response = $this->get('/admin', [
-            'User-Agent' => 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1',
+            'User-Agent' => 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1'
         ]);
 
         $response->assertStatus(200);
 
         $content = $response->getContent();
-
+        
         // Check for appropriate text sizes (not too small for mobile)
         $this->assertTrue(
-            str_contains($content, 'text-sm') ||
+            str_contains($content, 'text-sm') || 
             str_contains($content, 'text-base') ||
             str_contains($content, 'text-lg'),
             'Text should have appropriate sizes for mobile readability'
@@ -301,7 +300,7 @@ final class MobileResponsivenessPropertyTest extends TestCase
 
         // Check for responsive text sizing
         $this->assertTrue(
-            str_contains($content, 'sm:text-') ||
+            str_contains($content, 'sm:text-') || 
             str_contains($content, 'md:text-') ||
             str_contains($content, 'lg:text-'),
             'Text should have responsive sizing for different screen sizes'
@@ -309,7 +308,7 @@ final class MobileResponsivenessPropertyTest extends TestCase
 
         // Check for proper line height and spacing
         $this->assertTrue(
-            str_contains($content, 'leading-') ||
+            str_contains($content, 'leading-') || 
             str_contains($content, 'line-height'),
             'Text should have proper line height for mobile readability'
         );
@@ -324,22 +323,22 @@ final class MobileResponsivenessPropertyTest extends TestCase
 
         // Test with different mobile orientations
         $orientations = [
-            'portrait'  => 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1',
-            'landscape' => 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1',
+            'portrait' => 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1',
+            'landscape' => 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1'
         ];
 
         foreach ($orientations as $orientation => $userAgent) {
             $response = $this->get('/admin', [
-                'User-Agent' => $userAgent,
+                'User-Agent' => $userAgent
             ]);
 
             $response->assertStatus(200);
 
             $content = $response->getContent();
-
+            
             // Check for flexible layout that adapts to orientation
             $this->assertTrue(
-                str_contains($content, 'flex') ||
+                str_contains($content, 'flex') || 
                 str_contains($content, 'grid') ||
                 str_contains($content, 'fi-layout'),
                 "Interface should have flexible layout for {$orientation} orientation"
@@ -347,7 +346,7 @@ final class MobileResponsivenessPropertyTest extends TestCase
 
             // Check for responsive breakpoints that handle different orientations
             $this->assertTrue(
-                str_contains($content, 'landscape:') ||
+                str_contains($content, 'landscape:') || 
                 str_contains($content, 'portrait:') ||
                 str_contains($content, 'orientation-'),
                 "Interface should handle {$orientation} orientation properly"
@@ -394,9 +393,8 @@ final class MobileResponsivenessPropertyTest extends TestCase
     {
         try {
             $pages = $resourceClass::getPages();
-
             return isset($pages['create']);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return false;
         }
     }
@@ -409,9 +407,8 @@ final class MobileResponsivenessPropertyTest extends TestCase
         try {
             $resourceName = str_replace('Resource', '', class_basename($resourceClass));
             $resourceName = strtolower(preg_replace('/([a-z])([A-Z])/', '$1-$2', $resourceName));
-
             return "/admin/{$resourceName}s/create";
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return null;
         }
     }
@@ -424,9 +421,8 @@ final class MobileResponsivenessPropertyTest extends TestCase
         try {
             $resourceName = str_replace('Resource', '', class_basename($resourceClass));
             $resourceName = strtolower(preg_replace('/([a-z])([A-Z])/', '$1-$2', $resourceName));
-
             return "/admin/{$resourceName}s";
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return null;
         }
     }

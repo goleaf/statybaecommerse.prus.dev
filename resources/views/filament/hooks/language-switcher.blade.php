@@ -23,16 +23,41 @@
         </x-filament::dropdown.header>
 
         <x-filament::dropdown.list>
-            @foreach (array_intersect_key(config('app.locales', []), array_flip(\App\Support\Locales::supported())) as $locale => $data)
-                <x-filament::dropdown.list.item
-                    :color="(app()->getLocale() === $locale) ? 'primary' : null"
-                    icon="heroicon-m-chevron-right"
-                    :href="url('lang/' . $locale)"
-                    tag="a"
-                >
-                    {{ $data['flag'] ?? '' }} {{ $data['native'] }}
-                </x-filament::dropdown.list.item>
-            @endforeach
+            <x-filament::dropdown.list.item
+                :color="(app()->getLocale() === 'en') ? 'primary' : null"
+                icon="heroicon-m-chevron-right"
+                :href="url('lang/en')"
+                tag="a"
+            >
+                🇺🇸 English
+            </x-filament::dropdown.list.item>
+
+            <x-filament::dropdown.list.item
+                :color="(app()->getLocale() === 'lt') ? 'primary' : null"
+                icon="heroicon-m-chevron-right"
+                :href="url('lang/lt')"
+                tag="a"
+            >
+                🇱🇹 Lietuvių
+            </x-filament::dropdown.list.item>
+
+            <x-filament::dropdown.list.item
+                :color="(app()->getLocale() === 'ru') ? 'primary' : null"
+                icon="heroicon-m-chevron-right"
+                :href="url('lang/ru')"
+                tag="a"
+            >
+                🇷🇺 Русский
+            </x-filament::dropdown.list.item>
+
+            <x-filament::dropdown.list.item
+                :color="(app()->getLocale() === 'de') ? 'primary' : null"
+                icon="heroicon-m-chevron-right"
+                :href="url('lang/de')"
+                tag="a"
+            >
+                🇩🇪 Deutsch
+            </x-filament::dropdown.list.item>
         </x-filament::dropdown.list>
     </x-filament::dropdown>
 </div>

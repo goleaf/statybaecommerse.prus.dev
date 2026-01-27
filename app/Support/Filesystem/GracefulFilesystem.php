@@ -24,7 +24,7 @@ use Throwable;
  * $directories = $fs->directories('/path', 2);    // Depth limit
  * ```
  */
-class GracefulFilesystem extends Filesystem
+final class GracefulFilesystem extends Filesystem
 {
     private readonly DirectoryMemoryManager $memoryManager;
 
@@ -40,11 +40,12 @@ class GracefulFilesystem extends Filesystem
         ?BackupDatabaseManager $backupManager = null,
         ?DirectoryScanner $scanner = null
     ) {
+        parent::__construct();
+
         $this->permissions = $permissions ?? FilesystemPermissions::default();
         $this->memoryManager = $memoryManager ?? new DirectoryMemoryManager;
         $this->backupManager = $backupManager ?? new BackupDatabaseManager($this->permissions);
-        // Use a base filesystem instance to avoid recursive calls back into this class.
-        $this->scanner = $scanner ?? new DirectoryScanner(new Filesystem, $this->memoryManager);
+        $this->scanner = $scanner ?? new DirectoryScanner($this, $this->memoryManager);
     }
 
     /**

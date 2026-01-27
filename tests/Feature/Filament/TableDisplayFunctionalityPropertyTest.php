@@ -5,14 +5,13 @@ declare(strict_types=1);
 namespace Tests\Feature\Filament;
 
 use App\Models\User;
-use Filament\Actions\Action;
-use Filament\Actions\BulkActionGroup;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\Column;
 use Filament\Tables\Filters\BaseFilter;
+use Filament\Actions\Action;
+use Filament\Actions\BulkActionGroup;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\File;
-use ReflectionClass;
 use Tests\TestCase;
 use Throwable;
 
@@ -51,10 +50,10 @@ final class TableDisplayFunctionalityPropertyTest extends TestCase
         foreach ($resourceClasses as $resourceClass) {
             // Test that resource has table columns
             $this->assertResourceHasTableColumns($resourceClass);
-
+            
             // Test that table columns have proper formatting configuration
             $this->assertTableColumnsHaveProperFormatting($resourceClass);
-
+            
             // Test that columns are properly configured for display
             $this->assertColumnsAreProperlyConfiguredForDisplay($resourceClass);
         }
@@ -70,7 +69,7 @@ final class TableDisplayFunctionalityPropertyTest extends TestCase
         foreach ($resourceClasses as $resourceClass) {
             // Test that resource has filtering functionality
             $this->assertResourceHasFilteringFunctionality($resourceClass);
-
+            
             // Test that filters are properly configured
             $this->assertFiltersAreProperlyConfigured($resourceClass);
         }
@@ -86,7 +85,7 @@ final class TableDisplayFunctionalityPropertyTest extends TestCase
         foreach ($resourceClasses as $resourceClass) {
             // Test that resource has searchable columns
             $this->assertResourceHasSearchableColumns($resourceClass);
-
+            
             // Test that searchable columns are properly configured
             $this->assertSearchableColumnsAreProperlyConfigured($resourceClass);
         }
@@ -102,10 +101,10 @@ final class TableDisplayFunctionalityPropertyTest extends TestCase
         foreach ($resourceClasses as $resourceClass) {
             // Test that resource has sortable columns
             $this->assertResourceHasSortableColumns($resourceClass);
-
+            
             // Test that sortable columns are properly configured
             $this->assertSortableColumnsAreProperlyConfigured($resourceClass);
-
+            
             // Test that table has default sorting configuration
             $this->assertTableHasDefaultSortingConfiguration($resourceClass);
         }
@@ -123,21 +122,21 @@ final class TableDisplayFunctionalityPropertyTest extends TestCase
                 try {
                     $columns = $resourceClass::tableColumns();
                     $this->assertIsArray($columns, "Table columns for {$resourceClass} should return array");
-
+                    
                     // Test that table has at least one column
                     $this->assertNotEmpty($columns, "Resource {$resourceClass} should have at least one table column");
-
+                    
                     // Test that all columns are valid Filament column components
                     foreach ($columns as $column) {
                         $this->assertInstanceOf(Column::class, $column, "All table columns in {$resourceClass} should extend Filament Column class");
-
+                        
                         // Test that column has proper name and label configuration
                         $this->assertColumnHasProperConfiguration($column, $resourceClass);
-
+                        
                         // Test that column has appropriate data type handling
                         $this->assertColumnHasAppropriateDataTypeHandling($column, $resourceClass);
                     }
-
+                    
                 } catch (Throwable $e) {
                     $this->fail("Table columns for {$resourceClass} threw an error: " . $e->getMessage());
                 }
@@ -158,12 +157,12 @@ final class TableDisplayFunctionalityPropertyTest extends TestCase
                 try {
                     $bulkActions = $resourceClass::tableBulkActions();
                     $this->assertIsArray($bulkActions, "Table bulk actions for {$resourceClass} should return array");
-
+                    
                     // Test that bulk actions are properly configured
                     foreach ($bulkActions as $bulkAction) {
                         $this->assertBulkActionIsProperlyConfigured($bulkAction, $resourceClass);
                     }
-
+                    
                 } catch (Throwable $e) {
                     $this->fail("Table bulk actions for {$resourceClass} threw an error: " . $e->getMessage());
                 }
@@ -174,13 +173,13 @@ final class TableDisplayFunctionalityPropertyTest extends TestCase
                 try {
                     $actions = $resourceClass::tableActions();
                     $this->assertIsArray($actions, "Table actions for {$resourceClass} should return array");
-
+                    
                     // Test that actions are properly configured
                     foreach ($actions as $action) {
                         $this->assertInstanceOf(Action::class, $action, "All table actions in {$resourceClass} should be Action instances");
                         $this->assertActionHasProperConfiguration($action, $resourceClass);
                     }
-
+                    
                 } catch (Throwable $e) {
                     $this->fail("Table actions for {$resourceClass} threw an error: " . $e->getMessage());
                 }
@@ -198,7 +197,7 @@ final class TableDisplayFunctionalityPropertyTest extends TestCase
         foreach ($resourceClasses as $resourceClass) {
             // Test that resource has table method or table configuration
             $this->assertResourceHasTableConfiguration($resourceClass);
-
+            
             // Test that table configuration includes performance considerations
             $this->assertTableConfigurationIncludesPerformanceConsiderations($resourceClass);
         }
@@ -211,7 +210,7 @@ final class TableDisplayFunctionalityPropertyTest extends TestCase
     {
         $hasTableMethod = method_exists($resourceClass, 'table');
         $hasTableColumns = method_exists($resourceClass, 'tableColumns');
-
+        
         $this->assertTrue(
             $hasTableMethod || $hasTableColumns,
             "Resource {$resourceClass} should have either table() method or tableColumns() method"
@@ -236,21 +235,21 @@ final class TableDisplayFunctionalityPropertyTest extends TestCase
         if (method_exists($resourceClass, 'tableColumns')) {
             try {
                 $columns = $resourceClass::tableColumns();
-
+                
                 foreach ($columns as $column) {
                     // Test that column has proper label configuration
                     $this->assertTrue(
                         method_exists($column, 'getLabel'),
                         "Column in {$resourceClass} should have getLabel method for proper formatting"
                     );
-
+                    
                     // Test that column has proper state formatting
                     $this->assertTrue(
                         method_exists($column, 'formatStateUsing') || method_exists($column, 'getState'),
                         "Column in {$resourceClass} should have state formatting capabilities"
                     );
                 }
-
+                
             } catch (Throwable $e) {
                 $this->fail("Table column formatting test for {$resourceClass} threw an error: " . $e->getMessage());
             }
@@ -265,21 +264,21 @@ final class TableDisplayFunctionalityPropertyTest extends TestCase
         if (method_exists($resourceClass, 'tableColumns')) {
             try {
                 $columns = $resourceClass::tableColumns();
-
+                
                 foreach ($columns as $column) {
                     // Test that column has a name
                     $this->assertTrue(
                         method_exists($column, 'getName'),
                         "Column in {$resourceClass} should have getName method"
                     );
-
+                    
                     // Test that column has proper visibility configuration
                     $this->assertTrue(
                         method_exists($column, 'isToggleable') || method_exists($column, 'isHidden'),
                         "Column in {$resourceClass} should have visibility configuration methods"
                     );
                 }
-
+                
             } catch (Throwable $e) {
                 $this->fail("Column display configuration test for {$resourceClass} threw an error: " . $e->getMessage());
             }
@@ -292,17 +291,17 @@ final class TableDisplayFunctionalityPropertyTest extends TestCase
     private function assertResourceHasFilteringFunctionality(string $resourceClass): void
     {
         $hasTableFilters = method_exists($resourceClass, 'tableFilters');
-
+        
         if ($hasTableFilters) {
             try {
                 $filters = $resourceClass::tableFilters();
                 $this->assertIsArray($filters, "Table filters for {$resourceClass} should return array");
-
+                
                 // If filters exist, they should be properly configured
                 foreach ($filters as $filter) {
                     $this->assertInstanceOf(BaseFilter::class, $filter, "All table filters in {$resourceClass} should extend Filament BaseFilter class");
                 }
-
+                
             } catch (Throwable $e) {
                 $this->fail("Table filters for {$resourceClass} threw an error: " . $e->getMessage());
             }
@@ -317,21 +316,21 @@ final class TableDisplayFunctionalityPropertyTest extends TestCase
         if (method_exists($resourceClass, 'tableFilters')) {
             try {
                 $filters = $resourceClass::tableFilters();
-
+                
                 foreach ($filters as $filter) {
                     // Test that filter has proper label configuration
                     $this->assertTrue(
                         method_exists($filter, 'getLabel'),
                         "Filter in {$resourceClass} should have getLabel method"
                     );
-
+                    
                     // Test that filter has proper query configuration
                     $this->assertTrue(
                         method_exists($filter, 'apply') || method_exists($filter, 'getQuery'),
                         "Filter in {$resourceClass} should have query application methods"
                     );
                 }
-
+                
             } catch (Throwable $e) {
                 $this->fail("Filter configuration test for {$resourceClass} threw an error: " . $e->getMessage());
             }
@@ -346,7 +345,7 @@ final class TableDisplayFunctionalityPropertyTest extends TestCase
         if (method_exists($resourceClass, 'tableColumns')) {
             try {
                 $columns = $resourceClass::tableColumns();
-
+                
                 // Check if any columns are searchable
                 $hasSearchableColumns = false;
                 foreach ($columns as $column) {
@@ -363,11 +362,11 @@ final class TableDisplayFunctionalityPropertyTest extends TestCase
                         }
                     }
                 }
-
+                
                 // Resources should have at least some searchable functionality
                 // This is a soft requirement - not all resources need searchable columns
                 $this->assertTrue(true, "Searchable columns test passed for {$resourceClass}");
-
+                
             } catch (Throwable $e) {
                 $this->fail("Searchable columns test for {$resourceClass} threw an error: " . $e->getMessage());
             }
@@ -382,7 +381,7 @@ final class TableDisplayFunctionalityPropertyTest extends TestCase
         if (method_exists($resourceClass, 'tableColumns')) {
             try {
                 $columns = $resourceClass::tableColumns();
-
+                
                 foreach ($columns as $column) {
                     if (method_exists($column, 'isSearchable')) {
                         // Test that searchable columns have proper configuration
@@ -392,7 +391,7 @@ final class TableDisplayFunctionalityPropertyTest extends TestCase
                         );
                     }
                 }
-
+                
             } catch (Throwable $e) {
                 $this->fail("Searchable column configuration test for {$resourceClass} threw an error: " . $e->getMessage());
             }
@@ -407,7 +406,7 @@ final class TableDisplayFunctionalityPropertyTest extends TestCase
         if (method_exists($resourceClass, 'tableColumns')) {
             try {
                 $columns = $resourceClass::tableColumns();
-
+                
                 // Check if any columns are sortable
                 $hasSortableColumns = false;
                 foreach ($columns as $column) {
@@ -424,10 +423,10 @@ final class TableDisplayFunctionalityPropertyTest extends TestCase
                         }
                     }
                 }
-
+                
                 // Resources should have at least some sortable functionality
                 $this->assertTrue(true, "Sortable columns test passed for {$resourceClass}");
-
+                
             } catch (Throwable $e) {
                 $this->fail("Sortable columns test for {$resourceClass} threw an error: " . $e->getMessage());
             }
@@ -442,7 +441,7 @@ final class TableDisplayFunctionalityPropertyTest extends TestCase
         if (method_exists($resourceClass, 'tableColumns')) {
             try {
                 $columns = $resourceClass::tableColumns();
-
+                
                 foreach ($columns as $column) {
                     if (method_exists($column, 'isSortable')) {
                         // Test that sortable columns have proper configuration
@@ -452,7 +451,7 @@ final class TableDisplayFunctionalityPropertyTest extends TestCase
                         );
                     }
                 }
-
+                
             } catch (Throwable $e) {
                 $this->fail("Sortable column configuration test for {$resourceClass} threw an error: " . $e->getMessage());
             }
@@ -467,7 +466,7 @@ final class TableDisplayFunctionalityPropertyTest extends TestCase
         // This is tested by checking if the resource has proper table configuration
         // Default sorting is typically configured in the table() method
         $hasTableMethod = method_exists($resourceClass, 'table');
-
+        
         if ($hasTableMethod) {
             // Table method exists, which should handle default sorting
             $this->assertTrue(true, "Table method exists for {$resourceClass}, default sorting can be configured");
@@ -487,7 +486,7 @@ final class TableDisplayFunctionalityPropertyTest extends TestCase
             method_exists($column, 'getName'),
             "Column in {$resourceClass} should have getName method"
         );
-
+        
         // Test that column has proper label configuration
         $this->assertTrue(
             method_exists($column, 'getLabel'),
@@ -505,7 +504,7 @@ final class TableDisplayFunctionalityPropertyTest extends TestCase
             method_exists($column, 'getState') || method_exists($column, 'formatStateUsing'),
             "Column in {$resourceClass} should have state handling methods"
         );
-
+        
         // Test that column has proper type-specific configuration
         $columnClass = get_class($column);
         $this->assertNotEmpty($columnClass, "Column in {$resourceClass} should have a valid class");
@@ -517,12 +516,12 @@ final class TableDisplayFunctionalityPropertyTest extends TestCase
     private function assertBulkActionIsProperlyConfigured($bulkAction, string $resourceClass): void
     {
         // Handle both individual actions and bulk action groups
-        $isValidBulkAction = $bulkAction instanceof Action ||
+        $isValidBulkAction = $bulkAction instanceof Action || 
                            $bulkAction instanceof BulkActionGroup ||
                            method_exists($bulkAction, 'getActions');
-
+        
         $this->assertTrue($isValidBulkAction, "All bulk actions in {$resourceClass} should be Action instances or BulkActionGroup instances");
-
+        
         // Test that bulk action has proper configuration
         if ($bulkAction instanceof Action) {
             $this->assertTrue(
@@ -542,7 +541,7 @@ final class TableDisplayFunctionalityPropertyTest extends TestCase
             method_exists($action, 'getLabel'),
             "Action in {$resourceClass} should have getLabel method"
         );
-
+        
         // Test that action has proper icon configuration
         $this->assertTrue(
             method_exists($action, 'getIcon'),
@@ -557,7 +556,7 @@ final class TableDisplayFunctionalityPropertyTest extends TestCase
     {
         $hasTableMethod = method_exists($resourceClass, 'table');
         $hasTableColumns = method_exists($resourceClass, 'tableColumns');
-
+        
         $this->assertTrue(
             $hasTableMethod || $hasTableColumns,
             "Resource {$resourceClass} should have table configuration"
@@ -572,14 +571,14 @@ final class TableDisplayFunctionalityPropertyTest extends TestCase
         // Test that resource has proper model association for efficient queries
         $hasModelProperty = property_exists($resourceClass, 'model');
         $hasGetModelMethod = method_exists($resourceClass, 'getModel');
-
+        
         $this->assertTrue(
             $hasModelProperty || $hasGetModelMethod,
             "Resource {$resourceClass} should have model association for efficient table queries"
         );
-
+        
         // Test that table has pagination support (implicit in Filament)
-        $this->assertTrue(true, 'Filament tables have built-in pagination support');
+        $this->assertTrue(true, "Filament tables have built-in pagination support");
     }
 
     /**
@@ -590,7 +589,7 @@ final class TableDisplayFunctionalityPropertyTest extends TestCase
         $resourceClasses = [];
         $resourcePath = app_path('Filament/Resources');
 
-        if (! is_dir($resourcePath)) {
+        if (!is_dir($resourcePath)) {
             return [];
         }
 
@@ -600,7 +599,7 @@ final class TableDisplayFunctionalityPropertyTest extends TestCase
             $relativePath = $file->getRelativePathname();
 
             // Skip relation managers and other subdirectories
-            if (str_contains($relativePath, '/') || ! str_ends_with($relativePath, 'Resource.php')) {
+            if (str_contains($relativePath, '/') || !str_ends_with($relativePath, 'Resource.php')) {
                 continue;
             }
 
@@ -608,8 +607,8 @@ final class TableDisplayFunctionalityPropertyTest extends TestCase
 
             if (class_exists($className) && is_subclass_of($className, Resource::class)) {
                 // Skip abstract classes
-                $reflection = new ReflectionClass($className);
-                if (! $reflection->isAbstract()) {
+                $reflection = new \ReflectionClass($className);
+                if (!$reflection->isAbstract()) {
                     $resourceClasses[] = $className;
                 }
             }

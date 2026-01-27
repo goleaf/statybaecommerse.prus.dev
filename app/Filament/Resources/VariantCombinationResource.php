@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Enums\NavigationGroup;
+use App\Filament\Resources\BaseResource;
 use App\Filament\Resources\VariantCombinationResource\Pages;
 use App\Models\Product;
 use App\Models\VariantCombination;

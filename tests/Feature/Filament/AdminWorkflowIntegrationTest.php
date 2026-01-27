@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Filament;
 
-use App\Models\AdminUser;
-use App\Models\Product;
 use App\Models\User;
+use App\Models\AdminUser;
 use App\Models\VariantCombination;
+use App\Models\Product;
+use App\Models\ProductVariant;
+use App\Models\Brand;
+use App\Models\Category;
 use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Route;
@@ -16,9 +19,9 @@ use Tests\TestCase;
 
 /**
  * Integration tests for complete admin workflows.
- *
+ * 
  * **Feature: filament-admin-backend-setup, Requirements: All requirements**
- *
+ * 
  * Tests full user journey through admin panel including:
  * - Authentication and authorization flows
  * - Navigation between resources
@@ -30,9 +33,7 @@ final class AdminWorkflowIntegrationTest extends TestCase
     use RefreshDatabase;
 
     private User $adminUser;
-
     private User $viewerUser;
-
     private AdminUser $superAdmin;
 
     protected function setUp(): void
@@ -41,21 +42,21 @@ final class AdminWorkflowIntegrationTest extends TestCase
 
         // Disable Vite for testing
         $this->withoutVite();
-
+        
         // Seed authorization system
         $this->seed(\Database\Seeders\AdminAuthorizationSeeder::class);
 
         // Create test users with different roles
         $this->adminUser = User::factory()->create([
-            'email'    => 'admin@test.com',
+            'email' => 'admin@test.com',
             'is_admin' => true,
         ]);
-
+        
         $this->viewerUser = User::factory()->create([
-            'email'    => 'viewer@test.com',
+            'email' => 'viewer@test.com',
             'is_admin' => false,
         ]);
-
+        
         $this->superAdmin = AdminUser::factory()->create([
             'email' => 'super@test.com',
         ]);
@@ -64,7 +65,7 @@ final class AdminWorkflowIntegrationTest extends TestCase
         $adminRole = Role::findByName('admin', 'web');
         $viewerRole = Role::findByName('viewer', 'web');
         $superAdminRole = Role::findByName('super_admin', 'admin');
-
+        
         $this->adminUser->assignRole($adminRole);
         $this->viewerUser->assignRole($viewerRole);
         $this->superAdmin->assignRole($superAdminRole);
@@ -117,7 +118,7 @@ final class AdminWorkflowIntegrationTest extends TestCase
 
         // Create test data for VariantCombination
         $product = Product::factory()->create();
-
+        
         // Test resource listing - accept 500 as it might be translation issues
         $response = $this->get('/admin/variant-combinations');
         $this->assertStatusIn($response->status(), [200, 302, 500]);
@@ -134,7 +135,7 @@ final class AdminWorkflowIntegrationTest extends TestCase
         // Test resource creation page (routes exist based on route:list) - accept 500 for translation issues
         $response = $this->get('/admin/variant-combinations/create');
         $this->assertStatusIn($response->status(), [200, 302, 500]);
-
+        
         // Test resource view page - accept 500 for translation issues
         $response = $this->get("/admin/variant-combinations/{$variantCombination->id}");
         $this->assertStatusIn($response->status(), [200, 302, 500]);
@@ -189,7 +190,7 @@ final class AdminWorkflowIntegrationTest extends TestCase
         // If successful response, check for widget presence
         if ($response->status() === 200) {
             $content = $response->getContent();
-
+            
             // Check for widget containers or dashboard elements
             $this->assertStringContainsString('dashboard', strtolower($content));
         }
@@ -201,7 +202,7 @@ final class AdminWorkflowIntegrationTest extends TestCase
 
         // Simulate mobile user agent
         $mobileUserAgent = 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15';
-
+        
         $response = $this->withHeaders([
             'User-Agent' => $mobileUserAgent,
         ])->get('/admin');
@@ -270,7 +271,7 @@ final class AdminWorkflowIntegrationTest extends TestCase
 
         // Create realistic data volume
         $products = Product::factory()->count(10)->create();
-
+        
         VariantCombination::factory()->count(50)->create([
             'product_id' => $products->random()->id,
         ]);
@@ -281,7 +282,7 @@ final class AdminWorkflowIntegrationTest extends TestCase
         $endTime = microtime(true);
 
         $this->assertStatusIn($response->status(), [200, 302, 500]);
-
+        
         // Performance should be reasonable (under 5 seconds)
         $executionTime = $endTime - $startTime;
         $this->assertLessThan(5.0, $executionTime, 'Admin resource listing should complete within 5 seconds');
@@ -290,26 +291,26 @@ final class AdminWorkflowIntegrationTest extends TestCase
     public function test_complete_user_journey(): void
     {
         // Complete user journey: Login -> Dashboard -> Resource -> Navigation -> Logout
-
+        
         // Step 1: Login
         $this->actingAs($this->adminUser);
-
+        
         // Step 2: Access Dashboard
         $response = $this->get('/admin');
         $this->assertStatusIn($response->status(), [200, 302]);
-
+        
         // Step 3: Navigate to Resource - accept 500 for translation issues
         $response = $this->get('/admin/variant-combinations');
         $this->assertStatusIn($response->status(), [200, 302, 500]);
-
+        
         // Step 4: Return to Dashboard
         $response = $this->get('/admin/dashboard');
         $this->assertStatusIn($response->status(), [200, 302]);
-
+        
         // Step 5: Test another navigation - accept 500 for translation issues
         $response = $this->get('/admin/variant-combinations');
         $this->assertStatusIn($response->status(), [200, 302, 500]);
-
+        
         // Step 6: Logout - accept 500 as logout might have issues
         $this->post('/logout');
         $response = $this->get('/admin');
@@ -323,7 +324,7 @@ final class AdminWorkflowIntegrationTest extends TestCase
     {
         $this->assertTrue(
             in_array($actual, $expected, true),
-            $message ?: 'Expected status to be one of [' . implode(', ', $expected) . "] but got {$actual}"
+            $message ?: "Expected status to be one of [" . implode(', ', $expected) . "] but got {$actual}"
         );
     }
 }

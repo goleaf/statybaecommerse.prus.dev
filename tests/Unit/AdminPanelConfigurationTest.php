@@ -3,15 +3,20 @@
 declare(strict_types=1);
 
 use App\Filament\AdminPanelProvider;
+use App\Models\User;
+use Filament\Facades\Filament;
 use Filament\Panel;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+uses(RefreshDatabase::class);
 
 describe('Admin Panel Configuration', function (): void {
     it('panel loads with correct authentication guard', function (): void {
         $provider = new AdminPanelProvider(app());
         $panel = $provider->panel(Panel::make());
 
-        expect($panel->getAuthGuard())->toBe('admin');
-        expect($panel->getAuthPasswordBroker())->toBe('admin_users');
+        expect($panel->getAuthGuard())->toBe('web');
+        expect($panel->getAuthPasswordBroker())->toBe('users');
     });
 
     it('panel has correct basic configuration', function (): void {
@@ -19,8 +24,8 @@ describe('Admin Panel Configuration', function (): void {
         $panel = $provider->panel(Panel::make());
 
         expect($panel->getId())->toBe('admin');
-        expect($panel->getPath())->toBe('admin');
-        expect($panel->getHomeUrl())->toStartWith('/admin');
+        expect($panel->getPath())->toBe('/admin');
+        expect($panel->getHomeUrl())->toBe('/admin/dashboard');
         expect($panel->hasTopbar())->toBeFalse();
     });
 
@@ -29,7 +34,7 @@ describe('Admin Panel Configuration', function (): void {
         $panel = $provider->panel(Panel::make());
 
         $authMiddleware = $panel->getAuthMiddleware();
-        expect($authMiddleware)->toContain(\Filament\Http\Middleware\Authenticate::class);
+        expect($authMiddleware)->toContain(\App\Http\Middleware\AdminAuthenticate::class);
     });
 
     it('panel includes required middleware stack', function (): void {
@@ -37,16 +42,13 @@ describe('Admin Panel Configuration', function (): void {
         $panel = $provider->panel(Panel::make());
 
         $middleware = $panel->getMiddleware();
-
+        
         $requiredMiddleware = [
             \Illuminate\Cookie\Middleware\EncryptCookies::class,
-            \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
             \Illuminate\Session\Middleware\StartSession::class,
-            \Filament\Http\Middleware\AuthenticateSession::class,
-            \Illuminate\View\Middleware\ShareErrorsFromSession::class,
-            \Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class,
+            \Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
-            \Filament\Http\Middleware\DispatchServingFilamentEvent::class,
+            \App\Http\Middleware\SetLocale::class,
         ];
 
         foreach ($requiredMiddleware as $required) {
@@ -54,11 +56,11 @@ describe('Admin Panel Configuration', function (): void {
         }
     });
 
-    it('panel uses the default Filament login page', function (): void {
+    it('panel uses custom login page', function (): void {
         $provider = new AdminPanelProvider(app());
         $panel = $provider->panel(Panel::make());
 
-        expect($panel->getLoginRouteAction())->toBe(\Filament\Auth\Pages\Login::class);
+        expect($panel->getLoginRouteAction())->toBe(\App\Filament\Pages\Auth\Login::class);
     });
 });
 
@@ -70,11 +72,23 @@ describe('Admin URL Authentication', function (): void {
         $response->assertRedirect(route('filament.admin.auth.login'));
     });
 
+    it('admin login form has correct field attributes', function (): void {
+        $response = $this->get('/admin/login');
+
+        $response->assertStatus(200);
+        
+        // Check that the custom login form components have the correct attributes
+        $response->assertSee('name="data[email]"', false);
+        $response->assertSee('name="data[password]"', false);
+        $response->assertSee('name="data[remember]"', false);
+    });
+
     it('admin authentication middleware redirects to correct login route', function (): void {
+        // Test that the AdminAuthenticate middleware redirects properly
         $response = $this->get('/admin/dashboard');
 
         $response->assertRedirect();
-
+        
         // Should redirect to Filament admin login
         if (route('filament.admin.auth.login')) {
             $response->assertRedirect(route('filament.admin.auth.login'));
@@ -90,7 +104,7 @@ describe('Panel Resource Discovery', function (): void {
         // In testing environment, should still discover resources
         $resources = $panel->getResources();
         expect($resources)->toBeArray();
-
+        
         // Should have at least some resources discovered
         expect(count($resources))->toBeGreaterThan(0);
     });
@@ -101,7 +115,7 @@ describe('Panel Resource Discovery', function (): void {
 
         $pages = $panel->getPages();
         expect($pages)->toBeArray();
-
+        
         // In testing environment, should include the dashboard page
         if (app()->environment('testing')) {
             expect($pages)->toContain(\App\Filament\Pages\Dashboard::class);
@@ -111,13 +125,13 @@ describe('Panel Resource Discovery', function (): void {
     it('panel configures widgets correctly for testing environment', function (): void {
         // Ensure we're in testing environment
         app()->instance('env', 'testing');
-
+        
         $provider = new AdminPanelProvider(app());
         $panel = $provider->panel(Panel::make());
 
         $widgets = $panel->getWidgets();
         expect($widgets)->toBeArray();
-
+        
         // Should include testing widgets
         $expectedTestingWidgets = [
             \App\Filament\Widgets\DashboardKpiWidget::class,

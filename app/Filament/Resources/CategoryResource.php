@@ -7,7 +7,6 @@ namespace App\Filament\Resources;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\CategoryResource\Pages;
 use App\Models\Category;
-use App\Support\Concerns\HasNav;
 use BackedEnum;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
@@ -23,8 +22,6 @@ use UnitEnum;
 
 final class CategoryResource extends BaseResource
 {
-    use HasNav;
-
     protected static ?string $model = Category::class;
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-folder';
@@ -32,11 +29,6 @@ final class CategoryResource extends BaseResource
     protected static string|UnitEnum|null $navigationGroup = NavigationGroup::Inventory;
 
     protected static ?int $navigationSort = 3;
-
-    public static function getRecordTitleAttribute(): ?string
-    {
-        return 'name';
-    }
 
     public static function getNavigationLabel(): string
     {
@@ -62,22 +54,22 @@ final class CategoryResource extends BaseResource
                     SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('name')
-                                ->label(__('messages.name'))
+                                ->label(__('admin.categories.name'))
                                 ->required()
                                 ->maxLength(255),
                             TextInput::make('slug')
-                                ->label(__('messages.slug'))
+                                ->label(__('admin.categories.slug'))
                                 ->required()
                                 ->unique(ignoreRecord: true)
                                 ->maxLength(255),
                         ]),
                     RichEditor::make('description')
-                        ->label(__('messages.description'))
+                        ->label(__('admin.categories.description'))
                         ->columnSpanFull(),
                     SchemaGrid::make(2)
                         ->schema([
                             Select::make('parent_id')
-                                ->label(__('messages.category'))
+                                ->label(__('admin.categories.parent'))
                                 ->relationship('parent', 'name')
                                 ->searchable()
                                 ->preload(),
@@ -94,15 +86,15 @@ final class CategoryResource extends BaseResource
         return $table
             ->columns([
                 TextColumn::make('name')
-                    ->label(__('messages.name'))
+                    ->label(__('admin.categories.name'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('slug')
-                    ->label(__('messages.slug'))
+                    ->label(__('admin.categories.slug'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('parent.name')
-                    ->label(__('messages.category'))
+                    ->label(__('admin.categories.parent'))
                     ->sortable(),
                 ToggleColumn::make('is_active')
                     ->label(__('admin.categories.is_active')),

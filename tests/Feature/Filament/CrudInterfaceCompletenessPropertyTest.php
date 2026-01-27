@@ -5,16 +5,15 @@ declare(strict_types=1);
 namespace Tests\Feature\Filament;
 
 use App\Models\User;
-use Filament\Actions\Action;
-use Filament\Actions\BulkActionGroup;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\Field;
 use Filament\Tables\Columns\Column;
 use Filament\Tables\Filters\BaseFilter;
+use Filament\Actions\Action;
+use Filament\Actions\BulkActionGroup;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\File;
-use ReflectionClass;
 use Tests\TestCase;
 use Throwable;
 
@@ -53,13 +52,13 @@ final class CrudInterfaceCompletenessPropertyTest extends TestCase
         foreach ($resourceClasses as $resourceClass) {
             // Test that resource has all required CRUD pages
             $this->assertResourceHasRequiredPages($resourceClass);
-
+            
             // Test that resource has form functionality for Create/Edit
             $this->assertResourceHasFormFunctionality($resourceClass);
-
+            
             // Test that resource has table functionality for Read/List
             $this->assertResourceHasTableFunctionality($resourceClass);
-
+            
             // Test that resource has proper model association
             $this->assertResourceHasProperModelAssociation($resourceClass);
         }
@@ -77,22 +76,22 @@ final class CrudInterfaceCompletenessPropertyTest extends TestCase
                 try {
                     $components = $resourceClass::formComponents();
                     $this->assertIsArray($components, "Form components for {$resourceClass} should return array");
-
+                    
                     // Test that form has at least one field component
                     $hasFields = false;
                     foreach ($components as $component) {
                         if ($this->isFieldComponent($component)) {
                             $hasFields = true;
-
+                            
                             // Test that field components have proper configuration
                             $this->assertFieldComponentHasProperConfiguration($component, $resourceClass);
                         }
                     }
-
-                    if (! empty($components)) {
+                    
+                    if (!empty($components)) {
                         $this->assertTrue($hasFields, "Resource {$resourceClass} should have at least one field component in its form");
                     }
-
+                    
                 } catch (Throwable $e) {
                     $this->fail("Form components for {$resourceClass} threw an error: " . $e->getMessage());
                 }
@@ -112,18 +111,18 @@ final class CrudInterfaceCompletenessPropertyTest extends TestCase
                 try {
                     $columns = $resourceClass::tableColumns();
                     $this->assertIsArray($columns, "Table columns for {$resourceClass} should return array");
-
+                    
                     // Test that table has at least one column
                     $this->assertNotEmpty($columns, "Resource {$resourceClass} should have at least one table column");
-
+                    
                     // Test that all columns are valid Filament column components
                     foreach ($columns as $column) {
                         $this->assertInstanceOf(Column::class, $column, "All table columns in {$resourceClass} should extend Filament Column class");
-
+                        
                         // Test that column has proper configuration
                         $this->assertColumnHasProperConfiguration($column, $resourceClass);
                     }
-
+                    
                 } catch (Throwable $e) {
                     $this->fail("Table columns for {$resourceClass} threw an error: " . $e->getMessage());
                 }
@@ -144,12 +143,12 @@ final class CrudInterfaceCompletenessPropertyTest extends TestCase
                 try {
                     $filters = $resourceClass::tableFilters();
                     $this->assertIsArray($filters, "Table filters for {$resourceClass} should return array");
-
+                    
                     // Test that all filters are valid Filament filter components
                     foreach ($filters as $filter) {
                         $this->assertInstanceOf(BaseFilter::class, $filter, "All table filters in {$resourceClass} should extend Filament BaseFilter class");
                     }
-
+                    
                 } catch (Throwable $e) {
                     $this->fail("Table filters for {$resourceClass} threw an error: " . $e->getMessage());
                 }
@@ -160,17 +159,17 @@ final class CrudInterfaceCompletenessPropertyTest extends TestCase
                 try {
                     $bulkActions = $resourceClass::tableBulkActions();
                     $this->assertIsArray($bulkActions, "Table bulk actions for {$resourceClass} should return array");
-
+                    
                     // Test that bulk actions are properly configured
                     foreach ($bulkActions as $bulkAction) {
                         // Handle both individual actions and bulk action groups
-                        $isValidBulkAction = $bulkAction instanceof Action ||
+                        $isValidBulkAction = $bulkAction instanceof Action || 
                                            $bulkAction instanceof BulkActionGroup ||
                                            method_exists($bulkAction, 'getActions');
-
+                        
                         $this->assertTrue($isValidBulkAction, "All bulk actions in {$resourceClass} should be Action instances or BulkActionGroup instances");
                     }
-
+                    
                 } catch (Throwable $e) {
                     $this->fail("Table bulk actions for {$resourceClass} threw an error: " . $e->getMessage());
                 }
@@ -181,12 +180,12 @@ final class CrudInterfaceCompletenessPropertyTest extends TestCase
                 try {
                     $actions = $resourceClass::tableActions();
                     $this->assertIsArray($actions, "Table actions for {$resourceClass} should return array");
-
+                    
                     // Test that actions are properly configured
                     foreach ($actions as $action) {
                         $this->assertInstanceOf(Action::class, $action, "All table actions in {$resourceClass} should be Action instances");
                     }
-
+                    
                 } catch (Throwable $e) {
                     $this->fail("Table actions for {$resourceClass} threw an error: " . $e->getMessage());
                 }
@@ -207,9 +206,9 @@ final class CrudInterfaceCompletenessPropertyTest extends TestCase
                 $modelClass = $resourceClass::getModel();
                 $this->assertIsString($modelClass, "Model for {$resourceClass} should be a string");
                 $this->assertTrue(class_exists($modelClass), "Model class {$modelClass} for resource {$resourceClass} should exist");
-
+                
                 // Test that model is an Eloquent model
-                $modelInstance = new $modelClass;
+                $modelInstance = new $modelClass();
                 $this->assertInstanceOf(\Illuminate\Database\Eloquent\Model::class, $modelInstance, "Model {$modelClass} should be an Eloquent model");
             }
 
@@ -217,15 +216,15 @@ final class CrudInterfaceCompletenessPropertyTest extends TestCase
             if (method_exists($resourceClass, 'getPages')) {
                 $pages = $resourceClass::getPages();
                 $this->assertIsArray($pages, "Pages for {$resourceClass} should return array");
-
+                
                 // Test that essential CRUD pages exist
                 $this->assertArrayHasKey('index', $pages, "Resource {$resourceClass} should have an index page");
-
+                
                 // Test that create page exists if resource supports creation
                 if ($this->resourceSupportsCreation($resourceClass)) {
                     $this->assertArrayHasKey('create', $pages, "Resource {$resourceClass} should have a create page");
                 }
-
+                
                 // Test that edit page exists if resource supports editing
                 if ($this->resourceSupportsEditing($resourceClass)) {
                     $this->assertArrayHasKey('edit', $pages, "Resource {$resourceClass} should have an edit page");
@@ -245,7 +244,7 @@ final class CrudInterfaceCompletenessPropertyTest extends TestCase
             if (method_exists($resourceClass, 'formComponents')) {
                 try {
                     $components = $resourceClass::formComponents();
-
+                    
                     // Test that form components have validation rules where appropriate
                     foreach ($components as $component) {
                         if ($this->isFieldComponent($component)) {
@@ -253,7 +252,7 @@ final class CrudInterfaceCompletenessPropertyTest extends TestCase
                             $this->assertFieldValidationIsConsistent($component, $resourceClass);
                         }
                     }
-
+                    
                 } catch (Throwable $e) {
                     $this->fail("Form validation testing for {$resourceClass} threw an error: " . $e->getMessage());
                 }
@@ -269,10 +268,10 @@ final class CrudInterfaceCompletenessPropertyTest extends TestCase
         if (method_exists($resourceClass, 'getPages')) {
             $pages = $resourceClass::getPages();
             $this->assertIsArray($pages, "Resource {$resourceClass} should have pages configuration");
-
+            
             // At minimum, should have index page
             $this->assertArrayHasKey('index', $pages, "Resource {$resourceClass} should have an index page");
-
+            
             // Test that page classes exist
             foreach ($pages as $pageName => $pageRoute) {
                 $this->assertNotNull($pageRoute, "Page route for {$pageName} in {$resourceClass} should not be null");
@@ -287,7 +286,7 @@ final class CrudInterfaceCompletenessPropertyTest extends TestCase
     {
         $hasFormMethod = method_exists($resourceClass, 'form');
         $hasFormComponents = method_exists($resourceClass, 'formComponents');
-
+        
         $this->assertTrue(
             $hasFormMethod || $hasFormComponents,
             "Resource {$resourceClass} should have either form() method or formComponents() method"
@@ -301,7 +300,7 @@ final class CrudInterfaceCompletenessPropertyTest extends TestCase
     {
         $hasTableMethod = method_exists($resourceClass, 'table');
         $hasTableColumns = method_exists($resourceClass, 'tableColumns');
-
+        
         $this->assertTrue(
             $hasTableMethod || $hasTableColumns,
             "Resource {$resourceClass} should have either table() method or tableColumns() method"
@@ -316,12 +315,12 @@ final class CrudInterfaceCompletenessPropertyTest extends TestCase
         // Test that resource has a model property or getModel method
         $hasModelProperty = property_exists($resourceClass, 'model');
         $hasGetModelMethod = method_exists($resourceClass, 'getModel');
-
+        
         $this->assertTrue(
             $hasModelProperty || $hasGetModelMethod,
             "Resource {$resourceClass} should have either \$model property or getModel() method"
         );
-
+        
         if ($hasGetModelMethod) {
             $modelClass = $resourceClass::getModel();
             $this->assertIsString($modelClass, "Model for {$resourceClass} should be a string");
@@ -334,7 +333,7 @@ final class CrudInterfaceCompletenessPropertyTest extends TestCase
      */
     private function isFieldComponent(Component $component): bool
     {
-        return $component instanceof Field ||
+        return $component instanceof Field || 
                method_exists($component, 'getName') ||
                $this->isNestedFieldComponent($component);
     }
@@ -358,7 +357,7 @@ final class CrudInterfaceCompletenessPropertyTest extends TestCase
                 return true;
             }
         }
-
+        
         return false;
     }
 
@@ -373,7 +372,7 @@ final class CrudInterfaceCompletenessPropertyTest extends TestCase
                 method_exists($component, 'getName'),
                 "Field component in {$resourceClass} should have getName method"
             );
-
+            
             // Test that field has proper label configuration
             $this->assertTrue(
                 method_exists($component, 'getLabel'),
@@ -392,7 +391,7 @@ final class CrudInterfaceCompletenessPropertyTest extends TestCase
             method_exists($column, 'getName'),
             "Column in {$resourceClass} should have getName method"
         );
-
+        
         // Test that column has proper label configuration
         $this->assertTrue(
             method_exists($column, 'getLabel'),
@@ -422,10 +421,9 @@ final class CrudInterfaceCompletenessPropertyTest extends TestCase
         // Check if resource has create page or form functionality
         if (method_exists($resourceClass, 'getPages')) {
             $pages = $resourceClass::getPages();
-
             return array_key_exists('create', $pages);
         }
-
+        
         return method_exists($resourceClass, 'form') || method_exists($resourceClass, 'formComponents');
     }
 
@@ -437,10 +435,9 @@ final class CrudInterfaceCompletenessPropertyTest extends TestCase
         // Check if resource has edit page or form functionality
         if (method_exists($resourceClass, 'getPages')) {
             $pages = $resourceClass::getPages();
-
             return array_key_exists('edit', $pages);
         }
-
+        
         return method_exists($resourceClass, 'form') || method_exists($resourceClass, 'formComponents');
     }
 
@@ -452,7 +449,7 @@ final class CrudInterfaceCompletenessPropertyTest extends TestCase
         $resourceClasses = [];
         $resourcePath = app_path('Filament/Resources');
 
-        if (! is_dir($resourcePath)) {
+        if (!is_dir($resourcePath)) {
             return [];
         }
 
@@ -462,7 +459,7 @@ final class CrudInterfaceCompletenessPropertyTest extends TestCase
             $relativePath = $file->getRelativePathname();
 
             // Skip relation managers and other subdirectories
-            if (str_contains($relativePath, '/') || ! str_ends_with($relativePath, 'Resource.php')) {
+            if (str_contains($relativePath, '/') || !str_ends_with($relativePath, 'Resource.php')) {
                 continue;
             }
 
@@ -470,8 +467,8 @@ final class CrudInterfaceCompletenessPropertyTest extends TestCase
 
             if (class_exists($className) && is_subclass_of($className, Resource::class)) {
                 // Skip abstract classes
-                $reflection = new ReflectionClass($className);
-                if (! $reflection->isAbstract()) {
+                $reflection = new \ReflectionClass($className);
+                if (!$reflection->isAbstract()) {
                     $resourceClasses[] = $className;
                 }
             }

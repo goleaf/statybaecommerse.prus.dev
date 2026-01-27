@@ -33,7 +33,7 @@ final class BrandResource extends BaseResource
 
     public static function getNavigationLabel(): string
     {
-        return __('messages.admin_brands');
+        return __('admin.brands.navigation_label');
     }
 
     public static function getPluralModelLabel(): string
@@ -55,27 +55,27 @@ final class BrandResource extends BaseResource
                     SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('name')
-                                ->label(__('messages.name'))
+                                ->label(__('admin.brands.name'))
                                 ->required()
                                 ->maxLength(255),
                             TextInput::make('slug')
-                                ->label(__('messages.slug'))
+                                ->label(__('admin.brands.slug'))
                                 ->required()
                                 ->unique(ignoreRecord: true)
                                 ->maxLength(255),
                         ]),
                     RichEditor::make('description')
-                        ->label(__('messages.description'))
+                        ->label(__('admin.brands.description'))
                         ->columnSpanFull(),
                     Toggle::make('is_active')
                         ->label(__('admin.brands.is_active'))
                         ->default(true),
                 ]),
-            SchemaSection::make(__('messages.media'))
+            SchemaSection::make(__('admin.brands.media'))
                 ->description(__('admin.brands.media_description'))
                 ->schema([
                     FileUpload::make('logo')
-                        ->label(__('messages.image'))
+                        ->label(__('admin.brands.logo'))
                         ->image()
                         ->columnSpanFull(),
                 ])
@@ -88,14 +88,14 @@ final class BrandResource extends BaseResource
         return $table
             ->columns([
                 ImageColumn::make('logo')
-                    ->label(__('messages.image'))
+                    ->label(__('admin.brands.logo'))
                     ->circular(),
                 TextColumn::make('name')
-                    ->label(__('messages.name'))
+                    ->label(__('admin.brands.name'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('slug')
-                    ->label(__('messages.slug'))
+                    ->label(__('admin.brands.slug'))
                     ->searchable()
                     ->sortable(),
                 ToggleColumn::make('is_active')

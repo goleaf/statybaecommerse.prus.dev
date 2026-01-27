@@ -13,7 +13,7 @@
     <div class="fi-mobile-table-header bg-white border-b border-gray-200 p-4 lg:hidden">
         <div class="flex items-center justify-between mb-4">
             <h3 class="text-lg font-medium text-gray-900">
-                {{ $title ?? __('messages.admin') }}
+                {{ $title ?? __('admin.table.records') }}
             </h3>
             <div class="flex items-center space-x-2">
                 {{-- Mobile Search Toggle --}}
@@ -84,8 +84,8 @@
                     {{-- Filter components would be dynamically inserted here --}}
                     <select class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                         <option value="">{{ __('admin.table.all_statuses') }}</option>
-                        <option value="active">{{ __('messages.admin') }}</option>
-                        <option value="inactive">{{ __('messages.admin') }}</option>
+                        <option value="active">{{ __('admin.table.active') }}</option>
+                        <option value="inactive">{{ __('admin.table.inactive') }}</option>
                     </select>
                 </div>
                 <div class="flex justify-between">
@@ -205,7 +205,7 @@
         <div id="mobile-bulk-actions" class="hidden lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-lg">
             <div class="flex items-center justify-between">
                 <span class="text-sm text-gray-600">
-                    <span id="selected-count">0</span> {{ __('messages.admin') }}
+                    <span id="selected-count">0</span> {{ __('admin.table.selected') }}
                 </span>
                 <div class="flex space-x-2">
                     @foreach($bulkActions as $action)

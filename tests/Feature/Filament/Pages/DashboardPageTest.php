@@ -6,11 +6,11 @@ namespace Tests\Feature\Filament\Pages;
 
 use App\Filament\Pages\Dashboard;
 use App\Filament\Widgets\DashboardKpiWidget;
-use App\Filament\Widgets\DashboardLowStockTable;
 use App\Filament\Widgets\DashboardQuickActionsWidget;
 use App\Filament\Widgets\DashboardRecentOrdersTable;
+use App\Filament\Widgets\DashboardLowStockTable;
+use App\Filament\Widgets\DashboardRecentErrorsTable;
 use App\Models\User;
-use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\Feature\TestCase;
@@ -25,7 +25,7 @@ final class DashboardPageTest extends TestCase
 
         // Set up basic dashboard permissions
         config([
-            'dashboard.permissions.view_kpis'   => 'dashboard.view_kpis',
+            'dashboard.permissions.view_kpis' => 'dashboard.view_kpis',
             'dashboard.permissions.view_tables' => 'dashboard.view_tables',
             'dashboard.permissions.run_actions' => 'dashboard.run_actions',
         ]);
@@ -33,7 +33,7 @@ final class DashboardPageTest extends TestCase
 
     public function test_dashboard_page_can_be_instantiated(): void
     {
-        $dashboard = new Dashboard;
+        $dashboard = new Dashboard();
 
         $this->assertInstanceOf(Dashboard::class, $dashboard);
     }
@@ -53,7 +53,7 @@ final class DashboardPageTest extends TestCase
 
     public function test_dashboard_has_correct_title(): void
     {
-        $dashboard = new Dashboard;
+        $dashboard = new Dashboard();
 
         // The title should be "Dashboard" in English, but it's being translated to Lithuanian
         // Let's check for the English version since the heading is kept in English
@@ -62,7 +62,7 @@ final class DashboardPageTest extends TestCase
 
     public function test_dashboard_has_correct_heading(): void
     {
-        $dashboard = new Dashboard;
+        $dashboard = new Dashboard();
 
         $this->assertEquals('Dashboard', $dashboard->getHeading());
     }
@@ -79,7 +79,7 @@ final class DashboardPageTest extends TestCase
 
     public function test_dashboard_includes_required_widgets(): void
     {
-        $dashboard = new Dashboard;
+        $dashboard = new Dashboard();
         $widgets = $dashboard->getWidgets();
 
         $expectedWidgets = [
@@ -87,6 +87,7 @@ final class DashboardPageTest extends TestCase
             DashboardQuickActionsWidget::class,
             DashboardRecentOrdersTable::class,
             DashboardLowStockTable::class,
+            DashboardRecentErrorsTable::class,
         ];
 
         foreach ($expectedWidgets as $expectedWidget) {
@@ -96,7 +97,7 @@ final class DashboardPageTest extends TestCase
 
     public function test_dashboard_has_responsive_columns_configuration(): void
     {
-        $dashboard = new Dashboard;
+        $dashboard = new Dashboard();
         $columns = $dashboard->getColumns();
 
         $expectedColumns = [
@@ -148,12 +149,13 @@ final class DashboardPageTest extends TestCase
             DashboardQuickActionsWidget::class,
             DashboardRecentOrdersTable::class,
             DashboardLowStockTable::class,
+            DashboardRecentErrorsTable::class,
         ];
 
         foreach ($widgets as $widget) {
             try {
                 Livewire::test($widget)->assertSuccessful();
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 // Some widgets may require specific permissions or data
                 // We'll just ensure they don't cause fatal errors
                 $this->assertNotNull($widget);
@@ -175,7 +177,7 @@ final class DashboardPageTest extends TestCase
     public function test_dashboard_translation_keys_exist(): void
     {
         // Test that required translation keys exist
-        $this->assertNotEmpty(trans('messages.admin'));
+        $this->assertNotEmpty(trans('admin.navigation.dashboard'));
         $this->assertNotEmpty(trans('admin/dashboard.kpis.orders_today'));
         $this->assertNotEmpty(trans('admin/dashboard.actions.heading'));
         $this->assertNotEmpty(trans('admin/dashboard.tables.recent_orders'));

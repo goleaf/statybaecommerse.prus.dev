@@ -63,7 +63,7 @@ final class MobileResponsivenessImplementationTest extends TestCase
     {
         // Load translations directly from file to verify they exist
         $translations = include base_path('lang/en/admin.php');
-
+        
         $this->assertArrayHasKey('navigation', $translations);
         $this->assertArrayHasKey('toggle_menu', $translations['navigation']);
         $this->assertArrayHasKey('close_menu', $translations['navigation']);
@@ -75,7 +75,7 @@ final class MobileResponsivenessImplementationTest extends TestCase
     {
         // Load translations directly from file to verify they exist
         $translations = include base_path('lang/lt/admin.php');
-
+        
         $this->assertArrayHasKey('navigation', $translations);
         $this->assertArrayHasKey('toggle_menu', $translations['navigation']);
         $this->assertArrayHasKey('close_menu', $translations['navigation']);
@@ -88,13 +88,13 @@ final class MobileResponsivenessImplementationTest extends TestCase
         // Load translations directly from file to verify they exist
         $enTranslations = include base_path('lang/en/admin.php');
         $ltTranslations = include base_path('lang/lt/admin.php');
-
+        
         // Check English translations - table is at top level
         $this->assertArrayHasKey('table', $enTranslations);
         $this->assertArrayHasKey('toggle_search', $enTranslations['table']);
         $this->assertArrayHasKey('toggle_filters', $enTranslations['table']);
         $this->assertEquals('Toggle search', $enTranslations['table']['toggle_search']);
-
+        
         // Check Lithuanian translations - table is at top level
         $this->assertArrayHasKey('table', $ltTranslations);
         $this->assertArrayHasKey('toggle_search', $ltTranslations['table']);
@@ -107,14 +107,14 @@ final class MobileResponsivenessImplementationTest extends TestCase
         // Load translations directly from file to verify they exist
         $enTranslations = include base_path('lang/en/admin.php');
         $ltTranslations = include base_path('lang/lt/admin.php');
-
+        
         // Check English translations - form is nested under filament
         $this->assertArrayHasKey('filament', $enTranslations);
         $this->assertArrayHasKey('form', $enTranslations['filament']);
         $this->assertArrayHasKey('go_back', $enTranslations['filament']['form']);
         $this->assertArrayHasKey('click_to_upload', $enTranslations['filament']['form']);
         $this->assertEquals('Go back', $enTranslations['filament']['form']['go_back']);
-
+        
         // Check Lithuanian translations - form is nested under filament
         $this->assertArrayHasKey('filament', $ltTranslations);
         $this->assertArrayHasKey('form', $ltTranslations['filament']);
@@ -126,13 +126,13 @@ final class MobileResponsivenessImplementationTest extends TestCase
     public function test_admin_panel_provider_includes_mobile_hooks(): void
     {
         $providerContent = file_get_contents(app_path('Filament/AdminPanelProvider.php'));
-
+        
         $this->assertStringContainsString(
             'mobile-navigation',
             $providerContent,
             'AdminPanelProvider should include mobile navigation hook'
         );
-
+        
         $this->assertStringContainsString(
             'admin-mobile.css',
             $providerContent,
@@ -143,7 +143,7 @@ final class MobileResponsivenessImplementationTest extends TestCase
     public function test_mobile_css_contains_responsive_styles(): void
     {
         $cssContent = file_get_contents(public_path('css/filament/admin-mobile.css'));
-
+        
         $this->assertStringContainsString('@media (max-width: 768px)', $cssContent);
         $this->assertStringContainsString('.fi-sidebar', $cssContent);
         $this->assertStringContainsString('.fi-table', $cssContent);
@@ -154,7 +154,7 @@ final class MobileResponsivenessImplementationTest extends TestCase
     public function test_mobile_navigation_includes_javascript(): void
     {
         $navContent = file_get_contents(resource_path('views/filament/components/mobile-navigation.blade.php'));
-
+        
         $this->assertStringContainsString('toggleMobileNav()', $navContent);
         $this->assertStringContainsString('closeMobileNav()', $navContent);
         $this->assertStringContainsString('addEventListener', $navContent);
@@ -163,7 +163,7 @@ final class MobileResponsivenessImplementationTest extends TestCase
     public function test_mobile_table_includes_responsive_features(): void
     {
         $tableContent = file_get_contents(resource_path('views/filament/components/mobile-table.blade.php'));
-
+        
         $this->assertStringContainsString('lg:hidden', $tableContent);
         $this->assertStringContainsString('overflow-x-auto', $tableContent);
         $this->assertStringContainsString('touch-action: manipulation', $tableContent);
@@ -173,7 +173,7 @@ final class MobileResponsivenessImplementationTest extends TestCase
     public function test_mobile_form_includes_touch_friendly_inputs(): void
     {
         $formContent = file_get_contents(resource_path('views/filament/components/mobile-form.blade.php'));
-
+        
         $this->assertStringContainsString('min-height: 44px', $formContent);
         $this->assertStringContainsString('touch-action: manipulation', $formContent);
         $this->assertStringContainsString('sticky bottom-0', $formContent);

@@ -54,18 +54,18 @@ final class FormSchemaCorrectnessPropertyTest extends TestCase
                 try {
                     $components = $resourceClass::formComponents();
                     $this->assertIsArray($components, "Form components for {$resourceClass} should return array");
-
+                    
                     // Test that all components are valid Filament 4 components
                     foreach ($components as $component) {
                         $this->assertInstanceOf(Component::class, $component, "All form components in {$resourceClass} should extend Filament Component class");
-
+                        
                         // Test that component has required methods for Filament 4
                         if ($component instanceof Field) {
                             $this->assertTrue(method_exists($component, 'getName'), "Field component in {$resourceClass} should have getName method");
                             $this->assertTrue(method_exists($component, 'getLabel'), "Field component in {$resourceClass} should have getLabel method");
                         }
                     }
-
+                    
                 } catch (Throwable $e) {
                     $this->fail("Form components for {$resourceClass} threw an error: " . $e->getMessage());
                 }
@@ -73,12 +73,12 @@ final class FormSchemaCorrectnessPropertyTest extends TestCase
                 // For resources that only have form method, test that it exists and has correct signature
                 $reflection = new ReflectionMethod($resourceClass, 'form');
                 $parameters = $reflection->getParameters();
-
+                
                 $this->assertCount(1, $parameters, "Form method for {$resourceClass} should have exactly one parameter");
-
+                
                 $parameter = $parameters[0];
                 $parameterType = $parameter->getType();
-
+                
                 if ($parameterType && $parameterType instanceof ReflectionNamedType) {
                     $typeName = $parameterType->getName();
                     $this->assertEquals('Filament\Schemas\Schema', $typeName, "Form method for {$resourceClass} should use Schema parameter");
@@ -99,12 +99,12 @@ final class FormSchemaCorrectnessPropertyTest extends TestCase
                 try {
                     $components = $resourceClass::formComponents();
                     $this->assertIsArray($components, "Form components for {$resourceClass} should be retrievable as array");
-
+                    
                     // Test that components can be iterated without errors
                     foreach ($components as $component) {
                         $this->assertInstanceOf(Component::class, $component, "Each component in {$resourceClass} should be a valid Filament component");
                     }
-
+                    
                 } catch (Throwable $e) {
                     $this->fail("Form components rendering for {$resourceClass} threw an error: " . $e->getMessage());
                 }
@@ -122,17 +122,17 @@ final class FormSchemaCorrectnessPropertyTest extends TestCase
         foreach ($resourceClasses as $resourceClass) {
             if (method_exists($resourceClass, 'formComponents')) {
                 $components = $resourceClass::formComponents();
-
+                
                 foreach ($components as $component) {
                     // Test that component can be evaluated without errors
                     try {
                         // Test basic component properties that don't require container initialization
                         $componentClass = get_class($component);
                         $this->assertInstanceOf(Component::class, $component, "Component in {$resourceClass} should be a valid Filament component");
-
+                        
                         // Test that component is from correct namespace
                         $this->assertStringStartsWith('Filament\\', $componentClass, "Component {$componentClass} in {$resourceClass} should be from Filament namespace");
-
+                        
                     } catch (Throwable $e) {
                         $this->fail("Component configuration validation for {$resourceClass} threw an error: " . $e->getMessage());
                     }
@@ -152,7 +152,7 @@ final class FormSchemaCorrectnessPropertyTest extends TestCase
             $content = File::get($file);
 
             // Skip files that don't have form methods
-            if (! str_contains($content, 'public static function form(')) {
+            if (!str_contains($content, 'public static function form(')) {
                 continue;
             }
 
@@ -187,16 +187,16 @@ final class FormSchemaCorrectnessPropertyTest extends TestCase
         foreach ($resourceClasses as $resourceClass) {
             if (method_exists($resourceClass, 'formComponents')) {
                 $components = $resourceClass::formComponents();
-
+                
                 foreach ($components as $component) {
                     $componentClass = get_class($component);
-
+                    
                     // Ensure component is from correct Filament 4 namespace
                     $this->assertStringStartsWith('Filament\\', $componentClass, "Component {$componentClass} in {$resourceClass} should be from Filament namespace");
-
+                    
                     // Ensure it's not from deprecated namespaces
                     $this->assertStringStartsNotWith('Filament\\Forms\\Components\\Form', $componentClass, "Component {$componentClass} in {$resourceClass} should not use deprecated Form namespace");
-
+                    
                     // Test that component extends the base Component class
                     $this->assertInstanceOf(Component::class, $component, "Component {$componentClass} in {$resourceClass} should extend Filament Component class");
                 }
@@ -216,12 +216,12 @@ final class FormSchemaCorrectnessPropertyTest extends TestCase
                 // Test that components can be retrieved without errors
                 $components = $resourceClass::formComponents();
                 $this->assertIsArray($components, "Form components for {$resourceClass} should be an array");
-
+                
                 // If there are components, they should be valid
-                if (! empty($components)) {
+                if (!empty($components)) {
                     foreach ($components as $component) {
                         $this->assertInstanceOf(Component::class, $component, "Each component in {$resourceClass} should be a valid Filament component");
-
+                        
                         // Test that component class exists and is properly defined
                         $componentClass = get_class($component);
                         $this->assertTrue(class_exists($componentClass), "Component class {$componentClass} should exist");
@@ -239,7 +239,7 @@ final class FormSchemaCorrectnessPropertyTest extends TestCase
         $resourceClasses = [];
         $resourcePath = app_path('Filament/Resources');
 
-        if (! is_dir($resourcePath)) {
+        if (!is_dir($resourcePath)) {
             return [];
         }
 
@@ -249,7 +249,7 @@ final class FormSchemaCorrectnessPropertyTest extends TestCase
             $relativePath = $file->getRelativePathname();
 
             // Skip relation managers and other subdirectories
-            if (str_contains($relativePath, '/') || ! str_ends_with($relativePath, 'Resource.php')) {
+            if (str_contains($relativePath, '/') || !str_ends_with($relativePath, 'Resource.php')) {
                 continue;
             }
 
@@ -270,7 +270,7 @@ final class FormSchemaCorrectnessPropertyTest extends TestCase
     {
         $resourcePath = app_path('Filament/Resources');
 
-        if (! is_dir($resourcePath)) {
+        if (!is_dir($resourcePath)) {
             return [];
         }
 

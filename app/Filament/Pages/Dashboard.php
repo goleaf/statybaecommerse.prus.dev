@@ -33,12 +33,12 @@ class Dashboard extends BaseDashboard
 
     public static function getNavigationLabel(): string
     {
-        return trans('messages.admin');
+        return trans('admin.navigation.dashboard');
     }
 
     public function getTitle(): string
     {
-        return trans('messages.admin');
+        return trans('admin.navigation.dashboard');
     }
 
     public function getHeading(): string
@@ -54,6 +54,7 @@ class Dashboard extends BaseDashboard
             \App\Filament\Widgets\DashboardQuickActionsWidget::class,
             \App\Filament\Widgets\DashboardRecentOrdersTable::class,
             \App\Filament\Widgets\DashboardLowStockTable::class,
+            \App\Filament\Widgets\DashboardRecentErrorsTable::class,
         ];
     }
 

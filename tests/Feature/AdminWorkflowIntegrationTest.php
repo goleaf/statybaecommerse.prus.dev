@@ -13,10 +13,10 @@ use Tests\TestCase;
 
 /**
  * Integration tests for complete admin workflows
- *
+ * 
  * Feature: filament-admin-backend-setup, Property 15.1: Complete Admin Workflow Integration
  * Validates: All requirements
- *
+ * 
  * These tests validate complete user journeys through the admin panel,
  * multi-resource operations, navigation flows, and translation completeness.
  */
@@ -36,7 +36,7 @@ final class AdminWorkflowIntegrationTest extends TestCase
 
         // Create admin user for testing
         $this->adminUser = User::factory()->create([
-            'email'    => 'admin@test.com',
+            'email' => 'admin@test.com',
             'is_admin' => true,
         ]);
     }
@@ -54,7 +54,7 @@ final class AdminWorkflowIntegrationTest extends TestCase
         // Step 2: Login to admin panel
         $this->actingAs($this->adminUser);
         $dashboardResponse = $this->get('/admin');
-
+        
         // Should successfully access admin panel
         $this->assertContains($dashboardResponse->status(), [200, 302], 'Admin users should have access to admin panel');
 
@@ -85,7 +85,7 @@ final class AdminWorkflowIntegrationTest extends TestCase
         foreach ($navigationGroups as $group) {
             $this->assertIsString($group->value, "Navigation group {$group->name} should have string value");
             $this->assertNotEmpty($group->value, "Navigation group {$group->name} value should not be empty");
-
+            
             $groupValues[] = $group->value;
             $groupNames[] = $group->name;
         }
@@ -96,8 +96,8 @@ final class AdminWorkflowIntegrationTest extends TestCase
 
         // Test expected core groups exist
         $expectedGroups = ['UserManagement', 'ContentManagement', 'Ecommerce', 'System'];
-        $actualGroupNames = array_map(fn ($group) => $group->name, $navigationGroups);
-
+        $actualGroupNames = array_map(fn($group) => $group->name, $navigationGroups);
+        
         foreach ($expectedGroups as $expectedGroup) {
             $this->assertContains($expectedGroup, $actualGroupNames, "Core navigation group {$expectedGroup} should exist");
         }
@@ -110,7 +110,7 @@ final class AdminWorkflowIntegrationTest extends TestCase
     public function test_translation_completeness_across_resources(): void
     {
         $supportedLocales = ['lt', 'en'];
-
+        
         foreach ($supportedLocales as $locale) {
             App::setLocale($locale);
 
@@ -121,16 +121,16 @@ final class AdminWorkflowIntegrationTest extends TestCase
             if (file_exists($navigationFile)) {
                 $navigationTranslations = include $navigationFile;
                 $this->assertIsArray($navigationTranslations, "Navigation translations should be array for locale {$locale}");
-
+                
                 // Test required navigation group translations
-                $this->assertArrayHasKey('navigation_groups', $navigationTranslations,
+                $this->assertArrayHasKey('navigation_groups', $navigationTranslations, 
                     "Navigation groups section should exist for locale {$locale}");
-
+                
                 $requiredKeys = ['user_management', 'content_management', 'ecommerce', 'system', 'inventory'];
                 foreach ($requiredKeys as $key) {
-                    $this->assertArrayHasKey($key, $navigationTranslations['navigation_groups'],
+                    $this->assertArrayHasKey($key, $navigationTranslations['navigation_groups'], 
                         "Navigation group key {$key} should exist for locale {$locale}");
-                    $this->assertNotEmpty($navigationTranslations['navigation_groups'][$key],
+                    $this->assertNotEmpty($navigationTranslations['navigation_groups'][$key], 
                         "Navigation group translation for {$key} should not be empty in locale {$locale}");
                 }
             }
@@ -150,12 +150,12 @@ final class AdminWorkflowIntegrationTest extends TestCase
 
         // Test core admin resource routes
         $resourceRoutes = [
-            '/admin/products'   => 'filament.admin.resources.products.index',
+            '/admin/products' => 'filament.admin.resources.products.index',
             '/admin/categories' => 'filament.admin.resources.categories.index',
-            '/admin/brands'     => 'filament.admin.resources.brands.index',
-            '/admin/inventory'  => 'filament.admin.resources.inventory.index',
-            '/admin/prices'     => 'filament.admin.resources.prices.index',
-            '/admin/discounts'  => 'filament.admin.resources.discounts.index',
+            '/admin/brands' => 'filament.admin.resources.brands.index',
+            '/admin/inventory' => 'filament.admin.resources.inventory.index',
+            '/admin/prices' => 'filament.admin.resources.prices.index',
+            '/admin/discounts' => 'filament.admin.resources.discounts.index',
         ];
 
         foreach ($resourceRoutes as $route => $routeName) {
@@ -179,7 +179,7 @@ final class AdminWorkflowIntegrationTest extends TestCase
 
         // Test admin panel with mobile user agent
         $mobileUserAgent = 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_7_1 like Mac OS X) AppleWebKit/605.1.15';
-
+        
         $response = $this->withHeaders([
             'User-Agent' => $mobileUserAgent,
         ])->get('/admin');
@@ -189,17 +189,17 @@ final class AdminWorkflowIntegrationTest extends TestCase
         // Test that responsive elements are present if we get HTML content
         if ($response->status() === 200) {
             $content = $response->getContent();
-
+            
             // Check for responsive indicators
             $responsiveIndicators = ['viewport', 'responsive', 'mobile', 'tailwind'];
             $foundIndicators = 0;
-
+            
             foreach ($responsiveIndicators as $indicator) {
                 if (stripos($content, $indicator) !== false) {
                     $foundIndicators++;
                 }
             }
-
+            
             $this->assertGreaterThan(0, $foundIndicators, 'Admin panel should contain responsive design indicators');
         }
     }
@@ -217,7 +217,7 @@ final class AdminWorkflowIntegrationTest extends TestCase
         // Test regular user access (should be denied)
         $regularUser = User::factory()->create(['is_admin' => false]);
         $this->actingAs($regularUser);
-
+        
         $response = $this->get('/admin');
         $this->assertContains($response->status(), [302, 401, 403], 'Regular users should be denied admin access');
 

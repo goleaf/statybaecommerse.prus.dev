@@ -31,8 +31,7 @@ final class FilesystemServiceProvider extends ServiceProvider
 
         $this->app->singleton(DirectoryScanner::class, static function ($app): DirectoryScanner {
             return new DirectoryScanner(
-                // Use the base filesystem to prevent recursive calls into GracefulFilesystem.
-                new Filesystem,
+                $app->make(Filesystem::class),
                 $app->make(DirectoryMemoryManager::class)
             );
         });

@@ -6,15 +6,14 @@ namespace Tests\Feature;
 
 use App\Enums\NavigationGroup;
 use Illuminate\Support\Facades\Route;
-use ReflectionClass;
 use Tests\TestCase;
 
 /**
  * Lightweight integration tests for admin workflows
- *
+ * 
  * Feature: filament-admin-backend-setup, Property 15.1: Complete Admin Workflow Integration
  * Validates: All requirements
- *
+ * 
  * These tests validate core admin functionality without heavy database operations
  * to avoid memory constraints while still providing comprehensive coverage.
  */
@@ -42,7 +41,7 @@ final class AdminWorkflowLightweightIntegrationTest extends TestCase
         foreach ($navigationGroups as $group) {
             $this->assertIsString($group->value, "Navigation group {$group->name} should have string value");
             $this->assertNotEmpty($group->value, "Navigation group {$group->name} value should not be empty");
-
+            
             $groupValues[] = $group->value;
             $groupNames[] = $group->name;
         }
@@ -53,8 +52,8 @@ final class AdminWorkflowLightweightIntegrationTest extends TestCase
 
         // Test expected core groups exist
         $expectedGroups = ['UserManagement', 'ContentManagement', 'Ecommerce', 'System'];
-        $actualGroupNames = array_map(fn ($group) => $group->name, $navigationGroups);
-
+        $actualGroupNames = array_map(fn($group) => $group->name, $navigationGroups);
+        
         foreach ($expectedGroups as $expectedGroup) {
             $this->assertContains($expectedGroup, $actualGroupNames, "Core navigation group {$expectedGroup} should exist");
         }
@@ -67,7 +66,7 @@ final class AdminWorkflowLightweightIntegrationTest extends TestCase
     public function test_translation_file_completeness(): void
     {
         $supportedLocales = ['lt', 'en'];
-
+        
         foreach ($supportedLocales as $locale) {
             // Test navigation translations exist
             $navigationFile = resource_path("lang/{$locale}/navigation.php");
@@ -76,16 +75,16 @@ final class AdminWorkflowLightweightIntegrationTest extends TestCase
             if (file_exists($navigationFile)) {
                 $navigationTranslations = include $navigationFile;
                 $this->assertIsArray($navigationTranslations, "Navigation translations should be array for locale {$locale}");
-
+                
                 // Test required navigation group translations
-                $this->assertArrayHasKey('navigation_groups', $navigationTranslations,
+                $this->assertArrayHasKey('navigation_groups', $navigationTranslations, 
                     "Navigation groups section should exist for locale {$locale}");
-
+                
                 $requiredKeys = ['user_management', 'content_management', 'ecommerce', 'system', 'inventory'];
                 foreach ($requiredKeys as $key) {
-                    $this->assertArrayHasKey($key, $navigationTranslations['navigation_groups'],
+                    $this->assertArrayHasKey($key, $navigationTranslations['navigation_groups'], 
                         "Navigation group key {$key} should exist for locale {$locale}");
-                    $this->assertNotEmpty($navigationTranslations['navigation_groups'][$key],
+                    $this->assertNotEmpty($navigationTranslations['navigation_groups'][$key], 
                         "Navigation group translation for {$key} should not be empty in locale {$locale}");
                 }
             }
@@ -150,14 +149,14 @@ final class AdminWorkflowLightweightIntegrationTest extends TestCase
 
         foreach ($expectedResources as $resourceClass) {
             $this->assertTrue(class_exists($resourceClass), "Resource class {$resourceClass} should exist");
-
+            
             if (class_exists($resourceClass)) {
                 // Test that resource has required methods
-                $reflection = new ReflectionClass($resourceClass);
-
+                $reflection = new \ReflectionClass($resourceClass);
+                
                 $requiredMethods = ['form', 'table', 'getRelations', 'getPages'];
                 foreach ($requiredMethods as $method) {
-                    $this->assertTrue($reflection->hasMethod($method),
+                    $this->assertTrue($reflection->hasMethod($method), 
                         "Resource {$resourceClass} should have {$method} method");
                 }
             }
@@ -171,23 +170,23 @@ final class AdminWorkflowLightweightIntegrationTest extends TestCase
     public function test_navigation_group_enum_properties(): void
     {
         $navigationGroups = NavigationGroup::cases();
-
+        
         foreach ($navigationGroups as $group) {
             // Test that each group has consistent properties
             $this->assertIsString($group->value, "Group {$group->name} should have string value");
             $this->assertIsString($group->name, "Group {$group->name} should have string name");
-
+            
             // Test value format for CSS class compatibility
-            $this->assertMatchesRegularExpression('/^[a-z][a-z-]*$/', $group->value,
+            $this->assertMatchesRegularExpression('/^[a-z][a-z-]*$/', $group->value, 
                 "Group value {$group->value} should be valid CSS class name");
-
+            
             // Test name format for PHP enum compatibility
-            $this->assertMatchesRegularExpression('/^[A-Z][a-zA-Z]*$/', $group->name,
+            $this->assertMatchesRegularExpression('/^[A-Z][a-zA-Z]*$/', $group->name, 
                 "Group name {$group->name} should follow PascalCase");
-
+            
             // Test enum consistency
             $sameGroup = NavigationGroup::from($group->value);
-            $this->assertSame($group, $sameGroup, 'Navigation group should maintain identity');
+            $this->assertSame($group, $sameGroup, "Navigation group should maintain identity");
         }
     }
 
@@ -207,7 +206,7 @@ final class AdminWorkflowLightweightIntegrationTest extends TestCase
         // Test that base resource exists
         $baseResource = 'App\\Filament\\Resources\\BaseResource';
         if (class_exists($baseResource)) {
-            $reflection = new ReflectionClass($baseResource);
+            $reflection = new \ReflectionClass($baseResource);
             $this->assertTrue($reflection->isAbstract(), 'BaseResource should be abstract');
         }
 
@@ -243,13 +242,13 @@ final class AdminWorkflowLightweightIntegrationTest extends TestCase
             $tailwindContent = file_get_contents($tailwindConfig);
             $responsiveIndicators = ['sm:', 'md:', 'lg:', 'xl:', 'responsive'];
             $foundIndicators = 0;
-
+            
             foreach ($responsiveIndicators as $indicator) {
                 if (strpos($tailwindContent, $indicator) !== false) {
                     $foundIndicators++;
                 }
             }
-
+            
             $this->assertGreaterThan(0, $foundIndicators, 'TailwindCSS should have responsive configuration');
         }
     }
@@ -288,53 +287,52 @@ final class AdminWorkflowLightweightIntegrationTest extends TestCase
     public function test_complete_workflow_integration_points(): void
     {
         // Test that all major components are properly integrated
-
+        
         // 1. Navigation system integration
         $this->assertNotEmpty(NavigationGroup::cases(), 'Navigation groups should be defined');
-
+        
         // 2. Resource system integration
         $resourceClasses = [
             'App\\Filament\\Resources\\ProductResource',
             'App\\Filament\\Resources\\CategoryResource',
             'App\\Filament\\Resources\\BrandResource',
         ];
-
+        
         $existingResources = 0;
         foreach ($resourceClasses as $resourceClass) {
             if (class_exists($resourceClass)) {
                 $existingResources++;
             }
         }
-
+        
         $this->assertGreaterThan(0, $existingResources, 'At least some admin resources should exist');
-
+        
         // 3. Translation system integration
         $translationFiles = ['lt/navigation.php', 'en/navigation.php'];
         $existingTranslations = 0;
-
+        
         foreach ($translationFiles as $translationFile) {
             $filePath = resource_path("lang/{$translationFile}");
             if (file_exists($filePath)) {
                 $existingTranslations++;
             }
         }
-
+        
         $this->assertGreaterThan(0, $existingTranslations, 'Translation files should exist');
-
+        
         // 4. Authentication system integration
         $authRoutes = collect(Route::getRoutes())->filter(function ($route) {
             $routeName = $route->getName() ?? '';
-
             return str_contains($routeName, 'login') || str_contains($routeName, 'auth');
         });
-
+        
         $this->assertGreaterThan(0, $authRoutes->count(), 'Authentication routes should be registered');
-
+        
         // 5. Admin panel integration
         $adminRoutes = collect(Route::getRoutes())->filter(function ($route) {
             return str_starts_with($route->getName() ?? '', 'filament.admin.');
         });
-
+        
         $this->assertGreaterThan(0, $adminRoutes->count(), 'Admin panel routes should be registered');
     }
 }
