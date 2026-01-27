@@ -1,4 +1,4 @@
-
+<?php
 
 declare(strict_types=1);
 
@@ -532,7 +532,7 @@ return array (
   'home_loyalty_title' => 'Rewards for loyal customers',
   'home_mission_badge' => 'Our mission',
   'home_mission_consultation' => 'Book a consultation',
-  'home_mission_subtitle' => 'With years of experience in construction, ventilated facades, and timber housing systems, we help you find the right accessories and deliver the best technical solutions. Can\'t see what you need? Book a consultation and let\'s build more together.',
+  'home_mission_subtitle' => 'With years of experience in construction, ventilated facades, and timber housing systems, we help you find the right accessories and deliver the best technical solutions. Can\u0027t see what you need? Book a consultation and let\u0027s build more together.',
   'home_mission_title' => 'Your most trusted construction partner',
   'home_mission_view_solutions' => 'View available solutions',
   'home_new' => 'Home new',
@@ -602,7 +602,7 @@ return array (
   'legal_terms' => 'Legal terms',
   'length' => 'Length',
   'live_quote_from_resolver' => 'Live quote from resolver',
-  'loading' => 'Loading...',
+  'loading' => 'Loading...', 
   'loading_more' => 'Loading more',
   'location' => 'Vilnius Warehouse',
   'locations' => 'Locations',
@@ -728,7 +728,7 @@ return array (
   'newsletter_privacy_note' => 'We care about your data. Read our privacy policy.',
   'newsletter_reset' => 'Reset form',
   'newsletter_subscribe' => 'Subscribe',
-  'newsletter_subscribing' => 'Subscribing...',
+  'newsletter_subscribing' => 'Subscribing...', 
   'newsletter_subscription' => 'Newsletter subscription',
   'newsletter_subtitle' => 'Get notified about new arrivals, special offers and exclusive deals.',
   'newsletter_success_body' => 'Thank you for subscribing to our newsletter.',
@@ -1023,4 +1023,5 @@ return array (
   'your_cart_is_empty' => 'Your cart is empty',
   'zip_code' => 'Zip Code',
   'zone' => 'Zone',
+  'slider_management' => 'Slider Management',
 );
