@@ -1,7 +1,7 @@
 @php
-    $heading = $heading ?? __('messages.legal);
+    $heading = $heading ?? __('messages.legal');
     $description = $description ?? null;
-    $emptyMessage = $emptyMessage ?? __('messages.frontend_legal);
+    $emptyMessage = $emptyMessage ?? __('messages.frontend_legal');
     $updatedAt = optional($legal?->updated_at)->format('Y-m-d');
     $content = $legal?->getTranslatedContent();
     $fallbackKey = $fallbackKey ?? null;
@@ -34,13 +34,13 @@
 
                     @if ($legal->is_required)
                         <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-200">
-                            {{ __('messages.frontend_legal) }}
+                            {{ __('messages.frontend_legal') }}
                         </span>
                     @endif
                 </div>
 
                 @if ($updatedAt)
-                    <span>{{ __('messages.frontend_legal) }}: {{ $updatedAt }}</span>
+                    <span>{{ __('messages.frontend_legal') }}: {{ $updatedAt }}</span>
                 @endif
             </div>
         @endif

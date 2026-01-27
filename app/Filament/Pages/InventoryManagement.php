@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
+use App\Enums\NavigationGroup;
 use App\Filament\Forms\Components\Quantity;
 use App\Models\Product;
+use Filament\Actions\BulkAction;
 use Filament\Forms\Components\Select;
 use Filament\Pages\Page;
-use Filament\Actions\BulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
@@ -23,7 +24,6 @@ final class InventoryManagement extends Page implements HasTable
         paginateTableQuery as basePaginateTableQuery;
     }
 
-
     protected string $view = 'filament.pages.inventory-management';
 
     public static function getNavigationIcon(): string
@@ -33,7 +33,7 @@ final class InventoryManagement extends Page implements HasTable
 
     public static function getNavigationGroup(): ?string
     {
-        return __('messages.inventory');
+        return NavigationGroup::Inventory->label();
     }
 
     public static function getSlug(?\Filament\Panel $panel = null): string

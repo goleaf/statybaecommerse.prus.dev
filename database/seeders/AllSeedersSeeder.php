@@ -27,8 +27,6 @@ final class AllSeedersSeeder extends Seeder
         CurrencySeeder::class,
         AttributeSeeder::class,
         AttributeValueSeeder::class,
-        AdminAuthorizationSeeder::class,
-        RolesAndPermissionsSeeder::class,
         AdminUserSeeder::class,
         CustomerGroupSeeder::class,
     ];

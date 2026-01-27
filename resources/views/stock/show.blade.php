@@ -1,6 +1,6 @@
 @extends('components.layouts.base')
 
-@section('title', __('messages.inventory))
+@section('title', __('messages.inventory'))
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
@@ -11,7 +11,7 @@
                 <ol class="inline-flex items-center space-x-1 md:space-x-3">
                     <li class="inline-flex items-center">
                         <a href="{{ route('stock.index') }}" class="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
-                            {{ __('messages.inventory) }}
+                            {{ __('messages.inventory') }}
                         </a>
                     </li>
                     <li>
@@ -39,7 +39,7 @@
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4"></path>
                 </svg>
-                <span>{{ __('messages.inventory) }}</span>
+                <span>{{ __('messages.inventory') }}</span>
             </button>
             
             @if($stock->available_stock > 0)
@@ -48,7 +48,7 @@
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
                     </svg>
-                    <span>{{ __('messages.inventory) }}</span>
+                    <span>{{ __('messages.inventory') }}</span>
                 </button>
             @endif
             
@@ -58,7 +58,7 @@
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path>
                     </svg>
-                    <span>{{ __('messages.inventory) }}</span>
+                    <span>{{ __('messages.inventory') }}</span>
                 </button>
             @endif
         </div>
@@ -70,13 +70,13 @@
             <!-- Basic Information -->
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
                 <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                    {{ __('messages.inventory) }}
+                    {{ __('messages.inventory') }}
                 </h2>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            {{ __('messages.inventory) }}
+                            {{ __('messages.inventory') }}
                         </label>
                         <p class="mt-1 text-sm text-gray-900 dark:text-white">
                             {{ $stock->variant->product->name }}
@@ -85,7 +85,7 @@
                     
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            {{ __('messages.inventory) }}
+                            {{ __('messages.inventory') }}
                         </label>
                         <p class="mt-1 text-sm text-gray-900 dark:text-white">
                             {{ $stock->variant->display_name }}
@@ -94,7 +94,7 @@
                     
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            {{ __('messages.inventory) }}
+                            {{ __('messages.inventory') }}
                         </label>
                         <p class="mt-1 text-sm text-gray-900 dark:text-white">
                             {{ $stock->location->name }}
@@ -103,10 +103,10 @@
                     
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            {{ __('messages.inventory) }}
+                            {{ __('messages.inventory') }}
                         </label>
                         <p class="mt-1 text-sm text-gray-900 dark:text-white">
-                            {{ $stock->supplier?->name ?? __('messages.inventory) }}
+                            {{ $stock->supplier?->name ?? __('messages.inventory') }}
                         </p>
                     </div>
                 </div>
@@ -115,7 +115,7 @@
             <!-- Stock Levels -->
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
                 <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                    {{ __('messages.inventory) }}
+                    {{ __('messages.inventory') }}
                 </h2>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -124,7 +124,7 @@
                             {{ $stock->stock }}
                         </div>
                         <div class="text-sm text-gray-600 dark:text-gray-400">
-                            {{ __('messages.inventory) }}
+                            {{ __('messages.inventory') }}
                         </div>
                     </div>
                     
@@ -133,7 +133,7 @@
                             {{ $stock->reserved }}
                         </div>
                         <div class="text-sm text-gray-600 dark:text-gray-400">
-                            {{ __('messages.inventory) }}
+                            {{ __('messages.inventory') }}
                         </div>
                     </div>
                     
@@ -142,7 +142,7 @@
                             {{ $stock->available_stock }}
                         </div>
                         <div class="text-sm text-gray-600 dark:text-gray-400">
-                            {{ __('messages.inventory) }}
+                            {{ __('messages.inventory') }}
                         </div>
                     </div>
                     
@@ -151,7 +151,7 @@
                             {{ $stock->incoming }}
                         </div>
                         <div class="text-sm text-gray-600 dark:text-gray-400">
-                            {{ __('messages.inventory) }}
+                            {{ __('messages.inventory') }}
                         </div>
                     </div>
                 </div>
@@ -159,7 +159,7 @@
                 <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            {{ __('messages.inventory) }}
+                            {{ __('messages.inventory') }}
                         </label>
                         <p class="mt-1 text-sm text-gray-900 dark:text-white">
                             {{ $stock->threshold }}
@@ -168,7 +168,7 @@
                     
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            {{ __('messages.inventory) }}
+                            {{ __('messages.inventory') }}
                         </label>
                         <p class="mt-1 text-sm text-gray-900 dark:text-white">
                             {{ $stock->reorder_point }}
@@ -177,10 +177,10 @@
                     
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            {{ __('messages.inventory) }}
+                            {{ __('messages.inventory') }}
                         </label>
                         <p class="mt-1 text-sm text-gray-900 dark:text-white">
-                            {{ $stock->max_stock_level ?? __('messages.inventory) }}
+                            {{ $stock->max_stock_level ?? __('messages.inventory') }}
                         </p>
                     </div>
                 </div>
@@ -189,22 +189,22 @@
             <!-- Financial Information -->
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
                 <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                    {{ __('messages.inventory) }}
+                    {{ __('messages.inventory') }}
                 </h2>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            {{ __('messages.inventory) }}
+                            {{ __('messages.inventory') }}
                         </label>
                         <p class="mt-1 text-sm text-gray-900 dark:text-white">
-                            {{ $stock->cost_per_unit ? '€' . number_format($stock->cost_per_unit, 2) : __('messages.inventory) }}
+                            {{ $stock->cost_per_unit ? '€' . number_format($stock->cost_per_unit, 2) : __('messages.inventory') }}
                         </p>
                     </div>
                     
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            {{ __('messages.inventory) }}
+                            {{ __('messages.inventory') }}
                         </label>
                         <p class="mt-1 text-sm text-gray-900 dark:text-white font-semibold">
                             €{{ number_format($stock->stock_value, 2) }}
@@ -213,7 +213,7 @@
                     
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            {{ __('messages.inventory) }}
+                            {{ __('messages.inventory') }}
                         </label>
                         <p class="mt-1 text-sm text-gray-900 dark:text-white">
                             €{{ number_format($stock->reserved_value, 2) }}
@@ -222,7 +222,7 @@
                     
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            {{ __('messages.inventory) }}
+                            {{ __('messages.inventory') }}
                         </label>
                         <p class="mt-1 text-sm text-gray-900 dark:text-white font-semibold">
                             €{{ number_format($stock->total_value, 2) }}
@@ -234,31 +234,31 @@
             <!-- Additional Information -->
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
                 <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                    {{ __('messages.inventory) }}
+                    {{ __('messages.inventory') }}
                 </h2>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            {{ __('messages.inventory) }}
+                            {{ __('messages.inventory') }}
                         </label>
                         <p class="mt-1 text-sm text-gray-900 dark:text-white">
-                            {{ $stock->batch_number ?? __('messages.inventory) }}
+                            {{ $stock->batch_number ?? __('messages.inventory') }}
                         </p>
                     </div>
                     
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            {{ __('messages.inventory) }}
+                            {{ __('messages.inventory') }}
                         </label>
                         <p class="mt-1 text-sm text-gray-900 dark:text-white">
-                            {{ $stock->expiry_date?->format('Y-m-d') ?? __('messages.inventory) }}
+                            {{ $stock->expiry_date?->format('Y-m-d') ?? __('messages.inventory') }}
                         </p>
                     </div>
                     
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            {{ __('messages.inventory) }}
+                            {{ __('messages.inventory') }}
                         </label>
                         <p class="mt-1 text-sm text-gray-900 dark:text-white">
                             {{ ucfirst($stock->status) }}
@@ -267,10 +267,10 @@
                     
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            {{ __('messages.inventory) }}
+                            {{ __('messages.inventory') }}
                         </label>
                         <p class="mt-1 text-sm text-gray-900 dark:text-white">
-                            {{ $stock->is_tracked ? __('messages.inventory) : __('messages.inventory) }}
+                            {{ $stock->is_tracked ? __('messages.inventory') : __('messages.inventory') }}
                         </p>
                     </div>
                 </div>
@@ -278,7 +278,7 @@
                 @if($stock->notes)
                     <div class="mt-6">
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            {{ __('messages.inventory) }}
+                            {{ __('messages.inventory') }}
                         </label>
                         <p class="mt-1 text-sm text-gray-900 dark:text-white">
                             {{ $stock->notes }}
@@ -293,7 +293,7 @@
             <!-- Stock Status -->
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                    {{ __('messages.inventory) }}
+                    {{ __('messages.inventory') }}
                 </h3>
                 
                 @php
@@ -316,7 +316,7 @@
             <!-- Quick Actions -->
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                    {{ __('messages.inventory) }}
+                    {{ __('messages.inventory') }}
                 </h3>
                 
                 <div class="space-y-3">
@@ -325,7 +325,7 @@
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4"></path>
                         </svg>
-                        <span>{{ __('messages.inventory) }}</span>
+                        <span>{{ __('messages.inventory') }}</span>
                     </button>
                     
                     @if($stock->available_stock > 0)
@@ -334,7 +334,7 @@
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
                             </svg>
-                            <span>{{ __('messages.inventory) }}</span>
+                            <span>{{ __('messages.inventory') }}</span>
                         </button>
                     @endif
                     
@@ -344,7 +344,7 @@
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path>
                             </svg>
-                            <span>{{ __('messages.inventory) }}</span>
+                            <span>{{ __('messages.inventory') }}</span>
                         </button>
                     @endif
                 </div>
@@ -353,31 +353,31 @@
             <!-- Timestamps -->
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                    {{ __('messages.inventory) }}
+                    {{ __('messages.inventory') }}
                 </h3>
                 
                 <div class="space-y-3">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            {{ __('messages.inventory) }}
+                            {{ __('messages.inventory') }}
                         </label>
                         <p class="mt-1 text-sm text-gray-900 dark:text-white">
-                            {{ $stock->last_restocked_at?->format('Y-m-d H:i') ?? __('messages.inventory) }}
+                            {{ $stock->last_restocked_at?->format('Y-m-d H:i') ?? __('messages.inventory') }}
                         </p>
                     </div>
                     
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            {{ __('messages.inventory) }}
+                            {{ __('messages.inventory') }}
                         </label>
                         <p class="mt-1 text-sm text-gray-900 dark:text-white">
-                            {{ $stock->last_sold_at?->format('Y-m-d H:i') ?? __('messages.inventory) }}
+                            {{ $stock->last_sold_at?->format('Y-m-d H:i') ?? __('messages.inventory') }}
                         </p>
                     </div>
                     
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            {{ __('messages.inventory) }}
+                            {{ __('messages.inventory') }}
                         </label>
                         <p class="mt-1 text-sm text-gray-900 dark:text-white">
                             {{ $stock->created_at->format('Y-m-d H:i') }}
@@ -386,7 +386,7 @@
                     
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            {{ __('messages.inventory) }}
+                            {{ __('messages.inventory') }}
                         </label>
                         <p class="mt-1 text-sm text-gray-900 dark:text-white">
                             {{ $stock->updated_at->format('Y-m-d H:i') }}
@@ -401,7 +401,7 @@
     <div class="mt-8">
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
             <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                {{ __('messages.inventory) }}
+                {{ __('messages.inventory') }}
             </h2>
             
             <div class="overflow-x-auto">
@@ -409,19 +409,19 @@
                     <thead class="bg-gray-50 dark:bg-gray-700">
                         <tr>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                {{ __('messages.inventory) }}
+                                {{ __('messages.inventory') }}
                             </th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                {{ __('messages.inventory) }}
+                                {{ __('messages.inventory') }}
                             </th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                {{ __('messages.inventory) }}
+                                {{ __('messages.inventory') }}
                             </th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                {{ __('messages.inventory) }}
+                                {{ __('messages.inventory') }}
                             </th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                {{ __('messages.inventory) }}
+                                {{ __('messages.inventory') }}
                             </th>
                         </tr>
                     </thead>
@@ -443,13 +443,13 @@
                                     {{ $movement->reason_label }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                                    {{ $movement->user?->name ?? __('messages.inventory) }}
+                                    {{ $movement->user?->name ?? __('messages.inventory') }}
                                 </td>
                             </tr>
                         @empty
                             <tr>
                                 <td colspan="5" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
-                                    {{ __('messages.inventory) }}
+                                    {{ __('messages.inventory') }}
                                 </td>
                             </tr>
                         @endforelse
@@ -465,14 +465,14 @@
     <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800">
         <div class="mt-3">
             <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
-                {{ __('messages.inventory) }}
+                {{ __('messages.inventory') }}
             </h3>
             
             <form id="adjustStockForm">
                 @csrf
                 <div class="mb-4">
                     <label for="adjustment_quantity" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        {{ __('messages.inventory) }}
+                        {{ __('messages.inventory') }}
                     </label>
                     <input type="number" 
                            id="adjustment_quantity" 
@@ -480,31 +480,31 @@
                            required
                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
                     <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                        {{ __('messages.inventory) }}
+                        {{ __('messages.inventory') }}
                     </p>
                 </div>
 
                 <div class="mb-4">
                     <label for="adjustment_reason" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        {{ __('messages.inventory) }}
+                        {{ __('messages.inventory') }}
                     </label>
                     <select id="adjustment_reason" 
                             name="reason" 
                             required
                             class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
-                        <option value="">{{ __('messages.inventory) }}</option>
-                        <option value="manual_adjustment">{{ __('messages.inventory) }}</option>
-                        <option value="damage">{{ __('messages.inventory) }}</option>
-                        <option value="theft">{{ __('messages.inventory) }}</option>
-                        <option value="return">{{ __('messages.inventory) }}</option>
-                        <option value="restock">{{ __('messages.inventory) }}</option>
-                        <option value="transfer">{{ __('messages.inventory) }}</option>
+                        <option value="">{{ __('messages.inventory') }}</option>
+                        <option value="manual_adjustment">{{ __('messages.inventory') }}</option>
+                        <option value="damage">{{ __('messages.inventory') }}</option>
+                        <option value="theft">{{ __('messages.inventory') }}</option>
+                        <option value="return">{{ __('messages.inventory') }}</option>
+                        <option value="restock">{{ __('messages.inventory') }}</option>
+                        <option value="transfer">{{ __('messages.inventory') }}</option>
                     </select>
                 </div>
 
                 <div class="mb-6">
                     <label for="adjustment_notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        {{ __('messages.inventory) }}
+                        {{ __('messages.inventory') }}
                     </label>
                     <textarea id="adjustment_notes" 
                               name="notes" 
@@ -516,11 +516,11 @@
                     <button type="button" 
                             onclick="closeAdjustStockModal()"
                             class="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-md">
-                        {{ __('messages.inventory) }}
+                        {{ __('messages.inventory') }}
                     </button>
                     <button type="submit" 
                             class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md">
-                        {{ __('messages.inventory) }}
+                        {{ __('messages.inventory') }}
                     </button>
                 </div>
             </form>
@@ -533,14 +533,14 @@
     <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800">
         <div class="mt-3">
             <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
-                {{ __('messages.inventory) }}
+                {{ __('messages.inventory') }}
             </h3>
             
             <form id="reserveStockForm">
                 @csrf
                 <div class="mb-4">
                     <label for="reserve_quantity" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        {{ __('messages.inventory) }}
+                        {{ __('messages.inventory') }}
                     </label>
                     <input type="number" 
                            id="reserve_quantity" 
@@ -550,13 +550,13 @@
                            max="{{ $stock->available_stock }}"
                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
                     <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                        {{ __('messages.inventory) }}: {{ $stock->available_stock }}
+                        {{ __('messages.inventory') }}: {{ $stock->available_stock }}
                     </p>
                 </div>
 
                 <div class="mb-6">
                     <label for="reserve_notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        {{ __('messages.inventory) }}
+                        {{ __('messages.inventory') }}
                     </label>
                     <textarea id="reserve_notes" 
                               name="notes" 
@@ -568,11 +568,11 @@
                     <button type="button" 
                             onclick="closeReserveStockModal()"
                             class="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-md">
-                        {{ __('messages.inventory) }}
+                        {{ __('messages.inventory') }}
                     </button>
                     <button type="submit" 
                             class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md">
-                        {{ __('messages.inventory) }}
+                        {{ __('messages.inventory') }}
                     </button>
                 </div>
             </form>
@@ -585,14 +585,14 @@
     <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800">
         <div class="mt-3">
             <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
-                {{ __('messages.inventory) }}
+                {{ __('messages.inventory') }}
             </h3>
             
             <form id="unreserveStockForm">
                 @csrf
                 <div class="mb-4">
                     <label for="unreserve_quantity" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        {{ __('messages.inventory) }}
+                        {{ __('messages.inventory') }}
                     </label>
                     <input type="number" 
                            id="unreserve_quantity" 
@@ -602,13 +602,13 @@
                            max="{{ $stock->reserved }}"
                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
                     <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                        {{ __('messages.inventory) }}: {{ $stock->reserved }}
+                        {{ __('messages.inventory') }}: {{ $stock->reserved }}
                     </p>
                 </div>
 
                 <div class="mb-6">
                     <label for="unreserve_notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        {{ __('messages.inventory) }}
+                        {{ __('messages.inventory') }}
                     </label>
                     <textarea id="unreserve_notes" 
                               name="notes" 
@@ -620,11 +620,11 @@
                     <button type="button" 
                             onclick="closeUnreserveStockModal()"
                             class="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-md">
-                        {{ __('messages.inventory) }}
+                        {{ __('messages.inventory') }}
                     </button>
                     <button type="submit" 
                             class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-md">
-                        {{ __('messages.inventory) }}
+                        {{ __('messages.inventory') }}
                     </button>
                 </div>
             </form>
@@ -684,7 +684,7 @@ document.getElementById('adjustStockForm').addEventListener('submit', function(e
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('{{ __("messages.inventory) }}');
+        alert('{{ __("messages.inventory") }}');
     });
     
     closeAdjustStockModal();
@@ -714,7 +714,7 @@ document.getElementById('reserveStockForm').addEventListener('submit', function(
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('{{ __("messages.inventory) }}');
+        alert('{{ __("messages.inventory") }}');
     });
     
     closeReserveStockModal();
@@ -744,7 +744,7 @@ document.getElementById('unreserveStockForm').addEventListener('submit', functio
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('{{ __("messages.inventory) }}');
+        alert('{{ __("messages.inventory") }}');
     });
     
     closeUnreserveStockModal();

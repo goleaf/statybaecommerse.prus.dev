@@ -260,5 +260,4 @@ final class PriceList extends Model
     {
         return $this->partners()->count();
     }
-
 }

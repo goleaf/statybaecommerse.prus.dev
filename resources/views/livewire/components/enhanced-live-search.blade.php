@@ -46,7 +46,7 @@
                 :class="showFilters ? 'bg-blue-100 text-blue-600' : 'text-gray-400 hover:text-gray-600'"
                 type="button"
                 class="p-2 rounded-lg transition-colors duration-200"
-                title="{{ __('messages.frontend) }}"
+                title="{{ __('messages.frontend') }}"
             >
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
@@ -126,11 +126,11 @@
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">{{ __('frontend.search.sort_by') }}</label>
                 <select wire:model.live="sortBy" class="w-full text-sm border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                    <option value="relevance">{{ __('messages.frontend) }}</option>
+                    <option value="relevance">{{ __('messages.frontend') }}</option>
                     <option value="price_asc">{{ __('frontend.search.price_low_high') }}</option>
                     <option value="price_desc">{{ __('frontend.search.price_high_low') }}</option>
-                    <option value="newest">{{ __('messages.frontend) }}</option>
-                    <option value="rating">{{ __('messages.frontend) }}</option>
+                    <option value="newest">{{ __('messages.frontend') }}</option>
+                    <option value="rating">{{ __('messages.frontend') }}</option>
                 </select>
             </div>
         </div>
@@ -189,7 +189,7 @@
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    <span class="text-sm font-medium">{{ __('messages.frontend) }}</span>
+                    <span class="text-sm font-medium">{{ __('messages.frontend') }}</span>
                     <span class="text-xs text-gray-400">{{ __('frontend.search.please_wait') }}</span>
                 </div>
             </div>
@@ -364,7 +364,7 @@
             <div class="px-4 py-3 border-b border-gray-200 bg-gray-50">
                 <div class="flex items-center justify-between">
                     <h3 class="text-sm font-medium text-gray-900">
-                        {{ __('messages.frontend) }}
+                        {{ __('messages.frontend') }}
                     </h3>
                     @if($enableRecentSearches)
                         <button
@@ -419,16 +419,16 @@
                                     </h3>
                                     @if(isset($suggestion['is_recent']))
                                         <span class="text-xs text-blue-600 font-medium">
-                                            {{ __('messages.frontend) }}
+                                            {{ __('frontend.search.recent') }}
                                         </span>
                                     @elseif(isset($suggestion['is_popular']))
                                         <span class="text-xs text-orange-600 font-medium">
-                                            {{ __('messages.frontend) }}
+                                            {{ __('frontend.search.popular') }}
                                         </span>
                                     @endif
                                 </div>
                                 
-                                @if($suggestion['subtitle'])
+                                @if(!empty($suggestion['subtitle']))
                                     <p class="text-sm text-gray-500 truncate mt-1">
                                         {{ $suggestion['subtitle'] }}
                                     </p>

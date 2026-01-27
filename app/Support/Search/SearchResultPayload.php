@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Support\Search;
 
-use DefStudio\SearchableInput\DTO\SearchResult;
-
 final class SearchResultPayload
 {
     /**

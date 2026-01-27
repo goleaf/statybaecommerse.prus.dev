@@ -100,7 +100,7 @@ final class AdminSeeder extends Seeder
                 $this->createSliders();
 
                 // Create recommendation blocks
-                $this->createRecommendationBlocks();
+                // $this->createRecommendationBlocks();
 
                 // Create SEO data
                 $this->createSeoData();
@@ -688,7 +688,6 @@ final class AdminSeeder extends Seeder
                     'carrier_name'    => 'DHL',
                     'service'         => 'standard',
                     'tracking_number' => 'TRK' . str_pad((string) ($order->id + 1000), 6, '0', STR_PAD_LEFT),
-                    'cost'            => 15.00,
                     'base_cost'       => 12.00,
                     'total_cost'      => 15.00,
                 ]

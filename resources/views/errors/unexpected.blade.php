@@ -19,13 +19,17 @@
 @extends('errors.layout', [
     'code' => '500',
     'title' => __('messages.errors),
+    '),
     'description' => __('messages.errors),
+    '),
     'primaryAction' => [
         'label' => __('messages.errors),
+        '),
         'url' => $homeUrl,
     ],
     'secondaryAction' => [
         'label' => __('messages.errors),
+        '),
         'url' => $contactUrl,
     ],
     'links' => [

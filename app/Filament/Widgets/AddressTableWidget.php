@@ -38,14 +38,14 @@ final class AddressTableWidget extends BaseWidget
             )
             ->columns([
                 TextColumn::make('user.name')
-                    ->label(__('messages.translations))
+                    ->label(__('translations.user'))
                     ->sortable()
                     ->searchable(),
                 TextColumn::make('display_name')
-                    ->label(__('messages.translations))
+                    ->label(__('translations.full_name'))
                     ->searchable(['first_name', 'last_name', 'company_name']),
                 TextColumn::make('type')
-                    ->label(__('messages.translations))
+                    ->label(__('translations.type'))
                     ->formatStateUsing(
                         /**
                          * Provide precise typing so PHPStan understands the enum instance.
@@ -76,20 +76,20 @@ final class AddressTableWidget extends BaseWidget
                         }
                     ),
                 TextColumn::make('city')
-                    ->label(__('messages.translations))
+                    ->label(__('translations.city'))
                     ->sortable()
                     ->searchable(),
                 TextColumn::make('country.name')
-                    ->label(__('messages.translations))
+                    ->label(__('translations.country'))
                     ->sortable()
                     ->searchable(),
                 TextColumn::make('is_active')
-                    ->label(__('messages.translations))
-                    ->formatStateUsing(fn ($state) => $state ? __('messages.translations) : __('messages.translations))
+                    ->label(__('translations.is_active'))
+                    ->formatStateUsing(fn ($state) => $state ? __('translations.yes') : __('translations.no'))
                     ->color(fn ($state) => $state ? 'success' : 'gray')
                     ->sortable(),
                 TextColumn::make('created_at')
-                    ->label(__('messages.translations))
+                    ->label(__('translations.created_at'))
                     ->dateTime()
                     ->sortable(),
             ])

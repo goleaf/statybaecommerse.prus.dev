@@ -418,7 +418,7 @@ final class SystemSettingHistoryResourceTest extends TestCase
     public function test_navigation_label_is_translated(): void
     {
         $this->assertEquals(
-            __('messages.admin_system_setting_histories),
+            __('messages.admin_system_setting_histories'),
             SystemSettingHistoryResource::getNavigationLabel(),
         );
     }
@@ -426,7 +426,7 @@ final class SystemSettingHistoryResourceTest extends TestCase
     public function test_model_label_is_translated(): void
     {
         $this->assertEquals(
-            __('messages.admin_system_setting_histories),
+            __('messages.admin_system_setting_histories'),
             SystemSettingHistoryResource::getModelLabel(),
         );
     }
@@ -434,7 +434,7 @@ final class SystemSettingHistoryResourceTest extends TestCase
     public function test_plural_model_label_is_translated(): void
     {
         $this->assertEquals(
-            __('messages.admin_system_setting_histories),
+            __('messages.admin_system_setting_histories'),
             SystemSettingHistoryResource::getPluralModelLabel(),
         );
     }

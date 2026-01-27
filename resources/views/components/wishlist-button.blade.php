@@ -43,8 +43,8 @@
                 'bg-red-50 text-red-600 hover:bg-red-100': isInWishlist,
                 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200 hover:border-gray-300': !isInWishlist
             }"
-            :title="isInWishlist ? '{{ __('messages.frontend) }}' : '{{ __('messages.frontend) }}'"
-            aria-label="isInWishlist ? '{{ __('messages.frontend) }}' : '{{ __('messages.frontend) }}'">
+            :title="isInWishlist ? '{{ __('messages.frontend) }}') }}' : '{{ __('messages.frontend) }}') }}'"
+            aria-label="isInWishlist ? '{{ __('messages.frontend) }}') }}' : '{{ __('messages.frontend) }}') }}'">
 
         {{-- Heart Icon --}}
         <svg class="w-5 h-5 transition-all duration-200"
@@ -70,7 +70,7 @@
         {{-- Text (if enabled) --}}
         @if ($showText)
             <span class="ml-2 text-sm font-medium"
-                  x-text="isInWishlist ? '{{ __('messages.frontend) }}' : '{{ __('messages.frontend) }}'"></span>
+                  x-text="isInWishlist ? '{{ __('messages.frontend) }}') }}' : '{{ __('messages.frontend) }}') }}'"></span>
         @endif
 
         {{-- Pulse Animation for Add Action --}}
@@ -169,8 +169,8 @@
                         this.isInWishlist = !isRemoving;
                         this.messageType = 'success';
                         this.message = data.message || (this.isInWishlist
-                            ? '{{ __('messages.frontend) }}'
-                            : '{{ __('messages.frontend) }}');
+                            ? '{{ __('messages.frontend) }}') }}'
+                            : '{{ __('messages.frontend) }}') }}');
 
                         if (data.item && Object.prototype.hasOwnProperty.call(data.item, 'variant_id')) {
                             this.variantId = data.item.variant_id;
@@ -181,11 +181,11 @@
                         }
                     } else {
                         this.messageType = 'error';
-                        this.message = data.message || '{{ __('messages.frontend) }}';
+                        this.message = data.message || '{{ __('messages.frontend) }}') }}';
                 }
             } catch (error) {
                 this.messageType = 'error';
-                this.message = '{{ __('messages.frontend) }}';
+                this.message = '{{ __('messages.frontend) }}') }}';
                 } finally {
                     this.loading = false;
 

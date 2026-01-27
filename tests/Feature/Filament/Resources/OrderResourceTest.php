@@ -1,20 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Filament\Resources\OrderResource;
 use App\Models\Order;
 use App\Models\User;
 use Filament\Pages\Actions\DeleteAction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+
 use function Pest\Livewire\livewire;
 
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
     $this->user = User::factory()->create([
-        'email' => 'admin@example.com',
+        'email'    => 'admin@example.com',
         'is_admin' => true,
     ]);
-    
+
     // Acting as admin
     $this->actingAs($this->user);
 });
@@ -37,14 +40,14 @@ it('can create an order', function () {
 
     livewire(OrderResource\Pages\CreateOrder::class)
         ->fillForm([
-            'number' => $newData->number,
-            'status' => 'pending',
+            'number'   => $newData->number,
+            'status'   => 'pending',
             'currency' => 'EUR',
-            'total' => 100.00,
+            'total'    => 100.00,
         ])
         ->call('create')
         ->assertHasNoFormErrors();
-    
+
     $this->assertDatabaseHas(Order::class, [
         'number' => $newData->number,
         'status' => 'pending',

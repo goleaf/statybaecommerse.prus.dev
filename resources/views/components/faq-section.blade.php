@@ -7,8 +7,8 @@
 ])
 
 @php
-    $title = $title ?? __('messages.frontend);
-    $subtitle = $subtitle ?? __('messages.frontend);
+    $title = $title ?? __('messages.frontend');
+    $subtitle = $subtitle ?? __('messages.frontend');
     $faqs =
         $faqs ??
         collect([
@@ -86,7 +86,7 @@
                             :class="selectedCategory === 'all' ? 'bg-blue-600 text-white' :
                                 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
                             class="px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200">
-                        {{ __('messages.frontend) }}
+                        {{ __('messages.frontend') }}
                     </button>
                     @foreach ($categories as $category)
                         <button @click="selectedCategory = '{{ $category }}'; filterFAQs()"
@@ -160,26 +160,26 @@
                       d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
                 </path>
             </svg>
-            <h3 class="text-lg font-medium text-gray-900 mb-2">{{ __('messages.frontend) }}</h3>
-            <p class="text-gray-600 mb-4">{{ __('messages.frontend) }}</p>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">{{ __('messages.frontend') }}</h3>
+            <p class="text-gray-600 mb-4">{{ __('messages.frontend') }}</p>
             <button @click="clearFilters()" class="text-blue-600 hover:text-blue-700 font-medium">
-                {{ __('messages.frontend) }}
+                {{ __('messages.frontend') }}
             </button>
         </div>
 
         {{-- Contact Support --}}
         <div class="mt-12 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-8 text-center">
-            <h3 class="text-xl font-bold text-gray-900 mb-4">{{ __('messages.frontend) }}</h3>
+            <h3 class="text-xl font-bold text-gray-900 mb-4">{{ __('messages.frontend') }}</h3>
             <p class="text-gray-600 mb-6">
-                {{ __('messages.frontend) }}</p>
+                {{ __('messages.frontend') }}</p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
                 <a href="{{ route('contact', ['locale' => app()->getLocale()]) ?? '/contact' }}"
                    class="btn-gradient px-6 py-3 rounded-xl font-semibold">
-                    {{ __('messages.frontend) }}
+                    {{ __('messages.frontend') }}
                 </a>
                 <a href="mailto:support@example.com"
                    class="border-2 border-gray-300 text-gray-700 px-6 py-3 rounded-xl font-semibold hover:border-gray-400 hover:bg-gray-50 transition-colors duration-200">
-                    {{ __('messages.frontend) }}
+                    {{ __('messages.frontend') }}
                 </a>
             </div>
         </div>

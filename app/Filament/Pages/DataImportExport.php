@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
+use App\Enums\NavigationGroup;
 use App\Services\ImportExport\ProviderRegistry;
 use App\Support\Storage\SecureStorage;
 use BackedEnum;
@@ -30,6 +31,16 @@ final class DataImportExport extends Page
     public static function getNavigationIcon(): string|Htmlable|null
     {
         return 'heroicon-o-arrow-down-tray';
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return NavigationGroup::System->label();
+    }
+
+    public function getTitle(): string|Htmlable
+    {
+        return __('translations.data_import_export');
     }
 
     public ?string $provider = 'xml';
@@ -68,7 +79,7 @@ final class DataImportExport extends Page
                                     ->label(__('translations.download_images'))
                                     ->default(true),
                             ]),
-                        Fieldset::make(__('Export'))
+                        Fieldset::make(__('translations.export'))
                             ->schema([
                                 Forms\Components\TextInput::make('exportPath')
                                     ->label(__('translations.export_path'))
@@ -116,7 +127,7 @@ final class DataImportExport extends Page
                     $this->dispatch('imported', created: $res['categories']['created'] + $res['products']['created']);
                 }),
             Action::make('export')
-                ->label(__('Export'))
+                ->label(__('translations.export'))
                 ->action(function (): void {
                     $provider = ProviderRegistry::get($this->provider ?? 'xml');
                     if (! $provider) {

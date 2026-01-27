@@ -295,7 +295,7 @@ final class UserController extends Controller
                 'account_deactivated_by_user',
                 $user,
                 [],
-                ['reason' => $reason],
+                ['reason'  => $reason],
                 ['channel' => 'frontend']
             );
         }

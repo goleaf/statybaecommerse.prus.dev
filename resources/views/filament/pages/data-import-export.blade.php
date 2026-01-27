@@ -6,7 +6,7 @@
                 {{ __('translations.import') }}
             </x-filament::button>
             <x-filament::button color="gray" wire:click="callAction('export')">
-                {{ __('messages.translations) }}
+                {{ __('admin.models.products') }}
             </x-filament::button>
         </div>
     </div>
@@ -19,21 +19,21 @@
             <x-filament::card>
                 <div class="text-center">
                     <div class="text-2xl font-bold text-blue-600">{{ number_format(\App\Models\Product::count()) }}</div>
-                    <div class="text-sm text-gray-500">{{ __('messages.admin) }}</div>
+                    <div class="text-sm text-gray-500">{{ __('messages.admin') }}</div>
                 </div>
             </x-filament::card>
             
             <x-filament::card>
                 <div class="text-center">
                     <div class="text-2xl font-bold text-green-600">{{ number_format(\App\Models\Category::count()) }}</div>
-                    <div class="text-sm text-gray-500">{{ __('messages.admin) }}</div>
+                    <div class="text-sm text-gray-500">{{ __('messages.admin') }}</div>
                 </div>
             </x-filament::card>
             
             <x-filament::card>
                 <div class="text-center">
                     <div class="text-2xl font-bold text-purple-600">{{ number_format(\App\Models\Brand::count()) }}</div>
-                    <div class="text-sm text-gray-500">{{ __('messages.admin) }}</div>
+                    <div class="text-sm text-gray-500">{{ __('messages.admin') }}</div>
                 </div>
             </x-filament::card>
             

@@ -1,6 +1,6 @@
 @extends('components.layouts.base')
 
-@section('title', __('messages.referrals))
+@section('title', __('messages.referrals'))
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
@@ -8,10 +8,10 @@
         <!-- Header -->
         <div class="mb-8">
             <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
-                {{ __('messages.referrals) }}
+                {{ __('messages.referrals') }}
             </h1>
             <p class="mt-2 text-gray-600 dark:text-gray-400">
-                {{ __('messages.referrals) }}
+                {{ __('messages.referrals') }}
             </p>
         </div>
 
@@ -19,7 +19,7 @@
         <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
             <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                 <h3 class="text-lg font-medium text-gray-900 dark:text-white">
-                    {{ __('messages.referrals) }}
+                    {{ __('messages.referrals') }}
                 </h3>
             </div>
 
@@ -29,82 +29,82 @@
                 <!-- Referred User Email -->
                 <div class="mb-6">
                     <label for="referred_email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        {{ __('messages.referrals) }}
+                        {{ __('messages.referrals') }}
                     </label>
                     <input type="email" 
                            id="referred_email" 
                            name="referred_email" 
                            value="{{ old('referred_email') }}"
                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white @error('referred_email') border-red-500 @enderror"
-                           placeholder="{{ __('messages.referrals) }}"
+                           placeholder="{{ __('messages.referrals') }}"
                            required>
                     @error('referred_email')
                         <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                     @enderror
                     <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                        {{ __('messages.referrals) }}
+                        {{ __('messages.referrals') }}
                     </p>
                 </div>
 
                 <!-- Title -->
                 <div class="mb-6">
                     <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        {{ __('messages.referrals) }}
+                        {{ __('messages.referrals') }}
                     </label>
                     <input type="text" 
                            id="title" 
                            name="title" 
                            value="{{ old('title') }}"
                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white @error('title') border-red-500 @enderror"
-                           placeholder="{{ __('messages.referrals) }}">
+                           placeholder="{{ __('messages.referrals') }}">
                     @error('title')
                         <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                     @enderror
                     <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                        {{ __('messages.referrals) }}
+                        {{ __('messages.referrals') }}
                     </p>
                 </div>
 
                 <!-- Description -->
                 <div class="mb-6">
                     <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        {{ __('messages.referrals) }}
+                        {{ __('messages.referrals') }}
                     </label>
                     <textarea id="description" 
                               name="description" 
                               rows="4"
                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white @error('description') border-red-500 @enderror"
-                              placeholder="{{ __('messages.referrals) }}">{{ old('description') }}</textarea>
+                              placeholder="{{ __('messages.referrals') }}">{{ old('description') }}</textarea>
                     @error('description')
                         <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                     @enderror
                     <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                        {{ __('messages.referrals) }}
+                        {{ __('messages.referrals') }}
                     </p>
                 </div>
 
                 <!-- Benefits Section -->
                 <div class="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                     <h4 class="text-sm font-medium text-blue-900 dark:text-blue-100 mb-2">
-                        {{ __('messages.referrals) }}
+                        {{ __('messages.referrals') }}
                     </h4>
                     <ul class="text-sm text-blue-800 dark:text-blue-200 space-y-1">
-                        <li>• {{ __('messages.referrals) }}</li>
-                        <li>• {{ __('messages.referrals) }}</li>
-                        <li>• {{ __('messages.referrals) }}</li>
+                        <li>• {{ __('messages.referrals') }}</li>
+                        <li>• {{ __('messages.referrals') }}</li>
+                        <li>• {{ __('messages.referrals') }}</li>
                     </ul>
                 </div>
 
                 <!-- How It Works Section -->
                 <div class="mb-6 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
                     <h4 class="text-sm font-medium text-green-900 dark:text-green-100 mb-2">
-                        {{ __('messages.referrals) }}
+                        {{ __('messages.referrals') }}
                     </h4>
                     <ol class="text-sm text-green-800 dark:text-green-200 space-y-1">
-                        <li>1. {{ __('messages.referrals) }}</li>
-                        <li>2. {{ __('messages.referrals) }}</li>
-                        <li>3. {{ __('messages.referrals) }}</li>
-                        <li>4. {{ __('messages.referrals) }}</li>
+                        <li>1. {{ __('messages.referrals') }}</li>
+                        <li>2. {{ __('messages.referrals') }}</li>
+                        <li>3. {{ __('messages.referrals') }}</li>
+                        <li>4. {{ __('messages.referrals') }}</li>
                     </ol>
                 </div>
 
@@ -117,9 +117,9 @@
                                class="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                                required>
                         <label for="terms" class="ml-2 text-sm text-gray-700 dark:text-gray-300">
-                            {{ __('messages.referrals) }}
+                            {{ __('messages.referrals') }}
                             <a href="{{ route('terms') }}" class="text-blue-600 dark:text-blue-400 hover:underline">
-                                {{ __('messages.referrals) }}
+                                {{ __('messages.referrals') }}
                             </a>
                         </label>
                     </div>
@@ -143,7 +143,7 @@
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                         </svg>
-                        {{ __('messages.referrals) }}
+                        {{ __('messages.referrals') }}
                     </button>
                 </div>
             </form>
@@ -152,25 +152,25 @@
         <!-- Additional Information -->
         <div class="mt-8 bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
             <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
-                {{ __('messages.referrals) }}
+                {{ __('messages.referrals') }}
             </h3>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-2">
-                        {{ __('messages.referrals) }}
+                        {{ __('messages.referrals') }}
                     </h4>
                     <p class="text-sm text-gray-600 dark:text-gray-400">
-                        {{ __('messages.referrals) }}
+                        {{ __('messages.referrals') }}
                     </p>
                 </div>
 
                 <div>
                     <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-2">
-                        {{ __('messages.referrals) }}
+                        {{ __('messages.referrals') }}
                     </h4>
                     <p class="text-sm text-gray-600 dark:text-gray-400">
-                        {{ __('messages.referrals) }}
+                        {{ __('messages.referrals') }}
                     </p>
                 </div>
             </div>

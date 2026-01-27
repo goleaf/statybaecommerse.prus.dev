@@ -50,8 +50,6 @@ Route::middleware('auth')->group(function (): void {
         Route::get('order/{number}', function (string $number) {
             return redirect()->route('account.orders.detail', ['number' => $number]);
         })->name('order.show');
-        // Account reviews page (list user's reviews)
-        Route::get('reviews', \App\Livewire\Pages\Account\Reviews::class)->name('reviews');
 
         // Documents page
         Route::view('documents', 'livewire.pages.account.documents')->name('documents');

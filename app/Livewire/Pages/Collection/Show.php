@@ -92,7 +92,7 @@ class Show extends Component
     #[Computed]
     public function ogImage(): ?string
     {
-        return $this->collection->getFirstMediaUrl(config('media.storage.collection_name'), 'large') 
+        return $this->collection->getFirstMediaUrl(config('media.storage.collection_name'), 'large')
             ?: $this->collection->getFirstMediaUrl(config('media.storage.collection_name'));
     }
 
@@ -115,11 +115,11 @@ class Show extends Component
         if ($preLarge) {
             $preSrcset[] = $preLarge . ' 800w';
         }
-        
+
         return [
-            'src' => (string) $preSrc,
+            'src'    => (string) $preSrc,
             'srcset' => implode(', ', $preSrcset),
-            'sizes' => '(max-width: 640px) 45vw, (max-width: 1024px) 22vw, 200px',
+            'sizes'  => '(max-width: 640px) 45vw, (max-width: 1024px) 22vw, 200px',
         ];
     }
 

@@ -1,6 +1,6 @@
 @extends('frontend.layouts.app')
 
-@section('title', __('messages.frontend))
+@section('title', __('messages.frontend'))
 
 @include('components.scripts.debounced-search-form')
 
@@ -11,10 +11,10 @@
                 <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div>
                         <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">
-                            {{ __('messages.frontend) }}
+                            {{ __('messages.frontend') }}
                         </h1>
                         <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                            {{ __('messages.frontend) }}
+                            {{ __('messages.frontend') }}
                         </p>
                     </div>
                     <form
@@ -31,7 +31,7 @@
                         })"
                         @submit.prevent="manualSubmit()"
                     >
-                        <label for="search-query" class="sr-only">{{ __('messages.frontend) }}</label>
+                        <label for="search-query" class="sr-only">{{ __('messages.frontend') }}</label>
                         <input
                             id="search-query"
                             type="search"
@@ -40,14 +40,14 @@
                             x-model="term"
                             @input="handleInput()"
                             value="{{ old('q', $query) }}"
-                            placeholder="{{ __('messages.frontend) }}"
+                            placeholder="{{ __('messages.frontend') }}"
                             class="flex-1 md:w-72 rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white focus:border-blue-500 focus:ring-blue-500"
                         >
                         <button
                             type="submit"
                             class="inline-flex items-center justify-center px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900"
                         >
-                            {{ __('messages.shared) }}
+                            {{ __('messages.shared') }}
                         </button>
                     </form>
                 </div>

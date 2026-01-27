@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -31,18 +33,19 @@ return new class extends Migration
             // Relationships references - simplified for now as constrained dependencies might not exist in factory test context unless full migration runs
             $table->unsignedBigInteger('channel_id')->nullable();
             $table->unsignedBigInteger('country_id')->nullable();
+            $table->unsignedBigInteger('zone_id')->nullable();
             $table->unsignedBigInteger('shipping_option_id')->nullable();
             $table->unsignedBigInteger('partner_id')->nullable();
             $table->unsignedBigInteger('coupon_id')->nullable();
-            
+
             $table->string('payment_status')->nullable();
             $table->string('payment_state')->nullable();
             $table->string('payment_method')->nullable();
             $table->string('payment_reference')->nullable();
-            
+
             $table->softDeletes();
             $table->timestamps();
-            
+
             // Indexes for optimizing searches
             $table->index('number');
             $table->index('user_id');

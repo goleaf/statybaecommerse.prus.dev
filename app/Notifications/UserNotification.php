@@ -67,11 +67,14 @@ final class UserNotification extends Notification
         // Resolve a localized title based on the action type.
         return match ($this->action) {
             'registered'        => __('messages.notifications),
+            '),
             'profile_updated'   => __('notifications.user.profile_updated'),
             'password_changed'  => __('notifications.user.password_changed'),
             'email_verified'    => __('notifications.user.email_verified'),
             'login'             => __('messages.notifications),
+            '),
             'logout'            => __('messages.notifications),
+            '),
             'account_suspended' => __('notifications.user.account_suspended'),
             'account_activated' => __('notifications.user.account_activated'),
             default             => __('notifications.user.profile_updated'),
@@ -87,12 +90,12 @@ final class UserNotification extends Notification
         $userName = $this->userData['name'] ?? $this->userData['email'] ?? 'Unknown User';
 
         return match ($this->action) {
-            'registered'        => __('messages.notifications) . ": {$userName}",
+            'registered'        => __('messages.notifications') . ": {$userName}",
             'profile_updated'   => __('notifications.user.profile_updated') . ": {$userName}",
             'password_changed'  => __('notifications.user.password_changed') . ": {$userName}",
             'email_verified'    => __('notifications.user.email_verified') . ": {$userName}",
-            'login'             => __('messages.notifications) . ": {$userName}",
-            'logout'            => __('messages.notifications) . ": {$userName}",
+            'login'             => __('messages.notifications') . ": {$userName}",
+            'logout'            => __('messages.notifications') . ": {$userName}",
             'account_suspended' => __('notifications.user.account_suspended') . ": {$userName}",
             'account_activated' => __('notifications.user.account_activated') . ": {$userName}",
             default             => __('notifications.user.profile_updated') . ": {$userName}",

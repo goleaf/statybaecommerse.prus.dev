@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
+use App\Enums\NavigationGroup;
 use BackedEnum;
 use Filament\Pages\Page;
 use Illuminate\Contracts\Support\Htmlable;
@@ -22,7 +23,7 @@ final class AdvancedReports extends Page
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Analytics'; // Ensure advanced analytics live with the rest of the reporting suite.
+        return NavigationGroup::Analytics->label(); // Ensure advanced analytics live with the rest of the reporting suite.
     }
 
     protected static ?string $title = 'Advanced Reports';

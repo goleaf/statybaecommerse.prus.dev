@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -19,7 +21,7 @@ return new class extends Migration
             // But strict is better. Assuming users table exists.
             $table->foreignId('product_id')->nullable(); // constrained() if products exist
             $table->foreignId('product_variant_id')->nullable();
-            
+
             $table->string('name')->nullable();
             $table->string('sku')->nullable();
             $table->integer('quantity')->default(1);
@@ -29,7 +31,7 @@ return new class extends Migration
             $table->decimal('discount_amount', 12, 2)->default(0);
             $table->string('status')->nullable();
             $table->text('notes')->nullable();
-            
+
             $table->timestamps();
         });
     }

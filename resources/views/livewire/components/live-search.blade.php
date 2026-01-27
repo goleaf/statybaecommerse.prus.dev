@@ -48,7 +48,7 @@
         <input
             wire:model.live.debounce.300ms="query"
             type="text"
-            placeholder="{{ __('messages.frontend) }}"
+            placeholder="{{ __('messages.frontend') }}"
             class="block w-full pl-10 pr-4 py-3 border border-sage/30 rounded-lg bg-dark text-sage placeholder:text-sage/50 focus:outline-none focus:ring-2 focus:ring-sage/50 focus:border-sage/60 transition-all duration-200"
             autocomplete="off"
             x-ref="searchInput"
@@ -98,7 +98,7 @@
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    <span>{{ __('messages.frontend) }}</span>
+                    <span>{{ __('messages.frontend') }}</span>
                 </div>
             </div>
         @elseif(count($results) > 0)
@@ -239,7 +239,7 @@
             <div class="px-4 py-2 border-b border-sage/30">
                 <div class="flex items-center justify-between">
                     <h3 class="text-sm font-medium text-sage">
-                        {{ __('messages.frontend) }}
+                        {{ __('messages.frontend') }}
                     </h3>
                     @if($enableRecentSearches)
                         <button
@@ -288,11 +288,11 @@
                                     </h3>
                                     @if(isset($suggestion['is_recent']))
                                         <span class="text-xs text-sage/70">
-                                            {{ __('messages.frontend) }}
+                                            {{ __('frontend.search.recent') }}
                                         </span>
                                     @elseif(isset($suggestion['is_popular']))
                                         <span class="text-xs text-sage/70">
-                                            {{ __('messages.frontend) }}
+                                            {{ __('frontend.search.popular') }}
                                         </span>
                                     @endif
                                 </div>

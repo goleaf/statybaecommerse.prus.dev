@@ -72,8 +72,8 @@ final class DiscountResource extends BaseResource
                             Select::make('type')
                                 ->label(__('messages.type'))
                                 ->options([
-                                    'percentage' => __('Percentage'),
-                                    'fixed'      => __('Fixed amount'),
+                                    'percentage' => __('admin.discounts.percentage'),
+                                    'fixed'      => __('admin.discounts.fixed_amount'),
                                 ])
                                 ->required(),
                             TextInput::make('value')
@@ -86,7 +86,7 @@ final class DiscountResource extends BaseResource
                                 ->default(true),
                         ]),
                 ]),
-            SchemaSection::make(__('Validity'))
+            SchemaSection::make(__('admin.discounts.validity'))
                 ->description(__('admin.discounts.validity_description'))
                 ->schema([
                     SchemaGrid::make(2)
@@ -129,8 +129,8 @@ final class DiscountResource extends BaseResource
                 TextColumn::make('type')
                     ->label(__('messages.type'))
                     ->formatStateUsing(fn ($state) => match ($state) {
-                        'percentage' => __('Percentage'),
-                        'fixed'      => __('Fixed amount'),
+                        'percentage' => __('admin.discounts.percentage'),
+                        'fixed'      => __('admin.discounts.fixed_amount'),
                         default      => $state,
                     })
                     ->sortable(),

@@ -133,6 +133,10 @@ final class ReferralController extends Controller
         }
         $referralCode = $user->activeReferralCode();
 
+        return view('));
+        }
+        $referralCode = $user->activeReferralCode();
+
         return view('referrals.create', compact('referralCode'));
     }
 
@@ -147,28 +151,31 @@ final class ReferralController extends Controller
             return redirect()->route('referrals.index')->with('error', __('messages.referrals));
         }
         $validated = $request->validated();
+        $referredUser = User::query()->where('));
+        }
+        $validated = $request->validated();
         $referredUser = User::query()->where('email', $validated['referred_email'])->first();
 
         if (! $referredUser instanceof User) {
             // Surface a validation style error so the customer can correct the
             // email if the account was removed between validation and storage.
             return redirect()->back()->withErrors([
-                'referred_email' => __('validation.exists', ['attribute' => __('messages.referrals)]),
+                'referred_email' => __('validation.exists', ['attribute' => __('messages.referrals')]),
             ])->withInput();
         }
 
         if ($referredUser->is($user)) {
-            return redirect()->back()->with('error', __('messages.referrals));
+            return redirect()->back()->with('error', __('messages.referrals'));
         }
         if (Referral::userAlreadyReferred($referredUser->id)) {
-            return redirect()->back()->with('error', __('messages.referrals));
+            return redirect()->back()->with('error', __('messages.referrals'));
         }
 
         // Normalise the optional marketing copy so both locales stay in sync.
-        $title = $validated['title'] ?? __('messages.referrals);
-        $titleLt = $validated['title'] ?? __('messages.referrals, [], 'lt');
-        $description = $validated['description'] ?? __('messages.referrals);
-        $descriptionLt = $validated['description'] ?? __('messages.referrals, [], 'lt');
+        $title = $validated['title'] ?? __('messages.referrals');
+        $titleLt = $validated['title'] ?? __('messages.referrals', [], 'lt');
+        $description = $validated['description'] ?? __('messages.referrals');
+        $descriptionLt = $validated['description'] ?? __('messages.referrals', [], 'lt');
 
         try {
             DB::beginTransaction();
@@ -201,10 +208,10 @@ final class ReferralController extends Controller
 
             report($exception);
 
-            return redirect()->back()->with('error', __('messages.referrals));
+            return redirect()->back()->with('error', __('messages.referrals'));
         }
 
-        return redirect()->route('referrals.index')->with('success', __('messages.referrals));
+        return redirect()->route('referrals.index')->with('success', __('messages.referrals'));
     }
 
     /**
@@ -225,14 +232,14 @@ final class ReferralController extends Controller
     {
         $user = $this->resolveAuthenticatedUser();
         if ($user->hasActiveReferralCode()) {
-            return redirect()->route('referrals.index')->with('info', __('messages.referrals));
+            return redirect()->route('referrals.index')->with('info', __('messages.referrals'));
         }
         $code = ReferralCode::generateUniqueCode();
         ReferralCode::create(['user_id' => $user->id, 'code' => $code, 'is_active' => true]);
         // Update user's referral code
         $user->update(['referral_code' => $code, 'referral_code_generated_at' => now()]);
 
-        return redirect()->route('referrals.index')->with('success', __('messages.referrals));
+        return redirect()->route('referrals.index')->with('success', __('messages.referrals'));
     }
 
     /**
@@ -243,10 +250,10 @@ final class ReferralController extends Controller
         $user = $this->resolveAuthenticatedUser();
         $referralCode = $user->activeReferralCode();
         if (! $referralCode) {
-            return redirect()->route('referrals.create')->with('info', __('messages.referrals));
+            return redirect()->route('referrals.create')->with('info', __('messages.referrals'));
         }
         $shareUrl = $referralCode->referral_url;
-        $shareText = __('messages.referrals, ['code' => $referralCode->code, 'url' => $shareUrl]);
+        $shareText = __('messages.referrals', ['code' => $referralCode->code, 'url' => $shareUrl]);
 
         return view('referrals.share', [
             'user'         => $user,
@@ -263,12 +270,12 @@ final class ReferralController extends Controller
     {
         $referralCode = ReferralCode::findByCode($code);
         if (! $referralCode || ! $referralCode->isValid()) {
-            return redirect()->route('register')->with('error', __('messages.referrals));
+            return redirect()->route('register')->with('error', __('messages.referrals'));
         }
         // Store referral code in session for registration
         session(['referral_code' => $code]);
 
-        return redirect()->route('register')->with('success', __('messages.referrals));
+        return redirect()->route('register')->with('success', __('messages.referrals'));
     }
 
     /**

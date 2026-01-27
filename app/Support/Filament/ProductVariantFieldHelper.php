@@ -7,7 +7,7 @@ namespace App\Support\Filament;
 use App\Models\ProductVariant;
 use App\Support\Filament\Components\SearchableComponentHelper;
 use App\Support\Search\ProductVariantSearch;
-use DefStudio\SearchableInput\Forms\Components\SearchableInput;
+use App\Support\Filament\Components\SearchableInput;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 
@@ -55,7 +55,7 @@ final class ProductVariantFieldHelper
         $normalised = self::normaliseVariant($variant);
 
         if ($component instanceof SearchableInput) {
-            // Normalise the component payload so DefStudio's widget mirrors persisted metadata.
+            // Normalise the component payload so the widget mirrors persisted metadata.
             $component
                 ->state((string) $normalised['value'])
                 ->options([

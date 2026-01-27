@@ -77,7 +77,15 @@ final class NewsletterSubscription extends Component
                 } else {
                     // Already subscribed
                     $this->isSubscribed = true;
+                    session()->flash('));
+                } else {
+                    // Already subscribed
+                    $this->isSubscribed = true;
                     session()->flash('info', __('messages.newsletter));
+                }
+            } else {
+                // Create new subscriber
+                $subscriberData = ['));
                 }
             } else {
                 // Create new subscriber
@@ -87,12 +95,23 @@ final class NewsletterSubscription extends Component
                 $this->showSuccess = true;
                 session()->flash('success', __('messages.newsletter));
                 // Dispatch event for other components to listen
+                $this->dispatch('));
+                // Dispatch event for other components to listen
                 $this->dispatch('subscriber-added', ['email' => $this->email, 'name' => trim($this->first_name . ' ' . $this->last_name)]);
             }
             $this->resetForm();
         } catch (Exception $e) {
             Log::error('Newsletter subscription error: ' . $e->getMessage());
             session()->flash('error', __('messages.newsletter));
+        }
+    }
+
+    /**
+     * Handle resetForm functionality with proper error handling.
+     */
+    public function resetForm(): void
+    {
+        $this->email = '));
         }
     }
 

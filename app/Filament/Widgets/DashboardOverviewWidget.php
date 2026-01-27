@@ -98,8 +98,8 @@ class DashboardOverviewWidget extends BaseWidget
                 ->description(__('translations.new_customers_today') . ': ' . \Illuminate\Support\Number::format($newUsersThisMonth))
                 ->descriptionIcon($userGrowth >= 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
                 ->color($userGrowth >= 0 ? 'success' : 'danger'),
-            Stat::make(__('messages.translations), \Illuminate\Support\Number::format($totalProducts))
-                ->description(__('messages.translations) . ': ' . \Illuminate\Support\Number::format($activeProducts))
+            Stat::make(__('translations.total_products'), \Illuminate\Support\Number::format($totalProducts))
+                ->description(__('translations.active_products') . ': ' . \Illuminate\Support\Number::format($activeProducts))
                 ->descriptionIcon('heroicon-m-cube')
                 ->color('primary'),
             // Performance Metrics
@@ -107,11 +107,11 @@ class DashboardOverviewWidget extends BaseWidget
                 ->description(__('translations.per_order'))
                 ->descriptionIcon('heroicon-m-shopping-cart')
                 ->color('info'),
-            Stat::make(__('messages.translations), number_format($avgRating, 1) . '/5')
+            Stat::make(__('translations.average_rating'), number_format($avgRating, 1) . '/5')
                 ->description(__('translations.customer_satisfaction'))
                 ->descriptionIcon('heroicon-m-star')
                 ->color($avgRating >= 4 ? 'success' : ($avgRating >= 3 ? 'warning' : 'danger')),
-            Stat::make(__('messages.translations), \Illuminate\Support\Number::format($lowStockProducts))
+            Stat::make(__('translations.low_stock'), \Illuminate\Support\Number::format($lowStockProducts))
                 ->description(__('translations.products_need_restocking'))
                 ->descriptionIcon('heroicon-m-exclamation-triangle')
                 ->color($lowStockProducts > 0 ? 'warning' : 'success'),
@@ -120,7 +120,7 @@ class DashboardOverviewWidget extends BaseWidget
                 ->descriptionIcon('heroicon-m-megaphone')
                 ->color('primary'),
             // Analytics Metrics
-            Stat::make(__('messages.translations), \Illuminate\Support\Number::format($totalPageViews))
+            Stat::make(__('translations.page_views'), \Illuminate\Support\Number::format($totalPageViews))
                 ->description(__('translations.total_views'))
                 ->descriptionIcon('heroicon-m-eye')
                 ->color('info'),
@@ -141,7 +141,7 @@ class DashboardOverviewWidget extends BaseWidget
                 ->description(__('translations.warehouse_locations'))
                 ->descriptionIcon('heroicon-m-building-office')
                 ->color('warning'),
-            Stat::make(__('messages.translations), \Illuminate\Support\Number::format($totalAddresses))
+            Stat::make(__('translations.addresses'), \Illuminate\Support\Number::format($totalAddresses))
                 ->description(__('translations.customer_addresses'))
                 ->descriptionIcon('heroicon-m-home')
                 ->color('info'),

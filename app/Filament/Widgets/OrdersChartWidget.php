@@ -13,12 +13,12 @@ final class OrdersChartWidget extends ChartWidget
 
     public function getHeading(): ?string
     {
-        return __('messages.analytics);
+        return __('messages.analytics');
     }
 
     public function getDescription(): ?string
     {
-        return __('messages.analytics);
+        return __('messages.analytics');
     }
 
     public function getData(): array
@@ -42,14 +42,14 @@ final class OrdersChartWidget extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label'           => __('messages.admin),
+                    'label'           => __('messages.admin'),
                     'data'            => $data->pluck('orders')->toArray(),
                     'backgroundColor' => 'rgba(59, 130, 246, 0.1)',
                     'borderColor'     => 'rgb(59, 130, 246)',
                     'yAxisID'         => 'y',
                 ],
                 [
-                    'label'           => __('messages.admin),
+                    'label'           => __('messages.admin'),
                     'data'            => $data->pluck('revenue')->toArray(),
                     'backgroundColor' => 'rgba(34, 197, 94, 0.1)',
                     'borderColor'     => 'rgb(34, 197, 94)',
@@ -80,7 +80,7 @@ final class OrdersChartWidget extends ChartWidget
                     'position' => 'left',
                     'title'    => [
                         'display' => true,
-                        'text'    => __('messages.admin),
+                        'text'    => __('messages.admin'),
                     ],
                 ],
                 'y1' => [

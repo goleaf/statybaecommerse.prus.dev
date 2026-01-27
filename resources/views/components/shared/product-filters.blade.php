@@ -12,7 +12,7 @@
     <x-slot name="header">
         <x-shared.section 
             title="{{ __('frontend.filters.products_title') }}"
-            description="{{ __('messages.frontend) }}"
+            description="{{ __('messages.frontend') }}"
             icon="heroicon-o-funnel"
             titleSize="text-xl"
             centered="false"
@@ -25,7 +25,7 @@
             <x-shared.input 
                 wire:model.live.debounce.300ms="search"
                 type="search"
-                label="{{ __('messages.shared) }}"
+                label="{{ __('messages.shared') }}"
                 placeholder="{{ __('frontend.filters.search_placeholder') }}"
                 icon="heroicon-o-magnifying-glass"
             />
@@ -35,7 +35,7 @@
             {{-- Category Filter --}}
             <x-shared.select 
                 wire:model.live="categoryId"
-                label="{{ __('messages.frontend) }}"
+                label="{{ __('messages.frontend') }}"
                 placeholder="{{ __('frontend.filters.all_categories') }}"
             >
                 @foreach($categories as $category)
@@ -48,7 +48,7 @@
             {{-- Brand Filter --}}
             <x-shared.select 
                 wire:model.live="brandId"
-                label="{{ __('messages.frontend) }}"
+                label="{{ __('messages.frontend') }}"
                 placeholder="{{ __('frontend.filters.all_brands') }}"
             >
                 @foreach($brands as $brand)
@@ -63,11 +63,11 @@
                 wire:model.live="sortBy"
                 label="{{ __('frontend.filters.sort_by') }}"
             >
-                <option value="created_at">{{ __('messages.frontend) }}</option>
-                <option value="name">{{ __('messages.frontend) }}</option>
-                <option value="price">{{ __('messages.frontend) }}</option>
-                <option value="popularity">{{ __('messages.frontend) }}</option>
-                <option value="rating">{{ __('messages.frontend) }}</option>
+                <option value="created_at">{{ __('messages.frontend') }}</option>
+                <option value="name">{{ __('messages.frontend') }}</option>
+                <option value="price">{{ __('messages.frontend') }}</option>
+                <option value="popularity">{{ __('messages.frontend') }}</option>
+                <option value="rating">{{ __('messages.frontend') }}</option>
             </x-shared.select>
         @endif
     </div>
@@ -103,7 +103,7 @@
             icon="heroicon-o-x-mark"
             size="sm"
         >
-            {{ __('messages.frontend) }}
+            {{ __('messages.frontend') }}
         </x-shared.button>
         
         <x-shared.button 
@@ -112,7 +112,7 @@
             icon="heroicon-o-funnel"
             size="sm"
         >
-            {{ __('messages.frontend) }}
+            {{ __('messages.frontend') }}
     </x-shared.button>
     </div>
 </x-shared.card>

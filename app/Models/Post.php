@@ -114,7 +114,6 @@ final class Post extends Model implements HasMedia
         $this->addMediaConversion('medium')->width(800)->height(600)->sharpen(10);
     }
 
-
     public function approvedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'approved_by_id');
@@ -288,7 +287,7 @@ final class Post extends Model implements HasMedia
     public function getStatusLabelAttribute(): string
     {
         if ($this->status === 'archived') {
-            return __('messages.posts);
+            return __('messages.posts');
         }
 
         return $this->resolveModerationState()->label();

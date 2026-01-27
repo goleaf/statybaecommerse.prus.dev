@@ -14,6 +14,7 @@ enum NavigationGroup: string
     case Marketing = 'marketing';
     case Reports = 'reports';
     case Settings = 'settings';
+    case Search = 'search';
 
     // Additional cases used in resources
     case Users = 'users';
@@ -38,6 +39,7 @@ enum NavigationGroup: string
             self::Marketing         => __('messages.navigation_groups.marketing'),
             self::Reports           => __('messages.navigation_groups.reports'),
             self::Settings          => __('messages.navigation_groups.settings'),
+            self::Search            => __('messages.navigation_groups.search'),
             self::Users             => __('messages.navigation_groups.users'),
             self::Products          => __('messages.navigation_groups.products'),
             self::Orders            => __('messages.navigation_groups.orders'),
@@ -67,6 +69,7 @@ enum NavigationGroup: string
             self::Marketing         => 'heroicon-o-megaphone',
             self::Reports           => 'heroicon-o-document-chart-bar',
             self::Settings          => 'heroicon-o-adjustments-horizontal',
+            self::Search            => 'heroicon-o-magnifying-glass',
             self::Users             => 'heroicon-o-users',
             self::Products          => 'heroicon-o-cube',
             self::Orders            => 'heroicon-o-shopping-bag',
@@ -96,6 +99,7 @@ enum NavigationGroup: string
             self::Marketing         => 50,
             self::Reports           => 60,
             self::Settings          => 80,
+            self::Search            => 70,
             self::Users             => 11,
             self::Products          => 31,
             self::Orders            => 32,
@@ -120,6 +124,7 @@ enum NavigationGroup: string
             self::Marketing         => 'pink',
             self::Reports           => 'indigo',
             self::Settings          => 'slate',
+            self::Search            => 'cyan',
             self::Users             => 'blue',
             self::Products          => 'blue',
             self::Orders            => 'green',

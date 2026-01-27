@@ -52,7 +52,9 @@
 @extends('errors.layout', [
     'code' => $resolvedCode,
     'title' => $title ?? __('messages.frontend),
+    '),
     'description' => $description ?? __('messages.frontend),
+    '),
     'primaryAction' => $primaryAction ?? [
         'label' => __('frontend.errors.actions.try_again'),
         'type' => 'refresh',

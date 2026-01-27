@@ -24,7 +24,7 @@
         <x-container class="max-w-7xl space-y-10">
             <x-breadcrumbs :items="[
                 [
-                    'label' => __('messages.frontend),
+                    'label' => __('frontend.navigation.products'),
                     'url' => route('localized.products.index', ['locale' => $locale]),
                 ],
                 [
@@ -38,7 +38,7 @@
                             : null,
                 ],
                 ['label' => $product->trans('name') ?? $product->name],
-            ]" aria-label="{{ __('messages.frontend) }}" />
+            ]" aria-label="{{ __('frontend.navigation.breadcrumbs') }}" />
 
             <div class="grid gap-10 lg:grid-cols-12">
                 <div class="lg:col-span-7 space-y-8">
@@ -83,10 +83,10 @@
                                     </div>
                                     <span class="text-slate-300">•</span>
                                     <span class="font-medium text-slate-600">{{ $this->reviewCount }}
-                                        {{ __('messages.translations) }}</span>
+                                        {{ __('messages.reviews') }}</span>
                                     @if ($product->sku)
                                         <span class="text-slate-300">•</span>
-                                        <span class="text-slate-500">{{ __('messages.translations) }}:
+                                        <span class="text-slate-500">{{ __('messages.sku') }}:
                                             {{ $product->sku }}</span>
                                     @endif
                                 </div>
@@ -120,7 +120,7 @@
                                 </div>
                                 <div class="sm:text-right">
                                     <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
-                                        {{ __('messages.translations) }}</p>
+                                        {{ __('product_page.delivery_eta_2_weeks') }}</p>
                                     <p class="text-lg font-semibold text-slate-900">
                                         {{ \Illuminate\Support\Number::format((float) $this->availableQuantity) }}
                                     </p>
@@ -139,14 +139,14 @@
                         <div class="space-y-6 p-6 lg:p-8">
                             <div class="flex items-center justify-between">
                                 <h2 class="text-lg font-semibold text-slate-900">
-                                    {{ __('messages.product_page) }}</h2>
+                                    {{ __('product_page.features_title') }}</h2>
                                 <span
                                       class="text-xs font-medium uppercase tracking-wide text-slate-400">{{ $this->attributeFeatures->count() }}
-                                    {{ __('messages.product_page) }}</span>
+                                    {{ __('product_page.features_count') }}</span>
                             </div>
 
                             @if ($this->attributeFeatures->isEmpty())
-                                <p class="text-sm text-slate-500">{{ __('messages.product_page) }}</p>
+                                <p class="text-sm text-slate-500">{{ __('product_page.features_empty') }}</p>
                             @else
                                 <div class="grid gap-4 sm:grid-cols-2">
                                     @foreach ($this->attributeFeatures as $feature)
@@ -171,10 +171,10 @@
                     <section class="rounded-3xl border border-slate-100 bg-white shadow-sm">
                         <div class="space-y-6 p-6 lg:p-8">
                             <h2 class="text-lg font-semibold text-slate-900">
-                                {{ __('messages.product_page) }}</h2>
+                                {{ __('product_page.detailed_description') }}</h2>
                             <div class="prose prose-slate max-w-none text-slate-700">
                                 {!! $product->trans('description') ??
-                                    ($product->description ?? '<p>' . __('messages.product_page) . '</p>') !!}
+                                    ($product->description ?? '<p>' . __('product_page.no_description') . '</p>') !!}
                             </div>
                         </div>
                     </section>
@@ -182,7 +182,7 @@
                     @php
                         $technicalMetrics = [
                             [
-                                'label' => __('messages.frontend),
+                                'label' => __('messages.height'),
                                 'value' => $product->height
                                     ? \Illuminate\Support\Number::format((float) $product->height) .
                                         ' ' .
@@ -190,7 +190,7 @@
                                     : null,
                             ],
                             [
-                                'label' => __('messages.frontend),
+                                'label' => __('messages.width'),
                                 'value' => $product->width
                                     ? \Illuminate\Support\Number::format((float) $product->width) .
                                         ' ' .
@@ -198,7 +198,7 @@
                                     : null,
                             ],
                             [
-                                'label' => __('messages.frontend),
+                                'label' => __('messages.length'),
                                 'value' => $product->length
                                     ? \Illuminate\Support\Number::format((float) $product->length) .
                                         ' ' .
@@ -206,14 +206,14 @@
                                     : null,
                             ],
                             [
-                                'label' => __('messages.translations),
+                                'label' => __('messages.product_weight'),
                                 'value' => $this->formatMeasurement(
                                     $product->weight,
                                     $product->weight_unit?->value ?? null,
                                 ),
                             ],
                             [
-                                'label' => __('messages.product_page),
+                                'label' => __('messages.quantity'),
                                 'value' => $product->getMinimumQuantity() > 1 ? $product->getMinimumQuantity() : null,
                             ],
                         ];
@@ -221,7 +221,7 @@
 
                     <section class="rounded-3xl border border-slate-100 bg-white shadow-sm">
                         <div class="space-y-6 p-6 lg:p-8">
-                            <h2 class="text-lg font-semibold text-slate-900">{{ __('messages.product_page) }}
+                            <h2 class="text-lg font-semibold text-slate-900">{{ __('messages.product_specifications') }}
                             </h2>
                             <dl class="grid gap-4 sm:grid-cols-2">
                                 @foreach ($technicalMetrics as $metric)
@@ -242,35 +242,35 @@
                         <div class="space-y-6 p-6 lg:p-8">
                             <div class="flex flex-wrap items-center justify-between gap-4">
                                 <h2 class="text-lg font-semibold text-slate-900">
-                                    {{ __('messages.product_page) }}
+                                    {{ __('messages.product_history') }}
                                 </h2>
                                 <a href="{{ route('localized.products.history', ['locale' => $locale, 'product' => $product->trans('slug') ?? $product->slug]) }}"
                                    class="inline-flex items-center gap-2 text-sm font-medium text-primary-600 hover:text-primary-700">
                                     <x-heroicon-o-clock class="h-4 w-4" />
-                                    {{ __('messages.product_page) }}
+                                    {{ __('product_page.view_full_history') }}
                                 </a>
                             </div>
                             <div class="grid gap-4 sm:grid-cols-3">
                                 <div class="rounded-2xl border border-slate-100 bg-slate-50/70 p-4">
                                     <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
-                                        {{ __('messages.frontend) }}</p>
+                                        {{ __('frontend.total_changes') }}</p>
                                     <p class="mt-2 text-2xl font-semibold text-slate-900">
                                         {{ $product->getChangeCount(30) }}</p>
-                                    <p class="text-xs text-slate-400">{{ __('messages.frontend) }}</p>
+                                    <p class="text-xs text-slate-400">{{ __('frontend.last_30_days') }}</p>
                                 </div>
                                 <div class="rounded-2xl border border-slate-100 bg-slate-50/70 p-4">
                                     <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
-                                        {{ __('messages.frontend) }}</p>
+                                        {{ __('frontend.price_changes') }}</p>
                                     <p class="mt-2 text-2xl font-semibold text-slate-900">
                                         {{ $product->getPriceChangeCount(30) }}</p>
-                                    <p class="text-xs text-slate-400">{{ __('messages.frontend) }}</p>
+                                    <p class="text-xs text-slate-400">{{ __('frontend.last_30_days') }}</p>
                                 </div>
                                 <div class="rounded-2xl border border-slate-100 bg-slate-50/70 p-4">
                                     <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
-                                        {{ __('messages.product_page) }}</p>
+                                        {{ __('product_page.change_frequency_30') }}</p>
                                     <p class="mt-2 text-2xl font-semibold text-slate-900">
                                         {{ $product->getChangeFrequency(30) }}</p>
-                                    <p class="text-xs text-slate-400">{{ __('messages.product_page) }}</p>
+                                    <p class="text-xs text-slate-400">{{ __('product_page.avg_changes_30') }}</p>
                                 </div>
                             </div>
 
@@ -311,7 +311,7 @@
                     <section class="rounded-3xl border border-slate-100 bg-white shadow-sm">
                         <div class="space-y-6 p-6 lg:p-8">
                             <h2 class="text-lg font-semibold text-slate-900">
-                                {{ __('messages.product_page) }}</h2>
+                                {{ __('translations.product_variants') }}</h2>
                             @if ($this->variantOptionGroups->isNotEmpty())
                                 {{-- Render attribute-level variant selectors to mirror marketplace option matrices. --}}
                                 <div class="space-y-5">
@@ -340,7 +340,7 @@
                                                             <span class="mt-1 text-[11px] text-slate-400">{{ $value['price_hint'] }}</span>
                                                         @endif
                                                         @if (! ($value['is_available'] ?? false))
-                                                            <span class="mt-0.5 text-[11px] font-medium text-rose-500">{{ __('messages.translations) }}</span>
+                                                            <span class="mt-0.5 text-[11px] font-medium text-rose-500">{{ __('product_page.all_variants_options') }}</span>
                                                         @endif
                                                     </div>
                                                 @endforeach
@@ -350,7 +350,7 @@
                                 </div>
                             @endif
                             @if ($this->variantMatrix->isEmpty())
-                                <p class="text-sm text-slate-600">{{ __('messages.product_page) }}</p>
+                                <p class="text-sm text-slate-600">{{ __('messages.detailed_description_coming_soon') }}</p>
                             @else
                                 <div class="space-y-4">
                                     @foreach ($this->variantMatrix as $variant)
@@ -371,7 +371,7 @@
                                                             {{ $variant['name'] }}</p>
                                                         @if ($variant['sku'])
                                                             <p class="text-xs text-slate-500">
-                                                                {{ __('messages.translations) }}: {{ $variant['sku'] }}
+                                                                {{ __('messages.sku') }}: {{ $variant['sku'] }}
                                                             </p>
                                                         @endif
                                                     </div>
@@ -398,9 +398,9 @@
                                                 @endif
                                                 <p
                                                    class="mt-2 text-xs font-medium uppercase tracking-wide {{ ($variant['is_out_of_stock'] ?? false) ? 'text-red-500' : 'text-emerald-500' }}">
-                                                    {{ ($variant['is_out_of_stock'] ?? false) ? __('messages.translations) : __('messages.translations) }}
+                                                    {{ ($variant['is_out_of_stock'] ?? false) ? __('product_page.single_configuration') : __('messages.product_in_stock') }}
                                                 </p>
-                                                <p class="text-xs text-slate-400">{{ __('messages.translations) }}:
+                                                <p class="text-xs text-slate-400">{{ __('product_page.available_quantity') }}:
                                                     {{ $variant['available_quantity'] }}</p>
                                             </div>
                                         </button>
@@ -414,7 +414,7 @@
                         <section class="rounded-3xl border border-slate-100 bg-white shadow-sm">
                             <div class="space-y-6 p-6 lg:p-8">
                                 <h2 class="text-lg font-semibold text-slate-900">
-                                    {{ __('messages.product_page) }}</h2>
+                                    {{ __('messages.admin_documents') }}</h2>
                                 <ul class="space-y-3 text-sm text-slate-600">
                                     @foreach ($product->documents as $document)
                                         <li
@@ -425,7 +425,7 @@
                                             </div>
                                             <a href="{{ $document->url }}" target="_blank" rel="noopener"
                                                class="text-sm font-medium text-primary-600 hover:text-primary-700">
-                                                {{ __('messages.translations) }}
+                                                {{ __('messages.view') }}
                                             </a>
                                         </li>
                                     @endforeach
@@ -438,7 +438,7 @@
                         <section class="rounded-3xl border border-slate-100 bg-white shadow-sm">
                             <div class="space-y-6 p-6 lg:p-8">
                                 <h2 class="text-lg font-semibold text-slate-900">
-                                    {{ __('messages.product_page) }}</h2>
+                                    {{ __('messages.product_reviews') }}</h2>
                                 <livewire:components.product-reviews :product="$product" />
                             </div>
                         </section>
@@ -451,9 +451,9 @@
                             <div class="flex items-start justify-between gap-4">
                                 <div class="space-y-1">
                                     <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
-                                        {{ __('messages.translations) }}</p>
+                                        {{ __('messages.product_brand') }}</p>
                                     <p class="text-lg font-semibold text-slate-900">
-                                        {{ $this->brandLabel ?? __('messages.product_page) }}</p>
+                                        {{ $this->brandLabel ?? $product->name }}</p>
                                 </div>
                                 @if ($this->pricingSummary['current'])
                                     <p class="text-3xl font-semibold text-primary-600">
@@ -464,7 +464,7 @@
                             <div class="rounded-2xl border border-slate-100 bg-slate-50/70 p-4 text-sm text-slate-600">
                                 <p class="flex items-center gap-2 text-slate-700">
                                     <x-heroicon-o-shield-check class="h-5 w-5 text-primary-500" />
-                                    {{ __('messages.product_page) }}
+                                    {{ __('messages.footer_secure_payment') }}
                                 </p>
                             </div>
                             <div class="variant-selector-card" wire:loading.class="opacity-50 pointer-events-none">
@@ -475,7 +475,7 @@
 
                     <section class="rounded-3xl border border-slate-100 bg-white shadow-sm">
                         <div class="space-y-4 p-6 lg:p-8">
-                            <h2 class="text-base font-semibold text-slate-900">{{ __('messages.product_page) }}
+                            <h2 class="text-base font-semibold text-slate-900">{{ __('messages.details') }}
                             </h2>
                             <dl class="grid gap-4 sm:grid-cols-2">
                                 @foreach ($this->productQuickFacts as $fact)
@@ -493,16 +493,16 @@
                     <section class="rounded-3xl border border-slate-100 bg-white shadow-sm">
                         <div class="space-y-4 p-6 lg:p-8">
                             <h2 class="text-base font-semibold text-slate-900">
-                                {{ __('messages.product_page) }}</h2>
+                                {{ __('messages.Shipping') }}</h2>
                             <div class="space-y-4">
                                 <div
                                      class="flex items-start gap-3 rounded-2xl border border-slate-100 bg-slate-50/70 p-4">
                                     <x-untitledui-globe-05 class="h-6 w-6 text-slate-500" />
                                     <div>
                                         <p class="text-sm font-semibold text-slate-900">
-                                            {{ __('frontend.products.international_delivery') }}</p>
+                                            {{ __('product_page.international_delivery') }}</p>
                                         <p class="text-sm text-slate-600">
-                                            {{ __('frontend.products.delivery_eta_2_weeks') }}</p>
+                                            {{ __('product_page.delivery_eta_2_weeks') }}</p>
                                     </div>
                                 </div>
                                 <div
@@ -510,9 +510,9 @@
                                     <x-untitledui-gift-02 class="h-6 w-6 text-slate-500" />
                                     <div>
                                         <p class="text-sm font-semibold text-slate-900">
-                                            {{ __('frontend.products.loyalty_rewards') }}</p>
+                                            {{ __('product_page.loyalty_rewards') }}</p>
                                         <p class="text-sm text-slate-600">
-                                            {{ __('frontend.products.loyalty_rewards_desc') }}</p>
+                                            {{ __('product_page.loyalty_rewards_desc') }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -524,12 +524,12 @@
                     <section class="rounded-3xl border border-slate-100 bg-white shadow-sm">
                         <div class="space-y-4 p-6 lg:p-8">
                             <h2 class="text-base font-semibold text-slate-900">
-                                {{ __('messages.product_page) }}</h2>
-                            <p class="text-sm text-slate-600">{{ __('messages.product_page) }}</p>
+                                {{ __('product_page.need_tailored_offer') }}</h2>
+                            <p class="text-sm text-slate-600">{{ __('product_page.contact_us_description') }}</p>
                             <a href="{{ $contactUrl }}"
                                class="inline-flex items-center justify-center rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700">
                                 <x-heroicon-o-phone class="mr-2 h-4 w-4" />
-                                {{ __('messages.translations) }}
+                                {{ __('product_page.need_tailored_offer') }}
                             </a>
                         </div>
                     </section>

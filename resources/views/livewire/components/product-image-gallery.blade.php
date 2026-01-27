@@ -78,7 +78,7 @@
         <div class="mt-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
             <div class="flex items-center justify-between text-sm">
                 <span class="text-gray-600 dark:text-gray-400">
-                    {{ __('messages.frontend) }}: {{ count($this->images) }}
+                    {{ __('messages.frontend') }}: {{ count($this->images) }}
                 </span>
                 <span class="text-green-600 dark:text-green-400 font-medium">
                     {{ __('frontend.images.webp_format') }}

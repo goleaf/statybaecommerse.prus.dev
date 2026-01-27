@@ -42,6 +42,15 @@ final class VerifyEmailMail extends Mailable implements ShouldQueue
         $locale = $this->resolveLocale();
 
         return new Content(
+            markdown: ', [], $locale)
+        );
+    }
+
+    public function content(): Content
+    {
+        $locale = $this->resolveLocale();
+
+        return new Content(
             markdown: 'emails.auth.verify',
             with: [
                 'url' => $this->verificationUrl,

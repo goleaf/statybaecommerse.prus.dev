@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace App\Support\Search;
 
 use App\Models\Location;
-use App\Support\Filament\SearchableComponentHelper;
-use DefStudio\SearchableInput\DTO\SearchResult;
-use DefStudio\SearchableInput\Forms\Components\SearchableInput;
+use App\Support\Search\SearchResult;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 

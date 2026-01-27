@@ -10,31 +10,31 @@
         <div class="text-sm mt-6 text-gray-500 lg:max-w-xs">
             <ul role="list" class="divide-y divide-gray-100">
                 <li class="grid grid-cols-2 gap-2 py-2">
-                    <span>{{ __('messages.frontend) }} :</span>
+                    <span>{{ __('messages.frontend') }} :</span>
                     <span class="text-gray-700 text-sm font-medium">
                         {{ $categories }}
                     </span>
                 </li>
                 <li class="grid grid-cols-2 gap-2 py-2">
-                    <span>{{ __('messages.frontend) }} :</span>
+                    <span>{{ __('messages.frontend') }} :</span>
                     <span class="text-gray-700 font-medium">
                         {{ \Illuminate\Support\Number::format($product->height ?? 0) }} {{ $product->height_unit?->value ?? '' }}
                     </span>
                 </li>
                 <li class="grid grid-cols-2 gap-2 py-2">
-                    <span>{{ __('messages.frontend) }} :</span>
+                    <span>{{ __('messages.frontend') }} :</span>
                     <span class="text-gray-700 font-medium">
                         {{ \Illuminate\Support\Number::format($product->width ?? 0) }} {{ $product->width_unit?->value ?? '' }}
                     </span>
                 </li>
                 <li class="grid grid-cols-2 gap-2 py-2">
-                    <span>{{ __('messages.frontend) }} :</span>
+                    <span>{{ __('messages.frontend') }} :</span>
                     <span class="text-gray-700 font-medium">
                         {{ \Illuminate\Support\Number::format($product->length ?? 0) }} {{ $product->depth_unit?->value ?? '' }}
                     </span>
                 </li>
                 <li class="grid grid-cols-2 gap-2 py-2">
-                    <span>{{ __('messages.frontend) }} :</span>
+                    <span>{{ __('messages.frontend') }} :</span>
                     <span class="text-gray-700 font-medium">
                         {{ \Illuminate\Support\Number::format($product->weight ?? 0) }} {{ $product->weight_unit?->value ?? '' }}
                     </span>

@@ -1,11 +1,11 @@
-<x-layouts.base title="{{ __('messages.frontend) }}">
+<x-layouts.base title="{{ __('messages.frontend') }}">
     <div class="max-w-6xl mx-auto px-4 py-8">
         <header class="flex items-center justify-between mb-8">
-            <h1 class="text-2xl font-semibold tracking-tight">{{ __('messages.frontend) }}</h1>
+            <h1 class="text-2xl font-semibold tracking-tight">{{ __('messages.frontend') }}</h1>
             @auth
                 @can('view system')
                     <a class="text-sm text-primary-700 hover:text-primary-800 dark:text-primary-400 dark:hover:text-primary-300 underline"
-                       href="{{ route('filament.admin.pages.dashboard') }}">{{ __('messages.frontend) }}</a>
+                       href="{{ route('filament.admin.pages.dashboard') }}">{{ __('messages.frontend') }}</a>
                 @endcan
             @endauth
             <x-language-switcher />
@@ -14,7 +14,7 @@
         @if ($products->isEmpty())
             <div
                  class="text-center p-12 text-gray-500 border border-dashed border-gray-300 rounded-xl dark:border-white/10 dark:text-gray-400">
-                {{ __('messages.frontend) }}
+                {{ __('messages.frontend') }}
             </div>
         @else
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

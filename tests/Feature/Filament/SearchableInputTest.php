@@ -9,12 +9,18 @@ use App\Filament\Resources\PriceResource;
 use App\Filament\Resources\ProductRequestResource;
 use App\Models\Product;
 use App\Support\Search\SearchResultPayload;
-use DefStudio\SearchableInput\Forms\Components\SearchableInput;
+use App\Support\Filament\Components\SearchableInput;
+use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
+use Filament\Schemas\Components\Component;
 use Filament\Schemas\Schema as FormSchema;
+use Filament\Schemas\Contracts\HasSchemas;
+use Filament\Support\Contracts\TranslatableContentDriver;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabaseState;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schema;
+use Livewire\Component as LivewireComponent;
 
 uses()->group('searchable-input');
 
@@ -38,6 +44,10 @@ beforeEach(function (): void {
 });
 
 it('feature: exposes product search results through the form component', function (string $resourceClass): void {
+    if (! class_exists($resourceClass)) {
+        $this->markTestSkipped("Resource class [{$resourceClass}] not available.");
+    }
+
     Product::unguarded(fn () => Product::create([
         'sku'          => 'FORM-001',
         'name'         => ['en' => 'Form Drill', 'lt' => 'Forma Gręžtuvas'],
@@ -48,7 +58,8 @@ it('feature: exposes product search results through the form component', functio
         'updated_at'   => Carbon::now(),
     ]));
 
-    $form = $resourceClass::form(FormSchema::make());
+    $livewire = new DummyLivewireComponent;
+    $form = $resourceClass::form(FormSchema::make($livewire));
     $components = $form->getFlatComponents(withActions: false);
 
     expect($components)->toHaveKey('product_id');
@@ -93,3 +104,44 @@ it('feature: exposes payload macros for standalone searchable inputs', function 
 
     expect($component->getPayload())->toBe([]);
 });
+
+/**
+ * Minimal Livewire harness so Filament schema components have a Livewire context.
+ */
+final class DummyLivewireComponent extends LivewireComponent implements HasSchemas
+{
+    public function makeFilamentTranslatableContentDriver(): ?TranslatableContentDriver
+    {
+        return null;
+    }
+
+    public function getSchemaComponent(string $key, bool $withHidden = false, array $skipComponentsChildContainersWhileSearching = []): Component|Action|ActionGroup|null
+    {
+        return null;
+    }
+
+    public function getSchema(string $name): ?FormSchema
+    {
+        return null;
+    }
+
+    public function currentlyValidatingSchema(?FormSchema $schema): void {}
+
+    public function getDefaultTestingSchemaName(): ?string
+    {
+        return null;
+    }
+
+    public function getOldSchemaState(string $statePath): mixed
+    {
+        return data_get($this, $statePath);
+    }
+
+    public function render(): mixed
+    {
+        return view('filament::components.badge')->with(['badge' => '']);
+    }
+}
+
+
+

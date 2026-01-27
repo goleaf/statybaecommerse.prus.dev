@@ -9,7 +9,7 @@
         <ol class="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
             <li><a href="{{ route('home') }}" class="hover:text-blue-600">{{ __('messages.nav_home') }}</a></li>
             <li><span class="mx-2">/</span></li>
-            <li><a href="{{ route('cities.index') }}" class="hover:text-blue-600">{{ __('messages.cities) }}</a></li>
+            <li><a href="{{ route('cities.index') }}" class="hover:text-blue-600">{{ __('messages.cities') }}</a></li>
             <li><span class="mx-2">/</span></li>
             <li class="text-gray-900 dark:text-white">{{ $city->translated_name }}</li>
         </ol>
@@ -28,7 +28,7 @@
                             <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                             </svg>
-                            {{ __('messages.cities) }}
+                            {{ __('messages.cities') }}
                         </span>
                     @endif
                 </div>
@@ -46,32 +46,32 @@
             <!-- Basic Information -->
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
                 <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                    {{ __('messages.cities) }}
+                    {{ __('messages.cities') }}
                 </h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('messages.cities) }}</dt>
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('messages.cities') }}</dt>
                         <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ $city->translated_name }}</dd>
                     </div>
                     <div>
-                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('messages.cities) }}</dt>
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('messages.cities') }}</dt>
                         <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ $city->code }}</dd>
                     </div>
                     <div>
-                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('messages.cities) }}</dt>
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('messages.cities') }}</dt>
                         <dd class="mt-1 text-sm text-gray-900 dark:text-white">
                             @switch($city->level)
-                                @case(0) {{ __('messages.cities) }} @break
-                                @case(1) {{ __('messages.cities) }} @break
-                                @case(2) {{ __('messages.cities) }} @break
-                                @case(3) {{ __('messages.cities) }} @break
-                                @default {{ __('messages.cities) }}
+                                @case(0) {{ __('messages.cities') }} @break
+                                @case(1) {{ __('messages.cities') }} @break
+                                @case(2) {{ __('messages.cities') }} @break
+                                @case(3) {{ __('messages.cities') }} @break
+                                @default {{ __('messages.cities') }}
                             @endswitch
                         </dd>
                     </div>
                     @if($city->type)
                         <div>
-                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('messages.cities) }}</dt>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('messages.cities') }}</dt>
                             <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ $city->type }}</dd>
                         </div>
                     @endif
@@ -81,12 +81,12 @@
             <!-- Location Information -->
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
                 <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                    {{ __('messages.cities) }}
+                    {{ __('messages.cities') }}
                 </h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     @if($city->country)
                         <div>
-                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('messages.cities) }}</dt>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('messages.cities') }}</dt>
                             <dd class="mt-1 text-sm text-gray-900 dark:text-white">
                                 <span class="text-gray-900 dark:text-white">
                                     {{ $city->country->translated_name }}
@@ -96,7 +96,7 @@
                     @endif
                     @if($city->region)
                         <div>
-                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('messages.cities) }}</dt>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('messages.cities') }}</dt>
                             <dd class="mt-1 text-sm text-gray-900 dark:text-white">
                                 <a href="{{ route('regions.show', $city->region) }}" class="text-blue-600 hover:text-blue-800">
                                     {{ $city->region->translated_name }}
@@ -116,7 +116,7 @@
                     @endif
                     @if($city->parent)
                         <div>
-                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('messages.cities) }}</dt>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('messages.cities') }}</dt>
                             <dd class="mt-1 text-sm text-gray-900 dark:text-white">
                                 <a href="{{ route('cities.show', $city->parent) }}" class="text-blue-600 hover:text-blue-800">
                                     {{ $city->parent->translated_name }}
@@ -131,7 +131,7 @@
             @if($city->latitude || $city->longitude || $city->population || $city->area)
                 <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
                     <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                        {{ __('messages.cities) }}
+                        {{ __('messages.cities') }}
                     </h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         @if($city->latitude && $city->longitude)
@@ -144,31 +144,31 @@
                         @endif
                         @if($city->population)
                             <div>
-                                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('messages.cities) }}</dt>
+                                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('messages.cities') }}</dt>
                                 <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ number_format($city->population) }}</dd>
                             </div>
                         @endif
                         @if($city->area)
                             <div>
-                                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('messages.cities) }}</dt>
+                                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('messages.cities') }}</dt>
                                 <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ number_format($city->area, 2) }} km²</dd>
                             </div>
                         @endif
                         @if($city->density)
                             <div>
-                                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('messages.cities) }}</dt>
+                                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('messages.cities') }}</dt>
                                 <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ number_format($city->density, 2) }} /km²</dd>
                             </div>
                         @endif
                         @if($city->elevation)
                             <div>
-                                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('messages.cities) }}</dt>
+                                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('messages.cities') }}</dt>
                                 <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ number_format($city->elevation, 2) }} m</dd>
                             </div>
                         @endif
                         @if($city->timezone)
                             <div>
-                                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('messages.cities) }}</dt>
+                                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('messages.cities') }}</dt>
                                 <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ $city->timezone }}</dd>
                             </div>
                         @endif
@@ -180,7 +180,7 @@
             @if($city->children->count() > 0)
                 <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
                     <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                        {{ __('messages.cities) }}
+                        {{ __('messages.cities') }}
                     </h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         @foreach($city->children as $child)
@@ -193,7 +193,7 @@
                                 <p class="text-sm text-gray-500 dark:text-gray-400">{{ $child->code }}</p>
                                 @if($child->population)
                                     <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                                        {{ number_format($child->population) }} {{ __('messages.cities) }}
+                                        {{ number_format($child->population) }} {{ __('messages.cities') }}
                                     </p>
                                 @endif
                             </div>
@@ -213,19 +213,19 @@
                 <div class="space-y-3">
                     @if($city->population)
                         <div class="flex justify-between">
-                            <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('messages.cities) }}</span>
+                            <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('messages.cities') }}</span>
                             <span class="text-sm font-medium text-gray-900 dark:text-white">{{ number_format($city->population) }}</span>
                         </div>
                     @endif
                     @if($city->area)
                         <div class="flex justify-between">
-                            <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('messages.cities) }}</span>
+                            <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('messages.cities') }}</span>
                             <span class="text-sm font-medium text-gray-900 dark:text-white">{{ number_format($city->area, 2) }} km²</span>
                         </div>
                     @endif
                     @if($city->density)
                         <div class="flex justify-between">
-                            <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('messages.cities) }}</span>
+                            <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('messages.cities') }}</span>
                             <span class="text-sm font-medium text-gray-900 dark:text-white">{{ number_format($city->density, 2) }} /km²</span>
                         </div>
                     @endif
@@ -241,19 +241,19 @@
                     <div class="space-y-3">
                         @if($city->currency_code)
                             <div class="flex justify-between">
-                                <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('messages.cities) }}</span>
+                                <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('messages.cities') }}</span>
                                 <span class="text-sm font-medium text-gray-900 dark:text-white">{{ $city->currency_code }}</span>
                             </div>
                         @endif
                         @if($city->language_code)
                             <div class="flex justify-between">
-                                <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('messages.cities) }}</span>
+                                <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('messages.cities') }}</span>
                                 <span class="text-sm font-medium text-gray-900 dark:text-white">{{ $city->language_code }}</span>
                             </div>
                         @endif
                         @if($city->phone_code)
                             <div class="flex justify-between">
-                                <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('messages.cities) }}</span>
+                                <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('messages.cities') }}</span>
                                 <span class="text-sm font-medium text-gray-900 dark:text-white">{{ $city->phone_code }}</span>
                             </div>
                         @endif

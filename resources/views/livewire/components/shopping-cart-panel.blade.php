@@ -4,7 +4,7 @@
         wire:click="toggleCart"
         wire:confirm="{{ __('translations.confirm_toggle_cart') }}"
         class="relative p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors duration-200"
-        aria-label="{{ __('messages.translations) }}"
+        aria-label="{{ __('translations.shopping_cart') }}"
     >
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5-6M20 13v6a2 2 0 01-2 2H6a2 2 0 01-2-2v-6m16 0V9a2 2 0 00-2-2H6a2 2 0 00-2-2v4m16 0H4" />
@@ -33,7 +33,7 @@
         <!-- Cart Header -->
         <div class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
             <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-                {{ __('messages.translations) }}
+                {{ __('translations.shopping_cart') }}
                 @if($cartSummary['items_count'] > 0)
                     ({{ $cartSummary['items_count'] }})
                 @endif
@@ -71,7 +71,7 @@
                                 $quantity = max(1, (int) ($item['quantity'] ?? 1));
                                 $unitPrice = (float) ($item['unitPrice'] ?? $item['unit_price'] ?? 0.0);
                                 $lineTotal = (float) ($item['totalPrice'] ?? $item['total_price'] ?? ($unitPrice * $quantity));
-                                $itemName = $snapshot['name'] ?? $item['name'] ?? __('messages.translations);
+                                $itemName = $snapshot['name'] ?? $item['name'] ?? __('translations.remove_item');
                                 $variantAttributes = isset($snapshot['variant_attributes']) && is_array($snapshot['variant_attributes'])
                                     ? $snapshot['variant_attributes']
                                     : [];
@@ -139,7 +139,7 @@
                                         wire:click="removeItem({{ $itemId }})"
                                         wire:confirm="{{ __('translations.confirm_remove_cart_item') }}"
                                         class="p-1 text-red-400 hover:text-red-600"
-                                        title="{{ __('messages.translations) }}"
+                                        title="{{ __('translations.discount_code') }}"
                                     >
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -201,24 +201,24 @@
                     <!-- Cart Summary -->
                     <div class="space-y-2 mb-4">
                         <div class="flex justify-between text-sm">
-                            <span class="text-gray-600 dark:text-gray-400">{{ __('messages.translations) }}</span>
+                            <span class="text-gray-600 dark:text-gray-400">{{ __('translations.subtotal') }}</span>
                             <span class="text-gray-900 dark:text-white">{{ app_money_format($cartSummary['subtotal']) }}</span>
                         </div>
                         
                         @if($cartSummary['discount_amount'] > 0)
                             <div class="flex justify-between text-sm">
-                                <span class="text-green-600 dark:text-green-400">{{ __('messages.translations) }}</span>
+                                <span class="text-green-600 dark:text-green-400">{{ __('translations.discount') }}</span>
                                 <span class="text-green-600 dark:text-green-400">-{{ app_money_format($cartSummary['discount_amount']) }}</span>
                             </div>
                         @endif
                         
                         <div class="flex justify-between text-sm">
-                            <span class="text-gray-600 dark:text-gray-400">{{ __('messages.translations) }}</span>
+                            <span class="text-gray-600 dark:text-gray-400">{{ __('translations.tax') }}</span>
                             <span class="text-gray-900 dark:text-white">{{ app_money_format($cartSummary['tax_amount']) }}</span>
                         </div>
                         
                         <div class="flex justify-between text-sm">
-                            <span class="text-gray-600 dark:text-gray-400">{{ __('messages.translations) }}</span>
+                            <span class="text-gray-600 dark:text-gray-400">{{ __('translations.shipping') }}</span>
                             <span class="text-gray-900 dark:text-white">
                                 @if($cartSummary['shipping_amount'] > 0)
                                     {{ app_money_format($cartSummary['shipping_amount']) }}
@@ -229,7 +229,7 @@
                         </div>
                         
                         <div class="flex justify-between text-base font-semibold border-t border-gray-200 dark:border-gray-600 pt-2">
-                            <span class="text-gray-900 dark:text-white">{{ __('messages.translations) }}</span>
+                            <span class="text-gray-900 dark:text-white">{{ __('translations.total') }}</span>
                             <span class="text-blue-600 dark:text-blue-400">{{ app_money_format($cartSummary['total']) }}</span>
                         </div>
                     </div>
@@ -240,7 +240,7 @@
                             wire:click="proceedToCheckout"
                             class="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 transition-colors duration-200 font-medium"
                         >
-                            {{ __('messages.translations) }}
+                            {{ __('translations.proceed_to_checkout') }}
                         </button>
                         
                         <div class="flex space-x-2">
@@ -250,7 +250,7 @@
                                 href="{{ route('cart.index', app()->getLocale()) }}"
                                 class="flex-1 bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 py-2 px-4 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors duration-200 text-center text-sm"
                             >
-                                {{ __('messages.translations) }}
+                                {{ __('translations.view_cart') }}
                             </a>
                             
                             <button 

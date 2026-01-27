@@ -94,15 +94,15 @@ final class Show extends Component implements HasActions, HasForms
             ->get();
 
         return $roots->map(fn ($cat) => [
-            'id' => $cat->id,
-            'name' => $cat->name,
-            'slug' => $cat->slug,
+            'id'       => $cat->id,
+            'name'     => $cat->name,
+            'slug'     => $cat->slug,
             'children' => $cat->children->map(fn ($child) => [
-                'id' => $child->id,
-                'name' => $child->name,
-                'slug' => $child->slug,
+                'id'       => $child->id,
+                'name'     => $child->name,
+                'slug'     => $child->slug,
                 'children' => $child->children->map(fn ($gc) => [
-                    'id' => $gc->id,
+                    'id'   => $gc->id,
                     'name' => $gc->name,
                     'slug' => $gc->slug,
                 ])->values(),

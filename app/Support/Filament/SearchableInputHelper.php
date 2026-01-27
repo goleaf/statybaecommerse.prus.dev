@@ -7,8 +7,8 @@ namespace App\Support\Filament;
 use App\Support\Filament\Components\SearchableComponentHelper;
 use App\Support\Search\SearchResultPayload;
 use Closure;
-use DefStudio\SearchableInput\DTO\SearchResult;
-use DefStudio\SearchableInput\Forms\Components\SearchableInput;
+use App\Support\Search\SearchResult;
+use App\Support\Filament\Components\SearchableInput;
 use Illuminate\Contracts\Support\Arrayable;
 use Stringable;
 
@@ -73,6 +73,11 @@ final class SearchableInputHelper
     {
         self::resetComponent($component);
 
+        $payloadKey = $component->getStatePath();
+        if (is_string($payloadKey) && $payloadKey !== '' && ! array_key_exists($payloadKey . '_payload', $resets)) {
+            $resets[$payloadKey . '_payload'] = [];
+        }
+
         foreach ($resets as $field => $value) {
             $set($field, $value);
         }
@@ -119,7 +124,7 @@ final class SearchableInputHelper
      * Convert various resolver return types into the canonical option payload.
      *
      * The helper accepts arrays, {@see Arrayable} structures, and the native
-     * {@see SearchResult} DTO used by the DefStudio package. Anything else is
+     * {@see SearchResult} DTO used by the in-project searchable input helpers. Anything else is
      * treated as an invalid option and coerced to `null` so the component is
      * cleared upstream.
      *

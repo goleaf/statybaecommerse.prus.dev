@@ -24,7 +24,7 @@ use Throwable;
  * $directories = $fs->directories('/path', 2);    // Depth limit
  * ```
  */
-final class GracefulFilesystem extends Filesystem
+class GracefulFilesystem extends Filesystem
 {
     private readonly DirectoryMemoryManager $memoryManager;
 

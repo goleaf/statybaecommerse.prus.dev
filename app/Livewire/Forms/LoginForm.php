@@ -106,7 +106,36 @@ final class LoginForm extends Form
             Auth::logout();
 
             $exception = ValidationException::withMessages([
+                '),
+            ]);
+        }
+
+        $user = Auth::user();
+
+        if (! $user instanceof User) {
+            Auth::logout();
+
+            $exception = ValidationException::withMessages([
                 'loginForm.email' => trans('messages.auth),
+            ]);
+
+            $exception->status = 422;
+
+            throw $exception;
+        }
+
+        $this->handleSuccessfulPasswordCheck($captchaManager, $monitor);
+
+        app(LoginRecorder::class)->record($user, request());
+
+        return $user;
+    }
+
+    public function syncCaptchaState(?CaptchaManager $captchaManager = null, bool $forceRefresh = false): void
+    {
+        $captchaManager ??= app(CaptchaManager::class);
+
+        if (! $captchaManager->shouldChallenge($this->throttleKey(), '),
             ]);
 
             $exception->status = 422;
@@ -244,6 +273,7 @@ final class LoginForm extends Form
 
         $exception = ValidationException::withMessages([
             'loginForm.email' => trans('messages.auth, [
+                ', [
                 'seconds' => $seconds,
                 'minutes' => (int) ceil($seconds / 60),
             ]),

@@ -1,13 +1,13 @@
 @extends('frontend.layouts.app')
 
-@section('title', __('messages.frontend))
+@section('title', __('messages.frontend'))
 
 @section('content')
     <div class="container mx-auto px-4">
         <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ __('messages.frontend) }}</h1>
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ __('messages.frontend') }}</h1>
             <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">
-                {{ __('messages.frontend) }}
+                {{ __('messages.frontend') }}
             </p>
         </div>
 
@@ -26,7 +26,7 @@
                             </p>
                         </div>
                         <a href="{{ route('frontend.categories.show', $category) }}" class="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-600 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-900/50">
-                            {{ __('messages.frontend) }}
+                            {{ __('messages.frontend') }}
                         </a>
                     </header>
                     @if ($category->children->isNotEmpty())

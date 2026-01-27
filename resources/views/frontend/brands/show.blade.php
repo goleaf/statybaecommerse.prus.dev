@@ -9,20 +9,20 @@
     <div class="bg-dark text-sage">
         <div class="mx-auto max-w-7xl px-4 py-12 sm:py-16 sm:px-6 lg:px-8">
             {{-- Breadcrumbs --}}
-            <nav class="text-xs font-medium uppercase tracking-[0.3em] mb-8 breadcrumb-nav-dark" aria-label="{{ __('messages.shared) }}">
+            <nav class="text-xs font-medium uppercase tracking-[0.3em] mb-8 breadcrumb-nav-dark" aria-label="{{ __('messages.shared') }}">
                 <ol class="flex items-center gap-3">
                     <li>
                         <a href="{{ route('home') }}" class="inline-flex items-center gap-2 breadcrumb-link-dark transition hover:opacity-80">
                             <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h12a1 1 0 001-1V10" />
                             </svg>
-                            <span class="breadcrumb-link-text-dark">{{ __('messages.frontend) }}</span>
+                            <span class="breadcrumb-link-text-dark">{{ __('messages.frontend') }}</span>
                         </a>
                     </li>
                     <li class="breadcrumb-separator-dark">/</li>
                     <li>
                         <a href="{{ route('frontend.brands.index') }}" class="breadcrumb-link-dark transition hover:opacity-80">
-                            <span class="breadcrumb-link-text-dark">{{ __('messages.shared) }}</span>
+                            <span class="breadcrumb-link-text-dark">{{ __('messages.shared') }}</span>
                         </a>
                     </li>
                     <li class="breadcrumb-separator-dark">/</li>

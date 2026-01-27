@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-if (!function_exists('app_setting')) {
+if (! function_exists('app_setting')) {
     /**
      * Get application setting value with multi-layer caching and performance optimization.
      *
@@ -23,6 +23,7 @@ if (!function_exists('app_setting')) {
         if ($key === '__flush_cache__') {
             $requestCache = [];
             $batchLoaded = false;
+
             return null;
         }
 
@@ -40,7 +41,7 @@ if (!function_exists('app_setting')) {
         }
 
         // Layer 3: Database with batch loading optimization
-        if (!$batchLoaded && Schema::hasTable('settings')) {
+        if (! $batchLoaded && Schema::hasTable('settings')) {
             try {
                 // Batch load all settings to prevent N+1 queries
                 // Use select() to only fetch needed columns for performance
@@ -53,7 +54,7 @@ if (!function_exists('app_setting')) {
                     $value = match ($setting->type) {
                         'boolean' => (bool) $setting->value,
                         'integer' => (int) $setting->value,
-                        'float' => (float) $setting->value,
+                        'float'   => (float) $setting->value,
                         'array', 'json' => safe_json_decode_array($setting->value),
                         default => $setting->value,
                     };
@@ -77,7 +78,7 @@ if (!function_exists('app_setting')) {
                 if (app()->bound('log')) {
                     app('log')->warning('Failed to batch load settings from database', [
                         'error' => $e->getMessage(),
-                        'key' => $key,
+                        'key'   => $key,
                     ]);
                 }
             }
@@ -102,7 +103,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 
-if (!function_exists('current_currency')) {
+if (! function_exists('current_currency')) {
     /**
      * Get the current currency code with optimized fallback chain and validation.
      *
@@ -118,6 +119,7 @@ if (!function_exists('current_currency')) {
 
         if ($reset) {
             $resolved = null;
+
             return 'EUR';
         }
 
@@ -147,7 +149,7 @@ if (!function_exists('current_currency')) {
     }
 }
 
-if (!function_exists('safe_json_decode_array')) {
+if (! function_exists('safe_json_decode_array')) {
     /**
      * Decode a JSON value into an associative array safely.
      * - Accepts mixed input; non-strings return [] or the array as-is
@@ -159,7 +161,7 @@ if (!function_exists('safe_json_decode_array')) {
             return $value;
         }
 
-        if (!is_string($value)) {
+        if (! is_string($value)) {
             return [];
         }
 
@@ -171,7 +173,7 @@ if (!function_exists('safe_json_decode_array')) {
 
         $decoded = json_decode($trimmed, true);
 
-        if (json_last_error() !== JSON_ERROR_NONE || !is_array($decoded)) {
+        if (json_last_error() !== JSON_ERROR_NONE || ! is_array($decoded)) {
             return [];
         }
 
@@ -179,7 +181,7 @@ if (!function_exists('safe_json_decode_array')) {
     }
 }
 
-if (!function_exists('app_currency')) {
+if (! function_exists('app_currency')) {
     /**
      * Get the application currency code.
      * Alias for current_currency() for backward compatibility.
@@ -190,7 +192,7 @@ if (!function_exists('app_currency')) {
     }
 }
 
-if (!function_exists('format_money')) {
+if (! function_exists('format_money')) {
     /**
      * Format money amount with proper currency and locale formatting.
      */
@@ -231,7 +233,7 @@ if (!function_exists('format_money')) {
     }
 }
 
-if (!function_exists('formatMoneyFallback')) {
+if (! function_exists('formatMoneyFallback')) {
     /**
      * Fallback money formatting when advanced formatters are unavailable.
      */
@@ -259,14 +261,14 @@ if (!function_exists('formatMoneyFallback')) {
     }
 }
 
-if (!function_exists('app_money_format')) {
+if (! function_exists('app_money_format')) {
     function app_money_format(float|int|string $amount, ?string $currency = null): string
     {
         return format_money((float) $amount, $currency ?: current_currency());
     }
 }
 
-if (!function_exists('format_price')) {
+if (! function_exists('format_price')) {
     function format_price(float|int|string|null $amount, ?string $currency = null, ?string $locale = null): string
     {
         if ($amount === null || $amount === '') {
@@ -281,13 +283,13 @@ if (!function_exists('format_price')) {
     }
 }
 
-if (!function_exists('format_date')) {
+if (! function_exists('format_date')) {
     /**
      * Format date according to application configuration.
      */
     function format_date(\DateTimeInterface|string|null $date, ?string $locale = null, int $dateType = \IntlDateFormatter::MEDIUM): string
     {
-        if (!$date) {
+        if (! $date) {
             return '';
         }
 
@@ -303,13 +305,13 @@ if (!function_exists('format_date')) {
 
 // Removed legacy shopper_money_format - use app_money_format instead
 
-if (!function_exists('format_datetime')) {
+if (! function_exists('format_datetime')) {
     /**
      * Format datetime according to application configuration.
      */
     function format_datetime(\DateTimeInterface|string|null $dateTime, ?string $locale = null): string
     {
-        if (!$dateTime) {
+        if (! $dateTime) {
             return '';
         }
 
@@ -323,10 +325,10 @@ if (!function_exists('format_datetime')) {
     }
 }
 
-if (!function_exists('format_date_short')) {
+if (! function_exists('format_date_short')) {
     function format_date_short(\DateTimeInterface|string|null $date, ?string $locale = null): string
     {
-        if (!$date) {
+        if (! $date) {
             return '';
         }
         $dt = $date instanceof \DateTimeInterface ? $date : new \DateTime($date);
@@ -336,10 +338,10 @@ if (!function_exists('format_date_short')) {
     }
 }
 
-if (!function_exists('format_datetime_full')) {
+if (! function_exists('format_datetime_full')) {
     function format_datetime_full(\DateTimeInterface|string|null $dateTime, ?string $locale = null): string
     {
-        if (!$dateTime) {
+        if (! $dateTime) {
             return '';
         }
         $dt = $dateTime instanceof \DateTimeInterface ? $dateTime : new \DateTime((string) $dateTime);
@@ -349,10 +351,10 @@ if (!function_exists('format_datetime_full')) {
     }
 }
 
-if (!function_exists('format_time')) {
+if (! function_exists('format_time')) {
     function format_time(\DateTimeInterface|string|null $dateTime, ?string $locale = null): string
     {
-        if (!$dateTime) {
+        if (! $dateTime) {
             return '';
         }
         $dt = $dateTime instanceof \DateTimeInterface ? $dateTime : new \DateTime((string) $dateTime);
@@ -361,7 +363,7 @@ if (!function_exists('format_time')) {
     }
 }
 
-if (!function_exists('app_feature_enabled')) {
+if (! function_exists('app_feature_enabled')) {
     function app_feature_enabled(string $featureName): bool
     {
         $feature = config('app-features.features.' . $featureName);
@@ -376,7 +378,7 @@ if (!function_exists('app_feature_enabled')) {
     }
 }
 
-if (!function_exists('debug_discount')) {
+if (! function_exists('debug_discount')) {
     function debug_discount(string $code, array $conditions, bool $applied, float $amount): void
     {
         try {
@@ -389,7 +391,7 @@ if (!function_exists('debug_discount')) {
     }
 }
 
-if (!function_exists('debug_translation')) {
+if (! function_exists('debug_translation')) {
     function debug_translation(string $key, string $locale, string $value, bool $fromCache): void
     {
         try {
@@ -402,7 +404,7 @@ if (!function_exists('debug_translation')) {
     }
 }
 
-if (!function_exists('debug_livewire')) {
+if (! function_exists('debug_livewire')) {
     function debug_livewire(string $component, string $phase, array $data = []): void
     {
         try {
@@ -415,7 +417,7 @@ if (!function_exists('debug_livewire')) {
     }
 }
 
-if (!function_exists('debug_cart')) {
+if (! function_exists('debug_cart')) {
     function debug_cart(string $operation, array $data = []): void
     {
         try {
@@ -428,7 +430,7 @@ if (!function_exists('debug_cart')) {
     }
 }
 
-if (!function_exists('debug_order')) {
+if (! function_exists('debug_order')) {
     function debug_order(string $operation, string $orderNumber, array $data = []): void
     {
         try {
@@ -441,7 +443,7 @@ if (!function_exists('debug_order')) {
     }
 }
 
-if (!function_exists('safe_asset')) {
+if (! function_exists('safe_asset')) {
     function safe_asset(string $path): string
     {
         $relativePath = '/' . ltrim($path, '/');
@@ -449,13 +451,13 @@ if (!function_exists('safe_asset')) {
         try {
             $app = app();
 
-            if (!method_exists($app, 'bound') || !$app->bound('url') || !$app->bound('request')) {
+            if (! method_exists($app, 'bound') || ! $app->bound('url') || ! $app->bound('request')) {
                 return $relativePath;
             }
 
             $request = $app->make('request');
 
-            if (!$request instanceof \Illuminate\Http\Request) {
+            if (! $request instanceof \Illuminate\Http\Request) {
                 return $relativePath;
             }
 
@@ -466,7 +468,7 @@ if (!function_exists('safe_asset')) {
     }
 }
 
-if (!function_exists('media_placeholder_url')) {
+if (! function_exists('media_placeholder_url')) {
     function media_placeholder_url(string $key, ?string $variant = null, ?string $default = null): string
     {
         try {
@@ -479,14 +481,14 @@ if (!function_exists('media_placeholder_url')) {
     }
 }
 
-if (!function_exists('app_placeholder_url')) {
+if (! function_exists('app_placeholder_url')) {
     function app_placeholder_url(): string
     {
         return media_placeholder_url('app', null, safe_asset('images/placeholder.jpg'));
     }
 }
 
-if (!function_exists('product_placeholder_url')) {
+if (! function_exists('product_placeholder_url')) {
     function product_placeholder_url(?string $variant = null): string
     {
         $fallback = $variant === 'thumb'
@@ -499,14 +501,14 @@ if (!function_exists('product_placeholder_url')) {
     }
 }
 
-if (!function_exists('og_placeholder_url')) {
+if (! function_exists('og_placeholder_url')) {
     function og_placeholder_url(): string
     {
         return media_placeholder_url('og', null, safe_asset('images/og-default.jpg'));
     }
 }
 
-if (!function_exists('media_img')) {
+if (! function_exists('media_img')) {
     /**
      * Render a responsive <img> tag for a Spatie media item.
      *
@@ -521,7 +523,7 @@ if (!function_exists('media_img')) {
                 $url = $media->getUrl($name);
                 if (is_string($url) && $url !== $media->getUrl()) {
                     $variants[$name] = [
-                        'url' => $url,
+                        'url'   => $url,
                         'width' => $details['width'] ?? null,
                     ];
                 }
@@ -536,7 +538,7 @@ if (!function_exists('media_img')) {
         $dir = \App\Support\Helpers\SharedHelpers::isRtlLocale() ? 'rtl' : 'ltr';
 
         $srcset = collect($variants)
-            ->filter(fn($variant) => isset($variant['url']))
+            ->filter(fn ($variant) => isset($variant['url']))
             ->map(function (array $variant) {
                 $descriptor = isset($variant['width']) ? $variant['width'] . 'w' : null;
 
@@ -547,12 +549,12 @@ if (!function_exists('media_img')) {
 
         $attributes = array_merge(
             [
-                'src' => $src,
-                'alt' => $alt,
-                'loading' => $loading,
+                'src'      => $src,
+                'alt'      => $alt,
+                'loading'  => $loading,
                 'decoding' => $attributes['decoding'] ?? 'async',
-                'sizes' => $sizes,
-                'dir' => $dir,
+                'sizes'    => $sizes,
+                'dir'      => $dir,
             ],
             Arr::except($attributes, ['alt', 'loading', 'sizes', 'decoding'])
         );
@@ -580,7 +582,7 @@ if (!function_exists('media_img')) {
         return new HtmlString('<img ' . $attrString . ' />');
     }
 }
-if (!function_exists('app_setting_flush_cache')) {
+if (! function_exists('app_setting_flush_cache')) {
     /**
      * Flush the static cache for app_setting function.
      * Useful for testing or when settings are updated during runtime.
@@ -591,7 +593,7 @@ if (!function_exists('app_setting_flush_cache')) {
     }
 }
 
-if (!function_exists('current_currency_flush')) {
+if (! function_exists('current_currency_flush')) {
     /**
      * Flush the static cache for current_currency function.
      */
@@ -601,7 +603,7 @@ if (!function_exists('current_currency_flush')) {
     }
 }
 
-if (!function_exists('validate_currency_code')) {
+if (! function_exists('validate_currency_code')) {
     /**
      * Validate if a currency code is valid according to ISO 4217.
      *
@@ -781,7 +783,7 @@ if (!function_exists('validate_currency_code')) {
     }
 }
 
-if (!function_exists('sanitize_html_content')) {
+if (! function_exists('sanitize_html_content')) {
     /**
      * Sanitize HTML content using the application's HTML sanitizer.
      *
@@ -810,7 +812,7 @@ if (!function_exists('sanitize_html_content')) {
     }
 }
 
-if (!function_exists('get_tenant_setting')) {
+if (! function_exists('get_tenant_setting')) {
     /**
      * Get a tenant-specific setting value.
      * Falls back to global app_setting if tenant setting doesn't exist.

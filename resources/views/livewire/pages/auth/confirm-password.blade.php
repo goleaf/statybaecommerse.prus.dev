@@ -27,6 +27,10 @@ new #[Layout('components.layouts.base')] class extends Component {
             ]);
         }
 
+        session(['),
+            ]);
+        }
+
         session(['auth.password_confirmed_at' => time()]);
 
         $this->redirectIntended(default: route('account.index'), navigate: true);

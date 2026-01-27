@@ -2,7 +2,7 @@
     @if ($showSubtotal)
         <div class="flex items-center justify-between">
             <dt class="{{ $variant === 'mobile' ? 'text-gray-400' : 'text-gray-300' }}">
-                {{ __('Sub total') }}
+                {{ __('messages.subtotal') }}
             </dt>
             <dd>
                 {{ \Illuminate\Support\Number::currency($this->subtotal, current_currency(), app()->getLocale()) }}
@@ -13,7 +13,7 @@
     @if ($showTaxes)
         <div class="flex items-center justify-between">
             <dt class="{{ $variant === 'mobile' ? 'text-gray-400' : 'text-gray-300' }}">
-                {{ __('Taxes') }}
+                {{ __('messages.taxes') }}
             </dt>
             <livewire:components.tax-price />
         </div>

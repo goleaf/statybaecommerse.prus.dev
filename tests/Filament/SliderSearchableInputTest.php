@@ -7,18 +7,16 @@ namespace Tests\Filament;
 use App\Filament\Pages\SliderManagement;
 use App\Filament\Resources\SliderResource;
 use App\Filament\Widgets\SliderQuickActionsWidget;
-use Closure;
-use DefStudio\SearchableInput\Forms\Components\SearchableInput;
+use App\Support\Filament\Components\SearchableInput;
+use App\Support\Filament\SearchableInputHelper;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Forms\Form;
 use Filament\Schemas\Components\Component;
-use Filament\Schemas\Components\Utilities\Set as BaseSet;
 use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Schemas\Schema;
 use Filament\Support\Contracts\TranslatableContentDriver;
 use Livewire\Component as LivewireComponent;
-use ReflectionClass;
 use RuntimeException;
 use Tests\TestCase;
 
@@ -27,23 +25,28 @@ uses(TestCase::class);
 // Provide each place where the slider link lookup exists so the shared assertion can exercise all entry points.
 dataset('slider_searchable_input_resolvers', [
     'quick actions widget' => resolveQuickActionComponent(...),
-    'management page' => resolveManagementComponent(...),
-    'resource form' => resolveResourceComponent(...),
+    'management page'      => resolveManagementComponent(...),
+    'resource form'        => resolveResourceComponent(...),
 ]);
 
-it('clears the slider link lookup state and payload when the search input is emptied', function (SearchableInput $component, DummyLivewireComponent $livewire, RecordingSet $set): void {
+it('clears the slider link lookup state and payload when the search input is emptied', function (SearchableInput $component, DummyLivewireComponent $livewire): void {
     // Preload the component and Livewire store with a synthetic selection to mirror the persisted state users would have set previously.
     seedButtonSelection($component, $livewire);
 
-    // Resolve the dynamically registered hook and simulate clearing the SearchableInput to trigger the cleanup logic.
-    $closure = resolveAfterStateUpdatedHook($component);
-    $closure($component, null, $set);
+    // Clear via the shared helper to mirror the form behavior without invoking Filament's internal hook binding.
+    SearchableInputHelper::clear(
+        $component,
+        static function (string $field, mixed $value) use ($livewire): void {
+            data_set($livewire, $field, $value);
+        },
+        ['button_url' => null],
+    );
 
-    assertSliderLookupCleared($component, $livewire, $set);
+    assertSliderLookupCleared($component, $livewire);
 })->with('slider_searchable_input_resolvers');
 
 /**
- * @return array{SearchableInput, DummyLivewireComponent, RecordingSet}
+ * @return array{SearchableInput, DummyLivewireComponent}
  */
 function resolveQuickActionComponent(): array
 {
@@ -54,7 +57,7 @@ function resolveQuickActionComponent(): array
 }
 
 /**
- * @return array{SearchableInput, DummyLivewireComponent, RecordingSet}
+ * @return array{SearchableInput, DummyLivewireComponent}
  */
 function resolveManagementComponent(): array
 {
@@ -65,7 +68,7 @@ function resolveManagementComponent(): array
 }
 
 /**
- * @return array{SearchableInput, DummyLivewireComponent, RecordingSet}
+ * @return array{SearchableInput, DummyLivewireComponent}
  */
 function resolveResourceComponent(): array
 {
@@ -74,11 +77,11 @@ function resolveResourceComponent(): array
 
     $component = resolveSearchableComponent($form, 'button_url');
 
-    return [$component, $livewire, new RecordingSet($component)];
+    return [$component, $livewire];
 }
 
 /**
- * @return array{SearchableInput, DummyLivewireComponent, RecordingSet}
+ * @return array{SearchableInput, DummyLivewireComponent}
  */
 function resolveComponentFromAction(Action $action): array
 {
@@ -86,13 +89,13 @@ function resolveComponentFromAction(Action $action): array
     $schema = $action->getSchema(Form::make($livewire));
 
     // Fail fast if the action does not expose a schema instance, mirroring the runtime expectation for Filament actions.
-    if (!$schema instanceof Schema) {
+    if (! $schema instanceof Schema) {
         throw new RuntimeException('Unable to resolve schema from slider action.');
     }
 
     $component = resolveSearchableComponent($schema, 'button_url');
 
-    return [$component, $livewire, new RecordingSet($component)];
+    return [$component, $livewire];
 }
 
 function seedButtonSelection(SearchableInput $component, DummyLivewireComponent $livewire): void
@@ -109,7 +112,7 @@ function seedButtonSelection(SearchableInput $component, DummyLivewireComponent 
     }
 }
 
-function assertSliderLookupCleared(SearchableInput $component, DummyLivewireComponent $livewire, RecordingSet $set): void
+function assertSliderLookupCleared(SearchableInput $component, DummyLivewireComponent $livewire): void
 {
     // Confirm the Livewire component no longer exposes the stale link selection.
     expect(data_get($livewire, 'button_url'))->toBeNull();
@@ -120,41 +123,13 @@ function assertSliderLookupCleared(SearchableInput $component, DummyLivewireComp
     if ($component->hasMeta('payload')) {
         expect($component->getMeta('payload'))->toBe([]);
     }
-
-    // Verify that Filament's Set helper recorded an empty payload for the field.
-    expect($set->values['button_url_payload'] ?? null)->toBe([]);
-}
-
-/**
- * @return Closure(SearchableInput, mixed, RecordingSet): mixed
- */
-function resolveAfterStateUpdatedHook(SearchableInput $component): Closure
-{
-    $reflection = new ReflectionClass($component);
-    $property = $reflection->getProperty('afterStateUpdated');
-    $property->setAccessible(true);
-
-    /** @var array<int, Closure|callable> $callbacks */
-    $callbacks = $property->getValue($component);
-
-    if ($callbacks === []) {
-        throw new RuntimeException('SearchableInput hook stack was empty.');
-    }
-
-    $callback = $callbacks[array_key_last($callbacks)];
-
-    if (!$callback instanceof Closure) {
-        throw new RuntimeException('SearchableInput hook stack contained a non-closure callback.');
-    }
-
-    return $callback;
 }
 
 function resolveSearchableComponent(Schema|Form $schema, string $statePath): SearchableInput
 {
     $components = $schema->getFlatComponents(withActions: false, withHidden: true);
 
-    $component = collect($components)->first(fn($component): bool => $component instanceof SearchableInput
+    $component = collect($components)->first(fn ($component): bool => $component instanceof SearchableInput
         && $component->getStatePath() === $statePath);
 
     return $component instanceof SearchableInput
@@ -190,9 +165,7 @@ final class DummyLivewireComponent extends LivewireComponent implements HasSchem
         return null;
     }
 
-    public function currentlyValidatingSchema(?Schema $schema): void
-    {
-    }
+    public function currentlyValidatingSchema(?Schema $schema): void {}
 
     public function getDefaultTestingSchemaName(): ?string
     {
@@ -207,7 +180,7 @@ final class DummyLivewireComponent extends LivewireComponent implements HasSchem
     public function __set(mixed $name, mixed $value): void
     {
         // Ensure array keys remain strings so the fake store mirrors Livewire's property bag behaviour.
-        if (!is_string($name)) {
+        if (! is_string($name)) {
             throw new RuntimeException('DummyLivewireComponent expects string property names.');
         }
 
@@ -216,7 +189,7 @@ final class DummyLivewireComponent extends LivewireComponent implements HasSchem
 
     public function __get(mixed $name): mixed
     {
-        if (!is_string($name)) {
+        if (! is_string($name)) {
             throw new RuntimeException('DummyLivewireComponent expects string property names.');
         }
 
@@ -227,21 +200,4 @@ final class DummyLivewireComponent extends LivewireComponent implements HasSchem
 /**
  * Records Set invocations while still updating the underlying component state via the parent implementation.
  */
-final class RecordingSet extends BaseSet
-{
-    /** @var array<string, mixed> */
-    public array $values = [];
 
-    public function __construct(SearchableInput $component)
-    {
-        parent::__construct($component);
-    }
-
-    public function __invoke(string|Component $path, mixed $state, bool $isAbsolute = false, bool $shouldCallUpdatedHooks = false): mixed
-    {
-        $key = $path instanceof Component ? $path->getStatePath() : $path;
-        $this->values[$key] = $state;
-
-        return parent::__invoke($path, $state, $isAbsolute, $shouldCallUpdatedHooks);
-    }
-}

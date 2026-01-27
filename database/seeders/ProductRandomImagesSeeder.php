@@ -64,7 +64,7 @@ final class ProductRandomImagesSeeder extends Seeder
                         'image_number' => $i + 1,
                         'alt_text'     => __('translations.product_image_alt', ['name' => $product->name, 'number' => $i + 1]),
                     ])
-                    ->usingName($product->name . ' - ' . __('messages.translations) . ' ' . ($i + 1))
+                    ->usingName($product->name . ' - ' . __('messages.translations') . ' ' . ($i + 1))
                     ->usingFileName('product_' . $product->id . '_image_' . ($i + 1) . '.webp')
                     ->toMediaCollection('images');
 

@@ -58,7 +58,7 @@
                                         <div class="text-sm text-gray-500">{{ $product->sku }}</div>
                                     </div>
                                     <div class="text-right">
-                                        <div class="font-semibold">{{ $product->order_items_count }} {{ __('messages.admin) }}</div>
+                                        <div class="font-semibold">{{ $product->order_items_count }} {{ __('messages.admin') }}</div>
                                         <div class="text-sm text-gray-500">{{ \Illuminate\Support\Number::currency($product->order_items_sum_total, current_currency(), app()->getLocale()) }}</div>
                                     </div>
                                 </div>
@@ -107,7 +107,7 @@
                                         <div class="text-sm text-gray-500">{{ $customer->email }}</div>
                                     </div>
                                     <div class="text-right">
-                                        <div class="font-semibold">{{ $customer->orders_count }} {{ __('messages.admin) }}</div>
+                                        <div class="font-semibold">{{ $customer->orders_count }} {{ __('messages.admin') }}</div>
                                         <div class="text-sm text-gray-500">{{ \Illuminate\Support\Number::currency($customer->orders_sum_total, current_currency(), app()->getLocale()) }}</div>
                                     </div>
                                 </div>

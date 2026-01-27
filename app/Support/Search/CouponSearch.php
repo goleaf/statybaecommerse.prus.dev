@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Support\Search;
 
 use App\Models\Coupon;
-use DefStudio\SearchableInput\DTO\SearchResult;
+use App\Support\Search\SearchResult;
 use Illuminate\Database\Eloquent\Builder;
 
 final class CouponSearch

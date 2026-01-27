@@ -55,7 +55,6 @@ final class ReferralCode extends Model
         return ['is_active' => 'boolean', 'expires_at' => 'datetime', 'metadata' => 'array', 'meta' => 'array', 'usage_limit' => 'integer', 'usage_count' => 'integer', 'reward_amount' => 'decimal:2', 'conditions' => 'array', 'tags' => 'array'];
     }
 
-
     /**
      * Handle user functionality with proper error handling.
      */

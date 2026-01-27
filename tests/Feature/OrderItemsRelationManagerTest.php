@@ -10,7 +10,7 @@ use App\Models\OrderItem;
 use App\Models\ProductVariant;
 use App\Models\User;
 use App\Support\Filament\ProductVariantFieldHelper;
-use DefStudio\SearchableInput\Forms\Components\SearchableInput;
+use App\Support\Filament\Components\SearchableInput;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use PHPUnit\Framework\Attributes\Test;
@@ -367,3 +367,6 @@ final class OrderItemsRelationManagerTest extends TestCase
         $this->assertSame(0.0, $fields['total']);
     }
 }
+
+
+

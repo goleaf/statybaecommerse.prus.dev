@@ -223,12 +223,12 @@
             <div class="fixed top-0 right-0 h-full w-full max-w-[350px] bg-sage transform transition-transform duration-300" x-show="open">
                 {{-- Header --}}
                 <div class="flex justify-between items-center py-3 px-4 bg-dark text-sage">
-                    <h3 class="font-bold font-montserrat">{{ __('messages.frontend_header) }}</h3>
+                    <h3 class="font-bold font-montserrat">{{ __('messages.frontend_header') }}</h3>
                     <button type="button" 
                             class="size-8 inline-flex justify-center items-center gap-x-2 rounded-full border border-sage text-sage bg-transparent hover:bg-sage hover:text-dark transition-colors" 
                             wire:click="toggleMobileMenu"
-                            aria-label="{{ __('messages.shared) }}">
-                        <span class="sr-only">{{ __('messages.shared) }}</span>
+                            aria-label="{{ __('messages.shared') }}">
+                        <span class="sr-only">{{ __('messages.shared') }}</span>
                         <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M18 6 6 18" />
                             <path d="m6 6 12 12" />

@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Filament\Widgets;
 
 use App\Models\Slider;
+use App\Support\Filament\Components\SearchableInput;
 use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\ContentLinkSearch;
-use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Exception;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
@@ -32,24 +32,24 @@ final class SliderQuickActionsWidget extends Widget implements HasActions, HasFo
     public function createSliderAction(): Action
     {
         return Action::make('createSlider')
-            ->label(__('messages.translations))
+            ->label(__('translations.create_slider'))
             ->icon('heroicon-m-plus')
             ->color('primary')
             ->form([
                 TextInput::make('title')
-                    ->label(__('messages.translations))
+                    ->label(__('translations.title'))
                     ->required()
                     ->maxLength(255),
                 Textarea::make('description')
-                    ->label(__('messages.translations))
+                    ->label(__('translations.description'))
                     ->maxLength(1000)
                     ->columnSpanFull(),
                 TextInput::make('button_text')
-                    ->label(__('messages.translations))
+                    ->label(__('translations.button_text'))
                     ->maxLength(255),
                 SearchableInput::make('button_url')
-                    ->label(__('messages.translations))
-                    ->placeholder(__('messages.translations))
+                    ->label(__('translations.button_url'))
+                    ->placeholder(__('translations.slider_link_placeholder'))
                     ->maxLength(255)
                     ->searchUsing(fn (string $value): array => ContentLinkSearch::results($value))
                     ->dehydrateStateUsing(fn (?string $state): ?string => $state !== null && $state !== '' ? $state : null)
@@ -70,24 +70,24 @@ final class SliderQuickActionsWidget extends Widget implements HasActions, HasFo
                         SearchableInputHelper::clear($component, $set, ['button_url' => null]);
                     }),
                 ColorPicker::make('background_color')
-                    ->label(__('messages.translations))
+                    ->label(__('translations.background_color'))
                     ->default('#ffffff'),
                 ColorPicker::make('text_color')
-                    ->label(__('messages.translations))
+                    ->label(__('translations.text_color'))
                     ->default('#000000'),
                 TextInput::make('sort_order')
-                    ->label(__('messages.translations))
+                    ->label(__('translations.sort_order'))
                     ->numeric()
                     ->default(0),
                 Toggle::make('is_active')
-                    ->label(__('messages.translations))
+                    ->label(__('translations.is_active'))
                     ->default(true),
             ])
             ->action(function (array $data): void {
                 $slider = Slider::create($data);
 
                 Notification::make()
-                    ->title(__('messages.translations))
+                    ->title(__('translations.slider_created'))
                     ->success()
                     ->send();
             });
@@ -96,7 +96,7 @@ final class SliderQuickActionsWidget extends Widget implements HasActions, HasFo
     public function toggleAllSlidersAction(): Action
     {
         return Action::make('toggleAllSliders')
-            ->label(__('messages.translations))
+            ->label(__('translations.toggle_all_sliders'))
             ->icon('heroicon-m-power')
             ->color('warning')
             ->requiresConfirmation()
@@ -107,11 +107,11 @@ final class SliderQuickActionsWidget extends Widget implements HasActions, HasFo
                 if ($activeCount > $inactiveCount) {
                     // Deactivate all
                     Slider::query()->update(['is_active' => false]);
-                    $message = __('messages.translations);
+                    $message = __('translations.all_sliders_deactivated');
                 } else {
                     // Activate all
                     Slider::query()->update(['is_active' => true]);
-                    $message = __('messages.translations);
+                    $message = __('translations.all_sliders_activated');
                 }
 
                 Notification::make()
@@ -124,7 +124,7 @@ final class SliderQuickActionsWidget extends Widget implements HasActions, HasFo
     public function reorderSlidersAction(): Action
     {
         return Action::make('reorderSliders')
-            ->label(__('messages.translations))
+            ->label(__('translations.reorder_sliders'))
             ->icon('heroicon-m-arrows-up-down')
             ->color('info')
             ->url(function () {

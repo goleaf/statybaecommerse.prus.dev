@@ -7,7 +7,7 @@
             wire:click="$dispatch('openModal', { component: 'modals.account.address-form' })"
             class="w-full px-8 py-2 text-sm sm:w-auto"
         >
-            {{ __('Add an address') }}
+            {{ __('translations.add_an_address') }}
         </x-buttons.default>
     </div>
 
@@ -19,15 +19,15 @@
                     <div>
                         <div>
                             <h4 class="font-medium leading-6 text-gray-900 font-heading">
-                                {{ __('Delivery addresses') }}
+                                {{ __('translations.delivery_addresses') }}
                             </h4>
                             <p class="mt-1 text-sm leading-5 text-gray-500">
-                                {{ __('Select a delivery address.') }}
+                                {{ __('translations.select_delivery_address') }}
                             </p>
                         </div>
 
                         @if($addresses->has('shipping') && $addresses->get('shipping')->isNotEmpty())
-                            <fieldset aria-label="{{ __('Delivery addresses') }}" class="mt-3 divide-y divide-gray-200">
+                            <fieldset aria-label="{{ __('translations.delivery_addresses') }}" class="mt-3 divide-y divide-gray-200">
                                 {{-- Assign a stable key for each delivery address row --}}
                                 @foreach($addresses->get('shipping') as $shippingAddress)
                                     <label
@@ -50,7 +50,7 @@
                                                 {{ $shippingAddress->street_address }}, {{ $shippingAddress->city }} {{ $shippingAddress->postal_code }}, {{ $shippingAddress->country->name }}
                                             </span>
                                             <span>
-                                                {{ __('Phone number') }} : {{ $shippingAddress->phone_number ?? '' }}
+                                                {{ __('translations.phone_number') }} : {{ $shippingAddress->phone_number ?? '' }}
                                             </span>
                                         </span>
                                     </label>
@@ -66,10 +66,10 @@
                     <div class="space-y-5">
                         <div>
                             <h4 class="font-medium leading-6 text-gray-900 font-heading">
-                                {{ __('Billing address') }}
+                                {{ __('translations.billing_address') }}
                             </h4>
                             <p class="mt-1 text-sm leading-5 text-gray-500">
-                                {{ __('Fill in a billing address.') }}
+                                {{ __('translations.fill_billing_address') }}
                             </p>
                         </div>
 
@@ -87,7 +87,7 @@
 
                         @if(! $sameAsShipping)
                             @if($addresses->has('billing') && $addresses->get('billing')->isNotEmpty())
-                                <fieldset aria-label="{{ __('Billing addresses') }}" class="divide-y divide-gray-200">
+                                <fieldset aria-label="{{ __('translations.billing_addresses') }}" class="divide-y divide-gray-200">
                                     {{-- Mirror the key usage for billing addresses to avoid DOM diff churn --}}
                                     @foreach($addresses->get('billing') as $billingAddress)
                                         <label
@@ -110,7 +110,7 @@
                                                     {{ $billingAddress->street_address }}, {{ $billingAddress->city }} {{ $billingAddress->postal_code }}, {{ $billingAddress->country->name }}
                                                 </span>
                                                 <span>
-                                                    {{ __('Phone number') }} : {{ $billingAddress->phone_number ?? '' }}
+                                                    {{ __('translations.phone_number') }} : {{ $billingAddress->phone_number ?? '' }}
                                                 </span>
                                             </span>
                                         </label>
@@ -123,7 +123,7 @@
 
                 <div class="pt-6 mt-10 border-t border-gray-200 sm:flex sm:items-center sm:justify-end">
                     <x-buttons.submit
-                        :title="__('Continue')"
+                        :title="__('translations.continue')"
                         class="w-full px-8 py-2 text-sm sm:w-auto"
                         {{-- Disable the CTA while address mutations recalculate shipping downstream. --}}
                         wire:loading.attr="disabled"
@@ -135,7 +135,7 @@
         </form>
     @else
         <div class="p-4 text-sm font-medium leading-6 text-gray-700 bg-gray-50">
-            {{ __('You don\'t have a corresponding address.') }}
+            {{ __('translations.no_address_found') }}
         </div>
     @endif
 </div>

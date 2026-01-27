@@ -26,12 +26,12 @@ enum ProductStatus: string implements EnumInterface
     public function label(): string
     {
         return match ($this) {
-            self::DRAFT          => __('messages.translations),
+            self::DRAFT          => __('translations.product_status_draft'),
             self::ACTIVE         => __('translations.product_status_active'),
             self::INACTIVE       => __('translations.product_status_inactive'),
             self::OUT_OF_STOCK   => __('translations.product_status_out_of_stock'),
             self::DISCONTINUED   => __('translations.product_status_discontinued'),
-            self::ARCHIVED       => __('messages.translations),
+            self::ARCHIVED       => __('translations.product_status_archived'),
             self::PENDING_REVIEW => __('translations.product_status_pending_review'),
             self::REJECTED       => __('translations.product_status_rejected'),
         };

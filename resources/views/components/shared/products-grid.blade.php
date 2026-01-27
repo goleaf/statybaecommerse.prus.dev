@@ -22,7 +22,7 @@
     >
         @if($title && $products instanceof \Illuminate\Pagination\LengthAwarePaginator)
             <x-slot name="title">
-                {{ $title }} ({{ $products->total() }} {{ __('messages.shared) }})
+                {{ $title }} ({{ $products->total() }} {{ __('messages.shared') }})
             </x-slot>
         @endif
         
@@ -46,10 +46,10 @@
 @else
     {{-- Empty State --}}
     <x-shared.empty-state 
-        :title="$emptyStateTitle ?? __('messages.shared)"
+        :title="$emptyStateTitle ?? __('messages.shared')"
         :description="$emptyStateDescription ?? __('frontend.products_grid.empty_description')"
         icon="heroicon-o-cube"
-        :actionText="$emptyStateAction ?? __('messages.shared)"
+        :actionText="$emptyStateAction ?? __('messages.shared')"
         :actionUrl="$emptyStateActionUrl ?? route('localized.categories.index', ['locale' => app()->getLocale()])"
     />
 @endif

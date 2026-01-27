@@ -75,11 +75,11 @@ final class VariantStockController extends Controller
         }
         $inventory = $query->first();
         if (! $inventory) {
-            return response()->json(['available' => false, 'message' => __('messages.inventory)]);
+            return response()->json(['available' => false, 'message' => __('messages.inventory')]);
         }
         $available = $inventory->canReserve((int) $validated['quantity']);
 
-        return response()->json(['available' => $available, 'available_stock' => $inventory->available_stock, 'message' => $available ? __('messages.inventory) : __('messages.inventory)]);
+        return response()->json(['available' => $available, 'available_stock' => $inventory->available_stock, 'message' => $available ? __('messages.inventory') : __('messages.inventory')]);
     }
 
     /**

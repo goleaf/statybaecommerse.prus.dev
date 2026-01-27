@@ -55,11 +55,11 @@ final class AttributeController extends Controller
     public function show(Attribute $attribute): View
     {
         // Optimize relationship loading using Laravel 12.10 relationLoaded dot notation
-        if (! $attribute->relationLoaded('values') || ! $attribute->relationLoaded('products.media') || ! $attribute->relationLoaded('products.brand') || ! $attribute->relationLoaded('products.category')) {
+        if (! $attribute->relationLoaded('values') || ! $attribute->relationLoaded('products.media') || ! $attribute->relationLoaded('products.brand') || ! $attribute->relationLoaded('products.mainCategory')) {
             $attribute->load(['values' => function ($query) {
                 $query->where('is_enabled', true)->orderBy('sort_order');
             }, 'products' => function ($query) {
-                $query->where('is_visible', true)->whereNotNull('published_at')->with(['media', 'brand', 'category'])->orderBy('name');
+                $query->where('is_visible', true)->whereNotNull('published_at')->with(['media', 'brand', 'mainCategory'])->orderBy('name');
             }]);
         }
         // Get related attributes from the same group
@@ -78,7 +78,7 @@ final class AttributeController extends Controller
      */
     public function filter(Request $request)
     {
-        $query = Product::visible()->published()->with(['media', 'brand', 'category', 'attributes']);
+        $query = Product::visible()->published()->with(['media', 'brand', 'mainCategory', 'attributes']);
         // Apply attribute filters
         if ($request->has('attributes') && is_array($request->attributes)) {
             foreach ($request->attributes as $attributeId => $values) {

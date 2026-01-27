@@ -34,6 +34,8 @@ final class RecentOrdersWidget extends BaseWidget
                     ->label(__('orders.customer'))
                     ->default(fn (?Order $record): string => $record?->user?->name ?? __('messages.orders))
                     ->sortable(),
+                Tables\Columns\TextColumn::make('))
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('status')
                     ->label(__('orders.status'))
                     ->badge()

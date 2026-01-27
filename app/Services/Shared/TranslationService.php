@@ -54,17 +54,11 @@ final class TranslationService
 
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($locale) {
             $translations = [];
-            // Load from JSON files
-            $jsonFile = lang_path("{$locale}.json");
-            if (File::exists($jsonFile)) {
-                $jsonTranslations = safe_json_decode_array(File::get($jsonFile));
-                $translations = array_merge($translations, $jsonTranslations);
-            }
             // Load from PHP files
             $phpFiles = File::glob(lang_path("{$locale}/*.php"));
             foreach ($phpFiles as $file) {
                 $group = pathinfo($file, PATHINFO_FILENAME);
-                $groupTranslations = include $file;
+                $groupTranslations = (static function($f) { return include $f; })($file);
                 if (is_array($groupTranslations)) {
                     foreach ($groupTranslations as $key => $value) {
                         $translations["{$group}.{$key}"] = $value;
@@ -139,20 +133,12 @@ final class TranslationService
      */
     private function loadTranslationFromFiles(string $key, string $locale): string|array|null
     {
-        // Try JSON file first
-        $jsonFile = lang_path("{$locale}.json");
-        if (File::exists($jsonFile)) {
-            $translations = safe_json_decode_array(File::get($jsonFile));
-            if (isset($translations[$key])) {
-                return $translations[$key];
-            }
-        }
         // Try PHP files with dot notation
         if (str_contains($key, '.')) {
             [$group, $item] = explode('.', $key, 2);
             $phpFile = lang_path("{$locale}/{$group}.php");
             if (File::exists($phpFile)) {
-                $translations = include $phpFile;
+                $translations = (static function($f) { return include $f; })($phpFile);
 
                 return data_get($translations, $item);
             }

@@ -54,7 +54,7 @@ final class ProductComparison extends Component
         }
         $this->compareProducts[] = $productId;
         session(['compare_products' => $this->compareProducts]);
-        $this->dispatch('notify', ['type' => 'success', 'message' => __('messages.translations)]);
+        $this->dispatch('notify', ['type' => 'success', 'message' => __('translations.product_added_to_comparison')]);
         $this->dispatch('compare-updated');
     }
 
@@ -65,7 +65,7 @@ final class ProductComparison extends Component
     {
         $this->compareProducts = array_values(array_filter($this->compareProducts, fn ($id) => $id !== $productId));
         session(['compare_products' => $this->compareProducts]);
-        $this->dispatch('notify', ['type' => 'success', 'message' => __('messages.translations)]);
+        $this->dispatch('notify', ['type' => 'success', 'message' => __('translations.product_removed_from_comparison')]);
         $this->dispatch('compare-updated');
     }
 

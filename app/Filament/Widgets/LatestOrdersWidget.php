@@ -38,6 +38,8 @@ final class LatestOrdersWidget extends BaseWidget
                 Tables\Columns\TextColumn::make('user.email')
                     ->label(__('messages.admin))
                     ->searchable(),
+                Tables\Columns\TextColumn::make('))
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {

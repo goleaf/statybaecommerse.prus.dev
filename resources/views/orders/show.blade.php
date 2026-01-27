@@ -92,7 +92,7 @@
                     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
                         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                             <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-                                {{ __('messages.orders) }}
+                                {{ __('messages.orders') }}
                             </h2>
                         </div>
                         <div class="p-6">
@@ -136,7 +136,7 @@
                                         <a href="{{ $order->shipping->tracking_url }}" 
                                            target="_blank"
                                            class="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
-                                            {{ __('messages.orders) }}
+                                            {{ __('messages.orders') }}
                                         </a>
                                     </div>
                                 @endif
@@ -183,7 +183,7 @@
                     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
                         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                             <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-                                {{ __('messages.orders) }}
+                                {{ __('messages.orders') }}
                             </h2>
                         </div>
                         <div class="p-6">
@@ -314,7 +314,7 @@
                                 <button type="submit" 
                                         onclick="return confirm('{{ __('orders.confirm_cancel') }}')"
                                         class="w-full inline-flex justify-center items-center px-4 py-2 border border-red-300 dark:border-red-600 shadow-sm text-sm font-medium rounded-md text-red-700 dark:text-red-300 bg-white dark:bg-gray-700 hover:bg-red-50 dark:hover:bg-red-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
-                                    {{ __('messages.orders) }}
+                                    {{ __('messages.orders') }}
                                 </button>
                             </form>
                         @endif

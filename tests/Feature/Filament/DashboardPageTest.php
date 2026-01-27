@@ -112,12 +112,12 @@ final class DashboardPageTest extends TestCase
     {
         $page = app(Dashboard::class);
 
-        $this->assertSame(trans('messages.admin), $page->getTitle());
+        $this->assertSame(trans('messages.admin'), $page->getTitle());
         $this->assertSame('Dashboard', $page->getHeading());
     }
 
     public function test_dashboard_navigation_label(): void
     {
-        $this->assertSame(trans('messages.admin), Dashboard::getNavigationLabel());
+        $this->assertSame(trans('messages.admin'), Dashboard::getNavigationLabel());
     }
 }

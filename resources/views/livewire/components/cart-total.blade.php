@@ -20,7 +20,7 @@
     <!-- Coupon Code Display -->
 		@if(session()->has('checkout.coupon.code'))
         <div class="flex items-center justify-between py-2 text-sm">
-            <span class="text-gray-500">{{ __('Coupon Applied') }}</span>
+            <span class="text-gray-500">{{ __('translations.coupon_applied') }}</span>
             <span class="text-brand-primary font-medium">{{ session('checkout.coupon.code') }}</span>
 			</div>
 		@endif
@@ -35,7 +35,7 @@
 
     <!-- Additional Info -->
     <div class="text-center text-sm text-gray-500">
-        <p>{{ __('Prices include VAT') }}</p>
-        <p>{{ __('Free shipping on orders over') }} {{ \Illuminate\Support\Number::currency(100, current_currency(), app()->getLocale()) }}</p>
+        <p>{{ __('translations.prices_include_vat') }}</p>
+        <p>{{ __('translations.free_shipping_on_orders_over') }} {{ \Illuminate\Support\Number::currency(100, current_currency(), app()->getLocale()) }}</p>
 	</div>
 </div>

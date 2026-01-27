@@ -117,6 +117,7 @@
 
         <div class="px-4 pb-36 pt-16 sm:px-6 lg:col-start-1 lg:row-start-1 lg:px-0 lg:pb-16">
             <livewire:components.checkout-wizard />
+            <p class="text-center text-xs text-gray-600 mt-8">{{ __('translations.secure_checkout_encrypted_payments') }}</p>
         </div>
     </x-container>
 </div>

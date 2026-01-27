@@ -40,34 +40,34 @@
             <div>
                 <h2 class="text-2xl font-bold text-gray-900 flex items-center gap-3">
                     <div class="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
-                    {{ __('messages.translations) }}
+                    {{ __('translations.live_inventory_tracker') }}
                 </h2>
                 <p class="text-gray-600 mt-1">
-                    {{ __('messages.translations) }}
+                    {{ __('translations.real_time_stock_monitoring') }}
                 </p>
             </div>
             
             <div class="flex items-center gap-4">
                 <!-- Stock Filter -->
                 <div class="flex items-center gap-2">
-                    <label class="text-sm font-medium text-gray-700">{{ __('messages.translations) }}:</label>
+                    <label class="text-sm font-medium text-gray-700">{{ __('translations.filter') }}:</label>
                     <select wire:model.live="stockFilter" 
                             class="text-sm border border-gray-300 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        <option value="all">{{ __('messages.translations) }}</option>
-                        <option value="in_stock">{{ __('messages.translations) }}</option>
-                        <option value="low">{{ __('messages.translations) }}</option>
-                        <option value="out">{{ __('messages.translations) }}</option>
+                        <option value="all">{{ __('translations.all_products') }}</option>
+                        <option value="in_stock">{{ __('translations.in_stock') }}</option>
+                        <option value="low">{{ __('translations.low_stock') }}</option>
+                        <option value="out">{{ __('translations.out_of_stock') }}</option>
                     </select>
                 </div>
                 
                 <!-- Sort By -->
                 <div class="flex items-center gap-2">
-                    <label class="text-sm font-medium text-gray-700">{{ __('messages.translations) }}:</label>
+                    <label class="text-sm font-medium text-gray-700">{{ __('translations.sort_by') }}:</label>
                     <select wire:model.live="sortBy" 
                             class="text-sm border border-gray-300 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        <option value="stock_quantity">{{ __('messages.translations) }}</option>
-                        <option value="name">{{ __('messages.translations) }}</option>
-                        <option value="last_updated">{{ __('messages.translations) }}</option>
+                        <option value="stock_quantity">{{ __('translations.stock_quantity') }}</option>
+                        <option value="name">{{ __('translations.name') }}</option>
+                        <option value="last_updated">{{ __('translations.last_updated') }}</option>
                     </select>
                 </div>
                 
@@ -79,7 +79,7 @@
                     <svg class="w-4 h-4" :class="autoRefresh ? 'animate-spin' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                     </svg>
-                    {{ __('messages.translations) }}
+                    {{ __('translations.auto_refresh') }}
                 </button>
                 
                 <!-- Manual Refresh -->
@@ -89,7 +89,7 @@
                     <svg class="w-4 h-4" :class="isRefreshing ? 'animate-spin' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                     </svg>
-                    {{ __('messages.translations) }}
+                    {{ __('translations.refresh') }}
                 </button>
             </div>
         </div>
@@ -99,7 +99,7 @@
             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <span x-text="'{{ __('messages.translations) }}: ' + lastUpdated.toLocaleTimeString()"></span>
+            <span x-text="'{{ __('translations.last_updated') }}: ' + lastUpdated.toLocaleTimeString()"></span>
         </div>
     </div>
 
@@ -108,13 +108,13 @@
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm font-medium text-gray-600">{{ __('messages.translations) }}</p>
+                    <p class="text-sm font-medium text-gray-600">{{ __('translations.total_products') }}</p>
                     <p class="text-3xl font-bold text-gray-900">{{ number_format($this->inventoryStats['total_products']) }}</p>
                     <p class="text-sm text-blue-600 flex items-center gap-1 mt-1">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                         </svg>
-                        {{ $this->inventoryStats['stock_health_percentage'] }}% {{ __('messages.translations) }}
+                        {{ $this->inventoryStats['stock_health_percentage'] }}% {{ __('translations.in_stock') }}
                     </p>
                 </div>
                 <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
@@ -128,13 +128,13 @@
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm font-medium text-gray-600">{{ __('messages.translations) }}</p>
+                    <p class="text-sm font-medium text-gray-600">{{ __('translations.in_stock') }}</p>
                     <p class="text-3xl font-bold text-green-600">{{ number_format($this->inventoryStats['in_stock']) }}</p>
                     <p class="text-sm text-green-600 flex items-center gap-1 mt-1">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                         </svg>
-                        {{ __('messages.translations) }}
+                        {{ __('translations.available') }}
                     </p>
                 </div>
                 <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
@@ -148,13 +148,13 @@
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm font-medium text-gray-600">{{ __('messages.translations) }}</p>
+                    <p class="text-sm font-medium text-gray-600">{{ __('translations.low_stock') }}</p>
                     <p class="text-3xl font-bold text-orange-600">{{ number_format($this->inventoryStats['low_stock']) }}</p>
                     <p class="text-sm text-orange-600 flex items-center gap-1 mt-1">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
                         </svg>
-                        {{ __('messages.translations) }}
+                        {{ __('translations.needs_attention') }}
                     </p>
                 </div>
                 <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
@@ -168,13 +168,13 @@
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm font-medium text-gray-600">{{ __('messages.translations) }}</p>
+                    <p class="text-sm font-medium text-gray-600">{{ __('translations.out_of_stock') }}</p>
                     <p class="text-3xl font-bold text-red-600">{{ number_format($this->inventoryStats['out_of_stock']) }}</p>
                     <p class="text-sm text-red-600 flex items-center gap-1 mt-1">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                         </svg>
-                        {{ __('messages.translations) }}
+                        {{ __('translations.unavailable') }}
                     </p>
                 </div>
                 <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
@@ -192,10 +192,10 @@
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
                     <div class="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
-                    {{ __('messages.translations) }}
+                    {{ __('translations.low_stock_alerts') }}
                 </h3>
                 <div class="flex items-center gap-2">
-                    <label class="text-sm text-gray-600">{{ __('messages.translations) }}:</label>
+                    <label class="text-sm text-gray-600">{{ __('translations.threshold') }}:</label>
                     <input wire:model.live="lowStockThreshold" 
                            type="number" 
                            min="1" 
@@ -238,7 +238,7 @@
         <div class="px-6 py-4 border-b border-gray-200">
             <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
                 <div class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-                {{ __('messages.translations) }}
+                {{ __('translations.inventory_items') }}
             </h3>
         </div>
         
@@ -247,25 +247,25 @@
                 <thead class="bg-gray-50">
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            {{ __('messages.translations) }}
+                            {{ __('translations.product') }}
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            {{ __('messages.translations) }}
+                            {{ __('translations.sku') }}
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            {{ __('messages.translations) }}
+                            {{ __('translations.brand') }}
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            {{ __('messages.translations) }}
+                            {{ __('translations.stock') }}
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            {{ __('messages.translations) }}
+                            {{ __('translations.price') }}
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            {{ __('messages.translations) }}
+                            {{ __('translations.total_value') }}
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            {{ __('messages.translations) }}
+                            {{ __('translations.status') }}
                         </th>
                     </tr>
                 </thead>
@@ -318,11 +318,11 @@
                                     @else bg-green-100 text-green-800
                                     @endif">
                                     @if($item['stock_status'] === 'out_of_stock')
-                                        {{ __('messages.translations) }}
+                                        {{ __('translations.out_of_stock') }}
                                     @elseif($item['stock_status'] === 'low_stock')
-                                        {{ __('messages.translations) }}
+                                        {{ __('translations.low_stock') }}
                                     @else
-                                        {{ __('messages.translations) }}
+                                        {{ __('translations.in_stock') }}
                                     @endif
                                 </span>
                             </td>
@@ -333,7 +333,7 @@
                                 <svg class="mx-auto h-12 w-12 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                                 </svg>
-                                <p>{{ __('messages.translations) }}</p>
+                                <p>{{ __('translations.no_inventory_items_found') }}</p>
                             </td>
                         </tr>
                     @endforelse

@@ -38,23 +38,23 @@
             <div>
                 <h2 class="text-2xl font-bold text-gray-900 flex items-center gap-3">
                     <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                    {{ __('messages.translations) }}
+                    {{ __('translations.live_dashboard') }}
                 </h2>
                 <p class="text-gray-600 mt-1">
-                    {{ __('messages.translations) }}
+                    {{ __('translations.real_time_analytics') }}
                 </p>
             </div>
             
             <div class="flex items-center gap-4">
                 <!-- Time Range Selector -->
                 <div class="flex items-center gap-2">
-                    <label class="text-sm font-medium text-gray-700">{{ __('messages.translations) }}:</label>
+                    <label class="text-sm font-medium text-gray-700">{{ __('translations.time_range') }}:</label>
                     <select wire:model.live="timeRange" 
                             class="text-sm border border-gray-300 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        <option value="1h">{{ __('messages.translations) }}</option>
-                        <option value="24h">{{ __('messages.translations) }}</option>
-                        <option value="7d">{{ __('messages.translations) }}</option>
-                        <option value="30d">{{ __('messages.translations) }}</option>
+                        <option value="1h">{{ __('translations.last_hour') }}</option>
+                        <option value="24h">{{ __('translations.last_24_hours') }}</option>
+                        <option value="7d">{{ __('translations.last_7_days') }}</option>
+                        <option value="30d">{{ __('translations.last_30_days') }}</option>
                     </select>
                 </div>
                 
@@ -66,7 +66,7 @@
                     <svg class="w-4 h-4" :class="autoRefresh ? 'animate-spin' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                     </svg>
-                    {{ __('messages.translations) }}
+                    {{ __('translations.auto_refresh') }}
                 </button>
                 
                 <!-- Manual Refresh -->
@@ -76,7 +76,7 @@
                     <svg class="w-4 h-4" :class="isRefreshing ? 'animate-spin' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                     </svg>
-                    {{ __('messages.translations) }}
+                    {{ __('translations.refresh') }}
                 </button>
             </div>
         </div>
@@ -86,7 +86,7 @@
             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <span x-text="'{{ __('messages.translations) }}: ' + lastUpdated.toLocaleTimeString()"></span>
+            <span x-text="'{{ __('translations.last_updated') }}: ' + lastUpdated.toLocaleTimeString()"></span>
         </div>
     </div>
 
@@ -97,7 +97,7 @@
     >
         {{-- Communicate that analytics widgets are refreshing --}}
         <x-loading-dots class="text-primary-600" aria-hidden="true" />
-        <span>{{ __('messages.translations) }}</span>
+        <span>{{ __('translations.products') }}</span>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8" wire:loading.remove>
@@ -108,13 +108,13 @@
             >
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm font-medium text-gray-600">{{ __('messages.translations) }}</p>
+                        <p class="text-sm font-medium text-gray-600">{{ __('translations.today') }}</p>
                         <p class="text-3xl font-bold text-gray-900">{{ number_format($this->realTimeStats['products']['total']) }}</p>
                         <p class="text-sm text-green-600 flex items-center gap-1 mt-1">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                             </svg>
-                            +{{ $this->realTimeStats['products']['new_today'] }} {{ __('messages.translations) }}
+                            +{{ $this->realTimeStats['products']['new_today'] }} {{ __('translations.featured') }}
                         </p>
                     </div>
                     <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
@@ -125,11 +125,11 @@
                 </div>
                 <div class="mt-4 grid grid-cols-2 gap-4 text-sm">
                     <div>
-                        <span class="text-gray-500">{{ __('messages.translations) }}:</span>
+                        <span class="text-gray-500">{{ __('translations.low_stock') }}:</span>
                         <span class="font-semibold">{{ $this->realTimeStats['products']['featured'] }}</span>
                     </div>
                     <div>
-                        <span class="text-gray-500">{{ __('messages.translations) }}:</span>
+                        <span class="text-gray-500">{{ __('translations.orders') }}:</span>
                         <span class="font-semibold text-orange-600">{{ $this->realTimeStats['products']['low_stock'] }}</span>
                     </div>
                 </div>
@@ -143,13 +143,13 @@
             >
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm font-medium text-gray-600">{{ __('messages.translations) }}</p>
+                        <p class="text-sm font-medium text-gray-600">{{ __('translations.today') }}</p>
                         <p class="text-3xl font-bold text-gray-900">{{ number_format($this->realTimeStats['orders']['total']) }}</p>
                         <p class="text-sm text-green-600 flex items-center gap-1 mt-1">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                             </svg>
-                            +{{ $this->realTimeStats['orders']['today'] }} {{ __('messages.translations) }}
+                            +{{ $this->realTimeStats['orders']['today'] }} {{ __('translations.pending') }}
                         </p>
                     </div>
                     <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
@@ -160,11 +160,11 @@
                 </div>
                 <div class="mt-4 grid grid-cols-2 gap-4 text-sm">
                     <div>
-                        <span class="text-gray-500">{{ __('messages.translations) }}:</span>
+                        <span class="text-gray-500">{{ __('translations.revenue') }}:</span>
                         <span class="font-semibold text-yellow-600">{{ $this->realTimeStats['orders']['pending'] }}</span>
                     </div>
                     <div>
-                        <span class="text-gray-500">{{ __('messages.translations) }}:</span>
+                        <span class="text-gray-500">{{ __('translations.users') }}:</span>
                         <span class="font-semibold text-green-600">{{ \Illuminate\Support\Number::currency($this->realTimeStats['orders']['revenue'], 'EUR') }}</span>
                     </div>
                 </div>
@@ -178,13 +178,13 @@
             >
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm font-medium text-gray-600">{{ __('messages.translations) }}</p>
+                        <p class="text-sm font-medium text-gray-600">{{ __('translations.today') }}</p>
                         <p class="text-3xl font-bold text-gray-900">{{ number_format($this->realTimeStats['users']['total']) }}</p>
                         <p class="text-sm text-green-600 flex items-center gap-1 mt-1">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                             </svg>
-                            +{{ $this->realTimeStats['users']['new_today'] }} {{ __('messages.translations) }}
+                            +{{ $this->realTimeStats['users']['new_today'] }} {{ __('translations.active') }}
                         </p>
                     </div>
                     <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
@@ -195,11 +195,11 @@
                 </div>
                 <div class="mt-4 grid grid-cols-2 gap-4 text-sm">
                     <div>
-                        <span class="text-gray-500">{{ __('messages.translations) }}:</span>
+                        <span class="text-gray-500">{{ __('translations.new_today') }}:</span>
                         <span class="font-semibold text-green-600">{{ $this->realTimeStats['users']['active'] }}</span>
                     </div>
                     <div>
-                        <span class="text-gray-500">{{ __('messages.translations) }}:</span>
+                        <span class="text-gray-500">{{ __('translations.reviews') }}:</span>
                         <span class="font-semibold">{{ $this->realTimeStats['users']['new_today'] }}</span>
                     </div>
                 </div>
@@ -213,13 +213,13 @@
             >
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm font-medium text-gray-600">{{ __('messages.translations) }}</p>
+                        <p class="text-sm font-medium text-gray-600">{{ __('translations.today') }}</p>
                         <p class="text-3xl font-bold text-gray-900">{{ number_format($this->realTimeStats['reviews']['total']) }}</p>
                         <p class="text-sm text-green-600 flex items-center gap-1 mt-1">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                             </svg>
-                            +{{ $this->realTimeStats['reviews']['today'] }} {{ __('messages.translations) }}
+                            +{{ $this->realTimeStats['reviews']['today'] }} {{ __('translations.avg_rating') }}
                         </p>
                     </div>
                     <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
@@ -230,11 +230,11 @@
                 </div>
                 <div class="mt-4 grid grid-cols-2 gap-4 text-sm">
                     <div>
-                        <span class="text-gray-500">{{ __('messages.translations) }}:</span>
+                        <span class="text-gray-500">{{ __('translations.pending') }}:</span>
                         <span class="font-semibold text-yellow-600">{{ number_format($this->realTimeStats['reviews']['avg_rating'], 1) }}/5</span>
                     </div>
                     <div>
-                        <span class="text-gray-500">{{ __('messages.translations) }}:</span>
+                        <span class="text-gray-500">{{ __('translations.recent_orders') }}:</span>
                         <span class="font-semibold text-orange-600">{{ $this->realTimeStats['reviews']['pending'] }}</span>
                     </div>
                 </div>
@@ -249,10 +249,10 @@
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
                     <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                    {{ __('messages.translations) }}
+                    {{ __('translations.view_all') }}
                 </h3>
                 <a href="{{ route('orders.index') }}" class="text-sm text-blue-600 hover:text-blue-800 font-medium">
-                    {{ __('messages.translations) }}
+                    {{ __('translations.no_recent_orders') }}
                 </a>
             </div>
             
@@ -286,7 +286,7 @@
                         <svg class="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
-                        <p>{{ __('messages.translations) }}</p>
+                        <p>{{ __('translations.recent_reviews') }}</p>
                     </div>
                 @endforelse
             </div>
@@ -297,10 +297,10 @@
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
                     <div class="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></div>
-                    {{ __('messages.translations) }}
+                    {{ __('translations.view_all') }}
                 </h3>
                 <a href="{{ route('reviews.index') }}" class="text-sm text-blue-600 hover:text-blue-800 font-medium">
-                    {{ __('messages.translations) }}
+                    {{ __('translations.no_recent_reviews') }}
                 </a>
             </div>
             
@@ -331,7 +331,7 @@
                         <svg class="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
                         </svg>
-                        <p>{{ __('messages.translations) }}</p>
+                        <p>{{ __('translations.performance_metrics') }}</p>
                     </div>
                 @endforelse
             </div>

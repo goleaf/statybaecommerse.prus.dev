@@ -91,7 +91,7 @@
                                                                 wire:click="decrementItem({{ (int) $item->id }})" 
                                                                 wire:loading.attr="disabled"
                                                                 class="w-8 h-8 bg-dark/30 hover:bg-dark/40 border border-sage/30 text-sage rounded-lg flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                                                title="{{ __('Decrease quantity') }}">
+                                                                title="{{ __('translations.decrease_quantity') }}">
                                                             <svg class="w-4 h-4 text-sage" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
                                                             </svg>
@@ -108,7 +108,7 @@
                                                                 wire:click="incrementItem({{ (int) $item->id }})" 
                                                                 wire:loading.attr="disabled"
                                                                 class="w-8 h-8 bg-dark/30 hover:bg-dark/40 border border-sage/30 text-sage rounded-lg flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                                                title="{{ __('Increase quantity') }}">
+                                                                title="{{ __('translations.increase_quantity') }}">
                                                             <svg class="w-4 h-4 text-sage" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                                                             </svg>
@@ -126,7 +126,7 @@
                                                 wire:confirm="{{ __('translations.confirm_remove_cart_item') }}"
                                                         wire:loading.attr="disabled"
                                                         class="inline-flex items-center gap-2 text-sm text-red-400 hover:text-red-300 hover:underline transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                                        title="{{ __('Remove item from cart') }}">
+                                                        title="{{ __('translations.remove_item_from_cart') }}">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                                                     {{ __('messages.remove') }}
                                                 </button>
@@ -143,7 +143,7 @@
                         <!-- Coupon Form -->
                         @if ((bool) (config('app-features.features.discount') ?? true))
                             <div class="bg-dark rounded-2xl shadow-soft border border-sage/30 p-6">
-                                <h3 class="text-lg font-semibold text-white mb-4">{{ __('Coupon Code') }}</h3>
+                                <h3 class="text-lg font-semibold text-white mb-4">{{ __('translations.coupon_code') }}</h3>
                                 <div class="coupon-form">
                             <livewire:components.coupon-form />
                                 </div>
@@ -152,7 +152,7 @@
 
                         <!-- Cart Total -->
                         <div class="cart-summary bg-dark rounded-2xl shadow-soft border border-sage/30 p-6">
-                            <h3 class="text-lg font-semibold text-white mb-4">{{ __('Order Summary') }}</h3>
+                            <h3 class="text-lg font-semibold text-white mb-4">{{ __('translations.order_summary') }}</h3>
                             <div class="cart-total">
                             <livewire:components.cart-total />
                         </div>
@@ -167,7 +167,7 @@
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m0 0L17 13m-10 0h10" />
                                 </svg>
-                                {{ __('Proceed to Checkout') }}
+                                {{ __('translations.proceed_to_checkout') }}
                             </a>
                             
                             <a href="{{ route('localized.home', ['locale' => app()->getLocale()]) }}" 
@@ -177,7 +177,7 @@
                                 </svg>
                                 {{ __('messages.continue_shopping') }}
                             </a>
-                            <p class="text-center text-xs text-gray-600">{{ __('Secure checkout • Encrypted payments') }}</p>
+                            <p class="text-center text-xs text-gray-600">{{ __('translations.secure_checkout_encrypted_payments') }}</p>
                         </div>
                     </div>
                 </div>

@@ -11,7 +11,7 @@ use App\Models\ProductVariant;
 use App\Models\User;
 use App\Support\Filament\ProductVariantFieldHelper;
 use App\Support\Nav;
-use DefStudio\SearchableInput\Forms\Components\SearchableInput;
+use App\Support\Filament\Components\SearchableInput;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 
@@ -476,3 +476,6 @@ final class OrderItemResourceTest extends TestCase
         $this->assertEquals('product_name', \App\Filament\Resources\OrderItemResource::getRecordTitleAttribute());
     }
 }
+
+
+

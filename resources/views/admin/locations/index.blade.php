@@ -32,8 +32,8 @@
                         <td>{{ $location->code }}</td>
                         <td>{{ $location->type ?? __('admin.common.not_available') }}</td>
                         <td>{{ optional($location->country)->name ?? $location->country_code ?? __('admin.common.not_available') }}</td>
-                        <td>{{ $location->is_enabled ? __('messages.admin) : __('messages.admin) }}</td>
-                        <td>{{ $location->is_default ? __('messages.admin) : __('messages.admin) }}</td>
+                        <td>{{ $location->is_enabled ? __('messages.admin') : __('messages.admin') }}</td>
+                        <td>{{ $location->is_default ? __('messages.admin') : __('messages.admin') }}</td>
                     </tr>
                 @endforeach
             </tbody>

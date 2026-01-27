@@ -219,16 +219,6 @@ final class News extends Model implements TranslatableRecord
     }
 
     /**
-     * Handle scopeByCategory functionality with proper error handling.
-     */
-    public function scopeByCategory(Builder $query, int $categoryId): Builder
-    {
-        return $query->whereHas('categories', function (Builder $q) use ($categoryId): void {
-            $q->where('news_category_id', $categoryId);
-        });
-    }
-
-    /**
      * Handle scopeSearch functionality with proper error handling.
      */
     public function scopeSearch(Builder $query, string $search): Builder

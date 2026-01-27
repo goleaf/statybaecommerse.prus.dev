@@ -13,7 +13,7 @@
                     <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
                     </svg>
-                    {{ __('messages.reports) }}
+                    {{ __('messages.reports') }}
                 </a>
             </li>
             <li>
@@ -61,17 +61,17 @@
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                     <div class="text-center">
                         <div class="text-2xl font-bold text-gray-900 dark:text-white">{{ $report->view_count }}</div>
-                        <div class="text-sm text-gray-500 dark:text-gray-400">{{ __('messages.reports) }}</div>
+                        <div class="text-sm text-gray-500 dark:text-gray-400">{{ __('messages.reports') }}</div>
                     </div>
                     <div class="text-center">
                         <div class="text-2xl font-bold text-gray-900 dark:text-white">{{ $report->download_count }}</div>
-                        <div class="text-sm text-gray-500 dark:text-gray-400">{{ __('messages.reports) }}</div>
+                        <div class="text-sm text-gray-500 dark:text-gray-400">{{ __('messages.reports') }}</div>
                     </div>
                     <div class="text-center">
                         <div class="text-2xl font-bold text-gray-900 dark:text-white">
                             {{ $report->created_at->format('M d') }}
                         </div>
-                        <div class="text-sm text-gray-500 dark:text-gray-400">{{ __('messages.reports) }}</div>
+                        <div class="text-sm text-gray-500 dark:text-gray-400">{{ __('messages.reports') }}</div>
                     </div>
                     <div class="text-center">
                         <div class="text-2xl font-bold text-gray-900 dark:text-white">
@@ -90,7 +90,7 @@
             @if($report->content)
                 <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
                     <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                        {{ __('messages.reports) }}
+                        {{ __('messages.reports') }}
                     </h2>
                     <div class="prose dark:prose-invert max-w-none">
                         {!! $report->content !!}
@@ -101,7 +101,7 @@
             <!-- Report Actions -->
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
                 <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                    {{ __('messages.reports) }}
+                    {{ __('messages.reports') }}
                 </h2>
                 
                 <div class="flex flex-wrap gap-4">
@@ -111,7 +111,7 @@
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                             </svg>
-                            {{ __('messages.reports) }}
+                            {{ __('messages.reports') }}
                         </a>
                     @endif
 
@@ -123,7 +123,7 @@
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
-                                <span class="generate-button-label">{{ __('messages.reports) }}</span>
+                                <span class="generate-button-label">{{ __('messages.reports') }}</span>
                             </button>
                         </form>
                     @endauth
@@ -133,7 +133,7 @@
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
                         </svg>
-                        {{ __('messages.reports) }}
+                        {{ __('messages.reports') }}
                     </button>
                 </div>
             </div>
@@ -144,13 +144,13 @@
             <!-- Report Info -->
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                    {{ __('messages.reports) }}
+                    {{ __('messages.reports') }}
                 </h3>
                 
                 <dl class="space-y-3">
                     <div>
                         <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
-                            {{ __('messages.reports) }}
+                            {{ __('messages.reports') }}
                         </dt>
                         <dd class="text-sm text-gray-900 dark:text-white">
                             {{ __("admin.reports.types.{$report->type}") }}
@@ -159,7 +159,7 @@
                     
                     <div>
                         <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
-                            {{ __('messages.reports) }}
+                            {{ __('messages.reports') }}
                         </dt>
                         <dd class="text-sm text-gray-900 dark:text-white">
                             {{ __("admin.reports.categories.{$report->category}") }}
@@ -179,7 +179,7 @@
                     
                     <div>
                         <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
-                            {{ __('messages.reports) }}
+                            {{ __('messages.reports') }}
                         </dt>
                         <dd class="text-sm text-gray-900 dark:text-white">
                             {{ $report->created_at->format('F d, Y') }}
@@ -214,7 +214,7 @@
             @if($relatedReports->count() > 0)
                 <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                        {{ __('messages.reports) }}
+                        {{ __('messages.reports') }}
                     </h3>
                     
                     <div class="space-y-4">

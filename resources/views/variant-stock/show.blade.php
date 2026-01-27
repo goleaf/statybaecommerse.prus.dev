@@ -1,7 +1,7 @@
 @extends('components.layouts.base')
 
 @section('title', $variantStock->display_name)
-@section('description', __('messages.inventory))
+@section('description', __('messages.inventory'))
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
@@ -10,7 +10,7 @@
         <ol class="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
             <li>
                 <a href="{{ route('frontend.variant-stock.index') }}" class="hover:text-gray-700 dark:hover:text-gray-300">
-                    {{ __('messages.inventory) }}
+                    {{ __('messages.inventory') }}
                 </a>
             </li>
             <li>
@@ -36,13 +36,13 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                            {{ __('messages.inventory) }}
+                            {{ __('messages.inventory') }}
                         </h3>
                         
                         <dl class="space-y-3">
                             <div class="flex justify-between">
                                 <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                    {{ __('messages.inventory) }}
+                                    {{ __('messages.inventory') }}
                                 </dt>
                                 <dd class="text-sm text-gray-900 dark:text-white font-semibold">
                                     {{ number_format($variantStock->stock) }}
@@ -51,7 +51,7 @@
                             
                             <div class="flex justify-between">
                                 <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                    {{ __('messages.inventory) }}
+                                    {{ __('messages.inventory') }}
                                 </dt>
                                 <dd class="text-sm text-gray-900 dark:text-white">
                                     {{ number_format($variantStock->reserved) }}
@@ -60,7 +60,7 @@
                             
                             <div class="flex justify-between">
                                 <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                    {{ __('messages.inventory) }}
+                                    {{ __('messages.inventory') }}
                                 </dt>
                                 <dd class="text-sm text-gray-900 dark:text-white font-semibold">
                                     {{ number_format($variantStock->available_stock) }}
@@ -69,7 +69,7 @@
                             
                             <div class="flex justify-between">
                                 <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                    {{ __('messages.inventory) }}
+                                    {{ __('messages.inventory') }}
                                 </dt>
                                 <dd class="text-sm text-gray-900 dark:text-white">
                                     {{ number_format($variantStock->threshold) }}
@@ -78,7 +78,7 @@
                             
                             <div class="flex justify-between">
                                 <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                    {{ __('messages.inventory) }}
+                                    {{ __('messages.inventory') }}
                                 </dt>
                                 <dd>
                                     <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full
@@ -96,14 +96,14 @@
 
                     <div>
                         <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                            {{ __('messages.inventory) }}
+                            {{ __('messages.inventory') }}
                         </h3>
                         
                         <dl class="space-y-3">
                             @if($variantStock->cost_per_unit)
                                 <div class="flex justify-between">
                                     <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                        {{ __('messages.inventory) }}
+                                        {{ __('messages.inventory') }}
                                     </dt>
                                     <dd class="text-sm text-gray-900 dark:text-white">
                                         €{{ number_format($variantStock->cost_per_unit, 2) }}
@@ -114,7 +114,7 @@
                             @if($variantStock->stock_value > 0)
                                 <div class="flex justify-between">
                                     <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                        {{ __('messages.inventory) }}
+                                        {{ __('messages.inventory') }}
                                     </dt>
                                     <dd class="text-sm text-gray-900 dark:text-white font-semibold">
                                         €{{ number_format($variantStock->stock_value, 2) }}
@@ -125,7 +125,7 @@
                             @if($variantStock->supplier)
                                 <div class="flex justify-between">
                                     <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                        {{ __('messages.inventory) }}
+                                        {{ __('messages.inventory') }}
                                     </dt>
                                     <dd class="text-sm text-gray-900 dark:text-white">
                                         {{ $variantStock->supplier->name }}
@@ -136,7 +136,7 @@
                             @if($variantStock->batch_number)
                                 <div class="flex justify-between">
                                     <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                        {{ __('messages.inventory) }}
+                                        {{ __('messages.inventory') }}
                                     </dt>
                                     <dd class="text-sm text-gray-900 dark:text-white">
                                         {{ $variantStock->batch_number }}
@@ -147,7 +147,7 @@
                             @if($variantStock->expiry_date)
                                 <div class="flex justify-between">
                                     <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                        {{ __('messages.inventory) }}
+                                        {{ __('messages.inventory') }}
                                     </dt>
                                     <dd class="text-sm text-gray-900 dark:text-white
                                         @if($variantStock->isExpired()) text-red-600 dark:text-red-400
@@ -155,9 +155,9 @@
                                         @endif">
                                         {{ $variantStock->expiry_date->format('Y-m-d') }}
                                         @if($variantStock->isExpired())
-                                            <span class="ml-1 text-xs">({{ __('messages.inventory) }})</span>
+                                            <span class="ml-1 text-xs">({{ __('messages.inventory') }})</span>
                                         @elseif($variantStock->isExpiringSoon())
-                                            <span class="ml-1 text-xs">({{ __('messages.inventory) }})</span>
+                                            <span class="ml-1 text-xs">({{ __('messages.inventory') }})</span>
                                         @endif
                                     </dd>
                                 </div>
@@ -166,7 +166,7 @@
                             @if($variantStock->last_restocked_at)
                                 <div class="flex justify-between">
                                     <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                        {{ __('messages.inventory) }}
+                                        {{ __('messages.inventory') }}
                                     </dt>
                                     <dd class="text-sm text-gray-900 dark:text-white">
                                         {{ $variantStock->last_restocked_at->format('Y-m-d H:i') }}
@@ -180,7 +180,7 @@
                 @if($variantStock->notes)
                     <div class="mt-6">
                         <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                            {{ __('messages.inventory) }}
+                            {{ __('messages.inventory') }}
                         </h3>
                         <p class="text-sm text-gray-600 dark:text-gray-400">
                             {{ $variantStock->notes }}
@@ -193,7 +193,7 @@
             @if($variantStock->stockMovements->count() > 0)
                 <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
                     <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                        {{ __('messages.inventory) }}
+                        {{ __('messages.inventory') }}
                     </h2>
                     
                     <div class="overflow-x-auto">
@@ -201,19 +201,19 @@
                             <thead class="bg-gray-50 dark:bg-gray-700">
                                 <tr>
                                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        {{ __('messages.inventory) }}
+                                        {{ __('messages.inventory') }}
                                     </th>
                                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        {{ __('messages.inventory) }}
+                                        {{ __('messages.inventory') }}
                                     </th>
                                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        {{ __('messages.inventory) }}
+                                        {{ __('messages.inventory') }}
                                     </th>
                                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        {{ __('messages.inventory) }}
+                                        {{ __('messages.inventory') }}
                                     </th>
                                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        {{ __('messages.inventory) }}
+                                        {{ __('messages.inventory') }}
                                     </th>
                                 </tr>
                             </thead>
@@ -243,7 +243,7 @@
                                             {{ $movement->moved_at->format('Y-m-d H:i') }}
                                         </td>
                                         <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                            {{ $movement->user?->name ?? __('messages.inventory) }}
+                                            {{ $movement->user?->name ?? __('messages.inventory') }}
                                         </td>
                                     </tr>
                                 @endforeach
@@ -259,13 +259,13 @@
             <!-- Product Information -->
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                    {{ __('messages.inventory) }}
+                    {{ __('messages.inventory') }}
                 </h3>
                 
                 <dl class="space-y-3">
                     <div>
                         <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
-                            {{ __('messages.inventory) }}
+                            {{ __('messages.inventory') }}
                         </dt>
                         <dd class="text-sm text-gray-900 dark:text-white">
                             {{ $variantStock->product_name }}
@@ -274,7 +274,7 @@
                     
                     <div>
                         <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
-                            {{ __('messages.inventory) }}
+                            {{ __('messages.inventory') }}
                         </dt>
                         <dd class="text-sm text-gray-900 dark:text-white">
                             {{ $variantStock->variant_name }}
@@ -283,7 +283,7 @@
                     
                     <div>
                         <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
-                            {{ __('messages.inventory) }}
+                            {{ __('messages.inventory') }}
                         </dt>
                         <dd class="text-sm text-gray-900 dark:text-white">
                             {{ $variantStock->variant->sku }}
@@ -292,7 +292,7 @@
                     
                     <div>
                         <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
-                            {{ __('messages.inventory) }}
+                            {{ __('messages.inventory') }}
                         </dt>
                         <dd class="text-sm text-gray-900 dark:text-white">
                             {{ $variantStock->location_name }}
@@ -304,18 +304,18 @@
             <!-- Quick Actions -->
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                    {{ __('messages.inventory) }}
+                    {{ __('messages.inventory') }}
                 </h3>
                 
                 <div class="space-y-3">
                     <a href="{{ route('frontend.products.show', $variantStock->variant->product) }}" 
                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition duration-200 text-center block">
-                        {{ __('messages.inventory) }}
+                        {{ __('messages.inventory') }}
                     </a>
                     
                     <a href="{{ route('frontend.variant-stock.index', ['search' => $variantStock->variant->sku]) }}" 
                        class="w-full bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-md transition duration-200 text-center block">
-                        {{ __('messages.inventory) }}
+                        {{ __('messages.inventory') }}
                     </a>
                 </div>
             </div>

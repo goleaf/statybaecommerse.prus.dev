@@ -214,11 +214,11 @@ final class CouponUsage extends Model
         $usedAt = $this->used_at;
 
         if (! $usedAt instanceof CarbonInterface) {
-            return __('messages.admin_coupon_usages);
+            return __('messages.admin_coupon_usages');
         }
 
         if ($usedAt->isToday()) {
-            return __('messages.admin_coupon_usages);
+            return __('messages.admin_coupon_usages');
         }
 
         if ($usedAt->between(now()->startOfWeek(), now()->endOfWeek())) {
@@ -230,6 +230,15 @@ final class CouponUsage extends Model
         }
 
         return __('messages.admin_coupon_usages);
+    }
+
+    /**
+     * @param  Builder<self> $query
+     * @return Builder<self>
+     */
+    public function scopeRecent(Builder $query, int $days = 7): Builder
+    {
+        return $query->where(');
     }
 
     /**

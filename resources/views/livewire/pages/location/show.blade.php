@@ -18,7 +18,7 @@
 
                 <div class="grid gap-8 md:grid-cols-2">
                     <div>
-                        <h2 class="text-xl font-semibold text-gray-900 mb-4">{{ __('messages.translations) }}</h2>
+                        <h2 class="text-xl font-semibold text-gray-900 mb-4">{{ __('translations.address') }}</h2>
                         <div class="space-y-2 text-gray-600">
                             @if($location->address_line_1)
                                 <div>{{ $location->address_line_1 }}</div>
@@ -38,7 +38,7 @@
                     </div>
 
                     <div>
-                        <h2 class="text-xl font-semibold text-gray-900 mb-4">{{ __('messages.translations) }}</h2>
+                        <h2 class="text-xl font-semibold text-gray-900 mb-4">{{ __('translations.contact_information') }}</h2>
                         <div class="space-y-3">
                             @if($location->phone)
                                 <div class="flex items-center">

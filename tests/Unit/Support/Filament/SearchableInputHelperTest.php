@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 use App\Support\Filament\SearchableInputHelper;
-use DefStudio\SearchableInput\DTO\SearchResult;
-use DefStudio\SearchableInput\Forms\Components\SearchableInput;
+use App\Support\Search\SearchResult;
+use App\Support\Filament\Components\SearchableInput;
 use Illuminate\Support\Collection;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery as MockeryFacade;
@@ -29,7 +29,11 @@ test('hydrate helper populates the component state with resolved option data', f
     $component
         ->shouldReceive('payload')
         ->once()
-        ->with(['foo' => 'bar'])
+        ->with([
+            'foo'   => 'bar',
+            'id'    => '5',
+            'label' => 'Resolved label',
+        ])
         ->andReturnSelf();
 
     // The resolver mimics a search payload normaliser resolving the display label.
@@ -166,7 +170,11 @@ test('hydrate helper can flatten arrayable labels and payloads', function (): vo
     $component
         ->shouldReceive('payload')
         ->once()
-        ->with(['foo' => 'bar'])
+        ->with([
+            'foo'   => 'bar',
+            'id'    => '5',
+            'label' => 'Foo Bar',
+        ])
         ->andReturnSelf();
 
     SearchableInputHelper::hydrate(
@@ -179,3 +187,8 @@ test('hydrate helper can flatten arrayable labels and payloads', function (): vo
         ]),
     );
 });
+
+
+
+
+

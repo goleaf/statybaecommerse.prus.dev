@@ -21,14 +21,14 @@
         <form wire:submit.prevent="subscribe" class="space-y-4">
             <div>
                 <label for="email" class="block text-sm font-medium text-ash mb-2">
-                    {{ __('messages.newsletter) }} <span class="text-red-400">*</span>
+                    {{ __('messages.newsletter_email') }} <span class="text-red-400">*</span>
                 </label>
                 <input 
                     type="email" 
                     id="email"
                     wire:model="email"
                     class="w-full px-4 py-3 bg-white/10 border border-ash/30 rounded-lg focus:ring-2 focus:ring-sage focus:border-sage text-sage placeholder:text-ash/50 transition-colors duration-200"
-                    placeholder="{{ __('messages.newsletter) }}"
+                    placeholder="{{ __('messages.newsletter_email') }}"
                     required
                 >
                 @error('email') 
@@ -39,14 +39,14 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label for="first_name" class="block text-sm font-medium text-ash mb-2">
-                        {{ __('messages.newsletter) }}
+                        {{ __('messages.newsletter_first_name') }}
                     </label>
                     <input 
                         type="text" 
                         id="first_name"
                         wire:model="first_name"
                         class="w-full px-4 py-3 bg-white/10 border border-ash/30 rounded-lg focus:ring-2 focus:ring-sage focus:border-sage text-sage placeholder:text-ash/50 transition-colors duration-200"
-                        placeholder="{{ __('messages.newsletter) }}"
+                        placeholder="{{ __('messages.newsletter_first_name') }}"
                     >
                     @error('first_name') 
                         <p class="mt-1 text-sm text-red-300">{{ $message }}</p> 
@@ -55,14 +55,14 @@
 
                 <div>
                     <label for="last_name" class="block text-sm font-medium text-ash mb-2">
-                        {{ __('messages.newsletter) }}
+                        {{ __('messages.newsletter_last_name') }}
                     </label>
                     <input 
                         type="text" 
                         id="last_name"
                         wire:model="last_name"
                         class="w-full px-4 py-3 bg-white/10 border border-ash/30 rounded-lg focus:ring-2 focus:ring-sage focus:border-sage text-sage placeholder:text-ash/50 transition-colors duration-200"
-                        placeholder="{{ __('messages.newsletter) }}"
+                        placeholder="{{ __('messages.newsletter_last_name') }}"
                     >
                     @error('last_name') 
                         <p class="mt-1 text-sm text-red-300">{{ $message }}</p> 
@@ -72,14 +72,14 @@
 
             <div>
                 <label for="company" class="block text-sm font-medium text-ash mb-2">
-                    {{ __('messages.newsletter) }}
+                    {{ __('messages.newsletter_company') }}
                 </label>
                 <input 
                     type="text" 
                     id="company"
                     wire:model="company"
                     class="w-full px-4 py-3 bg-white/10 border border-ash/30 rounded-lg focus:ring-2 focus:ring-sage focus:border-sage text-sage placeholder:text-ash/50 transition-colors duration-200"
-                    placeholder="{{ __('messages.newsletter) }}"
+                    placeholder="{{ __('messages.newsletter_company') }}"
                 >
                 @error('company') 
                     <p class="mt-1 text-sm text-red-300">{{ $message }}</p> 
@@ -88,16 +88,16 @@
 
             <div>
                 <label class="block text-sm font-medium text-ash mb-2">
-                    {{ __('messages.newsletter) }}
+                    {{ __('messages.newsletter_interests') }}
                 </label>
                 <div class="grid grid-cols-2 gap-2">
                     @foreach([
-                        'products' => __('messages.newsletter),
-                        'news' => __('messages.newsletter),
-                        'promotions' => __('messages.newsletter),
-                        'events' => __('messages.newsletter),
-                        'blog' => __('messages.newsletter),
-                        'technical' => __('messages.newsletter),
+                        'products' => __('messages.newsletter_interest_products'),
+                        'news' => __('messages.newsletter_interest_news'),
+                        'promotions' => __('messages.newsletter_interest_promotions'),
+                        'events' => __('messages.newsletter_interest_events'),
+                        'blog' => __('messages.newsletter_interest_blog'),
+                        'technical' => __('messages.newsletter_interest_technical'),
                     ] as $value => $label)
                         <label class="flex items-center space-x-2 cursor-pointer">
                             <input 
@@ -122,19 +122,19 @@
                 wire:target="subscribe"
             >
                 <span wire:loading.remove wire:target="subscribe">
-                    {{ __('messages.newsletter) }}
+                    {{ __('messages.newsletter_subscribe') }}
                 </span>
                 <span wire:loading wire:target="subscribe" class="flex items-center justify-center">
                     <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-dark" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    {{ __('messages.newsletter) }}
+                    {{ __('messages.newsletter_subscribing') }}
                 </span>
             </button>
 
             <p class="text-xs text-ash/70 text-center">
-                {{ __('messages.newsletter) }}
+                {{ __('messages.newsletter_privacy_note') }}
             </p>
         </form>
     @else
@@ -145,17 +145,17 @@
                 </svg>
             </div>
             <h3 class="text-lg font-medium text-sage mb-2">
-                {{ __('messages.newsletter) }}
+                {{ __('messages.newsletter_success_title') }}
             </h3>
             <p class="text-ash mb-4">
-                {{ __('messages.newsletter) }}
+                {{ __('messages.newsletter_success_body') }}
             </p>
             <button 
                 wire:click="resetForm"
                 wire:confirm="{{ __('translations.confirm_reset_newsletter_form') }}"
                 class="text-sage hover:text-sage/80 font-medium text-sm"
             >
-                {{ __('messages.newsletter) }}
+                {{ __('messages.newsletter_reset') }}
             </button>
         </div>
     @endif

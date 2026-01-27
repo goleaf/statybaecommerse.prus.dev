@@ -1,6 +1,6 @@
 @extends('components.layouts.base')
 
-@section('title', __('messages.referrals))
+@section('title', __('messages.referrals'))
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
@@ -8,10 +8,10 @@
         <!-- Header -->
         <div class="mb-8">
             <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
-                {{ __('messages.referrals) }}
+                {{ __('messages.referrals') }}
             </h1>
             <p class="mt-2 text-gray-600 dark:text-gray-400">
-                {{ __('messages.referrals) }}
+                {{ __('messages.referrals') }}
             </p>
         </div>
 
@@ -19,7 +19,7 @@
         <div class="bg-white dark:bg-gray-800 shadow rounded-lg mb-8">
             <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                 <h3 class="text-lg font-medium text-gray-900 dark:text-white">
-                    {{ __('messages.referrals) }}
+                    {{ __('messages.referrals') }}
                 </h3>
             </div>
 
@@ -32,7 +32,7 @@
                     </div>
 
                     <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">
-                        {{ __('messages.referrals) }}
+                        {{ __('messages.referrals') }}
                     </p>
 
                     <!-- Copy Button -->
@@ -41,7 +41,7 @@
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
                         </svg>
-                        {{ __('messages.referrals) }}
+                        {{ __('messages.referrals') }}
                     </button>
                 </div>
             </div>
@@ -53,7 +53,7 @@
             <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
                 <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                     <h3 class="text-lg font-medium text-gray-900 dark:text-white">
-                        {{ __('messages.referrals) }}
+                        {{ __('messages.referrals') }}
                     </h3>
                 </div>
 
@@ -106,24 +106,24 @@
             <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
                 <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                     <h3 class="text-lg font-medium text-gray-900 dark:text-white">
-                        {{ __('messages.referrals) }}
+                        {{ __('messages.referrals') }}
                     </h3>
                 </div>
 
                 <div class="px-6 py-6">
                     <div class="mb-4">
                         <label for="email_subject" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            {{ __('messages.referrals) }}
+                            {{ __('messages.referrals') }}
                         </label>
                         <input type="text" 
                                id="email_subject" 
-                               value="{{ __('messages.referrals) }}"
+                               value="{{ __('messages.referrals') }}"
                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
                     </div>
 
                     <div class="mb-4">
                         <label for="email_body" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            {{ __('messages.referrals) }}
+                            {{ __('messages.referrals') }}
                         </label>
                         <textarea id="email_body" 
                                   rows="6"
@@ -135,7 +135,7 @@
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
                         </svg>
-                        {{ __('messages.referrals) }}
+                        {{ __('messages.referrals') }}
                     </button>
                 </div>
             </div>
@@ -145,7 +145,7 @@
         <div class="mt-8 bg-white dark:bg-gray-800 shadow rounded-lg">
             <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                 <h3 class="text-lg font-medium text-gray-900 dark:text-white">
-                    {{ __('messages.referrals) }}
+                    {{ __('messages.referrals') }}
                 </h3>
             </div>
 
@@ -162,7 +162,7 @@
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
                         </svg>
-                        {{ __('messages.referrals) }}
+                        {{ __('messages.referrals') }}
                     </button>
                 </div>
             </div>
@@ -185,14 +185,14 @@
 function copyCode() {
     const code = '{{ $user->referral_code }}';
     navigator.clipboard.writeText(code).then(function() {
-        showNotification('{{ __("messages.referrals) }}', 'success');
+        showNotification('{{ __("messages.referrals") }}', 'success');
     });
 }
 
 function copyLink() {
     const link = document.getElementById('referral_link').value;
     navigator.clipboard.writeText(link).then(function() {
-        showNotification('{{ __("messages.referrals) }}', 'success');
+        showNotification('{{ __("messages.referrals") }}', 'success');
     });
 }
 
@@ -202,7 +202,7 @@ function copyEmailContent() {
     const content = `Subject: ${subject}\n\n${body}`;
     
     navigator.clipboard.writeText(content).then(function() {
-        showNotification('{{ __("messages.referrals) }}', 'success');
+        showNotification('{{ __("messages.referrals") }}', 'success');
     });
 }
 

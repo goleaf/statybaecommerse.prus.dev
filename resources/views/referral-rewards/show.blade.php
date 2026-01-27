@@ -60,7 +60,7 @@
                 @if($reward->localized_description)
                     <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
                         <h2 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
-                            {{ __('messages.referrals) }}
+                            {{ __('messages.referrals') }}
                         </h2>
                         <p class="text-gray-600 dark:text-gray-400">
                             {{ $reward->localized_description }}
@@ -76,7 +76,7 @@
                     <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                {{ __('messages.referrals) }}
+                                {{ __('messages.referrals') }}
                             </dt>
                             <dd class="mt-1 text-lg font-semibold text-gray-900 dark:text-white">
                                 €{{ number_format($reward->amount, 2) }}
@@ -84,7 +84,7 @@
                         </div>
                         <div>
                             <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                {{ __('messages.referrals) }}
+                                {{ __('messages.referrals') }}
                             </dt>
                             <dd class="mt-1 text-sm text-gray-900 dark:text-white">
                                 {{ $reward->currency_code }}
@@ -138,7 +138,7 @@
                         @if($reward->order)
                             <div>
                                 <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                    {{ __('messages.referrals) }}
+                                    {{ __('messages.referrals') }}
                                 </dt>
                                 <dd class="mt-1 text-sm text-gray-900 dark:text-white">
                                     #{{ $reward->order->id }}
@@ -154,23 +154,23 @@
                 <!-- Status Card -->
                 <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
                     <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
-                        {{ __('messages.referrals) }}
+                        {{ __('messages.referrals') }}
                     </h3>
                     <div class="flex items-center space-x-3">
                         @if($reward->status === 'pending')
                             <div class="w-3 h-3 bg-yellow-400 rounded-full"></div>
                             <span class="text-sm font-medium text-yellow-800 dark:text-yellow-200">
-                                {{ __('messages.referrals) }}
+                                {{ __('messages.referrals') }}
                             </span>
                         @elseif($reward->status === 'applied')
                             <div class="w-3 h-3 bg-green-400 rounded-full"></div>
                             <span class="text-sm font-medium text-green-800 dark:text-green-200">
-                                {{ __('messages.referrals) }}
+                                {{ __('messages.referrals') }}
                             </span>
                         @else
                             <div class="w-3 h-3 bg-red-400 rounded-full"></div>
                             <span class="text-sm font-medium text-red-800 dark:text-red-200">
-                                {{ __('messages.referrals) }}
+                                {{ __('messages.referrals') }}
                             </span>
                         @endif
                     </div>
@@ -189,7 +189,7 @@
                 @if($reward->status === 'pending' && $reward->isValid())
                     <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
                         <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
-                            {{ __('messages.referrals) }}
+                            {{ __('messages.referrals') }}
                         </h3>
                         <div class="space-y-3">
                             <button type="button" 

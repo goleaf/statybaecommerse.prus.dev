@@ -82,17 +82,17 @@ class SimplifiedStatsWidget extends BaseWidget
                 ->color('info'),
 
             // === PRODUCT ECOSYSTEM ===
-            Stat::make(__('messages.translations), \Illuminate\Support\Number::format($totalProducts)) // Viso produktų
-                ->description(__('messages.translations) . ': ' . \Illuminate\Support\Number::format($activeProducts))
+            Stat::make(__('translations.total_products'), \Illuminate\Support\Number::format($totalProducts)) // Viso produktų
+                ->description(__('translations.active_products') . ': ' . \Illuminate\Support\Number::format($activeProducts))
                 ->descriptionIcon('heroicon-m-cube')
                 ->color('primary'),
 
-            Stat::make(__('messages.translations), \Illuminate\Support\Number::format($totalCategories))
+            Stat::make(__('translations.categories'), \Illuminate\Support\Number::format($totalCategories))
                 ->description(__('translations.total_categories'))
                 ->descriptionIcon('heroicon-m-tag')
                 ->color('info'),
 
-            Stat::make(__('messages.translations), \Illuminate\Support\Number::format($totalBrands))
+            Stat::make(__('translations.brands'), \Illuminate\Support\Number::format($totalBrands))
                 ->description(__('translations.total_brands'))
                 ->descriptionIcon('heroicon-m-building-storefront')
                 ->color('primary'),
@@ -103,7 +103,7 @@ class SimplifiedStatsWidget extends BaseWidget
                 ->descriptionIcon('heroicon-m-star')
                 ->color('warning'),
 
-            Stat::make(__('messages.translations), number_format((float) $avgRating, 1) . '/5')
+            Stat::make(__('translations.average_rating'), number_format((float) $avgRating, 1) . '/5')
                 ->description(__('translations.customer_satisfaction'))
                 ->descriptionIcon('heroicon-m-star')
                 ->color($avgRating >= 4 ? 'success' : ($avgRating >= 3 ? 'warning' : 'danger')),

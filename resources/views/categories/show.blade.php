@@ -6,9 +6,9 @@
     <div class="container mx-auto px-4">
         <nav class="mb-6 text-sm text-gray-500 dark:text-gray-400" aria-label="Breadcrumb">
             <ol class="flex flex-wrap items-center gap-1">
-                <li><a href="{{ route('home') }}" class="hover:text-blue-600 dark:hover:text-blue-300">{{ __('messages.frontend) }}</a></li>
+                <li><a href="{{ route('home') }}" class="hover:text-blue-600 dark:hover:text-blue-300">{{ __('messages.frontend') }}</a></li>
                 <li aria-hidden="true" class="px-1">/</li>
-                <li><a href="{{ route('frontend.categories.index') }}" class="hover:text-blue-600 dark:hover:text-blue-300">{{ __('messages.frontend) }}</a></li>
+                <li><a href="{{ route('frontend.categories.index') }}" class="hover:text-blue-600 dark:hover:text-blue-300">{{ __('messages.frontend') }}</a></li>
                 <li aria-hidden="true" class="px-1">/</li>
                 <li class="font-semibold text-gray-900 dark:text-white">{{ $category->name }}</li>
             </ol>
@@ -59,7 +59,7 @@
                 <div class="flex flex-col">
                     <label for="sort" class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('frontend.categories.show.sort_by') }}</label>
                     <select id="sort" name="sort" class="mt-1 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white">
-                        <option value="latest" @selected(($filters['sort'] ?? 'latest') === 'latest')>{{ __('messages.frontend) }}</option>
+                        <option value="latest" @selected(($filters['sort'] ?? 'latest') === 'latest')>{{ __('messages.frontend') }}</option>
                         <option value="price_asc" @selected(($filters['sort'] ?? '') === 'price_asc')>{{ __('frontend.categories.show.sort.price_low_high') }}</option>
                         <option value="price_desc" @selected(($filters['sort'] ?? '') === 'price_desc')>{{ __('frontend.categories.show.sort.price_high_low') }}</option>
                         <option value="name_asc" @selected(($filters['sort'] ?? '') === 'name_asc')>{{ __('frontend.categories.show.sort.name_a_z') }}</option>

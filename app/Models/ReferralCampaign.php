@@ -73,7 +73,6 @@ final class ReferralCampaign extends Model
         return ['is_active' => 'boolean', 'start_date' => 'datetime', 'end_date' => 'datetime', 'reward_amount' => 'float', 'max_referrals_per_user' => 'integer', 'max_total_referrals' => 'integer', 'conditions' => 'array', 'metadata' => 'array', 'meta' => 'array'];
     }
 
-
     /**
      * @return HasMany<ReferralCode, $this>
      */

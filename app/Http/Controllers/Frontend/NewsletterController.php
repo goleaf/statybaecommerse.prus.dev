@@ -49,7 +49,18 @@ final class NewsletterController extends Controller
                 $subscriber->update($attributes);
             }
 
+            return $this->respondWithMessage($request, '));
+            }
+
+            if ($attributes !== []) {
+                $subscriber->update($attributes);
+            }
+
             return $this->respondWithMessage($request, 'info', __('messages.newsletter));
+        }
+
+        $payload = array_merge([
+            '));
         }
 
         $payload = array_merge([
@@ -68,6 +79,12 @@ final class NewsletterController extends Controller
     public function unsubscribe(Request $request): JsonResponse|RedirectResponse
     {
         $validator = Validator::make($request->all(), [
+            '));
+    }
+
+    public function unsubscribe(Request $request): JsonResponse|RedirectResponse
+    {
+        $validator = Validator::make($request->all(), [
             'email' => ['required', 'email', 'max:255'],
         ]);
 
@@ -81,11 +98,21 @@ final class NewsletterController extends Controller
             return $this->respondWithMessage($request, 'error', __('messages.newsletter), 404);
         }
 
+        if ($subscriber->status !== '), 404);
+        }
+
         if ($subscriber->status !== 'unsubscribed') {
             $subscriber->unsubscribe();
         }
 
         return $this->respondWithMessage($request, 'success', __('messages.subscribers));
+    }
+
+    private function handleValidationFailure(Request $request, ValidatorContract $validator): JsonResponse|RedirectResponse
+    {
+        if ($request->expectsJson()) {
+            return response()->json([
+                '));
     }
 
     private function handleValidationFailure(Request $request, ValidatorContract $validator): JsonResponse|RedirectResponse

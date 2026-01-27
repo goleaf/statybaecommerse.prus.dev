@@ -15,11 +15,11 @@ enum Status: string
     public function getLabel(): string
     {
         return match ($this) {
-            self::ACTIVE    => __('messages.enums),
-            self::INACTIVE  => __('messages.enums),
-            self::PENDING   => __('messages.enums),
-            self::SUSPENDED => __('messages.enums),
-            self::ARCHIVED  => __('messages.enums),
+            self::ACTIVE    => __('enums.status.active'),
+            self::INACTIVE  => __('enums.status.inactive'),
+            self::PENDING   => __('enums.status.pending'),
+            self::SUSPENDED => __('enums.status.suspended'),
+            self::ARCHIVED  => __('enums.status.archived'),
         };
     }
 

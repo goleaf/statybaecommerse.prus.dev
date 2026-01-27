@@ -55,7 +55,9 @@
 @extends('errors.layout', [
     'code' => $resolvedCode,
     'title' => $title ?? __('messages.frontend),
+    '),
     'description' => $description ?? __('messages.frontend),
+    '),
     'primaryAction' => $primaryAction ?? [
         'label' => __('frontend.errors.actions.return_home'),
         'url' => $homeUrl,
@@ -71,7 +73,9 @@
     'statusPageUrl' => $statusUrl,
     'showSearch' => $showSearch ?? false,
     'searchTitle' => $searchTitle ?? __('messages.frontend),
+    '),
     'searchPlaceholder' => $searchPlaceholder ?? __('messages.frontend),
+    '),
     'topCategories' => $topCategories ?? [],
     'topCategoriesTitle' => $topCategoriesTitle ?? __('frontend.errors.top_categories.title'),
     'contactCta' => $contactCta ?? null,

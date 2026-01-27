@@ -73,7 +73,7 @@
                         <div class="space-y-2">
                             <span class="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide">{{ __('Live catalogue') }}</span>
                             <h1 class="text-3xl font-semibold sm:text-4xl">{{ __('Discover professional tools for every job') }}</h1>
-                            <p class="text-sm text-white/80 sm:text-base">{{ __('Filter, sort, and browse the entire product catalogue sourced directly from the live inventory feed.') }}</p>
+                            <p class="text-sm text-white/80 sm:text-base">{{ __('Filter', sort, and browse the entire product catalogue sourced directly from the live inventory feed.') }}</p>
                         </div>
                         <div class="flex flex-col gap-4 text-sm sm:flex-row sm:items-center sm:justify-between">
                             <div class="flex items-center gap-2 text-white/70">

@@ -25,7 +25,7 @@ test('component initializes with correct default values', function () {
 
 test('component requires authenticated user', function () {
     auth()->logout();
-    
+
     expect(function () {
         Livewire::test(NotificationCenter::class);
     })->toThrow(Exception::class);
@@ -45,16 +45,16 @@ test('show unread only updates reset pagination', function () {
 
 test('mark notification as read works correctly', function () {
     $notificationId = (string) \Illuminate\Support\Str::uuid();
-    
+
     DB::table('notifications')->insert([
-        'id' => $notificationId,
-        'type' => 'App\\Notifications\\TestNotification',
+        'id'              => $notificationId,
+        'type'            => 'App\\Notifications\\TestNotification',
         'notifiable_type' => User::class,
-        'notifiable_id' => $this->user->id,
-        'data' => json_encode(['message' => 'Test notification']),
-        'read_at' => null,
-        'created_at' => now(),
-        'updated_at' => now(),
+        'notifiable_id'   => $this->user->id,
+        'data'            => json_encode(['message' => 'Test notification']),
+        'read_at'         => null,
+        'created_at'      => now(),
+        'updated_at'      => now(),
     ]);
 
     Livewire::test(NotificationCenter::class)
@@ -67,16 +67,16 @@ test('mark notification as read works correctly', function () {
 
 test('mark notification as unread works correctly', function () {
     $notificationId = (string) \Illuminate\Support\Str::uuid();
-    
+
     DB::table('notifications')->insert([
-        'id' => $notificationId,
-        'type' => 'App\\Notifications\\TestNotification',
+        'id'              => $notificationId,
+        'type'            => 'App\\Notifications\\TestNotification',
         'notifiable_type' => User::class,
-        'notifiable_id' => $this->user->id,
-        'data' => json_encode(['message' => 'Test notification']),
-        'read_at' => now(),
-        'created_at' => now(),
-        'updated_at' => now(),
+        'notifiable_id'   => $this->user->id,
+        'data'            => json_encode(['message' => 'Test notification']),
+        'read_at'         => now(),
+        'created_at'      => now(),
+        'updated_at'      => now(),
     ]);
 
     Livewire::test(NotificationCenter::class)
@@ -91,14 +91,14 @@ test('mark all as read works correctly', function () {
     // Create multiple unread notifications
     for ($i = 0; $i < 3; $i++) {
         DB::table('notifications')->insert([
-            'id' => (string) \Illuminate\Support\Str::uuid(),
-            'type' => 'App\\Notifications\\TestNotification',
+            'id'              => (string) \Illuminate\Support\Str::uuid(),
+            'type'            => 'App\\Notifications\\TestNotification',
             'notifiable_type' => User::class,
-            'notifiable_id' => $this->user->id,
-            'data' => json_encode(['message' => "Test notification {$i}"]),
-            'read_at' => null,
-            'created_at' => now(),
-            'updated_at' => now(),
+            'notifiable_id'   => $this->user->id,
+            'data'            => json_encode(['message' => "Test notification {$i}"]),
+            'read_at'         => null,
+            'created_at'      => now(),
+            'updated_at'      => now(),
         ]);
     }
 
@@ -110,22 +110,22 @@ test('mark all as read works correctly', function () {
         ->where('notifiable_id', $this->user->id)
         ->whereNull('read_at')
         ->count();
-    
+
     expect($unreadCount)->toBe(0);
 });
 
 test('delete notification works correctly', function () {
     $notificationId = (string) \Illuminate\Support\Str::uuid();
-    
+
     DB::table('notifications')->insert([
-        'id' => $notificationId,
-        'type' => 'App\\Notifications\\TestNotification',
+        'id'              => $notificationId,
+        'type'            => 'App\\Notifications\\TestNotification',
         'notifiable_type' => User::class,
-        'notifiable_id' => $this->user->id,
-        'data' => json_encode(['message' => 'Test notification']),
-        'read_at' => null,
-        'created_at' => now(),
-        'updated_at' => now(),
+        'notifiable_id'   => $this->user->id,
+        'data'            => json_encode(['message' => 'Test notification']),
+        'read_at'         => null,
+        'created_at'      => now(),
+        'updated_at'      => now(),
     ]);
 
     Livewire::test(NotificationCenter::class)
@@ -140,14 +140,14 @@ test('clear all notifications works correctly', function () {
     // Create multiple notifications
     for ($i = 0; $i < 3; $i++) {
         DB::table('notifications')->insert([
-            'id' => (string) \Illuminate\Support\Str::uuid(),
-            'type' => 'App\\Notifications\\TestNotification',
+            'id'              => (string) \Illuminate\Support\Str::uuid(),
+            'type'            => 'App\\Notifications\\TestNotification',
             'notifiable_type' => User::class,
-            'notifiable_id' => $this->user->id,
-            'data' => json_encode(['message' => "Test notification {$i}"]),
-            'read_at' => null,
-            'created_at' => now(),
-            'updated_at' => now(),
+            'notifiable_id'   => $this->user->id,
+            'data'            => json_encode(['message' => "Test notification {$i}"]),
+            'read_at'         => null,
+            'created_at'      => now(),
+            'updated_at'      => now(),
         ]);
     }
 
@@ -158,7 +158,7 @@ test('clear all notifications works correctly', function () {
     $count = DB::table('notifications')
         ->where('notifiable_id', $this->user->id)
         ->count();
-    
+
     expect($count)->toBe(0);
 });
 

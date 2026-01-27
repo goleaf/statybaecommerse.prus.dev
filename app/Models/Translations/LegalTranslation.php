@@ -231,6 +231,119 @@ final class LegalTranslation extends Model
      */
     public function getWordCount(): int
     {
+        return str_word_count(strip_tags($this->content ?: ');
+    }
+
+    /**
+     * Handle getFormattedContentAttribute functionality with proper error handling.
+     */
+    public function getFormattedContentAttribute(): ?string
+    {
+        return $this->content ?: null;
+    }
+
+    /**
+     * Handle getFormattedSlugAttribute functionality with proper error handling.
+     */
+    public function getFormattedSlugAttribute(): string
+    {
+        return $this->slug ?: \Illuminate\Support\Str::slug($this->title);
+    }
+
+    /**
+     * Handle getFormattedSeoTitleAttribute functionality with proper error handling.
+     */
+    public function getFormattedSeoTitleAttribute(): ?string
+    {
+        return $this->seo_title ?: $this->title;
+    }
+
+    /**
+     * Handle getFormattedSeoDescriptionAttribute functionality with proper error handling.
+     */
+    public function getFormattedSeoDescriptionAttribute(): ?string
+    {
+        return $this->seo_description ?: \Illuminate\Support\Str::limit(strip_tags($this->content), 160);
+    }
+
+    /**
+     * Handle getMetaDataArrayAttribute functionality with proper error handling.
+     */
+    public function getMetaDataArrayAttribute(): array
+    {
+        return $this->meta_data ?? [];
+    }
+
+    // Helper methods
+    /**
+     * Handle hasTitle functionality with proper error handling.
+     */
+    public function hasTitle(): bool
+    {
+        return ! empty($this->title);
+    }
+
+    /**
+     * Handle hasContent functionality with proper error handling.
+     */
+    public function hasContent(): bool
+    {
+        return ! empty($this->content);
+    }
+
+    /**
+     * Handle hasSlug functionality with proper error handling.
+     */
+    public function hasSlug(): bool
+    {
+        return ! empty($this->slug);
+    }
+
+    /**
+     * Handle hasSeoTitle functionality with proper error handling.
+     */
+    public function hasSeoTitle(): bool
+    {
+        return ! empty($this->seo_title);
+    }
+
+    /**
+     * Handle hasSeoDescription functionality with proper error handling.
+     */
+    public function hasSeoDescription(): bool
+    {
+        return ! empty($this->seo_description);
+    }
+
+    /**
+     * Handle hasMetaData functionality with proper error handling.
+     */
+    public function hasMetaData(): bool
+    {
+        return ! empty($this->meta_data);
+    }
+
+    /**
+     * Handle isEmpty functionality with proper error handling.
+     */
+    public function isEmpty(): bool
+    {
+        return ! $this->hasTitle() && ! $this->hasContent();
+    }
+
+    /**
+     * Handle isComplete functionality with proper error handling.
+     */
+    public function isComplete(): bool
+    {
+        return $this->hasTitle() && $this->hasContent() && $this->hasSlug();
+    }
+
+    /**
+     * Handle getWordCount functionality with proper error handling.
+     */
+    public function getWordCount(): int
+    {
         return str_word_count(strip_tags($this->content ?: ''));
     }
 

@@ -53,7 +53,7 @@
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
                 </svg>
-                <span>{{ __('messages.admin) }}</span>
+                <span>{{ __('messages.admin') }}</span>
             </a>
 
             {{-- Dynamic Navigation Groups --}}
@@ -96,10 +96,10 @@
                 </div>
                 <div class="flex-1 min-w-0">
                     <p class="text-sm font-medium text-gray-900 truncate">
-                        {{ auth()->user()->name ?? __('messages.admin) }}
+                        {{ auth()->user()->name ?? __('messages.admin') }}
                     </p>
                     <p class="text-xs text-gray-500 truncate">
-                        {{ auth()->user()->email ?? __('messages.admin) }}
+                        {{ auth()->user()->email ?? __('messages.admin') }}
                     </p>
                 </div>
                 <form method="POST" action="{{ route('filament.admin.auth.logout') }}">
@@ -107,7 +107,7 @@
                     <button 
                         type="submit"
                         class="p-2 text-gray-400 hover:text-gray-600 rounded-md transition-colors duration-200"
-                        title="{{ __('messages.admin) }}"
+                        title="{{ __('messages.admin') }}"
                     >
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>

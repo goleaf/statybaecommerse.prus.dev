@@ -1,6 +1,6 @@
 @extends('components.layouts.base')
 
-@section('title', __('messages.frontend))
+@section('title', __('messages.frontend'))
 
 @section('content')
 <div class="min-h-screen bg-gray-50">
@@ -10,10 +10,10 @@
             <div class="md:flex md:items-center md:justify-between">
                 <div class="flex-1 min-w-0">
                     <h1 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
-                        {{ __('messages.frontend) }}
+                        {{ __('messages.frontend') }}
                     </h1>
                     <p class="mt-1 text-sm text-gray-500">
-                        {{ __('messages.frontend) }}
+                        {{ __('messages.frontend') }}
                     </p>
                 </div>
                 
@@ -25,7 +25,7 @@
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                         </svg>
-                        {{ __('messages.frontend) }}
+                        {{ __('messages.frontend') }}
                     </a>
                 </div>
             </div>
@@ -118,7 +118,7 @@
                         <div class="ml-5 w-0 flex-1">
                             <dl>
                                 <dt class="text-sm font-medium text-gray-500 truncate">
-                                    {{ __('messages.frontend) }}
+                                    {{ __('messages.frontend') }}
                                 </dt>
                                 <dd class="text-lg font-medium text-gray-900">
                                     {{ __('frontend.notifications.actions.settings_help') }}

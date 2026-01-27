@@ -34,7 +34,6 @@ Route::middleware(['web'])->group(function () {
         Route::get('/category/{category}', [App\Http\Controllers\Frontend\ProductController::class, 'byCategory'])->name('by-category');
         Route::get('/brand/{brand}', [App\Http\Controllers\Frontend\ProductController::class, 'byBrand'])->name('by-brand');
         Route::get('/{product:slug}', [App\Http\Controllers\Frontend\ProductController::class, 'show'])->name('show');
-        Route::post('/{product}/review', [App\Http\Controllers\Frontend\ProductController::class, 'addReview'])->name('add-review');
     });
 
     // Categories
@@ -150,18 +149,6 @@ Route::middleware(['web'])->group(function () {
         Route::get('/cart/count', [App\Http\Controllers\Frontend\ApiController::class, 'getCartCount'])->name('cart.count');
         Route::get('/recently-viewed', [App\Http\Controllers\Frontend\ApiController::class, 'getRecentlyViewed'])->name('recently-viewed');
         Route::post('/recently-viewed/add', [App\Http\Controllers\Frontend\ApiController::class, 'addRecentlyViewed'])->name('recently-viewed.add');
-    });
-
-    // Reviews
-    Route::prefix('reviews')->name('frontend.reviews.')->group(function () {
-        Route::middleware('auth')->group(function (): void {
-            // Reuse the same guard as the web surface so storefront AJAX flows respect authentication rules.
-            Route::post('/{product}', [App\Http\Controllers\ReviewController::class, 'store'])->name('store');
-            Route::put('/{review}', [App\Http\Controllers\ReviewController::class, 'update'])->name('update');
-            Route::delete('/{review}', [App\Http\Controllers\ReviewController::class, 'destroy'])->name('destroy');
-            Route::post('/{review}/like', [App\Http\Controllers\ReviewController::class, 'like'])->name('like');
-            Route::post('/{review}/report', [App\Http\Controllers\ReviewController::class, 'report'])->name('report');
-        });
     });
 
     // Contact

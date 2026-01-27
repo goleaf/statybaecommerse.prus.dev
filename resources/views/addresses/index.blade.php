@@ -1,11 +1,11 @@
 @extends('components.layouts.base')
 
-@section('title', __('messages.translations))
+@section('title', __('translations.addresses'))
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
     <div class="flex justify-between items-center mb-8">
-        <h1 class="text-3xl font-bold text-gray-900">{{ __('messages.translations) }}</h1>
+        <h1 class="text-3xl font-bold text-gray-900">{{ __('translations.addresses') }}</h1>
         <a href="{{ route('frontend.addresses.create') }}" 
            class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200">
             {{ __('translations.add_new_address') }}
@@ -103,7 +103,7 @@
                                 @csrf
                                 <button type="submit" 
                                         class="text-xs bg-yellow-100 hover:bg-yellow-200 text-yellow-800 px-2 py-1 rounded">
-                                    {{ __('messages.translations) }}
+                                    {{ __('translations.set_as_default') }}
                                 </button>
                             </form>
                         @endif
@@ -112,7 +112,7 @@
                             @csrf
                             <button type="submit" 
                                     class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-800 px-2 py-1 rounded">
-                                {{ __('messages.translations) }}
+                                {{ __('translations.duplicate') }}
                             </button>
                         </form>
                     </div>

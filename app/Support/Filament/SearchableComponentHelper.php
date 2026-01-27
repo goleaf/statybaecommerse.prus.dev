@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Support\Filament;
 
+use App\Support\Filament\Components\SearchableInput;
 use Closure;
-use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Illuminate\Contracts\Support\Arrayable;
 use Stringable;
 
 /**
- * Centralises repetitive wiring around DefStudio's SearchableInput component.
+ * Centralises repetitive wiring around the searchable input component.
  *
  * @phpstan-type NormalisedPayload array{
  *     value: string|int|null,

@@ -1,6 +1,6 @@
 @extends('components.layouts.base')
 
-@section('title', __('messages.seo_data))
+@section('title', __('messages.seo_data'))
 
 @section('content')
 @php
@@ -10,7 +10,7 @@
 <div class="container mx-auto px-4 py-8">
     <div class="mb-8">
         <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-            {{ __('messages.seo_data) }}
+            {{ __('messages.seo_data') }}
         </h1>
         <p class="text-gray-600 dark:text-gray-400">
             {{ __('seo_data.description') }}
@@ -40,8 +40,8 @@
                         name="locale"
                         class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white">
                     <option value="">{{ __('seo_data.all_locales') }}</option>
-                    <option value="lt" {{ ($activeFilters['locale'] ?? null) === 'lt' ? 'selected' : '' }}>{{ __('messages.seo_data) }}</option>
-                    <option value="en" {{ ($activeFilters['locale'] ?? null) === 'en' ? 'selected' : '' }}>{{ __('messages.seo_data) }}</option>
+                    <option value="lt" {{ ($activeFilters['locale'] ?? null) === 'lt' ? 'selected' : '' }}>{{ __('messages.seo_data') }}</option>
+                    <option value="en" {{ ($activeFilters['locale'] ?? null) === 'en' ? 'selected' : '' }}>{{ __('messages.seo_data') }}</option>
                 </select>
             </div>
 
@@ -53,9 +53,9 @@
                         name="type"
                         class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white">
                     <option value="">{{ __('seo_data.all_types') }}</option>
-                    <option value="App\Models\Product" {{ ($activeFilters['type'] ?? null) === 'App\Models\Product' ? 'selected' : '' }}>{{ __('messages.seo_data) }}</option>
-                    <option value="App\Models\Category" {{ ($activeFilters['type'] ?? null) === 'App\Models\Category' ? 'selected' : '' }}>{{ __('messages.seo_data) }}</option>
-                    <option value="App\Models\Brand" {{ ($activeFilters['type'] ?? null) === 'App\Models\Brand' ? 'selected' : '' }}>{{ __('messages.seo_data) }}</option>
+                    <option value="App\Models\Product" {{ ($activeFilters['type'] ?? null) === 'App\Models\Product' ? 'selected' : '' }}>{{ __('messages.seo_data') }}</option>
+                    <option value="App\Models\Category" {{ ($activeFilters['type'] ?? null) === 'App\Models\Category' ? 'selected' : '' }}>{{ __('messages.seo_data') }}</option>
+                    <option value="App\Models\Brand" {{ ($activeFilters['type'] ?? null) === 'App\Models\Brand' ? 'selected' : '' }}>{{ __('messages.seo_data') }}</option>
                 </select>
             </div>
 
@@ -82,7 +82,7 @@
             @foreach($activeFilterChips as $filterKey => $filterValue)
                 @php
                     $label = match($filterKey) {
-                        'locale' => $filterValue === 'lt' ? __('messages.seo_data) : __('messages.seo_data),
+                        'locale' => $filterValue === 'lt' ? __('messages.seo_data') : __('messages.seo_data'),
                         'type' => __($filterValue === 'App\\Models\\Product' ? 'seo_data.products' : ($filterValue === 'App\\Models\\Category' ? 'seo_data.categories' : 'seo_data.brands')),
                         default => $filterValue,
                     };

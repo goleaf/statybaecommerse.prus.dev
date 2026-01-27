@@ -14,7 +14,6 @@ use App\Models\UserProductInteraction;
 use App\Services\Pricing\PriceCalculator;
 use App\Support\Logging\StructuredLogger;
 use Exception;
-use Illuminate\Support\Facades\Log;
 use Throwable;
 
 /**
@@ -36,18 +35,18 @@ final class ReportGenerationService
     {
         $timeout = now()->addMinutes(5);
         // 5 minute timeout for sales report generation
-        
+
         $summary = [
-            'total' => 0,
-            'subtotal' => 0,
-            'tax' => 0,
-            'shipping' => 0,
-            'discount' => 0,
-            'currency' => 'EUR',
-            'total_revenue' => 0,
+            'total'              => 0,
+            'subtotal'           => 0,
+            'tax'                => 0,
+            'shipping'           => 0,
+            'discount'           => 0,
+            'currency'           => 'EUR',
+            'total_revenue'      => 0,
             'total_transactions' => 0,
-            'days_covered' => 0,
-            'processed_events' => 0
+            'days_covered'       => 0,
+            'processed_events'   => 0,
         ];
 
         return ['summary' => $summary, 'daily_data' => []];

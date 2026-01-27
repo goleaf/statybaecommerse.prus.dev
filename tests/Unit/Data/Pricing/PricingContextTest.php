@@ -8,7 +8,6 @@ use Carbon\Carbon;
 test('creates pricing context from array with defaults', function () {
     $context = PricingContext::fromArray([]);
 
-
     expect($context->quantity)->toBe(1);
     expect($context->customerGroupIds)->toBeEmpty();
     expect($context->recordHistory)->toBeFalse();
@@ -19,15 +18,15 @@ test('creates pricing context with provided values', function () {
     $moment = Carbon::now();
 
     $context = PricingContext::fromArray([
-        'quantity' => 5,
+        'quantity'           => 5,
         'customer_group_ids' => [1, 2, 3],
-        'currency' => 'USD',
-        'base_currency' => 'EUR',
-        'now' => $moment,
-        'record_history' => true,
-        'history_reason' => 'bulk_update',
+        'currency'           => 'USD',
+        'base_currency'      => 'EUR',
+        'now'                => $moment,
+        'record_history'     => true,
+        'history_reason'     => 'bulk_update',
         'history_price_type' => 'promotional',
-        'changed_by' => 123,
+        'changed_by'         => 123,
     ]);
 
     expect($context->quantity)->toBe(5);
@@ -57,7 +56,7 @@ test('filters null customer group ids', function () {
 
 test('handles empty currency strings', function () {
     $context = PricingContext::fromArray([
-        'currency' => '',
+        'currency'      => '',
         'base_currency' => 'EUR',
     ]);
 
@@ -67,7 +66,7 @@ test('handles empty currency strings', function () {
 
 test('normalizes currency codes to uppercase', function () {
     $context = PricingContext::fromArray([
-        'currency' => 'usd',
+        'currency'      => 'usd',
         'base_currency' => 'eur',
     ]);
 

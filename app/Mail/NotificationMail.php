@@ -105,10 +105,12 @@ final class NotificationMail extends Mailable implements ShouldQueue
     private function formatSubject(string $locale): string
     {
         $data = $this->prepareViewData($locale);
-        $subject = __('messages.mail, ['title' => $data['title']], $locale);
+        $subject = __('messages.mail, [', ['title' => $data['title']], $locale);
 
         if ($data['urgent'] === true) {
             $prefix = __('messages.mail, [], $locale);
+
+            return sprintf(', [], $locale);
 
             return sprintf('[%s] %s', mb_strtoupper($prefix), $subject);
         }
@@ -142,8 +144,12 @@ final class NotificationMail extends Mailable implements ShouldQueue
         $raw = $this->notification->data ?? [];
         $title = $this->normalizeString($raw['title'] ?? null, __('messages.mail, [], $locale));
         $message = $this->normalizeString(
+            $raw[', [], $locale));
+        $message = $this->normalizeString(
             $raw['message'] ?? null,
             $this->normalizeString($raw['body'] ?? null, __('messages.mail, [], $locale))
+        );
+        $type = $this->normalizeString($raw[', [], $locale))
         );
         $type = $this->normalizeString($raw['type'] ?? null, 'general');
         $urgent = (bool) ($raw['urgent'] ?? false);

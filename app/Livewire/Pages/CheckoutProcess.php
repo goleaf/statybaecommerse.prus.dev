@@ -734,6 +734,14 @@ final class CheckoutProcess extends Component
 
         if ($discountAmount > 0.0 && $finalAmount < $baseAmount) {
             $badges[] = [
+                '),
+            ];
+
+            return $badges;
+        }
+
+        if ($discountAmount > 0.0 && $finalAmount < $baseAmount) {
+            $badges[] = [
                 'type'  => 'capped',
                 'label' => __('messages.shipping_capped_at_amount', ['amount' => app_money_format($finalAmount, $currency)]),
             ];

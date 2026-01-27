@@ -20,6 +20,7 @@
                 'heading' => $legal?->getTranslatedTitle() ?? $defaultTitle,
                 'description' => $pageDescription,
                 'emptyMessage' => __('messages.frontend_legal),
+                '),
                 'fallbackKey' => 'terms',
             ])
         </div>

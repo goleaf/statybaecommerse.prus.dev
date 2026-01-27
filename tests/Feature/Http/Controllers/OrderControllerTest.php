@@ -163,7 +163,7 @@ test('cancels order successfully', function () {
     $response->assertStatus(200)
         ->assertJson([
             'success' => true,
-            'message' => __('messages.orders),
+            'message' => __('messages.orders'),
         ]);
 
     $this->assertDatabaseHas('orders', [

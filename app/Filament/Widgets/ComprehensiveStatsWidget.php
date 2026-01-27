@@ -60,38 +60,38 @@ final class ComprehensiveStatsWidget extends BaseStatsOverviewWidget
         $averageRating = (float) (Review::avg('rating') ?? 0);
 
         return [
-            Stat::make(__('Total Revenue'), '€' . number_format($totalRevenue, 2))
+            Stat::make(__('translations.total_revenue'), '€' . number_format($totalRevenue, 2))
                 ->description($revenueChange >= 0 ? '+' . number_format($revenueChange, 1) . '%' : number_format($revenueChange, 1) . '%')
                 ->descriptionIcon($revenueChange >= 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
                 ->color($revenueChange >= 0 ? 'success' : 'danger')
                 ->chart($this->getRevenueChart()),
-            Stat::make(__('Monthly Revenue'), '€' . number_format($monthlyRevenue, 2))
-                ->description(__('This month'))
+            Stat::make(__('translations.monthly_revenue'), '€' . number_format($monthlyRevenue, 2))
+                ->description(__('translations.from_last_month'))
                 ->descriptionIcon('heroicon-m-banknotes')
                 ->color('success'),
-            Stat::make(__('Total Orders'), number_format($totalOrders))
+            Stat::make(__('translations.total_orders'), number_format($totalOrders))
                 ->description($ordersChange >= 0 ? '+' . number_format($ordersChange, 1) . '%' : number_format($ordersChange, 1) . '%')
                 ->descriptionIcon($ordersChange >= 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
                 ->color($ordersChange >= 0 ? 'success' : 'danger')
                 ->chart($this->getOrdersChart()),
             Stat::make(__('messages.products'), number_format($totalProducts))
-                ->description(number_format($activeProducts) . ' ' . __('active'))
+                ->description(number_format($activeProducts) . ' ' . __('translations.active_products'))
                 ->descriptionIcon('heroicon-m-cube')
                 ->color('info'),
-            Stat::make(__('Customers'), number_format($totalCustomers))
-                ->description(number_format($newCustomers) . ' ' . __('new this month'))
+            Stat::make(__('translations.total_customers'), number_format($totalCustomers))
+                ->description(number_format($newCustomers) . ' ' . __('translations.new_customers_this_month'))
                 ->descriptionIcon('heroicon-m-users')
                 ->color('warning'),
-            Stat::make(__('Avg Order Value'), '€' . number_format($averageOrderValue, 2))
-                ->description(__('Per order'))
+            Stat::make(__('translations.average_order_value'), '€' . number_format($averageOrderValue, 2))
+                ->description(__('translations.per_order'))
                 ->descriptionIcon('heroicon-m-calculator')
                 ->color('info'),
-            Stat::make(__('Reviews'), number_format($totalReviews))
-                ->description(number_format($averageRating, 1) . ' ' . __('avg rating'))
+            Stat::make(__('translations.total_reviews'), number_format($totalReviews))
+                ->description(number_format($averageRating, 1) . ' ' . __('translations.average_rating'))
                 ->descriptionIcon('heroicon-m-star')
                 ->color('warning'),
-            Stat::make(__('Conversion Rate'), '2.4%')
-                ->description('+0.3% ' . __('from last month'))
+            Stat::make(__('translations.conversions'), '2.4%')
+                ->description('+0.3% ' . __('translations.from_last_month'))
                 ->descriptionIcon('heroicon-m-arrow-trending-up')
                 ->color('success'),
         ];

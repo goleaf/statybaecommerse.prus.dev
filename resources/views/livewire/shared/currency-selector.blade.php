@@ -16,11 +16,11 @@
                 type="button"
                 class="flex items-center gap-2 text-gray-700 hover:text-gray-800">
             @if ($this->countryFlag)
-                <img src="{{ $this->countryFlag }}" alt="{{ __('messages.translations) }}" class="block h-auto w-5 shrink-0" />
+                <img src="{{ $this->countryFlag }}" alt="{{ __('change currency') }}" class="block h-auto w-5 shrink-0" />
             @endif
 
             <span class="block text-sm font-medium">{{ current_currency() }}</span>
-            <span class="sr-only">, {{ __('messages.translations) }}</span>
+            <span class="sr-only">, {{ __('translations.country_flag') }}</span>
         </button>
     </div>
 </div>

@@ -193,7 +193,7 @@
                 {{ __('messages.search_no_results_found') }}
             </h2>
             <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">
-                {{ __('messages.frontend) }}
+                {{ __('messages.frontend') }}
             </p>
             <div class="mt-6 flex flex-wrap justify-center gap-3">
                 <button

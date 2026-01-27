@@ -29,7 +29,7 @@ enum LegalDocumentType: string implements EnumInterface
             self::COOKIE_POLICY   => __('legal.types.cookie_policy'),
             self::GDPR_POLICY     => __('legal.types.gdpr_policy'),
             self::LEGAL_NOTICE    => __('legal.types.legal_notice'),
-            self::IMPRINT         => __('messages.legal),
+            self::IMPRINT         => __('messages.legal'),
             self::LEGAL_DOCUMENT  => __('legal.types.legal_document'),
         };
     }

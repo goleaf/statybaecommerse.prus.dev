@@ -1,7 +1,7 @@
 @extends('components.layouts.base')
 
-@section('title', __('messages.locations))
-@section('description', __('messages.locations))
+@section('title', __('messages.locations'))
+@section('description', __('messages.locations'))
 
 @section('content')
 @php
@@ -32,10 +32,10 @@
     <!-- Header -->
     <div class="mb-8">
         <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            {{ __('messages.locations) }}
+            {{ __('messages.locations') }}
         </h1>
         <p class="text-gray-600 dark:text-gray-400">
-            {{ __('messages.locations) }}
+            {{ __('messages.locations') }}
         </p>
     </div>
 
@@ -46,7 +46,7 @@
                 <!-- Search -->
                 <div>
                     <label for="search" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        {{ __('messages.locations) }}
+                        {{ __('messages.locations') }}
                     </label>
                     <input type="text" 
                            id="search" 
@@ -145,7 +145,7 @@
                             @if($location->is_open_now)
                                 <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
                                     <i class="fas fa-circle text-green-500 mr-1"></i>
-                                    {{ __('messages.locations) }}
+                                    {{ __('messages.locations') }}
                                 </span>
                             @endif
                         </div>

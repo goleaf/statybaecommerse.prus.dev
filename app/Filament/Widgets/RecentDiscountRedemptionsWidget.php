@@ -38,13 +38,20 @@ class RecentDiscountRedemptionsWidget extends BaseWidget
                     ->label(__('messages.discount_redemptions))
                     ->weight(FontWeight::Bold)
                     ->searchable(),
+                Tables\Columns\TextColumn::make('))
+                    ->weight(FontWeight::Bold)
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('code.code')
                     ->label(__('messages.discount_redemptions))
+                    ->badge()
+                    ->color('))
                     ->badge()
                     ->color('info')
                     ->copyable(),
                 Tables\Columns\TextColumn::make('user.name')
                     ->label(__('messages.discount_redemptions))
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('))
                     ->searchable(),
                 Tables\Columns\TextColumn::make('amount_saved')
                     ->label(__('discount_redemptions.fields.amount_saved'))

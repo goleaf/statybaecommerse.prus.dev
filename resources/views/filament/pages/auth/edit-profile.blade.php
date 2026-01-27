@@ -56,7 +56,7 @@
                                             type="button"
                                             color="gray"
                                             wire:click="cancel">
-                            {{ __('messages.admin) }}
+                            {{ __('messages.admin') }}
                         </x-filament::button>
 
                         <x-filament::button
@@ -115,7 +115,7 @@
                         <dd class="text-sm font-medium">
                             @if (auth()->user()->isEmailVerified())
                                 <span
-                                      class="text-green-600 dark:text-green-400">{{ __('messages.admin) }}</span>
+                                      class="text-green-600 dark:text-green-400">{{ __('messages.admin') }}</span>
                             @else
                                 <span
                                       class="text-red-600 dark:text-red-400">{{ __('admin.profile.not_verified') }}</span>
@@ -125,11 +125,11 @@
                     <div class="flex justify-between">
                         <dt class="text-sm text-gray-500 dark:text-gray-400">{{ __('admin.profile.last_login') }}</dt>
                         <dd class="text-sm font-medium text-gray-900 dark:text-white">
-                            {{ auth()->user()->last_login_at ? auth()->user()->last_login_at->diffForHumans() : __('messages.admin) }}
+                            {{ auth()->user()->last_login_at ? auth()->user()->last_login_at->diffForHumans() : __('messages.admin') }}
                         </dd>
                     </div>
                     <div class="flex justify-between">
-                        <dt class="text-sm text-gray-500 dark:text-gray-400">{{ __('messages.admin) }}</dt>
+                        <dt class="text-sm text-gray-500 dark:text-gray-400">{{ __('messages.admin') }}</dt>
                         <dd class="text-sm font-medium text-gray-900 dark:text-white">{{ auth()->user()->roles_label }}
                         </dd>
                     </div>

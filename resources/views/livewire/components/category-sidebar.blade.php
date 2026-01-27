@@ -2,8 +2,8 @@
 <div class="category-sidebar">
     {{-- Header --}}
     <div class="category-sidebar-header">
-        <h3 class="category-sidebar-title">{{ __('messages.home) }}</h3>
-        <p class="category-sidebar-subtitle">{{ __('messages.home) }}</p>
+        <h3 class="category-sidebar-title">{{ __('messages.home') }}</h3>
+        <p class="category-sidebar-subtitle">{{ __('messages.home') }}</p>
     </div>
     
     {{-- Categories List - No scrolling, all visible --}}

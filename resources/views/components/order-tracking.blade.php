@@ -9,39 +9,39 @@
 
 @php
     $order = $order ?? new \App\Models\Order();
-    $title = $title ?? __('Order Tracking');
-    $subtitle = $subtitle ?? __('Track your order status and delivery information');
+    $title = $title ?? __('translations.order_tracking');
+    $subtitle = $subtitle ?? __('translations.track_order_status');
 
     // Order status timeline
     $statusTimeline = [
         'pending' => [
-            'label' => __('Order Placed'),
+            'label' => __('translations.order_placed'),
             'icon' => 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',
             'color' => 'blue',
         ],
         'confirmed' => [
-            'label' => __('Order Confirmed'),
+            'label' => __('translations.order_confirmed'),
             'icon' => 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',
             'color' => 'blue',
         ],
         'processing' => [
-            'label' => __('Processing'),
+            'label' => __('translations.processing'),
             'icon' =>
                 'M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z',
             'color' => 'yellow',
         ],
         'shipped' => [
-            'label' => __('Shipped'),
+            'label' => __('translations.shipped'),
             'icon' => 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4',
             'color' => 'purple',
         ],
         'delivered' => [
-            'label' => __('Delivered'),
+            'label' => __('translations.delivered'),
             'icon' => 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',
             'color' => 'green',
         ],
         'cancelled' => [
-            'label' => __('Cancelled'),
+            'label' => __('translations.cancelled'),
             'icon' => 'M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z',
             'color' => 'red',
         ],
@@ -64,13 +64,13 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {{-- Order Number --}}
                 <div>
-                    <h3 class="text-sm font-medium text-gray-500 mb-1">{{ __('Order Number') }}</h3>
+                    <h3 class="text-sm font-medium text-gray-500 mb-1">{{ __('translations.order_number') }}</h3>
                     <p class="text-lg font-semibold text-gray-900">{{ $order->order_number ?? 'N/A' }}</p>
                 </div>
 
                 {{-- Order Date --}}
                 <div>
-                    <h3 class="text-sm font-medium text-gray-500 mb-1">{{ __('Order Date') }}</h3>
+                    <h3 class="text-sm font-medium text-gray-500 mb-1">{{ __('translations.order_date') }}</h3>
                     <p class="text-lg font-semibold text-gray-900">
                         {{ $order->created_at ? $order->created_at->format('Y-m-d') : 'N/A' }}
                     </p>
@@ -78,7 +78,7 @@
 
                 {{-- Total Amount --}}
                 <div>
-                    <h3 class="text-sm font-medium text-gray-500 mb-1">{{ __('Total Amount') }}</h3>
+                    <h3 class="text-sm font-medium text-gray-500 mb-1">{{ __('translations.total_amount') }}</h3>
                     <p class="text-lg font-semibold text-gray-900">
                         {{ $order->total ? \Illuminate\Support\Number::currency($order->total, current_currency(), app()->getLocale()) : 'N/A' }}
                     </p>
@@ -89,7 +89,7 @@
         {{-- Status Timeline --}}
         @if ($showTimeline)
             <div class="bg-white border border-gray-200 rounded-2xl p-6 mb-8">
-                <h2 class="text-xl font-semibold text-gray-900 mb-6">{{ __('Order Status') }}</h2>
+                <h2 class="text-xl font-semibold text-gray-900 mb-6">{{ __('translations.order_status') }}</h2>
 
                 <div class="relative">
                     {{-- Timeline Line --}}
@@ -152,9 +152,9 @@
         @endif
 
         {{-- Order Details --}}
-        @if ($showDetails && $order->items && $order->items->count() > 0)
-            <div class="bg-white border border-gray-200 rounded-2xl p-6 mb-8">
-                <h2 class="text-xl font-semibold text-gray-900 mb-6">{{ __('Order Items') }}</h2>
+            @if ($showDetails && $order->items->count() > 0)
+                <div class="p-6 sm:p-8 bg-gray-50/50 border-t border-gray-200">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-6">{{ __('translations.order_items') }}</h2>
 
                 <div class="space-y-4">
                     @foreach ($order->items as $item)
@@ -176,7 +176,7 @@
                                 </h3>
                                 <p class="text-sm text-gray-600">{{ __('messages.quantity') }}: {{ $item->quantity }}</p>
                                 @if ($item->variant)
-                                    <p class="text-sm text-gray-600">{{ __('Variant') }}: {{ $item->variant }}</p>
+                                    <p class="text-sm text-gray-600">{{ __('translations.variant') }}: {{ $item->variant }}</p>
                                 @endif
                             </div>
 
@@ -187,7 +187,7 @@
                                 </p>
                                 <p class="text-sm text-gray-600">
                                     {{ \Illuminate\Support\Number::currency($item->price, current_currency(), app()->getLocale()) }}
-                                    {{ __('each') }}
+                                    {{ __('translations.each') }}
                                 </p>
                             </div>
                         </div>
@@ -210,7 +210,7 @@
                             </span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-gray-600">{{ __('Tax') }}</span>
+                            <span class="text-gray-600">{{ __('translations.tax') }}</span>
                             <span class="font-medium">
                                 {{ \Illuminate\Support\Number::currency($order->tax_amount ?? 0, current_currency(), app()->getLocale()) }}
                             </span>

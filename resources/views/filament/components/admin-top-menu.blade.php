@@ -13,7 +13,7 @@
                 <a href="{{ route('filament.admin.pages.dashboard') }}"
                    class="flex items-center space-x-2 text-sm font-medium text-gray-700 hover:text-primary-600">
                     <x-heroicon-o-home class="h-4 w-4" />
-                    <span>{{ __('messages.admin) }}</span>
+                    <span>{{ __('messages.admin') }}</span>
                 </a>
 
                 @foreach ($navigationGroups->take(6) as $group)
@@ -51,7 +51,7 @@
                     <div class="h-6 w-6 rounded-full bg-primary-600 flex items-center justify-center">
                         <span class="text-xs font-medium text-white">{{ substr($user->name ?? 'A', 0, 1) }}</span>
                     </div>
-                    <span class="text-sm font-medium text-gray-700">{{ $user->name ?? __('messages.admin) }}</span>
+                    <span class="text-sm font-medium text-gray-700">{{ $user->name ?? __('messages.admin') }}</span>
                 </div>
             </div>
         </div>
