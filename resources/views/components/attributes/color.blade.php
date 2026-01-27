@@ -7,7 +7,7 @@
     <h2 class="text-sm font-medium text-gray-900">{{ $option->attribute->name }}</h2>
 
     <fieldset class="mt-2">
-        <legend class="sr-only">{{ __('messages.frontend) }}</legend>
+        <legend class="sr-only">{{ __('messages.frontend') }}</legend>
         <div
             class="flex items-center space-x-3"
             x-data="{

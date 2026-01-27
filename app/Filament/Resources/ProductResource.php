@@ -75,9 +75,9 @@ final class ProductResource extends BaseResource
                                 ->relationship('brand', 'name')
                                 ->searchable()
                                 ->preload(),
-                            Select::make('category_id')
+                            Select::make('mainCategory')
                                 ->label(__('messages.category'))
-                                ->relationship('category', 'name')
+                                ->relationship('mainCategory', 'name')
                                 ->searchable()
                                 ->preload(),
                         ]),
@@ -119,7 +119,7 @@ final class ProductResource extends BaseResource
                 TextColumn::make('brand.name')
                     ->label(__('messages.brand'))
                     ->sortable(),
-                TextColumn::make('category.name')
+                TextColumn::make('mainCategory.name')
                     ->label(__('messages.category'))
                     ->sortable(),
                 ToggleColumn::make('is_active')

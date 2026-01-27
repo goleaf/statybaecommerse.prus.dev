@@ -53,6 +53,13 @@ final class ProductRequestData extends Data
      */
     public static function attributes(ValidationContext $context): array
     {
-        return ['product_id' => __('messages.translations), 'name' => __('messages.translations), 'email' => __('messages.translations), 'phone' => __('messages.translations), 'message' => __('translations.message'), 'requested_quantity' => __('messages.translations)];
+        return [
+            'product_id'         => __('translations.product'),
+            'name'               => __('translations.name'),
+            'email'              => __('translations.email'),
+            'phone'              => __('translations.phone'),
+            'message'            => __('translations.message'),
+            'requested_quantity' => __('translations.quantity'),
+        ];
     }
 }

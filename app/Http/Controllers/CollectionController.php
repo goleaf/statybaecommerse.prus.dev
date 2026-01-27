@@ -304,7 +304,7 @@ final class CollectionController extends Controller
      */
     public function personalizedProducts(Collection $collection, Request $request): JsonResponse
     {
-        $products = $collection->products()->published()->with(['images', 'translations', 'brand', 'category'])->get();
+        $products = $collection->products()->published()->with(['images', 'translations', 'brand', 'mainCategory'])->get();
         $galleryService = new ProductGalleryService;
         // Apply multiple skipWhile filters based on user preferences and performance
         $userPreferences = $request->only(['preferred_brands', 'preferred_categories', 'excluded_brands', 'excluded_categories', 'price_range']);

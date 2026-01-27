@@ -1,7 +1,7 @@
 <article class="container mx-auto px-4 py-8 prose max-w-none">
     <nav class="mb-6 text-sm text-gray-600">
         <a href="{{ app()->getLocale() === 'lt' ? url('/lt/naujienos') : url('/en/news') }}"
-           class="underline">{{ __('messages.frontend) }}</a>
+           class="underline">{{ __('messages.frontend') }}</a>
         <span class="mx-2">/</span>
         <span>{{ $record->title ?? $record->trans('title') }}</span>
     </nav>

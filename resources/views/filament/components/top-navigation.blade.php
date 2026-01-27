@@ -69,11 +69,17 @@
                                                 {{ __('messages.admin) }}
                                             </a>
                                         @endif
+                                        @if (Route::has(') }}
+                                            </a>
+                                        @endif
                                         @if (Route::has('filament.admin.resources.categories.index'))
                                             <a href="{{ route('filament.admin.resources.categories.index') }}"
                                                class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                                                 <x-heroicon-o-tag class="h-4 w-4 mr-3" />
                                                 {{ __('messages.admin) }}
+                                            </a>
+                                        @endif
+                                        @if (Route::has(') }}
                                             </a>
                                         @endif
                                         @if (Route::has('filament.admin.resources.brands.index'))
@@ -83,11 +89,17 @@
                                                 {{ __('messages.admin) }}
                                             </a>
                                         @endif
+                                        @if (Route::has(') }}
+                                            </a>
+                                        @endif
                                         @if (Route::has('filament.admin.resources.collections.index'))
                                             <a href="{{ route('filament.admin.resources.collections.index') }}"
                                                class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                                                 <x-heroicon-o-folder class="h-4 w-4 mr-3" />
                                                 {{ __('messages.admin) }}
+                                            </a>
+                                        @endif
+                                    @elseif($group->value === ') }}
                                             </a>
                                         @endif
                                     @elseif($group->value === 'Orders')
@@ -179,6 +191,9 @@
                                                 {{ __('messages.admin) }}
                                             </a>
                                         @endif
+                                    @elseif($group->value === ') }}
+                                            </a>
+                                        @endif
                                     @elseif($group->value === 'Reports')
                                         @if (Route::has('filament.admin.resources.reports.index'))
                                             <a href="{{ route('filament.admin.resources.reports.index') }}"
@@ -195,11 +210,17 @@
                                                 {{ __('messages.admin) }}
                                             </a>
                                         @endif
+                                        @if (Route::has(') }}
+                                            </a>
+                                        @endif
                                         @if (Route::has('filament.admin.resources.posts.index'))
                                             <a href="{{ route('filament.admin.resources.posts.index') }}"
                                                class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                                                 <x-heroicon-o-document-text class="h-4 w-4 mr-3" />
                                                 {{ __('messages.admin) }}
+                                            </a>
+                                        @endif
+                                        @if (Route::has(') }}
                                             </a>
                                         @endif
                                         @if (Route::has('filament.admin.resources.legal.index'))
@@ -245,7 +266,7 @@
                 >
                     <button
                             type="button"
-                            aria-label="{{ __('messages.admin) }}"
+                            aria-label="{{ __('messages.admin') }}"
                             class="relative p-2 text-gray-400 hover:text-gray-500"
                     >
                         <x-heroicon-o-bell class="h-5 w-5" />
@@ -262,7 +283,7 @@
                         <div class="h-8 w-8 rounded-full bg-primary-600 flex items-center justify-center">
                             <span class="text-sm font-medium text-white">{{ substr($user->name ?? 'A', 0, 1) }}</span>
                         </div>
-                        <span>{{ $user->name ?? __('messages.admin) }}</span>
+                        <span>{{ $user->name ?? __('messages.admin') }}</span>
                         <x-heroicon-o-chevron-down class="h-3 w-3" />
                     </button>
                 </div>

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\OrderResource\Tables;
 
 use Filament\Actions\BulkActionGroup;
@@ -19,33 +21,41 @@ class OrdersTable
         return $table
             ->columns([
                 TextColumn::make('number')
+                    ->label(__('messages.order_number'))
                     ->searchable()
                     ->sortable()
                     ->weight('bold'),
                 TextColumn::make('user.name')
-                    ->label('Customer')
+                    ->label(__('messages.customer'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('status')
+                    ->label(__('messages.status'))
                     ->badge()
                     ->searchable(),
                 TextColumn::make('total')
+                    ->label(__('messages.total'))
                     ->money(fn ($record) => $record->currency)
                     ->sortable(),
                 TextColumn::make('payment_status')
+                    ->label(__('messages.payment_status'))
                     ->badge()
                     ->searchable(),
                 TextColumn::make('created_at')
+                    ->label(__('messages.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(),
                 TextColumn::make('updated_at')
+                    ->label(__('messages.updated_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('shipping_option.name')
+                    ->label(__('messages.shipping'))
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('tracking_number')
+                    ->label(__('messages.tracking_number'))
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])

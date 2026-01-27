@@ -3,20 +3,20 @@
     <section class="bg-gradient-to-br from-blue-600 via-purple-600 to-blue-600 text-white py-20">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h1 class="text-5xl md:text-6xl font-bold mb-6">
-                {{ __('messages.translations) }}
+                {{ __('translations.live_demo_title') }}
             </h1>
             <p class="text-xl md:text-2xl mb-8 text-white/90 max-w-3xl mx-auto">
-                {{ __('messages.translations) }}
+                {{ __('translations.live_demo_subtitle') }}
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
                 <div class="bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2">
-                    <span class="text-sm font-medium">{{ __('messages.translations) }}</span>
+                    <span class="text-sm font-medium">{{ __('translations.real_time_updates') }}</span>
                 </div>
                 <div class="bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2">
-                    <span class="text-sm font-medium">{{ __('messages.translations) }}</span>
+                    <span class="text-sm font-medium">{{ __('translations.enhanced_performance') }}</span>
                 </div>
                 <div class="bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2">
-                    <span class="text-sm font-medium">{{ __('messages.translations) }}</span>
+                    <span class="text-sm font-medium">{{ __('translations.modern_design') }}</span>
                 </div>
             </div>
         </div>
@@ -27,10 +27,10 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-12">
                 <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                    {{ __('messages.translations) }}
+                    {{ __('translations.live_dashboard') }}
                 </h2>
                 <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-                    {{ __('messages.translations) }}
+                    {{ __('translations.live_dashboard_description') }}
                 </p>
             </div>
             
@@ -43,10 +43,10 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-12">
                 <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                    {{ __('messages.translations) }}
+                    {{ __('translations.enhanced_search') }}
                 </h2>
                 <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-                    {{ __('messages.translations) }}
+                    {{ __('translations.enhanced_search_description') }}
                 </p>
             </div>
             
@@ -61,10 +61,10 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-12">
                 <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                    {{ __('messages.translations) }}
+                    {{ __('translations.live_inventory_tracker') }}
                 </h2>
                 <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-                    {{ __('messages.translations) }}
+                    {{ __('translations.live_inventory_description') }}
                 </p>
             </div>
             
@@ -77,10 +77,10 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-12">
                 <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                    {{ __('messages.translations) }}
+                    {{ __('translations.performance_features') }}
                 </h2>
                 <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-                    {{ __('messages.translations) }}
+                    {{ __('translations.performance_features_description') }}
                 </p>
             </div>
             
@@ -93,15 +93,15 @@
                         </svg>
                     </div>
                     <h3 class="text-lg font-semibold text-gray-900 mb-2">
-                        {{ __('messages.translations) }}
+                        {{ __('translations.computed_properties') }}
                     </h3>
                     <p class="text-gray-600 mb-4">
-                        {{ __('messages.translations) }}
+                        {{ __('translations.computed_properties_description') }}
                     </p>
                     <ul class="text-sm text-gray-500 space-y-1">
-                        <li>• {{ __('messages.translations) }}</li>
-                        <li>• {{ __('messages.translations) }}</li>
-                        <li>• {{ __('messages.translations) }}</li>
+                        <li>• {{ __('translations.intelligent_caching') }}</li>
+                        <li>• {{ __('translations.reduced_queries') }}</li>
+                        <li>• {{ __('translations.automatic_optimization') }}</li>
                     </ul>
                 </div>
 
@@ -113,15 +113,15 @@
                         </svg>
                     </div>
                     <h3 class="text-lg font-semibold text-gray-900 mb-2">
-                        {{ __('messages.translations) }}
+                        {{ __('translations.real_time_updates') }}
                     </h3>
                     <p class="text-gray-600 mb-4">
-                        {{ __('messages.translations) }}
+                        {{ __('translations.real_time_updates_description') }}
                     </p>
                     <ul class="text-sm text-gray-500 space-y-1">
-                        <li>• {{ __('messages.translations) }}</li>
-                        <li>• {{ __('messages.translations) }}</li>
-                        <li>• {{ __('messages.translations) }}</li>
+                        <li>• {{ __('translations.auto_refresh') }}</li>
+                        <li>• {{ __('translations.live_polling') }}</li>
+                        <li>• {{ __('translations.instant_updates') }}</li>
                     </ul>
                 </div>
 
@@ -133,15 +133,15 @@
                         </svg>
                     </div>
                     <h3 class="text-lg font-semibold text-gray-900 mb-2">
-                        {{ __('messages.translations) }}
+                        {{ __('translations.enhanced_ux') }}
                     </h3>
                     <p class="text-gray-600 mb-4">
-                        {{ __('messages.translations) }}
+                        {{ __('translations.enhanced_ux_description') }}
                     </p>
                     <ul class="text-sm text-gray-500 space-y-1">
-                        <li>• {{ __('messages.translations) }}</li>
-                        <li>• {{ __('messages.translations) }}</li>
-                        <li>• {{ __('messages.translations) }}</li>
+                        <li>• {{ __('translations.modern_design') }}</li>
+                        <li>• {{ __('translations.smooth_animations') }}</li>
+                        <li>• {{ __('translations.responsive_layout') }}</li>
                     </ul>
                 </div>
             </div>
@@ -153,10 +153,10 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-12">
                 <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                    {{ __('messages.translations) }}
+                    {{ __('translations.technical_specifications') }}
                 </h2>
                 <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-                    {{ __('messages.translations) }}
+                    {{ __('translations.technical_specifications_description') }}
                 </p>
             </div>
             
@@ -164,44 +164,44 @@
                 <!-- Features List -->
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                     <h3 class="text-lg font-semibold text-gray-900 mb-4">
-                        {{ __('messages.translations) }}
+                        {{ __('translations.performance_metrics') }}
                     </h3>
                     <div class="space-y-3">
                         <div class="flex items-center gap-3">
                             <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                             </svg>
-                            <span class="text-gray-700">{{ __('messages.translations) }}</span>
+                            <span class="text-gray-700">{{ __('translations.page_load_time') }}</span>
                         </div>
                         <div class="flex items-center gap-3">
                             <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                             </svg>
-                            <span class="text-gray-700">{{ __('messages.translations) }}</span>
+                            <span class="text-gray-700">{{ __('translations.database_queries') }}</span>
                         </div>
                         <div class="flex items-center gap-3">
                             <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                             </svg>
-                            <span class="text-gray-700">{{ __('messages.translations) }}</span>
+                            <span class="text-gray-700">{{ __('translations.cache_hit_rate') }}</span>
                         </div>
                         <div class="flex items-center gap-3">
                             <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                             </svg>
-                            <span class="text-gray-700">{{ __('messages.translations) }}</span>
+                            <span class="text-gray-700">{{ __('translations.memory_usage') }}</span>
                         </div>
                         <div class="flex items-center gap-3">
                             <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                             </svg>
-                            <span class="text-gray-700">{{ __('messages.translations) }}</span>
+                            <span class="text-gray-700">{{ __('translations.implemented_features') }}</span>
                         </div>
                         <div class="flex items-center gap-3">
                             <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                             </svg>
-                            <span class="text-gray-700">{{ __('messages.translations) }}</span>
+                            <span class="text-gray-700">{{ __('translations.live_dashboard') }}</span>
                         </div>
                     </div>
                 </div>
@@ -213,19 +213,19 @@
     <section class="py-16 bg-gradient-to-br from-blue-600 via-purple-600 to-blue-600 text-white">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h2 class="text-3xl md:text-4xl font-bold mb-6">
-                {{ __('messages.translations) }}
+                {{ __('translations.enhanced_search') }}
             </h2>
             <p class="text-xl mb-8 text-white/90">
-                {{ __('messages.translations) }}
+                {{ __('translations.inventory_tracker') }}
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
                 <a href="{{ route('home') }}" 
                    class="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-colors duration-200">
-                    {{ __('messages.translations) }}
+                    {{ __('translations.computed_properties') }}
                 </a>
                 <a href="{{ route('localized.products.index', ['locale' => app()->getLocale()]) }}" 
                    class="bg-white/10 backdrop-blur-sm text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/20 transition-colors duration-200">
-                    {{ __('messages.translations) }}
+                    {{ __('translations.real_time_updates') }}
                 </a>
             </div>
         </div>

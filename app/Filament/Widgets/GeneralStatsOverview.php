@@ -33,13 +33,13 @@ final class GeneralStatsOverview extends BaseWidget
     protected function getFilters(): ?array
     {
         return [
-            'today'        => __('Today'),
-            'week'         => __('Last week'),
-            'month'        => __('Last month'),
+            'today'        => __('translations.new_customers_today'),
+            'week'         => __('translations.added_this_week'),
+            'month'        => __('translations.new_customers_this_month'),
             'quarter'      => __('This quarter'),
-            'year'         => __('This year'),
+            'year'         => __('translations.date_this_year'),
             'ytd'          => __('Year to date'),
-            'last_30_days' => __('Last 30 days'),
+            'last_30_days' => __('translations.last_7_days'),
         ];
     }
 
@@ -53,7 +53,7 @@ final class GeneralStatsOverview extends BaseWidget
         $ordersChange = $orderMetrics['ordersChange'];
 
         return [
-            Stat::make(__('Revenue'), Number::currency($orderMetrics['revenue'], 'EUR'))
+            Stat::make(__('translations.total_revenue'), Number::currency($orderMetrics['revenue'], 'EUR'))
                 ->description($this->formatChangeDescription($revenueChange))
                 ->descriptionIcon($this->changeIcon($revenueChange), 'before')
                 ->descriptionColor($this->changeColor($revenueChange))
@@ -62,20 +62,20 @@ final class GeneralStatsOverview extends BaseWidget
                 ->valueColor('success')
                 ->chart($orderMetrics['revenueSparkline'])
                 ->chartColor('success'),
-            Stat::make(__('Orders'), Number::format($orderMetrics['orders']))
+            Stat::make(__('translations.total_orders'), Number::format($orderMetrics['orders']))
                 ->description($this->formatChangeDescription($ordersChange))
                 ->descriptionIcon($this->changeIcon($ordersChange), 'before')
                 ->descriptionColor($this->changeColor($ordersChange))
                 ->icon('heroicon-o-shopping-cart')
                 ->iconBackgroundColor('primary')
                 ->valueColor('primary'),
-            Stat::make(__('Average order value'), Number::currency($orderMetrics['aov'], 'EUR'))
-                ->description(__('Basket size'))
+            Stat::make(__('translations.average_order_value'), Number::currency($orderMetrics['aov'], 'EUR'))
+                ->description(__('translations.per_order'))
                 ->icon('heroicon-o-calculator')
                 ->iconBackgroundColor('warning')
                 ->valueColor('warning'),
-            Stat::make(__('Conversion rate'), Number::format($orderMetrics['conversionRate'], 2) . ' %')
-                ->description(__('Sessions → orders'))
+            Stat::make(__('translations.conversions'), Number::format($orderMetrics['conversionRate'], 2) . ' %')
+                ->description(__('translations.customer_satisfaction'))
                 ->icon('heroicon-o-bolt')
                 ->iconBackgroundColor('success')
                 ->valueColor('success'),
@@ -84,8 +84,8 @@ final class GeneralStatsOverview extends BaseWidget
                 ->icon('heroicon-o-arrow-uturn-left')
                 ->iconBackgroundColor('danger')
                 ->valueColor('danger'),
-            Stat::make(__('New customers'), Number::format($orderMetrics['newCustomers']))
-                ->description(__('New sign-ups'))
+            Stat::make(__('translations.new_users'), Number::format($orderMetrics['newCustomers']))
+                ->description(__('translations.new_customers_this_month'))
                 ->icon('heroicon-o-user-plus')
                 ->iconBackgroundColor('secondary')
                 ->valueColor('secondary'),
@@ -95,11 +95,11 @@ final class GeneralStatsOverview extends BaseWidget
     private function formatChangeDescription(?float $change): string
     {
         if ($change === null) {
-            return __('No prior period');
+            return __('translations.no');
         }
 
         if ($change === 0.0) {
-            return __('No change');
+            return __('translations.no');
         }
 
         return ($change > 0 ? '+' : '') . Number::format($change, 2) . '%';

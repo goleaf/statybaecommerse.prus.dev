@@ -20,9 +20,6 @@ final class NewsSeeder extends Seeder
             ->unique()
             ->values();
 
-        // Create categories first
-        $categories = $this->createCategories($locales);
-
         // Create 20 news items with different dates and relationships
         for ($i = 1; $i <= 20; $i++) {
             $news = News::factory()->create([
@@ -57,10 +54,6 @@ final class NewsSeeder extends Seeder
                 ]);
             }
 
-            // Attach random categories (1-3 per news)
-            $randomCategories = $categories->random(fake()->numberBetween(1, 3));
-            $news->categories()->attach($randomCategories->pluck('id'));
-
             // Create images (0-3 per news)
             $imageCount = fake()->numberBetween(0, 3);
             for ($k = 0; $k < $imageCount; $k++) {
@@ -70,18 +63,5 @@ final class NewsSeeder extends Seeder
                 ]);
             }
         }
-    }
-
-    private function createCategories($locales)
-    {
-        $categoryNames = [
-            'Technology', 'Business', 'Sports', 'Entertainment', 'Health', 'Science',
-            'Politics', 'Education', 'Travel', 'Food', 'Fashion', 'Automotive',
-        ];
-
-        $categories = collect();
-
-        // News category functionality has been removed
-        return collect();
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
+use App\Enums\NavigationGroup;
 use BackedEnum;
 use Filament\Forms;
 use Filament\Forms\Components\Section;
@@ -32,7 +33,7 @@ final class CacheMaintenance extends Page
 
     public static function getNavigationGroup(): ?string
     {
-        return __('messages.system'); // Keep cache tooling aligned with the broader system utilities group.
+        return NavigationGroup::System->label(); // Keep cache tooling aligned with the broader system utilities group.
     }
 
     protected static ?string $slug = 'cache-maintenance';

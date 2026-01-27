@@ -58,16 +58,18 @@ final class DocumentGenerated extends Notification implements ShouldQueue
         $displayName = $this->resolveNotifiableName($notifiable);
 
         $message = (new MailMessage)
-            ->subject(__('messages.documents, ['title' => $this->document->title], $locale))
-            ->greeting(__('messages.documents, ['name' => $displayName], $locale))
+            ->subject(__('messages.documents, [', ['title' => $this->document->title], $locale))
+            ->greeting(__('messages.documents, [', ['name' => $displayName], $locale))
             ->line(
                 __('messages.documents, [
+                    ', [
                     'title' => $this->document->title,
                     'type'  => __('documents.types.' . $this->document->template->type, [], $locale),
                 ], $locale)
             )
             ->line(
                 __('messages.documents, [
+                    ', [
                     'date'   => $this->document->generated_at?->format('Y-m-d H:i'),
                     'status' => __('documents.statuses.' . $this->document->status, [], $locale),
                 ], $locale)
@@ -107,12 +109,24 @@ final class DocumentGenerated extends Notification implements ShouldQueue
     {
         // Persist a lean payload that powers the notification centre and API responses.
         return [
+            ', [], $locale));
+    }
+
+    /**
+     * Convert the instance to an array representation.
+     *
+     * @return array<string, mixed>
+     */
+    public function toArray(object $notifiable): array
+    {
+        // Persist a lean payload that powers the notification centre and API responses.
+        return [
             'document_id'     => $this->document->id,
             'document_title'  => $this->document->title,
             'document_type'   => $this->document->template->type,
             'document_status' => $this->document->status,
             'generated_at'    => $this->document->generated_at?->toIso8601String(),
-            'message'         => __('messages.documents, ['title' => $this->document->title]),
+            'message'         => __('messages.documents, [', ['title' => $this->document->title]),
         ];
     }
 

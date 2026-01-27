@@ -59,7 +59,7 @@ final class Order extends Model
 
     public array $translatable = ['notes', 'billing_address', 'shipping_address'];
 
-    protected $fillable = ['number', 'user_id', 'status', 'subtotal', 'tax_amount', 'shipping_amount', 'discount_amount', 'total', 'currency', 'billing_address', 'shipping_address', 'notes', 'shipped_at', 'delivered_at', 'channel_id', 'shipping_option_id', 'partner_id', 'coupon_id', 'payment_status', 'payment_state', 'payment_method', 'payment_reference'];
+    protected $fillable = ['number', 'user_id', 'status', 'locale', 'subtotal', 'tax_amount', 'shipping_amount', 'discount_amount', 'total', 'currency', 'billing_address', 'shipping_address', 'notes', 'shipped_at', 'delivered_at', 'channel_id', 'shipping_option_id', 'partner_id', 'coupon_id', 'payment_status', 'payment_state', 'payment_method', 'payment_reference'];
 
     /**
      * Bootstrap the model and ensure a unique order number is assigned.

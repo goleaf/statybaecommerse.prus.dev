@@ -6,17 +6,16 @@ use App\Filament\Resources\VariantInventoryResource;
 use App\Models\Location;
 use App\Models\Product;
 use App\Models\ProductVariant;
-use DefStudio\SearchableInput\Forms\Components\SearchableInput;
+use App\Support\Filament\Components\SearchableInput;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Schema;
 
-
 // Bridge the new Filament namespace layout so the resource signature resolves during tests.
-if (!class_exists(\Filament\Forms\Form::class)) {
+if (! class_exists(\Filament\Forms\Form::class)) {
     class_alias(\Filament\Schemas\Components\Form::class, \Filament\Forms\Form::class);
 }
 
-if (!class_exists(\Filament\Forms\Set::class)) {
+if (! class_exists(\Filament\Forms\Set::class)) {
     class_alias(\Filament\Schemas\Components\Utilities\Set::class, \Filament\Forms\Set::class);
 }
 
@@ -64,15 +63,15 @@ it('normalises the variant payload including related product metadata', function
     // Prepare a product variant with numeric-friendly attributes to verify casting behaviour.
     $variant = ProductVariant::make([
         'product_id' => 654,
-        'sku' => 1001,
-        'name' => 'Wool Hat',
-        'price' => '199.95',
+        'sku'        => 1001,
+        'name'       => 'Wool Hat',
+        'price'      => '199.95',
     ]);
     $variant->setAttribute('id', 321);
 
     // Attach a related product so the helper can surface parent identifiers in the payload.
     $product = Product::make([
-        'sku' => 'PROD-900',
+        'sku'  => 'PROD-900',
         'name' => 'Felt Collection',
     ]);
     $product->setAttribute('id', 654);
@@ -87,12 +86,12 @@ it('normalises the variant payload including related product metadata', function
 
     expect($payload)
         ->toMatchArray([
-            'variant_id' => 321,
-            'sku' => '1001',
-            'name' => 'Wool Hat',
-            'price' => 199.95,
-            'product_id' => 654,
-            'product_sku' => 'PROD-900',
+            'variant_id'   => 321,
+            'sku'          => '1001',
+            'name'         => 'Wool Hat',
+            'price'        => 199.95,
+            'product_id'   => 654,
+            'product_sku'  => 'PROD-900',
             'product_name' => 'Felt Collection',
         ]);
 });
@@ -100,9 +99,9 @@ it('normalises the variant payload including related product metadata', function
 it('casts arbitrary location attributes into the expected payload shape', function (): void {
     // Seed a location with mixed attribute types so we can validate the string coercion logic.
     $location = Location::make([
-        'name' => 'Central Warehouse',
-        'code' => 42,
-        'city' => 'Vilnius',
+        'name'         => 'Central Warehouse',
+        'code'         => 42,
+        'city'         => 'Vilnius',
         'country_code' => 123,
     ]);
     $location->setAttribute('id', 777);
@@ -116,10 +115,13 @@ it('casts arbitrary location attributes into the expected payload shape', functi
 
     expect($payload)
         ->toMatchArray([
-            'location_id' => 777,
-            'name' => 'Central Warehouse',
-            'code' => '42',
-            'city' => 'Vilnius',
+            'location_id'  => 777,
+            'name'         => 'Central Warehouse',
+            'code'         => '42',
+            'city'         => 'Vilnius',
             'country_code' => '123',
         ]);
 });
+
+
+

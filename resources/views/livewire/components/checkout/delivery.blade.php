@@ -33,7 +33,7 @@
         <div class="flex items-center gap-3 rounded border border-amber-200 bg-amber-50 p-4" role="alert">
             <x-untitledui-truck class="size-5 text-amber-600" stroke-width="1.5" aria-hidden="true" />
             <p class="text-sm text-amber-800">
-                {{ __('No delivery option available for your address. Please confirm your details or contact support.') }}
+                {{ __('translations.no_delivery_options_available') }}
             </p>
         </div>
     @endif
@@ -72,7 +72,7 @@
             @enderror
 
             <div class="max-w-lg mx-auto lg:max-w-none">
-                <fieldset aria-label="{{ __('Delivery method') }}" aria-busy="{{ $isResolving ? 'true' : 'false' }}">
+                <fieldset aria-label="{{ __('translations.delivery_method') }}" aria-busy="{{ $isResolving ? 'true' : 'false' }}">
                     <div
                         class="-space-y-px bg-white"
                         @class([
@@ -154,7 +154,7 @@
 
                 <div class="pt-6 mt-10 border-t border-gray-200 sm:flex sm:items-center sm:justify-end">
                     <x-buttons.submit
-                        :title="__('Go to checkout')"
+                        :title="__('translations.go_to_checkout')"
                         class="w-full px-8 py-2 text-sm sm:w-auto"
                         wire:loading.attr="data-loading"
                         wire:loading.attr="disabled"

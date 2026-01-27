@@ -175,7 +175,7 @@ final class DashboardPageTest extends TestCase
     public function test_dashboard_translation_keys_exist(): void
     {
         // Test that required translation keys exist
-        $this->assertNotEmpty(trans('messages.admin));
+        $this->assertNotEmpty(trans('messages.admin'));
         $this->assertNotEmpty(trans('admin/dashboard.kpis.orders_today'));
         $this->assertNotEmpty(trans('admin/dashboard.actions.heading'));
         $this->assertNotEmpty(trans('admin/dashboard.tables.recent_orders'));

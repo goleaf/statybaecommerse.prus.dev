@@ -89,7 +89,6 @@ final class Location extends Model
         ];
     }
 
-
     /**
      * Handle country functionality with proper error handling.
      */
@@ -228,11 +227,11 @@ final class Location extends Model
     public function getTypeLabelAttribute(): string
     {
         return match ($this->type) {
-            'warehouse'    => __('messages.locations),
-            'store'        => __('messages.locations),
-            'office'       => __('messages.locations),
-            'pickup_point' => __('messages.locations),
-            'other'        => __('messages.locations),
+            'warehouse'    => __('messages.locations'),
+            'store'        => __('messages.locations'),
+            'office'       => __('messages.locations'),
+            'pickup_point' => __('messages.locations'),
+            'other'        => __('messages.locations'),
             default        => $this->type,
         };
     }

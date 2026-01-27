@@ -32,8 +32,7 @@ class TranslationCompletenessPropertyTest extends TestCase
 
         // Property: Core translation files should exist for all locales
         $coreTranslationFiles = [
-            'admin.php',
-            'frontend.php',
+            'messages.php',
             'validation.php',
         ];
 
@@ -107,34 +106,35 @@ class TranslationCompletenessPropertyTest extends TestCase
      * **Feature: filament-downgrade-restore, Property 4: Translation Completeness**
      * **Validates: Requirements 3.3, 5.3**
      *
-     * Property: JSON translation files should exist for all supported locales
+     * Property: Catalogue translation files should exist for all supported locales
      */
-    public function test_json_translation_completeness_property(): void
+    public function test_catalogue_translation_completeness_property(): void
     {
         $supportedLocales = ['lt', 'en', 'de', 'ru'];
         $langPath = lang_path();
+        $catalogueFiles = ['brand.php', 'category.php', 'city.php', 'country.php', 'product.php'];
 
-        // Property: JSON translation files should exist for all locales
+        // Property: Catalogue translation files should exist for all locales
         foreach ($supportedLocales as $locale) {
-            $jsonFilePath = $langPath . DIRECTORY_SEPARATOR . $locale . '.json';
-            $this->assertFileExists(
-                $jsonFilePath,
-                "JSON translation file should exist for locale '{$locale}'"
-            );
+            foreach ($catalogueFiles as $file) {
+                $filePath = $langPath . DIRECTORY_SEPARATOR . $locale . DIRECTORY_SEPARATOR . $file;
+                $this->assertFileExists(
+                    $filePath,
+                    "Catalogue translation file '{$file}' should exist for locale '{$locale}'"
+                );
 
-            // Property: JSON files should contain valid JSON
-            $content = file_get_contents($jsonFilePath);
-            $decoded = json_decode($content, true);
+                // Property: Files should return valid arrays
+                $translations = include $filePath;
+                $this->assertIsArray(
+                    $translations,
+                    "Catalogue translation file '{$file}' for locale '{$locale}' should return an array"
+                );
 
-            $this->assertIsArray(
-                $decoded,
-                "JSON translation file for locale '{$locale}' should contain valid JSON"
-            );
-
-            $this->assertNotEmpty(
-                $decoded,
-                "JSON translation file for locale '{$locale}' should not be empty"
-            );
+                $this->assertNotEmpty(
+                    $translations,
+                    "Catalogue translation file '{$file}' for locale '{$locale}' should not be empty"
+                );
+            }
         }
     }
 
@@ -151,10 +151,9 @@ class TranslationCompletenessPropertyTest extends TestCase
 
         // Essential e-commerce translation files that should exist
         $essentialFiles = [
-            'products.php',
-            'orders.php',
-            'customers.php',
-            'categories.php',
+            'product.php',
+            'category.php',
+            'brand.php',
         ];
 
         // Property: Essential e-commerce translation files should exist for primary locales

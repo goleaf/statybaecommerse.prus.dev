@@ -74,7 +74,7 @@ final class ReferralController extends Controller
         $user = Auth::user();
         // Check if user can create referral
         if (! Referral::canUserRefer($user->id)) {
-            return redirect()->route('referrals.index')->with('error', __('messages.referrals));
+            return redirect()->route('referrals.index')->with('error', __('messages.referrals'));
         }
 
         return view('referrals.create');
@@ -93,26 +93,26 @@ final class ReferralController extends Controller
         $referredUser = User::where('email', $request->referred_email)->first();
         // Check if user is trying to refer themselves
         if ($referredUser->id === $user->id) {
-            return redirect()->back()->with('error', __('messages.referrals));
+            return redirect()->back()->with('error', __('messages.referrals'));
         }
         // Check if user has already been referred
         if (Referral::userAlreadyReferred($referredUser->id)) {
-            return redirect()->back()->with('error', __('messages.referrals));
+            return redirect()->back()->with('error', __('messages.referrals'));
         }
         // Check if user can refer
         if (! Referral::canUserRefer($user->id)) {
-            return redirect()->back()->with('error', __('messages.referrals));
+            return redirect()->back()->with('error', __('messages.referrals'));
         }
         try {
             DB::beginTransaction();
-            $referral = Referral::createWithCode(['referrer_id' => $user->id, 'referred_id' => $referredUser->id, 'status' => 'pending', 'title' => ['en' => $request->title ?? __('messages.referrals), 'lt' => $request->title ?? __('messages.referrals)], 'description' => ['en' => $request->description ?? __('messages.referrals), 'lt' => $request->description ?? __('messages.referrals)], 'source' => 'website', 'ip_address' => $request->ip(), 'user_agent' => $request->userAgent()]);
+            $referral = Referral::createWithCode(['referrer_id' => $user->id, 'referred_id' => $referredUser->id, 'status' => 'pending', 'title' => ['en' => $request->title ?? __('messages.referrals'), 'lt' => $request->title ?? __('messages.referrals')], 'description' => ['en' => $request->description ?? __('messages.referrals'), 'lt' => $request->description ?? __('messages.referrals')], 'source' => 'website', 'ip_address' => $request->ip(), 'user_agent' => $request->userAgent()]);
             DB::commit();
 
-            return redirect()->route('referrals.index')->with('success', __('messages.referrals));
+            return redirect()->route('referrals.index')->with('success', __('messages.referrals'));
         } catch (Exception $e) {
             DB::rollBack();
 
-            return redirect()->back()->with('error', __('messages.referrals));
+            return redirect()->back()->with('error', __('messages.referrals'));
         }
     }
 
@@ -124,15 +124,15 @@ final class ReferralController extends Controller
         $user = Auth::user();
         // Check if user already has an active referral code
         if ($user->referral_code) {
-            return response()->json(['success' => false, 'message' => __('messages.referrals), 'code' => $user->referral_code]);
+            return response()->json(['success' => false, 'message' => __('messages.referrals'), 'code' => $user->referral_code]);
         }
         try {
             $code = Referral::generateUniqueCode();
             $user->update(['referral_code' => $code, 'referral_code_generated_at' => now()]);
 
-            return response()->json(['success' => true, 'message' => __('messages.referrals), 'code' => $code]);
+            return response()->json(['success' => true, 'message' => __('messages.referrals'), 'code' => $code]);
         } catch (Exception $e) {
-            return response()->json(['success' => false, 'message' => __('messages.referrals)]);
+            return response()->json(['success' => false, 'message' => __('messages.referrals')]);
         }
     }
 
@@ -148,20 +148,20 @@ final class ReferralController extends Controller
         $user = Auth::user();
         // Check if user has already been referred
         if (Referral::userAlreadyReferred($user->id)) {
-            return response()->json(['success' => false, 'message' => __('messages.referrals)]);
+            return response()->json(['success' => false, 'message' => __('messages.referrals')]);
         }
         // Find referral by code
         $referral = Referral::findByCode($request->code);
         if (! $referral) {
-            return response()->json(['success' => false, 'message' => __('messages.referrals)]);
+            return response()->json(['success' => false, 'message' => __('messages.referrals')]);
         }
         // Check if referral is valid
         if (! $referral->isValid()) {
-            return response()->json(['success' => false, 'message' => __('messages.referrals)]);
+            return response()->json(['success' => false, 'message' => __('messages.referrals')]);
         }
         // Check if user is trying to use their own code
         if ($referral->referrer_id === $user->id) {
-            return response()->json(['success' => false, 'message' => __('messages.referrals)]);
+            return response()->json(['success' => false, 'message' => __('messages.referrals')]);
         }
         try {
             DB::beginTransaction();
@@ -169,11 +169,11 @@ final class ReferralController extends Controller
             $referral->update(['referred_id' => $user->id]);
             DB::commit();
 
-            return response()->json(['success' => true, 'message' => __('messages.referrals)]);
+            return response()->json(['success' => true, 'message' => __('messages.referrals')]);
         } catch (Exception $e) {
             DB::rollBack();
 
-            return response()->json(['success' => false, 'message' => __('messages.referrals)]);
+            return response()->json(['success' => false, 'message' => __('messages.referrals')]);
         }
     }
 
@@ -184,9 +184,9 @@ final class ReferralController extends Controller
     {
         $user = Auth::user();
         if (! $user->referral_code) {
-            return redirect()->route('referrals.create')->with('info', __('messages.referrals));
+            return redirect()->route('referrals.create')->with('info', __('messages.referrals'));
         }
-        $shareText = __('messages.referrals, ['code' => $user->referral_code, 'url' => route('referrals.apply', $user->referral_code)]);
+        $shareText = __('messages.referrals', ['code' => $user->referral_code, 'url' => route('referrals.apply', $user->referral_code)]);
 
         return view('referrals.share', compact('user', 'shareText'));
     }

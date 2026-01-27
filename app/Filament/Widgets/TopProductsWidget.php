@@ -39,6 +39,14 @@ final class TopProductsWidget extends BaseWidget
         // Configure the widget table to meet the Filament v4 return type contract.
         $query = Product::query()
             ->withoutGlobalScopes()
+            ->select([');
+    }
+
+    public function table(Table $table): Table
+    {
+        // Configure the widget table to meet the Filament v4 return type contract.
+        $query = Product::query()
+            ->withoutGlobalScopes()
             ->select(['products.*'])
             ->selectRaw(
                 '(SELECT COALESCE(SUM(quantity), 0) FROM order_items '

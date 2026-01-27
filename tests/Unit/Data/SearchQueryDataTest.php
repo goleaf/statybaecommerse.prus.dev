@@ -11,6 +11,5 @@ test('search query data normalizes case-insensitive type filters', function (): 
         'types' => ['Product', 'CATEGORY', ' brand '],
     ]);
 
-
     expect($data->types())->toBe(['product', 'category', 'brand']);
 });

@@ -55,17 +55,18 @@ final class SingleProduct extends Component
     public function specifications(): \Illuminate\Support\Collection
     {
         return $this->product->attributes
-            ->filter(fn($attribute) => $attribute->pivot->attribute_value_id !== null)
+            ->filter(fn ($attribute) => $attribute->pivot->attribute_value_id !== null)
             ->map(function ($attribute) {
                 $valueId = $attribute->pivot->attribute_value_id;
                 $valueModel = $attribute->values->firstWhere('id', $valueId);
+
                 return [
                     'label' => $attribute->trans('name') ?? $attribute->name,
                     'value' => $valueModel ? ($valueModel->trans('value') ?? $valueModel->value) : null,
-                    'icon' => $attribute->icon,
+                    'icon'  => $attribute->icon,
                 ];
             })
-            ->filter(fn($spec) => $spec['value'] !== null)
+            ->filter(fn ($spec) => $spec['value'] !== null)
             ->values();
     }
 
@@ -74,29 +75,29 @@ final class SingleProduct extends Component
     {
         $priceData = $this->product->getPrice();
         $brandName = $this->product->brand?->trans('name') ?? $this->product->brand?->name;
-        
+
         $schema = [
-            '@context' => 'https://schema.org',
-            '@type' => 'Product',
-            'name' => $this->product->trans('name') ?? $this->product->name,
-            'image' => $this->ogImage ? [$this->ogImage] : [],
+            '@context'    => 'https://schema.org',
+            '@type'       => 'Product',
+            'name'        => $this->product->trans('name') ?? $this->product->name,
+            'image'       => $this->ogImage ? [$this->ogImage] : [],
             'description' => Str::limit(strip_tags($this->product->trans('description') ?? $this->product->description), 300),
         ];
 
         if ($brandName) {
             $schema['brand'] = [
                 '@type' => 'Brand',
-                'name' => $brandName,
+                'name'  => $brandName,
             ];
         }
 
         if ($priceData) {
             $schema['offers'] = [
-                '@type' => 'Offer',
+                '@type'         => 'Offer',
                 'priceCurrency' => function_exists('current_currency') ? current_currency() : 'EUR',
-                'price' => number_format((float) ($priceData->value->amount ?? $priceData->value), 2, '.', ''),
-                'availability' => 'https://schema.org/' . ($this->product->isPublished() ? 'InStock' : 'OutOfStock'),
-                'url' => url()->current(),
+                'price'         => number_format((float) ($priceData->value->amount ?? $priceData->value), 2, '.', ''),
+                'availability'  => 'https://schema.org/' . ($this->product->isPublished() ? 'InStock' : 'OutOfStock'),
+                'url'           => url()->current(),
             ];
         }
 
@@ -107,23 +108,23 @@ final class SingleProduct extends Component
     public function reviewsSchema(): ?array
     {
         $recentReviews = $this->recentApprovedReviewsLimited;
-        
+
         if ($recentReviews->isEmpty()) {
             return null;
         }
 
         return [
-            '@context' => 'https://schema.org',
-            '@type' => 'ItemList',
+            '@context'        => 'https://schema.org',
+            '@type'           => 'ItemList',
             'itemListElement' => $recentReviews
                 ->map(fn ($r) => [
-                    '@type' => 'Review',
-                    'name' => $r->title,
-                    'reviewBody' => Str::limit(strip_tags($r->content), 300),
+                    '@type'        => 'Review',
+                    'name'         => $r->title,
+                    'reviewBody'   => Str::limit(strip_tags($r->content), 300),
                     'reviewRating' => [
-                        '@type' => 'Rating',
+                        '@type'       => 'Rating',
                         'ratingValue' => (int) $r->rating,
-                        'bestRating' => '5',
+                        'bestRating'  => '5',
                     ],
                     'datePublished' => optional($r->created_at)->toDateString(),
                 ])
@@ -149,7 +150,7 @@ final class SingleProduct extends Component
     public function categoryLabels(): \Illuminate\Support\Collection
     {
         return $this->product->categories
-            ->map(fn($category) => $category->trans('name') ?? $category->name)
+            ->map(fn ($category) => $category->trans('name') ?? $category->name)
             ->filter()
             ->values();
     }
@@ -176,7 +177,7 @@ final class SingleProduct extends Component
     public function stockToneClass(): string
     {
         return match ($this->stockStatus) {
-            'in_stock' => 'text-emerald-600',
+            'in_stock'  => 'text-emerald-600',
             'low_stock' => 'text-amber-600',
             'out_of_stock', 'unavailable' => 'text-rose-600',
             default => 'text-slate-600',
@@ -302,7 +303,7 @@ final class SingleProduct extends Component
         $this->activeVariantId = $this->determineDefaultVariantId();
         $this->refreshVariantState($this->activeVariantId);
 
-        $this->ogImage = $this->product->getFirstMediaUrl(config('media.storage.collection_name'), 'large') 
+        $this->ogImage = $this->product->getFirstMediaUrl(config('media.storage.collection_name'), 'large')
             ?: $this->product->getFirstMediaUrl(config('media.storage.collection_name'));
     }
 
@@ -671,7 +672,7 @@ final class SingleProduct extends Component
                             $currency = $value['price_currency_hint'];
 
                             if ($currency) {
-                                $priceHint = __('messages.product_page', [
+                                $priceHint = __('product_page.variant_option_from_price', [
                                     'price' => Number::currency((float) $minPrice, $currency, app()->getLocale()),
                                 ]);
                             }
@@ -923,13 +924,13 @@ final class SingleProduct extends Component
     protected function resolveStockMessage(): string
     {
         if (! $this->product->manage_stock) {
-            return __('messages.translations');
+            return __('translations.in_stock');
         }
 
         $available = $this->product->availableQuantity();
 
         if ($available <= 0) {
-            return __('messages.translations');
+            return __('translations.out_of_stock');
         }
 
         $threshold = (int) ($this->product->low_stock_threshold ?? 0);
@@ -953,13 +954,13 @@ final class SingleProduct extends Component
             ->implode(', ');
 
         $facts = [
-            ['label' => __('messages.translations'), 'value' => $brandName],
-            ['label' => __('messages.translations'), 'value' => $categoryNames],
-            ['label' => __('messages.translations'), 'value' => $this->product->sku],
-            ['label' => __('messages.translations'), 'value' => $this->product->isInStock() ? __('messages.translations') : __('messages.translations')],
-            ['label' => __('messages.translations'), 'value' => $this->formatMeasurement($this->product->weight, $this->product->weight_unit?->value ?? null)],
-            ['label' => __('messages.translations'), 'value' => $this->product->getDimensions()],
-            ['label' => __('messages.translations'), 'value' => $this->product->updated_at?->diffForHumans()],
+            ['label' => __('translations.brand'), 'value' => $brandName],
+            ['label' => __('translations.category'), 'value' => $categoryNames],
+            ['label' => __('translations.sku'), 'value' => $this->product->sku],
+            ['label' => __('translations.availability'), 'value' => $this->product->isInStock() ? __('translations.in_stock') : __('translations.out_of_stock')],
+            ['label' => __('translations.weight'), 'value' => $this->formatMeasurement($this->product->weight, $this->product->weight_unit?->value ?? null)],
+            ['label' => __('translations.dimensions'), 'value' => $this->product->getDimensions()],
+            ['label' => __('translations.last_updated'), 'value' => $this->product->updated_at?->diffForHumans()],
         ];
 
         return array_values(array_filter($facts, fn (array $fact) => filled($fact['value'])));

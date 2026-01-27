@@ -194,23 +194,6 @@ Route::middleware(['web'])->group(function () {
         Route::post('/{discountCode}/generate-document', [App\Http\Controllers\Frontend\DiscountCodeController::class, 'generateDocument'])->name('generate-document');
     });
 
-    // Review Routes
-    Route::prefix('reviews')->name('reviews.')->group(function () {
-        Route::get('/', [App\Http\Controllers\ReviewController::class, 'index'])->name('index');
-        Route::get('/products/{product}/reviews', [App\Http\Controllers\ReviewController::class, 'productReviews'])->name('product');
-
-        Route::middleware('auth')->group(function (): void {
-            // Guard review editor endpoints so only authenticated users can create or modify entries.
-            Route::get('/create', [App\Http\Controllers\ReviewController::class, 'create'])->name('create');
-            Route::post('/', [App\Http\Controllers\ReviewController::class, 'store'])->name('store');
-            Route::get('/{review}/edit', [App\Http\Controllers\ReviewController::class, 'edit'])->name('edit');
-            Route::put('/{review}', [App\Http\Controllers\ReviewController::class, 'update'])->name('update');
-            Route::delete('/{review}', [App\Http\Controllers\ReviewController::class, 'destroy'])->name('destroy');
-        });
-
-        Route::get('/{review}', [App\Http\Controllers\ReviewController::class, 'show'])->name('show');
-    });
-
     // Referral Routes
     Route::middleware(['auth'])->prefix('referrals')->name('referrals.')->group(function () {
         Route::get('/', [App\Http\Controllers\ReferralController::class, 'index'])->name('index');

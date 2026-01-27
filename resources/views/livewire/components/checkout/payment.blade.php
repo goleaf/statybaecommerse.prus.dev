@@ -20,14 +20,14 @@
         @enderror
 
         <div class="max-w-lg mx-auto lg:max-w-none">
-            <fieldset aria-label="{{ __('Payment method') }}">
+            <fieldset aria-label="{{ __('translations.payment_method') }}">
                 {{-- Display a loading hint while payment integrations hydrate --}}
                 <div
                     wire:loading.flex
                     class="items-center gap-2 p-3 mb-2 text-sm text-gray-500 bg-gray-50 border border-dashed border-gray-200 rounded"
                 >
                     <x-loading-dots class="text-primary-600" aria-hidden="true" />
-                    <span>{{ __('Preparing payment methods...') }}</span>
+                    <span>{{ __('translations.preparing_payment_methods') }}</span>
                 </div>
 
                 <div class="-space-y-px bg-white" wire:loading.remove>
@@ -68,9 +68,7 @@
 
             <div class="mt-8 space-y-8">
                 <p class="text-sm leading-5 text-gray-500">
-                    {{ __(" By clicking on the 'Place my order' button, you confirm that you have read,
-                     understood and accepted our terms of use, our terms of sale and our returns policy,
-                      and you acknowledge that you have read our privacy policy.") }}
+                    {{ __('translations.checkout_acknowledgement') }}
                 </p>
                 <div class="pt-6 border-t border-gray-200 sm:flex sm:items-center sm:justify-end">
                     @php
@@ -89,7 +87,7 @@
                         <span class="absolute left-0 pl-2" wire:loading>
                             <x-loading-dots class="bg-white" aria-hidden="true" />
                         </span>
-                        {{ $ctaIsLocked ? __('Recalculating shipping…') : __('Place my order') }}
+                        {{ $ctaIsLocked ? __('translations.recalculating_shipping') : __('translations.place_my_order') }}
                     </x-buttons.primary>
                 </div>
             </div>

@@ -60,8 +60,6 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property-read string|null $thumbnail
  * @property-read string|null $main_image
  * @property-read int $sales_count
- * @property-read int $reviews_count
- * @property-read float $average_rating
  *
  * @method static \Illuminate\Database\Eloquent\Builder|Product newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Product newQuery()
@@ -127,7 +125,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
      *
      * @var array<int, string>
      */
-    protected $appends = ['average_rating', 'reviews_count', 'main_image', 'thumbnail', 'stock_status', 'is_in_stock', 'is_low_stock', 'is_out_of_stock', 'available_quantity', 'discount_percentage', 'profit_margin', 'markup_percentage', 'dimensions', 'volume', 'canonical_url', 'sales_count', 'revenue', 'formatted_price', 'formatted_compare_price'];
+    protected $appends = ['main_image', 'thumbnail', 'stock_status', 'is_in_stock', 'is_low_stock', 'is_out_of_stock', 'available_quantity', 'discount_percentage', 'profit_margin', 'markup_percentage', 'dimensions', 'volume', 'canonical_url', 'sales_count', 'revenue', 'formatted_price', 'formatted_compare_price'];
 
     protected $table = 'products';
 
@@ -472,11 +470,15 @@ final class Product extends Model implements HasMedia, TranslatableRecord
 
     public function getCategoryAttribute(): ?Category
     {
-        if (! $this->relationLoaded('categories')) {
-            return null;
+        if ($this->relationLoaded('mainCategory')) {
+            return $this->mainCategory->first();
         }
 
-        return $this->getRelation('categories')->first();
+        if ($this->relationLoaded('categories')) {
+            return $this->getRelation('categories')->first();
+        }
+
+        return $this->categories()->first();
     }
 
     /**
@@ -705,9 +707,9 @@ final class Product extends Model implements HasMedia, TranslatableRecord
         return $this->belongsToMany(Category::class, 'product_categories');
     }
 
-    public function category(): HasOne
+    public function mainCategory(): BelongsToMany
     {
-        return $this->hasOne(Category::class, 'id', 'category_id')->withDefault();
+        return $this->belongsToMany(Category::class, 'product_categories')->limit(1);
     }
 
     /**
@@ -721,56 +723,6 @@ final class Product extends Model implements HasMedia, TranslatableRecord
     public function userBehaviors(): HasMany
     {
         return $this->hasMany(UserBehavior::class);
-    }
-
-    /**
-     * Handle reviews functionality with proper error handling.
-     */
-    public function reviews(): HasMany
-    {
-        return $this->hasMany(Review::class);
-    }
-
-    /**
-     * Handle latestReview functionality with proper error handling.
-     */
-    public function latestReview(): HasOne
-    {
-        return $this->reviews()->one()->latestOfMany();
-    }
-
-    /**
-     * Handle oldestReview functionality with proper error handling.
-     */
-    public function oldestReview(): HasOne
-    {
-        return $this->reviews()->one()->oldestOfMany();
-    }
-
-    /**
-     * Handle highestRatedReview functionality with proper error handling.
-     */
-    public function highestRatedReview(): HasOne
-    {
-        return $this->reviews()->one()->ofMany('rating', 'max');
-    }
-
-    /**
-     * Handle lowestRatedReview functionality with proper error handling.
-     */
-    public function lowestRatedReview(): HasOne
-    {
-        return $this->reviews()->one()->ofMany('rating', 'min');
-    }
-
-    /**
-     * Handle latestApprovedReview functionality with proper error handling.
-     */
-    public function latestApprovedReview(): HasOne
-    {
-        return $this->reviews()->one()->ofMany(['created_at' => 'max'], function ($query): void {
-            $query->where('is_approved', true);
-        });
     }
 
     /**
@@ -1158,52 +1110,6 @@ final class Product extends Model implements HasMedia, TranslatableRecord
     public function scopeWithRequests($query)
     {
         return $query->where('requests_count', '>', 0);
-    }
-
-    /**
-     * Handle getAverageRatingAttribute functionality with proper error handling.
-     */
-    public function getAverageRatingAttribute(): float
-    {
-        // When aggregate values are eager loaded (e.g. via loadAvg), prefer the hydrated
-        // attributes so we do not run redundant queries when the value is already known.
-        foreach (['average_rating', 'reviews_avg_rating', 'approved_reviews_avg_rating'] as $attribute) {
-            if (array_key_exists($attribute, $this->attributes)) {
-                $rating = $this->attributes[$attribute];
-
-                return $rating !== null ? (float) $rating : 0.0;
-            }
-        }
-
-        if ($this->relationLoaded('reviews')) {
-            $rating = $this->getRelation('reviews')->avg('rating');
-
-            return $rating !== null ? (float) $rating : 0.0;
-        }
-
-        $rating = $this->reviews()->approved()->avg('rating');
-
-        return $rating ? (float) $rating : 0.0;
-    }
-
-    /**
-     * Handle getReviewsCountAttribute functionality with proper error handling.
-     */
-    public function getReviewsCountAttribute(): int
-    {
-        // Respect any eager-loaded aggregate counts (loadCount / withCount) to avoid
-        // re-querying the database when the information is already on the model.
-        foreach (['reviews_count', 'approved_reviews_count'] as $attribute) {
-            if (array_key_exists($attribute, $this->attributes)) {
-                return (int) $this->attributes[$attribute];
-            }
-        }
-
-        if ($this->relationLoaded('reviews')) {
-            return $this->getRelation('reviews')->count();
-        }
-
-        return $this->reviews()->approved()->count();
     }
 
     /**
@@ -1705,7 +1611,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
      */
     public function getBusinessInfo(): array
     {
-        return ['is_featured' => $this->is_featured, 'is_requestable' => $this->is_requestable, 'requests_count' => $this->requests_count, 'average_rating' => $this->average_rating, 'reviews_count' => $this->reviews_count, 'sales_count' => $this->getSalesCount(), 'revenue' => $this->getRevenue()];
+        return ['is_featured' => $this->is_featured, 'is_requestable' => $this->is_requestable, 'requests_count' => $this->requests_count, 'sales_count' => $this->getSalesCount(), 'revenue' => $this->getRevenue()];
     }
 
     /**

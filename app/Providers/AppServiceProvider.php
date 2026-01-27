@@ -12,6 +12,7 @@ use App\Database\Connectors\GracefulSQLiteConnector;
 use App\Domain\Product\Repositories\ProductRepositoryInterface;
 use App\Filament\Components\LiveNotificationFeed;
 use App\Infrastructure\Product\Repositories\EloquentProductRepository;
+use App\Mail\Auth\VerifyEmailMail;
 use App\Services\CacheInvalidationService;
 use App\Services\CurrencyRateSyncService;
 use App\Services\DocumentService;
@@ -26,7 +27,7 @@ use App\Support\Uploads\SecureUploadHandler;
 use Closure;
 use DateInterval;
 use DateTimeInterface;
-use DefStudio\SearchableInput\Forms\Components\SearchableInput;
+use App\Support\Filament\Components\SearchableInput;
 use Faker\Factory as FakerFactory;
 use Faker\Generator as FakerGenerator;
 use Filament\Facades\Filament;
@@ -61,7 +62,6 @@ use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Number;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
-use App\Mail\Auth\VerifyEmailMail;
 
 use function in_array;
 
@@ -341,6 +341,9 @@ class AppServiceProvider extends ServiceProvider
             resource_path('views/filament/components'),
             'filament'
         );  // Expose custom Filament Blade components for anonymous <x-filament::*> usage.
+
+        // Allow overrides for Filament panel anonymous components when the package views are not loaded.
+        Blade::anonymousComponentNamespace('vendor/filament-panels', 'filament-panels');
 
         if (! Testable::hasMacro('assertCanSeeFormData')) {
             Testable::macro('assertCanSeeFormData', function (array $data): Testable {

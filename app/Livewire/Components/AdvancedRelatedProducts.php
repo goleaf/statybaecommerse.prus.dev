@@ -74,10 +74,10 @@ final class AdvancedRelatedProducts extends Component
         }
 
         return match ($this->type) {
-            'category' => __('messages.ecommerce),
-            'brand'    => __('messages.ecommerce),
-            'price'    => __('messages.ecommerce),
-            default    => __('messages.ecommerce),
+            'category' => __('messages.ecommerce'),
+            'brand'    => __('messages.ecommerce'),
+            'price'    => __('messages.ecommerce'),
+            default    => __('messages.ecommerce'),
         };
     }
 

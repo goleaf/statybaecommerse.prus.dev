@@ -30,7 +30,7 @@ class RecentActivityWidget extends BaseWidget
             ->query($this->getTableQuery())
             ->columns([
                 Tables\Columns\TextColumn::make('type')
-                    ->label(__('messages.translations))
+                    ->label(__('Type'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'Order'          => 'success',
@@ -46,12 +46,12 @@ class RecentActivityWidget extends BaseWidget
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('title')
-                    ->label(__('messages.translations))
+                    ->label(__('Description'))
                     ->searchable()
                     ->sortable()
                     ->limit(50),
                 Tables\Columns\TextColumn::make('description')
-                    ->label(__('messages.translations))
+                    ->label(__('Subject'))
                     ->searchable()
                     ->limit(100)
                     ->tooltip(function (Tables\Columns\TextColumn $column): ?string {
@@ -60,7 +60,7 @@ class RecentActivityWidget extends BaseWidget
                         return strlen($state) > 100 ? $state : null;
                     }),
                 Tables\Columns\TextColumn::make('status')
-                    ->label(__('messages.translations))
+                    ->label(__('User'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'active', 'completed', 'published', 'approved' => 'success',
@@ -71,12 +71,12 @@ class RecentActivityWidget extends BaseWidget
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label(__('messages.translations))
+                    ->label(__('System'))
                     ->dateTime()
                     ->sortable()
                     ->since(),
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->label(__('messages.translations))
+                    ->label(__('Time'))
                     ->dateTime()
                     ->sortable()
                     ->since(),

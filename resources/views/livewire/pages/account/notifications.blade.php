@@ -138,11 +138,11 @@ new #[Layout('components.layouts.templates.account')] class extends Component {
 }; ?>
 
 <div class="space-y-6">
-    <x-breadcrumbs :items="[['label' => __('messages.frontend), 'url' => route('account.index')], ['label' => __('messages.frontend)]]" />
+    <x-breadcrumbs :items="[['label' => __('messages.frontend'), 'url' => route('account.index')], ['label' => __('messages.frontend')]]" />
     
     <div class="flex items-center justify-between">
         <div>
-            <h1 class="text-2xl font-bold text-gray-900">{{ __('messages.frontend) }}</h1>
+            <h1 class="text-2xl font-bold text-gray-900">{{ __('messages.frontend') }}</h1>
             <p class="mt-1 text-sm text-gray-500">{{ __('frontend.account.notifications_description') }}</p>
         </div>
         
@@ -155,7 +155,7 @@ new #[Layout('components.layouts.templates.account')] class extends Component {
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                     </svg>
-                    {{ __('messages.notifications) }}
+                    {{ __('messages.notifications') }}
                 </button>
                 
                 <button 
@@ -166,7 +166,7 @@ new #[Layout('components.layouts.templates.account')] class extends Component {
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                     </svg>
-                    {{ __('messages.notifications) }}
+                    {{ __('messages.notifications') }}
                 </button>
             </div>
         @endif
@@ -185,29 +185,29 @@ new #[Layout('components.layouts.templates.account')] class extends Component {
                             class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
                         >
                         <label for="unread-only" class="ml-2 text-sm text-gray-700">
-                            {{ __('messages.notifications) }}
+                            {{ __('messages.notifications') }}
                         </label>
                     </div>
                 </div>
                 
                 <div class="flex items-center space-x-2">
-                    <label for="filter" class="text-sm font-medium text-gray-700">{{ __('messages.notifications) }}:</label>
+                    <label for="filter" class="text-sm font-medium text-gray-700">{{ __('messages.notifications') }}:</label>
                     <select 
                         wire:model.live="filter" 
                         id="filter" 
                         class="block w-40 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                     >
-                        <option value="all">{{ __('messages.notifications) }}</option>
-                        <option value="order">{{ __('messages.notifications) }}</option>
-                        <option value="product">{{ __('messages.notifications) }}</option>
-                        <option value="user">{{ __('messages.notifications) }}</option>
-                        <option value="system">{{ __('messages.notifications) }}</option>
-                        <option value="payment">{{ __('messages.notifications) }}</option>
-                        <option value="shipping">{{ __('messages.notifications) }}</option>
-                        <option value="review">{{ __('messages.notifications) }}</option>
-                        <option value="promotion">{{ __('messages.notifications) }}</option>
-                        <option value="newsletter">{{ __('messages.notifications) }}</option>
-                        <option value="support">{{ __('messages.notifications) }}</option>
+                        <option value="all">{{ __('messages.notifications') }}</option>
+                        <option value="order">{{ __('messages.notifications') }}</option>
+                        <option value="product">{{ __('messages.notifications') }}</option>
+                        <option value="user">{{ __('messages.notifications') }}</option>
+                        <option value="system">{{ __('messages.notifications') }}</option>
+                        <option value="payment">{{ __('messages.notifications') }}</option>
+                        <option value="shipping">{{ __('messages.notifications') }}</option>
+                        <option value="review">{{ __('messages.notifications') }}</option>
+                        <option value="promotion">{{ __('messages.notifications') }}</option>
+                        <option value="newsletter">{{ __('messages.notifications') }}</option>
+                        <option value="support">{{ __('messages.notifications') }}</option>
                     </select>
                 </div>
             </div>
@@ -220,8 +220,8 @@ new #[Layout('components.layouts.templates.account')] class extends Component {
             <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM4 19h6v-6H4v6zM4 5h6V1H4v4zM15 3h5v6h-5V3z"></path>
             </svg>
-            <h3 class="mt-2 text-sm font-medium text-gray-900">{{ __('messages.notifications) }}</h3>
-            <p class="mt-1 text-sm text-gray-500">{{ __('messages.notifications) }}</p>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">{{ __('messages.notifications') }}</h3>
+            <p class="mt-1 text-sm text-gray-500">{{ __('messages.notifications') }}</p>
         </div>
     @else
         <div class="bg-white shadow overflow-hidden sm:rounded-md">
@@ -278,7 +278,7 @@ new #[Layout('components.layouts.templates.account')] class extends Component {
                                             </p>
                                             @if (!$notification['read_at'])
                                                 <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                                    {{ __('messages.notifications) }}
+                                                    {{ __('messages.notifications') }}
                                                 </span>
                                             @endif
                                         </div>
@@ -299,7 +299,7 @@ new #[Layout('components.layouts.templates.account')] class extends Component {
                                         <button 
                                             wire:click="markAsRead('{{ $notification['id'] }}')"
                                             class="text-gray-400 hover:text-gray-600"
-                                            title="{{ __('messages.notifications) }}"
+                                            title="{{ __('messages.notifications') }}"
                                         >
                                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
@@ -311,7 +311,7 @@ new #[Layout('components.layouts.templates.account')] class extends Component {
                                         wire:click="deleteNotification('{{ $notification['id'] }}')"
                                         wire:confirm="{{ __('notifications.confirmations.delete_one') }}"
                                         class="text-gray-400 hover:text-red-600"
-                                        title="{{ __('messages.notifications) }}"
+                                        title="{{ __('messages.notifications') }}"
                                     >
                                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>

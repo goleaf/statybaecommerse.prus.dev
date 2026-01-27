@@ -34,7 +34,7 @@
                                 {{ $productRequest->product->trans('name') ?? $productRequest->product->name }}
                             </h3>
                             <p class="text-sm text-gray-600 mb-2">
-                                {{ __('messages.translations) }}: {{ $productRequest->product->sku }}
+                                {{ __('translations.sku') }}: {{ $productRequest->product->sku }}
                             </p>
                             @if($productRequest->product->price)
                                 <p class="text-lg font-semibold text-green-600">
@@ -54,14 +54,14 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">
-                                {{ __('messages.translations) }}
+                                {{ __('translations.name') }}
                             </label>
                             <p class="text-gray-900">{{ $productRequest->name }}</p>
                         </div>
                         
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">
-                                {{ __('messages.translations) }}
+                                {{ __('translations.email') }}
                             </label>
                             <p class="text-gray-900">{{ $productRequest->email }}</p>
                         </div>
@@ -69,7 +69,7 @@
                         @if($productRequest->phone)
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">
-                                    {{ __('messages.translations) }}
+                                    {{ __('translations.phone') }}
                                 </label>
                                 <p class="text-gray-900">{{ $productRequest->phone }}</p>
                             </div>
@@ -77,7 +77,7 @@
                         
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">
-                                {{ __('messages.translations) }}
+                                {{ __('translations.quantity') }}
                             </label>
                             <p class="text-gray-900">{{ $productRequest->requested_quantity }}</p>
                         </div>
@@ -123,7 +123,7 @@
                 <!-- Status Card -->
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <h3 class="text-lg font-semibold text-gray-900 mb-4">
-                        {{ __('messages.translations) }}
+                        {{ __('translations.status') }}
                     </h3>
                     
                     <div class="text-center">

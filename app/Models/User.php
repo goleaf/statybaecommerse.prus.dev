@@ -85,7 +85,7 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
      *
      * @var array<int, string>
      */
-    protected $appends = ['full_name', 'initials', 'total_spent', 'average_order_value', 'last_order_date', 'orders_count', 'reviews_count', 'average_rating', 'subscription_status_color', 'status_color', 'status_text', 'age', 'gender_text', 'locale_text', 'avatar_url', 'social_links', 'notification_preferences', 'privacy_settings', 'marketing_preferences'];
+    protected $appends = ['full_name', 'initials', 'total_spent', 'average_order_value', 'last_order_date', 'orders_count', 'subscription_status_color', 'status_color', 'status_text', 'age', 'gender_text', 'locale_text', 'avatar_url', 'social_links', 'notification_preferences', 'privacy_settings', 'marketing_preferences'];
 
     /**
      * Handle casts functionality with proper error handling.
@@ -329,64 +329,6 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
 
     /**
      * Handle cartItems functionality with proper error handling.
-     */
-    public function cartItems(): HasMany
-    {
-        return $this->hasMany(CartItem::class);
-    }
-
-    /**
-     * Handle reviews functionality with proper error handling.
-     */
-    public function reviews(): HasMany
-    {
-        return $this->hasMany(Review::class)->withoutGlobalScopes([ApprovedScope::class, ActiveScope::class]);
-    }
-
-    /**
-     * Handle latestReview functionality with proper error handling.
-     */
-    public function latestReview(): HasOne
-    {
-        return $this->reviews()->one()->latestOfMany();
-    }
-
-    /**
-     * Handle oldestReview functionality with proper error handling.
-     */
-    public function oldestReview(): HasOne
-    {
-        return $this->reviews()->one()->oldestOfMany();
-    }
-
-    /**
-     * Handle highestRatedReview functionality with proper error handling.
-     */
-    public function highestRatedReview(): HasOne
-    {
-        return $this->reviews()->one()->ofMany('rating', 'max');
-    }
-
-    /**
-     * Handle lowestRatedReview functionality with proper error handling.
-     */
-    public function lowestRatedReview(): HasOne
-    {
-        return $this->reviews()->one()->ofMany('rating', 'min');
-    }
-
-    // Explicit alias for clarity in code: reviews authored by this customer
-
-    /**
-     * Handle authoredReviews functionality with proper error handling.
-     */
-    public function authoredReviews(): HasMany
-    {
-        return $this->hasMany(Review::class, 'user_id');
-    }
-
-    /**
-     * Handle customerGroups functionality with proper error handling.
      */
     public function customerGroups(): BelongsToMany
     {
@@ -923,22 +865,6 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     }
 
     /**
-     * Handle getReviewsCountAttribute functionality with proper error handling.
-     */
-    public function getReviewsCountAttribute(): int
-    {
-        return $this->reviews()->count();
-    }
-
-    /**
-     * Handle getAverageRatingAttribute functionality with proper error handling.
-     */
-    public function getAverageRatingAttribute(): float
-    {
-        return $this->reviews()->avg('rating') ?? 0;
-    }
-
-    /**
      * Handle isEmailVerified functionality with proper error handling.
      */
     public function isEmailVerified(): bool
@@ -1033,9 +959,9 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     public function getGenderTextAttribute(): ?string
     {
         return match ($this->gender) {
-            'male'   => __('messages.admin),
-            'female' => __('messages.admin),
-            'other'  => __('messages.admin),
+            'male'   => __('admin.gender.male'),
+            'female' => __('admin.gender.female'),
+            'other'  => __('admin.gender.other'),
             default  => null,
         };
     }
@@ -1046,9 +972,9 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     public function getLocaleTextAttribute(): string
     {
         return match ($this->preferred_locale) {
-            'en'    => __('messages.admin),
-            'lt'    => __('messages.admin),
-            default => $this->preferred_locale,
+            'en'    => __('admin.locale.en'),
+            'lt'    => __('admin.locale.lt'),
+            default => $this->preferred_locale ?? '',
         };
     }
 

@@ -1,5 +1,5 @@
 <x-mail::message>
-# {{ __('messages.mail, ['subject' => $contactMessage->subject]) }}
+# {{ __('messages.mail, [', ['subject' => $contactMessage->subject]) }}
 
 {{ __('frontend/contact.heading.subtitle') }}
 
@@ -19,5 +19,6 @@
 > {{ $contactMessage->message }}
 
 {{ __('messages.mail) }},  
+{{ config(') }},  
 {{ config('app.name') }}
 </x-mail::message>

@@ -17,7 +17,7 @@
     @if ($isOpen)
         <div class="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
             <div class="p-4">
-                <h3 class="text-lg font-semibold mb-4">{{ __('messages.ecommerce) }}</h3>
+                <h3 class="text-lg font-semibold mb-4">{{ __('messages.ecommerce') }}</h3>
                 
                 @if ($this->cartItems->count() > 0)
                     <div class="space-y-3 max-h-64 overflow-y-auto">
@@ -62,7 +62,7 @@
                     
                     <div class="mt-4 pt-4 border-t border-gray-200">
                         <div class="flex justify-between items-center mb-3">
-                            <span class="font-semibold">{{ __('messages.store) }}:</span>
+                            <span class="font-semibold">{{ __('messages.store') }}:</span>
                             <span class="font-bold text-lg">{{ format_currency($this->cartTotal) }}</span>
                         </div>
                         
@@ -71,18 +71,18 @@
                                {{-- Maintain sidebar state by navigating client-side --}}
                                href="{{ route('cart.index') }}"
                                class="block w-full text-center px-4 py-2 bg-gray-100 text-gray-800 rounded-md hover:bg-gray-200 transition-colors">
-                                {{ __('messages.store) }}
+                                {{ __('messages.store') }}
                             </a>
                             <a wire:navigate
                                {{-- Jump into checkout without reloading the Livewire cart widget --}}
                                href="{{ route('checkout.index') }}"
                                class="block w-full text-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
-                                {{ __('messages.store) }}
+                                {{ __('messages.store') }}
                             </a>
                         </div>
                     </div>
                 @else
-                    <p class="text-gray-500 text-center py-8">{{ __('messages.ecommerce) }}</p>
+                    <p class="text-gray-500 text-center py-8">{{ __('messages.ecommerce') }}</p>
                 @endif
             </div>
         </div>

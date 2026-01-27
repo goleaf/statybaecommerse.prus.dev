@@ -347,7 +347,7 @@ final class OptimizedProductImageSeeder extends Seeder
         $product
             ->addMedia($imagePath)
             ->withCustomProperties($customProperties)
-            ->usingName($product->name . ' - ' . __('messages.translations) . ' ' . $imageNumber)
+            ->usingName($product->name . ' - ' . __('messages.translations') . ' ' . $imageNumber)
             ->usingFileName($fileName)
             ->toMediaCollection('images');
     }

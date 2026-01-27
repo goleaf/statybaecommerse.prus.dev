@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Pages;
 
 use App\Data\SearchQueryData;
+use App\Enums\NavigationGroup;
 use App\Services\SearchService;
 use BackedEnum;
 use Filament\Pages\Page;
@@ -25,10 +26,13 @@ final class SearchExplorer extends Page
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Search'; // Keep discovery tooling under the dedicated search navigation bucket.
+        return NavigationGroup::Search->label(); // Keep discovery tooling under the dedicated search navigation bucket.
     }
 
-    protected static ?string $title = 'Search Explorer';
+    public function getTitle(): string|Htmlable
+    {
+        return __('admin.search_explorer.title');
+    }
 
     protected static ?string $slug = 'search-explorer';
 

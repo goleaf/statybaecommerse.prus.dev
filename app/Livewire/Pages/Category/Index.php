@@ -76,6 +76,8 @@ final class Index extends Component implements HasSchemas
 
     public bool $sidebarOpen = false;
 
+    public bool $isIndex = true;
+
     #[Computed]
     public function pageTitle(): string
     {

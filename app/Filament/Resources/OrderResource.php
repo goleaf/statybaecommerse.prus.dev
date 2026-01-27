@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources;
 
 use App\Enums\NavigationGroup;
@@ -12,9 +14,7 @@ use App\Filament\Resources\OrderResource\Schemas\OrderInfolist;
 use App\Filament\Resources\OrderResource\Tables\OrdersTable;
 use App\Models\Order;
 use BackedEnum;
-use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -32,7 +32,17 @@ class OrderResource extends BaseResource
 
     public static function getNavigationLabel(): string
     {
-        return 'Orders';
+        return __('admin.orders.navigation_label');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('admin.orders.plural_model_label');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('admin.orders.model_label');
     }
 
     public static function form(Schema $schema): Schema
@@ -67,10 +77,10 @@ class OrderResource extends BaseResource
     public static function getPages(): array
     {
         return [
-            'index' => ListOrders::route('/'),
+            'index'  => ListOrders::route('/'),
             'create' => CreateOrder::route('/create'),
-            'view' => ViewOrder::route('/{record}'),
-            'edit' => EditOrder::route('/{record}/edit'),
+            'view'   => ViewOrder::route('/{record}'),
+            'edit'   => EditOrder::route('/{record}/edit'),
         ];
     }
 

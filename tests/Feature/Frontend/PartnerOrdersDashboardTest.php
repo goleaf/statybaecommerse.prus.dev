@@ -37,7 +37,7 @@ final class PartnerOrdersDashboardTest extends TestCase
         $response->assertOk();
         $response->assertSee($order->number);
         $response->assertSee($partner->name);
-        $response->assertSee(__('messages.partners));
+        $response->assertSee(__('messages.partners'));
     }
 
     public function test_dashboard_filters_by_status_segment(): void
@@ -75,6 +75,6 @@ final class PartnerOrdersDashboardTest extends TestCase
         $response = $this->actingAs($user)->get(route('frontend.partner.orders.index'));
 
         $response->assertStatus(403);
-        $response->assertSee(__('messages.partners));
+        $response->assertSee(__('messages.partners'));
     }
 }

@@ -77,12 +77,6 @@ describe('Product model', function () {
         expect($product->variants())->toBeInstanceOf(HasMany::class);
     });
 
-    it('has reviews relationship', function () {
-        $product = new Product;
-
-        expect($product->reviews())->toBeInstanceOf(HasMany::class);
-    });
-
     it('has images relationship', function () {
         $product = new Product;
 

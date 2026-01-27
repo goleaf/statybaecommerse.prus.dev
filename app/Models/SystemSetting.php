@@ -177,7 +177,6 @@ final class SystemSetting extends Model implements HasMedia
         });
     }
 
-
     /**
      * Handle category functionality with proper error handling.
      */

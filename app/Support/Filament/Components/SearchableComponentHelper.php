@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Support\Filament\Components;
 
 use Closure;
-use DefStudio\SearchableInput\Forms\Components\SearchableInput;
+use App\Support\Filament\Components\SearchableInput;
 use Filament\Forms\ComponentContainer;
 use Filament\Forms\Components\Component as SchemaComponent;
 use Filament\Forms\Contracts\HasForms;

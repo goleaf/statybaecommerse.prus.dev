@@ -7,6 +7,7 @@ namespace App\Filament\Resources;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\CategoryResource\Pages;
 use App\Models\Category;
+use App\Support\Concerns\HasNav;
 use BackedEnum;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
@@ -22,6 +23,8 @@ use UnitEnum;
 
 final class CategoryResource extends BaseResource
 {
+    use HasNav;
+
     protected static ?string $model = Category::class;
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-folder';
@@ -29,6 +32,11 @@ final class CategoryResource extends BaseResource
     protected static string|UnitEnum|null $navigationGroup = NavigationGroup::Inventory;
 
     protected static ?int $navigationSort = 3;
+
+    public static function getRecordTitleAttribute(): ?string
+    {
+        return 'name';
+    }
 
     public static function getNavigationLabel(): string
     {

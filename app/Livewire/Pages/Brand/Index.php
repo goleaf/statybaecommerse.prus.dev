@@ -162,8 +162,8 @@ final class Index extends AbstractPageComponent
     public function render(): View
     {
         return view('livewire.pages.brand.index', [
-            'paginator' => $this->brands,
-            'totalBrands' => $this->totalBrands(),
+            'paginator'         => $this->brands,
+            'totalBrands'       => $this->totalBrands(),
             'activeFilterCount' => $this->activeFilterCount(),
         ])->title(__('messages.brands_index_meta_title') . ' - ' . config('app.name'));
     }

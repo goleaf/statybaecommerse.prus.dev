@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
+use App\Enums\NavigationGroup;
 use App\Models\Slider;
 use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\ContentLinkSearch;
 use BackedEnum;
-
+use App\Support\Filament\Components\SearchableInput;
+use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Components\CheckboxList;
@@ -30,7 +32,6 @@ use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Support\Enums\Size;
 use Filament\Support\Enums\Width;
-use Filament\Actions\Action;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Str;
 
@@ -49,9 +50,15 @@ class SliderManagement extends Page implements HasActions, HasForms
         return 'heroicon-o-rectangle-stack';
     }
 
-    protected static ?string $navigationLabel = 'Slider Management';
+    public function getTitle(): string|Htmlable
+    {
+        return __('translations.slider_management');
+    }
 
-    protected static ?string $title = 'Slider Management';
+    public static function getNavigationLabel(): string
+    {
+        return __('translations.slider_management');
+    }
 
     protected static ?string $slug = 'slider-management';
 
@@ -59,7 +66,7 @@ class SliderManagement extends Page implements HasActions, HasForms
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Content'; // Keep slider tooling with the rest of the content curation pages.
+        return NavigationGroup::Content->label(); // Keep slider tooling with the rest of the content curation pages.
     }
 
     public function mount(): void
@@ -77,22 +84,22 @@ class SliderManagement extends Page implements HasActions, HasForms
     public function createSliderAction(): Action
     {
         return Action::make('createSlider')
-            ->label(__('messages.translations'))
+            ->label(__('translations.create_slider'))
             ->icon('heroicon-o-plus')
             ->color('primary')
             ->size(Size::Large)
             ->form([
-                Section::make(__('messages.translations'))
+                Section::make(__('translations.title'))
                     ->schema([
                         Grid::make(2)->schema([
                             TextInput::make('title')
-                                ->label(__('messages.translations'))
+                                ->label(__('translations.title'))
                                 ->required()
                                 ->maxLength(255)
                                 ->live()
                                 ->afterStateUpdated(fn ($state, callable $set) => $set('slug', Str::slug($state))),
                             TextInput::make('slug')
-                                ->label(__('messages.translations'))
+                                ->label(__('messages.slug'))
                                 ->required()
                                 ->maxLength(255)
                                 ->unique(Slider::class, 'slug')
@@ -100,7 +107,7 @@ class SliderManagement extends Page implements HasActions, HasForms
                                 ->dehydrated(),
                         ]),
                         RichEditor::make('description')
-                            ->label(__('messages.translations'))
+                            ->label(__('translations.description'))
                             ->maxLength(2000)
                             ->toolbarButtons([
                                 'bold',
@@ -122,11 +129,11 @@ class SliderManagement extends Page implements HasActions, HasForms
                             ]),
                         Grid::make(3)->schema([
                             TextInput::make('button_text')
-                                ->label(__('messages.translations'))
+                                ->label(__('translations.button_text'))
                                 ->maxLength(255),
                             TextInput::make('button_url')
-                                ->label(__('messages.translations'))
-                                ->placeholder(__('messages.translations'))
+                                ->label(__('translations.button_url'))
+                                ->placeholder(__('translations.button_url'))
                                 ->maxLength(255)
                                 ->helperText('Search functionality temporarily disabled due to missing component.')
                                 ->afterStateUpdated(function (TextInput $component, ?string $state, callable $set): void {
@@ -139,7 +146,7 @@ class SliderManagement extends Page implements HasActions, HasForms
                                 }),
                         ]),
                         TextInput::make('button_url')
-                            ->label(__('messages.translations'))
+                            ->label(__('translations.button_url'))
                             ->url()
                             ->maxLength(255)
                             ->columnSpanFull(),
@@ -148,7 +155,7 @@ class SliderManagement extends Page implements HasActions, HasForms
                 Section::make(__('translations.media'))
                     ->schema([
                         FileUpload::make('slider_image')
-                            ->label(__('messages.translations'))
+                            ->label(__('translations.slider_image'))
                             ->image()
                             ->directory('sliders/images')
                             ->visibility('private')
@@ -172,10 +179,10 @@ class SliderManagement extends Page implements HasActions, HasForms
                     ->schema([
                         Grid::make(3)->schema([
                             ColorPicker::make('background_color')
-                                ->label(__('messages.translations'))
+                                ->label(__('translations.background_color'))
                                 ->default('#ffffff'),
                             ColorPicker::make('text_color')
-                                ->label(__('messages.translations'))
+                                ->label(__('translations.text_color'))
                                 ->default('#000000'),
                             ColorPicker::make('button_color')
                                 ->label(__('translations.button_color'))
@@ -185,7 +192,7 @@ class SliderManagement extends Page implements HasActions, HasForms
                             Select::make('text_alignment')
                                 ->label(__('translations.text_alignment'))
                                 ->options([
-                                    'left'   => __('messages.translations'),
+                                    'left'   => __('translations.left'),
                                     'center' => __('translations.center'),
                                     'right'  => __('translations.right'),
                                 ])
@@ -211,19 +218,19 @@ class SliderManagement extends Page implements HasActions, HasForms
                     ->schema([
                         Grid::make(2)->schema([
                             Select::make('animation_type')
-                                ->label(__('messages.translations'))
+                                ->label(__('translations.animation_type'))
                                 ->options([
-                                    'fade'   => __('messages.translations'),
-                                    'slide'  => __('messages.translations'),
-                                    'zoom'   => __('messages.translations'),
-                                    'flip'   => __('messages.translations'),
+                                    'fade'   => __('translations.fade'),
+                                    'slide'  => __('translations.slide'),
+                                    'zoom'   => __('translations.zoom'),
+                                    'flip'   => __('translations.flip'),
                                     'bounce' => __('translations.bounce'),
                                     'pulse'  => __('translations.pulse'),
                                 ])
                                 ->default('fade')
                                 ->live(),
                             TextInput::make('duration')
-                                ->label(__('messages.translations'))
+                                ->label(__('translations.duration'))
                                 ->numeric()
                                 ->default(5000)
                                 ->suffix('ms')
@@ -232,7 +239,7 @@ class SliderManagement extends Page implements HasActions, HasForms
                         ]),
                         Grid::make(2)->schema([
                             Toggle::make('autoplay')
-                                ->label(__('messages.translations'))
+                                ->label(__('translations.autoplay'))
                                 ->default(true)
                                 ->live(),
                             Toggle::make('pause_on_hover')
@@ -266,11 +273,11 @@ class SliderManagement extends Page implements HasActions, HasForms
                             ->live(),
                     ])
                     ->collapsible(),
-                Section::make(__('messages.translations'))
+                Section::make(__('translations.all_sliders_activated'))
                     ->schema([
                         Grid::make(2)->schema([
                             TextInput::make('sort_order')
-                                ->label(__('messages.translations'))
+                                ->label(__('translations.reorder_sliders'))
                                 ->numeric()
                                 ->default(0)
                                 ->minValue(0),
@@ -289,8 +296,8 @@ class SliderManagement extends Page implements HasActions, HasForms
                             ->placeholder(__('translations.add_tags')),
                         KeyValue::make('custom_attributes')
                             ->label(__('translations.custom_attributes'))
-                            ->keyLabel(__('messages.translations'))
-                            ->valueLabel(__('messages.translations')),
+                            ->keyLabel(__('translations.title'))
+                            ->valueLabel(__('translations.description')),
                         Repeater::make('slides')
                             ->label(__('translations.additional_slides'))
                             ->schema([
@@ -301,12 +308,12 @@ class SliderManagement extends Page implements HasActions, HasForms
                                     ->label(__('translations.slide_image'))
                                     ->image()
                                     ->directory('sliders/slides'),
-                                TextInput::make('link')
-                                    ->label(__('messages.translations'))
-                                    ->placeholder(__('messages.translations'))
+                                SearchableInput::make('link')
+                                    ->label(__('translations.button_url'))
+                                    ->placeholder(__('translations.button_url'))
                                     ->searchUsing(fn (string $value): array => ContentLinkSearch::results($value))
                                     ->dehydrateStateUsing(fn (?string $state): ?string => $state !== null && $state !== '' ? $state : null)
-                                    ->afterStateHydrated(function (TextInput $component, ?string $state): void {
+                                    ->afterStateHydrated(function (SearchableInput $component, ?string $state): void {
                                         // Reuse helper hydration so repeater slides follow documented metadata lifecycle.
                                         SearchableInputHelper::hydrate(
                                             $component,
@@ -314,7 +321,7 @@ class SliderManagement extends Page implements HasActions, HasForms
                                             static fn (string $value): ?array => ['value' => $value, 'label' => $value],
                                         );
                                     })
-                                    ->afterStateUpdated(function (TextInput $component, ?string $state, callable $set): void {
+                                    ->afterStateUpdated(function (SearchableInput $component, ?string $state, callable $set): void {
                                         if ($state !== null && $state !== '') {
                                             return;
                                         }
@@ -327,14 +334,14 @@ class SliderManagement extends Page implements HasActions, HasForms
                             ->itemLabel(fn (array $state): ?string => $state['title'] ?? null),
                     ])
                     ->collapsible(),
-                Section::make(__('messages.translations'))
+                Section::make(__('translations.settings'))
                     ->schema([
                         Grid::make(2)->schema([
                             Toggle::make('is_active')
-                                ->label(__('messages.translations'))
+                                ->label(__('translations.is_active'))
                                 ->default(true),
                             Toggle::make('is_featured')
-                                ->label(__('messages.translations'))
+                                ->label(__('messages.featured'))
                                 ->default(false),
                         ]),
                         CheckboxList::make('target_audience')
@@ -408,7 +415,7 @@ class SliderManagement extends Page implements HasActions, HasForms
                 $this->loadSliders();
 
                 Notification::make()
-                    ->title(__('messages.translations'))
+                    ->title(__('translations.slider_created'))
                     ->body(__('translations.slider_created_successfully'))
                     ->success()
                     ->send();
@@ -419,7 +426,7 @@ class SliderManagement extends Page implements HasActions, HasForms
     public function toggleAllSlidersAction(): Action
     {
         return Action::make('toggleAllSliders')
-            ->label(__('messages.translations'))
+            ->label(__('translations.toggle_all_sliders'))
             ->icon('heroicon-o-power')
             ->color('warning')
             ->requiresConfirmation()
@@ -429,10 +436,10 @@ class SliderManagement extends Page implements HasActions, HasForms
 
                 if ($activeCount > $inactiveCount) {
                     Slider::query()->update(['is_active' => false]);
-                    $message = __('messages.translations');
+                    $message = __('translations.all_sliders_deactivated');
                 } else {
                     Slider::query()->update(['is_active' => true]);
-                    $message = __('messages.translations');
+                    $message = __('translations.all_sliders_activated');
                 }
 
                 $this->loadSliders();
@@ -447,7 +454,7 @@ class SliderManagement extends Page implements HasActions, HasForms
     public function reorderSlidersAction(): Action
     {
         return Action::make('reorderSliders')
-            ->label(__('messages.translations'))
+            ->label(__('translations.reorder_sliders'))
             ->icon('heroicon-o-arrows-up-down')
             ->color('info')
             ->url(route('filament.admin.resources.sliders.index'))
@@ -457,7 +464,7 @@ class SliderManagement extends Page implements HasActions, HasForms
     public function duplicateSliderAction(Slider $slider): Action
     {
         return Action::make('duplicateSlider')
-            ->label(__('messages.translations'))
+            ->label(__('translations.duplicate'))
             ->icon('heroicon-o-document-duplicate')
             ->color('info')
             ->action(function () use ($slider): void {
@@ -482,7 +489,7 @@ class SliderManagement extends Page implements HasActions, HasForms
                 $this->loadSliders();
 
                 Notification::make()
-                    ->title(__('messages.translations'))
+                    ->title(__('translations.slider_duplicated'))
                     ->success()
                     ->send();
             });
@@ -491,7 +498,7 @@ class SliderManagement extends Page implements HasActions, HasForms
     public function toggleSliderAction(Slider $slider): Action
     {
         return Action::make('toggleSlider')
-            ->label($slider->is_active ? __('messages.translations') : __('messages.translations'))
+            ->label($slider->is_active ? __('translations.deactivate') : __('translations.activate'))
             ->icon($slider->is_active ? 'heroicon-o-x-circle' : 'heroicon-o-check-circle')
             ->color($slider->is_active ? 'danger' : 'success')
             ->action(function () use ($slider): void {
@@ -500,8 +507,8 @@ class SliderManagement extends Page implements HasActions, HasForms
 
                 Notification::make()
                     ->title($slider->is_active
-                        ? __('messages.translations')
-                        : __('messages.translations')
+                        ? __('translations.slider_activated')
+                        : __('translations.slider_deactivated')
                     )
                     ->success()
                     ->send();
@@ -511,7 +518,7 @@ class SliderManagement extends Page implements HasActions, HasForms
     public function deleteSliderAction(Slider $slider): Action
     {
         return Action::make('deleteSlider')
-            ->label(__('messages.translations'))
+            ->label(__('translations.delete'))
             ->icon('heroicon-o-trash')
             ->color('danger')
             ->requiresConfirmation()
@@ -520,7 +527,7 @@ class SliderManagement extends Page implements HasActions, HasForms
                 $this->loadSliders();
 
                 Notification::make()
-                    ->title(__('messages.translations'))
+                    ->title(__('translations.slider_deleted'))
                     ->success()
                     ->send();
             });
@@ -591,7 +598,7 @@ class SliderManagement extends Page implements HasActions, HasForms
     public function settingsAction(): Action
     {
         return Action::make('settings')
-            ->label(__('messages.translations'))
+            ->label(__('translations.settings'))
             ->icon('heroicon-o-cog-6-tooth')
             ->color('gray')
             ->form([
@@ -603,9 +610,9 @@ class SliderManagement extends Page implements HasActions, HasForms
                         Select::make('default_animation')
                             ->label(__('translations.default_animation'))
                             ->options([
-                                'fade'  => __('messages.translations'),
-                                'slide' => __('messages.translations'),
-                                'zoom'  => __('messages.translations'),
+                                'fade'  => __('translations.fade'),
+                                'slide' => __('translations.slide'),
+                                'zoom'  => __('translations.zoom'),
                             ])
                             ->default('fade'),
                         TextInput::make('default_duration')
@@ -649,4 +656,3 @@ class SliderManagement extends Page implements HasActions, HasForms
         return 'filament.pages.slider-management';
     }
 }
-

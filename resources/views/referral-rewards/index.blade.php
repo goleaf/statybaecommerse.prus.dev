@@ -48,7 +48,7 @@
                     </div>
                     <div class="ml-4">
                         <p class="text-sm font-medium text-gray-500 dark:text-gray-400">
-                            {{ __('messages.referrals) }}
+                            {{ __('messages.referrals') }}
                         </p>
                         <p class="text-2xl font-semibold text-gray-900 dark:text-white">
                             {{ $stats['pending_rewards'] }}
@@ -68,7 +68,7 @@
                     </div>
                     <div class="ml-4">
                         <p class="text-sm font-medium text-gray-500 dark:text-gray-400">
-                            {{ __('messages.referrals) }}
+                            {{ __('messages.referrals') }}
                         </p>
                         <p class="text-2xl font-semibold text-gray-900 dark:text-white">
                             {{ $stats['applied_rewards'] }}
@@ -104,19 +104,19 @@
                 <div class="flex flex-wrap gap-4">
                     <a href="{{ route('frontend.referral-rewards.index') }}" 
                        class="px-4 py-2 rounded-lg {{ request('status') === null ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300' }}">
-                        {{ __('messages.referrals) }}
+                        {{ __('messages.referrals') }}
                     </a>
                     <a href="{{ route('frontend.referral-rewards.index', ['status' => 'pending']) }}" 
                        class="px-4 py-2 rounded-lg {{ request('status') === 'pending' ? 'bg-yellow-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300' }}">
-                        {{ __('messages.referrals) }}
+                        {{ __('messages.referrals') }}
                     </a>
                     <a href="{{ route('frontend.referral-rewards.index', ['status' => 'applied']) }}" 
                        class="px-4 py-2 rounded-lg {{ request('status') === 'applied' ? 'bg-green-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300' }}">
-                        {{ __('messages.referrals) }}
+                        {{ __('messages.referrals') }}
                     </a>
                     <a href="{{ route('frontend.referral-rewards.index', ['status' => 'expired']) }}" 
                        class="px-4 py-2 rounded-lg {{ request('status') === 'expired' ? 'bg-red-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300' }}">
-                        {{ __('messages.referrals) }}
+                        {{ __('messages.referrals') }}
                     </a>
                 </div>
             </div>
@@ -182,7 +182,7 @@
                                     </div>
                                     <a href="{{ route('frontend.referral-rewards.show', $reward) }}" 
                                        class="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                        {{ __('messages.referrals) }}
+                                        {{ __('messages.referrals') }}
                                     </a>
                                 </div>
                             </div>

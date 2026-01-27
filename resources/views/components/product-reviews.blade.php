@@ -12,8 +12,8 @@
 
 @php
     $product = $product ?? new \App\Models\Product();
-    $title = $title ?? __('Customer Reviews');
-    $subtitle = $subtitle ?? __('Read what our customers say about this product');
+    $title = $title ?? __('reviews.customer_reviews');
+    $subtitle = $subtitle ?? __('reviews.read_what_customers_say');
 
     // Get reviews from database or use provided reviews
     if (!$reviews) {
@@ -80,7 +80,7 @@
                                     </svg>
                                 @endfor
                             </div>
-                            <p class="text-gray-600">{{ $totalReviews }} {{ __('reviews') }}</p>
+                            <p class="text-gray-600">{{ $totalReviews }} {{ __('messages.reviews') }}</p>
                         </div>
 
                         {{-- Rating Distribution --}}
@@ -111,16 +111,16 @@
                     <span class="text-sm text-gray-600">{{ __('messages.sort_by') }}:</span>
                     <select x-model="sortBy" @change="applySorting()"
                             class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        <option value="newest">{{ __('Newest First') }}</option>
-                        <option value="oldest">{{ __('Oldest First') }}</option>
-                        <option value="highest">{{ __('Highest Rating') }}</option>
-                        <option value="lowest">{{ __('Lowest Rating') }}</option>
-                        <option value="helpful">{{ __('Most Helpful') }}</option>
+                        <option value="newest">{{ __('reviews.newest_first') }}</option>
+                        <option value="oldest">{{ __('reviews.oldest_first') }}</option>
+                        <option value="highest">{{ __('reviews.highest_rating') }}</option>
+                        <option value="lowest">{{ __('reviews.lowest_rating') }}</option>
+                        <option value="helpful">{{ __('reviews.most_helpful') }}</option>
                     </select>
                 </div>
 
                 <div class="flex items-center gap-2">
-                    <span class="text-sm text-gray-600">{{ __('Filter by rating') }}:</span>
+                    <span class="text-sm text-gray-600">{{ __('reviews.filter_by_rating') }}:</span>
                     <div class="flex gap-1">
                         @for ($i = 5; $i >= 1; $i--)
                             <button @click="filterByRating({{ $i }})"
@@ -162,7 +162,7 @@
                                 {{-- User Info --}}
                                 <div>
                                     <h4 class="font-semibold text-gray-900">
-                                        {{ $review->user->name ?? __('Anonymous') }}</h4>
+                                        {{ $review->user->name ?? __('reviews.anonymous') }}</h4>
                                     <div class="flex items-center gap-2">
                                         <div class="flex items-center">
                                             @for ($i = 1; $i <= 5; $i++)
@@ -187,7 +187,7 @@
                                               d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
                                               clip-rule="evenodd" />
                                     </svg>
-                                    {{ __('Verified Purchase') }}
+                                    {{ __('reviews.verified_purchase') }}
                                 </span>
                             @endif
                         </div>
@@ -217,7 +217,7 @@
                             <div class="flex items-center justify-between pt-4 border-t border-gray-100">
                                 <div class="flex items-center gap-4">
                                     <span class="text-sm text-gray-600">
-                                        {{ __('Was this review helpful?') }}
+                                        {{ __('reviews.was_this_review_helpful?') }}
                                     </span>
                                     <div class="flex gap-2">
                                         <button @click="voteHelpful({{ $review->id }}, true)"
@@ -228,7 +228,7 @@
                                                       d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V18m-7-8a2 2 0 01-2-2V5a2 2 0 012-2h2.343M11 7.16l-2.343 2.343a2 2 0 00-.586 1.414V18">
                                                 </path>
                                             </svg>
-                                            {{ __('Yes') }} ({{ $review->helpful_votes ?? 0 }})
+                                            {{ __('messages.yes') }} ({{ $review->helpful_votes ?? 0 }})
                                         </button>
                                         <button @click="voteHelpful({{ $review->id }}, false)"
                                                 class="flex items-center gap-1 text-sm text-red-600 hover:text-red-700 font-medium">
@@ -238,13 +238,13 @@
                                                       d="M10 14H5.236a2 2 0 01-1.789-2.894l3.5-7A2 2 0 018.737 3h4.018c.163 0 .326.02.485.06L17 4m-7 10V6m7 8a2 2 0 012-2V5a2 2 0 00-2-2h-2.343M13 16.84l2.343-2.343a2 2 0 00.586-1.414V6">
                                                 </path>
                                             </svg>
-                                            {{ __('No') }} ({{ $review->unhelpful_votes ?? 0 }})
+                                            {{ __('messages.no') }} ({{ $review->unhelpful_votes ?? 0 }})
                                         </button>
                                     </div>
                                 </div>
 
                                 <button class="text-sm text-gray-600 hover:text-gray-700 font-medium">
-                                    {{ __('Report') }}
+                                    {{ __('reviews.report') }}
                                 </button>
                             </div>
                         @endif
@@ -256,7 +256,7 @@
             @if ($reviews->count() >= 10)
                 <div class="text-center mt-8">
                     <button class="btn-gradient px-8 py-3 rounded-xl font-semibold">
-                        {{ __('Load More Reviews') }}
+                        {{ __('reviews.load_more_reviews') }}
                     </button>
                 </div>
             @endif
@@ -269,20 +269,20 @@
                           d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z">
                     </path>
                 </svg>
-                <h3 class="text-2xl font-bold text-gray-900 mb-4">{{ __('No reviews yet') }}</h3>
-                <p class="text-gray-600 mb-8">{{ __('Be the first to review this product!') }}</p>
+                <h3 class="text-2xl font-bold text-gray-900 mb-4">{{ __('reviews.no_reviews_yet') }}</h3>
+                <p class="text-gray-600 mb-8">{{ __('reviews.be_the_first_to_review') }}</p>
             </div>
         @endif
 
         {{-- Review Form --}}
         @if ($showReviewForm)
             <div class="mt-12 bg-white border border-gray-200 rounded-2xl p-8">
-                <h3 class="text-2xl font-bold text-gray-900 mb-6">{{ __('Write a Review') }}</h3>
+                <h3 class="text-2xl font-bold text-gray-900 mb-6">{{ __('reviews.write_a_review') }}</h3>
 
                 <form @submit.prevent="submitReview()" class="space-y-6">
                     {{-- Rating --}}
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">{{ __('Rating') }} <span
+                        <label class="block text-sm font-medium text-gray-700 mb-2">{{ __('reviews.rating') }} <span
                                   class="text-red-500">*</span></label>
                         <div class="flex gap-1">
                             @for ($i = 1; $i <= 5; $i++)
@@ -301,7 +301,7 @@
                     {{-- Title --}}
                     <div>
                         <label for="review-title"
-                               class="block text-sm font-medium text-gray-700 mb-2">{{ __('Review Title') }} <span
+                               class="block text-sm font-medium text-gray-700 mb-2">{{ __('reviews.review_title') }} <span
                                   class="text-red-500">*</span></label>
                         <input type="text" id="review-title" x-model="reviewForm.title" required
                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder:text-gray-500">
@@ -310,17 +310,17 @@
                     {{-- Content --}}
                     <div>
                         <label for="review-content"
-                               class="block text-sm font-medium text-gray-700 mb-2">{{ __('Your Review') }} <span
+                               class="block text-sm font-medium text-gray-700 mb-2">{{ __('reviews.your_review') }} <span
                                   class="text-red-500">*</span></label>
                         <textarea id="review-content" x-model="reviewForm.content" rows="6" required
                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder:text-gray-500"
-                                  placeholder="{{ __('Share your experience with this product...') }}"></textarea>
+                                  placeholder="{{ __('reviews.share_your_experience') }}"></textarea>
                     </div>
 
                     {{-- Submit Button --}}
                     <button type="submit" :disabled="reviewForm.loading"
                             class="btn-gradient px-8 py-3 rounded-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed">
-                        <span x-show="!reviewForm.loading">{{ __('Submit Review') }}</span>
+                        <span x-show="!reviewForm.loading">{{ __('reviews.submit_review') }}</span>
                         <span x-show="reviewForm.loading" class="flex items-center gap-2">
                             <svg class="animate-spin w-5 h-5" fill="none" stroke="currentColor"
                                  viewBox="0 0 24 24">
@@ -328,7 +328,7 @@
                                       d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
                                 </path>
                             </svg>
-                            {{ __('Submitting...') }}
+                            {{ __('reviews.submitting') }}
                         </span>
                     </button>
                 </form>
@@ -378,7 +378,7 @@
 
             async submitReview() {
                 if (this.reviewForm.rating === 0) {
-                    alert('{{ __('Please select a rating.') }}');
+                    alert('{{ __('reviews.please_select_rating') }}');
                     return;
                 }
 
@@ -407,13 +407,13 @@
                             content: '',
                             loading: false
                         };
-                        alert('{{ __('Review submitted successfully!') }}');
+                        alert('{{ __('reviews.review_submitted_successfully') }}');
                         window.location.reload();
                     } else {
-                        alert('{{ __('Failed to submit review. Please try again.') }}');
+                        alert('{{ __('reviews.failed_to_submit_review') }}');
                     }
                 } catch (error) {
-                    alert('{{ __('Network error. Please check your connection and try again.') }}');
+                    alert('{{ __('reviews.network_error') }}');
                 } finally {
                     this.reviewForm.loading = false;
                 }

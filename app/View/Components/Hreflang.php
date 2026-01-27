@@ -22,6 +22,7 @@ final class Hreflang extends Component
 
         if (is_array($provided) && $provided !== []) {
             $this->alternateLocales = $this->withXDefault($provided);
+
             return;
         }
 
@@ -34,7 +35,7 @@ final class Hreflang extends Component
     }
 
     /**
-     * @param array<string, string> $provided
+     * @param  array<string, string> $provided
      * @return array<string, string>
      */
     private function withXDefault(array $provided): array

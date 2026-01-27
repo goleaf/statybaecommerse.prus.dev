@@ -7,7 +7,7 @@
     <div class="border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
             <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-                {{ __('messages.frontend) }}
+                {{ __('messages.frontend') }}
             </h2>
             <p class="text-sm text-gray-600 dark:text-gray-400">
                 {{ trans_choice('frontend.search.result_count', $totalResults, ['count' => $totalResults]) }}
@@ -27,8 +27,8 @@
     <div class="px-6 py-8">
         @if (empty($query))
             <div class="text-center text-gray-600 dark:text-gray-400">
-                <p class="text-lg font-medium">{{ __('messages.frontend) }}</p>
-                <p class="mt-2 text-sm">{{ __('messages.frontend) }}</p>
+                <p class="text-lg font-medium">{{ __('messages.frontend') }}</p>
+                <p class="mt-2 text-sm">{{ __('messages.frontend') }}</p>
             </div>
         @elseif ($totalResults === 0)
             <div class="flex flex-col items-center gap-6 text-center text-gray-600 dark:text-gray-400">
@@ -48,7 +48,7 @@
                     </li>
                     <li class="flex items-center justify-center gap-2">
                         <span class="h-1.5 w-1.5 rounded-full bg-blue-400"></span>
-                        {{ __('messages.frontend) }}
+                        {{ __('messages.frontend') }}
                     </li>
                     <li class="flex items-center justify-center gap-2">
                         <span class="h-1.5 w-1.5 rounded-full bg-blue-400"></span>

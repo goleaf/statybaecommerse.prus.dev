@@ -52,6 +52,7 @@ final class TopSellingProductsWidget extends BaseWidget
                 TextColumn::make('price')->money('EUR')->sortable(),
                 TextColumn::make('order_items_sum_quantity')->label(__('analytics.sold_quantity'))->sortable(),
                 TextColumn::make('order_items_count')->label(__('messages.analytics))->sortable(),
+                TextColumn::make('))->sortable(),
                 TextColumn::make('stock_quantity')->sortable(),
             ]);
     }

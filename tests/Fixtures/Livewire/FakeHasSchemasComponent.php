@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Fixtures\Livewire;
 
-use DefStudio\SearchableInput\Forms\Components\SearchableInput;
+use App\Support\Filament\Components\SearchableInput;
 use Filament\Schemas\Concerns\InteractsWithSchemas;
 use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Schemas\Schema;
@@ -35,3 +35,6 @@ final class FakeHasSchemasComponent extends Component implements HasSchemas
         return '';
     }
 }
+
+
+

@@ -1,6 +1,6 @@
 @extends('components.layouts.base')
 
-@section('title', __('messages.news))
+@section('title', __('messages.news'))
 
 @include('components.scripts.debounced-search-form')
 
@@ -8,14 +8,14 @@
 <div class="container mx-auto px-4 py-8">
     <!-- Header Section -->
     <div class="mb-8">
-        <h1 class="text-4xl font-bold text-gray-900 mb-4">{{ __('messages.news) }}</h1>
-        <p class="text-lg text-gray-600">{{ __('messages.news) }}</p>
+        <h1 class="text-4xl font-bold text-gray-900 mb-4">{{ __('messages.news') }}</h1>
+        <p class="text-lg text-gray-600">{{ __('messages.news') }}</p>
     </div>
 
     <!-- Featured News Section -->
     @if($featuredNews->count() > 0)
     <section class="mb-12">
-        <h2 class="text-2xl font-bold text-gray-900 mb-6">{{ __('messages.news) }}</h2>
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">{{ __('messages.news') }}</h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             @foreach($featuredNews as $featured)
             <article class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
@@ -71,7 +71,7 @@
                 <!-- Search -->
                 <div>
                     <label for="search" class="block text-sm font-medium text-gray-700 mb-1">
-                        {{ __('messages.news) }}
+                        {{ __('messages.news') }}
                     </label>
                     <input type="text"
                            id="search"
@@ -80,20 +80,20 @@
                            x-model="term"
                            @input="handleInput()"
                            value="{{ $searchTerm }}"
-                           placeholder="{{ __('messages.news) }}"
+                           placeholder="{{ __('messages.news') }}"
                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
 
                 <!-- Category Filter -->
                 <div>
                     <label for="category" class="block text-sm font-medium text-gray-700 mb-1">
-                        {{ __('messages.news) }}
+                        {{ __('messages.news') }}
                     </label>
                     <select id="category"
                             name="category"
                             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                             @change="manualSubmit()">
-                        <option value="">{{ __('messages.news) }}</option>
+                        <option value="">{{ __('messages.news') }}</option>
                         @foreach($categories as $category)
                         <option value="{{ $category->id }}" {{ (string) $selectedCategory === (string) $category->id ? 'selected' : '' }}>
                             {{ $category->name }}
@@ -105,13 +105,13 @@
                 <!-- Tag Filter -->
                 <div>
                     <label for="tag" class="block text-sm font-medium text-gray-700 mb-1">
-                        {{ __('messages.news) }}
+                        {{ __('messages.news') }}
                     </label>
                     <select id="tag"
                             name="tag"
                             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                             @change="manualSubmit()">
-                        <option value="">{{ __('messages.news) }}</option>
+                        <option value="">{{ __('messages.news') }}</option>
                         @foreach($tags as $tag)
                         <option value="{{ $tag->id }}" {{ (string) $selectedTag === (string) $tag->id ? 'selected' : '' }}>
                             {{ $tag->name }}
@@ -129,7 +129,7 @@
                                {{ $featuredOnly ? 'checked' : '' }}
                                class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                                @change="manualSubmit()">
-                        <span class="ml-2 text-sm text-gray-700">{{ __('messages.news) }}</span>
+                        <span class="ml-2 text-sm text-gray-700">{{ __('messages.news') }}</span>
                     </label>
                 </div>
             </div>
@@ -137,7 +137,7 @@
             <div class="flex justify-end">
                 <button type="submit"
                         class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    {{ __('messages.news) }}
+                    {{ __('messages.news') }}
                 </button>
             </div>
         </form>
@@ -161,7 +161,7 @@
         <div class="flex flex-col items-center gap-4" data-infinite-scroll-controls>
             <div class="flex items-center gap-3 text-sm text-gray-500" data-infinite-scroll-loader hidden>
                 <span class="h-5 w-5 rounded-full border-2 border-blue-500 border-t-transparent animate-spin"></span>
-                <span>{{ __('messages.news) }}</span>
+                <span>{{ __('messages.news') }}</span>
             </div>
 
             <button
@@ -169,11 +169,11 @@
                 class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition disabled:opacity-50 disabled:cursor-not-allowed {{ $hasMoreNews ? '' : 'hidden' }}"
                 data-infinite-scroll-trigger
             >
-                {{ __('messages.news) }}
+                {{ __('messages.news') }}
             </button>
 
             <p class="text-sm text-gray-500 hidden" data-infinite-scroll-end>
-                {{ __('messages.news) }}
+                {{ __('messages.news') }}
             </p>
 
             <div data-infinite-scroll-fallback class="w-full">
@@ -188,7 +188,7 @@
         <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-blue-100 text-blue-600">
             <x-heroicon-o-newspaper class="h-7 w-7" />
         </div>
-        <h3 class="mt-6 text-xl font-semibold text-gray-900 dark:text-white">{{ __('messages.news) }}</h3>
+        <h3 class="mt-6 text-xl font-semibold text-gray-900 dark:text-white">{{ __('messages.news') }}</h3>
         <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">{{ __('news.empty_state.description') }}</p>
 
         @if($categories->isNotEmpty())

@@ -142,27 +142,11 @@ final class TranslationHookService
     }
 
     /**
-     * Sync translations between different formats (JSON and PHP arrays)
+     * Sync translations between different formats (deprecated, now all PHP)
      */
     public function syncTranslationFormats(): void
     {
-        foreach ($this->supportedLocales as $locale) {
-            $jsonFile = lang_path("{$locale}.json");
-            $phpFile = lang_path("{$locale}.php");
-
-            if (File::exists($jsonFile)) {
-                $jsonTranslations = json_decode(File::get($jsonFile), true) ?? [];
-
-                if (File::exists($phpFile)) {
-                    $phpTranslations = include $phpFile;
-                    if (is_array($phpTranslations)) {
-                        // Merge JSON translations into PHP format
-                        $merged = array_merge($phpTranslations, $jsonTranslations);
-                        $this->savePhpTranslationFile($locale, $merged);
-                    }
-                }
-            }
-        }
+        // JSON format is no longer used. This method is preserved for interface compatibility.
     }
 
     /**
@@ -170,8 +154,8 @@ final class TranslationHookService
      */
     public function getMissingTranslations(string $locale): array
     {
-        $defaultTranslations = $this->translationFiles[$this->defaultLocale] ?? [];
-        $localeTranslations = $this->translationFiles[$locale] ?? [];
+        $defaultTranslations = $this->loadAllTranslations($this->defaultLocale);
+        $localeTranslations = $this->loadAllTranslations($locale);
 
         return array_diff_key($defaultTranslations, $localeTranslations);
     }
@@ -181,13 +165,14 @@ final class TranslationHookService
      */
     public function generateTranslationReport(): array
     {
+        $defaultTranslations = $this->loadAllTranslations($this->defaultLocale);
         $report = [
-            'total_keys' => count($this->translationFiles[$this->defaultLocale] ?? []),
+            'total_keys' => count($defaultTranslations),
             'locales'    => [],
         ];
 
         foreach ($this->supportedLocales as $locale) {
-            $translations = $this->translationFiles[$locale] ?? [];
+            $translations = $this->loadAllTranslations($locale);
             $missing = $this->getMissingTranslations($locale);
 
             $report['locales'][$locale] = [
@@ -216,50 +201,84 @@ final class TranslationHookService
 
     private function loadTranslationFiles(): void
     {
-        foreach ($this->supportedLocales as $locale) {
-            $jsonFile = lang_path("{$locale}.json");
-
-            if (File::exists($jsonFile)) {
-                $content = File::get($jsonFile);
-                $this->translationFiles[$locale] = json_decode($content, true) ?? [];
-            } else {
-                $this->translationFiles[$locale] = [];
-            }
-        }
+        // No longer pre-loading all files into memory. 
+        // We load them on demand in updateTranslationFile and saveTranslationFiles.
     }
 
     private function updateTranslationFile(string $locale, string $key, string $translation): void
     {
-        if (! isset($this->translationFiles[$locale])) {
-            $this->translationFiles[$locale] = [];
+        $parts = explode('.', $key, 2);
+        $group = count($parts) === 2 ? $parts[0] : 'messages';
+        $subKey = count($parts) === 2 ? $parts[1] : $key;
+
+        $phpFile = lang_path("{$locale}/{$group}.php");
+        $translations = [];
+
+        if (File::exists($phpFile)) {
+            $translations = (static function($f) { return include $f; })($phpFile);
+            if (!is_array($translations)) $translations = [];
         }
 
-        $this->translationFiles[$locale][$key] = $translation;
+        $translations[$subKey] = $translation;
+        ksort($translations);
+
+        $this->savePhpTranslationFile($locale, $group, $translations);
     }
 
     private function saveTranslationFiles(): void
     {
-        foreach ($this->translationFiles as $locale => $translations) {
-            $jsonFile = lang_path("{$locale}.json");
-
-            // Sort translations alphabetically
-            ksort($translations);
-
-            $jsonContent = json_encode($translations, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-            File::put($jsonFile, $jsonContent);
-        }
+        // Translations are saved immediately in updateTranslationFile for PHP files
+        // to avoid complex merging logic for multiple files in memory.
     }
 
-    private function savePhpTranslationFile(string $locale, array $translations): void
+    private function savePhpTranslationFile(string $locale, string $group, array $translations): void
     {
-        $phpFile = lang_path("{$locale}.php");
-        $content = "<?php\n\nreturn " . var_export($translations, true) . ";\n";
+        $localeDir = lang_path($locale);
+        if (! File::isDirectory($localeDir)) {
+            File::makeDirectory($localeDir, 0755, true);
+        }
+
+        $phpFile = "{$localeDir}/{$group}.php";
+        $content = "<?php\n\ndeclare(strict_types=1);\n\nreturn " . var_export($translations, true) . ";\n";
         File::put($phpFile, $content);
+    }
+
+    private function loadAllTranslations(string $locale): array
+    {
+        $translations = [];
+        $localeDir = lang_path($locale);
+
+        if (File::isDirectory($localeDir)) {
+            $files = File::files($localeDir);
+            foreach ($files as $file) {
+                if ($file->getExtension() === 'php') {
+                    $group = $file->getFilenameWithoutExtension();
+                    $fileTranslations = (static function($f) { return include $f; })($file->getPathname());
+                    if (is_array($fileTranslations)) {
+                        foreach ($fileTranslations as $k => $v) {
+                            $translations["{$group}.{$k}"] = $v;
+                        }
+                    }
+                }
+            }
+        }
+
+        return $translations;
     }
 
     private function translationExists(string $key): bool
     {
-        return isset($this->translationFiles[$this->defaultLocale][$key]);
+        $parts = explode('.', $key, 2);
+        $group = count($parts) === 2 ? $parts[0] : 'messages';
+        $subKey = count($parts) === 2 ? $parts[1] : $key;
+
+        $phpFile = lang_path("{$this->defaultLocale}/{$group}.php");
+        if (! File::exists($phpFile)) {
+            return false;
+        }
+
+        $translations = (static function($f) { return include $f; })($phpFile);
+        return is_array($translations) && isset($translations[$subKey]);
     }
 
     private function humanizeKey(string $key): string

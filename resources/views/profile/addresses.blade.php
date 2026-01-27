@@ -8,10 +8,10 @@
             <div class="flex items-center justify-between">
                 <div>
                     <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
-                        {{ __('messages.frontend) }}
+                        {{ __('messages.frontend') }}
                     </h1>
                     <p class="mt-2 text-gray-600 dark:text-gray-400">
-                        {{ __('messages.frontend) }}
+                        {{ __('messages.frontend') }}
                     </p>
                 </div>
                 <a href="{{ route('frontend.profile.index') }}"
@@ -19,7 +19,7 @@
                     <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
                     </svg>
-                    {{ __('messages.frontend) }}
+                    {{ __('messages.frontend') }}
                 </a>
             </div>
 
@@ -55,13 +55,13 @@
                             </div>
                             <div class="flex items-center gap-2 text-xs font-medium text-gray-600 dark:text-gray-300">
                                 @if($address->is_default)
-                                    <span class="px-2 py-1 rounded-full bg-blue-100 text-blue-800">{{ __('messages.frontend) }}</span>
+                                    <span class="px-2 py-1 rounded-full bg-blue-100 text-blue-800">{{ __('messages.frontend') }}</span>
                                 @endif
                                 @if($address->is_billing)
-                                    <span class="px-2 py-1 rounded-full bg-green-100 text-green-800">{{ __('messages.frontend) }}</span>
+                                    <span class="px-2 py-1 rounded-full bg-green-100 text-green-800">{{ __('messages.frontend') }}</span>
                                 @endif
                                 @if($address->is_shipping)
-                                    <span class="px-2 py-1 rounded-full bg-purple-100 text-purple-800">{{ __('messages.frontend) }}</span>
+                                    <span class="px-2 py-1 rounded-full bg-purple-100 text-purple-800">{{ __('messages.frontend') }}</span>
                                 @endif
                             </div>
                         </div>
@@ -73,7 +73,7 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="type-{{ $address->id }}">
-                                        {{ __('messages.frontend) }}
+                                        {{ __('messages.frontend') }}
                                     </label>
                                     <select id="type-{{ $address->id }}"
                                             name="type"
@@ -88,15 +88,15 @@
                                 <div class="grid grid-cols-2 gap-2">
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="is_default-{{ $address->id }}">
                                         <input id="is_default-{{ $address->id }}" type="checkbox" name="is_default" value="1" @checked(old('is_default', $address->is_default))>
-                                        <span class="ml-2">{{ __('messages.frontend) }}</span>
+                                        <span class="ml-2">{{ __('messages.frontend') }}</span>
                                     </label>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="is_billing-{{ $address->id }}">
                                         <input id="is_billing-{{ $address->id }}" type="checkbox" name="is_billing" value="1" @checked(old('is_billing', $address->is_billing))>
-                                        <span class="ml-2">{{ __('messages.frontend) }}</span>
+                                        <span class="ml-2">{{ __('messages.frontend') }}</span>
                                     </label>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="is_shipping-{{ $address->id }}">
                                         <input id="is_shipping-{{ $address->id }}" type="checkbox" name="is_shipping" value="1" @checked(old('is_shipping', $address->is_shipping))>
-                                        <span class="ml-2">{{ __('messages.frontend) }}</span>
+                                        <span class="ml-2">{{ __('messages.frontend') }}</span>
                                     </label>
                                 </div>
                             </div>
@@ -153,7 +153,7 @@
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="city-{{ $address->id }}">
-                                        {{ __('messages.frontend) }}
+                                        {{ __('messages.frontend') }}
                                     </label>
                                     <input id="city-{{ $address->id }}"
                                            type="text"
@@ -193,7 +193,7 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="phone-addr-{{ $address->id }}">
-                                        {{ __('messages.frontend) }}
+                                        {{ __('messages.frontend') }}
                                     </label>
                                     <input id="phone-addr-{{ $address->id }}"
                                            type="text"
@@ -203,7 +203,7 @@
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="email-addr-{{ $address->id }}">
-                                        {{ __('messages.frontend) }}
+                                        {{ __('messages.frontend') }}
                                     </label>
                                     <input id="email-addr-{{ $address->id }}"
                                            type="email"
@@ -216,13 +216,13 @@
                             <div class="flex justify-between items-center">
                                 <button type="submit"
                                         class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                    {{ __('messages.frontend) }}
+                                    {{ __('messages.frontend') }}
                                 </button>
                                 <button type="submit"
                                         form="delete-address-{{ $address->id }}"
                                         onclick="return confirm('{{ __('frontend.profile.addresses.actions.confirm_delete') }}');"
                                         class="inline-flex items-center px-3 py-2 border border-red-300 dark:border-red-600 rounded-md text-sm font-medium text-red-700 dark:text-red-300 bg-white dark:bg-gray-700 hover:bg-red-50 dark:hover:bg-red-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
-                                    {{ __('messages.frontend) }}
+                                    {{ __('messages.frontend') }}
                                 </button>
                             </div>
                         </form>
@@ -254,7 +254,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="type">
-                                {{ __('messages.frontend) }}
+                                {{ __('messages.frontend') }}
                             </label>
                             <select id="type"
                                     name="type"
@@ -267,15 +267,15 @@
                         <div class="grid grid-cols-3 gap-2">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="is_default">
                                 <input id="is_default" type="checkbox" name="is_default" value="1" @checked(old('is_default'))>
-                                <span class="ml-2">{{ __('messages.frontend) }}</span>
+                                <span class="ml-2">{{ __('messages.frontend') }}</span>
                             </label>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="is_billing">
                                 <input id="is_billing" type="checkbox" name="is_billing" value="1" @checked(old('is_billing'))>
-                                <span class="ml-2">{{ __('messages.frontend) }}</span>
+                                <span class="ml-2">{{ __('messages.frontend') }}</span>
                             </label>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="is_shipping">
                                 <input id="is_shipping" type="checkbox" name="is_shipping" value="1" @checked(old('is_shipping'))>
-                                <span class="ml-2">{{ __('messages.frontend) }}</span>
+                                <span class="ml-2">{{ __('messages.frontend') }}</span>
                             </label>
                         </div>
                     </div>
@@ -332,7 +332,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="city">
-                                {{ __('messages.frontend) }}
+                                {{ __('messages.frontend') }}
                             </label>
                             <input id="city"
                                    type="text"
@@ -371,7 +371,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="phone_new">
-                                {{ __('messages.frontend) }}
+                                {{ __('messages.frontend') }}
                             </label>
                             <input id="phone_new"
                                    type="text"
@@ -381,7 +381,7 @@
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="email_new">
-                                {{ __('messages.frontend) }}
+                                {{ __('messages.frontend') }}
                             </label>
                             <input id="email_new"
                                    type="email"

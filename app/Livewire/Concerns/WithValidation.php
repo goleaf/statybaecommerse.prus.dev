@@ -16,7 +16,7 @@ trait WithValidation
 {
     protected function getValidationMessages(): array
     {
-        return ['required' => __('messages.shared), 'email' => __('messages.validation), 'min' => __('messages.validation), 'max' => __('messages.validation), 'numeric' => __('validation.numeric'), 'integer' => __('validation.integer'), 'url' => __('validation.url'), 'confirmed' => __('messages.validation), 'unique' => __('messages.validation), 'exists' => __('validation.exists')];
+        return ['required' => __('messages.shared), '), 'email' => __('messages.validation), '), 'min' => __('messages.validation), '), 'max' => __('messages.validation), '), 'numeric' => __('validation.numeric'), 'integer' => __('validation.integer'), 'url' => __('validation.url'), 'confirmed' => __('messages.validation), '), 'unique' => __('messages.validation), '), 'exists' => __('validation.exists')];
     }
 
     protected function getValidationAttributes(): array
@@ -38,6 +38,18 @@ trait WithValidation
             throw $e;
         } catch (Exception $e) {
             $this->notifyError(__('messages.shared));
+            throw $e;
+        }
+    }
+
+    public function validateEmail(string $email): bool
+    {
+        return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
+    }
+
+    public function validatePhone(string $phone): bool
+    {
+        $cleaned = preg_replace('));
             throw $e;
         }
     }

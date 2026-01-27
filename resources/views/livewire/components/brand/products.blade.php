@@ -18,6 +18,6 @@
             @endforeach
         </div>
 
-        <nav class="mt-6" aria-label="{{ __('Pagination') }}">{{ $products->links() }}</nav>
+        <nav class="mt-6" aria-label="{{ __('messages.pagination') }}">{{ $products->links() }}</nav>
     @endif
 </div>

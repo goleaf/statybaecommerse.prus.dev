@@ -7,16 +7,16 @@
 @php
     $steps = [
         1 => [
-            'label'       => __('Billing'),
-            'description' => __('Contact & billing details'),
+            'label'       => __('frontend.billing'),
+            'description' => __('frontend.contact_billing_details'),
         ],
         2 => [
-            'label'       => __('messages.shipping'),
-            'description' => __('Delivery options'),
+            'label'       => __('messages.Shipping'),
+            'description' => __('frontend.delivery_options'),
         ],
         3 => [
             'label'       => __('messages.Payment'),
-            'description' => __('Review & pay'),
+            'description' => __('frontend.review_pay'),
         ],
     ];
 @endphp
@@ -24,13 +24,13 @@
 <div class="mx-auto max-w-6xl px-4 py-10 lg:px-0">
     <div class="flex flex-col gap-6">
         <header class="space-y-2">
-            <h1 class="text-3xl font-semibold text-gray-900">{{ __('Checkout') }}</h1>
+            <h1 class="text-3xl font-semibold text-gray-900">{{ __('frontend.checkout') }}</h1>
             <p class="text-sm text-gray-600">
-                {{ __('Complete your purchase in three quick steps. Your cart items and totals stay visible on the right for reference.') }}
+                {{ __('frontend.checkout_description') }}
             </p>
         </header>
 
-        <nav aria-label="{{ __('Checkout steps') }}">
+        <nav aria-label="{{ __('frontend.checkout_steps') }}">
             <ol class="flex flex-col gap-6 sm:flex-row sm:items-center sm:gap-8">
                 @foreach ($steps as $number => $meta)
                     @php
@@ -83,20 +83,20 @@
         >
             <h2 class="text-xl font-semibold text-gray-900">{{ __('messages.your_cart_is_empty') }}</h2>
             <p class="mt-2 text-sm text-gray-600">
-                {{ __('Add some products to your cart before proceeding through checkout.') }}
+                {{ __('frontend.empty_checkout_description') }}
             </p>
             <div class="mt-6 flex flex-wrap justify-center gap-3">
                 <a
                     href="{{ route('frontend.cart.index') }}"
                     class="inline-flex items-center rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
                 >
-                    {{ __('View cart') }}
+                    {{ __('frontend.view_cart') }}
                 </a>
                 <a
                     href="{{ route('frontend.products.index') }}"
                     class="inline-flex items-center rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-300"
                 >
-                    {{ __('Continue shopping') }}
+                    {{ __('frontend.continue_shopping') }}
                 </a>
             </div>
         </section>

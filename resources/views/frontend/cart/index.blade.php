@@ -1,11 +1,11 @@
-<x-layouts.base title="{{ __('messages.frontend) }}">
+<x-layouts.base title="{{ __('messages.frontend') }}">
     <div class="bg-sage">
     <!-- Hero Banner (centered) -->
     <section class="relative bg-sage z-10 overflow-hidden">
         <x-container class="px-4 py-16">
             <div class="max-w-site mx-auto w-full space-y-6 text-dark text-center">
                 <p class="uppercase text-3xl md:text-4xl font-medium">
-                    {{ __('messages.frontend) }}
+                    {{ __('messages.frontend') }}
                 </p>
                 <p class="text-sm max-w-2xl mx-auto">
                     {{ __('frontend.cart.review_prompt') }}
@@ -28,7 +28,7 @@
     <x-container class="px-4 py-10">
         <div class="max-w-site mx-auto grid gap-10 lg:grid-cols-12">
             <div class="lg:col-span-9 space-y-8">
-        <h1 class="text-3xl font-semibold text-gray-900 dark:text-gray-100">{{ __('messages.frontend) }}</h1>
+        <h1 class="text-3xl font-semibold text-gray-900 dark:text-gray-100">{{ __('messages.frontend') }}</h1>
         @if ($items)
                     <section class="bg-dark border border-sage/30 rounded-2xl shadow-sm">
                         <div class="p-6 space-y-6 divide-y divide-sage/30 text-sage">
@@ -42,21 +42,21 @@
                                         <p class="text-sm text-sage/80">{{ __('frontend.cart.quantity_label', ['quantity' => $item['quantity']]) }}</p>
                             </div>
                                     <div class="flex items-center justify-end gap-3 text-sm text-sage">
-                                        <dt class="text-sage/80">{{ __('messages.frontend) }}:</dt>
+                                        <dt class="text-sage/80">{{ __('messages.frontend') }}:</dt>
                                         <dd class="font-semibold text-white">{{ $summary['formatted_tax_amount'] }}</dd>
                             </div>
                                     <div class="flex items-center justify-end gap-3 text-sm text-sage">
-                                        <dt class="text-sage/80">{{ __('messages.frontend) }}:</dt>
+                                        <dt class="text-sage/80">{{ __('messages.frontend') }}:</dt>
                                         <dd class="font-semibold text-white">{{ $summary['formatted_shipping_amount'] }}</dd>
                             </div>
                             @if(($summary['discount_amount'] ?? 0) > 0)
                                         <div class="flex items-center justify-end gap-3 text-sm text-green-400">
-                                    <dt>{{ __('messages.frontend) }}:</dt>
+                                    <dt>{{ __('messages.frontend') }}:</dt>
                                     <dd class="font-semibold">-{{ $summary['formatted_discount_amount'] }}</dd>
                                 </div>
                             @endif
                                     <div class="flex items-center justify-end gap-3 text-base font-semibold text-white border-t border-sage/30 pt-2">
-                                <dt>{{ __('messages.frontend) }}:</dt>
+                                <dt>{{ __('messages.frontend') }}:</dt>
                                 <dd>{{ $summary['formatted_total'] }}</dd>
                             </div>
                         </div>
@@ -64,7 +64,7 @@
                 </div>
             </section>
         @else
-            <p class="text-gray-500 dark:text-gray-400">{{ __('messages.frontend) }}</p>
+            <p class="text-gray-500 dark:text-gray-400">{{ __('messages.frontend') }}</p>
         @endif
             </div>
             <aside class="lg:col-span-3">
@@ -72,23 +72,23 @@
             <h2 class="text-2xl font-semibold mb-4">{{ __('frontend.cart.order_summary') }}</h2>
                     <dl class="space-y-3 text-sm text-sage">
                 <div class="flex justify-between">
-                            <dt class="text-sage/80">{{ __('messages.frontend) }}</dt>
+                            <dt class="text-sage/80">{{ __('messages.frontend') }}</dt>
                             <dd class="text-white">{{ app_money_format($subtotal) }}</dd>
                 </div>
                 <div class="flex justify-between">
-                            <dt class="text-sage/80">{{ __('messages.frontend) }}</dt>
+                            <dt class="text-sage/80">{{ __('messages.frontend') }}</dt>
                             <dd class="text-white">{{ app_money_format($tax) }}</dd>
                 </div>
                 <div class="flex justify-between">
-                            <dt class="text-sage/80">{{ __('messages.frontend) }}</dt>
+                            <dt class="text-sage/80">{{ __('messages.frontend') }}</dt>
                             <dd class="text-white">{{ app_money_format($shipping) }}</dd>
                 </div>
                         <div class="flex justify-between">
-                            <dt class="text-sage/80">{{ __('messages.frontend) }}</dt>
+                            <dt class="text-sage/80">{{ __('messages.frontend') }}</dt>
                             <dd class="text-red-400">-{{ app_money_format($discount) }}</dd>
                 </div>
                         <div class="flex justify-between items-center text-lg font-semibold text-white bg-sage/10 rounded-xl px-4 py-3 border border-sage/30">
-                            <dt class="text-white">{{ __('messages.frontend) }}</dt>
+                            <dt class="text-white">{{ __('messages.frontend') }}</dt>
                             <dd class="text-white">{{ app_money_format($total) }}</dd>
                 </div>
             </dl>
@@ -96,14 +96,14 @@
                     <div class="mt-6 flex flex-wrap items-center gap-4 text-sage">
                 <form method="POST" action="{{ route('frontend.cart.clear') }}">
                     @csrf
-                            <button type="submit" class="px-4 py-2 border border-sage/30 rounded-lg text-sm hover:bg-sage/10">{{ __('messages.frontend) }}</button>
+                            <button type="submit" class="px-4 py-2 border border-sage/30 rounded-lg text-sm hover:bg-sage/10">{{ __('messages.frontend') }}</button>
                 </form>
 
                 <form method="POST" action="{{ route('frontend.discounts.apply-coupon') }}" class="flex items-center gap-2">
                     @csrf
                             <label for="code" class="text-sm text-sage/80">{{ __('frontend.cart.coupon_code') }}</label>
                             <input id="code" name="code" class="rounded-lg border border-sage/30 bg-dark/30 text-white placeholder:text-sage/50" placeholder="{{ __('frontend.cart.enter_code') }}">
-                            <button type="submit" class="px-4 py-2 rounded-lg bg-sage text-dark hover:bg-sage/90">{{ __('messages.frontend) }}</button>
+                            <button type="submit" class="px-4 py-2 rounded-lg bg-sage text-dark hover:bg-sage/90">{{ __('messages.frontend') }}</button>
                 </form>
 
                 <form method="POST" action="{{ route('frontend.discounts.remove-coupon') }}">

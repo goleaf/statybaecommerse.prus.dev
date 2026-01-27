@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use App\Filament\Concerns\HasResizableColumns;
-
 use Tests\TestCase;
 
 uses(TestCase::class);
@@ -114,8 +113,6 @@ final class HasResizableColumnsHarness
     /**
      * @var array<string, int>
      */
-
-
     public ?int $fakeUserId = null;
 
     protected function getUserId(): int|string|null

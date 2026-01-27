@@ -6,7 +6,7 @@ namespace App\Support\Filament\Forms;
 
 use App\Models\ProductVariant;
 use App\Support\Search\ProductVariantSearch;
-use DefStudio\SearchableInput\Forms\Components\SearchableInput;
+use App\Support\Filament\Components\SearchableInput;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 

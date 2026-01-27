@@ -59,6 +59,7 @@ final class CheckoutController extends Controller
             return $this->respondError(
                 $request,
                 __('messages.auth, [
+                    ', [
                     'seconds' => $seconds,
                     'minutes' => (int) ceil($seconds / 60),
                 ]),
@@ -163,6 +164,17 @@ final class CheckoutController extends Controller
 
         RateLimiter::clear($throttleKey);
 
+        Session::forget('), 500);
+        }
+
+        $cartLifecycleService->clearAfterCheckout(
+            $request->user()?->id,
+            $request->session()->getId(),
+            $order->payment_status ?? null
+        );
+
+        RateLimiter::clear($throttleKey);
+
         Session::forget('cart');
         Session::forget('cart_discount');
         Session::forget('applied_coupon');
@@ -174,6 +186,7 @@ final class CheckoutController extends Controller
             return response()->json([
                 'success'  => true,
                 'message'  => __('messages.ecommerce),
+                '),
                 'order_id' => $order->getKey(),
                 'order'    => [
                     'id'     => $order->getKey(),
@@ -183,6 +196,11 @@ final class CheckoutController extends Controller
         }
 
         return redirect()->route('frontend.checkout.success')->with('status', __('messages.ecommerce));
+    }
+
+    public function success(Request $request): View
+    {
+        $orderId = Session::get('));
     }
 
     public function success(Request $request): View

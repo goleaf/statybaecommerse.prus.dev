@@ -1,0 +1,8 @@
+<?php
+
+declare(strict_types=1);
+
+return array (
+  'accepted' => 'Das :attribute-Attribut muss akzeptiert werden.',
+  'active_url' => 'validation.active_url',
+);

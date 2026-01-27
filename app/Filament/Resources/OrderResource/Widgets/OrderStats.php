@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\OrderResource\Widgets;
 
 use App\Enums\OrderStatus;
@@ -12,9 +14,9 @@ class OrderStats extends BaseWidget
     protected function getStats(): array
     {
         return [
-            Stat::make('Total Orders', Order::count()),
-            Stat::make('Pending Orders', Order::where('status', OrderStatus::PENDING)->count()),
-            Stat::make('Revenue (Today)', number_format(Order::createdToday()->sum('total'), 2) . ' €'),
+            Stat::make(__('messages.admin.widgets.total_orders'), Order::count()),
+            Stat::make(__('messages.pending_orders'), Order::where('status', OrderStatus::PENDING)->count()),
+            Stat::make(__('messages.todays_revenue'), number_format(Order::createdToday()->sum('total'), 2) . ' €'),
         ];
     }
 }

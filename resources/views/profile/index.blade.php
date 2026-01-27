@@ -1,6 +1,6 @@
 @extends('components.layouts.base')
 
-@section('title', __('messages.frontend))
+@section('title', __('messages.frontend'))
 
 @section('content')
     <div class="container mx-auto px-4 py-8">
@@ -24,16 +24,16 @@
             <div class="flex items-center justify-between">
                 <div>
                     <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
-                        {{ __('messages.frontend) }}
+                        {{ __('messages.frontend') }}
                     </h1>
                     <p class="mt-2 text-gray-600 dark:text-gray-400">
-                        {{ __('messages.frontend) }}
+                        {{ __('messages.frontend') }}
                     </p>
                 </div>
                 <div class="flex gap-3">
                     <a href="{{ route('frontend.profile.edit') }}"
                        class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                        {{ __('messages.frontend) }}
+                        {{ __('messages.frontend') }}
                     </a>
                     <a href="{{ route('frontend.profile.addresses') }}"
                        class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-800 text-sm font-medium rounded-md shadow hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
@@ -60,13 +60,13 @@
                             </dd>
                         </div>
                         <div>
-                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('messages.frontend) }}</dt>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('messages.frontend') }}</dt>
                             <dd class="mt-1 text-base text-gray-900 dark:text-white">
                                 {{ $user->email }}
                             </dd>
                         </div>
                         <div>
-                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('messages.frontend) }}</dt>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('messages.frontend') }}</dt>
                             <dd class="mt-1 text-base text-gray-900 dark:text-white">
                                 {{ $user->phone ?? $user->phone_number ?? __('frontend.profile.fields.not_provided') }}
                             </dd>
@@ -85,10 +85,10 @@
                 <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm">
                     <div class="px-6 py-5 border-b border-gray-200 dark:border-gray-700">
                         <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-                            {{ __('messages.frontend) }}
+                            {{ __('messages.frontend') }}
                         </h2>
                         <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                            {{ __('messages.frontend) }}
+                            {{ __('messages.frontend') }}
                         </p>
                     </div>
                     <div class="px-6 py-5 space-y-4">
@@ -114,21 +114,21 @@
                                     <div class="text-sm text-gray-500 dark:text-gray-400 space-y-1 text-right">
                                         @if($address->is_default)
                                             <span class="inline-flex items-center px-2 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-medium">
-                                                {{ __('messages.frontend) }}
+                                                {{ __('messages.frontend') }}
                                             </span>
                                         @endif
                                         @if($address->is_billing)
-                                            <span class="block">{{ __('messages.frontend) }}</span>
+                                            <span class="block">{{ __('messages.frontend') }}</span>
                                         @endif
                                         @if($address->is_shipping)
-                                            <span class="block">{{ __('messages.frontend) }}</span>
+                                            <span class="block">{{ __('messages.frontend') }}</span>
                                         @endif
                                     </div>
                                 </div>
                             </div>
                         @empty
                             <p class="text-sm text-gray-600 dark:text-gray-300">
-                                {{ __('messages.frontend) }}
+                                {{ __('messages.frontend') }}
                             </p>
                         @endforelse
                         <div>

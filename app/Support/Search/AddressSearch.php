@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace App\Support\Search;
 
 use App\Models\Address;
-use App\Models\City;
-use DefStudio\SearchableInput\DTO\SearchResult;
-use DefStudio\SearchableInput\Forms\Components\SearchableInput;
+use App\Support\Search\SearchResult;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 

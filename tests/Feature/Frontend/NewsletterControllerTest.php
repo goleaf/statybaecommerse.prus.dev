@@ -20,7 +20,7 @@ final class NewsletterControllerTest extends TestCase
 
         $response->assertOk()->assertJson([
             'status'  => 'success',
-            'message' => __('messages.newsletter),
+            'message' => __('messages.newsletter'),
         ]);
 
         $this->assertDatabaseHas('subscribers', [
@@ -52,7 +52,7 @@ final class NewsletterControllerTest extends TestCase
 
         $response->assertOk()->assertJson([
             'status'  => 'success',
-            'message' => __('messages.subscribers),
+            'message' => __('messages.subscribers'),
         ]);
 
         $this->assertDatabaseHas('subscribers', [

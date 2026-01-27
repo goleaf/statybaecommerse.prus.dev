@@ -122,9 +122,9 @@
                             </label>
                             <select name="currency_code" id="currency_code" required
                                     class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 @error('currency_code') border-red-500 @enderror">
-                                <option value="EUR" {{ old('currency_code', 'EUR') === 'EUR' ? 'selected' : '' }}>{{ __('messages.discount_redemptions) }}</option>
-                                <option value="USD" {{ old('currency_code') === 'USD' ? 'selected' : '' }}>{{ __('messages.discount_redemptions) }}</option>
-                                <option value="GBP" {{ old('currency_code') === 'GBP' ? 'selected' : '' }}>{{ __('messages.discount_redemptions) }}</option>
+                                <option value="EUR" {{ old('currency_code', 'EUR') === 'EUR' ? 'selected' : '' }}>{{ __('messages.discount_redemptions') }}</option>
+                                <option value="USD" {{ old('currency_code') === 'USD' ? 'selected' : '' }}>{{ __('messages.discount_redemptions') }}</option>
+                                <option value="GBP" {{ old('currency_code') === 'GBP' ? 'selected' : '' }}>{{ __('messages.discount_redemptions') }}</option>
                             </select>
                             @error('currency_code')
                                 <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>

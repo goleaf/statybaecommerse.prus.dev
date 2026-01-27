@@ -23,20 +23,20 @@ final class SliderManagementWidget extends BaseWidget
         $recentSliders = Slider::where('created_at', '>=', Carbon::now()->subDays(7))->count();
 
         return [
-            Stat::make(__('messages.translations), \Illuminate\Support\Number::format($totalSliders))
-                ->description(__('messages.translations))
+            Stat::make(__('translations.total_sliders'), \Illuminate\Support\Number::format($totalSliders))
+                ->description(__('translations.all_sliders'))
                 ->descriptionIcon('heroicon-m-rectangle-stack')
                 ->color('primary'),
-            Stat::make(__('messages.translations), \Illuminate\Support\Number::format($activeSliders))
-                ->description(__('messages.translations))
+            Stat::make(__('translations.active_sliders'), \Illuminate\Support\Number::format($activeSliders))
+                ->description(__('translations.currently_active'))
                 ->descriptionIcon('heroicon-m-check-circle')
                 ->color('success'),
-            Stat::make(__('messages.translations), \Illuminate\Support\Number::format($inactiveSliders))
-                ->description(__('messages.translations))
+            Stat::make(__('translations.inactive_sliders'), \Illuminate\Support\Number::format($inactiveSliders))
+                ->description(__('translations.currently_inactive'))
                 ->descriptionIcon('heroicon-m-x-circle')
                 ->color('danger'),
-            Stat::make(__('messages.translations), \Illuminate\Support\Number::format($recentSliders))
-                ->description(__('messages.translations))
+            Stat::make(__('translations.recent_sliders'), \Illuminate\Support\Number::format($recentSliders))
+                ->description(__('translations.added_this_week'))
                 ->descriptionIcon('heroicon-m-clock')
                 ->color('info'),
         ];

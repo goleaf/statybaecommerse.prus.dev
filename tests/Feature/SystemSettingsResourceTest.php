@@ -469,7 +469,7 @@ final class SystemSettingsResourceTest extends TestCase
     public function test_navigation_label_is_translated(): void
     {
         self::assertEquals(
-            __('messages.system_settings),
+            __('messages.system_settings'),
             SystemSettingsResource::getNavigationLabel(),
         );
     }
@@ -480,7 +480,7 @@ final class SystemSettingsResourceTest extends TestCase
     public function test_model_label_is_translated(): void
     {
         self::assertEquals(
-            __('messages.system_settings),
+            __('messages.system_settings'),
             SystemSettingsResource::getModelLabel(),
         );
     }
@@ -491,7 +491,7 @@ final class SystemSettingsResourceTest extends TestCase
     public function test_plural_model_label_is_translated(): void
     {
         self::assertEquals(
-            __('messages.system_settings),
+            __('messages.system_settings'),
             SystemSettingsResource::getPluralModelLabel(),
         );
     }

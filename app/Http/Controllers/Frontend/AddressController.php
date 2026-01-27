@@ -131,7 +131,7 @@ final class AddressController extends Controller
         $this->authorize('update', $address);
         $address->setAsDefault();
 
-        return redirect()->route('frontend.addresses.index')->with('success', __('messages.translations));
+        return redirect()->route('frontend.addresses.index')->with('success', __('translations.address_set_as_default'));
     }
 
     /**
@@ -142,7 +142,7 @@ final class AddressController extends Controller
         $this->authorize('view', $address);
         $newAddress = $address->duplicateForUser(Auth::id());
 
-        return redirect()->route('frontend.addresses.edit', $newAddress)->with('success', __('messages.translations));
+        return redirect()->route('frontend.addresses.edit', $newAddress)->with('success', __('translations.address_duplicated'));
     }
 
     /**

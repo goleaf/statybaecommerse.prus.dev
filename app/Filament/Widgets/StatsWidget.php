@@ -34,15 +34,15 @@ final class StatsWidget extends BaseStatsOverviewWidget
         $monthOrders = (int) Order::createdThisMonth()->count();
 
         return [
-            Stat::make(__('messages.analytics), '€' . number_format($totalRevenue, 2))->color('success'),
-            Stat::make(__('messages.analytics), $totalOrders)->color('primary'),
-            Stat::make(__('messages.analytics), $totalProducts)->color('primary'),
-            Stat::make(__('messages.analytics), $totalCustomers)->color('primary'),
-            Stat::make(__('messages.analytics), $activeCustomers)->color('success'),
+            Stat::make(__('messages.analytics), '), '€' . number_format($totalRevenue, 2))->color('success'),
+            Stat::make(__('messages.analytics), $totalOrders)->color('), $totalOrders)->color('primary'),
+            Stat::make(__('messages.analytics), $totalProducts)->color('), $totalProducts)->color('primary'),
+            Stat::make(__('messages.analytics), $totalCustomers)->color('), $totalCustomers)->color('primary'),
+            Stat::make(__('messages.analytics), $activeCustomers)->color('), $activeCustomers)->color('success'),
             Stat::make(__('analytics.categories'), $visibleCategories)->color('info'),
             Stat::make(__('analytics.brands'), $enabledBrands)->color('info'),
             Stat::make(__('analytics.content'), $visibleCategories + $enabledBrands)->color('info'),
-            Stat::make(__('messages.analytics), $approvedReviews)->color('warning'),
+            Stat::make(__('messages.analytics), $approvedReviews)->color('), $approvedReviews)->color('warning'),
             Stat::make(__('analytics.average_rating'), number_format($avgRating, 1) . '/5')->color('warning'),
             Stat::make(__('analytics.average_order_value'), '€' . number_format($avgOrderValue, 2))->color('info'),
             Stat::make(__('analytics.month_orders'), $monthOrders)->color('primary'),

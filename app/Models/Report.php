@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Translatable\HasTranslations;
@@ -38,7 +37,6 @@ final class Report extends Model
     protected $casts = ['filters' => 'array', 'is_active' => 'boolean', 'is_public' => 'boolean', 'is_scheduled' => 'boolean', 'start_date' => 'date', 'end_date' => 'date', 'last_generated_at' => 'datetime', 'view_count' => 'integer', 'download_count' => 'integer', 'settings' => 'array', 'metadata' => 'array'];
 
     protected array $translatable = ['name', 'description', 'content'];
-
 
     /**
      * Handle generator functionality with proper error handling.
@@ -143,7 +141,7 @@ final class Report extends Model
      */
     public function getReportTypes(): array
     {
-        return ['sales' => __('messages.admin), 'products' => __('messages.admin), 'customers' => __('messages.admin), 'inventory' => __('messages.admin), 'analytics' => __('messages.admin), 'financial' => __('messages.admin), 'marketing' => __('messages.admin), 'custom' => __('messages.admin)];
+        return ['sales' => __('messages.admin), '), 'products' => __('messages.admin), '), 'customers' => __('messages.admin), '), 'inventory' => __('messages.admin), '), 'analytics' => __('messages.admin), '), 'financial' => __('messages.admin), '), 'marketing' => __('messages.admin), '), 'custom' => __('messages.admin)];
     }
 
     /**
@@ -151,7 +149,23 @@ final class Report extends Model
      */
     public function getReportCategories(): array
     {
-        return ['sales' => __('messages.admin), 'marketing' => __('messages.admin), 'operations' => __('messages.admin), 'finance' => __('messages.admin), 'customer_service' => __('admin.reports.categories.customer_service'), 'inventory' => __('messages.admin), 'analytics' => __('messages.admin)];
+        return [')];
+    }
+
+    /**
+     * Handle getReportCategories functionality with proper error handling.
+     */
+    public function getReportCategories(): array
+    {
+        return ['sales' => __('messages.admin), '), 'marketing' => __('messages.admin), '), 'operations' => __('messages.admin), '), 'finance' => __('messages.admin), '), 'customer_service' => __('admin.reports.categories.customer_service'), 'inventory' => __('messages.admin), '), 'analytics' => __('messages.admin)];
+    }
+
+    /**
+     * Handle getDateRanges functionality with proper error handling.
+     */
+    public function getDateRanges(): array
+    {
+        return [')];
     }
 
     /**

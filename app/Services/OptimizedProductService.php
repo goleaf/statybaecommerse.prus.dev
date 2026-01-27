@@ -27,12 +27,12 @@ class OptimizedProductService
             // Eager load all relationships in one go
             ->with([
                 'brand:id,name,slug,logo_path',
-                'category:id,name,slug,parent_id',
-                'category.parent:id,name,slug',
+                'mainCategory:id,name,slug,parent_id',
+                'mainCategory.parent:id,name,slug',
                 'variants:id,product_id,sku,name,price,stock_quantity',
                 'variants.attributeValues:id,variant_id,attribute_id,value',
                 'variants.attributeValues.attribute:id,name,type',
-                'productImages:id,product_id,path,alt_text,sort_order',
+                'images:id,product_id,path,alt_text,sort_order',
                 'tags:id,name,slug',
             ])
             // Use aggregate functions instead of separate queries
@@ -62,12 +62,14 @@ class OptimizedProductService
             // Only select needed columns
             ->select([
                 'id', 'name', 'slug', 'description', 'sku',
-                'brand_id', 'category_id', 'status', 'featured',
+                'brand_id', 'status', 'is_featured',
                 'created_at', 'updated_at',
             ])
             // Apply filters efficiently
             ->when($filters['category_id'] ?? null, function ($query, $categoryId) {
-                $query->where('category_id', $categoryId);
+                $query->whereHas('categories', function ($q) use ($categoryId) {
+                    $q->where('categories.id', $categoryId);
+                });
             })
             ->when($filters['brand_id'] ?? null, function ($query, $brandId) {
                 $query->where('brand_id', $brandId);
@@ -78,7 +80,7 @@ class OptimizedProductService
                     $q->whereBetween('price', [$min, $max]);
                 });
             })
-            ->orderBy('featured', 'desc')
+            ->orderBy('is_featured', 'desc')
             ->orderBy('created_at', 'desc')
             ->get();
     }
@@ -94,13 +96,13 @@ class OptimizedProductService
             function () use ($productId) {
                 return Product::with([
                     'brand:id,name,slug,description,logo_path',
-                    'category:id,name,slug,description,parent_id',
-                    'category.parent:id,name,slug',
+                    'mainCategory:id,name,slug,description,parent_id',
+                    'mainCategory.parent:id,name,slug',
                     'variants:id,product_id,sku,name,price,stock_quantity,status',
                     'variants.attributeValues:id,variant_id,attribute_id,value',
                     'variants.attributeValues.attribute:id,name,type,display_name',
                     'variants.inventory:variant_id,quantity,reserved_quantity,location',
-                    'productImages:id,product_id,path,alt_text,sort_order',
+                    'images:id,product_id,path,alt_text,sort_order',
                     'reviews:id,product_id,user_id,rating,comment,created_at',
                     'reviews.user:id,name,avatar_path',
                     'tags:id,name,slug,color',
@@ -125,7 +127,7 @@ class OptimizedProductService
         return Product::with([
             'brand:id,name,slug',
             'variants:id,product_id,price,stock_quantity',
-            'productImages:id,product_id,path,alt_text',
+            'images:id,product_id,path,alt_text',
         ])
             ->withCount('reviews')
             ->withAvg('reviews', 'rating')
@@ -137,9 +139,11 @@ class OptimizedProductService
                         ->where('status', 'active');
                 },
             ])
-            ->whereIn('category_id', $categoryIds)
+            ->whereHas('categories', function ($q) use ($categoryIds) {
+                $q->whereIn('categories.id', $categoryIds);
+            })
             ->where('status', 'active')
-            ->orderBy('featured', 'desc')
+            ->orderBy('is_featured', 'desc')
             ->orderBy('created_at', 'desc')
             ->paginate($perPage);
     }
@@ -153,9 +157,9 @@ class OptimizedProductService
             ->query(function ($builder) use ($filters) {
                 $builder->with([
                     'brand:id,name,slug',
-                    'category:id,name,slug',
+                    'mainCategory:id,name,slug',
                     'variants:id,product_id,price,stock_quantity',
-                    'productImages:id,product_id,path,alt_text',
+                    'images:id,product_id,path,alt_text',
                 ])
                     ->withCount('reviews')
                     ->withAvg('reviews', 'rating')
@@ -170,7 +174,9 @@ class OptimizedProductService
                         $q->whereIn('brand_id', $brandIds);
                     })
                     ->when($filters['category_ids'] ?? null, function ($q, $categoryIds) {
-                        $q->whereIn('category_id', $categoryIds);
+                        $q->whereHas('categories', function ($sq) use ($categoryIds) {
+                            $sq->whereIn('categories.id', $categoryIds);
+                        });
                     })
                     ->when($filters['price_range'] ?? null, function ($q, $priceRange) {
                         [$min, $max] = $priceRange;

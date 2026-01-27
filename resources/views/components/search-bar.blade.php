@@ -1,7 +1,7 @@
 @props(['placeholder' => null, 'showSuggestions' => true])
 
 @php
-    $placeholder = $placeholder ?? __('messages.frontend);
+    $placeholder = $placeholder ?? __('messages.frontend');
 @endphp
 
 <div class="relative" x-data="searchBar()">
@@ -31,7 +31,7 @@
             {{-- Search Button --}}
             <button type="submit"
                     class="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-500 hover:text-blue-600 transition-colors duration-200"
-                    aria-label="{{ __('messages.frontend) }}">
+                    aria-label="{{ __('messages.frontend') }}">
                 <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                     <path fill-rule="evenodd"
                           d="M12.9 14.32a8 8 0 111.414-1.414l4.387 4.387a1 1 0 01-1.414 1.414l-4.387-4.387zM14 8a6 6 0 11-12 0 6 6 0 0112 0z"
@@ -57,7 +57,7 @@
             <template x-if="suggestions.length > 0">
                 <div>
                     <div class="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                        {{ __('messages.frontend) }}
+                        {{ __('messages.frontend') }}
                     </div>
                     <template x-for="suggestion in suggestions" :key="suggestion.id">
                         <a :href="`/search?q=${suggestion.name}`"

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Support\Filament;
 
-use DefStudio\SearchableInput\Forms\Components\SearchableInput;
+use App\Support\Filament\Components\SearchableInput;
 
 /**
  * Lightweight registry that associates SearchableInput component instances with their

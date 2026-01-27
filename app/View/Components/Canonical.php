@@ -6,7 +6,6 @@ namespace App\View\Components;
 
 use App\Support\Locales;
 use Illuminate\Contracts\View\View;
-use Illuminate\Support\Collection;
 use Illuminate\View\Component;
 
 final class Canonical extends Component
@@ -61,9 +60,9 @@ final class Canonical extends Component
                 $normalizedKey = strtolower($key);
 
                 return [
-                    'original' => $pair,
-                    'key' => $key,
-                    'value' => $value,
+                    'original'       => $pair,
+                    'key'            => $key,
+                    'value'          => $value,
                     'normalized_key' => $normalizedKey,
                 ];
             })

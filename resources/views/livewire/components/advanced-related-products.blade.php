@@ -7,7 +7,7 @@
                         {{ $this->sectionTitle }}
                     </h2>
                     <p class="mt-4 text-lg text-gray-600">
-                        {{ __('messages.ecommerce) }}
+                        {{ __('messages.ecommerce') }}
                     </p>
                 </div>
             @endif
@@ -82,11 +82,11 @@
                                 
                                 @if($relatedProduct->isInStock())
                                     <span class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
-                                        {{ __('messages.ecommerce) }}
+                                        {{ __('messages.ecommerce') }}
                                     </span>
                                 @else
                                     <span class="inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800">
-                                        {{ __('messages.ecommerce) }}
+                                        {{ __('messages.ecommerce') }}
                                     </span>
                                 @endif
                             </div>

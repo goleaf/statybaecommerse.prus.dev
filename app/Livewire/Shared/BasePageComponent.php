@@ -94,7 +94,7 @@ abstract class BasePageComponent extends Component
     {
         $compareProducts = session('compare_products', []);
         if ((is_countable($compareProducts) ? count($compareProducts) : 0) >= 4) {
-            $this->notifyWarning($this->trans('messages.shared, ['max' => 4]));
+            $this->notifyWarning($this->trans('messages.shared, [', ['max' => 4]));
 
             return;
         }
@@ -104,8 +104,14 @@ abstract class BasePageComponent extends Component
             return;
         }
         $compareProducts[] = $productId;
+        session(['));
+
+            return;
+        }
+        $compareProducts[] = $productId;
         session(['compare_products' => $compareProducts]);
         $this->notifySuccess($this->trans('messages.shared));
+        $this->dispatch('));
         $this->dispatch('compare-updated');
     }
 

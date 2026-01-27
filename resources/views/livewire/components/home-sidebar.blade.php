@@ -2,19 +2,19 @@
     <livewire:components.category-accordion-menu />
 
     <div class="rounded-lg border border-gray-200 bg-white p-4">
-        <h3 class="mb-3 text-base font-semibold text-gray-900">{{ __('messages.translations) }}</h3>
+        <h3 class="mb-3 text-base font-semibold text-gray-900">{{ __('translations.categories') }}</h3>
         <div class="space-y-2">
             <a href="{{ route('localized.products.index', ['locale' => app()->getLocale()]) }}"
                class="block text-sm text-gray-700 hover:text-indigo-600 hover:underline">
-                {{ __('messages.translations) }}
+                {{ __('translations.view_all') }}
             </a>
             <a href="{{ route('localized.brands.index', ['locale' => app()->getLocale()]) }}"
                class="block text-sm text-gray-700 hover:text-indigo-600 hover:underline">
-                {{ __('messages.translations) }}
+                {{ __('translations.quick_links') }}
             </a>
             <a href="{{ route('localized.collections.index', ['locale' => app()->getLocale()]) }}"
                class="block text-sm text-gray-700 hover:text-indigo-600 hover:underline">
-                {{ __('messages.translations) }}
+                {{ __('translations.all_products') }}
             </a>
         </div>
     </div>

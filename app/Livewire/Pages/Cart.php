@@ -151,11 +151,12 @@ class Cart extends Component
     {
         $model = $item->associatedModel ?? null;
         if ($model && method_exists($model, 'getFirstMediaUrl')) {
-            return $model->getFirstMediaUrl(config('media.storage.thumbnail_collection')) 
-                ?: $model->getFirstMediaUrl(config('media.storage.collection_name'), 'small') 
-                ?: $model->getFirstMediaUrl(config('media.storage.collection_name'), 'medium') 
+            return $model->getFirstMediaUrl(config('media.storage.thumbnail_collection'))
+                ?: $model->getFirstMediaUrl(config('media.storage.collection_name'), 'small')
+                ?: $model->getFirstMediaUrl(config('media.storage.collection_name'), 'medium')
                 ?: $model->getFirstMediaUrl(config('media.storage.collection_name'));
         }
+
         return null;
     }
 

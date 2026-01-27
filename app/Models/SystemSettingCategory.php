@@ -56,7 +56,6 @@ final class SystemSettingCategory extends Model
         return SlugOptions::create()->generateSlugsFrom('name')->saveSlugsTo('slug');
     }
 
-
     /**
      * Handle settings functionality with proper error handling.
      */

@@ -17,7 +17,7 @@
                             <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h12a1 1 0 001-1V10" />
                             </svg>
-                            {{ __('messages.frontend) }}
+                            {{ __('messages.frontend') }}
                         </a>
                     </li>
                     <li class="text-sage/60">/</li>
@@ -356,7 +356,7 @@
                                             @endif
 
                                             <div class="flex items-center justify-center">
-                                                <a href="{{ route('localized.categories.show', ['locale' => $locale, 'category' => $slug]) }}"
+                                                <a href="{{ route('localized.categories.show', ['locale' => app()->getLocale(), 'category' => $slug]) }}"
                                                    class="inline-flex items-center gap-2 rounded-full bg-sage px-4 py-2 text-sm font-semibold text-dark transition hover:bg-sage/90">
                                                     {{ __('messages.categories_index_view_category') }}
                                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
@@ -374,7 +374,7 @@
                                 description="{{ __('messages.categories_index_empty_description') }}"
                                 icon="heroicon-o-archive-box"
                                 :action-text="__('messages.categories_index_reset_filters')"
-                                :action-url="route('localized.categories.index', ['locale' => $locale])"
+                                :action-url="route('localized.categories.index', ['locale' => app()->getLocale()])"
                             />
                         @endif
                     @else

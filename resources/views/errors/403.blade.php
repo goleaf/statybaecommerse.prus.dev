@@ -21,7 +21,9 @@
 @extends('errors.layout', [
     'code' => '403',
     'title' => __('messages.frontend),
+    '),
     'description' => __('messages.frontend),
+    '),
     'primaryAction' => [
         'label' => __('frontend.errors.actions.return_home'),
         'url' => $homeUrl,

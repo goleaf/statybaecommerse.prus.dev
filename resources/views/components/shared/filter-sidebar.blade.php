@@ -1,5 +1,5 @@
 @props([
-    'title' => __('messages.frontend),
+    'title' => __('messages.frontend'),
     'description' => null,
     'badge' => null,
     'sticky' => true,
@@ -26,7 +26,7 @@ SVG;
                 <div class="space-y-2">
                     <span class="inline-flex items-center gap-2 rounded-full bg-blue-50 text-blue-600 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.35em]">
                         {!! $iconMarkup !!}
-                        {{ __('messages.frontend) }}
+                        {{ __('messages.frontend') }}
                     </span>
                     <h2 class="text-xl font-semibold text-gray-900 dark:text-white">{{ $title }}</h2>
                     @if($description)

@@ -163,32 +163,32 @@ class UltimateStatsWidget extends BaseWidget
                 ->descriptionIcon('heroicon-m-shopping-cart')
                 ->color('info'),
             // === PRODUCT ECOSYSTEM ===
-            Stat::make(__('messages.translations), \Illuminate\Support\Number::format($totalProducts))
-                ->description(__('messages.translations) . ': ' . \Illuminate\Support\Number::format($activeProducts))
+            Stat::make(__('translations.total_products'), \Illuminate\Support\Number::format($totalProducts))
+                ->description(__('translations.active_products') . ': ' . \Illuminate\Support\Number::format($activeProducts))
                 ->descriptionIcon('heroicon-m-cube')
                 ->color('primary'),
             Stat::make(__('translations.product_variants'), \Illuminate\Support\Number::format($totalVariants))
                 ->description(__('translations.total_variants'))
                 ->descriptionIcon('heroicon-m-squares-2x2')
                 ->color('info'),
-            Stat::make(__('messages.translations), \Illuminate\Support\Number::format($lowStockProducts))
+            Stat::make(__('translations.low_stock'), \Illuminate\Support\Number::format($lowStockProducts))
                 ->description(__('translations.products_need_restocking'))
                 ->descriptionIcon('heroicon-m-exclamation-triangle')
                 ->color($lowStockProducts > 0 ? 'warning' : 'success'),
-            Stat::make(__('messages.translations), \Illuminate\Support\Number::format($outOfStockProducts))
+            Stat::make(__('translations.out_of_stock'), \Illuminate\Support\Number::format($outOfStockProducts))
                 ->description(__('translations.products_out_of_stock'))
                 ->descriptionIcon('heroicon-m-x-circle')
                 ->color($outOfStockProducts > 0 ? 'danger' : 'success'),
             // === CATEGORIES & BRANDS ===
-            Stat::make(__('messages.translations), \Illuminate\Support\Number::format($totalCategories))
+            Stat::make(__('translations.categories'), \Illuminate\Support\Number::format($totalCategories))
                 ->description(__('translations.active_categories') . ': ' . \Illuminate\Support\Number::format($activeCategories))
                 ->descriptionIcon('heroicon-m-tag')
                 ->color('info'),
-            Stat::make(__('messages.translations), \Illuminate\Support\Number::format($totalBrands))
+            Stat::make(__('translations.brands'), \Illuminate\Support\Number::format($totalBrands))
                 ->description(__('translations.active_brands') . ': ' . \Illuminate\Support\Number::format($activeBrands))
                 ->descriptionIcon('heroicon-m-building-storefront')
                 ->color('primary'),
-            Stat::make(__('messages.translations), \Illuminate\Support\Number::format($totalCollections))
+            Stat::make(__('translations.collections'), \Illuminate\Support\Number::format($totalCollections))
                 ->description(__('translations.total_collections'))
                 ->descriptionIcon('heroicon-m-archive-box')
                 ->color('warning'),
@@ -197,12 +197,12 @@ class UltimateStatsWidget extends BaseWidget
                 ->description(__('translations.total_movements'))
                 ->descriptionIcon('heroicon-m-arrow-path')
                 ->color('info'),
-            Stat::make(__('messages.translations), \Illuminate\Support\Number::format($totalInventoryItems))
+            Stat::make(__('translations.inventory_items'), \Illuminate\Support\Number::format($totalInventoryItems))
                 ->description(__('translations.total_items'))
                 ->descriptionIcon('heroicon-m-archive-box')
                 ->color('primary'),
             Stat::make(__('translations.stock_value'), \Illuminate\Support\Number::currency($totalStockValue, 'EUR'))
-                ->description(__('messages.translations))
+                ->description(__('translations.total_value'))
                 ->descriptionIcon('heroicon-m-banknotes')
                 ->color('success'),
             // === REVIEWS & RATINGS ===
@@ -210,7 +210,7 @@ class UltimateStatsWidget extends BaseWidget
                 ->description(__('translations.approved_reviews') . ': ' . \Illuminate\Support\Number::format($approvedReviews))
                 ->descriptionIcon('heroicon-m-star')
                 ->color('warning'),
-            Stat::make(__('messages.translations), number_format($avgRating, 1) . '/5')
+            Stat::make(__('translations.average_rating'), number_format($avgRating, 1) . '/5')
                 ->description(__('translations.customer_satisfaction'))
                 ->descriptionIcon('heroicon-m-star')
                 ->color($avgRating >= 4 ? 'success' : ($avgRating >= 3 ? 'warning' : 'danger')),
@@ -241,7 +241,7 @@ class UltimateStatsWidget extends BaseWidget
             //     ->descriptionIcon('heroicon-m-percent')
             //     ->color('info'), // Commented out - table doesn't exist
             // === ANALYTICS & TRACKING ===
-            Stat::make(__('messages.translations), \Illuminate\Support\Number::format($totalPageViews))
+            Stat::make(__('translations.page_views'), \Illuminate\Support\Number::format($totalPageViews))
                 ->description(__('translations.total_views'))
                 ->descriptionIcon('heroicon-m-eye')
                 ->color('info'),
@@ -279,7 +279,7 @@ class UltimateStatsWidget extends BaseWidget
                 ->description(__('translations.warehouse_locations'))
                 ->descriptionIcon('heroicon-m-building-office')
                 ->color('warning'),
-            Stat::make(__('messages.translations), \Illuminate\Support\Number::format($totalAddresses))
+            Stat::make(__('translations.addresses'), \Illuminate\Support\Number::format($totalAddresses))
                 ->description(__('translations.customer_addresses'))
                 ->descriptionIcon('heroicon-m-home')
                 ->color('info'),
@@ -292,7 +292,7 @@ class UltimateStatsWidget extends BaseWidget
                 ->description(__('translations.configuration_items'))
                 ->descriptionIcon('heroicon-m-cog-6-tooth')
                 ->color('warning'),
-            Stat::make(__('messages.translations), \Illuminate\Support\Number::format($totalCurrencies))
+            Stat::make(__('translations.currencies'), \Illuminate\Support\Number::format($totalCurrencies))
                 ->description(__('translations.supported_currencies'))
                 ->descriptionIcon('heroicon-m-currency-euro')
                 ->color('info'),
@@ -301,7 +301,7 @@ class UltimateStatsWidget extends BaseWidget
                 ->descriptionIcon('heroicon-m-newspaper')
                 ->color('primary'),
             Stat::make(__('translations.sliders'), \Illuminate\Support\Number::format($totalSliders))
-                ->description(__('messages.translations))
+                ->description(__('translations.total_sliders'))
                 ->descriptionIcon('heroicon-m-photo')
                 ->color('success'),
             // === ATTRIBUTES & FEATURES ===

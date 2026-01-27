@@ -79,7 +79,6 @@ final class ProductRequest extends Model
      */
     protected $table = 'product_requests';
 
-
     /**
      * Handle product functionality with proper error handling.
      *

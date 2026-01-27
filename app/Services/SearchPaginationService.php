@@ -388,16 +388,16 @@ final class SearchPaginationService
     private function getLoadMoreText(array $pagination): string
     {
         if (! $pagination['has_next_page']) {
-            return __('messages.frontend);
+            return __('messages.frontend');
         }
 
         $remaining = $pagination['total'] - ($pagination['current_page'] * $pagination['per_page']);
 
         if ($remaining <= 0) {
-            return __('messages.frontend);
+            return __('messages.frontend');
         }
 
-        return __('messages.frontend, ['count' => min($remaining, $pagination['per_page'])]);
+        return __('messages.frontend', ['count' => min($remaining, $pagination['per_page'])]);
     }
 
     /**

@@ -33,7 +33,10 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property bool                      $is_enabled
  * @property float|null                $discount_rate
  * @property float|null                $commission_rate
+ * @property int|null                  $tier_id
  * @property array<string, mixed>|null $metadata
+ *
+ * @property-read \App\Models\PartnerTier|null $tier
  *
  * @mixin \Eloquent
  */
@@ -51,14 +54,22 @@ final class Partner extends Model implements HasMedia
 
     protected $table = 'partners';
 
-    protected $fillable = ['name', 'code', 'contact_email', 'contact_phone', 'is_enabled', 'discount_rate', 'commission_rate', 'metadata'];
+    protected $fillable = ['name', 'code', 'contact_email', 'contact_phone', 'is_enabled', 'discount_rate', 'commission_rate', 'tier_id', 'metadata'];
 
     /**
      * Handle casts functionality with proper error handling.
      */
     protected function casts(): array
     {
-        return ['is_enabled' => 'boolean', 'discount_rate' => 'decimal:4', 'commission_rate' => 'decimal:4', 'metadata' => 'array'];
+        return ['is_enabled' => 'boolean', 'discount_rate' => 'decimal:4', 'commission_rate' => 'decimal:4', 'tier_id' => 'integer', 'metadata' => 'array'];
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\PartnerTier, $this>
+     */
+    public function tier(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(PartnerTier::class);
     }
 
     /**

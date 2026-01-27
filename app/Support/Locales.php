@@ -30,18 +30,20 @@ final class Locales
         $locales = [];
 
         if (is_array($configured) && $configured !== []) {
-            $locales = array_keys($configured);
+            $locales = array_is_list($configured) ? $configured : array_keys($configured);
         }
 
         // Fall back to the legacy supported_locales config for backwards compatibility.
-        $configured = $locales === [] ? config('app.supported_locales') : $configured;
+        if ($locales === []) {
+            $configured = config('app.supported_locales');
 
-        if (is_string($configured)) {
-            $configured = array_filter(array_map('trim', explode(',', $configured)));
-        }
+            if (is_string($configured)) {
+                $configured = array_filter(array_map('trim', explode(',', $configured)));
+            }
 
-        if (is_array($configured) && $configured !== []) {
-            $locales = $configured;
+            if (is_array($configured) && $configured !== []) {
+                $locales = $configured;
+            }
         }
 
         if ($locales === []) {
@@ -51,9 +53,7 @@ final class Locales
             $langPath = lang_path();
 
             if ($filesystem->exists($langPath)) {
-                $directories = array_map(static fn (string $path): string => basename($path), $filesystem->directories($langPath));
-                $jsonFiles = array_map(static fn (string $file): string => basename($file, '.json'), glob($langPath . '/*.json') ?: []);
-                $locales = array_merge($directories, $jsonFiles);
+                $locales = array_map(static fn (string $path): string => basename($path), $filesystem->directories($langPath));
             }
         }
 

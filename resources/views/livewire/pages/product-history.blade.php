@@ -71,6 +71,7 @@
             <x-breadcrumbs :items="[
                 [
                     'label' => __('messages.frontend),
+                    '),
                     'url' => route('localized.products.index', ['locale' => app()->getLocale()]),
                 ],
                 [
@@ -80,8 +81,8 @@
                         'product' => $product->trans('slug') ?? $product->slug,
                     ]),
                 ],
-                ['label' => __('messages.frontend)],
-            ]" aria-label="{{ __('messages.frontend) }}" />
+                ['label' => __('messages.frontend')],
+            ]" aria-label="{{ __('messages.frontend') }}" />
 
             <section class="rounded-3xl border border-slate-200 bg-white/80 p-6 shadow-sm backdrop-blur">
                 <div class="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
@@ -99,7 +100,7 @@
                         <div class="space-y-4">
                             <div>
                                 <p class="text-sm font-semibold uppercase tracking-wide text-indigo-500">
-                                    {{ __('messages.frontend) }}
+                                    {{ __('messages.frontend') }}
                                 </p>
                                 <h1 class="mt-1 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
                                     {{ __('frontend.products.history_title', ['product' => $product->trans('name') ?? $product->name]) }}
@@ -111,13 +112,13 @@
 
                             <dl class="flex flex-wrap gap-x-6 gap-y-3 text-sm text-slate-600">
                                 <div class="flex items-center gap-2">
-                                    <dt class="font-medium text-slate-500">{{ __('messages.frontend) }}:</dt>
+                                    <dt class="font-medium text-slate-500">{{ __('messages.frontend') }}:</dt>
                                     <dd>{{ $product->sku }}</dd>
                                 </div>
 
                                 @if($product->brand)
                                     <div class="flex items-center gap-2">
-                                        <dt class="font-medium text-slate-500">{{ __('messages.frontend) }}:</dt>
+                                        <dt class="font-medium text-slate-500">{{ __('messages.frontend') }}:</dt>
                                         <dd>{{ $product->brand->trans('name') ?? $product->brand->name }}</dd>
                                     </div>
                                 @endif
@@ -144,7 +145,7 @@
             </section>
 
             <section aria-labelledby="history-stats" class="space-y-6">
-                <h2 id="history-stats" class="sr-only">{{ __('messages.frontend) }}</h2>
+                <h2 id="history-stats" class="sr-only">{{ __('messages.frontend') }}</h2>
 
                 <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
                     @foreach($stats as $stat)

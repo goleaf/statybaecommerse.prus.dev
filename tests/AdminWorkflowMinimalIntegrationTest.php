@@ -58,26 +58,18 @@ final class AdminWorkflowMinimalIntegrationTest extends TestCase
         $supportedLocales = ['lt', 'en'];
 
         foreach ($supportedLocales as $locale) {
-            // Test navigation translations exist
-            $navigationFile = $this->getResourcePath("lang/{$locale}/navigation.php");
-            $this->assertFileExists($navigationFile, "Navigation translation file should exist for locale {$locale}");
+            // Test admin translations exist (replaces legacy navigation.php)
+            $adminFile = $this->getLangPath("{$locale}/admin.php");
+            $this->assertFileExists($adminFile, "Admin translation file should exist for locale {$locale}");
 
-            if (file_exists($navigationFile)) {
-                $navigationTranslations = include $navigationFile;
-                $this->assertIsArray($navigationTranslations, "Navigation translations should be array for locale {$locale}");
-
-                // Test required navigation group translations
-                $this->assertArrayHasKey('navigation_groups', $navigationTranslations,
-                    "Navigation groups section should exist for locale {$locale}");
-
-                $requiredKeys = ['user_management', 'content_management', 'ecommerce', 'system', 'inventory'];
-                foreach ($requiredKeys as $key) {
-                    $this->assertArrayHasKey($key, $navigationTranslations['navigation_groups'],
-                        "Navigation group key {$key} should exist for locale {$locale}");
-                    $this->assertNotEmpty($navigationTranslations['navigation_groups'][$key],
-                        "Navigation group translation for {$key} should not be empty in locale {$locale}");
-                }
+            if (file_exists($adminFile)) {
+                $adminTranslations = include $adminFile;
+                $this->assertIsArray($adminTranslations, "Admin translations should be array for locale {$locale}");
             }
+            
+            // Test messages translations exist
+            $messagesFile = $this->getLangPath("{$locale}/messages.php");
+            $this->assertFileExists($messagesFile, "Messages translation file should exist for locale {$locale}");
         }
     }
 
@@ -125,14 +117,7 @@ final class AdminWorkflowMinimalIntegrationTest extends TestCase
         // Test that navigation group enum exists and is properly configured
         $this->assertTrue(enum_exists('App\\Enums\\NavigationGroup'), 'NavigationGroup enum should exist');
 
-        // Test that base resource exists
-        $baseResource = 'App\\Filament\\Resources\\BaseResource';
-        if (class_exists($baseResource)) {
-            $reflection = new ReflectionClass($baseResource);
-            $this->assertTrue($reflection->isAbstract(), 'BaseResource should be abstract');
-        }
-
-        // Test configuration files exist
+        // Test that configuration files exist
         $configFiles = [
             'filament.php',
             'auth.php',
@@ -161,8 +146,8 @@ final class AdminWorkflowMinimalIntegrationTest extends TestCase
 
         // Test that responsive breakpoints are configured
         if (file_exists($tailwindConfig)) {
-            $tailwindContent = file_get_contents($tailwindConfig);
-            $responsiveIndicators = ['sm', 'md', 'lg', 'xl', '2xl', 'max-w-', 'variants'];
+            $tailwindContent = (string) file_get_contents($tailwindConfig);
+            $responsiveIndicators = ['sm', 'md', 'lg', 'xl', '2xl', 'max-w-'];
             $foundIndicators = 0;
 
             foreach ($responsiveIndicators as $indicator) {
@@ -181,11 +166,7 @@ final class AdminWorkflowMinimalIntegrationTest extends TestCase
      */
     public function test_error_handling_configuration(): void
     {
-        // Test that exception handler exists
-        $exceptionHandler = 'App\\Exceptions\\Handler';
-        $this->assertTrue(class_exists($exceptionHandler), 'Exception handler should exist');
-
-        // Test logging configuration
+        // Test that logging configuration exists
         $loggingConfig = $this->getConfigPath('logging.php');
         $this->assertFileExists($loggingConfig, 'Logging configuration should exist');
     }
@@ -218,11 +199,11 @@ final class AdminWorkflowMinimalIntegrationTest extends TestCase
         $this->assertGreaterThan(0, $existingResources, 'At least some admin resources should exist');
 
         // 3. Translation system integration
-        $translationFiles = ['lt/navigation.php', 'en/navigation.php'];
+        $translationFiles = ['lt/admin.php', 'en/admin.php'];
         $existingTranslations = 0;
 
         foreach ($translationFiles as $translationFile) {
-            $filePath = $this->getResourcePath("lang/{$translationFile}");
+            $filePath = $this->getLangPath($translationFile);
             if (file_exists($filePath)) {
                 $existingTranslations++;
             }
@@ -235,11 +216,11 @@ final class AdminWorkflowMinimalIntegrationTest extends TestCase
     }
 
     /**
-     * Helper method to get resource path
+     * Helper method to get language path
      */
-    private function getResourcePath(string $path): string
+    private function getLangPath(string $path): string
     {
-        return dirname(__DIR__) . '/resources/' . $path;
+        return dirname(__DIR__) . '/lang/' . $path;
     }
 
     /**

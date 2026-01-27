@@ -7,8 +7,8 @@ namespace App\Support\Search;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Support\Filament\SearchableComponentHelper;
-use DefStudio\SearchableInput\DTO\SearchResult;
-use DefStudio\SearchableInput\Forms\Components\SearchableInput;
+use App\Support\Search\SearchResult;
+use App\Support\Filament\Components\SearchableInput;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 

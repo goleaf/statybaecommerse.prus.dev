@@ -421,7 +421,7 @@ final class VariantImageResourceTest extends TestCase
     public function test_navigation_label_is_correct(): void
     {
         $this->assertEquals(
-            __('messages.admin_variant_images),
+            __('messages.admin_variant_images'),
             VariantImageResource::getNavigationLabel()
         );
     }
@@ -429,7 +429,7 @@ final class VariantImageResourceTest extends TestCase
     public function test_model_label_is_correct(): void
     {
         $this->assertEquals(
-            __('messages.admin_variant_images),
+            __('messages.admin_variant_images'),
             VariantImageResource::getModelLabel()
         );
     }
@@ -437,7 +437,7 @@ final class VariantImageResourceTest extends TestCase
     public function test_plural_model_label_is_correct(): void
     {
         $this->assertEquals(
-            __('messages.admin_variant_images),
+            __('messages.admin_variant_images'),
             VariantImageResource::getPluralModelLabel()
         );
     }

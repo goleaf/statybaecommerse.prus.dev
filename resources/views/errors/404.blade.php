@@ -103,7 +103,9 @@
 @extends('errors.4xx', [
     'code' => '404',
     'title' => __('messages.frontend),
+    '),
     'description' => __('messages.frontend),
+    '),
     'showSearch' => true,
     'searchTitle' => __('frontend.errors.404.search_title'),
     'searchPlaceholder' => __('frontend.errors.404.search_placeholder'),

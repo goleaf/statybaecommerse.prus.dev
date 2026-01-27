@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Support\Search;
 
-use App\Models\User;
-use DefStudio\SearchableInput\DTO\SearchResult;
+use App\Models\Customer;
+use App\Support\Search\SearchResult;
 use Illuminate\Database\Eloquent\Builder;
 use Throwable;
 
