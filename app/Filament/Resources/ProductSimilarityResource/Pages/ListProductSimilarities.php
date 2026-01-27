@@ -8,7 +8,7 @@ use App\Filament\Resources\ProductSimilarityResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
-final class ListProductSimilarities extends ListRecords
+class ListProductSimilarities extends ListRecords
 {
     protected static string $resource = ProductSimilarityResource::class;
 

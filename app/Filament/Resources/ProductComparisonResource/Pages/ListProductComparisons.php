@@ -8,7 +8,7 @@ use App\Filament\Resources\ProductComparisonResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
-final class ListProductComparisons extends ListRecords
+class ListProductComparisons extends ListRecords
 {
     protected static string $resource = ProductComparisonResource::class;
 

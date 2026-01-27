@@ -8,14 +8,13 @@ use App\Filament\Resources\ProductFeatureResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
-final class EditProductFeature extends EditRecord
+class EditProductFeature extends EditRecord
 {
     protected static string $resource = ProductFeatureResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make(),
             Actions\DeleteAction::make(),
         ];
     }

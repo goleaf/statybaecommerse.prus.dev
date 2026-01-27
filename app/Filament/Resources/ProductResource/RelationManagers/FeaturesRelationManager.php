@@ -4,91 +4,66 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ProductResource\RelationManagers;
 
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\CreateAction;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Forms\Components\Select;
+use App\Models\ProductFeature;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Schemas\Schema;
-use Filament\Tables\Columns\BadgeColumn;
+use Filament\Tables\Actions\CreateAction;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
 
-final class FeaturesRelationManager extends RelationManager
+class FeaturesRelationManager extends RelationManager
 {
     protected static string $relationship = 'features';
 
-    protected function getTableQuery(): Builder
-    {
-        return parent::getTableQuery()->withoutGlobalScopes();
-    }
+    protected static ?string $recordTitleAttribute = 'feature_key';
 
-    public function form(Schema $schema): Schema
+    public function form(Form $form): Form
     {
-        return $schema->components([
-            Select::make('feature_type')
-                ->label(__('admin.products.feature_type'))
-                ->options([
-                    'specification' => __('admin.products.feature_specification'),
-                    'benefit' => __('admin.products.feature_benefit'),
-                    'performance' => __('admin.products.feature_performance'),
-                    'other' => __('admin.products.feature_other'),
-                ])
-                ->default('specification')
-                ->required(),
-            TextInput::make('feature_key')
-                ->label(__('admin.products.feature_key'))
-                ->required()
-                ->maxLength(255),
-            TextInput::make('feature_value')
-                ->label(__('admin.products.feature_value'))
-                ->numeric()
-                ->required(),
-            TextInput::make('weight')
-                ->label(__('admin.products.weight'))
-                ->numeric()
-                ->default(1),
-            Toggle::make('is_active')
-                ->label(__('admin.products.is_active'))
-                ->default(true),
-        ]);
+        return $form
+            ->schema([
+                TextInput::make('feature_type')
+                    ->required()
+                    ->maxLength(255),
+                TextInput::make('feature_key')
+                    ->required()
+                    ->maxLength(255),
+                TextInput::make('feature_value')
+                    ->required()
+                    ->maxLength(255),
+                TextInput::make('weight')
+                    ->numeric()
+                    ->default(0),
+                Toggle::make('is_active')
+                    ->default(true),
+            ]);
     }
 
     public function table(Table $table): Table
     {
         return $table
-            ->recordTitleAttribute('feature_key')
             ->columns([
-                BadgeColumn::make('feature_type')
-                    ->label(__('admin.products.feature_type'))
-                    ->formatStateUsing(static fn (?string $state): string => ucfirst((string) $state))
-                    ->colors([
-                        'primary' => 'specification',
-                        'success' => 'benefit',
-                        'warning' => 'performance',
-                        'gray' => 'other',
-                    ])
-                    ->sortable(),
+                TextColumn::make('feature_type')
+                    ->sortable()
+                    ->searchable(),
                 TextColumn::make('feature_key')
-                    ->label(__('admin.products.feature_key'))
-                    ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->searchable(),
                 TextColumn::make('feature_value')
-                    ->label(__('admin.products.feature_value'))
-                    ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->searchable(),
                 TextColumn::make('weight')
-                    ->label(__('admin.products.weight'))
-                    ->numeric()
                     ->sortable(),
-                ToggleColumn::make('is_active')
-                    ->label(__('admin.products.is_active')),
+                ToggleColumn::make('is_active'),
+            ])
+            ->filters([
+                SelectFilter::make('feature_type')
+                    ->options(fn () => ProductFeature::distinct()->pluck('feature_type', 'feature_type')->toArray()),
             ])
             ->headerActions([
                 CreateAction::make(),
@@ -96,11 +71,6 @@ final class FeaturesRelationManager extends RelationManager
             ->actions([
                 EditAction::make(),
                 DeleteAction::make(),
-            ])
-            ->bulkActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
             ]);
     }
 }

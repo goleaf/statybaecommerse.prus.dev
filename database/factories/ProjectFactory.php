@@ -62,15 +62,6 @@ final class ProjectFactory extends Factory
         ]);
     }
 
-    public function withTasks(int $count = 5): static
-    {
-        return $this->afterCreating(function (Project $project) use ($count) {
-            \App\Models\Task::factory($count)->create([
-                'project_id' => $project->id,
-            ]);
-        });
-    }
-
     public function withMembers(int $count = 3): static
     {
         return $this->afterCreating(function (Project $project) use ($count) {

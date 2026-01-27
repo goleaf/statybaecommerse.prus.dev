@@ -4,73 +4,55 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ProductResource\RelationManagers;
 
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\CreateAction;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Schemas\Schema;
+use Filament\Tables\Actions\CreateAction;
+use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
 
-final class ComparisonsRelationManager extends RelationManager
+class ComparisonsRelationManager extends RelationManager
 {
     protected static string $relationship = 'comparisons';
 
-    protected function getTableQuery(): Builder
-    {
-        return parent::getTableQuery()->withoutGlobalScopes();
-    }
+    protected static ?string $recordTitleAttribute = 'session_id';
 
-    public function form(Schema $schema): Schema
+    public function form(Form $form): Form
     {
-        return $schema->components([
-            Select::make('user_id')
-                ->label(__('messages.user'))
-                ->relationship('user', 'name')
-                ->searchable()
-                ->preload(),
-            TextInput::make('session_id')
-                ->label(__('admin.products.session_id'))
-                ->required()
-                ->maxLength(255),
-        ]);
+        return $form
+            ->schema([
+                Select::make('user_id')
+                    ->relationship('user', 'name')
+                    ->searchable(),
+                TextInput::make('session_id')
+                    ->maxLength(255),
+            ]);
     }
 
     public function table(Table $table): Table
     {
         return $table
-            ->recordTitleAttribute('session_id')
             ->columns([
-                TextColumn::make('session_id')
-                    ->label(__('admin.products.session_id'))
+                TextColumn::make('user.name')
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('user.name')
-                    ->label(__('messages.user'))
+                TextColumn::make('session_id')
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('created_at')
-                    ->label(__('admin.products.created_at'))
                     ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->sortable(),
+            ])
+            ->filters([
+                //
             ])
             ->headerActions([
                 CreateAction::make(),
             ])
             ->actions([
-                EditAction::make(),
                 DeleteAction::make(),
-            ])
-            ->bulkActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
             ]);
     }
 }

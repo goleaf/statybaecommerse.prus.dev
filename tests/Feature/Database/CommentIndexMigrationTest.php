@@ -38,7 +38,7 @@ describe('Comment Index Migration', function () {
             EXPLAIN QUERY PLAN 
             SELECT * FROM comments 
             WHERE commentable_type = ? AND commentable_id = ?
-        ', ['App\\Models\\Task', 1]);
+        ', ['App\\Models\\Project', 1]);
 
         $planText = collect($explainResult)->pluck('detail')->implode(' ');
         expect($planText)->toContain('comments_commentable_index');
@@ -51,7 +51,7 @@ describe('Comment Index Migration', function () {
             $testData[] = [
                 'content'          => "Test comment {$i}",
                 'user_id'          => 1,
-                'commentable_type' => 'App\\Models\\Task',
+                'commentable_type' => 'App\\Models\\Project',
                 'commentable_id'   => ($i % 10) + 1, // Distribute across 10 tasks
                 'is_approved'      => true,
                 'is_pinned'        => false,
@@ -67,7 +67,7 @@ describe('Comment Index Migration', function () {
         $startTime = microtime(true);
 
         $result = DB::table('comments')
-            ->where('commentable_type', 'App\\Models\\Task')
+            ->where('commentable_type', 'App\\Models\\Project')
             ->where('commentable_id', 1)
             ->where('is_approved', true)
             ->orderBy('created_at', 'desc')
@@ -86,7 +86,7 @@ describe('Comment Index Migration', function () {
         $queries = [
             'SELECT * FROM comments WHERE parent_id IS NULL',
             'SELECT * FROM comments WHERE user_id = 1 ORDER BY created_at DESC',
-            "SELECT * FROM comments WHERE commentable_type = 'App\\Models\\Task'",
+            "SELECT * FROM comments WHERE commentable_type = 'App\\Models\\Project'",
         ];
 
         foreach ($queries as $query) {
@@ -101,17 +101,17 @@ describe('Index Performance Properties', function () {
         // Property: Query time should remain consistent even with skewed data
         $times = [];
 
-        for ($taskId = 1; $taskId <= 5; $taskId++) {
+        for ($projectId = 1; $projectId <= 5; $projectId++) {
             // Create varying amounts of comments per task
-            $commentCount = $taskId * 100; // 100, 200, 300, 400, 500 comments
+            $commentCount = $projectId * 100; // 100, 200, 300, 400, 500 comments
 
             $testData = [];
             for ($i = 1; $i <= $commentCount; $i++) {
                 $testData[] = [
-                    'content'          => "Comment {$i} for task {$taskId}",
+                    'content'          => "Comment {$i} for project {$projectId}",
                     'user_id'          => 1,
-                    'commentable_type' => 'App\\Models\\Task',
-                    'commentable_id'   => $taskId,
+                    'commentable_type' => 'App\\Models\\Project',
+                    'commentable_id'   => $projectId,
                     'is_approved'      => true,
                     'is_pinned'        => false,
                     'likes_count'      => 0,
@@ -125,8 +125,8 @@ describe('Index Performance Properties', function () {
             // Measure query time
             $startTime = microtime(true);
             DB::table('comments')
-                ->where('commentable_type', 'App\\Models\\Task')
-                ->where('commentable_id', $taskId)
+                ->where('commentable_type', 'App\\Models\\Project')
+                ->where('commentable_id', $projectId)
                 ->where('is_approved', true)
                 ->orderBy('created_at', 'desc')
                 ->limit(10)
@@ -150,7 +150,7 @@ describe('Index Performance Properties', function () {
             $testData[] = [
                 'content'          => "Paginated comment {$i}",
                 'user_id'          => 1,
-                'commentable_type' => 'App\\Models\\Task',
+                'commentable_type' => 'App\\Models\\Project',
                 'commentable_id'   => 1,
                 'is_approved'      => true,
                 'is_pinned'        => false,
@@ -172,7 +172,7 @@ describe('Index Performance Properties', function () {
             $startTime = microtime(true);
 
             DB::table('comments')
-                ->where('commentable_type', 'App\\Models\\Task')
+                ->where('commentable_type', 'App\\Models\\Project')
                 ->where('commentable_id', 1)
                 ->where('is_approved', true)
                 ->orderBy('created_at', 'desc')
@@ -195,3 +195,4 @@ describe('Index Performance Properties', function () {
         expect($lastPageTime / $firstPageTime)->toBeLessThan(3.0);
     });
 });
+

@@ -8,7 +8,7 @@ use App\Filament\Resources\ProductImageResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
-final class ListProductImages extends ListRecords
+class ListProductImages extends ListRecords
 {
     protected static string $resource = ProductImageResource::class;
 

@@ -5,17 +5,9 @@ declare(strict_types=1);
 namespace App\Filament\Resources\ProductFeatureResource\Pages;
 
 use App\Filament\Resources\ProductFeatureResource;
-use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 
-final class CreateProductFeature extends CreateRecord
+class CreateProductFeature extends CreateRecord
 {
     protected static string $resource = ProductFeatureResource::class;
-
-    protected function getHeaderActions(): array
-    {
-        return [
-            Actions\ListAction::make(),
-        ];
-    }
 }

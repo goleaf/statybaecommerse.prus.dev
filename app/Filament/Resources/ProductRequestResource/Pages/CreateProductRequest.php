@@ -5,17 +5,9 @@ declare(strict_types=1);
 namespace App\Filament\Resources\ProductRequestResource\Pages;
 
 use App\Filament\Resources\ProductRequestResource;
-use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 
-final class CreateProductRequest extends CreateRecord
+class CreateProductRequest extends CreateRecord
 {
     protected static string $resource = ProductRequestResource::class;
-
-    protected function getHeaderActions(): array
-    {
-        return [
-            Actions\ListAction::make(),
-        ];
-    }
 }

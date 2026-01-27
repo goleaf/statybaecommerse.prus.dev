@@ -8,14 +8,13 @@ use App\Filament\Resources\ProductImageResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
-final class EditProductImage extends EditRecord
+class EditProductImage extends EditRecord
 {
     protected static string $resource = ProductImageResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make(),
             Actions\DeleteAction::make(),
         ];
     }

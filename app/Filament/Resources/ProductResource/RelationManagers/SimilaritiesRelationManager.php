@@ -4,70 +4,58 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ProductResource\RelationManagers;
 
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\CreateAction;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Schemas\Schema;
+use Filament\Tables\Actions\CreateAction;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
 
-final class SimilaritiesRelationManager extends RelationManager
+class SimilaritiesRelationManager extends RelationManager
 {
     protected static string $relationship = 'similarities';
 
-    protected function getTableQuery(): Builder
-    {
-        return parent::getTableQuery()->withoutGlobalScopes();
-    }
+    protected static ?string $recordTitleAttribute = 'id';
 
-    public function form(Schema $schema): Schema
+    public function form(Form $form): Form
     {
-        return $schema->components([
-            Select::make('similar_product_id')
-                ->label(__('admin.products.similar_product'))
-                ->relationship('similarProduct', 'name')
-                ->searchable()
-                ->preload()
-                ->required(),
-            TextInput::make('algorithm_type')
-                ->label(__('admin.products.algorithm_type'))
-                ->required()
-                ->maxLength(100)
-                ->default('manual'),
-            TextInput::make('similarity_score')
-                ->label(__('admin.products.similarity_score'))
-                ->numeric()
-                ->required(),
-        ]);
+        return $form
+            ->schema([
+                Select::make('similar_product_id')
+                    ->relationship('similarProduct', 'name')
+                    ->required()
+                    ->searchable(),
+                TextInput::make('similarity_score')
+                    ->numeric()
+                    ->required(),
+                TextInput::make('algorithm_type')
+                    ->maxLength(255),
+            ]);
     }
 
     public function table(Table $table): Table
     {
         return $table
-            ->recordTitleAttribute('algorithm_type')
             ->columns([
                 TextColumn::make('similarProduct.name')
-                    ->label(__('admin.products.similar_product'))
-                    ->searchable()
-                    ->sortable(),
-                TextColumn::make('algorithm_type')
-                    ->label(__('admin.products.algorithm_type'))
+                    ->label('Similar Product')
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('similarity_score')
-                    ->label(__('admin.products.similarity_score'))
                     ->numeric()
                     ->sortable(),
+                TextColumn::make('algorithm_type')
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('calculated_at')
-                    ->label(__('admin.products.calculated_at'))
                     ->dateTime()
                     ->sortable(),
+            ])
+            ->filters([
+                //
             ])
             ->headerActions([
                 CreateAction::make(),
@@ -75,11 +63,6 @@ final class SimilaritiesRelationManager extends RelationManager
             ->actions([
                 EditAction::make(),
                 DeleteAction::make(),
-            ])
-            ->bulkActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
             ]);
     }
 }

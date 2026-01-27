@@ -8,7 +8,7 @@ use App\Filament\Resources\ProductFeatureResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
-final class ListProductFeatures extends ListRecords
+class ListProductFeatures extends ListRecords
 {
     protected static string $resource = ProductFeatureResource::class;
 

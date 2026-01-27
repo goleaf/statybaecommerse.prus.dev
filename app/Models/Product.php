@@ -1868,4 +1868,24 @@ final class Product extends Model implements HasMedia, TranslatableRecord
     {
         return $this->hasMany(\App\Models\Translations\ProductTranslation::class);
     }
+
+    public function features(): HasMany
+    {
+        return $this->hasMany(ProductFeature::class);
+    }
+
+    public function comparisons(): HasMany
+    {
+        return $this->hasMany(ProductComparison::class);
+    }
+
+    public function similarities(): HasMany
+    {
+        return $this->hasMany(ProductSimilarity::class);
+    }
+
+    public function requests(): HasMany
+    {
+        return $this->hasMany(ProductRequest::class);
+    }
 }

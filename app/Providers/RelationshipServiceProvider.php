@@ -39,10 +39,8 @@ final class RelationshipServiceProvider extends ServiceProvider
             'user'         => \App\Models\User::class,
             'organization' => \App\Models\Organization::class,
             'project'      => \App\Models\Project::class,
-            'task'         => \App\Models\Task::class,
             'comment'      => \App\Models\Comment::class,
             'file'         => \App\Models\File::class,
-            'tag'          => \App\Models\Tag::class,
 
             // Existing models
             'product'    => \App\Models\Product::class,
@@ -102,3 +100,4 @@ final class RelationshipServiceProvider extends ServiceProvider
         });
     }
 }
+

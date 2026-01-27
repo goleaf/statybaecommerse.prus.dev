@@ -8,14 +8,13 @@ use App\Filament\Resources\ProductSimilarityResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
-final class EditProductSimilarity extends EditRecord
+class EditProductSimilarity extends EditRecord
 {
     protected static string $resource = ProductSimilarityResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make(),
             Actions\DeleteAction::make(),
         ];
     }
