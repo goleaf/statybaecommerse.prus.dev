@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\OrderDocumentsRelationManagerTest" file="Order Documents Relation Manager (Tests\Feature\OrderDocumentsRelationManager)" tests="5" assertions="11" errors="0" failures="0" skipped="0" time="24.084674">
+    <testcase name="It hides download action when not downloadable" file="Order Documents Relation Manager (Tests\Feature\OrderDocumentsRelationManager)::It hides download action when not downloadable" class="Tests\Feature\OrderDocumentsRelationManagerTest" classname="Tests.Feature.OrderDocumentsRelationManagerTest" assertions="2" time="23.107972"/>
+    <testcase name="It can list documents" file="Order Documents Relation Manager (Tests\Feature\OrderDocumentsRelationManager)::It can list documents" class="Tests\Feature\OrderDocumentsRelationManagerTest" classname="Tests.Feature.OrderDocumentsRelationManagerTest" assertions="2" time="0.271334"/>
+    <testcase name="It can download document" file="Order Documents Relation Manager (Tests\Feature\OrderDocumentsRelationManager)::It can download document" class="Tests\Feature\OrderDocumentsRelationManagerTest" classname="Tests.Feature.OrderDocumentsRelationManagerTest" assertions="3" time="0.227406"/>
+    <testcase name="It can view document" file="Order Documents Relation Manager (Tests\Feature\OrderDocumentsRelationManager)::It can view document" class="Tests\Feature\OrderDocumentsRelationManagerTest" classname="Tests.Feature.OrderDocumentsRelationManagerTest" assertions="3" time="0.262105"/>
+    <testcase name="It can render order documents relation manager" file="Order Documents Relation Manager (Tests\Feature\OrderDocumentsRelationManager)::It can render order documents relation manager" class="Tests\Feature\OrderDocumentsRelationManagerTest" classname="Tests.Feature.OrderDocumentsRelationManagerTest" assertions="1" time="0.215858"/>
+  </testsuite>
+</testsuites>

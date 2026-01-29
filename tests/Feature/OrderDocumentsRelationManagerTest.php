@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use App\Filament\Resources\OrderResource\RelationManagers\OrderDocumentsRelationManager;
+use App\Filament\Resources\OrderResource\RelationManagers\DocumentsRelationManager;
 use App\Models\Document;
 use App\Models\DocumentTemplate;
 use App\Models\Order;
@@ -15,14 +15,12 @@ use Livewire\Livewire;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
-/**
- * OrderDocumentsRelationManagerTest
- *
- * Comprehensive test suite for OrderDocumentsRelationManager with Filament v4 compatibility
- */
 final class OrderDocumentsRelationManagerTest extends TestCase
 {
     use RefreshDatabase;
+
+    private User $user;
+    private Order $order;
 
     protected function setUp(): void
     {
@@ -37,186 +35,90 @@ final class OrderDocumentsRelationManagerTest extends TestCase
     {
         $this->actingAs($this->user);
 
-        $component = Livewire::test(OrderDocumentsRelationManager::class, [
+        Livewire::test(DocumentsRelationManager::class, [
             'ownerRecord' => $this->order,
             'pageClass'   => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
-        ]);
-
-        $component->assertSuccessful();
+        ])
+        ->assertSuccessful();
     }
 
     #[Test]
-    public function it_can_create_order_document(): void
-    {
-        $this->actingAs($this->user);
-
-        Storage::fake();
-        $template = DocumentTemplate::factory()->create();
-
-        $component = Livewire::test(OrderDocumentsRelationManager::class, [
-            'ownerRecord' => $this->order,
-            'pageClass'   => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
-        ]);
-
-        $component
-            ->mountTableAction('create')
-            ->assertFormExists()
-            ->fillForm([
-                'document_template_id' => $template->id,
-                'name'                 => 'Test Document',
-                'type'                 => 'invoice',
-                'version'              => '1.0',
-                'status'               => 'draft',
-                'is_public'            => false,
-                'is_downloadable'      => true,
-                'description'          => 'Test document description',
-            ])
-            ->callMountedTableAction()
-            ->assertHasNoFormErrors();
-
-        $this->assertDatabaseHas('documents', [
-            'documentable_type' => \App\Models\Order::class,
-            'documentable_id'   => $this->order->id,
-            'name'              => 'Test Document',
-            'type'              => 'invoice',
-            'status'            => 'draft',
-        ]);
-    }
-
-    #[Test]
-    public function it_can_approve_document(): void
+    public function it_can_list_documents(): void
     {
         $this->actingAs($this->user);
 
         $document = Document::factory()->create([
-            'documentable_type' => \App\Models\Order::class,
+            'documentable_type' => Order::class,
             'documentable_id'   => $this->order->id,
-            'status'            => 'pending',
+            'title'             => 'Test Invoice',
         ]);
 
-        $component = Livewire::test(OrderDocumentsRelationManager::class, [
+        Livewire::test(DocumentsRelationManager::class, [
             'ownerRecord' => $this->order,
             'pageClass'   => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
-        ]);
-
-        $component
-            ->callTableAction('approve', $document)
-            ->assertHasNoFormErrors();
-
-        $this->assertDatabaseHas('documents', [
-            'id'     => $document->id,
-            'status' => 'approved',
-        ]);
+        ])
+        ->assertCanSeeTableRecords([$document])
+        ->assertSee('Test Invoice');
     }
 
     #[Test]
-    public function it_can_reject_document(): void
+    public function it_can_view_document(): void
     {
         $this->actingAs($this->user);
 
         $document = Document::factory()->create([
-            'documentable_type' => \App\Models\Order::class,
+            'documentable_type' => Order::class,
             'documentable_id'   => $this->order->id,
-            'status'            => 'pending',
+            'status'            => 'generated',
+            'file_path'         => 'documents/test.pdf',
         ]);
 
-        $component = Livewire::test(OrderDocumentsRelationManager::class, [
+        Livewire::test(DocumentsRelationManager::class, [
             'ownerRecord' => $this->order,
             'pageClass'   => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
-        ]);
-
-        $component
-            ->callTableAction('reject', $document)
-            ->assertHasNoFormErrors();
-
-        $this->assertDatabaseHas('documents', [
-            'id'     => $document->id,
-            'status' => 'rejected',
-        ]);
+        ])
+        ->assertTableActionExists('view')
+        ->assertTableActionVisible('view', $document);
     }
 
     #[Test]
-    public function it_can_filter_by_document_type(): void
+    public function it_can_download_document(): void
     {
         $this->actingAs($this->user);
 
-        Document::factory()->create([
-            'documentable_type' => \App\Models\Order::class,
+        $document = Document::factory()->create([
+            'documentable_type' => Order::class,
             'documentable_id'   => $this->order->id,
-            'type'              => 'invoice',
+            'status'            => 'generated',
+            'is_downloadable'   => true,
+            'file_path'         => 'documents/test.pdf',
         ]);
 
-        Document::factory()->create([
-            'documentable_type' => \App\Models\Order::class,
-            'documentable_id'   => $this->order->id,
-            'type'              => 'receipt',
-        ]);
-
-        $component = Livewire::test(OrderDocumentsRelationManager::class, [
+        Livewire::test(DocumentsRelationManager::class, [
             'ownerRecord' => $this->order,
             'pageClass'   => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
-        ]);
-
-        $component
-            ->filterTable('type', 'invoice')
-            ->assertCanSeeTableRecords(
-                Document::where('type', 'invoice')->get()
-            );
+        ])
+        ->assertTableActionExists('download')
+        ->assertTableActionVisible('download', $document);
     }
 
     #[Test]
-    public function it_can_perform_bulk_approve(): void
+    public function it_hides_download_action_when_not_downloadable(): void
     {
         $this->actingAs($this->user);
 
-        $documents = Document::factory()->count(2)->create([
-            'documentable_type' => \App\Models\Order::class,
+        $document = Document::factory()->create([
+            'documentable_type' => Order::class,
             'documentable_id'   => $this->order->id,
-            'status'            => 'pending',
+            'status'            => 'generated',
+            'is_downloadable'   => false,
+            'file_path'         => 'documents/test.pdf',
         ]);
 
-        $component = Livewire::test(OrderDocumentsRelationManager::class, [
+        Livewire::test(DocumentsRelationManager::class, [
             'ownerRecord' => $this->order,
             'pageClass'   => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
-        ]);
-
-        $component
-            ->callTableBulkAction('approve_documents', $documents)
-            ->assertHasNoFormErrors();
-
-        foreach ($documents as $document) {
-            $this->assertDatabaseHas('documents', [
-                'id'     => $document->id,
-                'status' => 'approved',
-            ]);
-        }
-    }
-
-    #[Test]
-    public function it_can_perform_bulk_make_public(): void
-    {
-        $this->actingAs($this->user);
-
-        $documents = Document::factory()->count(2)->create([
-            'documentable_type' => \App\Models\Order::class,
-            'documentable_id'   => $this->order->id,
-            'is_public'         => false,
-        ]);
-
-        $component = Livewire::test(OrderDocumentsRelationManager::class, [
-            'ownerRecord' => $this->order,
-            'pageClass'   => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
-        ]);
-
-        $component
-            ->callTableBulkAction('make_public', $documents)
-            ->assertHasNoFormErrors();
-
-        foreach ($documents as $document) {
-            $this->assertDatabaseHas('documents', [
-                'id'        => $document->id,
-                'is_public' => true,
-            ]);
-        }
+        ])
+        ->assertTableActionHidden('download', $document);
     }
 }

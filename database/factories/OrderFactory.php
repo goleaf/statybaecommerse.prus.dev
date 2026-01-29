@@ -315,7 +315,7 @@ class OrderFactory extends Factory
                     $dirty = true;
                 }
 
-                if ($order->country_id === null && Schema::hasTable($countryTable)) {
+                if ($order->country_id === null && Schema::hasTable($countryTable) && $this->ordersTableHasColumn('country_id')) {
                     // Prefer recycling a persisted country to keep factories from generating
                     // random country codes that may clash with curated seed data.
                     $existingCountry = Country::query()->inRandomOrder()->first();
@@ -401,6 +401,10 @@ class OrderFactory extends Factory
 
         if (! $this->ordersTableHasColumn('payment_state')) {
             unset($attributes['payment_state']);
+        }
+
+        if (! $this->ordersTableHasColumn('country_id')) {
+            unset($attributes['country_id']);
         }
 
         return $attributes;
