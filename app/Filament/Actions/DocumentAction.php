@@ -7,6 +7,7 @@ namespace App\Filament\Actions;
 use App\Contracts\DocumentServiceContract;
 use App\Models\DocumentTemplate;
 use DateTimeInterface;
+use App\Services\LocaleService;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -15,6 +16,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\App;
 use Throwable;
 
 final class DocumentAction
@@ -47,12 +49,29 @@ final class DocumentAction
                     ])
                     ->default('pdf')
                     ->required(),
+                Select::make('locale')
+                    ->label(__('admin.fields.locale'))
+                    ->options(function () {
+                        $locales = app(LocaleService::class)->getSupportedLocales();
+                        return array_combine(
+                            $locales,
+                            array_map(fn ($locale) => strtoupper($locale), $locales)
+                        );
+                    })
+                    ->default(fn (Model $record) => $record->preferred_locale ?? app()->getLocale())
+                    ->required(),
                 TextInput::make('title')
                     ->label(__('admin.fields.title'))
                     ->required(),
             ])
             ->action(function (Model $record, array $data, DocumentServiceContract $documentService): RedirectResponse|Response {
+                $originalLocale = App::getLocale();
+                
                 try {
+                    if (isset($data['locale'])) {
+                        App::setLocale($data['locale']);
+                    }
+
                     // Enforce the active scope at read-time as a defence-in-depth guard against crafted payloads.
                     $template = DocumentTemplate::query()
                         ->active()
@@ -93,6 +112,10 @@ final class DocumentAction
                         ->send();
 
                     throw $e;
+                } finally {
+                    if (isset($data['locale'])) {
+                        App::setLocale($originalLocale);
+                    }
                 }
             });
     }
@@ -102,11 +125,11 @@ final class DocumentAction
         $now = now();
 
         $variables = [
-            'MODEL_ID'   => $record->getKey(),
-            'MODEL_TYPE' => $record->getMorphClass(),
+            '$MODEL_ID'   => $record->getKey(),
+            '$MODEL_TYPE' => $record->getMorphClass(),
             // Prefer model timestamps when available and gracefully fall back to the current time.
-            'CREATED_AT' => self::formatDateTime($record->getAttribute('created_at')) ?? $now->format('d/m/Y H:i'),
-            'UPDATED_AT' => self::formatDateTime($record->getAttribute('updated_at')) ?? $now->format('d/m/Y H:i'),
+            '$CREATED_AT' => self::formatDateTime($record->getAttribute('created_at')) ?? $now->format('d/m/Y H:i'),
+            '$UPDATED_AT' => self::formatDateTime($record->getAttribute('updated_at')) ?? $now->format('d/m/Y H:i'),
         ];
 
         // Add model-specific variables if the model has common attributes
@@ -117,7 +140,7 @@ final class DocumentAction
                 $value = $record->getAttribute($attribute);
 
                 if ($value !== null) {
-                    $variables[strtoupper($attribute)] = $value;
+                    $variables['$' . strtoupper($attribute)] = $value;
                 }
             }
         }

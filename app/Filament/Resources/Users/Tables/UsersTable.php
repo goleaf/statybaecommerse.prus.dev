@@ -31,13 +31,12 @@ class UsersTable
                     ->sortable(),
                 TextColumn::make('phone_number')
                     ->label(__('messages.phone'))
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
                 IconColumn::make('is_active')
                     ->label(__('messages.active'))
-                    ->boolean(),
-                IconColumn::make('is_admin')
-                    ->label(__('admin.user_status.admin'))
-                    ->boolean(),
+                    ->boolean()
+                    ->sortable(),
                 TextColumn::make('created_at')
                     ->label(__('messages.created_at'))
                     ->dateTime()
@@ -47,8 +46,6 @@ class UsersTable
             ->filters([
                 TernaryFilter::make('is_active')
                     ->label(__('messages.active')),
-                TernaryFilter::make('is_admin')
-                    ->label(__('admin.user_status.admin')),
                 TrashedFilter::make(),
             ])
             ->recordActions([

@@ -38,6 +38,8 @@ class UserFactory extends Factory
             Str::lower(Str::random(6))
         );
 
+        $phoneNumber = '+3706' . fake()->numberBetween(1000000, 9999999);
+
         $state = [
             'name'              => $firstName . ' ' . $lastName,
             'email'             => $email,
@@ -47,6 +49,7 @@ class UserFactory extends Factory
             'preferred_locale' => fake()->randomElement(['en', 'lt']),
             'is_admin'         => false,
             'remember_token'   => Str::random(10),
+            'phone_number'     => $phoneNumber,
         ];
 
         // Store decomposed name parts only when the schema supports them.
@@ -56,6 +59,11 @@ class UserFactory extends Factory
 
         if ($this->tableExists('users') && $this->tableHasColumn('users', 'last_name')) {
             $state['last_name'] = $lastName;
+        }
+
+        // Populate legacy phone field if present to keep data consistent.
+        if ($this->tableExists('users') && $this->tableHasColumn('users', 'phone')) {
+            $state['phone'] = $phoneNumber;
         }
 
         // Some test runs (e.g. partial migrations, in-memory DBs) may not yet
@@ -93,6 +101,8 @@ class UserFactory extends Factory
 
     public function shippingAddress(): static
     {
+        $phoneNumber = '+370' . fake()->numberBetween(60000000, 69999999);
+
         return $this->hasAddresses(1, fn (): array => [
             'type'           => AddressType::SHIPPING,
             'is_default'     => true,
@@ -101,7 +111,7 @@ class UserFactory extends Factory
             'city'           => 'Vilnius',
             'address_line_1' => 'Gedimino pr. 1',
             'postal_code'    => '01103',
-            'phone'          => '+370' . fake()->numberBetween(60000000, 69999999),
+            'phone'          => $phoneNumber,
         ]);
     }
 

@@ -13,6 +13,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (! Schema::hasTable('user_product_interactions')) {
+            return;
+        }
+
         Schema::table('user_product_interactions', function (Blueprint $table): void {
             $table->string('notes', 500)->nullable()->after('count');
             $table->boolean('is_anonymous')->default(false)->after('notes');
@@ -25,6 +29,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (! Schema::hasTable('user_product_interactions')) {
+            return;
+        }
+
         Schema::table('user_product_interactions', function (Blueprint $table): void {
             $table->dropColumn(['notes', 'is_anonymous', 'ip_address']);
         });

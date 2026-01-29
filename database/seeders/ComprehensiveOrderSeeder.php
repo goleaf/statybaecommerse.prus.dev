@@ -256,22 +256,29 @@ final class ComprehensiveOrderSeeder extends Seeder
             // Create order using factory
             $country = $countries->random();
 
-            $order = Order::factory()
-                ->for($users->random())
-                ->state([
-                    // Supply an explicit order number so rerunning the seeder never collides with persisted data.
-                    'number'           => $this->nextOrderNumber(),
-                    'created_at'       => $orderDate,
-                    'updated_at'       => $orderDate->copy()->addMinutes(fake()->numberBetween(1, 1440)),
-                    'status'           => fake()->randomElement($this->orderStatuses),
-                    'payment_method'   => fake()->randomElement($this->paymentMethods),
-                    'currency'         => 'EUR',
-                    'locale'           => 'lt',
-                    'country_id'       => $country->id,
-                    'billing_address'  => $this->addressForCountry($country),
-                    'shipping_address' => $this->addressForCountry($country),
-                ])
-                ->create();
+            try {
+                $order = Order::factory()
+                    ->for($users->random())
+                    ->state([
+                        // Supply an explicit order number so rerunning the seeder never collides with persisted data.
+                        'number'           => $this->nextOrderNumber(),
+                        'created_at'       => $orderDate,
+                        'updated_at'       => $orderDate->copy()->addMinutes(fake()->numberBetween(1, 1440)),
+                        'status'           => fake()->randomElement($this->orderStatuses),
+                        'payment_method'   => fake()->randomElement($this->paymentMethods),
+                        'currency'         => 'EUR',
+                        'locale'           => 'lt',
+                        'country_id'       => $country->id,
+                        'billing_address'  => $this->addressForCountry($country),
+                        'shipping_address' => $this->addressForCountry($country),
+                    ])
+                    ->create();
+            } catch (Exception $e) {
+                // If collision occurs, try skipping a few numbers
+                Log::warning("Order creation failed for sequence {$this->nextOrderSequence}, retrying: " . $e->getMessage());
+                $this->nextOrderSequence++;
+                continue;
+            }
 
             // Create order items using factory
             $itemCount = fake()->numberBetween(1, 5);
@@ -516,7 +523,7 @@ final class ComprehensiveOrderSeeder extends Seeder
             'state'          => fake()->randomElement($lithuanianCounties),
             'postal_code'    => fake('lt_LT')->postcode(),
             'country'        => 'LT',
-            'phone'          => fake('lt_LT')->phoneNumber(),
+            'phone'          => '+370' . fake()->numberBetween(60000000, 69999999),
             'email'          => fake()->email(),
         ];
     }

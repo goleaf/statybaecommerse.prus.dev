@@ -109,8 +109,8 @@ final class DocumentActionTest extends TestCase
                 expect($variables['MODEL_TYPE'])->toBe($record->getMorphClass());
                 expect($variables['NAME'])->toBe($record->name);
                 expect($title)->toBe($data['title']);
-                expect($variables['CREATED_AT'])->toBe($record->created_at?->format('d/m/Y H:i'));
-                expect($variables['UPDATED_AT'])->toBe($record->updated_at?->format('d/m/Y H:i'));
+                expect($variables['CREATED_AT'])->toBe($record->created_at?->format('Y-m-d H:i'));
+                expect($variables['UPDATED_AT'])->toBe($record->updated_at?->format('Y-m-d H:i'));
                 expect($variables['MOCKED_VAR'])->toBe('value');
             }
         );

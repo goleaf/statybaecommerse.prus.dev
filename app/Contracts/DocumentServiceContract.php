@@ -24,4 +24,9 @@ interface DocumentServiceContract
      * @return array<string, mixed>
      */
     public function extractVariablesFromModel(Model $model, string $prefix = ''): array;
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function getAvailableVariables(): array;
 }

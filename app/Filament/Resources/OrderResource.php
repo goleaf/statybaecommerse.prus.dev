@@ -31,7 +31,7 @@ class OrderResource extends BaseResource
 
     public static function getNavigationLabel(): string
     {
-        return __('admin.orders.navigation_label');
+        return __('admin.navigation.orders');
     }
 
     public static function getPluralModelLabel(): string

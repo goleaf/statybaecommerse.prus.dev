@@ -26,17 +26,17 @@ class UserResource extends Resource
 
     public static function getModelLabel(): string
     {
-        return __('admin.navigation.users');
+        return __('admin.users.model_label');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return __('admin.navigation.users');
+        return __('admin.users.plural_model_label');
     }
 
     public static function getNavigationLabel(): string
     {
-        return 'Clients';
+        return __('admin.navigation.users');
     }
 
     public static function form(Schema $schema): Schema
@@ -81,6 +81,7 @@ class UserResource extends Resource
         return parent::getEloquentQuery()
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
-            ]);
+            ])
+            ->where('is_admin', false);
     }
 }

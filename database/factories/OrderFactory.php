@@ -87,22 +87,24 @@ class OrderFactory extends Factory
             'total'             => $total,
             'currency'          => 'EUR',
             'billing_address'   => [
-                'name'        => 'Customer ' . $sequence,
-                'email'       => sprintf('customer%02d@example.test', $sequence),
-                'phone'       => sprintf('+370600%04d', $sequence % 10000),
-                'address'     => 'Example Street ' . $sequence,
-                'city'        => $billingCities[$sequence % count($billingCities)],
-                'postal_code' => sprintf('%05d', ($sequence * 37) % 100000),
-                'country'     => 'Lithuania',
+                'first_name' => 'Customer',
+                'last_name'  => (string) $sequence,
+                'email'      => sprintf('customer%02d@example.test', $sequence),
+                'phone'      => sprintf('+3706%07d', $sequence % 10000000),
+                'street'     => 'Example Street ' . $sequence,
+                'city'       => $billingCities[$sequence % count($billingCities)],
+                'zip'        => sprintf('%05d', ($sequence * 37) % 100000),
+                'country'    => 'Lithuania',
             ],
             'shipping_address' => [
-                'name'        => 'Recipient ' . $sequence,
-                'email'       => sprintf('recipient%02d@example.test', $sequence),
-                'phone'       => sprintf('+370612%04d', $sequence % 10000),
-                'address'     => 'Warehouse Avenue ' . $sequence,
-                'city'        => $shippingCities[$sequence % count($shippingCities)],
-                'postal_code' => sprintf('%05d', ($sequence * 53) % 100000),
-                'country'     => 'Lithuania',
+                'first_name' => 'Recipient',
+                'last_name'  => (string) $sequence,
+                'email'      => sprintf('recipient%02d@example.test', $sequence),
+                'phone'      => sprintf('+3706%07d', ($sequence + 5000000) % 10000000),
+                'street'     => 'Warehouse Avenue ' . $sequence,
+                'city'       => $shippingCities[$sequence % count($shippingCities)],
+                'zip'        => sprintf('%05d', ($sequence * 53) % 100000),
+                'country'    => 'Lithuania',
             ],
             'notes'        => $sequence % 3 === 0 ? null : 'Order note #' . $sequence,
             'shipped_at'   => $shippedAt,
@@ -118,19 +120,18 @@ class OrderFactory extends Factory
     private function nextSequence(): int
     {
         if (self::$sequence === null) {
-            // Pull the highest stored order number (including soft-deleted and
-            // scope-filtered rows) so rerunning factories never reuses an
-            // existing identifier that would violate the unique constraint.
+            // Pull the highest stored order number that matches our ORD- prefix
+            // so rerunning factories never reuses an existing identifier.
             $maxNumber = Order::withoutGlobalScopes()
                 ->withTrashed()
-                ->max('number');
+                ->where('number', 'like', 'ORD-%')
+                ->orderByRaw('CAST(SUBSTR(number, 5) AS INTEGER) DESC')
+                ->value('number');
 
-            if (is_string($maxNumber) && preg_match('/(\d+)$/', $maxNumber, $matches)) {
+            if (is_string($maxNumber) && preg_match('/ORD-(\d+)$/', $maxNumber, $matches)) {
                 self::$sequence = ((int) $matches[1]) + 1;
             } else {
-                // Fall back to the default baseline when the table is empty or
-                // contains unexpected data so factories still generate readable
-                // identifiers during the first bootstrap run.
+                // Fall back to the default baseline when no ORD- records exist.
                 self::$sequence = 1;
             }
         }
@@ -283,7 +284,14 @@ class OrderFactory extends Factory
                 }
 
                 if ($order->channel_id === null && ! $order->relationLoaded('channel')) {
-                    $order->setRelation('channel', Channel::factory()->make());
+                    $existingChannel = Channel::query()->first();
+
+                    if ($existingChannel !== null) {
+                        $order->setRelation('channel', $existingChannel);
+                        $order->channel_id = $existingChannel->getKey();
+                    } else {
+                        $order->setRelation('channel', Channel::factory()->make());
+                    }
                 }
 
                 if ($order->country_id === null && ! $order->relationLoaded('country')) {
@@ -311,7 +319,15 @@ class OrderFactory extends Factory
                 }
 
                 if ($order->channel_id === null && Schema::hasTable($channelTable)) {
-                    $order->channel()->associate(Channel::factory()->create());
+                    // Reuse an existing channel when available to avoid unique slug/code collisions.
+                    $existingChannel = Channel::query()->first();
+
+                    if ($existingChannel !== null) {
+                        $order->channel()->associate($existingChannel);
+                    } else {
+                        $order->channel()->associate(Channel::factory()->create());
+                    }
+
                     $dirty = true;
                 }
 

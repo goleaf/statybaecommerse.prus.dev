@@ -317,10 +317,10 @@ final class AdminSeeder extends Seeder
         $this->logInfo('👥 Creating customer groups...');
 
         $groups = [
-            ['name' => ['lt' => 'VIP Customers', 'en' => 'VIP Customers'], 'slug' => 'vip-customers', 'code' => 'VIP', 'description' => ['lt' => 'High-value customers with special privileges', 'en' => 'High-value customers with special privileges'], 'discount_percentage' => 15.0, 'is_enabled' => true],
-            ['name' => ['lt' => 'Regular Customers', 'en' => 'Regular Customers'], 'slug' => 'regular-customers', 'code' => 'REGULAR', 'description' => ['lt' => 'Standard customers', 'en' => 'Standard customers'], 'discount_percentage' => 5.0, 'is_enabled' => true],
-            ['name' => ['lt' => 'New Customers', 'en' => 'New Customers'], 'slug' => 'new-customers', 'code' => 'NEW', 'description' => ['lt' => 'First-time customers', 'en' => 'First-time customers'], 'discount_percentage' => 10.0, 'is_enabled' => true],
-            ['name' => ['lt' => 'Wholesale', 'en' => 'Wholesale'], 'slug' => 'wholesale', 'code' => 'WHOLESALE', 'description' => ['lt' => 'Bulk purchase customers', 'en' => 'Bulk purchase customers'], 'discount_percentage' => 20.0, 'is_enabled' => true],
+            ['name' => ['lt' => 'VIP Customers', 'en' => 'VIP Customers'], 'slug' => 'vip-main', 'code' => 'VIP', 'description' => ['lt' => 'High-value customers with special privileges', 'en' => 'High-value customers with special privileges'], 'discount_percentage' => 15.0, 'is_enabled' => true],
+            ['name' => ['lt' => 'Regular Customers', 'en' => 'Regular Customers'], 'slug' => 'regular-main', 'code' => 'REGULAR', 'description' => ['lt' => 'Standard customers', 'en' => 'Standard customers'], 'discount_percentage' => 5.0, 'is_enabled' => true],
+            ['name' => ['lt' => 'New Customers', 'en' => 'New Customers'], 'slug' => 'new-main', 'code' => 'NEW', 'description' => ['lt' => 'First-time customers', 'en' => 'First-time customers'], 'discount_percentage' => 10.0, 'is_enabled' => true],
+            ['name' => ['lt' => 'Wholesale', 'en' => 'Wholesale'], 'slug' => 'wholesale-main', 'code' => 'WHOLESALE', 'description' => ['lt' => 'Bulk purchase customers', 'en' => 'Bulk purchase customers'], 'discount_percentage' => 20.0, 'is_enabled' => true],
         ];
 
         $createdGroups = [];

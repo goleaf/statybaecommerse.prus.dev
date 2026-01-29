@@ -96,9 +96,10 @@
                         </dt>
                         <dd class="mt-1 text-sm text-gray-900 dark:text-white">
                             @if($customer->email_verified_at)
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                    {{ __('customers.fields.verified') }} - {{ $customer->email_verified_at->format('d/m/Y H:i') }}
-                                </span>
+                        <h3 class="text-base font-semibold leading-7 text-gray-900">{{ __('customers.fields.status_information') }}</h3>
+                        <p class="mt-1 max-w-2xl text-sm leading-6 text-gray-500">
+                            {{ __('customers.fields.verified') }} - {{ $customer->email_verified_at->format('Y-m-d H:i') }}
+                        </p>
                             @else
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
                                     {{ __('customers.fields.not_verified') }}
@@ -106,14 +107,12 @@
                             @endif
                         </dd>
                     </div>
-                    <div>
-                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
-                            {{ __('customers.fields.last_login_at') }}
-                        </dt>
-                        <dd class="mt-1 text-sm text-gray-900 dark:text-white">
-                            {{ $customer->last_login_at ? $customer->last_login_at->format('d/m/Y H:i') : __('customers.fields.never_logged_in') }}
-                        </dd>
-                    </div>
+                            <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                                <dt class="text-sm font-medium leading-6 text-gray-900">{{ __('customers.fields.last_login') }}</dt>
+                                <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                                    {{ $customer->last_login_at ? $customer->last_login_at->format('Y-m-d H:i') : __('customers.fields.never_logged_in') }}
+                                </dd>
+                            </div>
                 </dl>
             </div>
 
@@ -252,7 +251,7 @@
                             {{ __('customers.fields.created_at') }}
                         </dt>
                         <dd class="text-sm text-gray-900 dark:text-white">
-                            {{ $customer->created_at->format('d/m/Y H:i') }}
+                            {{ $customer->created_at->format('Y-m-d H:i') }}
                         </dd>
                     </div>
                     <div class="flex justify-between">
@@ -260,7 +259,7 @@
                             {{ __('customers.fields.updated_at') }}
                         </dt>
                         <dd class="text-sm text-gray-900 dark:text-white">
-                            {{ $customer->updated_at->format('d/m/Y H:i') }}
+                            {{ $customer->updated_at->format('Y-m-d H:i') }}
                         </dd>
                     </div>
                 </dl>

@@ -29,8 +29,14 @@ final class ComprehensiveProductVariantSeeder extends Seeder
     private function createAttributes(): void
     {
         // Size attributes
-        $sizeAttribute = Attribute::where('slug', 'product-size')->first()
-            ?? Attribute::factory()->create([
+        $sizeAttribute = Attribute::withoutGlobalScopes()->withTrashed()->where('slug', 'product-size')->first();
+        
+        if ($sizeAttribute && $sizeAttribute->trashed()) {
+            $sizeAttribute->restore();
+        }
+
+        if (! $sizeAttribute) {
+            $sizeAttribute = Attribute::factory()->create([
                 'slug'          => 'product-size',
                 'name'          => 'Product Size',
                 'type'          => 'select',
@@ -40,10 +46,17 @@ final class ComprehensiveProductVariantSeeder extends Seeder
                 'is_enabled'    => true,
                 'sort_order'    => 1,
             ]);
+        }
 
         // Color attributes
-        $colorAttribute = Attribute::where('slug', 'product-color')->first()
-            ?? Attribute::factory()->create([
+        $colorAttribute = Attribute::withoutGlobalScopes()->withTrashed()->where('slug', 'product-color')->first();
+
+        if ($colorAttribute && $colorAttribute->trashed()) {
+            $colorAttribute->restore();
+        }
+
+        if (! $colorAttribute) {
+            $colorAttribute = Attribute::factory()->create([
                 'slug'          => 'product-color',
                 'name'          => 'Product Color',
                 'type'          => 'select',
@@ -53,10 +66,17 @@ final class ComprehensiveProductVariantSeeder extends Seeder
                 'is_enabled'    => true,
                 'sort_order'    => 2,
             ]);
+        }
 
         // Material attributes
-        $materialAttribute = Attribute::where('slug', 'product-material')->first()
-            ?? Attribute::factory()->create([
+        $materialAttribute = Attribute::withoutGlobalScopes()->withTrashed()->where('slug', 'product-material')->first();
+
+        if ($materialAttribute && $materialAttribute->trashed()) {
+            $materialAttribute->restore();
+        }
+
+        if (! $materialAttribute) {
+            $materialAttribute = Attribute::factory()->create([
                 'slug'          => 'product-material',
                 'name'          => 'Product Material',
                 'type'          => 'select',
@@ -66,6 +86,7 @@ final class ComprehensiveProductVariantSeeder extends Seeder
                 'is_enabled'    => true,
                 'sort_order'    => 3,
             ]);
+        }
 
         // Create size values
         $sizes = [
@@ -294,30 +315,36 @@ final class ComprehensiveProductVariantSeeder extends Seeder
             $brand = $brandModels[$productData['brand']];
             $category = $categoryModels[$productData['category']];
 
-            $product = Product::create([
-                'name'              => $productData['name'],
-                'slug'              => Str::slug($productData['name']),
-                'description'       => $productData['description'],
-                'short_description' => substr($productData['description'], 0, 100),
-                'sku'               => 'PROD-' . strtoupper(Str::random(8)),
-                'price'             => $productData['base_price'],
-                'compare_price'     => $productData['base_price'] * 1.2,
-                'cost_price'        => $productData['base_price'] * 0.6,
-                'manage_stock'      => true,
-                'stock_quantity'    => 0,
-                'weight'            => 0.5,
-                'is_visible'        => true,
-                'is_featured'       => true,
-                'published_at'      => now(),
-                'brand_id'          => $brand->id,
-                'status'            => 'published',
-                'type'              => 'variable',
-            ]);
+            $product = Product::withoutGlobalScopes()->withTrashed()->updateOrCreate(
+                ['slug' => Str::slug($productData['name'])],
+                [
+                    'name'              => $productData['name'],
+                    'description'       => $productData['description'],
+                    'short_description' => substr($productData['description'], 0, 100),
+                    'sku'               => 'PROD-' . strtoupper(Str::random(8)),
+                    'price'             => $productData['base_price'],
+                    'compare_price'     => $productData['base_price'] * 1.2,
+                    'cost_price'        => $productData['base_price'] * 0.6,
+                    'manage_stock'      => true,
+                    'stock_quantity'    => 0,
+                    'weight'            => 0.5,
+                    'is_visible'        => true,
+                    'is_featured'       => true,
+                    'published_at'      => now(),
+                    'brand_id'          => $brand->id,
+                    'status'            => 'published',
+                    'type'              => 'variable',
+                ]
+            );
+
+            if ($product->trashed()) {
+                $product->restore();
+            }
 
             $this->syncProductTranslations($product, $productData);
 
             // Attach category
-            $product->categories()->attach($category->id);
+            $product->categories()->syncWithoutDetaching([$category->id]);
 
             // Create variants
             foreach ($productData['variants'] as $index => $variantData) {

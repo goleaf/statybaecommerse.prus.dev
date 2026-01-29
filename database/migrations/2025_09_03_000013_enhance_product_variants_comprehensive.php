@@ -144,8 +144,10 @@ return new class extends Migration
         if (! Schema::hasTable('variant_analytics')) {
             Schema::create('variant_analytics', function (Blueprint $table) {
                 $table->id();
+                $table->unsignedBigInteger('product_id')->nullable();
                 $table->unsignedBigInteger('variant_id');
                 $table->date('date');
+                $table->string('date_bucket')->index()->nullable();
                 $table->integer('views')->default(0);
                 $table->integer('clicks')->default(0);
                 $table->integer('add_to_cart')->default(0);
@@ -154,9 +156,10 @@ return new class extends Migration
                 $table->decimal('conversion_rate', 5, 4)->default(0);
                 $table->timestamps();
 
+                $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
                 $table->foreign('variant_id')->references('id')->on('product_variants')->onDelete('cascade');
 
-                $table->unique(['variant_id', 'date']);
+                $table->unique(['variant_id', 'date_bucket']);
                 $table->index(['date', 'views', 'clicks']);
                 $table->index(['variant_id', 'conversion_rate']);
             });

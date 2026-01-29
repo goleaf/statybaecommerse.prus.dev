@@ -18,10 +18,10 @@ final class AdminPresetDiscountsSeeder extends Seeder
         // 1) VIP 12% sitewide discount
         $vipGroup = CustomerGroup::where('code', 'vip')->first();
         if ($vipGroup) {
+            /** @var Discount $vipDiscount */
             $vipDiscount = Discount::factory()
                 ->state([
                     'name'            => 'VIP 12% Off',
-                    'code'            => 'VIP12',
                     'type'            => 'percentage',
                     'value'           => 12.0,
                     'priority'        => 20,
@@ -29,6 +29,17 @@ final class AdminPresetDiscountsSeeder extends Seeder
                     'stacking_policy' => 'single_best',
                 ])
                 ->create();
+
+            // Create the code separately
+            $codeData = DiscountCode::factory()->make([
+                'discount_id' => $vipDiscount->id,
+                'code'        => 'VIP12',
+            ])->toArray();
+
+            DiscountCode::updateOrCreate(
+                ['code' => 'VIP12'],
+                $codeData
+            );
 
             // Create condition for customer group if model supports it
             if (method_exists($vipDiscount, 'conditions')) {

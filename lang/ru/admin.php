@@ -94,6 +94,7 @@ return [
     'format' => 'Формат',
     'template' => 'Шаблон',
     'title' => 'Заголовок',
+    'locale' => 'Язык',
   ],
   'inventory' => 
   [

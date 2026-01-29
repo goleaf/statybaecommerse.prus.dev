@@ -531,6 +531,25 @@ class AppServiceProvider extends ServiceProvider
             // Safe fallback if Number is unavailable
         }
 
+        if (class_exists(\Filament\Tables\Table::class)) {
+            \Filament\Tables\Table::configureUsing(static function (\Filament\Tables\Table $table): void {
+                $table->defaultDateTimeDisplayFormat('Y-m-d H:i:s');
+                $table->defaultDateDisplayFormat('Y-m-d');
+            });
+        }
+
+        if (class_exists(\Filament\Forms\Components\DatePicker::class)) {
+            \Filament\Forms\Components\DatePicker::configureUsing(static function (\Filament\Forms\Components\DatePicker $component): void {
+                $component->displayFormat('Y-m-d');
+            });
+        }
+
+        if (class_exists(\Filament\Forms\Components\DateTimePicker::class)) {
+            \Filament\Forms\Components\DateTimePicker::configureUsing(static function (\Filament\Forms\Components\DateTimePicker $component): void {
+                $component->displayFormat('Y-m-d H:i:s');
+            });
+        }
+
         // Using native Filament resources for admin panel functionality
 
         Model::saved(function ($model): void {

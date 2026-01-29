@@ -7,16 +7,16 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\BrandResource\Pages;
 use App\Models\Brand;
 use BackedEnum;
-use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Schemas\Schema;
-use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
@@ -35,7 +35,7 @@ final class BrandResource extends BaseResource
 
     public static function getNavigationLabel(): string
     {
-        return __('messages.admin_brands');
+        return __('admin.navigation.brands');
     }
 
     public static function getPluralModelLabel(): string
@@ -82,8 +82,9 @@ final class BrandResource extends BaseResource
             SchemaSection::make(__('messages.media'))
                 ->description(__('admin.brands.media_description'))
                 ->schema([
-                    FileUpload::make('logo')
+                    SpatieMediaLibraryFileUpload::make('logo')
                         ->label(__('messages.image'))
+                        ->collection('logo')
                         ->image()
                         ->columnSpanFull(),
                 ])
@@ -118,8 +119,9 @@ final class BrandResource extends BaseResource
     {
         return $table
             ->columns([
-                ImageColumn::make('logo')
+                SpatieMediaLibraryImageColumn::make('logo')
                     ->label(__('messages.image'))
+                    ->collection('logo')
                     ->circular(),
                 TextColumn::make('name')
                     ->label(__('messages.name'))
@@ -142,6 +144,13 @@ final class BrandResource extends BaseResource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->defaultSort('name');
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            \App\Filament\Resources\BrandResource\RelationManagers\ProductsRelationManager::class,
+        ];
     }
 
     public static function getPages(): array

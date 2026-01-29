@@ -26,19 +26,19 @@ class SliderResource extends Resource
         return NavigationGroup::Content->label();
     }
 
-    public static function getModelLabel(): string
+    public static function getNavigationLabel(): string
     {
-        return __('translations.slide');
+        return __('admin.navigation.sliders');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return __('translations.slider_management');
+        return __('admin.sliders.plural_model_label');
     }
 
-    public static function getNavigationLabel(): string
+    public static function getModelLabel(): string
     {
-        return __('translations.slider_management');
+        return __('admin.sliders.model_label');
     }
 
     public static function form(Schema $schema): Schema

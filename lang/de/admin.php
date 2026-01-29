@@ -94,6 +94,7 @@ return [
     'format' => 'Format',
     'template' => 'Vorlage',
     'title' => 'Titel',
+    'locale' => 'Sprache',
   ],
   'inventory' => 
   [
