@@ -8,10 +8,10 @@
     <section class="rounded-3xl border border-slate-100 bg-white shadow-sm">
         <div class="space-y-4 p-6 lg:p-8">
             <h2 class="text-base font-semibold text-slate-900">
-                {{ __('product_page.need_tailored_offer') }}
+                {{ __('products.page.need_tailored_offer') }}
             </h2>
             <p class="text-sm text-slate-600">
-                {{ __('product_page.tailored_offer_desc') }}
+                {{ __('products.page.tailored_offer_desc') }}
             </p>
             @if ($product->request_message)
                 <p class="text-xs text-slate-500">
@@ -24,7 +24,7 @@
                 class="inline-flex items-center justify-center rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
             >
                 <x-heroicon-o-phone class="mr-2 h-4 w-4" />
-                {{ $showForm ? __('product_page.cancel') : __('product_page.request_info_title') }}
+                {{ $showForm ? __('products.page.cancel') : __('products.page.request_info_title') }}
             </button>
         </div>
     </section>
@@ -33,14 +33,14 @@
         <section class="rounded-3xl border border-slate-100 bg-white shadow-sm">
             <div class="p-6 lg:p-8">
                 <h3 class="text-base font-semibold text-slate-900">
-                    {{ __('product_page.request_form_title') }}
+                    {{ __('products.page.request_form_title') }}
                 </h3>
 
                 <form wire:submit.prevent="submitRequest" class="mt-6 space-y-6">
                     <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                         <div>
                             <label for="name" class="mb-1 block text-sm font-medium text-slate-700">
-                                {{ __('product_page.name') }} <span class="text-red-500">*</span>
+                                {{ __('products.page.name') }} <span class="text-red-500">*</span>
                             </label>
                             <input
                                 type="text"
@@ -56,7 +56,7 @@
 
                         <div>
                             <label for="email" class="mb-1 block text-sm font-medium text-slate-700">
-                                {{ __('product_page.email') }} <span class="text-red-500">*</span>
+                                {{ __('products.page.email') }} <span class="text-red-500">*</span>
                             </label>
                             <input
                                 type="email"
@@ -72,7 +72,7 @@
 
                         <div>
                             <label for="phone" class="mb-1 block text-sm font-medium text-slate-700">
-                                {{ __('product_page.phone') }}
+                                {{ __('products.page.phone') }}
                             </label>
                             <input
                                 type="tel"
@@ -87,7 +87,7 @@
 
                         <div>
                             <label for="requested_quantity" class="mb-1 block text-sm font-medium text-slate-700">
-                                {{ __('product_page.requested_quantity') }} <span class="text-red-500">*</span>
+                                {{ __('products.page.requested_quantity') }} <span class="text-red-500">*</span>
                             </label>
                             <input
                                 type="number"
@@ -106,14 +106,14 @@
 
                     <div>
                         <label for="message" class="mb-1 block text-sm font-medium text-slate-700">
-                            {{ __('product_page.message') }}
+                            {{ __('products.page.message') }}
                         </label>
                         <textarea
                             id="message"
                             wire:model="message"
                             rows="4"
                             class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-200 @error('message') border-red-500 focus:ring-red-200 @enderror"
-                            placeholder="{{ __('product_page.message_placeholder') }}"
+                            placeholder="{{ __('products.page.message_placeholder') }}"
                         ></textarea>
                         @error('message')
                             <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
@@ -126,13 +126,13 @@
                             wire:click="toggleForm"
                             class="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 transition hover:border-slate-300 hover:text-slate-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
                         >
-                            {{ __('product_page.cancel') }}
+                            {{ __('products.page.cancel') }}
                         </button>
                         <button
                             type="submit"
                             class="inline-flex items-center justify-center rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
                         >
-                            {{ __('product_page.submit_request') }}
+                            {{ __('products.page.submit_request') }}
                         </button>
                     </div>
                 </form>
@@ -140,4 +140,5 @@
         </section>
     @endif
 </div>
+
 

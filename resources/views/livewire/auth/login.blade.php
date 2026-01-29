@@ -1,7 +1,7 @@
 @section('meta')
     <x-meta
-        :title="__('auth_ui.login.title') . ' - ' . config('app.name')"
-        :description="__('auth_ui.login.subtitle')"
+        :title="__('auth.ui.login.title') . ' - ' . config('app.name')"
+        :description="__('auth.ui.login.subtitle')"
         canonical="{{ url()->current() }}" />
 @endsection
 
@@ -36,10 +36,10 @@
 
             <div class="mt-10 rounded-2xl border border-ash bg-white/70 p-6">
                 <p class="text-sm text-slate-800">
-                    <span class="font-semibold">{{ __('auth_ui.login.new_user') }}</span>
-                    {{ __('auth_ui.login.new_user_description') }}
+                    <span class="font-semibold">{{ __('auth.ui.login.new_user') }}</span>
+                    {{ __('auth.ui.login.new_user_description') }}
                     <x-link :href="route('register')" class="ml-1 font-semibold text-dark hover:text-black/80">
-                        {{ __('auth_ui.login.create_account') }}
+                        {{ __('auth.ui.login.create_account') }}
                     </x-link>
                 </p>
             </div>
@@ -57,13 +57,13 @@
 
             <div class="space-y-3">
                 <span class="inline-flex items-center gap-2 rounded-full bg-dark/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-dark">
-                    {{ __('auth_ui.login.account_zone') }}
+                    {{ __('auth.ui.login.account_zone') }}
             </span>
                 <h1 class="text-3xl font-extrabold tracking-tight text-dark sm:text-4xl">
-                    {{ __('auth_ui.login.welcome_back') }}
+                    {{ __('auth.ui.login.welcome_back') }}
             </h1>
                 <p class="mx-auto max-w-xl text-sm text-slate-600">
-                    {{ __('auth_ui.login.welcome_back_subtitle') }}
+                    {{ __('auth.ui.login.welcome_back_subtitle') }}
             </p>
             </div>
         </div>
@@ -82,7 +82,7 @@
                             autocomplete="email"
                             autofocus
                             class="rounded-xl border border-ash bg-white px-4 py-3 text-base shadow-sm transition focus:border-dark focus:ring-2 focus:ring-dark/10"
-                            placeholder="{{ __('auth_ui.login.email_placeholder') }}"
+                            placeholder="{{ __('auth.ui.login.email_placeholder') }}"
                         />
                         <x-forms.errors :messages="$errors->get('loginForm.email')" class="mt-1" />
                     </div>
@@ -100,7 +100,7 @@
                                 wire:model.defer="loginForm.password"
                                 autocomplete="current-password"
                             class="rounded-xl border border-ash bg-white px-4 py-3 text-base shadow-sm transition focus:border-dark focus:ring-2 focus:ring-dark/10"
-                            placeholder="{{ __('auth_ui.login.password_placeholder') }}"
+                            placeholder="{{ __('auth.ui.login.password_placeholder') }}"
                         />
                         <x-forms.errors :messages="$errors->get('loginForm.password')" class="mt-1" />
                     </div>
@@ -116,7 +116,7 @@
                         <span>{{ __('messages.auth_remember_me') }}</span>
                     </label>
 
-                    <p class="text-xs text-slate-500">{{ __('auth_ui.login.secure_notice') }}</p>
+                    <p class="text-xs text-slate-500">{{ __('auth.ui.login.secure_notice') }}</p>
                 </div>
 
                 <button
@@ -125,14 +125,14 @@
                     class="group relative flex w-full items-center justify-center gap-2 rounded-xl bg-dark px-5 py-3.5 text-base font-semibold text-sage shadow-lg transition hover:bg-stone hover:text-dark focus:outline-none focus:ring-2 focus:ring-dark/20 focus:ring-offset-2 focus:ring-offset-white disabled:cursor-not-allowed disabled:opacity-70"
                 >
                     <span wire:loading.remove>
-                        {{ __('auth_ui.login.title') }}
+                        {{ __('auth.ui.login.title') }}
                     </span>
                     <span wire:loading class="inline-flex items-center gap-2">
                         <svg class="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
-                        {{ __('auth_ui.login.connecting') }}
+                        {{ __('auth.ui.login.connecting') }}
                     </span>
                 </button>
             </form>
@@ -144,7 +144,7 @@
                     </div>
                     <div class="relative flex justify-center">
                         <span class="bg-white px-4 text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">
-                            {{ __('auth_ui.login.continue_with') }}
+                            {{ __('auth.ui.login.continue_with') }}
                         </span>
                     </div>
                 </div>
@@ -156,17 +156,18 @@
         </div>
 
         <div class="rounded-2xl border border-ash bg-sage px-5 py-4 text-center text-sm text-dark">
-            {{ __('auth_ui.login.no_account') }}
+            {{ __('auth.ui.login.no_account') }}
             <x-link :href="route('register')" class="font-semibold text-dark hover:text-stone">
-                {{ __('auth_ui.login.create_account') }}
+                {{ __('auth.ui.login.create_account') }}
             </x-link>
         </div>
 
         <p class="text-center text-xs text-slate-500">
-            {{ __('auth_ui.common.terms_agreement') }}
-            <x-link href="#" class="text-dark hover:text-stone">{{ __('auth_ui.common.terms_of_use') }}</x-link>
-            {{ __('auth_ui.common.and') }}
-            <x-link href="#" class="text-dark hover:text-stone">{{ __('auth_ui.common.privacy_policy') }}</x-link>.
+            {{ __('auth.ui.common.terms_agreement') }}
+            <x-link href="#" class="text-dark hover:text-stone">{{ __('auth.ui.common.terms_of_use') }}</x-link>
+            {{ __('auth.ui.common.and') }}
+            <x-link href="#" class="text-dark hover:text-stone">{{ __('auth.ui.common.privacy_policy') }}</x-link>.
         </p>
     </div>
 </x-auth-page>
+

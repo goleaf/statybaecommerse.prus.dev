@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="C:\Dropbox\projects\egistatyba\phpunit.xml" tests="3" assertions="278" errors="0" failures="0" skipped="0" time="24.921722">
-    <testsuite name="Feature" tests="3" assertions="278" errors="0" failures="0" skipped="0" time="24.921722">
-      <testsuite name="Tests\Feature\LanguageFilesTest" file="tests\Feature\LanguageFilesTest.php" tests="3" assertions="278" errors="0" failures="0" skipped="0" time="24.921722">
-        <testcase name="language files are normalized to lowercase snake case php files" file="tests\Feature\LanguageFilesTest.php::language files are normalized to lowercase snake case php files" class="Tests\Feature\LanguageFilesTest" classname="Tests.Feature.LanguageFilesTest" assertions="253" time="24.388899"/>
-        <testcase name="product variants are merged into product group" file="tests\Feature\LanguageFilesTest.php::product variants are merged into product group" class="Tests\Feature\LanguageFilesTest" classname="Tests.Feature.LanguageFilesTest" assertions="24" time="0.382099"/>
-        <testcase name="resources lang directory contains no json files" file="tests\Feature\LanguageFilesTest.php::resources lang directory contains no json files" class="Tests\Feature\LanguageFilesTest" classname="Tests.Feature.LanguageFilesTest" assertions="1" time="0.150725"/>
+  <testsuite name="C:\Dropbox\projects\egistatyba\phpunit.xml" tests="3" assertions="278" errors="0" failures="0" skipped="0" time="29.852324">
+    <testsuite name="Feature" tests="3" assertions="278" errors="0" failures="0" skipped="0" time="29.852324">
+      <testsuite name="Tests\Feature\LanguageFilesTest" file="tests\Feature\LanguageFilesTest.php" tests="3" assertions="278" errors="0" failures="0" skipped="0" time="29.852324">
+        <testcase name="resources lang directory contains no json files" file="tests\Feature\LanguageFilesTest.php::resources lang directory contains no json files" class="Tests\Feature\LanguageFilesTest" classname="Tests.Feature.LanguageFilesTest" assertions="1" time="28.892702"/>
+        <testcase name="language files are normalized to lowercase snake case php files" file="tests\Feature\LanguageFilesTest.php::language files are normalized to lowercase snake case php files" class="Tests\Feature\LanguageFilesTest" classname="Tests.Feature.LanguageFilesTest" assertions="253" time="0.470673"/>
+        <testcase name="product variants are merged into product group" file="tests\Feature\LanguageFilesTest.php::product variants are merged into product group" class="Tests\Feature\LanguageFilesTest" classname="Tests.Feature.LanguageFilesTest" assertions="24" time="0.488948"/>
       </testsuite>
     </testsuite>
   </testsuite>

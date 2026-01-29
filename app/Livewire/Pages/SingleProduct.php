@@ -591,7 +591,7 @@ final class SingleProduct extends Component
                             $currency = $value['price_currency_hint'];
 
                             if ($currency) {
-                                $priceHint = __('product_page.variant_option_from_price', [
+                                $priceHint = __('products.page.variant_option_from_price', [
                                     'price' => Number::currency((float) $minPrice, $currency, app()->getLocale()),
                                 ]);
                             }
@@ -973,3 +973,4 @@ final class SingleProduct extends Component
         return trim($formatted . ' ' . ($unit ?? '')) ?: null;
     }
 }
+

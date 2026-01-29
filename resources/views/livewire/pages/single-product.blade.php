@@ -105,7 +105,7 @@
                                 </div>
                                 <div class="sm:text-right">
                                     <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
-                                        {{ __('product_page.delivery_eta_2_weeks') }}</p>
+                                        {{ __('products.page.delivery_eta_2_weeks') }}</p>
                                     <p class="text-lg font-semibold text-slate-900">
                                         {{ \Illuminate\Support\Number::format((float) $this->availableQuantity) }}
                                     </p>
@@ -124,14 +124,14 @@
                         <div class="space-y-6 p-6 lg:p-8">
                             <div class="flex items-center justify-between">
                                 <h2 class="text-lg font-semibold text-slate-900">
-                                    {{ __('product_page.features_title') }}</h2>
+                                    {{ __('products.page.features_title') }}</h2>
                                 <span
                                       class="text-xs font-medium uppercase tracking-wide text-slate-400">{{ $this->attributeFeatures->count() }}
-                                    {{ __('product_page.features_count') }}</span>
+                                    {{ __('products.page.features_count') }}</span>
                             </div>
 
                             @if ($this->attributeFeatures->isEmpty())
-                                <p class="text-sm text-slate-500">{{ __('product_page.features_empty') }}</p>
+                                <p class="text-sm text-slate-500">{{ __('products.page.features_empty') }}</p>
                             @else
                                 <div class="grid gap-4 sm:grid-cols-2">
                                     @foreach ($this->attributeFeatures as $feature)
@@ -156,10 +156,10 @@
                     <section class="rounded-3xl border border-slate-100 bg-white shadow-sm">
                         <div class="space-y-6 p-6 lg:p-8">
                             <h2 class="text-lg font-semibold text-slate-900">
-                                {{ __('product_page.detailed_description') }}</h2>
+                                {{ __('products.page.detailed_description') }}</h2>
                             <div class="prose prose-slate max-w-none text-slate-700">
                                 {!! $product->trans('description') ??
-                                    ($product->description ?? '<p>' . __('product_page.no_description') . '</p>') !!}
+                                    ($product->description ?? '<p>' . __('products.page.no_description') . '</p>') !!}
                             </div>
                         </div>
                     </section>
@@ -256,7 +256,7 @@
                                                             <span class="mt-1 text-[11px] text-slate-400">{{ $value['price_hint'] }}</span>
                                                         @endif
                                                         @if (! ($value['is_available'] ?? false))
-                                                            <span class="mt-0.5 text-[11px] font-medium text-rose-500">{{ __('product_page.all_variants_options') }}</span>
+                                                            <span class="mt-0.5 text-[11px] font-medium text-rose-500">{{ __('products.page.all_variants_options') }}</span>
                                                         @endif
                                                     </div>
                                                 @endforeach
@@ -314,9 +314,9 @@
                                                 @endif
                                                 <p
                                                    class="mt-2 text-xs font-medium uppercase tracking-wide {{ ($variant['is_out_of_stock'] ?? false) ? 'text-red-500' : 'text-emerald-500' }}">
-                                                    {{ ($variant['is_out_of_stock'] ?? false) ? __('product_page.single_configuration') : __('messages.product_in_stock') }}
+                                                    {{ ($variant['is_out_of_stock'] ?? false) ? __('products.page.single_configuration') : __('messages.product_in_stock') }}
                                                 </p>
-                                                <p class="text-xs text-slate-400">{{ __('product_page.available_quantity') }}:
+                                                <p class="text-xs text-slate-400">{{ __('products.page.available_quantity') }}:
                                                     {{ $variant['available_quantity'] }}</p>
                                             </div>
                                         </button>
@@ -407,9 +407,9 @@
                                     <x-untitledui-globe-05 class="h-6 w-6 text-slate-500" />
                                     <div>
                                         <p class="text-sm font-semibold text-slate-900">
-                                            {{ __('product_page.international_delivery') }}</p>
+                                            {{ __('products.page.international_delivery') }}</p>
                                         <p class="text-sm text-slate-600">
-                                            {{ __('product_page.delivery_eta_2_weeks') }}</p>
+                                            {{ __('products.page.delivery_eta_2_weeks') }}</p>
                                     </div>
                                 </div>
                                 <div
@@ -417,9 +417,9 @@
                                     <x-untitledui-gift-02 class="h-6 w-6 text-slate-500" />
                                     <div>
                                         <p class="text-sm font-semibold text-slate-900">
-                                            {{ __('product_page.loyalty_rewards') }}</p>
+                                            {{ __('products.page.loyalty_rewards') }}</p>
                                         <p class="text-sm text-slate-600">
-                                            {{ __('product_page.loyalty_rewards_desc') }}</p>
+                                            {{ __('products.page.loyalty_rewards_desc') }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -431,12 +431,12 @@
                     <section class="rounded-3xl border border-slate-100 bg-white shadow-sm">
                         <div class="space-y-4 p-6 lg:p-8">
                             <h2 class="text-base font-semibold text-slate-900">
-                                {{ __('product_page.need_tailored_offer') }}</h2>
-                            <p class="text-sm text-slate-600">{{ __('product_page.contact_us_description') }}</p>
+                                {{ __('products.page.need_tailored_offer') }}</h2>
+                            <p class="text-sm text-slate-600">{{ __('products.page.contact_us_description') }}</p>
                             <a href="{{ $this->contactUrl }}"
                                class="inline-flex items-center justify-center rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700">
                                 <x-heroicon-o-phone class="mr-2 h-4 w-4" />
-                                {{ __('product_page.need_tailored_offer') }}
+                                {{ __('products.page.need_tailored_offer') }}
                             </a>
                         </div>
                     </section>
@@ -471,3 +471,4 @@
 @push('scripts')
     <script type="application/ld+json">{!! json_encode($this->productSchema, JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE) !!}</script>
 @endpush
+

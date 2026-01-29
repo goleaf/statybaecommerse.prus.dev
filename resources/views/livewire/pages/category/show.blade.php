@@ -42,8 +42,8 @@
     
     // Determine if this is category index or category show
     $isIndex = !isset($category);
-    $pageTitle = $isIndex ? __('categories_ui.index.meta_title') : $category->name;
-    $pageDescription = $isIndex ? __('categories_ui.index.meta_description') : ($category->description ?? '');
+    $pageTitle = $isIndex ? __('categories.index.meta_title') : $category->name;
+    $pageDescription = $isIndex ? __('categories.index.meta_description') : ($category->description ?? '');
 @endphp
 
 @section('meta')
@@ -73,13 +73,13 @@
                         <li>
                             <a href="{{ route('localized.categories.index', ['locale' => app()->getLocale()]) }}"
                                class="text-sage transition hover:text-white">
-                                {{ __('categories_ui.index.meta_title') }}
+                                {{ __('categories.index.meta_title') }}
                             </a>
                         </li>
                         <li class="text-sage/60">/</li>
                         <li class="text-white">{{ $category->name }}</li>
                     @else
-                        <li class="text-white">{{ __('categories_ui.index.meta_title') }}</li>
+                        <li class="text-white">{{ __('categories.index.meta_title') }}</li>
                     @endif
                 </ol>
             </nav>
@@ -88,21 +88,21 @@
                 <div class="max-w-2xl space-y-5">
                     <span class="inline-flex items-center gap-2 rounded-full border border-sage bg-sage px-4 py-1 text-[11px] font-semibold uppercase tracking-[0.35em] text-dark">
                         @if ($isIndex)
-                            {{ __('categories_ui.index.badge') }}
+                            {{ __('categories.index.badge') }}
                         @else
-                            {{ __('categories_ui.show.badge') }}
+                            {{ __('categories.show.badge') }}
                         @endif
                     </span>
                     <h1 class="text-3xl font-bold leading-tight text-white sm:text-4xl md:text-5xl">
                         @if ($isIndex)
-                            {{ __('categories_ui.index.title') }}
+                            {{ __('categories.index.title') }}
                         @else
                             {{ $category->name }}
                         @endif
                     </h1>
                     @if ($isIndex)
                         <p class="text-base text-sage sm:text-lg">
-                            {{ __('categories_ui.index.description') }}
+                            {{ __('categories.index.description') }}
                         </p>
                     @elseif (!empty($category->description))
                         <p class="text-base text-white sm:text-lg">
@@ -131,13 +131,13 @@
                             ])->filter()->count();
                         @endphp
                         <div class="rounded-2xl border border-sage/30 bg-sage/10 px-4 py-3 text-sm font-semibold text-sage shadow-sm">
-                            {{ __('categories_ui.index.catalogue_count', ['count' => number_format($totalCategories)]) }}
+                            {{ __('categories.index.catalogue_count', ['count' => number_format($totalCategories)]) }}
                         </div>
                         <div class="rounded-2xl border border-sage/30 bg-sage/10 px-4 py-3 text-sm text-sage/80 shadow-sm">
                             @if ($activeFilterCount > 0)
-                                {{ __('categories_ui.index.filters_active', ['count' => $activeFilterCount]) }}
+                                {{ __('categories.index.filters_active', ['count' => $activeFilterCount]) }}
                             @else
-                                {{ __('categories_ui.index.filters_none') }}
+                                {{ __('categories.index.filters_none') }}
                             @endif
                         </div>
                         <button type="button"
@@ -147,17 +147,17 @@
                             <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 5h6M3 12h6m-6 7h6M13 5h8M13 12h8m-8 7h8" />
                             </svg>
-                            {{ __('categories_ui.index.filters_button') }}
+                            {{ __('categories.index.filters_button') }}
                         </button>
                     @else
                         <div class="rounded-2xl border border-sage/30 bg-sage/10 px-4 py-3 text-sm font-semibold text-sage shadow-sm">
-                            {{ __('categories_ui.show.products_count', ['count' => number_format($products->total())]) }}
+                            {{ __('categories.show.products_count', ['count' => number_format($products->total())]) }}
                         </div>
                         <div class="rounded-2xl border border-sage/30 bg-sage/10 px-4 py-3 text-sm text-sage/80 shadow-sm">
                             @if ($products->firstItem() && $products->lastItem())
-                                {{ __('categories_ui.show.showing', ['from' => $products->firstItem(), 'to' => $products->lastItem()]) }}
+                                {{ __('categories.show.showing', ['from' => $products->firstItem(), 'to' => $products->lastItem()]) }}
                             @else
-                                {{ __('categories_ui.show.no_products') }}
+                                {{ __('categories.show.no_products') }}
                             @endif
                         </div>
                         <button type="button"
@@ -166,7 +166,7 @@
                             <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 5h6M3 12h6m-6 7h6M13 5h8M13 12h8m-8 7h8" />
                             </svg>
-                            {{ __('categories_ui.show.filter') }}
+                            {{ __('categories.show.filter') }}
                         </button>
                     @endif
                 </div>
@@ -233,23 +233,23 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                             </svg>
                             @if ($isIndex)
-                                {{ __('categories_ui.index.filters_button') }}
+                                {{ __('categories.index.filters_button') }}
                             @else
-                                {{ __('categories_ui.show.filter') }}
+                                {{ __('categories.show.filter') }}
                             @endif
                         </span>
                         <h2 class="text-xl font-semibold text-white">
                             @if ($isIndex)
-                                {{ __('categories_ui.index.filters_title') }}
+                                {{ __('categories.index.filters_title') }}
                             @else
-                                {{ __('categories_ui.show.filters_title') }}
+                                {{ __('categories.show.filters_title') }}
                             @endif
                         </h2>
                         <p class="text-sm leading-relaxed text-sage/80">
                             @if ($isIndex)
-                                {{ __('categories_ui.index.filters_description') }}
+                                {{ __('categories.index.filters_description') }}
                             @else
-                                {{ __('categories_ui.show.filters_description') }}
+                                {{ __('categories.show.filters_description') }}
                             @endif
                         </p>
                     </div>
@@ -263,7 +263,7 @@
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
                                     </svg>
-                                    {{ __('categories_ui.index.meta_title') }}
+                                    {{ __('categories.index.meta_title') }}
                                 </h3>
                                 <div class="space-y-1">
                                     <x-category.tree :nodes="$categoryTree" />
@@ -276,7 +276,7 @@
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707l-6.414 6.414A1 1 0 0014 13v6l-4-2v-4a1 1 0 00-.293-.707L3.293 6.707A1 1 0 013 6V4z"></path>
                                     </svg>
-                                    {{ __('categories_ui.show.advanced_filters') }}
+                                    {{ __('categories.show.advanced_filters') }}
                                 </h3>
                                 <div>
                                     @livewire('components.product-filter-widget')
@@ -298,22 +298,22 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
                                 @if ($isIndex)
-                                    {{ __('categories_ui.index.real_time_results') }}
+                                    {{ __('categories.index.real_time_results') }}
                                 @else
-                                    {{ __('categories_ui.show.real_time_results') }}
+                                    {{ __('categories.show.real_time_results') }}
                                 @endif
                             </span>
                             @if ($isIndex)
                                 @if ($from && $to)
-                                    <span class="text-sage/80">{{ __('categories_ui.index.showing_results', ['from' => $from, 'to' => $to, 'total' => $totalCategories]) }}</span>
+                                    <span class="text-sage/80">{{ __('categories.index.showing_results', ['from' => $from, 'to' => $to, 'total' => $totalCategories]) }}</span>
                                 @else
-                                    <span class="text-sage/80">{{ __('categories_ui.index.no_results') }}</span>
+                                    <span class="text-sage/80">{{ __('categories.index.no_results') }}</span>
                                 @endif
                             @else
                                 @if ($products->firstItem() && $products->lastItem())
-                                    <span class="text-sage/80">{{ __('categories_ui.show.showing_results', ['from' => $products->firstItem(), 'to' => $products->lastItem(), 'total' => $products->total()]) }}</span>
+                                    <span class="text-sage/80">{{ __('categories.show.showing_results', ['from' => $products->firstItem(), 'to' => $products->lastItem(), 'total' => $products->total()]) }}</span>
                                 @else
-                                    <span class="text-sage/80">{{ __('categories_ui.show.no_results') }}</span>
+                                    <span class="text-sage/80">{{ __('categories.show.no_results') }}</span>
                                 @endif
                             @endif
                         </div>
@@ -322,35 +322,35 @@
                             @if ($isIndex)
                                 <div class="flex items-center gap-2 rounded-xl border border-sage/30 bg-dark/30 px-3 py-2 text-sm text-sage">
                                     <label for="sort" class="text-xs font-semibold uppercase tracking-wide text-sage/60">
-                                        {{ __('categories_ui.index.sort') }}
+                                        {{ __('categories.index.sort') }}
                                     </label>
                                     <select id="sort" wire:model.live="sort" class="border-0 bg-transparent text-sm font-medium text-sage focus:outline-none focus:ring-0">
-                                        <option value="name_asc" class="bg-dark text-sage">{{ __('categories_ui.index.sort_name_asc') }}</option>
-                                        <option value="name_desc" class="bg-dark text-sage">{{ __('categories_ui.index.sort_name_desc') }}</option>
-                                        <option value="products_desc" class="bg-dark text-sage">{{ __('categories_ui.index.sort_products_desc') }}</option>
-                                        <option value="products_asc" class="bg-dark text-sage">{{ __('categories_ui.index.sort_products_asc') }}</option>
+                                        <option value="name_asc" class="bg-dark text-sage">{{ __('categories.index.sort_name_asc') }}</option>
+                                        <option value="name_desc" class="bg-dark text-sage">{{ __('categories.index.sort_name_desc') }}</option>
+                                        <option value="products_desc" class="bg-dark text-sage">{{ __('categories.index.sort_products_desc') }}</option>
+                                        <option value="products_asc" class="bg-dark text-sage">{{ __('categories.index.sort_products_asc') }}</option>
                                     </select>
                                 </div>
                             @else
                                 <div class="flex items-center gap-2 rounded-xl border border-sage/30 bg-dark/30 px-3 py-2 text-sm text-sage">
                                     <label for="sort-by" class="text-xs font-semibold uppercase tracking-wide text-sage/60">
-                                        {{ __('categories_ui.show.sort') }}
+                                        {{ __('categories.show.sort') }}
                                     </label>
                                     <select id="sort-by" wire:model.live="sortBy" class="border-0 bg-transparent text-sm font-medium text-sage focus:outline-none focus:ring-0">
-                                        <option value="created_at" class="bg-dark text-sage">{{ __('categories_ui.show.sort_newest') }}</option>
-                                        <option value="name" class="bg-dark text-sage">{{ __('categories_ui.show.sort_name') }}</option>
-                                        <option value="price" class="bg-dark text-sage">{{ __('categories_ui.show.sort_price') }}</option>
-                                        <option value="rating" class="bg-dark text-sage">{{ __('categories_ui.show.sort_rating') }}</option>
+                                        <option value="created_at" class="bg-dark text-sage">{{ __('categories.show.sort_newest') }}</option>
+                                        <option value="name" class="bg-dark text-sage">{{ __('categories.show.sort_name') }}</option>
+                                        <option value="price" class="bg-dark text-sage">{{ __('categories.show.sort_price') }}</option>
+                                        <option value="rating" class="bg-dark text-sage">{{ __('categories.show.sort_rating') }}</option>
                                     </select>
                                 </div>
 
                                 <div class="flex items-center gap-2 rounded-xl border border-sage/30 bg-dark/30 px-3 py-2 text-sm text-sage">
                                     <label for="sort-direction" class="text-xs font-semibold uppercase tracking-wide text-sage/60">
-                                        {{ __('categories_ui.show.order') }}
+                                        {{ __('categories.show.order') }}
                                     </label>
                                     <select id="sort-direction" wire:model.live="sortDirection" class="border-0 bg-transparent text-sm font-medium text-sage focus:outline-none focus:ring-0">
-                                        <option value="asc" class="bg-dark text-sage">{{ __('categories_ui.show.order_ascending') }}</option>
-                                        <option value="desc" class="bg-dark text-sage">{{ __('categories_ui.show.order_descending') }}</option>
+                                        <option value="asc" class="bg-dark text-sage">{{ __('categories.show.order_ascending') }}</option>
+                                        <option value="desc" class="bg-dark text-sage">{{ __('categories.show.order_descending') }}</option>
                                     </select>
                                 </div>
                             @endif
@@ -364,9 +364,9 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h7v7H4V6zm9 0h7v7h-7V6zM4 13h7v7H4v-7zm9 0h7v7h-7v-7z" />
                                     </svg>
                                     @if ($isIndex)
-                                        {{ __('categories_ui.index.view_grid') }}
+                                        {{ __('categories.index.view_grid') }}
                                     @else
-                                        {{ __('categories_ui.show.view_grid') }}
+                                        {{ __('categories.show.view_grid') }}
                                     @endif
                                 </button>
                                 <button type="button"
@@ -377,9 +377,9 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
                                     </svg>
                                     @if ($isIndex)
-                                        {{ __('categories_ui.index.view_list') }}
+                                        {{ __('categories.index.view_list') }}
                                     @else
-                                        {{ __('categories_ui.show.view_list') }}
+                                        {{ __('categories.show.view_list') }}
                                     @endif
                                 </button>
                             </div>
@@ -448,14 +448,14 @@
                                                 </p>
                                             @else
                                                 <p class="text-sm text-ash">
-                                                    {{ __('categories_ui.index.description_placeholder') }}
+                                                    {{ __('categories.index.description_placeholder') }}
                                                 </p>
                                             @endif
 
                                             <div class="flex items-center justify-center">
                                                 <a href="{{ route('localized.categories.show', ['locale' => $locale, 'category' => $slug]) }}"
                                                    class="inline-flex items-center gap-2 rounded-full bg-sage px-4 py-2 text-sm font-semibold text-dark transition hover:bg-sage/90">
-                                                    {{ __('categories_ui.index.view_category') }}
+                                                    {{ __('categories.index.view_category') }}
                                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
                                                     </svg>
@@ -467,10 +467,10 @@
                             </div>
                         @else
                             <x-shared.empty-state
-                                title="{{ __('categories_ui.index.empty_title') }}"
-                                description="{{ __('categories_ui.index.empty_description') }}"
+                                title="{{ __('categories.index.empty_title') }}"
+                                description="{{ __('categories.index.empty_description') }}"
                                 icon="heroicon-o-archive-box"
-                                :action-text="__('categories_ui.index.reset_filters')"
+                                :action-text="__('categories.index.reset_filters')"
                                 :action-url="route('localized.categories.index', ['locale' => $locale])"
                             />
                         @endif
@@ -493,7 +493,7 @@
 
                             <!-- Pagination -->
                             <div class="mt-12 rounded-3xl border border-sage/30 bg-dark p-6 shadow-lg">
-                                <nav class="flex items-center justify-center" aria-label="{{ __('categories_ui.show.pagination_navigation') }}">
+                                <nav class="flex items-center justify-center" aria-label="{{ __('categories.show.pagination_navigation') }}">
                                     <div class="flex items-center justify-center">
                                         <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
                                             @if ($products->onFirstPage())
@@ -574,10 +574,10 @@
                                     </svg>
                                                                 </div>
                                                                 <h3 class="text-xl font-bold text-white mb-2">
-                                                                    {{ __('categories_ui.show.no_products_found') }}
+                                                                    {{ __('categories.show.no_products_found') }}
                                                                 </h3>
                                                                 <p class="text-sage/80 mb-8 max-w-md mx-auto">
-                                                                    {{ __('categories_ui.show.try_different_search') }}
+                                                                    {{ __('categories.show.try_different_search') }}
                                                                 </p>
                                                                 <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
                                                                     <a href="{{ route('localized.categories.index', ['locale' => app()->getLocale()]) }}"
@@ -585,14 +585,14 @@
                                                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
                                                                         </svg>
-                                                                        {{ __('categories_ui.show.browse_categories') }}
+                                                                        {{ __('categories.show.browse_categories') }}
                                                                     </a>
                                                                     <a href="{{ route('localized.products.index', ['locale' => app()->getLocale()]) }}"
                                                                        class="inline-flex items-center gap-2 rounded-full bg-sage px-6 py-3 text-sm font-semibold text-dark transition hover:bg-sage/90 shadow-sm">
                                                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
                                                                         </svg>
-                                                                        {{ __('categories_ui.show.view_all_products') }}
+                                                                        {{ __('categories.show.view_all_products') }}
                                                                     </a>
                                                                 </div>
                                                             </div>
@@ -618,17 +618,17 @@
                                                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                                                                     </svg>
-                                                                    {{ __('categories_ui.index.filters_button') }}
+                                                                    {{ __('categories.index.filters_button') }}
                                                                 </span>
-                                                                <h2 class="text-xl font-semibold text-white">{{ __('categories_ui.index.filters_title') }}</h2>
+                                                                <h2 class="text-xl font-semibold text-white">{{ __('categories.index.filters_title') }}</h2>
                                                                 <p class="text-sm leading-relaxed text-sage/80">
-                                                                    {{ __('categories_ui.index.filters_description') }}
+                                                                    {{ __('categories.index.filters_description') }}
                                                                 </p>
                                                             </div>
                                                             <button type="button"
                                                                     class="rounded-full border border-sage/30 p-2 text-sage transition hover:border-sage hover:bg-sage/10"
                                                                     wire:click="$toggle('sidebarOpen')"
-                                                                    aria-label="{{ __('categories_ui.index.close') }}">
+                                                                    aria-label="{{ __('categories.index.close') }}">
                                                                 <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                                                 </svg>
@@ -647,7 +647,7 @@
                                                                 size="sm"
                                                                 class="w-full"
                                                                 wire:click="$toggle('sidebarOpen')">
-                                                                {{ __('categories_ui.index.apply_filters') }}
+                                                                {{ __('categories.index.apply_filters') }}
                                                             </x-shared.button>
                                                         </div>
                                                     </div>
@@ -665,17 +665,17 @@
                                                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                                                                 </svg>
-                                                                {{ __('categories_ui.show.filter') }}
+                                                                {{ __('categories.show.filter') }}
                                                             </span>
-                                                            <h2 class="text-xl font-semibold text-white">{{ __('categories_ui.show.filter') }}</h2>
+                                                            <h2 class="text-xl font-semibold text-white">{{ __('categories.show.filter') }}</h2>
                                                             <p class="text-sm leading-relaxed text-sage/80">
-                                                                {{ __('categories_ui.show.adjust_filters') }}
+                                                                {{ __('categories.show.adjust_filters') }}
                                                             </p>
                                                         </div>
                                                         <button type="button"
                                                                 class="rounded-full border border-sage/30 p-2 text-sage transition hover:border-sage hover:bg-sage/10"
                                                                 @click="showFilters = false"
-                                                                aria-label="{{ __('categories_ui.index.close') }}">
+                                                                aria-label="{{ __('categories.index.close') }}">
                                                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                                             </svg>
@@ -687,7 +687,7 @@
                                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                                                                 </svg>
-                                                                {{ __('categories_ui.show.filters_title') }}
+                                                                {{ __('categories.show.filters_title') }}
                                                             </h4>
                                                             <div class="space-y-1">
                                                                 @livewire('components.product-filter-widget')
@@ -698,7 +698,7 @@
                                                         <button type="button"
                                                                 @click="showFilters = false"
                                                                 class="w-full rounded-2xl bg-sage px-6 py-4 text-center text-sm font-bold text-dark transition hover:bg-sage/90">
-                                                            {{ __('categories_ui.show.apply_filters') }}
+                                                            {{ __('categories.show.apply_filters') }}
                                                         </button>
                                                     </div>
                                                 </div>
