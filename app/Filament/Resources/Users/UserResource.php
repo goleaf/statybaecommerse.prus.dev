@@ -63,6 +63,7 @@ class UserResource extends Resource
             RelationManagers\DiscountRedemptionsRelationManager::class,
             RelationManagers\ReferralRewardsRelationManager::class,
             RelationManagers\NotificationsRelationManager::class,
+            RelationManagers\SubscriberRelationManager::class,
         ];
     }
 

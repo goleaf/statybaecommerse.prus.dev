@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace App\Filament\Resources\Sliders\Tables;
 
 use App\Models\Slider;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Actions\Action;
+use Filament\Actions\ReplicateAction;
 use Filament\Notifications\Notification;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
@@ -90,8 +92,8 @@ class SlidersTable
                             ->send();
                     }),
                 EditAction::make(),
-                \Filament\Tables\Actions\DeleteAction::make(),
-                \Filament\Tables\Actions\ReplicateAction::make()
+                DeleteAction::make(),
+                ReplicateAction::make()
                     ->beforeReplicaSaved(function (Slider $replica): void {
                         $replica->title = $replica->title . ' (Copy)';
                         $replica->sort_order = Slider::max('sort_order') + 1;

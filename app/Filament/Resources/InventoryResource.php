@@ -17,6 +17,8 @@ use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Schemas\Schema;
+use Filament\Actions\BulkAction;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use UnitEnum;
@@ -156,7 +158,7 @@ final class InventoryResource extends BaseResource
             ])
             ->defaultSort('updated_at', 'desc')
             ->bulkActions([
-                \Filament\Tables\Actions\BulkAction::make('bulk_stock_update')
+                BulkAction::make('bulk_stock_update')
                     ->label(__('admin.inventory_management.bulk_stock_update.label'))
                     ->form([
                         \Filament\Forms\Components\Select::make('operation')
@@ -188,7 +190,7 @@ final class InventoryResource extends BaseResource
                             $inventory->save();
                         }
                     }),
-                \Filament\Tables\Actions\DeleteBulkAction::make(),
+                DeleteBulkAction::make(),
             ]);
     }
 

@@ -40,6 +40,7 @@ namespace {
         \Filament\Tables\Actions\ForceDeleteBulkAction::class => \Filament\Actions\ForceDeleteBulkAction::class,
         \Filament\Tables\Actions\RestoreBulkAction::class     => \Filament\Actions\RestoreBulkAction::class,
         \Filament\Tables\Actions\ViewAction::class            => \Filament\Actions\ViewAction::class,
+        \Filament\Tables\Actions\ReplicateAction::class       => \Filament\Actions\ReplicateAction::class,
     ];
 
     foreach ($legacyTableActions as $legacyClass => $modernClass) {
