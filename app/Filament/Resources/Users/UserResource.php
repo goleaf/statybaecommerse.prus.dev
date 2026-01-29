@@ -59,6 +59,10 @@ class UserResource extends Resource
             RelationManagers\ReferralCodesRelationManager::class,
             RelationManagers\DocumentsRelationManager::class,
             RelationManagers\ReferralsRelationManager::class,
+            RelationManagers\CouponUsagesRelationManager::class,
+            RelationManagers\DiscountRedemptionsRelationManager::class,
+            RelationManagers\ReferralRewardsRelationManager::class,
+            RelationManagers\NotificationsRelationManager::class,
         ];
     }
 

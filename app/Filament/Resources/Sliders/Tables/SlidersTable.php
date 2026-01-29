@@ -4,14 +4,19 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Sliders\Tables;
 
+use App\Models\Slider;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\Action;
+use Filament\Notifications\Notification;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ColorColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Filament\Support\Enums\ActionSize;
 
 class SlidersTable
 {
@@ -26,12 +31,38 @@ class SlidersTable
                     ->label(__('messages.title'))
                     ->searchable()
                     ->sortable(),
+                TextColumn::make('slug')
+                    ->label(__('messages.slug'))
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('sort_order')
                     ->label(__('translations.sort_order'))
                     ->sortable(),
+                TextColumn::make('priority')
+                    ->label(__('translations.priority'))
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'urgent' => 'danger',
+                        'high'   => 'warning',
+                        'normal' => 'info',
+                        'low'    => 'gray',
+                        default  => 'gray',
+                    })
+                    ->sortable(),
+                ColorColumn::make('background_color')
+                    ->label(__('translations.background_color'))
+                    ->toggleable(isToggledHiddenByDefault: true),
+                ColorColumn::make('text_color')
+                    ->label(__('translations.text_color'))
+                    ->toggleable(isToggledHiddenByDefault: true),
                 IconColumn::make('is_active')
                     ->label(__('translations.is_active'))
-                    ->boolean(),
+                    ->boolean()
+                    ->sortable(),
+                IconColumn::make('is_featured')
+                    ->label(__('messages.featured'))
+                    ->boolean()
+                    ->sortable(),
                 TextColumn::make('created_at')
                     ->label(__('messages.created'))
                     ->dateTime()
@@ -41,16 +72,33 @@ class SlidersTable
             ->filters([
                 TernaryFilter::make('is_active')
                     ->label(__('translations.is_active')),
+                TernaryFilter::make('is_featured')
+                    ->label(__('messages.featured')),
             ])
-            ->recordActions([
+            ->actions([
+                Action::make('toggleSlider')
+                    ->label(fn (Slider $record): string => $record->is_active ? __('translations.deactivate') : __('translations.activate'))
+                    ->color(fn (Slider $record): string => $record->is_active ? 'danger' : 'success')
+                    ->action(function (Slider $record): void {
+                        $record->update(['is_active' => ! $record->is_active]);
+                        Notification::make()
+                            ->title($record->is_active
+                                ? __('translations.slider_activated')
+                                : __('translations.slider_deactivated')
+                            )
+                            ->success()
+                            ->send();
+                    }),
                 EditAction::make(),
                 \Filament\Tables\Actions\DeleteAction::make(),
                 \Filament\Tables\Actions\ReplicateAction::make()
-                    ->beforeReplicaSaved(function (\App\Models\Slider $replica): void {
+                    ->beforeReplicaSaved(function (Slider $replica): void {
                         $replica->title = $replica->title . ' (Copy)';
-                    }),
+                        $replica->sort_order = Slider::max('sort_order') + 1;
+                    })
+                    ->successNotificationTitle(__('translations.slider_duplicated')),
             ])
-            ->toolbarActions([
+            ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),

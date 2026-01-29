@@ -90,7 +90,8 @@
                 @endif
                 @foreach($this->sliders as $index => $slider)
                     <div class="absolute inset-0 transition-opacity duration-1000 ease-in-out"
-                         :class="{ 'opacity-100': currentSlide === {{ $index }}, 'opacity-0': currentSlide !== {{ $index }} }">
+                         :class="{ 'opacity-100': currentSlide === {{ $index }}, 'opacity-0': currentSlide !== {{ $index }} }"
+                         style="background-color: {{ $slider->getEffectiveBackgroundColor() }}">
 
                     <!-- Background Image -->
                     @php($bgUrl = $slider->getImageUrl('slider_large') ?? $slider->getImageUrl('slider'))
@@ -100,8 +101,10 @@
                                  alt="{{ $slider->getTranslatedTitle() }}"
                                  loading="lazy">
                         @else
-                            <div class="w-full h-full bg-gray-300 flex items-center justify-center">
-                                <span class="text-gray-500">{{ __('messages.home_slider_placeholder_alt') }}</span>
+                            <div class="w-full h-full flex items-center justify-center">
+                                @if(!$slider->background_color)
+                                    <span class="text-gray-500">{{ __('messages.home_slider_placeholder_alt') }}</span>
+                                @endif
                             </div>
                     @endif
 
@@ -109,17 +112,35 @@
                         <div class="absolute inset-0 bg-black bg-opacity-30"></div>
 
                         <!-- Slider Content -->
-                        <div class="absolute inset-0 z-20 flex items-center justify-center">
-                            <div class="max-w-4xl mx-auto text-center px-4">
+                        @php
+                            $alignmentClasses = match($slider->text_alignment) {
+                                'left' => 'text-left',
+                                'right' => 'text-right',
+                                default => 'text-center',
+                            };
+                            $positionClasses = match($slider->content_position) {
+                                'top-left' => 'items-start justify-start p-12',
+                                'top-center' => 'items-start justify-center p-12',
+                                'top-right' => 'items-start justify-end p-12',
+                                'center-left' => 'items-center justify-start p-12',
+                                'center-right' => 'items-center justify-end p-12',
+                                'bottom-left' => 'items-end justify-start p-12',
+                                'bottom-center' => 'items-end justify-center p-12',
+                                'bottom-right' => 'items-end justify-end p-12',
+                                default => 'items-center justify-center',
+                            };
+                        @endphp
+                        <div class="absolute inset-0 z-20 flex {{ $positionClasses }}">
+                            <div class="max-w-4xl {{ $alignmentClasses }} px-4">
                             <div class="space-y-6">
                                 <!-- Title -->
-                                    <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight text-white">
+                                    <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight" style="color: {{ $slider->getEffectiveTextColor() }}">
                                     {{ $slider->getTranslatedTitle() }}
                                 </h1>
 
                                 <!-- Description -->
                                     @if($slider->getTranslatedDescription())
-                                        <p class="text-sm sm:text-base lg:text-lg max-w-3xl mx-auto leading-tight text-white opacity-90">
+                                        <p class="text-sm sm:text-base lg:text-lg max-w-3xl mx-auto leading-tight opacity-90" style="color: {{ $slider->getEffectiveTextColor() }}">
                                         {{ $slider->getTranslatedDescription() }}
                                     </p>
                                 @endif
@@ -128,7 +149,8 @@
                                     @if($slider->getTranslatedButtonText() && $slider->button_url)
                                     <div class="pt-4">
                                         <a href="{{ $slider->button_url }}"
-                                               class="inline-flex items-center px-8 py-4 text-lg font-semibold text-white rounded-full hover:opacity-90 transition-colors duration-300 shadow-lg bg-dark">
+                                               class="inline-flex items-center px-8 py-4 text-lg font-semibold text-white rounded-full hover:opacity-90 transition-colors duration-300 shadow-lg"
+                                               style="background-color: {{ $slider->button_color ?: '#111827' }}">
                                             {{ $slider->getTranslatedButtonText() }}
                                                 <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>

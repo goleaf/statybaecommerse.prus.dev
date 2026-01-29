@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace App\Filament\Resources\Sliders\Pages;
+namespace App\Filament\Resources\Subscribers\Pages;
 
-use App\Filament\Resources\Sliders\SliderResource;
+use App\Filament\Resources\Subscribers\SubscriberResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 
-class EditSlider extends EditRecord
+class EditSubscriber extends EditRecord
 {
-    protected static string $resource = SliderResource::class;
+    protected static string $resource = SubscriberResource::class;
 
     protected function getHeaderActions(): array
     {

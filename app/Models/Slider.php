@@ -11,27 +11,19 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
+use App\Traits\HasTranslations;
+
 final class Slider extends Model implements HasMedia
 {
-    use HasFactory, InteractsWithMedia;
+    use HasFactory, InteractsWithMedia, HasTranslations;
+
+    protected string $translationModel = \App\Models\SliderTranslation::class;
+
+    protected array $translatable = ['title', 'description', 'button_text'];
 
     /**
      * @var int|null ensures tests can request the next record when verifying toggle actions.
      */
-    public static ?int $skipFirstIdForTests = null;
-
-    protected $fillable = [
-        'title',
-        'description',
-        'button_text',
-        'button_url',
-        'image',
-        'background_color',
-        'text_color',
-        'sort_order',
-        'is_active',
-        'settings',
-    ];
 
     public static function first($columns = ['*'])
     {
@@ -49,9 +41,17 @@ final class Slider extends Model implements HasMedia
     }
 
     protected $casts = [
-        'is_active'  => 'boolean',
-        'settings'   => 'array',
-        'sort_order' => 'integer',
+        'is_active'         => 'boolean',
+        'is_featured'       => 'boolean',
+        'is_scheduled'      => 'boolean',
+        'settings'          => 'array',
+        'slides'            => 'array',
+        'tags'              => 'array',
+        'custom_attributes' => 'array',
+        'target_audience'   => 'array',
+        'sort_order'        => 'integer',
+        'start_date'        => 'datetime',
+        'end_date'          => 'datetime',
     ];
 
     public function registerMediaCollections(): void
@@ -63,9 +63,20 @@ final class Slider extends Model implements HasMedia
             ->useDisk('public');
 
         $this
+            ->addMediaCollection('mobile_images')
+            ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
+            ->singleFile()
+            ->useDisk('public');
+
+        $this
             ->addMediaCollection('slider_backgrounds')
             ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
             ->singleFile()
+            ->useDisk('public');
+
+        $this
+            ->addMediaCollection('additional_slides')
+            ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
             ->useDisk('public');
     }
 
@@ -112,35 +123,42 @@ final class Slider extends Model implements HasMedia
 
     public function translations(): HasMany
     {
-        return $this->hasMany(SliderTranslation::class);
-    }
-
-    public function translation(?string $locale = null): ?SliderTranslation
-    {
-        $locale = $locale ?: app()->getLocale();
-
-        return $this->translations()->where('locale', $locale)->first();
+        return $this->hasMany($this->translationModel ?? \App\Models\SliderTranslation::class);
     }
 
     public function getTranslatedTitle(?string $locale = null): string
     {
-        $translation = $this->translation($locale);
-
-        return $translation?->title ?? $this->title;
+        return (string) ($this->trans('title', $locale) ?: $this->title);
     }
 
     public function getTranslatedDescription(?string $locale = null): ?string
     {
-        $translation = $this->translation($locale);
-
-        return $translation?->description ?? $this->description;
+        return $this->trans('description', $locale) ?: $this->description;
     }
 
     public function getTranslatedButtonText(?string $locale = null): ?string
     {
-        $translation = $this->translation($locale);
+        return $this->trans('button_text', $locale) ?: $this->button_text;
+    }
 
-        return $translation?->button_text ?? $this->button_text;
+    /**
+     * Get translated field value for the specified locale.
+     * Uses the eager-loaded translations relationship to avoid N+1 queries.
+     */
+    public function trans(string $field, ?string $locale = null): mixed
+    {
+        $locale ??= app()->getLocale();
+
+        // If translations are loaded, use them to avoid additional queries
+        if ($this->relationLoaded('translations')) {
+            $translation = $this->translations->firstWhere('locale', $locale);
+            if ($translation && isset($translation->{$field})) {
+                return $translation->{$field};
+            }
+        }
+
+        // Fallback to the base field value
+        return $this->{$field} ?? null;
     }
 
     public function getImageUrl(string $conversion = 'slider'): ?string

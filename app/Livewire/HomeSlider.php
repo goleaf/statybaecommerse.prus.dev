@@ -35,7 +35,6 @@ final class HomeSlider extends Component
             CacheKeys::TTL_FIVE_MINUTES,
             function () use ($locale) {
                 return Slider::query()
-                    ->with(['translations' => fn ($q) => $q->where('locale', $locale)])
                     ->active()
                     ->ordered()
                     ->get();
