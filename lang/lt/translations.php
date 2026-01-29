@@ -180,6 +180,8 @@ return array (
   'quantity_required' => 'Kiekis yra privalomas',
   'recent_sliders' => 'Naujausios skaidrės',
   'recommendations' => 'Rekomendacijos',
+  'related_products' => 'Susijusios prekės',
+  'related_products_description' => 'Atraskite kitas prekes, kurios jums galėtų patikti',
   'remove_item_from_cart' => 'Pašalinti prekę iš krepšelio',
   'referral_codes' => 'Rekomendacijų kodai',
   'referrals' => 'Rekomendacijos',

@@ -4,7 +4,7 @@
             @foreach($attributes as $attribute)
                 <div class="attribute-group mb-4">
                     <label class="block text-sm font-medium text-gray-700 mb-2">
-                        {{ $attribute->name }}
+                        {{ $attribute->trans('name') ?? $attribute->name }}
                     </label>
                     
                     <div class="attribute-values flex flex-wrap gap-2">
@@ -53,7 +53,7 @@
                     @endif
                 </div>
                 <span class="text-sm text-gray-500">
-                    SKU: {{ $selectedVariant->variant_sku }}
+                    {{ __('messages.sku') }}: {{ $selectedVariant->variant_sku }}
                 </span>
             </div>
 
@@ -109,7 +109,7 @@
             @if($selectedVariant->weight)
                 <div class="mb-4">
                     <span class="text-sm text-gray-600">{{ __('product_variants.fields.weight') }}:</span>
-                    <span class="ml-2 font-medium">{{ number_format($selectedVariant->getFinalWeight(), 2) }} kg</span>
+                    <span class="ml-2 font-medium">{{ number_format($selectedVariant->getFinalWeight(), 2) }} {{ __('messages.kg') }}</span>
                 </div>
             @endif
         </div>

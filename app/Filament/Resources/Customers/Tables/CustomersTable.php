@@ -23,28 +23,35 @@ class CustomersTable
         return $table
             ->columns([
                 TextColumn::make('name')
+                    ->label(__('messages.name'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('email')
+                    ->label(__('messages.email'))
                     ->searchable(),
                 TextColumn::make('phone')
+                    ->label(__('messages.phone'))
                     ->searchable(),
                 TextColumn::make('city.name')
-                    ->label('City')
+                    ->label(__('messages.city'))
                     ->sortable(),
                 TextColumn::make('country.name')
-                    ->label('Country')
+                    ->label(__('messages.country'))
                     ->sortable(),
                 IconColumn::make('is_active')
+                    ->label(__('messages.active'))
                     ->boolean(),
             ])
             ->filters([
-                TernaryFilter::make('is_active'),
+                TernaryFilter::make('is_active')
+                    ->label(__('messages.active')),
                 SelectFilter::make('city')
+                    ->label(__('messages.city'))
                     ->relationship('city', 'name')
                     ->searchable()
                     ->preload(),
                 SelectFilter::make('country')
+                    ->label(__('messages.country'))
                     ->relationship('country', 'name')
                     ->searchable()
                     ->preload(),

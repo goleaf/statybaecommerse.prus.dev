@@ -19,22 +19,28 @@ class OrganizationsTable
         return $table
             ->columns([
                 TextColumn::make('name')
+                    ->label(__('messages.name'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('slug')
+                    ->label(__('messages.slug'))
                     ->searchable(),
                 TextColumn::make('type')
+                    ->label(__('messages.Type'))
                     ->searchable()
                     ->sortable(),
                 IconColumn::make('is_active')
+                    ->label(__('messages.active'))
                     ->boolean(),
                 TextColumn::make('created_at')
+                    ->label(__('messages.created'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                TernaryFilter::make('is_active'),
+                TernaryFilter::make('is_active')
+                    ->label(__('messages.active')),
             ])
             ->recordActions([
                 EditAction::make(),

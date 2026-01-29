@@ -18,53 +18,63 @@ class PartnerForm
     {
         return $schema
             ->components([
-                Section::make('General Information')
+                Section::make(__('messages.General'))
                     ->schema([
                         SpatieMediaLibraryFileUpload::make('logo')
+                            ->label(__('messages.logo'))
                             ->collection('logo')
                             ->avatar()
                             ->alignCenter()
                             ->columnSpanFull(),
                         TextInput::make('name')
+                            ->label(__('messages.name'))
                             ->required()
                             ->maxLength(255),
                         TextInput::make('code')
+                            ->label(__('messages.code'))
                             ->required()
                             ->unique(ignoreRecord: true)
                             ->maxLength(255),
                     ])->columns(2),
 
-                Section::make('Contact Details')
+                Section::make(__('messages.footer_contact'))
                     ->schema([
                         TextInput::make('contact_email')
+                            ->label(__('messages.email'))
                             ->email()
                             ->maxLength(255),
                         TextInput::make('contact_phone')
+                            ->label(__('messages.phone'))
                             ->tel()
                             ->maxLength(255),
                     ])->columns(2),
 
-                Section::make('Commercial Terms')
+                Section::make(__('messages.financials'))
                     ->schema([
                         TextInput::make('discount_rate')
+                            ->label(__('messages.discount'))
                             ->numeric()
                             ->step(0.01)
                             ->suffix('%'),
                         TextInput::make('commission_rate')
+                            ->label(__('messages.admin.widgets.average_order_value'))
                             ->numeric()
                             ->step(0.01)
                             ->suffix('%'),
                         Select::make('tier_id')
-                            ->relationship('tier', 'name')
+                            ->label(__('messages.partner_tiers'))
+                            ->relationship('partnerTier', 'name')
                             ->searchable()
                             ->preload(),
                     ])->columns(3),
 
-                Section::make('Settings')
+                Section::make(__('admin.navigation.settings'))
                     ->schema([
                         Toggle::make('is_enabled')
+                            ->label(__('messages.enabled'))
                             ->required(),
-                        KeyValue::make('metadata'),
+                        KeyValue::make('metadata')
+                            ->label(__('messages.Value')),
                     ]),
             ]);
     }

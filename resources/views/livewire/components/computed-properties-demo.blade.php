@@ -58,7 +58,7 @@
                 <p class="text-2xl font-bold text-yellow-900">{{ $stats['brands'] }}</p>
             </div>
             <div class="bg-red-50 rounded-lg p-4">
-                <h3 class="text-sm font-medium text-red-600">{{ __('Reviews') }}</h3>
+                <h3 class="text-sm font-medium text-red-600">{{ __('common.Reviews') }}</h3>
                 <p class="text-2xl font-bold text-red-900">{{ $stats['reviews'] }}</p>
             </div>
         </div>
@@ -130,7 +130,7 @@
                                 @endif
                                 <div class="flex-1">
                                     <h4 class="font-medium text-sm text-gray-900">{{ $product['name'] }}</h4>
-                                    <p class="text-xs text-gray-600">{{ $product['reviews_count'] }} {{ __('reviews') }}</p>
+                                    <p class="text-xs text-gray-600">{{ trans_choice('common.reviews', $product['reviews_count']) }}</p>
                                 </div>
                             </div>
                         @endforeach

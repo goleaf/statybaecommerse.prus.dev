@@ -57,6 +57,38 @@ return array (
     'start_typing' => 'Pradėkite rašyti',
     'view_all_results' => 'Rodyti visus rezultatus',
   ),
+  'search_results' => 
+  array (
+    'title' => 'Paieškos rezultatai',
+    'subtitle' => 'Rezultatai jūsų užklausai',
+    'found' => 'Rasta',
+    'results_for' => 'rezultatai užklausai',
+    'sort_by' => 'Rūšiuoti pagal',
+    'sort' => 
+    array (
+      'relevance' => 'Aktualumą',
+      'price_low_high' => 'Kainą: nuo žemiausios',
+      'price_high_low' => 'Kainą: nuo aukščiausios',
+      'name_a_z' => 'Pavadinimą: A-Z',
+      'name_z_a' => 'Pavadinimą: Z-A',
+      'highest_rated' => 'Geriausiai įvertintus',
+      'newest' => 'Naujausius',
+    ),
+    'filters' => 
+    array (
+      'min' => 'Min',
+      'max' => 'Max',
+      'categories' => 'Kategorijos',
+      'brands' => 'Prekių ženklai',
+      'apply' => 'Filtrai',
+      'clear' => 'Išvalyti viską',
+    ),
+    'empty' => 
+    array (
+      'title' => 'Prekių nerasta',
+      'description' => 'Bandykite pakeisti paieškos ar filtravimo kriterijus',
+    ),
+  ),
   'test_results' => 
   array (
     'duration_seconds' => 'Duration seconds',
@@ -502,6 +534,9 @@ return array (
     'remove_coupon' => 'Pašalinti kodą',
     'proceed_to_checkout' => 'Apmokėti',
     'continue_shopping' => 'Tęsti apsipirkimą',
+    'add_success' => 'Prekė sėkmingai pridėta į krepšelį!',
+    'add_error' => 'Nepavyko pridėti prekės į krepšelį',
+    'network_error' => 'Tinklo klaida. Bandykite dar kartą.',
   ),
   'user_dashboard' => 
   array (
@@ -930,6 +965,7 @@ return array (
     'back_to_collections' => 'Atgal į kolekijas',
     'back_to_news' => 'Atgal į naujienas',
     'back_to_product' => 'Atgal į prekę',
+    'back_to_products' => 'Atgal į visas prekes',
     'back_to_home' => 'Atgal į pradžią',
   ),
   'component_showcase' => 

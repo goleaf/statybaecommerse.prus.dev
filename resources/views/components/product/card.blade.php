@@ -24,8 +24,8 @@
                 </p>
             @endif
             <p class="mt-1 text-xs text-gray-500">
-                {{ __('Reserved') }}: {{ $product->reservedQuantity() }}
-                <span class="ml-2">{{ __('Available') }}: {{ $product->availableQuantity() }}</span>
+                {{ __('messages.reserved') }}: {{ $product->reservedQuantity() }}
+                <span class="ml-2">{{ __('messages.available') }}: {{ $product->availableQuantity() }}</span>
                 @if ($product->isOutOfStock())
                     <span class="ml-2 text-red-600 font-medium">{{ __('messages.out_of_stock') }}</span>
                 @endif

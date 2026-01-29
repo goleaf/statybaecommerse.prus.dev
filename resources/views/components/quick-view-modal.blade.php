@@ -75,8 +75,7 @@
                                 @endfor
                             </div>
                             <span class="text-sm text-gray-600">
-                                {{ number_format($product->avg_rating, 1) }} ({{ $product->reviews_count ?? 0 }}
-                                {{ __('reviews') }})
+                                {{ number_format($product->avg_rating, 1) }} ({{ trans_choice('common.reviews', $product->reviews_count ?? 0) }})
                             </span>
                         </div>
                     @endif
@@ -91,7 +90,7 @@
                                 {{ \Illuminate\Support\Number::currency($product->price, current_currency(), app()->getLocale()) }}
                             </span>
                             <span class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-sm font-medium">
-                                {{ __('Sale') }}
+                                {{ __('common.Sale') }}
                             </span>
                         @else
                             <span class="text-3xl font-bold text-gray-900">
@@ -111,7 +110,7 @@
                                 {{ __('messages.in_stock') }}
                             </span>
                             <span class="text-sm text-gray-600">
-                                ({{ $product->stock_quantity }} {{ __('available') }})
+                                ({{ $product->stock_quantity }} {{ __('messages.available') }})
                             </span>
                         @else
                             <span class="inline-flex items-center gap-1 text-sm text-red-600 font-medium">
@@ -184,7 +183,7 @@
                         <button wire:click="addToCart({{ $product->id }})" @click="addToCart()"
                                 :disabled="!canAddToCart"
                                 class="w-full btn-gradient py-3 rounded-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed">
-                            <span x-show="!loading">{{ __('Add to Cart') }}</span>
+                            <span x-show="!loading">{{ __('frontend.cart.add_to_cart') }}</span>
                             <span x-show="loading" class="flex items-center justify-center gap-2">
                                 <svg class="animate-spin w-5 h-5" fill="none" stroke="currentColor"
                                      viewBox="0 0 24 24">
@@ -192,7 +191,7 @@
                                           d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
                                     </path>
                                 </svg>
-                                {{ __('Adding...') }}
+                                {{ __('common.Adding...') }}
                             </span>
                         </button>
 
@@ -205,7 +204,7 @@
                                           d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
                                     </path>
                                 </svg>
-                                {{ __('Wishlist') }}
+                                {{ __('common.Wishlist') }}
                             </button>
 
                             <button @click="compareProduct()"
@@ -215,20 +214,20 @@
                                           d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
                                     </path>
                                 </svg>
-                                {{ __('Compare') }}
+                                {{ __('common.Compare') }}
                             </button>
                         </div>
 
-                        <a href="{{ route('product.show', $product->slug ?? $product) }}"
+                        <a href="{{ route('localized.products.show', ['locale' => app()->getLocale(), 'product' => $product->trans('slug') ?? $product->slug ?? $product->getKey()]) }}"
                            class="w-full text-center py-3 text-blue-600 hover:text-blue-700 font-medium">
-                            {{ __('View Full Details') }}
+                            {{ __('messages.view_product') }}
                         </a>
                     </div>
 
                     {{-- Product Features --}}
                     @if ($product->features && $product->features->count() > 0)
                         <div>
-                            <h3 class="text-lg font-semibold text-gray-900 mb-3">{{ __('Key Features') }}</h3>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-3">{{ __('messages.product_specifications') }}</h3>
                             <ul class="space-y-2">
                                 @foreach ($product->features as $feature)
                                     @php
@@ -262,7 +261,7 @@
 
                     {{-- Shipping Info --}}
                     <div class="bg-gray-50 rounded-xl p-4">
-                        <h4 class="font-semibold text-gray-900 mb-2">{{ __('Shipping Information') }}</h4>
+                        <h4 class="font-semibold text-gray-900 mb-2">{{ __('messages.Shipping') }}</h4>
                         <div class="space-y-2 text-sm text-gray-600">
                             <div class="flex items-center gap-2">
                                 <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor"
@@ -270,7 +269,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                           d="M5 13l4 4L19 7"></path>
                                 </svg>
-                                {{ __('Free shipping on orders over €50') }}
+                                {{ __('translations.free_shipping_on_orders_over') }} €50
                             </div>
                             <div class="flex items-center gap-2">
                                 <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor"
@@ -278,7 +277,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                           d="M5 13l4 4L19 7"></path>
                                 </svg>
-                                {{ __('2-3 business days delivery') }}
+                                {{ __('product_page.delivery_eta_2_weeks') }}
                             </div>
                             <div class="flex items-center gap-2">
                                 <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor"
@@ -286,7 +285,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                           d="M5 13l4 4L19 7"></path>
                                 </svg>
-                                {{ __('30-day return policy') }}
+                                {{ __('legal.return_policy') }}
                             </div>
                         </div>
                     </div>
@@ -359,13 +358,13 @@
                     });
 
                     if (response.ok) {
-                        this.showNotification('{{ __('Product added to cart successfully!') }}', 'success');
+                        this.showNotification('{{ __('frontend.cart.add_success') }}', 'success');
                         this.closeModal();
                     } else {
-                        this.showNotification('{{ __('Failed to add product to cart') }}', 'error');
+                        this.showNotification('{{ __('frontend.cart.add_error') }}', 'error');
                     }
                 } catch (error) {
-                    this.showNotification('{{ __('Network error. Please try again.') }}', 'error');
+                    this.showNotification('{{ __('frontend.cart.network_error') }}', 'error');
                 } finally {
                     this.loading = false;
                 }

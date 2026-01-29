@@ -724,7 +724,7 @@ sass-embedded-win32-x64@1.97.3:
   resolved "https://registry.npmjs.org/sass-embedded-win32-x64/-/sass-embedded-win32-x64-1.97.3.tgz"
   integrity sha512-SFRa2lED9UEwV6vIGeBXeBOLKF+rowF3WmNfb/BzhxmdAsKofCXrJ8ePW7OcDVrvNEbTOGwhsReIsF5sH8fVaw==
 
-sass-embedded@^1.70.0, sass-embedded@^1.92.1:
+sass-embedded@^1.70.0:
   version "1.97.3"
   resolved "https://registry.npmjs.org/sass-embedded/-/sass-embedded-1.97.3.tgz"
   integrity sha512-eKzFy13Nk+IRHhlAwP3sfuv+PzOrvzUkwJK2hdoCKYcWGSdmwFpeGpWmyewdw8EgBnsKaSBtgf/0b2K635ecSA==
@@ -756,7 +756,7 @@ sass-embedded@^1.70.0, sass-embedded@^1.92.1:
     sass-embedded-win32-arm64 "1.97.3"
     sass-embedded-win32-x64 "1.97.3"
 
-sass@^1.70.0, sass@^1.93.2:
+sass@^1.70.0:
   version "1.97.3"
   resolved "https://registry.npmjs.org/sass/-/sass-1.97.3.tgz"
   integrity sha512-fDz1zJpd5GycprAbu4Q2PV/RprsRtKC/0z82z0JLgdytmcq0+ujJbJ/09bPGDxCLkKY3Np5cRAOcWiVkLXJURg==

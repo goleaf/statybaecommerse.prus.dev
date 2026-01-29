@@ -19,26 +19,39 @@ class OrganizationForm
     {
         return $schema
             ->components([
-                Section::make('Organization Details')
+                Section::make(__('admin.document_templates.document_form.sections.organization'))
                     ->schema([
                         TextInput::make('name')
+                            ->label(__('messages.name'))
                             ->required()
-                            ->maxLength(255),
+                            ->maxLength(255)
+                            ->live(onBlur: true)
+                            ->afterStateUpdated(fn (Set $set, ?string $state) => $set('slug', Str::slug($state))),
+                        TextInput::make('slug')
+                            ->label(__('messages.slug'))
+                            ->required()
+                            ->maxLength(255)
+                            ->unique(ignoreRecord: true),
                         TextInput::make('type')
+                            ->label(__('messages.Type'))
                             ->required()
                             ->maxLength(255),
-                    ])->columns(2),
+                    ])->columns(3),
 
-                Section::make('Description')
+                Section::make(__('messages.Description'))
                     ->schema([
                         RichEditor::make('description')
+                            ->label(__('messages.Description'))
                             ->columnSpanFull(),
                     ]),
 
-                Section::make('Settings')
+                Section::make(__('admin.navigation.settings'))
                     ->schema([
                         Toggle::make('is_active')
+                            ->label(__('messages.active'))
                             ->required(),
+                        KeyValue::make('settings')
+                            ->label(__('messages.Value')),
                     ]),
             ]);
     }

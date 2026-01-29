@@ -24,25 +24,33 @@ class PartnersTable
         return $table
             ->columns([
                 SpatieMediaLibraryImageColumn::make('logo')
+                    ->label(__('messages.logo'))
                     ->collection('logo')
                     ->circular(),
                 TextColumn::make('name')
+                    ->label(__('messages.name'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('code')
+                    ->label(__('messages.code'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('contact_email')
+                    ->label(__('messages.email'))
                     ->searchable(),
-                TextColumn::make('tier.name')
+                TextColumn::make('partnerTier.name')
+                    ->label(__('messages.partner_tiers'))
                     ->sortable(),
                 IconColumn::make('is_enabled')
+                    ->label(__('messages.enabled'))
                     ->boolean(),
             ])
             ->filters([
-                TernaryFilter::make('is_enabled'),
-                SelectFilter::make('tier')
-                    ->relationship('tier', 'name'),
+                TernaryFilter::make('is_enabled')
+                    ->label(__('messages.enabled')),
+                SelectFilter::make('tier_id')
+                    ->relationship('partnerTier', 'name')
+                    ->label(__('messages.partner_tiers')),
                 TrashedFilter::make(),
             ])
             ->recordActions([

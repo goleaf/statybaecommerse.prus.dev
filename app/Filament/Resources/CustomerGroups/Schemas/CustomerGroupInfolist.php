@@ -15,96 +15,96 @@ class CustomerGroupInfolist
     {
         return $schema
             ->components([
-                SchemaSection::make(__('Basic Information'))
+                SchemaSection::make(__('messages.basic_information'))
                     ->schema([
                         SchemaGrid::make(2)
                             ->schema([
                                 TextEntry::make('name')
-                                    ->label(__('Name')),
+                                    ->label(__('messages.name')),
                                 TextEntry::make('code')
-                                    ->label(__('Code')),
+                                    ->label(__('messages.code')),
                                 TextEntry::make('slug')
-                                    ->label(__('Slug')),
+                                    ->label(__('messages.slug')),
                                 TextEntry::make('type')
-                                    ->label(__('Type'))
+                                    ->label(__('messages.type'))
                                     ->badge(),
                                 ColorEntry::make('color')
-                                    ->label(__('Color')),
+                                    ->label(__('messages.color')),
                                 TextEntry::make('icon')
-                                    ->label(__('Icon')),
+                                    ->label(__('messages.icon')),
                                 TextEntry::make('sort_order')
-                                    ->label(__('Sort Order')),
+                                    ->label(__('messages.sort_order')),
                             ]),
                         TextEntry::make('description')
-                            ->label(__('Description'))
+                            ->label(__('messages.description'))
                             ->columnSpanFull(),
                     ]),
 
-                SchemaSection::make(__('Discount Settings'))
+                SchemaSection::make(__('messages.discount_settings'))
                     ->schema([
                         SchemaGrid::make(2)
                             ->schema([
                                 TextEntry::make('discount_percentage')
-                                    ->label(__('Discount Percentage'))
+                                    ->label(__('messages.discount_percentage'))
                                     ->suffix('%'),
                                 TextEntry::make('discount_fixed')
-                                    ->label(__('Discount Fixed'))
+                                    ->label(__('messages.discount_fixed'))
                                     ->money('EUR'),
                                 IconEntry::make('has_special_pricing')
-                                    ->label(__('Has Special Pricing'))
+                                    ->label(__('messages.has_special_pricing'))
                                     ->boolean(),
                                 IconEntry::make('has_volume_discounts')
-                                    ->label(__('Has Volume Discounts'))
+                                    ->label(__('messages.has_volume_discounts'))
                                     ->boolean(),
                             ]),
                     ]),
 
-                SchemaSection::make(__('Permissions'))
+                SchemaSection::make(__('messages.permissions'))
                     ->schema([
                         SchemaGrid::make(2)
                             ->schema([
                                 IconEntry::make('can_view_prices')
-                                    ->label(__('Can View Prices'))
+                                    ->label(__('messages.can_view_prices'))
                                     ->boolean(),
                                 IconEntry::make('can_place_orders')
-                                    ->label(__('Can Place Orders'))
+                                    ->label(__('messages.can_place_orders'))
                                     ->boolean(),
                                 IconEntry::make('can_view_catalog')
-                                    ->label(__('Can View Catalog'))
+                                    ->label(__('messages.can_view_catalog'))
                                     ->boolean(),
                                 IconEntry::make('can_use_coupons')
-                                    ->label(__('Can Use Coupons'))
+                                    ->label(__('messages.can_use_coupons'))
                                     ->boolean(),
                             ]),
                     ]),
 
-                SchemaSection::make(__('Financials'))
+                SchemaSection::make(__('messages.financials'))
                     ->schema([
                         SchemaGrid::make(3)
                             ->schema([
                                 TextEntry::make('minimum_order_amount')
-                                    ->label(__('Minimum Order Amount'))
+                                    ->label(__('messages.minimum_order_amount'))
                                     ->money('EUR'),
                                 TextEntry::make('credit_limit')
-                                    ->label(__('Credit Limit'))
+                                    ->label(__('messages.credit_limit'))
                                     ->money('EUR'),
                                 TextEntry::make('payment_terms')
-                                    ->label(__('Payment Terms')),
+                                    ->label(__('messages.payment_terms')),
                             ]),
                     ]),
 
-                SchemaSection::make(__('Status'))
+                SchemaSection::make(__('messages.status'))
                     ->schema([
                         SchemaGrid::make(3)
                             ->schema([
                                 IconEntry::make('is_active')
-                                    ->label(__('Active'))
+                                    ->label(__('messages.active'))
                                     ->boolean(),
                                 IconEntry::make('is_enabled')
-                                    ->label(__('Enabled'))
+                                    ->label(__('messages.enabled'))
                                     ->boolean(),
                                 IconEntry::make('is_default')
-                                    ->label(__('Default'))
+                                    ->label(__('messages.default'))
                                     ->boolean(),
                             ]),
                     ]),

@@ -26,17 +26,17 @@ class CustomerResource extends Resource
 
     public static function getModelLabel(): string
     {
-        return 'Client';
+        return __('admin.navigation.customers');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return 'Clients';
+        return __('admin.navigation.customers');
     }
 
     public static function getNavigationLabel(): string
     {
-        return 'Clients';
+        return __('admin.navigation.customers');
     }
 
     public static function form(Schema $schema): Schema

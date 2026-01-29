@@ -27,9 +27,11 @@ class UsersRelationManager extends RelationManager
         return $schema
             ->components([
                 TextInput::make('name')
+                    ->label(__('messages.name'))
                     ->required()
                     ->maxLength(255),
                 TextInput::make('email')
+                    ->label(__('messages.email'))
                     ->email()
                     ->required()
                     ->maxLength(255),
@@ -42,13 +44,15 @@ class UsersRelationManager extends RelationManager
             ->recordTitleAttribute('name')
             ->columns([
                 TextColumn::make('name')
+                    ->label(__('messages.name'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('email')
+                    ->label(__('messages.email'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('pivot.role')
-                    ->label('Role')
+                    ->label(__('messages.roles'))
                     ->badge(),
             ])
             ->filters([

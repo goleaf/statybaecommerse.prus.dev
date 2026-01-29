@@ -4,10 +4,10 @@
             @if($showTitle)
                 <div class="text-center">
                     <h2 id="related-products-heading" class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-                        {{ $title ?: __('messages.ecommerce') }}
+                        {{ $title ?: __('translations.related_products') }}
                     </h2>
                     <p class="mt-4 text-lg text-gray-600">
-                        {{ __('messages.ecommerce') }}
+                        {{ __('translations.related_products_description') }}
                     </p>
                 </div>
             @endif
@@ -82,11 +82,11 @@
                                 
                                 @if($relatedProduct->isInStock())
                                     <span class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
-                                        {{ __('messages.ecommerce') }}
+                                        {{ __('translations.in_stock') }}
                                     </span>
                                 @else
                                     <span class="inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800">
-                                        {{ __('messages.ecommerce') }}
+                                        {{ __('translations.out_of_stock') }}
                                     </span>
                                 @endif
                             </div>

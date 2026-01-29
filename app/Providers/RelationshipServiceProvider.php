@@ -51,6 +51,7 @@ final class RelationshipServiceProvider extends ServiceProvider
             'category'   => \App\Models\Category::class,
             'collection' => \App\Models\Collection::class,
             'document'   => \App\Models\Document::class,
+            'partner'    => \App\Models\Partner::class,
         ]);
     }
 

@@ -27,9 +27,11 @@ class ProjectsRelationManager extends RelationManager
         return $schema
             ->components([
                 TextInput::make('name')
+                    ->label(__('messages.name'))
                     ->required()
                     ->maxLength(255),
                 TextInput::make('status')
+                    ->label(__('messages.status'))
                     ->required(),
             ]);
     }
@@ -40,12 +42,15 @@ class ProjectsRelationManager extends RelationManager
             ->recordTitleAttribute('name')
             ->columns([
                 TextColumn::make('name')
+                    ->label(__('messages.name'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('status')
+                    ->label(__('messages.status'))
                     ->badge()
                     ->sortable(),
                 TextColumn::make('created_at')
+                    ->label(__('messages.created'))
                     ->dateTime()
                     ->sortable(),
             ])

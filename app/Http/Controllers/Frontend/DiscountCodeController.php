@@ -61,15 +61,15 @@ final class DiscountCodeController extends Controller
             ->withCode($data->code)
             ->first();
         if (! $code || ! $code->discount instanceof Discount) {
-            return response()->json(['valid' => false, 'message' => __('discount_code_invalid')], 422);
+            return response()->json(['valid' => false, 'message' => __('coupons.messages.invalid')], 422);
         }
         if (! $code->isValid()) {
             $expiresAt = $code->expires_at instanceof CarbonInterface ? $code->expires_at : null;
             $message = match (true) {
-                $code->hasReachedLimit()                                       => __('discount_code_limit_reached'),
-                $expiresAt instanceof CarbonInterface && $expiresAt->lt(now()) => __('discount_code_expired_message'),
-                ! $code->is_active                                             => __('discount_code_inactive'),
-                default                                                        => __('discount_code_invalid'),
+                $code->hasReachedLimit()                                       => __('coupons.messages.limit_reached'),
+                $expiresAt instanceof CarbonInterface && $expiresAt->lt(now()) => __('coupons.messages.expired'),
+                ! $code->is_active                                             => __('coupons.messages.inactive'),
+                default                                                        => __('coupons.messages.invalid'),
             };
 
             return response()->json(['valid' => false, 'message' => $message], 422);
@@ -78,11 +78,11 @@ final class DiscountCodeController extends Controller
         if ($code->usage_limit_per_user && Auth::check()) {
             $userUsage = DiscountRedemption::where('code_id', $code->id)->where('user_id', Auth::id())->count();
             if ($userUsage >= $code->usage_limit_per_user) {
-                return response()->json(['valid' => false, 'message' => __('discount_code_already_used')], 422);
+                return response()->json(['valid' => false, 'message' => __('coupons.messages.already_used')], 422);
             }
         }
 
-        return response()->json(['valid' => true, 'message' => __('discount_code_success'), 'discount' => ['id' => $code->id, 'code' => $code->code, 'name' => $code->discount->name, 'type' => $code->discount->type, 'value' => $code->discount->value, 'description' => $code->description]]);
+        return response()->json(['valid' => true, 'message' => __('coupons.messages.success'), 'discount' => ['id' => $code->id, 'code' => $code->code, 'name' => $code->discount->name, 'type' => $code->discount->type, 'value' => $code->discount->value, 'description' => $code->description]]);
     }
 
     /**
@@ -100,7 +100,7 @@ final class DiscountCodeController extends Controller
             ->first();
 
         if (! $code || ! $code->discount instanceof Discount) {
-            return $this->failure('not_found', __('discount_code_invalid'), 422);
+            return $this->failure('not_found', __('coupons.messages.invalid'), 422);
         }
 
         $discount = $code->discount;
@@ -108,24 +108,24 @@ final class DiscountCodeController extends Controller
 
         // Guard against stale or future-dated codes before performing heavier calculations.
         if (! $code->is_active) {
-            return $this->failure('inactive', __('discount_code_invalid'), 422);
+            return $this->failure('inactive', __('coupons.messages.invalid'), 422);
         }
         if ($code->starts_at && $code->starts_at->gt($now)) {
-            return $this->failure('inactive', __('discount_code_invalid'), 422);
+            return $this->failure('inactive', __('coupons.messages.invalid'), 422);
         }
         if ($code->expires_at && $code->expires_at->lt($now)) {
-            return $this->failure('expired', __('discount_code_expired_message'), 422);
+            return $this->failure('expired', __('coupons.messages.expired'), 422);
         }
         if ($code->hasReachedLimit()) {
-            return $this->failure('usage_limit', __('discount_code_limit_reached'), 409);
+            return $this->failure('usage_limit', __('coupons.messages.limit_reached'), 409);
         }
 
         // Mirror the checks for the parent discount so legacy codes cannot bypass discount-level limits.
         if (! $discount->isValid()) {
-            return $this->failure('inactive', __('discount_code_invalid'), 422);
+            return $this->failure('inactive', __('coupons.messages.invalid'), 422);
         }
         if ($discount->hasReachedLimit()) {
-            return $this->failure('usage_limit', __('discount_code_limit_reached'), 409);
+            return $this->failure('usage_limit', __('coupons.messages.limit_reached'), 409);
         }
 
         // Derive the pricing context from the incoming payload to guarantee server-side calculations.
@@ -138,7 +138,7 @@ final class DiscountCodeController extends Controller
             $discount->minimum_amount !== null ? (float) $discount->minimum_amount : null,
         ]);
         if ($requiredMinimums !== [] && $subtotal < max($requiredMinimums)) {
-            return $this->failure('minimum_not_met', __('discount_code_minimum_not_met'), 422);
+            return $this->failure('minimum_not_met', __('coupons.messages.minimum_not_met'), 422);
         }
 
         // Prevent mixing with other promotions when stackability rules disallow it.
@@ -147,13 +147,13 @@ final class DiscountCodeController extends Controller
         if ($activeCode !== null && mb_strtoupper((string) ($activeCode['code'] ?? '')) !== $normalized) {
             $existingStackable = (bool) ($activeCode['is_stackable'] ?? false);
             if (! $existingStackable || ! $code->is_stackable) {
-                return $this->failure('stacking', __('discount_code_not_stackable'), 409);
+                return $this->failure('stacking', __('coupons.messages.not_stackable'), 409);
             }
         }
         /** @var array<string, mixed>|null $activeCoupon */
         $activeCoupon = session('checkout.coupon');
         if ($activeCoupon !== null && ! $code->is_stackable) {
-            return $this->failure('stacking', __('discount_code_not_stackable'), 409);
+            return $this->failure('stacking', __('coupons.messages.not_stackable'), 409);
         }
 
         /** @var int|null $userId */
@@ -168,7 +168,7 @@ final class DiscountCodeController extends Controller
                 ->whereIn('status', $blockingStatuses)
                 ->count();
             if ($userUsage >= (int) $code->usage_limit_per_user) {
-                return $this->failure('per_user_limit', __('discount_code_already_used'), 409);
+                return $this->failure('per_user_limit', __('coupons.messages.already_used'), 409);
             }
         }
         if ($userId !== null && $discount->per_customer_limit) {
@@ -178,7 +178,7 @@ final class DiscountCodeController extends Controller
                 ->whereIn('status', $blockingStatuses)
                 ->count();
             if ($discountUsage >= (int) $discount->per_customer_limit) {
-                return $this->failure('per_user_limit', __('discount_code_already_used'), 409);
+                return $this->failure('per_user_limit', __('coupons.messages.already_used'), 409);
             }
         }
 
@@ -190,7 +190,7 @@ final class DiscountCodeController extends Controller
         $totalBenefit = round($discountAmount + $shippingDiscount, 2);
 
         if (! $applied || $totalBenefit <= 0.0) {
-            return $this->failure('not_applicable', __('discount_code_not_applicable'), 422);
+            return $this->failure('not_applicable', __('coupons.messages.not_applicable'), 422);
         }
 
         // Persist or refresh the pending ledger entry so audits can trace redemption attempts.
@@ -251,7 +251,7 @@ final class DiscountCodeController extends Controller
         return response()->json([
             'success'       => true,
             'reason'        => null,
-            'message'       => __('discount_code_success'),
+            'message'       => __('coupons.messages.success'),
             'discount_code' => $payload,
         ]);
     }
@@ -264,7 +264,7 @@ final class DiscountCodeController extends Controller
         $validated = $request->validated();
         $code = DiscountCode::where('code', $validated['code'])->first();
         if (! $code) {
-            return response()->json(['success' => false, 'message' => __('discount_code_invalid')], 422);
+            return response()->json(['success' => false, 'message' => __('coupons.messages.invalid')], 422);
         }
         // Find and mark the pending ledger entry so history remains intact while freeing the code.
         $redemption = DiscountRedemption::query()
@@ -282,7 +282,7 @@ final class DiscountCodeController extends Controller
 
         session()->forget('checkout.discount_code');
 
-        return response()->json(['success' => true, 'message' => __('discount_code_removed')]);
+        return response()->json(['success' => true, 'message' => __('coupons.messages.removed')]);
     }
 
     /**
@@ -364,7 +364,7 @@ final class DiscountCodeController extends Controller
             if (! $discountCode->discount instanceof Discount) {
                 return response()->json([
                     'error'   => 'Discount data unavailable',
-                    'message' => __('discount_code_invalid'),
+                    'message' => __('coupons.messages.invalid'),
                 ], 422);
             }
 

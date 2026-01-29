@@ -114,4 +114,6 @@ return [
     'Website' => 'Website',
     'Wishlist' => 'Wishlist',
     'Yes' => 'Yes',
+    'stars' => '{1} :count star|[2,*] :count stars',
+    'reviews' => '{0} No reviews|{1} :count review|[2,*] :count reviews',
 ];

@@ -23,6 +23,8 @@ class PartnerResourceTest extends TestCase
             'email'    => 'admin@example.com',
             'is_admin' => true,
         ]);
+
+        $this->partnerTier = \App\Models\PartnerTier::factory()->create();
     }
 
     public function test_can_list_partners(): void
@@ -283,7 +285,7 @@ class PartnerResourceTest extends TestCase
             ->assertCanSeeTableRecords([$partner])
             ->assertTableColumnExists('name')
             ->assertTableColumnExists('code')
-            ->assertTableColumnExists('tier.name')
+            ->assertTableColumnExists('partnerTier.name')
             ->assertTableColumnExists('is_enabled')
             ->assertTableColumnExists('discount_rate')
             ->assertTableColumnExists('commission_rate')

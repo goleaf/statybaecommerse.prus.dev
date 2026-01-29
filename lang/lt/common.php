@@ -114,4 +114,6 @@ return [
     'Website' => 'Svetainė',
     'Wishlist' => 'Norų sąrašas',
     'Yes' => 'Taip',
+    'stars' => '{1} :count žvaigždutė|[2,9] :count žvaigždutės|[0,10] :count žvaigždučių|[11,19] :count žvaigždučių|[20,*] :count žvaigždučių',
+    'reviews' => '{0} Nėra apžvalgų|{1} :count apžvalga|[2,9] :count apžvalgos|[0,10] :count apžvalgų|[11,19] :count apžvalgų|[20,*] :count apžvalgų',
 ];

@@ -24,6 +24,21 @@ class PartnerResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUserGroup;
 
+    public static function getModelLabel(): string
+    {
+        return __('admin.navigation.partners');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('admin.navigation.partners');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('admin.navigation.partners');
+    }
+
     public static function form(Schema $schema): Schema
     {
         return PartnerForm::configure($schema);

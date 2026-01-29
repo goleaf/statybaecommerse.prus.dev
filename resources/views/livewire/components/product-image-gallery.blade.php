@@ -45,7 +45,7 @@
 
                 {{-- WebP Format Badge --}}
                 <div class="absolute top-2 left-2 bg-green-500 text-white px-2 py-1 rounded text-xs font-medium">
-                    WebP
+                    {{ __('frontend.images.webp_badge') }}
                 </div>
 
                 {{-- Generated Image Badge --}}
@@ -78,7 +78,7 @@
         <div class="mt-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
             <div class="flex items-center justify-between text-sm">
                 <span class="text-gray-600 dark:text-gray-400">
-                    {{ __('messages.frontend') }}: {{ count($this->images) }}
+                    {{ __('translations.images') }}: {{ count($this->images) }}
                 </span>
                 <span class="text-green-600 dark:text-green-400 font-medium">
                     {{ __('frontend.images.webp_format') }}

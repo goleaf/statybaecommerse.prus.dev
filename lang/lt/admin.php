@@ -13,6 +13,7 @@ return array (
     'customers' => 'Klientai',
     'marketing' => 'Rinkodara',
     'partners' => 'Partneriai',
+    'organizations' => 'Organizacijos',
     'content' => 'Turinys',
     'documents' => 'Dokumentai',
     'settings' => 'Nustatymai',

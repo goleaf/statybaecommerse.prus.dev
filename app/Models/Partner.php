@@ -36,7 +36,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property int|null                  $tier_id
  * @property array<string, mixed>|null $metadata
  *
- * @property-read \App\Models\PartnerTier|null $tier
+ * @property-read \App\Models\PartnerTier|null $partnerTier
  *
  * @mixin \Eloquent
  */
@@ -67,9 +67,9 @@ final class Partner extends Model implements HasMedia
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\PartnerTier, $this>
      */
-    public function tier(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function partnerTier(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(PartnerTier::class);
+        return $this->belongsTo(PartnerTier::class, 'tier_id');
     }
 
     /**
