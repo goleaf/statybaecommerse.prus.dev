@@ -24,11 +24,13 @@ class DocumentsRelationManager extends RelationManager
     {
         return $schema
             ->components([
-                Select::make('template_id')
-                    ->relationship('template', 'name')
+                Select::make('document_template_id')
+                    ->relationship('documentTemplate', 'name')
                     ->required(),
-                TextInput::make('file_path')
+                TextInput::make('title')
                     ->required()
+                    ->maxLength(255),
+                TextInput::make('file_path')
                     ->maxLength(255),
                 TextInput::make('status')
                     ->required()
@@ -39,9 +41,13 @@ class DocumentsRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
-            ->recordTitleAttribute('file_path')
+            ->recordTitleAttribute('title')
             ->columns([
-                TextColumn::make('template.name')
+                TextColumn::make('title')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('documentTemplate.name')
+                    ->label('Template')
                     ->sortable(),
                 TextColumn::make('file_path')
                     ->searchable(),

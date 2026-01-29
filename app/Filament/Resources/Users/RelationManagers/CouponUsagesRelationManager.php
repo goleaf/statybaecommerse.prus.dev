@@ -10,6 +10,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
@@ -24,12 +25,18 @@ class CouponUsagesRelationManager extends RelationManager
     {
         return $schema
             ->components([
-                TextInput::make('coupon_id')
+                Select::make('coupon_id')
+                    ->relationship('coupon', 'code')
+                    ->required(),
+                Select::make('order_id')
+                    ->relationship('order', 'number')
                     ->required(),
                 TextInput::make('discount_amount')
                     ->numeric()
+                    ->prefix('€')
                     ->required(),
-                DateTimePicker::make('used_at'),
+                DateTimePicker::make('used_at')
+                    ->default(now()),
             ]);
     }
 
@@ -39,14 +46,15 @@ class CouponUsagesRelationManager extends RelationManager
             ->recordTitleAttribute('discount_amount')
             ->columns([
                 TextColumn::make('coupon.code')
-                    ->label('Coupon Code')
+                    ->label('Coupon')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('order.number')
+                    ->label('Order')
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('discount_amount')
-                    ->money()
-                    ->sortable(),
-                TextColumn::make('order.id')
-                    ->label('Order ID')
+                    ->money('EUR')
                     ->sortable(),
                 TextColumn::make('used_at')
                     ->dateTime()

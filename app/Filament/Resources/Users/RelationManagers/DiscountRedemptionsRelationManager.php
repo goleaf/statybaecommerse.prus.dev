@@ -10,6 +10,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
@@ -24,10 +25,18 @@ class DiscountRedemptionsRelationManager extends RelationManager
     {
         return $schema
             ->components([
+                Select::make('discount_id')
+                    ->relationship('discount', 'name')
+                    ->required(),
+                Select::make('order_id')
+                    ->relationship('order', 'number')
+                    ->required(),
                 TextInput::make('amount_saved')
                     ->numeric()
+                    ->prefix('€')
                     ->required(),
-                DateTimePicker::make('redeemed_at'),
+                DateTimePicker::make('redeemed_at')
+                    ->default(now()),
             ]);
     }
 
@@ -36,15 +45,16 @@ class DiscountRedemptionsRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('amount_saved')
             ->columns([
-                TextColumn::make('code.code')
-                    ->label('Discount Code')
+                TextColumn::make('discount.name')
+                    ->label('Discount')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('order.number')
+                    ->label('Order')
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('amount_saved')
-                    ->money()
-                    ->sortable(),
-                TextColumn::make('status')
-                    ->badge()
+                    ->money('EUR')
                     ->sortable(),
                 TextColumn::make('redeemed_at')
                     ->dateTime()

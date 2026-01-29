@@ -10,6 +10,7 @@ use Filament\Actions\DetachAction;
 use Filament\Actions\DetachBulkAction;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -33,8 +34,13 @@ class PartnersRelationManager extends RelationManager
                 TextColumn::make('name')
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('email')
+                TextColumn::make('code')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('contact_email')
                     ->searchable(),
+                IconColumn::make('is_enabled')
+                    ->boolean(),
             ])
             ->filters([
                 //

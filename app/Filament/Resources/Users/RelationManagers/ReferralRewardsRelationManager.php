@@ -10,6 +10,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
@@ -24,10 +25,25 @@ class ReferralRewardsRelationManager extends RelationManager
     {
         return $schema
             ->components([
+                TextInput::make('title')
+                    ->required()
+                    ->maxLength(255),
                 TextInput::make('amount')
                     ->numeric()
+                    ->prefix('€')
                     ->required(),
-                TextInput::make('status')
+                Select::make('status')
+                    ->options([
+                        'pending' => 'Pending',
+                        'applied' => 'Applied',
+                        'expired' => 'Expired',
+                    ])
+                    ->required(),
+                Select::make('type')
+                    ->options([
+                        'referrer_bonus' => 'Referrer Bonus',
+                        'referred_discount' => 'Referred Discount',
+                    ])
                     ->required(),
                 DateTimePicker::make('expires_at'),
             ]);
@@ -36,18 +52,22 @@ class ReferralRewardsRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
-            ->recordTitleAttribute('amount')
+            ->recordTitleAttribute('title')
             ->columns([
                 TextColumn::make('title')
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('amount')
-                    ->money()
+                    ->money('EUR')
                     ->sortable(),
                 TextColumn::make('status')
                     ->badge()
                     ->sortable(),
                 TextColumn::make('type')
+                    ->formatStateUsing(fn (string $state): string => ucwords(str_replace('_', ' ', $state)))
+                    ->sortable(),
+                TextColumn::make('expires_at')
+                    ->dateTime()
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime()

@@ -30,6 +30,9 @@ class ReferralCodesRelationManager extends RelationManager
                     ->required()
                     ->unique(ignoreRecord: true)
                     ->maxLength(255),
+                TextInput::make('reward_amount')
+                    ->numeric()
+                    ->prefix('€'),
                 TextInput::make('usage_limit')
                     ->numeric(),
                 DateTimePicker::make('expires_at'),
@@ -46,9 +49,14 @@ class ReferralCodesRelationManager extends RelationManager
                 TextColumn::make('code')
                     ->searchable()
                     ->sortable(),
+                TextColumn::make('reward_amount')
+                    ->money('EUR')
+                    ->sortable(),
                 TextColumn::make('usage_count')
+                    ->label('Used')
                     ->sortable(),
                 TextColumn::make('usage_limit')
+                    ->label('Limit')
                     ->sortable(),
                 IconColumn::make('is_active')
                     ->boolean(),

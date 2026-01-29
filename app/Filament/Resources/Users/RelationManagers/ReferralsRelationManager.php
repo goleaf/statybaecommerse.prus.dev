@@ -7,6 +7,10 @@ namespace App\Filament\Resources\Users\RelationManagers;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
@@ -20,14 +24,28 @@ class ReferralsRelationManager extends RelationManager
     {
         return $schema
             ->components([
-                //
+                Select::make('referred_id')
+                    ->relationship('referred', 'name')
+                    ->required(),
+                TextInput::make('referral_code')
+                    ->required()
+                    ->maxLength(255),
+                Select::make('status')
+                    ->options([
+                        'pending' => 'Pending',
+                        'completed' => 'Completed',
+                        'expired' => 'Expired',
+                    ])
+                    ->required(),
+                DateTimePicker::make('completed_at'),
+                DateTimePicker::make('expires_at'),
             ]);
     }
 
     public function table(Table $table): Table
     {
         return $table
-            ->recordTitleAttribute('referred_id')
+            ->recordTitleAttribute('referral_code')
             ->columns([
                 TextColumn::make('referred.name')
                     ->label('Referred User')
@@ -36,7 +54,11 @@ class ReferralsRelationManager extends RelationManager
                 TextColumn::make('referral_code')
                     ->searchable(),
                 TextColumn::make('status')
-                    ->badge(),
+                    ->badge()
+                    ->sortable(),
+                TextColumn::make('completed_at')
+                    ->dateTime()
+                    ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable(),
@@ -48,6 +70,7 @@ class ReferralsRelationManager extends RelationManager
                 //
             ])
             ->recordActions([
+                EditAction::make(),
                 DeleteAction::make(),
             ])
             ->toolbarActions([
