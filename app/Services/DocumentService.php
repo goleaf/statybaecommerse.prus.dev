@@ -205,21 +205,16 @@ final class DocumentService implements DocumentServiceContract
      */
     public function extractVariablesFromModel(Model $model, string $prefix = ''): array
     {
+        if ($model instanceof \App\Contracts\HasDocuments) {
+            return $model->getDocumentVariables();
+        }
+
         $variables = [];
         $attributes = $model->getAttributes();
         foreach ($attributes as $key => $value) {
             if (! is_null($value)) {
                 $variableName = '$' . strtoupper($prefix . $key);
                 $variables[$variableName] = $value;
-            }
-        }
-        // Add specific mappings for Order model
-        if ($model instanceof \App\Models\Order) {
-            $variables['$ORDER_NUMBER'] = $model->number ?? $model->id;
-            $variables['$ORDER_TOTAL'] = number_format((float) ($model->total ?? 0), 2);
-            if ($model->user) {
-                $variables['$CUSTOMER_NAME'] = $model->user->name ?? '';
-                $variables['$CUSTOMER_EMAIL'] = $model->user->email ?? '';
             }
         }
 

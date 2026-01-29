@@ -206,7 +206,7 @@ final class CheckoutProcess extends Component
         $this->validate($this->rules());
         $cartItems = $this->getCartItems();
         if ($cartItems->isEmpty()) {
-            $this->addError('cart', 'Jūsų krepšelis tuščias');
+            $this->addError('cart', __('messages.your_cart_is_empty'));
 
             return;
         }

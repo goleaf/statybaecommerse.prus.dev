@@ -177,7 +177,7 @@
 <script>
 (function() {
     const cartAddUrl = '{{ route("frontend.cart.add") }}';
-    const addToCartText = '{{ __("frontend/home.products.actions.add_to_cart") }}';
+    const addToCartText = '{{ __("frontend.home.products.actions.add_to_cart") }}';
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
     
     function replaceAddToCartButtons() {

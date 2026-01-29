@@ -1,7 +1,7 @@
-<x-layouts.base title="{{ __('frontend/home.home.title') }}">
+<x-layouts.base title="{{ __('frontend.home.home.title') }}">
     <div class="max-w-7xl mx-auto px-4 py-10 space-y-12">
         <section>
-            <h1 class="text-3xl font-semibold mb-4">{{ __('frontend/home.featured_products') }}</h1>
+            <h1 class="text-3xl font-semibold mb-4">{{ __('frontend.home.featured_products') }}</h1>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 @forelse ($featuredProducts as $product)
                     <div class="p-4 border border-gray-200 rounded-xl bg-white shadow-sm dark:bg-gray-900 dark:border-white/10">
@@ -9,16 +9,16 @@
                         <p class="text-sm text-gray-500 dark:text-gray-400">{{ $product->brand?->name }}</p>
                         <p class="mt-2 text-primary-600 font-semibold">{{ app_money_format($product->sale_price ?? $product->price ?? 0) }}</p>
                         <a class="mt-3 inline-flex items-center text-sm text-primary-700 hover:text-primary-800"
-                           href="{{ route('frontend.products.show', $product) }}">{{ __('frontend/products.view_product') }}</a>
+                           href="{{ route('frontend.products.show', $product) }}">{{ __('frontend.products.view_product') }}</a>
                     </div>
                 @empty
-                    <p class="text-gray-500 dark:text-gray-400">{{ __('frontend/home.featured_empty') }}</p>
+                    <p class="text-gray-500 dark:text-gray-400">{{ __('frontend.home.featured_empty') }}</p>
                 @endforelse
             </div>
         </section>
 
         <section>
-            <h2 class="text-2xl font-semibold mb-4">{{ __('frontend/home.latest_arrivals') }}</h2>
+            <h2 class="text-2xl font-semibold mb-4">{{ __('frontend.home.latest_arrivals') }}</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 @forelse ($latestProducts as $product)
                     <div class="p-4 rounded-xl border border-gray-200 bg-white dark:bg-gray-900 dark:border-white/10">
@@ -27,7 +27,7 @@
                         <div class="mt-2 text-primary-600 font-medium">{{ app_money_format($product->sale_price ?? $product->price ?? 0) }}</div>
                     </div>
                 @empty
-                    <p class="text-gray-500 dark:text-gray-400">{{ __('frontend/home.latest_empty') }}</p>
+                    <p class="text-gray-500 dark:text-gray-400">{{ __('frontend.home.latest_empty') }}</p>
                 @endforelse
             </div>
         </section>
@@ -37,16 +37,16 @@
                 <div class="flex flex-col gap-16">
                     <div class="space-y-4 text-center">
                         <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-                            {{ __('frontend/home.sections.featured.title') }}
+                            {{ __('frontend.home.sections.featured.title') }}
                         </h2>
                         <p class="text-lg text-gray-600">
-                            {{ __('frontend/home.sections.featured.subtitle') }}
+                            {{ __('frontend.home.sections.featured.subtitle') }}
                         </p>
                     </div>
 
                     @include('frontend.products.partials.product-grid', [
                         'products' => $featuredProducts,
-                        'emptyMessage' => __('frontend/home.messages.no_featured_products'),
+                        'emptyMessage' => __('frontend.home.messages.no_featured_products'),
                     ])
                 </div>
             </div>
@@ -58,68 +58,68 @@
                     <div class="space-y-8">
                         <div class="space-y-4">
                             <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-                                {{ __('frontend/home.sections.catalogue.title') }}
+                                {{ __('frontend.home.sections.catalogue.title') }}
                             </h2>
                             <p class="text-lg text-gray-600">
-                                {{ __('frontend/home.sections.catalogue.subtitle') }}
+                                {{ __('frontend.home.sections.catalogue.subtitle') }}
                             </p>
                         </div>
                         <div class="grid gap-6 sm:grid-cols-2">
                             <div class="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
                                 <div class="flex items-center justify-between">
-                                    <h3 class="text-xl font-semibold text-gray-900">{{ __('frontend/home.sections.catalogue.lists.categories.title') }}</h3>
-                                    <a href="{{ route('frontend.categories.index') }}" class="text-sm font-semibold text-indigo-600 hover:text-indigo-700">{{ __('frontend/home.sections.catalogue.lists.categories.link') }}</a>
+                                    <h3 class="text-xl font-semibold text-gray-900">{{ __('frontend.home.sections.catalogue.lists.categories.title') }}</h3>
+                                    <a href="{{ route('frontend.categories.index') }}" class="text-sm font-semibold text-indigo-600 hover:text-indigo-700">{{ __('frontend.home.sections.catalogue.lists.categories.link') }}</a>
                                 </div>
-                                <p class="mt-2 text-sm text-gray-600">{{ __('frontend/home.sections.catalogue.lists.categories.subtitle') }}</p>
+                                <p class="mt-2 text-sm text-gray-600">{{ __('frontend.home.sections.catalogue.lists.categories.subtitle') }}</p>
                                 <ul class="mt-4 space-y-3">
                                     @forelse($popularCategories as $popularCategory)
                                         <li class="flex items-center justify-between rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3">
                                             <div>
                                                 <p class="text-sm font-semibold text-gray-900">{{ $popularCategory->name }}</p>
                                                 @if($popularCategory->visible_products_count ?? false)
-                                                    <p class="text-xs text-gray-500">{{ __('frontend/home.sections.catalogue.lists.categories.item_count', ['count' => $popularCategory->visible_products_count]) }}</p>
+                                                    <p class="text-xs text-gray-500">{{ __('frontend.home.sections.catalogue.lists.categories.item_count', ['count' => $popularCategory->visible_products_count]) }}</p>
                                                 @endif
                                             </div>
                                             <x-untitledui-arrow-up-right class="h-4 w-4 text-indigo-500" />
                                         </li>
                                     @empty
                                         <li class="rounded-2xl border border-dashed border-gray-200 bg-white px-4 py-6 text-sm text-gray-500">
-                                            {{ __('frontend/home.sections.catalogue.lists.categories.empty') }}
+                                            {{ __('frontend.home.sections.catalogue.lists.categories.empty') }}
                                         </li>
                                     @endforelse
                                 </ul>
                                 <a href="{{ route('frontend.categories.index') }}"
                                    class="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-indigo-600 hover:text-indigo-700">
-                                    {{ __('frontend/home.sections.catalogue.cards.categories.link') }}
+                                    {{ __('frontend.home.sections.catalogue.cards.categories.link') }}
                                     <x-untitledui-arrow-narrow-right class="h-4 w-4" />
                                 </a>
                             </div>
                             <div class="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
                                 <div class="flex items-center justify-between">
-                                    <h3 class="text-xl font-semibold text-gray-900">{{ __('frontend/home.sections.catalogue.lists.brands.title') }}</h3>
-                                    <a href="{{ route('frontend.brands.index') }}" class="text-sm font-semibold text-rose-600 hover:text-rose-700">{{ __('frontend/home.sections.catalogue.lists.brands.link') }}</a>
+                                    <h3 class="text-xl font-semibold text-gray-900">{{ __('frontend.home.sections.catalogue.lists.brands.title') }}</h3>
+                                    <a href="{{ route('frontend.brands.index') }}" class="text-sm font-semibold text-rose-600 hover:text-rose-700">{{ __('frontend.home.sections.catalogue.lists.brands.link') }}</a>
                                 </div>
-                                <p class="mt-2 text-sm text-gray-600">{{ __('frontend/home.sections.catalogue.lists.brands.subtitle') }}</p>
+                                <p class="mt-2 text-sm text-gray-600">{{ __('frontend.home.sections.catalogue.lists.brands.subtitle') }}</p>
                                 <ul class="mt-4 space-y-3">
                                     @forelse($topBrands as $topBrand)
                                         <li class="flex items-center justify-between rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3">
                                             <div>
                                                 <p class="text-sm font-semibold text-gray-900">{{ $topBrand->name }}</p>
                                                 @if($topBrand->visible_products_count ?? false)
-                                                    <p class="text-xs text-gray-500">{{ __('frontend/home.sections.catalogue.lists.brands.item_count', ['count' => $topBrand->visible_products_count]) }}</p>
+                                                    <p class="text-xs text-gray-500">{{ __('frontend.home.sections.catalogue.lists.brands.item_count', ['count' => $topBrand->visible_products_count]) }}</p>
                                                 @endif
                                             </div>
                                             <x-untitledui-arrow-up-right class="h-4 w-4 text-rose-500" />
                                         </li>
                                     @empty
                                         <li class="rounded-2xl border border-dashed border-gray-200 bg-white px-4 py-6 text-sm text-gray-500">
-                                            {{ __('frontend/home.sections.catalogue.lists.brands.empty') }}
+                                            {{ __('frontend.home.sections.catalogue.lists.brands.empty') }}
                                         </li>
                                     @endforelse
                                 </ul>
                                 <a href="{{ route('frontend.brands.index') }}"
                                    class="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-rose-600 hover:text-rose-700">
-                                    {{ __('frontend/home.sections.catalogue.cards.brands.link') }}
+                                    {{ __('frontend.home.sections.catalogue.cards.brands.link') }}
                                     <x-untitledui-arrow-narrow-right class="h-4 w-4" />
                                 </a>
                             </div>
@@ -137,25 +137,25 @@
                 <div class="flex flex-col gap-12">
                     <div class="space-y-4 text-center">
                         <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-                            {{ __('frontend/home.sections.highlights.title') }}
+                            {{ __('frontend.home.sections.highlights.title') }}
                         </h2>
                         <p class="text-lg text-slate-300">
-                            {{ __('frontend/home.sections.highlights.subtitle') }}
+                            {{ __('frontend.home.sections.highlights.subtitle') }}
                         </p>
                     </div>
 
                     <div class="space-y-12">
                         <div class="space-y-4">
-                            <h3 class="text-xl font-semibold text-white">{{ __('frontend/home.sections.highlights.latest.title') }}</h3>
-                            @include('frontend.catalogue.product-grid', ['products' => $latestProducts, 'columns' => 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4', 'emptyMessage' => __('frontend/home.sections.highlights.latest.empty')])
+                            <h3 class="text-xl font-semibold text-white">{{ __('frontend.home.sections.highlights.latest.title') }}</h3>
+                            @include('frontend.catalogue.product-grid', ['products' => $latestProducts, 'columns' => 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4', 'emptyMessage' => __('frontend.home.sections.highlights.latest.empty')])
                         </div>
                         <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                             @foreach($topBrands as $brand)
                                 <article class="rounded-2xl border border-white/10 bg-white/10 p-5 backdrop-blur-sm">
                                     <h3 class="text-lg font-semibold text-white">{{ $brand->name }}</h3>
-                                    <p class="mt-2 text-sm text-slate-200">{{ \Illuminate\Support\Str::limit(strip_tags($brand->description ?? __('frontend/home.sections.highlights.brands.fallback_description')), 90) }}</p>
+                                    <p class="mt-2 text-sm text-slate-200">{{ \Illuminate\Support\Str::limit(strip_tags($brand->description ?? __('frontend.home.sections.highlights.brands.fallback_description')), 90) }}</p>
                                     <a href="{{ route('frontend.brands.show', $brand) }}" class="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-emerald-200 hover:text-white">
-                                        {{ __('frontend/home.sections.highlights.brands.cta') }}
+                                        {{ __('frontend.home.sections.highlights.brands.cta') }}
                                         <x-untitledui-arrow-up-right class="h-4 w-4" />
                                     </a>
                                 </article>
@@ -171,31 +171,31 @@
                 <div class="grid gap-12 lg:grid-cols-[1.2fr_1fr] lg:items-center">
                     <div class="space-y-6">
                         <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-                            {{ __('frontend/home.sections.discovery.title') }}
+                            {{ __('frontend.home.sections.discovery.title') }}
                         </h2>
                         <p class="text-lg text-gray-600">
-                            {{ __('frontend/home.sections.discovery.subtitle') }}
+                            {{ __('frontend.home.sections.discovery.subtitle') }}
                         </p>
                         <ul class="grid gap-4 sm:grid-cols-2">
                             <li class="flex items-start gap-3 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
                                 <x-untitledui-shield-tick class="mt-1 h-6 w-6 text-emerald-500" />
                                 <div>
-                                    <p class="text-sm font-semibold text-gray-900">{{ __('frontend/home.sections.discovery.items.security.title') }}</p>
-                                    <p class="mt-1 text-sm text-gray-600">{{ __('frontend/home.sections.discovery.items.security.subtitle') }}</p>
+                                    <p class="text-sm font-semibold text-gray-900">{{ __('frontend.home.sections.discovery.items.security.title') }}</p>
+                                    <p class="mt-1 text-sm text-gray-600">{{ __('frontend.home.sections.discovery.items.security.subtitle') }}</p>
                                 </div>
                             </li>
                             <li class="flex items-start gap-3 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
                                 <x-untitledui-credit-card-check class="mt-1 h-6 w-6 text-blue-500" />
                                 <div>
-                                    <p class="text-sm font-semibold text-gray-900">{{ __('frontend/home.sections.discovery.items.payments.title') }}</p>
-                                    <p class="mt-1 text-sm text-gray-600">{{ __('frontend/home.sections.discovery.items.payments.subtitle') }}</p>
+                                    <p class="text-sm font-semibold text-gray-900">{{ __('frontend.home.sections.discovery.items.payments.title') }}</p>
+                                    <p class="mt-1 text-sm text-gray-600">{{ __('frontend.home.sections.discovery.items.payments.subtitle') }}</p>
                                 </div>
                             </li>
                             <li class="flex items-start gap-3 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
                                 <x-untitledui-truck class="mt-1 h-6 w-6 text-indigo-500" />
                                 <div>
-                                    <p class="text-sm font-semibold text-gray-900">{{ __('frontend/home.sections.discovery.items.delivery.title') }}</p>
-                                    <p class="mt-1 text-sm text-gray-600">{{ __('frontend/home.sections.discovery.items.delivery.subtitle') }}</p>
+                                    <p class="text-sm font-semibold text-gray-900">{{ __('frontend.home.sections.discovery.items.delivery.title') }}</p>
+                                    <p class="mt-1 text-sm text-gray-600">{{ __('frontend.home.sections.discovery.items.delivery.subtitle') }}</p>
                                 </div>
                             </li>
                         </ul>
@@ -212,30 +212,30 @@
                 <div class="grid gap-12 lg:grid-cols-[1.2fr_1fr] lg:items-center">
                     <div class="space-y-6">
                         <h2 class="text-3xl font-bold tracking-tight sm:text-4xl">
-                            {{ __('frontend/home.sections.cta.title') }}
+                            {{ __('frontend.home.sections.cta.title') }}
                         </h2>
                         <p class="text-lg text-gray-300">
-                            {{ __('frontend/home.sections.cta.subtitle') }}
+                            {{ __('frontend.home.sections.cta.subtitle') }}
                         </p>
                         <div class="flex flex-wrap items-center gap-4">
                             <a href="{{ route('frontend.news.index') }}"
                                class="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-base font-semibold text-gray-900 transition hover:bg-gray-200">
                                 <x-untitledui-newsletter class="h-5 w-5" />
-                                <span>{{ __('frontend/home.sections.cta.primary') }}</span>
+                                <span>{{ __('frontend.home.sections.cta.primary') }}</span>
                             </a>
                             <a href="{{ route('frontend.contact.index') }}"
                                class="inline-flex items-center gap-2 rounded-full border border-white/40 px-6 py-3 text-base font-semibold text-white transition hover:border-white hover:bg-white/10">
                                 <x-untitledui-arrow-up-right class="h-5 w-5" />
-                                <span>{{ __('frontend/home.sections.cta.secondary') }}</span>
+                                <span>{{ __('frontend.home.sections.cta.secondary') }}</span>
                             </a>
                         </div>
                         <div class="flex flex-col gap-3 text-sm text-gray-300 sm:flex-row sm:items-center">
                             <span class="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-200">
                                 <x-untitledui-shield-tick class="h-4 w-4" />
-                                {{ __('frontend/home.sections.cta.review_badge') }}
+                                {{ __('frontend.home.sections.cta.review_badge') }}
                             </span>
                             <p class="max-w-lg">
-                                {{ __('frontend/home.sections.cta.review_copy') }}
+                                {{ __('frontend.home.sections.cta.review_copy') }}
                             </p>
                         </div>
                     </div>
@@ -243,30 +243,30 @@
                         @php($homeStats = $stats ?? [])
                         <dl class="space-y-6">
                             <div>
-                                <dt class="text-sm font-semibold text-gray-200">{{ __('frontend/home.stats.products.label') }}</dt>
+                                <dt class="text-sm font-semibold text-gray-200">{{ __('frontend.home.stats.products.label') }}</dt>
                                 <dd class="mt-1 text-3xl font-bold text-white">{{ number_format($homeStats['products_count'] ?? 0) }}</dd>
-                                <p class="mt-1 text-xs text-gray-400">{{ __('frontend/home.stats.products.caption') }}</p>
+                                <p class="mt-1 text-xs text-gray-400">{{ __('frontend.home.stats.products.caption') }}</p>
                             </div>
                             <div>
-                                <dt class="text-sm font-semibold text-gray-200">{{ __('frontend/home.stats.categories.label') }}</dt>
+                                <dt class="text-sm font-semibold text-gray-200">{{ __('frontend.home.stats.categories.label') }}</dt>
                                 <dd class="mt-1 text-3xl font-bold text-white">{{ number_format($homeStats['categories_count'] ?? 0) }}</dd>
-                                <p class="mt-1 text-xs text-gray-400">{{ __('frontend/home.stats.categories.caption') }}</p>
+                                <p class="mt-1 text-xs text-gray-400">{{ __('frontend.home.stats.categories.caption') }}</p>
                             </div>
                             <div>
-                                <dt class="text-sm font-semibold text-gray-200">{{ __('frontend/home.stats.brands.label') }}</dt>
+                                <dt class="text-sm font-semibold text-gray-200">{{ __('frontend.home.stats.brands.label') }}</dt>
                                 <dd class="mt-1 text-3xl font-bold text-white">{{ number_format($homeStats['brands_count'] ?? 0) }}</dd>
-                                <p class="mt-1 text-xs text-gray-400">{{ __('frontend/home.stats.brands.caption') }}</p>
+                                <p class="mt-1 text-xs text-gray-400">{{ __('frontend.home.stats.brands.caption') }}</p>
                             </div>
                             <div>
-                                <dt class="text-sm font-semibold text-gray-200">{{ __('frontend/home.stats.reviews.label') }}</dt>
+                                <dt class="text-sm font-semibold text-gray-200">{{ __('frontend.home.stats.reviews.label') }}</dt>
                                 <dd class="mt-1 text-3xl font-bold text-white">{{ number_format($homeStats['reviews_count'] ?? 0) }}</dd>
                                 <p class="mt-1 text-xs text-gray-400">
-                                    {{ __('frontend/home.stats.reviews.caption', ['rating' => number_format($homeStats['avg_rating'] ?? 0, 1)]) }}
+                                    {{ __('frontend.home.stats.reviews.caption', ['rating' => number_format($homeStats['avg_rating'] ?? 0, 1)]) }}
                                 </p>
                             </div>
                         </dl>
                         <p class="mt-6 text-xs text-gray-400">
-                            {{ __('frontend/home.sections.cta.review_caption', ['count' => number_format($homeStats['reviews_count'] ?? 0)]) }}
+                            {{ __('frontend.home.sections.cta.review_caption', ['count' => number_format($homeStats['reviews_count'] ?? 0)]) }}
                         </p>
                     </div>
                 </div>

@@ -136,10 +136,10 @@ final class VariantComparisonTable extends Component
         $quantity = $variant->available_quantity;
 
         return match ($status) {
-            'in_stock'     => __('product_variants.messages.in_stock', ['quantity' => $quantity]),
-            'low_stock'    => __('product_variants.messages.low_stock', ['quantity' => $quantity]),
-            'out_of_stock' => __('product_variants.messages.out_of_stock'),
-            default        => __('product_variants.messages.variant_not_available'),
+            'in_stock'     => __('product.variants.messages.in_stock', ['quantity' => $quantity]),
+            'low_stock'    => __('product.variants.messages.low_stock', ['quantity' => $quantity]),
+            'out_of_stock' => __('product.variants.messages.out_of_stock'),
+            default        => __('product.variants.messages.variant_not_available'),
         };
     }
 
@@ -148,19 +148,19 @@ final class VariantComparisonTable extends Component
         $badges = [];
 
         if ($variant->is_new) {
-            $badges[] = ['type' => 'new', 'label' => __('product_variants.badges.new')];
+            $badges[] = ['type' => 'new', 'label' => __('product.variants.badges.new')];
         }
 
         if ($variant->is_featured) {
-            $badges[] = ['type' => 'featured', 'label' => __('product_variants.badges.featured')];
+            $badges[] = ['type' => 'featured', 'label' => __('product.variants.badges.featured')];
         }
 
         if ($variant->is_bestseller) {
-            $badges[] = ['type' => 'bestseller', 'label' => __('product_variants.badges.bestseller')];
+            $badges[] = ['type' => 'bestseller', 'label' => __('product.variants.badges.bestseller')];
         }
 
         if ($variant->isCurrentlyOnSale()) {
-            $badges[] = ['type' => 'sale', 'label' => __('product_variants.badges.sale')];
+            $badges[] = ['type' => 'sale', 'label' => __('product.variants.badges.sale')];
         }
 
         return $badges;

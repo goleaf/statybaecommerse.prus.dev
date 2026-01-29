@@ -26,7 +26,7 @@ trait InteractsWithDocuments
     {
         $variables = [];
         $attributes = $this->getAttributes();
-        
+
         foreach ($attributes as $key => $value) {
             if (! is_null($value) && is_scalar($value)) {
                 $variables['$' . strtoupper($key)] = $value;

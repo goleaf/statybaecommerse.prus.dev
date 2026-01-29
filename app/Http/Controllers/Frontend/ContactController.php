@@ -43,6 +43,6 @@ final class ContactController extends Controller
 
         SendContactMessageJob::dispatch($contactMessage);
 
-        return back()->with('success', __('frontend/contact.flash.success'));
+        return back()->with('success', __('frontend.contact.flash.success'));
     }
 }

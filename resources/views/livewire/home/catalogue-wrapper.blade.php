@@ -6,13 +6,13 @@
         <div class="space-y-4 max-w-3xl">
             <span
                   class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-white/70">
-                {{ __('frontend/home.catalogue.badge') }}
+                {{ __('frontend.home.catalogue.badge') }}
             </span>
             <h2 class="text-3xl sm:text-4xl font-heading font-semibold leading-tight">
-                {{ __('frontend/home.catalogue.title') }}
+                {{ __('frontend.home.catalogue.title') }}
             </h2>
             <p class="text-sm sm:text-base text-white/70 leading-relaxed">
-                {{ __('frontend/home.catalogue.subtitle') }}
+                {{ __('frontend.home.catalogue.subtitle') }}
             </p>
         </div>
 

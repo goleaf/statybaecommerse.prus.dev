@@ -1,7 +1,7 @@
 @props([
     'products',
     'columns' => 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4',
-    'emptyMessage' => __('frontend/catalogue.grid.empty_default'),
+    'emptyMessage' => __('frontend.catalogue.grid.empty_default'),
 ])
 
 <div class="grid gap-6 {{ $columns }}">

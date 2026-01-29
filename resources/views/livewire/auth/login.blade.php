@@ -11,25 +11,25 @@
             <div class="space-y-8">
                 <div class="space-y-4">
                     <span class="inline-flex items-center gap-2 rounded-full bg-white/70 px-4 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-dark">
-                        {{ __('frontend/home.mission.badge') }}
+                        {{ __('frontend.home.mission.badge') }}
                     </span>
 
                     <h2 class="text-3xl font-semibold leading-tight text-dark">
-                        {{ __('frontend/home.mission.title') }}
+                        {{ __('frontend.home.mission.title') }}
                     </h2>
 
                     <p class="text-sm leading-relaxed text-slate-800">
-                        {{ __('frontend/home.mission.subtitle') }}
+                        {{ __('frontend.home.mission.subtitle') }}
                     </p>
                 </div>
 
                 <div class="rounded-3xl border border-ash bg-white/70 p-6 text-dark">
                     <div class="space-y-3">
                         <span class="inline-flex items-center gap-2 rounded-full bg-white/80 px-4 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-dark">
-                            {{ __('frontend/home.loyalty.badge') }}
+                            {{ __('frontend.home.loyalty.badge') }}
                         </span>
-                        <h3 class="text-2xl font-bold text-dark">{{ __('frontend/home.loyalty.title') }}</h3>
-                        <p class="text-slate-800">{{ __('frontend/home.loyalty.subtitle') }}</p>
+                        <h3 class="text-2xl font-bold text-dark">{{ __('frontend.home.loyalty.title') }}</h3>
+                        <p class="text-slate-800">{{ __('frontend.home.loyalty.subtitle') }}</p>
                     </div>
                 </div>
             </div>

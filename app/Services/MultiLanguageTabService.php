@@ -37,12 +37,12 @@ final class MultiLanguageTabService
     public static function getLanguageName(string $locale): string
     {
         return match ($locale) {
-            'en'    => __('English'),
-            'lt'    => __('Lietuvių'),
-            'de'    => __('Deutsch'),
-            'fr'    => __('Français'),
-            'es'    => __('Español'),
-            'ru'    => __('Русский'),
+            'en'    => __('translations.english'),
+            'lt'    => __('translations.lithuanian'),
+            'de'    => __('translations.german'),
+            'fr'    => __('translations.french'),
+            'es'    => __('translations.spanish'),
+            'ru'    => __('translations.russian'),
             default => strtoupper($locale),
         };
     }

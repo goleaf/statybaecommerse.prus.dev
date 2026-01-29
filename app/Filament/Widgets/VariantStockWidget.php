@@ -34,32 +34,32 @@ final class VariantStockWidget extends BaseWidget
         $stockValue = (float) ProductVariant::sum(DB::raw('available_quantity * cost_price'));
 
         return [
-            Stat::make(__('product_variants.stats.total_stock'), number_format($totalStock))
-                ->description(__('product_variants.stats.all_variants_stock'))
+            Stat::make(__('product.variants.stats.total_stock'), number_format($totalStock))
+                ->description(__('product.variants.stats.all_variants_stock'))
                 ->descriptionIcon('heroicon-m-cube')
                 ->color('info'),
-            Stat::make(__('product_variants.stats.available_stock'), number_format($availableStock))
-                ->description(__('product_variants.stats.ready_for_sale'))
+            Stat::make(__('product.variants.stats.available_stock'), number_format($availableStock))
+                ->description(__('product.variants.stats.ready_for_sale'))
                 ->descriptionIcon('heroicon-m-check-circle')
                 ->color('success'),
-            Stat::make(__('product_variants.stats.reserved_stock'), number_format($reservedStock))
-                ->description(__('product_variants.stats.pending_orders'))
+            Stat::make(__('product.variants.stats.reserved_stock'), number_format($reservedStock))
+                ->description(__('product.variants.stats.pending_orders'))
                 ->descriptionIcon('heroicon-m-clock')
                 ->color('warning'),
-            Stat::make(__('product_variants.stats.sold_stock'), number_format($soldStock))
-                ->description(__('product_variants.stats.total_sold'))
+            Stat::make(__('product.variants.stats.sold_stock'), number_format($soldStock))
+                ->description(__('product.variants.stats.total_sold'))
                 ->descriptionIcon('heroicon-m-shopping-bag')
                 ->color('success'),
-            Stat::make(__('product_variants.stats.low_stock_alerts'), $lowStockCount)
-                ->description(__('product_variants.stats.need_restocking'))
+            Stat::make(__('product.variants.stats.low_stock_alerts'), $lowStockCount)
+                ->description(__('product.variants.stats.need_restocking'))
                 ->descriptionIcon('heroicon-m-exclamation-triangle')
                 ->color('warning'),
-            Stat::make(__('product_variants.stats.out_of_stock'), $outOfStockCount)
-                ->description(__('product_variants.stats.unavailable_variants'))
+            Stat::make(__('product.variants.stats.out_of_stock'), $outOfStockCount)
+                ->description(__('product.variants.stats.unavailable_variants'))
                 ->descriptionIcon('heroicon-m-x-circle')
                 ->color('danger'),
-            Stat::make(__('product_variants.stats.stock_value'), '€' . number_format($stockValue, 2))
-                ->description(__('product_variants.stats.total_inventory_value'))
+            Stat::make(__('product.variants.stats.stock_value'), '€' . number_format($stockValue, 2))
+                ->description(__('product.variants.stats.total_inventory_value'))
                 ->descriptionIcon('heroicon-m-currency-euro')
                 ->color('primary'),
         ];

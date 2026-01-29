@@ -92,17 +92,17 @@
     <section class="text-dark border-b border-ash bg-sage">
         <div class="container mx-auto flex justify-between gap-10 h-9 px-5">
             <div class="flex items-center gap-5 sm:gap-8">
-                <a href="tel:{{ __('frontend/header.topbar.phone_href') }}" class="flex items-center group gap-2 hover:text-stone transition-colors">
+                <a href="tel:{{ __('frontend.header.topbar.phone_href') }}" class="flex items-center group gap-2 hover:text-stone transition-colors">
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 2.138 1.912 3.75 3.75 3.75s3.75-1.612 3.75-3.75S8.838 3 6 3 2.25 4.612 2.25 6.75zM2.25 17.25c0 2.138 1.912 3.75 3.75 3.75S9.75 19.388 9.75 17.25 7.838 13.5 6 13.5s-3.75 1.612-3.75 3.75zM14.25 6.75c0 2.138 1.912 3.75 3.75 3.75s3.75-1.612 3.75-3.75S20.088 3 18.25 3s-3.75 1.612-3.75 3.75zM14.25 17.25c0 2.138 1.912 3.75 3.75 3.75s3.75-1.612 3.75-3.75-1.912-3.75-3.75-3.75-3.75 1.612-3.75 3.75z" />
                     </svg>
-                    <span class="hidden sm:block">{{ __('frontend/header.topbar.phone') }}</span>
+                    <span class="hidden sm:block">{{ __('frontend.header.topbar.phone') }}</span>
                 </a>
-                <a href="mailto:{{ __('frontend/header.topbar.email_href') }}" class="flex items-center group gap-2 hover:text-stone transition-colors">
+                <a href="mailto:{{ __('frontend.header.topbar.email_href') }}" class="flex items-center group gap-2 hover:text-stone transition-colors">
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
-                    <span class="hidden sm:block">{{ __('frontend/header.topbar.email') }}</span>
+                    <span class="hidden sm:block">{{ __('frontend.header.topbar.email') }}</span>
                 </a>
                 @if (Route::has('localized.locations.index'))
                     <a href="{{ route('localized.locations.index', ['locale' => $locale]) }}" class="flex items-center group gap-2 hover:text-stone transition-colors">
@@ -110,7 +110,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 11c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3z" />
                             <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 9c0 7.5-7.5 12-7.5 12S4.5 16.5 4.5 9a7.5 7.5 0 1115 0z" />
                         </svg>
-                        <span class="hidden sm:block">{{ __('frontend/header.topbar.store_locator') }}</span>
+                        <span class="hidden sm:block">{{ __('frontend.header.topbar.store_locator') }}</span>
                     </a>
                 @endif
             </div>
@@ -121,13 +121,13 @@
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 5h16v14H4zM8 9h8M8 13h5" />
                     </svg>
-                    <span class="hidden sm:block">{{ __('frontend/header.topbar.news') }}</span>
+                    <span class="hidden sm:block">{{ __('frontend.header.topbar.news') }}</span>
                 </a>
                 <a href="#" class="flex items-center group gap-2 hover:text-stone transition-colors">
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h8M8 14h5M12 20l-3.5-2H6a2 2 0 01-2-2V6a2 2 0 012-2h12a2 2 0 012 2v8a2 2 0 01-2 2h-2" />
                     </svg>
-                    <span class="hidden sm:block">{{ __('frontend/header.topbar.consultations') }}</span>
+                    <span class="hidden sm:block">{{ __('frontend.header.topbar.consultations') }}</span>
                 </a>
             </div>
         </div>

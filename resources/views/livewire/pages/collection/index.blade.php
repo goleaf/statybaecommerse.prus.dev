@@ -5,8 +5,8 @@
 
 @section('meta')
     <x-meta
-        :title="__('frontend/collections.meta.title') . ' - ' . config('app.name')"
-        :description="__('frontend/collections.meta.description')"
+        :title="__('frontend.collections.meta.title') . ' - ' . config('app.name')"
+        :description="__('frontend.collections.meta.description')"
         canonical="{{ url()->current() }}" />
 @endsection
 
@@ -18,13 +18,13 @@
         <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16 lg:pb-24">
             <div class="space-y-6 max-w-3xl">
                 <span class="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-4 py-1 text-xs font-semibold uppercase tracking-[0.35em] text-blue-600">
-                    {{ __('frontend/collections.hero.badge') }}
+                    {{ __('frontend.collections.hero.badge') }}
                 </span>
                 <h1 class="text-4xl sm:text-5xl lg:text-6xl font-heading font-semibold leading-tight text-balance text-slate-900">
-                    {{ __('frontend/collections.hero.title') }}
+                    {{ __('frontend.collections.hero.title') }}
                 </h1>
                 <p class="text-base sm:text-lg text-slate-600 leading-relaxed max-w-2xl">
-                    {{ __('frontend/collections.hero.subtitle') }}
+                    {{ __('frontend.collections.hero.subtitle') }}
                 </p>
             </div>
         </div>
@@ -48,10 +48,10 @@
                         <div class="space-y-5 max-w-3xl">
                             <div class="flex flex-wrap items-center gap-3">
                                 <span class="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.3em] text-blue-600">
-                                    {{ __('frontend/collections.types.' . $typeKey) }}
+                                    {{ __('frontend.collections.types.' . $typeKey) }}
                                 </span>
                                 <span class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.3em] text-slate-500">
-                                    {{ trans_choice('frontend/collections.stats.products', $productCount, ['count' => $productCount]) }}
+                                    {{ trans_choice('frontend.collections.stats.products', $productCount, ['count' => $productCount]) }}
                                 </span>
                             </div>
 
@@ -79,7 +79,7 @@
 
                     @if ($products->isEmpty())
                         <div class="rounded-2xl border border-slate-200 bg-slate-50 px-6 py-10 text-center text-sm text-slate-500">
-                            {{ __('frontend/collections.empty.products') }}
+                            {{ __('frontend.collections.empty.products') }}
                         </div>
                     @else
                         <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -96,7 +96,7 @@
                     <div class="flex justify-end">
                         <a href="{{ route('localized.collections.show', ['locale' => app()->getLocale(), 'collection' => $collection->getTranslatedSlug() ?? $collection->slug]) }}"
                            class="inline-flex items-center gap-2 rounded-full bg-indigo-500 px-5 py-3 text-xs font-semibold text-white shadow-lg transition hover:bg-indigo-600">
-                            {{ __('frontend/collections.buttons.view_collection') }}
+                            {{ __('frontend.collections.buttons.view_collection') }}
                             <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
                             </svg>
@@ -106,7 +106,7 @@
             </article>
         @empty
             <div class="rounded-3xl border border-slate-200 bg-slate-50 px-6 py-16 text-center text-sm text-slate-500">
-                {{ __('frontend/collections.empty.collections') }}
+                {{ __('frontend.collections.empty.collections') }}
             </div>
         @endforelse
     </div>

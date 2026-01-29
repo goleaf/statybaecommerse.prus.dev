@@ -1,6 +1,6 @@
 @extends('components.layouts.base')
 
-@section('title', __('product_variants.showcase.title'))
+@section('title', __('product.variants.showcase.title'))
 
 @section('content')
 <div class="min-h-screen bg-gray-50">
@@ -8,17 +8,17 @@
         <!-- Header -->
         <div class="mb-8">
             <h1 class="text-3xl font-bold text-gray-900 mb-4">
-                {{ __('product_variants.showcase.title') }}
+                {{ __('product.variants.showcase.title') }}
             </h1>
             <p class="text-lg text-gray-600">
-                {{ __('product_variants.showcase.subtitle') }}
+                {{ __('product.variants.showcase.subtitle') }}
             </p>
         </div>
 
         <!-- Product Selection -->
         <div class="bg-white rounded-lg shadow-sm border p-6 mb-8">
             <h2 class="text-xl font-semibold text-gray-900 mb-4">
-                {{ __('product_variants.showcase.select_product') }}
+                {{ __('product.variants.showcase.select_product') }}
             </h2>
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -40,7 +40,7 @@
                                 €{{ number_format($product->price, 2) }}
                             </span>
                             <span class="text-sm text-gray-500">
-                                {{ data_get($product, 'variant_counts.total_variants', $product->variants->count()) }} {{ __('product_variants.showcase.variants_count') }}
+                                {{ data_get($product, 'variant_counts.total_variants', $product->variants->count()) }} {{ __('product.variants.showcase.variants_count') }}
                             </span>
                         </div>
                     </div>
@@ -62,7 +62,7 @@
                             </span>
                             @if($selectedProduct->brand)
                                 <span class="text-sm text-gray-500">
-                                    {{ __('product_variants.showcase.brand') }}: {{ $selectedProduct->brand?->trans('name') ?? $selectedProduct->brand->name }}
+                                    {{ __('product.variants.showcase.brand') }}: {{ $selectedProduct->brand?->trans('name') ?? $selectedProduct->brand->name }}
                                 </span>
                             @endif
                         </div>
@@ -82,7 +82,7 @@
             <!-- Variant Comparison -->
             <div class="bg-white rounded-lg shadow-sm border p-6 mb-8">
                 <h3 class="text-xl font-semibold text-gray-900 mb-4">
-                    {{ __('product_variants.showcase.comparison_title') }}
+                    {{ __('product.variants.showcase.comparison_title') }}
                 </h3>
                 <livewire:components.variant-comparison-table :product="$selectedProduct" />
             </div>
@@ -90,7 +90,7 @@
             <!-- Analytics Dashboard -->
             <div class="bg-white rounded-lg shadow-sm border p-6">
                 <h3 class="text-xl font-semibold text-gray-900 mb-4">
-                    {{ __('product_variants.showcase.analytics_title') }}
+                    {{ __('product.variants.showcase.analytics_title') }}
                 </h3>
                 
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -103,7 +103,7 @@
                                 </svg>
                             </div>
                             <div class="ml-4">
-                                <p class="text-sm font-medium text-blue-600">{{ __('product_variants.showcase.total_variants') }}</p>
+                                <p class="text-sm font-medium text-blue-600">{{ __('product.variants.showcase.total_variants') }}</p>
                                 @php
                                     $variantCounts = data_get($selectedProduct, 'variant_counts', [
                                         'total_variants' => $selectedProduct->variants->count(),
@@ -126,7 +126,7 @@
                                 </svg>
                             </div>
                             <div class="ml-4">
-                                <p class="text-sm font-medium text-green-600">{{ __('product_variants.showcase.in_stock') }}</p>
+                                <p class="text-sm font-medium text-green-600">{{ __('product.variants.showcase.in_stock') }}</p>
                                 <p class="text-2xl font-bold text-green-900">{{ $variantCounts['in_stock'] }}</p>
                             </div>
                         </div>
@@ -141,7 +141,7 @@
                                 </svg>
                             </div>
                             <div class="ml-4">
-                                <p class="text-sm font-medium text-yellow-600">{{ __('product_variants.showcase.low_stock') }}</p>
+                                <p class="text-sm font-medium text-yellow-600">{{ __('product.variants.showcase.low_stock') }}</p>
                                 <p class="text-2xl font-bold text-yellow-900">{{ $variantCounts['low_stock'] }}</p>
                             </div>
                         </div>
@@ -156,7 +156,7 @@
                                 </svg>
                             </div>
                             <div class="ml-4">
-                                <p class="text-sm font-medium text-red-600">{{ __('product_variants.showcase.out_of_stock') }}</p>
+                                <p class="text-sm font-medium text-red-600">{{ __('product.variants.showcase.out_of_stock') }}</p>
                                 <p class="text-2xl font-bold text-red-900">{{ $variantCounts['out_of_stock'] }}</p>
                             </div>
                         </div>

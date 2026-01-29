@@ -16,7 +16,7 @@ final class LowStockAlertsWidget extends BaseWidget
 {
     protected static ?int $sort = 4;
 
-    protected static ?string $heading = 'Mažų atsargų įspėjimai';
+    protected static ?string $heading = null;
 
     public function mount(): void
     {
@@ -30,7 +30,7 @@ final class LowStockAlertsWidget extends BaseWidget
 
     public function getHeading(): ?string
     {
-        return self::$heading;
+        return __('messages.low_stock_alerts');
     }
 
     public function table(Table $table): Table
@@ -50,7 +50,7 @@ final class LowStockAlertsWidget extends BaseWidget
                 TextColumn::make('stock_quantity')->sortable(),
                 TextColumn::make('low_stock_threshold')->sortable(),
                 BadgeColumn::make('status')
-                    ->label(__('Product'))
+                    ->label(__('messages.product'))
                     ->getStateUsing(fn (Product $record): string => $record->stock_quantity <= 0 ? 'out_of_stock' : 'low_stock')
                     ->colors([
                         'danger'  => 'out_of_stock',

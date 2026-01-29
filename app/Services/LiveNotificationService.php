@@ -69,7 +69,7 @@ final class LiveNotificationService implements SystemNotificationSender
      */
     public function sendOrderNotification(int $orderId, string $message, string $type = 'info'): void
     {
-        $title = "Užsakymas #{$orderId}";
+        $title = __('messages.order_notification_title', ['order_id' => $orderId]);
         $this->sendToAdmins($title, $message, $type);
     }
 
@@ -78,8 +78,12 @@ final class LiveNotificationService implements SystemNotificationSender
      */
     public function sendStockAlert(string $productName, int $currentStock, int $threshold): void
     {
-        $title = 'Mažos atsargos';
-        $message = "Prekė \"{$productName}\" turi mažiau nei {$threshold} vienetų atsargų. Dabartinis kiekis: {$currentStock}";
+        $title = __('messages.low_stock_alert_title');
+        $message = __('messages.low_stock_alert_message', [
+            'product'   => $productName,
+            'threshold' => $threshold,
+            'current'   => $currentStock,
+        ]);
         $this->sendToAdmins($title, $message, 'warning');
     }
 
@@ -88,13 +92,17 @@ final class LiveNotificationService implements SystemNotificationSender
      */
     public function sendPaymentNotification(int $orderId, string $status): void
     {
-        $title = 'Mokėjimo atnaujinimas';
-        $message = "Užsakymo #{$orderId} mokėjimas: {$status}";
-        $type = match ($status) {
-            'Sėkmingas' => 'success',
-            'Nepavyko'  => 'error',
-            'Laukiama'  => 'warning',
-            default     => 'info',
+        $title = __('messages.payment_update_title');
+        $message = __('messages.payment_update_message', [
+            'order_id' => $orderId,
+            'status'   => $status,
+        ]);
+        $normalized = mb_strtolower($status);
+        $type = match (true) {
+            in_array($normalized, ['sėkmingas', 'successful', 'success', 'erfolgreich', 'успешно'], true) => 'success',
+            in_array($normalized, ['nepavyko', 'failed', 'failure', 'fehlgeschlagen', 'ошибка'], true)    => 'error',
+            in_array($normalized, ['laukiama', 'pending', 'in progress', 'ожидание', 'wartend'], true)    => 'warning',
+            default                                                                                       => 'info',
         };
         $this->sendToAdmins($title, $message, $type);
     }
@@ -104,8 +112,8 @@ final class LiveNotificationService implements SystemNotificationSender
      */
     public function sendCustomerRegistrationNotification(string $customerEmail): void
     {
-        $title = 'Naujas klientas';
-        $message = "Registruotas naujas klientas: {$customerEmail}";
+        $title = __('messages.new_customer_title');
+        $message = __('messages.new_customer_message', ['email' => $customerEmail]);
         $this->sendToAdmins($title, $message, 'success');
     }
 
@@ -114,8 +122,8 @@ final class LiveNotificationService implements SystemNotificationSender
      */
     public function sendReviewNotification(string $productName, int $rating): void
     {
-        $title = 'Naujas atsiliepimas';
-        $message = "Prekė \"{$productName}\" gavo naują atsiliepimą: {$rating}/5 žvaigždučių";
+        $title = __('messages.new_review_title');
+        $message = __('messages.new_review_message', ['product' => $productName, 'rating' => $rating]);
         $this->sendToAdmins($title, $message, 'info');
     }
 }

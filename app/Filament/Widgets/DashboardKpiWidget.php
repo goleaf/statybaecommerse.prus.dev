@@ -97,28 +97,28 @@ final class DashboardKpiWidget extends StatsOverviewWidget
     private function buildOrdersStat(int $orders, string $locale): Stat
     {
         return Stat::make(
-            trans('admin/dashboard.kpis.orders_today'),
+            trans('admin.dashboard.kpis.orders_today'),
             Number::format($orders, locale: $locale)
         )
-            ->description(trans('admin/dashboard.kpis.orders_today_description'))
+            ->description(trans('admin.dashboard.kpis.orders_today_description'))
             ->icon('heroicon-m-shopping-cart')
             ->color($orders > 0 ? 'primary' : 'gray')
             ->extraAttributes([
-                'aria-label' => trans('admin/dashboard.kpis.orders_today') . ': ' . $orders,
+                'aria-label' => trans('admin.dashboard.kpis.orders_today') . ': ' . $orders,
             ]);
     }
 
     private function buildRevenueStat(float $revenue, string $locale): Stat
     {
         return Stat::make(
-            trans('admin/dashboard.kpis.revenue_last_seven_days'),
+            trans('admin.dashboard.kpis.revenue_last_seven_days'),
             Number::currency($revenue, 'EUR', locale: $locale)
         )
-            ->description(trans('admin/dashboard.kpis.revenue_last_seven_days_description'))
+            ->description(trans('admin.dashboard.kpis.revenue_last_seven_days_description'))
             ->icon('heroicon-m-banknotes')
             ->color($revenue > 0 ? 'success' : 'gray')
             ->extraAttributes([
-                'aria-label' => trans('admin/dashboard.kpis.revenue_last_seven_days') . ': ' .
+                'aria-label' => trans('admin.dashboard.kpis.revenue_last_seven_days') . ': ' .
                     Number::currency($revenue, 'EUR', locale: $locale),
             ]);
     }
@@ -126,14 +126,14 @@ final class DashboardKpiWidget extends StatsOverviewWidget
     private function buildUsersStat(int $users, string $locale): Stat
     {
         return Stat::make(
-            trans('admin/dashboard.kpis.new_users_today'),
+            trans('admin.dashboard.kpis.new_users_today'),
             Number::format($users, locale: $locale)
         )
-            ->description(trans('admin/dashboard.kpis.new_users_today_description'))
+            ->description(trans('admin.dashboard.kpis.new_users_today_description'))
             ->icon('heroicon-m-user-plus')
             ->color($users > 0 ? 'info' : 'gray')
             ->extraAttributes([
-                'aria-label' => trans('admin/dashboard.kpis.new_users_today') . ': ' . $users,
+                'aria-label' => trans('admin.dashboard.kpis.new_users_today') . ': ' . $users,
             ]);
     }
 
@@ -146,14 +146,14 @@ final class DashboardKpiWidget extends StatsOverviewWidget
         };
 
         return Stat::make(
-            trans('admin/dashboard.kpis.low_stock_items'),
+            trans('admin.dashboard.kpis.low_stock_items'),
             Number::format($lowStock, locale: $locale)
         )
-            ->description(trans('admin/dashboard.kpis.low_stock_items_description'))
+            ->description(trans('admin.dashboard.kpis.low_stock_items_description'))
             ->icon('heroicon-m-exclamation-triangle')
             ->color($color)
             ->extraAttributes([
-                'aria-label' => trans('admin/dashboard.kpis.low_stock_items') . ': ' . $lowStock,
+                'aria-label' => trans('admin.dashboard.kpis.low_stock_items') . ': ' . $lowStock,
             ]);
     }
 
@@ -163,20 +163,20 @@ final class DashboardKpiWidget extends StatsOverviewWidget
     private function getErrorStats(): array
     {
         return [
-            Stat::make(trans('admin/dashboard.kpis.orders_today'), '—')
-                ->description(trans('admin/dashboard.errors.metric_unavailable'))
+            Stat::make(trans('admin.dashboard.kpis.orders_today'), '—')
+                ->description(trans('admin.dashboard.errors.metric_unavailable'))
                 ->icon('heroicon-m-exclamation-triangle')
                 ->color('danger'),
-            Stat::make(trans('admin/dashboard.kpis.revenue_last_seven_days'), '—')
-                ->description(trans('admin/dashboard.errors.metric_unavailable'))
+            Stat::make(trans('admin.dashboard.kpis.revenue_last_seven_days'), '—')
+                ->description(trans('admin.dashboard.errors.metric_unavailable'))
                 ->icon('heroicon-m-exclamation-triangle')
                 ->color('danger'),
-            Stat::make(trans('admin/dashboard.kpis.new_users_today'), '—')
-                ->description(trans('admin/dashboard.errors.metric_unavailable'))
+            Stat::make(trans('admin.dashboard.kpis.new_users_today'), '—')
+                ->description(trans('admin.dashboard.errors.metric_unavailable'))
                 ->icon('heroicon-m-exclamation-triangle')
                 ->color('danger'),
-            Stat::make(trans('admin/dashboard.kpis.low_stock_items'), '—')
-                ->description(trans('admin/dashboard.errors.metric_unavailable'))
+            Stat::make(trans('admin.dashboard.kpis.low_stock_items'), '—')
+                ->description(trans('admin.dashboard.errors.metric_unavailable'))
                 ->icon('heroicon-m-exclamation-triangle')
                 ->color('danger'),
         ];

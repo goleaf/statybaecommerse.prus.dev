@@ -24,54 +24,54 @@ final class VariantBulkPriceUpdate extends Action
     {
         // Respect a custom name when callers provide one while keeping the historical default intact.
         return parent::make($name ?? 'bulk_price_update')
-            ->label(__('product_variants.actions.bulk_price_update'))
+            ->label(__('product.variants.actions.bulk_price_update'))
             ->icon('heroicon-o-currency-euro')
             ->color('warning')
             ->form([
                 Select::make('price_type')
-                    ->label(__('product_variants.fields.price_type'))
+                    ->label(__('product.variants.fields.price_type'))
                     ->options([
-                        'price'             => __('product_variants.price_types.regular'),
-                        'wholesale_price'   => __('product_variants.price_types.wholesale'),
-                        'member_price'      => __('product_variants.price_types.member'),
-                        'promotional_price' => __('product_variants.price_types.promotional'),
+                        'price'             => __('product.variants.price_types.regular'),
+                        'wholesale_price'   => __('product.variants.price_types.wholesale'),
+                        'member_price'      => __('product.variants.price_types.member'),
+                        'promotional_price' => __('product.variants.price_types.promotional'),
                     ])
                     ->required()
                     ->default('price'),
                 Select::make('update_type')
-                    ->label(__('product_variants.fields.update_type'))
+                    ->label(__('product.variants.fields.update_type'))
                     ->options([
-                        'fixed_amount' => __('product_variants.update_types.fixed_amount'),
-                        'percentage'   => __('product_variants.update_types.percentage'),
-                        'multiply_by'  => __('product_variants.update_types.multiply_by'),
-                        'set_to'       => __('product_variants.update_types.set_to'),
+                        'fixed_amount' => __('product.variants.update_types.fixed_amount'),
+                        'percentage'   => __('product.variants.update_types.percentage'),
+                        'multiply_by'  => __('product.variants.update_types.multiply_by'),
+                        'set_to'       => __('product.variants.update_types.set_to'),
                     ])
                     ->required()
                     ->default('percentage'),
                 TextInput::make('update_value')
-                    ->label(__('product_variants.fields.update_value'))
+                    ->label(__('product.variants.fields.update_value'))
                     ->numeric()
                     ->step(0.01)
                     ->required()
-                    ->helperText(__('product_variants.help.update_value')),
+                    ->helperText(__('product.variants.help.update_value')),
                 Toggle::make('apply_to_sale_items')
-                    ->label(__('product_variants.fields.apply_to_sale_items'))
+                    ->label(__('product.variants.fields.apply_to_sale_items'))
                     ->default(true),
                 Toggle::make('update_compare_price')
-                    ->label(__('product_variants.fields.update_compare_price'))
+                    ->label(__('product.variants.fields.update_compare_price'))
                     ->default(false),
                 Select::make('compare_price_action')
-                    ->label(__('product_variants.fields.compare_price_action'))
+                    ->label(__('product.variants.fields.compare_price_action'))
                     ->options([
-                        'no_change'                => __('product_variants.compare_price_actions.no_change'),
-                        'match_new_price'          => __('product_variants.compare_price_actions.match_new_price'),
-                        'increase_by_percentage'   => __('product_variants.compare_price_actions.increase_by_percentage'),
-                        'increase_by_fixed_amount' => __('product_variants.compare_price_actions.increase_by_fixed_amount'),
+                        'no_change'                => __('product.variants.compare_price_actions.no_change'),
+                        'match_new_price'          => __('product.variants.compare_price_actions.match_new_price'),
+                        'increase_by_percentage'   => __('product.variants.compare_price_actions.increase_by_percentage'),
+                        'increase_by_fixed_amount' => __('product.variants.compare_price_actions.increase_by_fixed_amount'),
                     ])
                     ->default('no_change')
                     ->visible(fn (Get $get): bool => (bool) $get('update_compare_price')),
                 TextInput::make('compare_price_value')
-                    ->label(__('product_variants.fields.compare_price_value'))
+                    ->label(__('product.variants.fields.compare_price_value'))
                     ->numeric()
                     ->step(0.01)
                     ->visible(
@@ -83,28 +83,28 @@ final class VariantBulkPriceUpdate extends Action
                             )
                     ),
                 Toggle::make('set_sale_period')
-                    ->label(__('product_variants.fields.set_sale_period'))
+                    ->label(__('product.variants.fields.set_sale_period'))
                     ->default(false),
                 Section::make('sale_period')
-                    ->label(__('product_variants.fields.set_sale_period'))
+                    ->label(__('product.variants.fields.set_sale_period'))
                     ->visible(fn (Get $get): bool => (bool) $get('set_sale_period'))
                     ->schema([
                         self::makeSalePeriodPicker(
                             name: 'sale_start_date',
-                            label: __('product_variants.fields.sale_start_date'),
+                            label: __('product.variants.fields.sale_start_date'),
                             default: fn (): Carbon => now(),
                         ),
                         self::makeSalePeriodPicker(
                             name: 'sale_end_date',
-                            label: __('product_variants.fields.sale_end_date'),
+                            label: __('product.variants.fields.sale_end_date'),
                             default: fn (): Carbon => now()->addDays(30),
                         ),
                     ]),
                 Textarea::make('change_reason')
-                    ->label(__('product_variants.fields.change_reason'))
+                    ->label(__('product.variants.fields.change_reason'))
                     ->maxLength(500)
                     ->rows(3)
-                    ->placeholder(__('product_variants.placeholders.change_reason')),
+                    ->placeholder(__('product.variants.placeholders.change_reason')),
             ])
             ->action(function (array $data, Collection $records): void {
                 DB::transaction(function () use ($data, $records): void {
@@ -202,8 +202,8 @@ final class VariantBulkPriceUpdate extends Action
 
                     // Send notification
                     Notification::make()
-                        ->title(__('product_variants.notifications.bulk_update_success'))
-                        ->body(__('product_variants.notifications.bulk_update_success_body', [
+                        ->title(__('product.variants.notifications.bulk_update_success'))
+                        ->body(__('product.variants.notifications.bulk_update_success_body', [
                             'updated' => $updatedCount,
                             'skipped' => $skippedCount,
                         ]))

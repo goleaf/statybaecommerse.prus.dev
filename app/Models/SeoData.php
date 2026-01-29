@@ -433,8 +433,10 @@ final class SeoData extends Model
     public function getLocaleNameAttribute(): string
     {
         return match ($this->locale) {
-            'lt'    => 'Lietuvių',
-            'en'    => 'English',
+            'lt'    => __('translations.lithuanian'),
+            'en'    => __('translations.english'),
+            'ru'    => __('translations.russian'),
+            'de'    => __('translations.german'),
             default => strtoupper($this->locale),
         };
     }

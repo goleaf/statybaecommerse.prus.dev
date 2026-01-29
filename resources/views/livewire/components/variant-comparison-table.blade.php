@@ -2,7 +2,7 @@
     @if($showComparison && $variantsToCompare->isNotEmpty())
         <div class="mb-6">
             <div class="flex items-center justify-between">
-                <h2 class="text-2xl font-bold text-gray-900">{{ __('product_variants.comparison.title') }}</h2>
+                <h2 class="text-2xl font-bold text-gray-900">{{ __('product.variants.comparison.title') }}</h2>
                 <button
                     wire:click="clearComparison"
                     class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
@@ -10,10 +10,10 @@
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                     </svg>
-                    {{ __('product_variants.comparison.clear_all') }}
+                    {{ __('product.variants.comparison.clear_all') }}
                 </button>
             </div>
-            <p class="text-gray-600 mt-2">{{ __('product_variants.comparison.subtitle', ['count' => $variantsToCompare->count()]) }}</p>
+            <p class="text-gray-600 mt-2">{{ __('product.variants.comparison.subtitle', ['count' => $variantsToCompare->count()]) }}</p>
         </div>
 
         <div class="overflow-x-auto">
@@ -21,7 +21,7 @@
                 <thead class="bg-gray-50">
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            {{ __('product_variants.comparison.variant') }}
+                            {{ __('product.variants.comparison.variant') }}
                         </th>
                         @foreach($variantsToCompare as $variant)
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider relative">
@@ -45,7 +45,7 @@
                     <!-- Price Row -->
                     <tr>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            {{ __('product_variants.fields.price') }}
+                            {{ __('product.variants.fields.price') }}
                         </td>
                         @foreach($variantsToCompare as $variant)
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -69,7 +69,7 @@
                     <!-- Stock Status Row -->
                     <tr>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            {{ __('product_variants.fields.stock_status') }}
+                            {{ __('product.variants.fields.stock_status') }}
                         </td>
                         @foreach($variantsToCompare as $variant)
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -79,7 +79,7 @@
                                     {{ $this->getVariantStockStatus($variant) === 'out_of_stock' ? 'bg-red-100 text-red-800' : '' }}
                                     {{ $this->getVariantStockStatus($variant) === 'not_tracked' ? 'bg-gray-100 text-gray-800' : '' }}
                                 ">
-                                    {{ __('product_variants.stock_status.' . $this->getVariantStockStatus($variant)) }}
+                                    {{ __('product.variants.stock_status.' . $this->getVariantStockStatus($variant)) }}
                                 </span>
                                 <div class="text-xs text-gray-500 mt-1">
                                     {{ $this->getVariantStockMessage($variant) }}
@@ -91,7 +91,7 @@
                     <!-- Weight Row -->
                     <tr>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            {{ __('product_variants.fields.weight') }}
+                            {{ __('product.variants.fields.weight') }}
                         </td>
                         @foreach($variantsToCompare as $variant)
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -103,7 +103,7 @@
                     <!-- Rating Row -->
                     <tr>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            {{ __('product_variants.fields.rating') }}
+                            {{ __('product.variants.fields.rating') }}
                         </td>
                         @foreach($variantsToCompare as $variant)
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -126,7 +126,7 @@
                     <!-- Views and Clicks Row -->
                     <tr>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            {{ __('product_variants.fields.views_count') }}
+                            {{ __('product.variants.fields.views_count') }}
                         </td>
                         @foreach($variantsToCompare as $variant)
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -137,7 +137,7 @@
 
                     <tr>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            {{ __('product_variants.fields.clicks_count') }}
+                            {{ __('product.variants.fields.clicks_count') }}
                         </td>
                         @foreach($variantsToCompare as $variant)
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -148,7 +148,7 @@
 
                     <tr>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            {{ __('product_variants.fields.conversion_rate') }}
+                            {{ __('product.variants.fields.conversion_rate') }}
                         </td>
                         @foreach($variantsToCompare as $variant)
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -160,7 +160,7 @@
                     <!-- Badges Row -->
                     <tr>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            {{ __('product_variants.fields.badges') }}
+                            {{ __('product.variants.fields.badges') }}
                         </td>
                         @foreach($variantsToCompare as $variant)
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -201,7 +201,7 @@
                     <!-- Actions Row -->
                     <tr>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            {{ __('product_variants.actions.actions') }}
+                            {{ __('product.variants.actions.actions') }}
                         </td>
                         @foreach($variantsToCompare as $variant)
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -213,7 +213,7 @@
                                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01"></path>
                                         </svg>
-                                        {{ __('product_variants.actions.add_to_cart') }}
+                                        {{ __('product.variants.actions.add_to_cart') }}
                                     </button>
                                     <button
                                         class="inline-flex items-center px-3 py-2 border border-gray-300 text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
@@ -223,7 +223,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                                         </svg>
-                                        {{ __('product_variants.actions.view_details') }}
+                                        {{ __('product.variants.actions.view_details') }}
                                     </button>
                                 </div>
                             </td>
@@ -237,8 +237,8 @@
             <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
             </svg>
-            <h3 class="mt-2 text-sm font-medium text-gray-900">{{ __('product_variants.comparison.no_variants_selected') }}</h3>
-            <p class="mt-1 text-sm text-gray-500">{{ __('product_variants.comparison.select_variants_to_compare') }}</p>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">{{ __('product.variants.comparison.no_variants_selected') }}</h3>
+            <p class="mt-1 text-sm text-gray-500">{{ __('product.variants.comparison.select_variants_to_compare') }}</p>
         </div>
     @endif
 </div>

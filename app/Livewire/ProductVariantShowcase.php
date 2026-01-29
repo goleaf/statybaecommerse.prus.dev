@@ -263,19 +263,19 @@ final class ProductVariantShowcase extends Component
         $badges = [];
 
         if ($variant->is_new) {
-            $badges[] = ['type' => 'new', 'label' => __('product_variants.badges.new')];
+            $badges[] = ['type' => 'new', 'label' => __('product.variants.badges.new')];
         }
 
         if ($variant->is_featured) {
-            $badges[] = ['type' => 'featured', 'label' => __('product_variants.badges.featured')];
+            $badges[] = ['type' => 'featured', 'label' => __('product.variants.badges.featured')];
         }
 
         if ($variant->is_bestseller) {
-            $badges[] = ['type' => 'bestseller', 'label' => __('product_variants.badges.bestseller')];
+            $badges[] = ['type' => 'bestseller', 'label' => __('product.variants.badges.bestseller')];
         }
 
         if ($variant->isCurrentlyOnSale()) {
-            $badges[] = ['type' => 'sale', 'label' => __('product_variants.badges.sale')];
+            $badges[] = ['type' => 'sale', 'label' => __('product.variants.badges.sale')];
         }
 
         return $badges;

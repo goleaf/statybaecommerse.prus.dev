@@ -37,13 +37,13 @@ final class DashboardQuickActionsWidget extends Widget implements HasActions
     public function rebuildSearchIndexAction(): Action
     {
         return Action::make('rebuildSearchIndex')
-            ->label(trans('admin/dashboard.actions.rebuild_search'))
+            ->label(trans('admin.dashboard.actions.rebuild_search'))
             ->icon('heroicon-m-magnifying-glass-circle')
             ->color('primary')
             ->authorize(fn () => Gate::allows(config('dashboard.permissions.run_actions')))
             ->requiresConfirmation()
-            ->modalHeading(trans('admin/dashboard.actions.rebuild_search_heading'))
-            ->modalDescription(trans('admin/dashboard.actions.rebuild_search_confirm'))
+            ->modalHeading(trans('admin.dashboard.actions.rebuild_search_heading'))
+            ->modalDescription(trans('admin.dashboard.actions.rebuild_search_confirm'))
             ->action(function (): void {
                 RebuildSearchIndexJob::dispatch();
                 Log::info('Dashboard quick action triggered: rebuild search index.');
@@ -53,13 +53,13 @@ final class DashboardQuickActionsWidget extends Widget implements HasActions
     public function clearCacheAction(): Action
     {
         return Action::make('clearCache')
-            ->label(trans('admin/dashboard.actions.clear_cache'))
+            ->label(trans('admin.dashboard.actions.clear_cache'))
             ->icon('heroicon-m-trash')
             ->color('warning')
             ->authorize(fn () => Gate::allows(config('dashboard.permissions.run_actions')))
             ->requiresConfirmation()
-            ->modalHeading(trans('admin/dashboard.actions.clear_cache_heading'))
-            ->modalDescription(trans('admin/dashboard.actions.clear_cache_confirm'))
+            ->modalHeading(trans('admin.dashboard.actions.clear_cache_heading'))
+            ->modalDescription(trans('admin.dashboard.actions.clear_cache_confirm'))
             ->action(function (): void {
                 ClearApplicationCacheJob::dispatch();
                 Log::info('Dashboard quick action triggered: clear cache.');
@@ -69,13 +69,13 @@ final class DashboardQuickActionsWidget extends Widget implements HasActions
     public function runMinimalSeedAction(): Action
     {
         return Action::make('runMinimalSeed')
-            ->label(trans('admin/dashboard.actions.run_minimal_seed'))
+            ->label(trans('admin.dashboard.actions.run_minimal_seed'))
             ->icon('heroicon-m-bolt')
             ->color('success')
             ->authorize(fn () => Gate::allows(config('dashboard.permissions.run_actions')))
             ->requiresConfirmation()
-            ->modalHeading(trans('admin/dashboard.actions.run_minimal_seed_heading'))
-            ->modalDescription(trans('admin/dashboard.actions.run_minimal_seed_confirm'))
+            ->modalHeading(trans('admin.dashboard.actions.run_minimal_seed_heading'))
+            ->modalDescription(trans('admin.dashboard.actions.run_minimal_seed_confirm'))
             ->action(function (): void {
                 RunMinimalSeedJob::dispatch();
                 Log::info('Dashboard quick action triggered: run minimal seed.');

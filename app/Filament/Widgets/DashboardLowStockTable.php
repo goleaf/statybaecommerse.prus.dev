@@ -33,7 +33,7 @@ final class DashboardLowStockTable extends BaseTableWidget
 
     public function getHeading(): ?string
     {
-        return trans('admin/dashboard.tables.low_stock');
+        return trans('admin.dashboard.tables.low_stock');
     }
 
     public function table(Table $table): Table

@@ -28,12 +28,12 @@ final class DashboardTimeSeriesWidget extends ChartWidget
 
     public function getHeading(): string
     {
-        return trans('admin/dashboard.charts.heading');
+        return trans('admin.dashboard.charts.heading');
     }
 
     public function getDescription(): ?string
     {
-        return trans('admin/dashboard.charts.description');
+        return trans('admin.dashboard.charts.description');
     }
 
     protected function getData(): array
@@ -62,7 +62,7 @@ final class DashboardTimeSeriesWidget extends ChartWidget
                     'position' => 'left',
                     'title'    => [
                         'display' => true,
-                        'text'    => trans('admin/dashboard.charts.orders_axis'),
+                        'text'    => trans('admin.dashboard.charts.orders_axis'),
                     ],
                 ],
                 'y1' => [
@@ -71,7 +71,7 @@ final class DashboardTimeSeriesWidget extends ChartWidget
                     'position' => 'right',
                     'title'    => [
                         'display' => true,
-                        'text'    => trans('admin/dashboard.charts.revenue_axis'),
+                        'text'    => trans('admin.dashboard.charts.revenue_axis'),
                     ],
                     'grid' => [
                         'drawOnChartArea' => false,

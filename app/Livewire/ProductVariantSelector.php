@@ -282,19 +282,19 @@ final class ProductVariantSelector extends Component
     public function addToCart(): void
     {
         if (! $this->selectedVariant) {
-            $this->dispatch('show-error', message: __('product_variants.messages.no_variant_selected'));
+            $this->dispatch('show-error', message: __('product.variants.messages.no_variant_selected'));
 
             return;
         }
 
         if (! $this->selectedVariant->isAvailableForPurchase()) {
-            $this->dispatch('show-error', message: __('product_variants.messages.variant_not_available'));
+            $this->dispatch('show-error', message: __('product.variants.messages.variant_not_available'));
 
             return;
         }
 
         if ($this->quantity > $this->selectedVariant->availableQuantity()) {
-            $this->dispatch('show-error', message: __('product_variants.messages.insufficient_stock'));
+            $this->dispatch('show-error', message: __('product.variants.messages.insufficient_stock'));
 
             return;
         }
@@ -310,7 +310,7 @@ final class ProductVariantSelector extends Component
             variantId: (int) $this->selectedVariant->getKey()
         );
 
-        $this->dispatch('show-success', message: __('product_variants.messages.added_to_cart'));
+        $this->dispatch('show-success', message: __('product.variants.messages.added_to_cart'));
     }
 
     public function getVariantPrice(): float
@@ -373,20 +373,20 @@ final class ProductVariantSelector extends Component
     public function getVariantStockMessage(): string
     {
         if (! $this->selectedVariant) {
-            return __('product_variants.messages.select_variant');
+            return __('product.variants.messages.select_variant');
         }
 
         $available = $this->selectedVariant->availableQuantity();
 
         if ($available <= 0) {
-            return __('product_variants.messages.out_of_stock');
+            return __('product.variants.messages.out_of_stock');
         }
 
         if ($available <= $this->selectedVariant->low_stock_threshold) {
-            return __('product_variants.messages.low_stock', ['quantity' => $available]);
+            return __('product.variants.messages.low_stock', ['quantity' => $available]);
         }
 
-        return __('product_variants.messages.in_stock', ['quantity' => $available]);
+        return __('product.variants.messages.in_stock', ['quantity' => $available]);
     }
 
     /**
@@ -447,19 +447,19 @@ final class ProductVariantSelector extends Component
         $badges = [];
 
         if ($this->selectedVariant->is_new) {
-            $badges[] = ['type' => 'new', 'label' => __('product_variants.badges.new')];
+            $badges[] = ['type' => 'new', 'label' => __('product.variants.badges.new')];
         }
 
         if ($this->selectedVariant->is_featured) {
-            $badges[] = ['type' => 'featured', 'label' => __('product_variants.badges.featured')];
+            $badges[] = ['type' => 'featured', 'label' => __('product.variants.badges.featured')];
         }
 
         if ($this->selectedVariant->is_bestseller) {
-            $badges[] = ['type' => 'bestseller', 'label' => __('product_variants.badges.bestseller')];
+            $badges[] = ['type' => 'bestseller', 'label' => __('product.variants.badges.bestseller')];
         }
 
         if ($this->isVariantOnSale()) {
-            $badges[] = ['type' => 'sale', 'label' => __('product_variants.badges.sale')];
+            $badges[] = ['type' => 'sale', 'label' => __('product.variants.badges.sale')];
         }
 
         return $badges;

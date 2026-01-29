@@ -99,15 +99,15 @@
         <div class="absolute top-3 right-3">
             @if ($hasDiscount)
                 <span class="inline-block bg-red-500 text-white px-3 py-1 rounded-full text-xs font-semibold uppercase">
-                    {{ __('frontend/home.products.badges.sale') }}
+                    {{ __('frontend.home.products.badges.sale') }}
                 </span>
             @elseif($cardPreset === 'latest')
                 <span class="inline-block text-white px-3 py-1 rounded-full text-xs font-semibold uppercase" style="background-color: #0ea5e9;">
-                    {{ __('frontend/home.products.badges.new') }}
+                    {{ __('frontend.home.products.badges.new') }}
                 </span>
             @elseif($cardPreset === 'trending')
                 <span class="inline-block bg-amber-500 text-white px-3 py-1 rounded-full text-xs font-semibold uppercase">
-                    {{ __('frontend/home.products.badges.popular') }}
+                    {{ __('frontend.home.products.badges.popular') }}
                 </span>
             @endif
         </div>
@@ -162,7 +162,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01" />
                 </svg>
                 <span>|</span>
-                <span>{{ __('frontend/home.products.actions.add_to_cart') }}</span>
+                <span>{{ __('frontend.home.products.actions.add_to_cart') }}</span>
             </button>
         </div>
 
@@ -170,7 +170,7 @@
         <div class="mt-auto flex items-center justify-between pt-2" style="border-top: 1px solid {{ $borderColor }};">
             {{-- Stock Status (left) --}}
             <span class="text-xs font-medium" style="color: {{ $brandPrimaryLight }} !important; display: inline-block;">
-                {{ $inStock ? __('frontend/home.products.stock.in') : __('frontend/home.products.stock.out') }}
+                {{ $inStock ? __('frontend.home.products.stock.in') : __('frontend.home.products.stock.out') }}
             </span>
 
             {{-- Rating Stars (right) - Always show, even if no reviews --}}

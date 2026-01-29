@@ -11,7 +11,6 @@ use Filament\Forms\Components\TextInput;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -50,8 +49,8 @@ class DocumentsRelationManager extends RelationManager
                 TextColumn::make('format')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'pdf' => 'danger',
-                        'html' => 'info',
+                        'pdf'   => 'danger',
+                        'html'  => 'info',
                         default => 'gray',
                     })
                     ->sortable(),
@@ -60,9 +59,9 @@ class DocumentsRelationManager extends RelationManager
                     ->color(fn (string $state): string => match ($state) {
                         'published' => 'success',
                         'generated' => 'info',
-                        'draft' => 'warning',
-                        'archived' => 'gray',
-                        default => 'gray',
+                        'draft'     => 'warning',
+                        'archived'  => 'gray',
+                        default     => 'gray',
                     })
                     ->sortable(),
                 TextColumn::make('created_at')

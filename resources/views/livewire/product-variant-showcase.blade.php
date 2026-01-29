@@ -1,12 +1,12 @@
 <div class="product-variant-showcase">
     <div class="bg-white shadow-sm rounded-lg p-6 mb-6">
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ __('product_variants.showcase.title') }}</h1>
-        <p class="text-gray-600">{{ __('product_variants.showcase.subtitle') }}</p>
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ __('product.variants.showcase.title') }}</h1>
+        <p class="text-gray-600">{{ __('product.variants.showcase.subtitle') }}</p>
     </div>
 
     <!-- Product Selection -->
     <div class="bg-white shadow-sm rounded-lg p-6 mb-6">
-        <h2 class="text-xl font-semibold text-gray-900 mb-4">{{ __('product_variants.showcase.select_product') }}</h2>
+        <h2 class="text-xl font-semibold text-gray-900 mb-4">{{ __('product.variants.showcase.select_product') }}</h2>
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             @foreach($products as $product)
@@ -21,11 +21,11 @@
                 >
                     <div class="flex items-center justify-between mb-2">
                         <h3 class="font-medium text-gray-900">{{ $loopProductName }}</h3>
-                        <span class="text-sm text-gray-500">{{ $product->variants->count() }} {{ __('product_variants.showcase.variants_count') }}</span>
+                        <span class="text-sm text-gray-500">{{ $product->variants->count() }} {{ __('product.variants.showcase.variants_count') }}</span>
                     </div>
                     
                     @if($loopProductBrand)
-                        <p class="text-sm text-gray-600 mb-2">{{ __('product_variants.showcase.brand') }}: {{ $loopProductBrand }}</p>
+                        <p class="text-sm text-gray-600 mb-2">{{ __('product.variants.showcase.brand') }}: {{ $loopProductBrand }}</p>
                     @endif
                     
                     <p class="text-sm text-gray-500 line-clamp-2">{{ $loopProductDescription }}</p>
@@ -34,7 +34,7 @@
                         <span class="text-lg font-bold text-gray-900">€{{ number_format($product->price, 2) }}</span>
                         @if($product->is_featured)
                             <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                {{ __('product_variants.badges.featured') }}
+                                {{ __('product.variants.badges.featured') }}
                             </span>
                         @endif
                     </div>
@@ -46,7 +46,7 @@
     @if($selectedProduct)
         <!-- Product Stats -->
         <div class="bg-white shadow-sm rounded-lg p-6 mb-6">
-            <h2 class="text-xl font-semibold text-gray-900 mb-4">{{ __('product_variants.showcase.analytics_title') }}</h2>
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">{{ __('product.variants.showcase.analytics_title') }}</h2>
             
             @php
                 $stats = $this->getProductStats();
@@ -58,56 +58,56 @@
             <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
                 <div class="text-center">
                     <div class="text-2xl font-bold text-blue-600">{{ $stats['total_variants'] }}</div>
-                    <div class="text-sm text-gray-600">{{ __('product_variants.showcase.total_variants') }}</div>
+                    <div class="text-sm text-gray-600">{{ __('product.variants.showcase.total_variants') }}</div>
                 </div>
                 
                 <div class="text-center">
                     <div class="text-2xl font-bold text-green-600">{{ $stats['in_stock'] }}</div>
-                    <div class="text-sm text-gray-600">{{ __('product_variants.showcase.in_stock') }}</div>
+                    <div class="text-sm text-gray-600">{{ __('product.variants.showcase.in_stock') }}</div>
                 </div>
                 
                 <div class="text-center">
                     <div class="text-2xl font-bold text-yellow-600">{{ $stats['low_stock'] }}</div>
-                    <div class="text-sm text-gray-600">{{ __('product_variants.showcase.low_stock') }}</div>
+                    <div class="text-sm text-gray-600">{{ __('product.variants.showcase.low_stock') }}</div>
                 </div>
                 
                 <div class="text-center">
                     <div class="text-2xl font-bold text-red-600">{{ $stats['out_of_stock'] }}</div>
-                    <div class="text-sm text-gray-600">{{ __('product_variants.showcase.out_of_stock') }}</div>
+                    <div class="text-sm text-gray-600">{{ __('product.variants.showcase.out_of_stock') }}</div>
                 </div>
                 
                 <div class="text-center">
                     <div class="text-2xl font-bold text-purple-600">{{ $stats['on_sale'] }}</div>
-                    <div class="text-sm text-gray-600">{{ __('product_variants.showcase.on_sale') }}</div>
+                    <div class="text-sm text-gray-600">{{ __('product.variants.showcase.on_sale') }}</div>
                 </div>
                 
                 <div class="text-center">
                     <div class="text-2xl font-bold text-indigo-600">{{ $stats['featured'] }}</div>
-                    <div class="text-sm text-gray-600">{{ __('product_variants.showcase.featured') }}</div>
+                    <div class="text-sm text-gray-600">{{ __('product.variants.showcase.featured') }}</div>
                 </div>
             </div>
             
             <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="text-center">
                     <div class="text-lg font-semibold text-gray-900">€{{ number_format($stats['average_price'], 2) }}</div>
-                    <div class="text-sm text-gray-600">{{ __('product_variants.showcase.average_price') }}</div>
+                    <div class="text-sm text-gray-600">{{ __('product.variants.showcase.average_price') }}</div>
                 </div>
                 
                 <div class="text-center">
                     <div class="text-lg font-semibold text-gray-900">€{{ number_format($stats['highest_price'], 2) }}</div>
-                    <div class="text-sm text-gray-600">{{ __('product_variants.showcase.highest_price') }}</div>
+                    <div class="text-sm text-gray-600">{{ __('product.variants.showcase.highest_price') }}</div>
                 </div>
                 
                 <div class="text-center">
                     <div class="text-lg font-semibold text-gray-900">€{{ number_format($stats['lowest_price'], 2) }}</div>
-                    <div class="text-sm text-gray-600">{{ __('product_variants.showcase.lowest_price') }}</div>
+                    <div class="text-sm text-gray-600">{{ __('product.variants.showcase.lowest_price') }}</div>
                 </div>
             </div>
         </div>
 
         <!-- Variant Selection -->
         <div class="bg-white shadow-sm rounded-lg p-6 mb-6">
-            <h2 class="text-xl font-semibold text-gray-900 mb-4">{{ __('product_variants.showcase.variant_selection') }}</h2>
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">{{ __('product.variants.showcase.variant_selection') }}</h2>
             
             @if($attributes->isNotEmpty())
                 <div class="space-y-4">
@@ -138,7 +138,7 @@
                                     >
                                         {{ $attributeValue->getLocalizedDisplayValue() }}
                                         @if(!$isAvailable)
-                                            <span class="text-xs text-gray-400 ml-1">({{ __('product_variants.messages.out_of_stock') }})</span>
+                                            <span class="text-xs text-gray-400 ml-1">({{ __('product.variants.messages.out_of_stock') }})</span>
                                         @endif
                                     </button>
                                 @endforeach
@@ -152,7 +152,7 @@
         <!-- Selected Variant Details -->
         @if($selectedVariant)
             <div class="bg-white shadow-sm rounded-lg p-6 mb-6">
-                <h2 class="text-xl font-semibold text-gray-900 mb-4">{{ __('product_variants.showcase.selected_variant') }}</h2>
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">{{ __('product.variants.showcase.selected_variant') }}</h2>
                 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div>
@@ -204,13 +204,13 @@
                                 {{ $this->getVariantStockStatus($selectedVariant) === 'out_of_stock' ? 'bg-red-100 text-red-800' : '' }}
                                 {{ $this->getVariantStockStatus($selectedVariant) === 'not_tracked' ? 'bg-gray-100 text-gray-800' : '' }}
                             ">
-                                {{ __('product_variants.stock_status.' . $this->getVariantStockStatus($selectedVariant)) }}
+                                {{ __('product.variants.stock_status.' . $this->getVariantStockStatus($selectedVariant)) }}
                             </span>
                         </div>
                     </div>
                     
                     <div>
-                        <h4 class="text-md font-medium text-gray-900 mb-2">{{ __('product_variants.showcase.variant_attributes') }}</h4>
+                        <h4 class="text-md font-medium text-gray-900 mb-2">{{ __('product.variants.showcase.variant_attributes') }}</h4>
                         <div class="space-y-2">
                             @foreach($this->getVariantAttributes($selectedVariant) as $attributeName => $attributeData)
                                 <div class="flex justify-between">
@@ -228,7 +228,7 @@
                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
                                 </svg>
-                                {{ __('product_variants.actions.add_to_comparison') }}
+                                {{ __('product.variants.actions.add_to_comparison') }}
                             </button>
                         </div>
                     </div>
@@ -238,7 +238,7 @@
 
         <!-- All Variants Grid -->
         <div class="bg-white shadow-sm rounded-lg p-6 mb-6">
-            <h2 class="text-xl font-semibold text-gray-900 mb-4">{{ __('product_variants.showcase.all_variants') }}</h2>
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">{{ __('product.variants.showcase.all_variants') }}</h2>
             
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 @foreach($productVariants as $variant)
@@ -274,7 +274,7 @@
                                 {{ $this->getVariantStockStatus($variant) === 'out_of_stock' ? 'bg-red-100 text-red-800' : '' }}
                                 {{ $this->getVariantStockStatus($variant) === 'not_tracked' ? 'bg-gray-100 text-gray-800' : '' }}
                             ">
-                                {{ __('product_variants.stock_status.' . $this->getVariantStockStatus($variant)) }}
+                                {{ __('product.variants.stock_status.' . $this->getVariantStockStatus($variant)) }}
                             </span>
                         </div>
                     </div>
@@ -286,12 +286,12 @@
         @if($showComparison && !empty($comparisonVariants))
             <div class="bg-white shadow-sm rounded-lg p-6">
                 <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-xl font-semibold text-gray-900">{{ __('product_variants.comparison.title') }}</h2>
+                    <h2 class="text-xl font-semibold text-gray-900">{{ __('product.variants.comparison.title') }}</h2>
                     <button
                         wire:click="clearComparison"
                         class="text-sm text-gray-500 hover:text-gray-700"
                     >
-                        {{ __('product_variants.comparison.clear_all') }}
+                        {{ __('product.variants.comparison.clear_all') }}
                     </button>
                 </div>
                 

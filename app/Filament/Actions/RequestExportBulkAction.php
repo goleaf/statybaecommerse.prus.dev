@@ -51,7 +51,7 @@ final class RequestExportBulkAction
                     ->helperText(__('Select which columns should be included in the export. Leave empty for defaults.')),
                 KeyValue::make('filters')
                     ->label(__('Filters'))
-                    ->helperText(__('Provide optional key/value filters, e.g. status => paid or created_from => 2024-01-01.'))
+                    ->helperText(__('messages.export_filters_help'))
                     ->keyLabel(__('Field'))
                     ->valueLabel(__('messages.Value')),
             ])

@@ -48,7 +48,7 @@
                     >
                         {{ $attributeValue->getLocalizedDisplayValue() }}
                         @if(!$isAvailable)
-                            <span class="text-xs text-gray-400 ml-1">({{ __('product_variants.messages.out_of_stock') }})</span>
+                            <span class="text-xs text-gray-400 ml-1">({{ __('product.variants.messages.out_of_stock') }})</span>
                         @endif
                     </button>
                 @endforeach
@@ -81,7 +81,7 @@
                     
                     @if($this->getVariantPromotionalPrice())
                         <p class="text-sm text-green-600 mt-1">
-                            {{ __('product_variants.price_types.promotional') }}: €{{ number_format($this->getVariantPromotionalPrice(), 2) }}
+                            {{ __('product.variants.price_types.promotional') }}: €{{ number_format($this->getVariantPromotionalPrice(), 2) }}
                         </p>
                     @endif
                 </div>
@@ -97,7 +97,7 @@
     @if($selectedVariant)
         <div class="mb-6">
             <label class="block text-sm font-medium text-gray-700 mb-2">
-                {{ __('product_variants.fields.quantity') }}:
+                {{ __('product.variants.fields.quantity') }}:
             </label>
             
             <div class="flex items-center space-x-4">
@@ -126,7 +126,7 @@
                 </div>
                 
                 <div class="text-sm text-gray-500">
-                    {{ __('product_variants.messages.max_quantity') }}: {{ $selectedVariant->available_quantity }}
+                    {{ __('product.variants.messages.max_quantity') }}: {{ $selectedVariant->available_quantity }}
                 </div>
             </div>
         </div>
@@ -141,7 +141,7 @@
                 <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01"></path>
                 </svg>
-                {{ __('product_variants.actions.add_to_cart') }}
+                {{ __('product.variants.actions.add_to_cart') }}
             </button>
             
             <button
@@ -151,12 +151,12 @@
                 <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
                 </svg>
-                {{ __('product_variants.actions.compare') }}
+                {{ __('product.variants.actions.compare') }}
             </button>
         </div>
     @else
         <div class="text-center py-8">
-            <p class="text-gray-500">{{ __('product_variants.messages.select_variant') }}</p>
+            <p class="text-gray-500">{{ __('product.variants.messages.select_variant') }}</p>
         </div>
     @endif
 
@@ -164,12 +164,12 @@
     @if($showComparison && !empty($comparisonVariants))
         <div class="mt-8 border-t pt-6">
             <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-medium text-gray-900">{{ __('product_variants.comparison.title') }}</h3>
+                <h3 class="text-lg font-medium text-gray-900">{{ __('product.variants.comparison.title') }}</h3>
                 <button
                     wire:click="clearComparison"
                     class="text-sm text-gray-500 hover:text-gray-700"
                 >
-                    {{ __('product_variants.comparison.clear_all') }}
+                    {{ __('product.variants.comparison.clear_all') }}
                 </button>
             </div>
             

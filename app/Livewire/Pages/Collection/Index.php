@@ -36,6 +36,6 @@ class Index extends Component
 
         return view('livewire.pages.collection.index', [
             'collections' => $collections,
-        ])->title(__('frontend/collections.meta.title'));
+        ])->title(__('frontend.collections.meta.title'));
     }
 }

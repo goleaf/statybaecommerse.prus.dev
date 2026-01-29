@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Contracts\HasDocuments;
 use App\Enums\OrderPaymentState;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
+use App\Models\Concerns\InteractsWithDocuments;
 use App\Models\Scopes\StatusScope;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
@@ -19,7 +21,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Carbon;
@@ -53,9 +54,9 @@ use ValueError;
  * @mixin \Eloquent
  */
 #[ScopedBy([StatusScope::class])]
-final class Order extends Model
+final class Order extends Model implements HasDocuments
 {
-    use HasFactory, HasTranslations, SoftDeletes;
+    use HasFactory, HasTranslations, InteractsWithDocuments, SoftDeletes;
 
     public array $translatable = ['notes', 'billing_address', 'shipping_address'];
 
@@ -239,14 +240,6 @@ final class Order extends Model
     public function partner(): BelongsTo
     {
         return $this->belongsTo(Partner::class);
-    }
-
-    /**
-     * Handle documents functionality with proper error handling.
-     */
-    public function documents(): MorphMany
-    {
-        return $this->morphMany(Document::class, 'documentable');
     }
 
     /**
@@ -481,6 +474,52 @@ final class Order extends Model
     public function getFormattedTotalAttribute(): string
     {
         return number_format((float) $this->total, 2) . ' ' . $this->currency;
+    }
+
+    /**
+     * Get variables available for document generation.
+     *
+     * @return array<string, mixed>
+     */
+    public function getDocumentVariables(): array
+    {
+        $variables = [];
+
+        // Add basic attributes with prefix
+        $attributes = $this->getAttributes();
+        foreach ($attributes as $key => $value) {
+            if (! is_null($value) && is_scalar($value)) {
+                $variables['$' . strtoupper($key)] = $value;
+            }
+        }
+
+        // Add standardized variables
+        $variables['$ORDER_NUMBER'] = $this->number ?? $this->id;
+        $variables['$ORDER_TOTAL'] = number_format((float) ($this->total ?? 0), 2);
+
+        if ($this->user) {
+            $variables['$CUSTOMER_NAME'] = $this->user->name ?? '';
+            $variables['$CUSTOMER_EMAIL'] = $this->user->email ?? '';
+        }
+
+        // Add address variables if available
+        if (is_array($this->billing_address)) {
+            foreach ($this->billing_address as $key => $value) {
+                if (is_scalar($value)) {
+                    $variables['$BILLING_' . strtoupper($key)] = $value;
+                }
+            }
+        }
+
+        if (is_array($this->shipping_address)) {
+            foreach ($this->shipping_address as $key => $value) {
+                if (is_scalar($value)) {
+                    $variables['$SHIPPING_' . strtoupper($key)] = $value;
+                }
+            }
+        }
+
+        return $variables;
     }
 
     /**

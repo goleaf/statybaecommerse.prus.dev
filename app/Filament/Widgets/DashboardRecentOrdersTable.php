@@ -32,7 +32,7 @@ final class DashboardRecentOrdersTable extends BaseTableWidget
 
     public function getHeading(): ?string
     {
-        return trans('admin/dashboard.tables.recent_orders');
+        return trans('admin.dashboard.tables.recent_orders');
     }
 
     public function table(Table $table): Table
@@ -49,10 +49,10 @@ final class DashboardRecentOrdersTable extends BaseTableWidget
                     ->label(trans('orders.status'))
                     ->badge()
                     ->sortable()
-                    ->formatStateUsing(fn (?string $state) => $state ? trans("orders.statuses.$state") : trans('admin/dashboard.tables.status_unknown')),
+                    ->formatStateUsing(fn (?string $state) => $state ? trans("orders.statuses.$state") : trans('admin.dashboard.tables.status_unknown')),
                 TextColumn::make('user.name')
                     ->label(trans('orders.customer'))
-                    ->description(fn ($record) => $record?->user?->email ?? trans('admin/dashboard.tables.guest_customer'))
+                    ->description(fn ($record) => $record?->user?->email ?? trans('admin.dashboard.tables.guest_customer'))
                     ->url(fn ($record) => $record?->user ? route('filament.admin.resources.users.view', $record->user) : null)
                     ->openUrlInNewTab()
                     ->limit(20)

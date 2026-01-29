@@ -186,26 +186,26 @@ final class NotificationService
     private function getOrderMessage(string $action, array $orderData): string
     {
         return match ($action) {
-            'created'   => "Naujas užsakymas #{$orderData['number']} buvo sukurtas.",
-            'updated'   => "Užsakymas #{$orderData['number']} buvo atnaujintas.",
-            'cancelled' => "Užsakymas #{$orderData['number']} buvo atšauktas.",
-            'completed' => "Užsakymas #{$orderData['number']} buvo užbaigtas.",
-            'shipped'   => "Užsakymas #{$orderData['number']} buvo išsiųstas.",
-            'delivered' => "Užsakymas #{$orderData['number']} buvo pristatytas.",
-            default     => "Užsakymas #{$orderData['number']} buvo {$action}.",
+            'created'   => __('messages.order_status_created', ['number' => $orderData['number'] ?? '']),
+            'updated'   => __('messages.order_status_updated', ['number' => $orderData['number'] ?? '']),
+            'cancelled' => __('messages.order_status_cancelled', ['number' => $orderData['number'] ?? '']),
+            'completed' => __('messages.order_status_completed', ['number' => $orderData['number'] ?? '']),
+            'shipped'   => __('messages.order_status_shipped', ['number' => $orderData['number'] ?? '']),
+            'delivered' => __('messages.order_status_delivered', ['number' => $orderData['number'] ?? '']),
+            default     => __('messages.order_status_default', ['number' => $orderData['number'] ?? '', 'status' => $action]),
         };
     }
 
     private function getProductMessage(string $action, array $productData): string
     {
         return match ($action) {
-            'created'       => "Naujas produktas '{$productData['name']}' buvo sukurtas.",
-            'updated'       => "Produktas '{$productData['name']}' buvo atnaujintas.",
-            'deleted'       => "Produktas '{$productData['name']}' buvo ištrintas.",
-            'low_stock'     => "Produktas '{$productData['name']}' turi mažai atsargų.",
-            'out_of_stock'  => "Produktas '{$productData['name']}' baigėsi atsargos.",
-            'back_in_stock' => "Produktas '{$productData['name']}' atsikūrė atsargos.",
-            default         => "Produktas '{$productData['name']}' buvo {$action}.",
+            'created'       => __('messages.product_status_created', ['name' => $productData['name'] ?? '']),
+            'updated'       => __('messages.product_status_updated', ['name' => $productData['name'] ?? '']),
+            'deleted'       => __('messages.product_status_deleted', ['name' => $productData['name'] ?? '']),
+            'low_stock'     => __('messages.product_status_low_stock', ['name' => $productData['name'] ?? '']),
+            'out_of_stock'  => __('messages.product_status_out_of_stock', ['name' => $productData['name'] ?? '']),
+            'back_in_stock' => __('messages.product_status_back_in_stock', ['name' => $productData['name'] ?? '']),
+            default         => __('messages.product_status_default', ['name' => $productData['name'] ?? '', 'status' => $action]),
         };
     }
 

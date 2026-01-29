@@ -6,11 +6,9 @@ namespace Tests\Feature;
 
 use App\Filament\Resources\OrderResource\RelationManagers\DocumentsRelationManager;
 use App\Models\Document;
-use App\Models\DocumentTemplate;
 use App\Models\Order;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
@@ -20,6 +18,7 @@ final class OrderDocumentsRelationManagerTest extends TestCase
     use RefreshDatabase;
 
     private User $user;
+
     private Order $order;
 
     protected function setUp(): void
@@ -39,7 +38,7 @@ final class OrderDocumentsRelationManagerTest extends TestCase
             'ownerRecord' => $this->order,
             'pageClass'   => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
         ])
-        ->assertSuccessful();
+            ->assertSuccessful();
     }
 
     #[Test]
@@ -57,8 +56,8 @@ final class OrderDocumentsRelationManagerTest extends TestCase
             'ownerRecord' => $this->order,
             'pageClass'   => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
         ])
-        ->assertCanSeeTableRecords([$document])
-        ->assertSee('Test Invoice');
+            ->assertCanSeeTableRecords([$document])
+            ->assertSee('Test Invoice');
     }
 
     #[Test]
@@ -77,8 +76,8 @@ final class OrderDocumentsRelationManagerTest extends TestCase
             'ownerRecord' => $this->order,
             'pageClass'   => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
         ])
-        ->assertTableActionExists('view')
-        ->assertTableActionVisible('view', $document);
+            ->assertTableActionExists('view')
+            ->assertTableActionVisible('view', $document);
     }
 
     #[Test]
@@ -98,8 +97,8 @@ final class OrderDocumentsRelationManagerTest extends TestCase
             'ownerRecord' => $this->order,
             'pageClass'   => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
         ])
-        ->assertTableActionExists('download')
-        ->assertTableActionVisible('download', $document);
+            ->assertTableActionExists('download')
+            ->assertTableActionVisible('download', $document);
     }
 
     #[Test]
@@ -119,6 +118,6 @@ final class OrderDocumentsRelationManagerTest extends TestCase
             'ownerRecord' => $this->order,
             'pageClass'   => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
         ])
-        ->assertTableActionHidden('download', $document);
+            ->assertTableActionHidden('download', $document);
     }
 }

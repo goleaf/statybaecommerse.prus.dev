@@ -77,7 +77,7 @@ class SimplifiedStatsWidget extends BaseWidget
                 ->color('info'),
 
             // === PRODUCT ECOSYSTEM ===
-            Stat::make(__('translations.total_products'), \Illuminate\Support\Number::format($totalProducts)) // Viso produktų
+            Stat::make(__('translations.total_products'), \Illuminate\Support\Number::format($totalProducts))
                 ->description(__('translations.active_products') . ': ' . \Illuminate\Support\Number::format($activeProducts))
                 ->descriptionIcon('heroicon-m-cube')
                 ->color('primary'),

@@ -127,7 +127,7 @@
             <!-- Contact Section -->
             <div class="mt-16 bg-blue-50 rounded-lg p-8 text-center">
                 <h3 class="text-xl font-semibold text-gray-900 mb-2">
-                    Turite klausimų apie teisinius dokumentus?
+                    {{ __('frontend.legal.questions_heading') }}
                 </h3>
                 <p class="text-gray-600 mb-4">
                     {{ __('messages.frontend_legal') }}

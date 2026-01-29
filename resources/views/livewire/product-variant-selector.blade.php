@@ -59,7 +59,7 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
-                    <span class="text-sm text-gray-600">{{ __('product_variants.fields.price') }}:</span>
+                    <span class="text-sm text-gray-600">{{ __('product.variants.fields.price') }}:</span>
                     <div class="flex items-center gap-2">
                         <span class="text-xl font-bold text-gray-900">
                             €{{ number_format($this->getVariantPrice(), 2) }}
@@ -80,7 +80,7 @@
                 </div>
 
                 <div>
-                    <span class="text-sm text-gray-600">{{ __('product_variants.fields.stock_status') }}:</span>
+                    <span class="text-sm text-gray-600">{{ __('product.variants.fields.stock_status') }}:</span>
                     <span class="ml-2 text-sm font-medium
                         {{ $this->getVariantStockStatus() === 'in_stock' ? 'text-green-600' : '' }}
                         {{ $this->getVariantStockStatus() === 'low_stock' ? 'text-yellow-600' : '' }}
@@ -94,21 +94,21 @@
             {{-- Localized Description --}}
             @if($this->getVariantLocalizedDescription())
                 <div class="mb-4">
-                    <span class="text-sm text-gray-600">{{ __('product_variants.fields.description') }}:</span>
+                    <span class="text-sm text-gray-600">{{ __('product.variants.fields.description') }}:</span>
                     <p class="mt-1 text-sm text-gray-700">{{ $this->getVariantLocalizedDescription() }}</p>
                 </div>
             @endif
 
             @if($selectedVariant->size_display_name)
                 <div class="mb-4">
-                    <span class="text-sm text-gray-600">{{ __('product_variants.fields.size') }}:</span>
+                    <span class="text-sm text-gray-600">{{ __('product.variants.fields.size') }}:</span>
                     <span class="ml-2 font-medium">{{ $selectedVariant->size_display_name }}</span>
                 </div>
             @endif
 
             @if($selectedVariant->weight)
                 <div class="mb-4">
-                    <span class="text-sm text-gray-600">{{ __('product_variants.fields.weight') }}:</span>
+                    <span class="text-sm text-gray-600">{{ __('product.variants.fields.weight') }}:</span>
                     <span class="ml-2 font-medium">{{ number_format($selectedVariant->getFinalWeight(), 2) }} {{ __('messages.kg') }}</span>
                 </div>
             @endif
@@ -117,7 +117,7 @@
         <div class="add-to-cart-section">
             <div class="quantity-selector flex items-center gap-4 mb-4">
                 <label class="text-sm font-medium text-gray-700">
-                    {{ __('product_variants.fields.quantity') }}:
+                    {{ __('product.variants.fields.quantity') }}:
                 </label>
                 
                 <div class="flex items-center border border-gray-300 rounded-lg">
@@ -164,9 +164,9 @@
                     <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01"></path>
                     </svg>
-                    {{ __('product_variants.actions.add_to_cart') }}
+                    {{ __('product.variants.actions.add_to_cart') }}
                 @else
-                    {{ __('product_variants.messages.not_available') }}
+                    {{ __('product.variants.messages.not_available') }}
                 @endif
             </button>
         </div>
@@ -177,13 +177,13 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
                 </svg>
             </div>
-            <p class="text-gray-600">{{ __('product_variants.messages.select_variant') }}</p>
+            <p class="text-gray-600">{{ __('product.variants.messages.select_variant') }}</p>
         </div>
     @endif
 
     @if($selectedVariant && $selectedVariant->images->isNotEmpty())
         <div class="variant-images mt-6">
-            <h4 class="text-sm font-medium text-gray-700 mb-3">{{ __('product_variants.fields.images') }}</h4>
+            <h4 class="text-sm font-medium text-gray-700 mb-3">{{ __('product.variants.fields.images') }}</h4>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
                 @foreach($selectedVariant->images->take(4) as $image)
                     <div class="aspect-square bg-gray-100 rounded-lg overflow-hidden">

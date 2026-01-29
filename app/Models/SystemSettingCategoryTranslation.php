@@ -137,11 +137,11 @@ final class SystemSettingCategoryTranslation extends Model
     public static function getAvailableLocales(): array
     {
         return [
-            'lt' => 'Lietuvių',
-            'en' => 'English',
-            'de' => 'Deutsch',
-            'fr' => 'Français',
-            'es' => 'Español',
+            'lt' => __('translations.lithuanian'),
+            'en' => __('translations.english'),
+            'de' => __('translations.german'),
+            'fr' => __('translations.french'),
+            'es' => __('translations.spanish'),
         ];
     }
 

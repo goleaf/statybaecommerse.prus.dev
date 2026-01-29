@@ -72,10 +72,10 @@ class UserForm
                         Select::make('preferred_locale')
                             ->label(__('messages.language'))
                             ->options([
-                                'en' => 'English',
-                                'lt' => 'Lietuvių',
-                                'ru' => 'Русский',
-                                'de' => 'Deutsch',
+                                'en' => __('translations.english'),
+                                'lt' => __('translations.lithuanian'),
+                                'ru' => __('translations.russian'),
+                                'de' => __('translations.german'),
                             ])
                             ->default('lt'),
                     ])->columns(3),

@@ -34,36 +34,36 @@ final class VariantPriceWidget extends BaseWidget
         ];
 
         return [
-            Stat::make(__('product_variants.stats.average_price'), '€' . number_format($averagePrice, 2))
-                ->description(__('product_variants.stats.all_variants'))
+            Stat::make(__('product.variants.stats.average_price'), '€' . number_format($averagePrice, 2))
+                ->description(__('product.variants.stats.all_variants'))
                 ->descriptionIcon('heroicon-m-calculator')
                 ->color('info'),
-            Stat::make(__('product_variants.stats.highest_price'), '€' . number_format($highestPrice, 2))
-                ->description(__('product_variants.stats.most_expensive'))
+            Stat::make(__('product.variants.stats.highest_price'), '€' . number_format($highestPrice, 2))
+                ->description(__('product.variants.stats.most_expensive'))
                 ->descriptionIcon('heroicon-m-arrow-trending-up')
                 ->color('success'),
-            Stat::make(__('product_variants.stats.lowest_price'), '€' . number_format($lowestPrice, 2))
-                ->description(__('product_variants.stats.most_affordable'))
+            Stat::make(__('product.variants.stats.lowest_price'), '€' . number_format($lowestPrice, 2))
+                ->description(__('product.variants.stats.most_affordable'))
                 ->descriptionIcon('heroicon-m-arrow-trending-down')
                 ->color('warning'),
-            Stat::make(__('product_variants.stats.on_sale'), $onSaleCount)
-                ->description(__('product_variants.stats.discounted_variants'))
+            Stat::make(__('product.variants.stats.on_sale'), $onSaleCount)
+                ->description(__('product.variants.stats.discounted_variants'))
                 ->descriptionIcon('heroicon-m-tag')
                 ->color('danger'),
-            Stat::make(__('product_variants.stats.average_discount'), number_format($averageDiscount, 1) . '%')
-                ->description(__('product_variants.stats.sale_discount'))
+            Stat::make(__('product.variants.stats.average_discount'), number_format($averageDiscount, 1) . '%')
+                ->description(__('product.variants.stats.sale_discount'))
                 ->descriptionIcon('heroicon-m-percent')
                 ->color('success'),
-            Stat::make(__('product_variants.stats.total_revenue'), '€' . number_format($totalRevenue, 2))
-                ->description(__('product_variants.stats.from_sales'))
+            Stat::make(__('product.variants.stats.total_revenue'), '€' . number_format($totalRevenue, 2))
+                ->description(__('product.variants.stats.from_sales'))
                 ->descriptionIcon('heroicon-m-currency-euro')
                 ->color('primary'),
-            Stat::make(__('product_variants.stats.price_range_under_50'), $priceRanges['under_50'])
-                ->description(__('product_variants.stats.under_50_euros'))
+            Stat::make(__('product.variants.stats.price_range_under_50'), $priceRanges['under_50'])
+                ->description(__('product.variants.stats.under_50_euros'))
                 ->descriptionIcon('heroicon-m-currency-euro')
                 ->color('info'),
-            Stat::make(__('product_variants.stats.price_range_50_100'), $priceRanges['50_100'])
-                ->description(__('product_variants.stats.between_50_100_euros'))
+            Stat::make(__('product.variants.stats.price_range_50_100'), $priceRanges['50_100'])
+                ->description(__('product.variants.stats.between_50_100_euros'))
                 ->descriptionIcon('heroicon-m-currency-euro')
                 ->color('success'),
         ];

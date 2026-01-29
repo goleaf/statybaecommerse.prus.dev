@@ -172,7 +172,6 @@ final class SingleProduct extends Component
         'available' => null,
     ];
 
-
     /**
      * Initialize the Livewire component with parameters.
      */
@@ -216,7 +215,6 @@ final class SingleProduct extends Component
             },
             $productTags
         );
-
 
         $this->trackProductView();
         $this->trackProductViewHistory();
@@ -628,7 +626,6 @@ final class SingleProduct extends Component
             ->values();
     }
 
-
     #[On('variant.selected')]
     public function handleVariantSelected(?int $variantId): void
     {
@@ -795,27 +792,27 @@ final class SingleProduct extends Component
 
             if ($available <= 0) {
                 $this->stockStatus = 'out_of_stock';
-                $this->stockMessage = __('product_variants.messages.out_of_stock');
+                $this->stockMessage = __('product.variants.messages.out_of_stock');
 
                 return;
             }
 
             if ($threshold > 0 && $available <= $threshold) {
                 $this->stockStatus = 'low_stock';
-                $this->stockMessage = __('product_variants.messages.low_stock', ['quantity' => $available]);
+                $this->stockMessage = __('product.variants.messages.low_stock', ['quantity' => $available]);
 
                 return;
             }
 
             $this->stockStatus = 'in_stock';
-            $this->stockMessage = __('product_variants.messages.in_stock', ['quantity' => $available]);
+            $this->stockMessage = __('product.variants.messages.in_stock', ['quantity' => $available]);
 
             return;
         }
 
         if ($this->product->relationLoaded('variants') && $this->product->variants->isNotEmpty()) {
             $this->stockStatus = 'unavailable';
-            $this->stockMessage = __('product_variants.messages.select_variant');
+            $this->stockMessage = __('product.variants.messages.select_variant');
 
             return;
         }
@@ -846,10 +843,10 @@ final class SingleProduct extends Component
         $threshold = (int) ($this->product->low_stock_threshold ?? 0);
 
         if ($threshold > 0 && $this->product->isLowStock()) {
-            return __('product_variants.messages.low_stock', ['quantity' => $available]);
+            return __('product.variants.messages.low_stock', ['quantity' => $available]);
         }
 
-        return __('product_variants.messages.in_stock', ['quantity' => $available]);
+        return __('product.variants.messages.in_stock', ['quantity' => $available]);
     }
 
     #[Computed]
