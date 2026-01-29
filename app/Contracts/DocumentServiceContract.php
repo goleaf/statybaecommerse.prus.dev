@@ -19,4 +19,9 @@ interface DocumentServiceContract
     public function generateDocument(DocumentTemplate $template, Model $relatedModel, array $variables = [], ?string $title = null, bool $sendNotification = false): Document;
 
     public function generatePdf(Document $document): string;
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function extractVariablesFromModel(Model $model, string $prefix = ''): array;
 }

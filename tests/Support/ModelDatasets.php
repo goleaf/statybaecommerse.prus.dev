@@ -136,12 +136,13 @@ dataset('model_relation_matrix', function (): array {
         [CouponUsage::class, 'order', BelongsTo::class],
 
         [EmailCampaign::class, 'creator', BelongsTo::class],
-        [EmailCampaign::class, 'template', BelongsTo::class],
         [EmailCampaign::class, 'recipients', HasMany::class],
 
         [EmailCampaignRecipient::class, 'campaign', BelongsTo::class],
         [EmailCampaignRecipient::class, 'user', BelongsTo::class],
         [EmailCampaignRecipient::class, 'subscriber', BelongsTo::class],
+
+        [User::class, 'subscriber', HasOne::class],
 
         [Referral::class, 'referrer', BelongsTo::class],
         [Referral::class, 'referred', BelongsTo::class],

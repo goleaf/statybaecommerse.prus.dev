@@ -58,10 +58,15 @@ final class DocumentAction
                         ->active()
                         ->findOrFail($data['template_id']);
 
+                    $variables = array_merge(
+                        self::getDefaultVariables($record),
+                        $documentService->extractVariablesFromModel($record)
+                    );
+
                     $document = $documentService->generateDocument(
                         template: $template,
                         relatedModel: $record,
-                        variables: self::getDefaultVariables($record),
+                        variables: $variables,
                         title: $data['title']
                     );
 

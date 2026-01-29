@@ -8,6 +8,7 @@ use App\Enums\NavigationGroup;
 use App\Filament\Resources\Sliders\Pages\CreateSlider;
 use App\Filament\Resources\Sliders\Pages\EditSlider;
 use App\Filament\Resources\Sliders\Pages\ListSliders;
+use App\Filament\Resources\Sliders\RelationManagers;
 use App\Filament\Resources\Sliders\Schemas\SliderForm;
 use App\Filament\Resources\Sliders\Tables\SlidersTable;
 use App\Models\Slider;
@@ -53,7 +54,7 @@ class SliderResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\TranslationsRelationManager::class,
         ];
     }
 

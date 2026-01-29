@@ -111,6 +111,7 @@ final class DocumentActionTest extends TestCase
                 expect($title)->toBe($data['title']);
                 expect($variables['CREATED_AT'])->toBe($record->created_at?->format('d/m/Y H:i'));
                 expect($variables['UPDATED_AT'])->toBe($record->updated_at?->format('d/m/Y H:i'));
+                expect($variables['MOCKED_VAR'])->toBe('value');
             }
         );
 
@@ -192,6 +193,11 @@ final class DocumentActionTest extends TestCase
                 }
 
                 return ($this->pdfHandler)($document);
+            }
+
+            public function extractVariablesFromModel(\Illuminate\Database\Eloquent\Model $model, string $prefix = ''): array
+            {
+                return ['MOCKED_VAR' => 'value'];
             }
         };
     }

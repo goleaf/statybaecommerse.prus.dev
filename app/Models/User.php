@@ -685,6 +685,14 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     }
 
     /**
+     * Handle subscriber functionality with proper error handling.
+     */
+    public function subscriber(): HasOne
+    {
+        return $this->hasOne(Subscriber::class);
+    }
+
+    /**
      * Handle files functionality with proper error handling.
      */
     public function files(): MorphMany
