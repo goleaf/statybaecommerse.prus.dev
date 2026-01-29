@@ -56,6 +56,9 @@ class UserResource extends Resource
             RelationManagers\AddressesRelationManager::class,
             RelationManagers\CustomerGroupsRelationManager::class,
             RelationManagers\PartnersRelationManager::class,
+            RelationManagers\ReferralCodesRelationManager::class,
+            RelationManagers\DocumentsRelationManager::class,
+            RelationManagers\ReferralsRelationManager::class,
         ];
     }
 
