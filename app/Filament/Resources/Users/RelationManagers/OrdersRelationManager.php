@@ -39,16 +39,19 @@ class OrdersRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
-            ->recordTitleAttribute('id')
+            ->recordTitleAttribute('number')
             ->columns([
-                TextColumn::make('id')
+                TextColumn::make('number')
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('status')
                     ->badge()
                     ->sortable(),
+                TextColumn::make('payment_status')
+                    ->badge()
+                    ->sortable(),
                 TextColumn::make('total')
-                    ->money()
+                    ->money(fn ($record) => $record->currency ?? 'EUR')
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime()
