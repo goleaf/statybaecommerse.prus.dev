@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProductFeatureResource\Pages as FeaturePages;
+use App\Filament\Resources\ProductFeatureResource\Schemas\ProductFeatureForm;
+use App\Filament\Resources\ProductFeatureResource\Schemas\ProductFeatureInfolist;
 use App\Models\ProductFeature;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
+use Filament\Actions\ViewAction;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
@@ -31,27 +31,12 @@ final class ProductFeatureResource extends BaseResource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Select::make('product_id')
-                    ->relationship('product', 'name')
-                    ->searchable()
-                    ->required(),
-                TextInput::make('feature_type')
-                    ->required()
-                    ->maxLength(255),
-                TextInput::make('feature_key')
-                    ->required()
-                    ->maxLength(255),
-                TextInput::make('feature_value')
-                    ->required()
-                    ->maxLength(255),
-                TextInput::make('weight')
-                    ->numeric()
-                    ->default(0),
-                Toggle::make('is_active')
-                    ->default(true),
-            ]);
+        return ProductFeatureForm::configure($schema);
+    }
+
+    public static function infolist(Schema $schema): Schema
+    {
+        return ProductFeatureInfolist::configure($schema);
     }
 
     public static function table(Table $table): Table
@@ -81,6 +66,7 @@ final class ProductFeatureResource extends BaseResource
                     ->options(fn () => ProductFeature::distinct()->pluck('feature_type', 'feature_type')->toArray()),
             ])
             ->actions([
+                ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make(),
             ])
@@ -96,6 +82,7 @@ final class ProductFeatureResource extends BaseResource
         return [
             'index'  => FeaturePages\ListProductFeatures::route('/'),
             'create' => FeaturePages\CreateProductFeature::route('/create'),
+            'view'   => FeaturePages\ViewProductFeature::route('/{record}'),
             'edit'   => FeaturePages\EditProductFeature::route('/{record}/edit'),
         ];
     }

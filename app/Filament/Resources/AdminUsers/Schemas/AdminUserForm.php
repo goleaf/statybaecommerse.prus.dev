@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\AdminUsers\Schemas;
 
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -34,6 +35,14 @@ class AdminUserForm
                             ->dehydrated(fn ($state) => filled($state))
                             ->required(fn (string $context): bool => $context === 'create'),
                     ])->columns(2),
+
+                Section::make(__('messages.additional_information'))
+                    ->schema([
+                        Textarea::make('admin_notes')
+                            ->label(__('messages.notes'))
+                            ->rows(3)
+                            ->columnSpanFull(),
+                    ]),
             ]);
     }
 }

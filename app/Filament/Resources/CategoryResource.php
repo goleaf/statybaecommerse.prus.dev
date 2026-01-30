@@ -5,15 +5,11 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\CategoryResource\Pages;
+use App\Filament\Resources\CategoryResource\Schemas\CategoryForm;
+use App\Filament\Resources\CategoryResource\Schemas\CategoryInfolist;
 use App\Models\Category;
 use App\Support\Concerns\HasNav;
 use BackedEnum;
-use Filament\Forms\Components\RichEditor;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Components\Grid as SchemaGrid;
-use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
@@ -54,38 +50,12 @@ final class CategoryResource extends BaseResource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
-            SchemaSection::make(__('admin.categories.basic_information'))
-                ->description(__('admin.categories.basic_information_description'))
-                ->schema([
-                    SchemaGrid::make(2)
-                        ->schema([
-                            TextInput::make('name')
-                                ->label(__('messages.name'))
-                                ->required()
-                                ->maxLength(255),
-                            TextInput::make('slug')
-                                ->label(__('messages.slug'))
-                                ->required()
-                                ->unique(ignoreRecord: true)
-                                ->maxLength(255),
-                        ]),
-                    RichEditor::make('description')
-                        ->label(__('messages.description'))
-                        ->columnSpanFull(),
-                    SchemaGrid::make(2)
-                        ->schema([
-                            Select::make('parent_id')
-                                ->label(__('messages.category'))
-                                ->relationship('parent', 'name')
-                                ->searchable()
-                                ->preload(),
-                            Toggle::make('is_active')
-                                ->label(__('admin.categories.is_active'))
-                                ->default(true),
-                        ]),
-                ]),
-        ]);
+        return CategoryForm::configure($schema);
+    }
+
+    public static function infolist(Schema $schema): Schema
+    {
+        return CategoryInfolist::configure($schema);
     }
 
     public static function table(Table $table): Table

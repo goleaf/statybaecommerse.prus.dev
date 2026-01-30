@@ -5,17 +5,10 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\InventoryResource\Pages;
+use App\Filament\Resources\InventoryResource\Schemas\InventoryForm;
+use App\Filament\Resources\InventoryResource\Schemas\InventoryInfolist;
 use App\Models\Inventory;
-use App\Models\Product;
-use App\Support\Filament\Components\SearchableInput;
-use App\Support\Filament\SearchableInputHelper;
-use App\Support\Search\ProductSearch;
-use App\Support\Search\SearchResult;
-use App\Support\Search\SearchResultPayload;
 use BackedEnum;
-use Filament\Forms\Components\TextInput;
-use Filament\Schemas\Components\Grid as SchemaGrid;
-use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Schemas\Schema;
 use Filament\Actions\BulkAction;
 use Filament\Actions\DeleteBulkAction;
@@ -52,72 +45,12 @@ final class InventoryResource extends BaseResource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
-            SchemaSection::make(__('admin.inventory.basic_information'))
-                ->description(__('admin.inventory.basic_information_description'))
-                ->schema([
-                    SchemaGrid::make(2)
-                        ->schema([
-                            SearchableInput::make('product_id')
-                                ->label(__('messages.product'))
-                                ->required()
-                                ->searchable()
-                                ->searchUsing(static fn (string $search): array => ProductSearch::complex($search))
-                                ->dehydrateStateUsing(static fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
-                                ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
-                                    SearchableInputHelper::hydrate(
-                                        $component,
-                                        $state,
-                                        static function (int|string $value): ?SearchResult {
-                                            $product = Product::query()
-                                                ->select(['id', 'sku', 'name', 'price'])
-                                                ->find((int) $value);
+        return InventoryForm::configure($schema);
+    }
 
-                                            if (! $product instanceof Product) {
-                                                return null;
-                                            }
-
-                                            $name = $product->getAttribute('name');
-                                            if (is_array($name)) {
-                                                $locale = app()->getLocale();
-                                                $name = $name[$locale] ?? reset($name);
-                                            }
-
-                                            $result = SearchResult::make(
-                                                (string) $product->getKey(),
-                                                ProductSearch::label($product),
-                                            );
-
-                                            return SearchResultPayload::normalise($result, [
-                                                'product_id' => $product->getKey(),
-                                                'sku'        => (string) ($product->getAttribute('sku') ?? ''),
-                                                'name'       => is_string($name) ? $name : '',
-                                                'price'      => is_numeric($product->getAttribute('price')) ? (float) $product->getAttribute('price') : 0.0,
-                                            ]);
-                                        },
-                                    );
-                                }),
-                            TextInput::make('quantity')
-                                ->label(__('messages.quantity'))
-                                ->required()
-                                ->numeric()
-                                ->minValue(0),
-                        ]),
-                    SchemaGrid::make(2)
-                        ->schema([
-                            TextInput::make('reserved_quantity')
-                                ->label(__('admin.inventory.reserved_quantity'))
-                                ->numeric()
-                                ->minValue(0)
-                                ->default(0),
-                            TextInput::make('low_stock_threshold')
-                                ->label(__('admin.inventory.low_stock_threshold'))
-                                ->numeric()
-                                ->minValue(0)
-                                ->default(10),
-                        ]),
-                ]),
-        ]);
+    public static function infolist(Schema $schema): Schema
+    {
+        return InventoryInfolist::configure($schema);
     }
 
     public static function table(Table $table): Table

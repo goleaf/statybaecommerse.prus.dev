@@ -5,15 +5,10 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\DiscountResource\Pages;
+use App\Filament\Resources\DiscountResource\Schemas\DiscountForm;
+use App\Filament\Resources\DiscountResource\Schemas\DiscountInfolist;
 use App\Models\Discount;
 use BackedEnum;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\RichEditor;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Components\Grid as SchemaGrid;
-use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
@@ -47,70 +42,12 @@ final class DiscountResource extends BaseResource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
-            SchemaSection::make(__('admin.discounts.basic_information'))
-                ->description(__('admin.discounts.basic_information_description'))
-                ->schema([
-                    SchemaGrid::make(2)
-                        ->schema([
-                            TextInput::make('name')
-                                ->label(__('messages.name'))
-                                ->required()
-                                ->maxLength(255),
-                            TextInput::make('code')
-                                ->label(__('messages.code'))
-                                ->required()
-                                ->unique(ignoreRecord: true)
-                                ->maxLength(50),
-                        ]),
-                    RichEditor::make('description')
-                        ->label(__('messages.description'))
-                        ->columnSpanFull(),
-                    SchemaGrid::make(3)
-                        ->schema([
-                            Select::make('type')
-                                ->label(__('messages.type'))
-                                ->options([
-                                    'percentage' => __('admin.discounts.percentage'),
-                                    'fixed'      => __('admin.discounts.fixed_amount'),
-                                ])
-                                ->required(),
-                            TextInput::make('value')
-                                ->label(__('messages.value'))
-                                ->required()
-                                ->numeric()
-                                ->minValue(0),
-                            Toggle::make('is_active')
-                                ->label(__('admin.discounts.is_active'))
-                                ->default(true),
-                        ]),
-                ]),
-            SchemaSection::make(__('admin.discounts.validity'))
-                ->description(__('admin.discounts.validity_description'))
-                ->schema([
-                    SchemaGrid::make(2)
-                        ->schema([
-                            DateTimePicker::make('valid_from')
-                                ->label(__('admin.discounts.valid_from'))
-                                ->default(now()),
-                            DateTimePicker::make('valid_until')
-                                ->label(__('admin.discounts.valid_until')),
-                        ]),
-                    SchemaGrid::make(2)
-                        ->schema([
-                            TextInput::make('usage_limit')
-                                ->label(__('admin.discounts.usage_limit'))
-                                ->numeric()
-                                ->minValue(1),
-                            TextInput::make('minimum_amount')
-                                ->label(__('admin.discounts.minimum_amount'))
-                                ->numeric()
-                                ->minValue(0)
-                                ->step(0.01),
-                        ]),
-                ])
-                ->collapsible(),
-        ]);
+        return DiscountForm::configure($schema);
+    }
+
+    public static function infolist(Schema $schema): Schema
+    {
+        return DiscountInfolist::configure($schema);
     }
 
     public static function table(Table $table): Table
