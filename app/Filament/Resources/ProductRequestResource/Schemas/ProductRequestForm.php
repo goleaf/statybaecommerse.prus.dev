@@ -56,8 +56,10 @@ class ProductRequestForm
                     ->schema([
                         Textarea::make('message')
                             ->label(__('messages.Message'))
+                            ->rows(5)
                             ->columnSpanFull(),
-                    ]),
+                    ])
+                    ->collapsible(),
 
                 Section::make(__('messages.Status & Response'))
                     ->schema([
@@ -70,9 +72,12 @@ class ProductRequestForm
                                 ProductRequest::STATUS_CANCELLED   => __('translations.status_cancelled'),
                             ])
                             ->required()
-                            ->default(ProductRequest::STATUS_PENDING),
+                            ->default(ProductRequest::STATUS_PENDING)
+                            ->selectablePlaceholder(false)
+                            ->native(false),
                         Textarea::make('admin_notes')
                             ->label(__('messages.Notes'))
+                            ->rows(3)
                             ->columnSpanFull(),
                     ])->columns(2),
             ]);

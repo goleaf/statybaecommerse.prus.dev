@@ -7,12 +7,10 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\BrandResource\Pages;
 use App\Filament\Resources\BrandResource\Schemas\BrandForm;
 use App\Filament\Resources\BrandResource\Schemas\BrandInfolist;
+use App\Filament\Resources\BrandResource\Tables\BrandsTable;
 use App\Models\Brand;
 use BackedEnum;
 use Filament\Schemas\Schema;
-use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
@@ -63,33 +61,7 @@ final class BrandResource extends BaseResource
 
     public static function table(Table $table): Table
     {
-        return $table
-            ->columns([
-                SpatieMediaLibraryImageColumn::make('logo')
-                    ->label(__('messages.image'))
-                    ->collection('logo')
-                    ->circular(),
-                TextColumn::make('name')
-                    ->label(__('messages.name'))
-                    ->searchable()
-                    ->sortable(),
-                TextColumn::make('slug')
-                    ->label(__('messages.slug'))
-                    ->searchable()
-                    ->sortable(),
-                ToggleColumn::make('is_active')
-                    ->label(__('admin.brands.is_active')),
-                TextColumn::make('products_count')
-                    ->label(__('admin.brands.products_count'))
-                    ->counts('products')
-                    ->sortable(),
-                TextColumn::make('created_at')
-                    ->label(__('admin.brands.created_at'))
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-            ])
-            ->defaultSort('name');
+        return BrandsTable::configure($table);
     }
 
     public static function getRelations(): array

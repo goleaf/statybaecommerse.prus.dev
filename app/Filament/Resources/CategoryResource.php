@@ -7,12 +7,11 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\CategoryResource\Pages;
 use App\Filament\Resources\CategoryResource\Schemas\CategoryForm;
 use App\Filament\Resources\CategoryResource\Schemas\CategoryInfolist;
+use App\Filament\Resources\CategoryResource\Tables\CategoriesTable;
 use App\Models\Category;
 use App\Support\Concerns\HasNav;
 use BackedEnum;
 use Filament\Schemas\Schema;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
 use UnitEnum;
 
@@ -60,32 +59,7 @@ final class CategoryResource extends BaseResource
 
     public static function table(Table $table): Table
     {
-        return $table
-            ->columns([
-                TextColumn::make('name')
-                    ->label(__('messages.name'))
-                    ->searchable()
-                    ->sortable(),
-                TextColumn::make('slug')
-                    ->label(__('messages.slug'))
-                    ->searchable()
-                    ->sortable(),
-                TextColumn::make('parent.name')
-                    ->label(__('messages.category'))
-                    ->sortable(),
-                ToggleColumn::make('is_active')
-                    ->label(__('admin.categories.is_active')),
-                TextColumn::make('products_count')
-                    ->label(__('admin.categories.products_count'))
-                    ->counts('products')
-                    ->sortable(),
-                TextColumn::make('created_at')
-                    ->label(__('admin.categories.created_at'))
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-            ])
-            ->defaultSort('name');
+        return CategoriesTable::configure($table);
     }
 
     public static function getPages(): array

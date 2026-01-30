@@ -21,6 +21,16 @@ final class ProductRequestResource extends BaseResource
 
     protected static string|UnitEnum|null $navigationGroup = null;
 
+    public static function getNavigationBadge(): ?string
+    {
+        return (string) static::getModel()::pending()->count();
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return static::getModel()::pending()->count() > 0 ? 'warning' : 'gray';
+    }
+
     public static function form(Schema $schema): Schema
     {
         return ProductRequestForm::configure($schema);
