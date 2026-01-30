@@ -37,11 +37,13 @@ class AdminUserForm
                     ])->columns(2),
 
                 Section::make(__('messages.additional_information'))
+                    ->description(__('messages.manage_admin_extra_details'))
                     ->schema([
-                        Textarea::make('admin_notes')
-                            ->label(__('messages.notes'))
-                            ->rows(3)
-                            ->columnSpanFull(),
+                        Textarea::make('description')
+                            ->label(__('messages.description'))
+                            ->rows(5)
+                            ->columnSpanFull()
+                            ->placeholder(__('messages.enter_description_placeholder')),
                     ]),
             ]);
     }

@@ -657,6 +657,8 @@ return [
     'delivered_at'                                                       => 'Delivered At',
     'demo_store'                                                         => 'Demo store',
     'description'                                                        => 'Description',
+    'enter_description_placeholder'                                      => 'Enter detailed description...',
+    'manage_admin_extra_details'                                         => 'Manage additional information and notes for this administrator.',
     'detail'                                                             => 'Detail',
     'detailed_description_coming_soon'                                   => 'Detailed description coming soon.',
     'details'                                                            => 'Details',
