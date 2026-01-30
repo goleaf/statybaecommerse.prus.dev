@@ -11,7 +11,7 @@ description: Turborepo monorepo template principles. pnpm workspaces, shared pac
 |-----------|------------|
 | Build System | Turborepo |
 | Package Manager | pnpm |
-| Apps | Next.js, Express |
+| Apps | Nuxt, Express |
 | Packages | Shared UI, Config, Types |
 | Language | TypeScript |
 
@@ -22,7 +22,7 @@ description: Turborepo monorepo template principles. pnpm workspaces, shared pac
 ```
 project-name/
 ├── apps/
-│   ├── web/             # Next.js app
+│   ├── web/             # Nuxt app
 │   ├── api/             # Express API
 │   └── docs/            # Documentation
 ├── packages/

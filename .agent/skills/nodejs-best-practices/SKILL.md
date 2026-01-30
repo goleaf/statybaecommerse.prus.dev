@@ -41,7 +41,7 @@ What are you building?
 │   └── Express (mature, most middleware)
 │
 └── Full-stack with frontend
-    └── Next.js API Routes or tRPC
+    └── Framework API routes or tRPC
 ```
 
 ### Comparison Principles

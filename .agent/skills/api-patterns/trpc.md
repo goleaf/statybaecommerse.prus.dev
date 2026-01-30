@@ -34,7 +34,7 @@ Why tRPC:
 
 ```
 Common setups:
-├── Next.js + tRPC (most common)
+├── React + tRPC (common)
 ├── Monorepo with shared types
 ├── Remix + tRPC
 └── Any TS frontend + backend

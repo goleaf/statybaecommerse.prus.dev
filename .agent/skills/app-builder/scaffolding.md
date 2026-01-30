@@ -4,60 +4,34 @@
 
 ---
 
-## Next.js Full-Stack Structure (2025 Optimized)
+## Nuxt 3 Full-Stack Structure (2025 Optimized)
 
 ```
 project-name/
-├── src/
-│   ├── app/                        # Routes only (thin layer)
-│   │   ├── layout.tsx
-│   │   ├── page.tsx
-│   │   ├── globals.css
-│   │   ├── (auth)/                 # Route group - auth pages
-│   │   │   ├── login/page.tsx
-│   │   │   └── register/page.tsx
-│   │   ├── (dashboard)/            # Route group - dashboard layout
-│   │   │   ├── layout.tsx
-│   │   │   └── page.tsx
-│   │   └── api/
-│   │       └── [resource]/route.ts
-│   │
-│   ├── features/                   # Feature-based modules
-│   │   ├── auth/
-│   │   │   ├── components/
-│   │   │   ├── hooks/
-│   │   │   ├── actions.ts          # Server Actions
-│   │   │   ├── queries.ts          # Data fetching
-│   │   │   └── types.ts
-│   │   ├── products/
-│   │   │   ├── components/
-│   │   │   ├── actions.ts
-│   │   │   └── queries.ts
-│   │   └── cart/
-│   │       └── ...
-│   │
-│   ├── shared/                     # Shared utilities
-│   │   ├── components/ui/          # Reusable UI components
-│   │   ├── lib/                    # Utils, helpers
-│   │   └── hooks/                  # Global hooks
-│   │
-│   └── server/                     # Server-only code
-│       ├── db/                     # Database client (Prisma)
-│       ├── auth/                   # Auth config
-│       └── services/               # External API integrations
-│
+├── app.vue
+├── pages/
+│   ├── index.vue
+│   ├── login.vue
+│   └── dashboard/
+│       └── index.vue
+├── components/
+│   └── ui/                         # Reusable UI components
+├── composables/                    # Shared composables
+│   └── useAuth.ts
+├── stores/                         # Pinia stores
+│   └── user.ts
+├── server/                         # Server-only code
+│   ├── api/
+│   │   └── [resource].ts
+│   └── utils/
+│       └── db.ts                   # Prisma client
+├── plugins/
 ├── prisma/
-│   ├── schema.prisma
-│   ├── migrations/
-│   └── seed.ts
-│
+│   └── schema.prisma
 ├── public/
 ├── .env.example
-├── .env.local
-├── package.json
-├── tailwind.config.ts
-├── tsconfig.json
-└── README.md
+├── nuxt.config.ts
+└── package.json
 ```
 
 ---
@@ -66,11 +40,10 @@ project-name/
 
 | Principle | Implementation |
 |-----------|----------------|
-| **Feature isolation** | Each feature in `features/` with its own components, hooks, actions |
+| **Feature isolation** | Group by domain across `components/`, `composables/`, `stores/` |
 | **Server/Client separation** | Server-only code in `server/`, prevents accidental client imports |
-| **Thin routes** | `app/` only for routing, logic lives in `features/` |
-| **Route groups** | `(groupName)/` for layout sharing without URL impact |
-| **Shared code** | `shared/` for truly reusable UI and utilities |
+| **Thin routes** | `pages/` only for routing, logic lives in composables/stores |
+| **Shared code** | `components/ui/` and `composables/` for reuse |
 
 ---
 

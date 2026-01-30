@@ -97,7 +97,7 @@ Agents: security-auditor → penetration-tester → synthesis
 | `security-auditor` | Security | "security", "auth", "vulnerabilities" |
 | `penetration-tester` | Security Testing | "pentest", "red team", "exploit" |
 | `backend-specialist` | Backend | "API", "server", "Node.js", "Express" |
-| `frontend-specialist` | Frontend | "React", "UI", "components", "Next.js" |
+| `frontend-specialist` | Frontend | "React", "UI", "components", "Vue" |
 | `test-engineer` | Testing | "tests", "coverage", "TDD" |
 | `devops-engineer` | DevOps | "deploy", "CI/CD", "infrastructure" |
 | `database-architect` | Database | "schema", "Prisma", "migrations" |

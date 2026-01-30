@@ -15,7 +15,7 @@ Requirements:
 
 Architecture Decisions:
   App Structure: Monolith (simpler for solo)
-  Framework: Next.js (full-stack, fast)
+  Framework: Nuxt (full-stack, fast)
   Data Layer: Prisma direct (no over-abstraction)
   Authentication: JWT (simpler than OAuth)
   Payment: Stripe (hosted solution)

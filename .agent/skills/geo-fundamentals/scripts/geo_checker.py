@@ -62,7 +62,7 @@ def is_page_file(file_path: Path) -> bool:
     page_indicators = ['page', 'index', 'home', 'about', 'contact', 'blog', 
                        'post', 'article', 'product', 'service', 'landing']
     
-    # Check if it's in a pages/app directory (Next.js, etc.)
+    # Check if it's in a pages/app directory (common web frameworks)
     parts = [p.lower() for p in file_path.parts]
     if 'pages' in parts or 'app' in parts or 'routes' in parts:
         return True

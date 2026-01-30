@@ -38,6 +38,6 @@
 │ Timeline     │ Fast (weeks)  │ Medium (months)│ Long (years)│
 │ Architecture │ Simple        │ Modular      │ Distributed  │
 │ Patterns     │ Minimal       │ Selective    │ Comprehensive│
-│ Example      │ Next.js API   │ NestJS       │ Microservices│
+│ Example      │ Express API   │ NestJS       │ Microservices│
 └─────────────────────────────────────────────────────────────┘
 ```

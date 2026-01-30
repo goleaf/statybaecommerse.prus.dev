@@ -191,7 +191,7 @@ Before assigning agents, determine project type:
 | Trigger | Project Type | Primary Agent | DO NOT USE |
 |---------|--------------|---------------|------------|
 | "mobile app", "iOS", "Android", "React Native", "Flutter", "Expo" | **MOBILE** | `mobile-developer` | ❌ frontend-specialist, backend-specialist |
-| "website", "web app", "Next.js", "React" (web) | **WEB** | `frontend-specialist` | ❌ mobile-developer |
+| "website", "web app", "React", "Vue" (web) | **WEB** | `frontend-specialist` | ❌ mobile-developer |
 | "API", "backend", "server", "database" (standalone) | **BACKEND** | `backend-specialist | - |
 
 > 🔴 **CRITICAL:** Mobile project + frontend-specialist = WRONG. Mobile project = mobile-developer ONLY.
@@ -403,4 +403,3 @@ python .agent/skills/webapp-testing/scripts/playwright_runner.py http://localhos
 | 10 | **Phase X** | Verification is ALWAYS final | Definition of done |
 
 ---
-

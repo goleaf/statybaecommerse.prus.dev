@@ -6,15 +6,15 @@
 
 ```yaml
 Frontend:
-  framework: Next.js 16 (Stable)
+  framework: Nuxt 3 (Stable)
   language: TypeScript 5.7+
   styling: Tailwind CSS v4
-  state: React 19 Actions / Server Components
-  bundler: Turbopack (Stable for Dev)
+  state: Pinia / Vue composables
+  bundler: Vite (default)
 
 Backend:
   runtime: Node.js 23
-  framework: Next.js API Routes / Hono (for Edge)
+  framework: Nuxt server routes / Hono (for Edge)
   validation: Zod / TypeBox
 
 Database:
