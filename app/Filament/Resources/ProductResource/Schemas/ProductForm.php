@@ -144,19 +144,19 @@ class ProductForm
                             TextInput::make('weight')
                                 ->label(__('admin.products.weight'))
                                 ->numeric()
-                                ->suffix('kg'),
+                                ->suffix(__('messages.unit_kg')),
                             TextInput::make('length')
                                 ->label(__('admin.products.length'))
                                 ->numeric()
-                                ->suffix('cm'),
+                                ->suffix(__('messages.unit_cm')),
                             TextInput::make('width')
                                 ->label(__('admin.products.width'))
                                 ->numeric()
-                                ->suffix('cm'),
+                                ->suffix(__('messages.unit_cm')),
                             TextInput::make('height')
                                 ->label(__('admin.products.height'))
                                 ->numeric()
-                                ->suffix('cm'),
+                                ->suffix(__('messages.unit_cm')),
                         ]),
                 ])
                 ->collapsible(),

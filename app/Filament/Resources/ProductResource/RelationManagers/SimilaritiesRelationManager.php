@@ -13,6 +13,7 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 
 class SimilaritiesRelationManager extends RelationManager
 {
@@ -20,18 +21,26 @@ class SimilaritiesRelationManager extends RelationManager
 
     protected static ?string $recordTitleAttribute = 'id';
 
+    public static function getTitle(Model $ownerRecord, string $pageClass): string
+    {
+        return __('messages.similarities');
+    }
+
     public function form(Schema $schema): Schema
     {
         return $schema
             ->schema([
                 Select::make('similar_product_id')
+                    ->label(__('messages.similar_product'))
                     ->relationship('similarProduct', 'name')
                     ->required()
                     ->searchable(),
                 TextInput::make('similarity_score')
+                    ->label(__('messages.similarity_score'))
                     ->numeric()
                     ->required(),
                 TextInput::make('algorithm_type')
+                    ->label(__('messages.algorithm_type'))
                     ->maxLength(255),
             ]);
     }
@@ -41,16 +50,19 @@ class SimilaritiesRelationManager extends RelationManager
         return $table
             ->columns([
                 TextColumn::make('similarProduct.name')
-                    ->label('Similar Product')
+                    ->label(__('messages.similar_product'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('similarity_score')
+                    ->label(__('messages.similarity_score'))
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('algorithm_type')
+                    ->label(__('messages.algorithm_type'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('calculated_at')
+                    ->label(__('messages.calculated_at'))
                     ->dateTime()
                     ->sortable(),
             ])

@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ProductResource\Schemas;
 
-use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\IconEntry;
-use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\KeyValueEntry;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -104,16 +103,16 @@ class ProductInfolist
                         ->schema([
                             TextEntry::make('weight')
                                 ->label(__('admin.products.weight'))
-                                ->suffix(' kg'),
+                                ->suffix(' ' . __('messages.unit_kg')),
                             TextEntry::make('length')
                                 ->label(__('admin.products.length'))
-                                ->suffix(' cm'),
+                                ->suffix(' ' . __('messages.unit_cm')),
                             TextEntry::make('width')
                                 ->label(__('admin.products.width'))
-                                ->suffix(' cm'),
+                                ->suffix(' ' . __('messages.unit_cm')),
                             TextEntry::make('height')
                                 ->label(__('admin.products.height'))
-                                ->suffix(' cm'),
+                                ->suffix(' ' . __('messages.unit_cm')),
                         ]),
                 ])
                 ->collapsible(),

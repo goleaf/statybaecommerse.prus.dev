@@ -15,6 +15,7 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 
 class RequestsRelationManager extends RelationManager
 {
@@ -22,34 +23,47 @@ class RequestsRelationManager extends RelationManager
 
     protected static ?string $recordTitleAttribute = 'name';
 
+    public static function getTitle(Model $ownerRecord, string $pageClass): string
+    {
+        return __('messages.requests');
+    }
+
     public function form(Schema $schema): Schema
     {
         return $schema
             ->schema([
                 Select::make('user_id')
+                    ->label(__('messages.user'))
                     ->relationship('user', 'name')
                     ->searchable(),
                 TextInput::make('name')
+                    ->label(__('messages.name'))
                     ->maxLength(255),
                 TextInput::make('email')
+                    ->label(__('messages.email'))
                     ->email()
                     ->maxLength(255),
                 TextInput::make('phone')
+                    ->label(__('messages.phone'))
                     ->tel()
                     ->maxLength(255),
                 Textarea::make('message')
+                    ->label(__('messages.message'))
                     ->columnSpanFull(),
                 TextInput::make('requested_quantity')
+                    ->label(__('messages.requested_quantity'))
                     ->numeric(),
                 Select::make('status')
+                    ->label(__('messages.status'))
                     ->options([
-                        ProductRequest::STATUS_PENDING     => 'Pending',
-                        ProductRequest::STATUS_IN_PROGRESS => 'In Progress',
-                        ProductRequest::STATUS_COMPLETED   => 'Completed',
-                        ProductRequest::STATUS_CANCELLED   => 'Cancelled',
+                        ProductRequest::STATUS_PENDING     => __('translations.status_pending'),
+                        ProductRequest::STATUS_IN_PROGRESS => __('translations.status_in_progress'),
+                        ProductRequest::STATUS_COMPLETED   => __('translations.status_completed'),
+                        ProductRequest::STATUS_CANCELLED   => __('translations.status_cancelled'),
                     ])
                     ->required(),
                 Textarea::make('admin_notes')
+                    ->label(__('messages.admin_notes'))
                     ->columnSpanFull(),
             ]);
     }
@@ -59,13 +73,17 @@ class RequestsRelationManager extends RelationManager
         return $table
             ->columns([
                 TextColumn::make('user.name')
+                    ->label(__('messages.user'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('name')
+                    ->label(__('messages.name'))
                     ->searchable(),
                 TextColumn::make('email')
+                    ->label(__('messages.email'))
                     ->searchable(),
                 TextColumn::make('status')
+                    ->label(__('messages.status'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         ProductRequest::STATUS_PENDING     => 'warning',
@@ -75,6 +93,7 @@ class RequestsRelationManager extends RelationManager
                         default                            => 'secondary',
                     }),
                 TextColumn::make('created_at')
+                    ->label(__('messages.created_at'))
                     ->dateTime()
                     ->sortable(),
             ])
