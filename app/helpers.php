@@ -261,6 +261,20 @@ if (! function_exists('formatMoneyFallback')) {
     }
 }
 
+if (! function_exists('current_currency_model')) {
+    /**
+     * Get the current active currency model.
+     */
+    function current_currency_model(): \App\Models\Currency
+    {
+        return \Illuminate\Support\Facades\Cache::remember(
+            'current_currency_model_' . current_currency(),
+            now()->addHours(1),
+            fn () => \App\Models\Currency::where('code', current_currency())->first() ?? \App\Models\Currency::where('is_default', true)->first()
+        );
+    }
+}
+
 if (! function_exists('app_money_format')) {
     function app_money_format(float|int|string $amount, ?string $currency = null): string
     {

@@ -44,14 +44,9 @@ return [
             ],
         ],
         'resources' => [
-            App\Filament\Resources\SystemSettingResource::class,
-            App\Filament\Resources\CustomerManagementResource::class,
-            App\Filament\Resources\AddressResource::class,
         ],
         'pages' => [
             App\Filament\Pages\Dashboard::class,
-            App\Filament\Pages\SliderManagement::class,
-            App\Filament\Pages\InventoryManagement::class,
         ],
     ],
 ];

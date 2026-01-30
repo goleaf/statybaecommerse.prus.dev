@@ -9,7 +9,6 @@ use Database\Seeders\AttributeSeeder;
 use Database\Seeders\AttributeValueSeeder;
 use Database\Seeders\CurrencySeeder;
 use Database\Seeders\CustomerGroupSeeder;
-use Database\Seeders\RolesAndPermissionsSeeder;
 
 return [
     /*
@@ -29,7 +28,6 @@ return [
             AttributeSeeder::class,
             AttributeValueSeeder::class,
             AdminAuthorizationSeeder::class,
-            RolesAndPermissionsSeeder::class,
             AdminUserSeeder::class,
             CustomerGroupSeeder::class,
         ],

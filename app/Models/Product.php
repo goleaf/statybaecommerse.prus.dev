@@ -122,10 +122,11 @@ final class Product extends Model implements HasMedia, TranslatableRecord
 
     /**
      * The accessors to append to the model's array form.
+     * Only append essential fields to reduce serialization overhead.
      *
      * @var array<int, string>
      */
-    protected $appends = ['main_image', 'thumbnail', 'stock_status', 'is_in_stock', 'is_low_stock', 'is_out_of_stock', 'available_quantity', 'discount_percentage', 'profit_margin', 'markup_percentage', 'dimensions', 'volume', 'canonical_url', 'sales_count', 'revenue', 'formatted_price', 'formatted_compare_price'];
+    protected $appends = ['main_image', 'thumbnail', 'stock_status', 'is_in_stock', 'formatted_price'];
 
     protected $table = 'products';
 
@@ -289,11 +290,20 @@ final class Product extends Model implements HasMedia, TranslatableRecord
     }
 
     /**
+     * Cache for reserved quantity to avoid repeated sum queries during a single request.
+     */
+    protected ?int $cachedReservedQuantity = null;
+
+    /**
      * Handle reservedQuantity functionality with proper error handling.
      */
     public function reservedQuantity(): int
     {
-        return (int) $this->stockReservations()
+        if ($this->cachedReservedQuantity !== null) {
+            return $this->cachedReservedQuantity;
+        }
+
+        return $this->cachedReservedQuantity = (int) $this->stockReservations()
             ->active()
             ->sum('quantity');
     }
@@ -455,8 +465,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
      */
     public function getSalesCountAttribute(): int
     {
-        // This would need to be implemented based on order items
-        return 0;
+        return $this->getSalesCount();
     }
 
     /**
@@ -464,8 +473,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
      */
     public function getRevenueAttribute(): float
     {
-        // This would need to be implemented based on order items
-        return 0.0;
+        return $this->getRevenue();
     }
 
     public function getCategoryAttribute(): ?Category
@@ -497,13 +505,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
         $decreased = DB::transaction(function () use ($quantity, $reservation): bool {
             $product = self::query()->whereKey($this->getKey())->lockForUpdate()->firstOrFail();
 
-            $activeReservations = StockReservation::query()
-                ->where('product_id', $product->getKey())
-                ->active()
-                ->lockForUpdate()
-                ->get();
-
-            $reserved = (int) $activeReservations->sum('quantity');
+            $reserved = $product->reservedQuantity();
 
             if (($product->stock_quantity - $reserved) < $quantity) {
                 return false;
@@ -532,6 +534,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
         }
 
         $this->refresh();
+        $this->cachedReservedQuantity = null;
 
         return true;
     }
@@ -552,6 +555,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
         });
 
         $this->refresh();
+        $this->cachedReservedQuantity = null;
     }
 
     public function reserveStock(
@@ -568,12 +572,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
         $reservation = DB::transaction(function () use ($quantity, $expiresAt, $meta, $referenceType, $referenceId): ?StockReservation {
             $product = self::query()->whereKey($this->getKey())->lockForUpdate()->firstOrFail();
 
-            $reserved = (int) StockReservation::query()
-                ->where('product_id', $product->getKey())
-                ->active()
-                ->lockForUpdate()
-                ->get()
-                ->sum('quantity');
+            $reserved = $product->reservedQuantity();
 
             if (($product->stock_quantity - $reserved) < $quantity) {
                 return null;
@@ -591,6 +590,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
         });
 
         $this->refresh();
+        $this->cachedReservedQuantity = null;
 
         return $reservation;
     }
@@ -615,6 +615,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
         });
 
         $this->refresh();
+        $this->cachedReservedQuantity = null;
     }
 
     /**
@@ -643,6 +644,10 @@ final class Product extends Model implements HasMedia, TranslatableRecord
      */
     public function isVariant(): bool
     {
+        if ($this->relationLoaded('variants')) {
+            return $this->type === 'variable' || $this->variants->isNotEmpty();
+        }
+
         return $this->type === 'variable' || $this->variants()->exists();
     }
 
@@ -686,9 +691,9 @@ final class Product extends Model implements HasMedia, TranslatableRecord
     /**
      * Handle prices functionality with proper error handling.
      */
-    public function prices(): MorphMany
+    public function prices(): HasMany
     {
-        return $this->morphMany(Price::class, 'priceable');
+        return $this->hasMany(Price::class, 'priceable_id')->where('priceable_type', self::class);
     }
 
     /**

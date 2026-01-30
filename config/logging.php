@@ -16,9 +16,7 @@ $configuredStackChannels = ['daily'];
 
 // Retention is configured directly in channel definitions below.
 
-$stackChannels = $configuredStackChannels === []
-    ? ['daily']
-    : array_values(array_unique($configuredStackChannels));
+$stackChannels = array_values(array_unique($configuredStackChannels));
 
 $productionStackChannels = array_values(array_unique(array_merge(['daily'], $stackChannels)));
 
