@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProductVariantResource\Pages;
+use App\Filament\Resources\ProductVariantResource\Schemas\ProductVariantForm;
+use App\Filament\Resources\ProductVariantResource\Schemas\ProductVariantInfolist;
 use App\Models\ProductVariant;
 use BackedEnum;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
+use Filament\Actions\ViewAction;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
@@ -29,27 +29,12 @@ final class ProductVariantResource extends BaseResource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Select::make('product_id')
-                    ->relationship('product', 'name')
-                    ->required()
-                    ->searchable(),
-                TextInput::make('sku')
-                    ->label('SKU')
-                    ->required()
-                    ->maxLength(255),
-                TextInput::make('name')
-                    ->maxLength(255),
-                TextInput::make('price')
-                    ->numeric()
-                    ->required(),
-                TextInput::make('stock_quantity')
-                    ->numeric()
-                    ->default(0),
-                Toggle::make('is_enabled')
-                    ->default(true),
-            ]);
+        return ProductVariantForm::configure($schema);
+    }
+
+    public static function infolist(Schema $schema): Schema
+    {
+        return ProductVariantInfolist::configure($schema);
     }
 
     public static function table(Table $table): Table
@@ -67,6 +52,7 @@ final class ProductVariantResource extends BaseResource
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('price')
+                    ->money('EUR')
                     ->sortable(),
                 TextColumn::make('stock_quantity')
                     ->sortable(),
@@ -76,6 +62,7 @@ final class ProductVariantResource extends BaseResource
                 //
             ])
             ->actions([
+                ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make(),
             ])
@@ -89,6 +76,7 @@ final class ProductVariantResource extends BaseResource
         return [
             'index'  => Pages\ListProductVariants::route('/'),
             'create' => Pages\CreateProductVariants::route('/create'),
+            'view'   => Pages\ViewProductVariants::route('/{record}'),
             'edit'   => Pages\EditProductVariants::route('/{record}/edit'),
         ];
     }

@@ -1,0 +1,135 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Filament\Resources\ProductVariantResource\Schemas;
+
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\Textarea;
+use Filament\Schemas\Schema;
+
+class ProductVariantForm
+{
+    public static function configure(Schema $schema): Schema
+    {
+        return $schema
+            ->components([
+                Section::make(__('admin.product_variants.general_info'))
+                    ->schema([
+                        Select::make('product_id')
+                            ->relationship('product', 'name')
+                            ->required()
+                            ->searchable()
+                            ->preload(),
+                        TextInput::make('sku')
+                            ->label('SKU')
+                            ->required()
+                            ->maxLength(255)
+                            ->unique(ignoreRecord: true),
+                        TextInput::make('name')
+                            ->maxLength(255),
+                        TextInput::make('barcode')
+                            ->maxLength(255),
+                    ])->columns(2),
+
+                Section::make(__('admin.product_variants.pricing'))
+                    ->schema([
+                        TextInput::make('price')
+                            ->numeric()
+                            ->required()
+                            ->prefix('€'),
+                        TextInput::make('compare_price')
+                            ->numeric()
+                            ->prefix('€'),
+                        TextInput::make('cost_price')
+                            ->numeric()
+                            ->prefix('€'),
+                        TextInput::make('wholesale_price')
+                            ->numeric()
+                            ->prefix('€'),
+                        TextInput::make('member_price')
+                            ->numeric()
+                            ->prefix('€'),
+                        TextInput::make('promotional_price')
+                            ->numeric()
+                            ->prefix('€'),
+                    ])->columns(3),
+
+                Section::make(__('admin.product_variants.inventory'))
+                    ->schema([
+                        TextInput::make('stock_quantity')
+                            ->numeric()
+                            ->default(0),
+                        TextInput::make('low_stock_threshold')
+                            ->numeric()
+                            ->default(5),
+                        Toggle::make('track_inventory')
+                            ->default(true),
+                        Toggle::make('allow_backorder')
+                            ->default(false),
+                    ])->columns(2),
+
+                Section::make(__('admin.product_variants.dimensions'))
+                    ->schema([
+                        TextInput::make('size')
+                            ->maxLength(255),
+                        TextInput::make('size_unit')
+                            ->maxLength(255),
+                        TextInput::make('size_display')
+                            ->maxLength(255),
+                        TextInput::make('weight')
+                            ->numeric()
+                            ->suffix('kg'),
+                    ])->columns(2),
+
+                Section::make(__('admin.product_variants.status_features'))
+                    ->schema([
+                        Toggle::make('is_enabled')
+                            ->default(true),
+                        Toggle::make('is_default_variant')
+                            ->default(false),
+                        Toggle::make('is_featured')
+                            ->default(false),
+                        Toggle::make('is_new')
+                            ->default(false),
+                        Toggle::make('is_bestseller')
+                            ->default(false),
+                    ])->columns(5),
+
+                Section::make(__('admin.product_variants.localization'))
+                    ->schema([
+                        Grid::make(2)
+                            ->schema([
+                                TextInput::make('variant_name_lt')
+                                    ->label(__('admin.fields.name_lt')),
+                                TextInput::make('variant_name_en')
+                                    ->label(__('admin.fields.name_en')),
+                                Textarea::make('description_lt')
+                                    ->label(__('admin.fields.description_lt')),
+                                Textarea::make('description_en')
+                                    ->label(__('admin.fields.description_en')),
+                            ]),
+                    ]),
+
+                Section::make(__('admin.product_variants.seo'))
+                    ->schema([
+                        Grid::make(2)
+                            ->schema([
+                                TextInput::make('seo_title_lt')
+                                    ->label(__('admin.fields.seo_title_lt')),
+                                TextInput::make('seo_title_en')
+                                    ->label(__('admin.fields.seo_title_en')),
+                                Textarea::make('seo_description_lt')
+                                    ->label(__('admin.fields.seo_description_lt')),
+                                Textarea::make('seo_description_en')
+                                    ->label(__('admin.fields.seo_description_en')),
+                            ]),
+                    ])->collapsed(),
+            ]);
+    }
+}

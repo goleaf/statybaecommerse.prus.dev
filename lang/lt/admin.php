@@ -39,6 +39,18 @@ return array (
     'model_label' => 'Užsakymas',
     'navigation_label' => 'Užsakymai',
   ),
+  'product_variants' => 
+  array (
+    'plural_model_label' => 'Prekių variantai',
+    'model_label' => 'Prekės variantas',
+    'general_info' => 'Pagrindinė informacija',
+    'pricing' => 'Kainodara',
+    'inventory' => 'Invenktorius',
+    'dimensions' => 'Matmenys ir dydis',
+    'status_features' => 'Būsena ir savybės',
+    'localization' => 'Lokalizacija',
+    'seo' => 'SEO',
+  ),
   'user_status' => 
   array (
     'admin' => 'Administratorius',

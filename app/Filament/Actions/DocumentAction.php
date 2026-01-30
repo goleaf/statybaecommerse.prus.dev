@@ -10,11 +10,8 @@ use DateTimeInterface;
 use App\Services\LocaleService;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\App;
 use Throwable;
@@ -41,14 +38,6 @@ final class DocumentAction
                     ->searchable()
                     ->preload()
                     ->required(),
-                Select::make('format')
-                    ->label(__('admin.fields.format'))
-                    ->options([
-                        'html' => __('HTML'),
-                        'pdf'  => __('PDF'),
-                    ])
-                    ->default('pdf')
-                    ->required(),
                 Select::make('locale')
                     ->label(__('admin.fields.locale'))
                     ->options(function () {
@@ -60,11 +49,8 @@ final class DocumentAction
                     })
                     ->default(fn (Model $record) => $record->preferred_locale ?? app()->getLocale())
                     ->required(),
-                TextInput::make('title')
-                    ->label(__('admin.fields.title'))
-                    ->required(),
             ])
-            ->action(function (Model $record, array $data, DocumentServiceContract $documentService): RedirectResponse|Response {
+            ->action(function (Model $record, array $data, DocumentServiceContract $documentService) {
                 $originalLocale = App::getLocale();
                 
                 try {
@@ -77,6 +63,13 @@ final class DocumentAction
                         ->active()
                         ->findOrFail($data['template_id']);
 
+                    $title = sprintf(
+                        '%s_%s_%s',
+                        $template->name,
+                        $record->getAttribute('number') ?? $record->getAttribute('code') ?? $record->getKey(),
+                        now()->format('Y-m-d_H-i')
+                    );
+
                     $variables = array_merge(
                         self::getDefaultVariables($record),
                         $documentService->extractVariablesFromModel($record)
@@ -86,7 +79,7 @@ final class DocumentAction
                         template: $template,
                         relatedModel: $record,
                         variables: $variables,
-                        title: $data['title']
+                        title: $title
                     );
 
                     Notification::make()
@@ -95,15 +88,9 @@ final class DocumentAction
                         ->success()
                         ->send();
 
-                    if ($data['format'] === 'pdf') {
-                        $downloadUrl = $documentService->generatePdf($document);
+                    $downloadUrl = $documentService->generatePdf($document);
 
-                        return redirect()->away($downloadUrl);
-                    }
-
-                    return response($document->content ?? '', 200, [
-                        'Content-Type' => 'text/html',
-                    ]);
+                    return redirect()->away($downloadUrl);
                 } catch (Throwable $e) {
                     Notification::make()
                         ->title(__('admin.notifications.document_generation_failed'))

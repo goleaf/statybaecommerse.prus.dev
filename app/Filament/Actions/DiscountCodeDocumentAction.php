@@ -9,10 +9,7 @@ use App\Models\DiscountCode;
 use App\Models\DocumentTemplate;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Response;
 use Throwable;
 
 final class DiscountCodeDocumentAction
@@ -37,33 +34,26 @@ final class DiscountCodeDocumentAction
                     ->searchable()
                     ->preload()
                     ->required(),
-
-                Select::make('format')
-                    ->label(__('admin.fields.format'))
-                    ->options([
-                        'html' => __('HTML'),
-                        'pdf'  => __('PDF'),
-                    ])
-                    ->default('pdf')
-                    ->required(),
-
-                TextInput::make('title')
-                    ->label(__('admin.fields.title'))
-                    ->default(fn (DiscountCode $record) => "Discount Code - {$record->code}")
-                    ->required(),
             ])
-            ->action(function (DiscountCode $record, array $data, DocumentServiceContract $documentService): RedirectResponse|Response {
+            ->action(function (DiscountCode $record, array $data, DocumentServiceContract $documentService) {
                 try {
                     // Double-check the template is active when resolving the selected option from the request payload.
                     $template = DocumentTemplate::query()
                         ->active()
                         ->findOrFail($data['template_id']);
 
+                    $title = sprintf(
+                        '%s_%s_%s',
+                        $template->name,
+                        $record->code,
+                        now()->format('Y-m-d_H-i')
+                    );
+
                     $document = $documentService->generateDocument(
                         template: $template,
                         relatedModel: $record,
                         variables: self::buildVariables($record),
-                        title: $data['title']
+                        title: $title
                     );
 
                     Notification::make()
@@ -72,15 +62,9 @@ final class DiscountCodeDocumentAction
                         ->success()
                         ->send();
 
-                    if ($data['format'] === 'pdf') {
-                        $downloadUrl = $documentService->generatePdf($document);
+                    $downloadUrl = $documentService->generatePdf($document);
 
-                        return redirect()->away($downloadUrl);
-                    }
-
-                    return response($document->content ?? '', 200, [
-                        'Content-Type' => 'text/html',
-                    ]);
+                    return redirect()->away($downloadUrl);
                 } catch (Throwable $e) {
                     Notification::make()
                         ->title(__('admin.notifications.document_generation_failed'))

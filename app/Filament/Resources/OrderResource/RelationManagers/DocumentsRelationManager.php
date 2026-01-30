@@ -77,18 +77,12 @@ class DocumentsRelationManager extends RelationManager
                 // CreateAction::make(),
             ])
             ->actions([
-                Action::make('view')
-                    ->label(__('admin.actions.view'))
-                    ->icon('heroicon-m-eye')
-                    ->url(fn (Document $record): ?string => $record->getFileUrl())
-                    ->openUrlInNewTab()
-                    ->visible(fn (Document $record): bool => $record->isGenerated()),
                 Action::make('download')
                     ->label(__('admin.actions.download'))
                     ->icon('heroicon-m-arrow-down-tray')
                     ->url(fn (Document $record): ?string => $record->getFileUrl())
-                    ->openUrlInNewTab() // Often better for downloads to prevent navigating away
-                    ->visible(fn (Document $record): bool => $record->isGenerated() && $record->isDownloadable()),
+                    ->openUrlInNewTab()
+                    ->visible(fn (Document $record): bool => $record->isGenerated()),
             ])
             ->bulkActions([
                 //

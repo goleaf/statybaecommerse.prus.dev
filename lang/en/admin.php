@@ -39,6 +39,18 @@ return array (
     'model_label' => 'Order',
     'navigation_label' => 'Orders',
   ),
+  'product_variants' => 
+  array (
+    'plural_model_label' => 'Product Variants',
+    'model_label' => 'Product Variant',
+    'general_info' => 'General Information',
+    'pricing' => 'Pricing',
+    'inventory' => 'Inventory',
+    'dimensions' => 'Dimensions & Size',
+    'status_features' => 'Status & Features',
+    'localization' => 'Localization',
+    'seo' => 'SEO',
+  ),
   'user_status' => 
   array (
     'admin' => 'Admin',
@@ -55,6 +67,14 @@ return array (
     'format' => 'Format',
     'title' => 'Title',
     'locale' => 'Language',
+    'name_lt' => 'Name (LT)',
+    'name_en' => 'Name (EN)',
+    'description_lt' => 'Description (LT)',
+    'description_en' => 'Description (EN)',
+    'seo_title_lt' => 'SEO Title (LT)',
+    'seo_title_en' => 'SEO Title (EN)',
+    'seo_description_lt' => 'SEO Description (LT)',
+    'seo_description_en' => 'SEO Description (EN)',
   ),
   'notifications' => 
   array (
