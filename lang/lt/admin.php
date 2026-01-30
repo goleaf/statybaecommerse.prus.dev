@@ -67,6 +67,14 @@ return array (
     'format' => 'Formatas',
     'title' => 'Pavadinimas',
     'locale' => 'Kalba',
+    'name_lt' => 'Pavadinimas (LT)',
+    'name_en' => 'Pavadinimas (EN)',
+    'description_lt' => 'Aprašymas (LT)',
+    'description_en' => 'Aprašymas (EN)',
+    'seo_title_lt' => 'SEO pavadinimas (LT)',
+    'seo_title_en' => 'SEO pavadinimas (EN)',
+    'seo_description_lt' => 'SEO aprašymas (LT)',
+    'seo_description_en' => 'SEO aprašymas (EN)',
   ),
   'notifications' => 
   array (

@@ -10,26 +10,18 @@ use App\Filament\Resources\ProductResource\RelationManagers\ImagesRelationManage
 use App\Filament\Resources\ProductResource\RelationManagers\RequestsRelationManager;
 use App\Filament\Resources\ProductResource\RelationManagers\SimilaritiesRelationManager;
 use App\Filament\Resources\ProductResource\RelationManagers\VariantsRelationManager;
+use App\Filament\Resources\ProductResource\Schemas\ProductForm;
+use App\Filament\Resources\ProductResource\Schemas\ProductInfolist;
 use App\Models\Product;
 use BackedEnum;
-use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\KeyValue;
-use Filament\Forms\Components\RichEditor;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TagsInput;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
-use Filament\Schemas\Components\Grid as SchemaGrid;
-use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Schemas\Schema;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -65,161 +57,12 @@ final class ProductResource extends BaseResource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
-            SchemaSection::make(__('admin.products.basic_information'))
-                ->description(__('admin.products.basic_information_description'))
-                ->schema([
-                    SchemaGrid::make(3)
-                        ->schema([
-                            TextInput::make('name')
-                                ->label(__('messages.name'))
-                                ->required()
-                                ->maxLength(255),
-                            TextInput::make('slug')
-                                ->label(__('messages.slug'))
-                                ->required()
-                                ->unique(ignoreRecord: true)
-                                ->maxLength(255),
-                            TextInput::make('sku')
-                                ->label(__('messages.sku'))
-                                ->required()
-                                ->unique(ignoreRecord: true)
-                                ->maxLength(100),
-                            TextInput::make('barcode')
-                                ->label(__('messages.barcode'))
-                                ->maxLength(100),
-                            Select::make('brand_id')
-                                ->label(__('messages.brand'))
-                                ->relationship('brand', 'name')
-                                ->searchable()
-                                ->preload(),
-                            Select::make('status')
-                                ->label(__('admin.products.status'))
-                                ->options([
-                                    'draft'     => __('admin.products.status_draft'),
-                                    'pending'   => __('admin.products.status_pending'),
-                                    'published' => __('admin.products.status_published'),
-                                    'archived'  => __('admin.products.status_archived'),
-                                ])
-                                ->default('draft')
-                                ->required(),
-                            Toggle::make('is_visible')
-                                ->label(__('admin.products.is_visible'))
-                                ->default(true),
-                            Toggle::make('is_featured')
-                                ->label(__('admin.products.is_featured'))
-                                ->default(false),
-                            DateTimePicker::make('published_at')
-                                ->label(__('admin.products.published_at')),
-                        ]),
-                    RichEditor::make('description')
-                        ->label(__('messages.description'))
-                        ->columnSpanFull(),
-                    Textarea::make('short_description')
-                        ->label(__('admin.products.short_description'))
-                        ->rows(3)
-                        ->columnSpanFull(),
-                    SchemaGrid::make(2)
-                        ->schema([
-                            Select::make('categories')
-                                ->label(__('messages.categories'))
-                                ->relationship('categories', 'name')
-                                ->multiple()
-                                ->searchable()
-                                ->preload(),
-                            Select::make('collections')
-                                ->label(__('messages.collections'))
-                                ->relationship('collections', 'name')
-                                ->multiple()
-                                ->searchable()
-                                ->preload(),
-                        ]),
-                ]),
-            SchemaSection::make(__('admin.products.pricing'))
-                ->schema([
-                    SchemaGrid::make(3)
-                        ->schema([
-                            TextInput::make('price')
-                                ->label(__('messages.price'))
-                                ->numeric()
-                                ->required(),
-                            TextInput::make('compare_price')
-                                ->label(__('admin.products.compare_price'))
-                                ->numeric(),
-                            TextInput::make('cost_price')
-                                ->label(__('admin.products.cost_price'))
-                                ->numeric(),
-                        ]),
-                ]),
-            SchemaSection::make(__('admin.products.inventory'))
-                ->schema([
-                    SchemaGrid::make(4)
-                        ->schema([
-                            Toggle::make('manage_stock')
-                                ->label(__('admin.products.manage_stock'))
-                                ->default(true),
-                            Toggle::make('track_stock')
-                                ->label(__('admin.products.track_stock'))
-                                ->default(true),
-                            Toggle::make('allow_backorder')
-                                ->label(__('admin.products.allow_backorder'))
-                                ->default(false),
-                            TextInput::make('stock_quantity')
-                                ->label(__('admin.products.stock_quantity'))
-                                ->numeric()
-                                ->integer()
-                                ->default(0),
-                            TextInput::make('low_stock_threshold')
-                                ->label(__('admin.products.low_stock_threshold'))
-                                ->numeric()
-                                ->integer()
-                                ->default(0),
-                        ]),
-                ]),
-            SchemaSection::make(__('admin.products.physical'))
-                ->schema([
-                    SchemaGrid::make(4)
-                        ->schema([
-                            TextInput::make('weight')
-                                ->label(__('admin.products.weight'))
-                                ->numeric(),
-                            TextInput::make('length')
-                                ->label(__('admin.products.length'))
-                                ->numeric(),
-                            TextInput::make('width')
-                                ->label(__('admin.products.width'))
-                                ->numeric(),
-                            TextInput::make('height')
-                                ->label(__('admin.products.height'))
-                                ->numeric(),
-                        ]),
-                ])
-                ->collapsible(),
-            SchemaSection::make(__('admin.products.seo'))
-                ->schema([
-                    TextInput::make('seo_title')
-                        ->label(__('admin.products.seo_title'))
-                        ->maxLength(255),
-                    Textarea::make('seo_description')
-                        ->label(__('admin.products.seo_description'))
-                        ->rows(3)
-                        ->columnSpanFull(),
-                ])
-                ->collapsible(),
-            SchemaSection::make(__('admin.products.metadata'))
-                ->schema([
-                    KeyValue::make('metadata')
-                        ->label(__('admin.products.metadata'))
-                        ->columnSpanFull(),
-                    // The products table does not currently have a tags column, but tests
-                    // and the admin UI expect the field to exist.
-                    TagsInput::make('tags')
-                        ->label(__('admin.products.tags'))
-                        ->dehydrated(false)
-                        ->columnSpanFull(),
-                ])
-                ->collapsible(),
-        ]);
+        return ProductForm::configure($schema);
+    }
+
+    public static function infolist(Schema $schema): Schema
+    {
+        return ProductInfolist::configure($schema);
     }
 
     public static function table(Table $table): Table
