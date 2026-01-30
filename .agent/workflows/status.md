@@ -42,11 +42,11 @@ Show current project and agent status.
 
 📁 Project: my-ecommerce
 📂 Path: C:/projects/my-ecommerce
-🏷️ Type: nextjs-ecommerce
+🏷️ Type: ecommerce
 📊 Status: active
 
 🔧 Tech Stack:
-   Framework: next.js
+   Framework: web
    Database: postgresql
    Auth: clerk
    Payment: stripe

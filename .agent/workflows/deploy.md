@@ -158,7 +158,7 @@ Run `/deploy rollback` if needed.
 
 | Platform | Command | Notes |
 |----------|---------|-------|
-| Vercel | `vercel --prod` | Auto-detected for Next.js |
+| Vercel | `vercel --prod` | Auto-detected for web apps |
 | Railway | `railway up` | Needs Railway CLI |
 | Fly.io | `fly deploy` | Needs flyctl |
 | Docker | `docker compose up -d` | For self-hosted |

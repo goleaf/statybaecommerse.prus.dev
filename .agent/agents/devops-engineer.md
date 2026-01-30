@@ -54,7 +54,7 @@ What are you deploying?
 
 | Platform | Best For | Trade-offs |
 |----------|----------|------------|
-| **Vercel** | Next.js, static | Limited backend control |
+| **Vercel** | Web apps, static | Limited backend control |
 | **Railway** | Quick deploy, DB included | Cost at scale |
 | **Fly.io** | Edge, global | Learning curve |
 | **VPS + PM2** | Full control | Manual management |

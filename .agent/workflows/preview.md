@@ -33,7 +33,7 @@ Manage preview server: start, stop, status check.
 Response:
 🚀 Starting preview...
    Port: 3000
-   Type: Next.js
+   Type: web
 
 ✅ Preview ready!
    URL: http://localhost:3000
@@ -48,7 +48,7 @@ Response:
 
 🌐 URL: http://localhost:3000
 📁 Project: C:/projects/my-app
-🏷️ Type: nextjs
+🏷️ Type: web
 💚 Health: OK
 ```
 
@@ -78,4 +78,3 @@ python .agent/scripts/auto_preview.py start [port]
 python .agent/scripts/auto_preview.py stop
 python .agent/scripts/auto_preview.py status
 ```
-

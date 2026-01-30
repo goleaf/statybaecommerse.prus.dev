@@ -36,7 +36,7 @@ Specialist AI personas for different domains.
 | ----- | ----- | ----------- |
 | `orchestrator` | Multi-agent coordination | parallel-agents, behavioral-modes |
 | `project-planner` | Discovery, task planning | brainstorming, plan-writing, architecture |
-| `frontend-specialist` | Web UI/UX | frontend-design, nextjs-react-expert, tailwind-patterns |
+| `frontend-specialist` | Web UI/UX | frontend-design, web-design-guidelines, tailwind-patterns |
 | `backend-specialist` | API, business logic | api-patterns, nodejs-best-practices, database-design |
 | `database-architect` | Schema, SQL | database-design, prisma-expert |
 | `mobile-developer` | iOS, Android, RN | mobile-design |
@@ -65,7 +65,6 @@ Modular knowledge domains that agents can load on-demand. based on task context.
 
 | Skill | Description |
 | ----- | ----------- |
-| `nextjs-react-expert` | React & Next.js performance optimization (Vercel - 57 rules) |
 | `web-design-guidelines` | Web UI audit - 100+ rules for accessibility, UX, performance (Vercel) |
 | `tailwind-patterns` | Tailwind CSS v4 utilities |
 | `frontend-design` | UI/UX patterns, design systems |
@@ -268,7 +267,7 @@ For details, see [scripts/README.md](scripts/README.md)
 | Metric | Value |
 | ------ | ----- |
 | **Total Agents** | 20 |
-| **Total Skills** | 36 |
+| **Total Skills** | 35 |
 | **Total Workflows** | 11 |
 | **Total Scripts** | 2 (master) + 18 (skill-level) |
 | **Coverage** | ~90% web/mobile development |
@@ -279,7 +278,7 @@ For details, see [scripts/README.md](scripts/README.md)
 
 | Need | Agent | Skills |
 | ---- | ----- | ------ |
-| Web App | `frontend-specialist` | nextjs-react-expert, frontend-design |
+| Web App | `frontend-specialist` | frontend-design, web-design-guidelines |
 | API | `backend-specialist` | api-patterns, nodejs-best-practices |
 | Mobile | `mobile-developer` | mobile-design |
 | Database | `database-architect` | database-design, prisma-expert |

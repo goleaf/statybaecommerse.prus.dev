@@ -23,16 +23,14 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash, Agent
 
 ---
 
-## 📦 Templates (13)
+## 📦 Templates (10)
 
 Quick-start scaffolding for new projects. **Read the matching template only!**
 
 | Template | Tech Stack | When to Use |
 |----------|------------|-------------|
-| [nextjs-fullstack](templates/nextjs-fullstack/TEMPLATE.md) | Next.js + Prisma | Full-stack web app |
-| [nextjs-saas](templates/nextjs-saas/TEMPLATE.md) | Next.js + Stripe | SaaS product |
-| [nextjs-static](templates/nextjs-static/TEMPLATE.md) | Next.js + Framer | Landing page |
 | [nuxt-app](templates/nuxt-app/TEMPLATE.md) | Nuxt 3 + Pinia | Vue full-stack app |
+| [astro-static](templates/astro-static/TEMPLATE.md) | Astro + MDX | Blog / Docs |
 | [express-api](templates/express-api/TEMPLATE.md) | Express + JWT | REST API |
 | [python-fastapi](templates/python-fastapi/TEMPLATE.md) | FastAPI | Python API |
 | [react-native-app](templates/react-native-app/TEMPLATE.md) | Expo + Zustand | Mobile app |
@@ -63,7 +61,7 @@ User: "Make an Instagram clone with photo sharing and likes"
 
 App Builder Process:
 1. Project type: Social Media App
-2. Tech stack: Next.js + Prisma + Cloudinary + Clerk
+2. Tech stack: Nuxt + Prisma + Cloudinary + Clerk
 3. Create plan:
    ├─ Database schema (users, posts, likes, follows)
    ├─ API routes (12 endpoints)

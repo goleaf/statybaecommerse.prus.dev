@@ -75,7 +75,6 @@ CSV_CONFIG = {
 STACK_CONFIG = {
     "html-tailwind": {"file": "stacks/html-tailwind.csv"},
     "react": {"file": "stacks/react.csv"},
-    "nextjs": {"file": "stacks/nextjs.csv"},
     "vue": {"file": "stacks/vue.csv"},
     "nuxtjs": {"file": "stacks/nuxtjs.csv"},
     "nuxt-ui": {"file": "stacks/nuxt-ui.csv"},
@@ -205,7 +204,7 @@ def detect_domain(query):
         "ux": ["ux", "usability", "accessibility", "wcag", "touch", "scroll", "animation", "keyboard", "navigation", "mobile"],
         "typography": ["font", "typography", "heading", "serif", "sans"],
         "icons": ["icon", "icons", "lucide", "heroicons", "symbol", "glyph", "pictogram", "svg icon"],
-        "react": ["react", "next.js", "nextjs", "suspense", "memo", "usecallback", "useeffect", "rerender", "bundle", "waterfall", "barrel", "dynamic import", "rsc", "server component"],
+        "react": ["react", "suspense", "memo", "usecallback", "useeffect", "rerender", "bundle", "waterfall", "barrel", "dynamic import", "rsc", "server component"],
         "web": ["aria", "focus", "outline", "semantic", "virtualize", "autocomplete", "form", "input type", "preconnect"]
     }
 

@@ -1,6 +1,6 @@
 ---
 name: templates
-description: Project scaffolding templates for new applications. Use when creating new projects from scratch. Contains 12 templates for various tech stacks.
+description: Project scaffolding templates for new applications. Use when creating new projects from scratch. Contains 10 templates for various tech stacks.
 allowed-tools: Read, Glob, Grep
 ---
 
@@ -16,9 +16,7 @@ allowed-tools: Read, Glob, Grep
 
 | Template | Tech Stack | When to Use |
 |----------|------------|-------------|
-| [nextjs-fullstack](nextjs-fullstack/TEMPLATE.md) | Next.js + Prisma | Full-stack web app |
-| [nextjs-saas](nextjs-saas/TEMPLATE.md) | Next.js + Stripe | SaaS product |
-| [nextjs-static](nextjs-static/TEMPLATE.md) | Next.js + Framer | Landing page |
+| [nuxt-app](nuxt-app/TEMPLATE.md) | Nuxt 3 + Pinia | Full-stack web app |
 | [express-api](express-api/TEMPLATE.md) | Express + JWT | REST API |
 | [python-fastapi](python-fastapi/TEMPLATE.md) | FastAPI | Python API |
 | [react-native-app](react-native-app/TEMPLATE.md) | Expo + Zustand | Mobile app |

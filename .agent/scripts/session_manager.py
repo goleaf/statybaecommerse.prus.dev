@@ -33,8 +33,7 @@ def analyze_package_json(root: Path) -> Dict[str, Any]:
         all_deps = {**deps, **dev_deps}
         
         stack = []
-        if "next" in all_deps: stack.append("Next.js")
-        elif "react" in all_deps: stack.append("React")
+        if "react" in all_deps or "next" in all_deps: stack.append("React")
         elif "vue" in all_deps: stack.append("Vue")
         elif "svelte" in all_deps: stack.append("Svelte")
         elif "express" in all_deps: stack.append("Express")

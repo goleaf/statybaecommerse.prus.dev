@@ -47,7 +47,7 @@ Extract key information from user request:
 - **Product type**: SaaS, e-commerce, portfolio, dashboard, landing page, etc.
 - **Style keywords**: minimal, playful, professional, elegant, dark mode, etc.
 - **Industry**: healthcare, fintech, gaming, education, etc.
-- **Stack**: React, Vue, Next.js, or default to `html-tailwind`
+- **Stack**: React, Vue, or default to `html-tailwind`
 
 ### Step 2: Generate Design System (REQUIRED)
 
@@ -119,8 +119,7 @@ Get implementation-specific best practices. If user doesn't specify a stack, **d
 python3 .agent/.shared/ui-ux-pro-max/scripts/search.py "<keyword>" --stack html-tailwind
 ```
 
-Available stacks: `html-tailwind`, `react`, `nextjs`, `vue`, `svelte`, `swiftui`, `react-native`, `flutter`, `shadcn`, `jetpack-compose`
-, `jetpack-compose`
+Available stacks: `html-tailwind`, `react`, `vue`, `svelte`, `swiftui`, `react-native`, `flutter`, `shadcn`, `jetpack-compose`
 ---
 
 ## Search Reference
@@ -136,7 +135,7 @@ Available stacks: `html-tailwind`, `react`, `nextjs`, `vue`, `svelte`, `swiftui`
 | `landing` | Page structure, CTA strategies | hero, hero-centric, testimonial, pricing, social-proof |
 | `chart` | Chart types, library recommendations | trend, comparison, timeline, funnel, pie |
 | `ux` | Best practices, anti-patterns | animation, accessibility, z-index, loading |
-| `react` | React/Next.js performance | waterfall, bundle, suspense, memo, rerender, cache |
+| `react` | React performance | waterfall, bundle, suspense, memo, rerender, cache |
 | `web` | Web interface guidelines | aria, focus, keyboard, semantic, virtualize |
 | `prompt` | AI prompts, CSS keywords | (style name) |
 
@@ -146,7 +145,6 @@ Available stacks: `html-tailwind`, `react`, `nextjs`, `vue`, `svelte`, `swiftui`
 |-------|-------|
 | `html-tailwind` | Tailwind utilities, responsive, a11y (DEFAULT) |
 | `react` | State, hooks, performance, patterns |
-| `nextjs` | SSR, routing, images, API routes |
 | `vue` | Composition API, Pinia, Vue Router |
 | `svelte` | Runes, stores, SvelteKit |
 | `swiftui` | Views, State, Navigation, Animation |
