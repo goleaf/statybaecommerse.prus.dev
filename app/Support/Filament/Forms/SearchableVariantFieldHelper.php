@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Support\Filament\Forms;
 
 use App\Models\ProductVariant;
-use App\Support\Search\ProductVariantSearch;
 use App\Support\Filament\Components\SearchableInput;
+use App\Support\Search\ProductVariantSearch;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 

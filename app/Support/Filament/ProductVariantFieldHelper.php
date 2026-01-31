@@ -6,8 +6,8 @@ namespace App\Support\Filament;
 
 use App\Models\ProductVariant;
 use App\Support\Filament\Components\SearchableComponentHelper;
-use App\Support\Search\ProductVariantSearch;
 use App\Support\Filament\Components\SearchableInput;
+use App\Support\Search\ProductVariantSearch;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 

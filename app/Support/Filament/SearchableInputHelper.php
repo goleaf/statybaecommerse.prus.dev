@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Support\Filament;
 
 use App\Support\Filament\Components\SearchableComponentHelper;
+use App\Support\Filament\Components\SearchableInput;
+use App\Support\Search\SearchResult;
 use App\Support\Search\SearchResultPayload;
 use Closure;
-use App\Support\Search\SearchResult;
-use App\Support\Filament\Components\SearchableInput;
 use Illuminate\Contracts\Support\Arrayable;
 use Stringable;
 

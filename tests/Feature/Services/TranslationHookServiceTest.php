@@ -107,8 +107,12 @@ it('gets missing translations for specific locale', function () {
     // Manually create files to simulate a truly missing translation
     $localeDirLt = lang_path('lt');
     $localeDirEn = lang_path('en');
-    if (!File::isDirectory($localeDirLt)) File::makeDirectory($localeDirLt, 0755, true);
-    if (!File::isDirectory($localeDirEn)) File::makeDirectory($localeDirEn, 0755, true);
+    if (! File::isDirectory($localeDirLt)) {
+        File::makeDirectory($localeDirLt, 0755, true);
+    }
+    if (! File::isDirectory($localeDirEn)) {
+        File::makeDirectory($localeDirEn, 0755, true);
+    }
 
     File::put($localeDirLt . '/test.php', "<?php return ['complete' => 'Pilnas', 'incomplete' => 'Nepilnas'];");
     File::put($localeDirEn . '/test.php', "<?php return ['complete' => 'Complete'];");
@@ -142,7 +146,7 @@ function cleanupTestTranslations(): void
             File::delete($dir . '/missing.php');
         }
     }
-    
+
     $testFiles = [
         resource_path('views/test-translation.blade.php'),
     ];

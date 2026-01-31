@@ -55,10 +55,10 @@ class UserInfolist
                         TextEntry::make('preferred_locale')
                             ->label(__('messages.language'))
                             ->formatStateUsing(fn ($state) => match ($state) {
-                                'en' => __('translations.english'),
-                                'lt' => __('translations.lithuanian'),
-                                'ru' => __('translations.russian'),
-                                'de' => __('translations.german'),
+                                'en'    => __('translations.english'),
+                                'lt'    => __('translations.lithuanian'),
+                                'ru'    => __('translations.russian'),
+                                'de'    => __('translations.german'),
                                 default => $state,
                             }),
                     ])->columns(3),

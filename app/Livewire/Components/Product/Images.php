@@ -60,9 +60,9 @@ class Images extends Component
                     ->getMedia(config('media.storage.collection_name'))
                     ->map(function ($media) use ($variant) {
                         return [
-                            'src' => $media->getUrl('large') ?: $media->getUrl(),
+                            'src'    => $media->getUrl('large') ?: $media->getUrl(),
                             'srcset' => trim(($media->getUrl('medium') ?: '') . ' 500w, ' . ($media->getUrl('large') ?: '')),
-                            'alt' => $variant->product?->trans('name') ?? ($variant->product?->name ?? 'Product image'),
+                            'alt'    => $variant->product?->trans('name') ?? ($variant->product?->name ?? 'Product image'),
                         ];
                     })
                     ->toArray()
@@ -70,9 +70,9 @@ class Images extends Component
                     ->getMedia(config('media.storage.collection_name'))
                     ->map(function ($media) use ($variant) {
                         return [
-                            'src' => $media->getUrl('large') ?: $media->getUrl(),
+                            'src'    => $media->getUrl('large') ?: $media->getUrl(),
                             'srcset' => trim(($media->getUrl('medium') ?: '') . ' 500w, ' . ($media->getUrl('large') ?: '')),
-                            'alt' => $variant->product?->trans('name') ?? ($variant->product?->name ?? 'Product image'),
+                            'alt'    => $variant->product?->trans('name') ?? ($variant->product?->name ?? 'Product image'),
                         ];
                     })
                     ->toArray();

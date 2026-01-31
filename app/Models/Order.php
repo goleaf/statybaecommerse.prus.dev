@@ -93,36 +93,35 @@ final class Order extends Model implements HasDocuments
             'billing_address'  => 'array',
             'shipping_address' => 'array',
             'transactions'     => 'array',
-                        'shipped_at'       => 'datetime',
-                        'delivered_at'     => 'datetime',
-                    ];
-                }
-            
-                /**
-                 * Get the customer name for exports and display.
-                 */
-                public function getCustomerNameAttribute(): ?string
-                {
-                    return $this->user?->name;
-                }
-            
-                /**
-                 * The accessors to append to the model's array form.
-                 * 
-                 * @var array<int, string>
-                 */
-                protected $appends = ['total_items_count', 'formatted_total'];
-            
-                /**
-                 * Cache whether the created_at index is available per connection to avoid repeated schema lookups.
-                 * 
-                 * @var array<string, bool>
-                 */
-                private static array $createdAtIndexAvailable = [];
-            
-                /**
-                 * Handle user functionality with proper error handling.
-            
+            'shipped_at'       => 'datetime',
+            'delivered_at'     => 'datetime',
+        ];
+    }
+
+    /**
+     * Get the customer name for exports and display.
+     */
+    public function getCustomerNameAttribute(): ?string
+    {
+        return $this->user?->name;
+    }
+
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array<int, string>
+     */
+    protected $appends = ['total_items_count', 'formatted_total'];
+
+    /**
+     * Cache whether the created_at index is available per connection to avoid repeated schema lookups.
+     *
+     * @var array<string, bool>
+     */
+    private static array $createdAtIndexAvailable = [];
+
+    /**
+     * Handle user functionality with proper error handling.
      */
     public function user(): BelongsTo
     {

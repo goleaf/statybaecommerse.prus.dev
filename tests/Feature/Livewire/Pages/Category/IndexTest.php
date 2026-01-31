@@ -5,11 +5,9 @@ declare(strict_types=1);
 namespace Tests\Feature\Livewire\Pages\Category;
 
 use App\Livewire\Pages\Category\Index;
-use App\Models\Category;
-use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 final class IndexTest extends TestCase
 {

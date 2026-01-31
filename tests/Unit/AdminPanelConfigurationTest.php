@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use App\Filament\AdminPanelProvider;
-use App\Models\User;
 use Filament\Facades\Filament;
 use Filament\Panel;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -41,7 +40,7 @@ describe('Admin Panel Configuration', function (): void {
         $panel = $provider->panel(Panel::make());
 
         $middleware = $panel->getMiddleware();
-        
+
         $requiredMiddleware = [
             \Illuminate\Cookie\Middleware\EncryptCookies::class,
             \Illuminate\Session\Middleware\StartSession::class,
@@ -74,7 +73,7 @@ describe('Admin URL Authentication', function (): void {
         $response = $this->get('/admin/login');
 
         $response->assertStatus(200);
-        
+
         // Check that the custom login form components have the correct attributes for Livewire 3
         $response->assertSee('wire:model="data.email"', false);
         $response->assertSee('wire:model="data.password"', false);
@@ -86,7 +85,7 @@ describe('Admin URL Authentication', function (): void {
         $response = $this->get('/admin/dashboard');
 
         $response->assertRedirect();
-        
+
         // Should redirect to Filament admin login
         if (route('filament.admin.auth.login')) {
             $response->assertRedirect(route('filament.admin.auth.login'));
@@ -102,7 +101,7 @@ describe('Panel Resource Discovery', function (): void {
         // In testing environment, should still discover resources
         $resources = $panel->getResources();
         expect($resources)->toBeArray();
-        
+
         // Should have at least some resources discovered
         expect(count($resources))->toBeGreaterThan(0);
     });
@@ -113,7 +112,7 @@ describe('Panel Resource Discovery', function (): void {
 
         $pages = $panel->getPages();
         expect($pages)->toBeArray();
-        
+
         // In testing environment, should include the dashboard page
         if (app()->environment('testing')) {
             expect($pages)->toContain(\App\Filament\Pages\Dashboard::class);
@@ -123,13 +122,13 @@ describe('Panel Resource Discovery', function (): void {
     it('panel configures widgets correctly for testing environment', function (): void {
         // Ensure we're in testing environment
         app()->instance('env', 'testing');
-        
+
         $provider = new AdminPanelProvider(app());
         $panel = $provider->panel(Panel::make());
 
         $widgets = $panel->getWidgets();
         expect($widgets)->toBeArray();
-        
+
         // Should include testing widgets
         $expectedTestingWidgets = [
             \App\Filament\Widgets\DashboardKpiWidget::class,

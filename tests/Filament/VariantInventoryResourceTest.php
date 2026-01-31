@@ -122,6 +122,3 @@ it('casts arbitrary location attributes into the expected payload shape', functi
             'country_code' => '123',
         ]);
 });
-
-
-

@@ -46,6 +46,7 @@ class ProductAnalytics extends Component
         if (! $this->product) {
             return ['total_reviews' => 0, 'average_rating' => 0.0, 'rating_distribution' => []];
         }
+
         return ['total_reviews' => 0, 'average_rating' => 0.0, 'rating_distribution' => []];
     }
 

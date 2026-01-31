@@ -184,8 +184,8 @@ final class CheckoutController extends Controller
 
         if ($request->wantsJson()) {
             return response()->json([
-                'success'  => true,
-                'message'  => __('messages.ecommerce),
+                'success' => true,
+                'message' => __('messages.ecommerce),
                 '),
                 'order_id' => $order->getKey(),
                 'order'    => [

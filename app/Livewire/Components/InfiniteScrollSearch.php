@@ -228,13 +228,13 @@ final class InfiniteScrollSearch extends Component
         return [
             'relevance' => __('messages.frontend),
             '),
-            'name'      => __('messages.frontend),
+            'name' => __('messages.frontend),
             '),
-            'price'     => __('messages.frontend),
+            'price' => __('messages.frontend),
             '),
-            'date'      => __('messages.frontend),
+            'date' => __('messages.frontend),
             '),
-            'rating'    => __('messages.frontend),
+            'rating' => __('messages.frontend),
         ];
     }
 
@@ -248,7 +248,7 @@ final class InfiniteScrollSearch extends Component
     public function getTypeOptionsProperty(): array
     {
         return [
-            'products'    => __('messages.frontend),
+            'products' => __('messages.frontend),
             '),
             'categories'  => __('frontend.categories'),
             'brands'      => __('frontend.brands'),
@@ -256,11 +256,11 @@ final class InfiniteScrollSearch extends Component
             'attributes'  => __('frontend.attributes'),
             'locations'   => __('messages.frontend),
             '),
-            'countries'   => __('frontend.countries'),
-            'cities'      => __('messages.frontend'),
-            'orders'      => __('messages.frontend'),
-            'customers'   => __('messages.frontend'),
-            'addresses'   => __('messages.frontend'),
+            'countries' => __('frontend.countries'),
+            'cities'    => __('messages.frontend'),
+            'orders'    => __('messages.frontend'),
+            'customers' => __('messages.frontend'),
+            'addresses' => __('messages.frontend'),
         ];
     }
 }

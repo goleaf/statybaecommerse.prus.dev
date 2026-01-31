@@ -23,8 +23,7 @@ trait BuildsProductCatalogueQuery
             ->with([
                 'brand:id,name,slug',
                 'media',
-            ])
-            ;
+            ]);
     }
 
     /**

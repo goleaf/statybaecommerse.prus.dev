@@ -43,10 +43,10 @@ final class CustomerSeeder extends Seeder
         // We can't easily use factory()->create() for bulk with existence check efficiently
         // except looping or using upsert (but factories are complex).
         // Given this is a seeder, we can just loop.
-        
+
         for ($i = 1; $i <= 100; $i++) {
             $email = sprintf('customer%03d@example.com', $i);
-            
+
             if (User::where('email', $email)->exists()) {
                 continue;
             }
@@ -56,7 +56,7 @@ final class CustomerSeeder extends Seeder
                 'first_name' => 'Customer',
                 'last_name'  => (string) $i,
             ]);
-            
+
             $this->assignCustomerRole($user);
         }
     }

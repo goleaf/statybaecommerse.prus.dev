@@ -33,7 +33,7 @@ final class HomeSlider extends Component
         return TagAwareCache::remember(
             CacheKeys::homeSliders($locale),
             CacheKeys::TTL_FIVE_MINUTES,
-            function () use ($locale) {
+            function () {
                 return Slider::query()
                     ->active()
                     ->ordered()

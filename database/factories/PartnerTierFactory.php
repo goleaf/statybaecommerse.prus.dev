@@ -22,6 +22,7 @@ class PartnerTierFactory extends Factory
     public function definition(): array
     {
         $name = $this->faker->word() . ' ' . $this->faker->unique()->numerify('####');
+
         return [
             'name'                 => ucfirst($name),
             'code'                 => strtolower(str_replace(' ', '-', $name)),

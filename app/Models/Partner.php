@@ -35,7 +35,6 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property float|null                $commission_rate
  * @property int|null                  $tier_id
  * @property array<string, mixed>|null $metadata
- *
  * @property-read \App\Models\PartnerTier|null $partnerTier
  *
  * @mixin \Eloquent

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -11,11 +12,9 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-use App\Traits\HasTranslations;
-
 final class Slider extends Model implements HasMedia
 {
-    use HasFactory, InteractsWithMedia, HasTranslations;
+    use HasFactory, HasTranslations, InteractsWithMedia;
 
     protected string $translationModel = \App\Models\SliderTranslation::class;
 
@@ -24,7 +23,6 @@ final class Slider extends Model implements HasMedia
     /**
      * @var int|null ensures tests can request the next record when verifying toggle actions.
      */
-
     public static function first($columns = ['*'])
     {
         $query = self::query();

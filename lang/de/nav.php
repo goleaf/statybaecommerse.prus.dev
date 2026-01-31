@@ -2,6 +2,6 @@
 
 declare(strict_types=1);
 
-return array (
-  'home' => 'Startseite',
-);
+return [
+    'home' => 'Startseite',
+];

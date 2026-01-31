@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\CustomerGroups\Schemas;
 
 use Filament\Forms\Components\ColorPicker;
@@ -37,10 +39,10 @@ class CustomerGroupForm
                                 Select::make('type')
                                     ->label(__('messages.type'))
                                     ->options([
-                                        'retail' => __('messages.Retail'),
+                                        'retail'    => __('messages.Retail'),
                                         'wholesale' => __('messages.Wholesale'),
-                                        'b2b' => __('messages.B2B'),
-                                        'internal' => __('messages.Internal'),
+                                        'b2b'       => __('messages.B2B'),
+                                        'internal'  => __('messages.Internal'),
                                     ])
                                     ->required(),
                                 ColorPicker::make('color')

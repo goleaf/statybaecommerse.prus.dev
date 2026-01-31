@@ -9,6 +9,8 @@ use App\Models\User;
 use Filament\Resources\Resource;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\File;
+use ReflectionClass;
+use ReflectionException;
 use Tests\TestCase;
 use UnitEnum;
 
@@ -107,7 +109,7 @@ final class NavigationOrganizationPropertyTest extends TestCase
         foreach ($allNavigationGroups as $group) {
             // Test that translation keys exist for both Lithuanian and English
             $translationKey = "navigation_groups.{$group->value}";
-            
+
             // Check Lithuanian translation - allow fallback to English if not found
             $ltTranslation = __($translationKey, [], 'lt');
             if ($ltTranslation !== $translationKey) {
@@ -123,7 +125,7 @@ final class NavigationOrganizationPropertyTest extends TestCase
             }
 
             // At least one translation should exist (either direct translation or via getLabel method)
-            $hasTranslation = ($ltTranslation !== $translationKey) || ($enTranslation !== $translationKey) || !empty($group->getLabel());
+            $hasTranslation = ($ltTranslation !== $translationKey) || ($enTranslation !== $translationKey) || ! empty($group->getLabel());
             $this->assertTrue($hasTranslation, "NavigationGroup {$group->name} should have at least one translation available");
         }
     }
@@ -172,14 +174,14 @@ final class NavigationOrganizationPropertyTest extends TestCase
 
         foreach ($allNavigationGroups as $group) {
             $priority = $group->priority();
-            
+
             // Check for duplicate priorities
             $this->assertNotContains(
                 $priority,
                 $priorities,
                 "NavigationGroup {$group->name} priority {$priority} should be unique"
             );
-            
+
             $priorities[] = $priority;
         }
 
@@ -211,7 +213,7 @@ final class NavigationOrganizationPropertyTest extends TestCase
 
         foreach ($resourceClasses as $resourceClass) {
             $navigationGroup = $this->getResourceNavigationGroup($resourceClass);
-            
+
             if ($navigationGroup instanceof NavigationGroup) {
                 $groupAssignments[$navigationGroup->name][] = $resourceClass;
             }
@@ -229,8 +231,6 @@ final class NavigationOrganizationPropertyTest extends TestCase
             }
         }
     }
-
-
 
     /**
      * Helper method to get all Filament resource classes
@@ -270,13 +270,14 @@ final class NavigationOrganizationPropertyTest extends TestCase
     private function getResourceNavigationGroup(string $resourceClass): mixed
     {
         try {
-            $reflection = new \ReflectionClass($resourceClass);
+            $reflection = new ReflectionClass($resourceClass);
             if ($reflection->hasProperty('navigationGroup')) {
                 $property = $reflection->getProperty('navigationGroup');
                 $property->setAccessible(true);
+
                 return $property->getValue();
             }
-        } catch (\ReflectionException $e) {
+        } catch (ReflectionException $e) {
             // Property doesn't exist or can't be accessed
         }
 
@@ -289,13 +290,14 @@ final class NavigationOrganizationPropertyTest extends TestCase
     private function getResourceNavigationIcon(string $resourceClass): ?string
     {
         try {
-            $reflection = new \ReflectionClass($resourceClass);
+            $reflection = new ReflectionClass($resourceClass);
             if ($reflection->hasProperty('navigationIcon')) {
                 $property = $reflection->getProperty('navigationIcon');
                 $property->setAccessible(true);
+
                 return $property->getValue();
             }
-        } catch (\ReflectionException $e) {
+        } catch (ReflectionException $e) {
             // Property doesn't exist or can't be accessed
         }
 
@@ -320,13 +322,14 @@ final class NavigationOrganizationPropertyTest extends TestCase
     private function getResourceNavigationSort(string $resourceClass): ?int
     {
         try {
-            $reflection = new \ReflectionClass($resourceClass);
+            $reflection = new ReflectionClass($resourceClass);
             if ($reflection->hasProperty('navigationSort')) {
                 $property = $reflection->getProperty('navigationSort');
                 $property->setAccessible(true);
+
                 return $property->getValue();
             }
-        } catch (\ReflectionException $e) {
+        } catch (ReflectionException $e) {
             // Property doesn't exist or can't be accessed
         }
 

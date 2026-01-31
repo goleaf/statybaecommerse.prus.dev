@@ -2,13 +2,12 @@
 
 declare(strict_types=1);
 
-return array (
-  'countries' => 
-  array (
-    'lt' => 'Lithuania',
-    'lv' => 'Latvia',
-    'ee' => 'Estonia',
-    'pl' => 'Poland',
-    'de' => 'Germany',
-  ),
-);
+return [
+    'countries' => [
+        'lt' => 'Lithuania',
+        'lv' => 'Latvia',
+        'ee' => 'Estonia',
+        'pl' => 'Poland',
+        'de' => 'Germany',
+    ],
+];

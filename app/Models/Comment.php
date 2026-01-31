@@ -290,4 +290,3 @@ final class Comment extends Model
         return 'parent_id';
     }
 }
-

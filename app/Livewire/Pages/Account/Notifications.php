@@ -55,15 +55,15 @@ class Notifications extends Component
                 $data = $n->data ?? [];
 
                 return [
-                    'id' => $n->id,
-                    'type' => $data['type'] ?? 'info',
-                    'action' => $data['action'] ?? 'updated',
-                    'title' => $data['title'] ?? __('notifications.types.info'),
-                    'message' => $data['message'] ?? '',
-                    'data' => $data,
-                    'read_at' => $n->read_at,
+                    'id'         => $n->id,
+                    'type'       => $data['type'] ?? 'info',
+                    'action'     => $data['action'] ?? 'updated',
+                    'title'      => $data['title'] ?? __('notifications.types.info'),
+                    'message'    => $data['message'] ?? '',
+                    'data'       => $data,
+                    'read_at'    => $n->read_at,
                     'created_at' => $n->created_at,
-                    'time_ago' => $this->getTimeAgo($n->created_at),
+                    'time_ago'   => $this->getTimeAgo($n->created_at),
                 ];
             })
             ->toArray();

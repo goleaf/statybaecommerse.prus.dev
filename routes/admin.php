@@ -635,7 +635,7 @@ if (app()->runningUnitTests()) {
                     ];
                 });
 
-            $content = $inventory-management
+            $content = $inventory - management
                 ->map(static function (array $inventory): string {
                     return '<div class="inventory" data-id="' . e((string) $inventory['id']) . '">'
                         . '<span class="product">' . e($inventory['product']) . '</span>'

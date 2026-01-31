@@ -151,7 +151,7 @@ final class LiveDashboard extends Component
                         'status'     => $order->status,
                         'created_at' => $order->created_at->diffForHumans(),
                     ]),
-                'recent_reviews' => collect(),
+                'recent_reviews'   => collect(),
                 'popular_products' => Product::with(['brand'])
                     ->where('is_visible', true)
                     ->latest('published_at')

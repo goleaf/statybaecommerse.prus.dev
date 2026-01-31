@@ -277,6 +277,7 @@ final class ComprehensiveOrderSeeder extends Seeder
                 // If collision occurs, try skipping a few numbers
                 Log::warning("Order creation failed for sequence {$this->nextOrderSequence}, retrying: " . $e->getMessage());
                 $this->nextOrderSequence++;
+
                 continue;
             }
 

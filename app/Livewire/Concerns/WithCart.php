@@ -132,9 +132,9 @@ trait WithCart
                 'variant_id' => $variant?->getKey(),
                 'name'       => $variant?->name ?: $product->name,
                 'price'      => $unitPrice,
-                'quantity' => $quantity,
-                'image'    => $product->getFirstMediaUrl('images'),
-                'sku'      => $variant?->sku ?? $product->sku,
+                'quantity'   => $quantity,
+                'image'      => $product->getFirstMediaUrl('images'),
+                'sku'        => $variant?->sku ?? $product->sku,
                 'attributes' => $variantAttributes,
             ];
         }

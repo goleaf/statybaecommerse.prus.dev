@@ -58,7 +58,9 @@ final class TranslationService
             $phpFiles = File::glob(lang_path("{$locale}/*.php"));
             foreach ($phpFiles as $file) {
                 $group = pathinfo($file, PATHINFO_FILENAME);
-                $groupTranslations = (static function($f) { return include $f; })($file);
+                $groupTranslations = (static function ($f) {
+                    return include $f;
+                })($file);
                 if (is_array($groupTranslations)) {
                     foreach ($groupTranslations as $key => $value) {
                         $translations["{$group}.{$key}"] = $value;
@@ -138,7 +140,9 @@ final class TranslationService
             [$group, $item] = explode('.', $key, 2);
             $phpFile = lang_path("{$locale}/{$group}.php");
             if (File::exists($phpFile)) {
-                $translations = (static function($f) { return include $f; })($phpFile);
+                $translations = (static function ($f) {
+                    return include $f;
+                })($phpFile);
 
                 return data_get($translations, $item);
             }

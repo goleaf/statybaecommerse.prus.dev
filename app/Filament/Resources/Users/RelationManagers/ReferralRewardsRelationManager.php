@@ -41,7 +41,7 @@ class ReferralRewardsRelationManager extends RelationManager
                     ->required(),
                 Select::make('type')
                     ->options([
-                        'referrer_bonus' => 'Referrer Bonus',
+                        'referrer_bonus'    => 'Referrer Bonus',
                         'referred_discount' => 'Referred Discount',
                     ])
                     ->required(),

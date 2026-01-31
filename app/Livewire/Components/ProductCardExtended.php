@@ -7,7 +7,6 @@ namespace App\Livewire\Components;
 use App\Livewire\Concerns\WithCart;
 use App\Livewire\Concerns\WithNotifications;
 use App\Models\Product;
-use Livewire\Attributes\On;
 use Livewire\Component;
 
 /**
@@ -39,9 +38,7 @@ final class ProductCardExtended extends Component
     /**
      * Initialize the Livewire component with parameters.
      */
-    public function mount(): void
-    {
-    }
+    public function mount(): void {}
 
     /**
      * Handle addToCart functionality with proper error handling.

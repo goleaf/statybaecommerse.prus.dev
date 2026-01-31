@@ -113,19 +113,19 @@ final class UserRelationsSeeder extends Seeder
         if ($subscriber) {
             $subscriber->restore();
             $subscriber->update([
-                'user_id'    => $user->id,
-                'first_name' => $user->first_name ?? 'First',
-                'last_name'  => $user->last_name ?? 'Last',
-                'status'     => 'active',
+                'user_id'       => $user->id,
+                'first_name'    => $user->first_name ?? 'First',
+                'last_name'     => $user->last_name ?? 'Last',
+                'status'        => 'active',
                 'subscribed_at' => now(),
             ]);
         } else {
             Subscriber::create([
-                'email'      => $user->email,
-                'user_id'    => $user->id,
-                'first_name' => $user->first_name ?? 'First',
-                'last_name'  => $user->last_name ?? 'Last',
-                'status'     => 'active',
+                'email'         => $user->email,
+                'user_id'       => $user->id,
+                'first_name'    => $user->first_name ?? 'First',
+                'last_name'     => $user->last_name ?? 'Last',
+                'status'        => 'active',
                 'subscribed_at' => now(),
             ]);
         }

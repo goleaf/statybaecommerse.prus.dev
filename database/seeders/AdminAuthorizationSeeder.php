@@ -11,7 +11,7 @@ use Spatie\Permission\Models\Role;
 
 /**
  * Seeder for admin authorization system.
- * 
+ *
  * This seeder creates all the necessary roles and permissions
  * for the admin panel authorization system.
  */
@@ -43,7 +43,7 @@ class AdminAuthorizationSeeder extends Seeder
         foreach ($guards as $guard) {
             foreach ($permissions as $permission) {
                 Permission::firstOrCreate([
-                    'name' => $permission,
+                    'name'       => $permission,
                     'guard_name' => $guard,
                 ]);
             }
@@ -61,7 +61,7 @@ class AdminAuthorizationSeeder extends Seeder
         foreach ($guards as $guard) {
             foreach ($roleDefinitions as $roleDefinition) {
                 $role = Role::firstOrCreate([
-                    'name' => $roleDefinition['role']->value,
+                    'name'       => $roleDefinition['role']->value,
                     'guard_name' => $guard,
                 ]);
 

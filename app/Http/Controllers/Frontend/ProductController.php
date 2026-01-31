@@ -56,5 +56,4 @@ final class ProductController extends Controller
 
         return view('frontend.products.show', $data);
     }
-
 }

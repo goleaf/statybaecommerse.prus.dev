@@ -150,8 +150,12 @@ final class TranslationHookServiceTest extends TestCase
         // Manually create files to simulate a truly missing translation
         $localeDirLt = $this->tempLangPath . '/lt';
         $localeDirEn = $this->tempLangPath . '/en';
-        if (!File::isDirectory($localeDirLt)) File::makeDirectory($localeDirLt, 0755, true);
-        if (!File::isDirectory($localeDirEn)) File::makeDirectory($localeDirEn, 0755, true);
+        if (! File::isDirectory($localeDirLt)) {
+            File::makeDirectory($localeDirLt, 0755, true);
+        }
+        if (! File::isDirectory($localeDirEn)) {
+            File::makeDirectory($localeDirEn, 0755, true);
+        }
 
         File::put($localeDirLt . '/common.php', "<?php return ['hello' => 'Labas', 'goodbye' => 'Viso gero'];");
         File::put($localeDirEn . '/common.php', "<?php return ['hello' => 'Hello'];");
@@ -167,8 +171,12 @@ final class TranslationHookServiceTest extends TestCase
         // Manually create files to simulate missing translations
         $localeDirLt = $this->tempLangPath . '/lt';
         $localeDirEn = $this->tempLangPath . '/en';
-        if (!File::isDirectory($localeDirLt)) File::makeDirectory($localeDirLt, 0755, true);
-        if (!File::isDirectory($localeDirEn)) File::makeDirectory($localeDirEn, 0755, true);
+        if (! File::isDirectory($localeDirLt)) {
+            File::makeDirectory($localeDirLt, 0755, true);
+        }
+        if (! File::isDirectory($localeDirEn)) {
+            File::makeDirectory($localeDirEn, 0755, true);
+        }
 
         File::put($localeDirLt . '/test.php', "<?php return ['key1' => 'Value 1', 'key2' => 'Value 2'];");
         File::put($localeDirEn . '/test.php', "<?php return ['key1' => 'Value 1'];");
@@ -234,7 +242,7 @@ final class TranslationHookServiceTest extends TestCase
 
         $ltContent = include $this->tempLangPath . '/lt/z.php';
         expect($ltContent['last'])->toBe('Last');
-        
+
         $ltContent = include $this->tempLangPath . '/lt/a.php';
         expect($ltContent['first'])->toBe('First');
     }
@@ -267,7 +275,7 @@ final class TranslationHookServiceTest extends TestCase
         $result = $service->addTranslation('test.key', ['lt' => 'Test Value']);
 
         expect($result)->toBeTrue();
-        
+
         $content = include $this->tempLangPath . '/lt/test.php';
         expect($content['key'])->toBe('Test Value');
     }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     /*
     |--------------------------------------------------------------------------
@@ -101,9 +103,9 @@ return [
             ],
 
             'redis' => [
-                'prefix' => 'sse',
+                'prefix'      => 'sse',
                 'session_ttl' => 86400, // 24 hours in seconds
-                'connection' => 'default',
+                'connection'  => 'default',
             ],
         ],
     ],

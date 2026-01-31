@@ -6,7 +6,6 @@ namespace App\Models;
 
 use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
-use App\Models\Scopes\ApprovedScope;
 use App\Support\Storage\SecureStorage;
 use App\Traits\HasSafeSerialization;
 use App\Traits\SecurePasswordHandling;
@@ -1078,5 +1077,3 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
         return is_array($preferences) ? $preferences : [];
     }
 }
-
-

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Support\Filament\Components;
 
+use Closure;
 use Filament\Forms\Components\Select;
 
 class SearchableInput extends Select
@@ -61,12 +62,12 @@ class SearchableInput extends Select
         return $this->meta[$keys] ?? null;
     }
 
-    public function getSearchResultsUsing(?\Closure $callback): static
+    public function getSearchResultsUsing(?Closure $callback): static
     {
         return parent::getSearchResultsUsing($callback);
     }
 
-    public function searchUsing(?\Closure $callback): static
+    public function searchUsing(?Closure $callback): static
     {
         return $this->getSearchResultsUsing($callback);
     }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\CustomerGroups;
 
 use App\Filament\Resources\CustomerGroups\Pages\CreateCustomerGroup;
@@ -49,10 +51,10 @@ class CustomerGroupResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListCustomerGroups::route('/'),
+            'index'  => ListCustomerGroups::route('/'),
             'create' => CreateCustomerGroup::route('/create'),
-            'view' => ViewCustomerGroup::route('/{record}'),
-            'edit' => EditCustomerGroup::route('/{record}/edit'),
+            'view'   => ViewCustomerGroup::route('/{record}'),
+            'edit'   => EditCustomerGroup::route('/{record}/edit'),
         ];
     }
 

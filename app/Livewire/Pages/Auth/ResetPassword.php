@@ -43,8 +43,8 @@ class ResetPassword extends Component
     public function resetPassword(): void
     {
         $this->validate([
-            'token' => ['required'],
-            'email' => ['required', 'string', 'email'],
+            'token'    => ['required'],
+            'email'    => ['required', 'string', 'email'],
             'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
         ]);
 
@@ -54,7 +54,7 @@ class ResetPassword extends Component
         $status = Password::reset($this->only('email', 'password', 'password_confirmation', 'token'), function ($user) {
             $user
                 ->forceFill([
-                    'password' => Hash::make($this->password),
+                    'password'       => Hash::make($this->password),
                     'remember_token' => Str::random(60),
                 ])
                 ->save();

@@ -57,12 +57,12 @@ final class HomeAddToCartTest extends TestCase
         $variant = ProductVariant::factory()
             ->for($product)
             ->create([
-                'name'               => 'Size L',
-                'price'              => 39.99,
-                'promotional_price'  => null,
-                'is_on_sale'         => false,
-                'track_inventory'    => false,
-                'is_enabled'         => true,
+                'name'              => 'Size L',
+                'price'             => 39.99,
+                'promotional_price' => null,
+                'is_on_sale'        => false,
+                'track_inventory'   => false,
+                'is_enabled'        => true,
             ]);
 
         session()->start();

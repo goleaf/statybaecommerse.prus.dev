@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use App\Support\Filament\SearchableComponentHelper;
 use App\Support\Filament\Components\SearchableInput;
+use App\Support\Filament\SearchableComponentHelper;
 use Filament\Schemas\Schema;
 use Tests\Fixtures\FakeFilamentComponent;
 
@@ -182,6 +182,3 @@ it('unit: bootstraps payload macros lazily when none are registered', function (
     // Without any payload metadata the helper should always fall back to an empty array.
     expect($component->getPayload())->toBe([]);
 });
-
-
-

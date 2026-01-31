@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
+use App\Support\Filament\Components\SearchableInput;
 use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\SearchResult;
-use App\Support\Filament\Components\SearchableInput;
 use Illuminate\Support\Collection;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery as MockeryFacade;
@@ -115,9 +115,9 @@ test('clear helper flushes dependent keys', function (): void {
     ]);
 
     expect($calls)->toMatchArray([
-        'product_id' => null,
+        'product_id'         => null,
         'product_id_payload' => [],
-        'name'       => 'Example',
+        'name'               => 'Example',
     ]);
 });
 
@@ -193,8 +193,3 @@ test('hydrate helper can flatten arrayable labels and payloads', function (): vo
         ]),
     );
 });
-
-
-
-
-

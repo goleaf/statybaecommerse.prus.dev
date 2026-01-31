@@ -6,8 +6,6 @@ namespace App\Providers\Filament;
 
 use Filament\Panel;
 use Filament\PanelProvider;
-use Filament\Support\Facades\FilamentView;
-use Illuminate\Contracts\View\View;
 
 final class LiveNotificationProvider extends PanelProvider
 {

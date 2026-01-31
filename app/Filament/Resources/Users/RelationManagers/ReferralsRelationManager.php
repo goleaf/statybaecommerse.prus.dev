@@ -32,9 +32,9 @@ class ReferralsRelationManager extends RelationManager
                     ->maxLength(255),
                 Select::make('status')
                     ->options([
-                        'pending' => 'Pending',
+                        'pending'   => 'Pending',
                         'completed' => 'Completed',
-                        'expired' => 'Expired',
+                        'expired'   => 'Expired',
                     ])
                     ->required(),
                 DateTimePicker::make('completed_at'),

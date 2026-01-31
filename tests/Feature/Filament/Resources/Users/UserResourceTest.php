@@ -25,9 +25,9 @@ class UserResourceTest extends TestCase
             ->assertTableColumnExists('phone_number')
             ->assertTableColumnExists('is_active')
             ->assertTableColumnExists('created_at');
-            
+
         $table = $component->instance()->getTable();
-        
+
         $this->assertTrue($table->getColumn('name')->isSortable());
         $this->assertTrue($table->getColumn('email')->isSortable());
         $this->assertTrue($table->getColumn('phone_number')->isSortable());

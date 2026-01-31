@@ -25,10 +25,10 @@ final class VariantAnalyticsFactory extends Factory
         $revenue = $purchases * $this->faker->numberBetween(20, 200);
 
         return [
-            'product_id'      => Product::factory(),
-            'variant_id'      => ProductVariant::factory(),
-            'date'            => $this->faker->dateTimeBetween('-30 days', 'now')->format('Y-m-d'),
-            'date_bucket'     => function (array $attributes) {
+            'product_id'  => Product::factory(),
+            'variant_id'  => ProductVariant::factory(),
+            'date'        => $this->faker->dateTimeBetween('-30 days', 'now')->format('Y-m-d'),
+            'date_bucket' => function (array $attributes) {
                 return 'daily:' . $attributes['date'];
             },
             'views'           => $views,

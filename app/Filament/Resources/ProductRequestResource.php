@@ -23,12 +23,12 @@ final class ProductRequestResource extends BaseResource
 
     public static function getNavigationBadge(): ?string
     {
-        return (string) static::getModel()::pending()->count();
+        return (string) self::getModel()::pending()->count();
     }
 
     public static function getNavigationBadgeColor(): ?string
     {
-        return static::getModel()::pending()->count() > 0 ? 'warning' : 'gray';
+        return self::getModel()::pending()->count() > 0 ? 'warning' : 'gray';
     }
 
     public static function form(Schema $schema): Schema

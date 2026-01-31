@@ -195,4 +195,3 @@ describe('Index Performance Properties', function () {
         expect($lastPageTime / $firstPageTime)->toBeLessThan(3.0);
     });
 });
-

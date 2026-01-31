@@ -6,8 +6,8 @@ namespace App\Filament\Actions;
 
 use App\Contracts\DocumentServiceContract;
 use App\Models\DocumentTemplate;
-use DateTimeInterface;
 use App\Services\LocaleService;
+use DateTimeInterface;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
 use Filament\Notifications\Notification;
@@ -42,6 +42,7 @@ final class DocumentAction
                     ->label(__('admin.fields.locale'))
                     ->options(function () {
                         $locales = app(LocaleService::class)->getSupportedLocales();
+
                         return array_combine(
                             $locales,
                             array_map(fn ($locale) => strtoupper($locale), $locales)
@@ -52,7 +53,7 @@ final class DocumentAction
             ])
             ->action(function (Model $record, array $data, DocumentServiceContract $documentService) {
                 $originalLocale = App::getLocale();
-                
+
                 try {
                     if (isset($data['locale'])) {
                         App::setLocale($data['locale']);

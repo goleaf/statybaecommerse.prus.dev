@@ -10,7 +10,6 @@ use App\Livewire\Concerns\WithNotifications;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
-use App\Repositories\ProductRepository;
 use App\Support\Cache\CacheKeys;
 use App\Support\Cache\CacheTags;
 use App\Support\Cache\TagAwareCache;

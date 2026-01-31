@@ -24,12 +24,12 @@ class Documents extends Component
                 ->get(['id', 'title', 'format', 'file_path', 'status', 'generated_at'])
                 ->map(function ($doc) {
                     return [
-                        'id' => $doc->id,
-                        'title' => $doc->title,
-                        'format' => $doc->format,
-                        'status' => $doc->status,
+                        'id'           => $doc->id,
+                        'title'        => $doc->title,
+                        'format'       => $doc->format,
+                        'status'       => $doc->status,
                         'generated_at' => optional($doc->generated_at)->toDateTimeString(),
-                        'url' => $doc->getFileUrl(),
+                        'url'          => $doc->getFileUrl(),
                     ];
                 })
                 ->toArray();

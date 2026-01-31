@@ -6,11 +6,12 @@ namespace Tests\Feature\Filament;
 
 use App\Enums\NavigationGroup;
 use App\Models\User;
-use App\Support\Nav;
 use Filament\Facades\Filament;
 use Filament\Resources\Resource;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\File;
+use ReflectionClass;
+use ReflectionException;
 use Tests\TestCase;
 
 /**
@@ -38,7 +39,7 @@ final class NavigationStateManagementPropertyTest extends TestCase
 
     /**
      * Property test: navigation maintains active states for all menu items
-     * 
+     *
      * **Feature: filament-admin-backend-setup, Property 5: Navigation State Management**
      * **Validates: Requirements 3.4**
      */
@@ -54,7 +55,7 @@ final class NavigationStateManagementPropertyTest extends TestCase
         foreach ($sampleResources as $resourceClass) {
             // Test that each resource can determine its active state
             $this->assertResourceCanDetermineActiveState($resourceClass);
-            
+
             // Test that navigation group context is maintained
             $this->assertNavigationGroupContextIsMaintained($resourceClass);
         }
@@ -62,7 +63,7 @@ final class NavigationStateManagementPropertyTest extends TestCase
 
     /**
      * Property test: navigation group context highlighting is maintained for all grouped items
-     * 
+     *
      * **Feature: filament-admin-backend-setup, Property 5: Navigation State Management**
      * **Validates: Requirements 8.4**
      */
@@ -75,8 +76,8 @@ final class NavigationStateManagementPropertyTest extends TestCase
         foreach ($resourceClasses as $resourceClass) {
             $navigationGroup = $this->getResourceNavigationGroup($resourceClass);
             if ($navigationGroup !== null) {
-                $groupKey = $navigationGroup instanceof NavigationGroup 
-                    ? $navigationGroup->value 
+                $groupKey = $navigationGroup instanceof NavigationGroup
+                    ? $navigationGroup->value
                     : (string) $navigationGroup;
                 $groupedResources[$groupKey][] = $resourceClass;
             }
@@ -95,7 +96,7 @@ final class NavigationStateManagementPropertyTest extends TestCase
 
     /**
      * Property test: navigation state consistency across all admin panel interactions
-     * 
+     *
      * **Feature: filament-admin-backend-setup, Property 5: Navigation State Management**
      * **Validates: Requirements 3.4, 8.4**
      */
@@ -114,7 +115,7 @@ final class NavigationStateManagementPropertyTest extends TestCase
 
     /**
      * Property test: navigation active states are mutually exclusive
-     * 
+     *
      * **Feature: filament-admin-backend-setup, Property 5: Navigation State Management**
      * **Validates: Requirements 3.4, 8.4**
      */
@@ -133,7 +134,7 @@ final class NavigationStateManagementPropertyTest extends TestCase
 
     /**
      * Property test: navigation group highlighting persists across resource navigation
-     * 
+     *
      * **Feature: filament-admin-backend-setup, Property 5: Navigation State Management**
      * **Validates: Requirements 8.4**
      */
@@ -146,8 +147,8 @@ final class NavigationStateManagementPropertyTest extends TestCase
         foreach ($resourceClasses as $resourceClass) {
             $navigationGroup = $this->getResourceNavigationGroup($resourceClass);
             if ($navigationGroup !== null) {
-                $groupKey = $navigationGroup instanceof NavigationGroup 
-                    ? $navigationGroup->value 
+                $groupKey = $navigationGroup instanceof NavigationGroup
+                    ? $navigationGroup->value
                     : (string) $navigationGroup;
                 $groupedResources[$groupKey][] = $resourceClass;
             }
@@ -173,7 +174,7 @@ final class NavigationStateManagementPropertyTest extends TestCase
 
         // At least one navigation property should be available for state determination
         $hasNavigationProperties = $navigationGroup !== null || $navigationLabel !== null || $navigationIcon !== null;
-        
+
         $this->assertTrue(
             $hasNavigationProperties,
             "Resource {$resourceClass} should have navigation properties for active state determination"
@@ -203,10 +204,10 @@ final class NavigationStateManagementPropertyTest extends TestCase
 
             $this->assertIsString($groupLabel, "NavigationGroup for {$resourceClass} should have a string label");
             $this->assertNotEmpty($groupLabel, "NavigationGroup for {$resourceClass} label should not be empty");
-            
+
             $this->assertIsString($groupIcon, "NavigationGroup for {$resourceClass} should have a string icon");
             $this->assertNotEmpty($groupIcon, "NavigationGroup for {$resourceClass} icon should not be empty");
-            
+
             $this->assertIsInt($groupPriority, "NavigationGroup for {$resourceClass} should have an integer priority");
             $this->assertGreaterThan(0, $groupPriority, "NavigationGroup for {$resourceClass} priority should be positive");
         }
@@ -222,7 +223,7 @@ final class NavigationStateManagementPropertyTest extends TestCase
         // Test that all resources in the group have consistent navigation group assignment
         foreach ($resources as $resourceClass) {
             $navigationGroup = $this->getResourceNavigationGroup($resourceClass);
-            
+
             if ($navigationGroup instanceof NavigationGroup) {
                 $this->assertEquals(
                     $groupKey,
@@ -244,15 +245,15 @@ final class NavigationStateManagementPropertyTest extends TestCase
             $navigationGroup = $this->getResourceNavigationGroup($resourceClass);
             if ($navigationGroup instanceof NavigationGroup) {
                 $groupMetadata[] = [
-                    'label' => $navigationGroup->getLabel(),
-                    'icon' => $navigationGroup->getIcon(),
+                    'label'    => $navigationGroup->getLabel(),
+                    'icon'     => $navigationGroup->getIcon(),
                     'priority' => $navigationGroup->priority(),
                 ];
             }
         }
 
         // All resources in the same group should have the same group metadata
-        if (!empty($groupMetadata)) {
+        if (! empty($groupMetadata)) {
             $firstMetadata = $groupMetadata[0];
             foreach ($groupMetadata as $metadata) {
                 $this->assertEquals(
@@ -302,14 +303,14 @@ final class NavigationStateManagementPropertyTest extends TestCase
         // If navigation sort is set, it should be unique within its group
         if ($navigationSort !== null) {
             $this->assertIsInt($navigationSort, "Resource {$resourceClass} navigation sort should be an integer");
-            
+
             // Test that the sort value is reasonable (not negative, not extremely large)
             $this->assertGreaterThanOrEqual(0, $navigationSort, "Resource {$resourceClass} navigation sort should not be negative");
             $this->assertLessThan(1000, $navigationSort, "Resource {$resourceClass} navigation sort should be reasonable");
         }
 
         // Test that the resource class name is unique (which ensures unique active states)
-        $this->assertIsString($resourceClass, "Resource class should be a string");
+        $this->assertIsString($resourceClass, 'Resource class should be a string');
         $this->assertStringEndsWith('Resource', $resourceClass, "Resource class should end with 'Resource'");
     }
 
@@ -322,23 +323,23 @@ final class NavigationStateManagementPropertyTest extends TestCase
 
         // Test that all resources in the group share the same navigation group
         $firstResourceGroup = $this->getResourceNavigationGroup($resources[0]);
-        
+
         foreach ($resources as $resourceClass) {
             $navigationGroup = $this->getResourceNavigationGroup($resourceClass);
-            
+
             if ($firstResourceGroup instanceof NavigationGroup && $navigationGroup instanceof NavigationGroup) {
                 $this->assertEquals(
                     $firstResourceGroup->value,
                     $navigationGroup->value,
                     "All resources in group {$groupKey} should have the same navigation group value"
                 );
-                
+
                 $this->assertEquals(
                     $firstResourceGroup->getLabel(),
                     $navigationGroup->getLabel(),
                     "All resources in group {$groupKey} should have the same group label"
                 );
-                
+
                 $this->assertEquals(
                     $firstResourceGroup->getIcon(),
                     $navigationGroup->getIcon(),
@@ -392,13 +393,14 @@ final class NavigationStateManagementPropertyTest extends TestCase
     private function getResourceNavigationGroup(string $resourceClass): mixed
     {
         try {
-            $reflection = new \ReflectionClass($resourceClass);
+            $reflection = new ReflectionClass($resourceClass);
             if ($reflection->hasProperty('navigationGroup')) {
                 $property = $reflection->getProperty('navigationGroup');
                 $property->setAccessible(true);
+
                 return $property->getValue();
             }
-        } catch (\ReflectionException $e) {
+        } catch (ReflectionException $e) {
             // Property doesn't exist or can't be accessed
         }
 
@@ -411,13 +413,14 @@ final class NavigationStateManagementPropertyTest extends TestCase
     private function getResourceNavigationIcon(string $resourceClass): ?string
     {
         try {
-            $reflection = new \ReflectionClass($resourceClass);
+            $reflection = new ReflectionClass($resourceClass);
             if ($reflection->hasProperty('navigationIcon')) {
                 $property = $reflection->getProperty('navigationIcon');
                 $property->setAccessible(true);
+
                 return $property->getValue();
             }
-        } catch (\ReflectionException $e) {
+        } catch (ReflectionException $e) {
             // Property doesn't exist or can't be accessed
         }
 
@@ -442,13 +445,14 @@ final class NavigationStateManagementPropertyTest extends TestCase
     private function getResourceNavigationSort(string $resourceClass): ?int
     {
         try {
-            $reflection = new \ReflectionClass($resourceClass);
+            $reflection = new ReflectionClass($resourceClass);
             if ($reflection->hasProperty('navigationSort')) {
                 $property = $reflection->getProperty('navigationSort');
                 $property->setAccessible(true);
+
                 return $property->getValue();
             }
-        } catch (\ReflectionException $e) {
+        } catch (ReflectionException $e) {
             // Property doesn't exist or can't be accessed
         }
 

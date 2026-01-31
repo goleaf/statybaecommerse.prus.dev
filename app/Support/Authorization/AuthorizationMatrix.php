@@ -22,28 +22,28 @@ class AuthorizationMatrix
             'delete_users',
             'view_roles',
             'manage_roles',
-            
+
             // Product Management
             'view_products',
             'manage_products',
             'delete_products',
             'manage_inventory',
-            
+
             // Order Management
             'view_orders',
             'manage_orders',
             'process_refunds',
-            
+
             // Content
             'manage_content',
             'manage_media',
-            
+
             // Settings
             'view_settings',
             'manage_settings',
             'view_logs',
             'manage_system',
-            
+
             // Reports
             'view_reports',
             'export_data',
@@ -71,19 +71,19 @@ class AuthorizationMatrix
 
         return [
             [
-                'role' => AuthorizationRole::SUPER_ADMIN,
+                'role'        => AuthorizationRole::SUPER_ADMIN,
                 'permissions' => $all,
             ],
             [
-                'role' => AuthorizationRole::ADMIN,
+                'role'        => AuthorizationRole::ADMIN,
                 'permissions' => array_diff($all, ['manage_system', 'delete_users']),
             ],
             [
-                'role' => AuthorizationRole::ADMINISTRATOR,
+                'role'        => AuthorizationRole::ADMINISTRATOR,
                 'permissions' => array_diff($all, ['manage_system', 'manage_roles']),
             ],
             [
-                'role' => AuthorizationRole::MANAGER,
+                'role'        => AuthorizationRole::MANAGER,
                 'permissions' => [
                     'view_users',
                     'view_products',
@@ -98,7 +98,7 @@ class AuthorizationMatrix
                 ],
             ],
             [
-                'role' => AuthorizationRole::EDITOR,
+                'role'        => AuthorizationRole::EDITOR,
                 'permissions' => [
                     'view_products',
                     'manage_products',
@@ -107,7 +107,7 @@ class AuthorizationMatrix
                 ],
             ],
             [
-                'role' => AuthorizationRole::SUPPORT,
+                'role'        => AuthorizationRole::SUPPORT,
                 'permissions' => [
                     'view_users',
                     'view_orders',
@@ -116,7 +116,7 @@ class AuthorizationMatrix
                 ],
             ],
             [
-                'role' => AuthorizationRole::VIEWER,
+                'role'        => AuthorizationRole::VIEWER,
                 'permissions' => [
                     'view_users',
                     'view_products',
@@ -125,7 +125,7 @@ class AuthorizationMatrix
                 ],
             ],
             [
-                'role' => AuthorizationRole::USER,
+                'role'        => AuthorizationRole::USER,
                 'permissions' => [],
             ],
         ];

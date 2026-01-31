@@ -18,6 +18,7 @@ use App\Services\CurrencyRateSyncService;
 use App\Services\DocumentService;
 use App\Services\StaticCurrencyRateProvider;
 use App\Support\Cache\RateLimiter as ExtendedRateLimiter;
+use App\Support\Filament\Components\SearchableInput;
 use App\Support\Filament\SearchableComponentHelper;
 use App\Support\Health\HealthReporter;
 use App\Support\Html\HtmlSanitizer;
@@ -27,7 +28,6 @@ use App\Support\Uploads\SecureUploadHandler;
 use Closure;
 use DateInterval;
 use DateTimeInterface;
-use App\Support\Filament\Components\SearchableInput;
 use Faker\Factory as FakerFactory;
 use Faker\Generator as FakerGenerator;
 use Filament\Facades\Filament;
@@ -62,8 +62,6 @@ use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Number;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
-use Kirschbaum\Loop\Facades\Loop;
-use Kirschbaum\Loop\Filament\FilamentToolkit;
 
 use function in_array;
 
@@ -71,6 +69,8 @@ use InvalidArgumentException;
 
 use function is_array;
 
+use Kirschbaum\Loop\Facades\Loop;
+use Kirschbaum\Loop\Filament\FilamentToolkit;
 use Livewire\Features\SupportTesting\Testable;
 use Livewire\Livewire;
 

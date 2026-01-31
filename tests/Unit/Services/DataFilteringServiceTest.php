@@ -144,5 +144,4 @@ final class DataFilteringServiceTest extends TestCase
         $this->assertSame([101], $filtered->pluck('id')->all());
         $this->assertSame([0], array_values($filtered->keys()->all()));
     }
-
 }

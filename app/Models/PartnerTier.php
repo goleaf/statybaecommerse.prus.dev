@@ -11,15 +11,15 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 /**
  * App\Models\PartnerTier
  *
- * @property int $id
- * @property string $name
- * @property string $code
- * @property int $priority
- * @property string $default_discount_pct
- * @property bool $is_enabled
- * @property float|null $discount_rate
- * @property float|null $commission_rate
- * @property array|null $metadata
+ * @property int                             $id
+ * @property string                          $name
+ * @property string                          $code
+ * @property int                             $priority
+ * @property string                          $default_discount_pct
+ * @property bool                            $is_enabled
+ * @property float|null                      $discount_rate
+ * @property float|null                      $commission_rate
+ * @property array|null                      $metadata
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  */

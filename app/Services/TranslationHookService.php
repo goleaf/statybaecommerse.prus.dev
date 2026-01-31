@@ -201,7 +201,7 @@ final class TranslationHookService
 
     private function loadTranslationFiles(): void
     {
-        // No longer pre-loading all files into memory. 
+        // No longer pre-loading all files into memory.
         // We load them on demand in updateTranslationFile and saveTranslationFiles.
     }
 
@@ -215,8 +215,12 @@ final class TranslationHookService
         $translations = [];
 
         if (File::exists($phpFile)) {
-            $translations = (static function($f) { return include $f; })($phpFile);
-            if (!is_array($translations)) $translations = [];
+            $translations = (static function ($f) {
+                return include $f;
+            })($phpFile);
+            if (! is_array($translations)) {
+                $translations = [];
+            }
         }
 
         $translations[$subKey] = $translation;
@@ -253,7 +257,9 @@ final class TranslationHookService
             foreach ($files as $file) {
                 if ($file->getExtension() === 'php') {
                     $group = $file->getFilenameWithoutExtension();
-                    $fileTranslations = (static function($f) { return include $f; })($file->getPathname());
+                    $fileTranslations = (static function ($f) {
+                        return include $f;
+                    })($file->getPathname());
                     if (is_array($fileTranslations)) {
                         foreach ($fileTranslations as $k => $v) {
                             $translations["{$group}.{$k}"] = $v;
@@ -277,7 +283,10 @@ final class TranslationHookService
             return false;
         }
 
-        $translations = (static function($f) { return include $f; })($phpFile);
+        $translations = (static function ($f) {
+            return include $f;
+        })($phpFile);
+
         return is_array($translations) && isset($translations[$subKey]);
     }
 

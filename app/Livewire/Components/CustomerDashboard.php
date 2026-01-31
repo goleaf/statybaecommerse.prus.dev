@@ -51,9 +51,9 @@ final class CustomerDashboard extends Component
             'pending_orders'   => $this->user->orders()->where('status', 'pending')->count(),
             'total_spent'      => $this->user->orders()->whereIn('status', ['delivered', 'completed'])->sum('total'),
             // Reviews are no longer supported, so keep the legacy stat stable at zero.
-            'reviews_written'  => 0,
-            'member_since'     => $this->user->created_at->format('Y'),
-            'last_order'       => $this->user->orders()->latest()->first()?->created_at?->diffForHumans(),
+            'reviews_written' => 0,
+            'member_since'    => $this->user->created_at->format('Y'),
+            'last_order'      => $this->user->orders()->latest()->first()?->created_at?->diffForHumans(),
         ];
     }
 

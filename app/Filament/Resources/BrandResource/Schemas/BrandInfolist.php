@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\BrandResource\Schemas;
 
-use App\Models\Brand;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\SpatieMediaLibraryImageEntry;
 use Filament\Infolists\Components\TextEntry;

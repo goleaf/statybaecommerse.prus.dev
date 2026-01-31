@@ -35,6 +35,3 @@ final class FakeHasSchemasComponent extends Component implements HasSchemas
         return '';
     }
 }
-
-
-

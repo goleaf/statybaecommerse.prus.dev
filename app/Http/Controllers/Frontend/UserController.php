@@ -55,6 +55,7 @@ final class UserController extends Controller
             // Skip orders that are not properly configured for display
             return empty($order->number) || empty($order->status) || $order->total_amount <= 0 || empty($order->items);
         });
+
         return view('users.dashboard', compact('user', 'stats', 'recentOrders'));
     }
 

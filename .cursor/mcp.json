@@ -13,6 +13,13 @@
                 "artisan",
                 "loop:mcp:start"
             ]
+        },
+        "clockwork": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "clockwork-mcp"
+            ]
         }
     }
 }

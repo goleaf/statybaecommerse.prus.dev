@@ -64,9 +64,13 @@ it('generates translation report', function () {
     // Create test translations
     $localeDirLt = lang_path('lt');
     $localeDirEn = lang_path('en');
-    if (!File::isDirectory($localeDirLt)) File::makeDirectory($localeDirLt, 0755, true);
-    if (!File::isDirectory($localeDirEn)) File::makeDirectory($localeDirEn, 0755, true);
-    
+    if (! File::isDirectory($localeDirLt)) {
+        File::makeDirectory($localeDirLt, 0755, true);
+    }
+    if (! File::isDirectory($localeDirEn)) {
+        File::makeDirectory($localeDirEn, 0755, true);
+    }
+
     File::put($localeDirLt . '/test.php', "<?php return ['key1' => 'Testas 1'];");
     File::put($localeDirEn . '/test.php', "<?php return ['key2' => 'Test 2'];");
 
@@ -79,8 +83,12 @@ it('syncs translations between locales', function () {
     // Create test translations with missing keys
     $localeDirLt = lang_path('lt');
     $localeDirEn = lang_path('en');
-    if (!File::isDirectory($localeDirLt)) File::makeDirectory($localeDirLt, 0755, true);
-    if (!File::isDirectory($localeDirEn)) File::makeDirectory($localeDirEn, 0755, true);
+    if (! File::isDirectory($localeDirLt)) {
+        File::makeDirectory($localeDirLt, 0755, true);
+    }
+    if (! File::isDirectory($localeDirEn)) {
+        File::makeDirectory($localeDirEn, 0755, true);
+    }
 
     File::put($localeDirLt . '/test.php', "<?php return ['key1' => 'Testas 1', 'key2' => 'Testas 2'];");
     File::put($localeDirEn . '/test.php', "<?php return ['key1' => 'Test 1'];");
@@ -112,7 +120,7 @@ it('processes blade files and creates translations', function () {
 
     $pageTranslations = include lang_path('lt/page.php');
     $buttonTranslations = include lang_path('lt/buttons.php');
-    
+
     expect($pageTranslations)->toHaveKey('title');
     expect($pageTranslations)->toHaveKey('description');
     expect($buttonTranslations)->toHaveKey('save');

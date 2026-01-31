@@ -13,28 +13,28 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 /**
  * App\Models\ShippingOption
  *
- * @property int $id
- * @property string $name
- * @property string $slug
- * @property string|null $description
- * @property string|null $carrier_name
- * @property string|null $service_type
- * @property string|null $price
- * @property string $currency_code
- * @property int|null $country_id
- * @property int|null $city_id
- * @property int|null $zone_id
- * @property bool $is_enabled
- * @property bool $is_default
- * @property int $sort_order
- * @property int|null $min_weight
- * @property int|null $max_weight
- * @property string|null $min_order_amount
- * @property string|null $max_order_amount
- * @property int|null $estimated_days_min
- * @property int|null $estimated_days_max
- * @property array|null $metadata
- * @property array|null $shipping_matrix
+ * @property int                             $id
+ * @property string                          $name
+ * @property string                          $slug
+ * @property string|null                     $description
+ * @property string|null                     $carrier_name
+ * @property string|null                     $service_type
+ * @property string|null                     $price
+ * @property string                          $currency_code
+ * @property int|null                        $country_id
+ * @property int|null                        $city_id
+ * @property int|null                        $zone_id
+ * @property bool                            $is_enabled
+ * @property bool                            $is_default
+ * @property int                             $sort_order
+ * @property int|null                        $min_weight
+ * @property int|null                        $max_weight
+ * @property string|null                     $min_order_amount
+ * @property string|null                     $max_order_amount
+ * @property int|null                        $estimated_days_min
+ * @property int|null                        $estimated_days_max
+ * @property array|null                      $metadata
+ * @property array|null                      $shipping_matrix
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at

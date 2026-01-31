@@ -6,9 +6,8 @@ namespace App\Support\Search;
 
 use App\Models\Product;
 use App\Models\ProductVariant;
-use App\Support\Filament\SearchableComponentHelper;
-use App\Support\Search\SearchResult;
 use App\Support\Filament\Components\SearchableInput;
+use App\Support\Filament\SearchableComponentHelper;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 

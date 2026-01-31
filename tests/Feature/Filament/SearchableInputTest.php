@@ -8,13 +8,13 @@ use App\Filament\Resources\OrderItemResource;
 use App\Filament\Resources\PriceResource;
 use App\Filament\Resources\ProductRequestResource;
 use App\Models\Product;
-use App\Support\Search\SearchResultPayload;
 use App\Support\Filament\Components\SearchableInput;
+use App\Support\Search\SearchResultPayload;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Schemas\Components\Component;
-use Filament\Schemas\Schema as FormSchema;
 use Filament\Schemas\Contracts\HasSchemas;
+use Filament\Schemas\Schema as FormSchema;
 use Filament\Support\Contracts\TranslatableContentDriver;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabaseState;
@@ -142,6 +142,3 @@ final class DummyLivewireComponent extends LivewireComponent implements HasSchem
         return view('filament::components.badge')->with(['badge' => '']);
     }
 }
-
-
-

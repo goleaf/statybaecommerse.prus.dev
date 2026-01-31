@@ -41,7 +41,7 @@ class DiscountInfolist
                                 ->label(__('messages.value'))
                                 ->formatStateUsing(fn ($state, $record) => $record->type === 'percentage'
                                     ? $state . '%'
-                                    : '€' . number_format((float)$state, 2)
+                                    : '€' . number_format((float) $state, 2)
                                 ),
                             IconEntry::make('is_active')
                                 ->label(__('admin.discounts.is_active'))

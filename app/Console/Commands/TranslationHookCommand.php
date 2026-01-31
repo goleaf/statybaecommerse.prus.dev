@@ -32,7 +32,7 @@ final class TranslationHookCommand extends Command
     private function scanAction(TranslationHookService $service, string $path, ?string $exclude): int
     {
         $this->info("Scanning Blade files in: {$path}");
-        
+
         $files = File::allFiles($path);
         $excludeList = $exclude ? explode(',', $exclude) : [];
 
@@ -43,7 +43,7 @@ final class TranslationHookCommand extends Command
 
             if ($file->getExtension() === 'php') {
                 $missing = $service->processBladeFile($file->getPathname());
-                if (!empty($missing)) {
+                if (! empty($missing)) {
                     $this->warn("Found missing keys in {$file->getRelativePathname()}: " . implode(', ', $missing));
                 }
             }
@@ -58,7 +58,7 @@ final class TranslationHookCommand extends Command
         $report = $service->generateTranslationReport();
 
         $this->info("Total Keys: {$report['total_keys']}");
-        
+
         foreach ($report['locales'] as $locale => $stats) {
             $this->info("Locale: {$locale}");
             $this->line("  Translated: {$stats['translated']}");
@@ -72,13 +72,15 @@ final class TranslationHookCommand extends Command
     private function syncAction(TranslationHookService $service): int
     {
         $this->info('Syncing translations between locales...');
-        
+
         // Simple sync: ensure all keys from default locale exist in others
         $report = $service->generateTranslationReport();
         $defaultLocale = config('app.locale', 'lt');
 
         foreach ($report['locales'] as $locale => $stats) {
-            if ($locale === $defaultLocale) continue;
+            if ($locale === $defaultLocale) {
+                continue;
+            }
 
             foreach ($stats['missing_keys'] as $key) {
                 $service->addTranslation($key, []);
@@ -86,18 +88,21 @@ final class TranslationHookCommand extends Command
         }
 
         $this->info('Sync completed.');
+
         return 0;
     }
 
     private function processAction(TranslationHookService $service, string $path): int
     {
         $this->info("Processing Blade files in: {$path}");
+
         return $this->scanAction($service, $path, null);
     }
 
     private function invalidAction(string $action): int
     {
         $this->error("Invalid action: {$action}");
+
         return 1;
     }
 }

@@ -9,6 +9,7 @@ use App\Filament\Resources\SliderResource;
 use App\Filament\Widgets\SliderQuickActionsWidget;
 use App\Support\Filament\Components\SearchableInput;
 use App\Support\Filament\SearchableInputHelper;
+use ErrorException;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Schemas\Components\Component;
@@ -16,7 +17,6 @@ use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Schemas\Schema;
 use Filament\Support\Contracts\TranslatableContentDriver;
 use Livewire\Component as LivewireComponent;
-use ErrorException;
 use RuntimeException;
 use Tests\TestCase;
 
@@ -214,4 +214,3 @@ final class DummyLivewireComponent extends LivewireComponent implements HasSchem
 /**
  * Records Set invocations while still updating the underlying component state via the parent implementation.
  */
-

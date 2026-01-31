@@ -7,7 +7,7 @@ namespace Tests\Feature;
 use App\Filament\Resources\Sliders\SliderResource;
 use App\Models\AdminUser;
 use App\Models\Slider;
-use App\Support\Nav;
+use Exception;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -80,7 +80,7 @@ final class SliderResourceTest extends TestCase
         try {
             $slider->addMedia(UploadedFile::fake()->image('slider.jpg'))
                 ->toMediaCollection('slider_images');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Ignore if media library not set up or fails in test env
         }
     }

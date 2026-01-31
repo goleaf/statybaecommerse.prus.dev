@@ -15,8 +15,7 @@ final class SearchResult implements Arrayable
         private readonly string $value,
         private readonly string $label,
         private array $data = []
-    ) {
-    }
+    ) {}
 
     public static function make(string $value, string $label): self
     {

@@ -36,9 +36,9 @@ class SubscriberRelationManager extends RelationManager
                     ->maxLength(255),
                 Select::make('status')
                     ->options([
-                        'active' => 'Active',
+                        'active'       => 'Active',
                         'unsubscribed' => 'Unsubscribed',
-                        'inactive' => 'Inactive',
+                        'inactive'     => 'Inactive',
                     ])
                     ->required(),
                 Toggle::make('newsletter_subscription')

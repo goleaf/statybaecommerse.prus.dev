@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace App\Filament\Resources\OrderResource\Schemas;
 
 use Filament\Infolists\Components\TextEntry;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 

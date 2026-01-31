@@ -7,18 +7,15 @@ namespace App\Services;
 use App\Contracts\DocumentServiceContract;
 use App\Models\Document;
 use App\Models\DocumentTemplate;
-use App\Models\User;
 use App\Notifications\DocumentGenerated;
 use App\Support\Storage\SecureStorage;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use InvalidArgumentException;
 use RuntimeException;
 use Stringable;
-use Throwable;
 
 /**
  * DocumentService
@@ -84,10 +81,10 @@ final class DocumentService implements DocumentServiceContract
         }
 
         $settings = $template->getPrintSettings();
-        
+
         // Normalize HTML to ensure UTF-8 support (Lithuanian characters) and proper font loading
         $htmlContent = $this->normalizeHtmlForPdf($document->content);
-        
+
         $pdf = Pdf::loadHTML($htmlContent);
         // Apply settings
         $pdf->setPaper($settings['page_size'] ?? 'A4', $settings['orientation'] ?? 'portrait');
@@ -109,8 +106,6 @@ final class DocumentService implements DocumentServiceContract
     /**
      * Extract variables from a model for template substitution.
      *
-     * @param Model $model
-     * @param string $prefix
      * @return array<string, mixed>
      */
     public function extractVariablesFromModel(Model $model, string $prefix = ''): array
@@ -120,7 +115,7 @@ final class DocumentService implements DocumentServiceContract
 
         foreach ($data as $key => $value) {
             $fullKey = $prefix ? "{$prefix}.{$key}" : $key;
-            
+
             if (is_scalar($value) || $value === null) {
                 $variables[$fullKey] = $value;
             }
@@ -145,7 +140,7 @@ final class DocumentService implements DocumentServiceContract
     private function normalizeHtmlForPdf(string $content): string
     {
         // If content already has a full HTML structure, return as is (assuming the template author handled it)
-        // or potentially inject the charset/font if strictly needed. 
+        // or potentially inject the charset/font if strictly needed.
         // For safety/simplicity, if we detect an html tag, we trust the template.
         if (stripos($content, '<html') !== false) {
             return $content;
@@ -209,11 +204,11 @@ HTML;
         if (preg_match('/<script|javascript:|on\w+=/i', $content)) {
             throw new InvalidArgumentException(__('documents.errors.dangerous_content'));
         }
-        
+
         // Basic check for severely malformed HTML (count open/close tags)
         $openTags = preg_match_all('/<([a-zA-Z][a-zA-Z0-9]*)[^>]*>/i', $content, $openMatches);
         $closeTags = preg_match_all('/<\/([a-zA-Z][a-zA-Z0-9]*)[^>]*>/i', $content, $closeMatches);
-        
+
         // This is a very rough check and might trigger on valid non-HTML content that looks like tags.
         // For a document template system, we generally expect valid HTML fragments.
         // We only warn if there's a significant mismatch in structure that might break PDF generation.

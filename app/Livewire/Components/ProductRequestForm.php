@@ -45,12 +45,12 @@ final class ProductRequestForm extends Component
     public function messages(): array
     {
         return [
-            'name.required' => __('translations.name_required'),
-            'email.required' => __('translations.email_required'),
-            'email.email' => __('translations.email_invalid'),
+            'name.required'               => __('translations.name_required'),
+            'email.required'              => __('translations.email_required'),
+            'email.email'                 => __('translations.email_invalid'),
             'requested_quantity.required' => __('translations.quantity_required'),
-            'requested_quantity.min' => __('translations.quantity_min_value', ['min' => 1]),
-            'requested_quantity.max' => __('translations.quantity_max_value', ['max' => 999]),
+            'requested_quantity.min'      => __('translations.quantity_min_value', ['min' => 1]),
+            'requested_quantity.max'      => __('translations.quantity_max_value', ['max' => 999]),
         ];
     }
 

@@ -973,4 +973,3 @@ final class SingleProduct extends Component
         return trim($formatted . ' ' . ($unit ?? '')) ?: null;
     }
 }
-

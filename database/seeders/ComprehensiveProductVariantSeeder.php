@@ -30,7 +30,7 @@ final class ComprehensiveProductVariantSeeder extends Seeder
     {
         // Size attributes
         $sizeAttribute = Attribute::withoutGlobalScopes()->withTrashed()->where('slug', 'product-size')->first();
-        
+
         if ($sizeAttribute && $sizeAttribute->trashed()) {
             $sizeAttribute->restore();
         }

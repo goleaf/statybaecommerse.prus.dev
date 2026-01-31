@@ -16,7 +16,6 @@ use App\Models\ReferralReward;
 use App\Models\Subscriber;
 use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 final class UserComprehensiveRelationsSeeder extends Seeder
 {
@@ -64,56 +63,74 @@ final class UserComprehensiveRelationsSeeder extends Seeder
 
     private function ensurePrerequisites(): void
     {
-        if (Partner::count() === 0) Partner::factory(3)->create();
-        if (Coupon::count() === 0) Coupon::factory(3)->create();
-        if (Discount::count() === 0) Discount::factory(3)->create();
-        if (DiscountCode::count() === 0) DiscountCode::factory(3)->create();
-        if (Referral::count() === 0) Referral::factory(3)->create();
-        if (Order::count() === 0) Order::factory(5)->create();
+        if (Partner::count() === 0) {
+            Partner::factory(3)->create();
+        }
+        if (Coupon::count() === 0) {
+            Coupon::factory(3)->create();
+        }
+        if (Discount::count() === 0) {
+            Discount::factory(3)->create();
+        }
+        if (DiscountCode::count() === 0) {
+            DiscountCode::factory(3)->create();
+        }
+        if (Referral::count() === 0) {
+            Referral::factory(3)->create();
+        }
+        if (Order::count() === 0) {
+            Order::factory(5)->create();
+        }
     }
 
     private function enforceOneCouponUsage(User $user, $couponIds, $orderIds): void
     {
         $relation = $user->couponUsages()->withoutGlobalScopes();
-        if ($relation->count() === 1) return;
+        if ($relation->count() === 1) {
+            return;
+        }
 
         if ($relation->count() > 1) {
             $keep = $relation->first();
             $relation->where('id', '!=', $keep->id)->delete();
+
             return;
         }
 
         if ($couponIds->isNotEmpty() && $orderIds->isNotEmpty()) {
             CouponUsage::create([
-                'coupon_id' => $couponIds->random(),
-                'user_id' => $user->id,
-                'order_id' => $orderIds->random(),
+                'coupon_id'       => $couponIds->random(),
+                'user_id'         => $user->id,
+                'order_id'        => $orderIds->random(),
                 'discount_amount' => 10.00,
-                'used_at' => now(),
-            ]); 
+                'used_at'         => now(),
+            ]);
         }
     }
 
     private function enforceOneDiscountRedemption(User $user, $discountIds, $discountCodeIds, $orderIds): void
     {
         $relation = $user->discountRedemptions()->withoutGlobalScopes();
-        if ($relation->count() === 1) return;
+        if ($relation->count() === 1) {
+            return;
+        }
 
         if ($relation->count() > 1) {
-             $keep = $relation->first();
-             $relation->where('id', '!=', $keep->id)->delete();
-             return;
+            $keep = $relation->first();
+            $relation->where('id', '!=', $keep->id)->delete();
+
+            return;
         }
 
         if ($discountIds->isNotEmpty() && $orderIds->isNotEmpty()) {
             DiscountRedemption::create([
-                'discount_id' => $discountIds->random(),
-                'code_id' => $discountCodeIds->isNotEmpty() ? $discountCodeIds->random() : null,
-                'user_id' => $user->id,
-                'order_id' => $orderIds->random(),
+                'discount_id'  => $discountIds->random(),
+                'code_id'      => $discountCodeIds->isNotEmpty() ? $discountCodeIds->random() : null,
+                'user_id'      => $user->id,
+                'order_id'     => $orderIds->random(),
                 'amount_saved' => 5.00,
-                'redeemed_at' => now(),
-                'status' => 'redeemed'
+                'redeemed_at'  => now(),
+                'status'       => 'redeemed',
             ]);
         }
     }
@@ -121,37 +138,42 @@ final class UserComprehensiveRelationsSeeder extends Seeder
     private function enforceOneReferralReward(User $user, $referralIds): void
     {
         $relation = $user->referralRewards()->withoutGlobalScopes();
-        if ($relation->count() === 1) return;
+        if ($relation->count() === 1) {
+            return;
+        }
 
         if ($relation->count() > 1) {
             $keep = $relation->first();
             $relation->where('id', '!=', $keep->id)->delete();
+
             return;
         }
 
         if ($referralIds->isNotEmpty()) {
             ReferralReward::create([
-                'referral_id' => $referralIds->random(),
-                'user_id' => $user->id,
-                'amount' => 20.00,
+                'referral_id'   => $referralIds->random(),
+                'user_id'       => $user->id,
+                'amount'        => 20.00,
                 'currency_code' => 'EUR',
-                'status' => 'pending',
-                'title' => ['en' => 'Referral Bonus', 'lt' => 'Premija'],
-                'type' => 'credit'
+                'status'        => 'pending',
+                'title'         => ['en' => 'Referral Bonus', 'lt' => 'Premija'],
+                'type'          => 'credit',
             ]);
         }
     }
 
     private function enforceSubscriber(User $user): void
     {
-        if ($user->subscriber()->withoutGlobalScopes()->exists()) return;
+        if ($user->subscriber()->withoutGlobalScopes()->exists()) {
+            return;
+        }
 
         Subscriber::create([
-            'user_id' => $user->id,
-            'email' => $user->email,
-            'status' => 'active',
+            'user_id'    => $user->id,
+            'email'      => $user->email,
+            'status'     => 'active',
             'first_name' => $user->first_name ?? 'User',
-            'last_name' => $user->last_name ?? '',
+            'last_name'  => $user->last_name ?? '',
         ]);
     }
 }
