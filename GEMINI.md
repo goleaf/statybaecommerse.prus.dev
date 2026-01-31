@@ -72,3 +72,4 @@ The project enforces strict development standards and includes a specialized AI 
 This project contains specific instructions for AI agents in `openspec/AGENTS.md`.
 - **Planning**: If the user asks for a plan, proposal, or spec, refer to `openspec/AGENTS.md`.
 - **Architecture**: Respect the modular structure defined in `.agent/ARCHITECTURE.md`.
+- **Laravel Boost**: Follow the guidelines in `AGENTS.md` (root) for Laravel best practices and skills.
