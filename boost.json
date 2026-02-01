@@ -1,7 +1,8 @@
 {
     "agents": [
         "codex",
-        "cursor"
+        "cursor",
+        "gemini"
     ],
     "guidelines": true,
     "herd_mcp": false,
