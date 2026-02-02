@@ -626,7 +626,6 @@ return array (
   'amet_ut' => 'Amet ut.',
   'amet_vel_quam' => 'Amet vel quam.',
   'amet_voluptatibus_dolor' => 'Amet voluptatibus dolor.',
-  'analytics' => 'campaigns.analytics',
   'animi_ab_voluptate_consequatur' => 'Animi ab voluptate consequatur.',
   'animi_adipisci_incidunt_sequi' => 'Animi adipisci incidunt sequi.',
   'animi_amet_qui' => 'Animi amet qui.',

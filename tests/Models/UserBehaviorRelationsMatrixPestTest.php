@@ -10,9 +10,9 @@ uses(TestCase::class);
 
 // Dataset enumerating the expected relations on UserBehavior so they remain documented.
 dataset('user_behavior_relations_matrix_pairs', [
-    // User relationship keeps behaviour analytics anchored to the account owner.
+    // User relationship keeps behaviour reporting anchored to the account owner.
     ['user', BelongsTo::class],
-    // Product relationship maps engagements back to catalogue items for interaction analytics.
+    // Product relationship maps engagements back to catalogue items for interaction reporting.
     ['product', BelongsTo::class],
     // Category relationship supports higher-level merchandising insights.
     ['category', BelongsTo::class],

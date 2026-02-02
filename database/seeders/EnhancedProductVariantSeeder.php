@@ -30,7 +30,7 @@ final class EnhancedProductVariantSeeder extends Seeder
         // Create a realistic catalogue of products with multiple variants captured for later enrichment.
         $variants = $this->seedProductsWithVariants($attributes);
 
-        // Attach inventory, pricing, historical, and analytics data to every generated variant.
+        // Attach inventory, pricing, historical, and reporting data to every generated variant.
         $this->seedVariantInventories($variants, $locations['main']);
         $this->seedPricingRules($variants);
         $this->seedPriceHistories($variants);
@@ -277,7 +277,7 @@ final class EnhancedProductVariantSeeder extends Seeder
                     ProductVariantAttributeMatrixService::sync($variant->fresh(), $matrix);
                 }
 
-                // Persist readable variant attribute rows for analytics and storefront consumption.
+                // Persist readable variant attribute rows for reporting and storefront consumption.
                 $this->createVariantAttributeValue($variant, $attributes['size'], $variantData['size']);
                 $this->createVariantAttributeValue($variant, $attributes['color'], $variantData['color']);
 

@@ -502,7 +502,6 @@ return array (
   'navigation' => 
   array (
     'admin_panel' => 'navigation.admin_panel',
-    'analytics' => 'navigation.analytics',
     'brands' => 'Brands',
     'commerce' => 'navigation.commerce',
     'contact_messages' => 'navigation.contact_messages',
@@ -909,8 +908,6 @@ return array (
   'total_users' => 'total_users',
   'user_behaviors' => 
   array (
-    'analytics_dashboard' => 'user_behaviors.analytics_dashboard',
-    'analytics_dashboard_description' => 'user_behaviors.analytics_dashboard_description',
   ),
   'user_status' => 
   array (

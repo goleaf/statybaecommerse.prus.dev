@@ -98,7 +98,7 @@ final class UserPreferenceResourceTest extends TestCase
                 'preference_key'   => 'updated-brand',
                 'preference_score' => 0.6,
                 'metadata'         => [
-                    'source'     => 'analytics',
+                    'source'     => 'system',
                     'frequency'  => 'medium',
                     'confidence' => '0.80',
                 ],

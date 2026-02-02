@@ -87,10 +87,10 @@
                 <livewire:components.variant-comparison-table :product="$selectedProduct" />
             </div>
 
-            <!-- Analytics Dashboard -->
+            <!-- Product Statistics -->
             <div class="bg-white rounded-lg shadow-sm border p-6">
                 <h3 class="text-xl font-semibold text-gray-900 mb-4">
-                    {{ __('product.variants.showcase.analytics_title') }}
+                    {{ __('product.variants.showcase.stats_title') }}
                 </h3>
                 
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-6">

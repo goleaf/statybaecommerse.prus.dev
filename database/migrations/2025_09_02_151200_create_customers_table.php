@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Build the customers table that backs order history, analytics and Filament resources.
+     * Build the customers table that backs order history, reporting and Filament resources.
      */
     public function up(): void
     {
@@ -30,7 +30,7 @@ return new class extends Migration
             $table->string('address')->nullable();
             $table->string('postal_code')->nullable();
 
-            // Optional location references so analytics can aggregate by geography.
+            // Optional location references so reporting can aggregate by geography.
             if ($countriesAvailable) {
                 $table->foreignId('country_id')->nullable()->constrained('countries')->nullOnDelete();
             } else {

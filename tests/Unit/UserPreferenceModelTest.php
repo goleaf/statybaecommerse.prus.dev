@@ -182,7 +182,7 @@ final class UserPreferenceModelTest extends TestCase
 
     public function test_metadata_alias_stores_complex_payloads(): void
     {
-        // Arrange: prepare a nested structure that mirrors analytics payloads.
+        // Arrange: prepare a nested structure that mirrors system payloads.
         $payload = [
             'source'      => 'purchase_history',
             'frequency'   => 'high',
@@ -213,7 +213,7 @@ final class UserPreferenceModelTest extends TestCase
         // Act: create a record using the stock factory to ensure it hydrates the expected attributes.
         $preference = $this->createPreference();
 
-        // Assert: confirm the defaults look reasonable for downstream analytics consumers.
+        // Assert: confirm the defaults look reasonable for downstream reporting consumers.
         $this->assertSame($this->user->id, $preference->user_id);
         $this->assertNotNull($preference->name);
         $this->assertNotNull($preference->key);

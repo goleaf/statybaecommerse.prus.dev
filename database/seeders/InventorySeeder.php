@@ -89,7 +89,7 @@ final class InventorySeeder extends Seeder
                                 ->for($variant, 'variant')
                                 ->for($location, 'location')
                                 ->state([
-                                    // Ensure inventory-style payloads stay realistic for analytics and storefronts.
+                                    // Ensure inventory-style payloads stay realistic for reporting and storefronts.
                                     'stock'      => $stock,
                                     'reserved'   => $reserved,
                                     'available'  => max(0, $stock - $reserved),

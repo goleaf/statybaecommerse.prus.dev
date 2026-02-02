@@ -17,7 +17,7 @@ final class SearchQuerySanitizer
     /**
      * Remove HTML tags, collapse whitespace, strip disallowed characters, and
      * cap the length of the supplied query so it is safe to feed into LIKE
-     * clauses or analytics. The method intentionally keeps common punctuation
+     * clauses. The method intentionally keeps common punctuation
      * (dashes, quotes, dots) that shoppers frequently rely on when searching
      * for model numbers.
      */

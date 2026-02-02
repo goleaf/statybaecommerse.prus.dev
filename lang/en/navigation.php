@@ -8,7 +8,6 @@ return [
         'content_management' => 'Content Management',
         'ecommerce'          => 'E-commerce',
         'system'             => 'System',
-        'analytics'          => 'Analytics',
         'marketing'          => 'Marketing',
         'reports'            => 'Reports',
         'settings'           => 'Settings',

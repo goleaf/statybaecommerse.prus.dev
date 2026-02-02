@@ -46,7 +46,7 @@
     @if($selectedProduct)
         <!-- Product Stats -->
         <div class="bg-white shadow-sm rounded-lg p-6 mb-6">
-            <h2 class="text-xl font-semibold text-gray-900 mb-4">{{ __('product.variants.showcase.analytics_title') }}</h2>
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">{{ __('product.variants.showcase.stats_title') }}</h2>
             
             @php
                 $stats = $this->getProductStats();

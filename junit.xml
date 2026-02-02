@@ -1,66 +1,87 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="Tests\Feature\SliderResourceTest" file="Slider Resource (Tests\Feature\SliderResource)" tests="13" assertions="38" errors="1" failures="0" skipped="0" time="109.641052">
-    <testcase name="Slider resource can duplicate slider" file="Slider Resource (Tests\Feature\SliderResource)::Slider resource can duplicate slider" class="Tests\Feature\SliderResourceTest" classname="Tests.Feature.SliderResourceTest" assertions="4" time="26.671429"/>
-    <testcase name="Slider resource can delete slider" file="Slider Resource (Tests\Feature\SliderResource)::Slider resource can delete slider" class="Tests\Feature\SliderResourceTest" classname="Tests.Feature.SliderResourceTest" assertions="4" time="6.921298"/>
-    <testcase name="Slider resource validates required fields" file="Slider Resource (Tests\Feature\SliderResource)::Slider resource validates required fields" class="Tests\Feature\SliderResourceTest" classname="Tests.Feature.SliderResourceTest" assertions="0" time="7.093774">
-      <error type="LogicException">Slider resource validates required fieldsLogicException: Filament failed to validate the [data.button_url] field\'s selected options because it did not have an [options()] or [getOptionLabelUsing()] configuration. Please use one of these methods to inform Filament which options are valid for this field.&#13;
-at vendor\filament\forms\src\Components\Select.php:1713
-at vendor\filament\forms\src\Components\Concerns\CanBeValidated.php:812
-at vendor\filament\forms\src\Components\Concerns\CanBeValidated.php:856
-at vendor\filament\forms\src\Components\Concerns\CanBeValidated.php:912
-at vendor\filament\schemas\src\Concerns\CanBeValidated.php:85
-at vendor\filament\schemas\src\Concerns\CanBeValidated.php:95
-at vendor\filament\schemas\src\Concerns\CanBeValidated.php:95
-at vendor\filament\schemas\src\Concerns\CanBeValidated.php:115
-at vendor\filament\schemas\src\Concerns\HasState.php:418
-at vendor\filament\schemas\src\Components\Concerns\CanBeHidden.php:264
-at vendor\filament\schemas\src\Concerns\HasState.php:417
-at vendor\filament\filament\src\Resources\Pages\CreateRecord.php:97
-at vendor\laravel\framework\src\Illuminate\Container\BoundMethod.php:36
-at vendor\laravel\framework\src\Illuminate\Container\Util.php:43
-at vendor\laravel\framework\src\Illuminate\Container\BoundMethod.php:96
-at vendor\laravel\framework\src\Illuminate\Container\BoundMethod.php:35
-at vendor\livewire\livewire\src\Wrapped.php:23
-at vendor\livewire\livewire\src\Mechanisms\HandleComponents\HandleComponents.php:492
-at vendor\livewire\livewire\src\Mechanisms\HandleComponents\HandleComponents.php:101
-at vendor\livewire\livewire\src\LivewireManager.php:102
-at vendor\livewire\livewire\src\Mechanisms\HandleRequests\HandleRequests.php:124
-at vendor\laravel\framework\src\Illuminate\Routing\ControllerDispatcher.php:46
-at vendor\laravel\framework\src\Illuminate\Routing\Route.php:265
-at vendor\laravel\framework\src\Illuminate\Routing\Route.php:211
-at vendor\laravel\framework\src\Illuminate\Routing\Router.php:822
-at vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php:180
-at vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php:137
-at vendor\laravel\framework\src\Illuminate\Routing\Router.php:821
-at vendor\laravel\framework\src\Illuminate\Routing\Router.php:800
-at vendor\laravel\framework\src\Illuminate\Routing\Router.php:764
-at vendor\laravel\framework\src\Illuminate\Routing\Router.php:753
-at vendor\laravel\framework\src\Illuminate\Foundation\Http\Kernel.php:200
-at vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php:180
-at vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php:137
-at vendor\laravel\framework\src\Illuminate\Foundation\Http\Kernel.php:175
-at vendor\laravel\framework\src\Illuminate\Foundation\Http\Kernel.php:144
-at vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\MakesHttpRequests.php:607
-at vendor\livewire\livewire\src\Features\SupportTesting\SubsequentRender.php:36
-at vendor\livewire\livewire\src\Features\SupportTesting\RequestBroker.php:30
-at vendor\livewire\livewire\src\Features\SupportTesting\SubsequentRender.php:35
-at vendor\livewire\livewire\src\Features\SupportTesting\Render.php:24
-at vendor\livewire\livewire\src\Features\SupportTesting\SubsequentRender.php:34
-at vendor\livewire\livewire\src\Features\SupportTesting\SubsequentRender.php:16
-at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:252
-at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:219
-at tests\Feature\SliderResourceTest.php:254</error>
-    </testcase>
-    <testcase name="Slider resource has correct navigation group" file="Slider Resource (Tests\Feature\SliderResource)::Slider resource has correct navigation group" class="Tests\Feature\SliderResourceTest" classname="Tests.Feature.SliderResourceTest" assertions="1" time="6.868125"/>
-    <testcase name="Slider resource has correct model" file="Slider Resource (Tests\Feature\SliderResource)::Slider resource has correct model" class="Tests\Feature\SliderResourceTest" classname="Tests.Feature.SliderResourceTest" assertions="1" time="6.934948"/>
-    <testcase name="Slider resource requires authentication" file="Slider Resource (Tests\Feature\SliderResource)::Slider resource requires authentication" class="Tests\Feature\SliderResourceTest" classname="Tests.Feature.SliderResourceTest" assertions="2" time="6.819775"/>
-    <testcase name="Slider resource has correct table columns" file="Slider Resource (Tests\Feature\SliderResource)::Slider resource has correct table columns" class="Tests\Feature\SliderResourceTest" classname="Tests.Feature.SliderResourceTest" assertions="0" time="6.871259"/>
-    <testcase name="Slider resource can list sliders" file="Slider Resource (Tests\Feature\SliderResource)::Slider resource can list sliders" class="Tests\Feature\SliderResourceTest" classname="Tests.Feature.SliderResourceTest" assertions="4" time="6.926288"/>
-    <testcase name="Slider resource can filter by status" file="Slider Resource (Tests\Feature\SliderResource)::Slider resource can filter by status" class="Tests\Feature\SliderResourceTest" classname="Tests.Feature.SliderResourceTest" assertions="5" time="6.880626"/>
-    <testcase name="Slider resource can search sliders" file="Slider Resource (Tests\Feature\SliderResource)::Slider resource can search sliders" class="Tests\Feature\SliderResourceTest" classname="Tests.Feature.SliderResourceTest" assertions="1" time="6.858563"/>
-    <testcase name="Slider resource can sort sliders" file="Slider Resource (Tests\Feature\SliderResource)::Slider resource can sort sliders" class="Tests\Feature\SliderResourceTest" classname="Tests.Feature.SliderResourceTest" assertions="4" time="6.923556"/>
-    <testcase name="Slider resource has correct form fields" file="Slider Resource (Tests\Feature\SliderResource)::Slider resource has correct form fields" class="Tests\Feature\SliderResourceTest" classname="Tests.Feature.SliderResourceTest" assertions="8" time="6.892119"/>
-    <testcase name="Slider resource can bulk delete sliders" file="Slider Resource (Tests\Feature\SliderResource)::Slider resource can bulk delete sliders" class="Tests\Feature\SliderResourceTest" classname="Tests.Feature.SliderResourceTest" assertions="4" time="6.979291"/>
+  <testsuite name="C:\Dropbox\projects\egistatyba\phpunit.xml" tests="31" assertions="64" errors="2" failures="0" skipped="1" time="107.949896">
+    <testsuite name="Unit" tests="11" assertions="18" errors="0" failures="0" skipped="0" time="21.938138">
+      <testsuite name="Tests\Unit\SliderResourceTest" file="tests\Unit\SliderResourceTest.php" tests="9" assertions="12" errors="0" failures="0" skipped="0" time="21.538680">
+        <testcase name="it unit: can get SliderResource model" file="tests\Unit\SliderResourceTest.php::it unit: can get SliderResource model" class="Tests\Unit\SliderResourceTest" classname="Tests.Unit.SliderResourceTest" assertions="1" time="20.295896"/>
+        <testcase name="it unit: can get SliderResource pages" file="tests\Unit\SliderResourceTest.php::it unit: can get SliderResource pages" class="Tests\Unit\SliderResourceTest" classname="Tests.Unit.SliderResourceTest" assertions="4" time="0.195070"/>
+        <testcase name="it unit: can get SliderResource relations" file="tests\Unit\SliderResourceTest.php::it unit: can get SliderResource relations" class="Tests\Unit\SliderResourceTest" classname="Tests.Unit.SliderResourceTest" assertions="1" time="0.144867"/>
+        <testcase name="it unit: can get SliderResource navigation label" file="tests\Unit\SliderResourceTest.php::it unit: can get SliderResource navigation label" class="Tests\Unit\SliderResourceTest" classname="Tests.Unit.SliderResourceTest" assertions="1" time="0.141487"/>
+        <testcase name="it unit: can get SliderResource model label" file="tests\Unit\SliderResourceTest.php::it unit: can get SliderResource model label" class="Tests\Unit\SliderResourceTest" classname="Tests.Unit.SliderResourceTest" assertions="1" time="0.147626"/>
+        <testcase name="it unit: can get SliderResource plural model label" file="tests\Unit\SliderResourceTest.php::it unit: can get SliderResource plural model label" class="Tests\Unit\SliderResourceTest" classname="Tests.Unit.SliderResourceTest" assertions="1" time="0.150896"/>
+        <testcase name="it unit: can get SliderResource navigation group" file="tests\Unit\SliderResourceTest.php::it unit: can get SliderResource navigation group" class="Tests\Unit\SliderResourceTest" classname="Tests.Unit.SliderResourceTest" assertions="1" time="0.144811"/>
+        <testcase name="it unit: can load SliderResource class" file="tests\Unit\SliderResourceTest.php::it unit: can load SliderResource class" class="Tests\Unit\SliderResourceTest" classname="Tests.Unit.SliderResourceTest" assertions="1" time="0.151683"/>
+        <testcase name="it unit: can load Slider model class" file="tests\Unit\SliderResourceTest.php::it unit: can load Slider model class" class="Tests\Unit\SliderResourceTest" classname="Tests.Unit.SliderResourceTest" assertions="1" time="0.166345"/>
+      </testsuite>
+      <testsuite name="Tests\Unit\Database\AllFactoriesTest" file="All Factories (Tests\Unit\Database\AllFactories)" tests="2" assertions="6" errors="0" failures="0" skipped="0" time="0.399457">
+        <testsuite name="Factory creates persisted model instance" tests="2" assertions="6" errors="0" failures="0" skipped="0" time="0.399457">
+          <testcase name="Factory creates persisted model instance with data set &quot;Database\Factories\SliderTranslationFactory&quot;" file="All Factories (Tests\Unit\Database\AllFactories)::Factory creates persisted model instance with data set &quot;Database\Factories\SliderTranslationFactory&quot;" class="Tests\Unit\Database\AllFactoriesTest" classname="Tests.Unit.Database.AllFactoriesTest" assertions="3" time="0.210716"/>
+          <testcase name="Factory creates persisted model instance with data set &quot;Database\Factories\SliderFactory&quot;" file="All Factories (Tests\Unit\Database\AllFactories)::Factory creates persisted model instance with data set &quot;Database\Factories\SliderFactory&quot;" class="Tests\Unit\Database\AllFactoriesTest" classname="Tests.Unit.Database.AllFactoriesTest" assertions="3" time="0.188741"/>
+        </testsuite>
+      </testsuite>
+    </testsuite>
+    <testsuite name="Feature" tests="20" assertions="46" errors="2" failures="0" skipped="1" time="86.011759">
+      <testsuite name="Tests\Feature\SliderResourceTest" file="Slider Resource (Tests\Feature\SliderResource)" tests="12" assertions="35" errors="0" failures="0" skipped="0" time="84.313942">
+        <testcase name="Slider resource can delete slider" file="Slider Resource (Tests\Feature\SliderResource)::Slider resource can delete slider" class="Tests\Feature\SliderResourceTest" classname="Tests.Feature.SliderResourceTest" assertions="4" time="7.179564"/>
+        <testcase name="Slider resource has correct navigation group" file="Slider Resource (Tests\Feature\SliderResource)::Slider resource has correct navigation group" class="Tests\Feature\SliderResourceTest" classname="Tests.Feature.SliderResourceTest" assertions="1" time="6.882115"/>
+        <testcase name="Slider resource has correct model" file="Slider Resource (Tests\Feature\SliderResource)::Slider resource has correct model" class="Tests\Feature\SliderResourceTest" classname="Tests.Feature.SliderResourceTest" assertions="1" time="6.939783"/>
+        <testcase name="Slider resource requires authentication" file="Slider Resource (Tests\Feature\SliderResource)::Slider resource requires authentication" class="Tests\Feature\SliderResourceTest" classname="Tests.Feature.SliderResourceTest" assertions="2" time="6.927191"/>
+        <testcase name="Slider resource can list sliders" file="Slider Resource (Tests\Feature\SliderResource)::Slider resource can list sliders" class="Tests\Feature\SliderResourceTest" classname="Tests.Feature.SliderResourceTest" assertions="4" time="7.001332"/>
+        <testcase name="Slider resource has correct table columns" file="Slider Resource (Tests\Feature\SliderResource)::Slider resource has correct table columns" class="Tests\Feature\SliderResourceTest" classname="Tests.Feature.SliderResourceTest" assertions="0" time="7.009883"/>
+        <testcase name="Slider resource can search sliders" file="Slider Resource (Tests\Feature\SliderResource)::Slider resource can search sliders" class="Tests\Feature\SliderResourceTest" classname="Tests.Feature.SliderResourceTest" assertions="1" time="6.982867"/>
+        <testcase name="Slider resource can filter by status" file="Slider Resource (Tests\Feature\SliderResource)::Slider resource can filter by status" class="Tests\Feature\SliderResourceTest" classname="Tests.Feature.SliderResourceTest" assertions="5" time="7.172550"/>
+        <testcase name="Slider resource can sort sliders" file="Slider Resource (Tests\Feature\SliderResource)::Slider resource can sort sliders" class="Tests\Feature\SliderResourceTest" classname="Tests.Feature.SliderResourceTest" assertions="4" time="7.045144"/>
+        <testcase name="Can access slider resource list" file="Slider Resource (Tests\Feature\SliderResource)::Can access slider resource list" class="Tests\Feature\SliderResourceTest" classname="Tests.Feature.SliderResourceTest" assertions="1" time="7.025473"/>
+        <testcase name="Slider resource has correct form fields" file="Slider Resource (Tests\Feature\SliderResource)::Slider resource has correct form fields" class="Tests\Feature\SliderResourceTest" classname="Tests.Feature.SliderResourceTest" assertions="8" time="7.124773"/>
+        <testcase name="Slider resource can bulk delete sliders" file="Slider Resource (Tests\Feature\SliderResource)::Slider resource can bulk delete sliders" class="Tests\Feature\SliderResourceTest" classname="Tests.Feature.SliderResourceTest" assertions="4" time="7.023266"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\SliderRouteTest" file="Slider Route (Tests\Feature\SliderRoute)" tests="3" assertions="4" errors="0" failures="0" skipped="0" time="0.796644">
+        <testcase name="Sliders index route exists" file="Slider Route (Tests\Feature\SliderRoute)::Sliders index route exists" class="Tests\Feature\SliderRouteTest" classname="Tests.Feature.SliderRouteTest" assertions="1" time="0.304036"/>
+        <testcase name="Sliders create route exists" file="Slider Route (Tests\Feature\SliderRoute)::Sliders create route exists" class="Tests\Feature\SliderRouteTest" classname="Tests.Feature.SliderRouteTest" assertions="1" time="0.335025"/>
+        <testcase name="Sliders route names are correct" file="Slider Route (Tests\Feature\SliderRoute)::Sliders route names are correct" class="Tests\Feature\SliderRouteTest" classname="Tests.Feature.SliderRouteTest" assertions="2" time="0.157583"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\AdminSeederTest" file="Admin Seeder (Tests\Feature\AdminSeeder)" tests="1" assertions="4" errors="0" failures="0" skipped="0" time="0.301116">
+        <testcase name="It creates sliders correctly" file="Admin Seeder (Tests\Feature\AdminSeeder)::It creates sliders correctly" class="Tests\Feature\AdminSeederTest" classname="Tests.Feature.AdminSeederTest" assertions="4" time="0.301116"/>
+      </testsuite>
+      <testsuite name="Tests\Filament\MissingResourceSmokeTest" file="Missing Resource Smoke (Tests\Filament\MissingResourceSmoke)" tests="1" assertions="0" errors="1" failures="0" skipped="0" time="0.168020">
+        <testsuite name="Missing resource lists render records" tests="1" assertions="0" errors="1" failures="0" skipped="0" time="0.168020">
+          <testcase name="Missing resource lists render records with data set &quot;slider_translations&quot;" file="Missing Resource Smoke (Tests\Filament\MissingResourceSmoke)::Missing resource lists render records with data set &quot;slider_translations&quot;" class="Tests\Filament\MissingResourceSmokeTest" classname="Tests.Filament.MissingResourceSmokeTest" assertions="0" time="0.168020">
+            <error type="Error">Missing resource lists render records with data set "slider_translations"Error: Unknown named parameter $resource</error>
+          </testcase>
+        </testsuite>
+      </testsuite>
+      <testsuite name="Tests\Filament\SliderSearchableInputTest" file="tests\Filament\SliderSearchableInputTest.php" tests="3" assertions="3" errors="1" failures="0" skipped="1" time="0.432036">
+        <testsuite name="it clears the slider link lookup state and payload when the search input is emptied" tests="3" assertions="3" errors="1" failures="0" skipped="1" time="0.432036">
+          <testcase name="it clears the slider link lookup state and payload when the search input is emptied with data set &quot;dataset &quot;management page&quot;&quot;" file="tests\Filament\SliderSearchableInputTest.php::it clears the slider link lookup state and payload when the search input is emptied with data set &quot;dataset &quot;management page&quot;&quot;" class="Tests\Filament\SliderSearchableInputTest" classname="Tests.Filament.SliderSearchableInputTest" assertions="0" time="0.146974">
+            <error type="Illuminate\Contracts\Container\BindingResolutionException">it clears the slider link lookup state and payload when the search input is emptied with data set "dataset "management page""Illuminate\Contracts\Container\BindingResolutionException: Target class [App\Filament\Pages\SliderManagement] does not exist.&#13;
+at vendor\laravel\framework\src\Illuminate\Container\Container.php:1122
+at vendor\laravel\framework\src\Illuminate\Container\Container.php:933
+at vendor\laravel\framework\src\Illuminate\Foundation\Application.php:1078
+at vendor\laravel\framework\src\Illuminate\Container\Container.php:864
+at vendor\laravel\framework\src\Illuminate\Foundation\Application.php:1058
+at vendor\laravel\framework\src\Illuminate\Foundation\helpers.php:138
+at tests\Filament\SliderSearchableInputTest.php:74
+at tests\Filament\SliderSearchableInputTest.php:28
+at tests\Filament\SliderSearchableInputTest.php:34
+Caused by
+ReflectionException: Class "App\Filament\Pages\SliderManagement" does not exist
+
+at vendor\laravel\framework\src\Illuminate\Container\Container.php:1122
+at vendor\laravel\framework\src\Illuminate\Container\Container.php:933
+at vendor\laravel\framework\src\Illuminate\Foundation\Application.php:1078
+at vendor\laravel\framework\src\Illuminate\Container\Container.php:864
+at vendor\laravel\framework\src\Illuminate\Foundation\Application.php:1058
+at vendor\laravel\framework\src\Illuminate\Foundation\helpers.php:138
+at tests\Filament\SliderSearchableInputTest.php:74
+at tests\Filament\SliderSearchableInputTest.php:28
+at tests\Filament\SliderSearchableInputTest.php:34</error>
+          </testcase>
+          <testcase name="it clears the slider link lookup state and payload when the search input is emptied with data set &quot;dataset &quot;resource form&quot;&quot;" file="tests\Filament\SliderSearchableInputTest.php::it clears the slider link lookup state and payload when the search input is emptied with data set &quot;dataset &quot;resource form&quot;&quot;" class="Tests\Filament\SliderSearchableInputTest" classname="Tests.Filament.SliderSearchableInputTest" assertions="0" time="0.142255">
+            <skipped/>
+          </testcase>
+          <testcase name="it clears the slider link lookup state and payload when the search input is emptied with data set &quot;dataset &quot;quick actions widget&quot;&quot;" file="tests\Filament\SliderSearchableInputTest.php::it clears the slider link lookup state and payload when the search input is emptied with data set &quot;dataset &quot;quick actions widget&quot;&quot;" class="Tests\Filament\SliderSearchableInputTest" classname="Tests.Filament.SliderSearchableInputTest" assertions="3" time="0.142807"/>
+        </testsuite>
+      </testsuite>
+    </testsuite>
   </testsuite>
 </testsuites>

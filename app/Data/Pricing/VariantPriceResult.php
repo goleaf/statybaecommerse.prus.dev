@@ -15,7 +15,7 @@ final class VariantPriceResult implements Arrayable
 {
     /**
      * Expose the aggregated pricing data that downstream callers need when rendering
-     * variant prices or persisting analytics. All numeric amounts are presented in the
+     * variant prices or internal reporting. All numeric amounts are presented in the
      * resolved display currency so storefront and admin experiences stay in sync.
      */
     public function __construct(

@@ -157,7 +157,7 @@ final class CouponUsage extends Model
             'used_at'  => now(),
         ])->save();
 
-        // Keep the coupon usage counter accurate for analytics dashboards.
+        // Keep the coupon usage counter accurate for reporting dashboards.
         $this->coupon?->increment('used_count');
         $this->notifyUser();
     }

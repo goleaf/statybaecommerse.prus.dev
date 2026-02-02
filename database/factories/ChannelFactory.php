@@ -56,7 +56,6 @@ class ChannelFactory extends Factory
             'is_default'        => false,
             'is_active'         => true,
             'ssl_enabled'       => $this->faker->boolean(70),
-            'analytics_enabled' => $this->faker->boolean(40),
             'sort_order'        => $this->faker->numberBetween(0, 50),
 
             // Provide deterministic defaults for nullable JSON columns.

@@ -55,7 +55,6 @@ return array (
   'all_sliders_deactivated' => 'translations.all_sliders_deactivated',
   'all_users' => 'Alle Benutzer',
   'aluminum' => 'translations.aluminum',
-  'analytics' => 'Analytik',
   'animation' => 'translations.animation',
   'animation_settings' => 'Animationseinstellungen',
   'animation_type' => 'translations.animation_type',

@@ -63,7 +63,7 @@ final class SystemSetting extends Model implements HasMedia
     /**
      * Override the attribute detection logic so Filament treats the "category"
      * column as a relationship when building form components. The table stores
-     * a legacy string column named "category" for analytics widgets, but the
+     * a legacy string column named "category" for legacy widgets, but the
      * admin resource also relies on the `category()` relationship. Returning
      * false here ensures Filament resolves the relationship instead of the raw
      * attribute while leaving other attributes to the framework defaults.

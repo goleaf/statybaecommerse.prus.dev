@@ -24,11 +24,11 @@ final class UserPrivacySettingsTest extends TestCase
     {
         $user = User::factory()->create([
             'password'         => Hash::make('secret-password'),
-            'privacy_settings' => ['analytics' => true, 'personalization' => true],
+            'privacy_settings' => ['personalization' => true],
         ]);
 
         $payload = [
-            'privacy_settings' => ['analytics' => false, 'personalization' => false, 'newsletter' => false],
+            'privacy_settings' => ['personalization' => false, 'newsletter' => false],
         ];
 
         $response = $this->actingAs($user)

@@ -9,10 +9,10 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Preserve the historical region relationships required by factories, seeders, and analytics tests.
+     * Preserve the historical region relationships required by factories, seeders, and reporting tests.
      *
      * The original migration removed the region scaffolding, which meant our factories could no longer
-     * insert related cities during test execution. That cascaded into numerous failing analytics and
+     * insert related cities during test execution. That cascaded into numerous failing reporting and
      * widget tests. We now invert the behaviour so the migration becomes an idempotent safeguard that
      * reinstates the region table and foreign keys whenever they are missing.
      */

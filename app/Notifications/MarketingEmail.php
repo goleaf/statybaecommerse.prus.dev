@@ -80,7 +80,7 @@ final class MarketingEmail extends Notification implements ShouldQueue
      */
     public function toArray(object $notifiable): array
     {
-        // Persist the email metadata for analytics dashboards.
+        // Persist the email metadata for reporting dashboards.
         return [
             'subject'  => $this->subject,
             'content'  => $this->content,

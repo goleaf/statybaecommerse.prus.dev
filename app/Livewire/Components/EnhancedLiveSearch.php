@@ -29,7 +29,6 @@ use Livewire\Component;
  * @property bool   $enableSuggestions
  * @property bool   $enableRecentSearches
  * @property bool   $enablePopularSearches
- * @property bool   $enableAnalytics
  * @property string $selectedCategory
  * @property string $selectedBrand
  * @property float  $minPrice

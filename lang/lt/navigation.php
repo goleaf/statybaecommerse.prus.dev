@@ -8,7 +8,6 @@ return [
         'content_management' => 'Turinio valdymas',
         'ecommerce'          => 'El. prekyba',
         'system'             => 'Sistema',
-        'analytics'          => 'Analitika',
         'marketing'          => 'Rinkodara',
         'reports'            => 'Ataskaitos',
         'settings'           => 'Nustatymai',

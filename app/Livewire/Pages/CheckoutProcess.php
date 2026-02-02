@@ -644,7 +644,7 @@ final class CheckoutProcess extends Component
     }
 
     /**
-     * Resolve the shipping option model for persistence and analytics tracking.
+     * Resolve the shipping option model for persistence and internal tracking.
      */
     private function resolveSelectedShippingOptionModel(): ?ShippingOption
     {

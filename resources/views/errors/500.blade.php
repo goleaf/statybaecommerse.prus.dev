@@ -15,8 +15,6 @@
         : url('/contact');
 @endphp
 
-<!-- Slider Analytics -->
-
 @extends('errors.layout', [
     'code' => '500',
     'title' => __('messages.frontend),

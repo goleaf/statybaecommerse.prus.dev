@@ -59,9 +59,6 @@ final class ProductVariantTest extends TestCase
             'seo_title_en',
             'seo_description_lt',
             'seo_description_en',
-            'views_count',
-            'clicks_count',
-            'conversion_rate',
             'variant_combination_hash',
         ], $model->getFillable());
 
@@ -97,7 +94,6 @@ final class ProductVariantTest extends TestCase
         self::assertInstanceOf(HasMany::class, $model->variantAttributeValues());
         self::assertInstanceOf(HasMany::class, $model->priceHistory());
         self::assertInstanceOf(HasMany::class, $model->stockHistory());
-        self::assertInstanceOf(HasMany::class, $model->analytics());
         self::assertInstanceOf(HasMany::class, $model->inventories());
         self::assertInstanceOf(HasMany::class, $model->orderItems());
         self::assertInstanceOf(HasMany::class, $model->cartItems());

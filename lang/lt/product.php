@@ -1628,7 +1628,6 @@ return array (
       'select_product' => 'Pasirinkite produktą',
       'variants_count' => 'Variantų skaičius',
       'brand' => 'Prekės ženklas',
-      'analytics_title' => 'Našumo analitika',
       'total_variants' => 'Iš viso variantų',
       'in_stock' => 'Yra sandėlyje',
       'low_stock' => 'Mažos atsargos',
