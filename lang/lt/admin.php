@@ -10,6 +10,7 @@ return [
         'orders'    => 'Užsakymai',
         'products'  => 'Produktai',
         'dashboard' => 'Pagrindinis',
+        'settings'  => 'Nustatymai',
     ],
     'brands' => [
         'plural_model_label'            => 'Prekių ženklai',

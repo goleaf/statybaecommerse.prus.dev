@@ -10,6 +10,7 @@ return [
         'orders'    => 'Orders',
         'products'  => 'Products',
         'dashboard' => 'Dashboard',
+        'settings'  => 'Settings',
     ],
     'brands' => [
         'plural_model_label'            => 'Brands',

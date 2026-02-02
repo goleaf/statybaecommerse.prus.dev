@@ -11,7 +11,6 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
@@ -29,17 +28,17 @@ final class DataImportExport extends Page implements HasForms
 
     public static function getNavigationIcon(): string|Htmlable|null
     {
-        return 'heroicon-o-arrow-down-tray';
+        return 'heroicon-o-arrow-up-tray';
     }
 
     public static function getNavigationLabel(): string
     {
-        return __('translations.data_import_export');
+        return __('translations.import');
     }
 
     public function getTitle(): string|Htmlable
     {
-        return __('translations.data_import_export');
+        return __('translations.import');
     }
 
     public ?array $data = [];
@@ -47,10 +46,9 @@ final class DataImportExport extends Page implements HasForms
     public function mount(): void
     {
         $this->form->fill([
-            'provider' => 'xml',
-            'only' => 'all',
+            'provider'       => 'xml',
+            'only'           => 'all',
             'downloadImages' => true,
-            'exportPath' => 'catalog-export.xml',
         ]);
     }
 
@@ -58,7 +56,7 @@ final class DataImportExport extends Page implements HasForms
     {
         return $form
             ->schema([
-                Section::make(__('translations.data_import_export'))
+                Section::make(__('translations.import'))
                     ->schema([
                         Grid::make(2)->schema([
                             Select::make('provider')
@@ -71,27 +69,15 @@ final class DataImportExport extends Page implements HasForms
                                 ->options(['all' => 'all', 'categories' => 'categories', 'products' => 'products'])
                                 ->required(),
                         ]),
-                        Grid::make(2)->schema([
-                            Section::make(__('translations.import'))
-                                ->schema([
-                                    FileUpload::make('file')
-                                        ->label(__('translations.xml_file'))
-                                        ->acceptedFileTypes(['application/xml', 'text/xml'])
-                                        ->disk(SecureStorage::disk())
-                                        ->directory('imports')
-                                        ->required(),
-                                    Toggle::make('downloadImages')
-                                        ->label(__('translations.download_images'))
-                                        ->default(true),
-                                ])->columnSpan(1),
-                            Section::make(__('translations.export'))
-                                ->schema([
-                                    TextInput::make('exportPath')
-                                        ->label(__('translations.export_path'))
-                                        ->default('catalog-export.xml')
-                                        ->required(),
-                                ])->columnSpan(1),
-                        ]),
+                        FileUpload::make('file')
+                            ->label(__('translations.xml_file'))
+                            ->acceptedFileTypes(['application/xml', 'text/xml'])
+                            ->disk(SecureStorage::disk())
+                            ->directory('imports')
+                            ->required(),
+                        Toggle::make('downloadImages')
+                            ->label(__('translations.download_images'))
+                            ->default(true),
                     ])
                     ->columns(1),
             ])
@@ -110,6 +96,7 @@ final class DataImportExport extends Page implements HasForms
                         ->title(__('translations.provider_not_found'))
                         ->danger()
                         ->send();
+
                     return;
                 }
                 $path = $data['file'];
@@ -118,40 +105,15 @@ final class DataImportExport extends Page implements HasForms
                         ->title(__('translations.file_missing'))
                         ->danger()
                         ->send();
+
                     return;
                 }
                 $abs = Storage::disk(SecureStorage::disk())->path($path);
                 $res = $provider->import($abs, ['only' => $data['only'] ?? 'all', 'download_images' => (bool) ($data['downloadImages'] ?? true)]);
-                
+
                 Notification::make()
                     ->title(__('translations.import_finished'))
                     ->body(__('messages.created') . ': ' . ($res['categories']['created'] + $res['products']['created']))
-                    ->success()
-                    ->send();
-            });
-    }
-
-    public function exportAction(): Action
-    {
-        return Action::make('export')
-            ->label(__('translations.export'))
-            ->action(function (): void {
-                $data = $this->form->getState();
-                $provider = ProviderRegistry::get($data['provider'] ?? 'xml');
-                if (! $provider) {
-                    Notification::make()
-                        ->title(__('translations.provider_not_found'))
-                        ->danger()
-                        ->send();
-                    return;
-                }
-                $targetPath = $data['exportPath'] ?? 'catalog-export.xml';
-                $provider->export(
-                    Storage::disk(SecureStorage::disk())->path($targetPath),
-                    ['only' => $data['only'] ?? 'all']
-                );
-                Notification::make()
-                    ->title(__('translations.export_finished'))
                     ->success()
                     ->send();
             });
@@ -161,7 +123,6 @@ final class DataImportExport extends Page implements HasForms
     {
         return [
             $this->importAction(),
-            $this->exportAction(),
         ];
     }
 }

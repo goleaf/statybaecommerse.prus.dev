@@ -38,11 +38,11 @@
             </x-filament::section>
         </div>
 
-        <!-- Import/Export Form -->
+        <!-- Import Form -->
         <x-filament::section>
             <div class="mb-6">
-                <h2 class="text-lg font-semibold text-gray-900">{{ __('translations.data_import_export') }}</h2>
-                <p class="text-sm text-gray-600 mt-1">{{ __('translations.page_description') }}</p>
+                <h2 class="text-lg font-semibold text-gray-900">{{ __('translations.import') }}</h2>
+                <p class="text-sm text-gray-600 mt-1">{{ __('admin.import_export.description') ?? 'Upload files to import data into the system.' }}</p>
             </div>
 
             <form wire:submit="import">
@@ -52,51 +52,26 @@
                     <x-filament::button type="button" wire:click="mountAction('import')">
                         {{ __('translations.import') }}
                     </x-filament::button>
-                    <x-filament::button type="button" color="gray" wire:click="mountAction('export')">
-                        {{ __('translations.export') }}
-                    </x-filament::button>
                 </div>
             </form>
         </x-filament::section>
 
-        <!-- Recent Export Files -->
+        <!-- Import Guidelines -->
         <x-filament::section>
-            <h3 class="text-lg font-semibold mb-4">{{ __('translations.recent_addresses') }} (Exports)</h3>
-            <div class="space-y-3">
-                @php
-                    $disk = \Storage::disk(\App\Support\Storage\SecureStorage::disk());
-                    $files = $disk->exists('exports') ? $disk->files('exports') : [];
-                    $recentFiles = array_slice(array_reverse($files), 0, 5);
-                @endphp
-                
-                @forelse($recentFiles as $file)
-                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <div class="flex items-center gap-3">
-                            <x-heroicon-o-document class="w-5 h-5 text-gray-500" />
-                            <div>
-                                <div class="font-medium">{{ basename($file) }}</div>
-                                <div class="text-sm text-gray-500">
-                                    {{ __('translations.file_size') ?? 'Size' }}: {{ $disk->size($file) }} bytes
-                                </div>
-                            </div>
-                        </div>
-                        <div class="flex gap-2">
-                              <a
-                                  href="{{ \App\Support\Storage\SecureStorage::temporarySignedUrl($file, now()->addMinutes(30), true) }}"
-                                target="_blank"
-                                class="inline-flex items-center gap-1 px-3 py-1 text-sm font-medium text-blue-600 hover:text-blue-700"
-                            >
-                                <x-heroicon-o-arrow-down-tray class="w-4 h-4" />
-                                {{ __('translations.download') }}
-                            </a>
-                        </div>
-                    </div>
-                @empty
-                    <div class="text-center py-6 text-gray-500">
-                        <x-heroicon-o-folder-open class="w-8 h-8 mx-auto mb-2" />
-                        <div>No recent exports found</div>
-                    </div>
-                @endforelse
+            <h3 class="text-lg font-semibold mb-4">{{ __('admin.import_export.guidelines') ?? 'Import Guidelines' }}</h3>
+            <div class="space-y-3 text-sm text-gray-600">
+                <div class="flex items-start gap-2">
+                    <x-heroicon-o-information-circle class="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                    <span>{{ __('admin.import_export.guideline_1') ?? 'Ensure your XML file follows the supported schema.' }}</span>
+                </div>
+                <div class="flex items-start gap-2">
+                    <x-heroicon-o-shield-check class="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                    <span>{{ __('admin.import_export.guideline_2') ?? 'Uploaded files are scanned for security.' }}</span>
+                </div>
+                <div class="flex items-start gap-2">
+                    <x-heroicon-o-exclamation-triangle class="w-4 h-4 text-yellow-500 mt-0.5 flex-shrink-0" />
+                    <span>{{ __('admin.import_export.guideline_3') ?? 'Large imports may take several minutes to process.' }}</span>
+                </div>
             </div>
         </x-filament::section>
     </div>
