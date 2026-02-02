@@ -15,7 +15,29 @@ class CustomerImporter extends Importer
     public static function getColumns(): array
     {
         return [
-            //
+            ImportColumn::make('name')
+                ->requiredMapping()
+                ->rules(['required', 'max:255']),
+            ImportColumn::make('email')
+                ->requiredMapping()
+                ->rules(['required', 'email', 'max:255']),
+            ImportColumn::make('phone')
+                ->rules(['max:255']),
+            ImportColumn::make('address')
+                ->rules(['max:255']),
+            ImportColumn::make('postal_code')
+                ->rules(['max:255']),
+            ImportColumn::make('country')
+                ->relationship(),
+            ImportColumn::make('city')
+                ->relationship(),
+            ImportColumn::make('company')
+                ->relationship(),
+            ImportColumn::make('is_active')
+                ->requiredMapping()
+                ->boolean()
+                ->rules(['required', 'boolean']),
+            ImportColumn::make('metadata'),
         ];
     }
 

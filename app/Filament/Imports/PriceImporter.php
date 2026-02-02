@@ -15,7 +15,27 @@ class PriceImporter extends Importer
     public static function getColumns(): array
     {
         return [
-            //
+            ImportColumn::make('priceable_id')
+                ->requiredMapping()
+                ->numeric()
+                ->rules(['required', 'integer']),
+            ImportColumn::make('priceable_type')
+                ->requiredMapping()
+                ->rules(['required', 'max:255']),
+            ImportColumn::make('currency')
+                ->relationship(),
+            ImportColumn::make('amount')
+                ->requiredMapping()
+                ->numeric()
+                ->rules(['required', 'numeric']),
+            ImportColumn::make('compare_amount')
+                ->numeric()
+                ->rules(['numeric']),
+            ImportColumn::make('type')
+                ->rules(['max:255']),
+            ImportColumn::make('is_enabled')
+                ->boolean()
+                ->rules(['boolean']),
         ];
     }
 

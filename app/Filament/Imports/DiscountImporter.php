@@ -15,7 +15,29 @@ class DiscountImporter extends Importer
     public static function getColumns(): array
     {
         return [
-            //
+            ImportColumn::make('name')
+                ->requiredMapping()
+                ->rules(['required', 'max:255']),
+            ImportColumn::make('slug')
+                ->requiredMapping()
+                ->rules(['required', 'max:255']),
+            ImportColumn::make('type')
+                ->requiredMapping()
+                ->rules(['required', 'max:255']),
+            ImportColumn::make('value')
+                ->requiredMapping()
+                ->numeric()
+                ->rules(['required', 'numeric']),
+            ImportColumn::make('is_active')
+                ->boolean()
+                ->rules(['boolean']),
+            ImportColumn::make('starts_at')
+                ->rules(['datetime']),
+            ImportColumn::make('ends_at')
+                ->rules(['datetime']),
+            ImportColumn::make('usage_limit')
+                ->numeric()
+                ->rules(['integer']),
         ];
     }
 

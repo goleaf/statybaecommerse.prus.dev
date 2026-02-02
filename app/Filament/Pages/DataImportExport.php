@@ -4,11 +4,20 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
-use App\Services\ImportExport\ProviderRegistry;
-use App\Support\Storage\SecureStorage;
 use App\Filament\Imports\BrandImporter;
 use App\Filament\Imports\CategoryImporter;
+use App\Filament\Imports\CustomerImporter;
+use App\Filament\Imports\DiscountImporter;
+use App\Filament\Imports\OrderImporter;
+use App\Filament\Imports\OrganizationImporter;
+use App\Filament\Imports\PartnerImporter;
+use App\Filament\Imports\PriceImporter;
 use App\Filament\Imports\ProductImporter;
+use App\Filament\Imports\SubscriberImporter;
+use App\Filament\Imports\UserImporter;
+use App\Models\AdminUser;
+use App\Services\ImportExport\ProviderRegistry;
+use App\Support\Storage\SecureStorage;
 use Filament\Actions\Action;
 use Filament\Actions\ImportAction;
 use Filament\Forms\Components\FileUpload;
@@ -47,7 +56,9 @@ final class DataImportExport extends Page implements HasForms
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->is_admin ?? false;
+        $user = auth()->user();
+
+        return $user instanceof AdminUser || (bool) ($user->is_admin ?? false);
     }
 
     public ?array $data = [];
@@ -80,6 +91,62 @@ final class DataImportExport extends Page implements HasForms
         return ImportAction::make('importBrands')
             ->label(__('admin.brands_import') ?? 'Import Brands')
             ->importer(BrandImporter::class);
+    }
+
+    public function importCustomersAction(): ImportAction
+    {
+        return ImportAction::make('importCustomers')
+            ->label('Import Customers')
+            ->importer(CustomerImporter::class);
+    }
+
+    public function importPartnersAction(): ImportAction
+    {
+        return ImportAction::make('importPartners')
+            ->label('Import Partners')
+            ->importer(PartnerImporter::class);
+    }
+
+    public function importOrganizationsAction(): ImportAction
+    {
+        return ImportAction::make('importOrganizations')
+            ->label('Import Organizations')
+            ->importer(OrganizationImporter::class);
+    }
+
+    public function importSubscribersAction(): ImportAction
+    {
+        return ImportAction::make('importSubscribers')
+            ->label('Import Subscribers')
+            ->importer(SubscriberImporter::class);
+    }
+
+    public function importUsersAction(): ImportAction
+    {
+        return ImportAction::make('importUsers')
+            ->label('Import Users')
+            ->importer(UserImporter::class);
+    }
+
+    public function importDiscountsAction(): ImportAction
+    {
+        return ImportAction::make('importDiscounts')
+            ->label('Import Discounts')
+            ->importer(DiscountImporter::class);
+    }
+
+    public function importPricesAction(): ImportAction
+    {
+        return ImportAction::make('importPrices')
+            ->label('Import Prices')
+            ->importer(PriceImporter::class);
+    }
+
+    public function importOrdersAction(): ImportAction
+    {
+        return ImportAction::make('importOrders')
+            ->label('Import Orders')
+            ->importer(OrderImporter::class);
     }
 
     public function form(Form $form): Form
@@ -155,6 +222,14 @@ final class DataImportExport extends Page implements HasForms
             $this->importProductsAction(),
             $this->importCategoriesAction(),
             $this->importBrandsAction(),
+            $this->importCustomersAction(),
+            $this->importPartnersAction(),
+            $this->importOrganizationsAction(),
+            $this->importSubscribersAction(),
+            $this->importUsersAction(),
+            $this->importDiscountsAction(),
+            $this->importPricesAction(),
+            $this->importOrdersAction(),
             $this->importAction(),
         ];
     }

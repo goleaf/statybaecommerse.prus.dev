@@ -15,7 +15,20 @@ class OrganizationImporter extends Importer
     public static function getColumns(): array
     {
         return [
-            //
+            ImportColumn::make('name')
+                ->requiredMapping()
+                ->rules(['required', 'max:255']),
+            ImportColumn::make('slug')
+                ->requiredMapping()
+                ->rules(['required', 'max:255']),
+            ImportColumn::make('description'),
+            ImportColumn::make('type')
+                ->rules(['max:255']),
+            ImportColumn::make('is_active')
+                ->requiredMapping()
+                ->boolean()
+                ->rules(['required', 'boolean']),
+            ImportColumn::make('settings'),
         ];
     }
 

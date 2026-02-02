@@ -15,7 +15,31 @@ class PartnerImporter extends Importer
     public static function getColumns(): array
     {
         return [
-            //
+            ImportColumn::make('name')
+                ->requiredMapping()
+                ->rules(['required', 'max:255']),
+            ImportColumn::make('code')
+                ->requiredMapping()
+                ->rules(['required', 'max:255']),
+            ImportColumn::make('tier')
+                ->relationship(),
+            ImportColumn::make('user')
+                ->relationship(),
+            ImportColumn::make('contact_email')
+                ->rules(['email', 'max:255']),
+            ImportColumn::make('contact_phone')
+                ->rules(['max:255']),
+            ImportColumn::make('is_enabled')
+                ->requiredMapping()
+                ->boolean()
+                ->rules(['required', 'boolean']),
+            ImportColumn::make('discount_rate')
+                ->numeric()
+                ->rules(['numeric', 'min:0', 'max:100']),
+            ImportColumn::make('commission_rate')
+                ->numeric()
+                ->rules(['numeric', 'min:0', 'max:100']),
+            ImportColumn::make('metadata'),
         ];
     }
 

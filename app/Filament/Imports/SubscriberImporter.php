@@ -15,7 +15,32 @@ class SubscriberImporter extends Importer
     public static function getColumns(): array
     {
         return [
-            //
+            ImportColumn::make('email')
+                ->requiredMapping()
+                ->rules(['required', 'email', 'max:255']),
+            ImportColumn::make('first_name')
+                ->rules(['max:255']),
+            ImportColumn::make('last_name')
+                ->rules(['max:255']),
+            ImportColumn::make('phone')
+                ->rules(['max:255']),
+            ImportColumn::make('company')
+                ->rules(['max:255']),
+            ImportColumn::make('job_title')
+                ->rules(['max:255']),
+            ImportColumn::make('source')
+                ->rules(['max:255']),
+            ImportColumn::make('status')
+                ->rules(['max:255']),
+            ImportColumn::make('is_verified')
+                ->boolean()
+                ->rules(['boolean']),
+            ImportColumn::make('accepts_marketing')
+                ->boolean()
+                ->rules(['boolean']),
+            ImportColumn::make('newsletter_subscription')
+                ->boolean()
+                ->rules(['boolean']),
         ];
     }
 

@@ -577,6 +577,7 @@ return array (
   'product2' => 'Product 2',
   'product_a' => 'Product A',
   'product_sample' => 'Product Sample',
+  'produktas' => 'Produktas',
   'profesionalus_perforatorius' => 'Profesionalus perforatorius',
   'profesionalus_plaktukas' => 'Profesionalus plaktukas',
   'professional_drill_set' => 'Professional Drill Set',

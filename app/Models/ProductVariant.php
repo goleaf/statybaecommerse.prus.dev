@@ -75,7 +75,7 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
         'weight', 'track_inventory', 'is_default', 'is_enabled', 'barcode', 'attributes', 'variant_attribute_matrix', 'variant_metadata',
         'is_on_sale', 'sale_start_date', 'sale_end_date', 'is_featured', 'is_new', 'is_bestseller',
         'seo_title_lt', 'seo_title_en', 'seo_description_lt', 'seo_description_en',
-        'views_count', 'clicks_count', 'conversion_rate', 'variant_combination_hash',
+        'variant_combination_hash',
     ];
 
     /**
@@ -104,9 +104,6 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
             'is_bestseller'            => 'boolean',
             'sale_start_date'          => 'datetime',
             'sale_end_date'            => 'datetime',
-            'views_count'              => 'integer',
-            'clicks_count'             => 'integer',
-            'conversion_rate'          => 'decimal:4',
             'attributes'               => 'array',
             'variant_attribute_matrix' => 'array',
             'variant_metadata'         => 'array',
@@ -739,46 +736,6 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
     }
 
     /**
-     * Record a view for analytics.
-     */
-    public function recordView(): bool
-    {
-        $this->increment('views_count');
-
-        // Record daily analytics
-        $this->recordDailyAnalytics('views');
-
-        return true;
-    }
-
-    /**
-     * Record a click for analytics.
-     */
-    public function recordClick(): bool
-    {
-        $this->increment('clicks_count');
-
-        // Record daily analytics
-        $this->recordDailyAnalytics('clicks');
-
-        return true;
-    }
-
-    /**
-     * Update conversion rate.
-     */
-    public function updateConversionRate(): bool
-    {
-        if ($this->views_count > 0) {
-            $this->conversion_rate = ($this->sold_quantity / $this->views_count) * 100;
-
-            return $this->save();
-        }
-
-        return false;
-    }
-
-    /**
      * Update available quantity.
      */
     public function updateAvailableQuantity(): bool
@@ -872,22 +829,6 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
                 $q->whereNull('sale_end_date')
                     ->orWhere('sale_end_date', '>=', now());
             });
-    }
-
-    /**
-     * Scope for variants with high conversion rate.
-     */
-    public function scopeHighConverting($query, float $threshold = 5.0)
-    {
-        return $query->where('conversion_rate', '>=', $threshold);
-    }
-
-    /**
-     * Scope for variants with high views.
-     */
-    public function scopePopular($query, int $threshold = 100)
-    {
-        return $query->where('views_count', '>=', $threshold);
     }
 
     /**
