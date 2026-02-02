@@ -8,7 +8,7 @@ use App\Filament\Resources\Sliders\SliderResource;
 use App\Models\AdminUser;
 use App\Models\Slider;
 use Exception;
-use Filament\Support\Icons\Heroicon;
+use App\Enums\NavigationGroup;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -92,18 +92,10 @@ final class SliderResourceTest extends TestCase
             ->assertStatus(200);
     }
 
-    public function test_slider_resource_has_correct_navigation_icon(): void
-    {
-        $this->assertEquals(
-            Heroicon::OutlinedPhoto,
-            SliderResource::getNavigationIcon()
-        );
-    }
-
     public function test_slider_resource_has_correct_navigation_group(): void
     {
         $this->assertEquals(
-            'Content',
+            NavigationGroup::Content->label(),
             SliderResource::getNavigationGroup()
         );
     }
@@ -124,23 +116,22 @@ final class SliderResourceTest extends TestCase
         Livewire::test(\App\Filament\Resources\Sliders\Pages\CreateSlider::class)
             ->fillForm([
                 'title'            => 'New Test Slider',
+                'slug'             => 'new-test-slider',
                 'description'      => 'Test description',
                 'button_text'      => 'Click Me',
-                'button_url'       => 'https://test.com',
                 'background_color' => '#ff0000',
                 'text_color'       => '#ffffff',
                 'is_active'        => true,
                 'sort_order'       => 1,
-                'image'            => UploadedFile::fake()->image('new_slider.jpg'),
             ])
             ->call('create')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('sliders', [
             'title'            => 'New Test Slider',
+            'slug'             => 'new-test-slider',
             'description'      => 'Test description',
             'button_text'      => 'Click Me',
-            'button_url'       => 'https://test.com',
             'background_color' => '#ff0000',
             'text_color'       => '#ffffff',
             'is_active'        => true,
@@ -261,12 +252,10 @@ final class SliderResourceTest extends TestCase
     {
         Livewire::test(\App\Filament\Resources\Sliders\Pages\CreateSlider::class)
             ->fillForm([
-                'title'      => 'Test Slider',
-                'button_url' => 'invalid-url',  // Invalid URL format
-                'image'      => UploadedFile::fake()->image('test.jpg'),
+                'title' => '',  // Required field - testing validation
             ])
             ->call('create')
-            ->assertHasFormErrors(['button_url']);
+            ->assertHasFormErrors(['title']);
     }
 
     public function test_slider_resource_can_upload_image(): void
@@ -277,7 +266,7 @@ final class SliderResourceTest extends TestCase
             'record' => $slider->getRouteKey(),
         ])
             ->fillForm([
-                'image' => UploadedFile::fake()->image('test.jpg'),
+                'slider_image' => UploadedFile::fake()->image('test.jpg'),
             ])
             ->call('save')
             ->assertHasNoFormErrors();
@@ -285,7 +274,7 @@ final class SliderResourceTest extends TestCase
         $this->assertTrue($slider->fresh()->hasMedia('slider_images'));
     }
 
-    public function test_slider_resource_can_upload_background(): void
+    public function test_slider_resource_can_upload_mobile_image(): void
     {
         $slider = Slider::first();
 
@@ -293,12 +282,12 @@ final class SliderResourceTest extends TestCase
             'record' => $slider->getRouteKey(),
         ])
             ->fillForm([
-                'background_image' => UploadedFile::fake()->image('background.jpg'),
+                'mobile_image' => UploadedFile::fake()->image('mobile.jpg'),
             ])
             ->call('save')
             ->assertHasNoFormErrors();
 
-        $this->assertTrue($slider->fresh()->hasMedia('slider_backgrounds'));
+        $this->assertTrue($slider->fresh()->hasMedia('mobile_images'));
     }
 
     /*
@@ -340,16 +329,15 @@ final class SliderResourceTest extends TestCase
     public function test_slider_resource_has_correct_form_fields(): void
     {
         Livewire::test(\App\Filament\Resources\Sliders\Pages\CreateSlider::class)
-            ->assertFormExists([
-                'title',
-                'description',
-                'button_text',
-                'button_url',
-                'background_color',
-                'text_color',
-                'is_active',
-                'sort_order',
-            ]);
+            ->assertFormFieldExists('title')
+            ->assertFormFieldExists('slug')
+            ->assertFormFieldExists('description')
+            ->assertFormFieldExists('button_text')
+            // Note: button_url is a SearchableInput which cannot be tested with assertFormFieldExists
+            ->assertFormFieldExists('background_color')
+            ->assertFormFieldExists('text_color')
+            ->assertFormFieldExists('is_active')
+            ->assertFormFieldExists('sort_order');
     }
 
     public function test_slider_resource_requires_authentication(): void

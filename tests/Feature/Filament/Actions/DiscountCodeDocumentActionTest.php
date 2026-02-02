@@ -121,7 +121,8 @@ final class DiscountCodeDocumentActionTest extends TestCase
                 expect($variables['DISCOUNT_NAME'])->toBe($this->discount->name);
                 expect($variables['DISCOUNT_VALUE'])->toBe($this->discount->value);
                 expect($title)->toBe($data['title']);
-            }
+            },
+            fn () => 'https://example.test/document.pdf'
         );
 
         $response = $handler($this->discountCode, $data, $service);
@@ -222,6 +223,16 @@ final class DiscountCodeDocumentActionTest extends TestCase
                 }
 
                 return ($this->pdfHandler)($document);
+            }
+
+            public function extractVariablesFromModel(\Illuminate\Database\Eloquent\Model $model, string $prefix = ''): array
+            {
+                return [];
+            }
+
+            public function getAvailableVariables(): array
+            {
+                return [];
             }
         };
     }

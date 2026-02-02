@@ -484,11 +484,6 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
      */
     public function canAccessPanel(Panel $panel): bool
     {
-        // Allow access in unit tests
-        if (app()->runningUnitTests()) {
-            return true;
-        }
-
         // Users with is_admin flag always have access
         return (bool) ($this->is_admin ?? false);
     }

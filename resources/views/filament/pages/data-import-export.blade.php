@@ -56,6 +56,20 @@
             </form>
         </x-filament::section>
 
+        <!-- Advanced Import -->
+        <x-filament::section>
+            <div class="mb-6">
+                <h2 class="text-lg font-semibold text-gray-900">{{ __('admin.advanced_import') ?? 'Advanced Excel Import' }}</h2>
+                <p class="text-sm text-gray-600 mt-1">{{ __('admin.advanced_import_description') ?? 'Import data with custom field mapping.' }}</p>
+            </div>
+
+            <div class="flex flex-wrap gap-4">
+                {{ $this->importProductsAction }}
+                {{ $this->importCategoriesAction }}
+                {{ $this->importBrandsAction }}
+            </div>
+        </x-filament::section>
+
         <!-- Import Guidelines -->
         <x-filament::section>
             <h3 class="text-lg font-semibold mb-4">{{ __('admin.import_export.guidelines') ?? 'Import Guidelines' }}</h3>
@@ -75,4 +89,6 @@
             </div>
         </x-filament::section>
     </div>
+
+    <x-filament-actions::modals />
 </x-filament-panels::page>

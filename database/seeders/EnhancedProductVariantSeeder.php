@@ -11,7 +11,6 @@ use App\Models\Category;
 use App\Models\Location;
 use App\Models\Product;
 use App\Models\ProductVariant;
-use App\Models\VariantAnalytics;
 use App\Models\VariantAttributeValue;
 use App\Models\VariantInventory;
 use App\Models\VariantPricingRule;
@@ -36,7 +35,6 @@ final class EnhancedProductVariantSeeder extends Seeder
         $this->seedPricingRules($variants);
         $this->seedPriceHistories($variants);
         $this->seedStockHistories($variants);
-        $this->seedAnalytics($variants);
     }
 
     /**
@@ -413,33 +411,5 @@ final class EnhancedProductVariantSeeder extends Seeder
     private function seedStockHistories(EloquentCollection $variants): void
     {
         // Stock history functionality removed
-    }
-
-    /**
-     * Record analytics snapshots so downstream metrics have source data.
-     */
-    private function seedAnalytics(EloquentCollection $variants): void
-    {
-        foreach ($variants as $variant) {
-            $product = $variant->getRelation('product') ?? $variant->product;
-
-            if ($product === null) {
-                continue;
-            }
-
-            VariantAnalytics::factory()
-                ->for($product, 'product')
-                ->for($variant, 'variant')
-                ->state([
-                    'date'        => now()->toDateString(),
-                    'date_bucket' => sprintf('%s:%s', VariantAnalytics::BUCKET_DAILY, now()->toDateString()),
-                    'views'       => 150,
-                    'clicks'      => 60,
-                    'add_to_cart' => 25,
-                    'purchases'   => 10,
-                    'revenue'     => max(10, $variant->price * 10),
-                ])
-                ->create();
-        }
     }
 }

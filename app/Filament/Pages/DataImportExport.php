@@ -6,7 +6,11 @@ namespace App\Filament\Pages;
 
 use App\Services\ImportExport\ProviderRegistry;
 use App\Support\Storage\SecureStorage;
+use App\Filament\Imports\BrandImporter;
+use App\Filament\Imports\CategoryImporter;
+use App\Filament\Imports\ProductImporter;
 use Filament\Actions\Action;
+use Filament\Actions\ImportAction;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
@@ -41,6 +45,11 @@ final class DataImportExport extends Page implements HasForms
         return __('translations.import');
     }
 
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->is_admin ?? false;
+    }
+
     public ?array $data = [];
 
     public function mount(): void
@@ -50,6 +59,27 @@ final class DataImportExport extends Page implements HasForms
             'only'           => 'all',
             'downloadImages' => true,
         ]);
+    }
+
+    public function importProductsAction(): ImportAction
+    {
+        return ImportAction::make('importProducts')
+            ->label(__('admin.products_import') ?? 'Import Products')
+            ->importer(ProductImporter::class);
+    }
+
+    public function importCategoriesAction(): ImportAction
+    {
+        return ImportAction::make('importCategories')
+            ->label(__('admin.categories_import') ?? 'Import Categories')
+            ->importer(CategoryImporter::class);
+    }
+
+    public function importBrandsAction(): ImportAction
+    {
+        return ImportAction::make('importBrands')
+            ->label(__('admin.brands_import') ?? 'Import Brands')
+            ->importer(BrandImporter::class);
     }
 
     public function form(Form $form): Form
@@ -122,6 +152,9 @@ final class DataImportExport extends Page implements HasForms
     protected function getHeaderActions(): array
     {
         return [
+            $this->importProductsAction(),
+            $this->importCategoriesAction(),
+            $this->importBrandsAction(),
             $this->importAction(),
         ];
     }

@@ -2,23 +2,23 @@
 
 declare(strict_types=1);
 
-return [
-    'company'                => 'Įmonė',
-    'company_placeholder'    => 'Įveskite įmonės pavadinimą',
-    'email_address'          => 'El. pašto adresas',
-    'email_placeholder'      => 'Įveskite savo el. pašto adresą',
-    'first_name'             => 'Vardas',
-    'first_name_placeholder' => 'Įveskite savo vardą',
-    'interests'              => 'Domėjimosi sritys',
-    'interests_blog'         => 'Tinklaraštis',
-    'interests_events'       => 'Renginiai',
-    'interests_news'         => 'Naujienos',
-    'interests_products'     => 'Produktai',
-    'interests_promotions'   => 'Akcijos ir nuolaidos',
-    'interests_technical'    => 'Techninė informacija',
-    'last_name'              => 'Pavardė',
-    'last_name_placeholder'  => 'Įveskite savo pavardę',
-    'privacy_notice'         => 'Prenumeruodami sutinkate su mūsų privatumo politika',
-    'subscribe_button'       => 'Prenumeruoti',
-    'subscribing'            => 'Prenumeruojama...',
-];
+return array (
+  'company' => 'newsletter.company',
+  'company_placeholder' => 'newsletter.company_placeholder',
+  'email_address' => 'newsletter.email_address',
+  'email_placeholder' => 'newsletter.email_placeholder',
+  'first_name' => 'newsletter.first_name',
+  'first_name_placeholder' => 'newsletter.first_name_placeholder',
+  'interests' => 'newsletter.interests',
+  'interests_blog' => 'newsletter.interests_blog',
+  'interests_events' => 'newsletter.interests_events',
+  'interests_news' => 'newsletter.interests_news',
+  'interests_products' => 'newsletter.interests_products',
+  'interests_promotions' => 'newsletter.interests_promotions',
+  'interests_technical' => 'newsletter.interests_technical',
+  'last_name' => 'newsletter.last_name',
+  'last_name_placeholder' => 'newsletter.last_name_placeholder',
+  'privacy_notice' => 'newsletter.privacy_notice',
+  'subscribe_button' => 'newsletter.subscribe_button',
+  'subscribing' => 'newsletter.subscribing',
+);

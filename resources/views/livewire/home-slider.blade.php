@@ -94,8 +94,10 @@
                          style="background-color: {{ $slider->getEffectiveBackgroundColor() }}">
 
                     <!-- Background Image -->
-                    @php($bgUrl = $slider->getImageUrl('slider_large') ?? $slider->getImageUrl('slider'))
-                        @if($bgUrl)
+                    @php
+                        $bgUrl = $slider->getImageUrl('slider_large') ?? $slider->getImageUrl('slider');
+                    @endphp
+                    @if($bgUrl)
                             <img src="{{ $bgUrl }}" 
                                  class="w-full h-full object-cover" 
                                  alt="{{ $slider->getTranslatedTitle() }}"

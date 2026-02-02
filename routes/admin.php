@@ -366,7 +366,6 @@ Route::middleware('auth')->group(function (): void {
         };
     };
 
-    Route::get('/admin/data-import-export', $placeholder('Data Import/Export'))->name('filament.admin.pages.data-import-export');
     Route::get('/admin/customer-segmentation', $placeholder('Customer Segmentation'))->name('filament.admin.pages.customer-segmentation');
     Route::get('/admin/seo-analytics', $placeholder('SEO Analytics'));  // Filament registers s-e-o-analytics; avoid name conflict
     Route::get('/admin/security-audit', $placeholder('Security Audit'))->name('filament.admin.pages.security-audit');

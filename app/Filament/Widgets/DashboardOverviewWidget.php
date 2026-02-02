@@ -14,7 +14,6 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\SystemSetting;
 use App\Models\User;
-use App\Models\VariantAnalytics;
 use Carbon\Carbon;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -73,7 +72,6 @@ class DashboardOverviewWidget extends BaseWidget
         $totalSystemSettings = SystemSetting::count();
 
         $totalUserBehaviors = 0; // UserBehavior::count();
-        $totalVariantAnalytics = VariantAnalytics::count();
 
         return [
             // Primary Business Metrics
@@ -139,10 +137,6 @@ class DashboardOverviewWidget extends BaseWidget
                 ->description(__('translations.tracked_behaviors'))
                 ->descriptionIcon('heroicon-m-chart-bar')
                 ->color('info'),
-            Stat::make(__('translations.variant_analytics'), \Illuminate\Support\Number::format($totalVariantAnalytics))
-                ->description(__('translations.variant_insights'))
-                ->descriptionIcon('heroicon-m-chart-pie')
-                ->color('primary'),
             Stat::make(__('translations.system_settings'), \Illuminate\Support\Number::format($totalSystemSettings))
                 ->description(__('translations.configuration_items'))
                 ->descriptionIcon('heroicon-m-cog-6-tooth')

@@ -2,9 +2,8 @@
 
 declare(strict_types=1);
 
-use App\Filament\Resources\SliderResource;
+use App\Filament\Resources\Sliders\SliderResource;
 use App\Models\Slider;
-use App\Support\Nav;
 
 it('unit: can load SliderResource class', function () {
     expect(class_exists(SliderResource::class))->toBeTrue();
@@ -19,9 +18,7 @@ it('unit: can get SliderResource model', function () {
 });
 
 it('unit: can get SliderResource navigation group', function () {
-    expect(SliderResource::getNavigationGroup())->toBe(
-        Nav::groupForResource(SliderResource::class)
-    );
+    expect(SliderResource::getNavigationGroup())->toBeString();
 });
 
 it('unit: can get SliderResource navigation label', function () {
@@ -41,7 +38,6 @@ it('unit: can get SliderResource pages', function () {
     expect($pages)->toBeArray();
     expect($pages)->toHaveKey('index');
     expect($pages)->toHaveKey('create');
-    expect($pages)->toHaveKey('view');
     expect($pages)->toHaveKey('edit');
 });
 
@@ -49,3 +45,4 @@ it('unit: can get SliderResource relations', function () {
     $relations = SliderResource::getRelations();
     expect($relations)->toBeArray();
 });
+

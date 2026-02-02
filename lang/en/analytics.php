@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-return [
-    'date'                      => 'Date',
-    'orders'                    => 'Orders',
-    'orders_and_revenue_trends' => 'Orders and revenue trends over the last 30 days',
-    'orders_overview'           => 'Orders Overview',
-    'revenue'                   => 'Revenue',
-];
+return array (
+  'date' => 'Date',
+  'orders' => 'analytics.orders',
+  'orders_and_revenue_trends' => 'analytics.orders_and_revenue_trends',
+  'orders_overview' => 'analytics.orders_overview',
+  'revenue' => 'analytics.revenue',
+);

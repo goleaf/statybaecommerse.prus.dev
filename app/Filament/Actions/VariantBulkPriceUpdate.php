@@ -13,6 +13,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
+use Filament\Tables\Actions\BulkAction as Action;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -216,9 +217,9 @@ final class VariantBulkPriceUpdate extends Action
     /**
      * Build a sale period date picker using Flatpickr when available, falling back to Filament's DateTimePicker otherwise.
      *
-     * @param Closure(): Carbon $default
+     * @param \Closure(): Carbon $default
      */
-    private static function makeSalePeriodPicker(string $name, string $label, Closure $default): FormComponent
+    private static function makeSalePeriodPicker(string $name, string $label, \Closure $default)
     {
         $componentClass = class_exists(self::FLATPICKR_COMPONENT)
             ? self::FLATPICKR_COMPONENT

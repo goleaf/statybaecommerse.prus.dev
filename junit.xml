@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ImportExportPageTest" file="tests\Feature\ImportExportPageTest.php" tests="2" assertions="1" errors="1" failures="1" skipped="0" time="21.354175">
+    <testcase name="it feature: renders the data import export page" file="tests\Feature\ImportExportPageTest.php::it feature: renders the data import export page" class="Tests\Feature\ImportExportPageTest" classname="Tests.Feature.ImportExportPageTest" assertions="1" time="21.079419">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">it feature: renders the data import export pageExpected response status code [200] but received 302.
+Failed asserting that 302 is identical to 200.&#13;
+at vendor\laravel\framework\src\Illuminate\Testing\TestResponseAssert.php:45
+at vendor\laravel\framework\src\Illuminate\Testing\TestResponse.php:174
+at vendor\laravel\framework\src\Illuminate\Testing\Concerns\AssertsStatusCodes.php:16
+at tests\Feature\ImportExportPageTest.php:17</failure>
+    </testcase>
+    <testcase name="it feature: imports via xml provider from uploaded file" file="tests\Feature\ImportExportPageTest.php::it feature: imports via xml provider from uploaded file" class="Tests\Feature\ImportExportPageTest" classname="Tests.Feature.ImportExportPageTest" assertions="0" time="0.274756">
+      <error type="Livewire\Exceptions\PublicPropertyNotFoundException">it feature: imports via xml provider from uploaded fileLivewire\Exceptions\PublicPropertyNotFoundException: Unable to set component data. Public property [$provider] not found on component: [components.navigation-menu]&#13;
+at vendor\livewire\livewire\src\Mechanisms\HandleComponents\HandleComponents.php:336
+at vendor\livewire\livewire\src\Mechanisms\HandleComponents\HandleComponents.php:318
+at vendor\livewire\livewire\src\Mechanisms\HandleComponents\HandleComponents.php:98
+at vendor\livewire\livewire\src\LivewireManager.php:102
+at vendor\livewire\livewire\src\Mechanisms\HandleRequests\HandleRequests.php:124
+at vendor\laravel\framework\src\Illuminate\Routing\ControllerDispatcher.php:46
+at vendor\laravel\framework\src\Illuminate\Routing\Route.php:265
+at vendor\laravel\framework\src\Illuminate\Routing\Route.php:211
+at vendor\laravel\framework\src\Illuminate\Routing\Router.php:822
+at vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php:180
+at vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php:137
+at vendor\laravel\framework\src\Illuminate\Routing\Router.php:821
+at vendor\laravel\framework\src\Illuminate\Routing\Router.php:800
+at vendor\laravel\framework\src\Illuminate\Routing\Router.php:764
+at vendor\laravel\framework\src\Illuminate\Routing\Router.php:753
+at vendor\laravel\framework\src\Illuminate\Foundation\Http\Kernel.php:200
+at vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php:180
+at vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php:137
+at vendor\laravel\framework\src\Illuminate\Foundation\Http\Kernel.php:175
+at vendor\laravel\framework\src\Illuminate\Foundation\Http\Kernel.php:144
+at vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\MakesHttpRequests.php:607
+at vendor\livewire\livewire\src\Features\SupportTesting\SubsequentRender.php:36
+at vendor\livewire\livewire\src\Features\SupportTesting\RequestBroker.php:30
+at vendor\livewire\livewire\src\Features\SupportTesting\SubsequentRender.php:35
+at vendor\livewire\livewire\src\Features\SupportTesting\Render.php:24
+at vendor\livewire\livewire\src\Features\SupportTesting\SubsequentRender.php:34
+at vendor\livewire\livewire\src\Features\SupportTesting\SubsequentRender.php:16
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:252
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:191
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:170
+at tests\Feature\ImportExportPageTest.php:52</error>
+    </testcase>
+  </testsuite>
+</testsuites>

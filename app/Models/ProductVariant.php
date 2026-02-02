@@ -251,14 +251,6 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
     }
 
     /**
-     * Handle analytics functionality with proper error handling.
-     */
-    public function analytics(): HasMany
-    {
-        return $this->hasMany(VariantAnalytics::class, 'variant_id');
-    }
-
-    /**
      * Handle inventories functionality with proper error handling.
      */
     public function inventories(): HasMany
@@ -770,31 +762,6 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
         $this->recordDailyAnalytics('clicks');
 
         return true;
-    }
-
-    /**
-     * Record daily analytics data.
-     */
-    public function recordDailyAnalytics(string $metric, int $amount = 1): void
-    {
-        $timestamp = now();
-        $metrics = [$metric => $amount];
-
-        VariantAnalytics::recordAnalytics(
-            $this->id,
-            $timestamp,
-            $metrics,
-            VariantAnalytics::BUCKET_DAILY,
-            $this->product_id
-        );
-
-        VariantAnalytics::recordAnalytics(
-            $this->id,
-            $timestamp,
-            $metrics,
-            VariantAnalytics::BUCKET_WEEKLY,
-            $this->product_id
-        );
     }
 
     /**
