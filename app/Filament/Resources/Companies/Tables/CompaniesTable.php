@@ -23,6 +23,10 @@ class CompaniesTable
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('industry')
+                    ->label(__('messages.industry'))
+                    ->badge()
+                    ->icon(fn (\App\Enums\Industry $state): string => $state->icon())
+                    ->color(fn (\App\Enums\Industry $state): string => $state->color())
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('size')
@@ -38,6 +42,9 @@ class CompaniesTable
             ->filters([
                 TernaryFilter::make('is_active')
                     ->label(__('messages.active')),
+                \Filament\Tables\Filters\SelectFilter::make('industry')
+                    ->label(__('messages.industry'))
+                    ->options(\App\Enums\Industry::class),
             ])
             ->recordActions([
                 EditAction::make(),

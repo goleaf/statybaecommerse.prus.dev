@@ -6,35 +6,35 @@ namespace App\Filament\Pages;
 
 use App\Services\ImportExport\ProviderRegistry;
 use App\Support\Storage\SecureStorage;
-use BackedEnum;
 use Filament\Actions\Action;
-use Filament\Forms;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
-use Filament\Schemas\Components\Fieldset;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
-use Filament\Schemas\Schema;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Facades\Storage;
 
-final class DataImportExport extends Page
+final class DataImportExport extends Page implements HasForms
 {
+    use InteractsWithForms;
+
     protected string $view = 'filament.pages.data-import-export';
 
-    /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations while conveying the
-     * accepted union types for maintainers via PHPDoc.
-     */
-    //    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-arrow-down-tray';
     public static function getNavigationIcon(): string|Htmlable|null
     {
         return 'heroicon-o-arrow-down-tray';
     }
 
-    public static function getNavigationGroup(): ?string
+    public static function getNavigationLabel(): string
     {
-        return null;
+        return __('translations.data_import_export');
     }
 
     public function getTitle(): string|Htmlable
@@ -42,111 +42,126 @@ final class DataImportExport extends Page
         return __('translations.data_import_export');
     }
 
-    public ?string $provider = 'xml';
+    public ?array $data = [];
 
-    public ?string $only = 'all';
-
-    public ?bool $downloadImages = true;
-
-    public ?string $exportPath = 'catalog-export.xml';
-
-    public array|string|null $file = null;
-
-    public function form(Schema $schema): Schema
+    public function mount(): void
     {
-        return $schema
+        $this->form->fill([
+            'provider' => 'xml',
+            'only' => 'all',
+            'downloadImages' => true,
+            'exportPath' => 'catalog-export.xml',
+        ]);
+    }
+
+    public function form(Form $form): Form
+    {
+        return $form
             ->schema([
                 Section::make(__('translations.data_import_export'))
                     ->schema([
                         Grid::make(2)->schema([
-                            Forms\Components\Select::make('provider')
+                            Select::make('provider')
                                 ->label(__('translations.provider'))
                                 ->options(collect(ProviderRegistry::providers())->mapWithKeys(fn ($p, $k) => [$k => $p->label()])->all())
-                                ->required(),
-                            Forms\Components\Select::make('only')
+                                ->required()
+                                ->live(),
+                            Select::make('only')
                                 ->label(__('translations.scope'))
                                 ->options(['all' => 'all', 'categories' => 'categories', 'products' => 'products'])
                                 ->required(),
                         ]),
-                        Fieldset::make(__('translations.import'))
-                            ->schema([
-                                Forms\Components\FileUpload::make('file')
-                                    ->label(__('translations.xml_file'))
-                                    ->acceptedFileTypes(['application/xml', 'text/xml'])
-                                    ->required(),
-                                Forms\Components\Toggle::make('downloadImages')
-                                    ->label(__('translations.download_images'))
-                                    ->default(true),
-                            ]),
-                        Fieldset::make(__('translations.export'))
-                            ->schema([
-                                Forms\Components\TextInput::make('exportPath')
-                                    ->label(__('translations.export_path'))
-                                    ->default('storage/catalog-export.xml')
-                                    ->required(),
-                            ]),
+                        Grid::make(2)->schema([
+                            Section::make(__('translations.import'))
+                                ->schema([
+                                    FileUpload::make('file')
+                                        ->label(__('translations.xml_file'))
+                                        ->acceptedFileTypes(['application/xml', 'text/xml'])
+                                        ->disk(SecureStorage::disk())
+                                        ->directory('imports')
+                                        ->required(),
+                                    Toggle::make('downloadImages')
+                                        ->label(__('translations.download_images'))
+                                        ->default(true),
+                                ])->columnSpan(1),
+                            Section::make(__('translations.export'))
+                                ->schema([
+                                    TextInput::make('exportPath')
+                                        ->label(__('translations.export_path'))
+                                        ->default('catalog-export.xml')
+                                        ->required(),
+                                ])->columnSpan(1),
+                        ]),
                     ])
                     ->columns(1),
-            ]);
+            ])
+            ->statePath('data');
     }
 
-    protected function getActions(): array
+    public function importAction(): Action
+    {
+        return Action::make('import')
+            ->label(__('translations.import'))
+            ->action(function (): void {
+                $data = $this->form->getState();
+                $provider = ProviderRegistry::get($data['provider'] ?? 'xml');
+                if (! $provider) {
+                    Notification::make()
+                        ->title(__('translations.provider_not_found'))
+                        ->danger()
+                        ->send();
+                    return;
+                }
+                $path = $data['file'];
+                if (! $path) {
+                    Notification::make()
+                        ->title(__('translations.file_missing'))
+                        ->danger()
+                        ->send();
+                    return;
+                }
+                $abs = Storage::disk(SecureStorage::disk())->path($path);
+                $res = $provider->import($abs, ['only' => $data['only'] ?? 'all', 'download_images' => (bool) ($data['downloadImages'] ?? true)]);
+                
+                Notification::make()
+                    ->title(__('translations.import_finished'))
+                    ->body(__('messages.created') . ': ' . ($res['categories']['created'] + $res['products']['created']))
+                    ->success()
+                    ->send();
+            });
+    }
+
+    public function exportAction(): Action
+    {
+        return Action::make('export')
+            ->label(__('translations.export'))
+            ->action(function (): void {
+                $data = $this->form->getState();
+                $provider = ProviderRegistry::get($data['provider'] ?? 'xml');
+                if (! $provider) {
+                    Notification::make()
+                        ->title(__('translations.provider_not_found'))
+                        ->danger()
+                        ->send();
+                    return;
+                }
+                $targetPath = $data['exportPath'] ?? 'catalog-export.xml';
+                $provider->export(
+                    Storage::disk(SecureStorage::disk())->path($targetPath),
+                    ['only' => $data['only'] ?? 'all']
+                );
+                Notification::make()
+                    ->title(__('translations.export_finished'))
+                    ->success()
+                    ->send();
+            });
+    }
+
+    protected function getHeaderActions(): array
     {
         return [
-            Action::make('import')
-                ->label(__('translations.import'))
-                ->action(function (): void {
-                    $provider = ProviderRegistry::get($this->provider ?? 'xml');
-                    if (! $provider) {
-                        Notification::make()
-                            ->title(__('translations.provider_not_found'))
-                            ->danger()
-                            ->send();
-
-                        return;
-                    }
-                    $path = $this->file;
-                    if (is_array($path)) {
-                        $path = $path[0] ?? null;
-                    }
-                    if (! $path) {
-                        Notification::make()
-                            ->title(__('translations.file_missing'))
-                            ->danger()
-                            ->send();
-
-                        return;
-                    }
-                    $abs = Storage::disk(SecureStorage::disk())->path($path);
-                    $res = $provider->import($abs, ['only' => $this->only ?? 'all', 'download_images' => (bool) $this->downloadImages]);
-                    Notification::make()
-                        ->title(__('translations.import_finished'))
-                        ->success()
-                        ->send();
-                    $this->dispatch('imported', created: $res['categories']['created'] + $res['products']['created']);
-                }),
-            Action::make('export')
-                ->label(__('translations.export'))
-                ->action(function (): void {
-                    $provider = ProviderRegistry::get($this->provider ?? 'xml');
-                    if (! $provider) {
-                        Notification::make()
-                            ->title(__('translations.provider_not_found'))
-                            ->danger()
-                            ->send();
-
-                        return;
-                    }
-                    $targetPath = $this->exportPath ?? 'catalog-export.xml';
-                    $provider->export(
-                        Storage::disk(SecureStorage::disk())->path($targetPath),
-                        ['only' => $this->only ?? 'all']
-                    );
-                    Notification::make()
-                        ->title(__('translations.export_finished'))
-                        ->success()
-                        ->send();
-                }),
+            $this->importAction(),
+            $this->exportAction(),
         ];
     }
 }

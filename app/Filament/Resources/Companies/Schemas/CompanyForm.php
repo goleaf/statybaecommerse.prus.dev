@@ -46,9 +46,11 @@ class CompanyForm
 
                 Section::make(__('messages.Profile'))
                     ->schema([
-                        TextInput::make('industry')
-                            ->label('Industry')
-                            ->maxLength(255),
+                        Select::make('industry')
+                            ->label(__('messages.industry'))
+                            ->options(\App\Enums\Industry::class)
+                            ->searchable()
+                            ->preload(),
                         Select::make('size')
                             ->label('Size')
                             ->options([

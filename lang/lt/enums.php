@@ -17,4 +17,14 @@ return [
         'suspended' => 'Sustabdytas',
         'archived'  => 'Archyvuota',
     ],
+    'industry' => [
+        'construction'  => 'Statyba',
+        'technology'    => 'Technologijos',
+        'manufacturing' => 'Gamyba',
+        'retail'        => 'Mažmeninė prekyba',
+        'finance'       => 'Finansai',
+        'education'     => 'Švietimas',
+        'healthcare'    => 'Sveikatos apsauga',
+        'other'         => 'Kita',
+    ],
 ];

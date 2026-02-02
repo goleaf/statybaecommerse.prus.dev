@@ -17,4 +17,14 @@ return [
         'suspended' => 'Suspended',
         'archived'  => 'Archived',
     ],
+    'industry' => [
+        'construction'  => 'Construction',
+        'technology'    => 'Technology',
+        'manufacturing' => 'Manufacturing',
+        'retail'        => 'Retail',
+        'finance'       => 'Finance',
+        'education'     => 'Education',
+        'healthcare'    => 'Healthcare',
+        'other'         => 'Other',
+    ],
 ];

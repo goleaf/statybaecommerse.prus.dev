@@ -123,6 +123,7 @@ return [
     'Hot'                                                                                                                                 => 'Karšta',
     'Hours'                                                                                                                               => 'Darbo laikas',
     'ID'                                                                                                                                  => 'ID',
+    'industry'                                                                                                                            => 'Industrija',
     'Image'                                                                                                                               => 'Nuotrauka',
     'Image caption for display'                                                                                                           => 'Nuotraukos antraštė rodymui',
     'Impersonate User'                                                                                                                    => 'Imituoti vartotoją',
