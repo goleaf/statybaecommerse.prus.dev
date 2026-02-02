@@ -102,25 +102,6 @@ return new class extends Migration
             });
         }
 
-        // Create enhanced product analytics table
-        if (! Schema::hasTable('product_analytics')) {
-            Schema::create('product_analytics', function (Blueprint $table) {
-                $table->id();
-                $table->foreignId('product_id')->constrained()->cascadeOnDelete();
-                $table->date('date');
-                $table->integer('views')->default(0);
-                $table->integer('cart_additions')->default(0);
-                $table->integer('purchases')->default(0);
-                $table->integer('wishlist_additions')->default(0);
-                $table->decimal('conversion_rate', 5, 4)->default(0);
-                $table->timestamps();
-
-                $table->unique(['product_id', 'date']);
-                $table->index(['date', 'views']);
-                $table->index(['date', 'purchases']);
-            });
-        }
-
         // Create enhanced system notifications table
         if (! Schema::hasTable('system_notifications')) {
             Schema::create('system_notifications', function (Blueprint $table) {
@@ -154,33 +135,13 @@ return new class extends Migration
                 $table->index(['key']);
             });
         }
-
-        // Create advanced search logs for analytics
-        if (! Schema::hasTable('search_logs')) {
-            Schema::create('search_logs', function (Blueprint $table) {
-                $table->id();
-                $table->string('query');
-                $table->integer('results_count')->default(0);
-                $table->string('ip_address')->nullable();
-                $table->foreignId('user_id')->nullable()->constrained()->cascadeOnDelete();
-                $table->json('filters')->nullable();
-                $table->timestamp('searched_at');
-                $table->timestamps();
-
-                $table->index(['query']);
-                $table->index(['searched_at']);
-                $table->index(['results_count']);
-            });
-        }
     }
 
     public function down(): void
     {
         // Drop tables in reverse order
-        Schema::dropIfExists('search_logs');
         Schema::dropIfExists('user_preferences');
         Schema::dropIfExists('system_notifications');
-        Schema::dropIfExists('product_analytics');
 
         // Remove added columns from existing tables
         if (Schema::hasTable('products')) {

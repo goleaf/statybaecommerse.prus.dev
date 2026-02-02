@@ -46,7 +46,6 @@ class FeatureToggleService
     public function getCampaignDependentFeatures(): array
     {
         return [
-            'analytics'       => $this->isEnabled('analytics'),
             'discount'        => $this->isEnabled('discount'),
             'customer_groups' => $this->isEnabled('customer_groups'),
         ];

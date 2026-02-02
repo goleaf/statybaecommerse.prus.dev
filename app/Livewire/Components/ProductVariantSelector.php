@@ -66,9 +66,6 @@ final class ProductVariantSelector extends Component
     {
         $this->selectedAttributes[$attributeSlug] = $value;
         $this->findMatchingVariant();
-
-        // Track analytics
-        $this->recordVariantClick();
     }
 
     public function findMatchingVariant(): void
@@ -122,9 +119,6 @@ final class ProductVariantSelector extends Component
 
         // Add to cart logic here
         // This would typically call a cart service
-
-        // Track analytics
-        $this->recordAddToCart();
 
         $this->dispatch('itemAddedToCart', [
             'variant_id' => $this->selectedVariant->id,
@@ -300,20 +294,6 @@ final class ProductVariantSelector extends Component
             ->firstWhere('value', $value);
 
         return $attributeValue?->getLocalizedDisplayValue() ?? $value;
-    }
-
-    private function recordVariantClick(): void
-    {
-        if ($this->selectedVariant) {
-            $this->selectedVariant->recordClick();
-        }
-    }
-
-    private function recordAddToCart(): void
-    {
-        if ($this->selectedVariant) {
-            $this->selectedVariant->recordAddToCart();
-        }
     }
 
     public function render()

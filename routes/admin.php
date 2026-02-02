@@ -367,7 +367,6 @@ Route::middleware('auth')->group(function (): void {
     };
 
     Route::get('/admin/customer-segmentation', $placeholder('Customer Segmentation'))->name('filament.admin.pages.customer-segmentation');
-    Route::get('/admin/seo-analytics', $placeholder('SEO Analytics'));  // Filament registers s-e-o-analytics; avoid name conflict
     Route::get('/admin/security-audit', $placeholder('Security Audit'))->name('filament.admin.pages.security-audit');
     // Minimal CustomerResource HTTP endpoints to support feature tests without relying on Livewire stack.
     Route::get('/admin/customers', $placeholder('Customers'))

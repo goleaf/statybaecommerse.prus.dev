@@ -41,7 +41,7 @@
                     {{ __('translations.live_dashboard') }}
                 </h2>
                 <p class="text-gray-600 mt-1">
-                    {{ __('translations.real_time_analytics') }}
+                    {{ __('translations.real_time_updates') }}
                 </p>
             </div>
             
@@ -95,7 +95,7 @@
         wire:loading.flex
         class="items-center justify-center p-6 mb-4 text-sm text-gray-500 bg-gray-50 border border-dashed border-gray-200 rounded-lg"
     >
-        {{-- Communicate that analytics widgets are refreshing --}}
+        {{-- Communicate that dashboard widgets are refreshing --}}
         <x-loading-dots class="text-primary-600" aria-hidden="true" />
         <span>{{ __('translations.products') }}</span>
     </div>
@@ -103,7 +103,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8" wire:loading.remove>
         @if(in_array('products', $selectedMetrics))
             <div
-                wire:key="analytics-products"
+                wire:key="dashboard-products"
                 class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200"
             >
                 <div class="flex items-center justify-between">
@@ -138,7 +138,7 @@
 
         @if(in_array('orders', $selectedMetrics))
             <div
-                wire:key="analytics-orders"
+                wire:key="dashboard-orders"
                 class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200"
             >
                 <div class="flex items-center justify-between">
@@ -173,7 +173,7 @@
 
         @if(in_array('users', $selectedMetrics))
             <div
-                wire:key="analytics-users"
+                wire:key="dashboard-users"
                 class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200"
             >
                 <div class="flex items-center justify-between">

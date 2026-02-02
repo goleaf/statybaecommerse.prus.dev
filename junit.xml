@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\SliderResourceTest" file="Slider Resource (Tests\Feature\SliderResource)" tests="13" assertions="38" errors="1" failures="0" skipped="0" time="109.641052">
+    <testcase name="Slider resource can duplicate slider" file="Slider Resource (Tests\Feature\SliderResource)::Slider resource can duplicate slider" class="Tests\Feature\SliderResourceTest" classname="Tests.Feature.SliderResourceTest" assertions="4" time="26.671429"/>
+    <testcase name="Slider resource can delete slider" file="Slider Resource (Tests\Feature\SliderResource)::Slider resource can delete slider" class="Tests\Feature\SliderResourceTest" classname="Tests.Feature.SliderResourceTest" assertions="4" time="6.921298"/>
+    <testcase name="Slider resource validates required fields" file="Slider Resource (Tests\Feature\SliderResource)::Slider resource validates required fields" class="Tests\Feature\SliderResourceTest" classname="Tests.Feature.SliderResourceTest" assertions="0" time="7.093774">
+      <error type="LogicException">Slider resource validates required fieldsLogicException: Filament failed to validate the [data.button_url] field\'s selected options because it did not have an [options()] or [getOptionLabelUsing()] configuration. Please use one of these methods to inform Filament which options are valid for this field.&#13;
+at vendor\filament\forms\src\Components\Select.php:1713
+at vendor\filament\forms\src\Components\Concerns\CanBeValidated.php:812
+at vendor\filament\forms\src\Components\Concerns\CanBeValidated.php:856
+at vendor\filament\forms\src\Components\Concerns\CanBeValidated.php:912
+at vendor\filament\schemas\src\Concerns\CanBeValidated.php:85
+at vendor\filament\schemas\src\Concerns\CanBeValidated.php:95
+at vendor\filament\schemas\src\Concerns\CanBeValidated.php:95
+at vendor\filament\schemas\src\Concerns\CanBeValidated.php:115
+at vendor\filament\schemas\src\Concerns\HasState.php:418
+at vendor\filament\schemas\src\Components\Concerns\CanBeHidden.php:264
+at vendor\filament\schemas\src\Concerns\HasState.php:417
+at vendor\filament\filament\src\Resources\Pages\CreateRecord.php:97
+at vendor\laravel\framework\src\Illuminate\Container\BoundMethod.php:36
+at vendor\laravel\framework\src\Illuminate\Container\Util.php:43
+at vendor\laravel\framework\src\Illuminate\Container\BoundMethod.php:96
+at vendor\laravel\framework\src\Illuminate\Container\BoundMethod.php:35
+at vendor\livewire\livewire\src\Wrapped.php:23
+at vendor\livewire\livewire\src\Mechanisms\HandleComponents\HandleComponents.php:492
+at vendor\livewire\livewire\src\Mechanisms\HandleComponents\HandleComponents.php:101
+at vendor\livewire\livewire\src\LivewireManager.php:102
+at vendor\livewire\livewire\src\Mechanisms\HandleRequests\HandleRequests.php:124
+at vendor\laravel\framework\src\Illuminate\Routing\ControllerDispatcher.php:46
+at vendor\laravel\framework\src\Illuminate\Routing\Route.php:265
+at vendor\laravel\framework\src\Illuminate\Routing\Route.php:211
+at vendor\laravel\framework\src\Illuminate\Routing\Router.php:822
+at vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php:180
+at vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php:137
+at vendor\laravel\framework\src\Illuminate\Routing\Router.php:821
+at vendor\laravel\framework\src\Illuminate\Routing\Router.php:800
+at vendor\laravel\framework\src\Illuminate\Routing\Router.php:764
+at vendor\laravel\framework\src\Illuminate\Routing\Router.php:753
+at vendor\laravel\framework\src\Illuminate\Foundation\Http\Kernel.php:200
+at vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php:180
+at vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php:137
+at vendor\laravel\framework\src\Illuminate\Foundation\Http\Kernel.php:175
+at vendor\laravel\framework\src\Illuminate\Foundation\Http\Kernel.php:144
+at vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\MakesHttpRequests.php:607
+at vendor\livewire\livewire\src\Features\SupportTesting\SubsequentRender.php:36
+at vendor\livewire\livewire\src\Features\SupportTesting\RequestBroker.php:30
+at vendor\livewire\livewire\src\Features\SupportTesting\SubsequentRender.php:35
+at vendor\livewire\livewire\src\Features\SupportTesting\Render.php:24
+at vendor\livewire\livewire\src\Features\SupportTesting\SubsequentRender.php:34
+at vendor\livewire\livewire\src\Features\SupportTesting\SubsequentRender.php:16
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:252
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:219
+at tests\Feature\SliderResourceTest.php:254</error>
+    </testcase>
+    <testcase name="Slider resource has correct navigation group" file="Slider Resource (Tests\Feature\SliderResource)::Slider resource has correct navigation group" class="Tests\Feature\SliderResourceTest" classname="Tests.Feature.SliderResourceTest" assertions="1" time="6.868125"/>
+    <testcase name="Slider resource has correct model" file="Slider Resource (Tests\Feature\SliderResource)::Slider resource has correct model" class="Tests\Feature\SliderResourceTest" classname="Tests.Feature.SliderResourceTest" assertions="1" time="6.934948"/>
+    <testcase name="Slider resource requires authentication" file="Slider Resource (Tests\Feature\SliderResource)::Slider resource requires authentication" class="Tests\Feature\SliderResourceTest" classname="Tests.Feature.SliderResourceTest" assertions="2" time="6.819775"/>
+    <testcase name="Slider resource has correct table columns" file="Slider Resource (Tests\Feature\SliderResource)::Slider resource has correct table columns" class="Tests\Feature\SliderResourceTest" classname="Tests.Feature.SliderResourceTest" assertions="0" time="6.871259"/>
+    <testcase name="Slider resource can list sliders" file="Slider Resource (Tests\Feature\SliderResource)::Slider resource can list sliders" class="Tests\Feature\SliderResourceTest" classname="Tests.Feature.SliderResourceTest" assertions="4" time="6.926288"/>
+    <testcase name="Slider resource can filter by status" file="Slider Resource (Tests\Feature\SliderResource)::Slider resource can filter by status" class="Tests\Feature\SliderResourceTest" classname="Tests.Feature.SliderResourceTest" assertions="5" time="6.880626"/>
+    <testcase name="Slider resource can search sliders" file="Slider Resource (Tests\Feature\SliderResource)::Slider resource can search sliders" class="Tests\Feature\SliderResourceTest" classname="Tests.Feature.SliderResourceTest" assertions="1" time="6.858563"/>
+    <testcase name="Slider resource can sort sliders" file="Slider Resource (Tests\Feature\SliderResource)::Slider resource can sort sliders" class="Tests\Feature\SliderResourceTest" classname="Tests.Feature.SliderResourceTest" assertions="4" time="6.923556"/>
+    <testcase name="Slider resource has correct form fields" file="Slider Resource (Tests\Feature\SliderResource)::Slider resource has correct form fields" class="Tests\Feature\SliderResourceTest" classname="Tests.Feature.SliderResourceTest" assertions="8" time="6.892119"/>
+    <testcase name="Slider resource can bulk delete sliders" file="Slider Resource (Tests\Feature\SliderResource)::Slider resource can bulk delete sliders" class="Tests\Feature\SliderResourceTest" classname="Tests.Feature.SliderResourceTest" assertions="4" time="6.979291"/>
+  </testsuite>
+</testsuites>

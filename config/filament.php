@@ -33,11 +33,6 @@ return [
                 'icon'  => 'heroicon-o-document-text',
             ],
             [
-                'key'   => AdminNavigationGroup::Analytics->value,
-                'label' => 'admin.navigation.analytics',
-                'icon'  => 'heroicon-o-chart-bar',
-            ],
-            [
                 'key'   => AdminNavigationGroup::System->value,
                 'label' => 'admin.navigation.system',
                 'icon'  => 'heroicon-o-cog-6-tooth',

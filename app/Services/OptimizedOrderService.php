@@ -93,32 +93,4 @@ final class OptimizedOrderService
             return $orders;
         });
     }
-
-    /**
-     * Get order analytics with cached results
-     */
-    public function getOrderAnalytics(string $period = 'month'): array
-    {
-        $cacheKey = "order_analytics_{$period}";
-
-        return Cache::remember($cacheKey, 1800, function () use ($period) { // 30 min cache
-            $startDate = match ($period) {
-                'week'  => now()->subWeek(),
-                'month' => now()->subMonth(),
-                'year'  => now()->subYear(),
-                default => now()->subMonth(),
-            };
-
-            return [
-                'total_orders'        => Order::createdSince($startDate)->count(),
-                'total_revenue'       => Order::createdSince($startDate)->sum('total'),
-                'average_order_value' => Order::createdSince($startDate)->avg('total'),
-                'orders_by_status'    => Order::createdSince($startDate)
-                    ->select('status', DB::raw('count(*) as count'))
-                    ->groupBy('status')
-                    ->pluck('count', 'status')
-                    ->toArray(),
-            ];
-        });
-    }
 }

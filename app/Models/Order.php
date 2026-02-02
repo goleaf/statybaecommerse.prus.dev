@@ -298,7 +298,7 @@ final class Order extends Model implements HasDocuments
 
     /**
      * Constrain the query to orders created within the provided window so the
-     * standalone orders_created_at_index can accelerate analytics workloads.
+     * standalone orders_created_at_index can accelerate filtered workloads.
      */
     public function scopeCreatedBetween(Builder $query, CarbonInterface|DateTimeInterface|string $start, CarbonInterface|DateTimeInterface|string $end): Builder
     {
@@ -319,7 +319,7 @@ final class Order extends Model implements HasDocuments
     public function scopeCreatedSince(Builder $query, CarbonInterface|DateTimeInterface|string $start): Builder
     {
         // Ensure partial window scans also leverage the dedicated created_at index for
-        // analytics roll-ups and dashboard aggregations.
+        // reporting roll-ups and dashboard aggregations.
         $this->enforceCreatedAtIndex($query);
 
         return $query->where($query->qualifyColumn('created_at'), '>=', $this->toImmutableCarbon($start));
@@ -346,7 +346,7 @@ final class Order extends Model implements HasDocuments
     {
         [$startOfDay, $endOfDay] = $this->normalizeDayRange($date);
 
-        // Keep day-level analytics aligned with the created_at index to avoid table
+        // Keep day-level reporting aligned with the created_at index to avoid table
         // scans whenever widgets drill into a single date bucket.
         $this->enforceCreatedAtIndex($query);
 
@@ -567,7 +567,7 @@ final class Order extends Model implements HasDocuments
     }
 
     /**
-     * Resolve the start and end of a given day while remaining timezone aware for analytics scopes.
+     * Resolve the start and end of a given day while remaining timezone aware for dashboard scopes.
      *
      * @return array{0: CarbonImmutable, 1: CarbonImmutable}
      */
@@ -581,7 +581,7 @@ final class Order extends Model implements HasDocuments
 
     /**
      * Apply a portable index hint so different database drivers consistently favour the
-     * dedicated orders_created_at_index during analytics queries.
+     * dedicated orders_created_at_index during date-range queries.
      */
     private function enforceCreatedAtIndex(Builder $query): void
     {
@@ -664,7 +664,7 @@ final class Order extends Model implements HasDocuments
             // Older or lightweight schema builders (such as the in-memory SQLite
             // adapter used by some test environments) omit the hasIndex helper.
             // Returning false instead of calling the missing method keeps the
-            // analytics helpers functional without triggering fatal errors.
+            // reporting helpers functional without triggering fatal errors.
             return self::$createdAtIndexAvailable[$cacheKey] = false;
         }
 

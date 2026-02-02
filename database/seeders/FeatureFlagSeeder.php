@@ -101,26 +101,6 @@ final class FeatureFlagSeeder extends Seeder
             ],
         ]);
 
-        // Analytics Category Feature Flags
-        FeatureFlag::factory()->create([
-            'name'        => 'Advanced Analytics',
-            'key'         => 'advanced_analytics',
-            'description' => 'Enable advanced analytics dashboard with real-time data',
-            'is_active'   => true,
-            'is_enabled'  => false,
-            'is_global'   => false,
-            'environment' => 'production',
-            'category'    => 'analytics',
-            'priority'    => 70,
-            'conditions'  => [
-                'user_role' => ['admin'],
-            ],
-            'metadata' => [
-                'version' => '2.0',
-                'author'  => 'Analytics Team',
-            ],
-        ]);
-
         // Payment Category Feature Flags
         FeatureFlag::factory()->create([
             'name'        => 'Payment Gateway V2',

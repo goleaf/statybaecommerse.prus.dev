@@ -220,7 +220,7 @@ final class CountryController extends Controller
     {
         $this->authorize('viewStatistics', Country::class);
 
-        // Aggregate useful statistics for analytics dashboards.
+        // Aggregate useful statistics for reporting dashboards.
         $stats = [
             'total_countries'    => Country::count(),
             'active_countries'   => Country::where('is_active', true)->count(),

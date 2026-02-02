@@ -186,11 +186,11 @@ final class CacheInvalidationService
     }
 
     /**
-     * Flush slider analytics caches and storefront slider payloads.
+     * Flush storefront slider payloads.
      */
     public function flushSliders(): void
     {
-        // Slider analytics dashboards and storefront hero carousels use shared tags for easy invalidation.
+        // Storefront hero carousels use shared tags for easy invalidation.
         $sliderTags = CacheTagHelper::merge(
             CacheTagHelper::sliders(),
             [CacheKeys::homeTag()]

@@ -63,32 +63,6 @@
             </div>
         </div>
 
-        <!-- Analytics Data -->
-        <div class="bg-gray-50 rounded-lg p-4 mb-6">
-            <h2 class="text-lg font-semibold text-gray-900 mb-4">{{ __('Filtered Analytics') }}</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="bg-white rounded-lg p-3">
-                    <h3 class="text-sm font-medium text-gray-600">{{ __('Filtered Products') }}</h3>
-                    <p class="text-xl font-bold text-gray-900">{{ $analyticsData['total_products'] }}</p>
-                </div>
-                <div class="bg-white rounded-lg p-3">
-                    <h3 class="text-sm font-medium text-gray-600">{{ __('Average Price') }}</h3>
-                    <p class="text-xl font-bold text-gray-900">€{{ number_format($analyticsData['average_price'], 2) }}</p>
-                </div>
-                <div class="bg-white rounded-lg p-3">
-                    <h3 class="text-sm font-medium text-gray-600">{{ __('Total Value') }}</h3>
-                    <p class="text-xl font-bold text-gray-900">€{{ number_format($analyticsData['total_value'], 2) }}</p>
-                </div>
-                <div class="bg-white rounded-lg p-3">
-                    <h3 class="text-sm font-medium text-gray-600">{{ __('Price Range') }}</h3>
-                    <p class="text-sm text-gray-900">
-                        €{{ number_format($analyticsData['price_range']['min'], 2) }} - 
-                        €{{ number_format($analyticsData['price_range']['max'], 2) }}
-                    </p>
-                </div>
-            </div>
-        </div>
-
         <!-- Filtered Products -->
         <div class="mb-6">
             <h2 class="text-lg font-semibold text-gray-900 mb-4">{{ __('Filtered Products') }}</h2>
@@ -109,54 +83,6 @@
                         <p class="text-gray-500">{{ __('No products found with current filters') }}</p>
                     </div>
                 @endforelse
-            </div>
-        </div>
-
-        <!-- Expensive Analytics (Persistent Cache) -->
-        <div class="bg-blue-50 rounded-lg p-4 mb-6">
-            <h2 class="text-lg font-semibold text-gray-900 mb-4">{{ __('Top Products & Brands (Persistent Cache)') }}</h2>
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Top Products -->
-                <div>
-                    <h3 class="font-medium text-gray-900 mb-3">{{ __('Top Products by Reviews') }}</h3>
-                    <div class="space-y-2">
-                        @foreach($expensiveAnalytics['top_products'] as $product)
-                            <div class="flex items-center space-x-3 bg-white rounded-lg p-3">
-                                {{-- Harmonise product images between cached analytics responses. --}}
-                                @php($productImage = $product['main_image'] ?? $product['thumbnail'] ?? ($product['image'] ?? null))
-                                @if($productImage)
-                                    <img src="{{ $productImage }}" alt="{{ $product['name'] }}"
-                                         class="w-10 h-10 object-cover rounded">
-                                @endif
-                                <div class="flex-1">
-                                    <h4 class="font-medium text-sm text-gray-900">{{ $product['name'] }}</h4>
-                                    <p class="text-xs text-gray-600">{{ trans_choice('common.reviews', $product['reviews_count']) }}</p>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
-
-                <!-- Top Brands -->
-                <div>
-                    <h3 class="font-medium text-gray-900 mb-3">{{ __('Top Brands by Products') }}</h3>
-                    <div class="space-y-2">
-                        @foreach($expensiveAnalytics['top_brands'] as $brand)
-                            <div class="flex items-center space-x-3 bg-white rounded-lg p-3">
-                                {{-- Harmonise brand images as well for consistency in the UI cache. --}}
-                                @php($brandImage = $brand['main_image'] ?? $brand['thumbnail'] ?? ($brand['image'] ?? null))
-                                @if($brandImage)
-                                    <img src="{{ $brandImage }}" alt="{{ $brand['name'] }}"
-                                         class="w-10 h-10 object-cover rounded">
-                                @endif
-                                <div class="flex-1">
-                                    <h4 class="font-medium text-sm text-gray-900">{{ $brand['name'] }}</h4>
-                                    <p class="text-xs text-gray-600">{{ $brand['products_count'] }} {{ __('messages.products') }}</p>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
             </div>
         </div>
 
@@ -199,11 +125,10 @@
                     </ul>
                 </div>
                 <div>
-                    <h3 class="font-medium text-gray-900 mb-2">{{ __('Performance Metrics') }}</h3>
+                    <h3 class="font-medium text-gray-900 mb-2">{{ __('Metrics') }}</h3>
                     <ul class="text-sm text-gray-600 space-y-1">
                         <li>{{ __('Filtered Results') }}: {{ $summaryReport['filtered_count'] }}</li>
                         <li>{{ __('Percentage of Total') }}: {{ $summaryReport['percentage_of_total'] }}%</li>
-                        <li>{{ __('Average Price') }}: €{{ number_format($summaryReport['average_price_vs_global'], 2) }}</li>
                     </ul>
                 </div>
             </div>

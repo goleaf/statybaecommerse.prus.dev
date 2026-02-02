@@ -24,7 +24,7 @@ class FeatureFlagFactory extends Factory
             'is_enabled'  => fake()->boolean(30),
             'is_global'   => fake()->boolean(20),
             'environment' => fake()->randomElement(['local', 'staging', 'production', null]),
-            'category'    => fake()->randomElement(['ui', 'performance', 'security', 'analytics', 'payment', 'shipping']),
+            'category'    => fake()->randomElement(['ui', 'performance', 'security', 'payment', 'shipping']),
             'priority'    => fake()->numberBetween(0, 100),
             'conditions'  => [
                 'user_type' => fake()->randomElement(['admin', 'customer', 'guest']),

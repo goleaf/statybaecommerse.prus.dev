@@ -122,18 +122,6 @@ final class SystemSettingCategorySeeder extends Seeder
                 ],
                 'translations' => $this->translationsFor('authentication'),
             ],
-            [
-                'attributes' => [
-                    'name'        => 'Analytics',
-                    'slug'        => 'analytics',
-                    'description' => 'Analytics and reporting settings',
-                    'icon'        => 'heroicon-o-chart-bar',
-                    'color'       => 'info',
-                    'sort_order'  => 8,
-                    'is_active'   => true,
-                ],
-                'translations' => $this->translationsFor('analytics'),
-            ],
         ];
     }
 
@@ -155,7 +143,6 @@ final class SystemSettingCategorySeeder extends Seeder
             'api'            => 'API nustatymai',
             'database'       => 'Duomenų bazės nustatymai',
             'authentication' => 'Autentifikavimo nustatymai',
-            'analytics'      => 'Analitikos nustatymai',
             default          => 'Nustatymai',
         };
     }
@@ -170,7 +157,6 @@ final class SystemSettingCategorySeeder extends Seeder
             'api'            => 'API integracijų ir ribojimų nustatymai.',
             'database'       => 'Duomenų bazės konfigūracijos nustatymai.',
             'authentication' => 'Autentifikavimo ir autorizacijos nustatymai.',
-            'analytics'      => 'Analitikos ir ataskaitų nustatymai.',
             default          => 'Sistema nustatymai.',
         };
     }
@@ -185,7 +171,6 @@ final class SystemSettingCategorySeeder extends Seeder
             'api'            => 'API Settings',
             'database'       => 'Database Settings',
             'authentication' => 'Authentication Settings',
-            'analytics'      => 'Analytics Settings',
             default          => 'Settings',
         };
     }
@@ -200,7 +185,6 @@ final class SystemSettingCategorySeeder extends Seeder
             'api'            => 'API integration and rate limit settings.',
             'database'       => 'Database configuration settings.',
             'authentication' => 'Authentication and authorization settings.',
-            'analytics'      => 'Analytics and reporting settings.',
             default          => 'System settings.',
         };
     }

@@ -157,14 +157,6 @@ enum UserRole: string implements EnumInterface
         };
     }
 
-    public function canViewAnalytics(): bool
-    {
-        return match ($this) {
-            self::SUPER_ADMIN, self::ADMIN, self::MANAGER => true,
-            default => false,
-        };
-    }
-
     public function canManageContent(): bool
     {
         return match ($this) {
@@ -208,9 +200,9 @@ enum UserRole: string implements EnumInterface
     public function permissions(): array
     {
         return match ($this) {
-            self::SUPER_ADMIN => ['manage_users', 'manage_products', 'manage_orders', 'manage_settings', 'view_analytics', 'manage_content', 'manage_inventory', 'manage_marketing', 'view_reports', 'manage_system', 'manage_referrals'],
-            self::ADMIN       => ['manage_users', 'manage_products', 'manage_orders', 'manage_settings', 'view_analytics', 'manage_content', 'manage_inventory', 'manage_marketing', 'view_reports', 'manage_referrals'],
-            self::MANAGER     => ['manage_products', 'manage_orders', 'view_analytics', 'manage_content', 'manage_inventory', 'manage_marketing', 'view_reports', 'manage_referrals'],
+            self::SUPER_ADMIN => ['manage_users', 'manage_products', 'manage_orders', 'manage_settings', 'manage_content', 'manage_inventory', 'manage_marketing', 'view_reports', 'manage_system', 'manage_referrals'],
+            self::ADMIN       => ['manage_users', 'manage_products', 'manage_orders', 'manage_settings', 'manage_content', 'manage_inventory', 'manage_marketing', 'view_reports', 'manage_referrals'],
+            self::MANAGER     => ['manage_products', 'manage_orders', 'manage_content', 'manage_inventory', 'manage_marketing', 'view_reports', 'manage_referrals'],
             self::EDITOR      => ['manage_products', 'manage_content'],
             self::CUSTOMER    => ['view_own_orders', 'manage_own_profile', 'view_own_referrals'],
             self::GUEST       => [],
@@ -249,7 +241,7 @@ enum UserRole: string implements EnumInterface
 
     public static function optionsWithDescriptions(): array
     {
-        return collect(self::cases())->sortBy('priority')->mapWithKeys(fn ($case) => [$case->value => ['label' => $case->label(), 'description' => $case->description(), 'icon' => $case->icon(), 'color' => $case->color(), 'level' => $case->level(), 'priority' => $case->priority(), 'is_admin' => $case->isAdmin(), 'is_staff' => $case->isStaff(), 'is_customer' => $case->isCustomer(), 'can_access_admin' => $case->canAccessAdmin(), 'can_manage_users' => $case->canManageUsers(), 'can_manage_products' => $case->canManageProducts(), 'can_manage_orders' => $case->canManageOrders(), 'can_manage_settings' => $case->canManageSettings(), 'can_view_analytics' => $case->canViewAnalytics(), 'can_manage_content' => $case->canManageContent(), 'can_manage_inventory' => $case->canManageInventory(), 'can_manage_marketing' => $case->canManageMarketing(), 'can_view_reports' => $case->canViewReports(), 'can_manage_system' => $case->canManageSystem(), 'permissions' => $case->permissions()]])->toArray();
+        return collect(self::cases())->sortBy('priority')->mapWithKeys(fn ($case) => [$case->value => ['label' => $case->label(), 'description' => $case->description(), 'icon' => $case->icon(), 'color' => $case->color(), 'level' => $case->level(), 'priority' => $case->priority(), 'is_admin' => $case->isAdmin(), 'is_staff' => $case->isStaff(), 'is_customer' => $case->isCustomer(), 'can_access_admin' => $case->canAccessAdmin(), 'can_manage_users' => $case->canManageUsers(), 'can_manage_products' => $case->canManageProducts(), 'can_manage_orders' => $case->canManageOrders(), 'can_manage_settings' => $case->canManageSettings(), 'can_manage_content' => $case->canManageContent(), 'can_manage_inventory' => $case->canManageInventory(), 'can_manage_marketing' => $case->canManageMarketing(), 'can_view_reports' => $case->canViewReports(), 'can_manage_system' => $case->canManageSystem(), 'permissions' => $case->permissions()]])->toArray();
     }
 
     public static function admin(): Collection
@@ -302,6 +294,6 @@ enum UserRole: string implements EnumInterface
 
     public function toArray(): array
     {
-        return ['value' => $this->value, 'label' => $this->label(), 'description' => $this->description(), 'icon' => $this->icon(), 'color' => $this->color(), 'level' => $this->level(), 'priority' => $this->priority(), 'is_admin' => $this->isAdmin(), 'is_staff' => $this->isStaff(), 'is_customer' => $this->isCustomer(), 'can_access_admin' => $this->canAccessAdmin(), 'can_manage_users' => $this->canManageUsers(), 'can_manage_products' => $this->canManageProducts(), 'can_manage_orders' => $this->canManageOrders(), 'can_manage_settings' => $this->canManageSettings(), 'can_view_analytics' => $this->canViewAnalytics(), 'can_manage_content' => $this->canManageContent(), 'can_manage_inventory' => $this->canManageInventory(), 'can_manage_marketing' => $this->canManageMarketing(), 'can_view_reports' => $this->canViewReports(), 'can_manage_system' => $this->canManageSystem(), 'permissions' => $this->permissions()];
+        return ['value' => $this->value, 'label' => $this->label(), 'description' => $this->description(), 'icon' => $this->icon(), 'color' => $this->color(), 'level' => $this->level(), 'priority' => $this->priority(), 'is_admin' => $this->isAdmin(), 'is_staff' => $this->isStaff(), 'is_customer' => $this->isCustomer(), 'can_access_admin' => $this->canAccessAdmin(), 'can_manage_users' => $this->canManageUsers(), 'can_manage_products' => $this->canManageProducts(), 'can_manage_orders' => $this->canManageOrders(), 'can_manage_settings' => $this->canManageSettings(), 'can_manage_content' => $this->canManageContent(), 'can_manage_inventory' => $this->canManageInventory(), 'can_manage_marketing' => $this->canManageMarketing(), 'can_view_reports' => $this->canViewReports(), 'can_manage_system' => $this->canManageSystem(), 'permissions' => $this->permissions()];
     }
 }
