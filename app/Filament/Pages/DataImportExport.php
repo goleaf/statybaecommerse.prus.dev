@@ -41,7 +41,7 @@ final class DataImportExport extends Page implements HasForms
 
     public static function getNavigationIcon(): string|Htmlable|null
     {
-        return 'heroicon-o-arrow-up-tray';
+        return null;
     }
 
     public static function getNavigationLabel(): string
@@ -76,77 +76,88 @@ final class DataImportExport extends Page implements HasForms
     {
         return ImportAction::make('importProducts')
             ->label(__('admin.products_import') ?? 'Import Products')
-            ->importer(ProductImporter::class);
+            ->importer(ProductImporter::class)
+            ->icon(null);
     }
 
     public function importCategoriesAction(): ImportAction
     {
         return ImportAction::make('importCategories')
             ->label(__('admin.categories_import') ?? 'Import Categories')
-            ->importer(CategoryImporter::class);
+            ->importer(CategoryImporter::class)
+            ->icon(null);
     }
 
     public function importBrandsAction(): ImportAction
     {
         return ImportAction::make('importBrands')
             ->label(__('admin.brands_import') ?? 'Import Brands')
-            ->importer(BrandImporter::class);
+            ->importer(BrandImporter::class)
+            ->icon(null);
     }
 
     public function importCustomersAction(): ImportAction
     {
         return ImportAction::make('importCustomers')
-            ->label('Import Customers')
-            ->importer(CustomerImporter::class);
+            ->label(__('admin.customers_import'))
+            ->importer(CustomerImporter::class)
+            ->icon(null);
     }
 
     public function importPartnersAction(): ImportAction
     {
         return ImportAction::make('importPartners')
-            ->label('Import Partners')
-            ->importer(PartnerImporter::class);
+            ->label(__('admin.partners_import'))
+            ->importer(PartnerImporter::class)
+            ->icon(null);
     }
 
     public function importOrganizationsAction(): ImportAction
     {
         return ImportAction::make('importOrganizations')
-            ->label('Import Organizations')
-            ->importer(OrganizationImporter::class);
+            ->label(__('admin.organizations_import'))
+            ->importer(OrganizationImporter::class)
+            ->icon(null);
     }
 
     public function importSubscribersAction(): ImportAction
     {
         return ImportAction::make('importSubscribers')
-            ->label('Import Subscribers')
-            ->importer(SubscriberImporter::class);
+            ->label(__('admin.subscribers_import'))
+            ->importer(SubscriberImporter::class)
+            ->icon(null);
     }
 
     public function importUsersAction(): ImportAction
     {
         return ImportAction::make('importUsers')
-            ->label('Import Users')
-            ->importer(UserImporter::class);
+            ->label(__('admin.users_import'))
+            ->importer(UserImporter::class)
+            ->icon(null);
     }
 
     public function importDiscountsAction(): ImportAction
     {
         return ImportAction::make('importDiscounts')
-            ->label('Import Discounts')
-            ->importer(DiscountImporter::class);
+            ->label(__('admin.discounts_import'))
+            ->importer(DiscountImporter::class)
+            ->icon(null);
     }
 
     public function importPricesAction(): ImportAction
     {
         return ImportAction::make('importPrices')
-            ->label('Import Prices')
-            ->importer(PriceImporter::class);
+            ->label(__('admin.prices_import'))
+            ->importer(PriceImporter::class)
+            ->icon(null);
     }
 
     public function importOrdersAction(): ImportAction
     {
         return ImportAction::make('importOrders')
-            ->label('Import Orders')
-            ->importer(OrderImporter::class);
+            ->label(__('admin.orders_import'))
+            ->importer(OrderImporter::class)
+            ->icon(null);
     }
 
     public function form(Form $form): Form
@@ -163,7 +174,11 @@ final class DataImportExport extends Page implements HasForms
                                 ->live(),
                             Select::make('only')
                                 ->label(__('translations.scope'))
-                                ->options(['all' => 'all', 'categories' => 'categories', 'products' => 'products'])
+                                ->options([
+                                    'all'        => __('translations.all'),
+                                    'categories' => __('translations.categories'),
+                                    'products'   => __('translations.products'),
+                                ])
                                 ->required(),
                         ]),
                         FileUpload::make('file')
@@ -185,6 +200,7 @@ final class DataImportExport extends Page implements HasForms
     {
         return Action::make('import')
             ->label(__('translations.import'))
+            ->icon(null)
             ->action(function (): void {
                 $data = $this->form->getState();
                 $provider = ProviderRegistry::get($data['provider'] ?? 'xml');

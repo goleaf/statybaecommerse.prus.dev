@@ -75,15 +75,12 @@
             <h3 class="text-lg font-semibold mb-4">{{ __('admin.import_export.guidelines') ?? 'Import Guidelines' }}</h3>
             <div class="space-y-3 text-sm text-gray-600">
                 <div class="flex items-start gap-2">
-                    <x-heroicon-o-information-circle class="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
                     <span>{{ __('admin.import_export.guideline_1') ?? 'Ensure your XML file follows the supported schema.' }}</span>
                 </div>
                 <div class="flex items-start gap-2">
-                    <x-heroicon-o-shield-check class="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
                     <span>{{ __('admin.import_export.guideline_2') ?? 'Uploaded files are scanned for security.' }}</span>
                 </div>
                 <div class="flex items-start gap-2">
-                    <x-heroicon-o-exclamation-triangle class="w-4 h-4 text-yellow-500 mt-0.5 flex-shrink-0" />
                     <span>{{ __('admin.import_export.guideline_3') ?? 'Large imports may take several minutes to process.' }}</span>
                 </div>
             </div>
