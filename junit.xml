@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductVariantAssortmentSeederTest" file="tests\Feature\ProductVariantAssortmentSeederTest.php" tests="1" assertions="5" errors="0" failures="0" skipped="0" time="26.093296">
+    <testcase name="it seeds variant inventory counts at one tenth of the base values" file="tests\Feature\ProductVariantAssortmentSeederTest.php::it seeds variant inventory counts at one tenth of the base values" class="Tests\Feature\ProductVariantAssortmentSeederTest" classname="Tests.Feature.ProductVariantAssortmentSeederTest" assertions="5" time="26.093296"/>
+  </testsuite>
+</testsuites>

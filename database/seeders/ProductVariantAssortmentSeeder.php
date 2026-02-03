@@ -17,6 +17,8 @@ use Illuminate\Support\Str;
 
 final class ProductVariantAssortmentSeeder extends Seeder
 {
+    private const INVENTORY_SCALE = 10;
+
     /**
      * Seed every visible product with a consistent assortment of colour, size, and pack variants.
      */
@@ -279,8 +281,8 @@ final class ProductVariantAssortmentSeeder extends Seeder
                 'stock'            => $stock,
                 'reserved'         => $reserved,
                 'available'        => $available,
-                'reorder_point'    => 6 + ($packIndex * 2),
-                'reorder_quantity' => 12 + ($sizeIndex * 3),
+                'reorder_point'    => $this->scaleInventoryCount(6 + ($packIndex * 2)),
+                'reorder_quantity' => $this->scaleInventoryCount(12 + ($sizeIndex * 3)),
                 'is_tracked'       => true,
                 'status'           => 'active',
             ],
@@ -294,6 +296,11 @@ final class ProductVariantAssortmentSeeder extends Seeder
     {
         $base = 48 - ($packIndex * 6) - ($sizeIndex * 4) - ($colorIndex * 3);
 
-        return max(8, $base);
+        return $this->scaleInventoryCount($base);
+    }
+
+    private function scaleInventoryCount(int $value): int
+    {
+        return max(1, (int) round($value / self::INVENTORY_SCALE));
     }
 }
