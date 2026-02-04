@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="Tests\Feature\ProductVariantAssortmentSeederTest" file="tests\Feature\ProductVariantAssortmentSeederTest.php" tests="1" assertions="5" errors="0" failures="0" skipped="0" time="26.093296">
-    <testcase name="it seeds variant inventory counts at one tenth of the base values" file="tests\Feature\ProductVariantAssortmentSeederTest.php::it seeds variant inventory counts at one tenth of the base values" class="Tests\Feature\ProductVariantAssortmentSeederTest" classname="Tests.Feature.ProductVariantAssortmentSeederTest" assertions="5" time="26.093296"/>
+  <testsuite name="Tests\Unit\TranslationMessagesTest" file="tests\Unit\TranslationMessagesTest.php" tests="1" assertions="88" errors="0" failures="0" skipped="0" time="24.020643">
+    <testcase name="it unit: has message label translations for core locales" file="tests\Unit\TranslationMessagesTest.php::it unit: has message label translations for core locales" class="Tests\Unit\TranslationMessagesTest" classname="Tests.Unit.TranslationMessagesTest" assertions="88" time="24.020643"/>
   </testsuite>
 </testsuites>

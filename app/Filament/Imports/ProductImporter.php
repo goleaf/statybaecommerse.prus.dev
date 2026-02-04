@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Imports;
 
 use App\Models\Product;
@@ -7,160 +9,172 @@ use Filament\Actions\Imports\ImportColumn;
 use Filament\Actions\Imports\Importer;
 use Filament\Actions\Imports\Models\Import;
 use Illuminate\Support\Number;
+use Illuminate\Support\Str;
 
 class ProductImporter extends Importer
 {
     protected static ?string $model = Product::class;
+
+    protected function beforeValidate(): void
+    {
+        $name = $this->data['name'] ?? null;
+
+        if (($this->data['slug'] ?? null) === null && is_string($name) && $name !== '') {
+            $this->data['slug'] = Str::slug($name);
+        }
+    }
 
     public static function getColumns(): array
     {
         return [
             ImportColumn::make('name')
                 ->requiredMapping()
-                ->rules(['required']),
+                ->rules(['required', 'string']),
             ImportColumn::make('slug')
-                ->requiredMapping()
-                ->rules(['required']),
+                ->rules(['required', 'string']),
             ImportColumn::make('description'),
             ImportColumn::make('short_description'),
             ImportColumn::make('sku')
-                ->label('SKU'),
+                ->label('SKU')
+                ->rules(['nullable', 'string']),
             ImportColumn::make('summary'),
             ImportColumn::make('price')
                 ->numeric()
-                ->rules(['integer']),
+                ->rules(['nullable', 'numeric']),
             ImportColumn::make('sale_price')
                 ->numeric()
-                ->rules(['integer']),
+                ->rules(['nullable', 'numeric']),
             ImportColumn::make('compare_price')
                 ->numeric()
-                ->rules(['integer']),
+                ->rules(['nullable', 'numeric']),
             ImportColumn::make('cost_price')
                 ->numeric()
-                ->rules(['integer']),
+                ->rules(['nullable', 'numeric']),
             ImportColumn::make('manage_stock')
-                ->requiredMapping()
                 ->boolean()
-                ->rules(['required', 'boolean']),
+                ->ignoreBlankState()
+                ->rules(['nullable', 'boolean']),
             ImportColumn::make('stock_quantity')
-                ->requiredMapping()
                 ->numeric()
-                ->rules(['required', 'integer']),
+                ->ignoreBlankState()
+                ->rules(['nullable', 'integer']),
             ImportColumn::make('low_stock_threshold')
-                ->requiredMapping()
                 ->numeric()
-                ->rules(['required', 'integer']),
+                ->ignoreBlankState()
+                ->rules(['nullable', 'integer']),
             ImportColumn::make('weight')
                 ->numeric()
-                ->rules(['integer']),
+                ->rules(['nullable', 'numeric']),
             ImportColumn::make('length')
                 ->numeric()
-                ->rules(['integer']),
+                ->rules(['nullable', 'numeric']),
             ImportColumn::make('width')
                 ->numeric()
-                ->rules(['integer']),
+                ->rules(['nullable', 'numeric']),
             ImportColumn::make('height')
                 ->numeric()
-                ->rules(['integer']),
+                ->rules(['nullable', 'numeric']),
             ImportColumn::make('is_visible')
-                ->requiredMapping()
                 ->boolean()
-                ->rules(['required', 'boolean']),
+                ->ignoreBlankState()
+                ->rules(['nullable', 'boolean']),
             ImportColumn::make('is_enabled')
-                ->requiredMapping()
                 ->boolean()
-                ->rules(['required', 'boolean']),
+                ->ignoreBlankState()
+                ->rules(['nullable', 'boolean']),
             ImportColumn::make('is_featured')
-                ->requiredMapping()
                 ->boolean()
-                ->rules(['required', 'boolean']),
+                ->ignoreBlankState()
+                ->rules(['nullable', 'boolean']),
             ImportColumn::make('published_at')
-                ->rules(['datetime']),
+                ->rules(['nullable', 'date']),
             ImportColumn::make('seo_title'),
             ImportColumn::make('seo_description'),
             ImportColumn::make('brand')
-                ->relationship(),
+                ->relationship()
+                ->ignoreBlankState(),
             ImportColumn::make('type')
-                ->requiredMapping()
-                ->rules(['required']),
+                ->ignoreBlankState()
+                ->rules(['nullable', 'in:simple,variable']),
             ImportColumn::make('is_requestable')
-                ->requiredMapping()
                 ->boolean()
-                ->rules(['required', 'boolean']),
+                ->ignoreBlankState()
+                ->rules(['nullable', 'boolean']),
             ImportColumn::make('requests_count')
-                ->requiredMapping()
                 ->numeric()
-                ->rules(['required', 'integer']),
+                ->ignoreBlankState()
+                ->rules(['nullable', 'integer']),
             ImportColumn::make('minimum_quantity')
-                ->requiredMapping()
                 ->numeric()
-                ->rules(['required', 'integer']),
+                ->ignoreBlankState()
+                ->rules(['nullable', 'integer']),
             ImportColumn::make('hide_add_to_cart')
-                ->requiredMapping()
                 ->boolean()
-                ->rules(['required', 'boolean']),
+                ->ignoreBlankState()
+                ->rules(['nullable', 'boolean']),
             ImportColumn::make('request_message'),
             ImportColumn::make('meta_title'),
             ImportColumn::make('meta_description'),
             ImportColumn::make('meta_keywords'),
             ImportColumn::make('barcode'),
             ImportColumn::make('track_inventory')
-                ->requiredMapping()
                 ->boolean()
-                ->rules(['required', 'boolean']),
+                ->ignoreBlankState()
+                ->rules(['nullable', 'boolean']),
             ImportColumn::make('metadata'),
             ImportColumn::make('video_url'),
             ImportColumn::make('view_count')
-                ->requiredMapping()
                 ->numeric()
-                ->rules(['required', 'integer']),
+                ->ignoreBlankState()
+                ->rules(['nullable', 'integer']),
             ImportColumn::make('last_viewed_at')
-                ->rules(['datetime']),
+                ->rules(['nullable', 'date']),
             ImportColumn::make('track_stock')
-                ->requiredMapping()
                 ->boolean()
-                ->rules(['required', 'boolean']),
+                ->ignoreBlankState()
+                ->rules(['nullable', 'boolean']),
             ImportColumn::make('allow_backorder')
-                ->requiredMapping()
                 ->boolean()
-                ->rules(['required', 'boolean']),
+                ->ignoreBlankState()
+                ->rules(['nullable', 'boolean']),
             ImportColumn::make('sort_order')
-                ->requiredMapping()
                 ->numeric()
-                ->rules(['required', 'integer']),
+                ->ignoreBlankState()
+                ->rules(['nullable', 'integer']),
             ImportColumn::make('tax_class'),
             ImportColumn::make('shipping_class'),
             ImportColumn::make('download_limit')
-                ->requiredMapping()
                 ->numeric()
-                ->rules(['required', 'integer']),
+                ->ignoreBlankState()
+                ->rules(['nullable', 'integer']),
             ImportColumn::make('download_expiry')
-                ->requiredMapping()
                 ->numeric()
-                ->rules(['required', 'integer']),
+                ->ignoreBlankState()
+                ->rules(['nullable', 'integer']),
             ImportColumn::make('external_url'),
             ImportColumn::make('button_text'),
             ImportColumn::make('gallery'),
             ImportColumn::make('available_from')
-                ->rules(['datetime']),
+                ->rules(['nullable', 'date']),
             ImportColumn::make('available_until')
-                ->rules(['datetime']),
+                ->rules(['nullable', 'date']),
             ImportColumn::make('warehouse_quantity')
                 ->numeric()
-                ->rules(['integer']),
+                ->ignoreBlankState()
+                ->rules(['nullable', 'integer']),
             ImportColumn::make('views_count')
-                ->requiredMapping()
                 ->numeric()
-                ->rules(['required', 'integer']),
+                ->ignoreBlankState()
+                ->rules(['nullable', 'integer']),
             ImportColumn::make('status')
-                ->requiredMapping()
-                ->rules(['required']),
+                ->ignoreBlankState()
+                ->rules(['nullable', 'in:draft,published,archived']),
         ];
     }
 
     public function resolveRecord(): Product
     {
-        return new Product();
+        return new Product;
     }
 
     public static function getCompletedNotificationBody(Import $import): string

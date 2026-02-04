@@ -15,6 +15,7 @@ use App\Filament\Imports\PriceImporter;
 use App\Filament\Imports\ProductImporter;
 use App\Filament\Imports\SubscriberImporter;
 use App\Filament\Imports\UserImporter;
+use App\Filament\Widgets\DataImportExportStatsWidget;
 use App\Models\AdminUser;
 use App\Services\ImportExport\ProviderRegistry;
 use App\Support\Storage\SecureStorage;
@@ -41,7 +42,7 @@ final class DataImportExport extends Page implements HasForms
 
     public static function getNavigationIcon(): string|Htmlable|null
     {
-        return null;
+        return 'heroicon-o-arrow-up-tray';
     }
 
     public static function getNavigationLabel(): string
@@ -248,5 +249,17 @@ final class DataImportExport extends Page implements HasForms
             $this->importOrdersAction(),
             $this->importAction(),
         ];
+    }
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            DataImportExportStatsWidget::class,
+        ];
+    }
+
+    public function getHeaderWidgetsColumns(): int|array
+    {
+        return 1;
     }
 }

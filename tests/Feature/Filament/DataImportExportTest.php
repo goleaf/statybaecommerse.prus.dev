@@ -6,9 +6,7 @@ namespace Tests\Feature\Filament;
 
 use App\Filament\Pages\DataImportExport;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
-use Filament\Actions\ImportAction;
 
 beforeEach(function () {
     $this->resolveAdminPanel();
@@ -21,9 +19,13 @@ it('can render data import export page', function () {
         ->assertSuccessful();
 });
 
+it('exposes the expected navigation icon', function () {
+    expect(DataImportExport::getNavigationIcon())->toBe('heroicon-o-arrow-up-tray');
+});
+
 it('forbids guest to access data import export page', function () {
     auth()->logout();
-    
+
     $this->get(DataImportExport::getUrl())
         ->assertRedirect('/admin/login');
 });
@@ -31,7 +33,7 @@ it('forbids guest to access data import export page', function () {
 it('forbids non-admin user to access data import export page', function () {
     $user = User::factory()->create(['is_admin' => false]);
     $this->actingAs($user);
-    
+
     $this->get(DataImportExport::getUrl())
         ->assertRedirect('/admin/login');
 });
@@ -58,6 +60,7 @@ it('can open import products modal', function () {
 
 it('displays the stats on the page', function () {
     Livewire::test(DataImportExport::class)
+        ->assertSee('fi-wi-stats-overview')
         ->assertSee(__('messages.admin_products'))
         ->assertSee(__('messages.admin_categories'))
         ->assertSee(__('messages.admin_brands'))

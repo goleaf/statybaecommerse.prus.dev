@@ -9,8 +9,8 @@ use App\Filament\Resources\VariantCombinationResource\Pages\CreateVariantCombina
 use App\Filament\Resources\VariantCombinationResource\Pages\EditVariantCombination;
 use App\Filament\Resources\VariantCombinationResource\Pages\ListVariantCombinations;
 use App\Filament\Resources\VariantCombinationResource\Pages\ViewVariantCombination;
+use App\Models\AdminUser;
 use App\Models\Product;
-use App\Models\User;
 use App\Models\VariantCombination;
 use App\Support\Nav;
 use Filament\Forms\Components\KeyValue;
@@ -40,7 +40,7 @@ final class VariantCombinationResourceTest extends TestCase
     /**
      * Authenticated administrator reused across scenarios to avoid duplicate factories.
      */
-    private User $adminUser;
+    private AdminUser $adminUser;
 
     /**
      * Catalogue product used for associating variant combinations in tests.
@@ -56,10 +56,12 @@ final class VariantCombinationResourceTest extends TestCase
     {
         parent::setUp();
 
+        // Ensure Filament resolves the admin panel configuration required for resource pages.
+        $this->resolveAdminPanel();
+
         // Authenticate a deterministic admin user so Filament policies allow access in every test.
-        $this->adminUser = User::factory()->create([
-            'email'    => 'admin@example.com',
-            'is_admin' => true,
+        $this->adminUser = AdminUser::factory()->create([
+            'email' => 'admin@example.com',
         ]);
 
         // Create a product to ensure combination relationships resolve cleanly.
@@ -78,7 +80,7 @@ final class VariantCombinationResourceTest extends TestCase
         ]);
 
         // Ensure all Livewire components execute as the administrator by default.
-        $this->actingAs($this->adminUser);
+        $this->actingAs($this->adminUser, 'admin');
     }
 
     public function test_list_page_can_render_records(): void
@@ -394,9 +396,9 @@ final class VariantCombinationResourceTest extends TestCase
         $this->assertCount(3, $schema);
 
         $sectionHeadings = Collection::make($schema)->map(static fn (SchemaSection $component) => $component->getHeading());
-        $this->assertContains('admin.variant_combinations.basic_information', $sectionHeadings->all());
-        $this->assertContains('admin.variant_combinations.attribute_combinations', $sectionHeadings->all());
-        $this->assertContains('admin.variant_combinations.additional_information', $sectionHeadings->all());
+        $this->assertContains(__('admin.variant_combinations.basic_information'), $sectionHeadings->all());
+        $this->assertContains(__('admin.variant_combinations.attribute_combinations'), $sectionHeadings->all());
+        $this->assertContains(__('admin.variant_combinations.additional_information'), $sectionHeadings->all());
     }
 
     public function test_form_contains_product_select_field(): void
@@ -404,7 +406,7 @@ final class VariantCombinationResourceTest extends TestCase
         // Locate the basic information section to inspect its grid layout.
         $schema = VariantCombinationResource::formComponents();
         $basicInfoSection = Collection::make($schema)
-            ->first(static fn (SchemaSection $component) => $component->getHeading() === 'admin.variant_combinations.basic_information');
+            ->first(static fn (SchemaSection $component) => $component->getHeading() === __('admin.variant_combinations.basic_information'));
         $this->assertInstanceOf(SchemaSection::class, $basicInfoSection);
 
         $sectionComponents = $this->normaliseSchemaComponents($basicInfoSection->getDefaultChildComponents());
@@ -423,7 +425,7 @@ final class VariantCombinationResourceTest extends TestCase
         // Reuse the basic information section to locate the availability toggle component.
         $schema = VariantCombinationResource::formComponents();
         $basicInfoSection = Collection::make($schema)
-            ->first(static fn (SchemaSection $component) => $component->getHeading() === 'admin.variant_combinations.basic_information');
+            ->first(static fn (SchemaSection $component) => $component->getHeading() === __('admin.variant_combinations.basic_information'));
         $this->assertInstanceOf(SchemaSection::class, $basicInfoSection);
 
         $sectionComponents = $this->normaliseSchemaComponents($basicInfoSection->getDefaultChildComponents());
@@ -442,7 +444,7 @@ final class VariantCombinationResourceTest extends TestCase
         // Inspect the attribute combinations section to confirm the key value component exists.
         $schema = VariantCombinationResource::formComponents();
         $combinationsSection = Collection::make($schema)
-            ->first(static fn (SchemaSection $component) => $component->getHeading() === 'admin.variant_combinations.attribute_combinations');
+            ->first(static fn (SchemaSection $component) => $component->getHeading() === __('admin.variant_combinations.attribute_combinations'));
         $this->assertInstanceOf(SchemaSection::class, $combinationsSection);
 
         $combinationComponents = $this->normaliseSchemaComponents($combinationsSection->getDefaultChildComponents());
