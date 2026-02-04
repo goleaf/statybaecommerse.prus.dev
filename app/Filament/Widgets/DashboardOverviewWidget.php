@@ -76,7 +76,7 @@ class DashboardOverviewWidget extends BaseWidget
                 ->description(__('translations.active_products') . ': ' . \Illuminate\Support\Number::format($activeProducts))
                 ->descriptionIcon('heroicon-m-cube')
                 ->color('primary'),
-            
+
             Stat::make(__('translations.average_order_value'), \Illuminate\Support\Number::currency($avgOrderValue, 'EUR'))
                 ->description(__('translations.per_order'))
                 ->descriptionIcon('heroicon-m-shopping-cart')
@@ -85,7 +85,7 @@ class DashboardOverviewWidget extends BaseWidget
                 ->description(__('translations.products_need_restocking'))
                 ->descriptionIcon('heroicon-m-exclamation-triangle')
                 ->color($lowStockProducts > 0 ? 'warning' : 'success'),
-            
+
             // System Metrics
             Stat::make(__('translations.countries'), \Illuminate\Support\Number::format($totalCountries))
                 ->description(__('translations.supported_countries'))

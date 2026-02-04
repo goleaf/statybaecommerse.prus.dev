@@ -14,9 +14,17 @@ return new class extends Migration
     public function up(): void
     {
         if (Schema::hasTable('product_similarities')) {
-            Schema::table('product_similarities', function (Blueprint $table) {
-                // Drop the index that depends on the column first
-                $table->dropIndex('product_similarities_product_id_similarity_score_index');
+            $indexes = Schema::getIndexes('product_similarities');
+            $indexNames = array_column($indexes, 'name');
+
+            Schema::table('product_similarities', function (Blueprint $table) use ($indexNames) {
+                if (in_array('product_similarities_product_id_similarity_score_index', $indexNames)) {
+                    $table->dropIndex('product_similarities_product_id_similarity_score_index');
+                }
+                
+                if (in_array('product_similarities_similar_product_id_similarity_score_index', $indexNames)) {
+                    $table->dropIndex('product_similarities_similar_product_id_similarity_score_index');
+                }
 
                 if (Schema::hasColumn('product_similarities', 'similarity_score')) {
                     $table->dropColumn('similarity_score');

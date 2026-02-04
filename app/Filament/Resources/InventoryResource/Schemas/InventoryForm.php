@@ -83,7 +83,8 @@ class InventoryForm
                                 ->minValue(0)
                                 ->default(10),
                         ]),
-                ]),
+                ])
+                ->columnSpanFull(),
         ]);
     }
 }

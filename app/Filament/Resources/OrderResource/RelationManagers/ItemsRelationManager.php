@@ -56,10 +56,9 @@ class ItemsRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('name')
             ->columns([
-                \Filament\Tables\Columns\ImageColumn::make('product.images.path')
+                \Filament\Tables\Columns\ImageColumn::make('product.primaryImage.path')
                     ->label(__('messages.image'))
                     ->disk('public')
-                    ->limit(1)
                     ->square(),
                 TextColumn::make('product.name')
                     ->label(__('messages.product'))

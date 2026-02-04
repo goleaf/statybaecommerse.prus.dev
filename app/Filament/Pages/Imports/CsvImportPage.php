@@ -15,21 +15,21 @@ use Filament\Actions\Imports\Events\ImportStarted;
 use Filament\Actions\Imports\ImportColumn;
 use Filament\Actions\Imports\Models\Import;
 use Filament\Facades\Filament;
-use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Components\Wizard;
-use Filament\Forms\Components\Wizard\Step;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Filament\Schemas\Components\Fieldset;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
+use Filament\Schemas\Components\Wizard;
+use Filament\Schemas\Components\Wizard\Step;
 use Filament\Support\ChunkIterator;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Support\Htmlable;
@@ -50,8 +50,10 @@ use League\Csv\Statement;
 use League\Csv\Writer;
 use Livewire\Component;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
+use ReflectionClass;
 use SplTempFileObject;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Throwable;
 
 abstract class CsvImportPage extends Page implements HasForms
 {
@@ -60,7 +62,7 @@ abstract class CsvImportPage extends Page implements HasForms
     public ?array $data = [];
 
     /**
-     * @var array{processed: int, successful: int, failed: int, total: int, new: int, updated: int, removed: int}|null
+     * @var array{processed: int, successful: int, failed: int, total: int, new: int, updated: int, removed: int, mappedFields: array<string>, missingRequiredFields: array<string>}|null
      */
     public ?array $lastImport = null;
 
@@ -158,6 +160,11 @@ abstract class CsvImportPage extends Page implements HasForms
 
                     Step::make(__('admin.import_step_mapping'))
                         ->description(__('admin.import_step_mapping_description'))
+                        ->afterValidation(function (Get $get) {
+                            $mapping = $get('columnMap') ?? [];
+                            $this->data['columnMap'] = $mapping;
+                            $this->runAnalysis($mapping);
+                        })
                         ->schema(function (Get $get) use ($page): array {
                             $csvFile = $get('file');
 
@@ -220,19 +227,19 @@ abstract class CsvImportPage extends Page implements HasForms
 
                     Step::make(__('admin.import_step_analysis'))
                         ->description(__('admin.import_step_analysis_description'))
-                        ->afterValidation(fn () => $this->runAnalysis())
                         ->schema([
                             Placeholder::make('analysis_summary')
                                 ->content(fn () => $this->getAnalysisContent()),
                         ]),
                 ])
-                ->submitAction(view('filament.pages.imports.import-button'))
-                ->statePath('data'),
+                    ->submitAction(view('filament.pages.imports.import-button'))
+                    ->statePath('data'),
             ]);
     }
 
-    protected function runAnalysis(): void
+    protected function runAnalysis(?array $columnMap = null): void
     {
+        $this->lastImport = null;
         $data = $this->data;
         $csvFile = $data['file'] ?? null;
 
@@ -241,7 +248,7 @@ abstract class CsvImportPage extends Page implements HasForms
         }
 
         $headers = $this->getCsvHeaders($csvFile);
-        $columnMap = $data['columnMap'] ?? $this->guessColumnMap($headers);
+        $columnMap ??= $data['columnMap'] ?? $this->guessColumnMap($headers);
 
         $csvStream = $this->getUploadedFileStream($csvFile);
         if (! $csvStream) {
@@ -258,11 +265,23 @@ abstract class CsvImportPage extends Page implements HasForms
 
         $importerClass = static::getImporterClass();
         $modelClass = $importerClass::getModel();
-        $importer = new $importerClass(new Import(), $columnMap, Arr::except($data, ['file', 'columnMap']));
+        $importer = new $importerClass(new Import, $columnMap, Arr::except($data, ['file', 'columnMap']));
 
         $newCount = 0;
         $updatedCount = 0;
         $totalCount = 0;
+        $mappedFields = [];
+        $missingRequiredFields = [];
+
+        // Check required fields
+        foreach ($this->getImporterColumns() as $column) {
+            $name = $column->getName();
+            if (isset($columnMap[$name]) && $columnMap[$name] !== null) {
+                $mappedFields[] = $column->getLabel() ?? $name;
+            } elseif ($column->isMappingRequired()) {
+                $missingRequiredFields[] = $column->getLabel() ?? $name;
+            }
+        }
 
         $limit = 1000;
         $processedForAnalysis = 0;
@@ -270,12 +289,15 @@ abstract class CsvImportPage extends Page implements HasForms
         foreach ($records as $record) {
             $totalCount++;
             if ($processedForAnalysis < $limit) {
-                $resolvedRecord = $this->evaluateImporterRecord($importer, $record);
-
-                if ($resolvedRecord->exists) {
-                    $updatedCount++;
-                } else {
-                    $newCount++;
+                try {
+                    $resolvedRecord = $this->evaluateImporterRecord($importer, $record);
+                    if ($resolvedRecord->exists) {
+                        $updatedCount++;
+                    } else {
+                        $newCount++;
+                    }
+                } catch (Throwable $e) {
+                    // Skip failures
                 }
                 $processedForAnalysis++;
             }
@@ -293,17 +315,19 @@ abstract class CsvImportPage extends Page implements HasForms
             $removedCount = max(0, $currentCount - $updatedCount);
         }
 
-        $this->lastImport = array_merge($this->lastImport ?? [], [
-            'total'     => $totalCount,
-            'new'       => $newCount,
-            'updated'   => $updatedCount,
-            'removed'   => $removedCount,
-        ]);
+        $this->lastImport = [
+            'total'                 => $totalCount,
+            'new'                   => $newCount,
+            'updated'               => $updatedCount,
+            'removed'               => $removedCount,
+            'mappedFields'          => $mappedFields,
+            'missingRequiredFields' => $missingRequiredFields,
+        ];
     }
 
     protected function evaluateImporterRecord($importer, array $data): Model
     {
-        $reflection = new \ReflectionClass($importer);
+        $reflection = new ReflectionClass($importer);
         $property = $reflection->getProperty('data');
         $property->setAccessible(true);
         $property->setValue($importer, $data);
@@ -314,36 +338,67 @@ abstract class CsvImportPage extends Page implements HasForms
     protected function getAnalysisContent(): HtmlString
     {
         if (! $this->lastImport) {
-            return new HtmlString('<p>' . __('admin.import_analyzing') . '</p>');
+            return new HtmlString('<div class="flex items-center gap-3 text-warning-600 p-4 bg-warning-50 rounded-lg border border-warning-200"><x-filament::loading-indicator class="h-5 w-5" /><p>' . __('admin.import_analyzing') . '</p></div>');
         }
 
         $summary = $this->lastImport;
 
-        return new HtmlString("
-            <div class='space-y-2 p-4 border rounded-lg bg-gray-50 dark:bg-gray-800'>
-                <p class='text-lg font-bold'>" . __('admin.import_total_rows') . ": {$summary['total']}</p>
-                <div class='grid grid-cols-1 md:grid-cols-3 gap-4'>
-                    <div class='p-2 bg-green-100 dark:bg-green-900 rounded text-center'>
-                        <span class='block text-2xl font-bold text-green-700 dark:text-green-300'>{$summary['new']}</span>
-                        <span class='text-sm text-green-600 dark:text-green-400'>" . __('admin.import_new_records') . "</span>
-                    </div>
-                    <div class='p-2 bg-yellow-100 dark:bg-yellow-900 rounded text-center'>
-                        <span class='block text-2xl font-bold text-yellow-700 dark:text-yellow-300'>{$summary['updated']}</span>
-                        <span class='text-sm text-yellow-600 dark:text-yellow-400'>" . __('admin.import_updated_records') . "</span>
-                    </div>
-                    " . (($this->data['should_sync'] ?? false) ? "
-                    <div class='p-2 bg-red-100 dark:bg-red-900 rounded text-center'>
-                        <span class='block text-2xl font-bold text-red-700 dark:text-red-300'>{$summary['removed']}</span>
-                        <span class='text-sm text-red-600 dark:text-red-400'>" . __('admin.import_removed_records') . "</span>
-                    </div>" : '') . "
+        $mappedFieldsHtml = collect($summary['mappedFields'])
+            ->map(fn ($f) => "<span class='inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10 dark:bg-blue-400/10 dark:text-blue-400 dark:ring-blue-400/30'>{$f}</span>")
+            ->implode(' ');
+
+        $missingRequiredHtml = '';
+        if (! empty($summary['missingRequiredFields'])) {
+            $fields = collect($summary['missingRequiredFields'])
+                ->map(fn ($f) => "<span class='inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-700/10 dark:bg-red-400/10 dark:text-red-400 dark:ring-red-400/30'>{$f}</span>")
+                ->implode(' ');
+            $missingRequiredHtml = "
+                <div class='mt-4 p-4 border border-red-200 bg-red-50 dark:bg-red-900/20 rounded-lg'>
+                    <p class='text-sm font-bold text-red-700 dark:text-red-400 mb-2'>" . __('admin.import_missing_required') . ":</p>
+                    <div class='flex flex-wrap gap-2'>{$fields}</div>
                 </div>
+            ";
+        }
+
+        return new HtmlString("
+            <div class='space-y-6'>
+                <div class='p-6 border rounded-xl bg-white dark:bg-gray-900 shadow-sm'>
+                    <p class='text-xl font-bold mb-6'>" . __('admin.import_total_rows') . ": {$summary['total']}</p>
+                    <div class='grid grid-cols-1 md:grid-cols-3 gap-6'>
+                        <div class='p-4 bg-green-50 dark:bg-green-900/20 rounded-xl text-center border-2 border-green-100 dark:border-green-800 shadow-sm'>
+                            <span class='block text-4xl font-black text-green-700 dark:text-green-400 mb-1'>{$summary['new']}</span>
+                            <span class='text-xs font-bold uppercase tracking-widest text-green-600 dark:text-green-500'>" . __('admin.import_new_records') . "</span>
+                        </div>
+                        <div class='p-4 bg-amber-50 dark:bg-amber-900/20 rounded-xl text-center border-2 border-amber-100 dark:border-amber-800 shadow-sm'>
+                            <span class='block text-4xl font-black text-amber-700 dark:text-amber-400 mb-1'>{$summary['updated']}</span>
+                            <span class='text-xs font-bold uppercase tracking-widest text-amber-600 dark:text-amber-500'>" . __('admin.import_updated_records') . '</span>
+                        </div>
+                        ' . (($this->data['should_sync'] ?? false) ? "
+                        <div class='p-4 bg-red-50 dark:bg-red-900/20 rounded-xl text-center border-2 border-red-100 dark:border-red-800 shadow-sm'>
+                            <span class='block text-4xl font-black text-red-700 dark:text-red-400 mb-1'>{$summary['removed']}</span>
+                            <span class='text-xs font-bold uppercase tracking-widest text-red-600 dark:text-red-500'>" . __('admin.import_removed_records') . '</span>
+                        </div>' : '') . "
+                    </div>
+                </div>
+
+                <div>
+                    <p class='text-sm font-bold text-gray-700 dark:text-gray-300 mb-3'>" . __('admin.import_fields_to_be_imported') . ":</p>
+                    <div class='flex flex-wrap gap-2'>{$mappedFieldsHtml}</div>
+                </div>
+
+                <div class='mt-4 p-4 border rounded-lg bg-blue-50 dark:bg-blue-900/20'>
+                    <p class='text-sm text-blue-700 dark:text-blue-300 font-medium'>" . __('admin.import_analysis_note') . "</p>
+                </div>
+
+                {$missingRequiredHtml}
             </div>
         ");
     }
 
     public function import(): void
     {
-        $data = $this->form->getState();
+        $state = $this->form->getState();
+        $data = $state['data'] ?? $state;
         $csvFile = $data['file'] ?? null;
 
         if (! $csvFile instanceof TemporaryUploadedFile) {
@@ -543,11 +598,11 @@ abstract class CsvImportPage extends Page implements HasForms
         );
 
         $customGuesses = [
-            'sku' => ['product code', 'artikulas', 'kodas', 'sku number', 'item number'],
-            'name' => ['title', 'pavadinimas', 'label', 'product name', 'prekė'],
-            'price' => ['kaina', 'amount', 'cost', 'retail price', 'price (inc. vat)'],
+            'sku'         => ['product code', 'artikulas', 'kodas', 'sku number', 'item number'],
+            'name'        => ['title', 'pavadinimas', 'label', 'product name', 'prekė'],
+            'price'       => ['kaina', 'amount', 'cost', 'retail price', 'price (inc. vat)'],
             'description' => ['aprašymas', 'body', 'content', 'long description'],
-            'status' => ['būsena', 'state', 'availability', 'is active'],
+            'status'      => ['būsena', 'state', 'availability', 'is active'],
         ];
 
         return array_reduce($this->getImporterColumns(), function (array $carry, ImportColumn $column) use ($lowercaseCsvColumnKeys, $lowercaseCsvColumnValues, $customGuesses): array {

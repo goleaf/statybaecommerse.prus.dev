@@ -57,10 +57,9 @@ class SimilaritiesRelationManager extends RelationManager
     {
         return $table
             ->columns([
-                \Filament\Tables\Columns\ImageColumn::make('similarProduct.images.path')
+                \Filament\Tables\Columns\ImageColumn::make('similarProduct.primaryImage.path')
                     ->label(__('messages.image'))
                     ->disk('public')
-                    ->limit(1)
                     ->square(),
                 TextColumn::make('similarProduct.name')
                     ->label(__('messages.similar_product'))

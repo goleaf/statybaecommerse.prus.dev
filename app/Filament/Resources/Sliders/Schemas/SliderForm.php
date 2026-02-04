@@ -295,7 +295,7 @@ class SliderForm
                             ])
                             ->default(['all']),
                     ])
-                    ->columnSpanFull()
+                    ->columnSpanFull(),
             ]);
     }
 }

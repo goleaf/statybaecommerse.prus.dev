@@ -170,8 +170,14 @@ class ProductImporter extends BaseImporter
 
     public function resolveRecord(): Product
     {
+        $sku = $this->data['sku'] ?? null;
+
+        if (blank($sku)) {
+            return new Product;
+        }
+
         return Product::firstOrNew([
-            'sku' => $this->data['sku'],
+            'sku' => $sku,
         ]);
     }
 

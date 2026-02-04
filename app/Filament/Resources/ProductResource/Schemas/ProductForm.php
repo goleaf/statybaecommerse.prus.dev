@@ -101,43 +101,49 @@ class ProductForm
                 Section::make(__('admin.products.images'))
                     ->schema([
                         Repeater::make('images')
-                            ->relationship('images')
+                            ->relationship('images', fn ($query) => $query->withoutGlobalScopes())
                             ->schema([
                                 FileUpload::make('path')
                                     ->label(__('admin.products.image'))
                                     ->image()
                                     ->disk('public')
                                     ->directory('product-images')
-                                    ->required(),
+                                    ->required()
+                                    ->columnSpanFull()
+                                    ->imageEditor()
+                                    ->imagePreviewHeight('250'),
                                 TextInput::make('alt_text')
-                                    ->label(__('admin.products.alt_text')),
-                                Toggle::make('is_default')
-                                    ->label(__('translations.is_default'))
-                                    ->live()
-                                    ->afterStateUpdated(function ($state, Set $set, Get $get, $component) {
-                                        if (! $state) {
-                                            return;
-                                        }
+                                    ->label(__('admin.products.alt_text'))
+                                    ->columnSpanFull(),
+                                Grid::make(2)
+                                    ->schema([
+                                        Toggle::make('is_default')
+                                            ->label(__('translations.is_default'))
+                                            ->live()
+                                            ->afterStateUpdated(function ($state, Set $set, Get $get, $component) {
+                                                if (! $state) {
+                                                    return;
+                                                }
 
-                                        $items = $get('../../images') ?? [];
-                                        $statePath = $component->getStatePath();
+                                                $items = $get('../../images') ?? [];
+                                                $statePath = $component->getStatePath();
 
-                                        foreach (array_keys($items) as $key) {
-                                            if (! str_contains($statePath, ".{$key}.")) {
-                                                $set("../../images.{$key}.is_default", false);
-                                            }
-                                        }
-                                    }),
-                                Toggle::make('is_active')
-                                    ->label(__('messages.is_active'))
-                                    ->default(true),
+                                                foreach (array_keys($items) as $key) {
+                                                    if (! str_contains($statePath, ".{$key}.")) {
+                                                        $set("../../images.{$key}.is_default", false);
+                                                    }
+                                                }
+                                            }),
+                                        Toggle::make('is_active')
+                                            ->label(__('messages.active'))
+                                            ->default(true),
+                                    ]),
                             ])
-                            ->columns(4)
                             ->orderColumn('sort_order')
+                            ->reorderable('sort_order')
                             ->columnSpanFull()
                             ->collapsible()
-                            ->live()
-                            ->itemLabel(fn (array $state): ?string => $state['alt_text'] ?? null),
+                            ->itemLabel(fn (array $state): ?string => $state['alt_text'] ?? ($state['path'] ?? 'Image')),
                     ])
                     ->columnSpanFull(),
 
