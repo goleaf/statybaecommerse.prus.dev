@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\ProductVariantResource\Schemas;
 
 use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -88,17 +89,32 @@ class ProductVariantForm
 
                 Section::make(__('admin.product_variants.status_features'))
                     ->schema([
-                        Toggle::make('is_enabled')
-                            ->default(true),
-                        Toggle::make('is_default_variant')
-                            ->default(false),
-                        Toggle::make('is_featured')
-                            ->default(false),
-                        Toggle::make('is_new')
-                            ->default(false),
-                        Toggle::make('is_bestseller')
-                            ->default(false),
-                    ])->columns(5),
+                        Radio::make('is_enabled')
+                            ->label(__('messages.is_enabled'))
+                            ->boolean()
+                            ->inline()
+                            ->columnSpanFull(),
+                        Radio::make('is_default_variant')
+                            ->label(__('messages.is_default_variant'))
+                            ->boolean()
+                            ->inline()
+                            ->columnSpanFull(),
+                        Radio::make('is_featured')
+                            ->label(__('messages.is_featured'))
+                            ->boolean()
+                            ->inline()
+                            ->columnSpanFull(),
+                        Radio::make('is_new')
+                            ->label(__('messages.is_new'))
+                            ->boolean()
+                            ->inline()
+                            ->columnSpanFull(),
+                        Radio::make('is_bestseller')
+                            ->label(__('messages.is_bestseller'))
+                            ->boolean()
+                            ->inline()
+                            ->columnSpanFull(),
+                    ])->columns(1),
 
                 Section::make(__('admin.product_variants.localization'))
                     ->schema([

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 return array (
+  11 => '11',
   'accusantium_eaque' => 'Accusantium Eaque',
   'acoustic_ceiling_panel_kit_family_pack_m_black' => 'Acoustic Ceiling Panel Kit - Family Pack / M / Black',
   'acoustic_ceiling_panel_kit_family_pack_m_raudona' => 'Acoustic Ceiling Panel Kit - Family Pack / M / Raudona',

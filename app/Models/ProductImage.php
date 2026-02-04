@@ -51,7 +51,7 @@ final class ProductImage extends Model
 
     protected $table = 'product_images';
 
-    protected $fillable = ['product_id', 'path', 'alt_text', 'sort_order', 'is_active'];
+    protected $fillable = ['product_id', 'path', 'alt_text', 'sort_order', 'is_active', 'is_default'];
 
     /**
      * Favour the alt_text column when sorting images so editors see human readable values first.
@@ -59,7 +59,8 @@ final class ProductImage extends Model
     protected string $nameColumn = 'alt_text';
 
     protected $attributes = [
-        'is_active' => true,
+        'is_active'  => true,
+        'is_default' => false,
     ];
 
     /**
@@ -69,7 +70,19 @@ final class ProductImage extends Model
         'product_id' => 'integer',
         'sort_order' => 'integer',
         'is_active'  => 'boolean',
+        'is_default' => 'boolean',
     ];
+
+    protected static function booted(): void
+    {
+        self::saving(function (ProductImage $image) {
+            if ($image->is_default) {
+                static::where('product_id', $image->product_id)
+                    ->where('id', '!=', $image->id)
+                    ->update(['is_default' => false]);
+            }
+        });
+    }
 
     /**
      * Expose the explicit cast configuration while omitting Laravel's implicit id cast.

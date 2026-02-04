@@ -754,7 +754,9 @@ final class Product extends Model implements HasMedia, TranslatableRecord
      */
     public function primaryImage(): HasOne
     {
-        return $this->images()->one()->ofMany('sort_order', 'min');
+        return $this->images()->one()->ofMany(['is_default' => 'max', 'sort_order' => 'min'], function ($query) {
+            $query->orderBy('is_default', 'desc')->orderBy('sort_order', 'asc');
+        });
     }
 
     /**
