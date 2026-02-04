@@ -7,9 +7,13 @@ namespace App\Filament\Resources\OrderResource\Schemas;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
+use App\Models\Address;
+use App\Models\User;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
@@ -24,9 +28,7 @@ class OrderForm
                         TextInput::make('number')
                             ->label(__('messages.order_number'))
                             ->required()
-                            ->maxLength(255)
-                            ->disabled()
-                            ->dehydrated(),
+                            ->maxLength(255),
                         Select::make('status')
                             ->label(__('messages.status'))
                             ->options(OrderStatus::class)
@@ -37,7 +39,8 @@ class OrderForm
                             ->options(['EUR' => 'EUR', 'USD' => 'USD'])
                             ->default('EUR')
                             ->required(),
-                    ])->columns(3),
+                    ])->columns(3)
+                    ->columnSpanFull(),
 
                 Section::make(__('messages.customer'))
                     ->schema([
@@ -46,6 +49,55 @@ class OrderForm
                             ->relationship('user', 'name')
                             ->searchable()
                             ->preload()
+                            ->live()
+                            ->afterStateUpdated(function ($state, Set $set) {
+                                if (! $state) {
+                                    return;
+                                }
+                                $user = User::find($state);
+                                if (! $user) {
+                                    return;
+                                }
+
+                                $address = Address::where('user_id', $state)->where('is_default', true)->first()
+                                    ?? Address::where('user_id', $state)->first();
+
+                                if ($address) {
+                                    $set('address_selector', $address->id);
+                                    $set('billing_address_selector', $address->id);
+
+                                    $set('shipping_address.first_name', $address->first_name);
+                                    $set('shipping_address.last_name', $address->last_name);
+                                    $set('shipping_address.email', $address->email);
+                                    $set('shipping_address.phone', $address->phone);
+                                    $set('shipping_address.street', trim($address->address_line_1 . ($address->address_line_2 ? ', ' . $address->address_line_2 : '')));
+                                    $set('shipping_address.city', $address->city);
+                                    $set('shipping_address.zip', $address->postal_code);
+                                    $set('shipping_address.country', $address->country?->name ?? $address->country_code);
+
+                                    $set('billing_address.first_name', $address->first_name);
+                                    $set('billing_address.last_name', $address->last_name);
+                                    $set('billing_address.email', $address->email);
+                                    $set('billing_address.phone', $address->phone);
+                                    $set('billing_address.street', trim($address->address_line_1 . ($address->address_line_2 ? ', ' . $address->address_line_2 : '')));
+                                    $set('billing_address.city', $address->city);
+                                    $set('billing_address.zip', $address->postal_code);
+                                    $set('billing_address.country', $address->country?->name ?? $address->country_code);
+                                } else {
+                                    $set('address_selector', null);
+                                    $set('billing_address_selector', null);
+
+                                    $set('shipping_address.first_name', $user->first_name);
+                                    $set('shipping_address.last_name', $user->last_name);
+                                    $set('shipping_address.email', $user->email);
+                                    $set('shipping_address.phone', $user->phone ?? $user->phone_number);
+
+                                    $set('billing_address.first_name', $user->first_name);
+                                    $set('billing_address.last_name', $user->last_name);
+                                    $set('billing_address.email', $user->email);
+                                    $set('billing_address.phone', $user->phone ?? $user->phone_number);
+                                }
+                            })
                             ->createOptionForm([
                                 TextInput::make('name')
                                     ->label(__('messages.name'))
@@ -53,11 +105,50 @@ class OrderForm
                                 TextInput::make('email')
                                     ->label(__('messages.email'))
                                     ->required()->email(),
-                            ]),
+                            ])
+                            ->columnSpanFull(),
                     ]),
 
                 Section::make(__('messages.checkout_shipping_address'))
                     ->schema([
+                        Select::make('address_selector')
+                            ->label(__('translations.customer_addresses'))
+                            ->options(fn (Get $get): array => Address::where('user_id', $get('user_id'))
+                                ->get()
+                                ->mapWithKeys(fn (Address $address) => [
+                                    $address->id => "
+                                        <div class='flex flex-col'>
+                                            <span class='font-bold'>{$address->full_name}</span>
+                                            <span class='text-xs text-gray-500'>{$address->full_address}</span>
+                                        </div>
+                                    ",
+                                ])
+                                ->toArray())
+                            ->allowHtml()
+                            ->searchable()
+                            ->live()
+                            ->afterStateUpdated(function ($state, Set $set) {
+                                if (! $state) {
+                                    return;
+                                }
+                                $address = Address::find($state);
+                                if (! $address) {
+                                    return;
+                                }
+
+                                $set('shipping_address.first_name', $address->first_name);
+                                $set('shipping_address.last_name', $address->last_name);
+                                $set('shipping_address.email', $address->email);
+                                $set('shipping_address.phone', $address->phone);
+                                $set('shipping_address.street', trim($address->address_line_1 . ($address->address_line_2 ? ', ' . $address->address_line_2 : '')));
+                                $set('shipping_address.city', $address->city);
+                                $set('shipping_address.zip', $address->postal_code);
+                                $set('shipping_address.country', $address->country?->name ?? $address->country_code);
+                                $set('shipping_address_is_default', $address->is_default);
+                            })
+                            ->visible(fn (Get $get): bool => filled($get('user_id')))
+                            ->dehydrated(false)
+                            ->columnSpanFull(),
                         TextInput::make('shipping_address.first_name')->label(__('messages.first_name')),
                         TextInput::make('shipping_address.last_name')->label(__('messages.last_name')),
                         TextInput::make('shipping_address.email')->email()->label(__('messages.email')),
@@ -66,10 +157,63 @@ class OrderForm
                         TextInput::make('shipping_address.city')->label(__('messages.city')),
                         TextInput::make('shipping_address.zip')->label(__('messages.zip_code')),
                         TextInput::make('shipping_address.country')->label(__('messages.country')),
-                    ])->columns(4),
+                        \Filament\Forms\Components\Checkbox::make('shipping_address_is_default')
+                            ->label(__('messages.is_default'))
+                            ->dehydrated(false)
+                            ->live()
+                            ->afterStateUpdated(function ($state, Get $get) {
+                                if ($state && $get('address_selector')) {
+                                    $address = Address::find($get('address_selector'));
+                                    if ($address) {
+                                        $address->setAsDefault();
+                                        \Filament\Notifications\Notification::make()->title(__('messages.address_set_as_default'))->success()->send();
+                                    }
+                                }
+                            })
+                            ->columnSpanFull(),
+                    ])->columns(4)
+                    ->columnSpanFull(),
 
                 Section::make(__('messages.checkout_billing_address'))
                     ->schema([
+                        Select::make('billing_address_selector')
+                            ->label(__('translations.customer_addresses'))
+                            ->options(fn (Get $get): array => Address::where('user_id', $get('user_id'))
+                                ->get()
+                                ->mapWithKeys(fn (Address $address) => [
+                                    $address->id => "
+                                        <div class='flex flex-col'>
+                                            <span class='font-bold'>{$address->full_name}</span>
+                                            <span class='text-xs text-gray-500'>{$address->full_address}</span>
+                                        </div>
+                                    ",
+                                ])
+                                ->toArray())
+                            ->allowHtml()
+                            ->searchable()
+                            ->live()
+                            ->afterStateUpdated(function ($state, Set $set) {
+                                if (! $state) {
+                                    return;
+                                }
+                                $address = Address::find($state);
+                                if (! $address) {
+                                    return;
+                                }
+
+                                $set('billing_address.first_name', $address->first_name);
+                                $set('billing_address.last_name', $address->last_name);
+                                $set('billing_address.email', $address->email);
+                                $set('billing_address.phone', $address->phone);
+                                $set('billing_address.street', trim($address->address_line_1 . ($address->address_line_2 ? ', ' . $address->address_line_2 : '')));
+                                $set('billing_address.city', $address->city);
+                                $set('billing_address.zip', $address->postal_code);
+                                $set('billing_address.country', $address->country?->name ?? $address->country_code);
+                                $set('billing_address_is_default', $address->is_default);
+                            })
+                            ->visible(fn (Get $get): bool => filled($get('user_id')))
+                            ->dehydrated(false)
+                            ->columnSpanFull(),
                         TextInput::make('billing_address.first_name')->label(__('messages.first_name')),
                         TextInput::make('billing_address.last_name')->label(__('messages.last_name')),
                         TextInput::make('billing_address.email')->email()->label(__('messages.email')),
@@ -78,8 +222,22 @@ class OrderForm
                         TextInput::make('billing_address.city')->label(__('messages.city')),
                         TextInput::make('billing_address.zip')->label(__('messages.zip_code')),
                         TextInput::make('billing_address.country')->label(__('messages.country')),
+                        \Filament\Forms\Components\Checkbox::make('billing_address_is_default')
+                            ->label(__('messages.is_default'))
+                            ->dehydrated(false)
+                            ->live()
+                            ->afterStateUpdated(function ($state, Get $get) {
+                                if ($state && $get('billing_address_selector')) {
+                                    $address = Address::find($get('billing_address_selector'));
+                                    if ($address) {
+                                        $address->setAsDefault();
+                                        \Filament\Notifications\Notification::make()->title(__('messages.address_set_as_default'))->success()->send();
+                                    }
+                                }
+                            })
+                            ->columnSpanFull(),
                     ])->columns(4)
-                    ->collapsed(),
+                    ->columnSpanFull(),
 
                 Section::make(__('messages.financials'))
                     ->schema([
@@ -98,7 +256,8 @@ class OrderForm
                         TextInput::make('total')
                             ->label(__('messages.total'))
                             ->numeric()->prefix('€')->required(),
-                    ])->columns(5),
+                    ])->columns(5)
+                    ->columnSpanFull(),
 
                 Section::make(__('messages.checkout_payment'))
                     ->schema([
@@ -109,7 +268,8 @@ class OrderForm
                             ->label(__('messages.payment_status'))
                             ->options(PaymentStatus::class)
                             ->required(),
-                    ])->columns(2),
+                    ])->columns(2)
+                    ->columnSpanFull(),
 
                 Section::make(__('messages.dates'))
                     ->schema([
@@ -123,7 +283,8 @@ class OrderForm
                             ->label(__('messages.shipped_at')),
                         DateTimePicker::make('delivered_at')
                             ->label(__('messages.delivered_at')),
-                    ])->columns(4),
+                    ])->columns(4)
+                    ->columnSpanFull(),
             ]);
     }
 }

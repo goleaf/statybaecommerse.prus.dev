@@ -276,7 +276,7 @@ final class ReferralReward extends Model
 
     /**
      * Surface the logical reward category (discount, credit, points) sourced
-     * from metadata so analytics and API clients can differentiate payouts.
+     * from metadata so internal reporting and API clients can differentiate payouts.
      */
     public function getRewardCategoryAttribute(): string
     {

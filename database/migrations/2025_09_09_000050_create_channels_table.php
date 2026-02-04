@@ -36,7 +36,6 @@ return new class extends Migration
                 $table->boolean('is_default')->default(false);
                 $table->boolean('is_active')->default(true);
                 $table->boolean('ssl_enabled')->default(false);
-                $table->boolean('analytics_enabled')->default(false);
                 $table->unsignedInteger('sort_order')->default(0);
 
                 // Flexible configuration payloads.

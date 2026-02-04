@@ -29,7 +29,7 @@ final class AutocompleteControllerTest extends TestCase
         $this->assertSame(200, $response->getStatusCode());
         // Assert the JSON payload marks the request as successful even when no records match the query.
         $this->assertTrue($payload['success']);
-        // Assert the meta data echoes the normalised search query for downstream analytics.
+        // Assert the meta data echoes the normalised search query for downstream reporting.
         $this->assertSame('query', $payload['meta']['query']);
         // Assert the limit value is preserved so client-side pagination can mirror server-side behaviour.
         $this->assertSame(15, $payload['meta']['limit']);

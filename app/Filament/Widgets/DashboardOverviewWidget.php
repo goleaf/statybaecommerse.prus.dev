@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace App\Filament\Widgets;
 
 use App\Models\Address;
-use App\Models\Campaign;
-use App\Models\CampaignView;
 use App\Models\Country;
 use App\Models\Inventory;
 use App\Models\Location;
@@ -14,7 +12,6 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\SystemSetting;
 use App\Models\User;
-use App\Models\VariantAnalytics;
 use Carbon\Carbon;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -30,8 +27,6 @@ class DashboardOverviewWidget extends BaseWidget
     {
         $now = Carbon::now();
         $lastMonth = $now->copy()->subMonth();
-        $lastWeek = $now->copy()->subWeek();
-        $yesterday = $now->copy()->subDay();
 
         // Core Business Metrics
         $totalRevenue = Order::query()->where('status', '!=', 'cancelled')->sum('total_amount');
@@ -53,27 +48,13 @@ class DashboardOverviewWidget extends BaseWidget
         $activeProducts = Product::where('is_visible', true)->count();
         $lowStockProducts = Inventory::where('stock_quantity', '<=', DB::raw('threshold'))->count();
 
-        // Advanced Metrics
         $avgOrderValue = $totalOrders > 0 ? $totalRevenue / $totalOrders : 0;
-        $activeCampaigns = 0; // Campaign::where('status', 'active')->count();
-        $totalCampaignViews = 0; // CampaignView::sum('views_count');
-
-        $totalConversions = 0;
-
-        // Performance Metrics
-        $totalPageViews = 0;
-        $totalSearches = 0;
-        $totalCartAdds = 0;
-        $totalWishlistAdds = 0; // WishlistItem::count();
 
         // Geographic & System Metrics
         $totalCountries = Country::count();
         $totalLocations = Location::count();
         $totalAddresses = Address::count();
         $totalSystemSettings = SystemSetting::count();
-
-        $totalUserBehaviors = 0; // UserBehavior::count();
-        $totalVariantAnalytics = VariantAnalytics::count();
 
         return [
             // Primary Business Metrics
@@ -95,7 +76,7 @@ class DashboardOverviewWidget extends BaseWidget
                 ->description(__('translations.active_products') . ': ' . \Illuminate\Support\Number::format($activeProducts))
                 ->descriptionIcon('heroicon-m-cube')
                 ->color('primary'),
-            // Performance Metrics
+
             Stat::make(__('translations.average_order_value'), \Illuminate\Support\Number::currency($avgOrderValue, 'EUR'))
                 ->description(__('translations.per_order'))
                 ->descriptionIcon('heroicon-m-shopping-cart')
@@ -104,23 +85,7 @@ class DashboardOverviewWidget extends BaseWidget
                 ->description(__('translations.products_need_restocking'))
                 ->descriptionIcon('heroicon-m-exclamation-triangle')
                 ->color($lowStockProducts > 0 ? 'warning' : 'success'),
-            Stat::make(__('translations.active_campaigns'), \Illuminate\Support\Number::format($activeCampaigns))
-                ->description(__('translations.running_campaigns'))
-                ->descriptionIcon('heroicon-m-megaphone')
-                ->color('primary'),
-            // Analytics Metrics
-            Stat::make(__('translations.page_views'), \Illuminate\Support\Number::format($totalPageViews))
-                ->description(__('translations.total_views'))
-                ->descriptionIcon('heroicon-m-eye')
-                ->color('info'),
-            Stat::make(__('translations.campaign_views'), \Illuminate\Support\Number::format($totalCampaignViews))
-                ->description(__('translations.total_impressions'))
-                ->descriptionIcon('heroicon-m-eye')
-                ->color('info'),
-            Stat::make(__('translations.conversions'), \Illuminate\Support\Number::format($totalConversions))
-                ->description(__('translations.total_conversions'))
-                ->descriptionIcon('heroicon-m-check-circle')
-                ->color('success'),
+
             // System Metrics
             Stat::make(__('translations.countries'), \Illuminate\Support\Number::format($totalCountries))
                 ->description(__('translations.supported_countries'))
@@ -134,15 +99,6 @@ class DashboardOverviewWidget extends BaseWidget
                 ->description(__('translations.customer_addresses'))
                 ->descriptionIcon('heroicon-m-home')
                 ->color('info'),
-            // Advanced System Metrics
-            Stat::make(__('translations.user_behaviors'), \Illuminate\Support\Number::format($totalUserBehaviors))
-                ->description(__('translations.tracked_behaviors'))
-                ->descriptionIcon('heroicon-m-chart-bar')
-                ->color('info'),
-            Stat::make(__('translations.variant_analytics'), \Illuminate\Support\Number::format($totalVariantAnalytics))
-                ->description(__('translations.variant_insights'))
-                ->descriptionIcon('heroicon-m-chart-pie')
-                ->color('primary'),
             Stat::make(__('translations.system_settings'), \Illuminate\Support\Number::format($totalSystemSettings))
                 ->description(__('translations.configuration_items'))
                 ->descriptionIcon('heroicon-m-cog-6-tooth')

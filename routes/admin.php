@@ -2,10 +2,6 @@
 
 declare(strict_types=1);
 
-use App\Filament\Resources\VariantCombinationResource\Pages\CreateVariantCombination;
-use App\Filament\Resources\VariantCombinationResource\Pages\EditVariantCombination;
-use App\Filament\Resources\VariantCombinationResource\Pages\ListVariantCombinations;
-use App\Filament\Resources\VariantCombinationResource\Pages\ViewVariantCombination;
 use App\Http\Controllers\Admin\AttributeValueTranslationController;
 use App\Http\Controllers\Admin\DiscountPresetController;
 use App\Http\Controllers\Admin\EnumValueController;
@@ -19,18 +15,6 @@ use Illuminate\Support\Facades\Validator;
 
 // Admin impersonation routes
 Route::middleware('auth')->group(function (): void {
-    Route::get('/admin/variant-combinations', ListVariantCombinations::class)
-        ->name('filament.admin.resources.variant-combinations.index');
-
-    Route::get('/admin/variant-combinations/create', CreateVariantCombination::class)
-        ->name('filament.admin.resources.variant-combinations.create');
-
-    Route::get('/admin/variant-combinations/{record}', ViewVariantCombination::class)
-        ->name('filament.admin.resources.variant-combinations.view');
-
-    Route::get('/admin/variant-combinations/{record}/edit', EditVariantCombination::class)
-        ->name('filament.admin.resources.variant-combinations.edit');
-
     // Enum value helper endpoints used by the legacy HTTP feature tests.
     Route::post('/admin/enum-values', [EnumValueController::class, 'store'])
         ->name('admin.enum-values.store');
@@ -366,9 +350,7 @@ Route::middleware('auth')->group(function (): void {
         };
     };
 
-    Route::get('/admin/data-import-export', $placeholder('Data Import/Export'))->name('filament.admin.pages.data-import-export');
     Route::get('/admin/customer-segmentation', $placeholder('Customer Segmentation'))->name('filament.admin.pages.customer-segmentation');
-    Route::get('/admin/seo-analytics', $placeholder('SEO Analytics'));  // Filament registers s-e-o-analytics; avoid name conflict
     Route::get('/admin/security-audit', $placeholder('Security Audit'))->name('filament.admin.pages.security-audit');
     // Minimal CustomerResource HTTP endpoints to support feature tests without relying on Livewire stack.
     Route::get('/admin/customers', $placeholder('Customers'))

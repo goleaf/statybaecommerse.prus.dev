@@ -36,7 +36,7 @@ final class DocumentFactory extends Factory
             'document_template_id' => DocumentTemplate::factory(), // Keep relational integrity with a valid template.
             'title'                => $this->faker->sentence(3), // Human-readable heading rendered in the UI.
             'name'                 => $this->faker->words(3, true), // Friendly alias for search dropdowns.
-            'type'                 => $this->faker->randomElement(['invoice', 'receipt', 'contract', 'report']), // Document classification for analytics.
+            'type'                 => $this->faker->randomElement(['invoice', 'receipt', 'contract']),
             'version'              => sprintf('v%s.%s', $this->faker->randomDigitNotNull(), $this->faker->randomDigit()), // Semantic version tag for auditing.
             'content'              => $this->faker->randomHtml(),
             'variables'            => [

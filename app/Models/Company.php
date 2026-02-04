@@ -49,6 +49,7 @@ final class Company extends Model
     // Attribute casting configuration ensures metadata remains structured and the active flag is always boolean.
     protected $casts = [
         'id'        => 'int',
+        'industry'  => \App\Enums\Industry::class,
         'metadata'  => 'array',
         'is_active' => 'boolean',
     ];

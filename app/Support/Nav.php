@@ -27,7 +27,6 @@ final class Nav
      * @var array<string, array{icon: string|null, sort: int|null}>
      */
     private const FALLBACK_GROUP_DEFINITIONS = [
-        'Analytics'          => ['icon' => 'heroicon-o-chart-bar', 'sort' => 500],
         'Campaigns'          => ['icon' => 'heroicon-o-rocket-launch', 'sort' => 310],
         'Content'            => ['icon' => 'heroicon-o-document-text', 'sort' => 400],
         'Content Management' => ['icon' => 'heroicon-o-folder', 'sort' => 410],

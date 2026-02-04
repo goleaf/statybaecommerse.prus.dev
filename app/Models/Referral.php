@@ -125,7 +125,7 @@ final class Referral extends Model
 
     /**
      * Allow filtering by the campaign identifier stored alongside the referral
-     * to keep analytics dashboards and exports expressive.
+     * to keep marketing dashboards and exports expressive.
      */
     public function scopeForCampaign(Builder $query, string $campaign): Builder
     {

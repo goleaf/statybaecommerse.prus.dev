@@ -12,7 +12,6 @@ use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -27,8 +26,9 @@ class ProductsTable
         return $table
             ->modifyQueryUsing(fn ($query) => $query->with(['brand', 'primaryImage']))
             ->columns([
-                ImageColumn::make('main_image')
+                ImageColumn::make('primaryImage.path')
                     ->label(__('messages.image'))
+                    ->disk('public')
                     ->circular(),
                 TextColumn::make('name')
                     ->label(__('messages.name'))
@@ -48,11 +48,6 @@ class ProductsTable
                 TextColumn::make('sales_sparkline')
                     ->label(__('admin.products.sales'))
                     ->formatStateUsing(static fn (): string => '—')
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('compare_price')
-                    ->label(__('admin.products.compare_price'))
-                    ->money('EUR')
-                    ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('cost_price')
                     ->label(__('admin.products.cost_price'))
@@ -92,7 +87,6 @@ class ProductsTable
                     ->label(__('admin.products.is_visible')),
             ])
             ->actions([
-                ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make(),
             ])

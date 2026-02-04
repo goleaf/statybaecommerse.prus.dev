@@ -7,10 +7,12 @@ namespace App\Filament\Pages\Support;
 use App\Filament\Tables\Concerns\ConfiguresToggleableTableLayout;
 use Filament\Resources\Pages\ManageRecords;
 use Filament\Tables\Table;
+use Hydrat\TableLayoutToggle\Concerns\HasToggleableTable;
 
 abstract class BaseManageRecords extends ManageRecords
 {
     use ConfiguresToggleableTableLayout;
+    use HasToggleableTable;
 
     public function table(Table $table): Table
     {

@@ -7,6 +7,7 @@ return [
     'apply_filters'          => 'Filter anwenden',
     'cart_empty_description' => 'Ihr Warenkorb ist leer.',
     'clear_filters'          => 'Filter zurücksetzen',
+    'close'                  => 'shared.close',
     'filter_by_brand'        => 'Nach Marke filtern',
     'filter_by_category'     => 'Nach Kategorie filtern',
     'home'                   => 'Startseite',

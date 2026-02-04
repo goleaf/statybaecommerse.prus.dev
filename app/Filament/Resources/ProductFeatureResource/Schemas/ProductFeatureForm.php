@@ -36,7 +36,8 @@ class ProductFeatureForm
                             ->default(0),
                         Toggle::make('is_active')
                             ->default(true),
-                    ])->columns(2),
+                    ])->columns(2)
+                    ->columnSpanFull(),
             ]);
     }
 }

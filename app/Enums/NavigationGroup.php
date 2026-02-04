@@ -12,7 +12,6 @@ enum NavigationGroup: string
     case ContentManagement = 'content-management';
     case Ecommerce = 'ecommerce';
     case System = 'system';
-    case Analytics = 'analytics';
     case Marketing = 'marketing';
     case Reports = 'reports';
     case Settings = 'settings';
@@ -37,7 +36,6 @@ enum NavigationGroup: string
             self::ContentManagement => __('navigation.navigation_groups.content_management'),
             self::Ecommerce         => __('navigation.navigation_groups.ecommerce'),
             self::System            => __('navigation.navigation_groups.system'),
-            self::Analytics         => __('navigation.navigation_groups.analytics'),
             self::Marketing         => __('navigation.navigation_groups.marketing'),
             self::Reports           => __('navigation.navigation_groups.reports'),
             self::Settings          => __('navigation.navigation_groups.settings'),
@@ -72,7 +70,6 @@ enum NavigationGroup: string
             self::ContentManagement => 'heroicon-o-document-text',
             self::Ecommerce         => 'heroicon-o-shopping-cart',
             self::System            => 'heroicon-o-cog-6-tooth',
-            self::Analytics         => 'heroicon-o-chart-bar',
             self::Marketing         => 'heroicon-o-megaphone',
             self::Reports           => 'heroicon-o-document-chart-bar',
             self::Settings          => 'heroicon-o-adjustments-horizontal',
@@ -102,7 +99,6 @@ enum NavigationGroup: string
             self::ContentManagement => 20,
             self::Ecommerce         => 30,
             self::System            => 90,
-            self::Analytics         => 40,
             self::Marketing         => 50,
             self::Reports           => 60,
             self::Settings          => 80,
@@ -132,7 +128,6 @@ enum NavigationGroup: string
             self::ContentManagement => 'green',
             self::Ecommerce         => 'orange',
             self::System            => 'gray',
-            self::Analytics         => 'purple',
             self::Marketing         => 'pink',
             self::Reports           => 'indigo',
             self::Settings          => 'slate',

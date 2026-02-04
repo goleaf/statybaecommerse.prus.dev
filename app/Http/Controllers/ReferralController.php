@@ -7,7 +7,6 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreReferralRequest;
 use App\Models\Referral;
 use App\Models\ReferralCode;
-use App\Models\ReferralStatistics;
 use App\Models\User;
 use App\Services\PaginationService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -27,25 +26,6 @@ use Throwable;
 final class ReferralController extends Controller
 {
     use AuthorizesRequests;
-
-    /**
-     * Handle codeStatistics functionality with proper error handling.
-     *
-     * @return Illuminate\Http\JsonResponse
-     */
-    public function codeStatistics(): JsonResponse
-    {
-        // Aggregate once to avoid multiple trips to the database when the
-        // dashboard polls this endpoint for analytics tiles.
-        $stats = [
-            'total_codes'   => ReferralCode::count(),
-            'active_codes'  => ReferralCode::where('is_active', true)->count(),
-            'total_usage'   => (int) ReferralCode::sum('usage_count'),
-            'total_rewards' => (float) ReferralCode::sum('total_rewards'),
-        ];
-
-        return response()->json($stats);
-    }
 
     /**
      * Handle getReferralUrl functionality with proper error handling.
@@ -129,11 +109,7 @@ final class ReferralController extends Controller
         $user = $this->resolveAuthenticatedUser();
 
         if (! Referral::canUserRefer($user->id)) {
-            return redirect()->route('referrals.index')->with('error', __('messages.referrals));
-        }
-        $referralCode = $user->activeReferralCode();
-
-        return view('));
+            return redirect()->route('referrals.index')->with('error', __('messages.referrals'));
         }
         $referralCode = $user->activeReferralCode();
 
@@ -148,10 +124,7 @@ final class ReferralController extends Controller
         $user = $this->resolveAuthenticatedUser();
 
         if (! Referral::canUserRefer($user->id)) {
-            return redirect()->route('referrals.index')->with('error', __('messages.referrals));
-        }
-        $validated = $request->validated();
-        $referredUser = User::query()->where('));
+            return redirect()->route('referrals.index')->with('error', __('messages.referrals'));
         }
         $validated = $request->validated();
         $referredUser = User::query()->where('email', $validated['referred_email'])->first();
@@ -197,10 +170,6 @@ final class ReferralController extends Controller
                     'created_via' => 'manual',
                 ],
             ]);
-
-            // Update statistics inside the same transaction to keep analytics
-            // counters consistent with the referral record itself.
-            $this->updateReferralStatistics($user->id, $referral->created_at->toDateString());
 
             DB::commit();
         } catch (Throwable $exception) {
@@ -288,31 +257,6 @@ final class ReferralController extends Controller
         $stats = ['total_rewards' => $user->referralRewards()->sum('amount'), 'pending_rewards' => $user->referralRewards()->pending()->sum('amount'), 'applied_rewards' => $user->referralRewards()->applied()->sum('amount')];
 
         return view('referrals.rewards', compact('rewards', 'stats'));
-    }
-
-    /**
-     * Handle statistics functionality with proper error handling.
-     */
-    public function statistics(): View
-    {
-        $user = $this->resolveAuthenticatedUser();
-        $stats = $user->referral_statistics;
-        // Get monthly data for chart
-        $monthlyData = DB::table('referral_statistics')->where('user_id', $user->id)->where('date', '>=', now()->subMonths(12))->orderBy('date')->get()->skipWhile(function ($stat) {
-            // Skip statistics that are not properly configured for display
-            return empty($stat->date) || empty($stat->user_id) || $stat->referrals_count < 0 || $stat->rewards_amount < 0;
-        });
-
-        return view('referrals.statistics', compact('stats', 'monthlyData'));
-    }
-
-    /**
-     * Handle updateReferralStatistics functionality with proper error handling.
-     */
-    private function updateReferralStatistics(int $userId, string $date): void
-    {
-        $stats = ReferralStatistics::getOrCreateForUserAndDate($userId, $date);
-        $stats->incrementReferrals();
     }
 
     /**

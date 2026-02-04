@@ -125,63 +125,10 @@ return new class extends Migration
             $table->timestamp('referral_code_generated_at')->nullable()->after('referral_code');
             $table->json('referral_settings')->nullable()->after('referral_code_generated_at');
         });
-
-        // Create referral_code_usage_logs table
-        Schema::create('referral_code_usage_logs', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('referral_code_id')->constrained('referral_codes')->cascadeOnDelete();
-            $table->foreignId('user_id')->nullable()->constrained('users');
-            $table->string('ip_address');
-            $table->text('user_agent')->nullable();
-            $table->string('referrer')->nullable();
-            $table->json('metadata')->nullable();
-            $table->timestamps();
-
-            $table->index(['referral_code_id', 'created_at']);
-            $table->index(['user_id', 'created_at']);
-            $table->index(['ip_address', 'created_at']);
-        });
-
-        // Create referral_code_statistics table
-        Schema::create('referral_code_statistics', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('referral_code_id')->constrained('referral_codes')->cascadeOnDelete();
-            $table->date('date');
-            $table->integer('total_views')->default(0);
-            $table->integer('total_clicks')->default(0);
-            $table->integer('total_signups')->default(0);
-            $table->integer('total_conversions')->default(0);
-            $table->decimal('total_revenue', 12, 2)->default(0);
-            $table->json('metadata')->nullable();
-            $table->timestamps();
-
-            $table->unique(['referral_code_id', 'date']);
-            $table->index(['date']);
-        });
-
-        // Create referral_statistics table for analytics
-        Schema::create('referral_statistics', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
-            $table->date('date');
-            $table->integer('total_referrals')->default(0);
-            $table->integer('completed_referrals')->default(0);
-            $table->integer('pending_referrals')->default(0);
-            $table->decimal('total_rewards_earned', 12, 2)->default(0);
-            $table->decimal('total_discounts_given', 12, 2)->default(0);
-            $table->json('metadata')->nullable();
-            $table->timestamps();
-
-            $table->unique(['user_id', 'date']);
-            $table->index(['date']);
-        });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('referral_statistics');
-        Schema::dropIfExists('referral_code_statistics');
-        Schema::dropIfExists('referral_code_usage_logs');
         Schema::dropIfExists('referral_campaigns');
         Schema::dropIfExists('referral_codes');
         Schema::dropIfExists('referral_rewards');

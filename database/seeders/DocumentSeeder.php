@@ -188,7 +188,7 @@ final class DocumentSeeder extends Seeder
             $factory = $factoryConfigurator(Document::factory());
 
             $state = [
-                // Normalise the stored type to the chosen template so analytics and filtering stay aligned.
+                // Normalise the stored type to the chosen template so reporting and filtering stay aligned.
                 'type' => $templateType,
                 // Persist explicit attribution to avoid the factory spinning up auxiliary users that the feature tests are not tracking.
                 'created_by' => $creator->getKey(),

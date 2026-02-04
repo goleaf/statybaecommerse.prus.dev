@@ -42,21 +42,26 @@ final class ProductVariantResource extends BaseResource
         return $table
             ->columns([
                 TextColumn::make('sku')
-                    ->label('SKU')
+                    ->label(__('messages.sku'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('product.name')
+                    ->label(__('messages.product'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('name')
+                    ->label(__('messages.name'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('price')
+                    ->label(__('messages.price'))
                     ->money('EUR')
                     ->sortable(),
                 TextColumn::make('stock_quantity')
+                    ->label(__('messages.stock_quantity'))
                     ->sortable(),
-                ToggleColumn::make('is_enabled'),
+                ToggleColumn::make('is_enabled')
+                    ->label(__('messages.is_enabled')),
             ])
             ->filters([
                 //

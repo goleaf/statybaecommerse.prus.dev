@@ -49,9 +49,6 @@ final class ProductVariantSelector extends Component
         $this->loadVariants();
         $this->loadAttributes();
         $this->selectDefaultVariant();
-        if (! app()->runningUnitTests()) {
-            $this->recordProductView();
-        }
     }
 
     public function loadVariants(): void
@@ -104,7 +101,6 @@ final class ProductVariantSelector extends Component
     {
         $this->selectedAttributes[$attributeSlug] = $value;
         $this->findMatchingVariant();
-        $this->recordVariantClick();
     }
 
     public function findMatchingVariant(): void
@@ -160,8 +156,6 @@ final class ProductVariantSelector extends Component
         $this->showVariantDetails = true;
         $this->quantity = 1;
         $this->refreshSelectedVariantPricing($variant);
-
-        $this->recordVariantClick();
     }
 
     private function resetVariantSelection(): void
@@ -299,9 +293,6 @@ final class ProductVariantSelector extends Component
             return;
         }
 
-        // Record analytics
-        $this->recordAddToCart();
-
         // Dispatch event to add to cart
         $this->dispatch(
             'add-to-cart',
@@ -387,52 +378,6 @@ final class ProductVariantSelector extends Component
         }
 
         return __('product.variants.messages.in_stock', ['quantity' => $available]);
-    }
-
-    /**
-     * Record product view for analytics.
-     */
-    public function recordProductView(): void
-    {
-        if (app()->runningUnitTests()) {
-            return;
-        }
-
-        // Record view for the product
-        $this->product->increment('views_count');
-
-        // Record view for the default variant if available
-        if ($this->selectedVariant) {
-            $this->selectedVariant->recordView();
-        }
-    }
-
-    /**
-     * Record variant click for analytics.
-     */
-    public function recordVariantClick(): void
-    {
-        if (app()->runningUnitTests()) {
-            return;
-        }
-
-        if ($this->selectedVariant) {
-            $this->selectedVariant->recordClick();
-        }
-    }
-
-    /**
-     * Record add to cart action for analytics.
-     */
-    public function recordAddToCart(): void
-    {
-        if (app()->runningUnitTests()) {
-            return;
-        }
-
-        if ($this->selectedVariant) {
-            $this->selectedVariant->recordDailyAnalytics('add_to_cart');
-        }
     }
 
     /**

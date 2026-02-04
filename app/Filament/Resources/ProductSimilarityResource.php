@@ -11,7 +11,6 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -20,6 +19,8 @@ use UnitEnum;
 final class ProductSimilarityResource extends BaseResource
 {
     protected static ?string $model = ProductSimilarity::class;
+
+    protected static bool $shouldRegisterNavigation = false;
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-sparkles';
 
@@ -37,11 +38,6 @@ final class ProductSimilarityResource extends BaseResource
                     ->relationship('similarProduct', 'name')
                     ->required()
                     ->searchable(),
-                TextInput::make('similarity_score')
-                    ->numeric()
-                    ->required(),
-                TextInput::make('algorithm_type')
-                    ->maxLength(255),
             ]);
     }
 
@@ -55,12 +51,6 @@ final class ProductSimilarityResource extends BaseResource
                     ->sortable(),
                 TextColumn::make('similarProduct.name')
                     ->label('Similar Product')
-                    ->searchable()
-                    ->sortable(),
-                TextColumn::make('similarity_score')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('algorithm_type')
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('calculated_at')

@@ -91,10 +91,10 @@ return new class extends Migration
             });
         }
 
-        // Optimize order queries for analytics
+        // Optimize order queries for reporting
         if (Schema::hasTable('orders')) {
             Schema::table('orders', function (Blueprint $table) {
-                // Index for order analytics and reporting
+                // Index for order reporting and filtering
                 $table->index(['created_at', 'status'], 'orders_analytics_idx');
             });
         }

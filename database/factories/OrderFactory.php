@@ -216,7 +216,7 @@ class OrderFactory extends Factory
      */
     public function completed(): static
     {
-        // Completed orders extend the delivery window slightly to capture post-delivery workflows in analytics tests.
+        // Completed orders extend the delivery window slightly to capture post-delivery workflows in reporting tests.
         return $this->state(fn (array $attributes) => $this->ensureOptionalColumns([
             // Map legacy "completed" into the delivered enum case to stay aligned with the new status set.
             'status'         => OrderStatus::DELIVERED->value,

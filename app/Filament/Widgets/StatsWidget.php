@@ -19,28 +19,20 @@ final class StatsWidget extends BaseStatsOverviewWidget
 
     public function getStats(): array
     {
-        $now = Carbon::now();
         $totalRevenue = (float) (Order::sum('total') ?? 0);
         $totalOrders = (int) Order::count();
         $totalProducts = (int) Product::where('is_visible', true)->count();
         $totalCustomers = (int) User::count();
-        $activeCustomers = (int) User::whereHas('orders')->count();
         $visibleCategories = (int) Category::where('is_visible', true)->count();
         $enabledBrands = (int) Brand::where('is_enabled', true)->count();
-        $avgOrderValue = $totalOrders > 0 ? $totalRevenue / $totalOrders : 0.0;
-        $monthOrders = (int) Order::createdThisMonth()->count();
 
         return [
-            Stat::make(__('messages.analytics), '), '€' . number_format($totalRevenue, 2))->color('success'),
-            Stat::make(__('messages.analytics), $totalOrders)->color('), $totalOrders)->color('primary'),
-            Stat::make(__('messages.analytics), $totalProducts)->color('), $totalProducts)->color('primary'),
-            Stat::make(__('messages.analytics), $totalCustomers)->color('), $totalCustomers)->color('primary'),
-            Stat::make(__('messages.analytics), $activeCustomers)->color('), $activeCustomers)->color('success'),
-            Stat::make(__('analytics.categories'), $visibleCategories)->color('info'),
-            Stat::make(__('analytics.brands'), $enabledBrands)->color('info'),
-            Stat::make(__('analytics.content'), $visibleCategories + $enabledBrands)->color('info'),
-            Stat::make(__('analytics.average_order_value'), '€' . number_format($avgOrderValue, 2))->color('info'),
-            Stat::make(__('analytics.month_orders'), $monthOrders)->color('primary'),
+            Stat::make(__('messages.total_revenue'), '€' . number_format($totalRevenue, 2))->color('success'),
+            Stat::make(__('messages.total_orders'), $totalOrders)->color('primary'),
+            Stat::make(__('messages.total_products'), $totalProducts)->color('primary'),
+            Stat::make(__('messages.total_customers'), $totalCustomers)->color('primary'),
+            Stat::make(__('messages.categories'), $visibleCategories)->color('info'),
+            Stat::make(__('messages.brands'), $enabledBrands)->color('info'),
         ];
     }
 

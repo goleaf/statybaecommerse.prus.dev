@@ -47,17 +47,9 @@ return new class extends Migration
                 $table->text('meta_keywords')->nullable()->after('meta_description');
             }
 
-            // Analytics settings
-            if (! Schema::hasColumn('channels', 'analytics_tracking_id')) {
-                $table->string('analytics_tracking_id')->nullable()->after('meta_keywords');
-            }
-            if (! Schema::hasColumn('channels', 'analytics_enabled')) {
-                $table->boolean('analytics_enabled')->default(false)->after('analytics_tracking_id');
-            }
-
             // Payment settings
             if (! Schema::hasColumn('channels', 'payment_methods')) {
-                $table->json('payment_methods')->nullable()->after('analytics_enabled');
+                $table->json('payment_methods')->nullable()->after('meta_keywords');
             }
             if (! Schema::hasColumn('channels', 'default_payment_method')) {
                 $table->string('default_payment_method')->nullable()->after('payment_methods');
@@ -121,7 +113,7 @@ return new class extends Migration
         Schema::table('channels', function (Blueprint $table) {
             $columns = [
                 'code', 'type', 'is_active', 'sort_order', 'configuration', 'domain', 'ssl_enabled',
-                'meta_title', 'meta_description', 'meta_keywords', 'analytics_tracking_id', 'analytics_enabled',
+                'meta_title', 'meta_description', 'meta_keywords',
                 'payment_methods', 'default_payment_method', 'shipping_methods', 'default_shipping_method',
                 'free_shipping_threshold', 'currency_code', 'currency_symbol', 'currency_position',
                 'default_language', 'supported_languages', 'contact_email', 'contact_phone', 'contact_address',

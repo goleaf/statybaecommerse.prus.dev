@@ -41,7 +41,7 @@ final class PartnerSeederTest extends TestCase
         // Run the seeder so the partner catalogue mirrors production defaults.
         $this->seed(PartnerSeeder::class);
 
-        // Verify that at least one partner exists for every tier so analytics have attribution data.
+        // Verify that at least one partner exists for every tier so reporting has attribution data.
         $tiersWithPartners = Partner::query()
             ->withoutGlobalScopes()
             ->selectRaw('partner_tiers.code as tier_code, COUNT(partners.id) as partner_count')

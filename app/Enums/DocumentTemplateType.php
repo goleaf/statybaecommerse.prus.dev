@@ -6,6 +6,7 @@ namespace App\Enums;
 
 enum DocumentTemplateType: string
 {
+    case Document = 'document';
     case Invoice = 'invoice';
     case Quote = 'quote';
     case Receipt = 'receipt';
@@ -22,6 +23,7 @@ enum DocumentTemplateType: string
     public function color(): string
     {
         return match ($this) {
+            self::Document => 'gray',
             self::Invoice  => 'success',
             self::Receipt  => 'info',
             self::Quote    => 'warning',

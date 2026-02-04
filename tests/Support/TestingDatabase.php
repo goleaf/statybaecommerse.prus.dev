@@ -783,24 +783,6 @@ final class TestingDatabase
             });
         }
 
-        if (! $schema->hasTable('variant_analytics')) {
-            $schema->create('variant_analytics', function (Blueprint $table): void {
-                $table->id();
-                $table->foreignId('product_id')->constrained('products')->cascadeOnDelete();
-                $table->foreignId('variant_id')->constrained('product_variants')->cascadeOnDelete();
-                $table->date('date');
-                $table->string('date_bucket');
-                $table->integer('views')->default(0);
-                $table->integer('clicks')->default(0);
-                $table->integer('add_to_cart')->default(0);
-                $table->integer('purchases')->default(0);
-                $table->decimal('revenue', 10, 4)->default(0);
-                $table->decimal('conversion_rate', 5, 4)->default(0);
-                $table->timestamps();
-                $table->unique(['product_id', 'variant_id', 'date_bucket'], 'variant_analytics_product_variant_bucket_unique');
-            });
-        }
-
         if (! $schema->hasTable('variant_images')) {
             $schema->create('variant_images', function (Blueprint $table): void {
                 $table->id();

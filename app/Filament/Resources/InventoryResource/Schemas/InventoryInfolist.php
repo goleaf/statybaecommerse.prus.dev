@@ -15,6 +15,7 @@ class InventoryInfolist
     {
         return $schema->components([
             Section::make(__('admin.inventory.basic_information'))
+                ->columnSpanFull()
                 ->schema([
                     Grid::make(2)
                         ->schema([

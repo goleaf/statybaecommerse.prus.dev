@@ -19,7 +19,6 @@ enum NavigationIcon: string
     case ShoppingBag = 'shopping-bag';
     case Users = 'users';
     case Cog = 'cog';
-    case ChartBar = 'chart-bar';
     case ComputerDesktop = 'computer-desktop';
     case Megaphone = 'megaphone';
     case ArchiveBox = 'archive-box';
@@ -42,7 +41,6 @@ enum NavigationIcon: string
     case Order = 'order';
     case Coupon = 'coupon';
     case Campaign = 'campaign';
-    case Analytics = 'analytics';
     case Report = 'report';
     case Activity = 'activity';
     case Stock = 'stock';
@@ -67,7 +65,6 @@ enum NavigationIcon: string
             self::ShoppingBag => 'heroicon-o-shopping-bag',
             self::Users       => 'heroicon-o-users',
             self::Cog, self::SystemSetting, self::SystemSettings => 'heroicon-o-cog-6-tooth',
-            self::ChartBar        => 'heroicon-o-chart-bar',
             self::ComputerDesktop => 'heroicon-o-computer-desktop',
             self::Megaphone, self::Campaign => 'heroicon-o-megaphone',
             self::ArchiveBox, self::Stock => 'heroicon-o-archive-box',
@@ -88,7 +85,6 @@ enum NavigationIcon: string
             self::Cart        => 'heroicon-o-shopping-cart',
             self::Order       => 'heroicon-o-clipboard-document-list',
             self::Coupon      => 'heroicon-o-ticket',
-            self::Analytics   => 'heroicon-o-chart-pie',
             self::Activity    => 'heroicon-o-clock',
             self::PriceList   => 'heroicon-o-list-bullet',
             self::Discount    => 'heroicon-o-percent',
@@ -109,7 +105,6 @@ enum NavigationIcon: string
             self::ShoppingBag      => 'Orders',
             self::Users            => 'Users',
             self::Cog              => 'Settings',
-            self::ChartBar         => 'Analytics',
             self::ComputerDesktop  => 'System',
             self::Megaphone        => 'Marketing',
             self::ArchiveBox       => 'Inventory',
@@ -132,7 +127,6 @@ enum NavigationIcon: string
             self::Order            => 'Order',
             self::Coupon           => 'Coupon',
             self::Campaign         => 'Campaign',
-            self::Analytics        => 'Analytics',
             self::Report           => 'Report',
             self::Activity         => 'Activity',
             self::Stock            => 'Stock',
@@ -159,7 +153,6 @@ enum NavigationIcon: string
             'order'          => self::ShoppingBag,
             'user'           => self::Users,
             'setting'        => self::Cog,
-            'analytics'      => self::ChartBar,
             'system'         => self::ComputerDesktop,
             'marketing'      => self::Megaphone,
             'inventory'      => self::ArchiveBox,

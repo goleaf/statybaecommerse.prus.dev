@@ -47,7 +47,8 @@ class BrandForm
                                 ->label(__('admin.brands.is_premium'))
                                 ->default(false),
                         ]),
-                ]),
+                ])
+                ->columnSpanFull(),
             Section::make(__('messages.media'))
                 ->description(__('admin.brands.media_description'))
                 ->schema([
@@ -56,8 +57,7 @@ class BrandForm
                         ->collection('logo')
                         ->image()
                         ->columnSpanFull(),
-                ])
-                ->collapsible(),
+                ]),
             Section::make(__('admin.brands.social_links'))
                 ->schema([
                     Repeater::make('social_links')
@@ -71,7 +71,7 @@ class BrandForm
                         ])
                         ->columns(2),
                 ])
-                ->collapsible(),
+                ->columnSpanFull(),
         ]);
     }
 }

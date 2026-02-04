@@ -32,7 +32,7 @@ final class ProductTranslation extends Model
 
     protected $table = 'product_translations';
 
-    protected $fillable = ['product_id', 'locale', 'name', 'slug', 'summary', 'description', 'short_description', 'seo_title', 'seo_description', 'meta_keywords', 'alt_text'];
+    protected $fillable = ['product_id', 'locale', 'name', 'slug', 'summary', 'description', 'short_description', 'detailed_description', 'seo_title', 'seo_description', 'meta_keywords', 'alt_text'];
 
     protected $casts = ['product_id' => 'integer', 'meta_keywords' => 'array'];
 
@@ -44,7 +44,7 @@ final class ProductTranslation extends Model
             /** @var HtmlSanitizer $sanitizer */
             $sanitizer = app(HtmlSanitizer::class);
 
-            foreach (['description', 'short_description', 'summary'] as $field) {
+            foreach (['description', 'short_description', 'summary', 'detailed_description'] as $field) {
                 $value = $translation->{$field};
 
                 if (! is_string($value) || trim($value) === '') {

@@ -26,7 +26,6 @@ class ProductVariantResource extends JsonResource
             'name'           => (string) $variant->name,
             'sku'            => (string) $variant->sku,
             'price'          => $variant->price !== null ? (float) $variant->price : null,
-            'compare_price'  => $variant->compare_price !== null ? (float) $variant->compare_price : null,
             'is_default'     => (bool) $variant->is_default,
             'stock_quantity' => (int) ($variant->stock_quantity ?? 0),
             'is_in_stock'    => ! $variant->isOutOfStock(),

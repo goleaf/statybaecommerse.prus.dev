@@ -6,14 +6,13 @@ namespace App\Filament\Actions;
 
 use App\Contracts\DocumentServiceContract;
 use App\Models\DocumentTemplate;
-use App\Services\LocaleService;
 use DateTimeInterface;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\App;
 use Throwable;
 
 final class DocumentAction
@@ -38,33 +37,26 @@ final class DocumentAction
                     ->searchable()
                     ->preload()
                     ->required(),
-                Select::make('locale')
-                    ->label(__('admin.fields.locale'))
-                    ->options(function () {
-                        $locales = app(LocaleService::class)->getSupportedLocales();
-
-                        return array_combine(
-                            $locales,
-                            array_map(fn ($locale) => strtoupper($locale), $locales)
-                        );
-                    })
-                    ->default(fn (Model $record) => $record->preferred_locale ?? app()->getLocale())
+                Select::make('format')
+                    ->label(__('admin.fields.format'))
+                    ->options([
+                        'html' => 'HTML',
+                        'pdf'  => 'PDF',
+                    ])
+                    ->default('pdf')
                     ->required(),
+                TextInput::make('title')
+                    ->label(__('admin.fields.title'))
+                    ->placeholder(__('admin.placeholders.title')),
             ])
             ->action(function (Model $record, array $data, DocumentServiceContract $documentService) {
-                $originalLocale = App::getLocale();
-
                 try {
-                    if (isset($data['locale'])) {
-                        App::setLocale($data['locale']);
-                    }
-
                     // Enforce the active scope at read-time as a defence-in-depth guard against crafted payloads.
                     $template = DocumentTemplate::query()
                         ->active()
                         ->findOrFail($data['template_id']);
 
-                    $title = sprintf(
+                    $title = $data['title'] ?? sprintf(
                         '%s_%s_%s',
                         $template->name,
                         $record->getAttribute('number') ?? $record->getAttribute('code') ?? $record->getKey(),
@@ -80,7 +72,7 @@ final class DocumentAction
                         template: $template,
                         relatedModel: $record,
                         variables: $variables,
-                        title: $title
+                        title: (string) $title
                     );
 
                     Notification::make()
@@ -88,6 +80,10 @@ final class DocumentAction
                         ->body(__('admin.notifications.document_generated_successfully'))
                         ->success()
                         ->send();
+
+                    if ($data['format'] === 'html') {
+                        return response($document->content)->header('Content-Type', 'text/html');
+                    }
 
                     $downloadUrl = $documentService->generatePdf($document);
 
@@ -100,10 +96,6 @@ final class DocumentAction
                         ->send();
 
                     throw $e;
-                } finally {
-                    if (isset($data['locale'])) {
-                        App::setLocale($originalLocale);
-                    }
                 }
             });
     }
@@ -113,11 +105,11 @@ final class DocumentAction
         $now = now();
 
         $variables = [
-            '$MODEL_ID'   => $record->getKey(),
-            '$MODEL_TYPE' => $record->getMorphClass(),
+            'MODEL_ID'   => $record->getKey(),
+            'MODEL_TYPE' => $record->getMorphClass(),
             // Prefer model timestamps when available and gracefully fall back to the current time.
-            '$CREATED_AT' => self::formatDateTime($record->getAttribute('created_at')) ?? $now->format('d/m/Y H:i'),
-            '$UPDATED_AT' => self::formatDateTime($record->getAttribute('updated_at')) ?? $now->format('d/m/Y H:i'),
+            'CREATED_AT' => self::formatDateTime($record->getAttribute('created_at')) ?? $now->format('d/m/Y H:i'),
+            'UPDATED_AT' => self::formatDateTime($record->getAttribute('updated_at')) ?? $now->format('d/m/Y H:i'),
         ];
 
         // Add model-specific variables if the model has common attributes
@@ -128,7 +120,7 @@ final class DocumentAction
                 $value = $record->getAttribute($attribute);
 
                 if ($value !== null) {
-                    $variables['$' . strtoupper($attribute)] = $value;
+                    $variables[strtoupper($attribute)] = $value;
                 }
             }
         }

@@ -21,7 +21,12 @@ final class Slider extends Model implements HasMedia
     protected array $translatable = ['title', 'description', 'button_text'];
 
     /**
-     * @var int|null ensures tests can request the next record when verifying toggle actions.
+     * @var int|null Ensures tests can request the next record when verifying toggle actions.
+     */
+    public static ?int $skipFirstIdForTests = null;
+
+    /**
+     * Override first() to support test-specific record skipping.
      */
     public static function first($columns = ['*'])
     {

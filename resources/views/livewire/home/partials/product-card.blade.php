@@ -42,18 +42,12 @@
 
     $price = (float) ($productData['price'] ?? 0.0);
     $salePrice = isset($productData['sale_price']) ? (float) $productData['sale_price'] : null;
-    $comparePrice = isset($productData['compare_price']) ? (float) $productData['compare_price'] : null;
 
     $currentPrice = $salePrice !== null && $salePrice > 0 && $salePrice < $price
         ? $salePrice
         : $price;
 
-    $compareAtPrice = null;
-    if ($comparePrice !== null && $comparePrice > $currentPrice) {
-        $compareAtPrice = $comparePrice;
-    } elseif ($salePrice !== null && $salePrice < $price) {
-        $compareAtPrice = $price;
-    }
+    $compareAtPrice = ($salePrice !== null && $salePrice < $price) ? $price : null;
 
     $hasDiscount = $compareAtPrice !== null;
     $discountBadge = null;

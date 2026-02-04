@@ -56,8 +56,13 @@ class ItemsRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('name')
             ->columns([
+                \Filament\Tables\Columns\ImageColumn::make('product.primaryImage.path')
+                    ->label(__('messages.image'))
+                    ->disk('public')
+                    ->square(),
                 TextColumn::make('product.name')
                     ->label(__('messages.product'))
+                    ->description(fn ($record) => $record->product?->sku)
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('quantity')

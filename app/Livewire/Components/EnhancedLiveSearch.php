@@ -29,7 +29,6 @@ use Livewire\Component;
  * @property bool   $enableSuggestions
  * @property bool   $enableRecentSearches
  * @property bool   $enablePopularSearches
- * @property bool   $enableAnalytics
  * @property string $selectedCategory
  * @property string $selectedBrand
  * @property float  $minPrice
@@ -64,8 +63,6 @@ final class EnhancedLiveSearch extends Component
 
     public bool $enablePopularSearches = true;
 
-    public bool $enableAnalytics = true;
-
     public string $selectedCategory = '';
 
     public string $selectedBrand = '';
@@ -99,9 +96,6 @@ final class EnhancedLiveSearch extends Component
             $this->performSearch();
             $this->showResults = true;
             $this->showSuggestions = false;
-            if ($this->enableAnalytics) {
-                $this->trackSearch();
-            }
         } else {
             $this->clearResults();
             if ($this->enableSuggestions && empty($this->query)) {
@@ -361,16 +355,6 @@ final class EnhancedLiveSearch extends Component
     private function generateCacheKey(): string
     {
         return 'enhanced_search_' . md5(json_encode(['query' => $this->query, 'max_results' => $this->maxResults, 'search_types' => $this->searchTypes, 'category' => $this->selectedCategory, 'brand' => $this->selectedBrand, 'min_price' => $this->minPrice, 'max_price' => $this->maxPrice, 'in_stock_only' => $this->inStockOnly, 'sort_by' => $this->sortBy]));
-    }
-
-    /**
-     * Handle trackSearch functionality with proper error handling.
-     */
-    private function trackSearch(): void
-    {
-        // Track search analytics
-        Cache::increment("search_count_{$this->query}", 1);
-        Cache::put("last_search_{$this->query}", now(), 3600);
     }
 
     /**

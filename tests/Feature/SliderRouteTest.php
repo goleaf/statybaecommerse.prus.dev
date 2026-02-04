@@ -4,20 +4,22 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use App\Models\User;
+use App\Models\AdminUser;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 final class SliderRouteTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected AdminUser $user;
+
     protected function setUp(): void
     {
         parent::setUp();
 
         // Create test user
-        $this->user = User::factory()->create();
-        $this->actingAs($this->user);
+        $this->user = AdminUser::factory()->create();
+        $this->actingAs($this->user, 'admin');
     }
 
     public function test_sliders_index_route_exists(): void

@@ -29,7 +29,6 @@ beforeEach(function () {
         'slug'           => 'test-product',
         'sku'            => 'TEST-001',
         'price'          => 99.99,
-        'compare_price'  => 119.99,
         'cost_price'     => 59.99,
         'stock_quantity' => 100,
         'manage_stock'   => true,
@@ -69,7 +68,6 @@ it('can create product', function () {
         'slug'           => 'new-test-product',
         'sku'            => 'NEW-001',
         'price'          => 149.99,
-        'compare_price'  => 179.99,
         'cost_price'     => 89.99,
         'stock_quantity' => 50,
         'manage_stock'   => true,
@@ -152,7 +150,6 @@ it('can retrieve product data for editing', function () {
         ->assertFormSet([
             'sku'            => $this->product->sku,
             'price'          => (float) $this->product->price,
-            'compare_price'  => (float) $this->product->compare_price,
             'cost_price'     => (float) $this->product->cost_price,
             'stock_quantity' => $this->product->stock_quantity,
             'manage_stock'   => $this->product->manage_stock,
@@ -329,7 +326,6 @@ it('displays correct table columns', function () {
         ->assertTableColumnExists('name')
         ->assertTableColumnExists('price')
         ->assertTableColumnExists('sales_sparkline')
-        ->assertTableColumnExists('compare_price')
         ->assertTableColumnExists('cost_price')
         ->assertTableColumnExists('weight')
         ->assertTableColumnExists('published_at')
@@ -345,7 +341,6 @@ it('has correct form fields in create page', function () {
         ->assertFormFieldExists('sku')
         ->assertFormFieldExists('barcode')
         ->assertFormFieldExists('price')
-        ->assertFormFieldExists('compare_price')
         ->assertFormFieldExists('cost_price')
         ->assertFormFieldExists('manage_stock')
         ->assertFormFieldExists('track_stock')
@@ -363,8 +358,7 @@ it('has correct form fields in create page', function () {
         ->assertFormFieldExists('height')
         ->assertFormFieldExists('seo_title')
         ->assertFormFieldExists('seo_description')
-        ->assertFormFieldExists('metadata')
-        ->assertFormFieldExists('tags');
+                ->assertFormFieldExists('tags');
 });
 
 it('can access table actions', function () {
@@ -380,12 +374,10 @@ it('validates price fields are numeric', function () {
             'name'          => 'Test Product',
             'sku'           => 'TEST-002',
             'price'         => 'not-a-number',
-            'compare_price' => 'also-not-a-number',
         ])
         ->call('create')
         ->assertHasFormErrors([
             'price'         => 'numeric',
-            'compare_price' => 'numeric',
         ]);
 });
 

@@ -8,7 +8,6 @@ return [
         'content_management' => 'Управление контентом',
         'ecommerce'          => 'Электронная коммерция',
         'system'             => 'Система',
-        'analytics'          => 'Аналитика',
         'marketing'          => 'Маркетинг',
         'reports'            => 'Отчёты',
         'settings'           => 'Настройки',

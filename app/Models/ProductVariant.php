@@ -69,13 +69,13 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
 
     protected $fillable = [
         'product_id', 'sku', 'name', 'variant_name_lt', 'variant_name_en',
-        'description_lt', 'description_en', 'price', 'compare_price', 'cost_price',
+        'description_lt', 'description_en', 'price', 'cost_price',
         'wholesale_price', 'member_price', 'promotional_price',
         'stock_quantity', 'reserved_quantity', 'available_quantity', 'sold_quantity',
-        'weight', 'track_inventory', 'is_default', 'is_enabled', 'barcode', 'attributes', 'variant_attribute_matrix', 'variant_metadata',
+        'weight', 'track_inventory', 'is_default', 'is_default_variant', 'is_enabled', 'barcode', 'attributes', 'variant_attribute_matrix',
         'is_on_sale', 'sale_start_date', 'sale_end_date', 'is_featured', 'is_new', 'is_bestseller',
         'seo_title_lt', 'seo_title_en', 'seo_description_lt', 'seo_description_en',
-        'views_count', 'clicks_count', 'conversion_rate', 'variant_combination_hash',
+        'variant_combination_hash',
     ];
 
     /**
@@ -85,7 +85,6 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
     {
         return [
             'price'                    => 'decimal:4',
-            'compare_price'            => 'decimal:4',
             'cost_price'               => 'decimal:4',
             'wholesale_price'          => 'decimal:4',
             'member_price'             => 'decimal:4',
@@ -97,6 +96,7 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
             'sold_quantity'            => 'integer',
             'track_inventory'          => 'boolean',
             'is_default'               => 'boolean',
+            'is_default_variant'       => 'boolean',
             'is_enabled'               => 'boolean',
             'is_on_sale'               => 'boolean',
             'is_featured'              => 'boolean',
@@ -104,12 +104,8 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
             'is_bestseller'            => 'boolean',
             'sale_start_date'          => 'datetime',
             'sale_end_date'            => 'datetime',
-            'views_count'              => 'integer',
-            'clicks_count'             => 'integer',
-            'conversion_rate'          => 'decimal:4',
             'attributes'               => 'array',
             'variant_attribute_matrix' => 'array',
-            'variant_metadata'         => 'array',
         ];
     }
 
@@ -248,14 +244,6 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
     {
         // Reuse the attribute pivot so attribute data remains consistent across accessors.
         return $this->attributes();
-    }
-
-    /**
-     * Handle analytics functionality with proper error handling.
-     */
-    public function analytics(): HasMany
-    {
-        return $this->hasMany(VariantAnalytics::class, 'variant_id');
     }
 
     /**
@@ -698,18 +686,12 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
     public function getCurrentPrice(): float
     {
         $basePrice = (float) $this->price;
-        $comparePrice = $this->compare_price !== null ? (float) $this->compare_price : null;
         $promotionalPrice = $this->promotional_price !== null ? (float) $this->promotional_price : null;
 
         // Check if variant is on sale and within sale period
         if ($this->is_on_sale && $this->isCurrentlyOnSale()) {
             if ($promotionalPrice !== null && $promotionalPrice > 0) {
                 return $promotionalPrice;
-            }
-
-            // Apply sale discount if no promotional price set
-            if ($comparePrice !== null && $comparePrice > $basePrice) {
-                return $basePrice;
             }
         }
 
@@ -744,71 +726,6 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
             'member'    => $this->member_price ?: $this->price,
             default     => $this->getCurrentPrice(),
         };
-    }
-
-    /**
-     * Record a view for analytics.
-     */
-    public function recordView(): bool
-    {
-        $this->increment('views_count');
-
-        // Record daily analytics
-        $this->recordDailyAnalytics('views');
-
-        return true;
-    }
-
-    /**
-     * Record a click for analytics.
-     */
-    public function recordClick(): bool
-    {
-        $this->increment('clicks_count');
-
-        // Record daily analytics
-        $this->recordDailyAnalytics('clicks');
-
-        return true;
-    }
-
-    /**
-     * Record daily analytics data.
-     */
-    public function recordDailyAnalytics(string $metric, int $amount = 1): void
-    {
-        $timestamp = now();
-        $metrics = [$metric => $amount];
-
-        VariantAnalytics::recordAnalytics(
-            $this->id,
-            $timestamp,
-            $metrics,
-            VariantAnalytics::BUCKET_DAILY,
-            $this->product_id
-        );
-
-        VariantAnalytics::recordAnalytics(
-            $this->id,
-            $timestamp,
-            $metrics,
-            VariantAnalytics::BUCKET_WEEKLY,
-            $this->product_id
-        );
-    }
-
-    /**
-     * Update conversion rate.
-     */
-    public function updateConversionRate(): bool
-    {
-        if ($this->views_count > 0) {
-            $this->conversion_rate = ($this->sold_quantity / $this->views_count) * 100;
-
-            return $this->save();
-        }
-
-        return false;
     }
 
     /**
@@ -905,22 +822,6 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
                 $q->whereNull('sale_end_date')
                     ->orWhere('sale_end_date', '>=', now());
             });
-    }
-
-    /**
-     * Scope for variants with high conversion rate.
-     */
-    public function scopeHighConverting($query, float $threshold = 5.0)
-    {
-        return $query->where('conversion_rate', '>=', $threshold);
-    }
-
-    /**
-     * Scope for variants with high views.
-     */
-    public function scopePopular($query, int $threshold = 100)
-    {
-        return $query->where('views_count', '>=', $threshold);
     }
 
     /**

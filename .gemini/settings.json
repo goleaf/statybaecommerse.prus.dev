@@ -13,10 +13,10 @@
         "herd": {
             "command": "php",
             "args": [
-                "/Applications/Herd.app/Contents/Resources/herd-mcp.phar"
+                "C:/Users/andre/.config/herd/bin/herd-mcp.phar"
             ],
             "env": {
-                "SITE_PATH": "/Users/andrejprus/Library/CloudStorage/Dropbox/projects/elatray/web-laravel"
+                "SITE_PATH": "C:\\Dropbox\\projects\\egistatyba"
             }
         }
     }

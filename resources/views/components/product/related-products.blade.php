@@ -71,20 +71,10 @@
                                         <span class="text-lg font-semibold text-gray-900">
                                             {{ format_price($product->getPrice()) }}
                                         </span>
-                                        @if($product->compare_price && $product->compare_price > $product->getPrice()?->value?->amount)
-                                            <span class="text-sm text-gray-500 line-through">
-                                                {{ format_price($product->compare_price) }}
-                                            </span>
-                                        @endif
                                     @else
                                         <span class="text-lg font-semibold text-gray-900">
                                             {{ format_price($product->price) }}
                                         </span>
-                                        @if($product->compare_price && $product->compare_price > $product->price)
-                                            <span class="text-sm text-gray-500 line-through">
-                                                {{ format_price($product->compare_price) }}
-                                            </span>
-                                        @endif
                                     @endif
                                 </div>
                                 

@@ -3,18 +3,26 @@
 declare(strict_types=1);
 
 return [
-    'priority' => [
-        'low'      => 'Low',
-        'medium'   => 'Medium',
-        'high'     => 'High',
-        'urgent'   => 'Urgent',
-        'critical' => 'Critical',
+    'industry'       => 'enums.industry',
+    'payment_method' => [
+        'apple_pay'        => 'Apple Pay',
+        'bank_transfer'    => 'Bank transfer',
+        'cash_on_delivery' => 'Cash on delivery',
+        'credit_card'      => 'Credit card',
+        'google_pay'       => 'Google Pay',
+        'paypal'           => 'PayPal',
+        'stripe'           => 'Stripe',
     ],
-    'status' => [
-        'active'    => 'Active',
-        'inactive'  => 'Inactive',
-        'pending'   => 'Pending',
-        'suspended' => 'Suspended',
-        'archived'  => 'Archived',
+    'payment_status' => [
+        'authorized'         => 'Authorized',
+        'captured'           => 'Captured',
+        'failed'             => 'Failed',
+        'paid'               => 'Paid',
+        'partially_refunded' => 'Partially refunded',
+        'pending'            => 'Pending',
+        'refunded'           => 'Refunded',
+        'settled'            => 'Settled',
     ],
+    'priority' => 'enums.priority',
+    'status'   => 'enums.status',
 ];

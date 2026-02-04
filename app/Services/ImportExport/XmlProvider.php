@@ -17,7 +17,7 @@ final class XmlProvider implements ProviderInterface
 
     public function label(): string
     {
-        return 'XML (lt/en)';
+        return __('admin.xml_provider_label');
     }
 
     public function import(string $path, array $options = []): array

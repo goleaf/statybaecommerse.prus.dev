@@ -95,7 +95,7 @@ final class DatabaseIndexAuditCommandTest extends TestCase
         });
 
         Schema::connection($connection)->table('orders', static function (Blueprint $table): void {
-            // Add the composite indexes the audit expects for analytics and CRM flows.
+            // Add the composite indexes the audit expects for reporting and CRM flows.
             $table->index(['status', 'created_at'], 'index_orders_status_created_at');
             $table->index(['customer_id', 'status'], 'index_orders_customer_status');
         });

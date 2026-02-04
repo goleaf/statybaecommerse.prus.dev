@@ -25,6 +25,7 @@ class AdminUsersTable
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('created_at')
+                    ->label(__('messages.created_at'))
                     ->dateTime()
                     ->sortable(),
             ])

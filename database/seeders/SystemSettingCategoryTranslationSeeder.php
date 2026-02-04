@@ -72,7 +72,7 @@ final class SystemSettingCategoryTranslationSeeder extends Seeder
             ],
             'seo' => [
                 'name'        => 'SEO nustatymai',
-                'description' => 'Paieškos variklių optimizacijos nustatymai, įskaitant meta duomenis, sitemap konfigūraciją ir analitikos integraciją.',
+                'description' => 'Paieškos variklių optimizacijos nustatymai, įskaitant meta duomenis ir sitemap konfigūraciją.',
             ],
             'security' => [
                 'name'        => 'Saugumo nustatymai',
@@ -84,7 +84,7 @@ final class SystemSettingCategoryTranslationSeeder extends Seeder
             ],
             'appearance' => [
                 'name'        => 'Išvaizdos nustatymai',
-                'description' => 'Svetainės išvaizdos ir dizaino nustatymai, įskaitant spalvas, logotipus ir vartotojo sąsajos elementus.',
+                'description' => 'Išvaizdos nustatymai ir parametrai.',
             ],
             'notifications' => [
                 'name'        => 'Pranešimų nustatymai',
@@ -120,7 +120,7 @@ final class SystemSettingCategoryTranslationSeeder extends Seeder
             ],
             'seo' => [
                 'name'        => 'SEO Settings',
-                'description' => 'Search engine optimization settings including meta data, sitemap configuration and analytics integration.',
+                'description' => 'Search engine optimization settings including meta data and sitemap configuration.',
             ],
             'security' => [
                 'name'        => 'Security Settings',
@@ -168,7 +168,7 @@ final class SystemSettingCategoryTranslationSeeder extends Seeder
             ],
             'seo' => [
                 'name'        => 'SEO-Einstellungen',
-                'description' => 'Suchmaschinenoptimierungseinstellungen einschließlich Meta-Daten, Sitemap-Konfiguration und Analytics-Integration.',
+                'description' => 'Suchmaschinenoptimierungseinstellungen einschließlich Meta-Daten und Sitemap-Konfiguration.',
             ],
             'security' => [
                 'name'        => 'Sicherheitseinstellungen',
@@ -204,35 +204,35 @@ final class SystemSettingCategoryTranslationSeeder extends Seeder
             ],
             'email' => [
                 'name'        => 'Paramètres e-mail',
-                'description' => 'Paramètres d\'envoi et de configuration e-mail incluant les informations d\'expéditeur, la configuration SMTP et les modèles de notification.',
+                'description' => 'Paramètres d\'envoi et de configuration e-mail incluant les informations d\'expéditeur, la configuration SMTP e-mail.',
             ],
             'payment' => [
                 'name'        => 'Paramètres de paiement',
-                'description' => 'Paramètres de systèmes de paiement et processus incluant les méthodes de paiement, l\'approbation automatique des commandes et les exigences de sécurité.',
+                'description' => 'Paramètres de systèmes de paiement et processus incluant les méthodes de paiement.',
             ],
             'shipping' => [
                 'name'        => 'Paramètres d\'expédition',
-                'description' => 'Paramètres de méthodes d\'expédition et conditions incluant les coûts d\'expédition, les délais et les restrictions géographiques.',
+                'description' => 'Paramètres de méthodes d\'expédition et conditions incluant les coûts d\'expédition.',
             ],
             'seo' => [
                 'name'        => 'Paramètres SEO',
-                'description' => 'Paramètres d\'optimisation des moteurs de recherche incluant les métadonnées, la configuration du plan du site et l\'intégration d\'analytique.',
+                'description' => 'Paramètres d\'optimisation des moteurs de recherche incluant les métadonnées et la configuration du plan du site.',
             ],
             'security' => [
                 'name'        => 'Paramètres de sécurité',
-                'description' => 'Paramètres de sécurité et d\'authentification incluant les exigences de mot de passe, la gestion de session et le contrôle d\'accès.',
+                'description' => 'Paramètres de sécurité et d\'authentification incluant les exigences de mot de passe.',
             ],
             'api' => [
                 'name'        => 'Paramètres API',
-                'description' => 'Paramètres d\'accès et de limitation API incluant l\'authentification, les limites de débit et le contrôle d\'accès.',
+                'description' => 'Paramètres d\'accès et de limitation API incluant l\'authentification.',
             ],
             'appearance' => [
                 'name'        => 'Paramètres d\'apparence',
-                'description' => 'Paramètres d\'apparence et de design du site web incluant les couleurs, logos et éléments d\'interface utilisateur.',
+                'description' => 'Paramètres d\'apparence et de design du site web incluant les couleurs.',
             ],
             'notifications' => [
                 'name'        => 'Paramètres de notification',
-                'description' => 'Paramètres de systèmes de notification et canaux incluant les notifications e-mail, SMS et push.',
+                'description' => 'Paramètres de systèmes de notification et canaux incluant les notifications.',
             ],
         ];
 
@@ -244,43 +244,43 @@ final class SystemSettingCategoryTranslationSeeder extends Seeder
         $translations = [
             'general' => [
                 'name'        => 'Configuración general',
-                'description' => 'Configuración general del sistema incluyendo nombre de aplicación, idioma, moneda y otros parámetros principales.',
+                'description' => 'Configuración general del sistema incluyendo nombre de aplicación.',
             ],
             'ecommerce' => [
                 'name'        => 'Configuración de comercio electrónico',
-                'description' => 'Configuración de funcionalidad de comercio electrónico y parámetros incluyendo tasas de impuestos, montos mínimos de pedido y gestión de inventario.',
+                'description' => 'Configuración de funcionalidad de comercio electrónico y parámetros.',
             ],
             'email' => [
                 'name'        => 'Configuración de correo electrónico',
-                'description' => 'Configuración de envío y configuración de correo electrónico incluyendo información del remitente, configuración SMTP y plantillas de notificación.',
+                'description' => 'Configuración de envío y configuración de correo electrónico.',
             ],
             'payment' => [
                 'name'        => 'Configuración de pagos',
-                'description' => 'Configuración de sistemas de pago y procesos incluyendo métodos de pago, aprobación automática de pedidos y requisitos de seguridad.',
+                'description' => 'Configuración de sistemas de pago y procesos.',
             ],
             'shipping' => [
                 'name'        => 'Configuración de envío',
-                'description' => 'Configuración de métodos de envío y condiciones incluyendo costos de envío, plazos y restricciones geográficas.',
+                'description' => 'Configuración de métodos de envío y condiciones.',
             ],
             'seo' => [
                 'name'        => 'Configuración SEO',
-                'description' => 'Configuración de optimización de motores de búsqueda incluyendo metadatos, configuración de sitemap e integración de analíticas.',
+                'description' => 'Configuración de optimización de motores de búsqueda incluyendo metadatos y sitemap.',
             ],
             'security' => [
                 'name'        => 'Configuración de seguridad',
-                'description' => 'Configuración de seguridad y autenticación incluyendo requisitos de contraseña, gestión de sesiones y control de acceso.',
+                'description' => 'Configuración de seguridad y autenticación.',
             ],
             'api' => [
                 'name'        => 'Configuración API',
-                'description' => 'Configuración de acceso y limitación API incluyendo autenticación, límites de velocidad y control de acceso.',
+                'description' => 'Configuración de acceso y limitación API.',
             ],
             'appearance' => [
                 'name'        => 'Configuración de apariencia',
-                'description' => 'Configuración de apariencia y diseño del sitio web incluyendo colores, logotipos y elementos de interfaz de usuario.',
+                'description' => 'Configuración de apariencia y diseño del sitio web.',
             ],
             'notifications' => [
                 'name'        => 'Configuración de notificaciones',
-                'description' => 'Configuración de sistemas de notificación y canales incluyendo notificaciones por correo electrónico, SMS y push.',
+                'description' => 'Configuración de sistemas de notification.',
             ],
         ];
 

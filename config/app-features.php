@@ -23,7 +23,6 @@ return [
         'multi_currency'   => true,
         'multi_language'   => true,
         'seo'              => true,
-        'analytics'        => true,
         'advanced_pricing' => true,
         'customer_groups'  => true,
         'partner_system'   => true,

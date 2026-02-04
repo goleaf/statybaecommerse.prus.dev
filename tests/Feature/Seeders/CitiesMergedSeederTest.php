@@ -80,7 +80,7 @@ final class CitiesMergedSeederTest extends TestCase
             ->whereIn('locale', $locales)
             ->count();
 
-        // Every city should expose a translation row for each supported locale to keep dropdowns and analytics consistent.
+        // Every city should expose a translation row for each supported locale to keep dropdowns and reporting consistent.
         $this->assertSame(
             $expectedTranslations,
             $actualTranslations,

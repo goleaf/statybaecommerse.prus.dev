@@ -2,23 +2,23 @@
 
 declare(strict_types=1);
 
-return [
-    'company'                => 'Компания',
-    'company_placeholder'    => 'Введите название компании',
-    'email_address'          => 'Адрес электронной почты',
-    'email_placeholder'      => 'Введите ваш адрес электронной почты',
-    'first_name'             => 'Имя',
-    'first_name_placeholder' => 'Введите ваше имя',
-    'interests'              => 'Области интересов',
-    'interests_blog'         => 'Публикации в блоге',
-    'interests_events'       => 'События',
-    'interests_news'         => 'Новости и обновления',
-    'interests_products'     => 'Продукты',
-    'interests_promotions'   => 'Акции и скидки',
-    'interests_technical'    => 'Технические обновления',
-    'last_name'              => 'Фамилия',
-    'last_name_placeholder'  => 'Введите вашу фамилию',
-    'privacy_notice'         => 'Подписываясь, вы соглашаетесь с нашей политикой конфиденциальности',
-    'subscribe_button'       => 'Подписаться',
-    'subscribing'            => 'Подписка...',
-];
+return array (
+  'company' => 'newsletter.company',
+  'company_placeholder' => 'newsletter.company_placeholder',
+  'email_address' => 'newsletter.email_address',
+  'email_placeholder' => 'newsletter.email_placeholder',
+  'first_name' => 'newsletter.first_name',
+  'first_name_placeholder' => 'newsletter.first_name_placeholder',
+  'interests' => 'newsletter.interests',
+  'interests_blog' => 'newsletter.interests_blog',
+  'interests_events' => 'newsletter.interests_events',
+  'interests_news' => 'newsletter.interests_news',
+  'interests_products' => 'newsletter.interests_products',
+  'interests_promotions' => 'newsletter.interests_promotions',
+  'interests_technical' => 'newsletter.interests_technical',
+  'last_name' => 'newsletter.last_name',
+  'last_name_placeholder' => 'newsletter.last_name_placeholder',
+  'privacy_notice' => 'newsletter.privacy_notice',
+  'subscribe_button' => 'newsletter.subscribe_button',
+  'subscribing' => 'newsletter.subscribing',
+);

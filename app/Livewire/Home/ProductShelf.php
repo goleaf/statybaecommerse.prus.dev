@@ -85,16 +85,8 @@ final class ProductShelf extends Component implements HasSchemas
             $query = match ($this->preset) {
                 'latest' => $query->orderByDesc('published_at'),
                 'sale'   => $query
-                    ->where(function ($saleQuery): void {
-                        $saleQuery
-                            ->whereNotNull('sale_price')
-                            ->whereColumn('sale_price', '<', 'price')
-                            ->orWhere(function ($compareQuery): void {
-                                $compareQuery
-                                    ->whereNotNull('compare_price')
-                                    ->whereColumn('compare_price', '>', 'price');
-                            });
-                    })
+                    ->whereNotNull('sale_price')
+                    ->whereColumn('sale_price', '<', 'price')
                     ->orderByDesc('updated_at')
                     ->orderByDesc('published_at'),
                 'trending' => $query

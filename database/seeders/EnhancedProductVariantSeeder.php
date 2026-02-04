@@ -11,7 +11,6 @@ use App\Models\Category;
 use App\Models\Location;
 use App\Models\Product;
 use App\Models\ProductVariant;
-use App\Models\VariantAnalytics;
 use App\Models\VariantAttributeValue;
 use App\Models\VariantInventory;
 use App\Models\VariantPricingRule;
@@ -31,12 +30,11 @@ final class EnhancedProductVariantSeeder extends Seeder
         // Create a realistic catalogue of products with multiple variants captured for later enrichment.
         $variants = $this->seedProductsWithVariants($attributes);
 
-        // Attach inventory, pricing, historical, and analytics data to every generated variant.
+        // Attach inventory, pricing, historical, and reporting data to every generated variant.
         $this->seedVariantInventories($variants, $locations['main']);
         $this->seedPricingRules($variants);
         $this->seedPriceHistories($variants);
         $this->seedStockHistories($variants);
-        $this->seedAnalytics($variants);
     }
 
     /**
@@ -226,9 +224,7 @@ final class EnhancedProductVariantSeeder extends Seeder
                     'description'       => $productData['description'],
                     'short_description' => Str::limit($productData['description'], 120),
                     'price'             => $productData['base_price'],
-                    'compare_price'     => $productData['base_price'] * 1.2,
-                    'cost_price'        => $productData['base_price'] * 0.6,
-                    'type'              => 'variable',
+                    'cost_price'        => $productData['base_price'] * 0.6,                    'type' => 'variable',
                     'manage_stock'      => true,
                     'is_visible'        => true,
                     'is_featured'       => true,
@@ -247,7 +243,6 @@ final class EnhancedProductVariantSeeder extends Seeder
                         'name'            => sprintf('%s - %s %s', $productData['name'], $variantData['size'], $variantData['color']),
                         'sku'             => strtoupper(Str::slug($productData['name'] . '-' . $variantData['size'] . '-' . $variantData['color'])),
                         'price'           => $productData['base_price'] + $variantData['price_modifier'],
-                        'compare_price'   => ($productData['base_price'] + $variantData['price_modifier']) * 1.2,
                         'cost_price'      => ($productData['base_price'] + $variantData['price_modifier']) * 0.6,
                         'stock_quantity'  => $variantData['stock'],
                         'track_inventory' => true,
@@ -279,7 +274,7 @@ final class EnhancedProductVariantSeeder extends Seeder
                     ProductVariantAttributeMatrixService::sync($variant->fresh(), $matrix);
                 }
 
-                // Persist readable variant attribute rows for analytics and storefront consumption.
+                // Persist readable variant attribute rows for reporting and storefront consumption.
                 $this->createVariantAttributeValue($variant, $attributes['size'], $variantData['size']);
                 $this->createVariantAttributeValue($variant, $attributes['color'], $variantData['color']);
 
@@ -413,33 +408,5 @@ final class EnhancedProductVariantSeeder extends Seeder
     private function seedStockHistories(EloquentCollection $variants): void
     {
         // Stock history functionality removed
-    }
-
-    /**
-     * Record analytics snapshots so downstream metrics have source data.
-     */
-    private function seedAnalytics(EloquentCollection $variants): void
-    {
-        foreach ($variants as $variant) {
-            $product = $variant->getRelation('product') ?? $variant->product;
-
-            if ($product === null) {
-                continue;
-            }
-
-            VariantAnalytics::factory()
-                ->for($product, 'product')
-                ->for($variant, 'variant')
-                ->state([
-                    'date'        => now()->toDateString(),
-                    'date_bucket' => sprintf('%s:%s', VariantAnalytics::BUCKET_DAILY, now()->toDateString()),
-                    'views'       => 150,
-                    'clicks'      => 60,
-                    'add_to_cart' => 25,
-                    'purchases'   => 10,
-                    'revenue'     => max(10, $variant->price * 10),
-                ])
-                ->create();
-        }
     }
 }

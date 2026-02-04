@@ -56,7 +56,6 @@ final class Channel extends Model
         'is_default',
         'is_active',
         'ssl_enabled',
-        'analytics_enabled',
         'sort_order',
         'metadata',
         'configuration',
@@ -69,14 +68,13 @@ final class Channel extends Model
      * @var array<string, string> Attribute casts ensuring typed access to toggles and configuration blobs.
      */
     protected $casts = [
-        'is_enabled'        => 'boolean',
-        'is_default'        => 'boolean',
-        'is_active'         => 'boolean',
-        'ssl_enabled'       => 'boolean',
-        'analytics_enabled' => 'boolean',
-        'sort_order'        => 'integer',
-        'metadata'          => 'array',
-        'configuration'     => 'array',
+        'is_enabled'    => 'boolean',
+        'is_default'    => 'boolean',
+        'is_active'     => 'boolean',
+        'ssl_enabled'   => 'boolean',
+        'sort_order'    => 'integer',
+        'metadata'      => 'array',
+        'configuration' => 'array',
     ];
 
     /**

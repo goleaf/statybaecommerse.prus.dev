@@ -79,8 +79,7 @@ final class MatrixFactory
         return Section::make($sectionLabel)
             ->schema($moduleSections)
             ->statePath($statePath)
-            ->columns(1)
-            ->collapsible();
+            ->columns(1);
     }
 
     /**

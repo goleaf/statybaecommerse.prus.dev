@@ -1,0 +1,60 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Filament\Imports;
+
+use App\Models\Customer;
+use Filament\Actions\Imports\ImportColumn;
+use Filament\Actions\Imports\Models\Import;
+use Illuminate\Support\Number;
+
+class CustomerImporter extends BaseImporter
+{
+    protected static ?string $model = Customer::class;
+
+    public static function getColumns(): array
+    {
+        return [
+            ImportColumn::make('name')
+                ->requiredMapping()
+                ->rules(['required', 'max:255']),
+            ImportColumn::make('email')
+                ->requiredMapping()
+                ->rules(['required', 'email', 'max:255']),
+            ImportColumn::make('phone')
+                ->rules(['max:255']),
+            ImportColumn::make('address')
+                ->rules(['max:255']),
+            ImportColumn::make('postal_code')
+                ->rules(['max:255']),
+            ImportColumn::make('country')
+                ->relationship(),
+            ImportColumn::make('city')
+                ->relationship(),
+            ImportColumn::make('company')
+                ->relationship(),
+            ImportColumn::make('is_active')
+                ->requiredMapping()
+                ->boolean()
+                ->rules(['required', 'boolean']),
+            ImportColumn::make('metadata'),
+        ];
+    }
+
+    public function resolveRecord(): Customer
+    {
+        return new Customer;
+    }
+
+    public static function getCompletedNotificationBody(Import $import): string
+    {
+        $body = 'Your customer import has completed and ' . Number::format($import->successful_rows) . ' ' . str('row')->plural($import->successful_rows) . ' imported.';
+
+        if ($failedRowsCount = $import->getFailedRowsCount()) {
+            $body .= ' ' . Number::format($failedRowsCount) . ' ' . str('row')->plural($failedRowsCount) . ' failed to import.';
+        }
+
+        return $body;
+    }
+}

@@ -24,17 +24,17 @@ class AdminUserResource extends Resource
 
     public static function getModelLabel(): string
     {
-        return 'Admin User';
+        return __('admin.admin_user');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return 'Admin Users';
+        return __('admin.admin_users');
     }
 
     public static function getNavigationLabel(): string
     {
-        return 'Admin Users';
+        return __('admin.admin_users');
     }
 
     public static function form(Schema $schema): Schema

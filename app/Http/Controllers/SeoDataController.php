@@ -85,7 +85,7 @@ final class SeoDataController extends Controller
     }
 
     /**
-     * Render the statistics dashboard to surface aggregated SEO metrics without analytics phrasing.
+     * Render the statistics dashboard to surface aggregated SEO metrics without reporting phrasing.
      */
     public function statistics(): View
     {

@@ -74,6 +74,7 @@ return array (
   'husqvarna' => 'Husqvarna',
   'husqvarna_landscaping_machines_and_forestry_solutions' => 'Husqvarna landscaping machines and forestry solutions.',
   'husqvarna_lithuania' => 'Husqvarna Lithuania',
+  'imported_brand' => 'Imported Brand',
   'inovatyv_s_black_decker_lt_sprendimai_statybos_pramonei_efektyvumas_ir_patikimumas' => 'Inovatyvūs Black & Decker LT sprendimai statybos pramonei. Efektyvumas ir patikimumas.',
   'inovatyv_s_bosch_lietuva_sprendimai_statybos_pramonei_efektyvumas_ir_patikimumas' => 'Inovatyvūs Bosch Lietuva sprendimai statybos pramonei. Efektyvumas ir patikimumas.',
   'inovatyv_s_ceresit_lithuania_sprendimai_statybos_pramonei_efektyvumas_ir_patikimumas' => 'Inovatyvūs Ceresit Lithuania sprendimai statybos pramonei. Efektyvumas ir patikimumas.',

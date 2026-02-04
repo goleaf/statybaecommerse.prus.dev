@@ -1,13 +1,10 @@
 {
     "agents": [
-        "codex",
-        "cursor",
         "gemini"
     ],
-    "guidelines": true,
-    "herd_mcp": false,
-    "mcp": true,
-    "sail": false,
+    "packages": [
+        "filament/filament"
+    ],
     "skills": [
         "pest-testing",
         "tailwindcss-development"

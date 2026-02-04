@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CustomerGroups\RelationManagers;
 
+use App\Filament\Resources\Users\UserResource;
+use App\Models\User;
+use Filament\Actions\Action;
 use Filament\Actions\AttachAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DetachAction;
 use Filament\Actions\DetachBulkAction;
-use Filament\Actions\ViewAction;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
@@ -31,6 +33,7 @@ class UsersRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->recordUrl(fn (User $record): string => UserResource::getUrl('edit', ['record' => $record]))
             ->columns([
                 TextColumn::make('name')
                     ->label(__('messages.name'))
@@ -53,7 +56,8 @@ class UsersRelationManager extends RelationManager
                     ->preloadRecordSelect(),
             ])
             ->recordActions([
-                ViewAction::make(),
+                Action::make('edit')
+                    ->url(fn (User $record): string => UserResource::getUrl('edit', ['record' => $record])),
                 DetachAction::make(),
             ])
             ->bulkActions([

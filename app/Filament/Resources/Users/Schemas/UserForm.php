@@ -18,11 +18,13 @@ class UserForm
     {
         return $schema
             ->components([
-                Section::make(__('admin.navigation.users'))
+                Section::make(__('messages.Profile'))
                     ->schema([
-                        TextInput::make('name')
-                            ->label(__('messages.name'))
-                            ->required()
+                        TextInput::make('first_name')
+                            ->label(__('messages.first_name'))
+                            ->maxLength(255),
+                        TextInput::make('last_name')
+                            ->label(__('messages.last_name'))
                             ->maxLength(255),
                         TextInput::make('email')
                             ->label(__('messages.email'))
@@ -36,16 +38,6 @@ class UserForm
                             ->dehydrateStateUsing(fn ($state) => Hash::make($state))
                             ->dehydrated(fn ($state) => filled($state))
                             ->required(fn (string $context): bool => $context === 'create'),
-                    ])->columns(2),
-
-                Section::make(__('messages.Profile'))
-                    ->schema([
-                        TextInput::make('first_name')
-                            ->label(__('messages.first_name'))
-                            ->maxLength(255),
-                        TextInput::make('last_name')
-                            ->label(__('messages.last_name'))
-                            ->maxLength(255),
                         TextInput::make('phone_number')
                             ->label(__('messages.phone'))
                             ->tel()
@@ -59,16 +51,9 @@ class UserForm
                             ]),
                         DateTimePicker::make('date_of_birth')
                             ->label(__('messages.birth_date')),
-                    ])->columns(2),
-
-                Section::make(__('admin.navigation.settings'))
-                    ->schema([
                         Toggle::make('is_active')
                             ->label(__('messages.active'))
                             ->default(true),
-                        Toggle::make('is_admin')
-                            ->label(__('admin.user_status.admin'))
-                            ->default(false),
                         Select::make('preferred_locale')
                             ->label(__('messages.language'))
                             ->options([
@@ -78,7 +63,8 @@ class UserForm
                                 'de' => __('translations.german'),
                             ])
                             ->default('lt'),
-                    ])->columns(3),
+                    ])->columns(2)
+                    ->columnSpanFull(),
             ]);
     }
 }

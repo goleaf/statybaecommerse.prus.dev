@@ -59,7 +59,8 @@ class CustomerGroupForm
                             ->label(__('messages.description'))
                             ->maxLength(65535)
                             ->columnSpanFull(),
-                    ]),
+                    ])
+                    ->columnSpanFull(),
 
                 SchemaSection::make(__('messages.discounts'))
                     ->schema([
@@ -80,7 +81,8 @@ class CustomerGroupForm
                                 Toggle::make('has_volume_discounts')
                                     ->label(__('Has Volume Discounts')),
                             ]),
-                    ]),
+                    ])
+                    ->columnSpanFull(),
 
                 SchemaSection::make(__('Security'))
                     ->schema([
@@ -99,7 +101,8 @@ class CustomerGroupForm
                                     ->label(__('Can Use Coupons'))
                                     ->default(true),
                             ]),
-                    ]),
+                    ])
+                    ->columnSpanFull(),
 
                 SchemaSection::make(__('messages.financials'))
                     ->schema([
@@ -118,7 +121,8 @@ class CustomerGroupForm
                                     ->placeholder('net_30')
                                     ->maxLength(255),
                             ]),
-                    ]),
+                    ])
+                    ->columnSpanFull(),
 
                 SchemaSection::make(__('messages.status'))
                     ->schema([
@@ -134,7 +138,8 @@ class CustomerGroupForm
                                     ->label(__('messages.default'))
                                     ->default(false),
                             ]),
-                    ]),
+                    ])
+                    ->columnSpanFull(),
             ]);
     }
 }

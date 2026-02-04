@@ -86,20 +86,6 @@ it('feature: includes admin-only groups for admin users', function (): void {
     expect($adminOnlyGroups)->toHaveCount(NavigationGroup::adminOnly()->count());
 });
 
-it('feature: respects user permissions for permission-required groups', function (): void {
-    $userWithoutPermission = User::factory()->create(['is_admin' => false]);
-
-    $this->actingAs($userWithoutPermission);
-
-    $component = Livewire::test(TopNavigation::class);
-    $viewData = $component->instance()->getViewData();
-
-    $groups = collect($viewData['navigationGroups']);
-    $analyticsGroup = $groups->firstWhere('key', NavigationGroup::Analytics->value);
-
-    expect($analyticsGroup)->toBeNull();
-});
-
 it('feature: returns empty navigation groups for unauthenticated user', function (): void {
     $component = Livewire::test(TopNavigation::class);
     $viewData = $component->instance()->getViewData();

@@ -140,31 +140,6 @@ return new class extends Migration
             });
         }
 
-        // Create variant_analytics table for performance tracking
-        if (! Schema::hasTable('variant_analytics')) {
-            Schema::create('variant_analytics', function (Blueprint $table) {
-                $table->id();
-                $table->unsignedBigInteger('product_id')->nullable();
-                $table->unsignedBigInteger('variant_id');
-                $table->date('date');
-                $table->string('date_bucket')->index()->nullable();
-                $table->integer('views')->default(0);
-                $table->integer('clicks')->default(0);
-                $table->integer('add_to_cart')->default(0);
-                $table->integer('purchases')->default(0);
-                $table->decimal('revenue', 10, 4)->default(0);
-                $table->decimal('conversion_rate', 5, 4)->default(0);
-                $table->timestamps();
-
-                $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
-                $table->foreign('variant_id')->references('id')->on('product_variants')->onDelete('cascade');
-
-                $table->unique(['variant_id', 'date_bucket']);
-                $table->index(['date', 'views', 'clicks']);
-                $table->index(['variant_id', 'conversion_rate']);
-            });
-        }
-
         // Create variant_bundles table for bundle products
         if (! Schema::hasTable('variant_bundles')) {
             Schema::create('variant_bundles', function (Blueprint $table) {
@@ -192,10 +167,6 @@ return new class extends Migration
         // Drop new tables
         if (Schema::hasTable('variant_bundles')) {
             Schema::dropIfExists('variant_bundles');
-        }
-
-        if (Schema::hasTable('variant_analytics')) {
-            Schema::dropIfExists('variant_analytics');
         }
 
         if (Schema::hasTable('variant_attribute_values')) {

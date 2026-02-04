@@ -29,6 +29,7 @@ final class AllSeedersSeeder extends Seeder
         AttributeValueSeeder::class,
         AdminUserSeeder::class,
         CustomerGroupSeeder::class,
+        CollectionSeeder::class,
     ];
 
     /**

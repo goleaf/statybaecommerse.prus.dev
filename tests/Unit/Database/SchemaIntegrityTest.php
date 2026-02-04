@@ -9,6 +9,7 @@ use function collect;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 use function str_contains;
 
@@ -17,6 +18,40 @@ use Tests\TestCase;
 final class SchemaIntegrityTest extends TestCase
 {
     use RefreshDatabase;
+
+    public function test_job_batches_has_failed_job_tracking_columns(): void
+    {
+        $this->assertTrue(Schema::hasTable('job_batches'), 'job_batches table should exist.');
+        $this->assertTrue(
+            Schema::hasColumn('job_batches', 'failed_jobs'),
+            'job_batches table should contain the failed_jobs column.',
+        );
+        $this->assertTrue(
+            Schema::hasColumn('job_batches', 'failed_job_ids'),
+            'job_batches table should contain the failed_job_ids column.',
+        );
+    }
+
+    public function test_job_batches_failed_jobs_defaults_to_zero(): void
+    {
+        $batchId = (string) Str::uuid();
+
+        DB::table('job_batches')->insert([
+            'id'           => $batchId,
+            'name'         => 'test-batch',
+            'total_jobs'   => 1,
+            'pending_jobs' => 1,
+            'options'      => null,
+            'cancelled_at' => null,
+            'created_at'   => time(),
+            'finished_at'  => null,
+        ]);
+
+        $batch = DB::table('job_batches')->where('id', $batchId)->first();
+
+        $this->assertNotNull($batch);
+        $this->assertSame(0, (int) $batch->failed_jobs);
+    }
 
     public function test_order_shippings_requires_a_valid_order_reference(): void
     {

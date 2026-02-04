@@ -3,7 +3,11 @@
 declare(strict_types=1);
 
 return [
-    'ui' => [
+    'failed'     => 'auth.failed',
+    'password'   => 'auth.password',
+    'throttle'   => 'auth.throttle',
+    'two_factor' => 'auth.two_factor',
+    'ui'         => [
         'login' => [
             'title'                 => 'Anmelden',
             'subtitle'              => 'Melden Sie sich an, um fortzufahren',

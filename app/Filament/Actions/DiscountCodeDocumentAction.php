@@ -9,6 +9,7 @@ use App\Models\DiscountCode;
 use App\Models\DocumentTemplate;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Throwable;
 
@@ -34,6 +35,17 @@ final class DiscountCodeDocumentAction
                     ->searchable()
                     ->preload()
                     ->required(),
+                Select::make('format')
+                    ->label(__('admin.fields.format'))
+                    ->options([
+                        'html' => 'HTML',
+                        'pdf'  => 'PDF',
+                    ])
+                    ->default('pdf')
+                    ->required(),
+                TextInput::make('title')
+                    ->label(__('admin.fields.title'))
+                    ->placeholder(__('admin.placeholders.title')),
             ])
             ->action(function (DiscountCode $record, array $data, DocumentServiceContract $documentService) {
                 try {
@@ -42,7 +54,7 @@ final class DiscountCodeDocumentAction
                         ->active()
                         ->findOrFail($data['template_id']);
 
-                    $title = sprintf(
+                    $title = $data['title'] ?? sprintf(
                         '%s_%s_%s',
                         $template->name,
                         $record->code,
@@ -53,7 +65,7 @@ final class DiscountCodeDocumentAction
                         template: $template,
                         relatedModel: $record,
                         variables: self::buildVariables($record),
-                        title: $title
+                        title: (string) $title
                     );
 
                     Notification::make()
@@ -61,6 +73,10 @@ final class DiscountCodeDocumentAction
                         ->body(__('admin.notifications.document_generated_successfully'))
                         ->success()
                         ->send();
+
+                    if ($data['format'] === 'html') {
+                        return response($document->content)->header('Content-Type', 'text/html');
+                    }
 
                     $downloadUrl = $documentService->generatePdf($document);
 
