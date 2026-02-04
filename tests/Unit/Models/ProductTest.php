@@ -34,7 +34,7 @@ describe('Product model', function () {
             'is_enabled', 'is_featured', 'is_requestable', 'requests_count',
             'minimum_quantity', 'hide_add_to_cart', 'request_message', 'published_at',
             'seo_title', 'seo_description', 'brand_id', 'status', 'type', 'video_url',
-            'metadata', 'variant_attribute_matrix', 'sort_order', 'tax_class',
+            'variant_attribute_matrix', 'sort_order', 'tax_class',
             'shipping_class', 'download_limit', 'download_expiry', 'external_url',
             'button_text',
         ];
@@ -49,7 +49,6 @@ describe('Product model', function () {
         expect($casts)->toHaveKey('price', 'decimal:2')
             ->and($casts)->toHaveKey('is_active', 'boolean')
             ->and($casts)->toHaveKey('published_at', 'datetime')
-            ->and($casts)->toHaveKey('metadata', 'array')
             ->and($casts)->toHaveKey('deleted_at', 'datetime'); // SoftDeletes adds this
     });
 

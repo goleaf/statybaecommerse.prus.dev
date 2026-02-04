@@ -49,11 +49,6 @@ class ProductsTable
                     ->label(__('admin.products.sales'))
                     ->formatStateUsing(static fn (): string => '—')
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('compare_price')
-                    ->label(__('admin.products.compare_price'))
-                    ->money('EUR')
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('cost_price')
                     ->label(__('admin.products.cost_price'))
                     ->money('EUR')

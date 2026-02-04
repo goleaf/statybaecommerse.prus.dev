@@ -28,14 +28,12 @@ final class SingleProductVariantSelectionTest extends TestCase
 
         $defaultVariant = ProductVariant::factory()->for($product)->create([
             'price'              => 49.99,
-            'compare_price'      => 59.99,
             'is_default_variant' => true,
             'is_default'         => true,
         ]);
 
         $alternativeVariant = ProductVariant::factory()->for($product)->create([
             'price'              => 89.50,
-            'compare_price'      => 109.50,
             'is_default_variant' => false,
             'is_default'         => false,
         ]);
@@ -46,7 +44,6 @@ final class SingleProductVariantSelectionTest extends TestCase
 
         $initialPricing = $component->get('pricingSummary');
         $this->assertEquals((float) $defaultVariant->price, $initialPricing['current']);
-        $this->assertEquals((float) $defaultVariant->compare_price, $initialPricing['compare']);
 
         $component->dispatch('variant.selected', variantId: $alternativeVariant->id);
 
@@ -54,7 +51,6 @@ final class SingleProductVariantSelectionTest extends TestCase
 
         $updatedPricing = $component->get('pricingSummary');
         $this->assertEquals((float) $alternativeVariant->price, $updatedPricing['current']);
-        $this->assertEquals((float) $alternativeVariant->compare_price, $updatedPricing['compare']);
     }
 
     public function test_gallery_switches_to_variant_images(): void

@@ -31,15 +31,6 @@
                     {{ __('translations.featured') }}
                 </span>
             @endif
-            
-            @if($product->compare_price && $product->compare_price > $product->price)
-                @php
-                    $discount = round((($product->compare_price - $product->price) / $product->compare_price) * 100);
-                @endphp
-                <span class="bg-red-500 text-white text-xs font-medium px-2 py-1 rounded-full">
-                    -{{ $discount }}%
-                </span>
-            @endif
         </div>
 
         {{-- Action Buttons --}}
@@ -117,12 +108,6 @@
             <span class="text-lg font-bold text-gray-900">
                 {{ app_money_format($product->price) }}
             </span>
-            
-            @if($product->compare_price && $product->compare_price > $product->price)
-                <span class="text-sm text-gray-500 line-through">
-                    {{ app_money_format($product->compare_price) }}
-                </span>
-            @endif
         </div>
 
         {{-- Stock Status --}}

@@ -1774,6 +1774,7 @@ return array (
   'epetys_kiaurymi_valymui14x300_friulsider' => 'Šepetys kiaurymių valymui 14x300, FRIULSIDER',
   'epetys_kiaurymi_valymui20x300_friulsider' => 'Šepetys kiaurymių valymui 20x300, FRIULSIDER',
   'epetys_kiaurymi_valymui30x300_friulsider' => 'Šepetys kiaurymių valymui 30x300, FRIULSIDER',
+  'existing_product' => 'Existing Product',
   'fasadiniai_da_ai' => 'Fasadiniai dažai',
   'featured_impact_drill' => 'Featured Impact Drill',
   'festool_hkc55_tsc_circular_saw' => 'Festool HKC 55 TSC Circular Saw',

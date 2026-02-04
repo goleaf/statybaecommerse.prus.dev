@@ -29,9 +29,9 @@ final class ProductSimilarity extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['product_id', 'similar_product_id', 'algorithm_type', 'similarity_score', 'calculation_data', 'calculated_at'];
+    protected $fillable = ['product_id', 'similar_product_id', 'calculation_data', 'calculated_at'];
 
-    protected $casts = ['similarity_score' => 'decimal:6', 'calculation_data' => 'array', 'calculated_at' => 'datetime'];
+    protected $casts = ['calculation_data' => 'array', 'calculated_at' => 'datetime'];
 
     protected static function booted(): void
     {
@@ -56,36 +56,6 @@ final class ProductSimilarity extends Model
     public function similarProduct(): BelongsTo
     {
         return $this->belongsTo(Product::class, 'similar_product_id');
-    }
-
-    /**
-     * Handle scopeByAlgorithm functionality with proper error handling.
-     *
-     * @param mixed $query
-     */
-    public function scopeByAlgorithm($query, string $algorithmType)
-    {
-        return $query->where('algorithm_type', $algorithmType);
-    }
-
-    /**
-     * Handle scopeWithMinScore functionality with proper error handling.
-     *
-     * @param mixed $query
-     */
-    public function scopeWithMinScore($query, float $minScore)
-    {
-        return $query->where('similarity_score', '>=', $minScore);
-    }
-
-    /**
-     * Handle scopeOrderedBySimilarity functionality with proper error handling.
-     *
-     * @param mixed $query
-     */
-    public function scopeOrderedBySimilarity($query)
-    {
-        return $query->orderByDesc('similarity_score');
     }
 
     /**

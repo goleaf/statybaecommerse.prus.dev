@@ -167,13 +167,7 @@ final class ProductVariantSelector extends Component
 
     public function getVariantOriginalPrice(): ?float
     {
-        if (! $this->selectedVariant) {
-            return null;
-        }
-
-        return $this->selectedVariant->compare_price > $this->selectedVariant->price
-            ? $this->selectedVariant->compare_price
-            : null;
+        return null;
     }
 
     public function getVariantPromotionalPrice(): ?float

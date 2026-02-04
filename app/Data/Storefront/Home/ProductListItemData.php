@@ -33,7 +33,6 @@ final class ProductListItemData implements Arrayable
         'products.short_description', // Used for short description, NOT description
         'products.price',
         'products.sale_price',
-        'products.compare_price',
         'products.stock_quantity',
         'products.brand_id',
         'products.created_at', // May be needed for sorting
@@ -73,7 +72,6 @@ final class ProductListItemData implements Arrayable
         public readonly array $categoryLabels,
         public readonly float $price,
         public readonly ?float $salePrice,
-        public readonly ?float $comparePrice,
         public readonly ?float $averageRating,
         public readonly int $reviewsCount,
         public readonly int $stockQuantity,
@@ -113,7 +111,6 @@ final class ProductListItemData implements Arrayable
 
         $price = (float) $product->price;
         $salePrice = $product->sale_price !== null ? (float) $product->sale_price : null;
-        $comparePrice = $product->compare_price !== null ? (float) $product->compare_price : null;
 
         $effectivePrice = $salePrice !== null && $salePrice > 0 && $salePrice < $price
             ? $salePrice
@@ -121,9 +118,7 @@ final class ProductListItemData implements Arrayable
 
         $referencePrice = null;
 
-        if ($comparePrice !== null && $comparePrice > $effectivePrice) {
-            $referencePrice = $comparePrice;
-        } elseif ($salePrice !== null && $salePrice < $price) {
+        if ($salePrice !== null && $salePrice < $price) {
             $referencePrice = $price;
         }
 
@@ -158,7 +153,6 @@ final class ProductListItemData implements Arrayable
             $categoryLabels,
             $price,
             $salePrice,
-            $comparePrice,
             $product->average_rating !== null ? (float) $product->average_rating : null,
             (int) $product->reviews_count,
             (int) $product->stock_quantity,
@@ -186,10 +180,6 @@ final class ProductListItemData implements Arrayable
      */
     public function compareAtPrice(): ?float
     {
-        if ($this->comparePrice !== null && $this->comparePrice > $this->currentPrice()) {
-            return $this->comparePrice;
-        }
-
         if ($this->salePrice !== null && $this->salePrice < $this->price) {
             return $this->price;
         }
@@ -245,7 +235,6 @@ final class ProductListItemData implements Arrayable
      *     category_labels:array<int, string>,
      *     price:float,
      *     sale_price:?float,
-     *     compare_price:?float,
      *     average_rating:?float,
      *     reviews_count:int,
      *     stock_quantity:int,
@@ -266,7 +255,6 @@ final class ProductListItemData implements Arrayable
             'category_labels'     => $this->categoryLabels,
             'price'               => $this->price,
             'sale_price'          => $this->salePrice,
-            'compare_price'       => $this->comparePrice,
             'average_rating'      => $this->averageRating,
             'reviews_count'       => $this->reviewsCount,
             'stock_quantity'      => $this->stockQuantity,

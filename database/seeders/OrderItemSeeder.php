@@ -116,8 +116,7 @@ final class OrderItemSeeder extends Seeder
     {
         $candidate = $variant?->price
             ?? $product->price
-            ?? $product->sale_price
-            ?? $product->compare_price;
+            ?? $product->sale_price;
 
         if ($candidate === null) {
             // Fallback to a generated amount when the catalog lacks any pricing.

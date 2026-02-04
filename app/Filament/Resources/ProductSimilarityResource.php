@@ -39,11 +39,6 @@ final class ProductSimilarityResource extends BaseResource
                     ->relationship('similarProduct', 'name')
                     ->required()
                     ->searchable(),
-                TextInput::make('similarity_score')
-                    ->numeric()
-                    ->required(),
-                TextInput::make('algorithm_type')
-                    ->maxLength(255),
             ]);
     }
 
@@ -57,12 +52,6 @@ final class ProductSimilarityResource extends BaseResource
                     ->sortable(),
                 TextColumn::make('similarProduct.name')
                     ->label('Similar Product')
-                    ->searchable()
-                    ->sortable(),
-                TextColumn::make('similarity_score')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('algorithm_type')
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('calculated_at')

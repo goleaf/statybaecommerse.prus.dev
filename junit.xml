@@ -1,7 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="Tests\Feature\ImportExportPageTest" file="tests\Feature\ImportExportPageTest.php" tests="2" assertions="2" errors="0" failures="0" skipped="0" time="25.337304">
-    <testcase name="it feature: imports via xml provider from uploaded file" file="tests\Feature\ImportExportPageTest.php::it feature: imports via xml provider from uploaded file" class="Tests\Feature\ImportExportPageTest" classname="Tests.Feature.ImportExportPageTest" assertions="1" time="25.001852"/>
-    <testcase name="it feature: renders the data import export page" file="tests\Feature\ImportExportPageTest.php::it feature: renders the data import export page" class="Tests\Feature\ImportExportPageTest" classname="Tests.Feature.ImportExportPageTest" assertions="1" time="0.335452"/>
+  <testsuite name="CLI Arguments" tests="2" assertions="2" errors="0" failures="2" skipped="0" time="23.820342">
+    <testsuite name="Tests\Feature\Filament\Importers\UserImporterTest" file="tests\Feature\Filament\Importers\UserImporterTest.php" tests="1" assertions="1" errors="0" failures="1" skipped="0" time="23.377965">
+      <testcase name="it can import users" file="tests\Feature\Filament\Importers\UserImporterTest.php::it can import users" class="Tests\Feature\Filament\Importers\UserImporterTest" classname="Tests.Feature.Filament.Importers.UserImporterTest" assertions="1" time="23.377965">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it can import usersFailed asserting that 0 is identical to 1.&#13;
+at tests\Feature\Filament\Importers\UserImporterTest.php:51</failure>
+      </testcase>
+    </testsuite>
+    <testsuite name="Tests\Feature\Filament\Importers\PriceImporterTest" file="tests\Feature\Filament\Importers\PriceImporterTest.php" tests="1" assertions="1" errors="0" failures="1" skipped="0" time="0.442377">
+      <testcase name="it can import prices" file="tests\Feature\Filament\Importers\PriceImporterTest.php::it can import prices" class="Tests\Feature\Filament\Importers\PriceImporterTest" classname="Tests.Feature.Filament.Importers.PriceImporterTest" assertions="1" time="0.442377">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it can import pricesFailed asserting that 0 is identical to 1.&#13;
+at tests\Feature\Filament\Importers\PriceImporterTest.php:55</failure>
+      </testcase>
+    </testsuite>
   </testsuite>
 </testsuites>

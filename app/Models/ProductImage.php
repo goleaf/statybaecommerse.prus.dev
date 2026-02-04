@@ -82,6 +82,26 @@ final class ProductImage extends Model
                     ->update(['is_default' => false]);
             }
         });
+
+        self::saved(function (ProductImage $image) {
+            $hasDefault = static::where('product_id', $image->product_id)
+                ->where('is_default', true)
+                ->exists();
+
+            if (! $hasDefault) {
+                static::where('product_id', $image->product_id)
+                    ->limit(1)
+                    ->update(['is_default' => true]);
+            }
+        });
+
+        self::deleted(function (ProductImage $image) {
+            if ($image->is_default) {
+                static::where('product_id', $image->product_id)
+                    ->limit(1)
+                    ->update(['is_default' => true]);
+            }
+        });
     }
 
     /**

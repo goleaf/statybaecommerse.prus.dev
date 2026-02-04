@@ -623,7 +623,6 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
                 'summary'       => 'High-quality Portland cement for construction',
                 'description'   => 'Premium Portland cement suitable for all construction projects. Provides excellent strength and durability.',
                 'price'         => 12.99,
-                'compare_price' => 15.99,
                 'cost_price'    => 8.5,
                 'is_enabled'    => true,
                 'translations'  => [
@@ -648,7 +647,6 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
                 'summary'       => 'Complete professional drill set with accessories',
                 'description'   => 'Professional-grade drill set including drill bits, screwdriver bits, and carrying case.',
                 'price'         => 89.99,
-                'compare_price' => 109.99,
                 'cost_price'    => 55.0,
                 'is_enabled'    => true,
                 'translations'  => [
@@ -673,7 +671,6 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
                 'summary'       => 'Energy-efficient LED light bulb',
                 'description'   => 'High-efficiency LED bulb with warm white light. Long-lasting and energy-saving.',
                 'price'         => 4.99,
-                'compare_price' => 6.99,
                 'cost_price'    => 2.5,
                 'is_enabled'    => true,
                 'translations'  => [
@@ -703,7 +700,6 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
                     'summary'       => $productData['summary'],
                     'description'   => $productData['description'],
                     'price'         => $productData['price'],
-                    'compare_price' => $productData['compare_price'],
                     'cost_price'    => $productData['cost_price'],
                     'is_enabled'    => $productData['is_enabled'],
                     'is_visible'    => $productData['is_enabled'],

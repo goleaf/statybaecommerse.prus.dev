@@ -121,13 +121,9 @@ final class ProductCard extends Component
     #[Computed]
     public function discountPercentage(): ?int
     {
-        // Check for sale_price first (if product is on sale)
+        // Check for sale_price (if product is on sale)
         if ($this->product->sale_price && $this->product->price) {
             return (int) round(($this->product->price - $this->product->sale_price) / $this->product->price * 100);
-        }
-        // Check for compare_price (regular price vs compare price)
-        if ($this->product->compare_price && $this->product->price) {
-            return (int) round(($this->product->compare_price - $this->product->price) / $this->product->compare_price * 100);
         }
 
         return null;

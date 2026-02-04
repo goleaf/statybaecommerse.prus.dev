@@ -22,10 +22,6 @@ final class VariantPriceWidget extends BaseWidget
         $onSaleCount = ProductVariant::where('is_on_sale', true)->count();
         $totalRevenue = (float) (ProductVariant::sum(DB::raw('sold_quantity * price')) ?? 0);
 
-        $averageDiscount = (float) (ProductVariant::where('is_on_sale', true)
-            ->whereNotNull('compare_price')
-            ->avg(DB::raw('((compare_price - price) / compare_price) * 100')) ?? 0);
-
         $priceRanges = [
             'under_50' => ProductVariant::where('price', '<', 50)->count(),
             '50_100'   => ProductVariant::whereBetween('price', [50, 100])->count(),
@@ -50,10 +46,6 @@ final class VariantPriceWidget extends BaseWidget
                 ->description(__('product.variants.stats.discounted_variants'))
                 ->descriptionIcon('heroicon-m-tag')
                 ->color('danger'),
-            Stat::make(__('product.variants.stats.average_discount'), number_format($averageDiscount, 1) . '%')
-                ->description(__('product.variants.stats.sale_discount'))
-                ->descriptionIcon('heroicon-m-percent')
-                ->color('success'),
             Stat::make(__('product.variants.stats.total_revenue'), '€' . number_format($totalRevenue, 2))
                 ->description(__('product.variants.stats.from_sales'))
                 ->descriptionIcon('heroicon-m-currency-euro')

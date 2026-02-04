@@ -149,7 +149,6 @@ final class VariantPriceService
             'regular'          => $regularPrice,
             'sale'             => $salePrice,
             'base'             => $salePrice ?? $regularPrice,
-            'compare_at'       => $variant->compare_price !== null ? $this->configuration->round((float) $variant->compare_price) : null,
             'cost'             => $variant->cost_price !== null ? $this->configuration->round((float) $variant->cost_price) : null,
             'variant_modifier' => $this->configuration->round((float) ($variant->size_price_modifier ?? 0.0)),
         ];
@@ -240,7 +239,6 @@ final class VariantPriceService
         $convertedPriceList = $priceListResult['priceListPrice'] !== null ? $this->currencyService->convert($priceListResult['priceListPrice'], $context->baseCurrency, $context->targetCurrency) : null;
         $convertedVariantModifier = $this->currencyService->convert($priceListResult['variantModifier'], $context->baseCurrency, $context->targetCurrency);
         $convertedDynamic = $this->currencyService->convert($dynamicResult['adjustments'], $context->baseCurrency, $context->targetCurrency);
-        $convertedCompare = $basePrices['compare_at'] !== null ? $this->currencyService->convert($basePrices['compare_at'], $context->baseCurrency, $context->targetCurrency) : null;
         $convertedCost = $basePrices['cost'] !== null ? $this->currencyService->convert($basePrices['cost'], $context->baseCurrency, $context->targetCurrency) : null;
 
         return new VariantPriceResult(
@@ -253,7 +251,7 @@ final class VariantPriceService
             currency: $context->targetCurrency,
             priceListId: $priceListResult['priceListId'],
             appliedRuleIds: $dynamicResult['appliedRuleIds'],
-            compareAtPrice: $convertedCompare,
+            compareAtPrice: null,
             costPrice: $convertedCost,
             historyRecorded: false, // Price history recording has been removed
         );

@@ -114,7 +114,6 @@ final class XmlCatalogService
                     $baseEl = $doc->createElement('base');
                     $fields = [
                         'price'               => $product->price,
-                        'compare_price'       => $product->compare_price,
                         'cost_price'          => $product->cost_price,
                         'sale_price'          => $product->sale_price,
                         'weight'              => $product->weight,
@@ -349,7 +348,6 @@ final class XmlCatalogService
 
             $map = [
                 'price',
-                'compare_price',
                 'cost_price',
                 'sale_price',
                 'weight',

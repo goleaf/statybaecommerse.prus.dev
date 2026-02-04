@@ -7,9 +7,13 @@ namespace App\Filament\Resources\OrderResource\Schemas;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
+use App\Models\Address;
+use App\Models\User;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
@@ -46,6 +50,35 @@ class OrderForm
                             ->relationship('user', 'name')
                             ->searchable()
                             ->preload()
+                            ->live()
+                            ->afterStateUpdated(function ($state, Set $set) {
+                                if (! $state) {
+                                    return;
+                                }
+                                $user = User::find($state);
+                                if (! $user) {
+                                    return;
+                                }
+
+                                $address = Address::where('user_id', $state)->where('is_default', true)->first()
+                                    ?? Address::where('user_id', $state)->first();
+
+                                if ($address) {
+                                    $set('shipping_address.first_name', $address->first_name);
+                                    $set('shipping_address.last_name', $address->last_name);
+                                    $set('shipping_address.email', $address->email);
+                                    $set('shipping_address.phone', $address->phone);
+                                    $set('shipping_address.street', trim($address->address_line_1 . ($address->address_line_2 ? ', ' . $address->address_line_2 : '')));
+                                    $set('shipping_address.city', $address->city);
+                                    $set('shipping_address.zip', $address->postal_code);
+                                    $set('shipping_address.country', $address->country?->name ?? $address->country_code);
+                                } else {
+                                    $set('shipping_address.first_name', $user->first_name);
+                                    $set('shipping_address.last_name', $user->last_name);
+                                    $set('shipping_address.email', $user->email);
+                                    $set('shipping_address.phone', $user->phone ?? $user->phone_number);
+                                }
+                            })
                             ->createOptionForm([
                                 TextInput::make('name')
                                     ->label(__('messages.name'))
@@ -58,6 +91,31 @@ class OrderForm
 
                 Section::make(__('messages.checkout_shipping_address'))
                     ->schema([
+                        Select::make('address_selector')
+                            ->label(__('translations.customer_addresses'))
+                            ->options(fn (Get $get): array => Address::where('user_id', $get('user_id'))->get()->pluck('display_name', 'id')->toArray())
+                            ->live()
+                            ->afterStateUpdated(function ($state, Set $set) {
+                                if (! $state) {
+                                    return;
+                                }
+                                $address = Address::find($state);
+                                if (! $address) {
+                                    return;
+                                }
+
+                                $set('shipping_address.first_name', $address->first_name);
+                                $set('shipping_address.last_name', $address->last_name);
+                                $set('shipping_address.email', $address->email);
+                                $set('shipping_address.phone', $address->phone);
+                                $set('shipping_address.street', trim($address->address_line_1 . ($address->address_line_2 ? ', ' . $address->address_line_2 : '')));
+                                $set('shipping_address.city', $address->city);
+                                $set('shipping_address.zip', $address->postal_code);
+                                $set('shipping_address.country', $address->country?->name ?? $address->country_code);
+                            })
+                            ->visible(fn (Get $get): bool => filled($get('user_id')))
+                            ->dehydrated(false)
+                            ->columnSpanFull(),
                         TextInput::make('shipping_address.first_name')->label(__('messages.first_name')),
                         TextInput::make('shipping_address.last_name')->label(__('messages.last_name')),
                         TextInput::make('shipping_address.email')->email()->label(__('messages.email')),

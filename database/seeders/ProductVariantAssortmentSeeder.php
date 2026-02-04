@@ -228,7 +228,6 @@ final class ProductVariantAssortmentSeeder extends Seeder
                 'name'            => sprintf('%s - %s / %s / %s', $product->name, $packValue->value, $sizeValue?->value ?? 'One Size', $colorValue?->value ?? 'Neutral'),
                 'sku'             => Str::upper(implode('-', $skuParts)),
                 'price'           => $price,
-                'compare_price'   => $compare,
                 'cost_price'      => $cost,
                 'stock_quantity'  => $this->resolveStockForIndexes($packIndex, $sizeIndex, $colorIndex),
                 'track_inventory' => true,

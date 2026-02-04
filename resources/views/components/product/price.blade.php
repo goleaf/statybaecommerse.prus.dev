@@ -11,9 +11,8 @@
 
     @if ($price && $price->percentage && $price->percentage > 0)
         <span>
-            <span class="sr-only">{{ __('messages.compare_price') }}</span>
             <span class="text-gray-400 font-normal text-[13px] line-through">
-                {{ \Illuminate\Support\Number::currency($price->compare->amount, current_currency(), app()->getLocale()) }}
+                {{ \Illuminate\Support\Number::currency($price->compare, current_currency(), app()->getLocale()) }}
             </span>
             <x-discount-badge
                               :discount="$price->percentage"

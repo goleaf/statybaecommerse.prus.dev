@@ -22,67 +22,84 @@ class ProductVariantForm
                 Section::make(__('admin.product_variants.general_info'))
                     ->schema([
                         Select::make('product_id')
+                            ->label(__('messages.product'))
                             ->relationship('product', 'name')
                             ->required()
                             ->searchable()
                             ->preload(),
                         TextInput::make('sku')
-                            ->label('SKU')
+                            ->label(__('messages.sku'))
                             ->required()
                             ->maxLength(255)
                             ->unique(ignoreRecord: true),
                         TextInput::make('name')
+                            ->label(__('messages.name'))
                             ->maxLength(255),
                         TextInput::make('barcode')
+                            ->label(__('messages.barcode'))
                             ->maxLength(255),
                     ])->columns(2),
 
                 Section::make(__('admin.product_variants.pricing'))
                     ->schema([
                         TextInput::make('price')
+                            ->label(__('messages.price'))
                             ->numeric()
                             ->required()
                             ->prefix('€'),
                         TextInput::make('compare_price')
+                            ->label(__('admin.products.compare_price'))
                             ->numeric()
                             ->prefix('€'),
                         TextInput::make('cost_price')
+                            ->label(__('admin.products.cost_price'))
                             ->numeric()
                             ->prefix('€'),
                         TextInput::make('wholesale_price')
+                            ->label(__('messages.wholesale_price'))
                             ->numeric()
                             ->prefix('€'),
                         TextInput::make('member_price')
+                            ->label(__('messages.member_price'))
                             ->numeric()
                             ->prefix('€'),
                         TextInput::make('promotional_price')
+                            ->label(__('messages.promotional_price'))
                             ->numeric()
                             ->prefix('€'),
-                    ])->columns(3),
+                    ])->columns(2),
 
                 Section::make(__('admin.product_variants.inventory'))
                     ->schema([
                         TextInput::make('stock_quantity')
+                            ->label(__('admin.products.stock_quantity'))
                             ->numeric()
                             ->default(0),
                         TextInput::make('low_stock_threshold')
+                            ->label(__('admin.products.low_stock_threshold'))
                             ->numeric()
                             ->default(5),
                         Toggle::make('track_inventory')
+                            ->label(__('admin.products.track_stock'))
                             ->default(true),
                         Toggle::make('allow_backorder')
+                            ->label(__('admin.products.allow_backorder'))
                             ->default(false),
                     ])->columns(2),
 
                 Section::make(__('admin.product_variants.dimensions'))
                     ->schema([
                         TextInput::make('size')
+                            ->label(__('messages.size'))
                             ->maxLength(255),
                         TextInput::make('size_unit')
+                            ->label(__('messages.size_unit'))
                             ->maxLength(255),
                         TextInput::make('size_display')
+                            ->label(__('messages.size_display'))
                             ->maxLength(255),
                         TextInput::make('weight')
+                            ->label(__('admin.products.weight'))
                             ->numeric()
                             ->suffix('kg'),
                     ])->columns(2),

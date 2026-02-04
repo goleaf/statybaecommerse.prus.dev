@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Actions;
 
+use Closure;
 use Filament\Forms\Components\Component as FormComponent;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
@@ -58,31 +59,6 @@ final class VariantBulkPriceUpdate extends Action
                 Toggle::make('apply_to_sale_items')
                     ->label(__('product.variants.fields.apply_to_sale_items'))
                     ->default(true),
-                Toggle::make('update_compare_price')
-                    ->label(__('product.variants.fields.update_compare_price'))
-                    ->default(false),
-                Select::make('compare_price_action')
-                    ->label(__('product.variants.fields.compare_price_action'))
-                    ->options([
-                        'no_change'                => __('product.variants.compare_price_actions.no_change'),
-                        'match_new_price'          => __('product.variants.compare_price_actions.match_new_price'),
-                        'increase_by_percentage'   => __('product.variants.compare_price_actions.increase_by_percentage'),
-                        'increase_by_fixed_amount' => __('product.variants.compare_price_actions.increase_by_fixed_amount'),
-                    ])
-                    ->default('no_change')
-                    ->visible(fn (Get $get): bool => (bool) $get('update_compare_price')),
-                TextInput::make('compare_price_value')
-                    ->label(__('product.variants.fields.compare_price_value'))
-                    ->numeric()
-                    ->step(0.01)
-                    ->visible(
-                        fn (Get $get): bool => (bool) $get('update_compare_price')
-                            && in_array(
-                                $get('compare_price_action'),
-                                ['increase_by_percentage', 'increase_by_fixed_amount'],
-                                true,
-                            )
-                    ),
                 Toggle::make('set_sale_period')
                     ->label(__('product.variants.fields.set_sale_period'))
                     ->default(false),
@@ -159,34 +135,6 @@ final class VariantBulkPriceUpdate extends Action
                         // Update the price
                         $record->forceFill([$priceType => $newPrice]);
 
-                        // Update compare price if requested
-                        if ($data['update_compare_price'] ?? false) {
-                            $compareAction = is_string($data['compare_price_action'] ?? null)
-                                ? (string) $data['compare_price_action']
-                                : 'no_change';
-                            $compareValue = is_numeric($data['compare_price_value'] ?? null)
-                                ? (float) $data['compare_price_value']
-                                : null;
-
-                            switch ($compareAction) {
-                                case 'match_new_price':
-                                    $record->forceFill(['compare_price' => $newPrice]);
-                                    break;
-                                case 'increase_by_percentage':
-                                    if ($compareValue !== null) {
-                                        $adjusted = round($newPrice * (1 + ($compareValue / 100)), 2);
-                                        $record->forceFill(['compare_price' => max(0, $adjusted)]);
-                                    }
-                                    break;
-                                case 'increase_by_fixed_amount':
-                                    if ($compareValue !== null) {
-                                        $adjusted = round($newPrice + $compareValue, 2);
-                                        $record->forceFill(['compare_price' => max(0, $adjusted)]);
-                                    }
-                                    break;
-                            }
-                        }
-
                         // Set sale period if requested
                         if ($data['set_sale_period'] ?? false) {
                             $record->forceFill([
@@ -217,9 +165,9 @@ final class VariantBulkPriceUpdate extends Action
     /**
      * Build a sale period date picker using Flatpickr when available, falling back to Filament's DateTimePicker otherwise.
      *
-     * @param \Closure(): Carbon $default
+     * @param Closure(): Carbon $default
      */
-    private static function makeSalePeriodPicker(string $name, string $label, \Closure $default)
+    private static function makeSalePeriodPicker(string $name, string $label, Closure $default)
     {
         $componentClass = class_exists(self::FLATPICKR_COMPONENT)
             ? self::FLATPICKR_COMPONENT

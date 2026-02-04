@@ -69,10 +69,10 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
 
     protected $fillable = [
         'product_id', 'sku', 'name', 'variant_name_lt', 'variant_name_en',
-        'description_lt', 'description_en', 'price', 'compare_price', 'cost_price',
+        'description_lt', 'description_en', 'price', 'cost_price',
         'wholesale_price', 'member_price', 'promotional_price',
         'stock_quantity', 'reserved_quantity', 'available_quantity', 'sold_quantity',
-        'weight', 'track_inventory', 'is_default', 'is_default_variant', 'is_enabled', 'barcode', 'attributes', 'variant_attribute_matrix', 'variant_metadata',
+        'weight', 'track_inventory', 'is_default', 'is_default_variant', 'is_enabled', 'barcode', 'attributes', 'variant_attribute_matrix',
         'is_on_sale', 'sale_start_date', 'sale_end_date', 'is_featured', 'is_new', 'is_bestseller',
         'seo_title_lt', 'seo_title_en', 'seo_description_lt', 'seo_description_en',
         'variant_combination_hash',
@@ -85,7 +85,6 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
     {
         return [
             'price'                    => 'decimal:4',
-            'compare_price'            => 'decimal:4',
             'cost_price'               => 'decimal:4',
             'wholesale_price'          => 'decimal:4',
             'member_price'             => 'decimal:4',
@@ -107,7 +106,6 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
             'sale_end_date'            => 'datetime',
             'attributes'               => 'array',
             'variant_attribute_matrix' => 'array',
-            'variant_metadata'         => 'array',
         ];
     }
 
@@ -688,18 +686,12 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
     public function getCurrentPrice(): float
     {
         $basePrice = (float) $this->price;
-        $comparePrice = $this->compare_price !== null ? (float) $this->compare_price : null;
         $promotionalPrice = $this->promotional_price !== null ? (float) $this->promotional_price : null;
 
         // Check if variant is on sale and within sale period
         if ($this->is_on_sale && $this->isCurrentlyOnSale()) {
             if ($promotionalPrice !== null && $promotionalPrice > 0) {
                 return $promotionalPrice;
-            }
-
-            // Apply sale discount if no promotional price set
-            if ($comparePrice !== null && $comparePrice > $basePrice) {
-                return $basePrice;
             }
         }
 

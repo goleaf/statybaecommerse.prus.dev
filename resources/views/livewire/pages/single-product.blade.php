@@ -308,10 +308,6 @@
                                                     <p class="text-lg font-semibold text-primary-600">
                                                         {{ $variant['price'] }}</p>
                                                 @endif
-                                                @if ($variant['compare_price'])
-                                                    <p class="text-xs text-slate-500 line-through">
-                                                        {{ $variant['compare_price'] }}</p>
-                                                @endif
                                                 <p
                                                    class="mt-2 text-xs font-medium uppercase tracking-wide {{ ($variant['is_out_of_stock'] ?? false) ? 'text-red-500' : 'text-emerald-500' }}">
                                                     {{ ($variant['is_out_of_stock'] ?? false) ? __('products.page.single_configuration') : __('messages.product_in_stock') }}

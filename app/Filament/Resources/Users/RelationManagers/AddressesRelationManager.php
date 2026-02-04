@@ -32,45 +32,53 @@ class AddressesRelationManager extends RelationManager
             ->components([
                 Select::make('type')
                     ->options(AddressType::options())
+                    ->label(__('messages.type'))
                     ->required(),
                 TextInput::make('first_name')
+                    ->label(__('messages.first_name'))
                     ->required()
                     ->maxLength(255),
                 TextInput::make('last_name')
+                    ->label(__('messages.last_name'))
                     ->required()
                     ->maxLength(255),
                 TextInput::make('company')
+                    ->label(__('messages.company'))
                     ->maxLength(255),
                 TextInput::make('company_vat')
-                    ->label('VAT Number')
+                    ->label(__('messages.company_vat'))
                     ->maxLength(50),
                 TextInput::make('address_line_1')
-                    ->label('Address')
+                    ->label(__('messages.address_line_1'))
                     ->required()
                     ->maxLength(255),
                 TextInput::make('address_line_2')
-                    ->label('Address Line 2')
+                    ->label(__('messages.address_line_2'))
                     ->maxLength(255),
                 TextInput::make('city')
+                    ->label(__('messages.city'))
                     ->required()
                     ->maxLength(100),
                 TextInput::make('postal_code')
+                    ->label(__('messages.postal_code'))
                     ->required()
                     ->maxLength(20),
                 TextInput::make('country_code')
-                    ->label('Country Code')
+                    ->label(__('messages.country_code'))
                     ->required()
                     ->maxLength(2),
                 TextInput::make('phone')
+                    ->label(__('messages.phone'))
                     ->tel()
                     ->maxLength(20),
                 TextInput::make('email')
+                    ->label(__('messages.email'))
                     ->email()
                     ->maxLength(255),
                 Toggle::make('is_default')
-                    ->label('Default'),
+                    ->label(__('messages.is_default')),
                 Toggle::make('is_active')
-                    ->label('Active')
+                    ->label(__('messages.active'))
                     ->default(true),
             ]);
     }
@@ -81,27 +89,30 @@ class AddressesRelationManager extends RelationManager
             ->recordTitleAttribute('address_line_1')
             ->columns([
                 TextColumn::make('type')
+                    ->label(__('messages.type'))
                     ->badge()
                     ->searchable(),
                 TextColumn::make('full_name')
-                    ->label('Name')
+                    ->label(__('messages.name'))
                     ->searchable(['first_name', 'last_name']),
                 TextColumn::make('address_line_1')
-                    ->label('Address')
+                    ->label(__('messages.address_line_1'))
                     ->searchable(),
                 TextColumn::make('city')
+                    ->label(__('messages.city'))
                     ->searchable(),
                 TextColumn::make('postal_code')
+                    ->label(__('messages.postal_code'))
                     ->searchable(),
                 TextColumn::make('country.name')
-                    ->label('Country')
+                    ->label(__('messages.country'))
                     ->searchable(),
                 IconColumn::make('is_default')
                     ->boolean()
-                    ->label('Default'),
+                    ->label(__('messages.is_default')),
                 IconColumn::make('is_active')
                     ->boolean()
-                    ->label('Active'),
+                    ->label(__('messages.active')),
             ])
             ->filters([
                 //

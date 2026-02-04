@@ -22,7 +22,7 @@
                 $priceRecord = $product->prices->first();
                 $priceAmount = $priceRecord->amount ?? $product->price;
                 $currencySymbol = $priceRecord?->currency?->symbol ?? $priceRecord?->currency?->code ?? '€';
-                $compareAmount = $priceRecord?->compare_amount ?? $product->compare_price;
+                $compareAmount = $priceRecord?->compare_amount;
                 $shortDescription = $product->short_description ?? $product->summary ?? '';
             @endphp
 

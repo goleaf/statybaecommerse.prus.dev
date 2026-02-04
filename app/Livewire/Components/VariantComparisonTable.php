@@ -110,7 +110,7 @@ final class VariantComparisonTable extends Component
 
     public function getVariantOriginalPrice(ProductVariant $variant): ?float
     {
-        return $variant->compare_price > $variant->price ? $variant->compare_price : null;
+        return null;
     }
 
     public function getVariantDiscountPercentage(ProductVariant $variant): ?int

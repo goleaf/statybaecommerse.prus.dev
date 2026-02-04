@@ -1449,6 +1449,7 @@ return array (
   'epetys_kiaurymi_valymui14x300_friulsider' => 'Šepetys kiaurymių valymui 14x300, FRIULSIDER',
   'epetys_kiaurymi_valymui20x300_friulsider' => 'Šepetys kiaurymių valymui 20x300, FRIULSIDER',
   'epetys_kiaurymi_valymui30x300_friulsider' => 'Šepetys kiaurymių valymui 30x300, FRIULSIDER',
+  'existing_product' => 'Existing Product',
   'fasadiniai_da_ai' => 'Fasadiniai dažai',
   'featured_impact_drill' => 'Featured Impact Drill',
   'festool_hkc55_tsc_circular_saw' => 'Festool HKC 55 TSC Circular Saw',
@@ -4453,13 +4454,6 @@ return array (
     'classic_t_shirt_xl_black' => 'Classic T-Shirt - XL black',
     'classic_t_shirt_xl_white' => 'Classic T-Shirt - XL white',
     'commodi_et' => 'Commodi Et',
-    'compare_price_actions' => 
-    array (
-      'no_change' => 'Nekeisti',
-      'match_new_price' => 'Sutapdinti su nauja kaina',
-      'increase_by_percentage' => 'Padidinti procentais',
-      'increase_by_fixed_amount' => 'Padidinti fiksuota suma',
-    ),
     'comparison' => 
     array (
       'title' => 'Prekių palyginimas',
@@ -4732,9 +4726,6 @@ return array (
       'update_type' => 'Atnaujinimo tipas',
       'update_value' => 'Reikšmė',
       'apply_to_sale_items' => 'Taikyti prekėms su nuolaida',
-      'update_compare_price' => 'Atnaujinti palyginimo kainą',
-      'compare_price_action' => 'Palyginimo kainos veiksmas',
-      'compare_price_value' => 'Palyginimo kainos reikšmė',
       'set_sale_period' => 'Nustatyti nuolaidos laikotarpį',
       'sale_start_date' => 'Nuolaidos pradžia',
       'sale_end_date' => 'Nuolaidos pabaiga',

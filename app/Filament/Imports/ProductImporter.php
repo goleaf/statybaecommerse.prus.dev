@@ -43,9 +43,6 @@ class ProductImporter extends BaseImporter
             ImportColumn::make('sale_price')
                 ->numeric()
                 ->rules(['nullable', 'numeric']),
-            ImportColumn::make('compare_price')
-                ->numeric()
-                ->rules(['nullable', 'numeric']),
             ImportColumn::make('cost_price')
                 ->numeric()
                 ->rules(['nullable', 'numeric']),
@@ -120,7 +117,7 @@ class ProductImporter extends BaseImporter
                 ->boolean()
                 ->ignoreBlankState()
                 ->rules(['nullable', 'boolean']),
-            ImportColumn::make('metadata'),
+
             ImportColumn::make('video_url'),
             ImportColumn::make('view_count')
                 ->numeric()

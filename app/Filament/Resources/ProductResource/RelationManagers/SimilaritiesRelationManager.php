@@ -37,13 +37,6 @@ class SimilaritiesRelationManager extends RelationManager
                     ->relationship('similarProduct', 'name')
                     ->required()
                     ->searchable(),
-                TextInput::make('similarity_score')
-                    ->label(__('messages.similarity_score'))
-                    ->numeric()
-                    ->required(),
-                TextInput::make('algorithm_type')
-                    ->label(__('messages.algorithm_type'))
-                    ->maxLength(255),
             ]);
     }
 
@@ -53,14 +46,6 @@ class SimilaritiesRelationManager extends RelationManager
             ->columns([
                 TextColumn::make('similarProduct.name')
                     ->label(__('messages.similar_product'))
-                    ->searchable()
-                    ->sortable(),
-                TextColumn::make('similarity_score')
-                    ->label(__('messages.similarity_score'))
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('algorithm_type')
-                    ->label(__('messages.algorithm_type'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('calculated_at')

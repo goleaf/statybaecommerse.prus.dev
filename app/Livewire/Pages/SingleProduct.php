@@ -153,11 +153,10 @@ final class SingleProduct extends Component
     /**
      * Structured pricing summary for the currently selected context (product or variant).
      *
-     * @var array{current: float|null, compare: float|null, discount: float|null, currency: string|null}
+     * @var array{current: float|null, discount: float|null, currency: string|null}
      */
     public array $pricingSummary = [
         'current'  => null,
-        'compare'  => null,
         'discount' => null,
         'currency' => null,
     ];
@@ -722,31 +721,11 @@ final class SingleProduct extends Component
             $result = $priceService->calculate($variant, $context);
 
             $current = (float) $result->finalPrice;
-            $compare = $result->compareAtPrice !== null ? (float) $result->compareAtPrice : null;
-
-            // Fall back to other reference prices (regular, sale, or price-list) when compare-at is absent but
-            // the server-calculated figure indicates a higher anchor price for discount messaging.
-            if ($compare === null) {
-                $fallbackAnchors = array_filter([
-                    $result->regularPrice,
-                    $result->salePrice,
-                    $result->priceListPrice,
-                ], static fn (?float $amount) => $amount !== null && $amount > ($current + 0.0001));
-
-                if ($fallbackAnchors !== []) {
-                    $compare = (float) max($fallbackAnchors);
-                }
-            }
 
             $discount = null;
 
-            if ($compare !== null && $compare > ($current + 0.0001)) {
-                $discount = round((($compare - $current) / $compare) * 100);
-            }
-
             return [
                 'current'  => $current,
-                'compare'  => $compare,
                 'discount' => $discount,
                 'currency' => $result->currency ?: $currency,
             ];
@@ -754,16 +733,10 @@ final class SingleProduct extends Component
 
         $priceData = $this->product->getPrice();
         $current = $priceData?->value ?? ($this->product->price !== null ? (float) $this->product->price : null);
-        $compare = $priceData?->compare ?? ($this->product->compare_price !== null ? (float) $this->product->compare_price : null);
         $discount = $priceData?->percentage;
-
-        if ($discount === null && $compare && $current && $compare > $current) {
-            $discount = round((($compare - $current) / $compare) * 100);
-        }
 
         return [
             'current'  => $current,
-            'compare'  => $compare,
             'discount' => $discount,
             'currency' => $currency,
         ];
@@ -897,10 +870,8 @@ final class SingleProduct extends Component
         $pricing = $this->buildPricingSummary($variant);
         $currency = $pricing['currency'] ?? (function_exists('current_currency') ? current_currency() : null);
         $currentPrice = $pricing['current'];
-        $comparePrice = $pricing['compare'];
 
         $priceFormatted = $currentPrice !== null ? app_money_format((float) $currentPrice, $currency) : null;
-        $compareFormatted = $comparePrice !== null ? app_money_format((float) $comparePrice, $currency) : null;
 
         $thumbnail = $variant->getFirstMediaUrl(config('media.storage.thumbnail_collection'))
             ?: ($variant->getFirstMediaUrl(config('media.storage.collection_name'), 'small')
@@ -944,7 +915,6 @@ final class SingleProduct extends Component
             'name'               => $variant->getLocalizedName(),
             'sku'                => $variant->sku,
             'price'              => $priceFormatted,
-            'compare_price'      => $compareFormatted,
             'is_out_of_stock'    => $variant->isOutOfStock(),
             'is_available'       => $variant->isAvailableForPurchase(),
             'available_quantity' => $variant->availableQuantity(),

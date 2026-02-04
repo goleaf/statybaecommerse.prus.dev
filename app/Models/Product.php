@@ -88,12 +88,11 @@ final class Product extends Model implements HasMedia, TranslatableRecord
         'published_at' => true,
     ];
 
-    protected $fillable = ['name', 'slug', 'description', 'short_description', 'sku', 'barcode', 'price', 'compare_price', 'cost_price', 'sale_price', 'manage_stock', 'track_stock', 'allow_backorder', 'stock_quantity', 'low_stock_threshold', 'weight', 'length', 'width', 'height', 'is_active', 'is_visible', 'is_enabled', 'is_featured', 'is_requestable', 'requests_count', 'minimum_quantity', 'hide_add_to_cart', 'request_message', 'published_at', 'seo_title', 'seo_description', 'brand_id', 'status', 'type', 'video_url', 'metadata', 'variant_attribute_matrix', 'sort_order', 'tax_class', 'shipping_class', 'download_limit', 'download_expiry', 'external_url', 'button_text'];
+    protected $fillable = ['name', 'slug', 'description', 'short_description', 'detailed_description', 'sku', 'barcode', 'price', 'cost_price', 'sale_price', 'manage_stock', 'track_stock', 'allow_backorder', 'stock_quantity', 'low_stock_threshold', 'weight', 'length', 'width', 'height', 'is_active', 'is_visible', 'is_enabled', 'is_featured', 'is_requestable', 'requests_count', 'minimum_quantity', 'hide_add_to_cart', 'request_message', 'published_at', 'seo_title', 'seo_description', 'brand_id', 'status', 'type', 'video_url', 'variant_attribute_matrix', 'sort_order', 'tax_class', 'shipping_class', 'download_limit', 'download_expiry', 'external_url', 'button_text'];
 
     protected $casts = [
         // Monetary and numeric fields use native casting for precise calculations within tests.
         'price'               => 'decimal:2',
-        'compare_price'       => 'decimal:2',
         'cost_price'          => 'decimal:2',
         'sale_price'          => 'decimal:2',
         'weight'              => 'decimal:2',
@@ -117,7 +116,6 @@ final class Product extends Model implements HasMedia, TranslatableRecord
         'sort_order'          => 'integer',
         'download_limit'      => 'integer',
         'download_expiry'     => 'integer',
-        'metadata'            => 'array',
     ];
 
     /**
@@ -133,7 +131,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
     protected string $translationModel = \App\Models\Translations\ProductTranslation::class;
 
     // Translation fields that should be handled by the translation system
-    protected array $translatable = ['name', 'slug', 'description', 'short_description', 'seo_title', 'seo_description'];
+    protected array $translatable = ['name', 'slug', 'description', 'short_description', 'detailed_description', 'seo_title', 'seo_description'];
 
     protected static function booted(): void
     {
@@ -141,7 +139,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
             /** @var HtmlSanitizer $sanitizer */
             $sanitizer = app(HtmlSanitizer::class);
 
-            foreach (['description', 'short_description'] as $field) {
+            foreach (['description', 'short_description', 'detailed_description'] as $field) {
                 $value = $product->{$field};
 
                 if (! is_string($value) || trim($value) === '') {
@@ -1001,7 +999,6 @@ final class Product extends Model implements HasMedia, TranslatableRecord
             'products.short_description', // Used for short description, NOT description
             'products.price',
             'products.sale_price',
-            'products.compare_price',
             'products.stock_quantity',
             'products.brand_id',
             'products.created_at', // May be needed for sorting
@@ -1597,7 +1594,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
      */
     public function getProductInfo(): array
     {
-        return ['id' => $this->id, 'name' => $this->name, 'slug' => $this->slug, 'sku' => $this->sku, 'description' => $this->description, 'short_description' => $this->short_description, 'price' => $this->price, 'sale_price' => $this->sale_price, 'compare_price' => $this->compare_price, 'cost_price' => $this->cost_price, 'status' => $this->status, 'type' => $this->type, 'is_visible' => $this->is_visible, 'is_featured' => $this->is_featured, 'published_at' => $this->published_at?->toISOString()];
+        return ['id' => $this->id, 'name' => $this->name, 'slug' => $this->slug, 'sku' => $this->sku, 'description' => $this->description, 'short_description' => $this->short_description, 'price' => $this->price, 'sale_price' => $this->sale_price, 'cost_price' => $this->cost_price, 'status' => $this->status, 'type' => $this->type, 'is_visible' => $this->is_visible, 'is_featured' => $this->is_featured, 'published_at' => $this->published_at?->toISOString()];
     }
 
     /**
@@ -1613,7 +1610,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
      */
     public function getPricingInfo(): array
     {
-        return ['price' => $this->price, 'sale_price' => $this->sale_price, 'compare_price' => $this->compare_price, 'cost_price' => $this->cost_price, 'current_price' => $this->sale_price ?: $this->price, 'discount_percentage' => $this->getDiscountPercentage(), 'profit_margin' => $this->getProfitMargin(), 'markup_percentage' => $this->getMarkupPercentage()];
+        return ['price' => $this->price, 'sale_price' => $this->sale_price, 'cost_price' => $this->cost_price, 'current_price' => $this->sale_price ?: $this->price, 'discount_percentage' => $this->getDiscountPercentage(), 'profit_margin' => $this->getProfitMargin(), 'markup_percentage' => $this->getMarkupPercentage()];
     }
 
     /**
@@ -1665,21 +1662,18 @@ final class Product extends Model implements HasMedia, TranslatableRecord
      */
     private function calculateDiscountPercentage(): ?float
     {
-        // Determine the comparison baseline, preferring the dedicated compare price
-        // but gracefully falling back to whichever persisted price is available so
-        // we can still surface a percentage discount in simplified fixtures.
-        $comparePrice = $this->compare_price ?? $this->price ?? $this->sale_price;
+        // Determine the comparison baseline, preferring the base price
+        // but gracefully falling back to whichever persisted price is available.
+        $basePrice = $this->price ?? $this->sale_price;
 
         // Choose the most appropriate current price. A sale price is only valid
-        // when it meaningfully undercuts the comparison baseline; otherwise we
-        // fall back to the regular price so factories that override price values
-        // without touching sale_price still calculate an accurate discount.
+        // when it meaningfully undercuts the comparison baseline.
         $currentPrice = null;
 
         if ($this->sale_price !== null) {
             $candidateSalePrice = (float) $this->sale_price;
 
-            if ($candidateSalePrice > 0 && ($comparePrice === null || $candidateSalePrice < (float) $comparePrice)) {
+            if ($candidateSalePrice > 0 && ($basePrice === null || $candidateSalePrice < (float) $basePrice)) {
                 $currentPrice = $candidateSalePrice;
             }
         }
@@ -1688,11 +1682,11 @@ final class Product extends Model implements HasMedia, TranslatableRecord
             $currentPrice = (float) $this->price;
         }
 
-        if ($comparePrice === null || $currentPrice === null) {
+        if ($basePrice === null || $currentPrice === null) {
             return null;
         }
 
-        $compare = (float) $comparePrice;
+        $compare = (float) $basePrice;
         $current = (float) $currentPrice;
 
         // Ensure we have valid positive prices and current price is less than compare price
@@ -1807,32 +1801,11 @@ final class Product extends Model implements HasMedia, TranslatableRecord
     }
 
     /**
-     * Handle getFormattedComparePrice functionality with proper error handling.
-     */
-    public function getFormattedComparePrice(): string
-    {
-        $price = $this->getPrice();
-        if (! $price || ! $price->compare) {
-            return app_money_format($this->compare_price ?? 0);
-        }
-
-        return app_money_format($price->compare);
-    }
-
-    /**
      * Handle getFormattedPriceAttribute functionality with proper error handling.
      */
     public function getFormattedPriceAttribute(): string
     {
         return $this->getFormattedPrice();
-    }
-
-    /**
-     * Handle getFormattedComparePriceAttribute functionality with proper error handling.
-     */
-    public function getFormattedComparePriceAttribute(): string
-    {
-        return $this->getFormattedComparePrice();
     }
 
     /**
