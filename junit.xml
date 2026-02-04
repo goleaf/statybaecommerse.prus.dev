@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="CLI Arguments" tests="7" assertions="17" errors="0" failures="0" skipped="0" time="31.285760">
-    <testsuite name="Tests\Unit\Filament\Importers\ProductImporterTest" file="tests\Unit\Filament\Importers\ProductImporterTest.php" tests="3" assertions="8" errors="0" failures="0" skipped="0" time="30.597444">
-      <testcase name="it has correct model" file="tests\Unit\Filament\Importers\ProductImporterTest.php::it has correct model" class="Tests\Unit\Filament\Importers\ProductImporterTest" classname="Tests.Unit.Filament.Importers.ProductImporterTest" assertions="1" time="30.243738"/>
-      <testcase name="it has correct notification body" file="tests\Unit\Filament\Importers\ProductImporterTest.php::it has correct notification body" class="Tests\Unit\Filament\Importers\ProductImporterTest" classname="Tests.Unit.Filament.Importers.ProductImporterTest" assertions="2" time="0.199556"/>
-      <testcase name="it has required columns" file="tests\Unit\Filament\Importers\ProductImporterTest.php::it has required columns" class="Tests\Unit\Filament\Importers\ProductImporterTest" classname="Tests.Unit.Filament.Importers.ProductImporterTest" assertions="5" time="0.154151"/>
+  <testsuite name="CLI Arguments" tests="6" assertions="16" errors="0" failures="0" skipped="0" time="38.855472">
+    <testsuite name="Tests\Unit\Filament\Importers\ProductImporterTest" file="tests\Unit\Filament\Importers\ProductImporterTest.php" tests="3" assertions="8" errors="0" failures="0" skipped="0" time="38.284690">
+      <testcase name="it has correct model" file="tests\Unit\Filament\Importers\ProductImporterTest.php::it has correct model" class="Tests\Unit\Filament\Importers\ProductImporterTest" classname="Tests.Unit.Filament.Importers.ProductImporterTest" assertions="1" time="37.925185"/>
+      <testcase name="it has correct notification body" file="tests\Unit\Filament\Importers\ProductImporterTest.php::it has correct notification body" class="Tests\Unit\Filament\Importers\ProductImporterTest" classname="Tests.Unit.Filament.Importers.ProductImporterTest" assertions="2" time="0.193528"/>
+      <testcase name="it has required columns" file="tests\Unit\Filament\Importers\ProductImporterTest.php::it has required columns" class="Tests\Unit\Filament\Importers\ProductImporterTest" classname="Tests.Unit.Filament.Importers.ProductImporterTest" assertions="5" time="0.165977"/>
     </testsuite>
-    <testsuite name="Tests\Feature\Filament\ProductImporterTest" file="tests\Feature\Filament\ProductImporterTest.php" tests="1" assertions="6" errors="0" failures="0" skipped="0" time="0.238627">
-      <testcase name="it imports a fully mapped product row with blank optional fields" file="tests\Feature\Filament\ProductImporterTest.php::it imports a fully mapped product row with blank optional fields" class="Tests\Feature\Filament\ProductImporterTest" classname="Tests.Feature.Filament.ProductImporterTest" assertions="6" time="0.238627"/>
+    <testsuite name="Tests\Feature\Filament\Importers\UniqueImportValuesTest" file="tests\Feature\Filament\Importers\UniqueImportValuesTest.php" tests="2" assertions="2" errors="0" failures="0" skipped="0" time="0.370840">
+      <testcase name="it appends a numeric suffix to duplicate emails during import" file="tests\Feature\Filament\Importers\UniqueImportValuesTest.php::it appends a numeric suffix to duplicate emails during import" class="Tests\Feature\Filament\Importers\UniqueImportValuesTest" classname="Tests.Feature.Filament.Importers.UniqueImportValuesTest" assertions="1" time="0.209689"/>
+      <testcase name="it appends a numeric suffix to duplicate slugs during import" file="tests\Feature\Filament\Importers\UniqueImportValuesTest.php::it appends a numeric suffix to duplicate slugs during import" class="Tests\Feature\Filament\Importers\UniqueImportValuesTest" classname="Tests.Feature.Filament.Importers.UniqueImportValuesTest" assertions="1" time="0.161150"/>
     </testsuite>
-    <testsuite name="Tests\Feature\CsvImportMappingSummaryTest" file="tests\Feature\CsvImportMappingSummaryTest.php" tests="3" assertions="3" errors="0" failures="0" skipped="0" time="0.449688">
-      <testcase name="it shows duplicate mapping errors" file="tests\Feature\CsvImportMappingSummaryTest.php::it shows duplicate mapping errors" class="Tests\Feature\CsvImportMappingSummaryTest" classname="Tests.Feature.CsvImportMappingSummaryTest" assertions="1" time="0.150698"/>
-      <testcase name="it shows success when mappings are valid" file="tests\Feature\CsvImportMappingSummaryTest.php::it shows success when mappings are valid" class="Tests\Feature\CsvImportMappingSummaryTest" classname="Tests.Feature.CsvImportMappingSummaryTest" assertions="1" time="0.152347"/>
-      <testcase name="it shows missing required mappings" file="tests\Feature\CsvImportMappingSummaryTest.php::it shows missing required mappings" class="Tests\Feature\CsvImportMappingSummaryTest" classname="Tests.Feature.CsvImportMappingSummaryTest" assertions="1" time="0.146644"/>
+    <testsuite name="Tests\Feature\Filament\ProductImporterTest" file="tests\Feature\Filament\ProductImporterTest.php" tests="1" assertions="6" errors="0" failures="0" skipped="0" time="0.199942">
+      <testcase name="it imports a fully mapped product row with blank optional fields" file="tests\Feature\Filament\ProductImporterTest.php::it imports a fully mapped product row with blank optional fields" class="Tests\Feature\Filament\ProductImporterTest" classname="Tests.Feature.Filament.ProductImporterTest" assertions="6" time="0.199942"/>
     </testsuite>
   </testsuite>
 </testsuites>

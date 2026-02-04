@@ -22,14 +22,7 @@ class ProductImporter extends BaseImporter
             $this->data['slug'] = Str::slug($name);
         }
 
-        $slug = $this->data['slug'] ?? null;
-
-        if (! is_string($slug) || $slug === '') {
-            return;
-        }
-
-        $slug = Str::slug($slug);
-        $this->data['slug'] = $this->ensureUniqueSlug($slug);
+        parent::beforeValidate();
     }
 
     protected function beforeFill(): void
@@ -53,8 +46,8 @@ class ProductImporter extends BaseImporter
             return;
         }
 
-        $slug = $this->ensureUniqueSlug(Str::slug((string) $slug));
-        $this->record->slug = $slug;
+        $slug = Str::slug((string) $slug);
+        $this->record->slug = $this->makeUniqueColumnValue($this->record, 'slug', $slug);
     }
 
     public static function getColumns(): array
@@ -218,44 +211,6 @@ class ProductImporter extends BaseImporter
         return Product::firstOrNew([
             'sku' => $sku,
         ]);
-    }
-
-    protected function ensureUniqueSlug(string $slug): string
-    {
-        if (! $this->slugExists($slug)) {
-            return $slug;
-        }
-
-        $sku = $this->data['sku'] ?? null;
-        $base = $slug;
-
-        if (is_string($sku) && $sku !== '') {
-            $candidate = $base . '-' . Str::slug($sku);
-            if (! $this->slugExists($candidate)) {
-                return $candidate;
-            }
-        }
-
-        $counter = 2;
-        $candidate = $base . '-' . $counter;
-
-        while ($this->slugExists($candidate)) {
-            $counter++;
-            $candidate = $base . '-' . $counter;
-        }
-
-        return $candidate;
-    }
-
-    protected function slugExists(string $slug): bool
-    {
-        $query = Product::query()->where('slug', $slug);
-
-        if ($this->record?->exists) {
-            $query->whereKeyNot($this->record->getKey());
-        }
-
-        return $query->exists();
     }
 
     public static function getCompletedNotificationBody(Import $import): string
