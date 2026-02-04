@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuites>
-  <testsuite name="Tests\Unit\TranslationMessagesTest" file="tests\Unit\TranslationMessagesTest.php" tests="1" assertions="88" errors="0" failures="0" skipped="0" time="24.020643">
-    <testcase name="it unit: has message label translations for core locales" file="tests\Unit\TranslationMessagesTest.php::it unit: has message label translations for core locales" class="Tests\Unit\TranslationMessagesTest" classname="Tests.Unit.TranslationMessagesTest" assertions="88" time="24.020643"/>
-  </testsuite>
-</testsuites>
