@@ -23,7 +23,7 @@ final class Service extends Model
     protected function casts(): array
     {
         return [
-            'price' => 'decimal:2',
+            'price'     => 'decimal:2',
             'is_active' => 'boolean',
         ];
     }

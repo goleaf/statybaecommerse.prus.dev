@@ -617,15 +617,15 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
 
         $products = [
             [
-                'name'          => 'Premium Cement 50kg',
-                'slug'          => 'premium-cement-50kg',
-                'sku'           => 'CEM-PREM-50',
-                'summary'       => 'High-quality Portland cement for construction',
-                'description'   => 'Premium Portland cement suitable for all construction projects. Provides excellent strength and durability.',
-                'price'         => 12.99,
-                'cost_price'    => 8.5,
-                'is_enabled'    => true,
-                'translations'  => [
+                'name'         => 'Premium Cement 50kg',
+                'slug'         => 'premium-cement-50kg',
+                'sku'          => 'CEM-PREM-50',
+                'summary'      => 'High-quality Portland cement for construction',
+                'description'  => 'Premium Portland cement suitable for all construction projects. Provides excellent strength and durability.',
+                'price'        => 12.99,
+                'cost_price'   => 8.5,
+                'is_enabled'   => true,
+                'translations' => [
                     'lt' => [
                         'name'        => 'Aukščiausios kokybės cementas 50kg',
                         'slug'        => 'auksciausia-kokybes-cementas-50kg',
@@ -641,15 +641,15 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
                 ],
             ],
             [
-                'name'          => 'Professional Drill Set',
-                'slug'          => 'professional-drill-set',
-                'sku'           => 'DRILL-PRO-SET',
-                'summary'       => 'Complete professional drill set with accessories',
-                'description'   => 'Professional-grade drill set including drill bits, screwdriver bits, and carrying case.',
-                'price'         => 89.99,
-                'cost_price'    => 55.0,
-                'is_enabled'    => true,
-                'translations'  => [
+                'name'         => 'Professional Drill Set',
+                'slug'         => 'professional-drill-set',
+                'sku'          => 'DRILL-PRO-SET',
+                'summary'      => 'Complete professional drill set with accessories',
+                'description'  => 'Professional-grade drill set including drill bits, screwdriver bits, and carrying case.',
+                'price'        => 89.99,
+                'cost_price'   => 55.0,
+                'is_enabled'   => true,
+                'translations' => [
                     'lt' => [
                         'name'        => 'Profesionalus grąžtų rinkinys',
                         'slug'        => 'profesionalus-graztu-rinkinys',
@@ -665,15 +665,15 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
                 ],
             ],
             [
-                'name'          => 'LED Light Bulb 10W',
-                'slug'          => 'led-light-bulb-10w',
-                'sku'           => 'LED-BULB-10W',
-                'summary'       => 'Energy-efficient LED light bulb',
-                'description'   => 'High-efficiency LED bulb with warm white light. Long-lasting and energy-saving.',
-                'price'         => 4.99,
-                'cost_price'    => 2.5,
-                'is_enabled'    => true,
-                'translations'  => [
+                'name'         => 'LED Light Bulb 10W',
+                'slug'         => 'led-light-bulb-10w',
+                'sku'          => 'LED-BULB-10W',
+                'summary'      => 'Energy-efficient LED light bulb',
+                'description'  => 'High-efficiency LED bulb with warm white light. Long-lasting and energy-saving.',
+                'price'        => 4.99,
+                'cost_price'   => 2.5,
+                'is_enabled'   => true,
+                'translations' => [
                     'lt' => [
                         'name'        => 'LED lemputė 10W',
                         'slug'        => 'led-lempute-10w',
@@ -695,15 +695,15 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
             $product = Product::withoutGlobalScopes()->withTrashed()->updateOrCreate(
                 ['sku' => $productData['sku']],
                 [
-                    'name'          => $productData['name'],
-                    'slug'          => $productData['slug'],
-                    'summary'       => $productData['summary'],
-                    'description'   => $productData['description'],
-                    'price'         => $productData['price'],
-                    'cost_price'    => $productData['cost_price'],
-                    'is_enabled'    => $productData['is_enabled'],
-                    'is_visible'    => $productData['is_enabled'],
-                    'brand_id'      => $brands->random()->id,
+                    'name'        => $productData['name'],
+                    'slug'        => $productData['slug'],
+                    'summary'     => $productData['summary'],
+                    'description' => $productData['description'],
+                    'price'       => $productData['price'],
+                    'cost_price'  => $productData['cost_price'],
+                    'is_enabled'  => $productData['is_enabled'],
+                    'is_visible'  => $productData['is_enabled'],
+                    'brand_id'    => $brands->random()->id,
                 ]
             );
 

@@ -21,7 +21,7 @@ return new class extends Migration
                 if (in_array('product_similarities_product_id_similarity_score_index', $indexNames)) {
                     $table->dropIndex('product_similarities_product_id_similarity_score_index');
                 }
-                
+
                 if (in_array('product_similarities_similar_product_id_similarity_score_index', $indexNames)) {
                     $table->dropIndex('product_similarities_similar_product_id_similarity_score_index');
                 }

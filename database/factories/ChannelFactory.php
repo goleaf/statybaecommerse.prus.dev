@@ -52,11 +52,11 @@ class ChannelFactory extends Factory
             'currency_position' => 'after',
 
             // Operational flags surfaced in Filament filters.
-            'is_enabled'        => true,
-            'is_default'        => false,
-            'is_active'         => true,
-            'ssl_enabled'       => $this->faker->boolean(70),
-            'sort_order'        => $this->faker->numberBetween(0, 50),
+            'is_enabled'  => true,
+            'is_default'  => false,
+            'is_active'   => true,
+            'ssl_enabled' => $this->faker->boolean(70),
+            'sort_order'  => $this->faker->numberBetween(0, 50),
 
             // Provide deterministic defaults for nullable JSON columns.
             'metadata'      => [],

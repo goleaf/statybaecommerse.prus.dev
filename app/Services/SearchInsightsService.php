@@ -29,7 +29,7 @@ final class SearchInsightsService
         try {
             $cacheKey = self::CACHE_PREFIX . 'insights_' . md5($query . serialize($context));
 
-            return Cache::remember($cacheKey, self::INSIGHTS_CACHE_TTL, function () use ($query, $context) {
+            return Cache::remember($cacheKey, self::INSIGHTS_CACHE_TTL, function () use ($query) {
                 return [
                     'query_analysis'     => $this->analyzeQuery($query),
                     'search_suggestions' => $this->getSearchSuggestions($query),
