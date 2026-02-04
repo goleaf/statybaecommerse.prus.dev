@@ -1,17 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="CLI Arguments" tests="2" assertions="2" errors="0" failures="2" skipped="0" time="23.820342">
-    <testsuite name="Tests\Feature\Filament\Importers\UserImporterTest" file="tests\Feature\Filament\Importers\UserImporterTest.php" tests="1" assertions="1" errors="0" failures="1" skipped="0" time="23.377965">
-      <testcase name="it can import users" file="tests\Feature\Filament\Importers\UserImporterTest.php::it can import users" class="Tests\Feature\Filament\Importers\UserImporterTest" classname="Tests.Feature.Filament.Importers.UserImporterTest" assertions="1" time="23.377965">
-        <failure type="PHPUnit\Framework\ExpectationFailedException">it can import usersFailed asserting that 0 is identical to 1.&#13;
-at tests\Feature\Filament\Importers\UserImporterTest.php:51</failure>
-      </testcase>
+  <testsuite name="CLI Arguments" tests="8" assertions="17" errors="0" failures="0" skipped="0" time="28.782686">
+    <testsuite name="Tests\Feature\Filament\Importers\PriceImporterTest" file="tests\Feature\Filament\Importers\PriceImporterTest.php" tests="1" assertions="2" errors="0" failures="0" skipped="0" time="26.837250">
+      <testcase name="it can import prices" file="tests\Feature\Filament\Importers\PriceImporterTest.php::it can import prices" class="Tests\Feature\Filament\Importers\PriceImporterTest" classname="Tests.Feature.Filament.Importers.PriceImporterTest" assertions="2" time="26.837250"/>
     </testsuite>
-    <testsuite name="Tests\Feature\Filament\Importers\PriceImporterTest" file="tests\Feature\Filament\Importers\PriceImporterTest.php" tests="1" assertions="1" errors="0" failures="1" skipped="0" time="0.442377">
-      <testcase name="it can import prices" file="tests\Feature\Filament\Importers\PriceImporterTest.php::it can import prices" class="Tests\Feature\Filament\Importers\PriceImporterTest" classname="Tests.Feature.Filament.Importers.PriceImporterTest" assertions="1" time="0.442377">
-        <failure type="PHPUnit\Framework\ExpectationFailedException">it can import pricesFailed asserting that 0 is identical to 1.&#13;
-at tests\Feature\Filament\Importers\PriceImporterTest.php:55</failure>
-      </testcase>
+    <testsuite name="Tests\Feature\Filament\Importers\UserImporterTest" file="tests\Feature\Filament\Importers\UserImporterTest.php" tests="1" assertions="3" errors="0" failures="0" skipped="0" time="0.301422">
+      <testcase name="it can import users" file="tests\Feature\Filament\Importers\UserImporterTest.php::it can import users" class="Tests\Feature\Filament\Importers\UserImporterTest" classname="Tests.Feature.Filament.Importers.UserImporterTest" assertions="3" time="0.301422"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\Filament\Importers\BrandImporterTest" file="tests\Feature\Filament\Importers\BrandImporterTest.php" tests="1" assertions="2" errors="0" failures="0" skipped="0" time="0.268666">
+      <testcase name="it can import brands" file="tests\Feature\Filament\Importers\BrandImporterTest.php::it can import brands" class="Tests\Feature\Filament\Importers\BrandImporterTest" classname="Tests.Feature.Filament.Importers.BrandImporterTest" assertions="2" time="0.268666"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\Filament\Importers\CategoryImporterTest" file="tests\Feature\Filament\Importers\CategoryImporterTest.php" tests="1" assertions="2" errors="0" failures="0" skipped="0" time="0.293818">
+      <testcase name="it can import categories" file="tests\Feature\Filament\Importers\CategoryImporterTest.php::it can import categories" class="Tests\Feature\Filament\Importers\CategoryImporterTest" classname="Tests.Feature.Filament.Importers.CategoryImporterTest" assertions="2" time="0.293818"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\Filament\Importers\OrderImporterTest" file="tests\Feature\Filament\Importers\OrderImporterTest.php" tests="1" assertions="2" errors="0" failures="0" skipped="0" time="0.285692">
+      <testcase name="it can import orders" file="tests\Feature\Filament\Importers\OrderImporterTest.php::it can import orders" class="Tests\Feature\Filament\Importers\OrderImporterTest" classname="Tests.Feature.Filament.Importers.OrderImporterTest" assertions="2" time="0.285692"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\Filament\Importers\OrganizationImporterTest" file="tests\Feature\Filament\Importers\OrganizationImporterTest.php" tests="1" assertions="2" errors="0" failures="0" skipped="0" time="0.325585">
+      <testcase name="it can import organizations" file="tests\Feature\Filament\Importers\OrganizationImporterTest.php::it can import organizations" class="Tests\Feature\Filament\Importers\OrganizationImporterTest" classname="Tests.Feature.Filament.Importers.OrganizationImporterTest" assertions="2" time="0.325585"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\Filament\Importers\PartnerImporterTest" file="tests\Feature\Filament\Importers\PartnerImporterTest.php" tests="1" assertions="2" errors="0" failures="0" skipped="0" time="0.242610">
+      <testcase name="it can import partners" file="tests\Feature\Filament\Importers\PartnerImporterTest.php::it can import partners" class="Tests\Feature\Filament\Importers\PartnerImporterTest" classname="Tests.Feature.Filament.Importers.PartnerImporterTest" assertions="2" time="0.242610"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\Filament\Importers\SubscriberImporterTest" file="tests\Feature\Filament\Importers\SubscriberImporterTest.php" tests="1" assertions="2" errors="0" failures="0" skipped="0" time="0.227644">
+      <testcase name="it can import subscribers" file="tests\Feature\Filament\Importers\SubscriberImporterTest.php::it can import subscribers" class="Tests\Feature\Filament\Importers\SubscriberImporterTest" classname="Tests.Feature.Filament.Importers.SubscriberImporterTest" assertions="2" time="0.227644"/>
     </testsuite>
   </testsuite>
 </testsuites>

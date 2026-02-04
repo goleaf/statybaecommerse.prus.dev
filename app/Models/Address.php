@@ -102,6 +102,15 @@ final class Address extends Model
 
     protected static function booted(): void
     {
+        self::saving(static function (Address $address): void {
+            if ($address->is_default) {
+                // Ensure only one default address exists for the user.
+                self::where('user_id', $address->user_id)
+                    ->where('id', '!=', $address->id)
+                    ->update(['is_default' => false]);
+            }
+        });
+
         self::creating(static function (Address $address): void {
             $columns = self::tableColumns($address);
 

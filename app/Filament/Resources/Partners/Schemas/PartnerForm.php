@@ -35,7 +35,8 @@ class PartnerForm
                             ->required()
                             ->unique(ignoreRecord: true)
                             ->maxLength(255),
-                    ])->columns(2),
+                    ])->columns(2)
+                    ->columnSpanFull(),
 
                 Section::make(__('messages.footer_contact'))
                     ->schema([
@@ -47,7 +48,8 @@ class PartnerForm
                             ->label(__('messages.phone'))
                             ->tel()
                             ->maxLength(255),
-                    ])->columns(2),
+                    ])->columns(2)
+                    ->columnSpanFull(),
 
                 Section::make(__('messages.financials'))
                     ->schema([
@@ -66,7 +68,8 @@ class PartnerForm
                             ->relationship('partnerTier', 'name')
                             ->searchable()
                             ->preload(),
-                    ])->columns(3),
+                    ])->columns(3)
+                    ->columnSpanFull(),
 
                 Section::make(__('admin.navigation.settings'))
                     ->schema([
@@ -75,7 +78,8 @@ class PartnerForm
                             ->required(),
                         KeyValue::make('metadata')
                             ->label(__('messages.Value')),
-                    ]),
+                    ])
+                    ->columnSpanFull(),
             ]);
     }
 }

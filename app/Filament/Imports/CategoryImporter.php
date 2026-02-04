@@ -77,4 +77,15 @@ class CategoryImporter extends BaseImporter
 
         return $body;
     }
+
+    public static function getColumnGroups(): array
+    {
+        return [
+            'Basic Information' => ['name', 'slug', 'parent'],
+            'Descriptions'      => ['description', 'short_description'],
+            'Settings'          => ['sort_order', 'is_visible', 'is_active', 'is_enabled', 'is_featured', 'show_in_menu'],
+            'Appearance'        => ['color', 'icon'],
+            'SEO'               => ['seo_title', 'seo_description', 'meta_title', 'meta_description'],
+        ];
+    }
 }

@@ -36,14 +36,16 @@ class OrganizationForm
                             ->label(__('messages.Type'))
                             ->required()
                             ->maxLength(255),
-                    ])->columns(3),
+                    ])->columns(3)
+                    ->columnSpanFull(),
 
                 Section::make(__('messages.Description'))
                     ->schema([
                         RichEditor::make('description')
                             ->label(__('messages.Description'))
                             ->columnSpanFull(),
-                    ]),
+                    ])
+                    ->columnSpanFull(),
 
                 Section::make(__('admin.navigation.settings'))
                     ->schema([
@@ -52,7 +54,8 @@ class OrganizationForm
                             ->required(),
                         KeyValue::make('settings')
                             ->label(__('messages.Value')),
-                    ]),
+                    ])
+                    ->columnSpanFull(),
             ]);
     }
 }

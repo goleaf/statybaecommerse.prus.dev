@@ -155,7 +155,8 @@ class ProductForm
                                     ->numeric()
                                     ->prefix('€'),
                             ]),
-                    ]),
+                    ])
+                    ->columnSpanFull(),
                 Section::make(__('admin.products.inventory'))
                     ->schema([
                         Grid::make(5)
@@ -216,7 +217,8 @@ class ProductForm
                             ->label(__('admin.products.seo_description'))
                             ->rows(3)
                             ->columnSpanFull(),
-                    ]),
+                    ])
+                    ->columnSpanFull(),
 
             ]);
     }

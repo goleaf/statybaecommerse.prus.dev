@@ -15,6 +15,9 @@ return new class extends Migration
     {
         if (Schema::hasTable('product_similarities')) {
             Schema::table('product_similarities', function (Blueprint $table) {
+                // Drop the index that depends on the column first
+                $table->dropIndex('product_similarities_product_id_similarity_score_index');
+
                 if (Schema::hasColumn('product_similarities', 'similarity_score')) {
                     $table->dropColumn('similarity_score');
                 }

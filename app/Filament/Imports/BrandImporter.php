@@ -77,4 +77,14 @@ class BrandImporter extends BaseImporter
 
         return $body;
     }
+
+    public static function getColumnGroups(): array
+    {
+        return [
+            'Identification' => ['name', 'slug'],
+            'Settings'       => ['is_enabled', 'sort_order', 'is_premium', 'is_featured', 'is_visible', 'is_active'],
+            'SEO'            => ['seo_title', 'seo_description', 'meta_title', 'meta_description'],
+            'Contact'        => ['website', 'contact_email', 'contact_phone', 'social_links'],
+        ];
+    }
 }

@@ -35,14 +35,16 @@ class CompanyForm
                             ->label(__('users.website'))
                             ->url()
                             ->maxLength(255),
-                    ])->columns(2),
+                    ])->columns(2)
+                    ->columnSpanFull(),
 
                 Section::make(__('messages.address'))
                     ->schema([
                         TextInput::make('address')
                             ->label(__('messages.address'))
                             ->maxLength(255),
-                    ]),
+                    ])
+                    ->columnSpanFull(),
 
                 Section::make(__('messages.Profile'))
                     ->schema([
@@ -61,14 +63,16 @@ class CompanyForm
                         Textarea::make('description')
                             ->label(__('messages.description'))
                             ->columnSpanFull(),
-                    ])->columns(2),
+                    ])->columns(2)
+                    ->columnSpanFull(),
 
                 Section::make(__('admin.navigation.settings'))
                     ->schema([
                         Toggle::make('is_active')
                             ->label(__('messages.active'))
                             ->default(true),
-                    ]),
+                    ])
+                    ->columnSpanFull(),
             ]);
     }
 }

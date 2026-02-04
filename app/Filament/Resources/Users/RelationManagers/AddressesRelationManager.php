@@ -22,6 +22,9 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
+use Filament\Tables\Actions\Action;
+use Filament\Notifications\Notification;
+
 class AddressesRelationManager extends RelationManager
 {
     protected static string $relationship = 'addresses';
@@ -122,6 +125,18 @@ class AddressesRelationManager extends RelationManager
                 AssociateAction::make(),
             ])
             ->recordActions([
+                Action::make('set_default')
+                    ->label(__('messages.set_as_default') ?? 'Set as Default')
+                    ->icon('heroicon-o-check-circle')
+                    ->color('success')
+                    ->action(function (Address $record) {
+                        $record->setAsDefault();
+                        Notification::make()
+                            ->title(__('messages.address_set_as_default') ?? 'Address set as default successfully.')
+                            ->success()
+                            ->send();
+                    })
+                    ->hidden(fn (Address $record): bool => $record->is_default),
                 EditAction::make(),
                 DissociateAction::make(),
                 DeleteAction::make(),

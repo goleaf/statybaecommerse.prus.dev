@@ -57,4 +57,13 @@ class DiscountImporter extends BaseImporter
 
         return $body;
     }
+
+    public static function getColumnGroups(): array
+    {
+        return [
+            'General' => ['name', 'slug', 'description', 'type', 'value'],
+            'Rules'   => ['starts_at', 'ends_at', 'usage_limit', 'minimum_amount', 'maximum_amount'],
+            'Status'  => ['is_active', 'is_enabled', 'status', 'priority'],
+        ];
+    }
 }

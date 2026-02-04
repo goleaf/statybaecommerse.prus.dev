@@ -49,9 +49,6 @@ class UserInfolist
                         IconEntry::make('is_active')
                             ->label(__('messages.active'))
                             ->boolean(),
-                        IconEntry::make('is_admin')
-                            ->label(__('admin.user_status.admin'))
-                            ->boolean(),
                         TextEntry::make('preferred_locale')
                             ->label(__('messages.language'))
                             ->formatStateUsing(fn ($state) => match ($state) {
@@ -61,7 +58,7 @@ class UserInfolist
                                 'de'    => __('translations.german'),
                                 default => $state,
                             }),
-                    ])->columns(3),
+                    ])->columns(2),
             ]);
     }
 }

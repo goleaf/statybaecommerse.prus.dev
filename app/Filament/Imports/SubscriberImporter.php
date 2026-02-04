@@ -60,4 +60,13 @@ class SubscriberImporter extends BaseImporter
 
         return $body;
     }
+
+    public static function getColumnGroups(): array
+    {
+        return [
+            'General'  => ['email', 'first_name', 'last_name', 'phone'],
+            'Business' => ['company', 'job_title'],
+            'Status'   => ['status', 'is_verified', 'accepts_marketing'],
+        ];
+    }
 }

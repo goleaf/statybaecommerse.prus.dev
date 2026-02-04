@@ -244,6 +244,8 @@ return [
     'Security'                                                                                              => 'Security',
     'Select'                                                                                                => 'Select',
     'Select options'                                                                                        => 'Select options',
+    'set_as_default'                                                                                        => 'Set as Default',
+    'address_set_as_default'                                                                                => 'Address set as default successfully.',
     'Setting'                                                                                               => 'Setting',
     'Settings'                                                                                              => 'Settings',
     'Shipping'                                                                                              => 'Shipping',

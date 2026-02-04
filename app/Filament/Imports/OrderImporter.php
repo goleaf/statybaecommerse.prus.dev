@@ -52,4 +52,13 @@ class OrderImporter extends BaseImporter
 
         return $body;
     }
+
+    public static function getColumnGroups(): array
+    {
+        return [
+            'General'   => ['number', 'user', 'status'],
+            'Financial' => ['total', 'currency', 'payment_status'],
+            'Address'   => ['billing_address', 'shipping_address'],
+        ];
+    }
 }

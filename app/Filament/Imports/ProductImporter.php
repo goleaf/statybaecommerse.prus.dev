@@ -170,7 +170,9 @@ class ProductImporter extends BaseImporter
 
     public function resolveRecord(): Product
     {
-        return new Product;
+        return Product::firstOrNew([
+            'sku' => $this->data['sku'],
+        ]);
     }
 
     public static function getCompletedNotificationBody(Import $import): string
@@ -182,5 +184,72 @@ class ProductImporter extends BaseImporter
         }
 
         return $body;
+    }
+
+    public static function getColumnGroups(): array
+    {
+        return [
+            'Basic Information' => [
+                'name',
+                'slug',
+                'sku',
+                'barcode',
+                'status',
+                'type',
+            ],
+            'Descriptions' => [
+                'description',
+                'short_description',
+                'summary',
+                'detailed_description',
+            ],
+            'Pricing' => [
+                'price',
+                'sale_price',
+                'cost_price',
+                'compare_price',
+            ],
+            'Inventory' => [
+                'manage_stock',
+                'stock_quantity',
+                'low_stock_threshold',
+                'track_inventory',
+                'track_stock',
+                'allow_backorder',
+                'warehouse_quantity',
+                'minimum_quantity',
+            ],
+            'Dimensions' => [
+                'weight',
+                'length',
+                'width',
+                'height',
+            ],
+            'SEO & Metadata' => [
+                'seo_title',
+                'seo_description',
+                'meta_title',
+                'meta_description',
+                'meta_keywords',
+                'tags',
+            ],
+            'Relations' => [
+                'brand',
+                'category',
+                'collection',
+            ],
+            'Other' => [
+                'is_visible',
+                'is_enabled',
+                'is_featured',
+                'published_at',
+                'video_url',
+                'external_url',
+                'button_text',
+                'gallery',
+                'available_from',
+                'available_until',
+            ],
+        ];
     }
 }

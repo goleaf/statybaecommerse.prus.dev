@@ -60,7 +60,8 @@ class DocumentTemplateForm
                                 ->label(__('admin.document_templates.fields.is_active'))
                                 ->default(true),
                         ]),
-                ]),
+                ])
+                ->columnSpanFull(),
             Section::make(__('admin.document_templates.sections.content'))
                 ->description(__('admin.document_templates.sections.content_description'))
                 ->schema([
@@ -69,7 +70,8 @@ class DocumentTemplateForm
                         ->required()
                         ->rows(16)
                         ->columnSpanFull(),
-                ]),
+                ])
+                ->columnSpanFull(),
             Section::make(__('admin.document_templates.sections.variables'))
                 ->description(__('admin.document_templates.sections.variables_description'))
                 ->schema([
@@ -77,7 +79,8 @@ class DocumentTemplateForm
                         ->label(__('admin.document_templates.fields.variables'))
                         ->default([])
                         ->columnSpanFull(),
-                ]),
+                ])
+                ->columnSpanFull(),
             Section::make(__('admin.document_templates.sections.settings'))
                 ->description(__('admin.document_templates.sections.settings_description'))
                 ->schema([
@@ -85,7 +88,8 @@ class DocumentTemplateForm
                         ->label(__('admin.document_templates.fields.settings'))
                         ->default([])
                         ->columnSpanFull(),
-                ]),
+                ])
+                ->columnSpanFull(),
         ]);
     }
 }

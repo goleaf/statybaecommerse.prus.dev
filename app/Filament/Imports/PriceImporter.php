@@ -55,4 +55,13 @@ class PriceImporter extends BaseImporter
 
         return $body;
     }
+
+    public static function getColumnGroups(): array
+    {
+        return [
+            'Target'   => ['priceable_id', 'priceable_type'],
+            'Pricing'  => ['amount', 'compare_amount', 'cost_amount', 'currency'],
+            'Settings' => ['type', 'starts_at', 'ends_at', 'is_enabled'],
+        ];
+    }
 }

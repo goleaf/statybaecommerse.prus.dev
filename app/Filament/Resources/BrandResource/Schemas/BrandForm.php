@@ -47,7 +47,8 @@ class BrandForm
                                 ->label(__('admin.brands.is_premium'))
                                 ->default(false),
                         ]),
-                ]),
+                ])
+                ->columnSpanFull(),
             Section::make(__('messages.media'))
                 ->description(__('admin.brands.media_description'))
                 ->schema([
@@ -69,7 +70,8 @@ class BrandForm
                                 ->required(),
                         ])
                         ->columns(2),
-                ]),
+                ])
+                ->columnSpanFull(),
         ]);
     }
 }

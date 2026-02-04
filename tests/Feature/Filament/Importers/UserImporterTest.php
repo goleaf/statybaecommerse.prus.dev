@@ -27,7 +27,7 @@ it('can import users', function () {
     $row = [
         'name' => 'John Doe',
         'email' => 'john@example.com',
-        'password' => 'password123',
+        'password' => 'Password123!',
         'is_admin' => '0',
         'is_active' => '1',
     ];
@@ -44,10 +44,6 @@ it('can import users', function () {
 
     $import->refresh();
 
-    if ($import->successful_rows === 0) {
-        dump($import->failedRows->toArray());
-    }
-
     expect($import->successful_rows)->toBe(1);
     $this->assertDatabaseHas('users', [
         'name' => 'John Doe',
@@ -55,5 +51,5 @@ it('can import users', function () {
     ]);
 
     $user = User::where('email', 'john@example.com')->first();
-    expect(Hash::check('password123', $user->password))->toBeTrue();
+    expect(Hash::check('Password123!', $user->password))->toBeTrue();
 });

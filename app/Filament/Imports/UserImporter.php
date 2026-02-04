@@ -24,9 +24,6 @@ class UserImporter extends BaseImporter
                 ->rules(['required', 'email', 'max:255']),
             ImportColumn::make('password')
                 ->rules(['required', 'min:8']),
-            ImportColumn::make('is_admin')
-                ->boolean()
-                ->rules(['boolean']),
             ImportColumn::make('is_active')
                 ->boolean()
                 ->rules(['boolean']),
@@ -53,5 +50,14 @@ class UserImporter extends BaseImporter
         }
 
         return $body;
+    }
+
+    public static function getColumnGroups(): array
+    {
+        return [
+            'Account'  => ['name', 'email', 'password', 'is_admin', 'is_active'],
+            'Profile'  => ['first_name', 'last_name', 'phone_number', 'bio', 'company', 'position', 'website'],
+            'Settings' => ['preferred_locale', 'preferred_currency', 'timezone'],
+        ];
     }
 }

@@ -48,4 +48,12 @@ class OrganizationImporter extends BaseImporter
 
         return $body;
     }
+
+    public static function getColumnGroups(): array
+    {
+        return [
+            'General'  => ['name', 'slug', 'type'],
+            'Settings' => ['is_active'],
+        ];
+    }
 }

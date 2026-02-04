@@ -54,7 +54,8 @@ class DiscountForm
                                 ->label(__('admin.discounts.is_active'))
                                 ->default(true),
                         ]),
-                ]),
+                ])
+                ->columnSpanFull(),
             Section::make(__('admin.discounts.validity'))
                 ->description(__('admin.discounts.validity_description'))
                 ->schema([
@@ -78,7 +79,8 @@ class DiscountForm
                                 ->minValue(0)
                                 ->step(0.01),
                         ]),
-                ]),
+                ])
+                ->columnSpanFull(),
         ]);
     }
 }

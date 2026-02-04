@@ -15,23 +15,30 @@ use Filament\Actions\Imports\Events\ImportStarted;
 use Filament\Actions\Imports\ImportColumn;
 use Filament\Actions\Imports\Models\Import;
 use Filament\Facades\Filament;
+use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\Wizard;
+use Filament\Forms\Components\Wizard\Step;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
-use Filament\Schemas\Components\Fieldset;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Support\ChunkIterator;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Filesystem\AwsS3V3Adapter;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\HtmlString;
 use Illuminate\Support\Number;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -53,7 +60,7 @@ abstract class CsvImportPage extends Page implements HasForms
     public ?array $data = [];
 
     /**
-     * @var array{processed: int, successful: int, failed: int, total: int}|null
+     * @var array{processed: int, successful: int, failed: int, total: int, new: int, updated: int, removed: int}|null
      */
     public ?array $lastImport = null;
 
@@ -95,76 +102,243 @@ abstract class CsvImportPage extends Page implements HasForms
 
         return $form
             ->schema([
-                Section::make(__('translations.import'))
-                    ->schema([
-                        FileUpload::make('file')
-                            ->label(__('filament-actions::import.modal.form.file.label'))
-                            ->placeholder(__('filament-actions::import.modal.form.file.placeholder'))
-                            ->acceptedFileTypes([
-                                'text/csv',
-                                'text/x-csv',
-                                'application/csv',
-                                'application/x-csv',
-                                'text/comma-separated-values',
-                                'text/x-comma-separated-values',
-                                'text/plain',
-                                'application/vnd.ms-excel',
-                            ])
-                            ->rules($this->getFileValidationRules())
-                            ->afterStateUpdated(function (FileUpload $component, Component $livewire, Set $set, ?TemporaryUploadedFile $state) use ($page): void {
-                                if (! $state instanceof TemporaryUploadedFile) {
-                                    return;
+                Wizard::make([
+                    Step::make(__('admin.import_step_source'))
+                        ->description(__('admin.import_step_source_description'))
+                        ->schema([
+                            Section::make(__('translations.import'))
+                                ->schema([
+                                    FileUpload::make('file')
+                                        ->label(__('filament-actions::import.modal.form.file.label'))
+                                        ->placeholder(__('filament-actions::import.modal.form.file.placeholder'))
+                                        ->acceptedFileTypes([
+                                            'text/csv',
+                                            'text/x-csv',
+                                            'application/csv',
+                                            'application/x-csv',
+                                            'text/comma-separated-values',
+                                            'text/x-comma-separated-values',
+                                            'text/plain',
+                                            'application/vnd.ms-excel',
+                                        ])
+                                        ->rules($this->getFileValidationRules())
+                                        ->afterStateUpdated(function (FileUpload $component, Component $livewire, Set $set, ?TemporaryUploadedFile $state) use ($page): void {
+                                            if (! $state instanceof TemporaryUploadedFile) {
+                                                return;
+                                            }
+
+                                            try {
+                                                $livewire->validateOnly($component->getStatePath());
+                                            } catch (ValidationException $exception) {
+                                                $component->state([]);
+
+                                                throw $exception;
+                                            }
+
+                                            $headers = $page->getCsvHeaders($state);
+
+                                            if ($headers === []) {
+                                                return;
+                                            }
+
+                                            $set('columnMap', $page->guessColumnMap($headers));
+                                        })
+                                        ->storeFiles(false)
+                                        ->visibility('private')
+                                        ->required(),
+
+                                    Toggle::make('should_sync')
+                                        ->label(__('admin.import_should_sync'))
+                                        ->helperText(__('admin.import_should_sync_description'))
+                                        ->default(false),
+
+                                    ...$this->getOptionsFormComponents(),
+                                ]),
+                        ]),
+
+                    Step::make(__('admin.import_step_mapping'))
+                        ->description(__('admin.import_step_mapping_description'))
+                        ->schema(function (Get $get) use ($page): array {
+                            $csvFile = $get('file');
+
+                            if (! $csvFile instanceof TemporaryUploadedFile) {
+                                return [
+                                    Placeholder::make('no_file')
+                                        ->content(__('admin.import_please_upload_file')),
+                                ];
+                            }
+
+                            $headers = $page->getCsvHeaders($csvFile);
+
+                            if ($headers === []) {
+                                return [];
+                            }
+
+                            $options = array_combine($headers, $headers);
+                            $importerClass = static::getImporterClass();
+                            $groups = $importerClass::getColumnGroups();
+                            $allColumns = $page->getImporterColumns();
+                            $mappedColumns = collect($allColumns)->keyBy->getName();
+
+                            $schemas = [];
+
+                            foreach ($groups as $groupLabel => $columnNames) {
+                                $groupColumns = [];
+                                foreach ($columnNames as $columnName) {
+                                    if ($mappedColumns->has($columnName)) {
+                                        $column = $mappedColumns->get($columnName);
+                                        $groupColumns[] = $column->getSelect()->options($options);
+                                        $mappedColumns->forget($columnName);
+                                    }
                                 }
 
-                                try {
-                                    $livewire->validateOnly($component->getStatePath());
-                                } catch (ValidationException $exception) {
-                                    $component->state([]);
+                                if (! empty($groupColumns)) {
+                                    $schemas[] = Fieldset::make($groupLabel)
+                                        ->schema($groupColumns)
+                                        ->columns(2);
+                                }
+                            }
 
-                                    throw $exception;
+                            // Remaining columns
+                            if ($mappedColumns->isNotEmpty()) {
+                                $remainingColumns = [];
+                                foreach ($mappedColumns as $column) {
+                                    $remainingColumns[] = $column->getSelect()->options($options);
                                 }
 
-                                $headers = $page->getCsvHeaders($state);
+                                $schemas[] = Fieldset::make(__('admin.import_other_columns'))
+                                    ->schema($remainingColumns)
+                                    ->columns(2);
+                            }
 
-                                if ($headers === []) {
-                                    return;
-                                }
+                            return [
+                                Grid::make(1)
+                                    ->schema($schemas)
+                                    ->statePath('columnMap'),
+                            ];
+                        }),
 
-                                $set('columnMap', $page->guessColumnMap($headers));
-                            })
-                            ->storeFiles(false)
-                            ->visibility('private')
-                            ->required(),
-                        Fieldset::make(__('filament-actions::import.modal.form.columns.label'))
-                            ->columns(1)
-                            ->inlineLabel()
-                            ->schema(function (Get $get) use ($page): array {
-                                $csvFile = $get('file');
+                    Step::make(__('admin.import_step_analysis'))
+                        ->description(__('admin.import_step_analysis_description'))
+                        ->afterValidation(fn () => $this->runAnalysis())
+                        ->schema([
+                            Placeholder::make('analysis_summary')
+                                ->content(fn () => $this->getAnalysisContent()),
+                        ]),
+                ])
+                ->submitAction(view('filament.pages.imports.import-button'))
+                ->statePath('data'),
+            ]);
+    }
 
-                                if (! $csvFile instanceof TemporaryUploadedFile) {
-                                    return [];
-                                }
+    protected function runAnalysis(): void
+    {
+        $data = $this->data;
+        $csvFile = $data['file'] ?? null;
 
-                                $headers = $page->getCsvHeaders($csvFile);
+        if (! $csvFile instanceof TemporaryUploadedFile) {
+            return;
+        }
 
-                                if ($headers === []) {
-                                    return [];
-                                }
+        $headers = $this->getCsvHeaders($csvFile);
+        $columnMap = $data['columnMap'] ?? $this->guessColumnMap($headers);
 
-                                $options = array_combine($headers, $headers);
+        $csvStream = $this->getUploadedFileStream($csvFile);
+        if (! $csvStream) {
+            return;
+        }
+        $csvReader = CsvReader::createFromStream($csvStream);
 
-                                return array_map(
-                                    fn (ImportColumn $column) => $column->getSelect()->options($options),
-                                    $page->getImporterColumns(),
-                                );
-                            })
-                            ->statePath('columnMap')
-                            ->visible(fn (Get $get): bool => $get('file') instanceof TemporaryUploadedFile),
-                        ...$this->getOptionsFormComponents(),
-                    ])
-                    ->columns(1),
-            ])
-            ->statePath('data');
+        if (filled($csvDelimiter = $this->getCsvDelimiter($csvReader))) {
+            $csvReader->setDelimiter($csvDelimiter);
+        }
+
+        $csvReader->setHeaderOffset($this->getHeaderOffset());
+        $records = $csvReader->getRecords();
+
+        $importerClass = static::getImporterClass();
+        $modelClass = $importerClass::getModel();
+        $importer = new $importerClass(new Import(), $columnMap, Arr::except($data, ['file', 'columnMap']));
+
+        $newCount = 0;
+        $updatedCount = 0;
+        $totalCount = 0;
+
+        $limit = 1000;
+        $processedForAnalysis = 0;
+
+        foreach ($records as $record) {
+            $totalCount++;
+            if ($processedForAnalysis < $limit) {
+                $resolvedRecord = $this->evaluateImporterRecord($importer, $record);
+
+                if ($resolvedRecord->exists) {
+                    $updatedCount++;
+                } else {
+                    $newCount++;
+                }
+                $processedForAnalysis++;
+            }
+        }
+
+        if ($totalCount > $processedForAnalysis && $processedForAnalysis > 0) {
+            $ratio = $totalCount / $processedForAnalysis;
+            $newCount = (int) ($newCount * $ratio);
+            $updatedCount = (int) ($updatedCount * $ratio);
+        }
+
+        $removedCount = 0;
+        if ($data['should_sync'] ?? false) {
+            $currentCount = $modelClass::count();
+            $removedCount = max(0, $currentCount - $updatedCount);
+        }
+
+        $this->lastImport = array_merge($this->lastImport ?? [], [
+            'total'     => $totalCount,
+            'new'       => $newCount,
+            'updated'   => $updatedCount,
+            'removed'   => $removedCount,
+        ]);
+    }
+
+    protected function evaluateImporterRecord($importer, array $data): Model
+    {
+        $reflection = new \ReflectionClass($importer);
+        $property = $reflection->getProperty('data');
+        $property->setAccessible(true);
+        $property->setValue($importer, $data);
+
+        return $importer->resolveRecord();
+    }
+
+    protected function getAnalysisContent(): HtmlString
+    {
+        if (! $this->lastImport) {
+            return new HtmlString('<p>' . __('admin.import_analyzing') . '</p>');
+        }
+
+        $summary = $this->lastImport;
+
+        return new HtmlString("
+            <div class='space-y-2 p-4 border rounded-lg bg-gray-50 dark:bg-gray-800'>
+                <p class='text-lg font-bold'>" . __('admin.import_total_rows') . ": {$summary['total']}</p>
+                <div class='grid grid-cols-1 md:grid-cols-3 gap-4'>
+                    <div class='p-2 bg-green-100 dark:bg-green-900 rounded text-center'>
+                        <span class='block text-2xl font-bold text-green-700 dark:text-green-300'>{$summary['new']}</span>
+                        <span class='text-sm text-green-600 dark:text-green-400'>" . __('admin.import_new_records') . "</span>
+                    </div>
+                    <div class='p-2 bg-yellow-100 dark:bg-yellow-900 rounded text-center'>
+                        <span class='block text-2xl font-bold text-yellow-700 dark:text-yellow-300'>{$summary['updated']}</span>
+                        <span class='text-sm text-yellow-600 dark:text-yellow-400'>" . __('admin.import_updated_records') . "</span>
+                    </div>
+                    " . (($this->data['should_sync'] ?? false) ? "
+                    <div class='p-2 bg-red-100 dark:bg-red-900 rounded text-center'>
+                        <span class='block text-2xl font-bold text-red-700 dark:text-red-300'>{$summary['removed']}</span>
+                        <span class='text-sm text-red-600 dark:text-red-400'>" . __('admin.import_removed_records') . "</span>
+                    </div>" : '') . "
+                </div>
+            </div>
+        ");
     }
 
     public function import(): void
@@ -255,12 +429,12 @@ abstract class CsvImportPage extends Page implements HasForms
 
         event(new ImportCompleted($import, $columnMap, $options));
 
-        $this->lastImport = [
+        $this->lastImport = array_merge($this->lastImport ?? [], [
             'processed'  => $import->processed_rows,
             'successful' => $import->successful_rows,
             'failed'     => $import->getFailedRowsCount(),
             'total'      => $import->total_rows,
-        ];
+        ]);
 
         if ($import->user instanceof Authenticatable) { /** @phpstan-ignore instanceof.alwaysTrue */
             $failedRowsCount = $import->getFailedRowsCount();
@@ -360,9 +534,6 @@ abstract class CsvImportPage extends Page implements HasForms
         return static::getImporterClass()::getOptionsFormComponents();
     }
 
-    /**
-     * @return array<string, string|null>
-     */
     protected function guessColumnMap(array $headers): array
     {
         $lowercaseCsvColumnValues = array_map(Str::lower(...), $headers);
@@ -371,15 +542,29 @@ abstract class CsvImportPage extends Page implements HasForms
             $headers,
         );
 
-        return array_reduce($this->getImporterColumns(), function (array $carry, ImportColumn $column) use ($lowercaseCsvColumnKeys, $lowercaseCsvColumnValues): array {
+        $customGuesses = [
+            'sku' => ['product code', 'artikulas', 'kodas', 'sku number', 'item number'],
+            'name' => ['title', 'pavadinimas', 'label', 'product name', 'prekė'],
+            'price' => ['kaina', 'amount', 'cost', 'retail price', 'price (inc. vat)'],
+            'description' => ['aprašymas', 'body', 'content', 'long description'],
+            'status' => ['būsena', 'state', 'availability', 'is active'],
+        ];
+
+        return array_reduce($this->getImporterColumns(), function (array $carry, ImportColumn $column) use ($lowercaseCsvColumnKeys, $lowercaseCsvColumnValues, $customGuesses): array {
+            $name = $column->getName();
+            $guesses = array_unique(array_merge(
+                $column->getGuesses(),
+                $customGuesses[$name] ?? []
+            ));
+
             $guess = Arr::first(
                 array_intersect(
                     $lowercaseCsvColumnValues,
-                    $column->getGuesses(),
+                    $guesses,
                 ),
             );
 
-            $carry[$column->getName()] = filled($guess) ? $lowercaseCsvColumnKeys[$guess] : null;
+            $carry[$name] = filled($guess) ? $lowercaseCsvColumnKeys[$guess] : null;
 
             return $carry;
         }, []);

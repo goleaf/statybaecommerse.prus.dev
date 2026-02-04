@@ -36,7 +36,8 @@ class UserForm
                             ->dehydrateStateUsing(fn ($state) => Hash::make($state))
                             ->dehydrated(fn ($state) => filled($state))
                             ->required(fn (string $context): bool => $context === 'create'),
-                    ])->columns(2),
+                    ])->columns(2)
+                    ->columnSpanFull(),
 
                 Section::make(__('messages.Profile'))
                     ->schema([
@@ -59,16 +60,14 @@ class UserForm
                             ]),
                         DateTimePicker::make('date_of_birth')
                             ->label(__('messages.birth_date')),
-                    ])->columns(2),
+                    ])->columns(2)
+                    ->columnSpanFull(),
 
                 Section::make(__('admin.navigation.settings'))
                     ->schema([
                         Toggle::make('is_active')
                             ->label(__('messages.active'))
                             ->default(true),
-                        Toggle::make('is_admin')
-                            ->label(__('admin.user_status.admin'))
-                            ->default(false),
                         Select::make('preferred_locale')
                             ->label(__('messages.language'))
                             ->options([
@@ -78,7 +77,8 @@ class UserForm
                                 'de' => __('translations.german'),
                             ])
                             ->default('lt'),
-                    ])->columns(3),
+                    ])->columns(2)
+                    ->columnSpanFull(),
             ]);
     }
 }

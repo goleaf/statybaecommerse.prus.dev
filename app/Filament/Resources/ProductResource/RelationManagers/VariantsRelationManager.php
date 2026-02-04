@@ -58,6 +58,11 @@ class VariantsRelationManager extends RelationManager
     {
         return $table
             ->columns([
+                \Filament\Tables\Columns\ImageColumn::make('media')
+                    ->label(__('messages.image'))
+                    ->collection('images')
+                    ->limit(1)
+                    ->square(),
                 TextColumn::make('sku')
                     ->label(__('messages.sku'))
                     ->sortable()

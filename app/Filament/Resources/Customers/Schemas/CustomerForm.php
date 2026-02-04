@@ -31,7 +31,8 @@ class CustomerForm
                             ->label(__('messages.phone'))
                             ->tel()
                             ->maxLength(255),
-                    ])->columns(2),
+                    ])->columns(2)
+                    ->columnSpanFull(),
 
                 Section::make(__('messages.address'))
                     ->schema([
@@ -51,7 +52,8 @@ class CustomerForm
                             ->relationship('country', 'name')
                             ->searchable()
                             ->preload(),
-                    ])->columns(2),
+                    ])->columns(2)
+                    ->columnSpanFull(),
 
                 Section::make(__('admin.navigation.settings'))
                     ->schema([
@@ -65,7 +67,8 @@ class CustomerForm
                             ->required(),
                         KeyValue::make('metadata')
                             ->label(__('messages.Value')),
-                    ]),
+                    ])
+                    ->columnSpanFull(),
             ]);
     }
 }

@@ -156,13 +156,25 @@
                     <section class="rounded-3xl border border-slate-100 bg-white shadow-sm">
                         <div class="space-y-6 p-6 lg:p-8">
                             <h2 class="text-lg font-semibold text-slate-900">
-                                {{ __('products.page.detailed_description') }}</h2>
+                                {{ __('products.page.description') }}</h2>
                             <div class="prose prose-slate max-w-none text-slate-700">
                                 {!! $product->trans('description') ??
                                     ($product->description ?? '<p>' . __('products.page.no_description') . '</p>') !!}
                             </div>
                         </div>
                     </section>
+
+                    @if($product->trans('detailed_description') || $product->detailed_description)
+                        <section class="rounded-3xl border border-slate-100 bg-white shadow-sm">
+                            <div class="space-y-6 p-6 lg:p-8">
+                                <h2 class="text-lg font-semibold text-slate-900">
+                                    {{ __('products.page.detailed_description') }}</h2>
+                                <div class="prose prose-slate max-w-none text-slate-700">
+                                    {!! $product->trans('detailed_description') ?? $product->detailed_description !!}
+                                </div>
+                            </div>
+                        </section>
+                    @endif
 
                     @php
                         $technicalMetrics = [

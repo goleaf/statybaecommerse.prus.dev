@@ -31,7 +31,7 @@ it('can import prices', function () {
     $row = [
         'priceable_id' => (string) $product->id,
         'priceable_type' => Product::class,
-        'currency' => 'EUR',
+        'currency' => (string) $currency->id,
         'amount' => '123.45',
         'is_enabled' => '1',
     ];
@@ -47,10 +47,6 @@ it('can import prices', function () {
     (new ImportCsv($import, [$row], $columnMap, []))->handle();
 
     $import->refresh();
-
-    if ($import->successful_rows === 0) {
-        dump($import->failedRows->toArray());
-    }
 
     expect($import->successful_rows)->toBe(1);
     $this->assertDatabaseHas('prices', [

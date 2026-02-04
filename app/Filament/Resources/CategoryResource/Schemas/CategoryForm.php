@@ -46,7 +46,8 @@ class CategoryForm
                                 ->label(__('admin.categories.is_active'))
                                 ->default(true),
                         ]),
-                ]),
+                ])
+                ->columnSpanFull(),
         ]);
     }
 }

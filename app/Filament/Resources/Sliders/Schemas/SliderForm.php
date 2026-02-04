@@ -90,7 +90,8 @@ class SliderForm
                                     SearchableInputHelper::clear($component, $set, ['button_url' => null]);
                                 }),
                         ]),
-                    ]),
+                    ])
+                    ->columnSpanFull(),
 
                 Section::make(__('translations.media'))
                     ->schema([
@@ -113,7 +114,8 @@ class SliderForm
                             ->visibility('private')
                             ->imageEditor()
                             ->maxSize(2048),  // 2MB
-                    ]),
+                    ])
+                    ->columnSpanFull(),
 
                 Section::make(__('translations.design'))
                     ->schema([
@@ -152,7 +154,8 @@ class SliderForm
                                 ])
                                 ->default('center'),
                         ]),
-                    ]),
+                    ])
+                    ->columnSpanFull(),
 
                 Section::make(__('translations.animation_settings'))
                     ->schema([
@@ -194,7 +197,8 @@ class SliderForm
                                 'fast'   => __('translations.fast'),
                             ])
                             ->default('normal'),
-                    ]),
+                    ])
+                    ->columnSpanFull(),
 
                 Section::make(__('translations.scheduling'))
                     ->schema([
@@ -210,7 +214,8 @@ class SliderForm
                             ->label(__('translations.is_scheduled'))
                             ->default(false)
                             ->live(),
-                    ]),
+                    ])
+                    ->columnSpanFull(),
 
                 Section::make(__('translations.all_sliders_activated'))
                     ->schema([
@@ -267,7 +272,8 @@ class SliderForm
                                     }),
                             ])
                             ->itemLabel(fn (array $state): ?string => $state['title'] ?? null),
-                    ]),
+                    ])
+                    ->columnSpanFull(),
 
                 Section::make(__('translations.settings'))
                     ->schema([
@@ -289,6 +295,7 @@ class SliderForm
                             ])
                             ->default(['all']),
                     ])
+                    ->columnSpanFull()
             ]);
     }
 }

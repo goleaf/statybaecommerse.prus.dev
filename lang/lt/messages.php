@@ -244,6 +244,8 @@ return [
     'Security'                                                                                              => 'Saugumas',
     'Select'                                                                                                => 'Pasirinkti',
     'Select options'                                                                                        => 'Pasirinkite parinktis',
+    'set_as_default'                                                                                        => 'Nustatyti kaip numatytąjį',
+    'address_set_as_default'                                                                                => 'Adresas sėkmingai nustatytas kaip numatytasis.',
     'Setting'                                                                                               => 'Nustatymas',
     'Settings'                                                                                              => 'Nustatymai',
     'Shipping'                                                                                              => 'Pristatymas',

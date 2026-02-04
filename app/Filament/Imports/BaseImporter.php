@@ -12,4 +12,14 @@ abstract class BaseImporter extends Importer
     {
         return 'sync';
     }
+
+    /**
+     * @return array<string, array<string>>
+     */
+    public static function getColumnGroups(): array
+    {
+        return [
+            'General' => [],
+        ];
+    }
 }

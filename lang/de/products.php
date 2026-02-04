@@ -8,6 +8,8 @@ return [
         'features_count'            => 'Merkmale',
         'features_empty'            => 'Zusätzliche Informationen zu den Funktionen sind für dieses Produkt noch nicht verfügbar.',
         'detailed_description'      => 'Detaillierte Beschreibung',
+        'description'               => 'Beschreibung',
+        'full_description'          => 'Vollständige Beschreibung',
         'no_description'            => 'Für dieses Produkt wurde noch keine Beschreibung bereitgestellt.',
         'view_full_history'         => 'Vollständigen Verlauf anzeigen',
         'change_frequency_30'       => 'Änderungshäufigkeit (30 Tage)',

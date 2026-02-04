@@ -59,4 +59,13 @@ class PartnerImporter extends BaseImporter
 
         return $body;
     }
+
+    public static function getColumnGroups(): array
+    {
+        return [
+            'General'  => ['name', 'code', 'tier'],
+            'Contact'  => ['contact_email', 'contact_phone'],
+            'Settings' => ['is_enabled', 'discount_rate', 'commission_rate'],
+        ];
+    }
 }
