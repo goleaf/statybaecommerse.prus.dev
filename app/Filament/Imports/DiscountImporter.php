@@ -1,14 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Imports;
 
 use App\Models\Discount;
 use Filament\Actions\Imports\ImportColumn;
-use Filament\Actions\Imports\Importer;
 use Filament\Actions\Imports\Models\Import;
 use Illuminate\Support\Number;
 
-class DiscountImporter extends Importer
+class DiscountImporter extends BaseImporter
 {
     protected static ?string $model = Discount::class;
 
@@ -43,7 +44,7 @@ class DiscountImporter extends Importer
 
     public function resolveRecord(): Discount
     {
-        return new Discount();
+        return new Discount;
     }
 
     public static function getCompletedNotificationBody(Import $import): string

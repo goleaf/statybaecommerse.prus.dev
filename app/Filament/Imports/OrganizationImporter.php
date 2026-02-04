@@ -1,14 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Imports;
 
 use App\Models\Organization;
 use Filament\Actions\Imports\ImportColumn;
-use Filament\Actions\Imports\Importer;
 use Filament\Actions\Imports\Models\Import;
 use Illuminate\Support\Number;
 
-class OrganizationImporter extends Importer
+class OrganizationImporter extends BaseImporter
 {
     protected static ?string $model = Organization::class;
 
@@ -34,7 +35,7 @@ class OrganizationImporter extends Importer
 
     public function resolveRecord(): Organization
     {
-        return new Organization();
+        return new Organization;
     }
 
     public static function getCompletedNotificationBody(Import $import): string

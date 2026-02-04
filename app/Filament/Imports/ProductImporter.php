@@ -6,12 +6,11 @@ namespace App\Filament\Imports;
 
 use App\Models\Product;
 use Filament\Actions\Imports\ImportColumn;
-use Filament\Actions\Imports\Importer;
 use Filament\Actions\Imports\Models\Import;
 use Illuminate\Support\Number;
 use Illuminate\Support\Str;
 
-class ProductImporter extends Importer
+class ProductImporter extends BaseImporter
 {
     protected static ?string $model = Product::class;
 

@@ -1,14 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Imports;
 
 use App\Models\Price;
 use Filament\Actions\Imports\ImportColumn;
-use Filament\Actions\Imports\Importer;
 use Filament\Actions\Imports\Models\Import;
 use Illuminate\Support\Number;
 
-class PriceImporter extends Importer
+class PriceImporter extends BaseImporter
 {
     protected static ?string $model = Price::class;
 
@@ -41,7 +42,7 @@ class PriceImporter extends Importer
 
     public function resolveRecord(): Price
     {
-        return new Price();
+        return new Price;
     }
 
     public static function getCompletedNotificationBody(Import $import): string

@@ -1,14 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Imports;
 
 use App\Models\Order;
 use Filament\Actions\Imports\ImportColumn;
-use Filament\Actions\Imports\Importer;
 use Filament\Actions\Imports\Models\Import;
 use Illuminate\Support\Number;
 
-class OrderImporter extends Importer
+class OrderImporter extends BaseImporter
 {
     protected static ?string $model = Order::class;
 
@@ -38,7 +39,7 @@ class OrderImporter extends Importer
 
     public function resolveRecord(): Order
     {
-        return new Order();
+        return new Order;
     }
 
     public static function getCompletedNotificationBody(Import $import): string

@@ -1,14 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Imports;
 
 use App\Models\User;
 use Filament\Actions\Imports\ImportColumn;
-use Filament\Actions\Imports\Importer;
 use Filament\Actions\Imports\Models\Import;
 use Illuminate\Support\Number;
 
-class UserImporter extends Importer
+class UserImporter extends BaseImporter
 {
     protected static ?string $model = User::class;
 
@@ -40,7 +41,7 @@ class UserImporter extends Importer
 
     public function resolveRecord(): User
     {
-        return new User();
+        return new User;
     }
 
     public static function getCompletedNotificationBody(Import $import): string

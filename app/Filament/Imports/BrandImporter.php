@@ -1,14 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Imports;
 
 use App\Models\Brand;
 use Filament\Actions\Imports\ImportColumn;
-use Filament\Actions\Imports\Importer;
 use Filament\Actions\Imports\Models\Import;
 use Illuminate\Support\Number;
 
-class BrandImporter extends Importer
+class BrandImporter extends BaseImporter
 {
     protected static ?string $model = Brand::class;
 
@@ -63,7 +64,7 @@ class BrandImporter extends Importer
 
     public function resolveRecord(): Brand
     {
-        return new Brand();
+        return new Brand;
     }
 
     public static function getCompletedNotificationBody(Import $import): string

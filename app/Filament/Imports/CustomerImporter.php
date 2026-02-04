@@ -1,14 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Imports;
 
 use App\Models\Customer;
 use Filament\Actions\Imports\ImportColumn;
-use Filament\Actions\Imports\Importer;
 use Filament\Actions\Imports\Models\Import;
 use Illuminate\Support\Number;
 
-class CustomerImporter extends Importer
+class CustomerImporter extends BaseImporter
 {
     protected static ?string $model = Customer::class;
 
@@ -43,7 +44,7 @@ class CustomerImporter extends Importer
 
     public function resolveRecord(): Customer
     {
-        return new Customer();
+        return new Customer;
     }
 
     public static function getCompletedNotificationBody(Import $import): string
