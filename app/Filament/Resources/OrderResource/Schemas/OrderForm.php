@@ -8,12 +8,16 @@ use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
 use App\Models\Address;
+use App\Models\Product;
+use App\Models\Service;
 use App\Models\User;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
+use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
@@ -108,6 +112,68 @@ class OrderForm
                             ])
                             ->columnSpanFull(),
                     ]),
+                Section::make(__('messages.items'))
+                    ->schema([
+                        Repeater::make('items')
+                            ->relationship()
+                            ->schema([
+                                Select::make('product_id')
+                                    ->label(__('messages.product'))
+                                    ->relationship('product', 'name')
+                                    ->searchable()
+                                    ->preload()
+                                    ->reactive()
+                                    ->afterStateUpdated(function ($state, Set $set): void {
+                                        $set('unit_price', Product::find($state)?->price ?? 0);
+                                    })
+                                    ->required(),
+                                TextInput::make('quantity')
+                                    ->label(__('messages.quantity'))
+                                    ->numeric()
+                                    ->default(1)
+                                    ->required(),
+                                TextInput::make('unit_price')
+                                    ->label(__('messages.unit_price'))
+                                    ->numeric()
+                                    ->prefix('€')
+                                    ->required(),
+                            ])
+                            ->columns(3)
+                            ->defaultItems(0),
+                    ])
+                    ->columnSpanFull(),
+                Section::make(__('translations.services'))
+                    ->schema([
+                        Repeater::make('services')
+                            ->schema([
+                                Grid::make(3)
+                                    ->schema([
+                                        Select::make('service_id')
+                                            ->label(__('translations.service'))
+                                            ->options(static fn (): array => Service::query()
+                                                ->where('is_active', true)
+                                                ->orderBy('name')
+                                                ->pluck('name', 'id')
+                                                ->all())
+                                            ->searchable()
+                                            ->preload()
+                                            ->required(),
+                                        TextInput::make('quantity')
+                                            ->label(__('messages.quantity'))
+                                            ->numeric()
+                                            ->default(1)
+                                            ->required(),
+                                        TextInput::make('price')
+                                            ->label(__('messages.price'))
+                                            ->numeric()
+                                            ->prefix('€')
+                                            ->required(),
+                                    ]),
+                            ])
+                            ->defaultItems(0)
+                            ->visible(fn (string $operation): bool => $operation === 'create'),
+                    ])
+                    ->columnSpanFull(),
 
                 Section::make(__('messages.checkout_shipping_address'))
                     ->schema([

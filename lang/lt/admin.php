@@ -32,6 +32,7 @@ return [
     'import_removed_records'           => 'Šalinami įrašai',
     'import_start_button'              => 'Pradėti importą',
     'import_started'                   => 'Importas pradėtas.',
+    'import_user_missing'              => 'Negalima pradėti importo be autentifikuoto vartotojo.',
     'import_fields_to_be_imported'     => 'Laukai, kurie bus importuojami',
     'import_missing_required'          => 'Trūkstami privalomi laukai',
     'import_last_summary'              => 'Paskutinio importo suvestinė',

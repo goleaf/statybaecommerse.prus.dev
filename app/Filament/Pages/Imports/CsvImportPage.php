@@ -29,6 +29,7 @@ use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Components\Wizard;
 use Filament\Schemas\Components\Wizard\Step;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Filesystem\AwsS3V3Adapter;
@@ -1018,9 +1019,19 @@ abstract class CsvImportPage extends Page implements HasForms
 
         $authGuard = $this->resolveAuthGuard();
         $user = auth($authGuard)->user();
+        $importUser = $this->resolveImportUser($user);
+
+        if (! $importUser) {
+            Notification::make()
+                ->title(__('admin.import_user_missing'))
+                ->danger()
+                ->send();
+
+            return;
+        }
 
         $import = app(Import::class);
-        $import->user()->associate($user);
+        $import->user()->associate($importUser);
         $import->file_name = $csvFile->getClientOriginalName();
         $import->file_path = $this->storeCsvFile($csvFile);
         $import->importer = static::getImporterClass();
@@ -1262,7 +1273,7 @@ abstract class CsvImportPage extends Page implements HasForms
 
     protected function getChunkSize(): int
     {
-        return 20;
+        return 100;
     }
 
     protected function getMaxRows(): ?int
@@ -1365,5 +1376,10 @@ abstract class CsvImportPage extends Page implements HasForms
         }
 
         return $authGuard->name;
+    }
+
+    protected function resolveImportUser(?Authenticatable $user): ?Authenticatable
+    {
+        return $user;
     }
 }

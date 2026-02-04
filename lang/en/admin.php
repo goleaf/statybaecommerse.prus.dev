@@ -32,6 +32,7 @@ return [
     'import_removed_records'           => 'Records to be Removed',
     'import_start_button'              => 'Start Import',
     'import_started'                   => 'Import started.',
+    'import_user_missing'              => 'Unable to start import without an authenticated user.',
     'import_fields_to_be_imported'     => 'Fields to be imported',
     'import_missing_required'          => 'Missing required fields',
     'import_last_summary'              => 'Last Import Summary',
