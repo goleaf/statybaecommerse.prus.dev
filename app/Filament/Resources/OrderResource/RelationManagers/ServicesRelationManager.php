@@ -61,17 +61,11 @@ class ServicesRelationManager extends RelationManager
             ->headerActions([
                 CreateAction::make(),
                 AttachAction::make()
-                    ->form(fn (AttachAction $action): array => [
+                    ->schema(fn (AttachAction $action): array => [
                         $action->getRecordSelect(),
                         TextInput::make('quantity')->numeric()->default(1)->required(),
                         TextInput::make('price')->numeric()->required()->prefix('$'),
-                    ])
-                    ->mutatePivotFormDataUsing(function (array $data): array {
-                        return [
-                            'quantity' => $data['quantity'],
-                            'price'    => $data['price'],
-                        ];
-                    }),
+                    ]),
                 Action::make('add_all_services')
                     ->label('Add All Services')
                     ->action(function () {
