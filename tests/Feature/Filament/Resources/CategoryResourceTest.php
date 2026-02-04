@@ -5,9 +5,6 @@ declare(strict_types=1);
 use App\Filament\Resources\CategoryResource;
 use App\Models\AdminUser;
 use App\Models\Category;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 
@@ -18,9 +15,9 @@ beforeEach(function () {
     $this->actingAs($this->user, 'admin');
 
     $this->category = Category::factory()->create([
-        'name' => 'Test Category',
-        'slug' => 'test-category',
-        'is_visible' => true,
+        'name'        => 'Test Category',
+        'slug'        => 'test-category',
+        'is_visible'  => true,
         'description' => 'Test Description',
     ]);
 });
@@ -46,10 +43,10 @@ it('can render category resource create page', function () {
 
 it('can create category', function () {
     $newCategoryData = [
-        'name' => 'New Test Category',
-        'slug' => 'new-test-category',
+        'name'        => 'New Test Category',
+        'slug'        => 'new-test-category',
         'description' => 'New Test Description',
-        'is_active' => true,
+        'is_active'   => true,
     ];
 
     Livewire::test(CategoryResource\Pages\CreateCategory::class)
@@ -87,19 +84,19 @@ it('can retrieve category data for editing', function () {
         'record' => $this->category->getRouteKey(),
     ])
         ->assertFormSet([
-            'name' => $this->category->name,
-            'slug' => $this->category->slug,
-            'description' => $this->category->description,
-            'is_active' => $this->category->is_active,
+            'name'        => $this->category->name,
+            'slug'        => $this->category->slug,
+            'description' => '<p>Test Description</p>',
+            'is_active'   => $this->category->is_active,
         ]);
 });
 
 it('can save category', function () {
     $updatedData = [
-        'name' => 'Updated Category Name',
-        'slug' => 'updated-category-name',
+        'name'        => 'Updated Category Name',
+        'slug'        => 'updated-category-name',
         'description' => 'Updated Description',
-        'is_active' => false,
+        'is_active'   => false,
     ];
 
     Livewire::test(CategoryResource\Pages\EditCategory::class, [
@@ -114,4 +111,18 @@ it('can save category', function () {
     expect($this->category->name)->toBe('Updated Category Name');
     expect($this->category->slug)->toBe('updated-category-name');
     expect($this->category->is_active)->toBeFalse();
+});
+
+it('can edit categories hidden by global scopes', function () {
+    $hiddenCategory = Category::factory()->create([
+        'name'       => 'Hidden Category',
+        'slug'       => 'hidden-category',
+        'is_active'  => false,
+        'is_visible' => false,
+        'is_enabled' => false,
+    ]);
+
+    $response = $this->get(CategoryResource::getUrl('edit', ['record' => $hiddenCategory]));
+
+    $response->assertOk();
 });

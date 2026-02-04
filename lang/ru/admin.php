@@ -9,10 +9,9 @@ return [
         'refresh'           => 'actions.refresh',
         'view'              => 'View',
     ],
-    'active_groups'               => 'active_groups',
-    'advanced_import'             => 'admin.advanced_import',
-    'advanced_import_description' => 'admin.advanced_import_description',
-    'attribute-values'            => [
+    'active_groups'    => 'active_groups',
+    'advanced_import'  => 'admin.advanced_import',
+    'attribute-values' => [
         'translations' => [
             ''     => 'attribute-values.translations.',
             'save' => 'attribute-values.translations.save',
@@ -723,8 +722,7 @@ return [
         'width'    => 'Ширина',
         'alt_text' => 'Альтернативный текст',
     ],
-    'products_import' => 'admin.products_import',
-    'profile'         => [
+    'profile' => [
         'accepts_marketing'                    => 'profile.accepts_marketing',
         'account_statistics'                   => 'profile.account_statistics',
         'confirm_password'                     => 'profile.confirm_password',

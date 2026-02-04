@@ -140,10 +140,40 @@ class ProductForm
                                     ]),
                             ])
                             ->orderColumn('sort_order')
-                            ->reorderable('sort_order')
+                            ->reorderable()
                             ->columnSpanFull()
                             ->collapsible()
-                            ->itemLabel(fn (array $state): ?string => $state['alt_text'] ?? ($state['path'] ?? 'Image')),
+                            ->itemLabel(function (array $state): ?string {
+                                $label = $state['alt_text'] ?? null;
+
+                                if (is_string($label) && $label !== '') {
+                                    return $label;
+                                }
+
+                                $path = $state['path'] ?? null;
+
+                                if ($path instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile) {
+                                    return $path->getClientOriginalName();
+                                }
+
+                                if (is_array($path)) {
+                                    $first = $path[0] ?? null;
+
+                                    if ($first instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile) {
+                                        return $first->getClientOriginalName();
+                                    }
+
+                                    if (is_string($first) && $first !== '') {
+                                        return $first;
+                                    }
+                                }
+
+                                if (is_string($path) && $path !== '') {
+                                    return $path;
+                                }
+
+                                return 'Image';
+                            }),
                     ])
                     ->columnSpanFull(),
 

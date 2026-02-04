@@ -18,14 +18,4 @@ class EditProduct extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
-
-    protected function afterSave(): void
-    {
-        /** @var \Filament\Schemas\Schema $form */
-        $form = $this->form;
-
-        if (method_exists($form, 'saveRelationships')) {
-            $form->saveRelationships();
-        }
-    }
 }

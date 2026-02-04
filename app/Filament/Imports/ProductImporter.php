@@ -21,6 +21,40 @@ class ProductImporter extends BaseImporter
         if (($this->data['slug'] ?? null) === null && is_string($name) && $name !== '') {
             $this->data['slug'] = Str::slug($name);
         }
+
+        $slug = $this->data['slug'] ?? null;
+
+        if (! is_string($slug) || $slug === '') {
+            return;
+        }
+
+        $slug = Str::slug($slug);
+        $this->data['slug'] = $this->ensureUniqueSlug($slug);
+    }
+
+    protected function beforeFill(): void
+    {
+        $slug = $this->data['slug'] ?? null;
+        $name = $this->data['name'] ?? null;
+
+        if (! filled($slug) && is_string($name) && $name !== '') {
+            $slug = Str::slug($name);
+        }
+
+        if (! filled($slug) || ! $this->record) {
+            return;
+        }
+
+        if (
+            $this->record->exists &&
+            filled($this->record->slug) &&
+            blank($this->data['slug'] ?? null)
+        ) {
+            return;
+        }
+
+        $slug = $this->ensureUniqueSlug(Str::slug((string) $slug));
+        $this->record->slug = $slug;
     }
 
     public static function getColumns(): array
@@ -28,8 +62,6 @@ class ProductImporter extends BaseImporter
         return [
             ImportColumn::make('name')
                 ->requiredMapping()
-                ->rules(['required', 'string']),
-            ImportColumn::make('slug')
                 ->rules(['required', 'string']),
             ImportColumn::make('description'),
             ImportColumn::make('short_description'),
@@ -171,6 +203,13 @@ class ProductImporter extends BaseImporter
     public function resolveRecord(): Product
     {
         $sku = $this->data['sku'] ?? null;
+        $slug = $this->data['slug'] ?? null;
+
+        if (filled($slug)) {
+            return Product::firstOrNew([
+                'slug' => $slug,
+            ]);
+        }
 
         if (blank($sku)) {
             return new Product;
@@ -179,6 +218,44 @@ class ProductImporter extends BaseImporter
         return Product::firstOrNew([
             'sku' => $sku,
         ]);
+    }
+
+    protected function ensureUniqueSlug(string $slug): string
+    {
+        if (! $this->slugExists($slug)) {
+            return $slug;
+        }
+
+        $sku = $this->data['sku'] ?? null;
+        $base = $slug;
+
+        if (is_string($sku) && $sku !== '') {
+            $candidate = $base . '-' . Str::slug($sku);
+            if (! $this->slugExists($candidate)) {
+                return $candidate;
+            }
+        }
+
+        $counter = 2;
+        $candidate = $base . '-' . $counter;
+
+        while ($this->slugExists($candidate)) {
+            $counter++;
+            $candidate = $base . '-' . $counter;
+        }
+
+        return $candidate;
+    }
+
+    protected function slugExists(string $slug): bool
+    {
+        $query = Product::query()->where('slug', $slug);
+
+        if ($this->record?->exists) {
+            $query->whereKeyNot($this->record->getKey());
+        }
+
+        return $query->exists();
     }
 
     public static function getCompletedNotificationBody(Import $import): string
@@ -197,7 +274,6 @@ class ProductImporter extends BaseImporter
         return [
             'Basic Information' => [
                 'name',
-                'slug',
                 'sku',
                 'barcode',
                 'status',

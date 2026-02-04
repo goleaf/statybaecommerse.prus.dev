@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages\Imports;
 
+use App\Jobs\ProcessCsvImport;
 use App\Models\AdminUser;
-use App\Services\ImportExport\CsvImportProcessor;
+use App\Models\ImportRowResult;
+use App\Support\Storage\SecureStorage;
 use BackedEnum;
 use Closure;
 use Filament\Actions\Action;
-use Filament\Actions\Imports\Events\ImportChunkProcessed;
-use Filament\Actions\Imports\Events\ImportCompleted;
-use Filament\Actions\Imports\Events\ImportStarted;
 use Filament\Actions\Imports\ImportColumn;
 use Filament\Actions\Imports\Models\Import;
 use Filament\Facades\Filament;
@@ -30,8 +29,6 @@ use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Components\Wizard;
 use Filament\Schemas\Components\Wizard\Step;
-use Filament\Support\ChunkIterator;
-use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Filesystem\AwsS3V3Adapter;
@@ -65,6 +62,17 @@ abstract class CsvImportPage extends Page implements HasForms
      * @var array{processed: int, successful: int, failed: int, total: int, new: int, updated: int, removed: int, mappedFields: array<string>, missingRequiredFields: array<string>}|null
      */
     public ?array $lastImport = null;
+
+    public ?int $activeImportId = null;
+
+    /**
+     * @var array{processed: int, successful: int, failed: int, total: int, percent: int, status: string}|null
+     */
+    public ?array $importProgress = null;
+
+    public bool $isImporting = false;
+
+    public ?string $mappingStatusHtml = null;
 
     protected string $view = 'filament.pages.imports.csv-import';
 
@@ -143,7 +151,10 @@ abstract class CsvImportPage extends Page implements HasForms
                                                 return;
                                             }
 
-                                            $set('columnMap', $page->guessColumnMap($headers));
+                                            $columnMap = $page->guessColumnMap($headers);
+
+                                            $set('columnMap', $columnMap);
+                                            $page->refreshMappingStatus($columnMap);
                                         })
                                         ->storeFiles(false)
                                         ->visibility('private')
@@ -190,6 +201,18 @@ abstract class CsvImportPage extends Page implements HasForms
                             $allColumns = $page->getImporterColumns();
                             $mappedColumns = collect($allColumns)->keyBy->getName();
 
+                            $mappingSummary = Placeholder::make('mapping_summary')
+                                ->content(function (Get $get) use ($page, $headers): HtmlString {
+                                    if ($page->mappingStatusHtml !== null) {
+                                        return new HtmlString($page->mappingStatusHtml);
+                                    }
+
+                                    return $page->getMappingStatusContent(
+                                        $headers,
+                                        (array) ($get('columnMap') ?? []),
+                                    );
+                                });
+
                             $schemas = [];
 
                             foreach ($groups as $groupLabel => $columnNames) {
@@ -197,7 +220,9 @@ abstract class CsvImportPage extends Page implements HasForms
                                 foreach ($columnNames as $columnName) {
                                     if ($mappedColumns->has($columnName)) {
                                         $column = $mappedColumns->get($columnName);
-                                        $groupColumns[] = $column->getSelect()->options($options);
+                                        $groupColumns[] = $column->getSelect()
+                                            ->options($options)
+                                            ->live();
                                         $mappedColumns->forget($columnName);
                                     }
                                 }
@@ -213,7 +238,9 @@ abstract class CsvImportPage extends Page implements HasForms
                             if ($mappedColumns->isNotEmpty()) {
                                 $remainingColumns = [];
                                 foreach ($mappedColumns as $column) {
-                                    $remainingColumns[] = $column->getSelect()->options($options);
+                                    $remainingColumns[] = $column->getSelect()
+                                        ->options($options)
+                                        ->live();
                                 }
 
                                 $schemas[] = Fieldset::make(__('admin.import_other_columns'))
@@ -222,6 +249,7 @@ abstract class CsvImportPage extends Page implements HasForms
                             }
 
                             return [
+                                $mappingSummary,
                                 Grid::make(1)
                                     ->schema($schemas)
                                     ->statePath('columnMap'),
@@ -233,6 +261,10 @@ abstract class CsvImportPage extends Page implements HasForms
                         ->schema([
                             Placeholder::make('analysis_summary')
                                 ->content(fn () => $this->getAnalysisContent()),
+                            Placeholder::make('import_progress')
+                                ->content(fn () => $this->getImportProgressContent()),
+                            Placeholder::make('import_rows')
+                                ->content(fn () => $this->getImportRowsContent()),
                         ]),
                 ])
                     ->submitAction(view('filament.pages.imports.import-button'))
@@ -402,6 +434,543 @@ abstract class CsvImportPage extends Page implements HasForms
         ");
     }
 
+    protected function getMappingStatusContent(array $headers, array $columnMap): HtmlString
+    {
+        $columns = $this->getImporterColumns();
+        $totalColumns = count($columns);
+        $mappedCount = 0;
+        $missingRequired = [];
+        $invalidMappings = [];
+        $headerMappings = [];
+
+        foreach ($columns as $column) {
+            $name = $column->getName();
+            $label = $column->getLabel() ?? $name;
+            $selected = $columnMap[$name] ?? null;
+
+            if (filled($selected)) {
+                $mappedCount++;
+                $headerMappings[$selected] ??= [];
+                $headerMappings[$selected][] = $label;
+
+                if (! in_array($selected, $headers, true)) {
+                    $invalidMappings[] = [
+                        'field'  => $label,
+                        'column' => $selected,
+                    ];
+                }
+            } elseif ($column->isMappingRequired()) {
+                $missingRequired[] = $label;
+            }
+        }
+
+        $duplicateMappings = array_filter(
+            $headerMappings,
+            fn (array $fields): bool => count($fields) > 1,
+        );
+
+        $errorCount = count($missingRequired) + count($invalidMappings) + count($duplicateMappings);
+        $badge = static fn (string $text, string $classes): string => "<span class='inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold {$classes}'>" . e($text) . '</span>';
+
+        if ($errorCount === 0) {
+            $summary = __('admin.import_mapping_ok');
+            $mapped = __('admin.import_mapping_mapped_count', [
+                'mapped' => Number::format($mappedCount),
+                'total'  => Number::format($totalColumns),
+            ]);
+
+            return new HtmlString("
+                <div class='rounded-lg border border-emerald-200 bg-emerald-50 p-4 dark:border-emerald-700/40 dark:bg-emerald-900/20'>
+                    <p class='text-sm font-semibold text-emerald-700 dark:text-emerald-300'>{$summary}</p>
+                    <p class='mt-1 text-xs text-emerald-700/80 dark:text-emerald-200/80'>{$mapped}</p>
+                </div>
+            ");
+        }
+
+        $errorLabel = trans_choice('admin.import_mapping_errors', $errorCount, [
+            'count' => Number::format($errorCount),
+        ]);
+
+        $details = [];
+
+        if (! empty($missingRequired)) {
+            $fields = collect($missingRequired)
+                ->map(fn (string $field): string => $badge($field, 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-200'))
+                ->implode(' ');
+
+            $details[] = "<p class='text-xs text-red-700 dark:text-red-200'>" . __('admin.import_mapping_missing_required') . " {$fields}</p>";
+        }
+
+        foreach ($duplicateMappings as $column => $fields) {
+            $fieldBadges = collect($fields)
+                ->map(fn (string $field): string => $badge($field, 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-200'))
+                ->implode(' ');
+
+            $details[] = "<p class='text-xs text-amber-700 dark:text-amber-200'>" . __('admin.import_mapping_duplicate_column', [
+                'column' => e((string) $column),
+            ]) . " {$fieldBadges}</p>";
+        }
+
+        foreach ($invalidMappings as $invalid) {
+            $details[] = "<p class='text-xs text-red-700 dark:text-red-200'>" . __('admin.import_mapping_invalid_column', [
+                'field'  => e($invalid['field']),
+                'column' => e($invalid['column']),
+            ]) . '</p>';
+        }
+
+        $mapped = __('admin.import_mapping_mapped_count', [
+            'mapped' => Number::format($mappedCount),
+            'total'  => Number::format($totalColumns),
+        ]);
+
+        return new HtmlString("
+            <div class='rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800/40 dark:bg-red-900/20'>
+                <p class='text-sm font-semibold text-red-700 dark:text-red-200'>{$errorLabel}</p>
+                <p class='mt-1 text-xs text-red-700/80 dark:text-red-200/80'>{$mapped}</p>
+                <div class='mt-3 space-y-2'>" . implode('', $details) . '</div>
+            </div>
+        ');
+    }
+
+    protected function refreshMappingStatus(?array $columnMap = null): void
+    {
+        $csvFile = $this->data['file'] ?? null;
+
+        if (is_array($csvFile)) {
+            $csvFile = head($csvFile);
+        }
+
+        if (! $csvFile instanceof TemporaryUploadedFile) {
+            $this->mappingStatusHtml = null;
+
+            return;
+        }
+
+        $headers = $this->getCsvHeaders($csvFile);
+
+        if ($headers === []) {
+            $this->mappingStatusHtml = null;
+
+            return;
+        }
+
+        $columnMap ??= (array) ($this->data['columnMap'] ?? $this->guessColumnMap($headers));
+        $this->mappingStatusHtml = $this->getMappingStatusContent($headers, $columnMap)->toHtml();
+    }
+
+    public function updatedDataColumnMap(): void
+    {
+        $this->refreshMappingStatus();
+    }
+
+    public function updatedDataFile(): void
+    {
+        $this->refreshMappingStatus();
+    }
+
+    protected function getImportProgressContent(): HtmlString
+    {
+        if (! $this->activeImportId) {
+            return new HtmlString('');
+        }
+
+        if (! $this->importProgress) {
+            $this->refreshImportProgress();
+        }
+
+        if (! $this->importProgress) {
+            return new HtmlString('');
+        }
+
+        $progress = $this->importProgress;
+        $processed = Number::format($progress['processed']);
+        $total = Number::format($progress['total']);
+        $successful = Number::format($progress['successful']);
+        $failed = Number::format($progress['failed']);
+        $percent = $progress['percent'];
+        $statusLabel = $progress['status'] === 'completed'
+            ? __('admin.import_status_completed')
+            : __('admin.import_status_running');
+
+        return new HtmlString('
+            <div wire:poll.visible.2s="tickImport" class="mt-6 space-y-4">
+                <div class="flex items-center justify-between">
+                    <p class="text-sm font-semibold text-gray-800 dark:text-gray-200">' . __('admin.import_progress') . '</p>
+                    <span class="text-xs font-medium text-gray-600 dark:text-gray-300">' . $percent . '%</span>
+                </div>
+                <div class="h-2 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-800">
+                    <div class="h-full bg-primary-600 transition-all duration-300" style="width: ' . $percent . '%;"></div>
+                </div>
+                <div class="grid grid-cols-2 gap-4 text-xs text-gray-600 dark:text-gray-300">
+                    <div><span class="font-medium text-gray-800 dark:text-gray-100">' . __('admin.import_processed_rows') . ':</span> ' . $processed . ' / ' . $total . '</div>
+                    <div><span class="font-medium text-gray-800 dark:text-gray-100">' . __('admin.import_successful_rows') . ':</span> ' . $successful . '</div>
+                    <div><span class="font-medium text-gray-800 dark:text-gray-100">' . __('admin.import_failed_rows') . ':</span> ' . $failed . '</div>
+                    <div><span class="font-medium text-gray-800 dark:text-gray-100">' . __('admin.import_status') . ':</span> ' . $statusLabel . '</div>
+                </div>
+            </div>
+        ');
+    }
+
+    protected function getImportRowsContent(): HtmlString
+    {
+        if (! $this->activeImportId) {
+            return new HtmlString('');
+        }
+
+        $rows = ImportRowResult::query()
+            ->where('import_id', $this->activeImportId)
+            ->orderByDesc('id')
+            ->limit(50)
+            ->get()
+            ->reverse();
+
+        if ($rows->isEmpty()) {
+            return new HtmlString(
+                "<div class='mt-6 rounded-lg border border-dashed border-gray-200 bg-gray-50 p-4 text-sm text-gray-600 dark:border-gray-800 dark:bg-gray-900/40 dark:text-gray-300'>"
+                . __('admin.import_rows_empty') .
+                '</div>'
+            );
+        }
+
+        $header = '
+            <div class="mt-8">
+                <div class="flex items-center justify-between gap-4">
+                    <div>
+                        <p class="text-sm font-semibold text-gray-800 dark:text-gray-200">' . __('admin.import_rows_latest') . '</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">' . __('admin.import_rows_latest_hint') . '</p>
+                    </div>
+                    <span class="text-xs font-medium text-gray-500 dark:text-gray-400">' . __('admin.import_chunk_size', ['count' => $this->getChunkSize()]) . '</span>
+                </div>
+            </div>
+        ';
+
+        $rowsHtml = $rows->map(function (ImportRowResult $row): string {
+            $statusBadge = $this->formatStatusBadge($row->status);
+            $actionBadge = $this->formatActionBadge($row->action);
+            $rowNumber = $row->row_number ? (string) $row->row_number : '-';
+            $message = e($row->message ?? '');
+            $errorMessage = e($row->error_message ?? '');
+            $changedFields = collect($row->changed_fields ?? [])->map(fn ($field) => "<span class='rounded-full bg-blue-50 px-2 py-0.5 text-[11px] font-semibold text-blue-700 dark:bg-blue-400/10 dark:text-blue-300'>{$field}</span>")->implode(' ');
+
+            $data = is_array($row->data) ? $row->data : [];
+            $dataHtml = collect($data)->map(function ($value, $field) use ($row): string {
+                $fieldLabel = e((string) $field);
+                $valueText = e(is_scalar($value) ? (string) $value : json_encode($value));
+                $fieldState = $this->resolveFieldState($row, (string) $field);
+                $fieldBadge = $this->formatFieldBadge($fieldState);
+
+                return "
+                    <div class='rounded-md border border-gray-200 bg-white p-2 text-xs text-gray-700 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200'>
+                        <div class='flex items-start justify-between gap-2'>
+                            <div class='font-semibold text-gray-900 dark:text-white'>{$fieldLabel}</div>
+                            {$fieldBadge}
+                        </div>
+                        <div class='mt-1 break-words text-gray-600 dark:text-gray-300'>{$valueText}</div>
+                    </div>
+                ";
+            })->implode('');
+
+            return "
+                <tr class='odd:bg-white even:bg-gray-50 dark:odd:bg-gray-900/40 dark:even:bg-gray-950'>
+                    <td class='whitespace-nowrap px-3 py-3 text-xs text-gray-700 dark:text-gray-200'>{$rowNumber}</td>
+                    <td class='px-3 py-3'>{$statusBadge}</td>
+                    <td class='px-3 py-3'>{$actionBadge}</td>
+                    <td class='px-3 py-3 text-xs text-gray-600 dark:text-gray-300'>{$message}</td>
+                    <td class='px-3 py-3 text-xs text-gray-600 dark:text-gray-300'>{$errorMessage}</td>
+                    <td class='px-3 py-3'>{$changedFields}</td>
+                    <td class='px-3 py-3'>
+                        <div class='grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3'>
+                            {$dataHtml}
+                        </div>
+                    </td>
+                </tr>
+            ";
+        })->implode('');
+
+        return new HtmlString($header . "
+            <div class='mt-4 overflow-hidden rounded-xl border border-gray-200 shadow-sm dark:border-gray-800'>
+                <div class='max-h-[520px] overflow-auto'>
+                    <table class='min-w-full divide-y divide-gray-200 text-left text-xs dark:divide-gray-800'>
+                        <thead class='sticky top-0 bg-gray-50 text-[11px] uppercase tracking-wide text-gray-500 dark:bg-gray-950 dark:text-gray-400'>
+                            <tr>
+                                <th class='px-3 py-3'>" . __('admin.import_row') . "</th>
+                                <th class='px-3 py-3'>" . __('admin.import_row_status') . "</th>
+                                <th class='px-3 py-3'>" . __('admin.import_row_action') . "</th>
+                                <th class='px-3 py-3'>" . __('admin.import_row_message') . "</th>
+                                <th class='px-3 py-3'>" . __('admin.import_row_error') . "</th>
+                                <th class='px-3 py-3'>" . __('admin.import_row_fields') . "</th>
+                                <th class='px-3 py-3'>" . __('admin.import_row_data') . "</th>
+                            </tr>
+                        </thead>
+                        <tbody class='divide-y divide-gray-100 dark:divide-gray-800'>
+                            {$rowsHtml}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        ");
+    }
+
+    protected function formatStatusBadge(string $status): string
+    {
+        return match ($status) {
+            'success' => "<span class='rounded-full bg-green-50 px-2 py-0.5 text-[11px] font-semibold text-green-700 dark:bg-green-400/10 dark:text-green-300'>" . __('admin.import_row_status_success') . '</span>',
+            'failed'  => "<span class='rounded-full bg-red-50 px-2 py-0.5 text-[11px] font-semibold text-red-700 dark:bg-red-400/10 dark:text-red-300'>" . __('admin.import_row_status_failed') . '</span>',
+            default   => "<span class='rounded-full bg-gray-100 px-2 py-0.5 text-[11px] font-semibold text-gray-600 dark:bg-gray-800 dark:text-gray-300'>" . __('admin.import_row_status_pending') . '</span>',
+        };
+    }
+
+    protected function formatActionBadge(string $action): string
+    {
+        return match ($action) {
+            'created' => "<span class='rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 dark:bg-emerald-400/10 dark:text-emerald-300'>" . __('admin.import_row_action_created') . '</span>',
+            'updated' => "<span class='rounded-full bg-blue-50 px-2 py-0.5 text-[11px] font-semibold text-blue-700 dark:bg-blue-400/10 dark:text-blue-300'>" . __('admin.import_row_action_updated') . '</span>',
+            'skipped' => "<span class='rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-700 dark:bg-amber-400/10 dark:text-amber-300'>" . __('admin.import_row_action_skipped') . '</span>',
+            'error'   => "<span class='rounded-full bg-red-50 px-2 py-0.5 text-[11px] font-semibold text-red-700 dark:bg-red-400/10 dark:text-red-300'>" . __('admin.import_row_action_error') . '</span>',
+            default   => "<span class='rounded-full bg-gray-100 px-2 py-0.5 text-[11px] font-semibold text-gray-600 dark:bg-gray-800 dark:text-gray-300'>" . e($action) . '</span>',
+        };
+    }
+
+    protected function resolveFieldState(ImportRowResult $row, string $field): string
+    {
+        if ($row->status === 'failed') {
+            return 'error';
+        }
+
+        if ($row->action === 'created') {
+            return 'created';
+        }
+
+        if ($row->action === 'updated' && in_array($field, $row->changed_fields ?? [], true)) {
+            return 'updated';
+        }
+
+        if ($row->action === 'skipped') {
+            return 'unchanged';
+        }
+
+        return 'unchanged';
+    }
+
+    protected function formatFieldBadge(string $state): string
+    {
+        return match ($state) {
+            'created' => "<span class='rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 dark:bg-emerald-400/10 dark:text-emerald-300'>" . __('admin.import_row_field_created') . '</span>',
+            'updated' => "<span class='rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-semibold text-blue-700 dark:bg-blue-400/10 dark:text-blue-300'>" . __('admin.import_row_field_updated') . '</span>',
+            'error'   => "<span class='rounded-full bg-red-50 px-2 py-0.5 text-[10px] font-semibold text-red-700 dark:bg-red-400/10 dark:text-red-300'>" . __('admin.import_row_field_error') . '</span>',
+            default   => "<span class='rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-semibold text-gray-600 dark:bg-gray-800 dark:text-gray-300'>" . __('admin.import_row_field_unchanged') . '</span>',
+        };
+    }
+
+    public function refreshImportProgress(): void
+    {
+        if (! $this->activeImportId) {
+            return;
+        }
+
+        $import = Import::query()->find($this->activeImportId);
+
+        if (! $import) {
+            $this->activeImportId = null;
+            $this->isImporting = false;
+            $this->importProgress = null;
+
+            return;
+        }
+
+        $processed = $import->processed_rows ?? 0;
+        $total = $import->total_rows ?? 0;
+        $successful = $import->successful_rows ?? 0;
+        $failed = $import->getFailedRowsCount();
+        $percent = $this->calculateProgressPercent($processed, $total);
+        $status = ($import->completed_at || $processed >= $total) ? 'completed' : 'running';
+
+        $this->importProgress = [
+            'processed'  => $processed,
+            'total'      => $total,
+            'successful' => $successful,
+            'failed'     => $failed,
+            'percent'    => $percent,
+            'status'     => $status,
+        ];
+
+        if ($status === 'completed') {
+            if ($this->isImporting) {
+                $this->notifyImportCompleted($import);
+            }
+
+            $this->isImporting = false;
+            $existingSummary = $this->lastImport ?? [];
+            $this->lastImport = array_merge($existingSummary, [
+                'new'                   => $existingSummary['new'] ?? 0,
+                'updated'               => $existingSummary['updated'] ?? 0,
+                'removed'               => $existingSummary['removed'] ?? 0,
+                'processed'             => $processed,
+                'successful'            => $successful,
+                'failed'                => $failed,
+                'total'                 => $total,
+                'mappedFields'          => $existingSummary['mappedFields'] ?? [],
+                'missingRequiredFields' => $existingSummary['missingRequiredFields'] ?? [],
+            ]);
+        }
+    }
+
+    public function tickImport(): void
+    {
+        if (! $this->activeImportId) {
+            return;
+        }
+
+        if ($this->isImporting) {
+            $this->processImportChunk();
+        }
+
+        $this->refreshImportProgress();
+    }
+
+    protected function processImportChunk(): void
+    {
+        $import = Import::query()->find($this->activeImportId);
+
+        if (! $import) {
+            $this->activeImportId = null;
+            $this->isImporting = false;
+
+            return;
+        }
+
+        if ($import->completed_at) {
+            $this->isImporting = false;
+
+            return;
+        }
+
+        $processed = (int) ($import->processed_rows ?? 0);
+        $total = (int) ($import->total_rows ?? 0);
+
+        if ($total > 0 && $processed >= $total) {
+            $import->touch('completed_at');
+            $this->isImporting = false;
+            $this->notifyImportCompleted($import);
+
+            return;
+        }
+
+        $columnMap = $this->normalizeImportPayload($import->column_map);
+        $options = $this->normalizeImportPayload($import->options);
+        $disk = (string) ($import->file_disk ?: SecureStorage::disk());
+
+        $csvStream = Storage::disk($disk)->readStream($import->file_path);
+        if (! $csvStream) {
+            $this->isImporting = false;
+
+            return;
+        }
+
+        $csvReader = CsvReader::createFromStream($csvStream);
+        if (filled($csvDelimiter = $this->getCsvDelimiter($csvReader))) {
+            $csvReader->setDelimiter($csvDelimiter);
+        }
+
+        $csvReader->setHeaderOffset($this->getHeaderOffset());
+
+        $statement = (new Statement)
+            ->offset($processed)
+            ->limit($this->getChunkSize());
+
+        $records = [];
+        $rowNumber = $processed + 1;
+        foreach ($statement->process($csvReader)->getRecords() as $record) {
+            $records[] = array_merge(['__row_number' => $rowNumber], $record);
+            $rowNumber++;
+        }
+
+        if (! count($records)) {
+            $import->touch('completed_at');
+            $this->isImporting = false;
+            $this->notifyImportCompleted($import);
+
+            return;
+        }
+
+        $importer = $import->getImporter(
+            columnMap: is_array($columnMap) ? $columnMap : [],
+            options: is_array($options) ? $options : [],
+        );
+
+        $processor = app(\App\Services\ImportExport\CsvImportProcessor::class);
+        $processor->processChunk($import, $importer, $records, is_array($columnMap) ? $columnMap : []);
+
+        $import->refresh();
+
+        if ($import->processed_rows >= $import->total_rows) {
+            $import->touch('completed_at');
+            $this->isImporting = false;
+            $this->notifyImportCompleted($import);
+        }
+    }
+
+    protected function normalizeImportPayload(mixed $payload): mixed
+    {
+        if (is_array($payload)) {
+            return $payload;
+        }
+
+        if (is_string($payload) && $payload !== '') {
+            $decoded = json_decode($payload, true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                return $decoded;
+            }
+        }
+
+        return [];
+    }
+
+    protected function notifyImportCompleted(Import $import): void
+    {
+        $failedRowsCount = $import->getFailedRowsCount();
+        $authGuard = $this->resolveAuthGuard();
+
+        Notification::make()
+            ->title($import->importer::getCompletedNotificationTitle($import))
+            ->body($import->importer::getCompletedNotificationBody($import))
+            ->when(
+                ! $failedRowsCount,
+                fn (Notification $notification) => $notification->success(),
+            )
+            ->when(
+                $failedRowsCount && ($failedRowsCount < $import->total_rows),
+                fn (Notification $notification) => $notification->warning(),
+            )
+            ->when(
+                $failedRowsCount === $import->total_rows,
+                fn (Notification $notification) => $notification->danger(),
+            )
+            ->when(
+                $failedRowsCount,
+                fn (Notification $notification) => $notification->actions([
+                    Action::make('downloadFailedRowsCsv')
+                        ->label(trans_choice('filament-actions::import.notifications.completed.actions.download_failed_rows_csv.label', $failedRowsCount, [
+                            'count' => Number::format($failedRowsCount),
+                        ]))
+                        ->color('danger')
+                        ->url(URL::signedRoute('filament.imports.failed-rows.download', ['authGuard' => $authGuard, 'import' => $import], absolute: false), shouldOpenInNewTab: true)
+                        ->markAsRead(),
+                ]),
+            )
+            ->persistent()
+            ->send();
+    }
+
+    protected function calculateProgressPercent(int $processed, int $total): int
+    {
+        if ($total <= 0) {
+            return 0;
+        }
+
+        return min(100, (int) floor(($processed / $total) * 100));
+    }
+
     public function import(): void
     {
         $state = $this->form->getState();
@@ -453,7 +1022,7 @@ abstract class CsvImportPage extends Page implements HasForms
         $import = app(Import::class);
         $import->user()->associate($user);
         $import->file_name = $csvFile->getClientOriginalName();
-        $import->file_path = $csvFile->getRealPath();
+        $import->file_path = $this->storeCsvFile($csvFile);
         $import->importer = static::getImporterClass();
         $import->total_rows = $totalRows;
         $import->save();
@@ -461,76 +1030,32 @@ abstract class CsvImportPage extends Page implements HasForms
         $columnMap = $data['columnMap'] ?? $this->guessColumnMap($csvReader->getHeader());
         $options = Arr::except($data, ['file', 'columnMap']);
 
-        $importer = $import->getImporter(
-            columnMap: $columnMap,
-            options: $options,
-        );
+        $import->column_map = $columnMap;
+        $import->options = $options;
+        $import->file_disk = SecureStorage::disk();
+        $import->save();
 
-        event(new ImportStarted($import, $columnMap, $options));
+        $this->activeImportId = $import->getKey();
+        $this->isImporting = true;
+        $this->importProgress = null;
+        $this->refreshImportProgress();
 
-        /** @var Authenticatable $user */
-        auth()->setUser($user);
-
-        $processor = app(CsvImportProcessor::class);
-        $chunkIterator = new ChunkIterator($csvResults->getRecords(), chunkSize: $this->getChunkSize());
-
-        foreach ($chunkIterator->get() as $importChunk) {
-            $result = $processor->processChunk($import, $importer, $importChunk, $columnMap);
-
-            event(new ImportChunkProcessed(
-                $import,
-                $columnMap,
-                $options,
-                $result['processedRows'],
-                $result['successfulRows'],
+        $queueConnection = (string) config('queue.default', 'sync');
+        if (! in_array($queueConnection, ['database', 'sync'], true)) {
+            dispatch(new ProcessCsvImport(
+                importId: $import->getKey(),
+                columnMap: $columnMap,
+                options: $options,
+                disk: SecureStorage::disk(),
+                path: $import->file_path,
+                chunkSize: $this->getChunkSize(),
             ));
         }
 
-        $import->touch('completed_at');
-        $import->refresh();
-
-        event(new ImportCompleted($import, $columnMap, $options));
-
-        $this->lastImport = array_merge($this->lastImport ?? [], [
-            'processed'  => $import->processed_rows,
-            'successful' => $import->successful_rows,
-            'failed'     => $import->getFailedRowsCount(),
-            'total'      => $import->total_rows,
-        ]);
-
-        if ($import->user instanceof Authenticatable) { /** @phpstan-ignore instanceof.alwaysTrue */
-            $failedRowsCount = $import->getFailedRowsCount();
-
-            Notification::make()
-                ->title($import->importer::getCompletedNotificationTitle($import))
-                ->body($import->importer::getCompletedNotificationBody($import))
-                ->when(
-                    ! $failedRowsCount,
-                    fn (Notification $notification) => $notification->success(),
-                )
-                ->when(
-                    $failedRowsCount && ($failedRowsCount < $import->total_rows),
-                    fn (Notification $notification) => $notification->warning(),
-                )
-                ->when(
-                    $failedRowsCount === $import->total_rows,
-                    fn (Notification $notification) => $notification->danger(),
-                )
-                ->when(
-                    $failedRowsCount,
-                    fn (Notification $notification) => $notification->actions([
-                        Action::make('downloadFailedRowsCsv')
-                            ->label(trans_choice('filament-actions::import.notifications.completed.actions.download_failed_rows_csv.label', $failedRowsCount, [
-                                'count' => Number::format($failedRowsCount),
-                            ]))
-                            ->color('danger')
-                            ->url(URL::signedRoute('filament.imports.failed-rows.download', ['authGuard' => $authGuard, 'import' => $import], absolute: false), shouldOpenInNewTab: true)
-                            ->markAsRead(),
-                    ]),
-                )
-                ->persistent()
-                ->send();
-        }
+        Notification::make()
+            ->title(__('admin.import_started'))
+            ->success()
+            ->send();
     }
 
     public function downloadExample(): StreamedResponse
@@ -737,7 +1262,7 @@ abstract class CsvImportPage extends Page implements HasForms
 
     protected function getChunkSize(): int
     {
-        return 100;
+        return 20;
     }
 
     protected function getMaxRows(): ?int
@@ -753,6 +1278,19 @@ abstract class CsvImportPage extends Page implements HasForms
     protected function getCsvDelimiter(?CsvReader $reader = null): ?string
     {
         return $this->guessCsvDelimiter($reader);
+    }
+
+    protected function storeCsvFile(TemporaryUploadedFile $file): string
+    {
+        $disk = SecureStorage::disk();
+        $extension = $file->getClientOriginalExtension();
+        $filename = Str::uuid()->toString();
+
+        if (filled($extension)) {
+            $filename .= '.' . $extension;
+        }
+
+        return $file->storeAs('imports/csv', $filename, $disk);
     }
 
     protected function guessCsvDelimiter(?CsvReader $reader = null): ?string

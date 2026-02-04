@@ -10,14 +10,4 @@ use Filament\Resources\Pages\CreateRecord;
 class CreateProduct extends CreateRecord
 {
     protected static string $resource = ProductResource::class;
-
-    protected function afterCreate(): void
-    {
-        /** @var \Filament\Schemas\Schema $form */
-        $form = $this->form;
-
-        if (method_exists($form, 'saveRelationships')) {
-            $form->saveRelationships();
-        }
-    }
 }

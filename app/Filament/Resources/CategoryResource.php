@@ -13,6 +13,7 @@ use App\Support\Concerns\HasNav;
 use BackedEnum;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 
 final class CategoryResource extends BaseResource
@@ -55,6 +56,16 @@ final class CategoryResource extends BaseResource
     public static function infolist(Schema $schema): Schema
     {
         return CategoryInfolist::configure($schema);
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                \App\Models\Scopes\ActiveScope::class,
+                \App\Models\Scopes\EnabledScope::class,
+                \App\Models\Scopes\VisibleScope::class,
+            ]);
     }
 
     public static function table(Table $table): Table

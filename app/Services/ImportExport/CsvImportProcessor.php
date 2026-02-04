@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace App\Services\ImportExport;
 
+use App\Models\ImportRowResult;
 use Filament\Actions\Imports\Exceptions\RowImportFailedException;
 use Filament\Actions\Imports\ImportColumn;
 use Filament\Actions\Imports\Importer;
 use Filament\Actions\Imports\Models\Import;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Throwable;
 
@@ -29,22 +31,59 @@ final class CsvImportProcessor
         $processedRows = 0;
         $successfulRows = 0;
         $failedRows = [];
+        $rowResults = [];
+        $timestamp = now();
 
-        DB::transaction(function () use ($import, $importer, $rows, $columnMap, &$processedRows, &$successfulRows, &$failedRows): void {
+        DB::transaction(function () use ($import, $importer, $rows, $columnMap, $timestamp, &$processedRows, &$successfulRows, &$failedRows, &$rowResults): void {
             foreach ($rows as $row) {
+                $rowNumber = $row['__row_number'] ?? null;
+                unset($row['__row_number']);
+
                 $row = $this->utf8Encode($row);
 
                 try {
                     ($importer)($row);
                     $successfulRows++;
+                    $rowResults[] = $this->formatRowResult(
+                        $importer,
+                        $row,
+                        $columnMap,
+                        $rowNumber,
+                        $timestamp,
+                    );
                 } catch (RowImportFailedException $exception) {
                     $failedRows[] = $this->formatFailedRow($row, $exception->getMessage(), $importer, $columnMap);
+                    $rowResults[] = $this->formatRowFailure(
+                        $importer,
+                        $row,
+                        $columnMap,
+                        $rowNumber,
+                        $exception->getMessage(),
+                        $timestamp,
+                    );
                 } catch (ValidationException $exception) {
-                    $failedRows[] = $this->formatFailedRow($row, collect($exception->errors())->flatten()->implode(' '), $importer, $columnMap);
+                    $message = collect($exception->errors())->flatten()->implode(' ');
+                    $failedRows[] = $this->formatFailedRow($row, $message, $importer, $columnMap);
+                    $rowResults[] = $this->formatRowFailure(
+                        $importer,
+                        $row,
+                        $columnMap,
+                        $rowNumber,
+                        $message,
+                        $timestamp,
+                    );
                 } catch (Throwable $exception) {
                     report($exception);
 
                     $failedRows[] = $this->formatFailedRow($row, null, $importer, $columnMap);
+                    $rowResults[] = $this->formatRowFailure(
+                        $importer,
+                        $row,
+                        $columnMap,
+                        $rowNumber,
+                        $exception->getMessage(),
+                        $timestamp,
+                    );
                 }
 
                 $processedRows++;
@@ -77,12 +116,74 @@ final class CsvImportProcessor
             if (count($failedRows)) {
                 $import->failedRows()->createMany($failedRows);
             }
+
+            if (count($rowResults)) {
+                ImportRowResult::query()->insert($rowResults);
+            }
         });
 
         return [
             'processedRows'  => $processedRows,
             'successfulRows' => $successfulRows,
             'failedRows'     => count($failedRows),
+        ];
+    }
+
+    /**
+     * @param  array<string, mixed> $data
+     * @return array<string, mixed>
+     */
+    private function formatRowResult(Importer $importer, array $data, array $columnMap, ?int $rowNumber, mixed $timestamp): array
+    {
+        $record = $importer->getRecord();
+        $changedFields = $record ? array_keys($record->getChanges()) : [];
+
+        $action = 'skipped';
+        if ($record?->wasRecentlyCreated) {
+            $action = 'created';
+        } elseif ($record && count($changedFields)) {
+            $action = 'updated';
+        }
+
+        $message = match ($action) {
+            'created' => 'Created.',
+            'updated' => 'Updated fields: ' . ($changedFields ? implode(', ', $changedFields) : 'none'),
+            default   => 'No changes.',
+        };
+
+        return [
+            'import_id'      => $importer->getImport()->getKey(),
+            'row_number'     => $rowNumber,
+            'status'         => 'success',
+            'action'         => $action,
+            'message'        => $message,
+            'error_message'  => null,
+            'changed_fields' => json_encode($changedFields),
+            'data'           => json_encode($this->filterSensitiveData($data, $importer, $columnMap)),
+            'created_at'     => $timestamp,
+            'updated_at'     => $timestamp,
+        ];
+    }
+
+    /**
+     * @param  array<string, mixed> $data
+     * @return array<string, mixed>
+     */
+    private function formatRowFailure(Importer $importer, array $data, array $columnMap, ?int $rowNumber, ?string $errorMessage, mixed $timestamp): array
+    {
+        $message = filled($errorMessage) ? Str::limit($errorMessage, 240) : 'Failed to import.';
+
+        return [
+            'import_id'      => $importer->getImport()->getKey(),
+            'row_number'     => $rowNumber,
+            'status'         => 'failed',
+            'action'         => 'error',
+            'message'        => $message,
+            'error_message'  => $errorMessage,
+            'changed_fields' => json_encode([]),
+            'data'           => json_encode($this->filterSensitiveData($data, $importer, $columnMap)),
+            'created_at'     => $timestamp,
+            'updated_at'     => $timestamp,
         ];
     }
 

@@ -9,10 +9,9 @@ return [
         'refresh'           => 'Aktualisieren',
         'view'              => 'Ansehen',
     ],
-    'active_groups'               => 'Aktive Gruppen',
-    'advanced_import'             => 'Erweiterter Import',
-    'advanced_import_description' => 'Daten mit benutzerdefinierter Feldzuordnung importieren.',
-    'attribute-values'            => [
+    'active_groups'    => 'Aktive Gruppen',
+    'advanced_import'  => 'Erweiterter Import',
+    'attribute-values' => [
         'translations' => [
             ''     => 'Attributwert-Übersetzungen',
             'save' => 'Übersetzungen speichern',
@@ -723,8 +722,7 @@ return [
         'width'    => 'Breite',
         'alt_text' => 'Alternativtext',
     ],
-    'products_import' => 'Produkte importieren',
-    'profile'         => [
+    'profile' => [
         'accepts_marketing'                    => 'Marketing akzeptieren',
         'account_statistics'                   => 'Konto-Statistiken',
         'confirm_password'                     => 'Passwort bestätigen',

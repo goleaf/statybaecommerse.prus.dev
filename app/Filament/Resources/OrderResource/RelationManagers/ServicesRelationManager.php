@@ -35,7 +35,7 @@ class ServicesRelationManager extends RelationManager
                 TextInput::make('price')
                     ->numeric()
                     ->required()
-                    ->prefix('$'),
+                    ->prefix('€'),
             ]);
     }
 
@@ -64,7 +64,7 @@ class ServicesRelationManager extends RelationManager
                     ->schema(fn (AttachAction $action): array => [
                         $action->getRecordSelect(),
                         TextInput::make('quantity')->numeric()->default(1)->required(),
-                        TextInput::make('price')->numeric()->required()->prefix('$'),
+                        TextInput::make('price')->numeric()->required()->prefix('€'),
                     ]),
                 Action::make('add_all_services')
                     ->label('Add All Services')

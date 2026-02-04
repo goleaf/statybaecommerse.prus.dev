@@ -2,8 +2,27 @@
 
 declare(strict_types=1);
 
-return array (
-  'industry' => 'enums.industry',
-  'priority' => 'enums.priority',
-  'status' => 'enums.status',
-);
+return [
+    'industry'       => 'enums.industry',
+    'payment_method' => [
+        'apple_pay'        => 'Apple Pay',
+        'bank_transfer'    => 'Банковский перевод',
+        'cash_on_delivery' => 'Наложенный платеж',
+        'credit_card'      => 'Кредитная карта',
+        'google_pay'       => 'Google Pay',
+        'paypal'           => 'PayPal',
+        'stripe'           => 'Stripe',
+    ],
+    'payment_status' => [
+        'authorized'         => 'Авторизован',
+        'captured'           => 'Списан',
+        'failed'             => 'Ошибка',
+        'paid'               => 'Оплачен',
+        'partially_refunded' => 'Частично возвращен',
+        'pending'            => 'В ожидании',
+        'refunded'           => 'Возвращен',
+        'settled'            => 'Зачислен',
+    ],
+    'priority' => 'enums.priority',
+    'status'   => 'enums.status',
+];
