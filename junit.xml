@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Unit\TranslationNavigationMessagesTest" file="tests\Unit\TranslationNavigationMessagesTest.php" tests="1" assertions="196" errors="0" failures="0" skipped="0" time="24.507406">
+    <testcase name="messages navigation labels exist across locales" file="tests\Unit\TranslationNavigationMessagesTest.php::messages navigation labels exist across locales" class="Tests\Unit\TranslationNavigationMessagesTest" classname="Tests.Unit.TranslationNavigationMessagesTest" assertions="196" time="24.507406"/>
+  </testsuite>
+</testsuites>

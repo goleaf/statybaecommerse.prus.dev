@@ -57,3 +57,4 @@ composer.lock
 junit.xml
 /docs/
 phpstan-baseline.neon
+junit.xml
