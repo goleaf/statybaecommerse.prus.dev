@@ -436,4 +436,7 @@ return [
     'reserved_quantity'                                                                                     => 'Reservierte Menge',
     'available_quantity'                                                                                    => 'Verfügbare Menge',
     'low_stock_threshold'                                                                                   => 'Mindestbestand',
+    'preview'                                                                                               => 'Vorschau',
+    'alt_text'                                                                                              => 'Alternativtext',
+    'sort_order'                                                                                            => 'Sortierreihenfolge',
 ];

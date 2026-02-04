@@ -6,12 +6,10 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProductResource\Pages;
 use App\Filament\Resources\ProductResource\RelationManagers\FeaturesRelationManager;
-use App\Filament\Resources\ProductResource\RelationManagers\ImagesRelationManager;
 use App\Filament\Resources\ProductResource\RelationManagers\RequestsRelationManager;
 use App\Filament\Resources\ProductResource\RelationManagers\SimilaritiesRelationManager;
 use App\Filament\Resources\ProductResource\RelationManagers\VariantsRelationManager;
 use App\Filament\Resources\ProductResource\Schemas\ProductForm;
-use App\Filament\Resources\ProductResource\Schemas\ProductInfolist;
 use App\Filament\Resources\ProductResource\Tables\ProductsTable;
 use App\Models\Product;
 use BackedEnum;
@@ -49,11 +47,6 @@ final class ProductResource extends BaseResource
         return ProductForm::configure($schema);
     }
 
-    public static function infolist(Schema $schema): Schema
-    {
-        return ProductInfolist::configure($schema);
-    }
-
     public static function table(Table $table): Table
     {
         return ProductsTable::configure($table);
@@ -63,7 +56,6 @@ final class ProductResource extends BaseResource
     {
         return [
             VariantsRelationManager::class,
-            ImagesRelationManager::class,
             FeaturesRelationManager::class,
             RequestsRelationManager::class,
             SimilaritiesRelationManager::class,
@@ -75,7 +67,6 @@ final class ProductResource extends BaseResource
         return [
             'index'  => Pages\ListProducts::route('/'),
             'create' => Pages\CreateProduct::route('/create'),
-            'view'   => Pages\ViewProduct::route('/{record}'),
             'edit'   => Pages\EditProduct::route('/{record}/edit'),
         ];
     }

@@ -436,4 +436,7 @@ return [
     'reserved_quantity'                                                                                     => 'Rezervuotas kiekis',
     'available_quantity'                                                                                    => 'Prieinamas kiekis',
     'low_stock_threshold'                                                                                   => 'Mažo likučio riba',
+    'preview'                                                                                               => 'Peržiūra',
+    'alt_text'                                                                                              => 'Alternatyvus tekstas',
+    'sort_order'                                                                                            => 'Rūšiavimo eiliškumas',
 ];

@@ -685,6 +685,8 @@ return [
         'cost_price'                    => 'Selbstkostenpreis',
         'created_at'                    => 'Erstellt am',
         'height'                        => 'Höhe',
+        'image'                         => 'Bild',
+        'images'                        => 'Bilder',
         'images_description'            => 'Produktbilder und Galerie.',
         'inventory'                     => 'Inventar',
         'is_active'                     => 'Aktiv',
@@ -717,8 +719,9 @@ return [
         'translations'                  => [
             'save' => 'Übersetzungen speichern',
         ],
-        'weight' => 'Gewicht',
-        'width'  => 'Breite',
+        'weight'   => 'Gewicht',
+        'width'    => 'Breite',
+        'alt_text' => 'Alternativtext',
     ],
     'products_import' => 'Produkte importieren',
     'profile'         => [

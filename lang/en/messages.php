@@ -436,4 +436,7 @@ return [
     'reserved_quantity'                                                                                     => 'Reserved Quantity',
     'available_quantity'                                                                                    => 'Available Quantity',
     'low_stock_threshold'                                                                                   => 'Low Stock Threshold',
+    'preview'                                                                                               => 'Preview',
+    'alt_text'                                                                                              => 'Alt Text',
+    'sort_order'                                                                                            => 'Sort Order',
 ];

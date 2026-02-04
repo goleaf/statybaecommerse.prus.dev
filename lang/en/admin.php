@@ -681,6 +681,8 @@ return [
         'cost_price'                    => 'Cost Price',
         'created_at'                    => 'Created At',
         'height'                        => 'Height',
+        'image'                         => 'Image',
+        'images'                        => 'Images',
         'images_description'            => 'Product images and gallery.',
         'inventory'                     => 'Inventory',
         'is_active'                     => 'Active',
@@ -713,8 +715,9 @@ return [
         'translations'                  => [
             'save' => 'Save Translations',
         ],
-        'weight' => 'Weight',
-        'width'  => 'Width',
+        'weight'   => 'Weight',
+        'width'    => 'Width',
+        'alt_text' => 'Alt Text',
     ],
     'products_import' => 'Import Products',
     'profile'         => [

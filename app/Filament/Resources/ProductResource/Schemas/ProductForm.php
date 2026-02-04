@@ -91,6 +91,28 @@ class ProductForm
                         ]),
                 ]),
 
+            Section::make(__('admin.products.images'))
+                ->schema([
+                    \Filament\Forms\Components\Repeater::make('images')
+                        ->relationship()
+                        ->schema([
+                            \Filament\Forms\Components\FileUpload::make('path')
+                                ->label(__('admin.products.image'))
+                                ->image()
+                                ->directory('product-images')
+                                ->required()
+                                ->columnSpanFull(),
+                            TextInput::make('alt_text')
+                                ->label(__('admin.products.alt_text'))
+                                ->columnSpanFull(),
+                        ])
+                        ->orderColumn('sort_order')
+                        ->grid(3)
+                        ->columnSpanFull()
+                        ->collapsible()
+                        ->itemLabel(fn (array $state): ?string => $state['alt_text'] ?? null),
+                ]),
+
             Section::make(__('admin.products.pricing'))
                 ->schema([
                     Grid::make(3)
