@@ -163,10 +163,13 @@ abstract class CsvImportPage extends Page implements HasForms
                         ->afterValidation(function (Get $get) {
                             $mapping = $get('columnMap') ?? [];
                             $this->data['columnMap'] = $mapping;
-                            $this->runAnalysis($mapping);
                         })
                         ->schema(function (Get $get) use ($page): array {
                             $csvFile = $get('file');
+
+                            if (is_array($csvFile)) {
+                                $csvFile = head($csvFile);
+                            }
 
                             if (! $csvFile instanceof TemporaryUploadedFile) {
                                 return [
@@ -237,18 +240,22 @@ abstract class CsvImportPage extends Page implements HasForms
             ]);
     }
 
-    protected function runAnalysis(?array $columnMap = null): void
+    public function analyze(): void
     {
         $this->lastImport = null;
         $data = $this->data;
         $csvFile = $data['file'] ?? null;
+
+        if (is_array($csvFile)) {
+            $csvFile = head($csvFile);
+        }
 
         if (! $csvFile instanceof TemporaryUploadedFile) {
             return;
         }
 
         $headers = $this->getCsvHeaders($csvFile);
-        $columnMap ??= $data['columnMap'] ?? $this->guessColumnMap($headers);
+        $columnMap = $data['columnMap'] ?? $this->guessColumnMap($headers);
 
         $csvStream = $this->getUploadedFileStream($csvFile);
         if (! $csvStream) {
@@ -338,7 +345,7 @@ abstract class CsvImportPage extends Page implements HasForms
     protected function getAnalysisContent(): HtmlString
     {
         if (! $this->lastImport) {
-            return new HtmlString('<div class="flex items-center gap-3 text-warning-600 p-4 bg-warning-50 rounded-lg border border-warning-200"><x-filament::loading-indicator class="h-5 w-5" /><p>' . __('admin.import_analyzing') . '</p></div>');
+            return new HtmlString('<div wire:init="analyze" class="flex items-center gap-3 text-warning-600 p-4 bg-warning-50 rounded-lg border border-warning-200"><x-filament::loading-indicator class="h-5 w-5" /><p>' . __('admin.import_analyzing') . '</p></div>');
         }
 
         $summary = $this->lastImport;

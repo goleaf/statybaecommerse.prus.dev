@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuites>
-  <testsuite name="Tests\Feature\Filament\Importers\PriceImporterTest" file="tests\Feature\Filament\Importers\PriceImporterTest.php" tests="1" assertions="2" errors="0" failures="0" skipped="0" time="21.807837">
-    <testcase name="it can import prices" file="tests\Feature\Filament\Importers\PriceImporterTest.php::it can import prices" class="Tests\Feature\Filament\Importers\PriceImporterTest" classname="Tests.Feature.Filament.Importers.PriceImporterTest" assertions="2" time="21.807837"/>
-  </testsuite>
-</testsuites>

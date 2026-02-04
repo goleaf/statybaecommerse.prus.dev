@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-return array (
-  'descriptions' => 'legal.descriptions',
-  'types' => 'legal.types',
-);
+return [
+    'descriptions' => 'legal.descriptions',
+    'types'        => 'legal.types',
+];

@@ -382,7 +382,7 @@ return array (
   'termoizoliacij' => 'Į termoizoliaciją',
   'termoizoliaciniai_kai_iai' => 'Termoizoliaciniai kaiščiai',
   'test_category' => 'Test Category',
-  'test_description' => 'Test description',
+  'test_description' => 'Test Description',
   'tools_equipment' => 'Tools & Equipment',
   'tvirtinimas_beton_m_r' => 'Tvirtinimas į betoną, mūrą',
   'tvirtinimas_gipsui' => 'Tvirtinimas gipsui',

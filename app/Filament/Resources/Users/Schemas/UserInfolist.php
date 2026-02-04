@@ -15,20 +15,14 @@ class UserInfolist
     {
         return $schema
             ->components([
-                Section::make(__('admin.navigation.users'))
-                    ->schema([
-                        TextEntry::make('name')
-                            ->label(__('messages.name')),
-                        TextEntry::make('email')
-                            ->label(__('messages.email')),
-                    ])->columns(2),
-
                 Section::make(__('messages.Profile'))
                     ->schema([
                         TextEntry::make('first_name')
                             ->label(__('messages.first_name')),
                         TextEntry::make('last_name')
                             ->label(__('messages.last_name')),
+                        TextEntry::make('email')
+                            ->label(__('messages.email')),
                         TextEntry::make('phone_number')
                             ->label(__('messages.phone')),
                         TextEntry::make('gender')
@@ -42,10 +36,6 @@ class UserInfolist
                         TextEntry::make('date_of_birth')
                             ->label(__('messages.birth_date'))
                             ->date(),
-                    ])->columns(2),
-
-                Section::make(__('admin.navigation.settings'))
-                    ->schema([
                         IconEntry::make('is_active')
                             ->label(__('messages.active'))
                             ->boolean(),
