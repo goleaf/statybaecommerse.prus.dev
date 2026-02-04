@@ -21,6 +21,7 @@ test('messages navigation labels exist across locales', function () {
         'home_featured',
         'home_products_featured_title',
         'home_products_featured_subtitle',
+        'home_slider_autoplay_start',
     ];
 
     foreach ($locales as $locale) {

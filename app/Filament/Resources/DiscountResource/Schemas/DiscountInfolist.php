@@ -68,8 +68,7 @@ class DiscountInfolist
                                 ->label(__('admin.discounts.minimum_amount'))
                                 ->money('EUR'),
                         ]),
-                ])
-                ->collapsible(),
+                ]),
         ]);
     }
 }

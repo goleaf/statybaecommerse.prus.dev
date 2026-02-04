@@ -30,7 +30,7 @@ class SubscriberForm
                             ->preload(),
                     ])->columns(2),
 
-                Section::make(__('messages.Profile'))
+                Section::make(__('messages.profile'))
                     ->schema([
                         TextInput::make('first_name')
                             ->label(__('messages.first_name'))
@@ -49,9 +49,9 @@ class SubscriberForm
                         Select::make('status')
                             ->label(__('messages.status'))
                             ->options([
-                                'active'       => 'Active',
-                                'inactive'     => 'Inactive',
-                                'unsubscribed' => 'Unsubscribed',
+                                'active'       => __('messages.active'),
+                                'inactive'     => __('messages.inactive'),
+                                'unsubscribed' => __('messages.unsubscribed'),
                             ])
                             ->required(),
                         Toggle::make('is_verified')

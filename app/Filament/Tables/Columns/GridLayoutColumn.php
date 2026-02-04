@@ -10,7 +10,7 @@ use Filament\Tables\Table;
 
 final class GridLayoutColumn extends ViewColumn
 {
-    protected static string $view = 'filament.tables.columns.grid-layout-column';
+    protected string $view = 'filament.tables.columns.grid-layout-column';
 
     /**
      * @var array<int, Column>

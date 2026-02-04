@@ -53,6 +53,6 @@ XML;
         ->set('data.only', 'all')
         ->set('data.downloadImages', false)
         ->set('data.file', $file)
-        ->callAction('import')
+        ->call('import')
         ->assertSuccessful();
 });

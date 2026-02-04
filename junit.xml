@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="Tests\Unit\TranslationNavigationMessagesTest" file="tests\Unit\TranslationNavigationMessagesTest.php" tests="1" assertions="196" errors="0" failures="0" skipped="0" time="24.507406">
-    <testcase name="messages navigation labels exist across locales" file="tests\Unit\TranslationNavigationMessagesTest.php::messages navigation labels exist across locales" class="Tests\Unit\TranslationNavigationMessagesTest" classname="Tests.Unit.TranslationNavigationMessagesTest" assertions="196" time="24.507406"/>
+  <testsuite name="Tests\Feature\ImportExportPageTest" file="tests\Feature\ImportExportPageTest.php" tests="2" assertions="2" errors="0" failures="0" skipped="0" time="25.337304">
+    <testcase name="it feature: imports via xml provider from uploaded file" file="tests\Feature\ImportExportPageTest.php::it feature: imports via xml provider from uploaded file" class="Tests\Feature\ImportExportPageTest" classname="Tests.Feature.ImportExportPageTest" assertions="1" time="25.001852"/>
+    <testcase name="it feature: renders the data import export page" file="tests\Feature\ImportExportPageTest.php::it feature: renders the data import export page" class="Tests\Feature\ImportExportPageTest" classname="Tests.Feature.ImportExportPageTest" assertions="1" time="0.335452"/>
   </testsuite>
 </testsuites>

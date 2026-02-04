@@ -90,8 +90,7 @@ class SliderForm
                                     SearchableInputHelper::clear($component, $set, ['button_url' => null]);
                                 }),
                         ]),
-                    ])
-                    ->collapsible(),
+                    ]),
 
                 Section::make(__('translations.media'))
                     ->schema([
@@ -114,8 +113,7 @@ class SliderForm
                             ->visibility('private')
                             ->imageEditor()
                             ->maxSize(2048),  // 2MB
-                    ])
-                    ->collapsible(),
+                    ]),
 
                 Section::make(__('translations.design'))
                     ->schema([
@@ -154,8 +152,7 @@ class SliderForm
                                 ])
                                 ->default('center'),
                         ]),
-                    ])
-                    ->collapsible(),
+                    ]),
 
                 Section::make(__('translations.animation_settings'))
                     ->schema([
@@ -197,8 +194,7 @@ class SliderForm
                                 'fast'   => __('translations.fast'),
                             ])
                             ->default('normal'),
-                    ])
-                    ->collapsible(),
+                    ]),
 
                 Section::make(__('translations.scheduling'))
                     ->schema([
@@ -214,8 +210,7 @@ class SliderForm
                             ->label(__('translations.is_scheduled'))
                             ->default(false)
                             ->live(),
-                    ])
-                    ->collapsible(),
+                    ]),
 
                 Section::make(__('translations.all_sliders_activated'))
                     ->schema([
@@ -271,10 +266,8 @@ class SliderForm
                                         SearchableInputHelper::clear($component, $set, ['link' => null]);
                                     }),
                             ])
-                            ->collapsible()
                             ->itemLabel(fn (array $state): ?string => $state['title'] ?? null),
-                    ])
-                    ->collapsible(),
+                    ]),
 
                 Section::make(__('translations.settings'))
                     ->schema([
@@ -296,7 +289,6 @@ class SliderForm
                             ])
                             ->default(['all']),
                     ])
-                    ->collapsible(),
             ]);
     }
 }

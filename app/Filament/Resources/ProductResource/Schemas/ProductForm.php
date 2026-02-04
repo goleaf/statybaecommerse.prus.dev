@@ -158,8 +158,7 @@ class ProductForm
                                 ->numeric()
                                 ->suffix(__('messages.unit_cm')),
                         ]),
-                ])
-                ->collapsible(),
+                ]),
 
             Section::make(__('admin.products.seo'))
                 ->schema([
@@ -170,9 +169,7 @@ class ProductForm
                         ->label(__('admin.products.seo_description'))
                         ->rows(3)
                         ->columnSpanFull(),
-                ])
-                ->collapsible()
-                ->collapsed(),
+                ]),
 
             Section::make(__('admin.products.metadata'))
                 ->schema([
@@ -184,8 +181,6 @@ class ProductForm
                         ->dehydrated(false)
                         ->columnSpanFull(),
                 ])
-                ->collapsible()
-                ->collapsed(),
         ]);
     }
 }

@@ -7,18 +7,29 @@
                 <p class="text-sm text-gray-600 mt-1">{{ __('admin.import_export.description') ?? 'Upload files to import data into the system.' }}</p>
             </div>
 
-            <form wire:submit="import">
+            <form wire:submit.prevent="import">
                 {{ $this->form }}
                 
                 <div class="mt-6 flex gap-3">
-                    <x-filament::button type="button" wire:click="mountAction('import')">
+                    <x-filament::button type="submit">
                         {{ __('translations.import') }}
                     </x-filament::button>
                 </div>
             </form>
         </x-filament::section>
 
-    </div>
+        <x-filament::section>
+            <x-slot name="heading">
+                {{ __('CSV imports') }}
+            </x-slot>
 
-    <x-filament-actions::modals />
+            <div class="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+                @foreach($this->getCsvImportPages() as $page)
+                    <x-filament::button :href="$page['url']" tag="a" color="gray">
+                        {{ $page['label'] }}
+                    </x-filament::button>
+                @endforeach
+            </div>
+        </x-filament::section>
+    </div>
 </x-filament-panels::page>

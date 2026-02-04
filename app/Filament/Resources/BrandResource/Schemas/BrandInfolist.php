@@ -45,16 +45,14 @@ class BrandInfolist
                         ->label(__('messages.image'))
                         ->collection('logo')
                         ->circular(),
-                ])
-                ->collapsible(),
+                ]),
             Section::make(__('admin.brands.social_links'))
                 ->schema([
                     TextEntry::make('social_links')
                         ->label(__('admin.brands.social_links'))
                         ->listWithLineBreaks()
                         ->formatStateUsing(fn ($state) => "{$state['platform']}: {$state['url']}"),
-                ])
-                ->collapsible(),
+                ]),
         ]);
     }
 }

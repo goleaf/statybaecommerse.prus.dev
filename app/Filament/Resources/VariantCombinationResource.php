@@ -141,9 +141,7 @@ final class VariantCombinationResource extends BaseResource
                         ->content(fn ($record): string|array|null => $record?->is_valid_combination
                             ? __('admin.variant_combinations.valid_combination')
                             : __('admin.variant_combinations.invalid_combination')),
-                ])
-                ->collapsible()
-                ->collapsed(),
+                ]),
         ];
     }
 

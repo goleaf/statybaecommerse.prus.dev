@@ -17,6 +17,7 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Validation\Rules\Password;
 
 class UsersRelationManager extends RelationManager
 {
@@ -32,7 +33,16 @@ class UsersRelationManager extends RelationManager
                 TextInput::make('email')
                     ->email()
                     ->required()
+                    ->unique(ignoreRecord: true)
                     ->maxLength(255),
+                TextInput::make('password')
+                    ->label(__('messages.password'))
+                    ->password()
+                    ->revealable()
+                    ->rule(Password::min(8)->mixedCase()->numbers()->symbols())
+                    ->validatedWhenNotDehydrated(false)
+                    ->dehydrated(fn ($state) => filled($state))
+                    ->required(fn (string $context): bool => $context === 'create'),
             ]);
     }
 

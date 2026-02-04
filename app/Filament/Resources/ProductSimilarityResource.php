@@ -21,6 +21,8 @@ final class ProductSimilarityResource extends BaseResource
 {
     protected static ?string $model = ProductSimilarity::class;
 
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-sparkles';
 
     protected static string|UnitEnum|null $navigationGroup = null;

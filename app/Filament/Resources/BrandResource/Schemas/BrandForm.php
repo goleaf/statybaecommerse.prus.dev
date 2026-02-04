@@ -56,8 +56,7 @@ class BrandForm
                         ->collection('logo')
                         ->image()
                         ->columnSpanFull(),
-                ])
-                ->collapsible(),
+                ]),
             Section::make(__('admin.brands.social_links'))
                 ->schema([
                     Repeater::make('social_links')
@@ -70,8 +69,7 @@ class BrandForm
                                 ->required(),
                         ])
                         ->columns(2),
-                ])
-                ->collapsible(),
+                ]),
         ]);
     }
 }

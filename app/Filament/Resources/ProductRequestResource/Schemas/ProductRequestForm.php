@@ -58,8 +58,7 @@ class ProductRequestForm
                             ->label(__('messages.Message'))
                             ->rows(5)
                             ->columnSpanFull(),
-                    ])
-                    ->collapsible(),
+                    ]),
 
                 Section::make(__('messages.Status & Response'))
                     ->schema([

@@ -38,26 +38,6 @@ it('forbids non-admin user to access data import export page', function () {
         ->assertRedirect('/admin/login');
 });
 
-it('has import products action', function () {
-    Livewire::test(DataImportExport::class)
-        ->assertActionExists('importProducts');
-});
-
-it('has import categories action', function () {
-    Livewire::test(DataImportExport::class)
-        ->assertActionExists('importCategories');
-});
-
-it('has import brands action', function () {
-    Livewire::test(DataImportExport::class)
-        ->assertActionExists('importBrands');
-});
-
-it('can open import products modal', function () {
-    Livewire::test(DataImportExport::class)
-        ->callAction('importProducts');
-});
-
 it('displays the stats on the page', function () {
     Livewire::test(DataImportExport::class)
         ->assertSee('fi-wi-stats-overview')
@@ -68,7 +48,17 @@ it('displays the stats on the page', function () {
         ->assertSee(__('messages.admin_orders'));
 });
 
-it('has the legacy import action', function () {
+it('shows CSV import links', function () {
     Livewire::test(DataImportExport::class)
-        ->assertActionExists('import');
+        ->assertSee(__('admin.products_import'))
+        ->assertSee(__('admin.categories_import'))
+        ->assertSee(__('admin.brands_import'))
+        ->assertSee(__('admin.customers_import'))
+        ->assertSee(__('admin.partners_import'))
+        ->assertSee(__('admin.organizations_import'))
+        ->assertSee(__('admin.subscribers_import'))
+        ->assertSee(__('admin.users_import'))
+        ->assertSee(__('admin.discounts_import'))
+        ->assertSee(__('admin.prices_import'))
+        ->assertSee(__('admin.orders_import'));
 });

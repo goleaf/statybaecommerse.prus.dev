@@ -1,8 +1,10 @@
 <?php
 
-use App\Filament\Pages\ImportData;
+declare(strict_types=1);
+
+use App\Filament\Pages\DataImportExport;
+use App\Filament\Pages\Imports\ImportCategories;
 use App\Models\AdminUser;
-use Filament\Actions\ImportAction;
 
 use function Pest\Livewire\livewire;
 
@@ -10,22 +12,30 @@ it('can render import data page', function () {
     $user = AdminUser::factory()->create();
 
     $this->actingAs($user, 'admin')
-        ->get(ImportData::getUrl())
+        ->get(DataImportExport::getUrl())
         ->assertSuccessful();
 });
 
-it('can mount import actions', function () {
+it('can render import categories page', function () {
+    $user = AdminUser::factory()->create();
+
+    $this->actingAs($user, 'admin')
+        ->get(ImportCategories::getUrl())
+        ->assertSuccessful();
+});
+
+it('exposes csv import pages on the data import dashboard', function () {
     $user = AdminUser::factory()->create();
 
     $this->actingAs($user, 'admin');
 
-    livewire(ImportData::class)
-        ->assertActionExists('importProducts')
-        ->assertActionExists('importBrands')
-        ->assertActionExists('importCategories');
+    $pages = livewire(DataImportExport::class)->instance()->getCsvImportPages();
+
+    expect(collect($pages)->pluck('url'))
+        ->toContain(ImportCategories::getUrl());
 });
 
 it('is forbidden for guests', function () {
-    $this->get(ImportData::getUrl())
+    $this->get(DataImportExport::getUrl())
         ->assertRedirect('/admin/login');
 });

@@ -61,7 +61,7 @@ class AdminUserForm
                         Grid::make(3)
                             ->schema([
                                 Placeholder::make('id')
-                                    ->label('ID')
+                                    ->label(__('messages.id'))
                                     ->content(fn ($record): ?string => $record?->id ? (string) $record->id : null),
 
                                 Placeholder::make('created_at')
@@ -72,8 +72,7 @@ class AdminUserForm
                                     ->label(__('messages.updated_at'))
                                     ->content(fn ($record): ?string => $record?->updated_at?->diffForHumans()),
                             ]),
-                    ])
-                    ->collapsible(),
+                    ]),
             ]);
     }
 }

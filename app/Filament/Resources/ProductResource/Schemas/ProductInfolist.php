@@ -114,8 +114,7 @@ class ProductInfolist
                                 ->label(__('admin.products.height'))
                                 ->suffix(' ' . __('messages.unit_cm')),
                         ]),
-                ])
-                ->collapsible(),
+                ]),
 
             Section::make(__('admin.products.seo'))
                 ->schema([
@@ -124,17 +123,13 @@ class ProductInfolist
                     TextEntry::make('seo_description')
                         ->label(__('admin.products.seo_description'))
                         ->columnSpanFull(),
-                ])
-                ->collapsible()
-                ->collapsed(),
+                ]),
 
             Section::make(__('admin.products.metadata'))
                 ->schema([
                     KeyValueEntry::make('metadata')
                         ->label(__('admin.products.metadata')),
-                ])
-                ->collapsible()
-                ->collapsed(),
+                ]),
         ]);
     }
 }

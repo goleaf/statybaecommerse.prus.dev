@@ -78,8 +78,7 @@ class OrderForm
                         TextInput::make('billing_address.city')->label(__('messages.city')),
                         TextInput::make('billing_address.zip')->label(__('messages.zip_code')),
                         TextInput::make('billing_address.country')->label(__('messages.country')),
-                    ])->columns(4)
-                    ->collapsed(),
+                    ])->columns(4),
 
                 Section::make(__('messages.financials'))
                     ->schema([

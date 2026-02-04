@@ -128,7 +128,7 @@ class ProductVariantForm
                                 Textarea::make('seo_description_en')
                                     ->label(__('admin.fields.seo_description_en')),
                             ]),
-                    ])->collapsed(),
+                    ]),
             ]);
     }
 }

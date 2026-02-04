@@ -4,23 +4,21 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
-use App\Filament\Imports\BrandImporter;
-use App\Filament\Imports\CategoryImporter;
-use App\Filament\Imports\CustomerImporter;
-use App\Filament\Imports\DiscountImporter;
-use App\Filament\Imports\OrderImporter;
-use App\Filament\Imports\OrganizationImporter;
-use App\Filament\Imports\PartnerImporter;
-use App\Filament\Imports\PriceImporter;
-use App\Filament\Imports\ProductImporter;
-use App\Filament\Imports\SubscriberImporter;
-use App\Filament\Imports\UserImporter;
+use App\Filament\Pages\Imports\ImportBrands;
+use App\Filament\Pages\Imports\ImportCategories;
+use App\Filament\Pages\Imports\ImportCustomers;
+use App\Filament\Pages\Imports\ImportDiscounts;
+use App\Filament\Pages\Imports\ImportOrders;
+use App\Filament\Pages\Imports\ImportOrganizations;
+use App\Filament\Pages\Imports\ImportPartners;
+use App\Filament\Pages\Imports\ImportPrices;
+use App\Filament\Pages\Imports\ImportProducts;
+use App\Filament\Pages\Imports\ImportSubscribers;
+use App\Filament\Pages\Imports\ImportUsers;
 use App\Filament\Widgets\DataImportExportStatsWidget;
 use App\Models\AdminUser;
 use App\Services\ImportExport\ProviderRegistry;
 use App\Support\Storage\SecureStorage;
-use Filament\Actions\Action;
-use Filament\Actions\ImportAction;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
@@ -73,92 +71,24 @@ final class DataImportExport extends Page implements HasForms
         ]);
     }
 
-    public function importProductsAction(): ImportAction
+    /**
+     * @return array<int, array{label: string, url: string}>
+     */
+    public function getCsvImportPages(): array
     {
-        return ImportAction::make('importProducts')
-            ->label(__('admin.products_import') ?? 'Import Products')
-            ->importer(ProductImporter::class)
-            ->icon(null);
-    }
-
-    public function importCategoriesAction(): ImportAction
-    {
-        return ImportAction::make('importCategories')
-            ->label(__('admin.categories_import') ?? 'Import Categories')
-            ->importer(CategoryImporter::class)
-            ->icon(null);
-    }
-
-    public function importBrandsAction(): ImportAction
-    {
-        return ImportAction::make('importBrands')
-            ->label(__('admin.brands_import') ?? 'Import Brands')
-            ->importer(BrandImporter::class)
-            ->icon(null);
-    }
-
-    public function importCustomersAction(): ImportAction
-    {
-        return ImportAction::make('importCustomers')
-            ->label(__('admin.customers_import'))
-            ->importer(CustomerImporter::class)
-            ->icon(null);
-    }
-
-    public function importPartnersAction(): ImportAction
-    {
-        return ImportAction::make('importPartners')
-            ->label(__('admin.partners_import'))
-            ->importer(PartnerImporter::class)
-            ->icon(null);
-    }
-
-    public function importOrganizationsAction(): ImportAction
-    {
-        return ImportAction::make('importOrganizations')
-            ->label(__('admin.organizations_import'))
-            ->importer(OrganizationImporter::class)
-            ->icon(null);
-    }
-
-    public function importSubscribersAction(): ImportAction
-    {
-        return ImportAction::make('importSubscribers')
-            ->label(__('admin.subscribers_import'))
-            ->importer(SubscriberImporter::class)
-            ->icon(null);
-    }
-
-    public function importUsersAction(): ImportAction
-    {
-        return ImportAction::make('importUsers')
-            ->label(__('admin.users_import'))
-            ->importer(UserImporter::class)
-            ->icon(null);
-    }
-
-    public function importDiscountsAction(): ImportAction
-    {
-        return ImportAction::make('importDiscounts')
-            ->label(__('admin.discounts_import'))
-            ->importer(DiscountImporter::class)
-            ->icon(null);
-    }
-
-    public function importPricesAction(): ImportAction
-    {
-        return ImportAction::make('importPrices')
-            ->label(__('admin.prices_import'))
-            ->importer(PriceImporter::class)
-            ->icon(null);
-    }
-
-    public function importOrdersAction(): ImportAction
-    {
-        return ImportAction::make('importOrders')
-            ->label(__('admin.orders_import'))
-            ->importer(OrderImporter::class)
-            ->icon(null);
+        return [
+            ['label' => __('admin.products_import'), 'url' => ImportProducts::getUrl()],
+            ['label' => __('admin.categories_import'), 'url' => ImportCategories::getUrl()],
+            ['label' => __('admin.brands_import'), 'url' => ImportBrands::getUrl()],
+            ['label' => __('admin.customers_import'), 'url' => ImportCustomers::getUrl()],
+            ['label' => __('admin.partners_import'), 'url' => ImportPartners::getUrl()],
+            ['label' => __('admin.organizations_import'), 'url' => ImportOrganizations::getUrl()],
+            ['label' => __('admin.subscribers_import'), 'url' => ImportSubscribers::getUrl()],
+            ['label' => __('admin.users_import'), 'url' => ImportUsers::getUrl()],
+            ['label' => __('admin.discounts_import'), 'url' => ImportDiscounts::getUrl()],
+            ['label' => __('admin.prices_import'), 'url' => ImportPrices::getUrl()],
+            ['label' => __('admin.orders_import'), 'url' => ImportOrders::getUrl()],
+        ];
     }
 
     public function form(Form $form): Form
@@ -197,58 +127,35 @@ final class DataImportExport extends Page implements HasForms
             ->statePath('data');
     }
 
-    public function importAction(): Action
+    public function import(): void
     {
-        return Action::make('import')
-            ->label(__('translations.import'))
-            ->icon(null)
-            ->action(function (): void {
-                $data = $this->form->getState();
-                $provider = ProviderRegistry::get($data['provider'] ?? 'xml');
-                if (! $provider) {
-                    Notification::make()
-                        ->title(__('translations.provider_not_found'))
-                        ->danger()
-                        ->send();
+        $data = $this->form->getState();
+        $provider = ProviderRegistry::get($data['provider'] ?? 'xml');
+        if (! $provider) {
+            Notification::make()
+                ->title(__('translations.provider_not_found'))
+                ->danger()
+                ->send();
 
-                    return;
-                }
-                $path = $data['file'];
-                if (! $path) {
-                    Notification::make()
-                        ->title(__('translations.file_missing'))
-                        ->danger()
-                        ->send();
+            return;
+        }
+        $path = $data['file'] ?? null;
+        if (! $path) {
+            Notification::make()
+                ->title(__('translations.file_missing'))
+                ->danger()
+                ->send();
 
-                    return;
-                }
-                $abs = Storage::disk(SecureStorage::disk())->path($path);
-                $res = $provider->import($abs, ['only' => $data['only'] ?? 'all', 'download_images' => (bool) ($data['downloadImages'] ?? true)]);
+            return;
+        }
+        $abs = Storage::disk(SecureStorage::disk())->path($path);
+        $res = $provider->import($abs, ['only' => $data['only'] ?? 'all', 'download_images' => (bool) ($data['downloadImages'] ?? true)]);
 
-                Notification::make()
-                    ->title(__('translations.import_finished'))
-                    ->body(__('messages.created') . ': ' . ($res['categories']['created'] + $res['products']['created']))
-                    ->success()
-                    ->send();
-            });
-    }
-
-    protected function getHeaderActions(): array
-    {
-        return [
-            $this->importProductsAction(),
-            $this->importCategoriesAction(),
-            $this->importBrandsAction(),
-            $this->importCustomersAction(),
-            $this->importPartnersAction(),
-            $this->importOrganizationsAction(),
-            $this->importSubscribersAction(),
-            $this->importUsersAction(),
-            $this->importDiscountsAction(),
-            $this->importPricesAction(),
-            $this->importOrdersAction(),
-            $this->importAction(),
-        ];
+        Notification::make()
+            ->title(__('translations.import_finished'))
+            ->body(__('messages.created') . ': ' . ($res['categories']['created'] + $res['products']['created']))
+            ->success()
+            ->send();
     }
 
     protected function getHeaderWidgets(): array

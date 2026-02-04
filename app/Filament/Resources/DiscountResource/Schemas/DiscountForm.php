@@ -78,8 +78,7 @@ class DiscountForm
                                 ->minValue(0)
                                 ->step(0.01),
                         ]),
-                ])
-                ->collapsible(),
+                ]),
         ]);
     }
 }
