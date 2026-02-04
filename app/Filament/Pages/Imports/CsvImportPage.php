@@ -378,56 +378,82 @@ abstract class CsvImportPage extends Page implements HasForms
     protected function getAnalysisContent(): HtmlString
     {
         if (! $this->lastImport) {
-            return new HtmlString('<div wire:init="analyze" class="flex items-center gap-3 text-warning-600 p-4 bg-warning-50 rounded-lg border border-warning-200"><x-filament::loading-indicator class="h-5 w-5" /><p>' . __('admin.import_analyzing') . '</p></div>');
+            return new HtmlString("
+                <div wire:init=\"analyze\" class='rounded-2xl border border-dashed border-primary-200 bg-gradient-to-br from-primary-50 via-white to-white p-6 text-gray-800 shadow-sm dark:border-primary-900/40 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900 dark:text-gray-100'>
+                    <div class='flex flex-wrap items-center justify-between gap-4'>
+                        <div>
+                            <p class='text-xs font-semibold uppercase tracking-widest text-primary-600 dark:text-primary-300'>" . __('admin.import_analysis_summary') . "</p>
+                            <p class='mt-2 text-base font-semibold text-gray-900 dark:text-white'>" . __('admin.import_analyzing') . "</p>
+                        </div>
+                        <div class='flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-sm dark:bg-gray-800'>
+                            <x-filament::loading-indicator class='h-5 w-5' />
+                        </div>
+                    </div>
+                </div>
+            ");
         }
 
         $summary = $this->lastImport;
 
         $mappedFieldsHtml = collect($summary['mappedFields'])
-            ->map(fn ($f) => "<span class='inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10 dark:bg-blue-400/10 dark:text-blue-400 dark:ring-blue-400/30'>{$f}</span>")
+            ->map(fn ($f) => "<span class='inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-200'>{$f}</span>")
             ->implode(' ');
 
         $missingRequiredHtml = '';
         if (! empty($summary['missingRequiredFields'])) {
             $fields = collect($summary['missingRequiredFields'])
-                ->map(fn ($f) => "<span class='inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-700/10 dark:bg-red-400/10 dark:text-red-400 dark:ring-red-400/30'>{$f}</span>")
+                ->map(fn ($f) => "<span class='inline-flex items-center rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-700 dark:bg-red-900/40 dark:text-red-200'>{$f}</span>")
                 ->implode(' ');
             $missingRequiredHtml = "
-                <div class='mt-4 p-4 border border-red-200 bg-red-50 dark:bg-red-900/20 rounded-lg'>
-                    <p class='text-sm font-bold text-red-700 dark:text-red-400 mb-2'>" . __('admin.import_missing_required') . ":</p>
-                    <div class='flex flex-wrap gap-2'>{$fields}</div>
+                <div class='rounded-2xl border border-red-200 bg-red-50 p-6 shadow-sm dark:border-red-900/40 dark:bg-red-950/40'>
+                    <p class='text-xs font-semibold uppercase tracking-widest text-red-600 dark:text-red-300'>" . __('admin.import_missing_required') . "</p>
+                    <div class='mt-3 flex flex-wrap gap-2'>{$fields}</div>
                 </div>
             ";
         }
 
         return new HtmlString("
             <div class='space-y-6'>
-                <div class='p-6 border rounded-xl bg-white dark:bg-gray-900 shadow-sm'>
-                    <p class='text-xl font-bold mb-6'>" . __('admin.import_total_rows') . ": {$summary['total']}</p>
-                    <div class='grid grid-cols-1 md:grid-cols-3 gap-6'>
-                        <div class='p-4 bg-green-50 dark:bg-green-900/20 rounded-xl text-center border-2 border-green-100 dark:border-green-800 shadow-sm'>
-                            <span class='block text-4xl font-black text-green-700 dark:text-green-400 mb-1'>{$summary['new']}</span>
-                            <span class='text-xs font-bold uppercase tracking-widest text-green-600 dark:text-green-500'>" . __('admin.import_new_records') . "</span>
+                <div class='rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900'>
+                    <div class='flex flex-wrap items-start justify-between gap-4'>
+                        <div>
+                            <p class='text-xs font-semibold uppercase tracking-widest text-gray-500 dark:text-gray-400'>" . __('admin.import_analysis_summary') . "</p>
+                            <div class='mt-3 flex items-end gap-3'>
+                                <span class='text-3xl font-bold text-gray-900 dark:text-white'>{$summary['total']}</span>
+                                <span class='text-[11px] font-semibold uppercase tracking-widest text-gray-500 dark:text-gray-400'>" . __('admin.import_total_rows') . "</span>
+                            </div>
                         </div>
-                        <div class='p-4 bg-amber-50 dark:bg-amber-900/20 rounded-xl text-center border-2 border-amber-100 dark:border-amber-800 shadow-sm'>
-                            <span class='block text-4xl font-black text-amber-700 dark:text-amber-400 mb-1'>{$summary['updated']}</span>
-                            <span class='text-xs font-bold uppercase tracking-widest text-amber-600 dark:text-amber-500'>" . __('admin.import_updated_records') . '</span>
+                        <div class='inline-flex items-center gap-2 rounded-full bg-gray-100 px-3 py-1 text-[11px] font-semibold text-gray-600 dark:bg-gray-800 dark:text-gray-300'>
+                            <span class='h-2 w-2 rounded-full bg-primary-500'></span>
+                            " . __('admin.import_step_analysis') . "
+                        </div>
+                    </div>
+                    <div class='mt-6 grid grid-cols-1 gap-4 md:grid-cols-3'>
+                        <div class='rounded-xl border border-emerald-100 bg-emerald-50 p-4 text-center dark:border-emerald-900/40 dark:bg-emerald-900/20'>
+                            <span class='block text-4xl font-black text-emerald-700 dark:text-emerald-300'>{$summary['new']}</span>
+                            <span class='mt-1 block text-xs font-semibold uppercase tracking-widest text-emerald-600 dark:text-emerald-400'>" . __('admin.import_new_records') . "</span>
+                        </div>
+                        <div class='rounded-xl border border-amber-100 bg-amber-50 p-4 text-center dark:border-amber-900/40 dark:bg-amber-900/20'>
+                            <span class='block text-4xl font-black text-amber-700 dark:text-amber-300'>{$summary['updated']}</span>
+                            <span class='mt-1 block text-xs font-semibold uppercase tracking-widest text-amber-600 dark:text-amber-400'>" . __('admin.import_updated_records') . '</span>
                         </div>
                         ' . (($this->data['should_sync'] ?? false) ? "
-                        <div class='p-4 bg-red-50 dark:bg-red-900/20 rounded-xl text-center border-2 border-red-100 dark:border-red-800 shadow-sm'>
-                            <span class='block text-4xl font-black text-red-700 dark:text-red-400 mb-1'>{$summary['removed']}</span>
-                            <span class='text-xs font-bold uppercase tracking-widest text-red-600 dark:text-red-500'>" . __('admin.import_removed_records') . '</span>
-                        </div>' : '') . "
+                        <div class='rounded-xl border border-red-100 bg-red-50 p-4 text-center dark:border-red-900/40 dark:bg-red-900/20'>
+                            <span class='block text-4xl font-black text-red-700 dark:text-red-300'>{$summary['removed']}</span>
+                            <span class='mt-1 block text-xs font-semibold uppercase tracking-widest text-red-600 dark:text-red-400'>" . __('admin.import_removed_records') . '</span>
+                        </div>' : "<div class='rounded-xl border border-slate-100 bg-slate-50 p-4 text-center dark:border-slate-800 dark:bg-slate-800/40'>
+                            <span class='block text-4xl font-black text-slate-300 dark:text-slate-500'>—</span>
+                            <span class='mt-1 block text-xs font-semibold uppercase tracking-widest text-slate-500'>" . __('admin.import_removed_records') . '</span>
+                        </div>') . "
                     </div>
                 </div>
 
-                <div>
-                    <p class='text-sm font-bold text-gray-700 dark:text-gray-300 mb-3'>" . __('admin.import_fields_to_be_imported') . ":</p>
-                    <div class='flex flex-wrap gap-2'>{$mappedFieldsHtml}</div>
-                </div>
-
-                <div class='mt-4 p-4 border rounded-lg bg-blue-50 dark:bg-blue-900/20'>
-                    <p class='text-sm text-blue-700 dark:text-blue-300 font-medium'>" . __('admin.import_analysis_note') . "</p>
+                <div class='rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900'>
+                    <p class='text-xs font-semibold uppercase tracking-widest text-gray-500 dark:text-gray-400'>" . __('admin.import_fields_to_be_imported') . "</p>
+                    <div class='mt-3 flex flex-wrap gap-2'>{$mappedFieldsHtml}</div>
+                    <div class='mt-4 rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-900/40 dark:bg-blue-900/20'>
+                        <p class='text-xs font-medium text-blue-700 dark:text-blue-300'>" . __('admin.import_analysis_note') . "</p>
+                    </div>
                 </div>
 
                 {$missingRequiredHtml}
@@ -594,19 +620,41 @@ abstract class CsvImportPage extends Page implements HasForms
             : __('admin.import_status_running');
 
         return new HtmlString('
-            <div wire:poll.visible.2s="tickImport" class="mt-6 space-y-4">
-                <div class="flex items-center justify-between">
-                    <p class="text-sm font-semibold text-gray-800 dark:text-gray-200">' . __('admin.import_progress') . '</p>
-                    <span class="text-xs font-medium text-gray-600 dark:text-gray-300">' . $percent . '%</span>
+            <div wire:poll.visible.2s="tickImport" class="mt-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+                <div class="flex flex-wrap items-start justify-between gap-4">
+                    <div>
+                        <p class="text-xs font-semibold uppercase tracking-widest text-gray-500 dark:text-gray-400">' . __('admin.import_progress') . '</p>
+                        <div class="mt-2 flex items-end gap-3">
+                            <span class="text-3xl font-bold text-gray-900 dark:text-white">' . $percent . '%</span>
+                            <span class="rounded-full bg-gray-100 px-3 py-1 text-[11px] font-semibold text-gray-600 dark:bg-gray-800 dark:text-gray-300">' . $statusLabel . '</span>
+                        </div>
+                        <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">' . __('admin.import_processed_rows') . ': ' . $processed . ' / ' . $total . '</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-[11px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">' . __('admin.import_processed_rows') . '</p>
+                        <p class="text-sm font-semibold text-gray-900 dark:text-white">' . $processed . ' / ' . $total . '</p>
+                    </div>
                 </div>
-                <div class="h-2 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-800">
-                    <div class="h-full bg-primary-600 transition-all duration-300" style="width: ' . $percent . '%;"></div>
+                <div class="mt-4 h-2 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-800">
+                    <div class="h-full rounded-full bg-gradient-to-r from-primary-500 via-primary-600 to-primary-700 transition-all duration-300" style="width: ' . $percent . '%;"></div>
                 </div>
-                <div class="grid grid-cols-2 gap-4 text-xs text-gray-600 dark:text-gray-300">
-                    <div><span class="font-medium text-gray-800 dark:text-gray-100">' . __('admin.import_processed_rows') . ':</span> ' . $processed . ' / ' . $total . '</div>
-                    <div><span class="font-medium text-gray-800 dark:text-gray-100">' . __('admin.import_successful_rows') . ':</span> ' . $successful . '</div>
-                    <div><span class="font-medium text-gray-800 dark:text-gray-100">' . __('admin.import_failed_rows') . ':</span> ' . $failed . '</div>
-                    <div><span class="font-medium text-gray-800 dark:text-gray-100">' . __('admin.import_status') . ':</span> ' . $statusLabel . '</div>
+                <div class="mt-5 grid grid-cols-1 gap-3 text-xs sm:grid-cols-2 lg:grid-cols-4">
+                    <div class="rounded-lg border border-slate-100 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-800/40">
+                        <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-300">' . __('admin.import_processed_rows') . '</p>
+                        <p class="mt-1 text-sm font-semibold text-slate-900 dark:text-white">' . $processed . ' / ' . $total . '</p>
+                    </div>
+                    <div class="rounded-lg border border-emerald-100 bg-emerald-50 p-3 dark:border-emerald-900/40 dark:bg-emerald-900/20">
+                        <p class="text-[11px] font-semibold uppercase tracking-wide text-emerald-600 dark:text-emerald-300">' . __('admin.import_successful_rows') . '</p>
+                        <p class="mt-1 text-sm font-semibold text-emerald-700 dark:text-emerald-200">' . $successful . '</p>
+                    </div>
+                    <div class="rounded-lg border border-red-100 bg-red-50 p-3 dark:border-red-900/40 dark:bg-red-900/20">
+                        <p class="text-[11px] font-semibold uppercase tracking-wide text-red-600 dark:text-red-300">' . __('admin.import_failed_rows') . '</p>
+                        <p class="mt-1 text-sm font-semibold text-red-700 dark:text-red-200">' . $failed . '</p>
+                    </div>
+                    <div class="rounded-lg border border-blue-100 bg-blue-50 p-3 dark:border-blue-900/40 dark:bg-blue-900/20">
+                        <p class="text-[11px] font-semibold uppercase tracking-wide text-blue-600 dark:text-blue-300">' . __('admin.import_status') . '</p>
+                        <p class="mt-1 text-sm font-semibold text-blue-700 dark:text-blue-200">' . $statusLabel . '</p>
+                    </div>
                 </div>
             </div>
         ');
@@ -627,20 +675,31 @@ abstract class CsvImportPage extends Page implements HasForms
 
         if ($rows->isEmpty()) {
             return new HtmlString(
-                "<div class='mt-6 rounded-lg border border-dashed border-gray-200 bg-gray-50 p-4 text-sm text-gray-600 dark:border-gray-800 dark:bg-gray-900/40 dark:text-gray-300'>"
-                . __('admin.import_rows_empty') .
-                '</div>'
+                "<div class='mt-6 rounded-2xl border border-dashed border-gray-200 bg-gray-50 p-6 text-sm text-gray-600 shadow-sm dark:border-gray-800 dark:bg-gray-900/40 dark:text-gray-300'>
+                    <div class='flex flex-wrap items-start justify-between gap-4'>
+                        <div>
+                            <p class='text-xs font-semibold uppercase tracking-widest text-gray-500 dark:text-gray-400'>" . __('admin.import_rows_title') . "</p>
+                            <p class='mt-1 text-sm font-semibold text-gray-800 dark:text-gray-100'>" . __('admin.import_rows_latest') . "</p>
+                            <p class='mt-1 text-xs text-gray-500 dark:text-gray-400'>" . __('admin.import_rows_latest_hint') . "</p>
+                        </div>
+                        <span class='inline-flex items-center rounded-full bg-white px-3 py-1 text-[11px] font-semibold text-gray-600 shadow-sm dark:bg-gray-800 dark:text-gray-300'>" . __('admin.import_chunk_size', ['count' => $this->getChunkSize()]) . "</span>
+                    </div>
+                    <div class='mt-4 rounded-lg border border-dashed border-gray-200 bg-white px-4 py-3 text-xs text-gray-600 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300'>"
+                        . __('admin.import_rows_empty') .
+                    '</div>
+                </div>'
             );
         }
 
         $header = '
-            <div class="mt-8">
-                <div class="flex items-center justify-between gap-4">
+            <div class="mt-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+                <div class="flex flex-wrap items-start justify-between gap-4">
                     <div>
-                        <p class="text-sm font-semibold text-gray-800 dark:text-gray-200">' . __('admin.import_rows_latest') . '</p>
+                        <p class="text-xs font-semibold uppercase tracking-widest text-gray-500 dark:text-gray-400">' . __('admin.import_rows_title') . '</p>
+                        <p class="mt-1 text-sm font-semibold text-gray-900 dark:text-white">' . __('admin.import_rows_latest') . '</p>
                         <p class="text-xs text-gray-500 dark:text-gray-400">' . __('admin.import_rows_latest_hint') . '</p>
                     </div>
-                    <span class="text-xs font-medium text-gray-500 dark:text-gray-400">' . __('admin.import_chunk_size', ['count' => $this->getChunkSize()]) . '</span>
+                    <span class="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-[11px] font-semibold text-gray-600 dark:bg-gray-800 dark:text-gray-300">' . __('admin.import_chunk_size', ['count' => $this->getChunkSize()]) . '</span>
                 </div>
             </div>
         ';

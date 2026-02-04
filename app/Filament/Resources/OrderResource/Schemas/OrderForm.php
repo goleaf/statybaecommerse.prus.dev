@@ -309,16 +309,20 @@ class OrderForm
                     ->schema([
                         TextInput::make('subtotal')
                             ->label(__('messages.subtotal'))
-                            ->numeric()->prefix('€'),
+                            ->numeric()->prefix('€')
+                            ->default(0),
                         TextInput::make('shipping_amount')
                             ->label(__('messages.shipping'))
-                            ->numeric()->prefix('€'),
+                            ->numeric()->prefix('€')
+                            ->default(0),
                         TextInput::make('tax_amount')
                             ->label(__('messages.tax_amount'))
-                            ->numeric()->prefix('€'),
+                            ->numeric()->prefix('€')
+                            ->default(0),
                         TextInput::make('discount_amount')
                             ->label(__('messages.discount_amount'))
-                            ->numeric()->prefix('€'),
+                            ->numeric()->prefix('€')
+                            ->default(0),
                         TextInput::make('total')
                             ->label(__('messages.total'))
                             ->numeric()->prefix('€')->required(),
