@@ -49,8 +49,8 @@
                            :max="priceRange.max"
                            class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider">
                     <div class="flex justify-between text-xs text-gray-500 mt-1">
-                        <span>{{ __('€') }}{{ $priceRange['min'] }}</span>
-                        <span>{{ __('€') }}{{ $priceRange['max'] }}</span>
+                        <span>{{ __('ui.text') }}{{ $priceRange['min'] }}</span>
+                        <span>{{ __('ui.text') }}{{ $priceRange['max'] }}</span>
                     </div>
                 </div>
             </div>

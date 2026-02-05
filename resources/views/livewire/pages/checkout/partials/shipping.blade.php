@@ -22,7 +22,7 @@
     <header class="space-y-1">
         <h2 class="text-lg font-semibold text-gray-900">{{ __('messages.shipping') }}</h2>
         <p class="text-sm text-gray-500">
-            {{ __('Confirm where we should send your order and choose a delivery option that works best for you.') }}
+            {{ __('ui.confirm_where_we_should_send_your_order_and_choose_a_delivery_option_that_works_best_for_you') }}
         </p>
     </header>
 
@@ -30,26 +30,26 @@
         <div class="rounded-lg border border-gray-200 bg-gray-50 p-4">
             <div class="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                    <p class="text-sm font-semibold text-gray-900">{{ __('Shipping address') }}</p>
+                    <p class="text-sm font-semibold text-gray-900">{{ __('ui.shipping_address') }}</p>
                     <ul class="mt-2 space-y-1 text-sm text-gray-600">
                         @forelse ($shippingLines as $line)
                             @if ($line !== '')
                                 <li>{{ $line }}</li>
                             @endif
                         @empty
-                            <li>{{ __('No shipping address provided yet.') }}</li>
+                            <li>{{ __('ui.no_shipping_address_provided_yet') }}</li>
                         @endforelse
                     </ul>
                 </div>
                 <x-buttons.secondary type="button" wire:click="toStep(1)" class="px-3 py-1.5 text-xs">
-                    {{ __('Edit address') }}
+                    {{ __('ui.edit_address') }}
                 </x-buttons.secondary>
             </div>
         </div>
 
         <form wire:submit.prevent="toStep(3)" class="space-y-6">
             <div class="flex items-center justify-between">
-                <h3 class="text-sm font-semibold text-gray-900">{{ __('Delivery options') }}</h3>
+                <h3 class="text-sm font-semibold text-gray-900">{{ __('ui.delivery_options') }}</h3>
                 <button
                     type="button"
                     wire:click="resolveShippingOptions(true)"
@@ -57,7 +57,7 @@
                     wire:target="resolveShippingOptions"
                     class="text-xs font-medium text-primary-600 hover:text-primary-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
                 >
-                    {{ __('Refresh options') }}
+                    {{ __('ui.refresh_options') }}
                 </button>
             </div>
 
@@ -68,10 +68,10 @@
                 role="status"
             >
                 <x-loading-dots class="text-primary-600" aria-hidden="true" />
-                <span>{{ __('Updating delivery options…') }}</span>
+                <span>{{ __('ui.updating_delivery_options') }}</span>
             </div>
 
-            <fieldset class="space-y-3" aria-label="{{ __('Delivery options') }}" wire:loading.remove wire:target="resolveShippingOptions">
+            <fieldset class="space-y-3" aria-label="{{ __('ui.delivery_options') }}" wire:loading.remove wire:target="resolveShippingOptions">
                 @forelse ($options as $option)
                     <label
                         wire:key="checkout-delivery-option-{{ $option['id'] }}"
@@ -125,7 +125,7 @@
                     </label>
                 @empty
                     <p class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                        {{ __('No shipping methods are available for the specified address. Please update the address or contact support.') }}
+                        {{ __('ui.no_shipping_methods_are_available_for_the_specified_address_please_update_the_address_or_contact_support') }}
                     </p>
                 @endforelse
             </fieldset>
@@ -136,7 +136,7 @@
 
             <div class="flex flex-wrap justify-between gap-3 pt-2">
                 <x-buttons.secondary type="button" wire:click="toStep(1)">
-                    {{ __('Back to billing') }}
+                    {{ __('ui.back_to_billing') }}
                 </x-buttons.secondary>
                 <x-buttons.primary
                     type="submit"
@@ -144,7 +144,7 @@
                     wire:loading.attr="disabled"
                     wire:target="toStep,resolveShippingOptions"
                 >
-                    {{ __('Continue to payment') }}
+                    {{ __('ui.continue_to_payment') }}
                 </x-buttons.primary>
             </div>
         </form>

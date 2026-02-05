@@ -389,7 +389,7 @@
                         this.showNotification(data.message, 'success');
                     }
                 } catch (error) {
-                    this.showNotification('{{ __('Network error. Please try again.') }}', 'error');
+                    this.showNotification('{{ __('ui.network_error_please_try_again') }}', 'error');
                 }
             },
 

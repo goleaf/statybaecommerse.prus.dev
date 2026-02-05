@@ -46,7 +46,7 @@
                             ];
                         })
                         ->filter(
-                            static fn(array $category): bool => $category['label'] !== '' && filled($category['url']),
+                            static fn (array $category): bool => $category['label'] !== '' && filled($category['url']),
                         )
                         ->values()
                         ->toArray();
@@ -95,17 +95,15 @@
                     ]
                     : null,
             ],
-            static fn($action) => is_array($action) && filled($action['url'] ?? null),
+            static fn ($action) => is_array($action) && filled($action['url'] ?? null),
         ),
     );
 @endphp
 
 @extends('errors.4xx', [
     'code' => '404',
-    'title' => __('messages.frontend),
-    '),
-    'description' => __('messages.frontend),
-    '),
+    'title' => __('frontend.errors.404.title'),
+    'description' => __('frontend.errors.404.description'),
     'showSearch' => true,
     'searchTitle' => __('frontend.errors.404.search_title'),
     'searchPlaceholder' => __('frontend.errors.404.search_placeholder'),

@@ -1,19 +1,19 @@
 <div>
     @if (!$confirmUserDeletion)
         <div class="max-w-xl text-sm text-gray-600">
-            <p>{{ __('Once your account is deleted, all of its resources and data will be permanently deleted. Before deleting your account, please download any data or information that you wish to retain.') }}
+            <p>{{ __('ui.once_your_account_is_deleted_all_of_its_resources_and_data_will_be_permanently_deleted_before_deleting_your_account_please_download_any_data_or_information_that_you_wish_to_retain') }}
             </p>
         </div>
 
         <div class="mt-5">
             <button type="button" wire:click="confirmUserDeletion" wire:loading.attr="disabled"
                     class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
-                {{ __('Delete Account') }}
+                {{ __('ui.delete_account') }}
             </button>
         </div>
     @else
         <div class="max-w-xl text-sm text-gray-600">
-            <p>{{ __('Are you sure you want to delete your account? Once your account is deleted, all of its resources and data will be permanently deleted. Please enter your password to confirm you would like to permanently delete your account.') }}
+            <p>{{ __('ui.are_you_sure_you_want_to_delete_your_account_once_your_account_is_deleted_all_of_its_resources_and_data_will_be_permanently_deleted_please_enter_your_password_to_confirm_you_would_like_to_permanently_delete_your_account') }}
             </p>
         </div>
 
@@ -35,7 +35,7 @@
                         wire:confirm.prompt="{{ __('translations.confirm_delete_account') }}\n\n{{ __('translations.confirm_type_delete') }}|DELETE"
                         wire:loading.attr="disabled"
                         class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
-                    {{ __('Delete Account') }}
+                    {{ __('ui.delete_account') }}
                 </button>
             </div>
         </form>

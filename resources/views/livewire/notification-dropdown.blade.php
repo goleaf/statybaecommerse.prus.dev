@@ -53,7 +53,7 @@
                         wire:click="markAllAsRead"
                         class="text-xs text-indigo-600 hover:text-indigo-500"
                     >
-                        {{ __('Mark all read') }}
+                        {{ __('ui.mark_all_read') }}
                     </button>
                 @endif
             </div>
@@ -92,7 +92,7 @@
                                     <button
                                         wire:click="markAsRead('{{ $notification['id'] }}')"
                                         class="flex-shrink-0 text-blue-400 hover:text-blue-600 transition-colors duration-150"
-                                        title="{{ __('Mark as read') }}"
+                                        title="{{ __('ui.mark_as_read') }}"
                                     >
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
@@ -108,7 +108,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM4 19h6v-6H4v6zM4 5h6V1H4v4zM15 3h5l-5-5v5z"></path>
                         </svg>
                         <p class="mt-2 text-sm text-gray-500">
-                            {{ __('No notifications') }}
+                            {{ __('ui.no_notifications') }}
                         </p>
                     </div>
                 @endif
@@ -118,7 +118,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM4 19h6v-6H4v6zM4 5h6V1H4v4zM15 3h5l-5-5v5z"></path>
                     </svg>
                     <p class="mt-2 text-sm text-gray-500">
-                        {{ __('Sign in to receive personalized notifications.') }}
+                        {{ __('ui.sign_in_to_receive_personalized_notifications') }}
                     </p>
                 </div>
             @endif
@@ -131,14 +131,14 @@
                     href="{{ route('account.notifications') }}"
                     class="block text-center text-sm text-indigo-600 hover:text-indigo-500 font-medium"
                 >
-                    {{ __('View all notifications') }}
+                    {{ __('ui.view_all_notifications') }}
                 </a>
             @elseif(!$isAuthenticated && Route::has('login'))
                 <a
                     href="{{ route('login') }}"
                     class="block text-center text-sm text-indigo-600 hover:text-indigo-500 font-medium"
                 >
-                    {{ __('Sign in to manage notifications') }}
+                    {{ __('ui.sign_in_to_manage_notifications') }}
                 </a>
             @endif
         </div>

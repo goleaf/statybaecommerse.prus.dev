@@ -1,7 +1,7 @@
 @extends('frontend.layouts.app')
 
 @section('title', __('messages.products'))
-@section('description', __('Browse the latest additions, featured picks, and trusted tools across every category.'))
+@section('description', __('ui.browse_the_latest_additions_featured_picks_and_trusted_tools_across_every_category'))
 
 @section('content')
     <div class="bg-gray-50 py-12">
@@ -9,18 +9,18 @@
             <div class="grid gap-10 lg:grid-cols-[280px_1fr]">
                 <aside class="space-y-8">
                     <div class="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
-                        <h2 class="text-lg font-semibold text-gray-900">{{ __('Search catalogue') }}</h2>
+                        <h2 class="text-lg font-semibold text-gray-900">{{ __('ui.search_catalogue') }}</h2>
                         <form method="get" class="mt-4 space-y-4">
                             <div>
                                 <label for="search" class="block text-sm font-medium text-gray-700">{{ __('messages.search') }}</label>
                                 <div class="mt-1 flex rounded-full border border-gray-200 bg-gray-50 px-4 py-2 focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500">
-                                    <input id="search" name="q" type="search" value="{{ $searchTerm }}" placeholder="{{ __('Search products') }}" class="w-full border-none bg-transparent text-sm focus:outline-none" />
+                                    <input id="search" name="q" type="search" value="{{ $searchTerm }}" placeholder="{{ __('ui.search_products') }}" class="w-full border-none bg-transparent text-sm focus:outline-none" />
                                     <x-untitledui-search-sm class="h-5 w-5 text-gray-400" />
                                 </div>
                             </div>
 
                             <div>
-                                <label for="filter" class="block text-sm font-medium text-gray-700">{{ __('Quick filter') }}</label>
+                                <label for="filter" class="block text-sm font-medium text-gray-700">{{ __('ui.quick_filter') }}</label>
                                 <div class="mt-2 space-y-2">
                                     @foreach ($availableFilters as $key => $label)
                                         <label class="flex items-center justify-between rounded-2xl border border-gray-200 bg-gray-50 px-4 py-2 text-sm font-medium text-gray-700">
@@ -29,21 +29,21 @@
                                         </label>
                                     @endforeach
                                     <label class="flex items-center justify-between rounded-2xl border border-gray-200 bg-gray-50 px-4 py-2 text-sm font-medium text-gray-700">
-                                        <span>{{ __('Clear filters') }}</span>
+                                        <span>{{ __('ui.clear_filters') }}</span>
                                         <input type="radio" name="filter" value="" @checked(! $activeFilter) class="h-4 w-4 text-indigo-600" />
                                     </label>
                                 </div>
                             </div>
 
                             <button type="submit" class="w-full rounded-full bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700">
-                                {{ __('Apply filters') }}
+                                {{ __('ui.apply_filters') }}
                             </button>
                         </form>
                     </div>
 
                     <div class="space-y-6">
                         <div class="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
-                            <h2 class="text-lg font-semibold text-gray-900">{{ __('Leading categories') }}</h2>
+                            <h2 class="text-lg font-semibold text-gray-900">{{ __('ui.leading_categories') }}</h2>
                             <ul class="mt-4 space-y-3 text-sm text-gray-700">
                                 @foreach ($categories as $category)
                                     <li class="flex items-center justify-between">
@@ -55,7 +55,7 @@
                         </div>
 
                         <div class="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
-                            <h2 class="text-lg font-semibold text-gray-900">{{ __('Trusted brands') }}</h2>
+                            <h2 class="text-lg font-semibold text-gray-900">{{ __('ui.trusted_brands') }}</h2>
                             <ul class="mt-4 space-y-3 text-sm text-gray-700">
                                 @foreach ($brands as $brand)
                                     <li class="flex items-center justify-between">
@@ -71,14 +71,14 @@
                 <div class="space-y-8">
                     <header class="flex flex-col gap-6 rounded-3xl bg-gradient-to-r from-indigo-600 via-blue-500 to-sky-500 p-8 text-white shadow-lg">
                         <div class="space-y-2">
-                            <span class="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide">{{ __('Live catalogue') }}</span>
-                            <h1 class="text-3xl font-semibold sm:text-4xl">{{ __('Discover professional tools for every job') }}</h1>
-                            <p class="text-sm text-white/80 sm:text-base">{{ __('Filter', sort, and browse the entire product catalogue sourced directly from the live inventory feed.') }}</p>
+                            <span class="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide">{{ __('ui.live_catalogue') }}</span>
+                            <h1 class="text-3xl font-semibold sm:text-4xl">{{ __('ui.discover_professional_tools_for_every_job') }}</h1>
+                            <p class="text-sm text-white/80 sm:text-base">{{ __('Filter, sort, and browse the entire product catalogue sourced directly from the live inventory feed.') }}</p>
                         </div>
                         <div class="flex flex-col gap-4 text-sm sm:flex-row sm:items-center sm:justify-between">
                             <div class="flex items-center gap-2 text-white/70">
                                 <x-untitledui-check-badge class="h-5 w-5" />
-                                <span>{{ __('Updated in real time with the latest product data.') }}</span>
+                                <span>{{ __('ui.updated_in_real_time_with_the_latest_product_data') }}</span>
                             </div>
                             <form method="get" class="flex items-center gap-3">
                                 @foreach (request()->except('sort') as $key => $value)

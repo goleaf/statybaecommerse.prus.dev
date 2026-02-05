@@ -2,7 +2,7 @@
     <x-link :href="route('account.index')"
             class="inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-gray-700">
         <x-untitledui-user-circle class="size-5" stroke-width="1.5" aria-hidden="true" />
-        {{ __('My account') }}
+        {{ __('ui.my_account') }}
     </x-link>
     <button wire:click="logout" 
             wire:confirm="{{ __('translations.confirm_logout') }}"

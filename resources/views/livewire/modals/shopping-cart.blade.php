@@ -7,12 +7,12 @@
                     <svg class="h-6 w-6 text-blue-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m0 0h7M7 18h10" />
                     </svg>
-                    <h2 class="text-lg font-semibold text-gray-900">{{ __('My cart') }}</h2>
+                    <h2 class="text-lg font-semibold text-gray-900">{{ __('ui.my_cart') }}</h2>
                 </div>
                 <button 
                     wire:click="$dispatch('closePanel')"
                     class="rounded-md p-2 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    title="{{ __('Close panel') }}"
+                    title="{{ __('ui.close_panel') }}"
                 >
                     <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -37,7 +37,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m0 0h7M7 18h10" />
                     </svg>
                     <h3 class="text-lg font-medium text-gray-900 mb-2">{{ __('messages.your_cart_is_empty') }}</h3>
-                    <p class="text-gray-500 mb-6">{{ __('Browse our product catalog to find your perfect match.') }}</p>
+                    <p class="text-gray-500 mb-6">{{ __('ui.browse_our_product_catalog_to_find_your_perfect_match') }}</p>
                     
                     <a 
                         href="{{ route('localized.products.index', ['locale' => app()->getLocale()]) }}"
@@ -62,7 +62,7 @@
             </div>
             <div class="flex items-center justify-between pt-1 pb-1 mb-3 border-b border-gray-200">
                 <p>{{ __('Delivery') }}</p>
-                <p class="text-right">{{ __('Calculated at the time of payment') }}</p>
+                <p class="text-right">{{ __('ui.calculated_at_the_time_of_payment') }}</p>
             </div>
             <div class="flex items-center justify-between pt-1 pb-1 mb-3 border-b border-gray-200">
                 <p>{{ __('messages.subtotal') }}</p>

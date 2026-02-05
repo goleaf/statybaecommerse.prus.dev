@@ -15,17 +15,17 @@
 
         <div class="flex items-center gap-3">
             <x-filament::button type="button" color="gray" wire:click="downloadExample" icon="heroicon-o-document-arrow-down">
-                {{ __('filament-actions::import.modal.actions.download_example.label') }}
+                {{ __('ui.filament_actions_import_modal_actions_download_example_label') }}
             </x-filament::button>
             <x-filament::button color="gray" :href="\App\Filament\Pages\DataImportExport::getUrl()" tag="a" icon="heroicon-o-arrow-left">
-                {{ __('admin.actions.back') ?? __('Back to imports') }}
+                {{ __('admin.actions.back') ?? __('ui.back_to_imports') }}
             </x-filament::button>
         </div>
 
         @if($this->lastImport)
             <x-filament::section collapsible>
                 <x-slot name="heading">
-                    {{ __('admin.last_import_summary') ?? __('Last import summary') }}
+                    {{ __('admin.last_import_summary') ?? __('ui.last_import_summary') }}
                 </x-slot>
 
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -39,7 +39,7 @@
                     </div>
                     <div class="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
                         <div class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 font-medium">
-                            {{ __('admin.import_processed_rows') ?? __('Processed rows') }}
+                            {{ __('admin.import_processed_rows') ?? __('ui.processed_rows') }}
                         </div>
                         <div class="mt-1 text-2xl font-bold text-gray-900 dark:text-gray-100">
                             {{ number_format($this->lastImport['processed']) }}
@@ -47,7 +47,7 @@
                     </div>
                     <div class="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
                         <div class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 font-medium text-success-600">
-                            {{ __('admin.import_successful_rows') ?? __('Successful rows') }}
+                            {{ __('admin.import_successful_rows') ?? __('ui.successful_rows') }}
                         </div>
                         <div class="mt-1 text-2xl font-bold text-success-600">
                             {{ number_format($this->lastImport['successful']) }}
@@ -55,7 +55,7 @@
                     </div>
                     <div class="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
                         <div class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 font-medium text-danger-600">
-                            {{ __('admin.import_failed_rows') ?? __('Failed rows') }}
+                            {{ __('admin.import_failed_rows') ?? __('ui.failed_rows') }}
                         </div>
                         <div class="mt-1 text-2xl font-bold text-danger-600">
                             {{ number_format($this->lastImport['failed']) }}

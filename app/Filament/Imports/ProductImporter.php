@@ -27,6 +27,10 @@ class ProductImporter extends BaseImporter
 
     protected function beforeFill(): void
     {
+        if ($this->record && ! $this->record->exists) {
+            $this->applyVisibilityDefaults();
+        }
+
         $slug = $this->data['slug'] ?? null;
         $name = $this->data['name'] ?? null;
 
@@ -34,20 +38,32 @@ class ProductImporter extends BaseImporter
             $slug = Str::slug($name);
         }
 
-        if (! filled($slug) || ! $this->record) {
-            return;
+        if ($this->record && filled($slug)) {
+            if (! ($this->record->exists && filled($this->record->slug) && blank($this->data['slug'] ?? null))) {
+                $slug = Str::slug((string) $slug);
+                $this->record->slug = $this->makeUniqueColumnValue($this->record, 'slug', $slug);
+            }
         }
+    }
 
-        if (
-            $this->record->exists &&
-            filled($this->record->slug) &&
-            blank($this->data['slug'] ?? null)
-        ) {
-            return;
+    private function applyVisibilityDefaults(): void
+    {
+        $defaults = [
+            'is_enabled'   => true,
+            'is_visible'   => true,
+            'status'       => 'published',
+            'published_at' => now(),
+        ];
+
+        foreach ($defaults as $field => $value) {
+            if (
+                ! array_key_exists($field, $this->data)
+                || $this->data[$field] === null
+                || $this->data[$field] === ''
+            ) {
+                $this->data[$field] = $value;
+            }
         }
-
-        $slug = Str::slug((string) $slug);
-        $this->record->slug = $this->makeUniqueColumnValue($this->record, 'slug', $slug);
     }
 
     public static function getColumns(): array

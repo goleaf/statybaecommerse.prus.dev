@@ -19,7 +19,7 @@
         </h3>
 
         <p class="mt-1 text-gray-300">
-            {{ __(':qty x :price', ['qty' => $item->quantity, 'price' => \Illuminate\Support\Number::currency($item->price, current_currency(), app()->getLocale())]) }}
+            {{ __('ui.qty_x_price', ['qty' => $item->quantity, 'price' => \Illuminate\Support\Number::currency($item->price, current_currency(), app()->getLocale())]) }}
         </p>
 
         @if ($item->attributes->isNotEmpty())

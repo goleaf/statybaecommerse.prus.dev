@@ -1,4 +1,4 @@
-<x-layouts.base :title="__('Update Order')">
+<x-layouts.base :title="__('ui.update_order')">
     <x-container class="py-8">
         <x-breadcrumbs :items="[['label' => __('Orders')], ['label' => $order->number], ['label' => __('messages.update')]]" />
 
@@ -8,10 +8,10 @@
 
         <div class="flex items-center justify-between max-w-xl mb-4">
             <div class="text-sm text-gray-600">
-                {{ __('messages.order') }} #{{ $order->number }} — {{ __('Current status') }}:
+                {{ __('messages.order') }} #{{ $order->number }} — {{ __('ui.current_status') }}:
                 <strong>{{ $order->status }}</strong>
             </div>
-            <x-link :href="route('admin.orders.packing-slip', ['number' => $order->number])">{{ __('Packing slip') }}</x-link>
+            <x-link :href="route('admin.orders.packing-slip', ['number' => $order->number])">{{ __('ui.packing_slip') }}</x-link>
         </div>
 
         <div class="max-w-xl">
@@ -20,12 +20,12 @@
                 @method('PUT')
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-sm font-medium">{{ __('Order status') }}</label>
+                        <label class="block text-sm font-medium">{{ __('ui.order_status') }}</label>
                         <input type="text" name="status" value="{{ old('status', $order->status) }}"
                                class="mt-1 w-full border-gray-300 rounded" />
                     </div>
                     <div>
-                        <label class="block text-sm font-medium">{{ __('Payment status') }}</label>
+                        <label class="block text-sm font-medium">{{ __('ui.payment_status') }}</label>
                         <input type="text" name="payment_status"
                                value="{{ old('payment_status', $order->payment_status) }}"
                                class="mt-1 w-full border-gray-300 rounded" />
@@ -42,24 +42,24 @@
         </div>
 
         <div class="max-w-xl mt-10">
-            <h2 class="text-lg font-medium mb-2">{{ __('Update tracking') }}</h2>
+            <h2 class="text-lg font-medium mb-2">{{ __('ui.update_tracking') }}</h2>
             <form method="POST" action="{{ route('admin.orders.tracking.update', ['number' => $order->number]) }}">
                 @csrf
                 @method('PUT')
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-sm font-medium">{{ __('Tracking number') }}</label>
+                        <label class="block text-sm font-medium">{{ __('ui.tracking_number') }}</label>
                         <input type="text" name="tracking_number" value="{{ old('tracking_number') }}"
                                class="mt-1 w-full border-gray-300 rounded" />
                     </div>
                     <div>
-                        <label class="block text-sm font-medium">{{ __('Tracking URL') }}</label>
+                        <label class="block text-sm font-medium">{{ __('ui.tracking_url') }}</label>
                         <input type="url" name="tracking_url" value="{{ old('tracking_url') }}"
                                class="mt-1 w-full border-gray-300 rounded" />
                     </div>
                 </div>
                 <div class="mt-4">
-                    <x-buttons.primary type="submit">{{ __('Save tracking') }}</x-buttons.primary>
+                    <x-buttons.primary type="submit">{{ __('ui.save_tracking') }}</x-buttons.primary>
                 </div>
             </form>
         </div>

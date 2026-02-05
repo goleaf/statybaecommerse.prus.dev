@@ -161,7 +161,7 @@
                     }
                 } catch (error) {
                     this.messageType = 'error';
-                    this.message = '{{ __('Network error. Please check your connection and try again.') }}';
+                    this.message = '{{ __('ui.network_error_please_check_your_connection_and_try_again') }}';
                 } finally {
                     this.loading = false;
 

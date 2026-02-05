@@ -11,13 +11,13 @@
                         <img src="{{ $product->thumbnail }}" alt="{{ $product->trans('name') ?? $product->name }}" class="h-full w-full object-cover">
                     @else
                         <div class="flex h-full items-center justify-center text-sm text-gray-400">
-                            {{ __('Image coming soon') }}
+                            {{ __('ui.image_coming_soon') }}
                         </div>
                     @endif
                 </div>
                 <div class="space-y-1">
                     <p class="text-xs uppercase tracking-wide text-blue-600 dark:text-blue-300">
-                        {{ optional($product->brand)?->trans('name') ?? optional($product->brand)->name ?? __('Independent brand') }}
+                        {{ optional($product->brand)?->trans('name') ?? optional($product->brand)->name ?? __('ui.independent_brand') }}
                     </p>
                     <h3 class="text-lg font-semibold text-gray-900 group-hover:text-blue-600 dark:text-white dark:group-hover:text-blue-300">
                         {{ $product->trans('name') ?? $product->name }}
@@ -27,7 +27,7 @@
                     </p>
                 </div>
                 <div class="mt-auto flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
-                    <span>{{ __('In stock') }}</span>
+                    <span>{{ __('ui.in_stock') }}</span>
                     @if ($product->price)
                         <span class="text-base font-semibold text-gray-900 dark:text-white">
                             €{{ number_format((float) $product->price, 2) }}
@@ -38,7 +38,7 @@
         </article>
     @empty
         <p class="col-span-full rounded-lg bg-white/80 p-6 text-center text-sm text-gray-600 ring-1 ring-gray-100 dark:bg-slate-900/60 dark:text-gray-300 dark:ring-slate-800">
-            {{ $emptyMessage ?? __('No products match your filters. Try adjusting your search or browse other categories.') }}
+            {{ $emptyMessage ?? __('ui.no_products_match_your_filters_try_adjusting_your_search_or_browse_other_categories') }}
         </p>
     @endforelse
 </div>

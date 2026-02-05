@@ -1,8 +1,8 @@
 <section class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
     <header class="space-y-1">
-        <h2 class="text-lg font-semibold text-gray-900">{{ __('Billing details') }}</h2>
+        <h2 class="text-lg font-semibold text-gray-900">{{ __('ui.billing_details') }}</h2>
         <p class="text-sm text-gray-500">
-            {{ __('We use these details for your invoice and to send order updates.') }}
+            {{ __('ui.we_use_these_details_for_your_invoice_and_to_send_order_updates') }}
         </p>
     </header>
 
@@ -10,7 +10,7 @@
         <div class="grid gap-4 sm:grid-cols-2">
             <div>
                 <label for="billing_first_name" class="block text-sm font-medium text-gray-700">
-                    {{ __('First name') }}
+                    {{ __('ui.first_name') }}
                 </label>
                 <input
                     id="billing_first_name"
@@ -26,7 +26,7 @@
 
             <div>
                 <label for="billing_last_name" class="block text-sm font-medium text-gray-700">
-                    {{ __('Last name') }}
+                    {{ __('ui.last_name') }}
                 </label>
                 <input
                     id="billing_last_name"
@@ -42,7 +42,7 @@
 
             <div>
                 <label for="billing_email" class="block text-sm font-medium text-gray-700">
-                    {{ __('Email address') }}
+                    {{ __('ui.email_address') }}
                 </label>
                 <input
                     id="billing_email"
@@ -58,7 +58,7 @@
 
             <div>
                 <label for="billing_phone" class="block text-sm font-medium text-gray-700">
-                    {{ __('Phone number') }}
+                    {{ __('ui.phone_number') }}
                 </label>
                 <input
                     id="billing_phone"
@@ -74,7 +74,7 @@
 
             <div class="sm:col-span-2">
                 <label for="billing_company" class="block text-sm font-medium text-gray-700">
-                    {{ __('Company (optional)') }}
+                    {{ __('ui.company_optional') }}
                 </label>
                 <input
                     id="billing_company"
@@ -90,7 +90,7 @@
 
             <div class="sm:col-span-2">
                 <label for="billing_address" class="block text-sm font-medium text-gray-700">
-                    {{ __('Street address') }}
+                    {{ __('ui.street_address') }}
                 </label>
                 <input
                     id="billing_address"
@@ -122,7 +122,7 @@
 
             <div>
                 <label for="billing_region" class="block text-sm font-medium text-gray-700">
-                    {{ __('Region / state (optional)') }}
+                    {{ __('ui.region_state_optional') }}
                 </label>
                 <input
                     id="billing_region"
@@ -138,7 +138,7 @@
 
             <div>
                 <label for="billing_postal_code" class="block text-sm font-medium text-gray-700">
-                    {{ __('Postal code') }}
+                    {{ __('ui.postal_code') }}
                 </label>
                 <input
                     id="billing_postal_code"
@@ -181,10 +181,10 @@
                 >
                 <span>
                     <span class="block text-sm font-medium text-gray-900">
-                        {{ __('Ship to the billing address') }}
+                        {{ __('ui.ship_to_the_billing_address') }}
                     </span>
                     <span class="block text-xs text-gray-500">
-                        {{ __('Uncheck to enter a different shipping address.') }}
+                        {{ __('ui.uncheck_to_enter_a_different_shipping_address') }}
                     </span>
                 </span>
             </label>
@@ -192,11 +192,11 @@
 
         @if (! $sameAsShipping)
             <div class="space-y-4 border-t border-gray-200 pt-6">
-                <h3 class="text-sm font-semibold text-gray-900">{{ __('Shipping address') }}</h3>
+                <h3 class="text-sm font-semibold text-gray-900">{{ __('ui.shipping_address') }}</h3>
                 <div class="grid gap-4 sm:grid-cols-2">
                     <div>
                         <label for="shipping_first_name" class="block text-sm font-medium text-gray-700">
-                            {{ __('First name') }}
+                            {{ __('ui.first_name') }}
                         </label>
                         <input
                             id="shipping_first_name"
@@ -212,7 +212,7 @@
 
                     <div>
                         <label for="shipping_last_name" class="block text-sm font-medium text-gray-700">
-                            {{ __('Last name') }}
+                            {{ __('ui.last_name') }}
                         </label>
                         <input
                             id="shipping_last_name"
@@ -228,7 +228,7 @@
 
                     <div class="sm:col-span-2">
                         <label for="shipping_company" class="block text-sm font-medium text-gray-700">
-                            {{ __('Company (optional)') }}
+                            {{ __('ui.company_optional') }}
                         </label>
                         <input
                             id="shipping_company"
@@ -244,7 +244,7 @@
 
                     <div class="sm:col-span-2">
                         <label for="shipping_address" class="block text-sm font-medium text-gray-700">
-                            {{ __('Street address') }}
+                            {{ __('ui.street_address') }}
                         </label>
                         <input
                             id="shipping_address"
@@ -276,7 +276,7 @@
 
                     <div>
                         <label for="shipping_region" class="block text-sm font-medium text-gray-700">
-                            {{ __('Region / state (optional)') }}
+                            {{ __('ui.region_state_optional') }}
                         </label>
                         <input
                             id="shipping_region"
@@ -292,7 +292,7 @@
 
                     <div>
                         <label for="shipping_postal_code" class="block text-sm font-medium text-gray-700">
-                            {{ __('Postal code') }}
+                            {{ __('ui.postal_code') }}
                         </label>
                         <input
                             id="shipping_postal_code"
@@ -345,7 +345,7 @@
                 wire:loading.attr="disabled"
                 wire:target="toStep,resolveShippingOptions"
             >
-                {{ __('Continue to shipping') }}
+                {{ __('ui.continue_to_shipping') }}
             </x-buttons.primary>
         </div>
     </form>

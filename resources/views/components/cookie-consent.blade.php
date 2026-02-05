@@ -18,11 +18,11 @@
         <p class="text-sage/80">
             {{ __('translations.cookie_prompt_description') }}
             <a href="{{ $privacyRoute }}" class="font-medium text-sage hover:text-white underline transition-colors duration-200">
-                {{ __('Privacy Policy') }}
+                {{ __('ui.privacy_policy') }}
             </a>
             <span class="text-sage/50"> · </span>
             <a href="{{ $cookieRoute }}" class="font-medium text-sage hover:text-white underline transition-colors duration-200">
-                {{ __('Cookie Policy') }}
+                {{ __('ui.cookie_policy') }}
             </a>
         </p>
     </div>

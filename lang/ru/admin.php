@@ -9,9 +9,11 @@ return [
         'refresh'           => 'actions.refresh',
         'view'              => 'View',
     ],
-    'active_groups'    => 'active_groups',
-    'advanced_import'  => 'admin.advanced_import',
-    'attribute-values' => [
+    'active_groups'           => 'active_groups',
+    'advanced_import'         => 'admin.advanced_import',
+    'import_analysis_summary' => 'Сводка анализа',
+    'import_rows_title'       => 'Строки импорта',
+    'attribute-values'        => [
         'translations' => [
             ''     => 'attribute-values.translations.',
             'save' => 'attribute-values.translations.save',

@@ -6,7 +6,7 @@
         :enable-suggestions="true"
         :enable-recent-searches="true"
         :enable-popular-searches="false"
-        placeholder="{{ __('Search products…') }}"
+        placeholder="{{ __('ui.search_products_2') }}"
         class="w-72"
     />
     

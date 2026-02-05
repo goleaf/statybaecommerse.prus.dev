@@ -1,4 +1,4 @@
-@extends('components.layouts.base', ['title' => __('Order Confirmed')])
+@extends('components.layouts.base', ['title' => __('ui.order_confirmed')])
 
 @section('meta')
     <x-meta robots="noindex" canonical="{{ url()->current() }}" />
@@ -50,20 +50,20 @@
 
     <div class="max-w-xl">
         <p class="text-2xl font-medium tracking-tight text-gray-900">
-            {{ __('Thank you!') }}
+            {{ __('ui.thank_you') }}
         </p>
         <h1 class="text-3xl font-bold tracking-tight text-gray-900">
-            {{ __('Your order has been placed successfully') }}
+            {{ __('ui.your_order_has_been_placed_successfully') }}
         </h1>
         <p class="mt-2 text text-gray-500">
-            {{ __('The details of your order have been sent to you by email.') }}
+            {{ __('ui.the_details_of_your_order_have_been_sent_to_you_by_email') }}
         </p>
     </div>
 
     <div class="mt-10 space-y-10 sm:mt-14 sm:space-y-14">
         <div>
             <h3 class="sr-only">
-                {{ __('Order place on') }}
+                {{ __('ui.order_place_on') }}
                 <time datetime="{{ format_datetime($order->created_at) }}" class="capitalize">
                     {{ format_datetime($order->created_at) }}
                 </time>
@@ -74,13 +74,13 @@
                     class="flex-auto space-y-4 divide-y divide-gray-200 text-sm text-gray-500 md:grid md:grid-cols-3 md:gap-x-6 md:space-y-0 md:divide-y-0 lg:w-1/2 lg:flex-none lg:gap-x-8">
                     <div class="flex justify-between md:block">
                         <dt class="font-medium text-gray-900">
-                            {{ __('Order N°') }}
+                            {{ __('ui.order_n') }}
                         </dt>
                         <dd class="uppercase md:mt-1">{{ $order->number }}</dd>
                     </div>
                     <div class="flex justify-between pt-4 md:block md:pt-0">
                         <dt class="font-medium text-gray-900">
-                            {{ __('Place on') }}
+                            {{ __('ui.place_on') }}
                         </dt>
                         <dd class="md:mt-1 capitalize">
                             <time datetime="{{ format_datetime($order->created_at) }}">
@@ -106,7 +106,7 @@
                     <x-buttons.default class="flex w-full px-4 py-2 text-sm md:w-auto">
                         {{ __('messages.view_invoice') }}
                         <span class="sr-only">
-                            {{ __('For the order :number', ['number' => $order->number]) }}
+                            {{ __('ui.for_the_order_number', ['number' => $order->number]) }}
                         </span>
                     </x-buttons.default>
                 </div>
@@ -129,7 +129,7 @@
                         </div>
                         <div class="ml-3 flex-1 md:flex md:justify-between">
                             <p class="text-sm text-gray-700">
-                                {{ __('You can follow the progress and processing of your order from your profile.') }}
+                                {{ __('ui.you_can_follow_the_progress_and_processing_of_your_order_from_your_profile') }}
                             </p>
                         </div>
                     </div>
@@ -145,7 +145,7 @@
             <div>
                 <div class="flex items-end justify-end">
                     <h6 class="bg-primary-500 inline-flex w-auto px-2.5 py-1 text-sm leading-6 text-white">
-                        {{ __('Order summary') }}
+                        {{ __('ui.order_summary') }}
                     </h6>
                 </div>
                 <x-order.summary :order="$order" />

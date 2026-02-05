@@ -16,7 +16,7 @@
                 type="button"
                 class="flex items-center gap-2 text-gray-700 hover:text-gray-800">
             @if ($this->countryFlag)
-                <img src="{{ $this->countryFlag }}" alt="{{ __('change currency') }}" class="block h-auto w-5 shrink-0" />
+                <img src="{{ $this->countryFlag }}" alt="{{ __('ui.change_currency') }}" class="block h-auto w-5 shrink-0" />
             @endif
 
             <span class="block text-sm font-medium">{{ current_currency() }}</span>

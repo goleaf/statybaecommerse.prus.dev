@@ -17,10 +17,8 @@
 
 @extends('errors.layout', [
     'code' => '429',
-    'title' => __('messages.frontend),
-    '),
-    'description' => __('messages.frontend),
-    '),
+    'title' => __('frontend.errors.429.title'),
+    'description' => __('frontend.errors.429.description'),
     'primaryAction' => [
         'label' => __('frontend.errors.actions.try_again'),
         'type' => 'refresh',

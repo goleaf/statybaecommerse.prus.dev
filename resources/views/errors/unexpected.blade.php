@@ -18,18 +18,14 @@
 
 @extends('errors.layout', [
     'code' => '500',
-    'title' => __('messages.errors),
-    '),
-    'description' => __('messages.errors),
-    '),
+    'title' => __('frontend.errors.unexpected.title'),
+    'description' => __('frontend.errors.unexpected.description'),
     'primaryAction' => [
-        'label' => __('messages.errors),
-        '),
+        'label' => __('frontend.errors.actions.return_home'),
         'url' => $homeUrl,
     ],
     'secondaryAction' => [
-        'label' => __('messages.errors),
-        '),
+        'label' => __('frontend.errors.actions.contact_support'),
         'url' => $contactUrl,
     ],
     'links' => [

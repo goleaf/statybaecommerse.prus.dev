@@ -2,13 +2,13 @@
     <header class="space-y-1">
         <h2 class="text-lg font-semibold text-gray-900">{{ __('messages.Payment') }}</h2>
         <p class="text-sm text-gray-500">
-            {{ __('Choose how you would like to pay and add any notes for our team before placing your order.') }}
+            {{ __('ui.choose_how_you_would_like_to_pay_and_add_any_notes_for_our_team_before_placing_your_order') }}
         </p>
     </header>
 
     <form wire:submit.prevent="placeOrder" class="mt-6 space-y-8">
-        <fieldset class="space-y-3" aria-label="{{ __('Payment methods') }}">
-            <legend class="text-sm font-semibold text-gray-900">{{ __('Payment method') }}</legend>
+        <fieldset class="space-y-3" aria-label="{{ __('ui.payment_methods') }}">
+            <legend class="text-sm font-semibold text-gray-900">{{ __('ui.payment_method') }}</legend>
             @foreach ($methods as $method => $label)
                 <label
                     @class([
@@ -36,7 +36,7 @@
 
         <div>
             <label for="order_notes" class="block text-sm font-medium text-gray-700">
-                {{ __('Order notes (optional)') }}
+                {{ __('ui.order_notes_optional') }}
             </label>
             <textarea
                 id="order_notes"
@@ -55,7 +55,7 @@
 
         <div class="flex flex-wrap justify-between gap-3 pt-2">
             <x-buttons.secondary type="button" wire:click="toStep(2)">
-                {{ __('Back to shipping') }}
+                {{ __('ui.back_to_shipping') }}
             </x-buttons.secondary>
             <x-buttons.primary
                 type="submit"
@@ -67,7 +67,7 @@
                     <span wire:loading.flex wire:target="placeOrder">
                         <x-loading-dots class="text-white" aria-hidden="true" />
                     </span>
-                    {{ __('Place order') }}
+                    {{ __('ui.place_order') }}
                 </span>
             </x-buttons.primary>
         </div>

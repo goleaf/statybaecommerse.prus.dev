@@ -38,7 +38,7 @@
         </div>
         <div class="flex items-end justify-between flex-1 text-sm">
             <p class="text-gray-500">
-                {{ __('Quantity: :qty', ['qty' => $item->quantity]) }}
+                {{ __('ui.quantity_qty', ['qty' => $item->quantity]) }}
             </p>
 
             <div class="flex">

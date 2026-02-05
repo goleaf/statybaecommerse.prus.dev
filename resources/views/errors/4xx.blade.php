@@ -54,10 +54,8 @@
 
 @extends('errors.layout', [
     'code' => $resolvedCode,
-    'title' => $title ?? __('messages.frontend),
-    '),
-    'description' => $description ?? __('messages.frontend),
-    '),
+    'title' => $title ?? __('frontend.errors.4xx.title'),
+    'description' => $description ?? __('frontend.errors.4xx.description'),
     'primaryAction' => $primaryAction ?? [
         'label' => __('frontend.errors.actions.return_home'),
         'url' => $homeUrl,
@@ -72,10 +70,8 @@
     'supportPageUrl' => $supportUrl,
     'statusPageUrl' => $statusUrl,
     'showSearch' => $showSearch ?? false,
-    'searchTitle' => $searchTitle ?? __('messages.frontend),
-    '),
-    'searchPlaceholder' => $searchPlaceholder ?? __('messages.frontend),
-    '),
+    'searchTitle' => $searchTitle ?? __('frontend.errors.search.title'),
+    'searchPlaceholder' => $searchPlaceholder ?? __('frontend.errors.search.placeholder'),
     'topCategories' => $topCategories ?? [],
     'topCategoriesTitle' => $topCategoriesTitle ?? __('frontend.errors.top_categories.title'),
     'contactCta' => $contactCta ?? null,

@@ -6,13 +6,13 @@ use App\Enums\PaymentStatus;
 use App\Filament\Resources\OrderResource\Pages\CreateOrder;
 use App\Filament\Resources\OrderResource\Pages\EditOrder;
 use App\Filament\Resources\OrderResource\Pages\ListOrders;
+use App\Models\AdminUser;
 use App\Models\Document;
 use App\Models\DocumentTemplate;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\Service;
-use App\Models\User;
-use Filament\Pages\Actions\DeleteAction;
+use Filament\Actions\DeleteAction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 
@@ -21,13 +21,12 @@ uses(RefreshDatabase::class);
 beforeEach(function () {
     $this->resolveAdminPanel();
 
-    $this->user = User::factory()->create([
-        'email'    => 'admin@example.com',
-        'is_admin' => true,
+    $this->admin = AdminUser::factory()->create([
+        'email' => 'admin@example.com',
     ]);
 
     // Acting as admin
-    $this->actingAs($this->user);
+    $this->actingAs($this->admin, 'admin');
 });
 
 it('can list orders', function () {
@@ -49,11 +48,15 @@ it('can create an order', function () {
 
     Livewire::test(CreateOrder::class)
         ->fillForm([
-            'number'         => $newData->number,
-            'status'         => 'pending',
-            'currency'       => 'EUR',
-            'payment_status' => PaymentStatus::PENDING->value,
-            'total'          => 100.00,
+            'number'          => $newData->number,
+            'status'          => 'pending',
+            'currency'        => 'EUR',
+            'payment_status'  => PaymentStatus::PENDING->value,
+            'subtotal'        => 0,
+            'shipping_amount' => 0,
+            'tax_amount'      => 0,
+            'discount_amount' => 0,
+            'total'           => 100.00,
         ])
         ->call('create')
         ->assertHasNoFormErrors();
@@ -110,12 +113,16 @@ it('creates an order with products, services, and documents', function () {
 
     Livewire::test(CreateOrder::class)
         ->fillForm([
-            'number'         => 'ORD-TEST-100',
-            'status'         => 'pending',
-            'currency'       => 'EUR',
-            'payment_status' => PaymentStatus::PENDING->value,
-            'total'          => 90.00,
-            'items'          => [
+            'number'          => 'ORD-TEST-100',
+            'status'          => 'pending',
+            'currency'        => 'EUR',
+            'payment_status'  => PaymentStatus::PENDING->value,
+            'subtotal'        => 0,
+            'shipping_amount' => 0,
+            'tax_amount'      => 0,
+            'discount_amount' => 0,
+            'total'           => 90.00,
+            'items'           => [
                 [
                     'product_id' => $product->id,
                     'quantity'   => 2,

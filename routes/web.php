@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Admin\AttributeTranslationController;
 use App\Http\Controllers\Admin\CollectionTranslationController;
+use App\Http\Controllers\Admin\DownloadImportFailureCsvController;
 use App\Http\Controllers\Admin\FilamentLoginController;
 use App\Http\Controllers\Admin\LegalTranslationController;
 use App\Http\Controllers\Admin\ProductTranslationController;
@@ -33,6 +34,10 @@ Route::middleware(['web', 'signed'])
     ->get('/secure-media/{encodedPath}', SecureMediaDownloadController::class)
     ->where('encodedPath', '.*')
     ->name('media.secure-download');
+
+Route::middleware(['web'])
+    ->get('/filament/imports/{import}/failed-rows/download', DownloadImportFailureCsvController::class)
+    ->name('filament.imports.failed-rows.download');
 
 Route::middleware(['web'])
     ->get('/api/users/{user}/notifications/stream', [NotificationStreamController::class, 'stream'])

@@ -13,7 +13,7 @@
 
 @php
     $title = $title ?? __('messages.products');
-    $subtitle = $subtitle ?? __('Discover our amazing collection of products');
+    $subtitle = $subtitle ?? __('ui.discover_our_amazing_collection_of_products');
     $products = $products ?? collect([]);
 
     // Grid classes based on columns
@@ -77,7 +77,7 @@
 
                         {{-- Price Range --}}
                         <div class="mb-6">
-                            <h4 class="text-sm font-semibold text-gray-900 mb-3">{{ __('Price Range') }}</h4>
+                            <h4 class="text-sm font-semibold text-gray-900 mb-3">{{ __('ui.price_range') }}</h4>
                             <div class="space-y-3">
                                 <div class="flex items-center gap-2">
                                     <input type="number" x-model="filters.priceMin" placeholder="{{ __('messages.min') }}"
@@ -141,7 +141,7 @@
                                                 </svg>
                                             @endfor
                                             <span class="text-sm text-gray-700">{{ $i }}
-                                                {{ __('Stars & Up') }}</span>
+                                                {{ __('ui.stars_up') }}</span>
                                         </div>
                                     </label>
                                 @endfor
@@ -162,13 +162,13 @@
                                        class="flex items-center gap-3 cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors duration-200">
                                     <input type="checkbox" x-model="filters.onSale"
                                            class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                                    <span class="text-sm text-gray-700">{{ __('On Sale') }}</span>
+                                    <span class="text-sm text-gray-700">{{ __('ui.on_sale') }}</span>
                                 </label>
                                 <label
                                        class="flex items-center gap-3 cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors duration-200">
                                     <input type="checkbox" x-model="filters.newArrivals"
                                            class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                                    <span class="text-sm text-gray-700">{{ __('New Arrivals') }}</span>
+                                    <span class="text-sm text-gray-700">{{ __('ui.new_arrivals') }}</span>
                                 </label>
                             </div>
                         </div>
@@ -177,7 +177,7 @@
                         <div class="flex gap-2">
                             <button @click="applyFilters()"
                                     class="flex-1 btn-gradient py-2 rounded-lg font-medium text-sm">
-                                {{ __('Apply Filters') }}
+                                {{ __('ui.apply_filters') }}
                             </button>
                             <button @click="clearFilters()"
                                     class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-medium text-sm hover:bg-gray-50 transition-colors duration-200">
@@ -204,12 +204,12 @@
                                     class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                                 <option value="relevance">{{ __('Relevance') }}</option>
                                 <option value="price_asc">{{ __('messages.price_low_to_high') }}</option>
-                                <option value="price_desc">{{ __('Price: High to Low') }}</option>
-                                <option value="name_asc">{{ __('Name: A to Z') }}</option>
-                                <option value="name_desc">{{ __('Name: Z to A') }}</option>
-                                <option value="rating_desc">{{ __('Highest Rated') }}</option>
-                                <option value="newest">{{ __('Newest First') }}</option>
-                                <option value="popularity">{{ __('Most Popular') }}</option>
+                                <option value="price_desc">{{ __('ui.price_high_to_low') }}</option>
+                                <option value="name_asc">{{ __('ui.name_a_to_z') }}</option>
+                                <option value="name_desc">{{ __('ui.name_z_to_a') }}</option>
+                                <option value="rating_desc">{{ __('ui.highest_rated') }}</option>
+                                <option value="newest">{{ __('ui.newest_first') }}</option>
+                                <option value="popularity">{{ __('ui.most_popular') }}</option>
                             </select>
                         </div>
                     @endif
@@ -301,13 +301,13 @@
                                                     <button wire:click="addToCart({{ $product->id }})"
                                                             @if ($product->stock_quantity <= 0) disabled @endif
                                                             class="w-full btn-gradient py-2 rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed">
-                                                        {{ __('Add to Cart') }}
+                                                        {{ __('ui.add_to_cart') }}
                                                     </button>
 
                                                     <button wire:click="toggleWishlist({{ $product->id }})"
                                                             wire:confirm="{{ __('translations.confirm_toggle_wishlist') }}"
                                                             class="w-full border border-gray-300 text-gray-700 py-2 rounded-lg font-medium hover:bg-gray-50 transition-colors duration-200">
-                                                        {{ __('Add to Wishlist') }}
+                                                        {{ __('ui.add_to_wishlist') }}
                                                     </button>
 
                                                     <button @click="openQuickView({{ $product->id }})"
@@ -338,10 +338,10 @@
                                   d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
                         </svg>
                         <h3 class="text-2xl font-bold text-gray-900 mb-4">{{ __('messages.no_products_found') }}</h3>
-                        <p class="text-gray-600 mb-8">{{ __('Try adjusting your filters or search terms') }}</p>
+                        <p class="text-gray-600 mb-8">{{ __('ui.try_adjusting_your_filters_or_search_terms') }}</p>
                         <button @click="clearFilters()"
                                 class="btn-gradient px-8 py-3 rounded-xl font-semibold">
-                            {{ __('Clear All Filters') }}
+                            {{ __('ui.clear_all_filters') }}
                         </button>
                     </div>
                 @endif
@@ -439,7 +439,7 @@
                     })
                     .catch(error => {
                         document.getElementById(`quick-view-content-${productId}`).innerHTML =
-                            '<div class="text-center py-8 text-red-600">{{ __('Error loading product details') }}</div>';
+                            '<div class="text-center py-8 text-red-600">{{ __('ui.error_loading_product_details') }}</div>';
                     });
             }
         }

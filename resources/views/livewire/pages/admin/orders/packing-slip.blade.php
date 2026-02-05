@@ -1,10 +1,10 @@
 <div class="p-8 text-gray-900">
-    <h1 class="text-2xl font-semibold">{{ __('Packing slip') }}</h1>
+    <h1 class="text-2xl font-semibold">{{ __('ui.packing_slip') }}</h1>
 
     <div class="mt-6 grid grid-cols-2 gap-6">
         <div>
             <h2 class="font-medium">{{ __('messages.order') }} #{{ $order->number }}</h2>
-            <p class="text-sm text-gray-600">{{ __('Placed at') }}:
+            <p class="text-sm text-gray-600">{{ __('ui.placed_at') }}:
                 {{ optional($order->created_at)->timezone(config('app.timezone'))->format('Y-m-d H:i') }}</p>
             <p class="text-sm text-gray-600 mt-1">
                 {{ __('messages.status') }}: <strong>{{ $order->status }}</strong> ·
@@ -12,7 +12,7 @@
             </p>
             <p class="mt-2">
                 <x-link :href="route('admin.orders.status.edit', ['number' => $order->number])" class="text-sm">
-                    {{ __('Update status') }}
+                    {{ __('ui.update_status') }}
                 </x-link>
             </p>
         </div>
@@ -24,7 +24,7 @@
 
     <div class="mt-8 grid grid-cols-2 gap-6">
         <div>
-            <h3 class="font-semibold uppercase text-xs tracking-wider text-gray-500">{{ __('Ship to') }}</h3>
+            <h3 class="font-semibold uppercase text-xs tracking-wider text-gray-500">{{ __('ui.ship_to') }}</h3>
             @php($sa = is_string($order->shipping_address) ? json_decode($order->shipping_address, true) : $order->shipping_address)
             @if ($sa)
                 <p class="mt-2">{{ $sa['first_name'] ?? '' }} {{ $sa['last_name'] ?? '' }}</p>

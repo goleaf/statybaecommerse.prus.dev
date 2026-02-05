@@ -25,20 +25,20 @@
 
             @if (session('status') == 'verification-link-sent')
                 <div class="mb-4 font-medium text-sm text-green-600">
-                    {{ __('A new verification link has been sent to the email address you provided during registration.') }}
+                    {{ __('ui.a_new_verification_link_has_been_sent_to_the_email_address_you_provided_during_registration') }}
                 </div>
             @endif
 
             <div class="mt-4 flex items-center justify-between">
                 <x-buttons.submit
-                                  :title="__('Resend Verification Email')"
+                                  :title="__('ui.resend_verification_email')"
                                   wire:click="sendVerification"
                                   wire:loading.attr="data-loading" />
 
                 <x-buttons.default wire:click="logout" 
                                    wire:confirm="{{ __('translations.confirm_logout') }}"
                                    type="submit">
-                    {{ __('Log out') }}
+                    {{ __('ui.log_out') }}
                 </x-buttons.default>
             </div>
         </div>

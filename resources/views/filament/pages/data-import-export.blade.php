@@ -20,7 +20,7 @@
 
         <x-filament::section>
             <x-slot name="heading">
-                {{ __('CSV imports') }}
+                {{ __('ui.csv_imports') }}
             </x-slot>
 
             <div class="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">

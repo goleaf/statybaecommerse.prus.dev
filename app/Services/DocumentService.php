@@ -7,6 +7,7 @@ namespace App\Services;
 use App\Contracts\DocumentServiceContract;
 use App\Models\Document;
 use App\Models\DocumentTemplate;
+use App\Models\User;
 use App\Notifications\DocumentGenerated;
 use App\Support\Storage\SecureStorage;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -47,6 +48,7 @@ final class DocumentService implements DocumentServiceContract
         $relatedModelKey = $relatedModelKey;
 
         $documentTitle = $title ?? sprintf('%s - %s', $template->name, (string) $relatedModelKey);
+        $creatorId = Auth::user() instanceof User ? Auth::id() : null;
 
         $document = Document::create([
             'document_template_id' => $template->id,
@@ -57,8 +59,8 @@ final class DocumentService implements DocumentServiceContract
             'format'               => 'html',
             'documentable_type'    => get_class($relatedModel),
             'documentable_id'      => $relatedModelKey,
-            'created_by'           => Auth::id(),
-            'updated_by'           => Auth::id(),
+            'created_by'           => $creatorId,
+            'updated_by'           => $creatorId,
             'generated_at'         => now(),
         ]);
         // Send notification if requested

@@ -20,10 +20,8 @@
 
 @extends('errors.layout', [
     'code' => '403',
-    'title' => __('messages.frontend),
-    '),
-    'description' => __('messages.frontend),
-    '),
+    'title' => __('frontend.errors.403.title'),
+    'description' => __('frontend.errors.403.description'),
     'primaryAction' => [
         'label' => __('frontend.errors.actions.return_home'),
         'url' => $homeUrl,

@@ -1,6 +1,6 @@
 @props([
     'products',
-    'emptyMessage' => __('No products were found for your selection.'),
+    'emptyMessage' => __('ui.no_products_were_found_for_your_selection'),
 ])
 
 <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -57,7 +57,7 @@
     @empty
         <div class="col-span-full rounded-3xl border border-dashed border-gray-300 bg-white/60 p-12 text-center">
             <x-untitledui-search-sm class="mx-auto h-10 w-10 text-gray-400" />
-            <p class="mt-4 text-lg font-semibold text-gray-900">{{ __('Nothing to show yet') }}</p>
+            <p class="mt-4 text-lg font-semibold text-gray-900">{{ __('ui.nothing_to_show_yet') }}</p>
             <p class="mt-2 text-sm text-gray-600">{{ $emptyMessage }}</p>
         </div>
     @endforelse

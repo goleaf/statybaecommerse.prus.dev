@@ -12,6 +12,7 @@ use Illuminate\Mail\Attachment;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 
 /**
@@ -76,7 +77,7 @@ final class DocumentGenerated extends Notification implements ShouldQueue
             );
 
         // Add a quick access action when the recipient is authorised to view the document.
-        if ($this->canViewDocument($notifiable)) {
+        if ($this->canViewDocument($notifiable) && Route::has('filament.admin.resources.documents.view')) {
             $message->action(
                 __('documents.email.view_document', [], $locale),
                 route('filament.admin.resources.documents.view', $this->document),

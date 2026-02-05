@@ -5,7 +5,7 @@
         <div class="grid grid-cols-2 gap-x-4">
             <div class="text-sm">
                 <dt class="font-medium text-gray-900">
-                    {{ __('Order N°') }}
+                    {{ __('ui.order_n') }}
                 </dt>
                 <dd class="mt-1 text-gray-500 uppercase">
                     {{ $order->number }}
@@ -13,7 +13,7 @@
             </div>
             <div class="text-sm">
                 <dt class="font-medium text-gray-900">
-                    {{ __('Placed on') }}
+                    {{ __('ui.placed_on') }}
                 </dt>
                 <dd class="mt-1 text-gray-500 capitalize">
                     <time datetime="{{ format_datetime($order->created_at) }}">
@@ -56,7 +56,7 @@
         </div>
         <div class="grid grid-cols-2 gap-x-5 lg:flex lg:flex-col lg:items-end lg:justify-end lg:space-y-2 lg:pl-4">
             <x-buttons.primary class="w-full px-4" :href="route('account.orders.detail', ['number' => $order->number])">
-                {{ __('View details') }}
+                {{ __('ui.view_details') }}
             </x-buttons.primary>
             <x-buttons.default class="w-full px-4" :href="route('account.orders.invoice', ['locale' => app()->getLocale(), 'number' => $order->number])">
                 {{ __('Invoice') }}

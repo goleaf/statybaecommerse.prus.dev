@@ -1,6 +1,6 @@
 @extends('frontend.layouts.app')
 
-@section('title', __('Discount Redemption Details'))
+@section('title', __('ui.discount_redemption_details'))
 
 @section('content')
     <div class="container mx-auto px-4 py-8">
@@ -10,10 +10,10 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
-                            {{ __('Redemption Details') }}
+                            {{ __('ui.redemption_details') }}
                         </h1>
                         <p class="mt-2 text-gray-600 dark:text-gray-400">
-                            {{ __('View detailed information about your discount redemption') }}
+                            {{ __('ui.view_detailed_information_about_your_discount_redemption') }}
                         </p>
                     </div>
                     <div class="flex space-x-3">
@@ -23,7 +23,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                       d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
                             </svg>
-                            {{ __('Back to Redemptions') }}
+                            {{ __('ui.back_to_redemptions') }}
                         </a>
                     </div>
                 </div>
@@ -52,17 +52,17 @@
                         <!-- Discount Information -->
                         <div>
                             <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
-                                {{ __('Discount Information') }}
+                                {{ __('ui.discount_information') }}
                             </h3>
                             <dl class="space-y-3">
                                 <div>
                                     <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                        {{ __('Discount Name') }}</dt>
+                                        {{ __('ui.discount_name') }}</dt>
                                     <dd class="text-sm text-gray-900 dark:text-white">{{ $redemption->discount->name }}</dd>
                                 </div>
                                 <div>
                                     <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                        {{ __('Discount Code') }}</dt>
+                                        {{ __('ui.discount_code') }}</dt>
                                     <dd class="text-sm text-gray-900 dark:text-white font-mono">
                                         {{ $redemption->code->code }}</dd>
                                 </div>
@@ -80,12 +80,12 @@
                         <!-- Financial Information -->
                         <div>
                             <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
-                                {{ __('Financial Information') }}
+                                {{ __('ui.financial_information') }}
                             </h3>
                             <dl class="space-y-3">
                                 <div>
                                     <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                        {{ __('Amount Saved') }}</dt>
+                                        {{ __('ui.amount_saved') }}</dt>
                                     <dd class="text-2xl font-bold text-green-600 dark:text-green-400">
                                         €{{ number_format($redemption->amount_saved, 2) }}
                                     </dd>
@@ -101,12 +101,12 @@
                         <!-- Redemption Details -->
                         <div>
                             <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
-                                {{ __('Redemption Details') }}
+                                {{ __('ui.redemption_details') }}
                             </h3>
                             <dl class="space-y-3">
                                 <div>
                                     <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                        {{ __('Redeemed At') }}</dt>
+                                        {{ __('ui.redeemed_at') }}</dt>
                                     <dd class="text-sm text-gray-900 dark:text-white">
                                         {{ $redemption->redeemed_at->format('F j, Y \a\t g:i A') }}
                                     </dd>
@@ -135,7 +135,7 @@
                         <!-- Additional Information -->
                         <div>
                             <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
-                                {{ __('Additional Information') }}
+                                {{ __('ui.additional_information') }}
                             </h3>
                             <dl class="space-y-3">
                                 @if ($redemption->notes)
@@ -146,13 +146,13 @@
                                     </div>
                                 @endif
                                 <div>
-                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('IP Address') }}
+                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('ui.ip_address') }}
                                     </dt>
                                     <dd class="text-sm text-gray-900 dark:text-white font-mono">
                                         {{ $redemption->ip_address }}</dd>
                                 </div>
                                 <div>
-                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('User Agent') }}
+                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('ui.user_agent') }}
                                     </dt>
                                     <dd class="text-sm text-gray-900 dark:text-white break-all">
                                         {{ $redemption->user_agent }}</dd>
@@ -186,10 +186,10 @@
                         </div>
                         <div class="ml-3">
                             <h3 class="text-sm font-medium text-yellow-800 dark:text-yellow-200">
-                                {{ __('Redemption Pending') }}
+                                {{ __('ui.redemption_pending') }}
                             </h3>
                             <div class="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
-                                <p>{{ __('This redemption is currently pending and will be processed soon.') }}</p>
+                                <p>{{ __('ui.this_redemption_is_currently_pending_and_will_be_processed_soon') }}</p>
                             </div>
                         </div>
                     </div>
@@ -206,10 +206,10 @@
                         </div>
                         <div class="ml-3">
                             <h3 class="text-sm font-medium text-red-800 dark:text-red-200">
-                                {{ __('Redemption Expired') }}
+                                {{ __('ui.redemption_expired') }}
                             </h3>
                             <div class="mt-2 text-sm text-red-700 dark:text-red-300">
-                                <p>{{ __('This redemption has expired and is no longer valid.') }}</p>
+                                <p>{{ __('ui.this_redemption_has_expired_and_is_no_longer_valid') }}</p>
                             </div>
                         </div>
                     </div>
@@ -226,10 +226,10 @@
                         </div>
                         <div class="ml-3">
                             <h3 class="text-sm font-medium text-gray-800 dark:text-gray-200">
-                                {{ __('Redemption Cancelled') }}
+                                {{ __('ui.redemption_cancelled') }}
                             </h3>
                             <div class="mt-2 text-sm text-gray-700 dark:text-gray-300">
-                                <p>{{ __('This redemption has been cancelled.') }}</p>
+                                <p>{{ __('ui.this_redemption_has_been_cancelled') }}</p>
                             </div>
                         </div>
                     </div>
@@ -247,10 +247,10 @@
                         </div>
                         <div class="ml-3">
                             <h3 class="text-sm font-medium text-green-800 dark:text-green-200">
-                                {{ __('Redemption Successful') }}
+                                {{ __('ui.redemption_successful') }}
                             </h3>
                             <div class="mt-2 text-sm text-green-700 dark:text-green-300">
-                                <p>{{ __('This redemption has been successfully processed.') }}</p>
+                                <p>{{ __('ui.this_redemption_has_been_successfully_processed') }}</p>
                             </div>
                         </div>
                     </div>

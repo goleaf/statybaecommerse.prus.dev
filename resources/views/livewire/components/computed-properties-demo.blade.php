@@ -1,19 +1,19 @@
 <div class="max-w-7xl mx-auto p-6">
     <div class="bg-white rounded-lg shadow-lg p-6">
-        <h1 class="text-3xl font-bold text-gray-900 mb-6">{{ __('Livewire Computed Properties Demo') }}</h1>
+        <h1 class="text-3xl font-bold text-gray-900 mb-6">{{ __('ui.livewire_computed_properties_demo') }}</h1>
         
         <!-- Controls -->
         <div class="bg-gray-50 rounded-lg p-4 mb-6">
-            <h2 class="text-lg font-semibold text-gray-900 mb-4">{{ __('Filters & Controls') }}</h2>
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">{{ __('ui.filters_controls') }}</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <!-- Time Filter -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">{{ __('Time Filter') }}</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">{{ __('ui.time_filter') }}</label>
                     <select wire:model.live="filter" class="w-full border border-gray-300 rounded-md px-3 py-2">
-                        <option value="week">{{ __('Last Week') }}</option>
-                        <option value="month">{{ __('Last Month') }}</option>
-                        <option value="year">{{ __('Last Year') }}</option>
-                        <option value="all">{{ __('All Time') }}</option>
+                        <option value="week">{{ __('ui.last_week') }}</option>
+                        <option value="month">{{ __('ui.last_month') }}</option>
+                        <option value="year">{{ __('ui.last_year') }}</option>
+                        <option value="all">{{ __('ui.all_time') }}</option>
                     </select>
                 </div>
 
@@ -33,7 +33,7 @@
                     <input type="checkbox" wire:model.live="showExpensiveProducts" id="expensive" 
                            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
                     <label for="expensive" class="ml-2 block text-sm text-gray-900">
-                        {{ __('Show only expensive products (>€100)') }}
+                        {{ __('ui.show_only_expensive_products_100') }}
                     </label>
                 </div>
             </div>
@@ -42,11 +42,11 @@
         <!-- Stats Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
             <div class="bg-blue-50 rounded-lg p-4">
-                <h3 class="text-sm font-medium text-blue-600">{{ __('Total Users') }}</h3>
+                <h3 class="text-sm font-medium text-blue-600">{{ __('ui.total_users') }}</h3>
                 <p class="text-2xl font-bold text-blue-900">{{ $stats['users'] }}</p>
             </div>
             <div class="bg-green-50 rounded-lg p-4">
-                <h3 class="text-sm font-medium text-green-600">{{ __('Total Products') }}</h3>
+                <h3 class="text-sm font-medium text-green-600">{{ __('ui.total_products') }}</h3>
                 <p class="text-2xl font-bold text-green-900">{{ $stats['products'] }}</p>
             </div>
             <div class="bg-purple-50 rounded-lg p-4">
@@ -65,7 +65,7 @@
 
         <!-- Filtered Products -->
         <div class="mb-6">
-            <h2 class="text-lg font-semibold text-gray-900 mb-4">{{ __('Filtered Products') }}</h2>
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">{{ __('ui.filtered_products') }}</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 @forelse($filteredProducts as $product)
                     <div class="bg-white border rounded-lg p-4 hover:shadow-md transition-shadow">
@@ -80,7 +80,7 @@
                     </div>
                 @empty
                     <div class="col-span-full text-center py-8">
-                        <p class="text-gray-500">{{ __('No products found with current filters') }}</p>
+                        <p class="text-gray-500">{{ __('ui.no_products_found_with_current_filters') }}</p>
                     </div>
                 @endforelse
             </div>
@@ -88,7 +88,7 @@
 
         <!-- Global Stats (Global Cache) -->
         <div class="bg-green-50 rounded-lg p-4 mb-6">
-            <h2 class="text-lg font-semibold text-gray-900 mb-4">{{ __('Global Site Statistics (Global Cache)') }}</h2>
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">{{ __('ui.global_site_statistics_global_cache') }}</h2>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div class="text-center">
                     <p class="text-2xl font-bold text-green-900">{{ $globalSiteStats['total_products'] }}</p>
@@ -104,7 +104,7 @@
                 </div>
                 <div class="text-center">
                     <p class="text-2xl font-bold text-green-900">{{ number_format($globalSiteStats['average_rating'], 1) }}</p>
-                    <p class="text-sm text-green-700">{{ __('Avg Rating') }}</p>
+                    <p class="text-sm text-green-700">{{ __('ui.avg_rating') }}</p>
                 </div>
             </div>
             <p class="text-xs text-green-600 mt-2 text-center">
@@ -114,32 +114,32 @@
 
         <!-- Summary Report -->
         <div class="bg-yellow-50 rounded-lg p-4">
-            <h2 class="text-lg font-semibold text-gray-900 mb-4">{{ __('Summary Report') }}</h2>
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">{{ __('ui.summary_report') }}</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <h3 class="font-medium text-gray-900 mb-2">{{ __('Current Filters') }}</h3>
+                    <h3 class="font-medium text-gray-900 mb-2">{{ __('ui.current_filters') }}</h3>
                     <ul class="text-sm text-gray-600 space-y-1">
-                        <li>{{ __('Time Filter') }}: {{ ucfirst($summaryReport['filter_applied']) }}</li>
+                        <li>{{ __('ui.time_filter') }}: {{ ucfirst($summaryReport['filter_applied']) }}</li>
                         <li>{{ __('messages.category') }}: {{ $summaryReport['category_filter'] ?: __('All') }}</li>
-                        <li>{{ __('Expensive Only') }}: {{ $summaryReport['expensive_only'] ? __('Yes') : __('No') }}</li>
+                        <li>{{ __('ui.expensive_only') }}: {{ $summaryReport['expensive_only'] ? __('Yes') : __('No') }}</li>
                     </ul>
                 </div>
                 <div>
                     <h3 class="font-medium text-gray-900 mb-2">{{ __('Metrics') }}</h3>
                     <ul class="text-sm text-gray-600 space-y-1">
-                        <li>{{ __('Filtered Results') }}: {{ $summaryReport['filtered_count'] }}</li>
-                        <li>{{ __('Percentage of Total') }}: {{ $summaryReport['percentage_of_total'] }}%</li>
+                        <li>{{ __('ui.filtered_results') }}: {{ $summaryReport['filtered_count'] }}</li>
+                        <li>{{ __('ui.percentage_of_total') }}: {{ $summaryReport['percentage_of_total'] }}%</li>
                     </ul>
                 </div>
             </div>
             <div class="mt-4 p-3 bg-white rounded-lg">
-                <h4 class="font-medium text-gray-900 mb-2">{{ __('Computed Properties Benefits') }}</h4>
+                <h4 class="font-medium text-gray-900 mb-2">{{ __('ui.computed_properties_benefits') }}</h4>
                 <ul class="text-sm text-gray-600 space-y-1">
-                    <li>✅ {{ __('Automatic caching during request lifecycle') }}</li>
-                    <li>✅ {{ __('Reduced database queries through intelligent caching') }}</li>
-                    <li>✅ {{ __('Memory optimization with computed results') }}</li>
-                    <li>✅ {{ __('Persistent caching across requests when needed') }}</li>
-                    <li>✅ {{ __('Global caching for shared data across instances') }}</li>
+                    <li>✅ {{ __('ui.automatic_caching_during_request_lifecycle') }}</li>
+                    <li>✅ {{ __('ui.reduced_database_queries_through_intelligent_caching') }}</li>
+                    <li>✅ {{ __('ui.memory_optimization_with_computed_results') }}</li>
+                    <li>✅ {{ __('ui.persistent_caching_across_requests_when_needed') }}</li>
+                    <li>✅ {{ __('ui.global_caching_for_shared_data_across_instances') }}</li>
                 </ul>
             </div>
         </div>

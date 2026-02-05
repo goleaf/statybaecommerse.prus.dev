@@ -10,8 +10,8 @@
 ])
 
 @php
-    $title = $title ?? __('What Our Customers Say');
-    $subtitle = $subtitle ?? __('Read reviews from satisfied customers who love our products and service');
+    $title = $title ?? __('ui.what_our_customers_say');
+    $subtitle = $subtitle ?? __('ui.read_reviews_from_satisfied_customers_who_love_our_products_and_service');
     $testimonials =
         $testimonials ??
         collect([
@@ -19,8 +19,7 @@
                 'name' => 'Sarah Johnson',
                 'location' => 'New York, USA',
                 'rating' => 5,
-                'text' => __(
-                    'The quality of products exceeded my expectations. Fast shipping and excellent customer service. I will definitely order again!',
+                'text' => __('ui.the_quality_of_products_exceeded_my_expectations_fast_shipping_and_excellent_customer_service_i_will_definitely_order_again',
                 ),
                 'avatar' => null,
                 'product' => 'Premium Headphones',
@@ -30,8 +29,7 @@
                 'name' => 'Michael Chen',
                 'location' => 'London, UK',
                 'rating' => 5,
-                'text' => __(
-                    'Outstanding customer support and the product arrived in perfect condition. Highly recommended for anyone looking for quality items.',
+                'text' => __('ui.outstanding_customer_support_and_the_product_arrived_in_perfect_condition_highly_recommended_for_anyone_looking_for_quality_items',
                 ),
                 'avatar' => null,
                 'product' => 'Wireless Speaker',
@@ -41,8 +39,7 @@
                 'name' => 'Emma Rodriguez',
                 'location' => 'Madrid, Spain',
                 'rating' => 4,
-                'text' => __(
-                    'Great selection of products and competitive prices. The checkout process was smooth and I received my order quickly.',
+                'text' => __('ui.great_selection_of_products_and_competitive_prices_the_checkout_process_was_smooth_and_i_received_my_order_quickly',
                 ),
                 'avatar' => null,
                 'product' => 'Smart Watch',
@@ -52,8 +49,7 @@
                 'name' => 'David Kim',
                 'location' => 'Seoul, South Korea',
                 'rating' => 5,
-                'text' => __(
-                    'Excellent shopping experience from start to finish. The product descriptions were accurate and the quality is top-notch.',
+                'text' => __('ui.excellent_shopping_experience_from_start_to_finish_the_product_descriptions_were_accurate_and_the_quality_is_top_notch',
                 ),
                 'avatar' => null,
                 'product' => 'Gaming Mouse',
@@ -74,8 +70,7 @@
                 'name' => 'Ahmed Hassan',
                 'location' => 'Dubai, UAE',
                 'rating' => 4,
-                'text' => __(
-                    'Good variety of products and reasonable prices. The customer service team was very helpful when I had questions.',
+                'text' => __('ui.good_variety_of_products_and_reasonable_prices_the_customer_service_team_was_very_helpful_when_i_had_questions',
                 ),
                 'avatar' => null,
                 'product' => 'Phone Case',
@@ -209,17 +204,17 @@
         <div class="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
             <div class="text-center">
                 <div class="text-4xl font-bold text-blue-600 mb-2">{{ $testimonials->count() }}+</div>
-                <div class="text-gray-600">{{ __('Happy Customers') }}</div>
+                <div class="text-gray-600">{{ __('ui.happy_customers') }}</div>
             </div>
             <div class="text-center">
                 <div class="text-4xl font-bold text-blue-600 mb-2">
                     {{ number_format($testimonials->avg('rating'), 1) }}
                 </div>
-                <div class="text-gray-600">{{ __('Average Rating') }}</div>
+                <div class="text-gray-600">{{ __('ui.average_rating') }}</div>
             </div>
             <div class="text-center">
                 <div class="text-4xl font-bold text-blue-600 mb-2">98%</div>
-                <div class="text-gray-600">{{ __('Satisfaction Rate') }}</div>
+                <div class="text-gray-600">{{ __('ui.satisfaction_rate') }}</div>
             </div>
         </div>
     </div>

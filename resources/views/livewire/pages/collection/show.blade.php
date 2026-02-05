@@ -14,7 +14,7 @@
 @endsection
 
 <div class="container mx-auto px-4 py-8" wire:loading.attr="aria-busy" aria-busy="false">
-    <a href="#results" class="sr-only focus:not-sr-only focus:underline">{{ __('Skip to results') }}</a>
+    <a href="#results" class="sr-only focus:not-sr-only focus:underline">{{ __('ui.skip_to_results') }}</a>
     @if (session('status'))
         <x-alert type="success" class="mb-4">{{ session('status') }}</x-alert>
     @endif
@@ -47,7 +47,7 @@
     </div>
 
     <div wire:loading role="status" aria-live="polite" class="mb-4 text-sm text-gray-600">
-        {{ __('Loading…') }}
+        {{ __('ui.loading') }}
     </div>
 
     @if ($collection->trans('description') ?? $collection->description)
@@ -55,7 +55,7 @@
     @endif
 
     <div class="mb-4">
-        <h2 class="text-xl font-semibold mb-2">{{ __('Filter by brand') }}</h2>
+        <h2 class="text-xl font-semibold mb-2">{{ __('ui.filter_by_brand') }}</h2>
         <div class="flex flex-wrap items-center gap-2 mb-2">
             @foreach ($activeBrandIds as $brandId)
                 @if ($brand = $this->filterValueLookup->get($brandId))
@@ -98,7 +98,7 @@
     @endphp
     @if (! empty($filterGroups))
         <div class="mb-6">
-            <h2 class="text-xl font-semibold mb-2">{{ __('Filter by') }}</h2>
+            <h2 class="text-xl font-semibold mb-2">{{ __('ui.filter_by') }}</h2>
             <div class="flex flex-wrap items-center gap-2 mb-2">
                 @foreach ($activeValueIds as $valueId)
                     @if ($selected = $this->filterValueLookup->get($valueId))

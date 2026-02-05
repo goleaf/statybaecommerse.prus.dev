@@ -7,7 +7,7 @@
         <div class="grid grid-cols-2 gap-4">
             <div class="space-y-2">
                 <label for="first_name" class="block text-sm font-medium text-gray-700">
-                    {{ __('First name') }} <span class="text-red-500">*</span>
+                    {{ __('ui.first_name') }} <span class="text-red-500">*</span>
                 </label>
                 {{-- Debounced model binding keeps the UI responsive while editing names. --}}
                 <input
@@ -24,7 +24,7 @@
 
             <div class="space-y-2">
                 <label for="last_name" class="block text-sm font-medium text-gray-700">
-                    {{ __('Last name') }} <span class="text-red-500">*</span>
+                    {{ __('ui.last_name') }} <span class="text-red-500">*</span>
                 </label>
                 {{-- Debounced model binding keeps the UI responsive while editing surnames. --}}
                 <input
@@ -42,13 +42,13 @@
 
         <div class="space-y-2">
             <label for="street_address" class="block text-sm font-medium text-gray-700">
-                {{ __('Street Address') }} <span class="text-red-500">*</span>
+                {{ __('ui.street_address') }} <span class="text-red-500">*</span>
             </label>
             {{-- Debounced model binding for the primary address line avoids chatty updates. --}}
             <input
                 wire:model.lazy="street_address"
                 id="street_address"
-                placeholder="{{ __('Enter street address') }}"
+                placeholder="{{ __('ui.enter_street_address') }}"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 name="street_address"
                 type="text"
@@ -96,7 +96,7 @@
 
             <div class="space-y-2">
                 <label for="postal_code" class="block text-sm font-medium text-gray-700">
-                    {{ __('Postal / Zip code') }} <span class="text-red-500">*</span>
+                    {{ __('ui.postal_zip_code') }} <span class="text-red-500">*</span>
                 </label>
                 {{-- Debounced model binding keeps postal code edits from firing every keystroke. --}}
                 <input
@@ -122,7 +122,7 @@
                 id="country_code" 
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
-                <option value="">{{ __('Select a country') }}</option>
+                <option value="">{{ __('ui.select_a_country') }}</option>
                 @foreach ($countries as $key => $country)
                     <option value="{{ $key }}">{{ $country }}</option>
                 @endforeach
@@ -134,7 +134,7 @@
 
         <div class="space-y-2">
             <label for="phone_number" class="block text-sm font-medium text-gray-700">
-                {{ __('Phone Number') }}
+                {{ __('ui.phone_number') }}
             </label>
             {{-- Debounced phone binding prevents rapid fire updates while typing. --}}
             <input
@@ -143,7 +143,7 @@
                 id="phone_number" 
                 name="phone_number" 
                 type="text"
-                placeholder="{{ __('Enter phone number') }}"
+                placeholder="{{ __('ui.enter_phone_number') }}"
             />
             @error('phone_number')
                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -153,7 +153,7 @@
         <div class="space-y-4">
             <div class="flex items-center justify-between">
                 <label class="block text-sm font-medium text-gray-700">
-                    {{ __('Address type') }} <span class="text-red-500">*</span>
+                    {{ __('ui.address_type') }} <span class="text-red-500">*</span>
                 </label>
             </div>
 
@@ -168,7 +168,7 @@
                         class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
                     />
                     <label for="type-billing" class="ml-2 text-sm font-medium text-gray-700">
-                        {{ __('Billing address') }}
+                        {{ __('ui.billing_address') }}
                     </label>
                 </div>
 
@@ -182,7 +182,7 @@
                         class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
                     />
                     <label for="type-shipping" class="ml-2 text-sm font-medium text-gray-700">
-                        {{ __('Shipping address') }}
+                        {{ __('ui.shipping_address') }}
                     </label>
                 </div>
             </div>

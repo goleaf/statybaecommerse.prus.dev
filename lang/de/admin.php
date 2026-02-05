@@ -9,9 +9,11 @@ return [
         'refresh'           => 'Aktualisieren',
         'view'              => 'Ansehen',
     ],
-    'active_groups'    => 'Aktive Gruppen',
-    'advanced_import'  => 'Erweiterter Import',
-    'attribute-values' => [
+    'active_groups'           => 'Aktive Gruppen',
+    'advanced_import'         => 'Erweiterter Import',
+    'import_analysis_summary' => 'Analyseübersicht',
+    'import_rows_title'       => 'Importzeilen',
+    'attribute-values'        => [
         'translations' => [
             ''     => 'Attributwert-Übersetzungen',
             'save' => 'Übersetzungen speichern',

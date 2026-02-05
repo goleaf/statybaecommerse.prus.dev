@@ -11,7 +11,7 @@
                 </h1>
                 @if (! empty($filters['search']))
                     <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">
-                        {{ __('Showing results for “:term”.', ['term' => $filters['search']]) }}
+                        {{ __('ui.showing_results_for_term', ['term' => $filters['search']]) }}
                     </p>
                 @endif
             </div>
@@ -20,12 +20,12 @@
                     <label for="q" class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('messages.search') }}</label>
                     <input type="text" id="q" name="q" value="{{ $filters['search'] ?? '' }}"
                            class="mt-1 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
-                           placeholder="{{ __('Search products…') }}">
+                           placeholder="{{ __('ui.search_products_2') }}">
                 </div>
                 <div class="flex flex-col">
                     <label for="category" class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('messages.category') }}</label>
                     <select id="category" name="category" class="mt-1 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white">
-                        <option value="">{{ __('All categories') }}</option>
+                        <option value="">{{ __('ui.all_categories') }}</option>
                         @foreach ($availableCategories as $category)
                             <option value="{{ $category->slug }}" @selected(($filters['categories'][0] ?? null) === $category->slug)>
                                 {{ $category->trans('name') ?? $category->name }}
@@ -47,16 +47,16 @@
                 <div class="flex flex-col">
                     <label for="sort" class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('messages.sort_by') }}</label>
                     <select id="sort" name="sort" class="mt-1 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white">
-                        <option value="latest" @selected(($filters['sort'] ?? 'latest') === 'latest')>{{ __('Newest first') }}</option>
+                        <option value="latest" @selected(($filters['sort'] ?? 'latest') === 'latest')>{{ __('ui.newest_first') }}</option>
                         <option value="price_asc" @selected(($filters['sort'] ?? '') === 'price_asc')>{{ __('messages.price_low_to_high') }}</option>
-                        <option value="price_desc" @selected(($filters['sort'] ?? '') === 'price_desc')>{{ __('Price: High to Low') }}</option>
-                        <option value="name_asc" @selected(($filters['sort'] ?? '') === 'name_asc')>{{ __('Name: A to Z') }}</option>
-                        <option value="name_desc" @selected(($filters['sort'] ?? '') === 'name_desc')>{{ __('Name: Z to A') }}</option>
+                        <option value="price_desc" @selected(($filters['sort'] ?? '') === 'price_desc')>{{ __('ui.price_high_to_low') }}</option>
+                        <option value="name_asc" @selected(($filters['sort'] ?? '') === 'name_asc')>{{ __('ui.name_a_to_z') }}</option>
+                        <option value="name_desc" @selected(($filters['sort'] ?? '') === 'name_desc')>{{ __('ui.name_z_to_a') }}</option>
                     </select>
                 </div>
                 <div class="flex items-end">
                     <button type="submit" class="inline-flex items-center rounded-md bg-blue-600 px-5 py-2.5 font-semibold text-white shadow hover:bg-blue-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500">
-                        {{ __('Apply filters') }}
+                        {{ __('ui.apply_filters') }}
                     </button>
                 </div>
             </form>

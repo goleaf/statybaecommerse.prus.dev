@@ -414,7 +414,8 @@ abstract class CsvImportPage extends Page implements HasForms
 
         return new HtmlString("
             <div class='space-y-6'>
-                <div class='rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900'>
+                <div class='relative overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900'>
+                    <div class='pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary-500 via-primary-400 to-transparent'></div>
                     <div class='flex flex-wrap items-start justify-between gap-4'>
                         <div>
                             <p class='text-xs font-semibold uppercase tracking-widest text-gray-500 dark:text-gray-400'>" . __('admin.import_analysis_summary') . "</p>
@@ -448,7 +449,8 @@ abstract class CsvImportPage extends Page implements HasForms
                     </div>
                 </div>
 
-                <div class='rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900'>
+                <div class='relative overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900'>
+                    <div class='pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-blue-500 via-sky-400 to-transparent'></div>
                     <p class='text-xs font-semibold uppercase tracking-widest text-gray-500 dark:text-gray-400'>" . __('admin.import_fields_to_be_imported') . "</p>
                     <div class='mt-3 flex flex-wrap gap-2'>{$mappedFieldsHtml}</div>
                     <div class='mt-4 rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-900/40 dark:bg-blue-900/20'>
@@ -620,7 +622,8 @@ abstract class CsvImportPage extends Page implements HasForms
             : __('admin.import_status_running');
 
         return new HtmlString('
-            <div wire:poll.visible.2s="tickImport" class="mt-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+            <div wire:poll.visible.2s="tickImport" class="relative mt-6 overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+                <div class="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary-500 via-primary-400 to-transparent"></div>
                 <div class="flex flex-wrap items-start justify-between gap-4">
                     <div>
                         <p class="text-xs font-semibold uppercase tracking-widest text-gray-500 dark:text-gray-400">' . __('admin.import_progress') . '</p>
@@ -679,7 +682,7 @@ abstract class CsvImportPage extends Page implements HasForms
                     <div class='flex flex-wrap items-start justify-between gap-4'>
                         <div>
                             <p class='text-xs font-semibold uppercase tracking-widest text-gray-500 dark:text-gray-400'>" . __('admin.import_rows_title') . "</p>
-                            <p class='mt-1 text-sm font-semibold text-gray-800 dark:text-gray-100'>" . __('admin.import_rows_latest') . "</p>
+                            <p class='mt-1 text-base font-semibold text-gray-900 dark:text-white'>" . __('admin.import_rows_latest') . "</p>
                             <p class='mt-1 text-xs text-gray-500 dark:text-gray-400'>" . __('admin.import_rows_latest_hint') . "</p>
                         </div>
                         <span class='inline-flex items-center rounded-full bg-white px-3 py-1 text-[11px] font-semibold text-gray-600 shadow-sm dark:bg-gray-800 dark:text-gray-300'>" . __('admin.import_chunk_size', ['count' => $this->getChunkSize()]) . "</span>
@@ -692,11 +695,12 @@ abstract class CsvImportPage extends Page implements HasForms
         }
 
         $header = '
-            <div class="mt-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+            <div class="relative mt-8 overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+                <div class="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-slate-900/70 via-slate-400 to-transparent dark:from-slate-200/40"></div>
                 <div class="flex flex-wrap items-start justify-between gap-4">
                     <div>
                         <p class="text-xs font-semibold uppercase tracking-widest text-gray-500 dark:text-gray-400">' . __('admin.import_rows_title') . '</p>
-                        <p class="mt-1 text-sm font-semibold text-gray-900 dark:text-white">' . __('admin.import_rows_latest') . '</p>
+                        <p class="mt-1 text-base font-semibold text-gray-900 dark:text-white">' . __('admin.import_rows_latest') . '</p>
                         <p class="text-xs text-gray-500 dark:text-gray-400">' . __('admin.import_rows_latest_hint') . '</p>
                     </div>
                     <span class="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-[11px] font-semibold text-gray-600 dark:bg-gray-800 dark:text-gray-300">' . __('admin.import_chunk_size', ['count' => $this->getChunkSize()]) . '</span>

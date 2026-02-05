@@ -885,6 +885,7 @@ return [
     'occaecati_consequatur'                                     => 'Occaecati Consequatur',
     'odit_modi'                                                 => 'Odit Modi',
     'officia_quaerat'                                           => 'Officia Quaerat',
+    'officia_sint'                                              => 'Officia Sint',
     'officiis_nemo'                                             => 'Officiis Nemo',
     'officiis_vel'                                              => 'Officiis Vel',
     'omnis_est'                                                 => 'Omnis Est',

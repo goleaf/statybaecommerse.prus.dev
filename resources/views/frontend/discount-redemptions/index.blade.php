@@ -1,6 +1,6 @@
 @extends('frontend.layouts.app')
 
-@section('title', __('Discount Redemptions'))
+@section('title', __('ui.discount_redemptions'))
 
 @section('content')
     <div class="container mx-auto px-4 py-8">
@@ -8,10 +8,10 @@
             <!-- Header -->
             <div class="mb-8">
                 <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
-                    {{ __('My Discount Redemptions') }}
+                    {{ __('ui.my_discount_redemptions') }}
                 </h1>
                 <p class="mt-2 text-gray-600 dark:text-gray-400">
-                    {{ __('View and manage your discount redemptions') }}
+                    {{ __('ui.view_and_manage_your_discount_redemptions') }}
                 </p>
             </div>
 
@@ -28,7 +28,7 @@
                             </svg>
                         </div>
                         <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ __('Total Redemptions') }}
+                            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ __('ui.total_redemptions') }}
                             </p>
                             <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ $totalRedemptions }}</p>
                         </div>
@@ -46,7 +46,7 @@
                             </svg>
                         </div>
                         <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ __('Total Saved') }}</p>
+                            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ __('ui.total_saved') }}</p>
                             <p class="text-2xl font-semibold text-gray-900 dark:text-white">
                                 €{{ number_format($totalSaved, 2) }}</p>
                         </div>
@@ -98,7 +98,7 @@
                             </label>
                             <select name="status" id="status"
                                     class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
-                                <option value="">{{ __('All Statuses') }}</option>
+                                <option value="">{{ __('ui.all_statuses') }}</option>
                                 <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>
                                     {{ __('Pending') }}</option>
                                 <option value="redeemed" {{ request('status') === 'redeemed' ? 'selected' : '' }}>
@@ -116,7 +116,7 @@
                             </label>
                             <select name="currency" id="currency"
                                     class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
-                                <option value="">{{ __('All Currencies') }}</option>
+                                <option value="">{{ __('ui.all_currencies') }}</option>
                                 <option value="EUR" {{ request('currency') === 'EUR' ? 'selected' : '' }}>EUR</option>
                                 <option value="USD" {{ request('currency') === 'USD' ? 'selected' : '' }}>USD</option>
                                 <option value="GBP" {{ request('currency') === 'GBP' ? 'selected' : '' }}>GBP</option>
@@ -125,7 +125,7 @@
 
                         <div>
                             <label for="date_from" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                {{ __('From Date') }}
+                                {{ __('ui.from_date') }}
                             </label>
                             <input type="date" name="date_from" id="date_from" value="{{ request('date_from') }}"
                                    class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
@@ -269,9 +269,9 @@
                             </path>
                         </svg>
                         <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">
-                            {{ __('No redemptions found') }}</h3>
+                            {{ __('ui.no_redemptions_found') }}</h3>
                         <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                            {{ __('Get started by using a discount code.') }}</p>
+                            {{ __('ui.get_started_by_using_a_discount_code') }}</p>
                     </div>
                 @endif
             </div>

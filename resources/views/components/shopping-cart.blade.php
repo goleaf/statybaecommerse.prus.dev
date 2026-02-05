@@ -125,7 +125,7 @@
                         @if ($showRemoveButton)
                             <button @click="removeItem({{ $item['id'] }})"
                                     class="flex-shrink-0 p-2 text-gray-400 hover:text-red-600 transition-colors duration-200"
-                                    title="{{ __('Remove from cart') }}">
+                                    title="{{ __('ui.remove_from_cart') }}">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                           d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
@@ -140,7 +140,7 @@
 
         {{-- Cart Summary --}}
         <div class="mt-8 bg-white border border-gray-200 rounded-xl p-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">{{ __('Order Summary') }}</h3>
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">{{ __('ui.order_summary') }}</h3>
 
             <div class="space-y-3">
                 {{-- Subtotal --}}
@@ -191,7 +191,7 @@
                    {{-- Keep cart context alive by navigating via Livewire --}}
                    href="{{ route('checkout.index', ['locale' => app()->getLocale()]) ?? '/checkout' }}"
                    class="w-full btn-gradient py-3 rounded-xl font-semibold text-center block">
-                    {{ __('Proceed to Checkout') }}
+                    {{ __('ui.proceed_to_checkout') }}
                 </a>
 
                 <a href="{{ route('localized.products.index', ['locale' => app()->getLocale()]) }}"
@@ -222,7 +222,7 @@
 
                 <a href="{{ route('localized.categories.index', ['locale' => app()->getLocale()]) }}"
                    class="border-2 border-gray-300 text-gray-700 px-8 py-3 rounded-xl font-semibold hover:border-gray-400 hover:bg-gray-50 transition-colors duration-200">
-                    {{ __('Browse Categories') }}
+                    {{ __('ui.browse_categories') }}
                 </a>
             </div>
         </div>
@@ -260,10 +260,10 @@
                         // Reload page to update cart
                         window.location.reload();
                     } else {
-                        this.showNotification('{{ __('Failed to update quantity. Please try again.') }}', 'error');
+                        this.showNotification('{{ __('ui.failed_to_update_quantity_please_try_again') }}', 'error');
                     }
                 } catch (error) {
-                    this.showNotification('{{ __('Network error. Please check your connection and try again.') }}',
+                    this.showNotification('{{ __('ui.network_error_please_check_your_connection_and_try_again') }}',
                         'error');
                 } finally {
                     this.loading = false;
@@ -271,7 +271,7 @@
             },
 
             async removeItem(itemId) {
-                if (!confirm('{{ __('Are you sure you want to remove this item from your cart?') }}')) {
+                if (!confirm('{{ __('ui.are_you_sure_you_want_to_remove_this_item_from_your_cart') }}')) {
                     return;
                 }
 
@@ -292,10 +292,10 @@
                         // Reload page to update cart
                         window.location.reload();
                     } else {
-                        this.showNotification('{{ __('Failed to remove item. Please try again.') }}', 'error');
+                        this.showNotification('{{ __('ui.failed_to_remove_item_please_try_again') }}', 'error');
                     }
                 } catch (error) {
-                    this.showNotification('{{ __('Network error. Please check your connection and try again.') }}',
+                    this.showNotification('{{ __('ui.network_error_please_check_your_connection_and_try_again') }}',
                         'error');
                 } finally {
                     this.loading = false;

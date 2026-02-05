@@ -1,7 +1,7 @@
 @section('meta')
     <x-meta
-        :title="__('Forgot password') . ' - ' . config('app.name')"
-        :description="__('Request a secure link to reset your Statybae Commerce account password')"
+        :title="__('ui.forgot_password') . ' - ' . config('app.name')"
+        :description="__('ui.request_a_secure_link_to_reset_your_statybae_commerce_account_password')"
         canonical="{{ url()->current() }}" />
 @endsection
 
@@ -16,9 +16,9 @@
             </div>
 
             <div class="space-y-2">
-                <h1 class="text-3xl font-semibold text-slate-900 dark:text-slate-50">{{ __('Forgot password') }}</h1>
+                <h1 class="text-3xl font-semibold text-slate-900 dark:text-slate-50">{{ __('ui.forgot_password') }}</h1>
                 <p class="text-slate-600 dark:text-slate-300">
-                    {{ __('Enter your email address and we will send you a secure password reset link.') }}
+                    {{ __('ui.enter_your_email_address_and_we_will_send_you_a_secure_password_reset_link') }}
                 </p>
             </div>
         </div>
@@ -31,7 +31,7 @@
 
         <form wire:submit.prevent="sendPasswordResetLink" class="grid gap-6">
             <div class="grid gap-2">
-                <x-forms.label for="email" :value="__('Email address')" />
+                <x-forms.label for="email" :value="__('ui.email_address')" />
                 <x-forms.input id="email" type="email" wire:model.defer="email" autocomplete="email" required />
                 <x-forms.errors :messages="$errors->get('email')" class="mt-1" />
             </div>
@@ -52,9 +52,9 @@
             @endif
 
             <div class="flex flex-col gap-4">
-                <x-buttons.submit :title="__('Send reset link')" wire:loading.attr="data-loading" class="w-full" />
+                <x-buttons.submit :title="__('ui.send_reset_link')" wire:loading.attr="data-loading" class="w-full" />
                 <a class="text-sm text-indigo-600 hover:text-indigo-500 dark:text-indigo-300" href="{{ route('login') }}">
-                    {{ __('Back to sign in') }}
+                    {{ __('ui.back_to_sign_in') }}
                 </a>
             </div>
         </form>

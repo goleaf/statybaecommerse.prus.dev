@@ -5,7 +5,7 @@
     <div class="flex items-center justify-between">
         <div>
             <h2 id="order-summary-heading" class="text-lg font-semibold text-gray-900">
-                {{ __('Order summary') }}
+                {{ __('ui.order_summary') }}
             </h2>
             <p class="text-sm text-gray-500">
                 {{ trans_choice(':count item|:count items', $cartItems->sum('quantity'), ['count' => $cartItems->sum('quantity')]) }}
@@ -22,7 +22,7 @@
                 /** @var \App\Models\CartItem $item */
                 $snapshot = (array) $item->product_snapshot;
                 $product = $item->product;
-                $name = $snapshot['name'] ?? $product?->name ?? __('Unknown product');
+                $name = $snapshot['name'] ?? $product?->name ?? __('ui.unknown_product');
                 $sku = $snapshot['sku'] ?? $product?->sku;
                 $subtotal = $item->calculateSubtotal();
                 $quantity = (int) $item->quantity;

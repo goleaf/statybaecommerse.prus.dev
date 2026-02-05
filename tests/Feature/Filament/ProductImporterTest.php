@@ -43,5 +43,11 @@ it('imports a fully mapped product row with blank optional fields', function ():
     expect($product)->not->toBeNull()
         ->and($product->name)->toBe('Test Product')
         ->and($product->slug)->toBe(Str::slug('Test Product'))
-        ->and((float) $product->price)->toBe(6.0);
+        ->and((float) $product->price)->toBe(6.0)
+        ->and($product->status)->toBe('published')
+        ->and($product->is_visible)->toBeTrue()
+        ->and($product->is_enabled)->toBeTrue()
+        ->and($product->published_at)->not->toBeNull();
+
+    expect(Product::query()->count())->toBe(1);
 });

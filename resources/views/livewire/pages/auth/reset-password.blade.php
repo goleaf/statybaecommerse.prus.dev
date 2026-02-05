@@ -20,7 +20,7 @@
          class="relative min-h-full flex flex-col justify-center py-12 divide-y divide-gray-200 lg:max-w-2xl lg:mx-auto">
         <div class="sm:mx-auto sm:w-full sm:max-w-md py-8">
             <h2 class="text-xl font-semibold text-gray-900 font-heading">
-                {{ __('Reset your password') }}
+                {{ __('ui.reset_your_password') }}
             </h2>
 
             <form wire:submit="resetPassword" class="mt-6 space-y-4">
@@ -42,7 +42,7 @@
 
                 <!-- Confirm Password -->
                 <div>
-                    <x-forms.label for="password_confirmation" :value="__('Confirm Password')" />
+                    <x-forms.label for="password_confirmation" :value="__('ui.confirm_password')" />
                     <x-forms.input
                                    wire:model="password_confirmation"
                                    id="password_confirmation"
@@ -56,7 +56,7 @@
                 </div>
 
                 <div class="flex items-center justify-end">
-                    <x-buttons.submit :title="__('Reset Password')" wire:loading.attr="data-loading" />
+                    <x-buttons.submit :title="__('ui.reset_password')" wire:loading.attr="data-loading" />
                 </div>
             </form>
         </div>

@@ -1,6 +1,6 @@
 @props([
     'products',
-    'emptyMessage' => __('No products found for your selection.'),
+    'emptyMessage' => __('ui.no_products_found_for_your_selection'),
 ])
 
 @php
@@ -65,7 +65,7 @@
                         </div>
 
                         <span class="inline-flex items-center rounded-full bg-indigo-50 px-3 py-1 text-xs font-medium text-indigo-700">
-                            {{ __('View product') }}
+                            {{ __('ui.view_product') }}
                         </span>
                     </div>
                 </div>

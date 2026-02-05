@@ -1,7 +1,7 @@
 <x-filament-panels::page.simple>
     @if (filament()->hasRegistration())
         <x-slot name="subheading">
-            {{ __('filament-panels::pages/auth/login.actions.register.before') }}
+            {{ __('ui.filament_panels_pages_auth_login_actions_register_before') }}
 
             {{ $this->registerAction }}
         </x-slot>

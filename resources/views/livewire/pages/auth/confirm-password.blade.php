@@ -20,7 +20,7 @@
          class="relative min-h-full flex flex-col justify-center py-12 divide-y divide-gray-200 lg:max-w-2xl lg:mx-auto">
         <div class="sm:mx-auto sm:w-full sm:max-w-md py-8">
             <div class="text-sm text-gray-500">
-                {{ __('This is a secure area of the application. Please confirm your password before continuing.') }}
+                {{ __('ui.this_is_a_secure_area_of_the_application_please_confirm_your_password_before_continuing') }}
             </div>
 
             <form wire:submit="confirmPassword" class="mt-6">

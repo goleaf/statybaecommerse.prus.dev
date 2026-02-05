@@ -76,7 +76,7 @@
                     <div class="grid grid-cols-2 gap-8 mb-8">
                         <div class="text-center">
                             <div class="text-3xl font-bold text-white">{{ $products->count() }}</div>
-                            <div class="text-blue-100">{{ __('Products Available') }}</div>
+                            <div class="text-blue-100">{{ __('ui.products_available') }}</div>
                         </div>
                         <div class="text-center">
                             <div class="text-3xl font-bold text-white">{{ __('Premium') }}</div>
@@ -94,7 +94,7 @@
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                                 </svg>
-                                {{ __('Visit Website') }}
+                                {{ __('ui.visit_website') }}
                             </a>
                         @endif
                         
@@ -102,7 +102,7 @@
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
-                            {{ __('View Products') }}
+                            {{ __('ui.view_products') }}
                         </a>
                     </div>
                 </div>
@@ -137,10 +137,10 @@
     <div id="products" class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div class="text-center mb-12">
             <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-                {{ __('Products by :brand', ['brand' => $brand->getTranslatedName()]) }}
+                {{ __('ui.products_by_brand', ['brand' => $brand->getTranslatedName()]) }}
             </h2>
             <p class="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-                {{ __('Discover our complete collection of :brand products, carefully curated for quality and performance.', ['brand' => $brand->getTranslatedName()]) }}
+                {{ __('ui.discover_our_complete_collection_of_brand_products_carefully_curated_for_quality_and_performance', ['brand' => $brand->getTranslatedName()]) }}
             </p>
         </div>
 
@@ -153,22 +153,22 @@
             >
                 <x-slot name="sidebar">
                     <x-shared.filter-sidebar
-                        title="{{ __('Explore :brand highlights', ['brand' => $brand->getTranslatedName()]) }}"
-                        description="{{ __('Switch between curated views to explore the assortment faster.') }}"
+                        title="{{ __('ui.explore_brand_highlights', ['brand' => $brand->getTranslatedName()]) }}"
+                        description="{{ __('ui.switch_between_curated_views_to_explore_the_assortment_faster') }}"
                     >
                         <div class="space-y-3">
                             <button type="button" class="flex w-full items-center justify-between rounded-xl border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-medium text-blue-700 transition hover:bg-blue-100">
-                                <span>{{ __('All Products') }}</span>
+                                <span>{{ __('ui.all_products') }}</span>
                                 <span class="rounded-full bg-white/70 px-2 py-0.5 text-xs font-semibold text-blue-600">{{ $products->count() }}</span>
                             </button>
                             <button type="button" class="flex w-full items-center justify-between rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-600 transition hover:border-blue-200 hover:text-blue-600 dark:bg-gray-800 dark:text-gray-200">
-                                <span>{{ __('New Arrivals') }}</span>
+                                <span>{{ __('ui.new_arrivals') }}</span>
                                 <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                                 </svg>
                             </button>
                             <button type="button" class="flex w-full items-center justify-between rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-600 transition hover:border-blue-200 hover:text-blue-600 dark:bg-gray-800 dark:text-gray-200">
-                                <span>{{ __('Best Sellers') }}</span>
+                                <span>{{ __('ui.best_sellers') }}</span>
                                 <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                 </svg>
@@ -199,7 +199,7 @@
                                 </svg>
                                 {{ $products->count() }} {{ trans_choice('products', $products->count()) }}
                             </span>
-                            <span>{{ __('Updated weekly with fresh arrivals and promotions.') }}</span>
+                            <span>{{ __('ui.updated_weekly_with_fresh_arrivals_and_promotions') }}</span>
                         </div>
                     </div>
 
@@ -213,7 +213,7 @@
         @else
             <x-shared.empty-state
                 title="{{ __('messages.no_products_found') }}"
-                description="{{ __('No products are available for this brand yet.') }}"
+                description="{{ __('ui.no_products_are_available_for_this_brand_yet') }}"
                 icon="heroicon-o-cube"
             />
         @endif
@@ -227,7 +227,7 @@
                     {{-- Brand Story --}}
                     @if($brand->getTranslatedDescription())
                         <div>
-                            <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">{{ __('About :brand', ['brand' => $brand->getTranslatedName()]) }}</h3>
+                            <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">{{ __('ui.about_brand', ['brand' => $brand->getTranslatedName()]) }}</h3>
                             <div class="prose max-w-none text-gray-600 dark:text-gray-300">
                                 {!! nl2br(e($brand->getTranslatedDescription())) !!}
                             </div>
@@ -236,13 +236,13 @@
                     
                     {{-- Brand Details --}}
                     <div>
-                        <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">{{ __('Brand Information') }}</h3>
+                        <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">{{ __('ui.brand_information') }}</h3>
                         <div class="space-y-4">
                             <div class="flex items-center">
                                 <svg class="w-5 h-5 text-blue-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
                                 </svg>
-                                <span class="text-gray-600 dark:text-gray-300">{{ __('Brand Name:') }}</span>
+                                <span class="text-gray-600 dark:text-gray-300">{{ __('ui.brand_name') }}</span>
                                 <span class="ml-2 font-medium text-gray-900 dark:text-white">{{ $brand->getTranslatedName() }}</span>
                             </div>
                             
@@ -251,7 +251,7 @@
                                     <svg class="w-5 h-5 text-blue-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9" />
                                     </svg>
-                                    <span class="text-gray-600 dark:text-gray-300">{{ __('Website:') }}</span>
+                                    <span class="text-gray-600 dark:text-gray-300">{{ __('ui.website') }}</span>
                                     <a href="{{ $brand->website }}" target="_blank" rel="noopener noreferrer" class="ml-2 font-medium text-blue-600 hover:text-blue-800 transition-colors">
                                         {{ $brand->website }}
                                     </a>
@@ -262,7 +262,7 @@
                                 <svg class="w-5 h-5 text-blue-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
-                                <span class="text-gray-600 dark:text-gray-300">{{ __('Products Available:') }}</span>
+                                <span class="text-gray-600 dark:text-gray-300">{{ __('ui.products_available_2') }}</span>
                                 <span class="ml-2 font-medium text-gray-900 dark:text-white">{{ $products->count() }}</span>
                             </div>
                             
@@ -270,7 +270,7 @@
                                 <svg class="w-5 h-5 text-blue-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                 </svg>
-                                <span class="text-gray-600 dark:text-gray-300">{{ __('Quality:') }}</span>
+                                <span class="text-gray-600 dark:text-gray-300">{{ __('ui.quality') }}</span>
                                 <span class="ml-2 font-medium text-gray-900 dark:text-white">{{ __('Premium') }}</span>
                             </div>
                         </div>
@@ -296,8 +296,8 @@
         <div class="bg-gray-50 dark:bg-gray-900">
             <div class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
                 <div class="text-center mb-12">
-                    <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">{{ __('Other Brands') }}</h2>
-                    <p class="text-lg text-gray-600 dark:text-gray-300">{{ __('Discover more trusted brand partners') }}</p>
+                    <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">{{ __('ui.other_brands') }}</h2>
+                    <p class="text-lg text-gray-600 dark:text-gray-300">{{ __('ui.discover_more_trusted_brand_partners') }}</p>
                 </div>
                 
                 <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
