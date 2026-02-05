@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\Filament\Resources\BrandResourceBulkSelectionTest" file="tests\Feature\Filament\Resources\BrandResourceBulkSelectionTest.php" tests="1" assertions="0" errors="1" failures="0" skipped="0" time="30.764530">
+    <testcase name="it allows bulk deleting brands from the list table" file="tests\Feature\Filament\Resources\BrandResourceBulkSelectionTest.php::it allows bulk deleting brands from the list table" class="Tests\Feature\Filament\Resources\BrandResourceBulkSelectionTest" classname="Tests.Feature.Filament.Resources.BrandResourceBulkSelectionTest" assertions="0" time="30.764530">
+      <error type="Livewire\Exceptions\PublicPropertyNotFoundException">it allows bulk deleting brands from the list tableLivewire\Exceptions\PublicPropertyNotFoundException: Unable to set component data. Public property [$selectedTableRecords] not found on component: [components.navigation-menu]&#13;
+at vendor\livewire\livewire\src\Mechanisms\HandleComponents\HandleComponents.php:336
+at vendor\livewire\livewire\src\Mechanisms\HandleComponents\HandleComponents.php:318
+at vendor\livewire\livewire\src\Mechanisms\HandleComponents\HandleComponents.php:98
+at vendor\livewire\livewire\src\LivewireManager.php:102
+at vendor\livewire\livewire\src\Mechanisms\HandleRequests\HandleRequests.php:124
+at vendor\laravel\framework\src\Illuminate\Routing\ControllerDispatcher.php:46
+at vendor\laravel\framework\src\Illuminate\Routing\Route.php:265
+at vendor\laravel\framework\src\Illuminate\Routing\Route.php:211
+at vendor\laravel\framework\src\Illuminate\Routing\Router.php:822
+at vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php:180
+at vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php:137
+at vendor\laravel\framework\src\Illuminate\Routing\Router.php:821
+at vendor\laravel\framework\src\Illuminate\Routing\Router.php:800
+at vendor\laravel\framework\src\Illuminate\Routing\Router.php:764
+at vendor\laravel\framework\src\Illuminate\Routing\Router.php:753
+at vendor\laravel\framework\src\Illuminate\Foundation\Http\Kernel.php:200
+at vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php:180
+at vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php:137
+at vendor\laravel\framework\src\Illuminate\Foundation\Http\Kernel.php:175
+at vendor\laravel\framework\src\Illuminate\Foundation\Http\Kernel.php:144
+at vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\MakesHttpRequests.php:607
+at vendor\livewire\livewire\src\Features\SupportTesting\SubsequentRender.php:36
+at vendor\livewire\livewire\src\Features\SupportTesting\RequestBroker.php:30
+at vendor\livewire\livewire\src\Features\SupportTesting\SubsequentRender.php:35
+at vendor\livewire\livewire\src\Features\SupportTesting\Render.php:24
+at vendor\livewire\livewire\src\Features\SupportTesting\SubsequentRender.php:34
+at vendor\livewire\livewire\src\Features\SupportTesting\SubsequentRender.php:16
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:252
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:191
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:170
+at vendor\filament\tables\src\Testing\TestsBulkActions.php:24
+at vendor\laravel\framework\src\Illuminate\Macroable\Traits\Macroable.php:126
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:398
+at vendor\filament\tables\src\Testing\TestsBulkActions.php:77
+at vendor\laravel\framework\src\Illuminate\Macroable\Traits\Macroable.php:126
+at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:398
+at tests\Feature\Filament\Resources\BrandResourceBulkSelectionTest.php:28</error>
+    </testcase>
+  </testsuite>
+</testsuites>

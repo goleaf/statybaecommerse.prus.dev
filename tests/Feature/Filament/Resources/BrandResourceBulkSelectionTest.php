@@ -6,8 +6,7 @@ use App\Filament\Resources\BrandResource\Pages\ListBrands;
 use App\Models\Brand;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-
-use function Pest\Livewire\livewire;
+use Livewire\Livewire;
 
 uses(RefreshDatabase::class);
 
@@ -25,7 +24,7 @@ beforeEach(function (): void {
 it('allows bulk deleting brands from the list table', function (): void {
     $brands = Brand::factory()->count(2)->create();
 
-    livewire(ListBrands::class)
+    Livewire::test(ListBrands::class)
         ->callTableBulkAction('delete', $brands)
         ->assertHasNoTableBulkActionErrors();
 

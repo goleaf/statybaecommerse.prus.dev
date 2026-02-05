@@ -8,6 +8,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
@@ -34,8 +35,14 @@ class ProductsRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(static fn ($query) => $query->with(['primaryImage']))
             ->recordTitleAttribute('name')
             ->columns([
+                ImageColumn::make('primaryImage.path')
+                    ->label(__('messages.image'))
+                    ->disk('public')
+                    ->defaultImageUrl(product_placeholder_url('thumb'))
+                    ->circular(),
                 TextColumn::make('name'),
                 TextColumn::make('price')
                     ->money('EUR'),

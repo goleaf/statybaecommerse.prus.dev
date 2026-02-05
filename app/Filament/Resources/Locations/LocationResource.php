@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\Locations;
 
 use App\Filament\Resources\Locations\Pages\CreateLocation;
@@ -10,10 +12,11 @@ use App\Filament\Resources\Locations\Schemas\LocationForm;
 use App\Filament\Resources\Locations\Schemas\LocationInfolist;
 use App\Filament\Resources\Locations\Tables\LocationsTable;
 use App\Models\Location;
+use App\Models\Scopes\ActiveScope;
+use App\Models\Scopes\EnabledScope;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -22,9 +25,24 @@ class LocationResource extends Resource
 {
     protected static ?string $model = Location::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-map-pin';
 
     protected static ?string $recordTitleAttribute = 'name';
+
+    public static function getNavigationLabel(): string
+    {
+        return __('admin.locations.navigation_label');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('admin.locations.plural_model_label');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('admin.locations.model_label');
+    }
 
     public static function form(Schema $schema): Schema
     {
@@ -41,6 +59,15 @@ class LocationResource extends Resource
         return LocationsTable::configure($table);
     }
 
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                ActiveScope::class,
+                EnabledScope::class,
+            ]);
+    }
+
     public static function getRelations(): array
     {
         return [
@@ -51,10 +78,10 @@ class LocationResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListLocations::route('/'),
+            'index'  => ListLocations::route('/'),
             'create' => CreateLocation::route('/create'),
-            'view' => ViewLocation::route('/{record}'),
-            'edit' => EditLocation::route('/{record}/edit'),
+            'view'   => ViewLocation::route('/{record}'),
+            'edit'   => EditLocation::route('/{record}/edit'),
         ];
     }
 
