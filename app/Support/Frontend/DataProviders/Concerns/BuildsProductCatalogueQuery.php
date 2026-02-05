@@ -16,7 +16,6 @@ trait BuildsProductCatalogueQuery
     private function baseProductQuery(): Builder
     {
         return Product::query()
-            ->where('is_visible', true)
             ->whereIn('status', ['published', 'active'])
             ->whereNotNull('published_at')
             ->where('published_at', '<=', now())
@@ -43,14 +42,12 @@ trait BuildsProductCatalogueQuery
         $filter = (string) ($filters['filter'] ?? '');
         if ($filter === 'featured') {
             $query->where('is_featured', true);
-        } elseif ($filter === 'sale') {
-            $query->whereNotNull('sale_price')->whereColumn('sale_price', '<', 'price');
         }
 
         $sort = (string) ($filters['sort'] ?? 'latest');
         match ($sort) {
-            'price_asc'  => $query->orderByRaw('COALESCE(NULLIF(sale_price, 0), price) asc'),
-            'price_desc' => $query->orderByRaw('COALESCE(NULLIF(sale_price, 0), price) desc'),
+            'price_asc'  => $query->orderBy('price'),
+            'price_desc' => $query->orderByDesc('price'),
             'name'       => $query->orderBy('name'),
             default      => $query->orderByDesc('published_at')->orderBy('name'),
         };

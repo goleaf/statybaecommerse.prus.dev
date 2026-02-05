@@ -60,7 +60,7 @@ final class SecureQueryBuilder
     {
         $direction = strtolower($direction) === 'desc' ? 'desc' : 'asc';
 
-        return $query->orderByRaw("COALESCE(NULLIF(sale_price, 0), price) {$direction}");
+        return $query->orderBy('price', $direction);
     }
 
     /**

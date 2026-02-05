@@ -13,6 +13,7 @@ use Filament\Tables\Actions\CreateAction;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
@@ -35,8 +36,7 @@ class VariantsRelationManager extends RelationManager
             ->schema([
                 TextInput::make('sku')
                     ->label(__('messages.sku'))
-                    ->required()
-                    ->maxLength(255),
+                    ->required(),
                 TextInput::make('name')
                     ->label(__('messages.name'))
                     ->maxLength(255),
@@ -58,7 +58,7 @@ class VariantsRelationManager extends RelationManager
     {
         return $table
             ->columns([
-                \Filament\Tables\Columns\ImageColumn::make('media')
+                SpatieMediaLibraryImageColumn::make('media')
                     ->label(__('messages.image'))
                     ->collection('images')
                     ->limit(1)

@@ -76,9 +76,9 @@ final class OrderController extends Controller
         $this->authorize('create', Order::class);
         $user = Auth::user();
 
-        $products = Product::with('variants')->where('is_visible', true)->get()->skipWhile(function (Product $product) {
+        $products = Product::query()->with('variants')->published()->get()->skipWhile(function (Product $product) {
             // Skip products that are not properly configured for order creation
-            return empty($product->name) || ! $product->is_visible || $product->price <= 0 || empty($product->slug) || $product->stock_quantity <= 0;
+            return empty($product->name) || $product->price <= 0 || empty($product->slug) || $product->stock_quantity <= 0;
         });
 
         return view('orders.create', compact('products'));
@@ -153,7 +153,7 @@ final class OrderController extends Controller
         if (! $order->relationLoaded('items.product') || ! $order->relationLoaded('items.productVariant')) {
             $order->load(['items.product', 'items.productVariant']);
         }
-        $products = Product::with('variants')->where('is_visible', true)->get();
+        $products = Product::query()->with('variants')->published()->get();
 
         return view('orders.edit', compact('order', 'products'));
     }

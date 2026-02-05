@@ -7,9 +7,15 @@ namespace App\Filament\Imports;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
+use Filament\Actions\Imports\Exceptions\RowImportFailedException;
 use Filament\Actions\Imports\ImportColumn;
 use Filament\Actions\Imports\Models\Import;
+use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Get;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Support\HtmlString;
 use Illuminate\Support\Number;
 use Illuminate\Support\Str;
 
@@ -17,12 +23,84 @@ class ProductImporter extends BaseImporter
 {
     protected static ?string $model = Product::class;
 
+    private const SYNC_KEY_FIELDS = [
+        'sku' => 'SKU',
+        'barcode' => 'Barcode',
+        'slug' => 'Slug',
+        'name' => 'Name',
+    ];
+
+    /**
+     * @return array<int, mixed>
+     */
+    public static function getOptionsFormComponents(): array
+    {
+        return [
+            Placeholder::make('sync_keys_available')
+                ->label(__('admin.import_sync_keys_available'))
+                ->content(function (Get $get): HtmlString {
+                    $columnMap = $get('columnMap');
+                    $columnMap = is_array($columnMap) ? $columnMap : [];
+                    $lines = [];
+
+                    foreach (self::SYNC_KEY_FIELDS as $field => $label) {
+                        $mapped = $columnMap[$field] ?? null;
+
+                        if ($field === 'slug' && blank($mapped) && filled($columnMap['name'] ?? null)) {
+                            $mapped = __('admin.import_sync_key_slug_derived', [
+                                'column' => $columnMap['name'],
+                            ]);
+                        }
+
+                        $lines[] = sprintf(
+                            '<div class="text-xs text-gray-600 dark:text-gray-300"><strong>%s</strong>: %s</div>',
+                            e($label),
+                            $mapped !== null && $mapped !== ''
+                                ? e((string) $mapped)
+                                : e(__('admin.import_sync_key_unmapped'))
+                        );
+                    }
+
+                    return new HtmlString('<div class="space-y-1">' . implode('', $lines) . '</div>');
+                })
+                ->visible(fn (Get $get): bool => (bool) $get('should_sync')),
+
+            Repeater::make('sync_keys')
+                ->label(__('admin.import_sync_keys'))
+                ->helperText(__('admin.import_sync_keys_description'))
+                ->schema([
+                    Select::make('field')
+                        ->label(__('admin.import_sync_key_field'))
+                        ->options(self::syncKeyFieldOptions())
+                        ->required()
+                        ->searchable(),
+                ])
+                ->default([['field' => 'sku']])
+                ->addActionLabel(__('admin.import_sync_key_add'))
+                ->reorderable(true)
+                ->columns(1)
+                ->visible(fn (Get $get): bool => (bool) $get('should_sync')),
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private static function syncKeyFieldOptions(): array
+    {
+        return self::SYNC_KEY_FIELDS;
+    }
+
     protected function beforeValidate(): void
     {
         $name = $this->data['name'] ?? null;
 
         if (($this->data['slug'] ?? null) === null && is_string($name) && $name !== '') {
             $this->data['slug'] = Str::slug($name);
+        }
+
+        if ($this->shouldSync() && ($this->record?->exists)) {
+            $this->fillMissingSyncValues();
         }
 
         parent::beforeValidate();
@@ -53,7 +131,6 @@ class ProductImporter extends BaseImporter
     {
         $defaults = [
             'is_enabled'   => true,
-            'is_visible'   => true,
             'status'       => 'published',
             'published_at' => now(),
         ];
@@ -69,6 +146,27 @@ class ProductImporter extends BaseImporter
         }
     }
 
+    private function fillMissingSyncValues(): void
+    {
+        if (! $this->record) {
+            return;
+        }
+
+        foreach (['name', 'sku'] as $field) {
+            if (
+                ! array_key_exists($field, $this->data)
+                || $this->data[$field] === null
+                || $this->data[$field] === ''
+            ) {
+                $value = $this->record->getAttribute($field);
+
+                if ($value !== null && $value !== '') {
+                    $this->data[$field] = $value;
+                }
+            }
+        }
+    }
+
     public static function getColumns(): array
     {
         return [
@@ -79,12 +177,9 @@ class ProductImporter extends BaseImporter
             ImportColumn::make('short_description'),
             ImportColumn::make('sku')
                 ->label('SKU')
-                ->rules(['nullable', 'string']),
-            ImportColumn::make('summary'),
+                ->requiredMapping()
+                ->rules(['required']),
             ImportColumn::make('price')
-                ->numeric()
-                ->rules(['nullable', 'numeric']),
-            ImportColumn::make('sale_price')
                 ->numeric()
                 ->rules(['nullable', 'numeric']),
             ImportColumn::make('cost_price')
@@ -114,10 +209,6 @@ class ProductImporter extends BaseImporter
             ImportColumn::make('height')
                 ->numeric()
                 ->rules(['nullable', 'numeric']),
-            ImportColumn::make('is_visible')
-                ->boolean()
-                ->ignoreBlankState()
-                ->rules(['nullable', 'boolean']),
             ImportColumn::make('is_enabled')
                 ->boolean()
                 ->ignoreBlankState()
@@ -139,19 +230,12 @@ class ProductImporter extends BaseImporter
                 ->relationship(resolveUsing: static function (array $state): EloquentCollection {
                     return static::resolveCategoriesFromState($state);
                 })
-                ->multiple(',')
+                ->multiple(';')
                 ->ignoreBlankState(),
-            ImportColumn::make('type')
-                ->ignoreBlankState()
-                ->rules(['nullable', 'in:simple,variable']),
             ImportColumn::make('is_requestable')
                 ->boolean()
                 ->ignoreBlankState()
                 ->rules(['nullable', 'boolean']),
-            ImportColumn::make('requests_count')
-                ->numeric()
-                ->ignoreBlankState()
-                ->rules(['nullable', 'integer']),
             ImportColumn::make('minimum_quantity')
                 ->numeric()
                 ->ignoreBlankState()
@@ -170,47 +254,17 @@ class ProductImporter extends BaseImporter
                 ->ignoreBlankState()
                 ->rules(['nullable', 'boolean']),
 
-            ImportColumn::make('video_url'),
-            ImportColumn::make('view_count')
-                ->numeric()
-                ->ignoreBlankState()
-                ->rules(['nullable', 'integer']),
-            ImportColumn::make('last_viewed_at')
-                ->rules(['nullable', 'date']),
-            ImportColumn::make('track_stock')
-                ->boolean()
-                ->ignoreBlankState()
-                ->rules(['nullable', 'boolean']),
             ImportColumn::make('allow_backorder')
                 ->boolean()
                 ->ignoreBlankState()
                 ->rules(['nullable', 'boolean']),
-            ImportColumn::make('sort_order')
-                ->numeric()
-                ->ignoreBlankState()
-                ->rules(['nullable', 'integer']),
-            ImportColumn::make('tax_class'),
             ImportColumn::make('shipping_class'),
-            ImportColumn::make('download_limit')
-                ->numeric()
-                ->ignoreBlankState()
-                ->rules(['nullable', 'integer']),
-            ImportColumn::make('download_expiry')
-                ->numeric()
-                ->ignoreBlankState()
-                ->rules(['nullable', 'integer']),
             ImportColumn::make('external_url'),
-            ImportColumn::make('button_text'),
-            ImportColumn::make('gallery'),
             ImportColumn::make('available_from')
                 ->rules(['nullable', 'date']),
             ImportColumn::make('available_until')
                 ->rules(['nullable', 'date']),
             ImportColumn::make('warehouse_quantity')
-                ->numeric()
-                ->ignoreBlankState()
-                ->rules(['nullable', 'integer']),
-            ImportColumn::make('views_count')
                 ->numeric()
                 ->ignoreBlankState()
                 ->rules(['nullable', 'integer']),
@@ -222,22 +276,11 @@ class ProductImporter extends BaseImporter
 
     public function resolveRecord(): Product
     {
-        $sku = $this->data['sku'] ?? null;
-        $slug = $this->data['slug'] ?? null;
-
-        if (filled($slug)) {
-            return Product::firstOrNew([
-                'slug' => $slug,
-            ]);
+        if ($this->shouldSync() && ($syncRecord = $this->resolveRecordFromSyncKeys())) {
+            return $syncRecord;
         }
 
-        if (blank($sku)) {
-            return new Product;
-        }
-
-        return Product::firstOrNew([
-            'sku' => $sku,
-        ]);
+        return new Product;
     }
 
     public static function getCompletedNotificationBody(Import $import): string
@@ -259,17 +302,14 @@ class ProductImporter extends BaseImporter
                 'sku',
                 'barcode',
                 'status',
-                'type',
             ],
             'Descriptions' => [
                 'description',
                 'short_description',
-                'summary',
                 'detailed_description',
             ],
             'Pricing' => [
                 'price',
-                'sale_price',
                 'cost_price',
                 'compare_price',
             ],
@@ -278,7 +318,6 @@ class ProductImporter extends BaseImporter
                 'stock_quantity',
                 'low_stock_threshold',
                 'track_inventory',
-                'track_stock',
                 'allow_backorder',
                 'warehouse_quantity',
                 'minimum_quantity',
@@ -303,18 +342,128 @@ class ProductImporter extends BaseImporter
                 'collection',
             ],
             'Other' => [
-                'is_visible',
                 'is_enabled',
                 'is_featured',
                 'published_at',
-                'video_url',
                 'external_url',
-                'button_text',
-                'gallery',
                 'available_from',
                 'available_until',
             ],
         ];
+    }
+
+    private function shouldSync(): bool
+    {
+        return (bool) ($this->options['should_sync'] ?? false);
+    }
+
+    private function resolveRecordFromSyncKeys(): ?Product
+    {
+        $keys = $this->getSyncKeys();
+
+        if ($keys === []) {
+            return null;
+        }
+
+        foreach ($keys as $key) {
+            $value = $this->getSyncKeyValue($key);
+
+            if ($value === null || $value === '') {
+                continue;
+            }
+
+            $matches = Product::query()
+                ->withoutGlobalScopes()
+                ->where($key, $value)
+                ->limit(2)
+                ->get();
+
+            if ($matches->count() > 1) {
+                throw new RowImportFailedException(__('admin.import_sync_key_ambiguous', [
+                    'field' => $this->getSyncKeyLabel($key),
+                    'value' => is_scalar($value) ? (string) $value : '',
+                ]));
+            }
+
+            if ($matches->count() === 1) {
+                return $matches->first();
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function getSyncKeys(): array
+    {
+        $raw = $this->options['sync_keys'] ?? [];
+
+        if (! is_array($raw)) {
+            return [];
+        }
+
+        $keys = [];
+
+        foreach ($raw as $item) {
+            if (is_string($item)) {
+                $field = $item;
+            } elseif (is_array($item)) {
+                $field = $item['field'] ?? null;
+            } else {
+                $field = null;
+            }
+
+            if (! is_string($field)) {
+                continue;
+            }
+
+            $field = trim($field);
+
+            if ($field === '') {
+                continue;
+            }
+
+            if (! array_key_exists($field, self::SYNC_KEY_FIELDS)) {
+                continue;
+            }
+
+            $keys[] = $field;
+        }
+
+        return array_values(array_unique($keys));
+    }
+
+    private function getSyncKeyValue(string $key): mixed
+    {
+        $value = $this->data[$key] ?? null;
+
+        if (($value === null || $value === '') && $key === 'slug') {
+            $name = $this->data['name'] ?? null;
+            if (is_string($name) && $name !== '') {
+                $value = Str::slug($name);
+            }
+        }
+
+        if (is_string($value)) {
+            $value = trim($value);
+        }
+
+        if ($value === '' || $value === null) {
+            return null;
+        }
+
+        if ($key === 'slug' && is_string($value)) {
+            return Str::slug($value);
+        }
+
+        return $value;
+    }
+
+    private function getSyncKeyLabel(string $key): string
+    {
+        return self::SYNC_KEY_FIELDS[$key] ?? Str::headline($key);
     }
 
     private static function resolveBrandFromState(mixed $state): ?Brand

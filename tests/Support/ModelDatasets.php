@@ -33,7 +33,6 @@ use App\Models\SystemSettingCategoryTranslation;
 use App\Models\SystemSettingDependency;
 use App\Models\SystemSettingHistory;
 use App\Models\SystemSettingTranslation;
-use App\Models\UiTranslation;
 use App\Models\User;
 use App\Models\UserBehavior;
 use App\Models\UserPreference;
@@ -74,7 +73,6 @@ dataset('ordered_by_name_models', function (): array {
         [SystemSettingCategoryTranslation::class, ['name', 'title']],
         [SystemSettingDependency::class, ['condition', 'key', 'name']],
         [SystemSettingTranslation::class, ['name', 'key', 'title']],
-        [UiTranslation::class, ['key']],
         // UserBehavior orders by behaviour_type instead of the legacy event/name pairing.
         [UserBehavior::class, ['behavior_type']],
         [UserPreference::class, ['key', 'name', 'preference_key', 'preference_type']],

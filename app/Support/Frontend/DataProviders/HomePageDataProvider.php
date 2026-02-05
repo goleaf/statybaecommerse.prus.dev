@@ -17,6 +17,7 @@ final class HomePageDataProvider
     public function get(): array
     {
         $locale = app()->getLocale();
+        $saleProducts = collect();
 
         $stats = Cache::remember("frontend:home:stats:{$locale}", now()->addMinutes(1), function (): array {
             return [
@@ -33,7 +34,7 @@ final class HomePageDataProvider
             'featuredProducts'  => $this->products->featured(),
             'latestProducts'    => $this->products->latest(),
             'trendingProducts'  => $this->products->trending(),
-            'saleProducts'      => $this->products->onSale(),
+            'saleProducts'      => $saleProducts,
             'topCategories'     => $this->collectTopCategories(),
             'highlightedBrands' => $this->collectHighlightedBrands(),
         ];

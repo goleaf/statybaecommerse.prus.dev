@@ -77,7 +77,7 @@ final class DataImportExport extends Page implements HasForms
     public function getCsvImportPages(): array
     {
         return [
-            ['label' => __('admin.products_import'), 'url' => ImportProducts::getUrl()],
+            ['label' => __('translations.import') . ' ' . __('translations.products'), 'url' => ImportProducts::getUrl()],
             ['label' => __('admin.categories_import'), 'url' => ImportCategories::getUrl()],
             ['label' => __('admin.brands_import'), 'url' => ImportBrands::getUrl()],
             ['label' => __('admin.customers_import'), 'url' => ImportCustomers::getUrl()],

@@ -88,7 +88,7 @@ final class ShoppingCartWidget extends Component
             }
             $cartItem->update(['quantity' => $newQuantity, 'options' => array_merge($cartItem->options ?? [], $options)]);
         } else {
-            CartItem::create(['session_id' => $sessionId, 'user_id' => auth()->id(), 'product_id' => $productId, 'quantity' => $quantity, 'price' => $product->sale_price ?? $product->price, 'options' => $options]);
+            CartItem::create(['session_id' => $sessionId, 'user_id' => auth()->id(), 'product_id' => $productId, 'quantity' => $quantity, 'price' => $product->price ?? 0, 'options' => $options]);
         }
         $this->calculateCartSummary();
         $this->dispatch('add-to-cart', productId: (int) $productId, quantity: $quantity);

@@ -39,7 +39,7 @@ final class LowStockAlertsWidget extends BaseWidget
         return $table
             ->query(
                 Product::query()
-                    ->where('is_visible', true)
+                    ->published()
                     ->where('manage_stock', true)
                     ->whereColumn('stock_quantity', '<=', 'low_stock_threshold')
                     ->orderBy('stock_quantity', 'asc')

@@ -1,8 +1,10 @@
 <?php
 
-namespace App\Filament\Resources\Locations\Pages;
+declare(strict_types=1);
 
-use App\Filament\Resources\Locations\LocationResource;
+namespace App\Filament\Resources\LocationResource\Pages;
+
+use App\Filament\Resources\LocationResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 

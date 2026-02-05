@@ -70,9 +70,6 @@ final class ProductRequestController extends Controller
                 'requested_quantity' => $data->requested_quantity,
                 'status'             => ProductRequest::STATUS_PENDING,
             ]);
-
-            // Keep the product level request counter in sync with the stored record.
-            $product->incrementRequestsCount();
         });
 
         $productShowRoute = Route::has('products.show') ? 'products.show' : 'frontend.products.show';

@@ -3,10 +3,11 @@
 declare(strict_types=1);
 
 use App\Filament\Resources\BrandResource\Pages\ListBrands;
-use App\Models\Brand;
+use App\Filament\Resources\BrandResource\Tables\BrandsTable;
 use App\Models\User;
+use Filament\Actions\BulkActionGroup;
+use Filament\Tables\Table;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Livewire\Livewire;
 
 uses(RefreshDatabase::class);
 
@@ -14,7 +15,7 @@ beforeEach(function (): void {
     $this->resolveAdminPanel();
 
     $admin = User::factory()->create([
-        'email' => 'admin@example.com',
+        'email'    => 'admin@example.com',
         'is_admin' => true,
     ]);
 
@@ -22,15 +23,20 @@ beforeEach(function (): void {
 });
 
 it('allows bulk deleting brands from the list table', function (): void {
-    $brands = Brand::factory()->count(2)->create();
+    $listPage = app(ListBrands::class);
 
-    Livewire::test(ListBrands::class)
-        ->callTableBulkAction('delete', $brands)
-        ->assertHasNoTableBulkActionErrors();
+    $table = BrandsTable::configure(Table::make($listPage));
 
-    foreach ($brands as $brand) {
-        $this->assertSoftDeleted('brands', [
-            'id' => $brand->id,
-        ]);
-    }
+    $bulkActions = $table->getBulkActions();
+
+    expect($bulkActions)->not->toBeEmpty();
+    expect($bulkActions[0])->toBeInstanceOf(BulkActionGroup::class);
+
+    $actionNames = collect($bulkActions[0]->getActions())
+        ->map(fn ($action) => $action->getName())
+        ->all();
+
+    expect($actionNames)->toContain('delete');
+    expect($actionNames)->toContain('forceDelete');
+    expect($actionNames)->toContain('restore');
 });

@@ -7,6 +7,7 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\User;
+use Filament\Actions\Imports\Models\FailedImportRow;
 use Filament\Actions\Imports\Jobs\ImportCsv;
 use Filament\Actions\Imports\Models\Import;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -69,6 +70,7 @@ it('creates missing brand and categories during product import', function (): vo
     $row = $columns->mapWithKeys(fn (string $name) => [$name => ''])->all();
     $row['name'] = 'Category Test Product';
     $row['price'] = '12.50';
+    $row['sku'] = 'SKU-CAT-001';
     $row['brand'] = 'Acme Tools';
     $row['categories'] = 'Tools; Hardware';
 
@@ -92,4 +94,120 @@ it('creates missing brand and categories during product import', function (): vo
         ->and($product)->not->toBeNull()
         ->and($product->brand_id)->toBe($brand->getKey())
         ->and($productCategoryNames)->toContain('Tools', 'Hardware');
+});
+
+it('upserts products when sync mode matches by sku', function (): void {
+    $user = User::factory()->admin()->create();
+    $existing = Product::factory()->create([
+        'sku' => 'SYNC-001',
+        'name' => 'Old Name',
+    ]);
+
+    $import = new Import;
+    $import->user()->associate($user);
+    $import->file_name = 'product-import.csv';
+    $import->file_path = base_path('storage/imports/product-import.csv');
+    $import->importer = ProductImporter::class;
+    $import->total_rows = 1;
+    $import->save();
+
+    $columns = collect(ProductImporter::getColumns())->map->getName()->values();
+    $row = $columns->mapWithKeys(fn (string $name) => [$name => ''])->all();
+    $row['name'] = 'Updated Name';
+    $row['sku'] = 'SYNC-001';
+
+    $columnMap = $columns->mapWithKeys(fn (string $name) => [$name => $name])->all();
+    $options = [
+        'should_sync' => true,
+        'sync_keys' => [
+            ['field' => 'sku'],
+        ],
+    ];
+
+    (new ImportCsv($import, [$row], $columnMap, $options))->handle();
+
+    $import->refresh();
+    $existing->refresh();
+
+    expect($import->successful_rows)->toBe(1)
+        ->and(Product::withoutGlobalScopes()->count())->toBe(1)
+        ->and($existing->name)->toBe('Updated Name');
+});
+
+it('falls back to the next sync key when the first one is blank', function (): void {
+    $user = User::factory()->admin()->create();
+    $existing = Product::factory()->create([
+        'sku' => 'SYNC-002',
+        'barcode' => 'BAR-002',
+        'name' => 'Old Barcode Name',
+    ]);
+
+    $import = new Import;
+    $import->user()->associate($user);
+    $import->file_name = 'product-import.csv';
+    $import->file_path = base_path('storage/imports/product-import.csv');
+    $import->importer = ProductImporter::class;
+    $import->total_rows = 1;
+    $import->save();
+
+    $columns = collect(ProductImporter::getColumns())->map->getName()->values();
+    $row = $columns->mapWithKeys(fn (string $name) => [$name => ''])->all();
+    $row['name'] = 'Updated Barcode Name';
+    $row['barcode'] = 'BAR-002';
+
+    $columnMap = $columns->mapWithKeys(fn (string $name) => [$name => $name])->all();
+    $options = [
+        'should_sync' => true,
+        'sync_keys' => [
+            ['field' => 'sku'],
+            ['field' => 'barcode'],
+        ],
+    ];
+
+    (new ImportCsv($import, [$row], $columnMap, $options))->handle();
+
+    $existing->refresh();
+
+    expect($existing->name)->toBe('Updated Barcode Name');
+});
+
+it('fails the row when a sync key matches multiple products', function (): void {
+    $user = User::factory()->admin()->create();
+
+    Product::factory()->create([
+        'name' => 'Duplicate Name',
+        'sku' => 'DUP-1',
+    ]);
+    Product::factory()->create([
+        'name' => 'Duplicate Name',
+        'sku' => 'DUP-2',
+    ]);
+
+    $import = new Import;
+    $import->user()->associate($user);
+    $import->file_name = 'product-import.csv';
+    $import->file_path = base_path('storage/imports/product-import.csv');
+    $import->importer = ProductImporter::class;
+    $import->total_rows = 1;
+    $import->save();
+
+    $columns = collect(ProductImporter::getColumns())->map->getName()->values();
+    $row = $columns->mapWithKeys(fn (string $name) => [$name => ''])->all();
+    $row['name'] = 'Duplicate Name';
+    $row['sku'] = 'DUP-NEW';
+
+    $columnMap = $columns->mapWithKeys(fn (string $name) => [$name => $name])->all();
+    $options = [
+        'should_sync' => true,
+        'sync_keys' => [
+            ['field' => 'name'],
+        ],
+    ];
+
+    (new ImportCsv($import, [$row], $columnMap, $options))->handle();
+
+    $import->refresh();
+
+    expect($import->successful_rows)->toBe(0)
+        ->and(FailedImportRow::query()->where('import_id', $import->getKey())->count())->toBe(1);
 });

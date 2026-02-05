@@ -80,9 +80,7 @@ final class ProductCard extends Component
      */
     public function getCurrentPriceProperty(): float
     {
-        $price = $this->product->sale_price ?? $this->product->price ?? 0.0;
-
-        return (float) $price;
+        return (float) ($this->product->price ?? 0.0);
     }
 
     /**
@@ -90,10 +88,6 @@ final class ProductCard extends Component
      */
     public function getOriginalPriceProperty(): ?float
     {
-        if ($this->product->sale_price) {
-            return (float) $this->product->price;
-        }
-
         return null;
     }
 
@@ -121,11 +115,6 @@ final class ProductCard extends Component
     #[Computed]
     public function discountPercentage(): ?int
     {
-        // Check for sale_price (if product is on sale)
-        if ($this->product->sale_price && $this->product->price) {
-            return (int) round(($this->product->price - $this->product->sale_price) / $this->product->price * 100);
-        }
-
         return null;
     }
 

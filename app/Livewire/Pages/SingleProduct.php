@@ -176,7 +176,7 @@ final class SingleProduct extends Component
      */
     public function mount(Product $product): void
     {
-        abort_if(! $product->is_visible, 404);
+        abort_if(! $product->isPublished(), 404);
 
         $locale = app()->getLocale();
         $productId = $product->getKey();
@@ -851,7 +851,7 @@ final class SingleProduct extends Component
      */
     public function render()
     {
-        if (! $this->product->is_visible) {
+        if (! $this->product->isPublished()) {
             abort(404);
         }
 

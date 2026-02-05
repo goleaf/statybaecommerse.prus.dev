@@ -47,9 +47,8 @@ class ProductResource extends JsonResource
             'description'       => $product->description,
             'short_description' => $product->short_description,
             'pricing'           => [
-                'amount'      => $product->price !== null ? (float) $product->price : null,
-                'sale_amount' => $product->sale_price !== null ? (float) $product->sale_price : null,
-                'currency'    => config('app.currency', 'EUR'),
+                'amount'   => $product->price !== null ? (float) $product->price : null,
+                'currency' => config('app.currency', 'EUR'),
             ],
             'brand' => $product->relationLoaded('brand') && $product->brand
                 ? [
@@ -71,7 +70,7 @@ class ProductResource extends JsonResource
                 'is_in_stock'    => $product->isInStock(),
             ],
             'status' => [
-                'is_visible'  => (bool) $product->is_visible,
+                'value'       => (string) ($product->status ?? ''),
                 'is_featured' => (bool) $product->is_featured,
             ],
             'reviews_count' => 0,

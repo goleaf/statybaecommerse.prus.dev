@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\Locations\Tables;
+declare(strict_types=1);
+
+namespace App\Filament\Resources\LocationResource\Tables;
 
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -10,8 +12,11 @@ use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Str;
 
 class LocationsTable
 {
@@ -75,6 +80,57 @@ class LocationsTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+                SelectFilter::make('type')
+                    ->label(__('messages.type'))
+                    ->options([
+                        'warehouse'    => Str::headline('warehouse'),
+                        'store'        => Str::headline('store'),
+                        'office'       => Str::headline('office'),
+                        'pickup_point' => Str::headline('pickup_point'),
+                        'other'        => Str::headline('other'),
+                    ]),
+                SelectFilter::make('has_coordinates')
+                    ->label(__('messages.coordinates'))
+                    ->options([
+                        'yes' => 'Yes',
+                        'no'  => 'No',
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        $value = $data['value'] ?? null;
+
+                        if ($value === 'yes') {
+                            return $query
+                                ->whereNotNull('latitude')
+                                ->whereNotNull('longitude');
+                        }
+
+                        if ($value === 'no') {
+                            return $query->where(static function (Builder $builder): void {
+                                $builder->whereNull('latitude')->orWhereNull('longitude');
+                            });
+                        }
+
+                        return $query;
+                    }),
+                SelectFilter::make('has_opening_hours')
+                    ->label(__('messages.Hours'))
+                    ->options([
+                        'yes' => 'Yes',
+                        'no'  => 'No',
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        $value = $data['value'] ?? null;
+
+                        if ($value === 'yes') {
+                            return $query->whereNotNull('opening_hours');
+                        }
+
+                        if ($value === 'no') {
+                            return $query->whereNull('opening_hours');
+                        }
+
+                        return $query;
+                    }),
                 TrashedFilter::make(),
             ])
             ->recordActions([

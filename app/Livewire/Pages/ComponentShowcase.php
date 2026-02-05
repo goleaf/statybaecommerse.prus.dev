@@ -82,14 +82,13 @@ final class ComponentShowcase extends Component
                 return Product::query()
                     ->forProductList()
                     ->withListRelations()
-                    ->where('is_visible', true)
+                    ->published()
                     ->where('is_featured', true)
                     ->latest('published_at')
                     ->limit(4)
                     ->get()
                     ->reject(static function (Product $product): bool {
                         return empty($product->name)
-                            || ! $product->is_visible
                             || ! $product->is_featured
                             || ($product->price ?? 0) <= 0
                             || empty($product->slug);

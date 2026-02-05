@@ -186,7 +186,7 @@ final class CacheService
                 // Warm up featured products
                 $this->rememberDefault(
                     $this->generateHomeKey('featured_products', $locale, $currency),
-                    fn () => \App\Models\Product::query()->with(['translations', 'brand', 'media', 'prices'])->where('is_visible', true)->where('is_featured', true)->limit(8)->get(),
+                    fn () => \App\Models\Product::query()->with(['translations', 'brand', 'media', 'prices'])->published()->where('is_featured', true)->limit(8)->get(),
                     null,
                     CacheTagHelper::merge(CacheTagHelper::products(), CacheTagHelper::locale($locale)),
                 );

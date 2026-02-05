@@ -56,9 +56,8 @@ final class ProductRepository
             CacheKeys::TTL_MINUTE,
             static fn (): int => Product::query()
                 ->withoutGlobalScopes()
-                ->where('is_visible', true)
-                ->whereNotNull('published_at')
-                ->where('published_at', '<=', now())
+                ->published()
+                ->enabled()
                 ->count(),
             $tags,
         );
@@ -88,10 +87,9 @@ final class ProductRepository
             static function () use ($limit): Collection {
                 return Product::query()
                     ->withoutGlobalScopes()
-                    ->where('is_visible', true)
+                    ->published()
+                    ->enabled()
                     ->where('is_featured', true)
-                    ->whereNotNull('published_at')
-                    ->where('published_at', '<=', now())
                     ->latest('published_at')
                     ->limit($limit)
                     ->get();
@@ -124,9 +122,8 @@ final class ProductRepository
             static function () use ($limit): Collection {
                 return Product::query()
                     ->withoutGlobalScopes()
-                    ->where('is_visible', true)
-                    ->whereNotNull('published_at')
-                    ->where('published_at', '<=', now())
+                    ->published()
+                    ->enabled()
                     ->latest('created_at')
                     ->limit($limit)
                     ->get();
@@ -155,9 +152,8 @@ final class ProductRepository
                 return Product::query()
                     ->withoutGlobalScopes()
                     ->whereKey($productId)
-                    ->where('is_visible', true)
-                    ->whereNotNull('published_at')
-                    ->where('published_at', '<=', now())
+                    ->published()
+                    ->enabled()
                     ->first();
             },
             $tags,

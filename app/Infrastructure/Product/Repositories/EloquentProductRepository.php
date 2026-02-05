@@ -38,7 +38,6 @@ final class EloquentProductRepository implements ProductRepositoryInterface
         $query = Product::query()
             // Allow draft fixtures during tests while downstream specs filter displayable records.
             ->withoutGlobalScopes([ActiveScope::class, PublishedScope::class, VisibleScope::class, SoftDeletingScope::class])
-            ->where('is_visible', true)
             ->where(static function ($builder) use ($criteria): void {
                 $term = $criteria->getQuery();
                 $builder->where('name', 'like', "%{$term}%")
@@ -79,7 +78,6 @@ final class EloquentProductRepository implements ProductRepositoryInterface
     {
         $builder = Product::query()
             ->withoutGlobalScopes([ActiveScope::class, PublishedScope::class, VisibleScope::class, SoftDeletingScope::class])
-            ->where('is_visible', true)
             ->with([
                 'brand'      => static fn ($relation) => $relation->withoutGlobalScopes([ActiveScope::class, EnabledScope::class]),
                 'categories' => static fn ($relation) => $relation->withoutGlobalScopes([ActiveScope::class, EnabledScope::class, VisibleScope::class]),
@@ -212,10 +210,10 @@ final class EloquentProductRepository implements ProductRepositoryInterface
             $slug,
             (string) $product->sku,
             (float) $product->price,
-            $product->sale_price !== null ? (float) $product->sale_price : null,
+            null,
             $brand,
             $category,
-            (bool) $product->is_visible,
+            $product->isPublished(),
             (bool) $product->is_featured,
             $manageStock,
             $isInStock,

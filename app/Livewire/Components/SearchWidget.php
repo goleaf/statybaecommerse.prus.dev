@@ -34,7 +34,6 @@ use Livewire\WithPagination;
  * @property string     $sortBy
  * @property string     $sortDirection
  * @property bool       $inStock
- * @property bool       $onSale
  * @property string     $viewMode
  * @property int        $perPage
  * @property mixed      $queryString
@@ -62,14 +61,12 @@ final class SearchWidget extends Component
 
     public bool $inStock = false;
 
-    public bool $onSale = false;
-
     public string $viewMode = 'grid';
 
     // grid, list
     public int $perPage = 12;
 
-    protected $queryString = ['query' => ['except' => ''], 'selectedCategories' => ['except' => []], 'selectedBrands' => ['except' => []], 'selectedAttributes' => ['except' => []], 'minPrice' => ['except' => null], 'maxPrice' => ['except' => null], 'sortBy' => ['except' => 'relevance'], 'inStock' => ['except' => false], 'onSale' => ['except' => false], 'viewMode' => ['except' => 'grid']];
+    protected $queryString = ['query' => ['except' => ''], 'selectedCategories' => ['except' => []], 'selectedBrands' => ['except' => []], 'selectedAttributes' => ['except' => []], 'minPrice' => ['except' => null], 'maxPrice' => ['except' => null], 'sortBy' => ['except' => 'relevance'], 'inStock' => ['except' => false], 'viewMode' => ['except' => 'grid']];
 
     /**
      * Initialize the Livewire component with parameters.
@@ -132,7 +129,7 @@ final class SearchWidget extends Component
      */
     public function clearFilters(): void
     {
-        $this->reset(['selectedCategories', 'selectedBrands', 'selectedAttributes', 'minPrice', 'maxPrice', 'inStock', 'onSale']);
+        $this->reset(['selectedCategories', 'selectedBrands', 'selectedAttributes', 'minPrice', 'maxPrice', 'inStock']);
         $this->resetPage();
     }
 
@@ -254,10 +251,10 @@ final class SearchWidget extends Component
     {
         return Attribute::with(['values' => function ($query) {
             $query->whereHas('productVariants.product', function ($q) {
-                $q->where('is_visible', true);
+                $q->published();
             });
         }])->whereHas('values.productVariants.product', function ($q) {
-            $q->where('is_visible', true);
+            $q->published();
         })->orderBy('name')->get();
     }
 
@@ -268,7 +265,7 @@ final class SearchWidget extends Component
     public function priceRange(): array
     {
         $prices = ProductVariant::whereHas('product', function ($q) {
-            $q->where('is_visible', true);
+            $q->published();
         })->pluck('price');
 
         return ['min' => $prices->min() ?? 0, 'max' => $prices->max() ?? 1000];
@@ -280,7 +277,7 @@ final class SearchWidget extends Component
     #[Computed]
     public function activeFiltersCount(): int
     {
-        return count($this->selectedCategories) + count($this->selectedBrands) + count($this->selectedAttributes) + ($this->minPrice ? 1 : 0) + ($this->maxPrice ? 1 : 0) + ($this->inStock ? 1 : 0) + ($this->onSale ? 1 : 0);
+        return count($this->selectedCategories) + count($this->selectedBrands) + count($this->selectedAttributes) + ($this->minPrice ? 1 : 0) + ($this->maxPrice ? 1 : 0) + ($this->inStock ? 1 : 0);
     }
 
     /**
@@ -312,10 +309,6 @@ final class SearchWidget extends Component
 
         if ($this->inStock) {
             $filters['in_stock'] = true;
-        }
-
-        if ($this->onSale) {
-            $filters['on_sale'] = true;
         }
 
         return $filters;
@@ -364,7 +357,7 @@ final class SearchWidget extends Component
                 'id'             => $item['id'],
                 'slug'           => $this->extractSlugFromUrl($item['url'] ?? ''),
                 'name'           => $item['title'] ?? '',
-                'summary'        => $item['description'] ?? '',
+                'short_description' => $item['description'] ?? '',
                 'brand_id'       => null, // Not available in search results
                 'published_at'   => now(), // Assume published since it's in results
                 'brand'          => $item['subtitle'] ? (object) ['name' => $item['subtitle']] : null,

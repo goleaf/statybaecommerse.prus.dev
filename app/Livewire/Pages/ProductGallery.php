@@ -51,7 +51,7 @@ final class ProductGallery extends Component
     #[Computed]
     public function products()
     {
-        return Product::query()->with(['media', 'brand'])->where('is_visible', true)->when($this->search, function ($query) {
+        return Product::query()->with(['media', 'brand'])->when($this->search, function ($query) {
             $query->where('name', 'like', '%' . $this->search . '%');
         })->when($this->filter === 'with_images', function ($query) {
             $query->whereHas('media', function ($q) {
@@ -76,7 +76,7 @@ final class ProductGallery extends Component
             $q->where('collection_name', 'images');
         }])->cursor()->takeUntilTimeout(now()->addSeconds(15))->collect()->skipWhile(function ($product) {
             // Skip products that are not properly configured for media counting
-            return empty($product->name) || ! $product->is_visible || $product->media_count < 0;
+            return empty($product->name) || $product->media_count < 0;
         })->sum('media_count');
     }
 

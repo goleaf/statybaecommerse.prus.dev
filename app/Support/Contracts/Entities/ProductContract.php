@@ -76,9 +76,8 @@ final class ProductContract
             'description'       => $product->description,
             'short_description' => $product->short_description,
             'pricing'           => [
-                'amount'      => (float) $product->price,
-                'sale_amount' => $product->sale_price !== null ? (float) $product->sale_price : null,
-                'currency'    => config('app.currency', 'EUR'),
+                'amount'   => (float) $product->price,
+                'currency' => config('app.currency', 'EUR'),
             ],
             'brand' => $product->brand?->exists ? [
                 'id'   => $product->brand->getKey(),
@@ -110,7 +109,7 @@ final class ProductContract
                 'is_in_stock'    => $product->isInStock(),
             ],
             'status' => [
-                'is_visible'  => (bool) $product->is_visible,
+                'value'       => (string) ($product->status ?? ''),
                 'is_featured' => (bool) $product->is_featured,
             ],
             'links' => [

@@ -4,9 +4,6 @@
             <h2 class="text-2xl font-bold tracking-tight text-gray-950 dark:text-white sm:text-3xl">
                 {{ $this->getTitle() }}
             </h2>
-            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                {{ __('admin.advanced_import_description') }}
-            </p>
         </div>
 
         <form wire:submit.prevent="import">

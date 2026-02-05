@@ -34,7 +34,6 @@ use Livewire\Component;
  * @property float|null      $priceMin
  * @property float|null      $priceMax
  * @property bool            $inStock
- * @property bool            $onSale
  * @property bool            $hasProducts
  * @property string          $sort
  * @property bool            $sidebarOpen
@@ -67,8 +66,6 @@ final class Index extends Component implements HasSchemas
     public ?float $priceMax = null;
 
     public bool $inStock = false;
-
-    public bool $onSale = false;
 
     public bool $hasProducts = false;
 
@@ -293,7 +290,6 @@ final class Index extends Component implements HasSchemas
             ->when($this->priceMin !== null, fn (Builder $q): Builder => $q->where('price', '>=', (float) $this->priceMin))
             ->when($this->priceMax !== null, fn (Builder $q): Builder => $q->where('price', '<=', (float) $this->priceMax))
             ->when($this->inStock, fn (Builder $q): Builder => $q->where('stock_quantity', '>', 0))
-            ->when($this->onSale, fn (Builder $q): Builder => $q->whereNotNull('sale_price'))
             ->when($this->search !== '', function (Builder $q): void {
                 $q->where(function (Builder $inner): void {
                     $inner
@@ -320,7 +316,7 @@ final class Index extends Component implements HasSchemas
                 $query = Category::query()
                     ->with(['media'])
                     ->withCount(['products' => function (Builder $q): void {
-                        $q->where('is_visible', true)
+                        $q->published()
                             ->when(
                                 ! empty($this->selectedBrandIds),
                                 fn (Builder $qq): Builder => $qq->whereIn('brand_id', $this->selectedBrandIds)
@@ -334,8 +330,7 @@ final class Index extends Component implements HasSchemas
                             )
                             ->when($this->priceMin !== null, fn (Builder $qq): Builder => $qq->where('price', '>=', (float) $this->priceMin))
                             ->when($this->priceMax !== null, fn (Builder $qq): Builder => $qq->where('price', '<=', (float) $this->priceMax))
-                            ->when($this->inStock, fn (Builder $qq): Builder => $qq->where('stock_quantity', '>', 0))
-                            ->when($this->onSale, fn (Builder $qq): Builder => $qq->whereNotNull('sale_price'));
+                            ->when($this->inStock, fn (Builder $qq): Builder => $qq->where('stock_quantity', '>', 0));
                     }])
                     ->where('is_visible', true);
 
@@ -397,7 +392,6 @@ final class Index extends Component implements HasSchemas
             'priceMin'              => $this->priceMin,
             'priceMax'              => $this->priceMax,
             'inStock'               => $this->inStock,
-            'onSale'                => $this->onSale,
             'hasProducts'           => $this->hasProducts,
             'sort'                  => $this->sort,
         ];

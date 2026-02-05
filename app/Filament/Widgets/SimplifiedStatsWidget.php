@@ -238,8 +238,9 @@ class SimplifiedStatsWidget extends BaseWidget
                     ->selectRaw(
                         '
                         COUNT(*) as total_products,
-                        SUM(CASE WHEN is_visible = 1 THEN 1 ELSE 0 END) as active_products
-                    '
+                        SUM(CASE WHEN status IN (?, ?) AND published_at IS NOT NULL AND published_at <= ? AND is_enabled = 1 THEN 1 ELSE 0 END) as active_products
+                    ',
+                        ['published', 'active', now()]
                     )
                     ->toBase()
                     ->first();

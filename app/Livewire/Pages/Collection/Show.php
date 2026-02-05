@@ -156,7 +156,7 @@ class Show extends Component
         $collection = $this->collection;
 
         $query = Product::query()
-            ->select(['id', 'slug', 'name', 'summary', 'brand_id', 'published_at'])
+            ->select(['id', 'slug', 'name', 'short_description', 'brand_id', 'published_at'])
             ->withCount('variants');
 
         $query->with(['brand:id,slug,name', 'media', 'prices.currency:id,code']);
@@ -190,7 +190,6 @@ class Show extends Component
         $this->applyCollectionScope($query, $collection);
 
         $query
-            ->where('is_visible', true)
             ->whereNotNull('published_at')
             ->where('published_at', '<=', now());
 

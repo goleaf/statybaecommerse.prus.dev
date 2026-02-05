@@ -40,9 +40,9 @@ class Products extends Component
     #[Computed]
     public function products(): LengthAwarePaginator
     {
-        return Product::query()->select(['id', 'slug', 'name', 'summary', 'brand_id', 'published_at'])->with(['brand:id,slug,name', 'media', 'prices' => function ($pq) {
+        return Product::query()->select(['id', 'slug', 'name', 'short_description', 'brand_id', 'published_at'])->with(['brand:id,slug,name', 'media', 'prices' => function ($pq) {
             $pq->whereRelation('currency', 'code', current_currency());
-        }, 'prices.currency:id,code'])->withCount('variants')->where('brand_id', $this->brandId)->where('is_visible', true)->whereNotNull('published_at')->where('published_at', '<=', now())->orderByDesc('published_at')->paginate(12);
+        }, 'prices.currency:id,code'])->withCount('variants')->where('brand_id', $this->brandId)->whereNotNull('published_at')->where('published_at', '<=', now())->orderByDesc('published_at')->paginate(12);
     }
 
     /**

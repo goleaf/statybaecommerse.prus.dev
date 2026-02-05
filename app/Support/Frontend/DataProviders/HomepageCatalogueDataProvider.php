@@ -76,7 +76,8 @@ final class HomepageCatalogueDataProvider
             CacheKeys::homeShelf('trending-products', 8, $locale),
             function (): Collection {
                 return $this->baseProductQuery()
-                    ->orderByDesc('requests_count')
+                    ->withSum('orderItems as sales_count', 'quantity')
+                    ->orderByDesc('sales_count')
                     ->orderByDesc('published_at')
                     ->limit(8)
                     ->get();
@@ -85,21 +86,7 @@ final class HomepageCatalogueDataProvider
             CacheTagHelper::products(),
         );
 
-        // Sale shelf highlights active promotions and clears with product mutations.
-        $saleProducts = $sharedCache->rememberLong(
-            CacheKeys::homeShelf('sale-products', 8, $locale),
-            function (): Collection {
-                return $this->baseProductQuery()
-                    ->whereNotNull('sale_price')
-                    ->whereColumn('sale_price', '<', 'price')
-                    ->orderByDesc('published_at')
-                    ->orderBy('sale_price')
-                    ->limit(8)
-                    ->get();
-            },
-            CacheKeys::TTL_FIVE_MINUTES,
-            CacheTagHelper::products(),
-        );
+        $saleProducts = collect();
 
         // Popular categories use both category and product relationships to determine demand.
         $popularCategories = $sharedCache->rememberDefault(
@@ -108,7 +95,7 @@ final class HomepageCatalogueDataProvider
                 return Category::query()
                     ->withCount([
                         'products as visible_products_count' => static function (Builder $query): void {
-                            $query->where('is_visible', true)
+                            $query->published()
                                 ->whereNotNull('published_at')
                                 ->where('published_at', '<=', now());
                         },
@@ -131,7 +118,7 @@ final class HomepageCatalogueDataProvider
                 return Brand::query()
                     ->withCount([
                         'products as visible_products_count' => static function (Builder $query): void {
-                            $query->where('is_visible', true)
+                            $query->published()
                                 ->whereNotNull('published_at')
                                 ->where('published_at', '<=', now());
                         },

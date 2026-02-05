@@ -128,7 +128,7 @@ final class LiveInventoryTracker extends Component
         $cacheKey = "live_inventory_stats_{$this->stockFilter}_{$this->lowStockThreshold}";
 
         return Cache::remember($cacheKey, 120, function () {
-            $query = Product::where('is_visible', true);
+            $query = Product::query()->published();
             // Apply filters
             if (! empty($this->selectedCategories)) {
                 $query->whereIn('category_id', $this->selectedCategories);
@@ -156,7 +156,7 @@ final class LiveInventoryTracker extends Component
         $cacheKey = "live_inventory_items_{$this->stockFilter}_{$this->sortBy}_{$this->lowStockThreshold}_" . implode(',', $this->selectedCategories) . '_' . implode(',', $this->selectedBrands);
 
         return Cache::remember($cacheKey, 180, function () {
-            $query = Product::with(['brand', 'categories', 'media'])->where('is_visible', true);
+            $query = Product::query()->with(['brand', 'categories', 'media'])->published();
             // Apply category filter
             if (! empty($this->selectedCategories)) {
                 $query->whereIn('category_id', $this->selectedCategories);
@@ -181,7 +181,7 @@ final class LiveInventoryTracker extends Component
 
             return $query->limit(50)->get()->skipWhile(function ($product) {
                 // Skip products that are not properly configured for inventory tracking
-                return empty($product->name) || ! $product->is_visible || empty($product->sku) || $product->price <= 0;
+                return empty($product->name) || empty($product->sku) || $product->price <= 0;
             })->map(function ($product) {
                 return ['id' => $product->id, 'name' => $product->name, 'sku' => $product->sku, 'brand' => $product->brand?->name, 'category' => $product->categories->first()?->name, 'stock_quantity' => $product->stock_quantity, 'price' => $product->price, 'total_value' => $product->stock_quantity * $product->price, 'image' => $product->getFirstMediaUrl('images', 'thumb'), 'last_updated' => $product->updated_at, 'stock_status' => $this->getStockStatus($product->stock_quantity), 'stock_percentage' => $this->getStockPercentage($product->stock_quantity)];
             })->toArray();
@@ -197,9 +197,9 @@ final class LiveInventoryTracker extends Component
         $cacheKey = "live_low_stock_alerts_{$this->lowStockThreshold}";
 
         return Cache::remember($cacheKey, 300, function () {
-            return Product::with(['brand', 'categories'])->where('is_visible', true)->where('stock_quantity', '>', 0)->where('stock_quantity', '<=', $this->lowStockThreshold)->orderBy('stock_quantity')->limit(20)->get()->skipWhile(function ($product) {
+            return Product::query()->with(['brand', 'categories'])->published()->where('stock_quantity', '>', 0)->where('stock_quantity', '<=', $this->lowStockThreshold)->orderBy('stock_quantity')->limit(20)->get()->skipWhile(function ($product) {
                 // Skip products that are not properly configured for low stock alerts
-                return empty($product->name) || ! $product->is_visible || empty($product->sku) || $product->price <= 0 || $product->stock_quantity <= 0;
+                return empty($product->name) || empty($product->sku) || $product->price <= 0 || $product->stock_quantity <= 0;
             })->map(function ($product) {
                 return ['id' => $product->id, 'name' => $product->name, 'sku' => $product->sku, 'brand' => $product->brand?->name, 'stock_quantity' => $product->stock_quantity, 'threshold' => $this->lowStockThreshold, 'urgency' => $this->getUrgencyLevel($product->stock_quantity), 'last_updated' => $product->updated_at];
             })->toArray();
@@ -214,7 +214,7 @@ final class LiveInventoryTracker extends Component
     {
         return Cache::remember('live_inventory_categories', 600, function () {
             return \App\Models\Category::where('is_visible', true)->withCount(['products' => function ($query) {
-                $query->where('is_visible', true);
+                $query->published();
             }])->orderBy('name')->get()->map(function ($category) {
                 return ['id' => $category->id, 'name' => $category->name, 'products_count' => $category->products_count, 'selected' => in_array($category->id, $this->selectedCategories)];
             })->toArray();
@@ -229,7 +229,7 @@ final class LiveInventoryTracker extends Component
     {
         return Cache::remember('live_inventory_brands', 600, function () {
             return \App\Models\Brand::where('is_enabled', true)->withCount(['products' => function ($query) {
-                $query->where('is_visible', true);
+                $query->published();
             }])->orderBy('name')->get()->map(function ($brand) {
                 return ['id' => $brand->id, 'name' => $brand->name, 'products_count' => $brand->products_count, 'selected' => in_array($brand->id, $this->selectedBrands)];
             })->toArray();

@@ -115,23 +115,18 @@ final class XmlCatalogService
                     $fields = [
                         'price'               => $product->price,
                         'cost_price'          => $product->cost_price,
-                        'sale_price'          => $product->sale_price,
                         'weight'              => $product->weight,
                         'length'              => $product->length,
                         'width'               => $product->width,
                         'height'              => $product->height,
                         'status'              => $product->status,
-                        'type'                => $product->type,
                         'brand_id'            => $product->brand_id,
-                        'tax_class'           => $product->tax_class,
                         'shipping_class'      => $product->shipping_class,
                         'manage_stock'        => $this->boolToString((bool) $product->manage_stock),
-                        'track_stock'         => $this->boolToString((bool) $product->track_stock),
                         'allow_backorder'     => $this->boolToString((bool) $product->allow_backorder),
                         'stock_quantity'      => $product->stock_quantity,
                         'low_stock_threshold' => $product->low_stock_threshold,
                         'minimum_quantity'    => $product->minimum_quantity,
-                        'is_visible'          => $this->boolToString((bool) $product->is_visible),
                         'is_featured'         => $this->boolToString((bool) $product->is_featured),
                         'is_requestable'      => $this->boolToString((bool) $product->is_requestable),
                     ];
@@ -349,15 +344,12 @@ final class XmlCatalogService
             $map = [
                 'price',
                 'cost_price',
-                'sale_price',
                 'weight',
                 'length',
                 'width',
                 'height',
                 'status',
-                'type',
                 'brand_id',
-                'tax_class',
                 'shipping_class',
                 'stock_quantity',
                 'low_stock_threshold',
@@ -368,7 +360,7 @@ final class XmlCatalogService
                     $payload[$field] = is_numeric((string) $base->{$field}) ? (float) ((string) $base->{$field}) : (string) $base->{$field};
                 }
             }
-            $bools = ['manage_stock', 'track_stock', 'allow_backorder', 'is_visible', 'is_featured', 'is_requestable'];
+            $bools = ['manage_stock', 'allow_backorder', 'is_featured', 'is_requestable'];
             foreach ($bools as $bf) {
                 if (isset($base->{$bf})) {
                     $payload[$bf] = $this->toBool((string) $base->{$bf});

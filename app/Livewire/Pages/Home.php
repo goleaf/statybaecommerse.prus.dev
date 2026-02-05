@@ -44,7 +44,7 @@ final class Home extends Component
             now()->addSeconds(60),
             static function (): array {
                 return [
-                    'products_count'   => Product::query()->where('is_visible', true)->count(),
+                    'products_count'   => Product::query()->published()->count(),
                     'categories_count' => Category::query()->where('is_visible', true)->count(),
                     'brands_count'     => Brand::query()->where('is_enabled', true)->count(),
                     'reviews_count'    => 0,
@@ -79,7 +79,8 @@ final class Home extends Component
             static function (): Collection {
                 return Product::query()
                     ->withoutGlobalScopes()
-                    ->where('is_visible', true)
+                    ->published()
+                    ->enabled()
                     ->where('is_featured', true)
                     ->latest('published_at')
                     ->limit(8)
@@ -113,7 +114,8 @@ final class Home extends Component
             static function (): Collection {
                 return Product::query()
                     ->withoutGlobalScopes()
-                    ->where('is_visible', true)
+                    ->published()
+                    ->enabled()
                     ->latest('published_at')
                     ->limit(8)
                     ->get();

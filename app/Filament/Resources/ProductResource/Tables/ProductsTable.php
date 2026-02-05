@@ -15,7 +15,6 @@ use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -83,8 +82,6 @@ class ProductsTable
                         'published' => __('admin.products.status_published'),
                         'archived'  => __('admin.products.status_archived'),
                     ]),
-                TernaryFilter::make('is_visible')
-                    ->label(__('admin.products.is_visible')),
             ])
             ->actions([
                 EditAction::make(),
@@ -100,7 +97,7 @@ class ProductsTable
                             $records->each(static function (Product $product): void {
                                 $product->forceFill([
                                     'status'       => 'published',
-                                    'is_visible'   => true,
+                                    'is_enabled'   => true,
                                     'published_at' => $product->published_at ?? now(),
                                 ])->save();
                             });
@@ -116,8 +113,8 @@ class ProductsTable
                         ->action(function (Collection $records): void {
                             $records->each(static function (Product $product): void {
                                 $product->forceFill([
-                                    'status'     => 'draft',
-                                    'is_visible' => false,
+                                    'status'       => 'draft',
+                                    'published_at' => null,
                                 ])->save();
                             });
 

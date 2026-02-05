@@ -35,7 +35,7 @@ class ComputedPropertiesDemo extends Component
     #[Computed]
     public function stats(): array
     {
-        return ['users' => \App\Models\User::count(), 'products' => Product::where('is_visible', true)->count(), 'categories' => Category::where('is_visible', true)->count(), 'brands' => Brand::where('is_enabled', true)->count(), 'reviews' => 0];
+        return ['users' => \App\Models\User::count(), 'products' => Product::query()->published()->count(), 'categories' => Category::where('is_visible', true)->count(), 'brands' => Brand::where('is_enabled', true)->count(), 'reviews' => 0];
     }
 
     /**
@@ -44,7 +44,7 @@ class ComputedPropertiesDemo extends Component
     #[Computed]
     public function filteredProducts(): Collection
     {
-        $query = Product::query()->where('is_visible', true)->with(['brand', 'categories', 'media']);
+        $query = Product::query()->published()->with(['brand', 'categories', 'media']);
         // Apply category filter
         if ($this->selectedCategory) {
             $query->whereHas('categories', function ($q) {
@@ -73,7 +73,7 @@ class ComputedPropertiesDemo extends Component
     public function globalSiteStats(): array
     {
         // This will be cached globally across all instances
-        return ['total_products' => Product::where('is_visible', true)->count(), 'total_categories' => Category::where('is_visible', true)->count(), 'total_brands' => Brand::where('is_enabled', true)->count(), 'total_reviews' => 0, 'average_rating' => 0, 'last_updated' => now()->toISOString()];
+        return ['total_products' => Product::query()->published()->count(), 'total_categories' => Category::where('is_visible', true)->count(), 'total_brands' => Brand::where('is_enabled', true)->count(), 'total_reviews' => 0, 'average_rating' => 0, 'last_updated' => now()->toISOString()];
     }
 
     /**

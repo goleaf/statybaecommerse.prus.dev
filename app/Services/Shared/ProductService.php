@@ -40,7 +40,13 @@ final class ProductService
         return $this->cacheService->rememberDefault(
             "featured_products.{$locale}.{$currency}",
             function () use ($limit) {
-                return Product::query()->with($this->getProductRelations())->where('is_visible', true)->where('is_featured', true)->whereNotNull('published_at')->latest('published_at')->limit($limit)->get();
+                return Product::query()
+                    ->with($this->getProductRelations())
+                    ->published()
+                    ->where('is_featured', true)
+                    ->latest('published_at')
+                    ->limit($limit)
+                    ->get();
             },
             null,
             CacheTagHelper::merge(CacheTagHelper::products(), CacheTagHelper::locale($locale))
@@ -63,7 +69,13 @@ final class ProductService
         return $this->cacheService->rememberShort(
             "new_arrivals.{$locale}.{$currency}",
             function () use ($limit, $days) {
-                return Product::query()->with($this->getProductRelations())->where('is_visible', true)->whereNotNull('published_at')->where('published_at', '>=', now()->subDays($days))->latest('published_at')->limit($limit)->get();
+                return Product::query()
+                    ->with($this->getProductRelations())
+                    ->published()
+                    ->where('published_at', '>=', now()->subDays($days))
+                    ->latest('published_at')
+                    ->limit($limit)
+                    ->get();
             },
             null,
             CacheTagHelper::merge(CacheTagHelper::products(), CacheTagHelper::locale($locale))
@@ -82,7 +94,9 @@ final class ProductService
      */
     public function searchProducts(array $filters = [], int $perPage = 12): LengthAwarePaginator
     {
-        $query = Product::query()->with($this->getProductRelations())->where('is_visible', true)->whereNotNull('published_at')->where('published_at', '<=', now());
+        $query = Product::query()
+            ->with($this->getProductRelations())
+            ->published();
         $query = $this->applyFilters($query, $filters);
         $query = $this->applySorting($query, $filters['sort_by'] ?? 'created_at', $filters['sort_direction'] ?? 'desc');
 
@@ -103,7 +117,7 @@ final class ProductService
     {
         $query = Product::query()->with($this->getProductRelations())->whereHas('categories', function ($q) use ($categoryId): void {
             $q->where('categories.id', $categoryId);
-        })->where('is_visible', true)->whereNotNull('published_at')->where('published_at', '<=', now());
+        })->published();
         $query = $this->applyFilters($query, $filters);
         $query = $this->applySorting($query, $filters['sort_by'] ?? 'created_at', $filters['sort_direction'] ?? 'desc');
 
@@ -122,7 +136,10 @@ final class ProductService
      */
     public function getProductsByBrand(int $brandId, array $filters = [], int $perPage = 12): LengthAwarePaginator
     {
-        $query = Product::query()->with($this->getProductRelations())->where('brand_id', $brandId)->where('is_visible', true)->whereNotNull('published_at')->where('published_at', '<=', now());
+        $query = Product::query()
+            ->with($this->getProductRelations())
+            ->where('brand_id', $brandId)
+            ->published();
         $query = $this->applyFilters($query, $filters);
         $query = $this->applySorting($query, $filters['sort_by'] ?? 'created_at', $filters['sort_direction'] ?? 'desc');
 
@@ -143,7 +160,7 @@ final class ProductService
     {
         $query = Product::query()->with($this->getProductRelations())->whereHas('collections', function ($q) use ($collectionId): void {
             $q->where('collections.id', $collectionId);
-        })->where('is_visible', true)->whereNotNull('published_at')->where('published_at', '<=', now());
+        })->published();
         $query = $this->applyFilters($query, $filters);
         $query = $this->applySorting($query, $filters['sort_by'] ?? 'created_at', $filters['sort_direction'] ?? 'desc');
 
@@ -166,7 +183,7 @@ final class ProductService
         return $this->cacheService->rememberDefault(
             "related_products.{$product->id}.{$locale}.{$currency}",
             function () use ($product, $limit) {
-                return Product::query()->with($this->getProductRelations())->where('id', '!=', $product->id)->where('is_visible', true)->where(function ($query) use ($product) {
+                return Product::query()->with($this->getProductRelations())->where('id', '!=', $product->id)->published()->where(function ($query) use ($product) {
                     // Same category or brand
                     $query->whereHas('categories', function ($q) use ($product) {
                         $q->whereIn('categories.id', $product->categories->pluck('id'));
@@ -216,7 +233,9 @@ final class ProductService
     {
         if (! empty($filters['search'])) {
             $query->where(function ($q) use ($filters) {
-                $q->where('name', 'like', '%' . $filters['search'] . '%')->orWhere('summary', 'like', '%' . $filters['search'] . '%')->orWhere('description', 'like', '%' . $filters['search'] . '%');
+                $q->where('name', 'like', '%' . $filters['search'] . '%')
+                    ->orWhere('short_description', 'like', '%' . $filters['search'] . '%')
+                    ->orWhere('description', 'like', '%' . $filters['search'] . '%');
             });
         }
         if (! empty($filters['categories'])) {
@@ -242,10 +261,6 @@ final class ProductService
                 $q->whereNull('stock_quantity')->orWhere('stock_quantity', '>', 0);
             });
         }
-        if ($filters['on_sale'] ?? false) {
-            $query->whereNotNull('sale_price')->where('sale_price', '>', 0);
-        }
-
         return $query;
     }
 

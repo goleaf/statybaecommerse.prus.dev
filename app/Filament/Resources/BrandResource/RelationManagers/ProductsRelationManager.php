@@ -5,12 +5,10 @@ declare(strict_types=1);
 namespace App\Filament\Resources\BrandResource\RelationManagers;
 
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
 
 class ProductsRelationManager extends RelationManager
@@ -27,8 +25,6 @@ class ProductsRelationManager extends RelationManager
                 TextInput::make('price')
                     ->numeric()
                     ->prefix('€'),
-                Toggle::make('is_visible')
-                    ->default(true),
             ]);
     }
 
@@ -46,7 +42,6 @@ class ProductsRelationManager extends RelationManager
                 TextColumn::make('name'),
                 TextColumn::make('price')
                     ->money('EUR'),
-                ToggleColumn::make('is_visible'),
             ])
             ->filters([
                 //

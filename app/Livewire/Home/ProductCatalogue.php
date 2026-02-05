@@ -99,7 +99,6 @@ final class ProductCatalogue extends Component implements HasSchemas
         $query = Product::query()
             ->forProductList()
             ->withListRelations()
-            ->where('is_visible', true)
             ->whereNotNull('published_at')
             ->where('published_at', '<=', now());
 

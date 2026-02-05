@@ -88,8 +88,6 @@ final class ProductRequestForm extends Component
         $this->validate();
         // Create the product request
         $request = ProductRequest::create(['product_id' => $this->product->id, 'user_id' => Auth::id(), 'name' => $this->name, 'email' => $this->email, 'phone' => $this->phone, 'message' => $this->message, 'requested_quantity' => $this->requested_quantity, 'status' => 'pending']);
-        // Increment the product's request count
-        $this->product->incrementRequestsCount();
         // Reset form and hide it
         $this->resetForm();
         $this->showForm = false;

@@ -15,17 +15,17 @@ final class ProductPerformanceWidget extends ChartWidget
 
     protected function getData(): array
     {
-        $products = Product::select('name', 'views_count', 'created_at')
-            ->orderBy('views_count', 'desc')
+        $products = Product::query()
+            ->withSum('orderItems as sales_count', 'quantity')
+            ->orderByDesc('sales_count')
             ->limit(10)
-            ->get();
+            ->get(['id', 'name']);
 
         return [
             'datasets' => [
                 [
-                    'label' => __('messages.dashboard),
-                    '),
-                    'data'            => $products->pluck('views_count')->toArray(),
+                    'label'           => __('admin.products.sales'),
+                    'data'            => $products->pluck('sales_count')->toArray(),
                     'backgroundColor' => [
                         '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6',
                         '#06B6D4', '#84CC16', '#F97316', '#EC4899', '#6366F1',

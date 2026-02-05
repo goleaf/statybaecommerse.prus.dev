@@ -26,7 +26,6 @@ use Livewire\Component;
  * @property float  $minPrice
  * @property float  $maxPrice
  * @property bool   $inStock
- * @property bool   $onSale
  * @property string $sortBy
  * @property string $sortDirection
  */
@@ -52,9 +51,6 @@ final class ProductFilterWidget extends Component
 
     #[Url]
     public bool $inStock = false;
-
-    #[Url]
-    public bool $onSale = false;
 
     #[Url]
     public string $sortBy = 'created_at';
@@ -160,7 +156,7 @@ final class ProductFilterWidget extends Component
      */
     public function clearFilters(): void
     {
-        $this->reset(['search', 'categories', 'brands', 'attributes', 'inStock', 'onSale', 'sortBy', 'sortDirection']);
+        $this->reset(['search', 'categories', 'brands', 'attributes', 'inStock', 'sortBy', 'sortDirection']);
         $this->updatePriceRange();
         $this->dispatch('filter-updated');
     }
@@ -170,7 +166,7 @@ final class ProductFilterWidget extends Component
      */
     public function updatePriceRange(): void
     {
-        $priceRange = Product::where('is_visible', true)->selectRaw('MIN(price) as min_price, MAX(price) as max_price')->first();
+        $priceRange = Product::selectRaw('MIN(price) as min_price, MAX(price) as max_price')->first();
         $this->minPrice = (float) ($priceRange->min_price ?? 0);
         $this->maxPrice = (float) ($priceRange->max_price ?? 10000);
     }
@@ -209,7 +205,7 @@ final class ProductFilterWidget extends Component
      */
     public function getFilteredProductsQuery()
     {
-        $query = Product::query()->with(['brand', 'categories', 'media', 'translations'])->where('is_visible', true);
+        $query = Product::query()->with(['brand', 'categories', 'media', 'translations']);
         // Search filter
         if ($this->search) {
             $query->where(function ($q) {
@@ -235,10 +231,6 @@ final class ProductFilterWidget extends Component
         // Stock filter
         if ($this->inStock) {
             $query->where('stock_quantity', '>', 0);
-        }
-        // Sale filter
-        if ($this->onSale) {
-            $query->whereNotNull('sale_price');
         }
         // Attribute filters
         if (! empty($this->selectedAttributes)) {

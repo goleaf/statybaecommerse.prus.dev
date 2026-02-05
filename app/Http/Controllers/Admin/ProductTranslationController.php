@@ -66,7 +66,6 @@ final class ProductTranslationController extends Controller
         $validated = $request->validate([
             'name'              => ['required', 'string', 'max:255'],
             'slug'              => ['nullable', 'string', 'max:255'],
-            'summary'           => ['nullable', 'string'],
             'description'       => ['nullable', 'string'],
             'short_description' => ['nullable', 'string'],
             'seo_title'         => ['nullable', 'string', 'max:255'],
@@ -123,7 +122,6 @@ final class ProductTranslationController extends Controller
             [
                 'name'              => $name,
                 'slug'              => $slug,
-                'summary'           => $optionalText($validated['summary'] ?? null),
                 'description'       => $optionalText($validated['description'] ?? null),
                 'short_description' => $optionalText($validated['short_description'] ?? null),
                 'seo_title'         => $optionalText($validated['seo_title'] ?? null),

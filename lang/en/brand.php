@@ -6,6 +6,7 @@ return array (
   '3m' => '3M',
   '3m_safety_solutions_delivering_certified_respiratory_and_head_protection' => '3M safety solutions delivering certified respiratory and head protection.',
   'acme' => 'Acme',
+  'acme_tools' => 'Acme Tools',
   'adidas' => 'Adidas',
   'advanced_plumbing_and_heating_solutions' => 'Advanced plumbing and heating solutions',
   'alpha_tools' => 'Alpha Tools',
@@ -243,4 +244,5 @@ return array (
   'w_rth_lietuva' => 'Würth Lietuva',
   'weber_lietuva' => 'Weber Lietuva',
   'zulu_tools' => 'Zulu Tools',
+  'zzzz' => 'zzzz',
 );

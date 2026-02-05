@@ -137,7 +137,7 @@ final class Show extends Component implements HasActions, HasForms
         return TagAwareCache::remember($cacheKey, now()->addSeconds(180), function () use ($locale): LengthAwarePaginatorContract {
             /** @var LengthAwarePaginatorContract<int, Product> $paginator */
             $paginator = $this->category->products()
-                ->where('is_visible', true)
+                ->published()
                 ->forProductList()
                 ->withListRelations()
                 ->orderBy('products.' . $this->sortBy, $this->sortDirection)

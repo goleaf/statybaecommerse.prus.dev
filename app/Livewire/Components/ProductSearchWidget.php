@@ -33,7 +33,6 @@ use Livewire\WithPagination;
  * @property string     $sortBy
  * @property string     $sortDirection
  * @property bool       $inStock
- * @property bool       $onSale
  * @property bool       $featured
  * @property string     $viewMode
  * @property int        $perPage
@@ -60,8 +59,6 @@ final class ProductSearchWidget extends Component
     public string $sortDirection = 'desc';
 
     public bool $inStock = false;
-
-    public bool $onSale = false;
 
     public bool $featured = false;
 
@@ -149,14 +146,6 @@ final class ProductSearchWidget extends Component
     }
 
     /**
-     * Handle updatedOnSale functionality with proper error handling.
-     */
-    public function updatedOnSale(): void
-    {
-        $this->resetPage();
-    }
-
-    /**
      * Handle updatedFeatured functionality with proper error handling.
      */
     public function updatedFeatured(): void
@@ -169,7 +158,7 @@ final class ProductSearchWidget extends Component
      */
     public function clearFilters(): void
     {
-        $this->reset(['search', 'categories', 'brands', 'selectedAttributes', 'minPrice', 'maxPrice', 'inStock', 'onSale', 'featured']);
+        $this->reset(['search', 'categories', 'brands', 'selectedAttributes', 'minPrice', 'maxPrice', 'inStock', 'featured']);
         $this->sortBy = 'relevance';
         $this->sortDirection = 'desc';
         $this->resetPage();
@@ -293,10 +282,6 @@ final class ProductSearchWidget extends Component
             $filters['in_stock'] = true;
         }
 
-        if ($this->onSale) {
-            $filters['on_sale'] = true;
-        }
-
         if ($this->featured) {
             $filters['featured'] = true;
         }
@@ -347,7 +332,7 @@ final class ProductSearchWidget extends Component
                 'id'             => $item['id'],
                 'slug'           => $this->extractSlugFromUrl($item['url'] ?? ''),
                 'name'           => $item['title'] ?? '',
-                'summary'        => $item['description'] ?? '',
+                'short_description' => $item['description'] ?? '',
                 'brand_id'       => null, // Not available in search results
                 'published_at'   => now(), // Assume published since it's in results
                 'brand'          => $item['subtitle'] ? (object) ['name' => $item['subtitle']] : null,

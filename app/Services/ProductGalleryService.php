@@ -20,7 +20,7 @@ final class ProductGalleryService
     {
         // Use skipWhile to filter out invalid products from the beginning
         $validProducts = $products->skipWhile(function ($product) {
-            return empty($product->name) || property_exists($product, 'is_visible') && ! $product->is_visible || property_exists($product, 'price') && $product->price <= 0 || property_exists($product, 'slug') && empty($product->slug);
+            return empty($product->name) || property_exists($product, 'price') && $product->price <= 0 || property_exists($product, 'slug') && empty($product->slug);
         });
         $productColumns = $validProducts->splitIn($columnCount);
 
@@ -36,7 +36,7 @@ final class ProductGalleryService
     {
         // Use skipWhile to filter out invalid products from the beginning
         $validProducts = $products->skipWhile(function ($product) {
-            return empty($product->name) || property_exists($product, 'is_visible') && ! $product->is_visible || property_exists($product, 'price') && $product->price <= 0 || property_exists($product, 'slug') && empty($product->slug);
+            return empty($product->name) || property_exists($product, 'price') && $product->price <= 0 || property_exists($product, 'slug') && empty($product->slug);
         });
 
         return $validProducts->splitIn($columns);
@@ -66,7 +66,7 @@ final class ProductGalleryService
     {
         // Use skipWhile to filter out invalid products from the beginning
         $validProducts = $products->skipWhile(function ($product) {
-            return empty($product->name) || property_exists($product, 'is_visible') && ! $product->is_visible || property_exists($product, 'price') && $product->price <= 0 || property_exists($product, 'slug') && empty($product->slug);
+            return empty($product->name) || property_exists($product, 'price') && $product->price <= 0 || property_exists($product, 'slug') && empty($product->slug);
         });
         $featuredProducts = $validProducts->take($featuredCount);
         $remainingProducts = $validProducts->skip($featuredCount);
@@ -126,7 +126,7 @@ final class ProductGalleryService
     {
         // Use skipWhile to filter out invalid products from the beginning
         $validProducts = $products->skipWhile(function ($product) {
-            return empty($product->name) || property_exists($product, 'is_visible') && ! $product->is_visible || property_exists($product, 'price') && $product->price <= 0 || property_exists($product, 'slug') && empty($product->slug);
+            return empty($product->name) || property_exists($product, 'price') && $product->price <= 0 || property_exists($product, 'slug') && empty($product->slug);
         });
         $heroProducts = $validProducts->take(1);
         $featuredProducts = $validProducts->skip(1)->take(6);
@@ -172,7 +172,7 @@ final class ProductGalleryService
 
         return $products->skipWhile(function ($product) use ($minPrice, $maxPrice, $minRating, $hasImages, $isFeatured) {
             // Skip products that don't meet basic requirements
-            if (empty($product->name) || ! $product->is_visible || empty($product->slug)) {
+            if (empty($product->name) || empty($product->slug)) {
                 return true;
             }
             // Skip products with invalid prices
@@ -229,9 +229,6 @@ final class ProductGalleryService
         if (! empty($product->slug)) {
             $score += 0.1;
         }
-        if ($product->is_visible) {
-            $score += 0.1;
-        }
         if ($product->price > 0) {
             $score += 0.1;
         }
@@ -250,9 +247,6 @@ final class ProductGalleryService
             $score += 0.1;
         }
         // Engagement metrics (10% of score)
-        if (($product->views_count ?? 0) > 0) {
-            $score += 0.05;
-        }
         if (($product->average_rating ?? 0) > 0) {
             $score += 0.05;
         }
@@ -274,7 +268,7 @@ final class ProductGalleryService
 
         return $products->skipWhile(function ($product) use ($minPrice, $maxPrice, $minRating, $hasImages, $isFeatured, $categoryId) {
             // Skip products that don't meet basic requirements
-            if (empty($product->name) || property_exists($product, 'is_visible') && ! $product->is_visible || property_exists($product, 'slug') && empty($product->slug)) {
+            if (empty($product->name) || property_exists($product, 'slug') && empty($product->slug)) {
                 return true;
             }
             // Skip products with invalid prices
@@ -416,9 +410,6 @@ final class ProductGalleryService
 
         return $products->skipWhile(function ($product) use ($minViews, $minSales, $minRating, $maxRating, $trendingOnly) {
             // Skip products with low views
-            if ($minViews > 0 && property_exists($product, 'views_count') && ($product->views_count ?? 0) < $minViews) {
-                return true;
-            }
             // Skip products with low sales
             if ($minSales > 0 && property_exists($product, 'sales_count') && ($product->sales_count ?? 0) < $minSales) {
                 return true;

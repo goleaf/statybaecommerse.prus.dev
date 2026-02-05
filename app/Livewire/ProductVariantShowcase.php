@@ -47,10 +47,6 @@ final class ProductVariantShowcase extends Component
 
         $productsTable = (new Product)->getTable();
 
-        if (Schema::hasColumn($productsTable, 'is_visible')) {
-            $query->where('is_visible', true);
-        }
-
         if (Schema::hasColumn($productsTable, 'status')) {
             $query->where('status', 'published');
         }

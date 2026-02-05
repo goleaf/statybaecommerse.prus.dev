@@ -103,7 +103,7 @@ trait WithCart
     {
         $cartItems = session()->get('cart', []);
         $cartKey = $this->resolveCartKey($product->getKey(), $variant?->getKey());
-        $unitPrice = $variant ? (float) $variant->getCurrentPrice() : (float) ($product->sale_price ?? $product->price);
+        $unitPrice = $variant ? (float) $variant->getCurrentPrice() : (float) ($product->price ?? 0);
         $variantAttributes = [];
 
         if ($variant !== null) {

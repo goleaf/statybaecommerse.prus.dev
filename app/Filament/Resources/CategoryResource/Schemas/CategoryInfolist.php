@@ -16,6 +16,7 @@ class CategoryInfolist
     {
         return $schema->components([
             Section::make(__('admin.categories.basic_information'))
+                ->columnSpanFull()
                 ->schema([
                     Grid::make(2)
                         ->schema([

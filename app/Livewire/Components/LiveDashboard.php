@@ -93,10 +93,10 @@ final class LiveDashboard extends Component
 
             return [
                 'products' => [
-                    'total'     => Product::where('is_visible', true)->count(),
-                    'new_today' => Product::where('is_visible', true)->where('created_at', '>=', $since)->count(),
-                    'featured'  => Product::where('is_featured', true)->where('is_visible', true)->count(),
-                    'low_stock' => Product::where('stock_quantity', '<', 10)->where('is_visible', true)->count(),
+                    'total'     => Product::query()->published()->count(),
+                    'new_today' => Product::query()->published()->where('created_at', '>=', $since)->count(),
+                    'featured'  => Product::query()->published()->where('is_featured', true)->count(),
+                    'low_stock' => Product::query()->published()->where('stock_quantity', '<', 10)->count(),
                 ],
                 'orders' => [
                     'total'     => Order::count(),
@@ -153,7 +153,7 @@ final class LiveDashboard extends Component
                     ]),
                 'recent_reviews'   => collect(),
                 'popular_products' => Product::with(['brand'])
-                    ->where('is_visible', true)
+                    ->published()
                     ->latest('published_at')
                     ->limit(5)
                     ->get()

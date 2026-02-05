@@ -32,13 +32,11 @@ final class ProductListItemData implements Arrayable
         'products.slug',
         'products.short_description', // Used for short description, NOT description
         'products.price',
-        'products.sale_price',
         'products.stock_quantity',
         'products.brand_id',
         'products.created_at', // May be needed for sorting
         'products.updated_at', // May be needed for sorting
         'products.published_at', // May be needed for sorting
-        'products.is_visible', // Needed for filtering
         'products.is_featured', // May be needed for sorting
     ];
 
@@ -71,11 +69,9 @@ final class ProductListItemData implements Arrayable
         public readonly ?string $brandName,
         public readonly array $categoryLabels,
         public readonly float $price,
-        public readonly ?float $salePrice,
         public readonly ?float $averageRating,
         public readonly int $reviewsCount,
         public readonly int $stockQuantity,
-        public readonly ?float $discountPercentage,
         public readonly ?string $imageUrl,
         public readonly string $initials,
         public readonly ?string $shortDescription,
@@ -110,22 +106,6 @@ final class ProductListItemData implements Arrayable
             ->all();
 
         $price = (float) $product->price;
-        $salePrice = $product->sale_price !== null ? (float) $product->sale_price : null;
-
-        $effectivePrice = $salePrice !== null && $salePrice > 0 && $salePrice < $price
-            ? $salePrice
-            : $price;
-
-        $referencePrice = null;
-
-        if ($salePrice !== null && $salePrice < $price) {
-            $referencePrice = $price;
-        }
-
-        $discountPercentage = null;
-        if ($referencePrice !== null && $referencePrice > 0 && $referencePrice > $effectivePrice) {
-            $discountPercentage = round((($referencePrice - $effectivePrice) / $referencePrice) * 100, 2);
-        }
 
         $imageUrl = null;
         if (method_exists($product, 'getMainImage')) {
@@ -152,59 +132,13 @@ final class ProductListItemData implements Arrayable
             $brandName !== '' ? $brandName : null,
             $categoryLabels,
             $price,
-            $salePrice,
             $product->average_rating !== null ? (float) $product->average_rating : null,
             (int) $product->reviews_count,
             (int) $product->stock_quantity,
-            $discountPercentage,
             $imageUrl !== '' ? $imageUrl : null,
             Str::upper(Str::of($name)->substr(0, 2)->toString()),
             $shortDescription,
         );
-    }
-
-    /**
-     * Determine which price should be displayed to the customer.
-     */
-    public function currentPrice(): float
-    {
-        if ($this->salePrice !== null && $this->salePrice > 0 && $this->salePrice < $this->price) {
-            return $this->salePrice;
-        }
-
-        return $this->price;
-    }
-
-    /**
-     * Expose the price that should be crossed out when a discount is active.
-     */
-    public function compareAtPrice(): ?float
-    {
-        if ($this->salePrice !== null && $this->salePrice < $this->price) {
-            return $this->price;
-        }
-
-        return null;
-    }
-
-    /**
-     * Flag used by the Blade template to toggle sale badges.
-     */
-    public function hasDiscount(): bool
-    {
-        return $this->compareAtPrice() !== null;
-    }
-
-    /**
-     * Return a simplified integer percentage for UI badges.
-     */
-    public function discountBadge(): ?int
-    {
-        if (! $this->hasDiscount() || $this->discountPercentage === null) {
-            return null;
-        }
-
-        return (int) round($this->discountPercentage);
     }
 
     /**
@@ -234,11 +168,9 @@ final class ProductListItemData implements Arrayable
      *     brand_name:?string,
      *     category_labels:array<int, string>,
      *     price:float,
-     *     sale_price:?float,
      *     average_rating:?float,
      *     reviews_count:int,
      *     stock_quantity:int,
-     *     discount_percentage:?float,
      *     image_url:?string,
      *     initials:string,
      *     short_description:?string
@@ -254,11 +186,9 @@ final class ProductListItemData implements Arrayable
             'brand_name'          => $this->brandName,
             'category_labels'     => $this->categoryLabels,
             'price'               => $this->price,
-            'sale_price'          => $this->salePrice,
             'average_rating'      => $this->averageRating,
             'reviews_count'       => $this->reviewsCount,
             'stock_quantity'      => $this->stockQuantity,
-            'discount_percentage' => $this->discountPercentage,
             'image_url'           => $this->imageUrl,
             'initials'            => $this->initials,
             'short_description'   => $this->shortDescription,

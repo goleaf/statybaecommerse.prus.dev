@@ -21,7 +21,8 @@ final class ProductSearchRepository extends AbstractSearchRepository
     {
         $limit = max(1, $limit);
         $metricColumns = $this->metricProjection();
-        $statusFilter = Schema::hasColumn('products', 'status') ? "  AND p.status = 'published'\n" : '';
+        $statusFilter = Schema::hasColumn('products', 'status') ? "  AND p.status IN ('published', 'active')\n" : '';
+        $enabledFilter = Schema::hasColumn('products', 'is_enabled') ? "  AND p.is_enabled = 1\n" : '';
 
         return <<<SQL
 SELECT
@@ -60,10 +61,9 @@ SELECT
 FROM products AS p
 LEFT JOIN brands AS b ON b.id = p.brand_id
 LEFT JOIN product_translations AS pt ON pt.product_id = p.id AND pt.locale = ?
-WHERE p.is_visible = 1
-  AND p.published_at IS NOT NULL
+WHERE p.published_at IS NOT NULL
   AND p.published_at <= ?
-{$statusFilter}  AND p.slug IS NOT NULL
+{$statusFilter}{$enabledFilter}  AND p.slug IS NOT NULL
   AND p.price IS NOT NULL
   AND p.price > 0
   AND (

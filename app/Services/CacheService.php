@@ -31,7 +31,7 @@ final class CacheService
             CacheTagHelper::products(),
             CacheKeys::productFeaturedList($limit),
             CacheKeys::TTL_ONE_HOUR,
-            fn () => Product::where('is_featured', true)->where('is_visible', true)->with(['brand', 'categories', 'media'])->limit($limit)->get(),
+            fn () => Product::query()->published()->where('is_featured', true)->with(['brand', 'categories', 'media'])->limit($limit)->get(),
         );
     }
 

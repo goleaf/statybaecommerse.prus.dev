@@ -102,11 +102,6 @@ final class ProductController extends Controller
             abort(404);
         }
 
-        // For private listings require explicit authorisation before exposing details.
-        if (! $product->is_visible && (! $request->user() || ! $request->user()->can('view', $product))) {
-            abort(404);
-        }
-
         $etagPayload = implode('|', [
             $product->getKey(),
             optional($product->updated_at)?->toIsoString(),

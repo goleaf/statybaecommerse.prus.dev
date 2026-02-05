@@ -21,7 +21,7 @@ final class StatsWidget extends BaseStatsOverviewWidget
     {
         $totalRevenue = (float) (Order::sum('total') ?? 0);
         $totalOrders = (int) Order::count();
-        $totalProducts = (int) Product::where('is_visible', true)->count();
+        $totalProducts = (int) Product::query()->published()->count();
         $totalCustomers = (int) User::count();
         $visibleCategories = (int) Category::where('is_visible', true)->count();
         $enabledBrands = (int) Brand::where('is_enabled', true)->count();

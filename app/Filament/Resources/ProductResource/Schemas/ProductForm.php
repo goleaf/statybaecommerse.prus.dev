@@ -17,6 +17,7 @@ use Filament\Forms\Set;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class ProductForm
 {
@@ -41,9 +42,7 @@ class ProductForm
                                     ->maxLength(255),
                                 TextInput::make('sku')
                                     ->label(__('messages.sku'))
-                                    ->required()
-                                    ->unique(ignoreRecord: true)
-                                    ->maxLength(100),
+                                    ->required(),
                                 TextInput::make('barcode')
                                     ->label(__('messages.barcode'))
                                     ->maxLength(100),
@@ -62,9 +61,6 @@ class ProductForm
                                     ])
                                     ->default('draft')
                                     ->required(),
-                                Toggle::make('is_visible')
-                                    ->label(__('admin.products.is_visible'))
-                                    ->default(true),
                                 Toggle::make('is_featured')
                                     ->label(__('admin.products.is_featured'))
                                     ->default(false),
@@ -141,6 +137,28 @@ class ProductForm
                             ])
                             ->orderColumn('sort_order')
                             ->reorderable()
+                            ->mutateRelationshipDataBeforeCreateUsing(function (array $data): array {
+                                $normalizedPath = self::normalizeImagePath($data['path'] ?? null);
+                                if ($normalizedPath !== null) {
+                                    $data['path'] = $normalizedPath;
+                                }
+                                $data['is_active'] = (bool) ($data['is_active'] ?? true);
+                                $data['is_default'] = (bool) ($data['is_default'] ?? false);
+
+                                return $data;
+                            })
+                            ->mutateRelationshipDataBeforeSaveUsing(function (array $data): array {
+                                $normalizedPath = self::normalizeImagePath($data['path'] ?? null);
+                                if ($normalizedPath !== null) {
+                                    $data['path'] = $normalizedPath;
+                                } else {
+                                    unset($data['path']);
+                                }
+                                $data['is_active'] = (bool) ($data['is_active'] ?? true);
+                                $data['is_default'] = (bool) ($data['is_default'] ?? false);
+
+                                return $data;
+                            })
                             ->columnSpanFull()
                             ->collapsible()
                             ->itemLabel(function (array $state): ?string {
@@ -195,13 +213,10 @@ class ProductForm
                     ->columnSpanFull(),
                 Section::make(__('admin.products.inventory'))
                     ->schema([
-                        Grid::make(5)
+                        Grid::make(4)
                             ->schema([
                                 Toggle::make('manage_stock')
                                     ->label(__('admin.products.manage_stock'))
-                                    ->default(true),
-                                Toggle::make('track_stock')
-                                    ->label(__('admin.products.track_stock'))
                                     ->default(true),
                                 Toggle::make('allow_backorder')
                                     ->label(__('admin.products.allow_backorder'))
@@ -257,5 +272,32 @@ class ProductForm
                     ->columnSpanFull(),
 
             ]);
+    }
+
+    private static function normalizeImagePath(mixed $path): ?string
+    {
+        if ($path instanceof TemporaryUploadedFile) {
+            return $path->store('product-images', 'public');
+        }
+
+        if (is_array($path)) {
+            foreach ($path as $value) {
+                $normalized = self::normalizeImagePath($value);
+
+                if ($normalized !== null) {
+                    return $normalized;
+                }
+            }
+
+            return null;
+        }
+
+        if (! is_string($path)) {
+            return null;
+        }
+
+        $path = trim($path);
+
+        return $path !== '' ? $path : null;
     }
 }

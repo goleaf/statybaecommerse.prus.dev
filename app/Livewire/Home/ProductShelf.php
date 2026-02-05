@@ -42,7 +42,7 @@ final class ProductShelf extends Component implements HasSchemas
         $this->preset = $preset;
         $this->limit = max(4, $limit);
 
-        $sectionKey = in_array($this->preset, ['latest', 'sale', 'trending', 'featured'], true)
+        $sectionKey = in_array($this->preset, ['latest', 'trending', 'featured'], true)
             ? $this->preset
             : 'featured';
 
@@ -50,14 +50,12 @@ final class ProductShelf extends Component implements HasSchemas
             'featured' => 'home_products_featured_title',
             'latest'   => 'home_products_latest_title',
             'trending' => 'home_products_trending_title',
-            'sale'     => 'home_products_sale_title',
         ];
 
         $subtitleMap = [
             'featured' => 'home_products_featured_subtitle',
             'latest'   => 'home_products_latest_subtitle',
             'trending' => 'home_products_trending_subtitle',
-            'sale'     => 'home_products_sale_subtitle',
         ];
 
         $this->title = $title !== ''
@@ -77,25 +75,18 @@ final class ProductShelf extends Component implements HasSchemas
             $query = Product::query()
                 ->forProductList()
                 ->withListRelations()
-                ->where('is_visible', true)
                 ->whereNotNull('published_at')
                 ->where('published_at', '<=', now())
                 ->whereNull('deleted_at');
 
             $query = match ($this->preset) {
                 'latest' => $query->orderByDesc('published_at'),
-                'sale'   => $query
-                    ->whereNotNull('sale_price')
-                    ->whereColumn('sale_price', '<', 'price')
-                    ->orderByDesc('updated_at')
-                    ->orderByDesc('published_at'),
                 'trending' => $query
                     ->withSum('orderItems as orders_quantity', 'quantity')
                     ->orderByDesc('orders_quantity')
                     ->orderByDesc('published_at'),
                 default => $query
                     ->where('is_featured', true)
-                    ->orderBy('sort_order')
                     ->orderByDesc('published_at'),
             };
 

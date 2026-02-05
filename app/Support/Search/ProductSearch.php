@@ -118,10 +118,6 @@ final class ProductSearch
             $builder->where("{$table}.is_active", true);
         }
 
-        if (Schema::hasColumn($table, 'is_visible')) {
-            $builder->where("{$table}.is_visible", true);
-        }
-
         if (Schema::hasColumn($table, 'is_enabled')) {
             $builder->where("{$table}.is_enabled", true);
         }

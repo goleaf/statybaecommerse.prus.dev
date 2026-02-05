@@ -34,7 +34,6 @@ final class ProductCatalogueDataProvider
      */
     private const FILTER_OPTIONS = [
         'featured' => 'Featured only',
-        'sale'     => 'On sale',
         'in_stock' => 'In stock',
     ];
 
@@ -139,17 +138,8 @@ final class ProductCatalogueDataProvider
     public function trending(int $limit = 8): Collection
     {
         return $this->baseQuery()
-            ->orderByDesc('requests_count')
-            ->orderByDesc('published_at')
-            ->limit($limit)
-            ->get();
-    }
-
-    public function onSale(int $limit = 8): Collection
-    {
-        return $this->baseQuery()
-            ->whereNotNull('sale_price')
-            ->whereColumn('sale_price', '<', 'price')
+            ->withSum('orderItems as sales_count', 'quantity')
+            ->orderByDesc('sales_count')
             ->orderByDesc('published_at')
             ->limit($limit)
             ->get();
@@ -160,7 +150,6 @@ final class ProductCatalogueDataProvider
         return Product::query()
             ->withoutGlobalScope(PublishedScope::class)
             ->with(['brand'])
-            ->where('is_visible', true)
             ->whereIn('status', ['active', 'published'])
             ->whereNotNull('published_at')
             ->where('published_at', '<=', now());
@@ -202,7 +191,6 @@ final class ProductCatalogueDataProvider
     {
         match ($filter) {
             'featured' => $query->where('is_featured', true),
-            'sale'     => $query->whereNotNull('sale_price')->whereColumn('sale_price', '<', 'price'),
             'in_stock' => $query->where(static function (Builder $builder): void {
                 $builder->where('manage_stock', false)
                     ->orWhere('stock_quantity', '>', 0);
@@ -217,7 +205,10 @@ final class ProductCatalogueDataProvider
             'latest'      => $query->orderByDesc('published_at'),
             'price_asc'   => $query->orderBy('price')->orderBy('name'),
             'price_desc'  => $query->orderByDesc('price')->orderBy('name'),
-            'bestsellers' => $query->orderByDesc('requests_count')->orderByDesc('published_at'),
+            'bestsellers' => $query
+                ->withSum('orderItems as sales_count', 'quantity')
+                ->orderByDesc('sales_count')
+                ->orderByDesc('published_at'),
             default       => $query->orderByDesc('is_featured')->orderByDesc('published_at'),
         };
     }

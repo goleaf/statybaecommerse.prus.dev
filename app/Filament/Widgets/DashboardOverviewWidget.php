@@ -45,7 +45,7 @@ class DashboardOverviewWidget extends BaseWidget
         $userGrowth = $newUsersThisMonth > 0 ? ($newUsersThisMonth / max($totalUsers - $newUsersThisMonth, 1)) * 100 : 0;
 
         $totalProducts = Product::count();
-        $activeProducts = Product::where('is_visible', true)->count();
+        $activeProducts = Product::query()->published()->count();
         $lowStockProducts = Inventory::where('stock_quantity', '<=', DB::raw('threshold'))->count();
 
         $avgOrderValue = $totalOrders > 0 ? $totalRevenue / $totalOrders : 0;

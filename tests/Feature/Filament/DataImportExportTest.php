@@ -49,8 +49,10 @@ it('displays the stats on the page', function () {
 });
 
 it('shows CSV import links', function () {
+    $productsImportLabel = __('translations.import') . ' ' . __('translations.products');
+
     Livewire::test(DataImportExport::class)
-        ->assertSee(__('admin.products_import'))
+        ->assertSee($productsImportLabel)
         ->assertSee(__('admin.categories_import'))
         ->assertSee(__('admin.brands_import'))
         ->assertSee(__('admin.customers_import'))

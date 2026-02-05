@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Filament\Resources\Locations\Schemas;
+namespace App\Filament\Resources\LocationResource\Schemas;
 
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;

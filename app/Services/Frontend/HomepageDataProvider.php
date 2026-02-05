@@ -27,7 +27,7 @@ final class HomepageDataProvider
             CacheKeys::homeStats($locale),
             static function (): array {
                 return [
-                    'products'       => Product::query()->where('is_visible', true)->count(),
+                    'products'       => Product::query()->published()->count(),
                     'categories'     => Category::query()->where('is_visible', true)->count(),
                     'brands'         => Brand::query()->where('is_enabled', true)->count(),
                     'reviews'        => 0,
@@ -64,7 +64,7 @@ final class HomepageDataProvider
                         'prices.currency',
                     ])
                     ->withSum('orderItems as orders_quantity', 'quantity')
-                    ->where('is_visible', true)
+                    ->published()
                     ->whereNotNull('published_at')
                     ->where('published_at', '<=', now())
                     ->orderByDesc('orders_quantity')

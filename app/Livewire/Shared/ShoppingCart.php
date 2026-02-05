@@ -53,7 +53,7 @@ final class ShoppingCart extends Component
         $sessionId = Session::getId();
         $unitPrice = $variant
             ? (float) $variant->getCurrentPrice()
-            : (float) ($product->sale_price ?? $product->price);
+            : (float) ($product->price ?? 0);
 
         $cartItemQuery = CartItem::query()
             ->where('session_id', $sessionId)

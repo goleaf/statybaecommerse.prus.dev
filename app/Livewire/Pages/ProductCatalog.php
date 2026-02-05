@@ -38,7 +38,11 @@ final class ProductCatalog extends Component
     #[Computed]
     public function products(): LengthAwarePaginator
     {
-        $query = Product::query()->with(['brand', 'categories', 'media', 'prices'])->withCount('orderItems')->where('is_visible', true)->whereNotNull('published_at')->where('published_at', '<=', now());
+        $query = Product::query()
+            ->with(['brand', 'categories', 'media', 'prices'])
+            ->withCount('orderItems')
+            ->whereNotNull('published_at')
+            ->where('published_at', '<=', now());
         // Apply shared filters from WithFilters trait
         $query = $this->applySearchFilters($query);
         // Apply sorting from WithFilters trait

@@ -21,7 +21,7 @@ final class ImportProducts extends CsvImportPage
 
     protected static function getImportLabel(): string
     {
-        return __('admin.products_import');
+        return __('translations.import') . ' ' . __('translations.products');
     }
 
     protected function resolveImportUser(?Authenticatable $user): ?Authenticatable

@@ -235,7 +235,6 @@ final class VariantPriceService
         // Convert all monetary values to target currency
         $convertedFinal = $this->currencyService->convert($finalPriceBase, $context->baseCurrency, $context->targetCurrency);
         $convertedRegular = $this->currencyService->convert($basePrices['regular'], $context->baseCurrency, $context->targetCurrency);
-        $convertedSale = $basePrices['sale'] !== null ? $this->currencyService->convert($basePrices['sale'], $context->baseCurrency, $context->targetCurrency) : null;
         $convertedPriceList = $priceListResult['priceListPrice'] !== null ? $this->currencyService->convert($priceListResult['priceListPrice'], $context->baseCurrency, $context->targetCurrency) : null;
         $convertedVariantModifier = $this->currencyService->convert($priceListResult['variantModifier'], $context->baseCurrency, $context->targetCurrency);
         $convertedDynamic = $this->currencyService->convert($dynamicResult['adjustments'], $context->baseCurrency, $context->targetCurrency);
@@ -243,7 +242,6 @@ final class VariantPriceService
 
         return new VariantPriceResult(
             regularPrice: $convertedRegular,
-            salePrice: $convertedSale,
             priceListPrice: $convertedPriceList,
             variantModifiers: $convertedVariantModifier,
             dynamicAdjustments: $convertedDynamic,

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CategoryResource\Tables;
 
+use App\Filament\Resources\CategoryResource;
+use App\Models\Category;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\TextColumn;
@@ -15,6 +17,7 @@ class CategoriesTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->recordUrl(fn (Category $record): string => CategoryResource::getUrl('edit', ['record' => $record]))
             ->columns([
                 TextColumn::make('name')
                     ->label(__('messages.name'))

@@ -49,9 +49,8 @@ final class CacheWarmer
             "featured_products.{$locale}",
             fn () => Product::query()
                 ->with(['brand', 'media', 'translations'])
+                ->published()
                 ->where('is_featured', true)
-                ->where('is_visible', true)
-                ->whereNotNull('published_at')
                 ->limit(8)
                 ->get(),
             3600,
@@ -86,8 +85,7 @@ final class CacheWarmer
             fn () => Brand::query()
                 ->with(['products', 'translations'])
                 ->whereHas('products', function ($query) {
-                    $query->where('is_visible', true)
-                        ->whereNotNull('published_at');
+                    $query->published();
                 })
                 ->limit(12)
                 ->get(),
@@ -135,12 +133,10 @@ final class CacheWarmer
                 return [
                     'brands' => Brand::query()
                         ->whereHas('products', function ($query) {
-                            $query->where('is_visible', true)
-                                ->whereNotNull('published_at');
+                            $query->published();
                         })
                         ->withCount(['products' => function ($query) {
-                            $query->where('is_visible', true)
-                                ->whereNotNull('published_at');
+                            $query->published();
                         }])
                         ->get()
                         ->pluck('products_count', 'id')
@@ -150,8 +146,7 @@ final class CacheWarmer
                         ->where('is_visible', true)
                         ->where('is_enabled', true)
                         ->withCount(['products' => function ($query) {
-                            $query->where('is_visible', true)
-                                ->whereNotNull('published_at');
+                            $query->published();
                         }])
                         ->get()
                         ->pluck('products_count', 'id')
@@ -159,8 +154,7 @@ final class CacheWarmer
 
                     'categories' => Category::query()
                         ->withCount(['products' => function ($query) {
-                            $query->where('is_visible', true)
-                                ->whereNotNull('published_at');
+                            $query->published();
                         }])
                         ->get()
                         ->pluck('products_count', 'id')

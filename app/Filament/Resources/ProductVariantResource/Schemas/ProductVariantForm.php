@@ -29,9 +29,7 @@ class ProductVariantForm
                             ->preload(),
                         TextInput::make('sku')
                             ->label(__('messages.sku'))
-                            ->required()
-                            ->maxLength(255)
-                            ->unique(ignoreRecord: true),
+                            ->required(),
                         TextInput::make('name')
                             ->label(__('messages.name'))
                             ->maxLength(255),

@@ -20,7 +20,6 @@ final class VariantPriceResult implements Arrayable
      */
     public function __construct(
         public readonly float $regularPrice,
-        public readonly ?float $salePrice,
         public readonly ?float $priceListPrice,
         public readonly float $variantModifiers,
         public readonly float $dynamicAdjustments,
@@ -42,7 +41,6 @@ final class VariantPriceResult implements Arrayable
     {
         return [
             'regular_price'       => $this->regularPrice,
-            'sale_price'          => $this->salePrice,
             'price_list_price'    => $this->priceListPrice,
             'variant_modifiers'   => $this->variantModifiers,
             'dynamic_adjustments' => $this->dynamicAdjustments,

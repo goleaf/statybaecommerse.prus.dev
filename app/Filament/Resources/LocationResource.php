@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace App\Filament\Resources\Locations;
+namespace App\Filament\Resources;
 
-use App\Filament\Resources\Locations\Pages\CreateLocation;
-use App\Filament\Resources\Locations\Pages\EditLocation;
-use App\Filament\Resources\Locations\Pages\ListLocations;
-use App\Filament\Resources\Locations\Pages\ViewLocation;
-use App\Filament\Resources\Locations\Schemas\LocationForm;
-use App\Filament\Resources\Locations\Schemas\LocationInfolist;
-use App\Filament\Resources\Locations\Tables\LocationsTable;
+use App\Filament\Resources\LocationResource\Pages\CreateLocation;
+use App\Filament\Resources\LocationResource\Pages\EditLocation;
+use App\Filament\Resources\LocationResource\Pages\ListLocations;
+use App\Filament\Resources\LocationResource\Pages\ViewLocation;
+use App\Filament\Resources\LocationResource\Schemas\LocationForm;
+use App\Filament\Resources\LocationResource\Schemas\LocationInfolist;
+use App\Filament\Resources\LocationResource\Tables\LocationsTable;
 use App\Models\Location;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;

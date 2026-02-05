@@ -49,7 +49,11 @@ final class CheckLowStockJob implements ShouldQueue
         // Use LazyCollection with timeout to prevent long-running operations
         $timeout = now()->addMinutes(5);
         // 5 minute timeout for low stock checks
-        $lowStockProducts = Product::where('is_visible', true)->where('manage_stock', true)->where('stock_quantity', '<=', DB::raw('low_stock_threshold'))->whereDoesntHave('notifications', function ($query): void {
+        $lowStockProducts = Product::query()
+            ->published()
+            ->where('manage_stock', true)
+            ->where('stock_quantity', '<=', DB::raw('low_stock_threshold'))
+            ->whereDoesntHave('notifications', function ($query): void {
             $query->where('type', LowStockAlert::class)->where('created_at', '>=', now()->subHours(24));
         })->cursor()->takeUntilTimeout($timeout);
         $processedCount = 0;

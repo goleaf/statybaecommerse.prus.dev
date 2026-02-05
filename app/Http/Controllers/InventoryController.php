@@ -37,7 +37,7 @@ final class InventoryController extends Controller
     public function index(Request $request): View
     {
         // Start with the base inventory query eager loading relationships used by the Blade template.
-        $query = Product::with(['brand', 'categories'])->where('is_visible', true)->published();
+        $query = Product::with(['brand', 'categories'])->published();
 
         // Apply request-driven filters in a predictable sequence to keep the query legible and extendable.
         $this->applyStockStatusFilter($query, $request);

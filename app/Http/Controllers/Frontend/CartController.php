@@ -321,12 +321,11 @@ final class CartController extends Controller
      */
     private function applyCartItemPricing(CartItem $cartItem, Product $product): void
     {
-        $unitPrice = (float) ($product->sale_price ?? $product->price ?? 0.0);
-        $regularPrice = (float) ($product->price ?? $unitPrice);
+        $unitPrice = (float) ($product->price ?? 0.0);
 
         $cartItem->unit_price = $unitPrice;
         $cartItem->price = $unitPrice;
-        $cartItem->discount_amount = max(0.0, $regularPrice - $unitPrice);
+        $cartItem->discount_amount = 0.0;
         $cartItem->total_price = round($unitPrice * $cartItem->quantity, 2);
         $cartItem->product_snapshot = array_filter([
             'name'  => $product->name,

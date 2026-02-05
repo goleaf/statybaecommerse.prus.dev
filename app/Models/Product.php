@@ -54,7 +54,6 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property string|null                     $sku
  * @property float|string|null               $price
  * @property bool                            $is_featured
- * @property bool                            $is_visible
  * @property \Illuminate\Support\Carbon|null $published_at
  * @property-read Brand|null $brand
  * @property-read string|null $thumbnail
@@ -82,40 +81,33 @@ final class Product extends Model implements HasMedia, TranslatableRecord
 
     public const SCOPE_COLUMN_HINTS = [
         'is_active'    => false,
-        'is_visible'   => true,
+        'is_visible'   => false,
         'is_enabled'   => true,
         'status'       => true,
         'published_at' => true,
     ];
 
-    protected $fillable = ['name', 'slug', 'description', 'short_description', 'detailed_description', 'sku', 'barcode', 'price', 'cost_price', 'sale_price', 'manage_stock', 'track_stock', 'allow_backorder', 'stock_quantity', 'low_stock_threshold', 'weight', 'length', 'width', 'height', 'is_active', 'is_visible', 'is_enabled', 'is_featured', 'is_requestable', 'requests_count', 'minimum_quantity', 'hide_add_to_cart', 'request_message', 'published_at', 'seo_title', 'seo_description', 'brand_id', 'status', 'type', 'video_url', 'variant_attribute_matrix', 'sort_order', 'tax_class', 'shipping_class', 'download_limit', 'download_expiry', 'external_url', 'button_text'];
+    protected $fillable = ['name', 'slug', 'description', 'short_description', 'detailed_description', 'sku', 'barcode', 'price', 'cost_price', 'manage_stock', 'allow_backorder', 'stock_quantity', 'low_stock_threshold', 'weight', 'length', 'width', 'height', 'is_active', 'is_enabled', 'is_featured', 'is_requestable', 'minimum_quantity', 'hide_add_to_cart', 'request_message', 'published_at', 'seo_title', 'seo_description', 'brand_id', 'status', 'variant_attribute_matrix', 'shipping_class', 'external_url'];
 
     protected $casts = [
         // Monetary and numeric fields use native casting for precise calculations within tests.
         'price'               => 'decimal:2',
         'cost_price'          => 'decimal:2',
-        'sale_price'          => 'decimal:2',
         'weight'              => 'decimal:2',
         'length'              => 'decimal:2',
         'width'               => 'decimal:2',
         'height'              => 'decimal:2',
         'is_active'           => 'boolean',
-        'is_visible'          => 'boolean',
         'is_enabled'          => 'boolean',
         'is_featured'         => 'boolean',
         'is_requestable'      => 'boolean',
         'hide_add_to_cart'    => 'boolean',
         'manage_stock'        => 'boolean',
-        'track_stock'         => 'boolean',
         'allow_backorder'     => 'boolean',
         'published_at'        => 'datetime',
         'stock_quantity'      => 'integer',
         'low_stock_threshold' => 'integer',
-        'requests_count'      => 'integer',
         'minimum_quantity'    => 'integer',
-        'sort_order'          => 'integer',
-        'download_limit'      => 'integer',
-        'download_expiry'     => 'integer',
     ];
 
     /**
@@ -284,7 +276,12 @@ final class Product extends Model implements HasMedia, TranslatableRecord
      */
     public function isPublished(): bool
     {
-        return $this->is_visible && $this->published_at && $this->published_at <= now();
+        $status = (string) ($this->status ?? '');
+
+        return in_array($status, ['published', 'active'], true)
+            && $this->published_at !== null
+            && $this->published_at <= now()
+            && ($this->is_enabled ?? true);
     }
 
     /**
@@ -643,10 +640,10 @@ final class Product extends Model implements HasMedia, TranslatableRecord
     public function isVariant(): bool
     {
         if ($this->relationLoaded('variants')) {
-            return $this->type === 'variable' || $this->variants->isNotEmpty();
+            return $this->variants->isNotEmpty();
         }
 
-        return $this->type === 'variable' || $this->variants()->exists();
+        return $this->variants()->exists();
     }
 
     /**
@@ -889,7 +886,10 @@ final class Product extends Model implements HasMedia, TranslatableRecord
      */
     public function scopePublished($query)
     {
-        return $query->where('is_visible', true)->where('status', 'published')->whereNotNull('published_at')->where('published_at', '<=', now());
+        return $query
+            ->whereIn('status', ['published', 'active'])
+            ->whereNotNull('published_at')
+            ->where('published_at', '<=', now());
     }
 
     /**
@@ -934,7 +934,10 @@ final class Product extends Model implements HasMedia, TranslatableRecord
      */
     public function scopeVisible($query)
     {
-        return $query->where('is_visible', true);
+        return $query
+            ->whereIn('status', ['published', 'active'])
+            ->whereNotNull('published_at')
+            ->where('published_at', '<=', now());
     }
 
     // orderedByName scope provided by OrdersByName trait for consistent sanitisation.
@@ -998,13 +1001,11 @@ final class Product extends Model implements HasMedia, TranslatableRecord
             'products.slug',
             'products.short_description', // Used for short description, NOT description
             'products.price',
-            'products.sale_price',
             'products.stock_quantity',
             'products.brand_id',
             'products.created_at', // May be needed for sorting
             'products.updated_at', // May be needed for sorting
             'products.published_at', // May be needed for sorting
-            'products.is_visible', // Needed for filtering
             'products.is_featured', // May be needed for sorting
         ]);
     }
@@ -1132,7 +1133,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
      */
     public function scopeWithRequests($query)
     {
-        return $query->where('requests_count', '>', 0);
+        return $query->whereHas('requests');
     }
 
     /**
@@ -1140,7 +1141,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
      */
     public function hasVariants(): bool
     {
-        return $this->type === 'variable' && $this->variants()->exists();
+        return $this->variants()->exists();
     }
 
     /**
@@ -1157,30 +1158,6 @@ final class Product extends Model implements HasMedia, TranslatableRecord
     public function shouldHideAddToCart(): bool
     {
         return $this->hide_add_to_cart || $this->is_requestable;
-    }
-
-    /**
-     * Handle getRequestsCount functionality with proper error handling.
-     */
-    public function getRequestsCount(): int
-    {
-        return $this->requests_count;
-    }
-
-    /**
-     * Handle incrementRequestsCount functionality with proper error handling.
-     */
-    public function incrementRequestsCount(): void
-    {
-        $this->increment('requests_count');
-    }
-
-    /**
-     * Handle decrementRequestsCount functionality with proper error handling.
-     */
-    public function decrementRequestsCount(): void
-    {
-        $this->decrement('requests_count');
     }
 
     /**
@@ -1390,7 +1367,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
      */
     public function getTranslatedShortDescription(?string $locale = null): ?string
     {
-        return $this->trans('summary', $locale) ?: $this->short_description;
+        return $this->trans('short_description', $locale) ?: $this->short_description;
     }
 
     /**
@@ -1398,7 +1375,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
      */
     public function getTranslatedSummary(?string $locale = null): ?string
     {
-        return $this->trans('summary', $locale) ?: ($this->summary ?? $this->short_description);
+        return $this->getTranslatedShortDescription($locale);
     }
 
     /**
@@ -1470,7 +1447,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
      */
     public function getOrCreateTranslation(string $locale): \App\Models\Translations\ProductTranslation
     {
-        return $this->translations()->firstOrCreate(['locale' => $locale], ['name' => $this->name, 'slug' => $this->slug, 'description' => $this->description, 'summary' => $this->short_description, 'seo_title' => $this->seo_title, 'seo_description' => $this->seo_description]);
+        return $this->translations()->firstOrCreate(['locale' => $locale], ['name' => $this->name, 'slug' => $this->slug, 'description' => $this->description, 'short_description' => $this->short_description, 'seo_title' => $this->seo_title, 'seo_description' => $this->seo_description]);
     }
 
     // Update translation for specific locale
@@ -1583,7 +1560,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
         $maxPrice = $currentPrice * (1 + $priceRange);
 
         return Product::published()->where('id', '!=', $this->id)->where(function ($query) use ($minPrice, $maxPrice): void {
-            $query->whereBetween('price', [$minPrice, $maxPrice])->orWhereBetween('sale_price', [$minPrice, $maxPrice]);
+            $query->whereBetween('price', [$minPrice, $maxPrice]);
         })->with(['media', 'brand', 'categories', 'translations'])->limit($limit)->get();
     }
 
@@ -1594,7 +1571,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
      */
     public function getProductInfo(): array
     {
-        return ['id' => $this->id, 'name' => $this->name, 'slug' => $this->slug, 'sku' => $this->sku, 'description' => $this->description, 'short_description' => $this->short_description, 'price' => $this->price, 'sale_price' => $this->sale_price, 'cost_price' => $this->cost_price, 'status' => $this->status, 'type' => $this->type, 'is_visible' => $this->is_visible, 'is_featured' => $this->is_featured, 'published_at' => $this->published_at?->toISOString()];
+        return ['id' => $this->id, 'name' => $this->name, 'slug' => $this->slug, 'sku' => $this->sku, 'description' => $this->description, 'short_description' => $this->short_description, 'price' => $this->price, 'cost_price' => $this->cost_price, 'status' => $this->status, 'is_featured' => $this->is_featured, 'published_at' => $this->published_at?->toISOString()];
     }
 
     /**
@@ -1602,7 +1579,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
      */
     public function getInventoryInfo(): array
     {
-        return ['stock_quantity' => $this->stock_quantity, 'manage_stock' => $this->manage_stock, 'track_stock' => $this->track_stock, 'allow_backorder' => $this->allow_backorder, 'low_stock_threshold' => $this->low_stock_threshold, 'minimum_quantity' => $this->minimum_quantity, 'stock_status' => $this->getStockStatus(), 'is_in_stock' => $this->isInStock(), 'is_low_stock' => $this->isLowStock(), 'is_out_of_stock' => $this->isOutOfStock(), 'available_quantity' => $this->availableQuantity(), 'reserved_quantity' => $this->reservedQuantity()];
+        return ['stock_quantity' => $this->stock_quantity, 'manage_stock' => $this->manage_stock, 'allow_backorder' => $this->allow_backorder, 'low_stock_threshold' => $this->low_stock_threshold, 'minimum_quantity' => $this->minimum_quantity, 'stock_status' => $this->getStockStatus(), 'is_in_stock' => $this->isInStock(), 'is_low_stock' => $this->isLowStock(), 'is_out_of_stock' => $this->isOutOfStock(), 'available_quantity' => $this->availableQuantity(), 'reserved_quantity' => $this->reservedQuantity()];
     }
 
     /**
@@ -1610,7 +1587,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
      */
     public function getPricingInfo(): array
     {
-        return ['price' => $this->price, 'sale_price' => $this->sale_price, 'cost_price' => $this->cost_price, 'current_price' => $this->sale_price ?: $this->price, 'discount_percentage' => $this->getDiscountPercentage(), 'profit_margin' => $this->getProfitMargin(), 'markup_percentage' => $this->getMarkupPercentage()];
+        return ['price' => $this->price, 'cost_price' => $this->cost_price, 'current_price' => $this->price, 'discount_percentage' => $this->getDiscountPercentage(), 'profit_margin' => $this->getProfitMargin(), 'markup_percentage' => $this->getMarkupPercentage()];
     }
 
     /**
@@ -1634,7 +1611,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
      */
     public function getBusinessInfo(): array
     {
-        return ['is_featured' => $this->is_featured, 'is_requestable' => $this->is_requestable, 'requests_count' => $this->requests_count, 'sales_count' => $this->getSalesCount(), 'revenue' => $this->getRevenue()];
+        return ['is_featured' => $this->is_featured, 'is_requestable' => $this->is_requestable, 'sales_count' => $this->getSalesCount(), 'revenue' => $this->getRevenue()];
     }
 
     /**
@@ -1662,39 +1639,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
      */
     private function calculateDiscountPercentage(): ?float
     {
-        // Determine the comparison baseline, preferring the base price
-        // but gracefully falling back to whichever persisted price is available.
-        $basePrice = $this->price ?? $this->sale_price;
-
-        // Choose the most appropriate current price. A sale price is only valid
-        // when it meaningfully undercuts the comparison baseline.
-        $currentPrice = null;
-
-        if ($this->sale_price !== null) {
-            $candidateSalePrice = (float) $this->sale_price;
-
-            if ($candidateSalePrice > 0 && ($basePrice === null || $candidateSalePrice < (float) $basePrice)) {
-                $currentPrice = $candidateSalePrice;
-            }
-        }
-
-        if ($currentPrice === null && $this->price !== null) {
-            $currentPrice = (float) $this->price;
-        }
-
-        if ($basePrice === null || $currentPrice === null) {
-            return null;
-        }
-
-        $compare = (float) $basePrice;
-        $current = (float) $currentPrice;
-
-        // Ensure we have valid positive prices and current price is less than compare price
-        if ($compare <= 0.0 || $current <= 0.0 || $current >= $compare) {
-            return null;
-        }
-
-        return round((($compare - $current) / $compare) * 100, 2);
+        return null;
     }
 
     /**
