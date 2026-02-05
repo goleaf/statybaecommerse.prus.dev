@@ -14,7 +14,9 @@ use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -44,6 +46,20 @@ class ProductsTable
                     ->label(__('messages.price'))
                     ->money('EUR')
                     ->sortable(),
+                TextColumn::make('status')
+                    ->label(__('admin.products.status'))
+                    ->badge()
+                    ->sortable(),
+                TextColumn::make('stock_quantity')
+                    ->label(__('admin.products.stock_quantity'))
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                ToggleColumn::make('is_enabled')
+                    ->label(__('messages.is_enabled'))
+                    ->toggleable(isToggledHiddenByDefault: true),
+                ToggleColumn::make('is_featured')
+                    ->label(__('admin.products.is_featured'))
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('sales_sparkline')
                     ->label(__('admin.products.sales'))
                     ->formatStateUsing(static fn (): string => '—')
@@ -58,10 +74,6 @@ class ProductsTable
                     ->numeric()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('published_at')
-                    ->label(__('admin.products.published_at'))
-                    ->dateTime()
-                    ->sortable(),
                 TextColumn::make('created_at')
                     ->label(__('admin.products.created_at'))
                     ->dateTime()
@@ -74,6 +86,18 @@ class ProductsTable
                     ->relationship('brand', 'name')
                     ->searchable()
                     ->preload(),
+                SelectFilter::make('categories')
+                    ->label(__('messages.categories'))
+                    ->relationship('categories', 'name')
+                    ->multiple()
+                    ->searchable()
+                    ->preload(),
+                SelectFilter::make('collections')
+                    ->label(__('messages.collections'))
+                    ->relationship('collections', 'name')
+                    ->multiple()
+                    ->searchable()
+                    ->preload(),
                 SelectFilter::make('status')
                     ->label(__('admin.products.status'))
                     ->options([
@@ -82,6 +106,16 @@ class ProductsTable
                         'published' => __('admin.products.status_published'),
                         'archived'  => __('admin.products.status_archived'),
                     ]),
+                TernaryFilter::make('is_active')
+                    ->label(__('admin.products.is_active')),
+                TernaryFilter::make('is_enabled')
+                    ->label(__('messages.is_enabled')),
+                TernaryFilter::make('is_featured')
+                    ->label(__('admin.products.is_featured')),
+                TernaryFilter::make('manage_stock')
+                    ->label(__('admin.products.manage_stock')),
+                TernaryFilter::make('allow_backorder')
+                    ->label(__('admin.products.allow_backorder')),
             ])
             ->actions([
                 EditAction::make(),

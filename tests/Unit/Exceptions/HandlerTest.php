@@ -242,7 +242,7 @@ class HandlerTest extends TestCase
         ];
 
         foreach ($testCases as $errorMessage => $expectedActionable) {
-            Log::clearResolvedInstances(); // Clear previous expectations
+            Log::swap(app('log')); // Reset facade to the real logger before re-spying
             Log::spy();
 
             $exception = new Exception($errorMessage);

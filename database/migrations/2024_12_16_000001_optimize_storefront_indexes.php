@@ -18,16 +18,13 @@ return new class extends Migration
         if (Schema::hasTable('products')) {
             Schema::table('products', function (Blueprint $table) {
                 // Composite index for category filtering with visibility
-                $table->index(['is_visible', 'is_enabled', 'published_at'], 'products_storefront_visibility_idx');
+                $table->index(['is_enabled', 'status', 'published_at'], 'products_storefront_visibility_idx');
 
                 // Index for price range filtering
-                $table->index(['price', 'is_visible'], 'products_price_visibility_idx');
+                $table->index(['price', 'is_enabled'], 'products_price_visibility_idx');
 
                 // Index for stock filtering
-                $table->index(['stock_quantity', 'is_visible'], 'products_stock_visibility_idx');
-
-                // Index for search and sorting by popularity
-                $table->index(['view_count', 'is_visible'], 'products_popularity_idx');
+                $table->index(['stock_quantity', 'is_enabled'], 'products_stock_visibility_idx');
             });
         }
 
@@ -112,7 +109,6 @@ return new class extends Migration
                 $table->dropIndex('products_storefront_visibility_idx');
                 $table->dropIndex('products_price_visibility_idx');
                 $table->dropIndex('products_stock_visibility_idx');
-                $table->dropIndex('products_popularity_idx');
             });
         }
 

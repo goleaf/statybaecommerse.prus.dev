@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace App\Filament\Resources\AdminUsers\Schemas;
 
 use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
@@ -47,32 +45,6 @@ class AdminUserForm
                             ]),
                     ]),
 
-                Section::make(__('messages.additional_information'))
-                    ->icon('heroicon-o-document-text')
-                    ->description(__('messages.manage_admin_extra_details'))
-                    ->schema([
-                        Textarea::make('description')
-                            ->label(__('messages.description'))
-                            ->rows(5)
-                            ->columnSpanFull()
-                            ->placeholder(__('messages.enter_description_placeholder'))
-                            ->dehydrated(false),
-
-                        Grid::make(3)
-                            ->schema([
-                                Placeholder::make('id')
-                                    ->label(__('messages.id'))
-                                    ->content(fn ($record): ?string => $record?->id ? (string) $record->id : null),
-
-                                Placeholder::make('created_at')
-                                    ->label(__('messages.created_at'))
-                                    ->content(fn ($record): ?string => $record?->created_at?->diffForHumans()),
-
-                                Placeholder::make('updated_at')
-                                    ->label(__('messages.updated_at'))
-                                    ->content(fn ($record): ?string => $record?->updated_at?->diffForHumans()),
-                            ]),
-                    ]),
             ]);
     }
 }

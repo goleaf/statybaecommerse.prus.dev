@@ -3,7 +3,16 @@
 declare(strict_types=1);
 
 return [
-    'industry'       => 'enums.industry',
+    'industry'       => [
+        'construction'  => 'Bau',
+        'technology'    => 'Technologie',
+        'manufacturing' => 'Fertigung',
+        'retail'        => 'Einzelhandel',
+        'finance'       => 'Finanzen',
+        'education'     => 'Bildung',
+        'healthcare'    => 'Gesundheitswesen',
+        'other'         => 'Sonstiges',
+    ],
     'organization_type' => [
         'company'    => 'Unternehmen',
         'team'       => 'Team',

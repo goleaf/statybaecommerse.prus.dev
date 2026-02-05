@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Users;
 
+use App\Models\AdminUser;
 use App\Filament\Resources\Users\Pages\CreateUser;
 use App\Filament\Resources\Users\Pages\EditUser;
 use App\Filament\Resources\Users\Pages\ListUsers;
@@ -90,6 +91,10 @@ class UserResource extends Resource
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ])
-            ->where('is_admin', false);
+            ->where(function (Builder $query): void {
+                $query->whereNull('is_admin')
+                    ->orWhere('is_admin', false);
+            })
+            ->whereNotIn('email', AdminUser::query()->select('email'));
     }
 }
