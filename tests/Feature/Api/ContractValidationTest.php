@@ -40,10 +40,9 @@ final class ContractValidationTest extends TestCase
         $product = Product::factory()
             ->for($brand)
             ->create([
-                'is_visible'     => true,
+                'is_enabled'     => true,
                 'published_at'   => now()->subDay(),
                 'price'          => 199,
-                'sale_price'     => 149,
                 'manage_stock'   => true,
                 'stock_quantity' => 25,
             ]);

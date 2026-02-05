@@ -17,14 +17,12 @@ return new class extends Migration
                 // Provide the catalogue columns exercised by factories and unit tests
                 // so SQLite-based runs can persist Product records reliably.
                 $table->id();
-                $table->string('type')->default('simple');
                 $table->string('name');
                 $table->string('slug')->nullable();
                 $table->string('sku')->nullable();
                 $table->text('description')->nullable();
                 $table->text('short_description')->nullable();
                 $table->decimal('price', 10, 2)->nullable();
-                $table->decimal('sale_price', 10, 2)->nullable();
                 $table->unsignedBigInteger('brand_id')->nullable();
                 $table->integer('stock_quantity')->default(0);
                 $table->integer('low_stock_threshold')->default(0);
@@ -33,7 +31,6 @@ return new class extends Migration
                 $table->decimal('width', 8, 2)->nullable();
                 $table->decimal('height', 8, 2)->nullable();
                 $table->boolean('is_active')->default(true);
-                $table->boolean('is_visible')->default(true);
                 $table->boolean('is_enabled')->default(true);
                 $table->boolean('is_featured')->default(false);
                 $table->boolean('manage_stock')->default(false);
@@ -44,7 +41,7 @@ return new class extends Migration
                 $table->timestamps();
                 $table->softDeletes();
 
-                $table->index(['is_visible', 'status']);
+                $table->index(['is_enabled', 'status', 'published_at']);
                 $table->index(['brand_id']);
             });
         }

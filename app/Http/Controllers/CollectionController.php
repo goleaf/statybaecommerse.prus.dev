@@ -224,9 +224,9 @@ final class CollectionController extends Controller
         if (! $collection->is_visible || ! $collection->is_active) {
             abort(404);
         }
-        $products = PaginationService::paginateQueryWithSkipWhile($collection->products()->published()->with(['images', 'translations'])->getQuery(), function ($product) {
+        $products = PaginationService::paginateQueryWithSkipWhile($collection->products()->published()->enabled()->with(['images', 'translations'])->getQuery(), function ($product) {
             // Skip products that are not properly configured for display
-            return empty($product->name) || ! $product->is_visible || $product->price <= 0 || empty($product->slug) || ! $product->getFirstMediaUrl('images');
+            return empty($product->name) || ! $product->isPublished() || $product->price <= 0 || empty($product->slug) || ! $product->getFirstMediaUrl('images');
         }, $collection->products_per_page ?: 12, 2);
 
         $data = collect($products->items())->map(function ($product) {
@@ -261,7 +261,7 @@ final class CollectionController extends Controller
         $columnCount = $request->get('columns', 4);
         $columnCount = max(1, min(6, (int) $columnCount));
         // Limit between 1-6 columns
-        $products = $collection->products()->published()->with(['images', 'translations'])->get();
+        $products = $collection->products()->published()->enabled()->with(['images', 'translations'])->get();
         $galleryService = new ProductGalleryService;
         // Apply advanced filtering based on request parameters
         $filters = $request->only(['min_price', 'max_price', 'min_rating', 'has_images', 'is_featured', 'category_id']);
@@ -270,7 +270,7 @@ final class CollectionController extends Controller
         } else {
             // Use basic skipWhile filtering
             $products = $products->skipWhile(function ($product) {
-                return empty($product->name) || ! $product->is_visible || $product->price <= 0 || empty($product->slug) || ! $product->getFirstMediaUrl('images');
+                return empty($product->name) || ! $product->isPublished() || $product->price <= 0 || empty($product->slug) || ! $product->getFirstMediaUrl('images');
             });
         }
         $organizedProducts = $galleryService->arrangeForGallery($products, $columnCount);
@@ -304,7 +304,7 @@ final class CollectionController extends Controller
      */
     public function personalizedProducts(Collection $collection, Request $request): JsonResponse
     {
-        $products = $collection->products()->published()->with(['images', 'translations', 'brand', 'mainCategory'])->get();
+        $products = $collection->products()->published()->enabled()->with(['images', 'translations', 'brand', 'mainCategory'])->get();
         $galleryService = new ProductGalleryService;
         // Apply multiple skipWhile filters based on user preferences and performance
         $userPreferences = $request->only(['preferred_brands', 'preferred_categories', 'excluded_brands', 'excluded_categories', 'price_range']);
@@ -324,7 +324,7 @@ final class CollectionController extends Controller
         }
         // Final quality filtering
         $products = $products->skipWhile(function ($product) {
-            return empty($product->name) || ! $product->is_visible || $product->price <= 0 || empty($product->slug) || ! $product->getFirstMediaUrl('images');
+            return empty($product->name) || ! $product->isPublished() || $product->price <= 0 || empty($product->slug) || ! $product->getFirstMediaUrl('images');
         });
         $columnCount = $request->get('columns', 4);
         $organizedProducts = $galleryService->arrangeForGallery($products, $columnCount);
@@ -348,14 +348,14 @@ final class CollectionController extends Controller
         $timeout = now()->addSeconds(30);
         // 30 second timeout for new arrivals processing
         LazyCollection::make($collections)->takeUntilTimeout($timeout)->each(function ($collection) use (&$allProducts, $galleryService, $days) {
-            $products = $collection->products()->published()->with(['images', 'translations'])->get();
+            $products = $collection->products()->published()->enabled()->with(['images', 'translations'])->get();
             // Apply date filtering using skipWhile
             $newProducts = $galleryService->arrangeWithDateFiltering($products, ['new_arrivals_days' => $days, 'exclude_old' => true]);
             $allProducts = $allProducts->merge($newProducts);
         });
         // Remove duplicates and apply final filtering
         $uniqueProducts = $allProducts->unique('id')->skipWhile(function ($product) {
-            return empty($product->name) || ! $product->is_visible || $product->price <= 0 || empty($product->slug);
+            return empty($product->name) || ! $product->isPublished() || $product->price <= 0 || empty($product->slug);
         });
         $organizedProducts = $galleryService->arrangeForGallery($uniqueProducts, $columnCount);
 

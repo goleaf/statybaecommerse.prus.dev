@@ -682,6 +682,7 @@ return [
         'bulk_update_prices_success'    => 'Preise erfolgreich aktualisiert.',
         'bulk_update_stock'             => 'Massen-Bestandsaktualisierung',
         'bulk_update_stock_success'     => 'Bestand erfolgreich aktualisiert.',
+        'compare_price'                 => 'Vergleichspreis',
         'cost_price'                    => 'Selbstkostenpreis',
         'created_at'                    => 'Erstellt am',
         'height'                        => 'Höhe',

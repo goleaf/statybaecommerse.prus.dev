@@ -20,9 +20,7 @@ final class ShoppingCartTest extends TestCase
     {
         $product = Product::factory()->create([
             'price'        => 199.00,
-            'sale_price'   => null,
             'status'       => 'published',
-            'is_visible'   => true,
             'is_enabled'   => true,
             'published_at' => now()->subDay(),
         ]);
@@ -45,11 +43,8 @@ final class ShoppingCartTest extends TestCase
     public function test_it_adds_variant_to_cart_with_variant_pricing(): void
     {
         $product = Product::factory()->create([
-            'type'         => 'variable',
             'price'        => 249.00,
-            'sale_price'   => null,
             'status'       => 'published',
-            'is_visible'   => true,
             'is_enabled'   => true,
             'published_at' => now()->subDay(),
         ]);

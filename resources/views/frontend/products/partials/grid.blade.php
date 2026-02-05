@@ -23,7 +23,7 @@
                 $priceAmount = $priceRecord->amount ?? $product->price;
                 $currencySymbol = $priceRecord?->currency?->symbol ?? $priceRecord?->currency?->code ?? '€';
                 $compareAmount = $priceRecord?->compare_amount;
-                $shortDescription = $product->short_description ?? $product->summary ?? '';
+                $shortDescription = $product->short_description ?? '';
             @endphp
 
             <article class="flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition hover:shadow-md">

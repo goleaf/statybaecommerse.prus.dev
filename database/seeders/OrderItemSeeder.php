@@ -115,8 +115,7 @@ final class OrderItemSeeder extends Seeder
     private function resolveUnitPrice(Product $product, ?ProductVariant $variant): float
     {
         $candidate = $variant?->price
-            ?? $product->price
-            ?? $product->sale_price;
+            ?? $product->price;
 
         if ($candidate === null) {
             // Fallback to a generated amount when the catalog lacks any pricing.

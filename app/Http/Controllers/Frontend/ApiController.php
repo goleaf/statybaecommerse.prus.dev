@@ -129,7 +129,7 @@ final class ApiController extends Controller
         $products = Product::withoutGlobalScopes()
             ->whereIn('id', $orderedIds)
             ->with(['images' => static fn ($relation) => $relation->orderBy('sort_order')])
-            ->get(['id', 'name', 'slug', 'price', 'is_visible', 'status', 'published_at'])
+            ->get(['id', 'name', 'slug', 'price', 'status', 'published_at', 'is_enabled'])
             ->sortBy(static function (Product $product) use ($orderedIds): int {
                 $position = array_search((int) $product->getKey(), $orderedIds, true);
 
@@ -138,7 +138,7 @@ final class ApiController extends Controller
             ->values()
             ->map(static function (Product $product): array {
                 // Avoid leaking draft catalog metadata by collapsing to the identifier when not publicly visible yet.
-                if (! $product->is_visible || $product->status !== 'published' || $product->published_at === null || $product->published_at->isFuture()) {
+                if (! $product->isPublished()) {
                     return [
                         'id'         => $product->getKey(),
                         'image'      => null,

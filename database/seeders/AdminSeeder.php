@@ -932,7 +932,6 @@ final class AdminSeeder extends Seeder
                 [
                     'name'              => $name,
                     'slug'              => Str::slug($name . '-' . $locale),
-                    'summary'           => $shortDescription,
                     'description'       => $description,
                     'short_description' => $shortDescription,
                     'seo_title'         => $seoTitle,

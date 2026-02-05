@@ -48,7 +48,6 @@ it('imports a fully mapped product row with blank optional fields', function ():
         ->and($product->slug)->toBe(Str::slug('Test Product'))
         ->and((float) $product->price)->toBe(6.0)
         ->and($product->status)->toBe('published')
-        ->and($product->is_visible)->toBeTrue()
         ->and($product->is_enabled)->toBeTrue()
         ->and($product->published_at)->not->toBeNull();
 

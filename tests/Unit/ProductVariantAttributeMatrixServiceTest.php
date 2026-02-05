@@ -164,14 +164,12 @@ final class ProductVariantAttributeMatrixServiceTest extends UnitTestCase
         if (! $schema->hasTable('products')) {
             $schema->create('products', static function (Blueprint $table): void {
                 $table->id();
-                $table->string('type')->default('simple');
                 $table->string('name');
                 $table->string('slug')->unique();
                 $table->string('sku')->nullable()->unique();
                 $table->text('description')->nullable();
                 $table->text('short_description')->nullable();
                 $table->decimal('price', 10, 2)->nullable();
-                $table->decimal('sale_price', 10, 2)->nullable();
                 $table->decimal('compare_price', 10, 2)->nullable();
                 $table->decimal('cost_price', 10, 2)->nullable();
                 $table->unsignedBigInteger('brand_id')->nullable();
@@ -182,7 +180,6 @@ final class ProductVariantAttributeMatrixServiceTest extends UnitTestCase
                 $table->decimal('length', 10, 2)->nullable();
                 $table->decimal('width', 10, 2)->nullable();
                 $table->decimal('height', 10, 2)->nullable();
-                $table->boolean('is_visible')->default(true);
                 $table->boolean('is_enabled')->default(true);
                 $table->boolean('is_featured')->default(false);
                 $table->string('status')->default('draft');

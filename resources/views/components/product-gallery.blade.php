@@ -103,11 +103,6 @@
                             {{ __('messages.new') }}
                         </span>
                     @endif
-                    @if ($product->sale_price && $product->sale_price < $product->price)
-                        <span class="bg-red-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
-                            {{ __('Sale') }}
-                        </span>
-                    @endif
                 </div>
             </div>
         </div>

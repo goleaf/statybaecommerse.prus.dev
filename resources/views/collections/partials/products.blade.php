@@ -34,18 +34,9 @@
                     <!-- Price -->
                     <div class="flex items-center justify-between mb-3">
                         <div class="flex items-center space-x-2">
-                            @if($product->sale_price && $product->sale_price < $product->price)
-                                <span class="text-lg font-bold text-red-600">
-                                    {{ number_format($product->sale_price, 2) }} €
-                                </span>
-                                <span class="text-sm text-gray-500 line-through">
-                                    {{ number_format($product->price, 2) }} €
-                                </span>
-                            @else
-                                <span class="text-lg font-bold text-gray-900">
-                                    {{ number_format($product->price, 2) }} €
-                                </span>
-                            @endif
+                            <span class="text-lg font-bold text-gray-900">
+                                {{ number_format($product->price, 2) }} €
+                            </span>
                         </div>
                         
                         @if($product->stock_quantity > 0)

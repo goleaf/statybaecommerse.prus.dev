@@ -347,10 +347,9 @@ final class ProductVariantSeeder extends Seeder
             'description'       => $productData['description'],
             'short_description' => substr($productData['description'], 0, 100),
             'price'             => $productData['base_price'],
-            'cost_price'        => $productData['base_price'] * 0.6,            'manage_stock' => true,
+            'cost_price'        => $productData['base_price'] * 0.6,
+            'manage_stock'      => true,
             'stock_quantity'    => 0,
-            'type'              => 'variable',
-            'is_visible'        => true,
             'is_featured'       => true,
             'published_at'      => now(),
         ];
@@ -410,7 +409,7 @@ final class ProductVariantSeeder extends Seeder
     private function createPricingRules(): void
     {
         // Size-based pricing rule for larger sizes
-        $products = Product::where('type', 'variable')->with('variants')->get();
+        $products = Product::query()->has('variants')->with('variants')->get();
 
         foreach ($products as $product) {
             VariantPricingRule::query()->updateOrCreate(
@@ -493,7 +492,6 @@ final class ProductVariantSeeder extends Seeder
                 [
                     'name'              => $name,
                     'slug'              => Str::slug($name . '-' . $locale),
-                    'summary'           => $shortDescription,
                     'description'       => $description,
                     'short_description' => $shortDescription,
                     'seo_title'         => $seoTitle,

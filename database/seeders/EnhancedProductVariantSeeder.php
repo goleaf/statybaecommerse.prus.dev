@@ -224,9 +224,8 @@ final class EnhancedProductVariantSeeder extends Seeder
                     'description'       => $productData['description'],
                     'short_description' => Str::limit($productData['description'], 120),
                     'price'             => $productData['base_price'],
-                    'cost_price'        => $productData['base_price'] * 0.6,                    'type' => 'variable',
+                    'cost_price'        => $productData['base_price'] * 0.6,
                     'manage_stock'      => true,
-                    'is_visible'        => true,
                     'is_featured'       => true,
                     'published_at'      => now(),
                 ])

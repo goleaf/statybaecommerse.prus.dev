@@ -164,8 +164,8 @@ SQL;
         if ($clauses === null) {
             $parts = [];
 
-            if (Schema::hasColumn('products', 'is_visible')) {
-                $parts[] = '  AND p.is_visible = 1';
+            if (Schema::hasColumn('products', 'is_enabled')) {
+                $parts[] = '  AND p.is_enabled = 1';
             }
 
             if (Schema::hasColumn('products', 'published_at')) {
@@ -174,7 +174,7 @@ SQL;
             }
 
             if (Schema::hasColumn('products', 'status')) {
-                $parts[] = "  AND p.status = 'published'";
+                $parts[] = "  AND p.status IN ('published','active')";
             }
 
             $clauses = $parts ? "\n" . implode("\n", $parts) : '';

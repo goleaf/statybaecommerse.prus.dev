@@ -82,21 +82,9 @@
 
                     {{-- Price --}}
                     <div class="flex items-center gap-4">
-                        @if ($product->sale_price && $product->sale_price < $product->price)
-                            <span class="text-3xl font-bold text-gray-900">
-                                {{ \Illuminate\Support\Number::currency($product->sale_price, current_currency(), app()->getLocale()) }}
-                            </span>
-                            <span class="text-xl text-gray-500 line-through">
-                                {{ \Illuminate\Support\Number::currency($product->price, current_currency(), app()->getLocale()) }}
-                            </span>
-                            <span class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-sm font-medium">
-                                {{ __('common.Sale') }}
-                            </span>
-                        @else
-                            <span class="text-3xl font-bold text-gray-900">
-                                {{ \Illuminate\Support\Number::currency($product->price, current_currency(), app()->getLocale()) }}
-                            </span>
-                        @endif
+                        <span class="text-3xl font-bold text-gray-900">
+                            {{ \Illuminate\Support\Number::currency($product->price, current_currency(), app()->getLocale()) }}
+                        </span>
                     </div>
 
                     {{-- Stock Status --}}
@@ -427,4 +415,3 @@
         }
     }
 </script>
-

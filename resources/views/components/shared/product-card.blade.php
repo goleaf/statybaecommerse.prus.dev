@@ -92,12 +92,12 @@
             </a>
         </h3>
         
-        @if($product->summary)
+        @if($product->short_description)
             <p @class([
                 'mt-2 text-sm text-gray-600 dark:text-gray-300 line-clamp-2' => $layout === 'grid',
                 'mt-2 text-gray-600 dark:text-gray-300' => $layout === 'list',
             ])>
-                {{ $product->summary }}
+                {{ $product->short_description }}
             </p>
         @endif
 
@@ -124,14 +124,6 @@
                     <span class="text-lg font-bold text-gray-900 dark:text-white">
                         {{ $price->currency->symbol }}{{ number_format($price->amount, 2) }}
                     </span>
-                    @if($product->sale_price && $product->sale_price < $price->amount)
-                        <span class="text-sm text-gray-500 line-through">
-                            {{ $price->currency->symbol }}{{ number_format($product->sale_price, 2) }}
-                        </span>
-                        <x-shared.badge variant="danger" size="sm">
-                            {{ __('translations.sale') }}
-                        </x-shared.badge>
-                    @endif
                 </div>
             @endif
             

@@ -21,7 +21,6 @@ final class ProductRequestControllerTest extends TestCase
         $user = User::factory()->create();
         $product = Product::factory()->create([
             'is_requestable' => true,
-            'requests_count' => 0,
         ]);
 
         // Act: open the request creation form.
@@ -53,7 +52,6 @@ final class ProductRequestControllerTest extends TestCase
         $user = User::factory()->create();
         $product = Product::factory()->create([
             'is_requestable' => true,
-            'requests_count' => 0,
         ]);
         $payload = [
             'product_id'         => $product->getKey(),
@@ -79,9 +77,7 @@ final class ProductRequestControllerTest extends TestCase
             'requested_quantity' => 2,
             'status'             => ProductRequest::STATUS_PENDING,
         ]);
-        $reloadedProduct = $product->fresh();
-        self::assertInstanceOf(Product::class, $reloadedProduct);
-        $this->assertSame(1, $reloadedProduct->getRequestsCount());
+        $this->assertSame(1, ProductRequest::query()->where('product_id', $product->getKey())->count());
     }
 
     public function test_store_returns_error_when_product_not_requestable(): void
@@ -90,7 +86,6 @@ final class ProductRequestControllerTest extends TestCase
         $user = User::factory()->create();
         $product = Product::factory()->create([
             'is_requestable' => false,
-            'requests_count' => 0,
         ]);
         $payload = [
             'product_id'         => $product->getKey(),
@@ -109,9 +104,7 @@ final class ProductRequestControllerTest extends TestCase
         $response->assertSessionHasErrors('error');
         $response->assertSessionHasInput('name', 'Disallowed Requester');
         $this->assertDatabaseCount('product_requests', 0);
-        $reloadedProduct = $product->fresh();
-        self::assertInstanceOf(Product::class, $reloadedProduct);
-        $this->assertSame(0, $reloadedProduct->getRequestsCount());
+        $this->assertSame(0, ProductRequest::query()->where('product_id', $product->getKey())->count());
     }
 
     public function test_cancel_marks_request_as_cancelled(): void
@@ -120,7 +113,6 @@ final class ProductRequestControllerTest extends TestCase
         $user = User::factory()->create();
         $product = Product::factory()->create([
             'is_requestable' => true,
-            'requests_count' => 0,
         ]);
         $productRequest = ProductRequest::factory()->create([
             'product_id' => $product->getKey(),
@@ -144,7 +136,6 @@ final class ProductRequestControllerTest extends TestCase
         $user = User::factory()->create();
         $product = Product::factory()->create([
             'is_requestable' => true,
-            'requests_count' => 0,
         ]);
         $productRequest = ProductRequest::factory()->create([
             'product_id' => $product->getKey(),

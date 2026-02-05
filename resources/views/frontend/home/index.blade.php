@@ -7,7 +7,7 @@
                     <div class="p-4 border border-gray-200 rounded-xl bg-white shadow-sm dark:bg-gray-900 dark:border-white/10">
                         <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">{{ $product->name }}</h2>
                         <p class="text-sm text-gray-500 dark:text-gray-400">{{ $product->brand?->name }}</p>
-                        <p class="mt-2 text-primary-600 font-semibold">{{ app_money_format($product->sale_price ?? $product->price ?? 0) }}</p>
+                        <p class="mt-2 text-primary-600 font-semibold">{{ app_money_format($product->price ?? 0) }}</p>
                         <a class="mt-3 inline-flex items-center text-sm text-primary-700 hover:text-primary-800"
                            href="{{ route('frontend.products.show', $product) }}">{{ __('frontend.products.view_product') }}</a>
                     </div>
@@ -24,7 +24,7 @@
                     <div class="p-4 rounded-xl border border-gray-200 bg-white dark:bg-gray-900 dark:border-white/10">
                         <h3 class="text-base font-semibold">{{ $product->name }}</h3>
                         <p class="text-sm text-gray-500 dark:text-gray-400">{{ $product->brand?->name }}</p>
-                        <div class="mt-2 text-primary-600 font-medium">{{ app_money_format($product->sale_price ?? $product->price ?? 0) }}</div>
+                        <div class="mt-2 text-primary-600 font-medium">{{ app_money_format($product->price ?? 0) }}</div>
                     </div>
                 @empty
                     <p class="text-gray-500 dark:text-gray-400">{{ __('frontend.home.latest_empty') }}</p>

@@ -27,16 +27,13 @@ describe('Product model', function () {
     it('has correct fillable attributes', function () {
         $product = new Product;
         $expectedFillable = [
-            'name', 'slug', 'description', 'short_description', 'sku', 'barcode',
-            'price', 'compare_price', 'cost_price', 'sale_price', 'manage_stock',
-            'track_stock', 'allow_backorder', 'stock_quantity', 'low_stock_threshold',
-            'weight', 'length', 'width', 'height', 'is_active', 'is_visible',
-            'is_enabled', 'is_featured', 'is_requestable', 'requests_count',
-            'minimum_quantity', 'hide_add_to_cart', 'request_message', 'published_at',
-            'seo_title', 'seo_description', 'brand_id', 'status', 'type', 'video_url',
-            'variant_attribute_matrix', 'sort_order', 'tax_class',
-            'shipping_class', 'download_limit', 'download_expiry', 'external_url',
-            'button_text',
+            'name', 'slug', 'description', 'short_description', 'detailed_description', 'sku', 'barcode',
+            'price', 'cost_price', 'manage_stock', 'allow_backorder', 'stock_quantity',
+            'low_stock_threshold', 'weight', 'length', 'width', 'height', 'is_active',
+            'is_enabled', 'is_featured', 'is_requestable', 'minimum_quantity',
+            'hide_add_to_cart', 'request_message', 'published_at', 'seo_title',
+            'seo_description', 'brand_id', 'status', 'variant_attribute_matrix',
+            'shipping_class', 'external_url',
         ];
 
         expect($product->getFillable())->toBe($expectedFillable);

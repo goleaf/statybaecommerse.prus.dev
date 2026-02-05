@@ -48,15 +48,14 @@ final class BrandController extends Controller
             $productModels = $brand->products()
                 ->forProductList()
                 ->withListRelations()
-                ->where('is_visible', true)
-                ->whereNotNull('published_at')
-                ->where('published_at', '<=', now())
+                ->published()
+                ->enabled()
                 ->orderByDesc('published_at')
                 ->get()
                 ->filter(function ($product) {
                     // Filter out products that are not properly configured for display
                     return ! empty($product->name) &&
-                           $product->is_visible &&
+                           $product->isPublished() &&
                            $product->price > 0 &&
                            ! empty($product->slug);
                 });
@@ -95,7 +94,6 @@ final class BrandController extends Controller
 
         $availableFilters = [
             'featured' => __('messages.filter_featured'),
-            'sale'     => __('messages.filter_sale'),
             'in_stock' => __('messages.filter_in_stock'),
         ];
 

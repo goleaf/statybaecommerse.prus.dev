@@ -34,7 +34,8 @@ final class ProductVariantAssortmentSeeder extends Seeder
         }
 
         Product::query()
-            ->where('is_visible', true)
+            ->published()
+            ->enabled()
             ->with(['variants'])
             ->chunkById(100, function (Collection $products) use ($catalogue, $mainLocation): void {
                 /** @var Product $product */

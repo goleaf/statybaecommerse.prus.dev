@@ -323,15 +323,14 @@ final class ComprehensiveProductVariantSeeder extends Seeder
                     'short_description' => substr($productData['description'], 0, 100),
                     'sku'               => 'PROD-' . strtoupper(Str::random(8)),
                     'price'             => $productData['base_price'],
-                    'cost_price'        => $productData['base_price'] * 0.6,                    'manage_stock' => true,
+                    'cost_price'        => $productData['base_price'] * 0.6,
+                    'manage_stock'      => true,
                     'stock_quantity'    => 0,
                     'weight'            => 0.5,
-                    'is_visible'        => true,
                     'is_featured'       => true,
                     'published_at'      => now(),
                     'brand_id'          => $brand->id,
                     'status'            => 'published',
-                    'type'              => 'variable',
                 ]
             );
 
@@ -461,7 +460,6 @@ final class ComprehensiveProductVariantSeeder extends Seeder
                 [
                     'name'              => $name,
                     'slug'              => Str::slug($name . '-' . $locale),
-                    'summary'           => $shortDescription,
                     'description'       => $description,
                     'short_description' => $shortDescription,
                     'seo_title'         => $seoTitle ?? $name,

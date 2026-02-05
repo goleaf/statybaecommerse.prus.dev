@@ -426,30 +426,6 @@ Route::middleware('auth')->group(function (): void {
 });
 
 Route::middleware('auth')->prefix('admin')->group(function (): void {
-
-    Route::get('/locations', [AdminLocationController::class, 'index'])
-        ->name('admin.locations.index');
-    Route::get('/locations/create', [AdminLocationController::class, 'create'])
-        ->name('admin.locations.create');
-    Route::post('/locations', [AdminLocationController::class, 'store'])
-        ->name('admin.locations.store');
-    Route::post('/locations/bulk-actions', [AdminLocationController::class, 'bulkActions'])
-        ->name('admin.locations.bulk-actions');
-    Route::post('/locations/reorder', [AdminLocationController::class, 'reorder'])
-        ->name('admin.locations.reorder');
-    Route::get('/locations/{location}', [AdminLocationController::class, 'show'])
-        ->whereNumber('location')
-        ->name('admin.locations.show');
-    Route::get('/locations/{location}/edit', [AdminLocationController::class, 'edit'])
-        ->whereNumber('location')
-        ->name('admin.locations.edit');
-    Route::put('/locations/{location}', [AdminLocationController::class, 'update'])
-        ->whereNumber('location')
-        ->name('admin.locations.update');
-    Route::delete('/locations/{location}', [AdminLocationController::class, 'destroy'])
-        ->whereNumber('location')
-        ->name('admin.locations.destroy');
-
     Route::post('/inventory-management', function (Request $request) {
         $validated = $request->validate([
             'product_id'  => ['required', 'integer', 'exists:products,id'],

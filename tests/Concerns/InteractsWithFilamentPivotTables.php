@@ -181,16 +181,13 @@ trait InteractsWithFilamentPivotTables
         if (! Schema::hasTable('products')) {
             Schema::create('products', function (Blueprint $table): void {
                 $table->id();
-                $table->string('type')->nullable();
                 $table->string('name');
                 $table->string('slug')->unique();
                 $table->string('sku')->nullable();
                 $table->text('description')->nullable();
                 $table->text('short_description')->nullable();
                 $table->decimal('price', 10, 2)->default(0);
-                $table->decimal('sale_price', 10, 2)->nullable();
                 $table->unsignedBigInteger('brand_id')->nullable();
-                $table->boolean('is_visible')->default(false);
                 $table->boolean('is_featured')->default(false);
                 $table->boolean('manage_stock')->default(false);
                 $table->unsignedInteger('stock_quantity')->default(0);
@@ -201,6 +198,7 @@ trait InteractsWithFilamentPivotTables
                 $table->decimal('height', 10, 2)->nullable();
                 $table->timestamp('published_at')->nullable();
                 $table->string('status')->default('draft');
+                $table->boolean('is_enabled')->default(true);
                 $table->string('seo_title')->nullable();
                 $table->text('seo_description')->nullable();
                 $table->softDeletes();

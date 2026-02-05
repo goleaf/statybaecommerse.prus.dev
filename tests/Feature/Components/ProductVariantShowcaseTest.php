@@ -71,14 +71,12 @@ final class ProductVariantShowcaseTest extends TestCase
 
         Schema::create('products', function (Blueprint $table): void {
             $table->id();
-            $table->string('type')->nullable();
             $table->string('name');
             $table->string('slug')->unique();
             $table->string('sku')->nullable();
             $table->text('description')->nullable();
             $table->text('short_description')->nullable();
             $table->decimal('price', 10, 2)->default(0);
-            $table->decimal('sale_price', 10, 2)->nullable();
             $table->unsignedBigInteger('brand_id')->nullable();
             $table->integer('stock_quantity')->default(0);
             $table->integer('low_stock_threshold')->default(0);
@@ -86,10 +84,9 @@ final class ProductVariantShowcaseTest extends TestCase
             $table->decimal('length', 10, 2)->nullable();
             $table->decimal('width', 10, 2)->nullable();
             $table->decimal('height', 10, 2)->nullable();
-            $table->boolean('is_visible')->default(true);
+            $table->boolean('is_enabled')->default(true);
             $table->boolean('is_featured')->default(false);
             $table->boolean('manage_stock')->default(false);
-            $table->boolean('track_stock')->default(false);
             $table->boolean('allow_backorder')->default(false);
             $table->string('status')->default('draft');
             $table->string('seo_title')->nullable();
@@ -176,7 +173,7 @@ final class ProductVariantShowcaseTest extends TestCase
     public function test_variant_metrics_do_not_trigger_additional_queries(): void
     {
         $product = Product::factory()->create([
-            'is_visible'   => true,
+            'is_enabled'   => true,
             'status'       => 'published',
             'published_at' => now(),
         ]);

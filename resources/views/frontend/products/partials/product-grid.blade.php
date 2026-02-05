@@ -14,11 +14,7 @@
                         class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                         loading="lazy"
                     >
-                    @if ($product->sale_price && $product->sale_price < $product->price)
-                        <span class="absolute left-4 top-4 inline-flex items-center rounded-full bg-rose-500/90 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white">
-                            {{ __('Sale') }}
-                        </span>
-                    @elseif($product->is_featured)
+                    @if($product->is_featured)
                         <span class="absolute left-4 top-4 inline-flex items-center rounded-full bg-indigo-500/90 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white">
                             {{ __('messages.featured') }}
                         </span>
@@ -45,9 +41,6 @@
                     <div class="mt-auto flex items-center justify-between pt-2">
                         <div class="flex items-center gap-2">
                             <span class="text-lg font-semibold text-gray-900">{{ $product->formatted_price }}</span>
-                            @if ($product->sale_price && $product->sale_price < $product->price)
-                                <span class="text-sm font-medium text-gray-400 line-through">{{ app_money_format($product->price) }}</span>
-                            @endif
                         </div>
                         <x-untitledui-arrow-up-right class="h-5 w-5 text-indigo-500 transition group-hover:translate-x-1" />
                     </div>

@@ -744,6 +744,7 @@ return [
         'bulk_update_prices_success'    => 'Kainos sėkmingai atnaujintos.',
         'bulk_update_stock'             => 'Masinis atsargų atnaujinimas',
         'bulk_update_stock_success'     => 'Atsargos sėkmingai atnaujintos.',
+        'compare_price'                 => 'Palyginamoji kaina',
         'cost_price'                    => 'Savikaina',
         'created_at'                    => 'Sukurta',
         'height'                        => 'Aukštis',

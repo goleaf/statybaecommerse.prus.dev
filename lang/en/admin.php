@@ -744,6 +744,7 @@ return [
         'bulk_update_prices_success'    => 'Prices updated successfully.',
         'bulk_update_stock'             => 'Bulk Update Stock',
         'bulk_update_stock_success'     => 'Stock updated successfully.',
+        'compare_price'                 => 'Compare Price',
         'cost_price'                    => 'Cost Price',
         'created_at'                    => 'Created At',
         'height'                        => 'Height',

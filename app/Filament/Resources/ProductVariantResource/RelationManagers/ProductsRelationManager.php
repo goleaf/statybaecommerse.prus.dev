@@ -2,33 +2,24 @@
 
 declare(strict_types=1);
 
-namespace App\Filament\Resources\CategoryResource\RelationManagers;
+namespace App\Filament\Resources\ProductVariantResource\RelationManagers;
 
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\PublishedScope;
 use App\Models\Scopes\VisibleScope;
-use Filament\Forms\Components\TextInput;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Schemas\Schema;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 
 class ProductsRelationManager extends RelationManager
 {
-    protected static string $relationship = 'products';
+    protected static string $relationship = 'product';
 
-    public function form(Schema $schema): Schema
+    public static function getTitle(Model $ownerRecord, string $pageClass): string
     {
-        return $schema
-            ->components([
-                TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                TextInput::make('price')
-                    ->numeric()
-                    ->prefix('€'),
-            ]);
+        return __('admin.products.plural_model_label');
     }
 
     public function table(Table $table): Table
@@ -40,7 +31,7 @@ class ProductsRelationManager extends RelationManager
                     PublishedScope::class,
                     VisibleScope::class,
                 ])
-                ->with(['primaryImage']))
+                ->with(['primaryImage', 'brand']))
             ->recordTitleAttribute('name')
             ->paginated(false)
             ->columns([
@@ -51,6 +42,8 @@ class ProductsRelationManager extends RelationManager
                     ->circular(),
                 TextColumn::make('name')
                     ->label(__('messages.name')),
+                TextColumn::make('sku')
+                    ->label(__('messages.sku')),
                 TextColumn::make('price')
                     ->label(__('messages.price'))
                     ->money('EUR'),

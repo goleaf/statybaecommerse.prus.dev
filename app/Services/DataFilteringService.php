@@ -23,13 +23,16 @@ final class DataFilteringService
             ->filter(function ($product) {
                 // Keep only products that satisfy every quality requirement regardless of their position in the collection.
                 $name = (string) ($this->extractValue($product, 'name') ?? '');
-                $isVisible = (bool) ($this->extractValue($product, 'is_visible') ?? false);
+                $isEnabled = (bool) ($this->extractValue($product, 'is_enabled') ?? true);
                 $price = (float) ($this->extractValue($product, 'price') ?? 0.0);
                 $slug = (string) ($this->extractValue($product, 'slug') ?? '');
                 $stock = (int) ($this->extractValue($product, 'stock_quantity') ?? 0);
-                $isPublished = (bool) ($this->extractValue($product, 'is_published') ?? false);
+                $status = (string) ($this->extractValue($product, 'status') ?? '');
+                $publishedAt = $this->extractValue($product, 'published_at');
+                $isPublished = (bool) ($this->extractValue($product, 'is_published') ?? false)
+                    || in_array($status, ['published', 'active'], true);
 
-                return $name !== '' && $isVisible && $price > 0 && $slug !== '' && $stock > 0 && $isPublished;
+                return $name !== '' && $isEnabled && $price > 0 && $slug !== '' && $stock > 0 && $isPublished && $publishedAt !== null;
             })
             ->values(); // Reindex results so pagination helpers receive tidy sequential keys.
     }

@@ -12,7 +12,7 @@ final class EnhancedProductCardTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_discount_calculation_uses_sale_price_when_available(): void
+    public function test_discount_calculation_uses_compare_price_when_available(): void
     {
         $product = Product::factory()->create([
             'price'         => '80.00',

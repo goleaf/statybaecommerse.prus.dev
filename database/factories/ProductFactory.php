@@ -22,7 +22,6 @@ class ProductFactory extends Factory
 
     private const PRESET_PRODUCTS = [
         'hammer-drill' => [
-            'type'              => 'simple',
             'name'              => 'Makita HR2475 smūginis perforatorius',
             'slug'              => 'makita-hr2475-smuginis-perforatorius',
             'sku'               => 'MK-HR2475',
@@ -32,7 +31,6 @@ class ProductFactory extends Factory
             'seo_description'   => 'Galingas Makita perforatorius profesionaliems statybos darbams.',
         ],
         'circular-saw' => [
-            'type'              => 'simple',
             'name'              => 'DeWalt DWE576K diskinis pjūklas',
             'slug'              => 'dewalt-dwe576k-diskinis-pjuklas',
             'sku'               => 'DW-DWE576K',
@@ -42,7 +40,6 @@ class ProductFactory extends Factory
             'seo_description'   => 'Patikimas DeWalt diskinis pjūklas tiksliems pjūviams.',
         ],
         'safety-glasses' => [
-            'type'              => 'simple',
             'name'              => 'Bosch apsauginiai akiniai UltraClear',
             'slug'              => 'bosch-apsauginiai-akiniai-ultraclear',
             'sku'               => 'BS-GLASS01',
@@ -104,17 +101,14 @@ class ProductFactory extends Factory
 
         $name = $this->faker->randomElement($lithuanianProducts);
         $basePrice = $this->faker->randomFloat(2, 5, 2000);
-        $salePrice = $this->faker->boolean(25) ? $basePrice * 0.8 : null;
 
         return $this->guardForMissingColumns([
-            'type'                => 'simple',
             'name'                => $name,
             'slug'                => Str::slug($name . '-' . $this->faker->unique()->randomNumber()),
             'sku'                 => 'LT-' . strtoupper(Str::random(8)),
             'description'         => $this->generateLithuanianDescription($name),
             'short_description'   => $this->generateShortDescription($name),
             'price'               => $basePrice,
-            'sale_price'          => $salePrice,
             'brand_id'            => null,
             'stock_quantity'      => $this->faker->numberBetween(0, 200),
             'low_stock_threshold' => $this->faker->numberBetween(5, 20),
@@ -126,7 +120,6 @@ class ProductFactory extends Factory
             // API layer so contract tests can rely on generated fixtures without
             // additional state tweaks.
             'is_active'       => true,
-            'is_visible'      => true,
             'is_enabled'      => true,
             'is_featured'     => false,
             'manage_stock'    => $this->faker->boolean(85),
@@ -189,7 +182,7 @@ class ProductFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'status'       => 'published',
-            'is_visible'   => true,
+            'is_enabled'   => true,
             'published_at' => now()->subDays(3),
         ]);
     }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProductVariantResource\Pages;
+use App\Filament\Resources\ProductVariantResource\RelationManagers\ProductsRelationManager;
 use App\Filament\Resources\ProductVariantResource\Schemas\ProductVariantForm;
 use App\Filament\Resources\ProductVariantResource\Schemas\ProductVariantInfolist;
 use App\Models\ProductVariant;
@@ -74,6 +75,13 @@ final class ProductVariantResource extends BaseResource
             ->bulkActions([
                 DeleteBulkAction::make(),
             ]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            ProductsRelationManager::class,
+        ];
     }
 
     public static function getPages(): array

@@ -156,7 +156,6 @@ final class TurboEcommerceSeeder extends Seeder
                         'short_description'   => '—',
                         'sku'                 => 'PRD-' . strtoupper(Str::random(10)),
                         'price'               => $price,
-                        'sale_price'          => (mt_rand(0, 100) < 20) ? round($price * 0.85, 2) : null,
                         'manage_stock'        => (mt_rand(0, 100) < 85),
                         'stock_quantity'      => mt_rand(0, 500),
                         'low_stock_threshold' => mt_rand(3, 25),
@@ -164,13 +163,11 @@ final class TurboEcommerceSeeder extends Seeder
                         'length'              => mt_rand(10, 3000) / 10,
                         'width'               => mt_rand(10, 3000) / 10,
                         'height'              => mt_rand(10, 1500) / 10,
-                        'is_visible'          => true,
                         'is_featured'         => (mt_rand(0, 100) < 10),
                         'published_at'        => now(),
                         'seo_title'           => $nameLt,
                         'seo_description'     => '—',
                         'status'              => 'published',
-                        'type'                => 'simple',
                     ]);
 
                 $products->push($product);
@@ -248,7 +245,6 @@ final class TurboEcommerceSeeder extends Seeder
                             'locale'          => $locale,
                             'name'            => $this->translateLike($product->name, $locale),
                             'slug'            => Str::slug($this->translateLike($product->name, $locale) . '-' . substr($product->slug, -6)),
-                            'summary'         => $this->translateLike('Profesionalus įrankis', $locale),
                             'description'     => $this->translateLike('Aukštos kokybės produktas profesionalams ir mėgėjams.', $locale),
                             'seo_title'       => $this->translateLike($product->name, $locale),
                             'seo_description' => $this->translateLike('Pirkite geriausia kaina. Greitas pristatymas.', $locale),

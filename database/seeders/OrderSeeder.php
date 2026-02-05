@@ -48,8 +48,9 @@ final class OrderSeeder extends Seeder
         );
 
         // Get product IDs only to reduce memory usage
-        $visibleProductIds = Product::where('is_visible', true)
-            ->whereNotNull('published_at')
+        $visibleProductIds = Product::query()
+            ->published()
+            ->enabled()
             ->inRandomOrder()
             ->limit(50)
             ->pluck('id')
@@ -58,7 +59,7 @@ final class OrderSeeder extends Seeder
         if (empty($visibleProductIds)) {
             $products = Product::factory()
                 ->count(10)
-                ->state(['is_visible' => true, 'published_at' => now()])
+                ->state(['status' => 'published', 'is_enabled' => true, 'published_at' => now()])
                 ->create();
             $visibleProductIds = $products->pluck('id')->toArray();
         }

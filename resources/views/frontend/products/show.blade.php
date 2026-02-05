@@ -43,9 +43,6 @@
 
                     <div class="flex items-baseline gap-3">
                         <span class="text-3xl font-semibold text-indigo-600">{{ $product->formatted_price }}</span>
-                        @if ($product->sale_price && $product->sale_price < $product->price)
-                            <span class="text-lg font-medium text-gray-400 line-through">{{ app_money_format($product->price) }}</span>
-                        @endif
                     </div>
 
                     <div class="flex items-center gap-2 text-sm text-gray-600">
@@ -59,10 +56,6 @@
                         <div class="flex items-center gap-2">
                             <x-untitledui-tag class="h-5 w-5 text-gray-400" />
                             <span>{{ __('ui.sku_sku', ['sku' => $product->sku]) }}</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <x-untitledui-layers-three class="h-5 w-5 text-gray-400" />
-                            <span>{{ __('ui.type_type', ['type' => ucfirst($product->type)]) }}</span>
                         </div>
                         @if ($product->categories->isNotEmpty())
                             <div class="flex items-start gap-2">

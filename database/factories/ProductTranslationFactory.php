@@ -70,7 +70,6 @@ class ProductTranslationFactory extends Factory
             'locale'            => $this->faker->randomElement(['lt', 'en']),
             'name'              => $name,
             'slug'              => \Illuminate\Support\Str::slug($name),
-            'summary'           => $this->faker->sentence(10),
             'description'       => $this->faker->paragraphs(3, true),
             'short_description' => $this->faker->sentence(5),
             'seo_title'         => $name . ' - ' . $this->faker->words(2, true),

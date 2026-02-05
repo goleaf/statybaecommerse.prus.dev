@@ -38,7 +38,6 @@ final class CartControllerJsonTest extends TestCase
         // Arrange a product with deterministic pricing and stock to assert totals.
         $product = Product::factory()->create([
             'price'            => 25.0,
-            'sale_price'       => null,
             'manage_stock'     => true,
             'stock_quantity'   => 10,
             'minimum_quantity' => 1,
@@ -70,7 +69,6 @@ final class CartControllerJsonTest extends TestCase
         $user = User::factory()->create();
         $product = Product::factory()->create([
             'price'          => 19.99,
-            'sale_price'     => null,
             'manage_stock'   => true,
             'stock_quantity' => 5,
         ]);
@@ -102,7 +100,6 @@ final class CartControllerJsonTest extends TestCase
         $user = User::factory()->create();
         $product = Product::factory()->create([
             'price'          => 15.5,
-            'sale_price'     => null,
             'manage_stock'   => true,
             'stock_quantity' => 8,
         ]);
@@ -141,7 +138,6 @@ final class CartControllerJsonTest extends TestCase
         // Arrange a cart item that will be removed using the API.
         $product = Product::factory()->create([
             'price'          => 12.0,
-            'sale_price'     => null,
             'manage_stock'   => true,
             'stock_quantity' => 4,
         ]);
@@ -171,7 +167,6 @@ final class CartControllerJsonTest extends TestCase
         // Arrange a product with limited stock to trigger the oversell guard.
         $product = Product::factory()->create([
             'price'          => 18.0,
-            'sale_price'     => null,
             'manage_stock'   => true,
             'stock_quantity' => 2,
         ]);

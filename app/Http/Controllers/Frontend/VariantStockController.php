@@ -24,7 +24,7 @@ final class VariantStockController extends Controller
     public function index(Request $request): View
     {
         $query = VariantInventory::with(['variant.product', 'location', 'supplier'])->whereHas('variant.product', function ($q) {
-            $q->where('is_visible', true);
+            $q->published()->enabled();
         });
         // Apply filters
         if ($request->filled('location')) {
@@ -101,7 +101,7 @@ final class VariantStockController extends Controller
     public function getLowStockAlerts(): JsonResponse
     {
         $lowStockItems = VariantInventory::with(['variant.product', 'location'])->lowStock()->whereHas('variant.product', function ($q) {
-            $q->where('is_visible', true);
+            $q->published()->enabled();
         })->limit(10)->get()->map(function ($inventory) {
             return ['id' => $inventory->id, 'product_name' => $inventory->product_name, 'variant_name' => $inventory->variant_name, 'location_name' => $inventory->location_name, 'current_stock' => $inventory->stock, 'threshold' => $inventory->threshold, 'stock_status' => $inventory->stock_status];
         });

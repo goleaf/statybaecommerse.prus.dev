@@ -281,20 +281,9 @@
                                             {{-- Price and Actions --}}
                                             <div class="lg:w-48 flex-shrink-0">
                                                 <div class="text-right mb-4">
-                                                    @if ($product->sale_price && $product->sale_price < $product->price)
-                                                        <div class="flex items-center justify-end gap-2">
-                                                            <span class="text-2xl font-bold text-gray-900">
-                                                                {{ \Illuminate\Support\Number::currency($product->sale_price, current_currency(), app()->getLocale()) }}
-                                                            </span>
-                                                            <span class="text-lg text-gray-500 line-through">
-                                                                {{ \Illuminate\Support\Number::currency($product->price, current_currency(), app()->getLocale()) }}
-                                                            </span>
-                                                        </div>
-                                                    @else
-                                                        <span class="text-2xl font-bold text-gray-900">
-                                                            {{ \Illuminate\Support\Number::currency($product->price, current_currency(), app()->getLocale()) }}
-                                                        </span>
-                                                    @endif
+                                                    <span class="text-2xl font-bold text-gray-900">
+                                                        {{ \Illuminate\Support\Number::currency($product->price, current_currency(), app()->getLocale()) }}
+                                                    </span>
                                                 </div>
 
                                                 <div class="space-y-2">

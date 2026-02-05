@@ -20,9 +20,7 @@ final class HomeAddToCartTest extends TestCase
     {
         $product = Product::factory()->create([
             'price'        => 29.99,
-            'sale_price'   => null,
             'status'       => 'published',
-            'is_visible'   => true,
             'is_enabled'   => true,
             'manage_stock' => false,
             'published_at' => now()->subDay(),
@@ -45,10 +43,8 @@ final class HomeAddToCartTest extends TestCase
     public function test_home_adds_variant_product_and_cart_page_renders(): void
     {
         $product = Product::factory()->create([
-            'type'         => 'variable',
             'price'        => 49.99,
             'status'       => 'published',
-            'is_visible'   => true,
             'is_enabled'   => true,
             'manage_stock' => false,
             'published_at' => now()->subDay(),
@@ -86,9 +82,7 @@ final class HomeAddToCartTest extends TestCase
         $user = User::factory()->create();
         $product = Product::factory()->create([
             'price'        => 19.99,
-            'sale_price'   => null,
             'status'       => 'published',
-            'is_visible'   => true,
             'is_enabled'   => true,
             'manage_stock' => false,
             'published_at' => now()->subDay(),
@@ -112,10 +106,8 @@ final class HomeAddToCartTest extends TestCase
     public function test_home_adds_default_variant_when_none_is_selected(): void
     {
         $product = Product::factory()->create([
-            'type'         => 'variable',
             'price'        => 59.99,
             'status'       => 'published',
-            'is_visible'   => true,
             'is_enabled'   => true,
             'manage_stock' => false,
             'published_at' => now()->subDay(),

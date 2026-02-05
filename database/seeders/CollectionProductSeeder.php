@@ -64,20 +64,17 @@ class CollectionProductSeeder extends Seeder
         $existingProduct = Product::where('slug', $productDefinition['slug'])->first();
 
         $productData = [
-            'type'                => 'simple',
             'name'                => $english['name'],
             'sku'                 => $productDefinition['sku'] ?? strtoupper(Str::random(10)),
             'description'         => $english['description'],
             'short_description'   => $english['short_description'],
             'price'               => $productDefinition['price'],
-            'sale_price'          => $productDefinition['sale_price'] ?? null,
             'stock_quantity'      => $productDefinition['stock'] ?? 50,
             'low_stock_threshold' => $productDefinition['low_stock_threshold'] ?? 8,
             'weight'              => $productDefinition['weight'] ?? 5.0,
             'length'              => $productDefinition['length'] ?? 40.0,
             'width'               => $productDefinition['width'] ?? 30.0,
             'height'              => $productDefinition['height'] ?? 20.0,
-            'is_visible'          => true,
             'is_featured'         => $productDefinition['featured'] ?? false,
             'manage_stock'        => true,
             'status'              => 'published',
@@ -119,7 +116,6 @@ class CollectionProductSeeder extends Seeder
             $translationData = [
                 'name'              => $localeTranslation['name'],
                 'slug'              => Str::slug($localeTranslation['name'] . '-' . $locale),
-                'summary'           => $localeTranslation['short_description'],
                 'short_description' => $localeTranslation['short_description'],
                 'description'       => $localeTranslation['description'],
                 'seo_title'         => $localeTranslation['name'] . ' - ' . config('app.name'),

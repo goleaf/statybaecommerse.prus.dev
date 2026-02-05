@@ -41,24 +41,6 @@
     $id = (int) ($productData['id'] ?? 0);
 
     $price = (float) ($productData['price'] ?? 0.0);
-    $salePrice = isset($productData['sale_price']) ? (float) $productData['sale_price'] : null;
-
-    $currentPrice = $salePrice !== null && $salePrice > 0 && $salePrice < $price
-        ? $salePrice
-        : $price;
-
-    $compareAtPrice = ($salePrice !== null && $salePrice < $price) ? $price : null;
-
-    $hasDiscount = $compareAtPrice !== null;
-    $discountBadge = null;
-    if ($hasDiscount) {
-        $discountValue = $productData['discount_percentage'] ?? null;
-        if ($discountValue !== null) {
-            $discountBadge = (int) round((float) $discountValue);
-        } elseif ($compareAtPrice > 0) {
-            $discountBadge = (int) round((($compareAtPrice - $currentPrice) / $compareAtPrice) * 100);
-        }
-    }
 
     $stockQuantity = (int) ($productData['stock_quantity'] ?? 0);
     $inStock = $stockQuantity > 0;
@@ -91,11 +73,7 @@
 
         {{-- Badge in top-right corner --}}
         <div class="absolute top-3 right-3">
-            @if ($hasDiscount)
-                <span class="inline-block bg-red-500 text-white px-3 py-1 rounded-full text-xs font-semibold uppercase">
-                    {{ __('frontend.home.products.badges.sale') }}
-                </span>
-            @elseif($cardPreset === 'latest')
+            @if($cardPreset === 'latest')
                 <span class="inline-block text-white px-3 py-1 rounded-full text-xs font-semibold uppercase" style="background-color: #0ea5e9;">
                     {{ __('frontend.home.products.badges.new') }}
                 </span>
@@ -136,13 +114,8 @@
             {{-- Price --}}
             <div class="flex items-baseline gap-2">
                 <span class="text-xl font-bold" style="color: {{ $brandPrimary }} !important; display: inline-block;">
-                    {{ Number::currency($currentPrice, current_currency(), app()->getLocale()) }}
+                    {{ Number::currency($price, current_currency(), app()->getLocale()) }}
                 </span>
-                @if ($compareAtPrice)
-                    <span class="text-sm line-through" style="color: {{ $brandPrimaryLight }} !important; display: inline-block;">
-                        {{ Number::currency($compareAtPrice, current_currency(), app()->getLocale()) }}
-                    </span>
-                @endif
         </div>
 
             {{-- Dark Add to Cart Button with brand primary color --}}

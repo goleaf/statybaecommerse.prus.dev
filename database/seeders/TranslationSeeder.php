@@ -98,11 +98,6 @@ class TranslationSeeder extends Seeder
                     [
                         'name'    => $suffix($product->name, $locale),
                         'slug'    => $suffix($product->slug, $locale),
-                        'summary' => $product->short_description
-                            ? $suffix($product->short_description, $locale)
-                            : ($locale === 'lt'
-                                ? 'Trumpas produkto aprašymas lietuvių kalba.'
-                                : 'Short product description in English.'),
                         'description' => $locale === 'lt'
                             ? '<p>Detalus produkto <strong>' . $product->name . '</strong> aprašymas lietuvių kalba.</p><p>Šis produktas pasižymi aukšta kokybe ir patikimumu. Idealiai tinka profesionaliam ir buitiniam naudojimui.</p><ul><li>Aukšta kokybė</li><li>Patikimumas</li><li>Lengvas naudojimas</li><li>Ilgas tarnavimo laikas</li></ul>'
                             : '<p>Detailed product <strong>' . $product->name . '</strong> description in English.</p><p>This product is characterized by high quality and reliability. Ideally suited for professional and domestic use.</p><ul><li>High quality</li><li>Reliability</li><li>Easy to use</li><li>Long service life</li></ul>',

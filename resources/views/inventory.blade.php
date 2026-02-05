@@ -84,20 +84,9 @@
                                 @livewire('inventory-status', ['product' => $product])
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                                @if($product->sale_price && $product->sale_price < $product->price)
-                                    <div>
-                                        <span class="text-lg font-semibold text-red-600 dark:text-red-400">
-                                            {{ number_format($product->sale_price, 2) }} €
-                                        </span>
-                                        <div class="text-sm text-gray-500 line-through">
-                                            {{ number_format($product->price, 2) }} €
-                                        </div>
-                                    </div>
-                                @else
-                                    <span class="text-lg font-semibold text-gray-900 dark:text-white">
-                                        {{ number_format($product->price, 2) }} €
-                                    </span>
-                                @endif
+                                <span class="text-lg font-semibold text-gray-900 dark:text-white">
+                                    {{ number_format($product->price, 2) }} €
+                                </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <div class="flex space-x-2">

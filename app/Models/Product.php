@@ -81,7 +81,6 @@ final class Product extends Model implements HasMedia, TranslatableRecord
 
     public const SCOPE_COLUMN_HINTS = [
         'is_active'    => false,
-        'is_visible'   => false,
         'is_enabled'   => true,
         'status'       => true,
         'published_at' => true,
