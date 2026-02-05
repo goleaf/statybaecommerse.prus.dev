@@ -69,9 +69,7 @@ return new class extends Migration
                 $table->text('description')->nullable();
                 $table->text('short_description')->nullable();
                 $table->string('sku')->nullable()->unique();
-                $table->text('summary')->nullable();
                 $table->decimal('price', 10, 2)->nullable();
-                $table->decimal('sale_price', 10, 2)->nullable();
                 $table->decimal('compare_price', 10, 2)->nullable();
                 $table->decimal('cost_price', 10, 2)->nullable();
                 $table->boolean('manage_stock')->default(false);
@@ -81,7 +79,6 @@ return new class extends Migration
                 $table->decimal('length', 8, 2)->nullable();
                 $table->decimal('width', 8, 2)->nullable();
                 $table->decimal('height', 8, 2)->nullable();
-                $table->boolean('is_visible')->default(true);
                 $table->boolean('is_enabled')->default(true);
                 $table->boolean('is_featured')->default(false);
                 $table->timestamp('published_at')->nullable();
@@ -89,15 +86,14 @@ return new class extends Migration
                 $table->text('seo_description')->nullable();
                 $table->unsignedBigInteger('brand_id')->nullable();
                 $table->enum('status', ['draft', 'published', 'archived'])->default('draft');
-                $table->enum('type', ['simple', 'variable'])->default('simple');
                 $table->timestamps();
                 $table->softDeletes();
 
                 $table->foreign('brand_id')->references('id')->on('brands')->onDelete('set null');
-                $table->index(['is_visible', 'published_at']);
-                $table->index(['status', 'is_visible']);
-                $table->index(['brand_id', 'is_visible']);
-                $table->index(['is_featured', 'is_visible']);
+                $table->index(['is_enabled', 'published_at']);
+                $table->index(['status', 'published_at']);
+                $table->index(['brand_id', 'is_enabled']);
+                $table->index(['is_featured', 'is_enabled']);
             });
         }
 

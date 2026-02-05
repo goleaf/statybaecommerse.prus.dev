@@ -44,7 +44,6 @@ return new class extends Migration
         $this->createTranslation('sh_product_translations', 'product_id', function (Blueprint $table) {
             $table->string('name');
             $table->string('slug');
-            $table->text('summary')->nullable();
             $table->longText('description')->nullable();
             $table->string('seo_title')->nullable();
             $table->text('seo_description')->nullable();

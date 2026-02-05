@@ -449,6 +449,7 @@ return [
     'sort_order'                                                                                            => 'Rūšiavimo eiliškumas',
     'is_enabled'                                                                                            => 'Įjungta',
     'is_default'                                                                                            => 'Numatytasis',
+    'is_main'                                                                                               => 'Pagrindinis',
     'is_default_variant'                                                                                    => 'Numatytasis variantas',
     'is_new'                                                                                                => 'Nauja prekė',
     'is_bestseller'                                                                                         => 'Perkamiausia prekė',

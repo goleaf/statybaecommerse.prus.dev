@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Organizations\Schemas;
 
-use Filament\Forms\Components\KeyValue;
+use App\Enums\OrganizationType;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Str;
@@ -27,16 +29,16 @@ class OrganizationForm
                             ->maxLength(255)
                             ->live(onBlur: true)
                             ->afterStateUpdated(fn (Set $set, ?string $state) => $set('slug', Str::slug($state))),
-                        TextInput::make('slug')
-                            ->label(__('messages.slug'))
-                            ->required()
-                            ->maxLength(255)
+                        Hidden::make('slug')
+                            ->dehydrateStateUsing(fn (Get $get): string => Str::slug((string) $get('name')))
                             ->unique(ignoreRecord: true),
-                        TextInput::make('type')
+                        Select::make('type')
                             ->label(__('messages.Type'))
+                            ->options(OrganizationType::options())
                             ->required()
-                            ->maxLength(255),
-                    ])->columns(3)
+                            ->default(OrganizationType::COMPANY->value)
+                            ->searchable(),
+                    ])->columns(2)
                     ->columnSpanFull(),
 
                 Section::make(__('messages.Description'))
@@ -47,15 +49,6 @@ class OrganizationForm
                     ])
                     ->columnSpanFull(),
 
-                Section::make(__('admin.navigation.settings'))
-                    ->schema([
-                        Toggle::make('is_active')
-                            ->label(__('messages.active'))
-                            ->required(),
-                        KeyValue::make('settings')
-                            ->label(__('messages.Value')),
-                    ])
-                    ->columnSpanFull(),
             ]);
     }
 }

@@ -947,6 +947,5 @@ return [
     'product_images'       => 'Produktbilder',
     'product_requests'     => 'Produktanfragen',
     'product_similarities' => 'Produktähnlichkeiten',
-    'product_variants'     => 'Produktvarianten',
     'xml_provider_label'   => 'XML (LT/EN)',
 ];

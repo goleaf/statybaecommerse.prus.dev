@@ -6,6 +6,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProductResource\Pages;
 use App\Filament\Resources\ProductResource\RelationManagers\FeaturesRelationManager;
+use App\Filament\Resources\ProductResource\RelationManagers\ImagesRelationManager;
 use App\Filament\Resources\ProductResource\RelationManagers\RequestsRelationManager;
 use App\Filament\Resources\ProductResource\RelationManagers\SimilaritiesRelationManager;
 use App\Filament\Resources\ProductResource\RelationManagers\VariantsRelationManager;
@@ -56,6 +57,7 @@ final class ProductResource extends BaseResource
     {
         return [
             VariantsRelationManager::class,
+            ImagesRelationManager::class,
             FeaturesRelationManager::class,
             RequestsRelationManager::class,
             SimilaritiesRelationManager::class,

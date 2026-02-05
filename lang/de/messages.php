@@ -447,6 +447,7 @@ return [
     'sort_order'                                                                                            => 'Sortierreihenfolge',
     'is_enabled'                                                                                            => 'Aktiviert',
     'is_default'                                                                                            => 'Standard',
+    'is_main'                                                                                               => 'Hauptbild',
     'is_default_variant'                                                                                    => 'Standardvariante',
     'is_new'                                                                                                => 'Neu',
     'is_bestseller'                                                                                         => 'Bestseller',

@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 return [
     'industry'       => 'enums.industry',
+    'organization_type' => [
+        'company'    => 'Unternehmen',
+        'team'       => 'Team',
+        'department' => 'Abteilung',
+    ],
     'payment_method' => [
         'apple_pay'        => 'Apple Pay',
         'bank_transfer'    => 'Banküberweisung',

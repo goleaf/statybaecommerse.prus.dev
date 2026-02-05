@@ -460,6 +460,7 @@ return [
     'user'                                                                                                  => 'User',
     'is_enabled'                                                                                            => 'Is Enabled',
     'is_default'                                                                                            => 'Is Default',
+    'is_main'                                                                                               => 'Is Main',
     'is_default_variant'                                                                                    => 'Is Default Variant',
     'is_new'                                                                                                => 'Is New',
     'is_bestseller'                                                                                         => 'Is Bestseller',

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
+use App\Enums\OrganizationType;
 use App\Models\Organization;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
@@ -23,7 +24,7 @@ final class OrganizationFactory extends Factory
             'name'        => $name,
             'slug'        => Str::slug($name),
             'description' => $this->faker->paragraph(),
-            'type'        => $this->faker->randomElement(['company', 'team', 'department']),
+            'type'        => $this->faker->randomElement(OrganizationType::values()),
             'is_active'   => true,
             'settings'    => [
                 'timezone' => $this->faker->timezone(),

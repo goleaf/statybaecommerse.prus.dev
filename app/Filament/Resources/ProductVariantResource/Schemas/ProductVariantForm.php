@@ -45,10 +45,6 @@ class ProductVariantForm
                             ->numeric()
                             ->required()
                             ->prefix('€'),
-                        TextInput::make('compare_price')
-                            ->label(__('admin.products.compare_price'))
-                            ->numeric()
-                            ->prefix('€'),
                         TextInput::make('cost_price')
                             ->label(__('admin.products.cost_price'))
                             ->numeric()

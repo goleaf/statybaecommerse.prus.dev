@@ -30,9 +30,6 @@ class ProjectsRelationManager extends RelationManager
                     ->label(__('messages.name'))
                     ->required()
                     ->maxLength(255),
-                TextInput::make('status')
-                    ->label(__('messages.status'))
-                    ->required(),
             ]);
     }
 

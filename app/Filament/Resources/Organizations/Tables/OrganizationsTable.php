@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Organizations\Tables;
 
+use App\Enums\OrganizationType;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -28,7 +29,14 @@ class OrganizationsTable
                 TextColumn::make('type')
                     ->label(__('messages.Type'))
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->formatStateUsing(static function ($state): string {
+                        if ($state instanceof OrganizationType) {
+                            return $state->label();
+                        }
+
+                        return OrganizationType::tryFrom((string) $state)?->label() ?? (string) $state;
+                    }),
                 IconColumn::make('is_active')
                     ->label(__('messages.active'))
                     ->boolean(),
