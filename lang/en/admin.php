@@ -497,6 +497,9 @@ return [
         'show'         => 'Show Location',
         'store'        => 'Save Location',
         'update'       => 'Update Location',
+        'navigation_label'   => 'Locations',
+        'plural_model_label' => 'Locations',
+        'model_label'        => 'Location',
     ],
     'locations_page' => [
         'columns' => [

@@ -497,6 +497,9 @@ return [
         'show'         => 'Rodyti vietovę',
         'store'        => 'Išsaugoti vietovę',
         'update'       => 'Atnaujinti vietovę',
+        'navigation_label'   => 'Vietovės',
+        'plural_model_label' => 'Vietovės',
+        'model_label'        => 'Vietovė',
     ],
     'locations_page' => [
         'columns' => [

@@ -431,6 +431,9 @@ return [
         'show'         => 'Standort anzeigen',
         'store'        => 'Standort speichern',
         'update'       => 'Standort aktualisieren',
+        'navigation_label'   => 'Standorte',
+        'plural_model_label' => 'Standorte',
+        'model_label'        => 'Standort',
     ],
     'locations_page' => [
         'columns' => [
