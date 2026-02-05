@@ -384,6 +384,7 @@ return [
     'total'                                                                                                 => 'Gesamt',
     'payment_status'                                                                                        => 'Zahlungsstatus',
     'created_at'                                                                                            => 'Erstellt am',
+    'added_at'                                                                                              => 'Hinzugefügt am',
     'image'                                                                                                 => 'Bild',
     'sku'                                                                                                   => 'SKU',
     'brand'                                                                                                 => 'Marke',

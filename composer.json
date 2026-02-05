@@ -19,6 +19,7 @@
         "kirschbaum-development/laravel-loop-filament": "^0.1.5",
         "lara-zeus/matrix-choice": "*",
         "laravel/framework": "^12.0",
+        "laravel/mcp": "^0.5.5",
         "laravel/sanctum": "^4.0",
         "laravel/scout": "^10.19",
         "laravel/tinker": "^2.10.1",

@@ -113,6 +113,7 @@ class AdminPanelProvider extends PanelProvider
             ->authGuard('admin')
             ->authPasswordBroker('admin_users')
             ->darkMode(false)
+            ->readOnlyRelationManagersOnResourceViewPagesByDefault(false)
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,

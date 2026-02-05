@@ -386,6 +386,7 @@ return [
     'total'                                                                                                 => 'Iš viso',
     'payment_status'                                                                                        => 'Mokėjimo būsena',
     'created_at'                                                                                            => 'Sukurta',
+    'added_at'                                                                                              => 'Pridėta',
     'image'                                                                                                 => 'Paveikslėlis',
     'sku'                                                                                                   => 'SKU',
     'brand'                                                                                                 => 'Prekės ženklas',

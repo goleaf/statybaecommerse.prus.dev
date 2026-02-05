@@ -433,6 +433,7 @@ return [
     'saturday'                                                                                              => 'Суббота',
     'sunday'                                                                                                => 'Воскресенье',
     'created_at'                                                                                            => 'Создано',
+    'added_at'                                                                                              => 'Добавлено',
     'updated_at'                                                                                            => 'Обновлено',
     'deleted_at'                                                                                            => 'Удалено',
     'width'                                                                                                 => 'Ширина',

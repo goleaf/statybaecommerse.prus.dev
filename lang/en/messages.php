@@ -386,6 +386,7 @@ return [
     'total'                                                                                                 => 'Total',
     'payment_status'                                                                                        => 'Payment Status',
     'created_at'                                                                                            => 'Created At',
+    'added_at'                                                                                              => 'Added At',
     'image'                                                                                                 => 'Image',
     'sku'                                                                                                   => 'SKU',
     'brand'                                                                                                 => 'Brand',

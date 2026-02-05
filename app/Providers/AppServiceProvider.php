@@ -550,6 +550,24 @@ class AppServiceProvider extends ServiceProvider
             });
         }
 
+        if (class_exists(\Filament\Schemas\Components\Section::class)) {
+            \Filament\Schemas\Components\Section::configureUsing(static function (\Filament\Schemas\Components\Section $section): void {
+                $section->columnSpanFull();
+            });
+        }
+
+        if (class_exists(\Filament\Schemas\Components\Grid::class)) {
+            \Filament\Schemas\Components\Grid::configureUsing(static function (\Filament\Schemas\Components\Grid $grid): void {
+                $grid->columnSpanFull();
+            });
+        }
+
+        if (class_exists(\Filament\Schemas\Components\Fieldset::class)) {
+            \Filament\Schemas\Components\Fieldset::configureUsing(static function (\Filament\Schemas\Components\Fieldset $fieldset): void {
+                $fieldset->columnSpanFull();
+            });
+        }
+
         // Using native Filament resources for admin panel functionality
 
         Model::saved(function ($model): void {

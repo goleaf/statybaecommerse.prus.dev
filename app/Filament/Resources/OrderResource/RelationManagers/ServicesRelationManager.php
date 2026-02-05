@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Filament\Resources\OrderResource\RelationManagers;
 
 use App\Models\Service;
-use Filament\Actions\Action;
 use Filament\Actions\AttachAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
@@ -15,6 +14,7 @@ use Filament\Actions\DetachAction;
 use Filament\Actions\DetachBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Set;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
@@ -24,15 +24,22 @@ class ServicesRelationManager extends RelationManager
 {
     protected static string $relationship = 'services';
 
+    public function isReadOnly(): bool
+    {
+        return false;
+    }
+
     public function form(Schema $schema): Schema
     {
         return $schema
             ->components([
                 TextInput::make('quantity')
+                    ->label(__('messages.quantity'))
                     ->numeric()
                     ->default(1)
                     ->required(),
                 TextInput::make('price')
+                    ->label(__('messages.price'))
                     ->numeric()
                     ->required()
                     ->prefix('€'),
@@ -47,12 +54,12 @@ class ServicesRelationManager extends RelationManager
                 TextColumn::make('name')
                     ->searchable(),
                 TextColumn::make('pivot.price')
-                    ->label('Price')
+                    ->label(__('messages.price'))
                     ->money(),
                 TextColumn::make('pivot.quantity')
-                    ->label('Quantity'),
+                    ->label(__('messages.quantity')),
                 TextColumn::make('pivot.created_at')
-                    ->label('Added At')
+                    ->label(__('messages.added_at'))
                     ->dateTime(),
             ])
             ->filters([
@@ -61,27 +68,35 @@ class ServicesRelationManager extends RelationManager
             ->headerActions([
                 CreateAction::make(),
                 AttachAction::make()
+                    ->multiple(false)
+                    ->preloadRecordSelect()
                     ->schema(fn (AttachAction $action): array => [
-                        $action->getRecordSelect(),
-                        TextInput::make('quantity')->numeric()->default(1)->required(),
-                        TextInput::make('price')->numeric()->required()->prefix('€'),
+                        $action->getRecordSelect()
+                            ->live()
+                            ->afterStateUpdated(function ($state, Set $set): void {
+                                if (! $state) {
+                                    return;
+                                }
+
+                                $service = Service::find($state);
+                                if (! $service) {
+                                    return;
+                                }
+
+                                $set('price', $service->price);
+                                $set('quantity', 1);
+                            }),
+                        TextInput::make('quantity')
+                            ->label(__('messages.quantity'))
+                            ->numeric()
+                            ->default(1)
+                            ->required(),
+                        TextInput::make('price')
+                            ->label(__('messages.price'))
+                            ->numeric()
+                            ->required()
+                            ->prefix('€'),
                     ]),
-                Action::make('add_all_services')
-                    ->label('Add All Services')
-                    ->action(function () {
-                        $services = Service::where('is_active', true)->get();
-                        foreach ($services as $service) {
-                            if (! $this->getOwnerRecord()->services()->where('service_id', $service->id)->exists()) {
-                                $this->getOwnerRecord()->services()->attach($service->id, [
-                                    'price'    => $service->price,
-                                    'quantity' => 1,
-                                ]);
-                            }
-                        }
-                    })
-                    ->requiresConfirmation()
-                    ->color('success')
-                    ->icon('heroicon-o-plus-circle'),
             ])
             ->recordActions([
                 EditAction::make(),
