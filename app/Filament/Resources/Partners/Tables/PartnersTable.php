@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Partners\Tables;
 
+use App\Models\Partner;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -26,6 +27,8 @@ class PartnersTable
                 SpatieMediaLibraryImageColumn::make('logo')
                     ->label(__('messages.logo'))
                     ->collection('logo')
+                    ->conversion('logo-sm')
+                    ->defaultImageUrl(static fn (Partner $record): ?string => $record->getLogoUrl('sm') ?? $record->getLogoUrl())
                     ->circular(),
                 TextColumn::make('name')
                     ->label(__('messages.name'))

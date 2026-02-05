@@ -46,7 +46,7 @@ class CompanyForm
                     ])
                     ->columnSpanFull(),
 
-                Section::make(__('messages.Profile'))
+                Section::make(__('messages.profile'))
                     ->schema([
                         Select::make('industry')
                             ->label(__('messages.industry'))
@@ -54,11 +54,11 @@ class CompanyForm
                             ->searchable()
                             ->preload(),
                         Select::make('size')
-                            ->label('Size')
+                            ->label(__('messages.company_size'))
                             ->options([
-                                'small'  => 'Small (1-10)',
-                                'medium' => 'Medium (11-50)',
-                                'large'  => 'Large (51+)',
+                                'small'  => __('messages.company_size_small'),
+                                'medium' => __('messages.company_size_medium'),
+                                'large'  => __('messages.company_size_large'),
                             ]),
                         Textarea::make('description')
                             ->label(__('messages.description'))

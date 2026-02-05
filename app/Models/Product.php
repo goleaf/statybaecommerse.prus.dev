@@ -762,6 +762,16 @@ final class Product extends Model implements HasMedia, TranslatableRecord
     }
 
     /**
+     * Handle orders functionality with proper error handling.
+     *
+     * @return BelongsToMany<Order, $this>
+     */
+    public function orders(): BelongsToMany
+    {
+        return $this->belongsToMany(Order::class, 'order_items')->distinct();
+    }
+
+    /**
      * Handle cartItems functionality with proper error handling.
      */
     public function cartItems(): HasMany

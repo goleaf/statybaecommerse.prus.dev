@@ -438,6 +438,7 @@ return [
     'products_count'                                                                                        => 'Produktanzahl',
     'media'                                                                                                 => 'Medien',
     'product'                                                                                               => 'Produkt',
+    'attached_products'                                                                                    => 'Zugeordnete Produkte',
     'quantity'                                                                                              => 'Menge',
     'reserved_quantity'                                                                                     => 'Reservierte Menge',
     'available_quantity'                                                                                    => 'Verfügbare Menge',

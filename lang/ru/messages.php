@@ -460,6 +460,7 @@ return [
     'low_stock_threshold'                                                                                   => 'Порог низкого остатка',
     'preview'                                                                                               => 'Просмотр',
     'alt_text'                                                                                              => 'Альтернативный текст',
+    'attached_products'                                                                                    => 'Привязанные товары',
     'address'                                                                                               => 'Адрес',
     'code'                                                                                                  => 'Код',
     'description'                                                                                           => 'Описание',

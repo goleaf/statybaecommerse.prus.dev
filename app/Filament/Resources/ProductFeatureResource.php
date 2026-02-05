@@ -13,7 +13,6 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
@@ -59,6 +58,7 @@ final class ProductFeatureResource extends BaseResource
                     ->sortable(),
                 ToggleColumn::make('is_active'),
             ])
+            ->recordUrl(fn (ProductFeature $record): string => self::getUrl('edit', ['record' => $record]))
             ->filters([
                 SelectFilter::make('product')
                     ->relationship('product', 'name'),
@@ -66,7 +66,6 @@ final class ProductFeatureResource extends BaseResource
                     ->options(fn () => ProductFeature::distinct()->pluck('feature_type', 'feature_type')->toArray()),
             ])
             ->actions([
-                ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make(),
             ])
@@ -82,7 +81,6 @@ final class ProductFeatureResource extends BaseResource
         return [
             'index'  => FeaturePages\ListProductFeatures::route('/'),
             'create' => FeaturePages\CreateProductFeature::route('/create'),
-            'view'   => FeaturePages\ViewProductFeature::route('/{record}'),
             'edit'   => FeaturePages\EditProductFeature::route('/{record}/edit'),
         ];
     }

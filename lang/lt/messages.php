@@ -440,6 +440,7 @@ return [
     'products_count'                                                                                        => 'Produktų skaičius',
     'media'                                                                                                 => 'Medija',
     'product'                                                                                               => 'Produktas',
+    'attached_products'                                                                                    => 'Prisegti produktai',
     'quantity'                                                                                              => 'Kiekis',
     'reserved_quantity'                                                                                     => 'Rezervuotas kiekis',
     'available_quantity'                                                                                    => 'Prieinamas kiekis',
