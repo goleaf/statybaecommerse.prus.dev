@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use App\Filament\Imports\ProductImporter;
+use App\Models\Brand;
+use App\Models\Category;
 use App\Models\Product;
 use App\Models\User;
 use Filament\Actions\Imports\Jobs\ImportCsv;
@@ -50,4 +52,44 @@ it('imports a fully mapped product row with blank optional fields', function ():
         ->and($product->published_at)->not->toBeNull();
 
     expect(Product::query()->count())->toBe(1);
+});
+
+it('creates missing brand and categories during product import', function (): void {
+    $user = User::factory()->admin()->create();
+
+    $import = new Import;
+    $import->user()->associate($user);
+    $import->file_name = 'product-import.csv';
+    $import->file_path = base_path('storage/imports/product-import.csv');
+    $import->importer = ProductImporter::class;
+    $import->total_rows = 1;
+    $import->save();
+
+    $columns = collect(ProductImporter::getColumns())->map->getName()->values();
+    $row = $columns->mapWithKeys(fn (string $name) => [$name => ''])->all();
+    $row['name'] = 'Category Test Product';
+    $row['price'] = '12.50';
+    $row['brand'] = 'Acme Tools';
+    $row['categories'] = 'Tools; Hardware';
+
+    $columnMap = $columns->mapWithKeys(fn (string $name) => [$name => $name])->all();
+
+    (new ImportCsv($import, [$row], $columnMap, []))->handle();
+
+    $brand = Brand::withoutGlobalScopes()->firstWhere('name', 'Acme Tools');
+    $categories = Category::withoutGlobalScopes()
+        ->whereIn('name', ['Tools', 'Hardware'])
+        ->get();
+
+    $product = Product::withoutGlobalScopes()->first();
+    $productCategoryNames = $product?->categories()
+        ->withoutGlobalScopes()
+        ->pluck('name')
+        ->all() ?? [];
+
+    expect($brand)->not->toBeNull()
+        ->and($categories)->toHaveCount(2)
+        ->and($product)->not->toBeNull()
+        ->and($product->brand_id)->toBe($brand->getKey())
+        ->and($productCategoryNames)->toContain('Tools', 'Hardware');
 });

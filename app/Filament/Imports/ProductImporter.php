@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Imports;
 
+use App\Models\Brand;
+use App\Models\Category;
 use App\Models\Product;
 use Filament\Actions\Imports\ImportColumn;
 use Filament\Actions\Imports\Models\Import;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Number;
 use Illuminate\Support\Str;
 
@@ -128,7 +131,15 @@ class ProductImporter extends BaseImporter
             ImportColumn::make('seo_title'),
             ImportColumn::make('seo_description'),
             ImportColumn::make('brand')
-                ->relationship()
+                ->relationship(resolveUsing: static function (string $state): ?Brand {
+                    return static::resolveBrandFromState($state);
+                })
+                ->ignoreBlankState(),
+            ImportColumn::make('categories')
+                ->relationship(resolveUsing: static function (array $state): EloquentCollection {
+                    return static::resolveCategoriesFromState($state);
+                })
+                ->multiple(',')
                 ->ignoreBlankState(),
             ImportColumn::make('type')
                 ->ignoreBlankState()
@@ -288,7 +299,7 @@ class ProductImporter extends BaseImporter
             ],
             'Relations' => [
                 'brand',
-                'category',
+                'categories',
                 'collection',
             ],
             'Other' => [
@@ -304,5 +315,114 @@ class ProductImporter extends BaseImporter
                 'available_until',
             ],
         ];
+    }
+
+    private static function resolveBrandFromState(mixed $state): ?Brand
+    {
+        if ($state === null) {
+            return null;
+        }
+
+        $raw = is_string($state) ? trim($state) : $state;
+
+        if ($raw === '' || $raw === null) {
+            return null;
+        }
+
+        $query = Brand::query()->withoutGlobalScopes();
+
+        if (is_numeric($raw)) {
+            $brand = $query->find((int) $raw);
+
+            if ($brand) {
+                return $brand;
+            }
+        }
+
+        $name = is_string($raw) ? $raw : (string) $raw;
+        $slug = Str::slug($name);
+
+        $brand = $query->where('slug', $slug)->first()
+            ?? $query->where('name', $name)->first();
+
+        if ($brand) {
+            return $brand;
+        }
+
+        return Brand::query()->create([
+            'name'        => $name,
+            'slug'        => $slug,
+            'is_enabled'  => true,
+            'is_active'   => true,
+            'is_visible'  => true,
+            'is_featured' => false,
+            'is_premium'  => false,
+            'sort_order'  => 0,
+        ]);
+    }
+
+    /**
+     * @param array<int, mixed> $state
+     */
+    private static function resolveCategoriesFromState(array $state): EloquentCollection
+    {
+        $names = collect($state)
+            ->flatMap(function ($value): array {
+                if (! is_string($value)) {
+                    return [$value];
+                }
+
+                $value = trim($value);
+
+                if ($value === '') {
+                    return [];
+                }
+
+                if (str_contains($value, ';') || str_contains($value, '|')) {
+                    return preg_split('/[;|]/', $value) ?: [$value];
+                }
+
+                return [$value];
+            })
+            ->map(fn ($value) => is_string($value) ? trim($value) : $value)
+            ->filter(fn ($value) => filled($value))
+            ->map(fn ($value) => (string) $value)
+            ->values();
+
+        if ($names->isEmpty()) {
+            return new EloquentCollection;
+        }
+
+        $categories = new EloquentCollection;
+
+        foreach ($names as $name) {
+            $slug = Str::slug($name);
+
+            $category = Category::query()
+                ->withoutGlobalScopes()
+                ->where('slug', $slug)
+                ->first()
+                ?? Category::query()
+                    ->withoutGlobalScopes()
+                    ->where('name', $name)
+                    ->first();
+
+            if (! $category) {
+                $category = Category::query()->create([
+                    'name'         => $name,
+                    'slug'         => $slug,
+                    'sort_order'   => 0,
+                    'is_enabled'   => true,
+                    'is_active'    => true,
+                    'is_visible'   => true,
+                    'is_featured'  => false,
+                    'show_in_menu' => true,
+                ]);
+            }
+
+            $categories->push($category);
+        }
+
+        return $categories;
     }
 }

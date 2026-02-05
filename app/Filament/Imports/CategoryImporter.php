@@ -8,10 +8,23 @@ use App\Models\Category;
 use Filament\Actions\Imports\ImportColumn;
 use Filament\Actions\Imports\Models\Import;
 use Illuminate\Support\Number;
+use Illuminate\Support\Str;
 
 class CategoryImporter extends BaseImporter
 {
     protected static ?string $model = Category::class;
+
+    protected function beforeValidate(): void
+    {
+        $name = $this->data['name'] ?? null;
+        $slug = $this->data['slug'] ?? null;
+
+        if (! filled($slug) && is_string($name) && $name !== '') {
+            $this->data['slug'] = Str::slug($name);
+        }
+
+        parent::beforeValidate();
+    }
 
     public static function getColumns(): array
     {
@@ -64,6 +77,26 @@ class CategoryImporter extends BaseImporter
 
     public function resolveRecord(): Category
     {
+        $name = $this->data['name'] ?? null;
+        $slug = $this->data['slug'] ?? null;
+
+        if (! filled($slug) && is_string($name) && $name !== '') {
+            $slug = Str::slug($name);
+            $this->data['slug'] = $slug;
+        }
+
+        if (filled($slug)) {
+            return Category::query()
+                ->withoutGlobalScopes()
+                ->firstOrNew(['slug' => $slug]);
+        }
+
+        if (is_string($name) && $name !== '') {
+            return Category::query()
+                ->withoutGlobalScopes()
+                ->firstOrNew(['name' => $name]);
+        }
+
         return new Category;
     }
 

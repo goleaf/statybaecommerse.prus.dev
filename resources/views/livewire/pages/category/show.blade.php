@@ -2,10 +2,21 @@
     // Ensure locale is set from route before rendering (mirror SetLocale middleware logic)
     $request = request();
     $supportedConfig = config('app.supported_locales', 'lt,en');
-    $supportedLocales = is_array($supportedConfig) 
-        ? $supportedConfig 
-        : array_map('trim', explode(',', (string) $supportedConfig));
-    $supportedLocales = array_values(array_filter($supportedLocales, function($locale) {
+    if (is_array($supportedConfig)) {
+        $supportedLocales = $supportedConfig;
+    } elseif ($supportedConfig instanceof \Traversable) {
+        $supportedLocales = iterator_to_array($supportedConfig);
+    } elseif (is_string($supportedConfig)) {
+        $supportedLocales = array_map('trim', explode(',', $supportedConfig));
+    } else {
+        $fallback = is_array($supportedConfig)
+            ? implode(',', array_filter($supportedConfig, static fn ($value) => is_string($value)))
+            : (string) $supportedConfig;
+        $supportedLocales = $fallback !== ''
+            ? array_map('trim', explode(',', $fallback))
+            : [];
+    }
+    $supportedLocales = array_values(array_filter($supportedLocales, function ($locale) {
         return is_string($locale) && $locale !== '';
     }));
     

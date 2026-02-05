@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuites>
-  <testsuite name="Tests\Feature\ImportFailedRowsDownloadTest" file="tests\Feature\ImportFailedRowsDownloadTest.php" tests="1" assertions="5" errors="0" failures="0" skipped="0" time="37.161091">
-    <testcase name="it allows admin users to download failed import rows" file="tests\Feature\ImportFailedRowsDownloadTest.php::it allows admin users to download failed import rows" class="Tests\Feature\ImportFailedRowsDownloadTest" classname="Tests.Feature.ImportFailedRowsDownloadTest" assertions="5" time="37.161091"/>
-  </testsuite>
-</testsuites>
