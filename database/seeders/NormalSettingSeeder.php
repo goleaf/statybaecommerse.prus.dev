@@ -6,9 +6,8 @@ namespace Database\Seeders;
 
 use App\Models\NormalSetting;
 use App\Models\NormalSettingTranslation;
-use Illuminate\Database\Seeder;
 
-final class NormalSettingSeeder extends Seeder
+final class NormalSettingSeeder extends \Database\Seeders\BaseSeeder
 {
     public function run(): void
     {

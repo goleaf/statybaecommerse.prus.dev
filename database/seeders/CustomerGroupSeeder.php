@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use App\Models\CustomerGroup;
-use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
-final class CustomerGroupSeeder extends Seeder
+final class CustomerGroupSeeder extends \Database\Seeders\BaseSeeder
 {
     public function run(): void
     {

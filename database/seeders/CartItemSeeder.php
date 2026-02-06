@@ -7,9 +7,8 @@ namespace Database\Seeders;
 use App\Models\CartItem;
 use App\Models\Product;
 use App\Models\User;
-use Illuminate\Database\Seeder;
 
-final class CartItemSeeder extends Seeder
+final class CartItemSeeder extends \Database\Seeders\BaseSeeder
 {
     public function run(): void
     {

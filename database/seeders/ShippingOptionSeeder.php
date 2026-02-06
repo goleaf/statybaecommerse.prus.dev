@@ -8,9 +8,8 @@ use App\Models\City;
 use App\Models\Country;
 use App\Models\ShippingOption;
 use App\Models\Zone;
-use Illuminate\Database\Seeder;
 
-class ShippingOptionSeeder extends Seeder
+class ShippingOptionSeeder extends \Database\Seeders\BaseSeeder
 {
     /**
      * Run the database seeds.

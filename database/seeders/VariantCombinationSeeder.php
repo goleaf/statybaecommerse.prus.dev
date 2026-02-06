@@ -6,9 +6,8 @@ namespace Database\Seeders;
 
 use App\Models\Product;
 use App\Models\VariantCombination;
-use Illuminate\Database\Seeder;
 
-class VariantCombinationSeeder extends Seeder
+class VariantCombinationSeeder extends \Database\Seeders\BaseSeeder
 {
     /**
      * Run the database seeds.

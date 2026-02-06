@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use App\Models\DocumentTemplate;
-use Illuminate\Database\Seeder;
 
-final class DocumentTemplateSeeder extends Seeder
+final class DocumentTemplateSeeder extends \Database\Seeders\BaseSeeder
 {
     public function run(): void
     {

@@ -8,9 +8,8 @@ use App\Models\Order;
 use App\Models\Referral;
 use App\Models\ReferralReward;
 use App\Models\User;
-use Illuminate\Database\Seeder;
 
-final class ReferralRewardSeeder extends Seeder
+final class ReferralRewardSeeder extends \Database\Seeders\BaseSeeder
 {
     public function run(): void
     {

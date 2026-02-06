@@ -9,10 +9,9 @@ use App\Models\Location;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\VariantInventory;
-use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Schema;
 
-final class InventorySeeder extends Seeder
+final class InventorySeeder extends \Database\Seeders\BaseSeeder
 {
     public function run(): void
     {

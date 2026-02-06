@@ -8,10 +8,9 @@ use App\Models\Collection;
 use App\Models\Translations\CollectionTranslation;
 use App\Services\Images\LocalImageGeneratorService;
 use Database\Seeders\Data\HouseBuilderCollections;
-use Illuminate\Database\Seeder;
 use Throwable;
 
-class CollectionSeeder extends Seeder
+final class CollectionSeeder extends \Database\Seeders\BaseSeeder
 {
     private LocalImageGeneratorService $imageGenerator;
 
@@ -24,17 +23,17 @@ class CollectionSeeder extends Seeder
     {
         $definitions = HouseBuilderCollections::collections();
 
-        if ($this->isFastModeEnabled()) {
+        if ($this->seedFastModeEnabled()) {
             $definitions = array_slice(
                 $definitions,
                 0,
-                max(1, (int) config('seeds.fast.collection_limit', 4)),
+                $this->seedFastInt('collection_limit', 4),
                 true
             );
         }
 
         $locales = $this->supportedLocales();
-        $shouldGenerateMedia = $this->shouldGenerateMedia();
+        $shouldGenerateMedia = $this->seedShouldGenerateMedia();
 
         foreach ($definitions as $slug => $definition) {
             $primaryTranslation = $definition['translations']['en'];
@@ -142,19 +141,8 @@ class CollectionSeeder extends Seeder
 
     private function supportedLocales(): array
     {
-        if ($this->isFastModeEnabled()) {
-            $locales = collect(config('seeds.fast.locales', ['lt', 'en']))
-                ->map(fn ($locale) => trim((string) $locale))
-                ->filter()
-                ->unique()
-                ->values()
-                ->toArray();
-
-            if ($locales !== []) {
-                return $locales;
-            }
-
-            return ['lt', 'en'];
+        if ($this->seedFastModeEnabled()) {
+            return $this->seedFastLocales(['lt', 'en']);
         }
 
         return collect(explode(',', (string) config('app.supported_locales', 'lt,en,ru,de')))
@@ -163,19 +151,5 @@ class CollectionSeeder extends Seeder
             ->unique()
             ->values()
             ->toArray();
-    }
-
-    private function isFastModeEnabled(): bool
-    {
-        return (bool) config('seeds.fast_mode', false);
-    }
-
-    private function shouldGenerateMedia(): bool
-    {
-        if (! $this->isFastModeEnabled()) {
-            return true;
-        }
-
-        return (bool) config('seeds.fast.generate_media', false);
     }
 }

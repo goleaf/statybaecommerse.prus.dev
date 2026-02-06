@@ -38,7 +38,7 @@ use Throwable;
  * Comprehensive seeder for admin@example.com user with all menu items
  * and sample data for testing and demonstration purposes.
  */
-final class AdminSeeder extends Seeder
+final class AdminSeeder extends \Database\Seeders\BaseSeeder
 {
     public function run(): void
     {

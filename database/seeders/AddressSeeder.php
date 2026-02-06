@@ -15,7 +15,7 @@ use Illuminate\Database\Seeder;
  *
  * Seeder for creating sample address data
  */
-final class AddressSeeder extends Seeder
+final class AddressSeeder extends \Database\Seeders\BaseSeeder
 {
     /**
      * Run the database seeds.

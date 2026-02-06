@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use App\Models\Partner;
-use Illuminate\Database\Seeder;
 
-final class PartnerSeeder extends Seeder
+final class PartnerSeeder extends \Database\Seeders\BaseSeeder
 {
     public function run(): void
     {

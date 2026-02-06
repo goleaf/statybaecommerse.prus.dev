@@ -7,10 +7,9 @@ namespace Database\Seeders;
 use App\Models\Category;
 use App\Services\Images\LocalImageGeneratorService;
 use Exception;
-use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
-final class CategorySeeder extends Seeder
+final class CategorySeeder extends \Database\Seeders\BaseSeeder
 {
     private LocalImageGeneratorService $imageGenerator;
 
@@ -28,7 +27,7 @@ final class CategorySeeder extends Seeder
     {
         $categories = $this->getCategoriesData();
 
-        if ($this->isFastModeEnabled()) {
+        if ($this->seedFastModeEnabled()) {
             $categories = $this->trimCategoriesForFastMode($categories);
         }
 
@@ -861,13 +860,13 @@ final class CategorySeeder extends Seeder
     }
 
     /**
-     * @param  array<int, array<string, mixed>>  $categories
+     * @param  array<int, array<string, mixed>> $categories
      * @return array<int, array<string, mixed>>
      */
     private function trimCategoriesForFastMode(array $categories): array
     {
-        $maxRootCategories = max(1, (int) config('seeds.fast.max_root_categories', 4));
-        $maxChildrenPerCategory = max(1, (int) config('seeds.fast.max_children_per_category', 3));
+        $maxRootCategories = $this->seedFastInt('max_root_categories', 4);
+        $maxChildrenPerCategory = $this->seedFastInt('max_children_per_category', 3);
 
         return array_map(
             fn (array $node): array => $this->trimCategoryNode($node, $maxChildrenPerCategory),
@@ -876,7 +875,7 @@ final class CategorySeeder extends Seeder
     }
 
     /**
-     * @param  array<string, mixed>  $node
+     * @param  array<string, mixed> $node
      * @return array<string, mixed>
      */
     private function trimCategoryNode(array $node, int $maxChildrenPerCategory): array
@@ -891,11 +890,6 @@ final class CategorySeeder extends Seeder
         );
 
         return $node;
-    }
-
-    private function isFastModeEnabled(): bool
-    {
-        return (bool) config('seeds.fast_mode', false);
     }
 
     private function createCategory(array $categoryData, ?int $parentId = null): void
@@ -990,11 +984,8 @@ final class CategorySeeder extends Seeder
 
     private function supportedLocales(): array
     {
-        if ($this->isFastModeEnabled()) {
-            $fastLocales = collect(config('seeds.fast.locales', ['lt', 'en']))
-                ->map(static fn ($locale) => Str::lower(trim((string) $locale)))
-                ->filter()
-                ->values();
+        if ($this->seedFastModeEnabled()) {
+            $fastLocales = collect($this->seedFastLocales(['lt', 'en']));
 
             $resolvedFastLocales = $fastLocales
                 ->intersect(collect(self::DEFAULT_SUPPORTED_LOCALES))

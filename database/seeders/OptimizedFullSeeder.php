@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use function class_exists;
-
-use Database\Seeders\Cities\CitiesMergedSeeder;
-
 use function gc_collect_cycles;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -17,17 +14,17 @@ use Illuminate\Support\Facades\DB;
 /**
  * Optimized full-profile seeder that executes only the core, production-relevant fixtures.
  */
-final class OptimizedFullSeeder extends Seeder
+final class OptimizedFullSeeder extends \Database\Seeders\BaseSeeder
 {
     use WithoutModelEvents;
 
     /**
      * @var array<int, class-string<Seeder>>
      */
-    private const SEEDERS = [
+    private const DEFAULT_SEEDERS = [
         CurrencySeeder::class,
         CountrySeeder::class,
-        CitiesMergedSeeder::class,
+        \Database\Seeders\Cities\CitiesMergedSeeder::class,
         AdminAuthorizationSeeder::class,
         AdminUserSeeder::class,
         CustomerGroupSeeder::class,
@@ -53,7 +50,7 @@ final class OptimizedFullSeeder extends Seeder
         }
 
         try {
-            foreach (self::SEEDERS as $seederClass) {
+            foreach ($this->standardSeeders() as $seederClass) {
                 if (! class_exists($seederClass)) {
                     continue;
                 }
@@ -64,5 +61,28 @@ final class OptimizedFullSeeder extends Seeder
         } finally {
             config()->set('seeds.fast_mode', $previousFastMode);
         }
+    }
+
+    /**
+     * @return array<int, class-string<Seeder>>
+     */
+    private function standardSeeders(): array
+    {
+        $configured = config('seeds.standard_seeders', self::DEFAULT_SEEDERS);
+
+        if (! is_array($configured)) {
+            return self::DEFAULT_SEEDERS;
+        }
+
+        $seeders = array_values(array_filter(
+            $configured,
+            static fn (mixed $class): bool => is_string($class) && $class !== ''
+        ));
+
+        if ($seeders === []) {
+            return self::DEFAULT_SEEDERS;
+        }
+
+        return $seeders;
     }
 }

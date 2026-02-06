@@ -15,7 +15,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Role;
 
-class LithuanianBuilderShopSeeder extends Seeder
+class LithuanianBuilderShopSeeder extends \Database\Seeders\BaseSeeder
 {
     public function run(): void
     {

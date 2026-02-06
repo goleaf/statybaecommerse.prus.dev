@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use App\Models\Channel;
-use Illuminate\Database\Seeder;
 
-final class ChannelSeeder extends Seeder
+final class ChannelSeeder extends \Database\Seeders\BaseSeeder
 {
     public function run(): void
     {

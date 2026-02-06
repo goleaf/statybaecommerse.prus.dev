@@ -6,9 +6,8 @@ namespace Database\Seeders;
 
 use App\Models\CustomerGroup;
 use App\Models\User;
-use Illuminate\Database\Seeder;
 
-final class GroupSeeder extends Seeder
+final class GroupSeeder extends \Database\Seeders\BaseSeeder
 {
     public function run(): void
     {

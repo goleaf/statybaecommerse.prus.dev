@@ -9,9 +9,7 @@ use App\Models\SystemSettingCategoryTranslation;
 
 use function collect;
 
-use Illuminate\Database\Seeder;
-
-final class SystemSettingCategorySeeder extends Seeder
+final class SystemSettingCategorySeeder extends \Database\Seeders\BaseSeeder
 {
     /**
      * Run the database seeds.

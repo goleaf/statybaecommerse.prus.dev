@@ -6,7 +6,7 @@ namespace Database\Seeders\Cities;
 
 use App\Models\Country;
 use App\Support\Locales;
-use Illuminate\Database\Seeder;
+use Database\Seeders\BaseSeeder;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -15,7 +15,7 @@ use RuntimeException;
 /**
  * Orchestrator that consolidates all city seeders into a single transaction-aware entry point.
  */
-final class CitiesMergedSeeder extends Seeder
+final class CitiesMergedSeeder extends BaseSeeder
 {
     public function run(): void
     {
@@ -35,7 +35,7 @@ final class CitiesMergedSeeder extends Seeder
         $discovery = $this->discoverSeeders();
         $selectedSeeders = $discovery['selected'];
 
-        if ($this->isFastModeEnabled()) {
+        if ($this->seedFastModeEnabled()) {
             $selectedSeeders = $this->trimSeedersForFastMode($selectedSeeders);
         }
 
@@ -121,11 +121,6 @@ final class CitiesMergedSeeder extends Seeder
         return ['selected' => $selected, 'duplicates' => $duplicates];
     }
 
-    private function isFastModeEnabled(): bool
-    {
-        return (bool) config('seeds.fast_mode', false);
-    }
-
     /**
      * @return array<int, string>
      */
@@ -133,15 +128,11 @@ final class CitiesMergedSeeder extends Seeder
     {
         $supportedLocales = Locales::supported();
 
-        if (! $this->isFastModeEnabled()) {
+        if (! $this->seedFastModeEnabled()) {
             return $supportedLocales;
         }
 
-        $configuredLocales = config('seeds.fast.locales', ['lt', 'en']);
-        $allowedLocales = collect(is_array($configuredLocales) ? $configuredLocales : [])
-            ->map(static fn (mixed $locale): string => Str::lower(trim((string) $locale)))
-            ->filter()
-            ->values();
+        $allowedLocales = collect($this->seedFastLocales(['lt', 'en']));
 
         $locales = collect($supportedLocales)
             ->map(static fn (string $locale): string => Str::lower($locale))
@@ -161,13 +152,13 @@ final class CitiesMergedSeeder extends Seeder
     }
 
     /**
-     * @param  array<string, array{class: class-string, rows: array<int, array<string, mixed>>}>  $selectedSeeders
+     * @param  array<string, array{class: class-string, rows: array<int, array<string, mixed>>}> $selectedSeeders
      * @return array<string, array{class: class-string, rows: array<int, array<string, mixed>>}>
      */
     private function trimSeedersForFastMode(array $selectedSeeders): array
     {
         $isoFilter = $this->fastIso2List();
-        $maxRowsPerCountry = max(1, (int) config('seeds.fast.max_cities_per_country', 80));
+        $maxRowsPerCountry = $this->seedFastInt('max_cities_per_country', 80);
 
         if ($isoFilter !== []) {
             $selectedSeeders = array_intersect_key($selectedSeeders, array_flip($isoFilter));

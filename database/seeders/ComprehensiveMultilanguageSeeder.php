@@ -15,12 +15,11 @@ use App\Models\Translations\CategoryTranslation;
 use App\Models\Zone;
 use App\Services\Images\LocalImageGeneratorService;
 use Exception;
-use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Throwable;
 
-final class ComprehensiveMultilanguageSeeder extends Seeder
+final class ComprehensiveMultilanguageSeeder extends \Database\Seeders\BaseSeeder
 {
     private LocalImageGeneratorService $imageGenerator;
 

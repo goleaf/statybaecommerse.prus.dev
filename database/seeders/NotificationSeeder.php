@@ -6,9 +6,8 @@ namespace Database\Seeders;
 
 use App\Models\Notification;
 use App\Models\User;
-use Illuminate\Database\Seeder;
 
-final class NotificationSeeder extends Seeder
+final class NotificationSeeder extends \Database\Seeders\BaseSeeder
 {
     private const NOTIFICATION_TEMPLATES = [
         [

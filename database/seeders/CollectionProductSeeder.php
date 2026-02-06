@@ -11,11 +11,10 @@ use App\Models\Product;
 use App\Models\Translations\ProductTranslation;
 use App\Services\Images\LocalImageGeneratorService;
 use Database\Seeders\Data\HouseBuilderCollections;
-use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 use Throwable;
 
-class CollectionProductSeeder extends Seeder
+class CollectionProductSeeder extends \Database\Seeders\BaseSeeder
 {
     private LocalImageGeneratorService $imageGenerator;
 

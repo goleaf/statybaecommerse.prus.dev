@@ -7,9 +7,8 @@ namespace Database\Seeders;
 use App\Models\SystemSetting;
 use App\Models\SystemSettingCategory;
 use App\Models\User;
-use Illuminate\Database\Seeder;
 
-final class SystemSettingSeeder extends Seeder
+final class SystemSettingSeeder extends \Database\Seeders\BaseSeeder
 {
     /**
      * Run the database seeds.

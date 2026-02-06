@@ -14,10 +14,9 @@ use App\Models\OrderShipping;
 use App\Models\Product;
 use App\Models\User;
 use App\Models\Zone;
-use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
-final class OrderSeeder extends Seeder
+final class OrderSeeder extends \Database\Seeders\BaseSeeder
 {
     public function run(): void
     {

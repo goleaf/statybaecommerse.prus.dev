@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use App\Models\Coupon;
-use Illuminate\Database\Seeder;
 
-final class CouponSeeder extends Seeder
+final class CouponSeeder extends \Database\Seeders\BaseSeeder
 {
     public function run(): void
     {

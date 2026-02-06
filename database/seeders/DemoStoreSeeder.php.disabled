@@ -26,7 +26,7 @@ use Illuminate\Support\Str;
 use RuntimeException;
 use Throwable;
 
-final class DemoStoreSeeder extends Seeder
+final class DemoStoreSeeder extends \Database\Seeders\BaseSeeder
 {
     private const FALLBACK_PIXEL = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO2aXhQAAAAASUVORK5CYII=';
 

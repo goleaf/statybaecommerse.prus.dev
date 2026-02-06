@@ -6,10 +6,9 @@ namespace Database\Seeders;
 
 use App\Models\Product;
 use App\Models\ProductFeature;
-use Illuminate\Database\Seeder;
 use Illuminate\Support\Arr;
 
-final class ProductFeatureSeeder extends Seeder
+final class ProductFeatureSeeder extends \Database\Seeders\BaseSeeder
 {
     private const FEATURE_TEMPLATES = [
         'electronics' => [

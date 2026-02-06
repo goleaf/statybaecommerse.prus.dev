@@ -5,12 +5,11 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use App\Models\Product;
-use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
-final class LocalProductImagesSeeder extends Seeder
+final class LocalProductImagesSeeder extends \Database\Seeders\BaseSeeder
 {
     public function run(): void
     {

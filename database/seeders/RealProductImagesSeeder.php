@@ -6,11 +6,10 @@ namespace Database\Seeders;
 
 use App\Models\Product;
 use App\Services\Images\LocalImageGeneratorService;
-use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
-final class RealProductImagesSeeder extends Seeder
+final class RealProductImagesSeeder extends \Database\Seeders\BaseSeeder
 {
     private LocalImageGeneratorService $imageGenerator;
 

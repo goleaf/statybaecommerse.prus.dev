@@ -7,9 +7,17 @@ use Database\Seeders\AdminUserSeeder;
 use Database\Seeders\AllSeedersSeeder;
 use Database\Seeders\AttributeSeeder;
 use Database\Seeders\AttributeValueSeeder;
+use Database\Seeders\BrandSeeder;
+use Database\Seeders\CategorySeeder;
+use Database\Seeders\Cities\CitiesMergedSeeder;
+use Database\Seeders\CollectionSeeder;
+use Database\Seeders\CountrySeeder;
 use Database\Seeders\CurrencySeeder;
 use Database\Seeders\CustomerGroupSeeder;
+use Database\Seeders\FeatureFlagSeeder;
 use Database\Seeders\OptimizedFullSeeder;
+use Database\Seeders\SettingsSeeder;
+use Database\Seeders\TurboEcommerceSeeder;
 
 return [
     /*
@@ -66,6 +74,31 @@ return [
     'optimized_enables_fast_mode' => (bool) env('DB_SEED_OPTIMIZED_FAST_MODE', true),
 
     /*
+     * Core seeder standard used by the full and legacy profiles.
+     */
+    'standard_seeders' => [
+        CurrencySeeder::class,
+        CountrySeeder::class,
+        CitiesMergedSeeder::class,
+        AdminAuthorizationSeeder::class,
+        AdminUserSeeder::class,
+        CustomerGroupSeeder::class,
+        AttributeSeeder::class,
+        AttributeValueSeeder::class,
+        BrandSeeder::class,
+        CategorySeeder::class,
+        CollectionSeeder::class,
+        FeatureFlagSeeder::class,
+        SettingsSeeder::class,
+        TurboEcommerceSeeder::class,
+    ],
+
+    /*
+     * Legacy profile can still discover and run every seeder class when enabled.
+     */
+    'include_experimental' => (bool) env('DB_SEED_INCLUDE_EXPERIMENTAL', false),
+
+    /*
      * Profiles centralize the exact seeder classes that should be executed.
      * Adjust the lists below to include or exclude fixture sets as needed.
      */
@@ -88,7 +121,7 @@ return [
             OptimizedFullSeeder::class,
         ],
         'legacy_full' => [
-            // Legacy exhaustive mode that executes all discovered seeders.
+            // Legacy entrypoint that follows the same standard list by default.
             AllSeedersSeeder::class,
         ],
     ],

@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use App\Models\FeatureFlag;
-use Illuminate\Database\Seeder;
 
-final class FeatureFlagSeeder extends Seeder
+final class FeatureFlagSeeder extends \Database\Seeders\BaseSeeder
 {
     public function run(): void
     {

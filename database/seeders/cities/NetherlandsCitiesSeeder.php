@@ -7,7 +7,7 @@ namespace Database\Seeders\Cities;
 use App\Support\Locales;
 use Illuminate\Database\Seeder;
 
-final class NetherlandsCitiesSeeder extends Seeder
+final class NetherlandsCitiesSeeder extends \Database\Seeders\BaseSeeder
 {
     public static function iso2(): string
     {

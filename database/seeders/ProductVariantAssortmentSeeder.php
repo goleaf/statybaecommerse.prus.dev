@@ -11,11 +11,10 @@ use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\VariantInventory;
 use App\Services\ProductVariantAttributeMatrixService;
-use Illuminate\Database\Seeder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
-final class ProductVariantAssortmentSeeder extends Seeder
+final class ProductVariantAssortmentSeeder extends \Database\Seeders\BaseSeeder
 {
     private const INVENTORY_SCALE = 10;
 

@@ -9,11 +9,10 @@ use App\Models\DocumentTemplate;
 use App\Models\Order;
 use App\Models\User;
 use Database\Factories\DocumentFactory;
-use Illuminate\Database\Seeder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Schema;
 
-final class DocumentSeeder extends Seeder
+final class DocumentSeeder extends \Database\Seeders\BaseSeeder
 {
     /**
      * Cache whether the documents table exposes denormalised attribution columns.

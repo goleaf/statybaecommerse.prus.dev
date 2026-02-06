@@ -8,9 +8,8 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\SeoData;
-use Illuminate\Database\Seeder;
 
-final class SeoDataSeeder extends Seeder
+final class SeoDataSeeder extends \Database\Seeders\BaseSeeder
 {
     public function run(): void
     {

@@ -6,10 +6,9 @@ namespace Database\Seeders;
 
 use App\Models\Brand;
 use App\Services\Images\LocalImageGeneratorService;
-use Illuminate\Database\Seeder;
 use Throwable;
 
-final class BrandSeeder extends Seeder
+final class BrandSeeder extends \Database\Seeders\BaseSeeder
 {
     public function run(): void
     {
@@ -26,13 +25,13 @@ final class BrandSeeder extends Seeder
             ['name' => 'Kärcher', 'featured' => false],
         ]);
 
-        if ($this->isFastModeEnabled()) {
+        if ($this->seedFastModeEnabled()) {
             $definitions = $definitions
-                ->take(max(1, (int) config('seeds.fast.brand_limit', 8)))
+                ->take($this->seedFastInt('brand_limit', 8))
                 ->values();
         }
 
-        $shouldGenerateMedia = $this->shouldGenerateMedia();
+        $shouldGenerateMedia = $this->seedShouldGenerateMedia();
 
         /** @var LocalImageGeneratorService $imageGenerator */
         $imageGenerator = app(LocalImageGeneratorService::class);
@@ -83,20 +82,6 @@ final class BrandSeeder extends Seeder
                 $this->attachGeneratedLogo($existingBrand, $imageGenerator);
             }
         });
-    }
-
-    private function isFastModeEnabled(): bool
-    {
-        return (bool) config('seeds.fast_mode', false);
-    }
-
-    private function shouldGenerateMedia(): bool
-    {
-        if (! $this->isFastModeEnabled()) {
-            return true;
-        }
-
-        return (bool) config('seeds.fast.generate_media', false);
     }
 
     private function attachGeneratedLogo(Brand $brand, LocalImageGeneratorService $imageGenerator): void

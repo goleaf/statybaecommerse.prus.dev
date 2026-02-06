@@ -16,7 +16,7 @@ use Spatie\Permission\Models\Role;
  * This seeder creates all the necessary roles and permissions
  * for the admin panel authorization system.
  */
-class AdminAuthorizationSeeder extends Seeder
+class AdminAuthorizationSeeder extends \Database\Seeders\BaseSeeder
 {
     /**
      * Run the database seeds.

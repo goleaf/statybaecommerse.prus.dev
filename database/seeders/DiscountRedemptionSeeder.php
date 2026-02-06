@@ -7,9 +7,8 @@ namespace Database\Seeders;
 use App\Models\Discount;
 use App\Models\DiscountCode;
 use App\Models\DiscountRedemption;
-use Illuminate\Database\Seeder;
 
-final class DiscountRedemptionSeeder extends Seeder
+final class DiscountRedemptionSeeder extends \Database\Seeders\BaseSeeder
 {
     public function run(): void
     {

@@ -6,9 +6,8 @@ namespace Database\Seeders;
 
 use App\Models\Attribute;
 use App\Models\AttributeValue;
-use Illuminate\Database\Seeder;
 
-final class AttributeValueSeeder extends Seeder
+final class AttributeValueSeeder extends \Database\Seeders\BaseSeeder
 {
     public function run(): void
     {

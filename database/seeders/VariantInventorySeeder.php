@@ -16,7 +16,7 @@ use Illuminate\Support\Collection;
  * Comprehensive seeder for VariantInventory with realistic data
  * including various stock levels, locations, and statuses.
  */
-final class VariantInventorySeeder extends Seeder
+final class VariantInventorySeeder extends \Database\Seeders\BaseSeeder
 {
     /**
      * Run the database seeds.

@@ -14,7 +14,7 @@ use Spatie\Permission\Models\Role;
  *
  * Creates the super admin user without loading Filament resources
  */
-final class SimpleAdminSeeder extends Seeder
+final class SimpleAdminSeeder extends \Database\Seeders\BaseSeeder
 {
     public function run(): void
     {

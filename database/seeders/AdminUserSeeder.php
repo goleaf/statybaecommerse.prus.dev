@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use App\Models\AdminUser;
-use Illuminate\Database\Seeder;
 
-final class AdminUserSeeder extends Seeder
+final class AdminUserSeeder extends \Database\Seeders\BaseSeeder
 {
     /**
      * Run the database seeds.

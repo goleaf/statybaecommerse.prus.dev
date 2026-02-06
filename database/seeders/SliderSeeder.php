@@ -9,11 +9,10 @@ use App\Models\SliderTranslation;
 
 use function collect;
 
-use Illuminate\Database\Seeder;
 use Illuminate\Support\Collection;
 use Throwable;
 
-final class SliderSeeder extends Seeder
+final class SliderSeeder extends \Database\Seeders\BaseSeeder
 {
     public function run(): void
     {
