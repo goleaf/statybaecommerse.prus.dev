@@ -171,37 +171,31 @@
             "php artisan docs:full"
         ],
         "diagnose:filament-pages": [
-            "@php artisan filament:diagnose-pages"
-        ],
-        "scan:filament-pages": [
-            "@php artisan filament:scan-resource-pages"
-        ],
-        "scan:filament-uninitialized": [
-            "@php artisan filament:scan-uninitialized-pages"
+            "@php artisan filament:fix-critical-errors --dry-run"
         ],
         "filament:analyze": [
-            "@php artisan filament:analyze"
+            "@php artisan filament:fix-critical-errors --dry-run"
         ],
-        "filament:fix-form-schema": [
-            "@php artisan filament:fix-form-schema"
+        "filament:assets": [
+            "@php artisan filament:assets"
         ],
-        "filament:fix-navigation": [
-            "@php artisan filament:navigation-groups:fix-all"
+        "filament:cache-components": [
+            "@php artisan filament:cache-components"
         ],
-        "filament:fix-navigation-comprehensive": [
-            "@php artisan filament:navigation-groups:fix-comprehensive"
+        "filament:clear-cached-components": [
+            "@php artisan filament:clear-cached-components"
         ],
-        "filament:fix-navigation-recursive": [
-            "@php artisan filament:navigation-groups:fix-recursive"
-        ],
-        "filament:fix-navigation-final": [
-            "@php artisan filament:navigation-groups:fix-final --skip-tests"
+        "filament:check-translations": [
+            "@php artisan filament:check-translations"
         ],
         "filament:fix-critical": [
             "@php artisan filament:fix-critical-errors"
         ],
-        "filament:fix-simple": [
-            "@php artisan filament:fix-simple-issues"
+        "filament:optimize": [
+            "@php artisan filament:optimize"
+        ],
+        "filament:optimize-clear": [
+            "@php artisan filament:optimize-clear"
         ],
         "app:test-brand": [
             "@php vendor/bin/phpunit --testsuite=Unit --filter=BrandResourceMetadataTest"
