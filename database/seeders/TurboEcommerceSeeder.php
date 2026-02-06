@@ -58,16 +58,17 @@ final class TurboEcommerceSeeder extends Seeder
         $this->imageGen = app(LocalImageGeneratorService::class);
         $this->sharedImagePoolDir = storage_path('app/temp/shared_product_images');
 
-        $this->productsPerBrand = max(100, (int) env('SEED_PRODUCTS_PER_BRAND', 100));
-        $this->categoriesPerProduct = (int) env('SEED_CATEGORIES_PER_PRODUCT', 3);
-        $this->attributesPerProductMin = (int) env('SEED_ATTRS_PER_PRODUCT_MIN', 3);
-        $this->attributesPerProductMax = (int) env('SEED_ATTRS_PER_PRODUCT_MAX', 6);
-        $this->minImagesPerProduct = (int) env('SEED_IMAGES_PER_PRODUCT_MIN', 3);
-        $this->maxImagesPerProduct = (int) env('SEED_IMAGES_PER_PRODUCT_MAX', 6);
+        // Keep defaults development-friendly and fast while still generating realistic relations.
+        $this->productsPerBrand = max(12, (int) env('SEED_PRODUCTS_PER_BRAND', 24));
+        $this->categoriesPerProduct = (int) env('SEED_CATEGORIES_PER_PRODUCT', 2);
+        $this->attributesPerProductMin = (int) env('SEED_ATTRS_PER_PRODUCT_MIN', 2);
+        $this->attributesPerProductMax = (int) env('SEED_ATTRS_PER_PRODUCT_MAX', 4);
+        $this->minImagesPerProduct = (int) env('SEED_IMAGES_PER_PRODUCT_MIN', 1);
+        $this->maxImagesPerProduct = (int) env('SEED_IMAGES_PER_PRODUCT_MAX', 2);
         if ($this->maxImagesPerProduct < $this->minImagesPerProduct) {
             $this->maxImagesPerProduct = $this->minImagesPerProduct;
         }
-        $this->chunkSize = (int) env('SEED_CHUNK_SIZE', 500);
+        $this->chunkSize = (int) env('SEED_CHUNK_SIZE', 250);
     }
 
     public function run(): void
