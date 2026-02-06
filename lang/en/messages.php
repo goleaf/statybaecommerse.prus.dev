@@ -758,6 +758,7 @@ return [
     'shared'                                             => 'Shared',
     'shipped_at'                                         => 'Shipped At',
     'shipping'                                           => 'Shipping',
+    'shipping_capped_at_amount'                          => 'Shipping capped at :amount',
     'short_description'                                  => 'Short description',
     'similar_product'                                    => 'Similar Product',
     'similarities'                                       => 'Similarities',

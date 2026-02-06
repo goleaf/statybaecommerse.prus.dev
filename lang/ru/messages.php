@@ -793,6 +793,7 @@ return [
     'shared'                                                                                                                              => 'Shared',
     'shipped_at'                                                                                                                          => 'Shipped At',
     'shipping'                                                                                                                            => 'Доставка',
+    'shipping_capped_at_amount'                                                                                                          => 'Доставка ограничена :amount',
     'short_description'                                                                                                                   => 'Краткое описание',
     'similar_product'                                                                                                                     => 'Похожий товар',
     'similarities'                                                                                                                        => 'Similarities',

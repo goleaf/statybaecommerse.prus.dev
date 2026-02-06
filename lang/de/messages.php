@@ -758,6 +758,7 @@ return [
     'shared'                                             => 'Shared',
     'shipped_at'                                         => 'Versandt am',
     'shipping'                                           => 'Versand',
+    'shipping_capped_at_amount'                          => 'Versand gedeckelt auf :amount',
     'short_description'                                  => 'Kurzbeschreibung',
     'similar_product'                                    => 'Ähnliches Produkt',
     'similarities'                                       => 'Ähnlichkeiten',
