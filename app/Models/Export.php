@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\ExportStatus;
+use App\Support\ImportExport\ProgressCounter;
 use Database\Factories\ExportFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -260,15 +261,10 @@ final class Export extends Model
     {
         return Attribute::make(
             get: function (): int {
-                $totalRows = max(0, (int) ($this->total_rows ?? 0));
+                $totalRows = (int) ($this->total_rows ?? 0);
+                $processedRows = (int) ($this->processed_rows ?? 0);
 
-                if ($totalRows === 0) {
-                    return 0;
-                }
-
-                $processedRows = max(0, min((int) ($this->processed_rows ?? 0), $totalRows));
-
-                return (int) round(($processedRows / $totalRows) * 100);
+                return ProgressCounter::percent($processedRows, $totalRows);
             }
         );
     }
@@ -359,13 +355,12 @@ final class Export extends Model
     public function updateProgress(int $processedRows, ?int $totalRows = null): bool
     {
         $resolvedTotalRows = $totalRows ?? (int) ($this->total_rows ?? 0);
-        $resolvedTotalRows = max(0, $resolvedTotalRows);
-        $resolvedProcessedRows = max(0, min($processedRows, $resolvedTotalRows > 0 ? $resolvedTotalRows : $processedRows));
+        $resolvedProcessedRows = ProgressCounter::normalizeProcessed($processedRows, $resolvedTotalRows);
 
         $data = ['processed_rows' => $resolvedProcessedRows];
 
         if ($totalRows !== null) {
-            $data['total_rows'] = $resolvedTotalRows;
+            $data['total_rows'] = ProgressCounter::normalizeTotal($resolvedTotalRows);
         }
 
         return $this->update($data);

@@ -13,6 +13,7 @@ use App\Models\User;
 use App\Notifications\ExportCompletedNotification;
 use App\Notifications\ExportFailedNotification;
 use App\Notifications\ExportReadyNotification;
+use App\Support\ImportExport\ProgressCounter;
 use App\Services\Export\Contracts\Exportable;
 use App\Services\Export\Contracts\ExportWriter;
 use App\Services\Export\Exporters\OrderExport;
@@ -176,8 +177,8 @@ final class ExportService
 
     private function persistExportProgress(Export $export, int $processed, int $total): void
     {
-        $safeTotal = max(0, $total);
-        $safeProcessed = max(0, min($processed, $safeTotal));
+        $safeTotal = ProgressCounter::normalizeTotal($total);
+        $safeProcessed = ProgressCounter::normalizeProcessed($processed, $safeTotal);
 
         $export->forceFill([
             'processed_rows' => $safeProcessed,

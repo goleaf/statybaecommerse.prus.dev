@@ -7,6 +7,7 @@ namespace App\Filament\Pages\Imports;
 use App\Jobs\ProcessCsvImport;
 use App\Models\AdminUser;
 use App\Models\ImportRowResult;
+use App\Support\ImportExport\ProgressCounter;
 use App\Support\Storage\SecureStorage;
 use BackedEnum;
 use Closure;
@@ -1028,20 +1029,16 @@ abstract class CsvImportPage extends Page implements HasForms
 
     protected function calculateProgressPercent(int $processed, int $total): int
     {
-        if ($total <= 0) {
-            return 0;
-        }
-
-        return min(100, (int) floor(($processed / $total) * 100));
+        return ProgressCounter::percent($processed, $total);
     }
 
     protected function calculateFailedRowsCount(Import $import): int
     {
-        $total = max(0, (int) ($import->total_rows ?? 0));
-        $processed = max(0, min((int) ($import->processed_rows ?? 0), $total));
-        $successful = max(0, min((int) ($import->successful_rows ?? 0), $processed));
-
-        return max(0, $processed - $successful);
+        return ProgressCounter::failedRows(
+            (int) ($import->processed_rows ?? 0),
+            (int) ($import->successful_rows ?? 0),
+            (int) ($import->total_rows ?? 0),
+        );
     }
 
     public function import(): void
