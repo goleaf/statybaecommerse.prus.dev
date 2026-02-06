@@ -14,6 +14,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Console\Seeds\SeedCommand;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Artisan;
 
 use function in_array;
 use function is_array;
@@ -94,6 +95,21 @@ final class ProfiledSeedCommand extends SeedCommand
         $connection = $this->resolver->connection($this->getDatabase());
         $schema = $connection->getSchemaBuilder();
         $driver = strtolower((string) $connection->getDriverName());
+        $databaseName = (string) ($connection->getDatabaseName() ?? '');
+
+        if ($driver === 'sqlite') {
+            if ($databaseName === ':memory:') {
+                return $this->clearTablesByDelete($connection, $schema);
+            }
+
+            Artisan::call('migrate:fresh', [
+                '--database'       => $this->getDatabase(),
+                '--force'          => true,
+                '--no-interaction' => true,
+            ]);
+
+            return 0;
+        }
 
         $rawExcludedTables = $this->laravel['config']->get('seeds.truncate_excluded', [
             'migrations',
@@ -124,16 +140,35 @@ final class ProfiledSeedCommand extends SeedCommand
                     continue;
                 }
 
-                if ($driver === 'sqlite') {
-                    $connection->table($table)->delete();
+                $connection->table($table)->truncate();
 
-                    try {
-                        $connection->delete('DELETE FROM sqlite_sequence WHERE name = ?', [$table]);
-                    } catch (Throwable) {
-                        // Ignore sequence reset failures for tables without auto-increment entries.
-                    }
-                } else {
-                    $connection->table($table)->truncate();
+                $clearedTables++;
+            }
+        } finally {
+            $schema->enableForeignKeyConstraints();
+        }
+
+        return $clearedTables;
+    }
+
+    private function clearTablesByDelete($connection, $schema): int
+    {
+        $tables = $schema->getTableListing();
+        $clearedTables = 0;
+
+        $schema->disableForeignKeyConstraints();
+
+        try {
+            foreach ($tables as $table) {
+                if (! is_string($table) || $table === '' || $table === 'migrations') {
+                    continue;
+                }
+
+                try {
+                    $connection->table($table)->delete();
+                } catch (Throwable) {
+                    // Some SQLite internals or virtual tables may not support direct deletion.
+                    continue;
                 }
 
                 $clearedTables++;
