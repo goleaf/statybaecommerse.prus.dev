@@ -110,7 +110,7 @@ final class ExportService
             $exportable = $this->resolveExportable($model->exportable_type);
             $columns = $this->resolveColumns($exportable, $model->columns ?? []);
             $query = $this->buildQuery($exportable, $model->exportable_options ?? []);
-            $total = (clone $query)->count();
+            $total = ProgressCounter::normalizeTotal((int) (clone $query)->count());
 
             $model->forceFill([
                 'status'         => ExportStatus::Processing,

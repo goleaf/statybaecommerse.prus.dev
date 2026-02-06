@@ -910,8 +910,8 @@ abstract class CsvImportPage extends Page implements HasForms
             return;
         }
 
-        $processed = (int) ($import->processed_rows ?? 0);
-        $total = (int) ($import->total_rows ?? 0);
+        $total = ProgressCounter::normalizeTotal((int) ($import->total_rows ?? 0));
+        $processed = ProgressCounter::normalizeProcessed((int) ($import->processed_rows ?? 0), $total);
 
         if ($total > 0 && $processed >= $total) {
             $import->touch('completed_at');

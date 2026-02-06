@@ -39,6 +39,21 @@ beforeEach(function (): void {
             $table->timestamps();
         });
     }
+
+    if (! Schema::hasTable('import_row_results')) {
+        Schema::create('import_row_results', function (Blueprint $table): void {
+            $table->id();
+            $table->foreignId('import_id')->constrained('imports')->cascadeOnDelete();
+            $table->unsignedInteger('row_number')->nullable();
+            $table->string('status');
+            $table->string('action');
+            $table->text('message')->nullable();
+            $table->text('error_message')->nullable();
+            $table->json('changed_fields')->nullable();
+            $table->json('data')->nullable();
+            $table->timestamps();
+        });
+    }
 });
 
 final class TestBrandImporter extends BaseImporter

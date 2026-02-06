@@ -1,92 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="CLI Arguments" tests="13" assertions="38" errors="2" failures="0" skipped="0" time="27.087557">
-    <testsuite name="Tests\Unit\CsvImportProcessorTest" file="tests/Unit/CsvImportProcessorTest.php" tests="2" assertions="0" errors="2" failures="0" skipped="0" time="24.107127">
-      <testcase name="it clamps imported counters to total rows when chunk overflows configured total" file="tests/Unit/CsvImportProcessorTest.php::it clamps imported counters to total rows when chunk overflows configured total" class="Tests\Unit\CsvImportProcessorTest" classname="Tests.Unit.CsvImportProcessorTest" assertions="0" time="23.761276">
-        <error type="Illuminate\Database\QueryException">it clamps imported counters to total rows when chunk overflows configured totalIlluminate\Database\QueryException: SQLSTATE[HY000]: General error: 1 no such table: import_row_results (Connection: sqlite, Database: :memory:, SQL: insert into "import_row_results" ("action", "changed_fields", "created_at", "data", "error_message", "import_id", "message", "row_number", "status", "updated_at") values (created, [], 2026-02-06 14:22:24, {"name":"Overflow Brand","slug":"overflow-brand","is_active":true}, ?, 1, Created., ?, success, 2026-02-06 14:22:24))
-at vendor/laravel/framework/src/Illuminate/Database/Connection.php:578
-at vendor/laravel/framework/src/Illuminate/Database/Connection.php:827
-at vendor/laravel/framework/src/Illuminate/Database/Connection.php:794
-at vendor/laravel/framework/src/Illuminate/Database/Connection.php:573
-at vendor/laravel/framework/src/Illuminate/Database/Connection.php:537
-at vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php:4005
-at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:2235
-at app/Services/ImportExport/CsvImportProcessor.php:121
-at vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
-at vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:491
-at vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:363
-at app/Services/ImportExport/CsvImportProcessor.php:37
-at tests/Unit/CsvImportProcessorTest.php:132
-Caused by
-PDOException: SQLSTATE[HY000]: General error: 1 no such table: import_row_results
-
-at vendor/laravel/framework/src/Illuminate/Database/Connection.php:578
-at vendor/laravel/framework/src/Illuminate/Database/Connection.php:827
-at vendor/laravel/framework/src/Illuminate/Database/Connection.php:794
-at vendor/laravel/framework/src/Illuminate/Database/Connection.php:573
-at vendor/laravel/framework/src/Illuminate/Database/Connection.php:537
-at vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php:4005
-at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:2235
-at app/Services/ImportExport/CsvImportProcessor.php:121
-at vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
-at vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:491
-at vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:363
-at app/Services/ImportExport/CsvImportProcessor.php:37
-at tests/Unit/CsvImportProcessorTest.php:132</error>
-      </testcase>
-      <testcase name="it imports csv rows immediately without queue jobs" file="tests/Unit/CsvImportProcessorTest.php::it imports csv rows immediately without queue jobs" class="Tests\Unit\CsvImportProcessorTest" classname="Tests.Unit.CsvImportProcessorTest" assertions="0" time="0.345851">
-        <error type="Illuminate\Database\QueryException">it imports csv rows immediately without queue jobsIlluminate\Database\QueryException: SQLSTATE[HY000]: General error: 1 no such table: import_row_results (Connection: sqlite, Database: /Users/andrejprus/Library/CloudStorage/Dropbox/projects/egistatyba/database/testing/databases/testing_parallel_pid_90894.sqlite, SQL: insert into "import_row_results" ("action", "changed_fields", "created_at", "data", "error_message", "import_id", "message", "row_number", "status", "updated_at") values (created, [], 2026-02-06 14:22:24, {"name":"Acme","slug":"acme","is_active":true}, ?, 1, Created., ?, success, 2026-02-06 14:22:24))
-at vendor/laravel/framework/src/Illuminate/Database/Connection.php:578
-at vendor/laravel/framework/src/Illuminate/Database/Connection.php:827
-at vendor/laravel/framework/src/Illuminate/Database/Connection.php:794
-at vendor/laravel/framework/src/Illuminate/Database/Connection.php:573
-at vendor/laravel/framework/src/Illuminate/Database/Connection.php:537
-at vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php:4005
-at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:2235
-at app/Services/ImportExport/CsvImportProcessor.php:121
-at vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
-at vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:491
-at vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:363
-at app/Services/ImportExport/CsvImportProcessor.php:37
-at tests/Unit/CsvImportProcessorTest.php:94
-Caused by
-PDOException: SQLSTATE[HY000]: General error: 1 no such table: import_row_results
-
-at vendor/laravel/framework/src/Illuminate/Database/Connection.php:578
-at vendor/laravel/framework/src/Illuminate/Database/Connection.php:827
-at vendor/laravel/framework/src/Illuminate/Database/Connection.php:794
-at vendor/laravel/framework/src/Illuminate/Database/Connection.php:573
-at vendor/laravel/framework/src/Illuminate/Database/Connection.php:537
-at vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php:4005
-at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:2235
-at app/Services/ImportExport/CsvImportProcessor.php:121
-at vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
-at vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:491
-at vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:363
-at app/Services/ImportExport/CsvImportProcessor.php:37
-at tests/Unit/CsvImportProcessorTest.php:94</error>
-      </testcase>
+  <testsuite name="CLI Arguments" tests="25" assertions="80" errors="0" failures="0" skipped="0" time="32.217553">
+    <testsuite name="Tests\Unit\CsvImportProcessorTest" file="tests/Unit/CsvImportProcessorTest.php" tests="2" assertions="10" errors="0" failures="0" skipped="0" time="23.698878">
+      <testcase name="it clamps imported counters to total rows when chunk overflows configured total" file="tests/Unit/CsvImportProcessorTest.php::it clamps imported counters to total rows when chunk overflows configured total" class="Tests\Unit\CsvImportProcessorTest" classname="Tests.Unit.CsvImportProcessorTest" assertions="4" time="23.439451"/>
+      <testcase name="it imports csv rows immediately without queue jobs" file="tests/Unit/CsvImportProcessorTest.php::it imports csv rows immediately without queue jobs" class="Tests\Unit\CsvImportProcessorTest" classname="Tests.Unit.CsvImportProcessorTest" assertions="6" time="0.259427"/>
     </testsuite>
-    <testsuite name="Tests\Unit\Support\ImportExport\ProgressCounterTest" file="tests/Unit/Support/ImportExport/ProgressCounterTest.php" tests="3" assertions="13" errors="0" failures="0" skipped="0" time="0.540404">
-      <testcase name="it calculates failed rows from processed minus successful using safe bounds" file="tests/Unit/Support/ImportExport/ProgressCounterTest.php::it calculates failed rows from processed minus successful using safe bounds" class="Tests\Unit\Support\ImportExport\ProgressCounterTest" classname="Tests.Unit.Support.ImportExport.ProgressCounterTest" assertions="4" time="0.174372"/>
-      <testcase name="it calculates percent from normalized counters" file="tests/Unit/Support/ImportExport/ProgressCounterTest.php::it calculates percent from normalized counters" class="Tests\Unit\Support\ImportExport\ProgressCounterTest" classname="Tests.Unit.Support.ImportExport.ProgressCounterTest" assertions="4" time="0.175446"/>
-      <testcase name="it normalizes total and processed counters to safe bounds" file="tests/Unit/Support/ImportExport/ProgressCounterTest.php::it normalizes total and processed counters to safe bounds" class="Tests\Unit\Support\ImportExport\ProgressCounterTest" classname="Tests.Unit.Support.ImportExport.ProgressCounterTest" assertions="5" time="0.190586"/>
+    <testsuite name="Tests\Feature\ImportExportPageTest" file="tests/Feature/ImportExportPageTest.php" tests="2" assertions="4" errors="0" failures="0" skipped="0" time="1.562912">
+      <testcase name="it feature: renders the data import export page" file="tests/Feature/ImportExportPageTest.php::it feature: renders the data import export page" class="Tests\Feature\ImportExportPageTest" classname="Tests.Feature.ImportExportPageTest" assertions="1" time="0.852494"/>
+      <testcase name="it feature: shows only csv import links and no upload form" file="tests/Feature/ImportExportPageTest.php::it feature: shows only csv import links and no upload form" class="Tests\Feature\ImportExportPageTest" classname="Tests.Feature.ImportExportPageTest" assertions="3" time="0.710419"/>
     </testsuite>
-    <testsuite name="Tests\Feature\Services\Export\ExportServiceTest" file="tests/Feature/Services/Export/ExportServiceTest.php" tests="3" assertions="15" errors="0" failures="0" skipped="0" time="1.313557">
-      <testcase name="it processes queued exports and stores downloadable artifacts" file="tests/Feature/Services/Export/ExportServiceTest.php::it processes queued exports and stores downloadable artifacts" class="Tests\Feature\Services\Export\ExportServiceTest" classname="Tests.Feature.Services.Export.ExportServiceTest" assertions="6" time="0.708910"/>
-      <testcase name="it marks exports as failed when processing throws an exception" file="tests/Feature/Services/Export/ExportServiceTest.php::it marks exports as failed when processing throws an exception" class="Tests\Feature\Services\Export\ExportServiceTest" classname="Tests.Feature.Services.Export.ExportServiceTest" assertions="5" time="0.336044"/>
-      <testcase name="it queues export records and dispatches the processor job" file="tests/Feature/Services/Export/ExportServiceTest.php::it queues export records and dispatches the processor job" class="Tests\Feature\Services\Export\ExportServiceTest" classname="Tests.Feature.Services.Export.ExportServiceTest" assertions="4" time="0.268603"/>
+    <testsuite name="Tests\Feature\Filament\DataImportExportTest" file="tests/Feature/Filament/DataImportExportTest.php" tests="6" assertions="23" errors="0" failures="0" skipped="0" time="1.926364">
+      <testcase name="it can render data import export page" file="tests/Feature/Filament/DataImportExportTest.php::it can render data import export page" class="Tests\Feature\Filament\DataImportExportTest" classname="Tests.Feature.Filament.DataImportExportTest" assertions="1" time="0.457191"/>
+      <testcase name="it exposes the expected navigation icon" file="tests/Feature/Filament/DataImportExportTest.php::it exposes the expected navigation icon" class="Tests\Feature\Filament\DataImportExportTest" classname="Tests.Feature.Filament.DataImportExportTest" assertions="1" time="0.243254"/>
+      <testcase name="it forbids guest to access data import export page" file="tests/Feature/Filament/DataImportExportTest.php::it forbids guest to access data import export page" class="Tests\Feature\Filament\DataImportExportTest" classname="Tests.Feature.Filament.DataImportExportTest" assertions="2" time="0.215827"/>
+      <testcase name="it forbids non-admin user to access data import export page" file="tests/Feature/Filament/DataImportExportTest.php::it forbids non-admin user to access data import export page" class="Tests\Feature\Filament\DataImportExportTest" classname="Tests.Feature.Filament.DataImportExportTest" assertions="2" time="0.271467"/>
+      <testcase name="it displays the stats on the page" file="tests/Feature/Filament/DataImportExportTest.php::it displays the stats on the page" class="Tests\Feature\Filament\DataImportExportTest" classname="Tests.Feature.Filament.DataImportExportTest" assertions="6" time="0.378694"/>
+      <testcase name="it shows CSV import links" file="tests/Feature/Filament/DataImportExportTest.php::it shows CSV import links" class="Tests\Feature\Filament\DataImportExportTest" classname="Tests.Feature.Filament.DataImportExportTest" assertions="11" time="0.359931"/>
     </testsuite>
-    <testsuite name="Tests\Feature\Models\ExportProgressTest" file="tests/Feature/Models/ExportProgressTest.php" tests="2" assertions="3" errors="0" failures="0" skipped="0" time="0.486429">
-      <testcase name="it clamps progress percentage when processed rows exceed total rows" file="tests/Feature/Models/ExportProgressTest.php::it clamps progress percentage when processed rows exceed total rows" class="Tests\Feature\Models\ExportProgressTest" classname="Tests.Feature.Models.ExportProgressTest" assertions="1" time="0.227071"/>
-      <testcase name="it clamps updateProgress to total rows" file="tests/Feature/Models/ExportProgressTest.php::it clamps updateProgress to total rows" class="Tests\Feature\Models\ExportProgressTest" classname="Tests.Feature.Models.ExportProgressTest" assertions="2" time="0.259358"/>
+    <testsuite name="Tests\Feature\Filament\Pages\ImportDataTest" file="tests/Feature/Filament/Pages/ImportDataTest.php" tests="4" assertions="5" errors="0" failures="0" skipped="0" time="1.613498">
+      <testcase name="it can render import data page" file="tests/Feature/Filament/Pages/ImportDataTest.php::it can render import data page" class="Tests\Feature\Filament\Pages\ImportDataTest" classname="Tests.Feature.Filament.Pages.ImportDataTest" assertions="1" time="0.448520"/>
+      <testcase name="it can render import categories page" file="tests/Feature/Filament/Pages/ImportDataTest.php::it can render import categories page" class="Tests\Feature\Filament\Pages\ImportDataTest" classname="Tests.Feature.Filament.Pages.ImportDataTest" assertions="1" time="0.612904"/>
+      <testcase name="it exposes csv import pages on the data import dashboard" file="tests/Feature/Filament/Pages/ImportDataTest.php::it exposes csv import pages on the data import dashboard" class="Tests\Feature\Filament\Pages\ImportDataTest" classname="Tests.Feature.Filament.Pages.ImportDataTest" assertions="1" time="0.327914"/>
+      <testcase name="it is forbidden for guests" file="tests/Feature/Filament/Pages/ImportDataTest.php::it is forbidden for guests" class="Tests\Feature\Filament\Pages\ImportDataTest" classname="Tests.Feature.Filament.Pages.ImportDataTest" assertions="2" time="0.224160"/>
     </testsuite>
-    <testsuite name="Tests\Unit\Filament\Pages\CsvImportPageFailedCountTest" file="tests/Unit/Filament/Pages/CsvImportPageFailedCountTest.php" tests="2" assertions="4" errors="0" failures="0" skipped="0" time="0.459587">
-      <testcase name="it calculates failed rows from processed minus successful for progress and notifications" file="tests/Unit/Filament/Pages/CsvImportPageFailedCountTest.php::it calculates failed rows from processed minus successful for progress and notifications" class="Tests\Unit\Filament\Pages\CsvImportPageFailedCountTest" classname="Tests.Unit.Filament.Pages.CsvImportPageFailedCountTest" assertions="3" time="0.171001"/>
-      <testcase name="it clamps invalid counters when calculating failed rows" file="tests/Unit/Filament/Pages/CsvImportPageFailedCountTest.php::it clamps invalid counters when calculating failed rows" class="Tests\Unit\Filament\Pages\CsvImportPageFailedCountTest" classname="Tests.Unit.Filament.Pages.CsvImportPageFailedCountTest" assertions="1" time="0.288586"/>
+    <testsuite name="Tests\Unit\Support\ImportExport\ProgressCounterTest" file="tests/Unit/Support/ImportExport/ProgressCounterTest.php" tests="3" assertions="13" errors="0" failures="0" skipped="0" time="0.628613">
+      <testcase name="it calculates failed rows from processed minus successful using safe bounds" file="tests/Unit/Support/ImportExport/ProgressCounterTest.php::it calculates failed rows from processed minus successful using safe bounds" class="Tests\Unit\Support\ImportExport\ProgressCounterTest" classname="Tests.Unit.Support.ImportExport.ProgressCounterTest" assertions="4" time="0.212166"/>
+      <testcase name="it normalizes total and processed counters to safe bounds" file="tests/Unit/Support/ImportExport/ProgressCounterTest.php::it normalizes total and processed counters to safe bounds" class="Tests\Unit\Support\ImportExport\ProgressCounterTest" classname="Tests.Unit.Support.ImportExport.ProgressCounterTest" assertions="5" time="0.213114"/>
+      <testcase name="it calculates percent from normalized counters" file="tests/Unit/Support/ImportExport/ProgressCounterTest.php::it calculates percent from normalized counters" class="Tests\Unit\Support\ImportExport\ProgressCounterTest" classname="Tests.Unit.Support.ImportExport.ProgressCounterTest" assertions="4" time="0.203333"/>
     </testsuite>
-    <testsuite name="Tests\Unit\Filament\Pages\CsvImportPageProgressStatusTest" file="tests/Unit/Filament/Pages/CsvImportPageProgressStatusTest.php" tests="1" assertions="3" errors="0" failures="0" skipped="0" time="0.180452">
-      <testcase name="it keeps status running when import counters are zero and import is not completed" file="tests/Unit/Filament/Pages/CsvImportPageProgressStatusTest.php::it keeps status running when import counters are zero and import is not completed" class="Tests\Unit\Filament\Pages\CsvImportPageProgressStatusTest" classname="Tests.Unit.Filament.Pages.CsvImportPageProgressStatusTest" assertions="3" time="0.180452"/>
+    <testsuite name="Tests\Feature\Services\Export\ExportServiceTest" file="tests/Feature/Services/Export/ExportServiceTest.php" tests="3" assertions="15" errors="0" failures="0" skipped="0" time="1.567110">
+      <testcase name="it marks exports as failed when processing throws an exception" file="tests/Feature/Services/Export/ExportServiceTest.php::it marks exports as failed when processing throws an exception" class="Tests\Feature\Services\Export\ExportServiceTest" classname="Tests.Feature.Services.Export.ExportServiceTest" assertions="5" time="0.395198"/>
+      <testcase name="it queues export records and dispatches the processor job" file="tests/Feature/Services/Export/ExportServiceTest.php::it queues export records and dispatches the processor job" class="Tests\Feature\Services\Export\ExportServiceTest" classname="Tests.Feature.Services.Export.ExportServiceTest" assertions="4" time="0.683635"/>
+      <testcase name="it processes queued exports and stores downloadable artifacts" file="tests/Feature/Services/Export/ExportServiceTest.php::it processes queued exports and stores downloadable artifacts" class="Tests\Feature\Services\Export\ExportServiceTest" classname="Tests.Feature.Services.Export.ExportServiceTest" assertions="6" time="0.488277"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\Models\ExportProgressTest" file="tests/Feature/Models/ExportProgressTest.php" tests="2" assertions="3" errors="0" failures="0" skipped="0" time="0.590469">
+      <testcase name="it clamps progress percentage when processed rows exceed total rows" file="tests/Feature/Models/ExportProgressTest.php::it clamps progress percentage when processed rows exceed total rows" class="Tests\Feature\Models\ExportProgressTest" classname="Tests.Feature.Models.ExportProgressTest" assertions="1" time="0.287659"/>
+      <testcase name="it clamps updateProgress to total rows" file="tests/Feature/Models/ExportProgressTest.php::it clamps updateProgress to total rows" class="Tests\Feature\Models\ExportProgressTest" classname="Tests.Feature.Models.ExportProgressTest" assertions="2" time="0.302811"/>
+    </testsuite>
+    <testsuite name="Tests\Unit\Filament\Pages\CsvImportPageFailedCountTest" file="tests/Unit/Filament/Pages/CsvImportPageFailedCountTest.php" tests="2" assertions="4" errors="0" failures="0" skipped="0" time="0.403770">
+      <testcase name="it calculates failed rows from processed minus successful for progress and notifications" file="tests/Unit/Filament/Pages/CsvImportPageFailedCountTest.php::it calculates failed rows from processed minus successful for progress and notifications" class="Tests\Unit\Filament\Pages\CsvImportPageFailedCountTest" classname="Tests.Unit.Filament.Pages.CsvImportPageFailedCountTest" assertions="3" time="0.182029"/>
+      <testcase name="it clamps invalid counters when calculating failed rows" file="tests/Unit/Filament/Pages/CsvImportPageFailedCountTest.php::it clamps invalid counters when calculating failed rows" class="Tests\Unit\Filament\Pages\CsvImportPageFailedCountTest" classname="Tests.Unit.Filament.Pages.CsvImportPageFailedCountTest" assertions="1" time="0.221741"/>
+    </testsuite>
+    <testsuite name="Tests\Unit\Filament\Pages\CsvImportPageProgressStatusTest" file="tests/Unit/Filament/Pages/CsvImportPageProgressStatusTest.php" tests="1" assertions="3" errors="0" failures="0" skipped="0" time="0.225938">
+      <testcase name="it keeps status running when import counters are zero and import is not completed" file="tests/Unit/Filament/Pages/CsvImportPageProgressStatusTest.php::it keeps status running when import counters are zero and import is not completed" class="Tests\Unit\Filament\Pages\CsvImportPageProgressStatusTest" classname="Tests.Unit.Filament.Pages.CsvImportPageProgressStatusTest" assertions="3" time="0.225938"/>
     </testsuite>
   </testsuite>
 </testsuites>
