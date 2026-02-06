@@ -17,8 +17,8 @@
 
 @extends('errors.layout', [
     'code' => '500',
-    'title' => __('frontend.errors.500.title'),
-    'description' => __('frontend.errors.500.description'),
+    'title' => __('frontend.errors.error_500.title'),
+    'description' => __('frontend.errors.error_500.description'),
     'primaryAction' => [
         'label' => __('frontend.errors.actions.return_home'),
         'url' => $homeUrl,
@@ -27,8 +27,8 @@
         'label' => __('frontend.errors.actions.contact_support'),
         'url' => $contactUrl,
     ],
-    'supportTitle' => __('frontend.errors.500.support_title'),
-    'supportDescription' => __('frontend.errors.500.support_description'),
+    'supportTitle' => __('frontend.errors.error_500.support_title'),
+    'supportDescription' => __('frontend.errors.error_500.support_description'),
     'links' => [
         [
             'label' => __('frontend.errors.actions.check_system_status'),

@@ -17,8 +17,8 @@
 
 @extends('errors.layout', [
     'code' => '429',
-    'title' => __('frontend.errors.429.title'),
-    'description' => __('frontend.errors.429.description'),
+    'title' => __('frontend.errors.error_429.title'),
+    'description' => __('frontend.errors.error_429.description'),
     'primaryAction' => [
         'label' => __('frontend.errors.actions.try_again'),
         'type' => 'refresh',
@@ -44,7 +44,7 @@
             'icon' => 'support',
         ],
         [
-            'label' => __('frontend.errors.429.links.read_news'),
+            'label' => __('frontend.errors.error_429.links.read_news'),
             'url' => $newsUrl,
             'icon' => 'refresh',
         ],

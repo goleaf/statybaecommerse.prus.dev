@@ -20,8 +20,8 @@
 
 @extends('errors.layout', [
     'code' => '403',
-    'title' => __('frontend.errors.403.title'),
-    'description' => __('frontend.errors.403.description'),
+    'title' => __('frontend.errors.error_403.title'),
+    'description' => __('frontend.errors.error_403.description'),
     'primaryAction' => [
         'label' => __('frontend.errors.actions.return_home'),
         'url' => $homeUrl,
@@ -32,22 +32,22 @@
     ],
     'links' => [
         [
-            'label' => __('frontend.errors.403.links.view_account'),
+            'label' => __('frontend.errors.error_403.links.view_account'),
             'url' => $profileUrl,
             'icon' => 'status',
         ],
         [
-            'label' => __('frontend.errors.403.links.order_status'),
+            'label' => __('frontend.errors.error_403.links.order_status'),
             'url' => $ordersUrl,
             'icon' => 'products',
         ],
         [
-            'label' => __('frontend.errors.403.links.support_center'),
+            'label' => __('frontend.errors.error_403.links.support_center'),
             'url' => $supportUrl,
             'icon' => 'support',
         ],
         [
-            'label' => __('frontend.errors.403.links.shop_new_arrivals'),
+            'label' => __('frontend.errors.error_403.links.shop_new_arrivals'),
             'url' => $productsUrl,
             'icon' => 'categories',
         ],

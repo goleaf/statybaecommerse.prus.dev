@@ -557,61 +557,7 @@ return [
     ],
     'empty_checkout_description' => 'Fügen Sie Artikel Ihrem Warenkorb hinzu, bevor Sie zur Kasse gehen.',
     'errors'                     => [
-        403 => [
-            'description' => 'Description',
-            'links'       => [
-                'order_status'      => 'Order status',
-                'shop_new_arrivals' => 'Shop new arrivals',
-                'support_center'    => 'Support center',
-                'view_account'      => 'View account',
-            ],
-            'title' => 'Title',
-        ],
-        404 => [
-            'actions' => [
-                'email_us'      => 'Email us',
-                'visit_contact' => 'Visit contact',
-            ],
-            'contact_cta' => [
-                'description' => 'Description',
-                'title'       => 'Title',
-            ],
-            'description'          => 'Description',
-            'search_placeholder'   => 'Search placeholder',
-            'search_title'         => 'Search title',
-            'support_description'  => 'Support description',
-            'support_title'        => 'Support title',
-            'title'                => 'Title',
-            'top_categories_title' => 'Top categories title',
-        ],
-        419 => [
-            'description' => 'Description',
-            'links'       => [
-                'review_cart'  => 'Review cart',
-                'track_orders' => 'Track orders',
-            ],
-            'title' => 'Title',
-        ],
-        429 => [
-            'description' => 'Description',
-            'links'       => [
-                'read_news' => 'Read news',
-            ],
-            'title' => 'Title',
-        ],
         '4xx' => [
-            'description'         => 'Description',
-            'support_description' => 'Support description',
-            'support_title'       => 'Support title',
-            'title'               => 'Title',
-        ],
-        500 => [
-            'description'         => 'Description',
-            'support_description' => 'Support description',
-            'support_title'       => 'Support title',
-            'title'               => 'Title',
-        ],
-        503 => [
             'description'         => 'Description',
             'support_description' => 'Support description',
             'support_title'       => 'Support title',
@@ -646,6 +592,60 @@ return [
         'contact_cta' => [
             'description' => 'Description',
             'title'       => 'Title',
+        ],
+        'error_403' => [
+            'description' => 'Description',
+            'links'       => [
+                'order_status'      => 'Order status',
+                'shop_new_arrivals' => 'Shop new arrivals',
+                'support_center'    => 'Support center',
+                'view_account'      => 'View account',
+            ],
+            'title' => 'Title',
+        ],
+        'error_404' => [
+            'actions' => [
+                'email_us'      => 'Email us',
+                'visit_contact' => 'Visit contact',
+            ],
+            'contact_cta' => [
+                'description' => 'Description',
+                'title'       => 'Title',
+            ],
+            'description'          => 'Description',
+            'search_placeholder'   => 'Search placeholder',
+            'search_title'         => 'Search title',
+            'support_description'  => 'Support description',
+            'support_title'        => 'Support title',
+            'title'                => 'Title',
+            'top_categories_title' => 'Top categories title',
+        ],
+        'error_419' => [
+            'description' => 'Description',
+            'links'       => [
+                'review_cart'  => 'Review cart',
+                'track_orders' => 'Track orders',
+            ],
+            'title' => 'Title',
+        ],
+        'error_429' => [
+            'description' => 'Description',
+            'links'       => [
+                'read_news' => 'Read news',
+            ],
+            'title' => 'Title',
+        ],
+        'error_500' => [
+            'description'         => 'Description',
+            'support_description' => 'Support description',
+            'support_title'       => 'Support title',
+            'title'               => 'Title',
+        ],
+        'error_503' => [
+            'description'         => 'Description',
+            'support_description' => 'Support description',
+            'support_title'       => 'Support title',
+            'title'               => 'Title',
         ],
         'generic_description' => 'Generic description',
         'generic_title'       => 'Generic title',

@@ -17,8 +17,8 @@
 
 @extends('errors.layout', [
     'code' => '419',
-    'title' => __('frontend.errors.419.title'),
-    'description' => __('frontend.errors.419.description'),
+    'title' => __('frontend.errors.error_419.title'),
+    'description' => __('frontend.errors.error_419.description'),
     'primaryAction' => [
         'label' => __('frontend.errors.actions.refresh_page'),
         'type' => 'refresh',
@@ -29,7 +29,7 @@
     ],
     'links' => [
         [
-            'label' => __('frontend.errors.419.links.review_cart'),
+            'label' => __('frontend.errors.error_419.links.review_cart'),
             'url' => $cartUrl,
             'icon' => 'cart',
         ],
@@ -39,7 +39,7 @@
             'icon' => 'products',
         ],
         [
-            'label' => __('frontend.errors.419.links.track_orders'),
+            'label' => __('frontend.errors.error_419.links.track_orders'),
             'url' => $ordersUrl,
             'icon' => 'status',
         ],
