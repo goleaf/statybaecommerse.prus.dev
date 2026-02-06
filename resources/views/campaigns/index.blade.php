@@ -1,7 +1,6 @@
 @extends('components.layouts.base')
 
-@section('title', __('messages.campaigns))
-@section('))
+@section('title', __('messages.campaigns_section'))
 @section('description', __('campaigns.index.description'))
 
 @section('content')

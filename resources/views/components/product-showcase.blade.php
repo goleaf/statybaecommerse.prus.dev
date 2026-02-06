@@ -73,7 +73,7 @@
             @if ($showFilters)
                 <div class="lg:w-1/4">
                     <div class="bg-white border border-gray-200 rounded-xl p-6">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-4">{{ __('Filters') }}</h3>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">{{ __('ui.filters') }}</h3>
 
                         {{-- Price Range --}}
                         <div class="mb-6">
@@ -125,7 +125,7 @@
 
                         {{-- Rating --}}
                         <div class="mb-6">
-                            <h4 class="text-sm font-semibold text-gray-900 mb-3">{{ __('Rating') }}</h4>
+                            <h4 class="text-sm font-semibold text-gray-900 mb-3">{{ __('ui.rating') }}</h4>
                             <div class="space-y-2">
                                 @for ($i = 5; $i >= 1; $i--)
                                     <label
@@ -181,7 +181,7 @@
                             </button>
                             <button @click="clearFilters()"
                                     class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-medium text-sm hover:bg-gray-50 transition-colors duration-200">
-                                {{ __('Clear') }}
+                                {{ __('ui.clear') }}
                             </button>
                         </div>
                     </div>
@@ -193,7 +193,7 @@
                 {{-- Sorting and Results --}}
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
                     <div class="text-sm text-gray-600">
-                        {{ __('Showing') }} <span class="font-medium">{{ $products->count() }}</span>
+                        {{ __('ui.showing') }} <span class="font-medium">{{ $products->count() }}</span>
                         {{ __('messages.products') }}
                     </div>
 
@@ -202,7 +202,7 @@
                             <span class="text-sm text-gray-600">{{ __('messages.sort_by') }}:</span>
                             <select x-model="sortBy" @change="applySorting()"
                                     class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                <option value="relevance">{{ __('Relevance') }}</option>
+                                <option value="relevance">{{ __('ui.relevance') }}</option>
                                 <option value="price_asc">{{ __('messages.price_low_to_high') }}</option>
                                 <option value="price_desc">{{ __('ui.price_high_to_low') }}</option>
                                 <option value="name_asc">{{ __('ui.name_a_to_z') }}</option>

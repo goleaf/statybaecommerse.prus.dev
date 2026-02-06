@@ -4,16 +4,17 @@ declare(strict_types=1);
 
 return [
     'actions' => [
+        'back'              => 'Back',
         'download'          => 'Herunterladen',
         'generate_document' => 'Dokument generieren',
         'refresh'           => 'Aktualisieren',
         'view'              => 'Ansehen',
     ],
-    'active_groups'           => 'Aktive Gruppen',
-    'advanced_import'         => 'Erweiterter Import',
-    'import_analysis_summary' => 'Analyseübersicht',
-    'import_rows_title'       => 'Importzeilen',
-    'attribute-values'        => [
+    'active_groups'    => 'Aktive Gruppen',
+    'admin_user'       => 'Admin-Benutzer',
+    'admin_users'      => 'Admin-Benutzer',
+    'advanced_import'  => 'Erweiterter Import',
+    'attribute-values' => [
         'translations' => [
             ''     => 'Attributwert-Übersetzungen',
             'save' => 'Übersetzungen speichern',
@@ -105,6 +106,7 @@ return [
     'common' => [
         'not_available' => 'Nicht verfügbar',
     ],
+    'companies'     => 'Unternehmen',
     'coupon_usages' => [
         'periods' => [
             'this_month' => 'Diesen Monat',
@@ -113,6 +115,7 @@ return [
     ],
     'customer_groups'                   => 'Kundengruppen',
     'customer_segmentation_description' => 'Kundensegmente basierend auf Verhalten und Daten verwalten.',
+    'customers_import'                  => 'Kunden importieren',
     'dashboard'                         => [
         'actions' => [
             'clear_cache'              => 'Cache leeren',
@@ -238,28 +241,22 @@ return [
         'validity'             => 'Gültigkeit',
         'validity_description' => 'Konfigurieren Sie, wann und wie der Rabatt gilt.',
     ],
+    'discounts_import'   => 'Rabatte importieren',
     'document_templates' => [
-        'navigation_label'   => 'Dokumentvorlagen',
-        'model_label'        => 'Dokumentvorlage',
-        'plural_model_label' => 'Dokumentvorlagen',
-        'sections'           => [
-            'basic_information'             => 'Grundinformationen',
-            'basic_information_description' => 'Name, Typ und Status der Vorlage.',
-            'content'                       => 'Vorlageninhalt',
-            'content_description'           => 'HTML-Inhalt mit Platzhaltern für Variablen.',
-            'variables'                     => 'Vorlagenvariablen',
-            'variables_description'         => 'Definieren Sie verfügbare Platzhalter für diese Vorlage.',
-            'settings'                      => 'Vorlageneinstellungen',
-            'settings_description'          => 'Druck- und Formatierungseinstellungen.',
+        'actions' => [
+            'activate'   => 'Aktivieren',
+            'deactivate' => 'Deaktivieren',
+            'duplicate'  => 'Duplizieren',
+            'preview'    => 'Vorschau',
         ],
         'categories' => [
             'business'  => 'Geschäftlich',
-            'sales'     => 'Vertrieb',
-            'legal'     => 'Rechtlich',
             'financial' => 'Finanziell',
+            'legal'     => 'Rechtlich',
             'marketing' => 'Marketing',
-            'technical' => 'Technisch',
             'other'     => 'Sonstiges',
+            'sales'     => 'Vertrieb',
+            'technical' => 'Technisch',
         ],
         'document_form' => [
             'sections' => [
@@ -267,37 +264,44 @@ return [
             ],
         ],
         'fields' => [
-            'type'            => 'Typ',
             'category'        => 'Kategorie',
             'content'         => 'Inhalt',
-            'variables'       => 'Variablen',
-            'settings'        => 'Dokumenteneinstellungen',
-            'is_active'       => 'Aktiv',
             'documents_count' => 'Dokumente',
+            'is_active'       => 'Aktiv',
+            'settings'        => 'Dokumenteneinstellungen',
+            'type'            => 'Typ',
+            'variables'       => 'Variablen',
         ],
         'filters' => [
-            'type'      => 'Typ',
             'category'  => 'Kategorie',
             'is_active' => 'Aktiv',
+            'type'      => 'Typ',
         ],
-        'actions' => [
-            'preview'    => 'Vorschau',
-            'duplicate'  => 'Duplizieren',
-            'activate'   => 'Aktivieren',
-            'deactivate' => 'Deaktivieren',
-        ],
-        'notifications' => [
+        'model_label'      => 'Dokumentvorlage',
+        'navigation_label' => 'Dokumentvorlagen',
+        'notifications'    => [
             'duplicated' => 'Dokumentvorlage dupliziert.',
         ],
+        'plural_model_label' => 'Dokumentvorlagen',
+        'sections'           => [
+            'basic_information'             => 'Grundinformationen',
+            'basic_information_description' => 'Name, Typ und Status der Vorlage.',
+            'content'                       => 'Vorlageninhalt',
+            'content_description'           => 'HTML-Inhalt mit Platzhaltern für Variablen.',
+            'settings'                      => 'Vorlageneinstellungen',
+            'settings_description'          => 'Druck- und Formatierungseinstellungen.',
+            'variables'                     => 'Vorlagenvariablen',
+            'variables_description'         => 'Definieren Sie verfügbare Platzhalter für diese Vorlage.',
+        ],
         'types' => [
+            'contract' => 'Vertrag',
             'document' => 'Dokument',
+            'email'    => 'E-Mail',
             'invoice'  => 'Rechnung',
+            'other'    => 'Sonstiges',
             'quote'    => 'Angebot',
             'receipt'  => 'Quittung',
-            'contract' => 'Vertrag',
             'report'   => 'Bericht',
-            'email'    => 'E-Mail',
-            'other'    => 'Sonstiges',
         ],
     ],
     'enum-values' => [
@@ -346,15 +350,22 @@ return [
         'male'   => 'Männlich',
         'other'  => 'Andere',
     ],
-    'impersonate'   => 'Benutzer imitieren',
-    'import_export' => [
+    'impersonate'             => 'Benutzer imitieren',
+    'import_analysis_summary' => 'Analyseübersicht',
+    'import_export'           => [
         'description' => 'Dateien hochladen, um Daten in das System zu importieren.',
         'guideline_1' => 'Stellen Sie sicher, dass Ihre Datei dem unterstützten Schema entspricht.',
         'guideline_2' => 'Hochgeladene Dateien werden auf Sicherheit geprüft.',
         'guideline_3' => 'Große Importe können einige Minuten dauern.',
         'guidelines'  => 'Import-Richtlinien',
     ],
-    'inventory' => [
+    'import_failed_rows'     => 'Failed Rows',
+    'import_processed_rows'  => 'Processed Rows',
+    'import_rows_title'      => 'Importzeilen',
+    'import_start_button'    => 'Start Import',
+    'import_successful_rows' => 'Successful Rows',
+    'import_total_rows'      => 'Total Rows',
+    'inventory'              => [
         'available_quantity'            => 'Verfügbare Menge',
         'basic_information'             => 'Basisinformationen',
         'basic_information_description' => 'Lagerbestände und Schwellenwerte.',
@@ -406,7 +417,8 @@ return [
             'lt' => 'LT',
         ],
     ],
-    'latest_orders' => [
+    'last_import_summary' => 'Last Import Summary',
+    'latest_orders'       => [
         'items' => 'Artikel',
     ],
     'legal' => [
@@ -422,18 +434,18 @@ return [
         'lt' => 'Litauisch',
     ],
     'locations' => [
-        'bulk-actions' => 'Massen-Aktionen',
-        'create'       => 'Standort erstellen',
-        'destroy'      => 'Standort löschen',
-        'edit'         => 'Standort bearbeiten',
-        'index'        => 'Standorte',
-        'reorder'      => 'Standorte neu ordnen',
-        'show'         => 'Standort anzeigen',
-        'store'        => 'Standort speichern',
-        'update'       => 'Standort aktualisieren',
+        'bulk-actions'       => 'Massen-Aktionen',
+        'create'             => 'Standort erstellen',
+        'destroy'            => 'Standort löschen',
+        'edit'               => 'Standort bearbeiten',
+        'index'              => 'Standorte',
+        'model_label'        => 'Standort',
         'navigation_label'   => 'Standorte',
         'plural_model_label' => 'Standorte',
-        'model_label'        => 'Standort',
+        'reorder'            => 'Standorte neu ordnen',
+        'show'               => 'Standort anzeigen',
+        'store'              => 'Standort speichern',
+        'update'             => 'Standort aktualisieren',
     ],
     'locations_page' => [
         'columns' => [
@@ -638,7 +650,10 @@ return [
             'update' => 'Tracking aktualisieren',
         ],
     ],
-    'prices' => [
+    'orders_import'        => 'Bestellungen importieren',
+    'organizations_import' => 'Organisationen importieren',
+    'partners_import'      => 'Partner importieren',
+    'prices'               => [
         'basic_information'             => 'Basisinformationen',
         'basic_information_description' => 'Preisstufen und Gültigkeit.',
         'created_at'                    => 'Erstellt am',
@@ -649,7 +664,8 @@ return [
         'valid_from'                    => 'Gültig ab',
         'valid_until'                   => 'Gültig bis',
     ],
-    'product' => [
+    'prices_import' => 'Preise importieren',
+    'product'       => [
         'in_stock'               => 'Auf Lager',
         'no_products_found'      => 'Keine Produkte gefunden',
         'out_of_stock'           => 'Nicht auf Lager',
@@ -657,10 +673,11 @@ return [
         'select_product'         => 'Produkt auswählen',
         'try_different_keywords' => 'Versuchen Sie andere Schlüsselwörter',
     ],
-    'product_features' => [
-        'basic_information' => 'Basisinformationen',
-    ],
-    'product_variants' => [
+    'product_features'     => 'Produktmerkmale',
+    'product_images'       => 'Produktbilder',
+    'product_requests'     => 'Produktanfragen',
+    'product_similarities' => 'Produktähnlichkeiten',
+    'product_variants'     => [
         'dimensions'         => 'Dimensionen & Größe',
         'general_info'       => 'Allgemeine Informationen',
         'inventory'          => 'Inventar',
@@ -673,6 +690,7 @@ return [
     ],
     'products' => [
         'allow_backorder'               => 'Nachbestellung erlauben',
+        'alt_text'                      => 'Alternativtext',
         'basic_information'             => 'Basisinformationen',
         'basic_information_description' => 'Produktname, SKU und Beschreibung.',
         'bulk_feature'                  => 'Massen-Hervorhebung',
@@ -688,6 +706,7 @@ return [
         'compare_price'                 => 'Vergleichspreis',
         'cost_price'                    => 'Selbstkostenpreis',
         'created_at'                    => 'Erstellt am',
+        'detailed_description'          => 'Detaillierte Beschreibung',
         'height'                        => 'Höhe',
         'image'                         => 'Bild',
         'images'                        => 'Bilder',
@@ -712,7 +731,6 @@ return [
         'seo_description'               => 'SEO-Beschreibung',
         'seo_title'                     => 'SEO-Titel',
         'short_description'             => 'Kurzbeschreibung',
-        'detailed_description'          => 'Detaillierte Beschreibung',
         'status'                        => 'Status',
         'status_archived'               => 'Archiviert',
         'status_draft'                  => 'Entwurf',
@@ -724,9 +742,8 @@ return [
         'translations'                  => [
             'save' => 'Übersetzungen speichern',
         ],
-        'weight'   => 'Gewicht',
-        'width'    => 'Breite',
-        'alt_text' => 'Alternativtext',
+        'weight' => 'Gewicht',
+        'width'  => 'Breite',
     ],
     'profile' => [
         'accepts_marketing'                    => 'Marketing akzeptieren',
@@ -811,6 +828,7 @@ return [
         'plural_model_label' => 'Slider',
     ],
     'stop-impersonating' => 'Imitation beenden',
+    'subscribers_import' => 'Abonnenten importieren',
     'system-settings'    => [
         'export' => 'Einstellungen exportieren',
         'index'  => 'Einstellungsliste',
@@ -855,9 +873,8 @@ return [
     ],
     'total_groups'   => 'Gruppen insgesamt',
     'total_users'    => 'Benutzer insgesamt',
-    'user_behaviors' => [
-    ],
-    'user_status' => [
+    'user_behaviors' => [],
+    'user_status'    => [
         'active'   => 'Aktiv',
         'admin'    => 'Admin',
         'inactive' => 'Inaktiv',
@@ -866,6 +883,7 @@ return [
         'model_label'        => 'Benutzer',
         'plural_model_label' => 'Benutzer',
     ],
+    'users_import'         => 'Benutzer importieren',
     'variant_combinations' => [
         'add_attribute'                      => 'Attribut hinzufügen',
         'additional_information'             => 'Zusätzliche Informationen',
@@ -931,21 +949,6 @@ return [
         'today_orders'       => 'Heutige Bestellungen',
         'today_revenue'      => 'Heutiger Umsatz',
     ],
-    'yes'                  => 'Ja',
-    'customers_import'     => 'Kunden importieren',
-    'partners_import'      => 'Partner importieren',
-    'organizations_import' => 'Organisationen importieren',
-    'subscribers_import'   => 'Abonnenten importieren',
-    'users_import'         => 'Benutzer importieren',
-    'discounts_import'     => 'Rabatte importieren',
-    'prices_import'        => 'Preise importieren',
-    'orders_import'        => 'Bestellungen importieren',
-    'admin_user'           => 'Admin-Benutzer',
-    'admin_users'          => 'Admin-Benutzer',
-    'companies'            => 'Unternehmen',
-    'product_features'     => 'Produktmerkmale',
-    'product_images'       => 'Produktbilder',
-    'product_requests'     => 'Produktanfragen',
-    'product_similarities' => 'Produktähnlichkeiten',
-    'xml_provider_label'   => 'XML (LT/EN)',
+    'xml_provider_label' => 'XML (LT/EN)',
+    'yes'                => 'Ja',
 ];

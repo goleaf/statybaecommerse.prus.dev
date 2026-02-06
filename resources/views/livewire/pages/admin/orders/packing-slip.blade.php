@@ -8,7 +8,7 @@
                 {{ optional($order->created_at)->timezone(config('app.timezone'))->format('Y-m-d H:i') }}</p>
             <p class="text-sm text-gray-600 mt-1">
                 {{ __('messages.status') }}: <strong>{{ $order->status }}</strong> ·
-                {{ __('messages.Payment') }}: <strong>{{ $order->payment_status ?? __('pending') }}</strong>
+                {{ __('messages.payment') }}: <strong>{{ $order->payment_status ?? __('ui.pending') }}</strong>
             </p>
             <p class="mt-2">
                 <x-link :href="route('admin.orders.status.edit', ['number' => $order->number])" class="text-sm">
@@ -40,7 +40,7 @@
             @endif
         </div>
         <div>
-            <h3 class="font-semibold uppercase text-xs tracking-wider text-gray-500">{{ __('Billing') }}</h3>
+            <h3 class="font-semibold uppercase text-xs tracking-wider text-gray-500">{{ __('ui.billing') }}</h3>
             @php($ba = is_string($order->billing_address) ? json_decode($order->billing_address, true) : $order->billing_address)
             @if ($ba)
                 <p class="mt-2">{{ $ba['first_name'] ?? '' }} {{ $ba['last_name'] ?? '' }}</p>

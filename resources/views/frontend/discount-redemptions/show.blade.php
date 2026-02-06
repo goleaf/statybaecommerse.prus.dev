@@ -91,7 +91,7 @@
                                     </dd>
                                 </div>
                                 <div>
-                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('Currency') }}
+                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('ui.currency') }}
                                     </dt>
                                     <dd class="text-sm text-gray-900 dark:text-white">{{ $redemption->currency_code }}</dd>
                                 </div>
@@ -141,7 +141,7 @@
                                 @if ($redemption->notes)
                                     <div>
                                         <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                            {{ __('Notes') }}</dt>
+                                            {{ __('ui.notes') }}</dt>
                                         <dd class="text-sm text-gray-900 dark:text-white">{{ $redemption->notes }}</dd>
                                     </div>
                                 @endif
@@ -164,7 +164,7 @@
                     @if ($redemption->notes)
                         <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
                             <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                                {{ __('Notes') }}
+                                {{ __('ui.notes') }}
                             </h3>
                             <p class="text-sm text-gray-600 dark:text-gray-400">{{ $redemption->notes }}</p>
                         </div>

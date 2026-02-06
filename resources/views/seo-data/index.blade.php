@@ -78,7 +78,7 @@
     @if($activeFilterChips->isNotEmpty())
         <div class="mb-6 flex flex-wrap items-center gap-2">
             {{-- Provide quick-glance filter context via removable-style chips. --}}
-            <span class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('search_active_filters') }}:</span>
+            <span class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('ui.search_active_filters') }}:</span>
             @foreach($activeFilterChips as $filterKey => $filterValue)
                 @php
                     $label = match($filterKey) {

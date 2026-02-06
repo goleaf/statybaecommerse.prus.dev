@@ -1,7 +1,7 @@
 @section('meta')
     <x-meta
-        :title="__('frontend.products.history_title', ['product' => $product->trans('name') ?? $product->name])"
-        :description="__('frontend.products.history_description', ['product' => $product->trans('name') ?? $product->name])"
+        :title="__('frontend.products.history_title', ['product' => $product->trans('ui.name') ?? $product->name])"
+        :description="__('frontend.products.history_description', ['product' => $product->trans('ui.name') ?? $product->name])"
         :canonical="url()->current()" />
 @endsection
 
@@ -70,15 +70,14 @@
 
             <x-breadcrumbs :items="[
                 [
-                    'label' => __('messages.frontend),
-                    '),
+                    'label' => __('messages.frontend'),
                     'url' => route('localized.products.index', ['locale' => app()->getLocale()]),
                 ],
                 [
-                    'label' => $product->trans('name') ?? $product->name,
+                    'label' => $product->trans('ui.name') ?? $product->name,
                     'url' => route('localized.products.show', [
                         'locale' => app()->getLocale(),
-                        'product' => $product->trans('slug') ?? $product->slug,
+                        'product' => $product->trans('ui.slug') ?? $product->slug,
                     ]),
                 ],
                 ['label' => __('messages.frontend')],
@@ -89,7 +88,7 @@
                     <div class="flex flex-1 items-start gap-4">
                         @if($product->getMainImage())
                             <img src="{{ $product->getMainImage() }}"
-                                 alt="{{ $product->trans('name') ?? $product->name }}"
+                                 alt="{{ $product->trans('ui.name') ?? $product->name }}"
                                  class="h-20 w-20 flex-none rounded-2xl object-cover shadow-sm" />
                         @else
                             <span class="flex h-20 w-20 flex-none items-center justify-center rounded-2xl bg-slate-100 text-slate-400 shadow-inner">
@@ -103,10 +102,10 @@
                                     {{ __('messages.frontend') }}
                                 </p>
                                 <h1 class="mt-1 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
-                                    {{ __('frontend.products.history_title', ['product' => $product->trans('name') ?? $product->name]) }}
+                                    {{ __('frontend.products.history_title', ['product' => $product->trans('ui.name') ?? $product->name]) }}
                                 </h1>
                                 <p class="mt-2 max-w-2xl text-base text-slate-600">
-                                    {{ __('frontend.products.history_description', ['product' => $product->trans('name') ?? $product->name]) }}
+                                    {{ __('frontend.products.history_description', ['product' => $product->trans('ui.name') ?? $product->name]) }}
                                 </p>
                             </div>
 
@@ -119,7 +118,7 @@
                                 @if($product->brand)
                                     <div class="flex items-center gap-2">
                                         <dt class="font-medium text-slate-500">{{ __('messages.frontend') }}:</dt>
-                                        <dd>{{ $product->brand->trans('name') ?? $product->brand->name }}</dd>
+                                        <dd>{{ $product->brand->trans('ui.name') ?? $product->brand->name }}</dd>
                                     </div>
                                 @endif
 
@@ -135,7 +134,7 @@
 
                     <a href="{{ route('localized.products.show', [
                         'locale' => app()->getLocale(),
-                        'product' => $product->trans('slug') ?? $product->slug,
+                        'product' => $product->trans('ui.slug') ?? $product->slug,
                     ]) }}"
                        class="inline-flex items-center justify-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition-colors hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                         <x-heroicon-s-arrow-left class="h-4 w-4" />
@@ -359,7 +358,7 @@
 
                         <a href="{{ route('localized.products.show', [
                             'locale' => app()->getLocale(),
-                            'product' => $product->trans('slug') ?? $product->slug,
+                            'product' => $product->trans('ui.slug') ?? $product->slug,
                         ]) }}"
                            class="inline-flex items-center justify-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition-colors hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                             <x-heroicon-s-arrow-left class="h-4 w-4" />
@@ -378,7 +377,7 @@
                         <div class="mt-6">
                             <a href="{{ route('localized.products.show', [
                                 'locale' => app()->getLocale(),
-                                'product' => $product->trans('slug') ?? $product->slug,
+                                'product' => $product->trans('ui.slug') ?? $product->slug,
                             ]) }}"
                                class="inline-flex items-center justify-center gap-2 rounded-full bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                                 <x-heroicon-s-arrow-left class="h-4 w-4" />

@@ -63,7 +63,7 @@
                             </svg>
                         </div>
                         <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ __('Pending') }}</p>
+                            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ __('ui.pending') }}</p>
                             <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ $pendingRedemptions }}</p>
                         </div>
                     </div>
@@ -80,7 +80,7 @@
                             </svg>
                         </div>
                         <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ __('Redeemed') }}</p>
+                            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ __('ui.redeemed') }}</p>
                             <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ $redeemedRedemptions }}</p>
                         </div>
                     </div>
@@ -100,19 +100,19 @@
                                     class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
                                 <option value="">{{ __('ui.all_statuses') }}</option>
                                 <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>
-                                    {{ __('Pending') }}</option>
+                                    {{ __('ui.pending') }}</option>
                                 <option value="redeemed" {{ request('status') === 'redeemed' ? 'selected' : '' }}>
-                                    {{ __('Redeemed') }}</option>
+                                    {{ __('ui.redeemed') }}</option>
                                 <option value="expired" {{ request('status') === 'expired' ? 'selected' : '' }}>
-                                    {{ __('Expired') }}</option>
+                                    {{ __('ui.expired') }}</option>
                                 <option value="cancelled" {{ request('status') === 'cancelled' ? 'selected' : '' }}>
-                                    {{ __('Cancelled') }}</option>
+                                    {{ __('ui.cancelled') }}</option>
                             </select>
                         </div>
 
                         <div>
                             <label for="currency" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                {{ __('Currency') }}
+                                {{ __('ui.currency') }}
                             </label>
                             <select name="currency" id="currency"
                                     class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
@@ -134,7 +134,7 @@
                         <div class="flex items-end">
                             <button type="submit"
                                     class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition duration-150 ease-in-out">
-                                {{ __('Filter') }}
+                                {{ __('ui.filter') }}
                             </button>
                         </div>
                     </form>
@@ -145,7 +145,7 @@
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
                 <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                     <h2 class="text-lg font-medium text-gray-900 dark:text-white">
-                        {{ __('Redemptions') }}
+                        {{ __('ui.redemptions') }}
                     </h2>
                 </div>
 
@@ -231,7 +231,7 @@
                                                 €{{ number_format($redemption->amount_saved, 2) }}
                                             </p>
                                             <p class="text-sm text-gray-600 dark:text-gray-400">
-                                                {{ __('Saved') }}
+                                                {{ __('ui.saved') }}
                                             </p>
                                         </div>
                                         <div class="text-right">
@@ -248,7 +248,7 @@
                                 @if ($redemption->notes)
                                     <div class="mt-4">
                                         <p class="text-sm text-gray-600 dark:text-gray-400">
-                                            <strong>{{ __('Notes') }}:</strong> {{ $redemption->notes }}
+                                            <strong>{{ __('ui.notes') }}:</strong> {{ $redemption->notes }}
                                         </p>
                                     </div>
                                 @endif

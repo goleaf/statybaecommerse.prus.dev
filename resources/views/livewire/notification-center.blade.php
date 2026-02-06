@@ -4,11 +4,11 @@
         <div class="flex items-center justify-between">
             <div class="flex items-center space-x-4">
                 <h2 class="text-xl font-semibold text-gray-900">
-                    {{ __('messages.Notifications') }}
+                    {{ __('messages.notifications') }}
                 </h2>
                 @if($unreadCount > 0)
                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                        {{ $unreadCount }} {{ __('unread') }}
+                        {{ $unreadCount }} {{ __('ui.unread') }}
                     </span>
                 @endif
             </div>

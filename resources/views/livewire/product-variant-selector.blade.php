@@ -4,7 +4,7 @@
             @foreach($attributes as $attribute)
                 <div class="attribute-group mb-4">
                     <label class="block text-sm font-medium text-gray-700 mb-2">
-                        {{ $attribute->trans('name') ?? $attribute->name }}
+                        {{ $attribute->trans('ui.name') ?? $attribute->name }}
                     </label>
                     
                     <div class="attribute-values flex flex-wrap gap-2">

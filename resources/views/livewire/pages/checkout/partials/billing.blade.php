@@ -106,7 +106,7 @@
 
             <div>
                 <label for="billing_city" class="block text-sm font-medium text-gray-700">
-                    {{ __('City') }}
+                    {{ __('ui.city') }}
                 </label>
                 <input
                     id="billing_city"
@@ -154,7 +154,7 @@
 
             <div>
                 <label for="billing_country" class="block text-sm font-medium text-gray-700">
-                    {{ __('Country') }}
+                    {{ __('ui.country') }}
                 </label>
                 <select
                     id="billing_country"
@@ -260,7 +260,7 @@
 
                     <div>
                         <label for="shipping_city" class="block text-sm font-medium text-gray-700">
-                            {{ __('City') }}
+                            {{ __('ui.city') }}
                         </label>
                         <input
                             id="shipping_city"
@@ -308,7 +308,7 @@
 
                     <div>
                         <label for="shipping_country" class="block text-sm font-medium text-gray-700">
-                            {{ __('Country') }}
+                            {{ __('ui.country') }}
                         </label>
                         <select
                             id="shipping_country"

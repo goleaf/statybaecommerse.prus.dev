@@ -1,6 +1,6 @@
 <x-layouts.base :title="__('ui.update_order')">
     <x-container class="py-8">
-        <x-breadcrumbs :items="[['label' => __('Orders')], ['label' => $order->number], ['label' => __('messages.update')]]" />
+        <x-breadcrumbs :items="[['label' => __('ui.orders')], ['label' => $order->number], ['label' => __('messages.update')]]" />
 
         @if (session('status'))
             <x-alert type="success" class="mb-4">{{ session('status') }}</x-alert>
@@ -31,7 +31,7 @@
                                class="mt-1 w-full border-gray-300 rounded" />
                     </div>
                     <div>
-                        <label class="block text-sm font-medium">{{ __('Note') }}</label>
+                        <label class="block text-sm font-medium">{{ __('ui.note') }}</label>
                         <textarea name="note" rows="4" class="mt-1 w-full border-gray-300 rounded">{{ old('note') }}</textarea>
                     </div>
                 </div>

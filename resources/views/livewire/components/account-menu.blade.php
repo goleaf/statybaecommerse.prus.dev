@@ -9,6 +9,6 @@
             type="submit"
             class="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700">
         <x-untitledui-log-out class="size-5" stroke-width="1.5" aria-hidden="true" />
-        {{ __('Logout') }}
+        {{ __('ui.logout') }}
     </button>
 </div>

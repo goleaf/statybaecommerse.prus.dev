@@ -1,8 +1,8 @@
 @section('meta')
     <x-meta
-            :title="$collection->trans('name') ?? $collection->name"
-            :description="$collection->trans('description')
-                ? Str::limit(strip_tags($collection->trans('description')), 150)
+            :title="$collection->trans('ui.name') ?? $collection->name"
+            :description="$collection->trans('ui.description')
+                ? Str::limit(strip_tags($collection->trans('ui.description')), 150)
                 : ''"
             :og-image="$this->ogImage"
             :prev="$products->previousPageUrl()"
@@ -32,12 +32,12 @@
     @endif
     <x-breadcrumbs :items="[
         ['label' => __('messages.collections'), 'url' => route('localized.collections.index', ['locale' => app()->getLocale()])],
-        ['label' => $collection->trans('name') ?? $collection->name],
+        ['label' => $collection->trans('ui.name') ?? $collection->name],
     ]" />
     <div class="flex items-center justify-between mb-6">
-        <h1 class="text-2xl font-semibold">{{ $collection->trans('name') ?? $collection->name }}</h1>
+        <h1 class="text-2xl font-semibold">{{ $collection->trans('ui.name') ?? $collection->name }}</h1>
         <div class="flex items-center gap-2">
-            <label for="sort" class="sr-only">{{ __('messages.Sort') }}</label>
+            <label for="sort" class="sr-only">{{ __('messages.sort') }}</label>
             <select id="sort" wire:model.live="sort" class="rounded-md border-gray-300 text-sm">
                 <option value="">{{ __('messages.newest') }}</option>
                 <option value="name_asc">{{ __('messages.name_a_z') }}</option>
@@ -50,8 +50,8 @@
         {{ __('ui.loading') }}
     </div>
 
-    @if ($collection->trans('description') ?? $collection->description)
-        <x-sanitized-html class="prose max-w-none mb-8" :content="$collection->trans('description') ?? $collection->description ?? ''" />
+    @if ($collection->trans('ui.description') ?? $collection->description)
+        <x-sanitized-html class="prose max-w-none mb-8" :content="$collection->trans('ui.description') ?? $collection->description ?? ''" />
     @endif
 
     <div class="mb-4">
@@ -125,7 +125,7 @@
                 @foreach ($filterGroups as $group)
                     <div wire:key="filter-group-{{ (int) ($group['attribute']['id'] ?? 0) ?: uniqid('attr-', false) }}">
                         <h3 class="text-sm font-semibold text-gray-900 mb-3">
-                            {{ $group['attribute']['name'] ?? __('Filters') }}
+                            {{ $group['attribute']['name'] ?? __('ui.filters') }}
                         </h3>
                         <ul class="flex flex-wrap gap-2">
                             @foreach ($group['values'] ?? [] as $value)
@@ -164,15 +164,15 @@
         </p>
         <div id="results" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             @foreach ($products as $product)
-                <a href="{{ route('product.show', $product->trans('slug') ?? $product->slug) }}"
+                <a href="{{ route('product.show', $product->trans('ui.slug') ?? $product->slug) }}"
                    class="block border rounded-lg p-4 hover:shadow-sm">
                     <x-product.thumbnail :product="$product" containerClass="mb-3" />
-                    <div class="text-base font-medium">{{ $product->trans('name') ?? $product->name }}</div>
+                    <div class="text-base font-medium">{{ $product->trans('ui.name') ?? $product->name }}</div>
                     <x-product.price :product="$product" class="mt-1" />
                 </a>
             @endforeach
         </div>
-        <nav class="mt-6" aria-label="{{ __('Pagination') }}">{{ $products->links() }}</nav>
+        <nav class="mt-6" aria-label="{{ __('ui.pagination') }}">{{ $products->links() }}</nav>
     @endif
 
     <!-- Back Button -->
@@ -193,8 +193,8 @@
             $elements[] = [
                 '@type' => 'ListItem',
                 'position' => $position++,
-                'url' => route('product.show', $p->trans('slug') ?? $p->slug),
-                'name' => $p->trans('name') ?? $p->name,
+                'url' => route('product.show', $p->trans('ui.slug') ?? $p->slug),
+                'name' => $p->trans('ui.name') ?? $p->name,
             ];
         }
     @endphp

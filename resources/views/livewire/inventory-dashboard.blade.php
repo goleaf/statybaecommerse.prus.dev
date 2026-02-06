@@ -79,7 +79,7 @@
                         </div>
                         <div class="text-right">
                             <p class="text-sm font-medium text-yellow-600 dark:text-yellow-400">
-                                {{ $product['stock_quantity'] }} {{ __('left') }}
+                                {{ $product['stock_quantity'] }} {{ __('ui.left') }}
                             </p>
                             <p class="text-xs text-gray-500 dark:text-gray-400">
                                 {{ __('ui.threshold') }} {{ $product['low_stock_threshold'] }}

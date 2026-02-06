@@ -1,6 +1,6 @@
 <section class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
     <header class="space-y-1">
-        <h2 class="text-lg font-semibold text-gray-900">{{ __('messages.Payment') }}</h2>
+        <h2 class="text-lg font-semibold text-gray-900">{{ __('messages.payment') }}</h2>
         <p class="text-sm text-gray-500">
             {{ __('ui.choose_how_you_would_like_to_pay_and_add_any_notes_for_our_team_before_placing_your_order') }}
         </p>

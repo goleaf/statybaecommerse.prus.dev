@@ -67,7 +67,7 @@
                         <option value="">{{ __('locations.filters.all_types') }}</option>
                         @foreach($types as $type)
                             <option value="{{ $type }}" {{ request('type') === $type ? 'selected' : '' }}>
-                                {{ __('locations.type_' . $type) }}
+                                {{ __('locations.type' . $type) }}
                             </option>
                         @endforeach
                     </select>
@@ -140,7 +140,7 @@
                                 @elseif($location->type === 'office') bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200
                                 @elseif($location->type === 'pickup_point') bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200
                                 @else bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200 @endif">
-                                {{ __('locations.type_' . $location->type) }}
+                                {{ __('locations.type' . $location->type) }}
                             </span>
                             @if($location->is_open_now)
                                 <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">

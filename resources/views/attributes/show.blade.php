@@ -72,7 +72,7 @@
                                         'date' => 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
                                         default => 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
                                     } }}">
-                                    {{ __('attributes.' . $attribute->type) }}
+                                    {{ __('ui.attributes.' . $attribute->type) }}
                                 </span>
                                 @if($attribute->is_required)
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
@@ -171,7 +171,7 @@
                     <div class="flex justify-between">
                         <span class="text-gray-600 dark:text-gray-300">{{ __('messages.attributes') }}:</span>
                         <span class="font-medium text-gray-900 dark:text-white">
-                            {{ __('attributes.' . $attribute->type) }}
+                            {{ __('ui.attributes.' . $attribute->type) }}
                         </span>
                     </div>
                     

@@ -46,19 +46,19 @@
             <div class="space-y-3 rounded-2xl bg-white/10 p-4 backdrop-blur">
                 {{-- Key metrics give immediate feedback about the query --}}
                 <div class="flex items-center justify-between text-sm">
-                    <span class="text-blue-100">{{ __('search_total_results') }}</span>
+                    <span class="text-blue-100">{{ __('ui.search_total_results') }}</span>
                     <span class="font-semibold">
                         {{ number_format($products->total() ?? $products->count()) }}
                     </span>
                 </div>
                 <div class="flex items-center justify-between text-sm">
-                    <span class="text-blue-100">{{ __('search_page_label') }}</span>
+                    <span class="text-blue-100">{{ __('ui.search_page_label') }}</span>
                     <span class="font-semibold">
                         {{ $products->currentPage() }} / {{ $products->lastPage() }}
                     </span>
                 </div>
                 <div class="flex items-center justify-between text-sm">
-                    <span class="text-blue-100">{{ __('search_sort_label') }}</span>
+                    <span class="text-blue-100">{{ __('ui.search_sort_label') }}</span>
                     <span class="font-semibold">
                         @switch($sort)
                             @case('name_asc')
@@ -82,10 +82,10 @@
             <header class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div>
                     <h2 class="text-lg font-semibold text-slate-900 dark:text-white">
-                        {{ __('search_refine_heading') }}
+                        {{ __('ui.search_refine_heading') }}
                     </h2>
                     <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                        {{ __('search_refine_description') }}
+                        {{ __('ui.search_refine_description') }}
                     </p>
                 </div>
                 <div class="flex items-center gap-3">
@@ -120,15 +120,15 @@
                 {{-- Additional query context cards --}}
                 <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800">
                     <dt class="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">
-                        {{ __('search_active_filters') }}
+                        {{ __('ui.search_active_filters') }}
                     </dt>
                     <dd class="mt-1 text-sm font-semibold text-slate-900 dark:text-white">
-                        {{ $term ? __('search_filter_keyword', ['term' => $term]) : __('search_filter_none') }}
+                        {{ $term ? __('ui.search_filter_keyword', ['term' => $term]) : __('ui.search_filter_none') }}
                     </dd>
                 </div>
                 <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800">
                     <dt class="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">
-                        {{ __('search_last_updated') }}
+                        {{ __('ui.search_last_updated') }}
                     </dt>
                     <dd class="mt-1 text-sm font-semibold text-slate-900 dark:text-white">
                         {{ now()->translatedFormat('Y-m-d H:i') }}
@@ -140,31 +140,31 @@
         <aside class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900">
             {{-- Quick help section outlines how to use the search page --}}
             <h3 class="text-base font-semibold text-slate-900 dark:text-white">
-                {{ __('search_support_title') }}
+                {{ __('ui.search_support_title') }}
             </h3>
             <ul class="mt-4 space-y-3 text-sm text-slate-600 dark:text-slate-300">
                 <li class="flex items-start gap-3">
                     <x-heroicon-o-sparkles class="mt-0.5 h-4 w-4 text-blue-500" />
-                    <span>{{ __('search_support_tip_one') }}</span>
+                    <span>{{ __('ui.search_support_tip_one') }}</span>
                 </li>
                 <li class="flex items-start gap-3">
                     <x-heroicon-o-adjustments-horizontal class="mt-0.5 h-4 w-4 text-blue-500" />
-                    <span>{{ __('search_support_tip_two') }}</span>
+                    <span>{{ __('ui.search_support_tip_two') }}</span>
                 </li>
                 <li class="flex items-start gap-3">
                     <x-heroicon-o-clock class="mt-0.5 h-4 w-4 text-blue-500" />
-                    <span>{{ __('search_support_tip_three') }}</span>
+                    <span>{{ __('ui.search_support_tip_three') }}</span>
                 </li>
             </ul>
             <div class="mt-6 rounded-2xl bg-blue-50 p-4 text-sm text-blue-800 dark:bg-blue-900/40 dark:text-blue-100">
-                <p class="font-semibold">{{ __('search_support_need_help') }}</p>
-                <p class="mt-1">{{ __('search_support_contact_cta') }}</p>
+                <p class="font-semibold">{{ __('ui.search_support_need_help') }}</p>
+                <p class="mt-1">{{ __('ui.search_support_contact_cta') }}</p>
                 <a
                     href="{{ route('contact', ['locale' => app()->getLocale()]) }}"
                     class="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-blue-700 hover:text-blue-600 dark:text-blue-200 dark:hover:text-blue-100"
                 >
                     <x-heroicon-o-chat-bubble-left-right class="h-4 w-4" />
-                    {{ __('search_support_contact_link') }}
+                    {{ __('ui.search_support_contact_link') }}
                 </a>
             </div>
         </aside>
@@ -202,14 +202,14 @@
                     class="inline-flex items-center gap-2 rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:border-blue-500 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-200 dark:border-slate-700 dark:text-slate-200"
                 >
                     <x-heroicon-o-x-mark class="h-4 w-4" />
-                    {{ __('search_clear_query') }}
+                    {{ __('ui.search_clear_query') }}
                 </button>
                 <a
                     href="{{ route('localized.collections.index', ['locale' => app()->getLocale()]) }}"
                     class="inline-flex items-center gap-2 rounded-full bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-200"
                 >
                     <x-heroicon-o-rectangle-stack class="h-4 w-4" />
-                    {{ __('search_browse_collections') }}
+                    {{ __('ui.search_browse_collections') }}
                 </a>
             </div>
         </section>
@@ -226,11 +226,11 @@
                 <div class="flex flex-wrap items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
                     <span class="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 dark:bg-slate-800">
                         <x-heroicon-o-bolt class="h-3.5 w-3.5 text-blue-500" />
-                        {{ __('search_refresh_hint') }}
+                        {{ __('ui.search_refresh_hint') }}
                     </span>
                     <span class="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 dark:bg-slate-800">
                         <x-heroicon-o-eye class="h-3.5 w-3.5 text-blue-500" />
-                        {{ __('search_view_hint') }}
+                        {{ __('ui.search_view_hint') }}
                     </span>
                 </div>
             </header>
@@ -265,7 +265,7 @@
         $elements = [];
         $position = 1;
         foreach ($products as $p) {
-            $productSlug = $p->trans('slug') ?? $p->slug;
+            $productSlug = $p->trans('ui.slug') ?? $p->slug;
             if (empty($productSlug)) {
                 continue; // Skip products without valid slug
             }
@@ -273,7 +273,7 @@
                 '@type' => 'ListItem',
                 'position' => $position++,
                 'url' => route('product.show', $productSlug),
-                'name' => $p->trans('name') ?? $p->name,
+                'name' => $p->trans('ui.name') ?? $p->name,
             ];
         }
         $searchUrl = route('search', ['locale' => app()->getLocale()]);

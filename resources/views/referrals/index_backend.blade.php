@@ -196,7 +196,7 @@
                                     @elseif($referral->status === 'pending') bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200
                                     @else bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200
                                     @endif">
-                                    {{ __('referrals.status_' . $referral->status) }}
+                                    {{ __('referrals.status' . $referral->status) }}
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">

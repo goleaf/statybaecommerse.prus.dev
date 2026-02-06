@@ -59,7 +59,7 @@
                 {{ __('ui.view_details') }}
             </x-buttons.primary>
             <x-buttons.default class="w-full px-4" :href="route('account.orders.invoice', ['locale' => app()->getLocale(), 'number' => $order->number])">
-                {{ __('Invoice') }}
+                {{ __('ui.invoice') }}
             </x-buttons.default>
         </div>
     </div>

@@ -12,7 +12,7 @@
                 <button type="button"
                         wire:click="$set('search', '')"
                         class="text-xs font-semibold text-sage hover:text-white">
-                    {{ __('Clear') }}
+                    {{ __('ui.clear') }}
                 </button>
             @endif
         </div>

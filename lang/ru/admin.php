@@ -4,16 +4,17 @@ declare(strict_types=1);
 
 return [
     'actions' => [
+        'back'              => 'Back',
         'download'          => 'Download',
         'generate_document' => 'Создать документ',
         'refresh'           => 'actions.refresh',
         'view'              => 'View',
     ],
-    'active_groups'           => 'active_groups',
-    'advanced_import'         => 'admin.advanced_import',
-    'import_analysis_summary' => 'Сводка анализа',
-    'import_rows_title'       => 'Строки импорта',
-    'attribute-values'        => [
+    'active_groups'    => 'active_groups',
+    'admin_user'       => 'Администратор',
+    'admin_users'      => 'Администраторы',
+    'advanced_import'  => 'admin.advanced_import',
+    'attribute-values' => [
         'translations' => [
             ''     => 'attribute-values.translations.',
             'save' => 'attribute-values.translations.save',
@@ -239,27 +240,20 @@ return [
         'validity_description' => 'Когда скидка действительна и сколько раз ее можно использовать.',
     ],
     'document_templates' => [
-        'navigation_label'   => 'Шаблоны документов',
-        'model_label'        => 'Шаблон документа',
-        'plural_model_label' => 'Шаблоны документов',
-        'sections'           => [
-            'basic_information'             => 'Основная информация',
-            'basic_information_description' => 'Название, тип и статус шаблона.',
-            'content'                       => 'Содержимое шаблона',
-            'content_description'           => 'HTML-контент с переменными.',
-            'variables'                     => 'Переменные шаблона',
-            'variables_description'         => 'Определите доступные переменные для шаблона.',
-            'settings'                      => 'Настройки шаблона',
-            'settings_description'          => 'Параметры печати и форматирования.',
+        'actions' => [
+            'activate'   => 'Активировать',
+            'deactivate' => 'Деактивировать',
+            'duplicate'  => 'Дублировать',
+            'preview'    => 'Просмотр',
         ],
         'categories' => [
             'business'  => 'Бизнес',
-            'sales'     => 'Продажи',
-            'legal'     => 'Юридические',
             'financial' => 'Финансовые',
+            'legal'     => 'Юридические',
             'marketing' => 'Маркетинг',
-            'technical' => 'Технические',
             'other'     => 'Другое',
+            'sales'     => 'Продажи',
+            'technical' => 'Технические',
         ],
         'document_form' => [
             'sections' => [
@@ -267,37 +261,44 @@ return [
             ],
         ],
         'fields' => [
-            'type'            => 'Тип',
             'category'        => 'Категория',
             'content'         => 'Содержимое',
-            'variables'       => 'Переменные',
-            'settings'        => 'Настройки документа',
-            'is_active'       => 'Активен',
             'documents_count' => 'Документы',
+            'is_active'       => 'Активен',
+            'settings'        => 'Настройки документа',
+            'type'            => 'Тип',
+            'variables'       => 'Переменные',
         ],
         'filters' => [
-            'type'      => 'Тип',
             'category'  => 'Категория',
             'is_active' => 'Активен',
+            'type'      => 'Тип',
         ],
-        'actions' => [
-            'preview'    => 'Просмотр',
-            'duplicate'  => 'Дублировать',
-            'activate'   => 'Активировать',
-            'deactivate' => 'Деактивировать',
-        ],
-        'notifications' => [
+        'model_label'      => 'Шаблон документа',
+        'navigation_label' => 'Шаблоны документов',
+        'notifications'    => [
             'duplicated' => 'Шаблон документа продублирован.',
         ],
+        'plural_model_label' => 'Шаблоны документов',
+        'sections'           => [
+            'basic_information'             => 'Основная информация',
+            'basic_information_description' => 'Название, тип и статус шаблона.',
+            'content'                       => 'Содержимое шаблона',
+            'content_description'           => 'HTML-контент с переменными.',
+            'settings'                      => 'Настройки шаблона',
+            'settings_description'          => 'Параметры печати и форматирования.',
+            'variables'                     => 'Переменные шаблона',
+            'variables_description'         => 'Определите доступные переменные для шаблона.',
+        ],
         'types' => [
+            'contract' => 'Договор',
             'document' => 'Документ',
+            'email'    => 'Письмо',
             'invoice'  => 'Счет',
+            'other'    => 'Другое',
             'quote'    => 'Коммерческое предложение',
             'receipt'  => 'Квитанция',
-            'contract' => 'Договор',
             'report'   => 'Отчет',
-            'email'    => 'Письмо',
-            'other'    => 'Другое',
         ],
     ],
     'enum-values' => [
@@ -346,15 +347,22 @@ return [
         'male'   => 'gender.male',
         'other'  => 'gender.other',
     ],
-    'impersonate'   => 'impersonate',
-    'import_export' => [
+    'impersonate'             => 'impersonate',
+    'import_analysis_summary' => 'Сводка анализа',
+    'import_export'           => [
         'description' => 'import_export.description',
         'guideline_1' => 'import_export.guideline_1',
         'guideline_2' => 'import_export.guideline_2',
         'guideline_3' => 'import_export.guideline_3',
         'guidelines'  => 'import_export.guidelines',
     ],
-    'inventory' => [
+    'import_failed_rows'     => 'Failed Rows',
+    'import_processed_rows'  => 'Processed Rows',
+    'import_rows_title'      => 'Строки импорта',
+    'import_start_button'    => 'Start Import',
+    'import_successful_rows' => 'Successful Rows',
+    'import_total_rows'      => 'Total Rows',
+    'inventory'              => [
         'available_quantity'            => 'Доступное количество',
         'basic_information'             => 'Основная информация',
         'basic_information_description' => 'Уровни запасов и пороги.',
@@ -406,7 +414,8 @@ return [
             'lt' => 'language_switcher.short.lt',
         ],
     ],
-    'latest_orders' => [
+    'last_import_summary' => 'Last Import Summary',
+    'latest_orders'       => [
         'items' => 'Товары',
     ],
     'legal' => [
@@ -422,18 +431,18 @@ return [
         'lt' => 'locale.lt',
     ],
     'locations' => [
-        'bulk-actions' => 'Массовые действия',
-        'create'       => 'Создать местоположение',
-        'destroy'      => 'Удалить местоположение',
-        'edit'         => 'Редактировать местоположение',
-        'index'        => 'Местоположения',
-        'reorder'      => 'Упорядочить местоположения',
-        'show'         => 'Просмотр местоположения',
-        'store'        => 'Сохранить местоположение',
-        'update'       => 'Обновить местоположение',
+        'bulk-actions'       => 'Массовые действия',
+        'create'             => 'Создать местоположение',
+        'destroy'            => 'Удалить местоположение',
+        'edit'               => 'Редактировать местоположение',
+        'index'              => 'Местоположения',
+        'model_label'        => 'Местоположение',
         'navigation_label'   => 'Местоположения',
         'plural_model_label' => 'Местоположения',
-        'model_label'        => 'Местоположение',
+        'reorder'            => 'Упорядочить местоположения',
+        'show'               => 'Просмотр местоположения',
+        'store'              => 'Сохранить местоположение',
+        'update'             => 'Обновить местоположение',
     ],
     'locations_page' => [
         'columns' => [
@@ -673,6 +682,7 @@ return [
     ],
     'products' => [
         'allow_backorder'               => 'Разрешить предзаказ',
+        'alt_text'                      => 'Альтернативный текст',
         'basic_information'             => 'Основная информация',
         'basic_information_description' => 'Название товара, артикул (SKU) и описание.',
         'bulk_feature'                  => 'Сделать рекомендуемыми',
@@ -688,6 +698,7 @@ return [
         'compare_price'                 => 'Сравнительная цена',
         'cost_price'                    => 'Себестоимость',
         'created_at'                    => 'Создано',
+        'detailed_description'          => 'Подробное описание',
         'height'                        => 'Высота',
         'image'                         => 'Изображение',
         'images'                        => 'Изображения',
@@ -712,7 +723,6 @@ return [
         'seo_description'               => 'SEO описание',
         'seo_title'                     => 'SEO заголовок',
         'short_description'             => 'Краткое описание',
-        'detailed_description'          => 'Подробное описание',
         'status'                        => 'Статус',
         'status_archived'               => 'Архивирован',
         'status_draft'                  => 'Черновик',
@@ -724,9 +734,8 @@ return [
         'translations'                  => [
             'save' => 'Сохранить переводы',
         ],
-        'weight'   => 'Вес',
-        'width'    => 'Ширина',
-        'alt_text' => 'Альтернативный текст',
+        'weight' => 'Вес',
+        'width'  => 'Ширина',
     ],
     'profile' => [
         'accepts_marketing'                    => 'profile.accepts_marketing',
@@ -855,9 +864,8 @@ return [
     ],
     'total_groups'   => 'total_groups',
     'total_users'    => 'total_users',
-    'user_behaviors' => [
-    ],
-    'user_status' => [
+    'user_behaviors' => [],
+    'user_status'    => [
         'active'   => 'user_status.active',
         'admin'    => 'Admin',
         'inactive' => 'user_status.inactive',
@@ -922,9 +930,7 @@ return [
         'value'                              => 'Значение',
         'will_be_generated'                  => 'Будет сгенерировано',
     ],
-    'admin_user'  => 'Администратор',
-    'admin_users' => 'Администраторы',
-    'widgets'     => [
+    'widgets' => [
         'active_campaigns'   => 'Активные кампании',
         'latest_orders'      => 'Последние заказы',
         'notifications'      => 'widgets.notifications',

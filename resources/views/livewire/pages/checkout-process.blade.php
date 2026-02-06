@@ -11,11 +11,11 @@
             'description' => __('frontend.contact_billing_details'),
         ],
         2 => [
-            'label'       => __('messages.Shipping'),
+            'label'       => __('messages.shipping'),
             'description' => __('frontend.delivery_options'),
         ],
         3 => [
-            'label'       => __('messages.Payment'),
+            'label'       => __('messages.payment'),
             'description' => __('frontend.review_pay'),
         ],
     ];

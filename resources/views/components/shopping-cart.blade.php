@@ -154,7 +154,7 @@
                 {{-- Tax --}}
                 @if ($showTax && $tax > 0)
                     <div class="flex justify-between text-gray-700">
-                        <span>{{ __('Tax') }}</span>
+                        <span>{{ __('ui.tax') }}</span>
                         <span>{{ \Illuminate\Support\Number::currency($tax, current_currency(), app()->getLocale()) }}</span>
                     </div>
                 @endif
@@ -167,7 +167,7 @@
                             @if ($shipping > 0)
                                 {{ \Illuminate\Support\Number::currency($shipping, current_currency(), app()->getLocale()) }}
                             @else
-                                {{ __('Free') }}
+                                {{ __('ui.free') }}
                             @endif
                         </span>
                     </div>
