@@ -162,7 +162,7 @@ final class MatrixFactory
                 if ($rows->isEmpty()) {
                     return [
                         Placeholder::make($statePath . '_empty')
-                            ->label(__('No attributes available'))
+                            ->label(__('messages.no_attributes_available'))
                             ->content(__('messages.assign_attributes_to_the_product_to_configure_the_matrix')),
                     ];
                 }

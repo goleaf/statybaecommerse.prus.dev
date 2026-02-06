@@ -156,13 +156,13 @@ class AddressForm extends ModalComponent
             if ($this->address->id) {
                 // Update existing address
                 $this->address->update($addressData);
-                $message = __('Address updated successfully');
+                $message = __('messages.address_updated_successfully');
             } else {
                 // Create new address
                 $address = new Address($addressData);
                 $address->user()->associate(Auth::user());
                 $address->save();
-                $message = __('Address added successfully');
+                $message = __('messages.address_added_successfully');
             }
 
             Notification::make()
@@ -178,13 +178,13 @@ class AddressForm extends ModalComponent
                 $this->addError($field, $messages[0] ?? __('messages.failed_to_save_address'));
             }
             Notification::make()
-                ->title(__('Error'))
+                ->title(__('messages.error'))
                 ->body(__('messages.failed_to_save_address_please_review_the_highlighted_fields'))
                 ->danger()
                 ->send();
         } catch (Exception $e) {
             Notification::make()
-                ->title(__('Error'))
+                ->title(__('messages.error'))
                 ->body(__('messages.failed_to_save_address_please_try_again'))
                 ->danger()
                 ->send();
@@ -247,7 +247,7 @@ class AddressForm extends ModalComponent
      */
     public function render(): View
     {
-        $title = $this->address->id ? __('Update address') : __('Add new address');
+        $title = $this->address->id ? __('messages.update_address') : __('messages.add_new_address');
 
         return view('livewire.modals.account.address-form', [
             'title' => $title,

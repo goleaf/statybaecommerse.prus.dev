@@ -128,7 +128,7 @@ final class Delivery extends StepComponent
     public function stepInfo(): array
     {
         return [
-            'label'    => __('Delivery method'),
+            'label'    => __('messages.delivery_method'),
             'complete' => session()->exists('checkout') && data_get(session()->get('checkout'), 'shipping_option') !== null,
         ];
     }

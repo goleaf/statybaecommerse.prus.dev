@@ -34,7 +34,7 @@ final class CustomerSearch
                 $name = $rawName ?? '';
                 $email = $rawEmail ?? '';
                 $phone = $rawPhone ?? $rawAltPhone ?? '';
-                $label = trim(sprintf('%s <%s>', $name !== '' ? $name : __('Unknown'), $email));
+                $label = trim(sprintf('%s <%s>', $name !== '' ? $name : __('messages.unknown'), $email));
 
                 /** @var int|string|null $identifier */
                 $identifier = $user->getKey();

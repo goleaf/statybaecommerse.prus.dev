@@ -15,7 +15,7 @@ final class UserExport implements Exportable
 {
     public function name(): string
     {
-        return __('Users Export');
+        return __('messages.users_export');
     }
 
     public function columns(): array

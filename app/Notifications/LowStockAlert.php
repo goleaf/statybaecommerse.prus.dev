@@ -51,7 +51,7 @@ final class LowStockAlert extends Notification implements ShouldQueue
             ->line(__('messages.product_name_is_running_low_on_stock', ['name' => $this->product->name]))
             ->line(__('messages.current_stock_stock_units', ['stock' => $this->product->stock_quantity]))
             ->line(__('messages.threshold_threshold_units', ['threshold' => $this->product->low_stock_threshold]))
-            ->action(__('Manage Product'), route('filament.admin.resources.products.edit', $this->product))
+            ->action(__('messages.manage_product'), route('filament.admin.resources.products.edit', $this->product))
             ->line(__('messages.please_restock_this_product_to_avoid_stockouts'));
     }
 

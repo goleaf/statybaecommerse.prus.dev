@@ -35,9 +35,9 @@ final class InventoryAnomalyDetected extends Notification implements ShouldQueue
     {
         // Build a simple summary and append each anomaly as its own line item.
         $message = (new MailMessage)
-            ->subject(__('Inventory anomaly report'))
-            ->greeting(__('Inventory Anomalies Detected'))
-            ->line(__('The scheduled reconciliation job found the following issues:'));
+            ->subject(__('messages.inventory_anomaly_report'))
+            ->greeting(__('messages.inventory_anomalies_detected'))
+            ->line(__('messages.the_scheduled_reconciliation_job_found_the_following_issues'));
 
         Collection::make($this->anomalies)->each(
             static fn (string $item) => $message->line("• {$item}")

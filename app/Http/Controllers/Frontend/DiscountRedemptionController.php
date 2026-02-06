@@ -133,6 +133,6 @@ final class DiscountRedemptionController extends Controller
 
         return redirect()
             ->route('frontend.discount-redemptions.show', $redemption)
-            ->with('success', __('Discount code redeemed successfully!'));
+            ->with('success', __('messages.discount_code_redeemed_successfully'));
     }
 }

@@ -20,7 +20,7 @@ final class OrderExport implements Exportable
 
     public function name(): string
     {
-        return __('Orders Export');
+        return __('messages.orders_export');
     }
 
     public function columns(): array
