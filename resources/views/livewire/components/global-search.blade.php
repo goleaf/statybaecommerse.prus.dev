@@ -11,6 +11,6 @@
     />
     
     @if (request()->filled('q'))
-        <p class="mt-1 text-xs text-gray-400">{{ __('Showing results for ":q"', ['q' => request('q')]) }}</p>
+        <p class="mt-1 text-xs text-gray-400">{{ __('ui.showing_results_for_term', ['term' => request('q')]) }}</p>
     @endif
 </div>

@@ -59,9 +59,7 @@
                 'name' => 'Lisa Thompson',
                 'location' => 'Toronto, Canada',
                 'rating' => 5,
-                'text' => __(
-                    'I\'ve been a customer for over a year now and I\'m always impressed with the service. Fast delivery and great products!',
-                ),
+                'text' => __('ui.ive_been_a_customer_for_over_a_year_now_and_im_always_impressed_with_the_service_fast_delivery_and_great_products'),
                 'avatar' => null,
                 'product' => 'Bluetooth Earbuds',
                 'verified' => true,

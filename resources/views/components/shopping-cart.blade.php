@@ -211,7 +211,7 @@
 
             <h3 class="text-2xl font-bold text-gray-900 mb-4">{{ __('messages.your_cart_is_empty') }}</h3>
             <p class="text-gray-600 mb-8 max-w-md mx-auto">
-                {{ __('Looks like you haven\'t added any items to your cart yet. Start shopping to fill it up!') }}
+                {{ __('ui.cart_empty_hint') }}
             </p>
 
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
