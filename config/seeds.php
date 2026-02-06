@@ -33,6 +33,39 @@ return [
     ],
 
     /*
+     * Global fast-mode switch used by heavy seeders. This is toggled internally by
+     * OptimizedFullSeeder so direct seeder runs keep full fixture coverage by default.
+     */
+    'fast_mode' => false,
+
+    /*
+     * Fast-mode knobs for local development seed runs.
+     */
+    'fast' => [
+        'city_iso2' => array_values(array_filter(array_map(
+            static fn (string $locale): string => strtoupper(trim($locale)),
+            explode(',', (string) env('DB_SEED_FAST_CITY_ISO2', 'LT,DE'))
+        ))),
+        'max_cities_per_country' => max(1, (int) env('DB_SEED_FAST_MAX_CITIES_PER_COUNTRY', 80)),
+        'max_root_categories' => max(1, (int) env('DB_SEED_FAST_MAX_ROOT_CATEGORIES', 4)),
+        'max_children_per_category' => max(1, (int) env('DB_SEED_FAST_MAX_CHILDREN_PER_CATEGORY', 3)),
+        'collection_limit' => max(1, (int) env('DB_SEED_FAST_COLLECTION_LIMIT', 4)),
+        'brand_limit' => max(1, (int) env('DB_SEED_FAST_BRAND_LIMIT', 8)),
+        'locales' => array_values(array_filter(array_map(
+            static fn (string $locale): string => strtolower(trim($locale)),
+            explode(',', (string) env('DB_SEED_FAST_LOCALES', 'lt,en'))
+        ))),
+        'generate_media' => (bool) env('DB_SEED_FAST_GENERATE_MEDIA', false),
+        'products_per_brand' => max(4, (int) env('DB_SEED_FAST_PRODUCTS_PER_BRAND', 8)),
+        'shared_image_pool_size' => max(8, (int) env('DB_SEED_FAST_SHARED_IMAGE_POOL_SIZE', 24)),
+    ],
+
+    /*
+     * Enable fast-mode automatically for the optimized profile.
+     */
+    'optimized_enables_fast_mode' => (bool) env('DB_SEED_OPTIMIZED_FAST_MODE', true),
+
+    /*
      * Profiles centralize the exact seeder classes that should be executed.
      * Adjust the lists below to include or exclude fixture sets as needed.
      */

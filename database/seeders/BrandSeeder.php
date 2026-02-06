@@ -26,10 +26,18 @@ final class BrandSeeder extends Seeder
             ['name' => 'Kärcher', 'featured' => false],
         ]);
 
+        if ($this->isFastModeEnabled()) {
+            $definitions = $definitions
+                ->take(max(1, (int) config('seeds.fast.brand_limit', 8)))
+                ->values();
+        }
+
+        $shouldGenerateMedia = $this->shouldGenerateMedia();
+
         /** @var LocalImageGeneratorService $imageGenerator */
         $imageGenerator = app(LocalImageGeneratorService::class);
 
-        $definitions->each(function (array $definition) use ($imageGenerator): void {
+        $definitions->each(function (array $definition) use ($imageGenerator, $shouldGenerateMedia): void {
             $slug = str($definition['name'])->slug()->toString();
 
             // Check if brand already exists to maintain idempotency
@@ -68,11 +76,27 @@ final class BrandSeeder extends Seeder
                     ],
                 ]);
 
-                $this->attachGeneratedLogo($brand, $imageGenerator);
-            } else {
+                if ($shouldGenerateMedia) {
+                    $this->attachGeneratedLogo($brand, $imageGenerator);
+                }
+            } elseif ($shouldGenerateMedia) {
                 $this->attachGeneratedLogo($existingBrand, $imageGenerator);
             }
         });
+    }
+
+    private function isFastModeEnabled(): bool
+    {
+        return (bool) config('seeds.fast_mode', false);
+    }
+
+    private function shouldGenerateMedia(): bool
+    {
+        if (! $this->isFastModeEnabled()) {
+            return true;
+        }
+
+        return (bool) config('seeds.fast.generate_media', false);
     }
 
     private function attachGeneratedLogo(Brand $brand, LocalImageGeneratorService $imageGenerator): void

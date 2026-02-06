@@ -45,13 +45,24 @@ final class OptimizedFullSeeder extends Seeder
     {
         DB::connection()->disableQueryLog();
 
-        foreach (self::SEEDERS as $seederClass) {
-            if (! class_exists($seederClass)) {
-                continue;
-            }
+        $enableFastMode = (bool) config('seeds.optimized_enables_fast_mode', true);
+        $previousFastMode = (bool) config('seeds.fast_mode', false);
 
-            $this->call($seederClass);
-            gc_collect_cycles();
+        if ($enableFastMode && ! $previousFastMode) {
+            config()->set('seeds.fast_mode', true);
+        }
+
+        try {
+            foreach (self::SEEDERS as $seederClass) {
+                if (! class_exists($seederClass)) {
+                    continue;
+                }
+
+                $this->call($seederClass);
+                gc_collect_cycles();
+            }
+        } finally {
+            config()->set('seeds.fast_mode', $previousFastMode);
         }
     }
 }

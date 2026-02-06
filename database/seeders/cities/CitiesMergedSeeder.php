@@ -23,7 +23,7 @@ final class CitiesMergedSeeder extends Seeder
             throw new RuntimeException('City seeders cannot run in production environments.');
         }
 
-        $locales = Locales::supported();
+        $locales = $this->resolveLocales();
 
         $availableIso = Country::query()
             ->withoutGlobalScopes()
@@ -34,6 +34,10 @@ final class CitiesMergedSeeder extends Seeder
         $isoLookup = array_flip($availableIso);
         $discovery = $this->discoverSeeders();
         $selectedSeeders = $discovery['selected'];
+
+        if ($this->isFastModeEnabled()) {
+            $selectedSeeders = $this->trimSeedersForFastMode($selectedSeeders);
+        }
 
         foreach ($discovery['duplicates'] as $duplicate) {
             $this->command?->warn(sprintf('Skipping duplicate city seeder %s in favour of the larger dataset.', $duplicate));
@@ -115,5 +119,80 @@ final class CitiesMergedSeeder extends Seeder
         ksort($selected);
 
         return ['selected' => $selected, 'duplicates' => $duplicates];
+    }
+
+    private function isFastModeEnabled(): bool
+    {
+        return (bool) config('seeds.fast_mode', false);
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function resolveLocales(): array
+    {
+        $supportedLocales = Locales::supported();
+
+        if (! $this->isFastModeEnabled()) {
+            return $supportedLocales;
+        }
+
+        $configuredLocales = config('seeds.fast.locales', ['lt', 'en']);
+        $allowedLocales = collect(is_array($configuredLocales) ? $configuredLocales : [])
+            ->map(static fn (mixed $locale): string => Str::lower(trim((string) $locale)))
+            ->filter()
+            ->values();
+
+        $locales = collect($supportedLocales)
+            ->map(static fn (string $locale): string => Str::lower($locale))
+            ->intersect($allowedLocales)
+            ->values()
+            ->all();
+
+        if ($locales !== []) {
+            return $locales;
+        }
+
+        return collect($supportedLocales)
+            ->map(static fn (string $locale): string => Str::lower($locale))
+            ->take(2)
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @param  array<string, array{class: class-string, rows: array<int, array<string, mixed>>}>  $selectedSeeders
+     * @return array<string, array{class: class-string, rows: array<int, array<string, mixed>>}>
+     */
+    private function trimSeedersForFastMode(array $selectedSeeders): array
+    {
+        $isoFilter = $this->fastIso2List();
+        $maxRowsPerCountry = max(1, (int) config('seeds.fast.max_cities_per_country', 80));
+
+        if ($isoFilter !== []) {
+            $selectedSeeders = array_intersect_key($selectedSeeders, array_flip($isoFilter));
+        }
+
+        return collect($selectedSeeders)
+            ->map(static fn (array $meta): array => [
+                'class' => $meta['class'],
+                'rows'  => array_slice($meta['rows'], 0, $maxRowsPerCountry),
+            ])
+            ->all();
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function fastIso2List(): array
+    {
+        $configured = config('seeds.fast.city_iso2', ['LT', 'DE']);
+
+        return collect(is_array($configured) ? $configured : [])
+            ->map(static fn (mixed $iso): string => Str::upper(trim((string) $iso)))
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
     }
 }

@@ -12,6 +12,12 @@ final class CountrySeeder extends Seeder
 {
     public function run(): void
     {
+        if ((bool) config('seeds.fast_mode', false)) {
+            $this->call(SimpleCountrySeeder::class);
+
+            return;
+        }
+
         $countries = $this->getCountriesData();
 
         foreach ($countries as $countryData) {

@@ -28,6 +28,10 @@ final class CategorySeeder extends Seeder
     {
         $categories = $this->getCategoriesData();
 
+        if ($this->isFastModeEnabled()) {
+            $categories = $this->trimCategoriesForFastMode($categories);
+        }
+
         foreach ($categories as $categoryData) {
             $this->createCategory($categoryData);
         }
@@ -856,6 +860,44 @@ final class CategorySeeder extends Seeder
         ];
     }
 
+    /**
+     * @param  array<int, array<string, mixed>>  $categories
+     * @return array<int, array<string, mixed>>
+     */
+    private function trimCategoriesForFastMode(array $categories): array
+    {
+        $maxRootCategories = max(1, (int) config('seeds.fast.max_root_categories', 4));
+        $maxChildrenPerCategory = max(1, (int) config('seeds.fast.max_children_per_category', 3));
+
+        return array_map(
+            fn (array $node): array => $this->trimCategoryNode($node, $maxChildrenPerCategory),
+            array_slice($categories, 0, $maxRootCategories)
+        );
+    }
+
+    /**
+     * @param  array<string, mixed>  $node
+     * @return array<string, mixed>
+     */
+    private function trimCategoryNode(array $node, int $maxChildrenPerCategory): array
+    {
+        if (! isset($node['children']) || ! is_array($node['children'])) {
+            return $node;
+        }
+
+        $node['children'] = array_map(
+            fn (array $child): array => $this->trimCategoryNode($child, $maxChildrenPerCategory),
+            array_slice($node['children'], 0, $maxChildrenPerCategory)
+        );
+
+        return $node;
+    }
+
+    private function isFastModeEnabled(): bool
+    {
+        return (bool) config('seeds.fast_mode', false);
+    }
+
     private function createCategory(array $categoryData, ?int $parentId = null): void
     {
         // Check if category already exists to maintain idempotency
@@ -948,6 +990,24 @@ final class CategorySeeder extends Seeder
 
     private function supportedLocales(): array
     {
+        if ($this->isFastModeEnabled()) {
+            $fastLocales = collect(config('seeds.fast.locales', ['lt', 'en']))
+                ->map(static fn ($locale) => Str::lower(trim((string) $locale)))
+                ->filter()
+                ->values();
+
+            $resolvedFastLocales = $fastLocales
+                ->intersect(collect(self::DEFAULT_SUPPORTED_LOCALES))
+                ->values()
+                ->all();
+
+            if ($resolvedFastLocales !== []) {
+                return $resolvedFastLocales;
+            }
+
+            return ['lt', 'en'];
+        }
+
         $defaultLocales = collect(self::DEFAULT_SUPPORTED_LOCALES);
 
         // Gather locale configuration from every canonical source, allowing the seeder to remain resilient even when
