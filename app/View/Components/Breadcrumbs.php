@@ -80,7 +80,7 @@ final class Breadcrumbs extends Component
      */
     private function buildBreadcrumbs(): array
     {
-        return collect([['label' => __('messages.frontend), '), 'url' => url('/' . $this->locale)]])
+        return collect([['label' => __('messages.frontend'), 'url' => url('/' . $this->locale)]])
             ->merge($this->items)
             ->mapWithKeys(static function (array $item): array {
                 return [$item['url'] ?? '' => $item['label']];
@@ -95,7 +95,7 @@ final class Breadcrumbs extends Component
     {
         $ldItems = [];
         $pos = 1;
-        $trail = array_merge([['label' => __('messages.frontend), '), 'url' => url('/' . $this->locale)]], $this->items ?? []);
+        $trail = array_merge([['label' => __('messages.frontend'), 'url' => url('/' . $this->locale)]], $this->items ?? []);
 
         foreach ($trail as $it) {
             if (! empty($it['label'])) {

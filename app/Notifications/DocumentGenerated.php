@@ -18,73 +18,49 @@ use Illuminate\Support\Facades\Storage;
 /**
  * DocumentGenerated
  *
- * Notification class for DocumentGenerated user notifications with multi-channel delivery and customizable content.
+ * Notification class for document generated events.
  */
 final class DocumentGenerated extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    /**
-     * Initialize the class instance with required dependencies.
-     */
     public function __construct(
         private readonly Document $document,
         private readonly bool $attachPdf = true,
-    ) {
-        // Capture the generated document so it can be surfaced across channels.
-    }
+    ) {}
 
     /**
-     * Handle via functionality with proper error handling.
-     *
      * @return list<string>
      */
     public function via(object $notifiable): array
     {
-        // Notify the recipient by email and through the database inbox.
         return ['mail', 'database'];
     }
 
-    /**
-     * Handle toMail functionality with proper error handling.
-     */
     public function toMail(object $notifiable): MailMessage
     {
-        // Resolve the locale up front so the template respects user preferences.
         $locale = method_exists($notifiable, 'preferredLocale')
             ? ($notifiable->preferredLocale() ?: app()->getLocale())
             : app()->getLocale();
 
-        // Use a graceful fallback for the greeting name so queued jobs never fail.
         $displayName = $this->resolveNotifiableName($notifiable);
+        $generatedAt = $this->document->generated_at?->format('Y-m-d H:i') ?? now()->format('Y-m-d H:i');
 
         $message = (new MailMessage)
-            ->subject(__('messages.documents, [', ['title' => $this->document->title], $locale))
-            ->greeting(__('messages.documents, [', ['name' => $displayName], $locale))
-            ->line(
-                __('messages.documents, [
-                    ', [
-                    'title' => $this->document->title,
-                    'type'  => __('documents.types.' . $this->document->template->type, [], $locale),
-                ], $locale)
-            )
-            ->line(
-                __('messages.documents, [
-                    ', [
-                    'date'   => $this->document->generated_at?->format('Y-m-d H:i'),
-                    'status' => __('documents.statuses.' . $this->document->status, [], $locale),
-                ], $locale)
-            );
+            ->locale($locale)
+            ->subject(__('messages.documents', [], $locale))
+            ->greeting(__('messages.documents', [], $locale) . ': ' . $displayName)
+            ->line(__('messages.documents', [], $locale) . ': ' . (string) $this->document->title)
+            ->line(__('documents.generated_on', [], $locale) . ': ' . $generatedAt)
+            ->line(__('messages.status', [], $locale) . ': ' . (string) $this->document->status);
 
-        // Add a quick access action when the recipient is authorised to view the document.
         if ($this->canViewDocument($notifiable) && Route::has('filament.admin.resources.documents.view')) {
             $message->action(
-                __('documents.email.view_document', [], $locale),
+                __('messages.view', [], $locale),
                 route('filament.admin.resources.documents.view', $this->document),
             );
         }
 
-        // Attach the freshly generated PDF when it is available in secure storage.
         if ($this->shouldAttachPdf()) {
             $disk = SecureStorage::disk();
 
@@ -97,55 +73,31 @@ final class DocumentGenerated extends Notification implements ShouldQueue
             }
         }
 
-        // Always end with a small footer reminder.
-        return $message->line(__('messages.documents, [], $locale));
+        return $message;
     }
 
     /**
-     * Convert the instance to an array representation.
-     *
      * @return array<string, mixed>
      */
     public function toArray(object $notifiable): array
     {
-        // Persist a lean payload that powers the notification centre and API responses.
-        return [
-            ', [], $locale));
-    }
-
-    /**
-     * Convert the instance to an array representation.
-     *
-     * @return array<string, mixed>
-     */
-    public function toArray(object $notifiable): array
-    {
-        // Persist a lean payload that powers the notification centre and API responses.
         return [
             'document_id'     => $this->document->id,
             'document_title'  => $this->document->title,
-            'document_type'   => $this->document->template->type,
+            'document_type'   => $this->document->template->type ?? null,
             'document_status' => $this->document->status,
             'generated_at'    => $this->document->generated_at?->toIso8601String(),
-            'message'         => __('messages.documents, [', ['title' => $this->document->title]),
+            'message'         => __('messages.documents', ['title' => $this->document->title]),
         ];
     }
 
-    /**
-     * Determine whether the notification should include the PDF attachment.
-     */
     private function shouldAttachPdf(): bool
     {
-        // Only attach PDFs when explicitly requested and the file path is set.
         return $this->attachPdf && $this->document->isPdf() && filled($this->document->file_path);
     }
 
-    /**
-     * Decide if the notifiable can access the document view link.
-     */
     private function canViewDocument(object $notifiable): bool
     {
-        // Use Gate to avoid relying on the global auth helper inside queued notifications.
         if (method_exists($notifiable, 'getAuthIdentifier')) {
             return Gate::forUser($notifiable)->allows('view', $this->document);
         }
@@ -153,12 +105,8 @@ final class DocumentGenerated extends Notification implements ShouldQueue
         return method_exists($notifiable, 'can') && $notifiable->can('view', $this->document);
     }
 
-    /**
-     * Resolve a friendly display name for greeting lines.
-     */
     private function resolveNotifiableName(object $notifiable): string
     {
-        // Fall back to the application name so anonymous notifiables are handled gracefully.
         return (string) ($notifiable->name ?? $notifiable->email ?? config('app.name'));
     }
 }

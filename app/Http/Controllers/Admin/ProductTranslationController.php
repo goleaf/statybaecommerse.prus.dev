@@ -79,7 +79,7 @@ final class ProductTranslationController extends Controller
         $name = trim($validated['name']);
         if ($name === '') {
             return back()->withInput()->withErrors([
-                'name' => __('messages.validation, [', ['attribute' => 'name']),
+                'name' => __('validation.required', ['attribute' => 'name']),
             ]);
         }
 

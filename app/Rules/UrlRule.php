@@ -23,7 +23,7 @@ final class UrlRule implements ValidationRule
         }
 
         if (empty(trim($value))) {
-            $fail(__('messages.validation, [', ['attribute' => $attribute]));
+            $fail(__('validation.required', ['attribute' => $attribute]));
 
             return;
         }

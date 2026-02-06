@@ -15,23 +15,14 @@ use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Arr;
 
-/**
- * NotificationMail
- *
- * Mailable class for NotificationMail email sending with template management and attachment support.
- */
 final class NotificationMail extends Mailable implements ShouldQueue
 {
-    use Queueable, SerializesModels;
+    use Queueable;
+    use SerializesModels;
 
-    /**
-     * Store the resolved locale so the view and subject stay in sync.
-     */
     private ?string $cachedLocale = null;
 
     /**
-     * Cache the normalized payload shared with the Blade template.
-     *
      * @var array{
      *     notification: Notification,
      *     title: string,
@@ -45,50 +36,36 @@ final class NotificationMail extends Mailable implements ShouldQueue
      */
     private ?array $cachedViewData = null;
 
-    /**
-     * Initialize the class instance with required dependencies.
-     */
     public function __construct(public Notification $notification) {}
 
-    /**
-     * Handle envelope functionality with proper error handling.
-     */
     public function envelope(): Envelope
     {
         $locale = $this->resolveLocale();
-        $this->locale($locale); // Keep Markdown components translated consistently.
+        $this->locale($locale);
 
         return new Envelope(subject: $this->formatSubject($locale));
     }
 
-    /**
-     * Handle content functionality with proper error handling.
-     */
     public function content(): Content
     {
         $locale = $this->resolveLocale();
 
         return new Content(
             view: 'emails.notification',
-            with: $this->prepareViewData($locale)
+            with: $this->prepareViewData($locale),
         );
     }
 
-    /**
-     * Handle attachments functionality with proper error handling.
-     */
     /**
      * @return array<int, Attachment>
      */
     public function attachments(): array
     {
-        // Notification digests currently only render HTML; keep this stub for future asset support.
         return [];
     }
 
     private function resolveLocale(): string
     {
-        // Allow notification payloads to override the locale while defaulting to the app setting.
         if ($this->cachedLocale !== null) {
             return $this->cachedLocale;
         }
@@ -105,24 +82,15 @@ final class NotificationMail extends Mailable implements ShouldQueue
     private function formatSubject(string $locale): string
     {
         $data = $this->prepareViewData($locale);
-        $subject = __('messages.mail, [', ['title' => $data['title']], $locale);
+        $subject = $data['title'];
 
         if ($data['urgent'] === true) {
-            $prefix = __('messages.mail, [], $locale);
-
-            return sprintf(', [], $locale);
-
-            return sprintf('[%s] %s', mb_strtoupper($prefix), $subject);
+            return '[' . __('messages.notifications', [], $locale) . '] ' . $subject;
         }
 
         return $subject;
     }
 
-    /**
-     * Normalize the payload consumed by the Blade template.
-     *
-     * @return array<string, mixed>
-     */
     /**
      * @return array{
      *     notification: Notification,
@@ -141,16 +109,10 @@ final class NotificationMail extends Mailable implements ShouldQueue
             return $this->cachedViewData;
         }
 
-        $raw = $this->notification->data ?? [];
-        $title = $this->normalizeString($raw['title'] ?? null, __('messages.mail, [], $locale));
-        $message = $this->normalizeString(
-            $raw[', [], $locale));
-        $message = $this->normalizeString(
-            $raw['message'] ?? null,
-            $this->normalizeString($raw['body'] ?? null, __('messages.mail, [], $locale))
-        );
-        $type = $this->normalizeString($raw[', [], $locale))
-        );
+        $raw = is_array($this->notification->data) ? $this->notification->data : [];
+
+        $title = $this->normalizeString($raw['title'] ?? null, __('messages.mail', [], $locale));
+        $message = $this->normalizeString($raw['message'] ?? null, __('messages.notifications', [], $locale));
         $type = $this->normalizeString($raw['type'] ?? null, 'general');
         $urgent = (bool) ($raw['urgent'] ?? false);
         $color = $this->normalizeColor($raw['color'] ?? null);
@@ -158,7 +120,6 @@ final class NotificationMail extends Mailable implements ShouldQueue
 
         $createdAt = $this->notification->created_at;
         if (! $createdAt instanceof DateTimeInterface) {
-            // When notifications are previewed without persistence we still want a timestamp.
             $createdAt = now();
         }
 
