@@ -6,11 +6,14 @@ use App\Filament\Imports\ProductImporter;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\ProductImage;
 use App\Models\User;
 use Filament\Actions\Imports\Models\FailedImportRow;
 use Filament\Actions\Imports\Jobs\ImportCsv;
 use Filament\Actions\Imports\Models\Import;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 uses(RefreshDatabase::class);
@@ -209,4 +212,71 @@ it('fails the row when a sync key matches multiple products', function (): void 
 
     expect($import->successful_rows)->toBe(0)
         ->and(FailedImportRow::query()->where('import_id', $import->getKey())->count())->toBe(1);
+});
+
+it('downloads image_url and keeps exactly one image for the product', function (): void {
+    Storage::fake('public');
+    Http::fake([
+        'https://example.com/images/product.png' => Http::response('fake-image-bytes', 200, [
+            'Content-Type' => 'image/png',
+        ]),
+    ]);
+
+    $user = User::factory()->admin()->create();
+
+    $existing = Product::factory()->create([
+        'sku'  => 'IMG-SYNC-001',
+        'name' => 'Existing Product',
+    ]);
+
+    ProductImage::factory()->create([
+        'product_id' => $existing->getKey(),
+        'path'       => 'product-images/legacy-1.jpg',
+        'sort_order' => 1,
+    ]);
+    ProductImage::factory()->create([
+        'product_id' => $existing->getKey(),
+        'path'       => 'product-images/legacy-2.jpg',
+        'sort_order' => 2,
+    ]);
+
+    $import = new Import;
+    $import->user()->associate($user);
+    $import->file_name = 'product-import.csv';
+    $import->file_path = base_path('storage/imports/product-import.csv');
+    $import->importer = ProductImporter::class;
+    $import->total_rows = 1;
+    $import->save();
+
+    $columns = collect(ProductImporter::getColumns())->map->getName()->values();
+    $row = $columns->mapWithKeys(fn (string $name) => [$name => ''])->all();
+    $row['name'] = 'Product With Imported Image';
+    $row['sku'] = 'IMG-SYNC-001';
+    $row['image_url'] = 'https://example.com/images/product.png';
+
+    $columnMap = $columns->mapWithKeys(fn (string $name) => [$name => $name])->all();
+    $options = [
+        'should_sync' => true,
+        'sync_keys'   => [
+            ['field' => 'sku'],
+        ],
+    ];
+
+    (new ImportCsv($import, [$row], $columnMap, $options))->handle();
+
+    $import->refresh();
+    $existing->refresh();
+
+    $images = $existing->images()->withoutGlobalScopes()->get();
+
+    expect($import->successful_rows)->toBe(1)
+        ->and($images)->toHaveCount(1)
+        ->and($images->first()?->is_default)->toBeTrue();
+
+    $storedPath = (string) $images->first()?->path;
+
+    expect($storedPath)->toStartWith('product-images/' . $existing->getKey() . '/')
+        ->and($storedPath)->toEndWith('.png');
+
+    Storage::disk('public')->assertExists($storedPath);
 });

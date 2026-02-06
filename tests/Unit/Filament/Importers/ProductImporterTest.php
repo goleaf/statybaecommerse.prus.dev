@@ -23,7 +23,8 @@ it('has required columns', function () {
         ->toContain('sku')
         ->toContain('price')
         ->toContain('manage_stock')
-        ->toContain('stock_quantity');
+        ->toContain('stock_quantity')
+        ->toContain('image_url');
 });
 
 it('has correct notification body', function () {
