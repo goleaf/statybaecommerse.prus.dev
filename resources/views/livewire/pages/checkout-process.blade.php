@@ -30,7 +30,7 @@
             </p>
         </header>
 
-        <nav aria-label="{{ __('frontend.checkout_steps') }}">
+        <nav aria-label="{{ __('frontend.checkout_steps.progress') }}">
             <ol class="flex flex-col gap-6 sm:flex-row sm:items-center sm:gap-8">
                 @foreach ($steps as $number => $meta)
                     @php
