@@ -845,7 +845,7 @@ abstract class CsvImportPage extends Page implements HasForms
         $processed = $import->processed_rows ?? 0;
         $total = $import->total_rows ?? 0;
         $successful = $import->successful_rows ?? 0;
-        $failed = $import->getFailedRowsCount();
+        $failed = $this->calculateFailedRowsCount($import);
         $percent = $this->calculateProgressPercent($processed, $total);
         $status = ($import->completed_at || $processed >= $total) ? 'completed' : 'running';
 
@@ -992,7 +992,7 @@ abstract class CsvImportPage extends Page implements HasForms
 
     protected function notifyImportCompleted(Import $import): void
     {
-        $failedRowsCount = $import->getFailedRowsCount();
+        $failedRowsCount = $this->calculateFailedRowsCount($import);
         $authGuard = $this->resolveAuthGuard();
 
         Notification::make()
@@ -1033,6 +1033,15 @@ abstract class CsvImportPage extends Page implements HasForms
         }
 
         return min(100, (int) floor(($processed / $total) * 100));
+    }
+
+    protected function calculateFailedRowsCount(Import $import): int
+    {
+        $total = max(0, (int) ($import->total_rows ?? 0));
+        $processed = max(0, min((int) ($import->processed_rows ?? 0), $total));
+        $successful = max(0, min((int) ($import->successful_rows ?? 0), $processed));
+
+        return max(0, $processed - $successful);
     }
 
     public function import(): void

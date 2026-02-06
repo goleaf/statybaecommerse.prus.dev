@@ -15,8 +15,8 @@ use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Get;
-use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\HtmlString;
@@ -29,10 +29,10 @@ class ProductImporter extends BaseImporter
     protected static ?string $model = Product::class;
 
     private const SYNC_KEY_FIELDS = [
-        'sku' => 'SKU',
+        'sku'     => 'SKU',
         'barcode' => 'Barcode',
-        'slug' => 'Slug',
-        'name' => 'Name',
+        'slug'    => 'Slug',
+        'name'    => 'Name',
     ];
 
     /**
@@ -307,7 +307,7 @@ class ProductImporter extends BaseImporter
     {
         $body = 'Your product import has completed and ' . Number::format($import->successful_rows) . ' ' . str('row')->plural($import->successful_rows) . ' imported.';
 
-        if ($failedRowsCount = $import->getFailedRowsCount()) {
+        if ($failedRowsCount = static::calculateFailedRowsCount($import)) {
             $body .= ' ' . Number::format($failedRowsCount) . ' ' . str('row')->plural($failedRowsCount) . ' failed to import.';
         }
 

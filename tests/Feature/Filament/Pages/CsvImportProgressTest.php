@@ -33,6 +33,7 @@ it('tracks running import progress', function () {
         ->set('isImporting', true)
         ->call('refreshImportProgress')
         ->assertSet('importProgress.percent', 40)
+        ->assertSet('importProgress.failed', 5)
         ->assertSet('importProgress.status', 'running');
 });
 
@@ -58,8 +59,34 @@ it('marks import as completed and updates summary', function () {
         ->set('isImporting', true)
         ->call('refreshImportProgress')
         ->assertSet('importProgress.status', 'completed')
+        ->assertSet('importProgress.failed', 0)
         ->assertSet('isImporting', false)
         ->assertSet('lastImport.total', 100);
+});
+
+it('does not show failures before rows are processed', function () {
+    $admin = AdminUser::factory()->create();
+    $user = User::factory()->create();
+
+    $import = Import::query()->create([
+        'completed_at'    => null,
+        'file_name'       => 'categories.csv',
+        'file_path'       => 'imports/csv/categories.csv',
+        'importer'        => ImportCategories::getImporter(),
+        'processed_rows'  => 0,
+        'total_rows'      => 120,
+        'successful_rows' => 0,
+        'user_id'         => $user->id,
+    ]);
+
+    $this->actingAs($admin, 'admin');
+
+    livewire(ImportCategories::class)
+        ->set('activeImportId', $import->getKey())
+        ->set('isImporting', true)
+        ->call('refreshImportProgress')
+        ->assertSet('importProgress.failed', 0)
+        ->assertSet('importProgress.status', 'running');
 });
 
 it('renders the latest import rows table', function () {

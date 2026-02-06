@@ -5,12 +5,22 @@ declare(strict_types=1);
 namespace App\Filament\Imports;
 
 use Filament\Actions\Imports\Importer;
+use Filament\Actions\Imports\Models\Import;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Throwable;
 
 abstract class BaseImporter extends Importer
 {
+    protected static function calculateFailedRowsCount(Import $import): int
+    {
+        $total = max(0, (int) ($import->total_rows ?? 0));
+        $processed = max(0, min((int) ($import->processed_rows ?? 0), $total));
+        $successful = max(0, min((int) ($import->successful_rows ?? 0), $processed));
+
+        return max(0, $processed - $successful);
+    }
+
     protected function beforeValidate(): void
     {
         $this->ensureUniqueColumnValues();
