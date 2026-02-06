@@ -70,7 +70,7 @@ return new class extends Migration
             });
         }
 
-        $this->ensureStatusVisibilityIndex();
+        $this->ensureStatusPublishedAtIndex();
     }
 
     /**
@@ -132,7 +132,7 @@ return new class extends Migration
             });
         }
 
-        $this->ensureStatusVisibilityIndex();
+        $this->ensureStatusPublishedAtIndex();
     }
 
     /**
@@ -156,13 +156,17 @@ return new class extends Migration
     }
 
     /**
-     * Ensure the canonical product status visibility index exists.
+     * Ensure the canonical product status index exists.
      */
-    private function ensureStatusVisibilityIndex(): void
+    private function ensureStatusPublishedAtIndex(): void
     {
+        if (! Schema::hasColumn('products', 'status') || ! Schema::hasColumn('products', 'published_at')) {
+            return;
+        }
+
         try {
             Schema::table('products', function (Blueprint $table): void {
-                $table->index(['status', 'is_visible']);
+                $table->index(['status', 'published_at']);
             });
         } catch (\Throwable $exception) {
             // Index is already present.

@@ -57,6 +57,11 @@ final class TurboEcommerceSeeder extends Seeder
 
     private bool $fastMode;
 
+    /**
+     * @var array<int, string>|null
+     */
+    private ?array $productTranslationColumns = null;
+
     public function __construct()
     {
         $this->imageGen = app(LocalImageGeneratorService::class);
@@ -258,22 +263,32 @@ final class TurboEcommerceSeeder extends Seeder
             return;
         }
 
+        $translationColumns = array_flip($this->productTranslationColumns());
+
+        if ($translationColumns === []) {
+            return;
+        }
+
         foreach ($products as $product) {
             foreach ($locales as $locale) {
-                // Create translation using factory with relationship
+                $name = $this->translateLike($product->name, $locale);
+                $translationPayload = [
+                    'name'              => $name,
+                    'slug'              => Str::slug($name . '-' . substr($product->slug, -6)),
+                    'summary'           => null,
+                    'description'       => $this->translateLike('Aukštos kokybės produktas profesionalams ir mėgėjams.', $locale),
+                    'short_description' => $this->translateLike('Aukštos kokybės produktas profesionalams ir mėgėjams.', $locale),
+                    'seo_title'         => $name,
+                    'seo_description'   => $this->translateLike('Pirkite geriausia kaina. Greitas pristatymas.', $locale),
+                    'meta_keywords'     => [],
+                    'alt_text'          => $name,
+                ];
+
+                $translationPayload = array_intersect_key($translationPayload, $translationColumns);
+
                 $product->translations()->firstOrCreate(
                     ['locale' => $locale],
-                    ProductTranslation::factory()
-                        ->for($product, 'product')
-                        ->make([
-                            'locale'          => $locale,
-                            'name'            => $this->translateLike($product->name, $locale),
-                            'slug'            => Str::slug($this->translateLike($product->name, $locale) . '-' . substr($product->slug, -6)),
-                            'description'     => $this->translateLike('Aukštos kokybės produktas profesionalams ir mėgėjams.', $locale),
-                            'seo_title'       => $this->translateLike($product->name, $locale),
-                            'seo_description' => $this->translateLike('Pirkite geriausia kaina. Greitas pristatymas.', $locale),
-                        ])
-                        ->toArray()
+                    $translationPayload
                 );
             }
         }
@@ -428,6 +443,28 @@ final class TurboEcommerceSeeder extends Seeder
         }
 
         return array_slice($locales, 0, 2);
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function productTranslationColumns(): array
+    {
+        if ($this->productTranslationColumns !== null) {
+            return $this->productTranslationColumns;
+        }
+
+        try {
+            $translationModel = new ProductTranslation;
+            $this->productTranslationColumns = $translationModel
+                ->getConnection()
+                ->getSchemaBuilder()
+                ->getColumnListing($translationModel->getTable());
+        } catch (Throwable) {
+            $this->productTranslationColumns = [];
+        }
+
+        return $this->productTranslationColumns;
     }
 
     private function translateLike(string $text, string $locale): string

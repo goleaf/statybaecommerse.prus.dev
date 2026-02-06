@@ -247,6 +247,7 @@ class ProductFactory extends Factory
 
         $defaultLocale = config('app.locale', 'en');
         $locales = $this->supportedLocales();
+        $translationColumns = array_flip($schema->getColumnListing($translationsTable));
 
         $translations = collect($locales)->map(function (string $locale) use ($product, $defaultLocale): array {
             $name = $locale === $defaultLocale
@@ -274,7 +275,11 @@ class ProductFactory extends Factory
                 'meta_keywords'     => $this->faker->words(5),
                 'alt_text'          => $this->faker->sentence(3),
             ];
-        })->values()->all();
+        })
+            ->map(static fn (array $translation): array => array_intersect_key($translation, $translationColumns))
+            ->filter(static fn (array $translation): bool => isset($translation['locale'], $translation['name'], $translation['slug']))
+            ->values()
+            ->all();
 
         if ($translations !== []) {
             $product->translations()->createMany($translations);
