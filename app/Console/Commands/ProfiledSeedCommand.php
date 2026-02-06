@@ -13,6 +13,7 @@ use Illuminate\Console\Command;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Console\Seeds\SeedCommand;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Artisan;
 
 use function in_array;
 use function is_array;
@@ -90,11 +91,18 @@ final class ProfiledSeedCommand extends SeedCommand
         $connection = $this->resolver->connection($this->getDatabase());
         $schema = $connection->getSchemaBuilder();
         $driver = strtolower((string) $connection->getDriverName());
+        $databaseName = (string) ($connection->getDatabaseName() ?? '');
         $excludedTables = $this->excludedTables();
         $tables = $this->tableListing($schema);
 
         if ($driver === 'sqlite') {
-            return $this->clearTablesByDelete($connection, $schema, $tables, $excludedTables);
+            $clearedTables = $this->clearTablesByDelete($connection, $schema, $tables, $excludedTables);
+
+            if ($databaseName !== ':memory:') {
+                $this->synchronizeSqliteSchema();
+            }
+
+            return $clearedTables;
         }
         $clearedTables = 0;
 
@@ -115,6 +123,15 @@ final class ProfiledSeedCommand extends SeedCommand
         }
 
         return $clearedTables;
+    }
+
+    private function synchronizeSqliteSchema(): void
+    {
+        Artisan::call('migrate', [
+            '--database'       => $this->getDatabase(),
+            '--force'          => true,
+            '--no-interaction' => true,
+        ]);
     }
 
     private function clearTablesByDelete($connection, $schema, array $tables, array $excludedTables): int
