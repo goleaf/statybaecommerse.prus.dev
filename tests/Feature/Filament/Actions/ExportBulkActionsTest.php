@@ -39,9 +39,7 @@ final class ExportBulkActionsTest extends TestCase
 
         config()->set('export.disk', 'public');
         config()->set('export.formats', [
-            'csv'  => \App\Services\Export\Writers\CsvExportWriter::class,
-            'xlsx' => \App\Services\Export\Writers\XlsxExportWriter::class,
-            'pdf'  => \App\Services\Export\Writers\PdfExportWriter::class,
+            'csv' => \App\Services\Export\Writers\CsvExportWriter::class,
         ]);
 
         Storage::fake('public');
@@ -78,14 +76,14 @@ final class ExportBulkActionsTest extends TestCase
         Bus::assertDispatched(ProcessExport::class, fn (ProcessExport $job): bool => $job->exportId === $export->getKey());
     }
 
-    public function test_products_bulk_export_uses_selected_format(): void
+    public function test_products_bulk_export_uses_csv_format(): void
     {
         Product::factory()->count(2)->create();
 
         Livewire::test(ListProducts::class)
             ->call('loadTable')
             ->callTableBulkAction('export_selected', Product::all(), [
-                'format'  => 'xlsx',
+                'format'  => 'csv',
                 'columns' => ['sku', 'name'],
             ])
             ->assertHasNoTableBulkActionErrors();
@@ -94,7 +92,7 @@ final class ExportBulkActionsTest extends TestCase
 
         self::assertNotNull($export);
         self::assertSame(ProductExport::class, $export->exportable_type);
-        self::assertSame('xlsx', $export->format);
+        self::assertSame('csv', $export->format);
         self::assertSame(['sku', 'name'], $export->columns);
     }
 

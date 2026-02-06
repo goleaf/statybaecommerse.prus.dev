@@ -256,9 +256,9 @@ final class ExportTest extends TestCase
 
     public function test_file_extension_accessor_returns_format(): void
     {
-        $export = Export::factory()->create(['format' => 'xlsx']);
+        $export = Export::factory()->create(['format' => 'csv']);
 
-        expect($export->file_extension)->toBe('xlsx');
+        expect($export->file_extension)->toBe('csv');
     }
 
     public function test_progress_percentage_accessor_calculates_correctly(): void

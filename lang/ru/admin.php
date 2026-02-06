@@ -1019,5 +1019,5 @@ return [
     'product_images'        => 'Product Images',
     'product_requests'      => 'Product Requests',
     'product_similarities'  => 'Product Similarities',
-    'xml_provider_label'    => 'XML (LT/EN)',
+    'xml_provider_label'    => 'CSV (LT/EN)',
 ];

@@ -744,7 +744,7 @@ return [
     'with_images'                          => 'With images',
     'wood'                                 => 'Holz',
     'work_addresses'                       => 'Arbeitsadressen',
-    'xml_file'                             => 'XML-Datei',
+    'xml_file'                             => 'CSV-Datei',
     'yellow'                               => 'Gelb',
     'yes'                                  => 'Ja',
     'zero'                                 => 'Null',

@@ -1016,7 +1016,7 @@ return [
         'today_orders'       => 'Heutige Bestellungen',
         'today_revenue'      => 'Heutiger Umsatz',
     ],
-    'xml_provider_label'    => 'XML (LT/EN)',
+    'xml_provider_label'    => 'CSV (LT/EN)',
     'yes'                   => 'Ja',
     'import_last_summary'   => 'Last Import Summary',
     'import_mapping_errors' => '{1} Mapping has :count error.|[2,*] Mapping has :count errors.',

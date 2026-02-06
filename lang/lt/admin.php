@@ -1018,6 +1018,6 @@ return [
         'today_orders'       => 'Šiandienos užsakymai',
         'today_revenue'      => 'Šiandienos pajamos',
     ],
-    'xml_provider_label' => 'XML (LT/EN)',
+    'xml_provider_label' => 'CSV (LT/EN)',
     'yes'                => 'Taip',
 ];

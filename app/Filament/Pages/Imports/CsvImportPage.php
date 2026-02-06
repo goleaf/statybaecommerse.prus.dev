@@ -130,8 +130,6 @@ abstract class CsvImportPage extends Page implements HasForms
                                             'application/x-csv',
                                             'text/comma-separated-values',
                                             'text/x-comma-separated-values',
-                                            'text/plain',
-                                            'application/vnd.ms-excel',
                                         ])
                                         ->rules($this->getFileValidationRules())
                                         ->afterStateUpdated(function (FileUpload $component, Component $livewire, Set $set, ?TemporaryUploadedFile $state) use ($page): void {
@@ -1402,7 +1400,7 @@ abstract class CsvImportPage extends Page implements HasForms
     protected function getFileValidationRules(): array
     {
         return [
-            'extensions:csv,txt',
+            'extensions:csv',
             fn (): Closure => function (string $attribute, mixed $value, Closure $fail): void {
                 $csvStream = $this->getUploadedFileStream($value);
 

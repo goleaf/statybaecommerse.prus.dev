@@ -1018,6 +1018,6 @@ return [
         'today_orders'       => 'Today\'s Orders',
         'today_revenue'      => 'Today\'s Revenue',
     ],
-    'xml_provider_label' => 'XML (LT/EN)',
+    'xml_provider_label' => 'CSV (LT/EN)',
     'yes'                => 'Yes',
 ];

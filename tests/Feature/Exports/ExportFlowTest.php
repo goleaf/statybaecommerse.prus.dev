@@ -21,8 +21,6 @@ use Illuminate\Support\Facades\Storage;
 
 use function Pest\Laravel\actingAs;
 
-use Spatie\SimpleExcel\SimpleExcelReader;
-
 uses(RefreshDatabase::class);
 
 it('feature: queues, processes, and downloads order exports', function (): void {
@@ -140,7 +138,7 @@ it('feature: streams one hundred thousand users without exhausting memory', func
     expect(memory_get_usage(true))->toBeLessThan(256 * 1024 * 1024);
 });
 
-it('feature: generates aligned columns for csv, xlsx, and pdf formats', function (): void {
+it('feature: generates aligned columns for csv format', function (): void {
     Storage::fake('local');
     Notification::fake();
     Queue::fake();
@@ -179,50 +177,5 @@ it('feature: generates aligned columns for csv, xlsx, and pdf formats', function
         'Created At',
     ]);
 
-    $xlsxRequest = ExportRequestData::from([
-        'entity'   => ExportType::PRODUCTS->value,
-        'format'   => ExportFormat::XLSX->value,
-        'columns'  => ['sku', 'name', 'status', 'price', 'stock', 'created_at'],
-        'filters'  => ['status' => 'published'],
-        'locale'   => 'en',
-        'timezone' => 'UTC',
-        'ids'      => [$product->getKey()],
-    ]);
-
-    $xlsxExport = $service->queueExport($xlsxRequest, $user);
-    $service->process($xlsxExport->fresh());
-    $xlsxExport->refresh();
-
-    $xlsxPath = Storage::disk('local')->path((string) $xlsxExport->file_path);
-    $xlsxRows = SimpleExcelReader::create($xlsxPath)->getRows()->toArray();
-    expect(array_keys($xlsxRows[0]))->toBe([
-        'SKU',
-        'Name',
-        'Status',
-        'Price',
-        'Stock',
-        'Created At',
-    ]);
-
-    $pdfRequest = ExportRequestData::from([
-        'entity'   => ExportType::ORDERS->value,
-        'format'   => ExportFormat::PDF->value,
-        'columns'  => ['number', 'status', 'payment_status', 'total', 'customer', 'items', 'created_at'],
-        'filters'  => [],
-        'locale'   => 'en',
-        'timezone' => 'UTC',
-        'ids'      => [],
-    ]);
-
-    Order::factory()->create(['total' => 42.50]);
-    $pdfExport = $service->queueExport($pdfRequest, $user);
-    $service->process($pdfExport->fresh());
-    $pdfExport->refresh();
-
-    $pdfRaw = Storage::disk('local')->get((string) $pdfExport->file_path);
-    expect($pdfRaw)->toContain('Order Number');
-    expect($pdfRaw)->toContain('Grand Total');
-    expect($pdfRaw)->toContain('Total rows:');
-
-    Queue::assertPushed(ProcessExportJob::class, 3);
+    Queue::assertPushed(ProcessExportJob::class, 1);
 });

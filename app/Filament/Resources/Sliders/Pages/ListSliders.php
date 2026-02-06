@@ -72,7 +72,7 @@ class ListSliders extends ListRecords
             ->form([
                 FileUpload::make('import_file')
                     ->label(__('translations.import_file'))
-                    ->acceptedFileTypes(['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'text/csv'])
+                    ->acceptedFileTypes(['text/csv'])
                     ->required(),
                 Toggle::make('update_existing')
                     ->label(__('translations.update_existing'))
@@ -96,11 +96,9 @@ class ListSliders extends ListRecords
                 Select::make('format')
                     ->label(__('translations.export_format'))
                     ->options([
-                        'excel' => __('translations.excel'),
-                        'csv'   => __('translations.csv'),
-                        'json'  => __('translations.json'),
+                        'csv' => __('translations.csv'),
                     ])
-                    ->default('excel'),
+                    ->default('csv'),
                 Toggle::make('include_images')
                     ->label(__('translations.include_images'))
                     ->default(false),

@@ -744,7 +744,7 @@ return [
     'with_images'                          => 'With images',
     'wood'                                 => 'Medis',
     'work_addresses'                       => 'Darbo adresai',
-    'xml_file'                             => 'XML failas',
+    'xml_file'                             => 'CSV failas',
     'yellow'                               => 'Geltona',
     'yes'                                  => 'Taip',
     'zero'                                 => 'Nulis',

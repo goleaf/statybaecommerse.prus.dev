@@ -19,8 +19,6 @@ use App\Services\Export\Exporters\OrderExport;
 use App\Services\Export\Exporters\ProductExport;
 use App\Services\Export\Exporters\UserExport;
 use App\Services\Export\Writers\CsvExportWriter;
-use App\Services\Export\Writers\PdfExportWriter;
-use App\Services\Export\Writers\XlsxExportWriter;
 use App\Support\Exports\ExportUrlGenerator;
 use App\Support\ImportExport\ProgressCounter;
 use App\Support\Storage\SecureStorage;
@@ -66,9 +64,7 @@ final class ExportService
         $this->downloadUrlTtl = $this->resolveInteger($config['download_url_ttl'] ?? null, 60);
 
         $this->writerMap = [
-            'csv'  => CsvExportWriter::class,
-            'xlsx' => XlsxExportWriter::class,
-            'pdf'  => PdfExportWriter::class,
+            'csv' => CsvExportWriter::class,
         ];
 
         foreach (($config['formats'] ?? []) as $key => $writer) {
@@ -76,7 +72,11 @@ final class ExportService
                 continue;
             }
 
-            $this->writerMap[Str::lower($key)] = $writer;
+            if (Str::lower($key) !== 'csv') {
+                continue;
+            }
+
+            $this->writerMap['csv'] = $writer;
         }
     }
 
