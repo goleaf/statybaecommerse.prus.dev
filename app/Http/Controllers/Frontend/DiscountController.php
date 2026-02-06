@@ -81,14 +81,14 @@ final class DiscountController extends Controller
             if ($expectsJson) {
                 return response()->json([
                     'success' => false,
-                    'message' => __('This coupon requires a minimum order amount of :amount.', [
+                    'message' => __('messages.this_coupon_requires_a_minimum_order_amount_of_amount', [
                         'amount' => app_money_format($minimumAmount),
                     ]),
                 ], 422);
             }
 
             return redirect()->back()->withErrors([
-                'code' => __('This coupon requires a minimum order amount of :amount.', ['amount' => app_money_format($coupon->minimum_amount ?? 0)]),
+                'code' => __('messages.this_coupon_requires_a_minimum_order_amount_of_amount', ['amount' => app_money_format($coupon->minimum_amount ?? 0)]),
             ]);
         }
 

@@ -88,7 +88,7 @@ class Addresses extends Component
 
             Notification::make()
                 ->title(__('Default address updated'))
-                ->body(__('The address has been set as your default :type address.', ['type' => $address->type]))
+                ->body(__('messages.the_address_has_been_set_as_your_default_type_address', ['type' => $address->type]))
                 ->success()
                 ->send();
 
