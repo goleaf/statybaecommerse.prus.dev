@@ -8,7 +8,7 @@ use App\Models\CartItem;
 use App\Models\Product;
 use App\Models\User;
 
-final class CartItemSeeder extends \Database\Seeders\BaseSeeder
+final class CartItemSeeder extends BaseSeeder
 {
     public function run(): void
     {

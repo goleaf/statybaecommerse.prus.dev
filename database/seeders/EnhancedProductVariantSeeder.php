@@ -18,7 +18,7 @@ use App\Services\ProductVariantAttributeMatrixService;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Str;
 
-final class EnhancedProductVariantSeeder extends \Database\Seeders\BaseSeeder
+final class EnhancedProductVariantSeeder extends BaseSeeder
 {
     public function run(): void
     {

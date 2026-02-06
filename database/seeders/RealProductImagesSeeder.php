@@ -9,7 +9,7 @@ use App\Services\Images\LocalImageGeneratorService;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
-final class RealProductImagesSeeder extends \Database\Seeders\BaseSeeder
+final class RealProductImagesSeeder extends BaseSeeder
 {
     private LocalImageGeneratorService $imageGenerator;
 

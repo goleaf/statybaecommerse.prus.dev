@@ -6,7 +6,7 @@ namespace Database\Seeders;
 
 use App\Models\Currency;
 
-final class CurrencySeeder extends \Database\Seeders\BaseSeeder
+final class CurrencySeeder extends BaseSeeder
 {
     public function run(): void
     {

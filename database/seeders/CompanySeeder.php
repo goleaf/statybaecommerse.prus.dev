@@ -6,7 +6,7 @@ namespace Database\Seeders;
 
 use App\Models\Company;
 
-final class CompanySeeder extends \Database\Seeders\BaseSeeder
+final class CompanySeeder extends BaseSeeder
 {
     public function run(): void
     {

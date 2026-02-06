@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Log;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Throwable;
 
-final class UltraFastProductImageSeeder extends \Database\Seeders\BaseSeeder
+final class UltraFastProductImageSeeder extends BaseSeeder
 {
     private const BATCH_SIZE = 50;
 

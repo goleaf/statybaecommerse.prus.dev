@@ -19,7 +19,7 @@ use Exception;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Log;
 
-final class ComprehensiveOrderSeeder extends \Database\Seeders\BaseSeeder
+final class ComprehensiveOrderSeeder extends BaseSeeder
 {
     /**
      * Maintain the next sequential order number across seeding passes so reruns remain idempotent.

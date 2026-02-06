@@ -12,7 +12,7 @@ use function collect;
 use Illuminate\Support\Collection;
 use Throwable;
 
-final class SliderSeeder extends \Database\Seeders\BaseSeeder
+final class SliderSeeder extends BaseSeeder
 {
     public function run(): void
     {

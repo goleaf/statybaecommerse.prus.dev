@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
-final class LocalProductImagesSeeder extends \Database\Seeders\BaseSeeder
+final class LocalProductImagesSeeder extends BaseSeeder
 {
     public function run(): void
     {

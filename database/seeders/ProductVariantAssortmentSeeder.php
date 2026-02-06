@@ -14,7 +14,7 @@ use App\Services\ProductVariantAttributeMatrixService;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
-final class ProductVariantAssortmentSeeder extends \Database\Seeders\BaseSeeder
+final class ProductVariantAssortmentSeeder extends BaseSeeder
 {
     private const INVENTORY_SCALE = 10;
 

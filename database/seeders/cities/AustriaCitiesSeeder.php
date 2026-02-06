@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace Database\Seeders\Cities;
 
 use App\Support\Locales;
+use Database\Seeders\BaseSeeder;
 
-final class AustriaCitiesSeeder extends \Database\Seeders\BaseSeeder
+final class AustriaCitiesSeeder extends BaseSeeder
 {
     public static function iso2(): string
     {

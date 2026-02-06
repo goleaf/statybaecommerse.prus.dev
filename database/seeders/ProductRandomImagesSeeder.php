@@ -9,7 +9,7 @@ use App\Services\Images\ProductImageService;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
-final class ProductRandomImagesSeeder extends \Database\Seeders\BaseSeeder
+final class ProductRandomImagesSeeder extends BaseSeeder
 {
     private ProductImageService $imageService;
 

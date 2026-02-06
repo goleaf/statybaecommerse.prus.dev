@@ -8,7 +8,7 @@ use App\Models\Discount;
 use App\Models\DiscountCode;
 use App\Models\DiscountRedemption;
 
-final class DiscountRedemptionSeeder extends \Database\Seeders\BaseSeeder
+final class DiscountRedemptionSeeder extends BaseSeeder
 {
     public function run(): void
     {

@@ -6,7 +6,7 @@ namespace Database\Seeders;
 
 use App\Models\ContactMessage;
 
-final class ContactMessageSeeder extends \Database\Seeders\BaseSeeder
+final class ContactMessageSeeder extends BaseSeeder
 {
     public function run(): void
     {

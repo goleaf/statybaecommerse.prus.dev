@@ -16,7 +16,7 @@ use App\Models\User;
 use App\Models\Zone;
 use Illuminate\Support\Str;
 
-final class OrderSeeder extends \Database\Seeders\BaseSeeder
+final class OrderSeeder extends BaseSeeder
 {
     public function run(): void
     {

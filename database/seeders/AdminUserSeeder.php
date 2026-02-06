@@ -6,7 +6,7 @@ namespace Database\Seeders;
 
 use App\Models\AdminUser;
 
-final class AdminUserSeeder extends \Database\Seeders\BaseSeeder
+final class AdminUserSeeder extends BaseSeeder
 {
     /**
      * Run the database seeds.

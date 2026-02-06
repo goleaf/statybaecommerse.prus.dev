@@ -6,7 +6,7 @@ namespace Database\Seeders;
 
 use App\Models\Channel;
 
-final class ChannelSeeder extends \Database\Seeders\BaseSeeder
+final class ChannelSeeder extends BaseSeeder
 {
     public function run(): void
     {

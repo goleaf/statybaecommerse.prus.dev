@@ -8,7 +8,7 @@ use App\Models\Location;
 use App\Models\Translations\LocationTranslation;
 use Illuminate\Support\Str;
 
-final class LocationSeeder extends \Database\Seeders\BaseSeeder
+final class LocationSeeder extends BaseSeeder
 {
     public function run(): void
     {

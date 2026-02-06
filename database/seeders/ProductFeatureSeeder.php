@@ -8,7 +8,7 @@ use App\Models\Product;
 use App\Models\ProductFeature;
 use Illuminate\Support\Arr;
 
-final class ProductFeatureSeeder extends \Database\Seeders\BaseSeeder
+final class ProductFeatureSeeder extends BaseSeeder
 {
     private const FEATURE_TEMPLATES = [
         'electronics' => [

@@ -10,7 +10,7 @@ use App\Services\Images\LocalImageGeneratorService;
 use Database\Seeders\Data\HouseBuilderCollections;
 use Throwable;
 
-final class CollectionSeeder extends \Database\Seeders\BaseSeeder
+final class CollectionSeeder extends BaseSeeder
 {
     private LocalImageGeneratorService $imageGenerator;
 

@@ -12,7 +12,7 @@ use Database\Factories\DocumentFactory;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Schema;
 
-final class DocumentSeeder extends \Database\Seeders\BaseSeeder
+final class DocumentSeeder extends BaseSeeder
 {
     /**
      * Cache whether the documents table exposes denormalised attribution columns.

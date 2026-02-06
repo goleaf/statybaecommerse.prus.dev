@@ -9,7 +9,7 @@ use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
-final class SuperAdminSeeder extends \Database\Seeders\BaseSeeder
+final class SuperAdminSeeder extends BaseSeeder
 {
     public function run(): void
     {

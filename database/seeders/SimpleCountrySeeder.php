@@ -7,7 +7,7 @@ namespace Database\Seeders;
 use App\Models\Country;
 use App\Models\Translations\CountryTranslation;
 
-final class SimpleCountrySeeder extends \Database\Seeders\BaseSeeder
+final class SimpleCountrySeeder extends BaseSeeder
 {
     public function run(): void
     {

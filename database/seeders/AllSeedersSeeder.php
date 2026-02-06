@@ -14,7 +14,7 @@ use function str_starts_with;
 /**
  * Seeder that automatically executes every seeder class found in the database/seeders directory.
  */
-final class AllSeedersSeeder extends \Database\Seeders\BaseSeeder
+final class AllSeedersSeeder extends BaseSeeder
 {
     /**
      * Core seeders that must run before the remaining classes to satisfy dependencies.

@@ -8,7 +8,7 @@ use App\Models\SystemSetting;
 use App\Models\SystemSettingCategory;
 use App\Models\User;
 
-final class SystemSettingSeeder extends \Database\Seeders\BaseSeeder
+final class SystemSettingSeeder extends BaseSeeder
 {
     /**
      * Run the database seeds.

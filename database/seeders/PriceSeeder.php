@@ -8,7 +8,7 @@ use App\Models\Currency;
 use App\Models\Price;
 use App\Models\Product;
 
-final class PriceSeeder extends \Database\Seeders\BaseSeeder
+final class PriceSeeder extends BaseSeeder
 {
     /**
      * Run the database seeds.

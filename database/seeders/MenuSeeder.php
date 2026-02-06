@@ -8,7 +8,7 @@ use App\Models\Category;
 use App\Models\Menu;
 use App\Models\MenuItem;
 
-final class MenuSeeder extends \Database\Seeders\BaseSeeder
+final class MenuSeeder extends BaseSeeder
 {
     public function run(): void
     {

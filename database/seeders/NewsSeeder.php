@@ -8,7 +8,7 @@ use App\Models\News;
 use App\Models\NewsImage;
 use App\Models\Translations\NewsTranslation;
 
-final class NewsSeeder extends \Database\Seeders\BaseSeeder
+final class NewsSeeder extends BaseSeeder
 {
     public function run(): void
     {

@@ -9,7 +9,7 @@ use App\Models\Category;
 use App\Models\Collection;
 use App\Models\Product;
 
-class TranslationSeeder extends \Database\Seeders\BaseSeeder
+class TranslationSeeder extends BaseSeeder
 {
     public function run(): void
     {

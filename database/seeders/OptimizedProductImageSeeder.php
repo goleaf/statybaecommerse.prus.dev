@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Log;
 use RuntimeException;
 use Throwable;
 
-final class OptimizedProductImageSeeder extends \Database\Seeders\BaseSeeder
+final class OptimizedProductImageSeeder extends BaseSeeder
 {
     private ProductImageService $imageService;
 

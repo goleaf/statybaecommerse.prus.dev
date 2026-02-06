@@ -7,7 +7,7 @@ namespace Database\Seeders;
 use App\Models\Product;
 use App\Models\VariantCombination;
 
-class VariantCombinationSeeder extends \Database\Seeders\BaseSeeder
+class VariantCombinationSeeder extends BaseSeeder
 {
     /**
      * Run the database seeds.

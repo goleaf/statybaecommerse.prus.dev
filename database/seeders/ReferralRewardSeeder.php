@@ -9,7 +9,7 @@ use App\Models\Referral;
 use App\Models\ReferralReward;
 use App\Models\User;
 
-final class ReferralRewardSeeder extends \Database\Seeders\BaseSeeder
+final class ReferralRewardSeeder extends BaseSeeder
 {
     public function run(): void
     {

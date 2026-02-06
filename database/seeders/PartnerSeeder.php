@@ -6,7 +6,7 @@ namespace Database\Seeders;
 
 use App\Models\Partner;
 
-final class PartnerSeeder extends \Database\Seeders\BaseSeeder
+final class PartnerSeeder extends BaseSeeder
 {
     public function run(): void
     {

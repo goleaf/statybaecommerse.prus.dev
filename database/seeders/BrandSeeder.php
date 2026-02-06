@@ -8,7 +8,7 @@ use App\Models\Brand;
 use App\Services\Images\LocalImageGeneratorService;
 use Throwable;
 
-final class BrandSeeder extends \Database\Seeders\BaseSeeder
+final class BrandSeeder extends BaseSeeder
 {
     public function run(): void
     {

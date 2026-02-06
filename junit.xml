@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\Seeders\SeederStandardizationTest" file="tests/Feature/Seeders/SeederStandardizationTest.php" tests="3" assertions="6" errors="0" failures="0" skipped="0" time="6.773862">
+    <testcase name="standard seeder registry is unique and valid" file="tests/Feature/Seeders/SeederStandardizationTest.php::standard seeder registry is unique and valid" class="Tests\Feature\Seeders\SeederStandardizationTest" classname="Tests.Feature.Seeders.SeederStandardizationTest" assertions="4" time="6.337942"/>
+    <testcase name="standard seeders keep model ownership overlap minimal and explicit" file="tests/Feature/Seeders/SeederStandardizationTest.php::standard seeders keep model ownership overlap minimal and explicit" class="Tests\Feature\Seeders\SeederStandardizationTest" classname="Tests.Feature.Seeders.SeederStandardizationTest" assertions="1" time="0.192772"/>
+    <testcase name="all concrete seeders extend the shared base seeder" file="tests/Feature/Seeders/SeederStandardizationTest.php::all concrete seeders extend the shared base seeder" class="Tests\Feature\Seeders\SeederStandardizationTest" classname="Tests.Feature.Seeders.SeederStandardizationTest" assertions="1" time="0.243149"/>
+  </testsuite>
+</testsuites>

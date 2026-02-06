@@ -14,7 +14,7 @@ use Database\Seeders\Data\HouseBuilderCollections;
 use Illuminate\Support\Str;
 use Throwable;
 
-class CollectionProductSeeder extends \Database\Seeders\BaseSeeder
+class CollectionProductSeeder extends BaseSeeder
 {
     private LocalImageGeneratorService $imageGenerator;
 

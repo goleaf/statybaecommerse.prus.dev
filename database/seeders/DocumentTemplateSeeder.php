@@ -6,7 +6,7 @@ namespace Database\Seeders;
 
 use App\Models\DocumentTemplate;
 
-final class DocumentTemplateSeeder extends \Database\Seeders\BaseSeeder
+final class DocumentTemplateSeeder extends BaseSeeder
 {
     public function run(): void
     {

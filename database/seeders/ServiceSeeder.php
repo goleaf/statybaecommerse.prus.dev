@@ -6,7 +6,7 @@ namespace Database\Seeders;
 
 use App\Models\Service;
 
-class ServiceSeeder extends \Database\Seeders\BaseSeeder
+class ServiceSeeder extends BaseSeeder
 {
     /**
      * Run the database seeds.

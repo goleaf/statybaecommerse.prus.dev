@@ -7,7 +7,7 @@ namespace Database\Seeders;
 use App\Models\Attribute;
 use App\Models\Translations\AttributeTranslation;
 
-final class AttributeSeeder extends \Database\Seeders\BaseSeeder
+final class AttributeSeeder extends BaseSeeder
 {
     public function run(): void
     {

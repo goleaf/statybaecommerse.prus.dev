@@ -27,7 +27,7 @@ use Throwable;
  * - Generates local placeholder images via LocalImageGeneratorService
  * - Leverages model events and relationships for data integrity
  */
-final class TurboEcommerceSeeder extends \Database\Seeders\BaseSeeder
+final class TurboEcommerceSeeder extends BaseSeeder
 {
     private LocalImageGeneratorService $imageGen;
 

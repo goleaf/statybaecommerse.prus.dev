@@ -6,7 +6,7 @@ namespace Database\Seeders;
 
 use App\Models\FeatureFlag;
 
-final class FeatureFlagSeeder extends \Database\Seeders\BaseSeeder
+final class FeatureFlagSeeder extends BaseSeeder
 {
     public function run(): void
     {

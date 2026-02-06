@@ -6,7 +6,7 @@ namespace Database\Seeders;
 
 use App\Models\Coupon;
 
-final class CouponSeeder extends \Database\Seeders\BaseSeeder
+final class CouponSeeder extends BaseSeeder
 {
     public function run(): void
     {

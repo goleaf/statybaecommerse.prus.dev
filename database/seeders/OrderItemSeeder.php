@@ -13,7 +13,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
-final class OrderItemSeeder extends \Database\Seeders\BaseSeeder
+final class OrderItemSeeder extends BaseSeeder
 {
     /**
      * Run the database seeds.

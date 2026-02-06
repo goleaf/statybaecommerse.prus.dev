@@ -7,7 +7,7 @@ namespace Database\Seeders;
 use App\Models\SystemSetting;
 use App\Models\SystemSettingCategory;
 
-final class SimpleSystemSettingsSeeder extends \Database\Seeders\BaseSeeder
+final class SimpleSystemSettingsSeeder extends BaseSeeder
 {
     public function run(): void
     {

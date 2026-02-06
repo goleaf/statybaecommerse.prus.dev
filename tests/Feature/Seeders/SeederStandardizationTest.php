@@ -65,3 +65,80 @@ test('standard seeder registry is unique and valid', function (): void {
     expect($duplicates)->toBe([]);
     expect($invalid)->toBe([]);
 });
+
+test('standard seeders keep model ownership overlap minimal and explicit', function (): void {
+    $allowedOverlaps = [
+        'Attribute' => [
+            'Database\\Seeders\\AttributeSeeder',
+            'Database\\Seeders\\AttributeValueSeeder',
+            'Database\\Seeders\\TurboEcommerceSeeder',
+        ],
+        'Brand' => [
+            'Database\\Seeders\\BrandSeeder',
+            'Database\\Seeders\\TurboEcommerceSeeder',
+        ],
+        'Category' => [
+            'Database\\Seeders\\CategorySeeder',
+            'Database\\Seeders\\TurboEcommerceSeeder',
+        ],
+        'Country' => [
+            'Database\\Seeders\\CountrySeeder',
+            'Database\\Seeders\\Cities\\CitiesMergedSeeder',
+        ],
+    ];
+
+    $classes = config('seeds.standard_seeders', []);
+    $modelsByClass = [];
+
+    foreach ($classes as $class) {
+        if (! is_string($class) || ! class_exists($class)) {
+            continue;
+        }
+
+        $file = (new \ReflectionClass($class))->getFileName();
+
+        if (! is_string($file) || ! file_exists($file)) {
+            continue;
+        }
+
+        $modelsByClass[$class] = collect(file($file) ?: [])
+            ->map(static fn (string $line): string => trim($line))
+            ->map(static function (string $line): ?string {
+                if (! preg_match('/^use\\s+App\\\\Models\\\\([^;]+);/', $line, $matches)) {
+                    return null;
+                }
+
+                return $matches[1];
+            })
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
+    }
+
+    $ownersByModel = [];
+
+    foreach ($modelsByClass as $class => $models) {
+        foreach ($models as $model) {
+            $ownersByModel[$model][] = $class;
+        }
+    }
+
+    $unexpectedOverlaps = collect($ownersByModel)
+        ->filter(static fn (array $owners): bool => count($owners) > 1)
+        ->map(static fn (array $owners): array => array_values(array_unique($owners)))
+        ->reject(static function (array $owners, string $model) use ($allowedOverlaps): bool {
+            $allowed = $allowedOverlaps[$model] ?? null;
+            if (! is_array($allowed)) {
+                return false;
+            }
+
+            sort($owners);
+            sort($allowed);
+
+            return $owners === $allowed;
+        })
+        ->all();
+
+    expect($unexpectedOverlaps)->toBe([]);
+});

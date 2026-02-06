@@ -8,7 +8,7 @@ use App\Models\Discount;
 use App\Models\DiscountCode;
 use Illuminate\Database\Seeder;
 
-final class DiscountCodeSeeder extends \Database\Seeders\BaseSeeder
+final class DiscountCodeSeeder extends BaseSeeder
 {
     public function run(): void
     {

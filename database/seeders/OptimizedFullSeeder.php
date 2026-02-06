@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\DB;
 /**
  * Optimized full-profile seeder that executes only the core, production-relevant fixtures.
  */
-final class OptimizedFullSeeder extends \Database\Seeders\BaseSeeder
+final class OptimizedFullSeeder extends BaseSeeder
 {
     use WithoutModelEvents;
 

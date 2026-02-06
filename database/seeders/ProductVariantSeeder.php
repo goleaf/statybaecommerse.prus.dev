@@ -15,7 +15,7 @@ use App\Models\VariantPricingRule;
 use App\Services\ProductVariantAttributeMatrixService;
 use Illuminate\Support\Str;
 
-final class ProductVariantSeeder extends \Database\Seeders\BaseSeeder
+final class ProductVariantSeeder extends BaseSeeder
 {
     /**
      * Run the database seeds.

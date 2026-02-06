@@ -7,7 +7,7 @@ namespace Database\Seeders;
 use App\Models\Legal;
 use App\Models\Translations\LegalTranslation;
 
-class LegalSeeder extends \Database\Seeders\BaseSeeder
+class LegalSeeder extends BaseSeeder
 {
     public function run(): void
     {

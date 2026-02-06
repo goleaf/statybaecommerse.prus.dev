@@ -18,7 +18,7 @@ use App\Models\ReferralReward;
 use App\Models\Subscriber;
 use App\Models\User;
 
-final class UserRelationsSeeder extends \Database\Seeders\BaseSeeder
+final class UserRelationsSeeder extends BaseSeeder
 {
     /**
      * Run the database seeds.

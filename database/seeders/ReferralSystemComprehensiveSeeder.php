@@ -15,7 +15,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
-final class ReferralSystemComprehensiveSeeder extends \Database\Seeders\BaseSeeder
+final class ReferralSystemComprehensiveSeeder extends BaseSeeder
 {
     public function run(): void
     {

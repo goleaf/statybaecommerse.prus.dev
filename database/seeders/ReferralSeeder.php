@@ -9,7 +9,7 @@ use App\Models\ReferralCode;
 use App\Models\ReferralReward;
 use App\Models\User;
 
-final class ReferralSeeder extends \Database\Seeders\BaseSeeder
+final class ReferralSeeder extends BaseSeeder
 {
     /**
      * Run the database seeds.

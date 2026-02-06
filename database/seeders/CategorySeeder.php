@@ -9,7 +9,7 @@ use App\Services\Images\LocalImageGeneratorService;
 use Exception;
 use Illuminate\Support\Str;
 
-final class CategorySeeder extends \Database\Seeders\BaseSeeder
+final class CategorySeeder extends BaseSeeder
 {
     private LocalImageGeneratorService $imageGenerator;
 

@@ -8,7 +8,7 @@ use App\Models\Country;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
-final class CountriesTableSeeder extends \Database\Seeders\BaseSeeder
+final class CountriesTableSeeder extends BaseSeeder
 {
     public function run(): void
     {

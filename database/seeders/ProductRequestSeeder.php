@@ -8,7 +8,7 @@ use App\Models\Product;
 use App\Models\ProductRequest;
 use App\Models\User;
 
-final class ProductRequestSeeder extends \Database\Seeders\BaseSeeder
+final class ProductRequestSeeder extends BaseSeeder
 {
     /**
      * Run the database seeds.

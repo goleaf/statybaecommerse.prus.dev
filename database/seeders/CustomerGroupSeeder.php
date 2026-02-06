@@ -7,7 +7,7 @@ namespace Database\Seeders;
 use App\Models\CustomerGroup;
 use Illuminate\Support\Str;
 
-final class CustomerGroupSeeder extends \Database\Seeders\BaseSeeder
+final class CustomerGroupSeeder extends BaseSeeder
 {
     public function run(): void
     {

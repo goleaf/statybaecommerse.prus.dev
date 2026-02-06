@@ -16,7 +16,7 @@ use RuntimeException;
  * existing automation can continue calling `CitySeeder` while guaranteeing the
  * merged toolkit remains the single entry point.
  */
-final class CitySeeder extends \Database\Seeders\BaseSeeder
+final class CitySeeder extends BaseSeeder
 {
     public function run(): void
     {

@@ -11,7 +11,7 @@ use App\Models\ProductVariant;
 use App\Models\VariantInventory;
 use Illuminate\Support\Facades\Schema;
 
-final class InventorySeeder extends \Database\Seeders\BaseSeeder
+final class InventorySeeder extends BaseSeeder
 {
     public function run(): void
     {

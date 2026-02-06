@@ -10,7 +10,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 use Throwable;
 
-final class LithuanianCatalogSeeder extends \Database\Seeders\BaseSeeder
+final class LithuanianCatalogSeeder extends BaseSeeder
 {
     private LocalImageGeneratorService $imageGenerator;
 

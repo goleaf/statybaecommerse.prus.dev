@@ -9,7 +9,7 @@ use App\Services\Images\GradientImageService;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
-final class ProductPlaceholdersSeeder extends \Database\Seeders\BaseSeeder
+final class ProductPlaceholdersSeeder extends BaseSeeder
 {
     public function run(): void
     {

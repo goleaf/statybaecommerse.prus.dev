@@ -9,7 +9,7 @@ use App\Models\User;
 
 use function collect;
 
-final class SubscriberSeeder extends \Database\Seeders\BaseSeeder
+final class SubscriberSeeder extends BaseSeeder
 {
     public function run(): void
     {

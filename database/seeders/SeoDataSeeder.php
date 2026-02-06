@@ -9,7 +9,7 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\SeoData;
 
-final class SeoDataSeeder extends \Database\Seeders\BaseSeeder
+final class SeoDataSeeder extends BaseSeeder
 {
     public function run(): void
     {

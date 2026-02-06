@@ -7,7 +7,7 @@ namespace Database\Seeders;
 use App\Models\Setting;
 use Illuminate\Support\Arr;
 
-final class SettingsSeeder extends \Database\Seeders\BaseSeeder
+final class SettingsSeeder extends BaseSeeder
 {
     public function run(): void
     {

@@ -7,7 +7,7 @@ namespace Database\Seeders;
 use App\Models\CustomerGroup;
 use App\Models\User;
 
-final class GroupSeeder extends \Database\Seeders\BaseSeeder
+final class GroupSeeder extends BaseSeeder
 {
     public function run(): void
     {

@@ -13,7 +13,7 @@ use App\Models\ProductVariant;
 use App\Models\VariantAttributeValue;
 use Illuminate\Support\Str;
 
-final class ComprehensiveProductVariantSeeder extends \Database\Seeders\BaseSeeder
+final class ComprehensiveProductVariantSeeder extends BaseSeeder
 {
     /**
      * Run the database seeds.

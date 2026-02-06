@@ -6,7 +6,7 @@ namespace Database\Seeders;
 
 use App\Models\Currency;
 
-final class PriceListSeeder extends \Database\Seeders\BaseSeeder
+final class PriceListSeeder extends BaseSeeder
 {
     public function run(): void
     {

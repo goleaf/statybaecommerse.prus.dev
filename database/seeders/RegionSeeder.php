@@ -9,7 +9,7 @@ use App\Models\Region;
 use App\Models\Translations\RegionTranslation;
 use App\Models\Zone;
 
-class RegionSeeder extends \Database\Seeders\BaseSeeder
+class RegionSeeder extends BaseSeeder
 {
     public function run(): void
     {

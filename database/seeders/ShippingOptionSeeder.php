@@ -9,7 +9,7 @@ use App\Models\Country;
 use App\Models\ShippingOption;
 use App\Models\Zone;
 
-class ShippingOptionSeeder extends \Database\Seeders\BaseSeeder
+class ShippingOptionSeeder extends BaseSeeder
 {
     /**
      * Run the database seeds.

@@ -10,7 +10,7 @@ use App\Models\Organization;
 use App\Models\Project;
 use App\Models\User;
 
-final class OrganizationSeeder extends \Database\Seeders\BaseSeeder
+final class OrganizationSeeder extends BaseSeeder
 {
     /**
      * Run the database seeds.

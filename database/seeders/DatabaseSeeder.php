@@ -13,7 +13,7 @@ use Illuminate\Database\Seeder;
 
 use function is_string;
 
-final class DatabaseSeeder extends \Database\Seeders\BaseSeeder
+final class DatabaseSeeder extends BaseSeeder
 {
     use WithoutModelEvents;
 
