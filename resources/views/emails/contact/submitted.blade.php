@@ -18,7 +18,7 @@
 
 > {{ $contactMessage->message }}
 
-{{ __('messages.mail) }},  
-{{ config(') }},  
+{{ __('messages.mail') }},  
+{{ config('app.name') }}  
 {{ config('app.name') }}
 </x-mail::message>

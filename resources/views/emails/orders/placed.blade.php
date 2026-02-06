@@ -1,7 +1,7 @@
 @component('mail::message')
     # {{ __('messages.mail') }}
 
-    {{ trans_choice('messages.mail, 1, ['number' => $order->number]) }}
+    {{ __('messages.mail', ['number' => $order->number]) }}
 
     @component('mail::panel')
         {{ __('messages.mail') }}: {{ format_money($order->grand_total_amount, $order->currency_code) }}

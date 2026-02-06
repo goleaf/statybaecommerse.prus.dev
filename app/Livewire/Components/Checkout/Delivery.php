@@ -336,15 +336,7 @@ final class Delivery extends StepComponent
         if ($finalAmount <= 0.0) {
             $badges[] = [
                 'type'  => 'free',
-                'label' => __('messages.ecommerce),
-            ];
-
-            return $badges;
-        }
-
-        if ($discountAmount > 0.0 && $finalAmount < $baseAmount) {
-            $badges[] = [
-                '),
+                'label' => __('translations.free_shipping_from'),
             ];
 
             return $badges;
@@ -353,8 +345,10 @@ final class Delivery extends StepComponent
         if ($discountAmount > 0.0 && $finalAmount < $baseAmount) {
             $badges[] = [
                 'type'  => 'capped',
-                'label' => __('messages.shipping_capped_at_amount', ['amount' => app_money_format($finalAmount, $currency)]),
+                'label' => __('messages.Shipping capped at :amount', ['amount' => app_money_format($finalAmount, $currency)]),
             ];
+
+            return $badges;
         }
 
         return $badges;

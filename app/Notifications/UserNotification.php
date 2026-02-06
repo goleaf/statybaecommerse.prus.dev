@@ -66,15 +66,12 @@ final class UserNotification extends Notification
     {
         // Resolve a localized title based on the action type.
         return match ($this->action) {
-            'registered' => __('messages.notifications),
-            '),
+            'registered' => __('messages.notifications'),
             'profile_updated'  => __('notifications.user.profile_updated'),
             'password_changed' => __('notifications.user.password_changed'),
             'email_verified'   => __('notifications.user.email_verified'),
-            'login'            => __('messages.notifications),
-            '),
-            'logout' => __('messages.notifications),
-            '),
+            'login'            => __('messages.notifications'),
+            'logout' => __('messages.notifications'),
             'account_suspended' => __('notifications.user.account_suspended'),
             'account_activated' => __('notifications.user.account_activated'),
             default             => __('notifications.user.profile_updated'),

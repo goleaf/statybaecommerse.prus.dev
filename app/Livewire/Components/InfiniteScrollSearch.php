@@ -226,41 +226,28 @@ final class InfiniteScrollSearch extends Component
     public function getSortOptionsProperty(): array
     {
         return [
-            'relevance' => __('messages.frontend),
-            '),
-            'name' => __('messages.frontend),
-            '),
-            'price' => __('messages.frontend),
-            '),
-            'date' => __('messages.frontend),
-            '),
-            'rating' => __('messages.frontend),
+            'relevance' => __('frontend.search_results.sort.relevance'),
+            'name' => __('frontend.search_results.sort.name_a_z'),
+            'price' => __('frontend.search_results.sort.price_low_high'),
+            'date' => __('frontend.search_results.sort.newest'),
+            'rating' => __('frontend.search_results.sort.highest_rated'),
         ];
     }
 
     public function getTypeOptionsProperty(): array
     {
         return [
-            '),
-        ];
-    }
-
-    public function getTypeOptionsProperty(): array
-    {
-        return [
-            'products' => __('messages.frontend),
-            '),
-            'categories'  => __('frontend.categories'),
-            'brands'      => __('frontend.brands'),
-            'collections' => __('frontend.collections'),
-            'attributes'  => __('frontend.attributes'),
-            'locations'   => __('messages.frontend),
-            '),
-            'countries' => __('frontend.countries'),
-            'cities'    => __('messages.frontend'),
-            'orders'    => __('messages.frontend'),
-            'customers' => __('messages.frontend'),
-            'addresses' => __('messages.frontend'),
+            'products' => __('messages.products'),
+            'categories' => __('messages.categories'),
+            'brands' => __('messages.brands'),
+            'collections' => __('messages.collections'),
+            'attributes' => __('messages.attributes'),
+            'locations' => __('messages.locations'),
+            'countries' => __('messages.countries'),
+            'cities' => __('messages.cities'),
+            'orders' => __('messages.orders'),
+            'customers' => __('messages.customers'),
+            'addresses' => __('messages.addresses'),
         ];
     }
 }
