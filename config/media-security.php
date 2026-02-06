@@ -21,8 +21,6 @@ return [
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         'text/csv',
         'text/plain',
-        'text/xml',
-        'application/xml',
     ],
     'allowed_extensions' => [
         'jpg',
@@ -39,6 +37,5 @@ return [
         'xlsx',
         'csv',
         'txt',
-        'xml',
     ],
 ];

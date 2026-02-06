@@ -7,7 +7,6 @@ namespace App\Services;
 use Exception;
 use Illuminate\Support\Facades\Cache;
 use Log;
-use SimpleXMLElement;
 use Throwable;
 
 /**
@@ -30,6 +29,10 @@ final class SearchExportService
     {
         try {
             $format = strtolower($format);
+
+            if ($format === 'xml') {
+                $format = 'csv';
+            }
             $exportId = $this->generateExportId($query, $format, $options);
 
             // Limit results for export
@@ -158,7 +161,6 @@ final class SearchExportService
         return match ($format) {
             'json'  => $this->formatAsJson($results, $options),
             'csv'   => $this->formatAsCsv($results, $options),
-            'xml'   => $this->formatAsXml($results, $options),
             'xlsx'  => $this->formatAsXlsx($results, $options),
             default => $this->formatAsJson($results, $options),
         };
@@ -209,44 +211,11 @@ final class SearchExportService
     }
 
     /**
-     * Handle formatAsXml functionality with proper error handling.
-     */
-    private function formatAsXml(array $results, array $options): string
-    {
-        $rootElement = $options['root_element'] ?? 'search_results';
-        $itemElement = $options['item_element'] ?? 'result';
-
-        $xml = new SimpleXMLElement("<{$rootElement}></{$rootElement}>");
-
-        foreach ($results as $result) {
-            $item = $xml->addChild($itemElement);
-            $this->arrayToXml($result, $item);
-        }
-
-        return $xml->asXML();
-    }
-
-    /**
      * Handle formatAsXlsx functionality with proper error handling.
      */
     private function formatAsXlsx(array $results, array $options): string
     {
         return $this->formatAsCsv($results, $options);
-    }
-
-    /**
-     * Handle arrayToXml functionality with proper error handling.
-     */
-    private function arrayToXml(array $data, SimpleXMLElement $xml): void
-    {
-        foreach ($data as $key => $value) {
-            if (is_array($value)) {
-                $child = $xml->addChild($key);
-                $this->arrayToXml($value, $child);
-            } else {
-                $xml->addChild($key, htmlspecialchars((string) $value));
-            }
-        }
     }
 
     /**

@@ -499,188 +499,146 @@ Route::get('/robots.txt', App\Http\Controllers\RobotsController::class)->name('r
 Route::get('/sitemap.xml', [App\Http\Controllers\SitemapController::class, 'index'])->name('sitemap');
 Route::get('/{locale}/sitemap.xml', [App\Http\Controllers\SitemapController::class, 'locale'])->name('sitemap.locale');
 
-// Catalog XML (products / categories) — on-the-fly via service with file fallback
-Route::get('/catalog.xml', function (\Illuminate\Http\Request $request) {
+Route::get('/catalog.csv', function (\Illuminate\Http\Request $request) {
     $only = (string) $request->query('only', 'products');
-    if (! in_array($only, ['all', 'products', 'categories'], true)) {
-        $only = 'products';
+
+    if ($only === 'categories') {
+        return redirect()->route('categories.csv');
     }
 
-    try {
-        /** @var App\Services\XmlCatalogService $svc */
-        $svc = app(App\Services\XmlCatalogService::class);
-        $xml = $svc->export('', ['only' => $only]);
-        if ($xml !== '') {
-            return response($xml, 200, ['Content-Type' => 'application/xml; charset=utf-8']);
-        }
-    } catch (\Throwable $e) {
-        // fall back to static file below
+    if ($only === 'all') {
+        return redirect()->route('products.csv');
     }
 
-    $path = public_path('catalog-products.xml');
-    if (is_file($path)) {
-        return response()->file($path, ['Content-Type' => 'application/xml; charset=utf-8']);
-    }
+    return redirect()->route('products.csv');
+})->name('catalog.csv');
 
-    return response('<?xml version="1.0" encoding="UTF-8"?><catalog/>', 200, ['Content-Type' => 'application/xml; charset=utf-8']);
-})->name('catalog.xml');
-
-Route::get('/{locale}/catalog.xml', function (string $locale, \Illuminate\Http\Request $request) {
+Route::get('/{locale}/catalog.csv', function (string $locale, \Illuminate\Http\Request $request) {
     app()->setLocale($locale);
+
     $only = (string) $request->query('only', 'products');
-    if (! in_array($only, ['all', 'products', 'categories'], true)) {
-        $only = 'products';
+    if ($only === 'categories') {
+        return redirect()->route('categories.csv');
     }
 
-    try {
-        /** @var App\Services\XmlCatalogService $svc */
-        $svc = app(App\Services\XmlCatalogService::class);
-        $xml = $svc->export('', ['only' => $only]);
-        if ($xml !== '') {
-            return response($xml, 200, ['Content-Type' => 'application/xml; charset=utf-8']);
-        }
-    } catch (\Throwable $e) {
-        // fall back to static file below
-    }
-
-    $path = public_path('catalog-products.xml');
-    if (is_file($path)) {
-        return response()->file($path, ['Content-Type' => 'application/xml; charset=utf-8']);
-    }
-
-    return response('<?xml version="1.0" encoding="UTF-8"?><catalog/>', 200, ['Content-Type' => 'application/xml; charset=utf-8']);
+    return redirect()->route('products.csv');
 })->where(['locale' => '[A-Za-z\-_]+'])->name('catalog.locale');
 
-// Separate feeds: products.xml
-Route::get('/products.xml', function () {
-    $doc = new \DOMDocument('1.0', 'UTF-8');
-    $doc->formatOutput = true;
-    $root = $doc->createElement('products');
-    $doc->appendChild($root);
-
+Route::get('/products.csv', function () {
     $locale = 'lt';
 
-    \App\Models\Product::query()
-        ->with(['categories:id'])
-        ->orderBy('id')
-        ->chunk(250, function ($chunk) use ($doc, $root, $locale) {
-            // Preload attribute pivots for the chunk
-            $productIds = $chunk->pluck('id')->all();
-            $pivots = \DB::table('product_attributes')
-                ->select('product_id', 'attribute_id', 'attribute_value_id')
-                ->whereIn('product_id', $productIds)
-                ->get()
-                ->groupBy('product_id');
+    $headers = [
+        'Content-Type'        => 'text/csv; charset=UTF-8',
+        'Content-Disposition' => 'attachment; filename="products.csv"',
+    ];
 
-            // Preload translations for attributes and values (lt)
-            $attributeIds = $pivots->flatten()->pluck('attribute_id')->unique()->values()->all();
-            $valueIds = $pivots->flatten()->pluck('attribute_value_id')->unique()->values()->all();
+    return response()->streamDownload(function () use ($locale): void {
+        $output = fopen('php://output', 'wb');
 
-            $attrNames = \DB::table('attribute_translations')
-                ->select('attribute_id', 'name')
-                ->where('locale', $locale)
-                ->whereIn('attribute_id', $attributeIds ?: [0])
-                ->get()
-                ->keyBy('attribute_id');
+        if ($output === false) {
+            return;
+        }
 
-            $valTexts = \DB::table('attribute_value_translations')
-                ->select('attribute_value_id', 'value')
-                ->where('locale', $locale)
-                ->whereIn('attribute_value_id', $valueIds ?: [0])
-                ->get()
-                ->keyBy('attribute_value_id');
+        fputcsv($output, ['id', 'sku', 'slug', 'category_ids', 'attributes']);
 
-            foreach ($chunk as $product) {
-                $pEl = $doc->createElement('product');
-                $pEl->appendChild($doc->createElement('id', (string) $product->id));
-                if (! empty($product->sku)) {
-                    $pEl->appendChild($doc->createElement('sku', (string) $product->sku));
-                }
-                if (! empty($product->slug)) {
-                    $pEl->appendChild($doc->createElement('slug', (string) $product->slug));
-                }
+        \App\Models\Product::query()
+            ->with(['categories:id'])
+            ->orderBy('id')
+            ->chunk(250, function ($chunk) use ($output, $locale): void {
+                $productIds = $chunk->pluck('id')->all();
+                $pivots = \DB::table('product_attributes')
+                    ->select('product_id', 'attribute_id', 'attribute_value_id')
+                    ->whereIn('product_id', $productIds)
+                    ->get()
+                    ->groupBy('product_id');
 
-                // Category relations by ID
-                $catIdsEl = $doc->createElement('category_ids');
-                foreach ($product->categories as $cat) {
-                    $catIdsEl->appendChild($doc->createElement('category_id', (string) $cat->id));
-                }
-                $pEl->appendChild($catIdsEl);
+                $attributeIds = $pivots->flatten()->pluck('attribute_id')->unique()->values()->all();
+                $valueIds = $pivots->flatten()->pluck('attribute_value_id')->unique()->values()->all();
 
-                // Attributes (LT only)
-                $attrsEl = $doc->createElement('attributes');
-                foreach (($pivots[$product->id] ?? collect()) as $pv) {
-                    $attrEl = $doc->createElement('attribute');
-                    $attrEl->setAttribute('id', (string) $pv->attribute_id);
+                $attrNames = \DB::table('attribute_translations')
+                    ->select('attribute_id', 'name')
+                    ->where('locale', $locale)
+                    ->whereIn('attribute_id', $attributeIds ?: [0])
+                    ->get()
+                    ->keyBy('attribute_id');
 
-                    $name = (string) ($attrNames[$pv->attribute_id]->name ?? '');
-                    if ($name !== '') {
-                        $nameEl = $doc->createElement('name', $name);
-                        $nameEl->setAttribute('locale', $locale);
-                        $attrEl->appendChild($nameEl);
+                $valTexts = \DB::table('attribute_value_translations')
+                    ->select('attribute_value_id', 'value')
+                    ->where('locale', $locale)
+                    ->whereIn('attribute_value_id', $valueIds ?: [0])
+                    ->get()
+                    ->keyBy('attribute_value_id');
+
+                foreach ($chunk as $product) {
+                    $categoryIds = $product->categories->pluck('id')->implode('|');
+                    $attributes = [];
+
+                    foreach (($pivots[$product->id] ?? collect()) as $pivot) {
+                        $name = (string) ($attrNames[$pivot->attribute_id]->name ?? '');
+                        $value = (string) ($valTexts[$pivot->attribute_value_id]->value ?? '');
+
+                        if ($name === '' && $value === '') {
+                            continue;
+                        }
+
+                        $attributes[] = trim($name . ':' . $value, ':');
                     }
 
-                    if (! empty($pv->attribute_value_id)) {
-                        $valueText = (string) ($valTexts[$pv->attribute_value_id]->value ?? '');
-                        $valEl = $doc->createElement('value', $valueText);
-                        $valEl->setAttribute('id', (string) $pv->attribute_value_id);
-                        $valEl->setAttribute('locale', $locale);
-                        $attrEl->appendChild($valEl);
-                    }
-
-                    $attrsEl->appendChild($attrEl);
+                    fputcsv($output, [
+                        $product->id,
+                        (string) ($product->sku ?? ''),
+                        (string) ($product->slug ?? ''),
+                        $categoryIds,
+                        implode('|', $attributes),
+                    ]);
                 }
-                $pEl->appendChild($attrsEl);
+            });
 
-                $root->appendChild($pEl);
-            }
-        });
+        fclose($output);
+    }, 'products.csv', $headers);
+})->name('products.csv');
 
-    return response($doc->saveXML() ?: '', 200, ['Content-Type' => 'application/xml; charset=utf-8']);
-})->name('products.xml');
-
-// Separate feeds: categories.xml
-Route::get('/categories.xml', function () {
-    $doc = new \DOMDocument('1.0', 'UTF-8');
-    $doc->formatOutput = true;
-    $root = $doc->createElement('categories');
-    $doc->appendChild($root);
-
+Route::get('/categories.csv', function () {
     $locale = 'lt';
 
-    \App\Models\Category::query()
-        ->orderBy('id')
-        ->chunk(500, function ($chunk) use ($doc, $root, $locale) {
-            // Preload LT names
-            $categoryIds = $chunk->pluck('id')->all();
-            $names = \DB::table('category_translations')
-                ->select('category_id', 'name')
-                ->where('locale', $locale)
-                ->whereIn('category_id', $categoryIds ?: [0])
-                ->get()
-                ->keyBy('category_id');
+    $headers = [
+        'Content-Type'        => 'text/csv; charset=UTF-8',
+        'Content-Disposition' => 'attachment; filename="categories.csv"',
+    ];
 
-            foreach ($chunk as $cat) {
-                $cEl = $doc->createElement('category');
-                $cEl->appendChild($doc->createElement('id', (string) $cat->id));
-                if (! is_null($cat->parent_id)) {
-                    $cEl->appendChild($doc->createElement('parent_id', (string) $cat->parent_id));
-                }
-                if (! empty($cat->slug)) {
-                    $cEl->appendChild($doc->createElement('slug', (string) $cat->slug));
-                }
-                $name = (string) ($names[$cat->id]->name ?? '');
-                if ($name !== '') {
-                    $nameEl = $doc->createElement('name', $name);
-                    $nameEl->setAttribute('locale', $locale);
-                    $cEl->appendChild($nameEl);
-                }
-                $root->appendChild($cEl);
-            }
-        });
+    return response()->streamDownload(function () use ($locale): void {
+        $output = fopen('php://output', 'wb');
 
-    return response($doc->saveXML() ?: '', 200, ['Content-Type' => 'application/xml; charset=utf-8']);
-})->name('categories.xml');
+        if ($output === false) {
+            return;
+        }
+
+        fputcsv($output, ['id', 'parent_id', 'slug', 'name']);
+
+        \App\Models\Category::query()
+            ->orderBy('id')
+            ->chunk(500, function ($chunk) use ($output, $locale): void {
+                $categoryIds = $chunk->pluck('id')->all();
+                $names = \DB::table('category_translations')
+                    ->select('category_id', 'name')
+                    ->where('locale', $locale)
+                    ->whereIn('category_id', $categoryIds ?: [0])
+                    ->get()
+                    ->keyBy('category_id');
+
+                foreach ($chunk as $category) {
+                    fputcsv($output, [
+                        $category->id,
+                        $category->parent_id,
+                        (string) ($category->slug ?? ''),
+                        (string) ($names[$category->id]->name ?? ''),
+                    ]);
+                }
+            });
+
+        fclose($output);
+    }, 'categories.csv', $headers);
+})->name('categories.csv');
 
 // Exports browser and downloads (protected)
 Route::middleware('auth')->group(function (): void {
