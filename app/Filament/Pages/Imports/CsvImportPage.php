@@ -848,7 +848,7 @@ abstract class CsvImportPage extends Page implements HasForms
         $successful = ProgressCounter::normalizeSuccessful((int) ($import->successful_rows ?? 0), $processed, $total);
         $failed = $this->calculateFailedRowsCount($import);
         $percent = $this->calculateProgressPercent($processed, $total);
-        $status = ($import->completed_at !== null || ($total > 0 && $processed >= $total)) ? 'completed' : 'running';
+        $status = $this->resolveImportStatus($import, $processed, $total);
 
         $this->importProgress = [
             'processed'  => $processed,
@@ -971,11 +971,18 @@ abstract class CsvImportPage extends Page implements HasForms
         $normalizedTotal = ProgressCounter::normalizeTotal((int) ($import->total_rows ?? 0));
         $normalizedProcessed = ProgressCounter::normalizeProcessed((int) ($import->processed_rows ?? 0), $normalizedTotal);
 
-        if ($normalizedTotal > 0 && $normalizedProcessed >= $normalizedTotal) {
+        if ($this->resolveImportStatus($import, $normalizedProcessed, $normalizedTotal) === 'completed') {
             $import->touch('completed_at');
             $this->isImporting = false;
             $this->notifyImportCompleted($import);
         }
+    }
+
+    protected function resolveImportStatus(Import $import, int $processedRows, int $totalRows): string
+    {
+        return ($import->completed_at !== null || ($totalRows > 0 && $processedRows >= $totalRows))
+            ? 'completed'
+            : 'running';
     }
 
     protected function normalizeImportPayload(mixed $payload): mixed

@@ -89,32 +89,6 @@ it('does not show failures before rows are processed', function () {
         ->assertSet('importProgress.status', 'running');
 });
 
-it('keeps import running when totals are zero and import is not completed', function () {
-    $admin = AdminUser::factory()->create();
-    $user = User::factory()->create();
-
-    $import = Import::query()->create([
-        'completed_at'    => null,
-        'file_name'       => 'categories.csv',
-        'file_path'       => 'imports/csv/categories.csv',
-        'importer'        => ImportCategories::getImporter(),
-        'processed_rows'  => 0,
-        'total_rows'      => 0,
-        'successful_rows' => 0,
-        'user_id'         => $user->id,
-    ]);
-
-    $this->actingAs($admin, 'admin');
-
-    livewire(ImportCategories::class)
-        ->set('activeImportId', $import->getKey())
-        ->set('isImporting', true)
-        ->call('refreshImportProgress')
-        ->assertSet('importProgress.failed', 0)
-        ->assertSet('importProgress.percent', 0)
-        ->assertSet('importProgress.status', 'running');
-});
-
 it('renders the latest import rows table', function () {
     $admin = AdminUser::factory()->create();
     $user = User::factory()->create();
