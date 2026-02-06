@@ -113,6 +113,14 @@ final class CsvImportProcessor
                     'successful_rows' => new Expression('total_rows'),
                 ]);
 
+            $import::query()
+                ->whereKey($import)
+                ->whereColumn('successful_rows', '>', 'processed_rows')
+                ->lockForUpdate()
+                ->update([
+                    'successful_rows' => new Expression('processed_rows'),
+                ]);
+
             if (count($failedRows)) {
                 $import->failedRows()->createMany($failedRows);
             }
