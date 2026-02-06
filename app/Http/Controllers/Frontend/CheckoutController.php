@@ -182,7 +182,7 @@ final class CheckoutController extends Controller
             ], 201);
         }
 
-        return redirect()->route('frontend.checkout.success')->with('status', __('messages.ecommerce));
+        return redirect()->route('frontend.checkout.success')->with('status', __('messages.ecommerce'));
     }
 
     public function success(Request $request): View
