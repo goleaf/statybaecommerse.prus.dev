@@ -6,7 +6,7 @@ namespace Tests\Feature\Filament\Actions;
 
 use App\Filament\Resources\OrderResource\Pages\ListOrders;
 use App\Filament\Resources\ProductResource\Pages\ListProducts;
-use App\Filament\Resources\UserResource\Pages\ListUsers;
+use App\Filament\Resources\Users\Pages\ListUsers;
 use App\Jobs\ProcessExport;
 use App\Models\Export;
 use App\Models\Order;

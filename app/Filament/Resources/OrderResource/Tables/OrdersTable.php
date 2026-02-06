@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\OrderResource\Tables;
 
+use App\Enums\ExportType;
+use App\Filament\Actions\RequestExportBulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -68,6 +70,7 @@ class OrdersTable
             ])
             ->bulkActions([ // Changed to bulkActions as it makes more sense for BulkActionGroup
                 BulkActionGroup::make([
+                    RequestExportBulkAction::make(ExportType::ORDERS),
                     DeleteBulkAction::make(),
                     ForceDeleteBulkAction::make(),
                     RestoreBulkAction::make(),

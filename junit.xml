@@ -1,20 +1,75 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="CLI Arguments" tests="9" assertions="23" errors="0" failures="0" skipped="0" time="14.363576">
-    <testsuite name="Tests\Feature\Console\ProfiledSeedCommandTest" file="Profiled Seed Command (Tests\Feature\Console\ProfiledSeedCommand)" tests="3" assertions="8" errors="0" failures="0" skipped="0" time="9.298790">
-      <testcase name="Clear option truncates seedable tables before run" file="Profiled Seed Command (Tests\Feature\Console\ProfiledSeedCommand)::Clear option truncates seedable tables before run" class="Tests\Feature\Console\ProfiledSeedCommandTest" classname="Tests.Feature.Console.ProfiledSeedCommandTest" assertions="3" time="8.329702"/>
-      <testcase name="Profile option runs configured profile for database seeder" file="Profiled Seed Command (Tests\Feature\Console\ProfiledSeedCommand)::Profile option runs configured profile for database seeder" class="Tests\Feature\Console\ProfiledSeedCommandTest" classname="Tests.Feature.Console.ProfiledSeedCommandTest" assertions="2" time="0.347345"/>
-      <testcase name="Clear option respects excluded tables from config" file="Profiled Seed Command (Tests\Feature\Console\ProfiledSeedCommand)::Clear option respects excluded tables from config" class="Tests\Feature\Console\ProfiledSeedCommandTest" classname="Tests.Feature.Console.ProfiledSeedCommandTest" assertions="3" time="0.621743"/>
-    </testsuite>
-    <testsuite name="Tests\Feature\Seeders\SeederStandardizationTest" file="tests/Feature/Seeders/SeederStandardizationTest.php" tests="3" assertions="6" errors="0" failures="0" skipped="0" time="1.159903">
-      <testcase name="standard seeder registry is unique and valid" file="tests/Feature/Seeders/SeederStandardizationTest.php::standard seeder registry is unique and valid" class="Tests\Feature\Seeders\SeederStandardizationTest" classname="Tests.Feature.Seeders.SeederStandardizationTest" assertions="4" time="0.346663"/>
-      <testcase name="standard seeders keep model ownership overlap minimal and explicit" file="tests/Feature/Seeders/SeederStandardizationTest.php::standard seeders keep model ownership overlap minimal and explicit" class="Tests\Feature\Seeders\SeederStandardizationTest" classname="Tests.Feature.Seeders.SeederStandardizationTest" assertions="1" time="0.325241"/>
-      <testcase name="all concrete seeders extend the shared base seeder" file="tests/Feature/Seeders/SeederStandardizationTest.php::all concrete seeders extend the shared base seeder" class="Tests\Feature\Seeders\SeederStandardizationTest" classname="Tests.Feature.Seeders.SeederStandardizationTest" assertions="1" time="0.487999"/>
-    </testsuite>
-    <testsuite name="Tests\Feature\Seeders\FastSeedModeTest" file="tests/Feature/Seeders/FastSeedModeTest.php" tests="3" assertions="9" errors="0" failures="0" skipped="0" time="3.904883">
-      <testcase name="country seeder switches to lightweight dataset in fast mode" file="tests/Feature/Seeders/FastSeedModeTest.php::country seeder switches to lightweight dataset in fast mode" class="Tests\Feature\Seeders\FastSeedModeTest" classname="Tests.Feature.Seeders.FastSeedModeTest" assertions="2" time="0.490100"/>
-      <testcase name="cities merged seeder honors fast iso and row limits" file="tests/Feature/Seeders/FastSeedModeTest.php::cities merged seeder honors fast iso and row limits" class="Tests\Feature\Seeders\FastSeedModeTest" classname="Tests.Feature.Seeders.FastSeedModeTest" assertions="4" time="1.495499"/>
-      <testcase name="category seeder trims tree size and locale count in fast mode" file="tests/Feature/Seeders/FastSeedModeTest.php::category seeder trims tree size and locale count in fast mode" class="Tests\Feature\Seeders\FastSeedModeTest" classname="Tests.Feature.Seeders.FastSeedModeTest" assertions="3" time="1.919284"/>
+  <testsuite name="CLI Arguments" tests="3" assertions="7" errors="2" failures="1" skipped="0" time="6.031445">
+    <testsuite name="Tests\Feature\Filament\Actions\ExportBulkActionsTest" file="Export Bulk Actions (Tests\Feature\Filament\Actions\ExportBulkActions)" tests="3" assertions="7" errors="2" failures="1" skipped="0" time="6.031445">
+      <testcase name="Users bulk export defaults to csv when no format selected" file="Export Bulk Actions (Tests\Feature\Filament\Actions\ExportBulkActions)::Users bulk export defaults to csv when no format selected" class="Tests\Feature\Filament\Actions\ExportBulkActionsTest" classname="Tests.Feature.Filament.Actions.ExportBulkActionsTest" assertions="0" time="3.829018">
+        <error type="Livewire\Exceptions\MethodNotFoundException">Users bulk export defaults to csv when no format selectedLivewire\Exceptions\MethodNotFoundException: Unable to call component method. Public method [loadTable] not found on component
+at vendor/livewire/livewire/src/Mechanisms/HandleComponents/HandleComponents.php:488
+at vendor/livewire/livewire/src/Mechanisms/HandleComponents/HandleComponents.php:101
+at vendor/livewire/livewire/src/LivewireManager.php:102
+at vendor/livewire/livewire/src/Mechanisms/HandleRequests/HandleRequests.php:124
+at vendor/laravel/framework/src/Illuminate/Routing/ControllerDispatcher.php:46
+at vendor/laravel/framework/src/Illuminate/Routing/Route.php:265
+at vendor/laravel/framework/src/Illuminate/Routing/Route.php:211
+at vendor/laravel/framework/src/Illuminate/Routing/Router.php:822
+at vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:180
+at vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:137
+at vendor/laravel/framework/src/Illuminate/Routing/Router.php:821
+at vendor/laravel/framework/src/Illuminate/Routing/Router.php:800
+at vendor/laravel/framework/src/Illuminate/Routing/Router.php:764
+at vendor/laravel/framework/src/Illuminate/Routing/Router.php:753
+at vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php:200
+at vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:180
+at vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:137
+at vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php:175
+at vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php:144
+at vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php:607
+at vendor/livewire/livewire/src/Features/SupportTesting/SubsequentRender.php:36
+at vendor/livewire/livewire/src/Features/SupportTesting/RequestBroker.php:30
+at vendor/livewire/livewire/src/Features/SupportTesting/SubsequentRender.php:35
+at vendor/livewire/livewire/src/Features/SupportTesting/Render.php:24
+at vendor/livewire/livewire/src/Features/SupportTesting/SubsequentRender.php:34
+at vendor/livewire/livewire/src/Features/SupportTesting/SubsequentRender.php:16
+at vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:252
+at vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:219
+at tests/Feature/Filament/Actions/ExportBulkActionsTest.php:104</error>
+      </testcase>
+      <testcase name="Orders bulk export dispatches job with selected columns" file="Export Bulk Actions (Tests\Feature\Filament\Actions\ExportBulkActions)::Orders bulk export dispatches job with selected columns" class="Tests\Feature\Filament\Actions\ExportBulkActionsTest" classname="Tests.Feature.Filament.Actions.ExportBulkActionsTest" assertions="0" time="0.614507">
+        <error type="Livewire\Exceptions\MethodNotFoundException">Orders bulk export dispatches job with selected columnsLivewire\Exceptions\MethodNotFoundException: Unable to call component method. Public method [loadTable] not found on component
+at vendor/livewire/livewire/src/Mechanisms/HandleComponents/HandleComponents.php:488
+at vendor/livewire/livewire/src/Mechanisms/HandleComponents/HandleComponents.php:101
+at vendor/livewire/livewire/src/LivewireManager.php:102
+at vendor/livewire/livewire/src/Mechanisms/HandleRequests/HandleRequests.php:124
+at vendor/laravel/framework/src/Illuminate/Routing/ControllerDispatcher.php:46
+at vendor/laravel/framework/src/Illuminate/Routing/Route.php:265
+at vendor/laravel/framework/src/Illuminate/Routing/Route.php:211
+at vendor/laravel/framework/src/Illuminate/Routing/Router.php:822
+at vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:180
+at vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:137
+at vendor/laravel/framework/src/Illuminate/Routing/Router.php:821
+at vendor/laravel/framework/src/Illuminate/Routing/Router.php:800
+at vendor/laravel/framework/src/Illuminate/Routing/Router.php:764
+at vendor/laravel/framework/src/Illuminate/Routing/Router.php:753
+at vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php:200
+at vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:180
+at vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:137
+at vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php:175
+at vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php:144
+at vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php:607
+at vendor/livewire/livewire/src/Features/SupportTesting/SubsequentRender.php:36
+at vendor/livewire/livewire/src/Features/SupportTesting/RequestBroker.php:30
+at vendor/livewire/livewire/src/Features/SupportTesting/SubsequentRender.php:35
+at vendor/livewire/livewire/src/Features/SupportTesting/Render.php:24
+at vendor/livewire/livewire/src/Features/SupportTesting/SubsequentRender.php:34
+at vendor/livewire/livewire/src/Features/SupportTesting/SubsequentRender.php:16
+at vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:252
+at vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:219
+at tests/Feature/Filament/Actions/ExportBulkActionsTest.php:62</error>
+      </testcase>
+      <testcase name="Products bulk export uses csv format" file="Export Bulk Actions (Tests\Feature\Filament\Actions\ExportBulkActions)::Products bulk export uses csv format" class="Tests\Feature\Filament\Actions\ExportBulkActionsTest" classname="Tests.Feature.Filament.Actions.ExportBulkActionsTest" assertions="7" time="1.587920">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Products bulk export uses csv formatFailed asserting that two arrays are identical.
+at tests/Feature/Filament/Actions/ExportBulkActionsTest.php:96</failure>
+      </testcase>
     </testsuite>
   </testsuite>
 </testsuites>

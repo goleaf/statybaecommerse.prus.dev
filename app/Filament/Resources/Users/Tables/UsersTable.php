@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Users\Tables;
 
+use App\Enums\ExportType;
+use App\Filament\Actions\RequestExportBulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -53,6 +55,7 @@ class UsersTable
             ])
             ->bulkActions([
                 BulkActionGroup::make([
+                    RequestExportBulkAction::make(ExportType::USERS),
                     DeleteBulkAction::make(),
                     ForceDeleteBulkAction::make(),
                     RestoreBulkAction::make(),

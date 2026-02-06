@@ -4,14 +4,16 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ProductResource\Tables;
 
+use App\Enums\ExportType;
+use App\Filament\Actions\RequestExportBulkAction;
 use App\Models\Product;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
-use Filament\Tables\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
@@ -124,6 +126,7 @@ class ProductsTable
             ])
             ->bulkActions([
                 BulkActionGroup::make([
+                    RequestExportBulkAction::make(ExportType::PRODUCTS),
                     DeleteBulkAction::make(),
                     BulkAction::make('publish')
                         ->label(__('admin.products.bulk_publish'))

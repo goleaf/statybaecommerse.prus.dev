@@ -28,6 +28,8 @@ class ProductImporter extends BaseImporter
 {
     protected static ?string $model = Product::class;
 
+    private ?string $pendingImageUrl = null;
+
     private const IMPORT_IMAGE_MAX_WIDTH = 1600;
 
     private const IMPORT_IMAGE_MAX_HEIGHT = 1600;
@@ -119,6 +121,15 @@ class ProductImporter extends BaseImporter
 
     protected function beforeFill(): void
     {
+        $rawImageUrl = $this->data['image_url'] ?? $this->data['image'] ?? null;
+        $this->pendingImageUrl = is_string($rawImageUrl) ? trim($rawImageUrl) : null;
+
+        if ($this->pendingImageUrl === '') {
+            $this->pendingImageUrl = null;
+        }
+
+        unset($this->data['image_url'], $this->data['image']);
+
         if ($this->record && ! $this->record->exists) {
             $this->applyVisibilityDefaults();
         }
@@ -295,7 +306,7 @@ class ProductImporter extends BaseImporter
 
     protected function afterSave(): void
     {
-        $imageUrl = $this->data['image_url'] ?? $this->data['image'] ?? null;
+        $imageUrl = $this->pendingImageUrl;
 
         if (! is_string($imageUrl) || trim($imageUrl) === '') {
             return;

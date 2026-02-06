@@ -25,7 +25,7 @@ final class RequestExportBulkAction
         $config = config(sprintf('exports.entities.%s', $type->value));
         $columns = collect($config['columns'] ?? [])->mapWithKeys(fn ($column, $key) => [$key => $column['label']])->all();
 
-        return BulkAction::make('export_' . $type->value)
+        return BulkAction::make('export_selected')
             ->label(__('ui.export'))
             ->icon('heroicon-o-arrow-down-tray')
             ->color('info')
