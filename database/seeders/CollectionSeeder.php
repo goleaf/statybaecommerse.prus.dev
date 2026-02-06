@@ -23,7 +23,18 @@ class CollectionSeeder extends Seeder
     public function run(): void
     {
         $definitions = HouseBuilderCollections::collections();
+
+        if ($this->isFastModeEnabled()) {
+            $definitions = array_slice(
+                $definitions,
+                0,
+                max(1, (int) config('seeds.fast.collection_limit', 4)),
+                true
+            );
+        }
+
         $locales = $this->supportedLocales();
+        $shouldGenerateMedia = $this->shouldGenerateMedia();
 
         foreach ($definitions as $slug => $definition) {
             $primaryTranslation = $definition['translations']['en'];
@@ -88,7 +99,9 @@ class CollectionSeeder extends Seeder
                 }
             }
 
-            $this->ensureCollectionMedia($collection, $definition['image_text'] ?? $primaryTranslation['name']);
+            if ($shouldGenerateMedia) {
+                $this->ensureCollectionMedia($collection, $definition['image_text'] ?? $primaryTranslation['name']);
+            }
 
             $this->command?->info(sprintf('CollectionSeeder: prepared "%s" collection.', $primaryTranslation['name']));
         }
@@ -129,11 +142,40 @@ class CollectionSeeder extends Seeder
 
     private function supportedLocales(): array
     {
+        if ($this->isFastModeEnabled()) {
+            $locales = collect(config('seeds.fast.locales', ['lt', 'en']))
+                ->map(fn ($locale) => trim((string) $locale))
+                ->filter()
+                ->unique()
+                ->values()
+                ->toArray();
+
+            if ($locales !== []) {
+                return $locales;
+            }
+
+            return ['lt', 'en'];
+        }
+
         return collect(explode(',', (string) config('app.supported_locales', 'lt,en,ru,de')))
             ->map(fn ($locale) => trim($locale))
             ->filter()
             ->unique()
             ->values()
             ->toArray();
+    }
+
+    private function isFastModeEnabled(): bool
+    {
+        return (bool) config('seeds.fast_mode', false);
+    }
+
+    private function shouldGenerateMedia(): bool
+    {
+        if (! $this->isFastModeEnabled()) {
+            return true;
+        }
+
+        return (bool) config('seeds.fast.generate_media', false);
     }
 }

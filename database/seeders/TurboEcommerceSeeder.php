@@ -53,22 +53,45 @@ final class TurboEcommerceSeeder extends Seeder
 
     private int $chunkSize;
 
+    private int $sharedImagePoolSize;
+
+    private bool $fastMode;
+
     public function __construct()
     {
         $this->imageGen = app(LocalImageGeneratorService::class);
         $this->sharedImagePoolDir = storage_path('app/temp/shared_product_images');
+        $this->fastMode = (bool) config('seeds.fast_mode', false);
 
         // Keep defaults development-friendly and fast while still generating realistic relations.
-        $this->productsPerBrand = max(12, (int) env('SEED_PRODUCTS_PER_BRAND', 24));
-        $this->categoriesPerProduct = (int) env('SEED_CATEGORIES_PER_PRODUCT', 2);
-        $this->attributesPerProductMin = (int) env('SEED_ATTRS_PER_PRODUCT_MIN', 2);
-        $this->attributesPerProductMax = (int) env('SEED_ATTRS_PER_PRODUCT_MAX', 4);
+        $this->productsPerBrand = max(
+            $this->fastMode ? 4 : 12,
+            (int) env('SEED_PRODUCTS_PER_BRAND', $this->defaultProductsPerBrand())
+        );
+        $this->categoriesPerProduct = (int) env(
+            'SEED_CATEGORIES_PER_PRODUCT',
+            $this->fastMode ? 1 : 2
+        );
+        $this->attributesPerProductMin = (int) env(
+            'SEED_ATTRS_PER_PRODUCT_MIN',
+            $this->fastMode ? 1 : 2
+        );
+        $this->attributesPerProductMax = (int) env(
+            'SEED_ATTRS_PER_PRODUCT_MAX',
+            $this->fastMode ? 2 : 4
+        );
         $this->minImagesPerProduct = (int) env('SEED_IMAGES_PER_PRODUCT_MIN', 1);
-        $this->maxImagesPerProduct = (int) env('SEED_IMAGES_PER_PRODUCT_MAX', 2);
+        $this->maxImagesPerProduct = (int) env(
+            'SEED_IMAGES_PER_PRODUCT_MAX',
+            $this->fastMode ? 1 : 2
+        );
         if ($this->maxImagesPerProduct < $this->minImagesPerProduct) {
             $this->maxImagesPerProduct = $this->minImagesPerProduct;
         }
-        $this->chunkSize = (int) env('SEED_CHUNK_SIZE', 250);
+        $this->chunkSize = (int) env('SEED_CHUNK_SIZE', $this->fastMode ? 120 : 250);
+        $this->sharedImagePoolSize = $this->fastMode
+            ? max(8, (int) config('seeds.fast.shared_image_pool_size', 24))
+            : 100;
     }
 
     public function run(): void
@@ -89,7 +112,7 @@ final class TurboEcommerceSeeder extends Seeder
         }])->get();
 
         // Prepare a shared pool of images used across all products
-        $this->buildSharedImagePool(100);
+        $this->buildSharedImagePool($this->sharedImagePoolSize);
 
         // Generate products per brand using factories with timeout protection
         $timeout = now()->addMinutes(60);  // 60 minute timeout for seeder operations
@@ -260,7 +283,7 @@ final class TurboEcommerceSeeder extends Seeder
     {
         // Ensure pool is available
         if (empty($this->sharedImagePool)) {
-            $this->buildSharedImagePool(100);
+            $this->buildSharedImagePool($this->sharedImagePoolSize);
         }
 
         foreach ($products as $product) {
@@ -367,16 +390,44 @@ final class TurboEcommerceSeeder extends Seeder
         // @rmdir($this->sharedImagePoolDir);
     }
 
+    private function defaultProductsPerBrand(): int
+    {
+        if ($this->fastMode) {
+            return max(4, (int) config('seeds.fast.products_per_brand', 8));
+        }
+
+        return 24;
+    }
+
     private function supportedLocales(): array
     {
         $raw = (string) config('app.supported_locales', 'lt');
-
-        return collect(explode(',', $raw))
+        $locales = collect(explode(',', $raw))
             ->map(fn ($v) => trim((string) $v))
             ->filter()
             ->unique()
             ->values()
             ->all();
+
+        if (! $this->fastMode) {
+            return $locales;
+        }
+
+        $preferredFastLocales = collect(config('seeds.fast.locales', ['lt', 'en']))
+            ->map(fn ($locale) => trim((string) $locale))
+            ->filter()
+            ->values();
+
+        $fastLocales = collect($locales)
+            ->intersect($preferredFastLocales)
+            ->values()
+            ->all();
+
+        if ($fastLocales !== []) {
+            return $fastLocales;
+        }
+
+        return array_slice($locales, 0, 2);
     }
 
     private function translateLike(string $text, string $locale): string
