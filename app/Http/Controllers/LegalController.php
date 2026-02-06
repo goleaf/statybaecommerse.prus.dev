@@ -137,21 +137,17 @@ final class LegalController extends Controller
             ->select(['slug', 'title'])
             ->get();
 
-        $handle = fopen('php://temp', 'r+');
-        if ($handle === false) {
-            return response('', 200, ['Content-Type' => 'text/csv; charset=utf-8']);
-        }
+        $xml = '<?xml version="1.0" encoding="UTF-8"?>'
+            . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
 
-        fputcsv($handle, ['loc', 'changefreq']);
         foreach ($translations as $t) {
-            fputcsv($handle, [(string) url('/legal/' . $t->slug), 'weekly']);
+            $loc = e((string) url('/legal/' . $t->slug));
+            $xml .= "<url><loc>{$loc}</loc><changefreq>weekly</changefreq></url>";
         }
 
-        rewind($handle);
-        $csv = stream_get_contents($handle);
-        fclose($handle);
+        $xml .= '</urlset>';
 
-        return response(is_string($csv) ? $csv : '', 200, ['Content-Type' => 'text/csv; charset=utf-8']);
+        return response($xml, 200, ['Content-Type' => 'application/xml']);
     }
 
     public function rss(): Response
@@ -161,24 +157,21 @@ final class LegalController extends Controller
             ->take(20)
             ->get();
 
-        $handle = fopen('php://temp', 'r+');
-        if ($handle === false) {
-            return response('', 200, ['Content-Type' => 'text/csv; charset=utf-8']);
-        }
+        $rss = '<?xml version="1.0" encoding="UTF-8"?>'
+            . '<rss version="2.0"><channel>'
+            . '<title>Legal Documents</title>'
+            . '<link>' . e((string) url('/legal')) . '</link>'
+            . '<description>Latest legal documents</description>';
 
-        fputcsv($handle, ['title', 'link', 'description']);
         foreach ($translations as $t) {
-            fputcsv($handle, [
-                (string) $t->title,
-                (string) url('/legal/' . $t->slug),
-                (string) str(strip_tags((string) $t->content))->limit(200),
-            ]);
+            $title = e((string) $t->title);
+            $link = e((string) url('/legal/' . $t->slug));
+            $desc = e((string) str(strip_tags((string) $t->content))->limit(200));
+            $rss .= "<item><title>{$title}</title><link>{$link}</link><description>{$desc}</description></item>";
         }
 
-        rewind($handle);
-        $csv = stream_get_contents($handle);
-        fclose($handle);
+        $rss .= '</channel></rss>';
 
-        return response(is_string($csv) ? $csv : '', 200, ['Content-Type' => 'text/csv; charset=utf-8']);
+        return response($rss, 200, ['Content-Type' => 'application/rss+xml']);
     }
 }

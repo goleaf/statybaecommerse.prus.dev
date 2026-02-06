@@ -1,96 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="CLI Arguments" tests="27" assertions="80" errors="2" failures="0" skipped="0" time="40.644555">
-    <testsuite name="Tests\Unit\CsvImportProcessorTest" file="tests/Unit/CsvImportProcessorTest.php" tests="2" assertions="10" errors="0" failures="0" skipped="0" time="30.566536">
-      <testcase name="it imports csv rows immediately without queue jobs" file="tests/Unit/CsvImportProcessorTest.php::it imports csv rows immediately without queue jobs" class="Tests\Unit\CsvImportProcessorTest" classname="Tests.Unit.CsvImportProcessorTest" assertions="6" time="30.054916"/>
-      <testcase name="it clamps imported counters to total rows when chunk overflows configured total" file="tests/Unit/CsvImportProcessorTest.php::it clamps imported counters to total rows when chunk overflows configured total" class="Tests\Unit\CsvImportProcessorTest" classname="Tests.Unit.CsvImportProcessorTest" assertions="4" time="0.511621"/>
+  <testsuite name="CLI Arguments" tests="7" assertions="22" errors="0" failures="0" skipped="0" time="44.821892">
+    <testsuite name="Tests\Unit\Filament\Importers\ProductImporterImageHandlingTest" file="tests/Unit/Filament/Importers/ProductImporterImageHandlingTest.php" tests="4" assertions="13" errors="0" failures="0" skipped="0" time="44.041748">
+      <testcase name="it returns null when image download fails" file="tests/Unit/Filament/Importers/ProductImporterImageHandlingTest.php::it returns null when image download fails" class="Tests\Unit\Filament\Importers\ProductImporterImageHandlingTest" classname="Tests.Unit.Filament.Importers.ProductImporterImageHandlingTest" assertions="1" time="42.510384"/>
+      <testcase name="it resolves image extension from content type and url fallback" file="tests/Unit/Filament/Importers/ProductImporterImageHandlingTest.php::it resolves image extension from content type and url fallback" class="Tests\Unit\Filament\Importers\ProductImporterImageHandlingTest" classname="Tests.Unit.Filament.Importers.ProductImporterImageHandlingTest" assertions="4" time="0.441810"/>
+      <testcase name="it downloads image contents successfully from http source" file="tests/Unit/Filament/Importers/ProductImporterImageHandlingTest.php::it downloads image contents successfully from http source" class="Tests\Unit\Filament\Importers\ProductImporterImageHandlingTest" classname="Tests.Unit.Filament.Importers.ProductImporterImageHandlingTest" assertions="3" time="0.265209"/>
+      <testcase name="it resizes oversized downloaded image contents" file="tests/Unit/Filament/Importers/ProductImporterImageHandlingTest.php::it resizes oversized downloaded image contents" class="Tests\Unit\Filament\Importers\ProductImporterImageHandlingTest" classname="Tests.Unit.Filament.Importers.ProductImporterImageHandlingTest" assertions="5" time="0.824345"/>
     </testsuite>
-    <testsuite name="Tests\Feature\ImportExportPageTest" file="tests/Feature/ImportExportPageTest.php" tests="2" assertions="4" errors="0" failures="0" skipped="0" time="1.220822">
-      <testcase name="it feature: shows only csv import links and no upload form" file="tests/Feature/ImportExportPageTest.php::it feature: shows only csv import links and no upload form" class="Tests\Feature\ImportExportPageTest" classname="Tests.Feature.ImportExportPageTest" assertions="3" time="0.715833"/>
-      <testcase name="it feature: renders the data import export page" file="tests/Feature/ImportExportPageTest.php::it feature: renders the data import export page" class="Tests\Feature\ImportExportPageTest" classname="Tests.Feature.ImportExportPageTest" assertions="1" time="0.504990"/>
-    </testsuite>
-    <testsuite name="Tests\Feature\Filament\DataImportExportTest" file="tests/Feature/Filament/DataImportExportTest.php" tests="6" assertions="23" errors="0" failures="0" skipped="0" time="2.021710">
-      <testcase name="it exposes the expected navigation icon" file="tests/Feature/Filament/DataImportExportTest.php::it exposes the expected navigation icon" class="Tests\Feature\Filament\DataImportExportTest" classname="Tests.Feature.Filament.DataImportExportTest" assertions="1" time="0.222414"/>
-      <testcase name="it forbids guest to access data import export page" file="tests/Feature/Filament/DataImportExportTest.php::it forbids guest to access data import export page" class="Tests\Feature\Filament\DataImportExportTest" classname="Tests.Feature.Filament.DataImportExportTest" assertions="2" time="0.279025"/>
-      <testcase name="it forbids non-admin user to access data import export page" file="tests/Feature/Filament/DataImportExportTest.php::it forbids non-admin user to access data import export page" class="Tests\Feature\Filament\DataImportExportTest" classname="Tests.Feature.Filament.DataImportExportTest" assertions="2" time="0.289781"/>
-      <testcase name="it can render data import export page" file="tests/Feature/Filament/DataImportExportTest.php::it can render data import export page" class="Tests\Feature\Filament\DataImportExportTest" classname="Tests.Feature.Filament.DataImportExportTest" assertions="1" time="0.432423"/>
-      <testcase name="it shows CSV import links" file="tests/Feature/Filament/DataImportExportTest.php::it shows CSV import links" class="Tests\Feature\Filament\DataImportExportTest" classname="Tests.Feature.Filament.DataImportExportTest" assertions="11" time="0.456211"/>
-      <testcase name="it displays the stats on the page" file="tests/Feature/Filament/DataImportExportTest.php::it displays the stats on the page" class="Tests\Feature\Filament\DataImportExportTest" classname="Tests.Feature.Filament.DataImportExportTest" assertions="6" time="0.341855"/>
-    </testsuite>
-    <testsuite name="Tests\Feature\Filament\Pages\ImportDataTest" file="tests/Feature/Filament/Pages/ImportDataTest.php" tests="4" assertions="5" errors="0" failures="0" skipped="0" time="1.667940">
-      <testcase name="it is forbidden for guests" file="tests/Feature/Filament/Pages/ImportDataTest.php::it is forbidden for guests" class="Tests\Feature\Filament\Pages\ImportDataTest" classname="Tests.Feature.Filament.Pages.ImportDataTest" assertions="2" time="0.228024"/>
-      <testcase name="it exposes csv import pages on the data import dashboard" file="tests/Feature/Filament/Pages/ImportDataTest.php::it exposes csv import pages on the data import dashboard" class="Tests\Feature\Filament\Pages\ImportDataTest" classname="Tests.Feature.Filament.Pages.ImportDataTest" assertions="1" time="0.319888"/>
-      <testcase name="it can render import data page" file="tests/Feature/Filament/Pages/ImportDataTest.php::it can render import data page" class="Tests\Feature\Filament\Pages\ImportDataTest" classname="Tests.Feature.Filament.Pages.ImportDataTest" assertions="1" time="0.570996"/>
-      <testcase name="it can render import categories page" file="tests/Feature/Filament/Pages/ImportDataTest.php::it can render import categories page" class="Tests\Feature\Filament\Pages\ImportDataTest" classname="Tests.Feature.Filament.Pages.ImportDataTest" assertions="1" time="0.549033"/>
-    </testsuite>
-    <testsuite name="Tests\Feature\XmlCatalogServiceTest" file="tests/Feature/XmlCatalogServiceTest.php" tests="1" assertions="0" errors="1" failures="0" skipped="0" time="0.469273">
-      <testcase name="it feature: exports categories and products with translations and images" file="tests/Feature/XmlCatalogServiceTest.php::it feature: exports categories and products with translations and images" class="Tests\Feature\XmlCatalogServiceTest" classname="Tests.Feature.XmlCatalogServiceTest" assertions="0" time="0.469273">
-        <error type="Illuminate\Database\QueryException">it feature: exports categories and products with translations and imagesIlluminate\Database\QueryException: SQLSTATE[HY000]: General error: 1 table product_images has no column named is_default (Connection: sqlite, Database: /Users/andrejprus/Library/CloudStorage/Dropbox/projects/egistatyba/database/testing/databases/testing_parallel_pid_1156.sqlite, SQL: insert into "product_images" ("is_active", "is_default", "product_id", "path", "alt_text", "sort_order", "updated_at", "created_at") values (1, 0, 1, images/sample.jpg, Sample, 1, 2026-02-06 14:28:36, 2026-02-06 14:28:36))
-at vendor/laravel/framework/src/Illuminate/Database/Connection.php:578
-at vendor/laravel/framework/src/Illuminate/Database/Connection.php:827
-at vendor/laravel/framework/src/Illuminate/Database/Connection.php:794
-at vendor/laravel/framework/src/Illuminate/Database/Connection.php:573
-at vendor/laravel/framework/src/Illuminate/Database/Connection.php:537
-at vendor/laravel/framework/src/Illuminate/Database/Query/Processors/Processor.php:32
-at vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php:4054
-at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:2235
-at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1436
-at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1401
-at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1240
-at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:1219
-at vendor/laravel/framework/src/Illuminate/Support/helpers.php:390
-at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:1218
-at tests/Feature/XmlCatalogServiceTest.php:22
-Caused by
-PDOException: SQLSTATE[HY000]: General error: 1 table product_images has no column named is_default
-
-at vendor/laravel/framework/src/Illuminate/Database/Connection.php:578
-at vendor/laravel/framework/src/Illuminate/Database/Connection.php:827
-at vendor/laravel/framework/src/Illuminate/Database/Connection.php:794
-at vendor/laravel/framework/src/Illuminate/Database/Connection.php:573
-at vendor/laravel/framework/src/Illuminate/Database/Connection.php:537
-at vendor/laravel/framework/src/Illuminate/Database/Query/Processors/Processor.php:32
-at vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php:4054
-at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:2235
-at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1436
-at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1401
-at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1240
-at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:1219
-at vendor/laravel/framework/src/Illuminate/Support/helpers.php:390
-at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:1218
-at tests/Feature/XmlCatalogServiceTest.php:22</error>
-      </testcase>
-    </testsuite>
-    <testsuite name="Tests\Feature\ImportExportCommandTest" file="tests/Feature/ImportExportCommandTest.php" tests="1" assertions="0" errors="1" failures="0" skipped="0" time="0.280298">
-      <testcase name="it feature: runs catalog:xml export" file="tests/Feature/ImportExportCommandTest.php::it feature: runs catalog:xml export" class="Tests\Feature\ImportExportCommandTest" classname="Tests.Feature.ImportExportCommandTest" assertions="0" time="0.280298">
-        <error type="Symfony\Component\Console\Exception\CommandNotFoundException">it feature: runs catalog:xml exportSymfony\Component\Console\Exception\CommandNotFoundException: The command "catalog:xml" does not exist.
-at vendor/laravel/framework/src/Illuminate/Console/Application.php:162
-at vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php:447
-at vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:451
-at vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:675
-at tests/Feature/ImportExportCommandTest.php:9</error>
-      </testcase>
-    </testsuite>
-    <testsuite name="Tests\Unit\Support\ImportExport\ProgressCounterTest" file="tests/Unit/Support/ImportExport/ProgressCounterTest.php" tests="3" assertions="13" errors="0" failures="0" skipped="0" time="0.824290">
-      <testcase name="it normalizes total and processed counters to safe bounds" file="tests/Unit/Support/ImportExport/ProgressCounterTest.php::it normalizes total and processed counters to safe bounds" class="Tests\Unit\Support\ImportExport\ProgressCounterTest" classname="Tests.Unit.Support.ImportExport.ProgressCounterTest" assertions="5" time="0.299568"/>
-      <testcase name="it calculates failed rows from processed minus successful using safe bounds" file="tests/Unit/Support/ImportExport/ProgressCounterTest.php::it calculates failed rows from processed minus successful using safe bounds" class="Tests\Unit\Support\ImportExport\ProgressCounterTest" classname="Tests.Unit.Support.ImportExport.ProgressCounterTest" assertions="4" time="0.298592"/>
-      <testcase name="it calculates percent from normalized counters" file="tests/Unit/Support/ImportExport/ProgressCounterTest.php::it calculates percent from normalized counters" class="Tests\Unit\Support\ImportExport\ProgressCounterTest" classname="Tests.Unit.Support.ImportExport.ProgressCounterTest" assertions="4" time="0.226131"/>
-    </testsuite>
-    <testsuite name="Tests\Feature\Services\Export\ExportServiceTest" file="tests/Feature/Services/Export/ExportServiceTest.php" tests="3" assertions="15" errors="0" failures="0" skipped="0" time="2.076961">
-      <testcase name="it processes queued exports and stores downloadable artifacts" file="tests/Feature/Services/Export/ExportServiceTest.php::it processes queued exports and stores downloadable artifacts" class="Tests\Feature\Services\Export\ExportServiceTest" classname="Tests.Feature.Services.Export.ExportServiceTest" assertions="6" time="0.831731"/>
-      <testcase name="it marks exports as failed when processing throws an exception" file="tests/Feature/Services/Export/ExportServiceTest.php::it marks exports as failed when processing throws an exception" class="Tests\Feature\Services\Export\ExportServiceTest" classname="Tests.Feature.Services.Export.ExportServiceTest" assertions="5" time="0.851485"/>
-      <testcase name="it queues export records and dispatches the processor job" file="tests/Feature/Services/Export/ExportServiceTest.php::it queues export records and dispatches the processor job" class="Tests\Feature\Services\Export\ExportServiceTest" classname="Tests.Feature.Services.Export.ExportServiceTest" assertions="4" time="0.393745"/>
-    </testsuite>
-    <testsuite name="Tests\Feature\Models\ExportProgressTest" file="tests/Feature/Models/ExportProgressTest.php" tests="2" assertions="3" errors="0" failures="0" skipped="0" time="0.613387">
-      <testcase name="it clamps progress percentage when processed rows exceed total rows" file="tests/Feature/Models/ExportProgressTest.php::it clamps progress percentage when processed rows exceed total rows" class="Tests\Feature\Models\ExportProgressTest" classname="Tests.Feature.Models.ExportProgressTest" assertions="1" time="0.307679"/>
-      <testcase name="it clamps updateProgress to total rows" file="tests/Feature/Models/ExportProgressTest.php::it clamps updateProgress to total rows" class="Tests\Feature\Models\ExportProgressTest" classname="Tests.Feature.Models.ExportProgressTest" assertions="2" time="0.305709"/>
-    </testsuite>
-    <testsuite name="Tests\Unit\Filament\Pages\CsvImportPageFailedCountTest" file="tests/Unit/Filament/Pages/CsvImportPageFailedCountTest.php" tests="2" assertions="4" errors="0" failures="0" skipped="0" time="0.690143">
-      <testcase name="it calculates failed rows from processed minus successful for progress and notifications" file="tests/Unit/Filament/Pages/CsvImportPageFailedCountTest.php::it calculates failed rows from processed minus successful for progress and notifications" class="Tests\Unit\Filament\Pages\CsvImportPageFailedCountTest" classname="Tests.Unit.Filament.Pages.CsvImportPageFailedCountTest" assertions="3" time="0.279729"/>
-      <testcase name="it clamps invalid counters when calculating failed rows" file="tests/Unit/Filament/Pages/CsvImportPageFailedCountTest.php::it clamps invalid counters when calculating failed rows" class="Tests\Unit\Filament\Pages\CsvImportPageFailedCountTest" classname="Tests.Unit.Filament.Pages.CsvImportPageFailedCountTest" assertions="1" time="0.410414"/>
-    </testsuite>
-    <testsuite name="Tests\Unit\Filament\Pages\CsvImportPageProgressStatusTest" file="tests/Unit/Filament/Pages/CsvImportPageProgressStatusTest.php" tests="1" assertions="3" errors="0" failures="0" skipped="0" time="0.213193">
-      <testcase name="it keeps status running when import counters are zero and import is not completed" file="tests/Unit/Filament/Pages/CsvImportPageProgressStatusTest.php::it keeps status running when import counters are zero and import is not completed" class="Tests\Unit\Filament\Pages\CsvImportPageProgressStatusTest" classname="Tests.Unit.Filament.Pages.CsvImportPageProgressStatusTest" assertions="3" time="0.213193"/>
+    <testsuite name="Tests\Unit\Filament\Importers\ProductImporterTest" file="tests/Unit/Filament/Importers/ProductImporterTest.php" tests="3" assertions="9" errors="0" failures="0" skipped="0" time="0.780145">
+      <testcase name="it has correct model" file="tests/Unit/Filament/Importers/ProductImporterTest.php::it has correct model" class="Tests\Unit\Filament\Importers\ProductImporterTest" classname="Tests.Unit.Filament.Importers.ProductImporterTest" assertions="1" time="0.230717"/>
+      <testcase name="it has required columns" file="tests/Unit/Filament/Importers/ProductImporterTest.php::it has required columns" class="Tests\Unit\Filament\Importers\ProductImporterTest" classname="Tests.Unit.Filament.Importers.ProductImporterTest" assertions="6" time="0.281639"/>
+      <testcase name="it has correct notification body" file="tests/Unit/Filament/Importers/ProductImporterTest.php::it has correct notification body" class="Tests\Unit\Filament\Importers\ProductImporterTest" classname="Tests.Unit.Filament.Importers.ProductImporterTest" assertions="2" time="0.267789"/>
     </testsuite>
   </testsuite>
 </testsuites>

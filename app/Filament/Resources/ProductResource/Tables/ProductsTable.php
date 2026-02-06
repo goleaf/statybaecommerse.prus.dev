@@ -27,9 +27,10 @@ class ProductsTable
         return $table
             ->modifyQueryUsing(fn ($query) => $query->with(['brand', 'primaryImage']))
             ->columns([
-                ImageColumn::make('primaryImage.path')
+                ImageColumn::make('main_image')
                     ->label(__('messages.image'))
                     ->disk('public')
+                    ->getStateUsing(static fn (Product $record): ?string => $record->primaryImage?->path)
                     ->circular(),
                 TextColumn::make('name')
                     ->label(__('messages.name'))

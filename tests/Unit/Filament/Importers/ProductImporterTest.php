@@ -24,7 +24,8 @@ it('has required columns', function () {
         ->toContain('price')
         ->toContain('manage_stock')
         ->toContain('stock_quantity')
-        ->toContain('image_url');
+        ->toContain('image_url')
+        ->toContain('image');
 });
 
 it('has correct notification body', function () {

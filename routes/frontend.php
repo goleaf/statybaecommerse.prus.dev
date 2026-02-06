@@ -164,7 +164,7 @@ Route::middleware(['web'])->group(function () {
     });
 
     // Sitemap
-    Route::get('/sitemap.csv', [App\Http\Controllers\SitemapController::class, 'index'])->name('sitemap');
+    Route::get('/sitemap.xml', [App\Http\Controllers\SitemapController::class, 'index'])->name('sitemap');
 
     // Robots
     Route::get('/robots.txt', App\Http\Controllers\RobotsController::class)->name('robots');

@@ -49,3 +49,36 @@ it('returns null when image download fails', function (): void {
 
     expect($result)->toBeNull();
 });
+
+it('resizes oversized downloaded image contents', function (): void {
+    if (! function_exists('imagecreatetruecolor')) {
+        $this->markTestSkipped('GD extension is not available.');
+    }
+
+    $canvas = imagecreatetruecolor(2400, 1800);
+    imagefill($canvas, 0, 0, imagecolorallocate($canvas, 255, 0, 0));
+    ob_start();
+    imagejpeg($canvas, null, 95);
+    $largeImageContents = (string) ob_get_clean();
+    imagedestroy($canvas);
+
+    $importer = new ProductImporter(new Import, [], []);
+    $method = new ReflectionMethod($importer, 'resizeImageContents');
+    $method->setAccessible(true);
+
+    $resizedContents = $method->invoke($importer, $largeImageContents, 'jpg');
+    $resizedImage = imagecreatefromstring($resizedContents);
+
+    expect($resizedImage)->not->toBeFalse();
+
+    if ($resizedImage === false) {
+        return;
+    }
+
+    $resizedWidth = imagesx($resizedImage);
+    $resizedHeight = imagesy($resizedImage);
+    imagedestroy($resizedImage);
+
+    expect($resizedWidth)->toBeLessThanOrEqual(1600)
+        ->and($resizedHeight)->toBeLessThanOrEqual(1600);
+});

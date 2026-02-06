@@ -26,12 +26,10 @@ final class SitemapController extends Controller
     public function index(): Response
     {
         $sitemaps = $this->sitemapService->getIndex();
-        $rows = array_map(static fn (array $entry): array => [
-            'loc'     => (string) ($entry['loc'] ?? ''),
-            'lastmod' => (string) ($entry['lastmod'] ?? ''),
-        ], $sitemaps);
 
-        return response($this->toCsv($rows), 200, ['Content-Type' => 'text/csv; charset=utf-8']);
+        return response()
+            ->view('sitemap.index', ['sitemaps' => $sitemaps])
+            ->header('Content-Type', 'application/xml; charset=utf-8');
     }
 
     /**
@@ -60,41 +58,8 @@ final class SitemapController extends Controller
             abort(404);
         }
 
-        $rows = array_map(static fn (array $entry): array => [
-            'loc'        => (string) ($entry['loc'] ?? ''),
-            'lastmod'    => (string) ($entry['lastmod'] ?? ''),
-            'changefreq' => (string) ($entry['changefreq'] ?? ''),
-            'priority'   => (string) ($entry['priority'] ?? ''),
-        ], $urls);
-
-        return response($this->toCsv($rows), 200, ['Content-Type' => 'text/csv; charset=utf-8']);
-    }
-
-    /**
-     * @param  array<int, array<string, string>> $rows
-     */
-    private function toCsv(array $rows): string
-    {
-        if ($rows === []) {
-            return '';
-        }
-
-        $handle = fopen('php://temp', 'r+');
-
-        if ($handle === false) {
-            return '';
-        }
-
-        fputcsv($handle, array_keys($rows[0]));
-
-        foreach ($rows as $row) {
-            fputcsv($handle, $row);
-        }
-
-        rewind($handle);
-        $csv = stream_get_contents($handle);
-        fclose($handle);
-
-        return is_string($csv) ? $csv : '';
+        return response()
+            ->view('sitemap.locale', ['urls' => $urls, 'locale' => $normalizedLocale])
+            ->header('Content-Type', 'application/xml; charset=utf-8');
     }
 }

@@ -28,6 +28,12 @@ class ProductImporter extends BaseImporter
 {
     protected static ?string $model = Product::class;
 
+    private const IMPORT_IMAGE_MAX_WIDTH = 1600;
+
+    private const IMPORT_IMAGE_MAX_HEIGHT = 1600;
+
+    private const IMPORT_IMAGE_QUALITY = 85;
+
     private const SYNC_KEY_FIELDS = [
         'sku'     => 'SKU',
         'barcode' => 'Barcode',
@@ -280,12 +286,16 @@ class ProductImporter extends BaseImporter
                 ->label('Image URL')
                 ->ignoreBlankState()
                 ->rules(['nullable', 'url:http,https']),
+            ImportColumn::make('image')
+                ->label('Image')
+                ->ignoreBlankState()
+                ->rules(['nullable', 'url:http,https']),
         ];
     }
 
     protected function afterSave(): void
     {
-        $imageUrl = $this->data['image_url'] ?? null;
+        $imageUrl = $this->data['image_url'] ?? $this->data['image'] ?? null;
 
         if (! is_string($imageUrl) || trim($imageUrl) === '') {
             return;
@@ -366,6 +376,8 @@ class ProductImporter extends BaseImporter
                 'is_featured',
                 'published_at',
                 'external_url',
+                'image_url',
+                'image',
                 'available_from',
                 'available_until',
             ],
@@ -610,7 +622,9 @@ class ProductImporter extends BaseImporter
         $extension = $this->resolveImageExtension($imageUrl, $contents['content_type'] ?? null);
         $path = 'product-images/' . $this->record->getKey() . '/import-' . Str::uuid() . '.' . $extension;
 
-        Storage::disk('public')->put($path, $contents['body']);
+        $resizedImageContents = $this->resizeImageContents($contents['body'], $extension);
+
+        Storage::disk('public')->put($path, $resizedImageContents);
 
         $existingImages = $this->record
             ->images()
@@ -693,5 +707,83 @@ class ProductImporter extends BaseImporter
         }
 
         return $extension === 'jpeg' ? 'jpg' : $extension;
+    }
+
+    private function resizeImageContents(string $imageContents, string $extension): string
+    {
+        if (! function_exists('imagecreatefromstring')) {
+            return $imageContents;
+        }
+
+        $sourceImage = @imagecreatefromstring($imageContents);
+
+        if ($sourceImage === false) {
+            return $imageContents;
+        }
+
+        $sourceWidth = imagesx($sourceImage);
+        $sourceHeight = imagesy($sourceImage);
+
+        if ($sourceWidth <= self::IMPORT_IMAGE_MAX_WIDTH && $sourceHeight <= self::IMPORT_IMAGE_MAX_HEIGHT) {
+            imagedestroy($sourceImage);
+
+            return $imageContents;
+        }
+
+        $scaleRatio = min(
+            self::IMPORT_IMAGE_MAX_WIDTH / max($sourceWidth, 1),
+            self::IMPORT_IMAGE_MAX_HEIGHT / max($sourceHeight, 1),
+            1
+        );
+
+        $targetWidth = max((int) floor($sourceWidth * $scaleRatio), 1);
+        $targetHeight = max((int) floor($sourceHeight * $scaleRatio), 1);
+        $targetImage = imagecreatetruecolor($targetWidth, $targetHeight);
+
+        if ($targetImage === false) {
+            imagedestroy($sourceImage);
+
+            return $imageContents;
+        }
+
+        if (in_array($extension, ['png', 'gif', 'webp'], true)) {
+            imagealphablending($targetImage, false);
+            imagesavealpha($targetImage, true);
+            $transparentColor = imagecolorallocatealpha($targetImage, 0, 0, 0, 127);
+            imagefilledrectangle($targetImage, 0, 0, $targetWidth, $targetHeight, $transparentColor);
+        }
+
+        imagecopyresampled(
+            $targetImage,
+            $sourceImage,
+            0,
+            0,
+            0,
+            0,
+            $targetWidth,
+            $targetHeight,
+            $sourceWidth,
+            $sourceHeight
+        );
+
+        ob_start();
+
+        $wasEncoded = match ($extension) {
+            'png'   => imagepng($targetImage, null, 6),
+            'gif'   => imagegif($targetImage),
+            'webp'  => function_exists('imagewebp') ? imagewebp($targetImage, null, self::IMPORT_IMAGE_QUALITY) : imagejpeg($targetImage, null, self::IMPORT_IMAGE_QUALITY),
+            default => imagejpeg($targetImage, null, self::IMPORT_IMAGE_QUALITY),
+        };
+
+        $encodedContents = (string) ob_get_clean();
+
+        imagedestroy($sourceImage);
+        imagedestroy($targetImage);
+
+        if (! $wasEncoded || $encodedContents === '') {
+            return $imageContents;
+        }
+
+        return $encodedContents;
     }
 }
