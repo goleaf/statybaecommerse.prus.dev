@@ -209,7 +209,7 @@ final class ProductCatalogueDataProvider
                 ->withSum('orderItems as sales_count', 'quantity')
                 ->orderByDesc('sales_count')
                 ->orderByDesc('published_at'),
-            default       => $query->orderByDesc('is_featured')->orderByDesc('published_at'),
+            default => $query->orderByDesc('is_featured')->orderByDesc('published_at'),
         };
     }
 

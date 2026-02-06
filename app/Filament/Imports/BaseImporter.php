@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Imports;
 
+use App\Support\ImportExport\ProgressCounter;
 use Filament\Actions\Imports\Importer;
 use Filament\Actions\Imports\Models\Import;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Throwable;
-use App\Support\ImportExport\ProgressCounter;
 
 abstract class BaseImporter extends Importer
 {

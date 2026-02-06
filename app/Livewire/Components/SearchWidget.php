@@ -354,16 +354,16 @@ final class SearchWidget extends Component
 
             // Create a Product-like object from search result data
             $product = (object) [
-                'id'             => $item['id'],
-                'slug'           => $this->extractSlugFromUrl($item['url'] ?? ''),
-                'name'           => $item['title'] ?? '',
+                'id'                => $item['id'],
+                'slug'              => $this->extractSlugFromUrl($item['url'] ?? ''),
+                'name'              => $item['title'] ?? '',
                 'short_description' => $item['description'] ?? '',
-                'brand_id'       => null, // Not available in search results
-                'published_at'   => now(), // Assume published since it's in results
-                'brand'          => $item['subtitle'] ? (object) ['name' => $item['subtitle']] : null,
-                'media'          => collect(), // Empty collection for compatibility
-                'prices'         => collect(), // Empty collection for compatibility
-                'variants_count' => 0, // Not available in search results
+                'brand_id'          => null, // Not available in search results
+                'published_at'      => now(), // Assume published since it's in results
+                'brand'             => $item['subtitle'] ? (object) ['name' => $item['subtitle']] : null,
+                'media'             => collect(), // Empty collection for compatibility
+                'prices'            => collect(), // Empty collection for compatibility
+                'variants_count'    => 0, // Not available in search results
             ];
 
             $products->push($product);

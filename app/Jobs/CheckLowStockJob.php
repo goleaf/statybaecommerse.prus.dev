@@ -54,8 +54,8 @@ final class CheckLowStockJob implements ShouldQueue
             ->where('manage_stock', true)
             ->where('stock_quantity', '<=', DB::raw('low_stock_threshold'))
             ->whereDoesntHave('notifications', function ($query): void {
-            $query->where('type', LowStockAlert::class)->where('created_at', '>=', now()->subHours(24));
-        })->cursor()->takeUntilTimeout($timeout);
+                $query->where('type', LowStockAlert::class)->where('created_at', '>=', now()->subHours(24));
+            })->cursor()->takeUntilTimeout($timeout);
         $processedCount = 0;
         $alertCount = 0;
         // Get admin users with inventory management permissions

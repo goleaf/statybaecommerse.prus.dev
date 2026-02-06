@@ -64,10 +64,10 @@ return new class extends Migration
         if (Schema::hasTable('products')) {
             Schema::table('products', function (Blueprint $table) {
                 $indexes = [
-                    'products_barcode_idx'          => ['barcode'],
-                    'products_compare_price_idx'    => ['compare_price'],
-                    'products_cost_price_idx'       => ['cost_price'],
-                    'products_shipping_class_idx'   => ['shipping_class'],
+                    'products_barcode_idx'        => ['barcode'],
+                    'products_compare_price_idx'  => ['compare_price'],
+                    'products_cost_price_idx'     => ['cost_price'],
+                    'products_shipping_class_idx' => ['shipping_class'],
                 ];
 
                 foreach ($indexes as $indexName => $columns) {

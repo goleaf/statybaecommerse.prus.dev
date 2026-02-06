@@ -34,7 +34,7 @@ final class LegalTranslation extends Model
     ];
 
     protected $casts = [
-        'legal_id' => 'integer',
+        'legal_id'  => 'integer',
         'meta_data' => 'array',
     ];
 

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Tests\Feature\Filament\Importers;
 
 use App\Filament\Imports\PartnerImporter;
-use App\Models\Partner;
 use App\Models\User;
 use Filament\Actions\Imports\Jobs\ImportCsv;
 use Filament\Actions\Imports\Models\Import;
@@ -16,7 +15,7 @@ uses(RefreshDatabase::class);
 it('can import partners', function () {
     $user = User::factory()->admin()->create();
 
-    $import = new Import();
+    $import = new Import;
     $import->user()->associate($user);
     $import->file_name = 'partners.csv';
     $import->file_path = 'partners.csv';
@@ -25,17 +24,17 @@ it('can import partners', function () {
     $import->save();
 
     $row = [
-        'name' => 'Imported Partner',
-        'code' => 'IP-001',
+        'name'          => 'Imported Partner',
+        'code'          => 'IP-001',
         'contact_email' => 'partner@example.com',
-        'is_enabled' => '1',
+        'is_enabled'    => '1',
     ];
 
     $columnMap = [
-        'name' => 'name',
-        'code' => 'code',
+        'name'          => 'name',
+        'code'          => 'code',
         'contact_email' => 'contact_email',
-        'is_enabled' => 'is_enabled',
+        'is_enabled'    => 'is_enabled',
     ];
 
     (new ImportCsv($import, [$row], $columnMap, []))->handle();

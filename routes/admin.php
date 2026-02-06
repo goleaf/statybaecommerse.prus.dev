@@ -5,7 +5,6 @@ declare(strict_types=1);
 use App\Http\Controllers\Admin\AttributeValueTranslationController;
 use App\Http\Controllers\Admin\DiscountPresetController;
 use App\Http\Controllers\Admin\EnumValueController;
-use App\Http\Controllers\Admin\LocationController as AdminLocationController;
 use App\Models\Inventory;
 use App\Models\NewsImage;
 use App\Support\Storage\SecureStorage;

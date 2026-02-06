@@ -59,13 +59,13 @@ final class NewsletterSubscription extends Component
                 }
             } else {
                 $subscriberData = [
-                    'email' => $this->email,
+                    'email'      => $this->email,
                     'first_name' => $this->first_name,
-                    'last_name' => $this->last_name,
-                    'company' => $this->company,
-                    'interests' => $this->interests,
-                    'source' => $this->source,
-                    'status' => 'active',
+                    'last_name'  => $this->last_name,
+                    'company'    => $this->company,
+                    'interests'  => $this->interests,
+                    'source'     => $this->source,
+                    'status'     => 'active',
                 ];
 
                 Subscriber::subscribe($subscriberData);
@@ -76,7 +76,7 @@ final class NewsletterSubscription extends Component
 
                 $this->dispatch('subscriber-added', [
                     'email' => $this->email,
-                    'name' => trim($this->first_name . ' ' . $this->last_name),
+                    'name'  => trim($this->first_name . ' ' . $this->last_name),
                 ]);
             }
 

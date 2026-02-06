@@ -227,27 +227,27 @@ final class InfiniteScrollSearch extends Component
     {
         return [
             'relevance' => __('frontend.search_results.sort.relevance'),
-            'name' => __('frontend.search_results.sort.name_a_z'),
-            'price' => __('frontend.search_results.sort.price_low_high'),
-            'date' => __('frontend.search_results.sort.newest'),
-            'rating' => __('frontend.search_results.sort.highest_rated'),
+            'name'      => __('frontend.search_results.sort.name_a_z'),
+            'price'     => __('frontend.search_results.sort.price_low_high'),
+            'date'      => __('frontend.search_results.sort.newest'),
+            'rating'    => __('frontend.search_results.sort.highest_rated'),
         ];
     }
 
     public function getTypeOptionsProperty(): array
     {
         return [
-            'products' => __('messages.products'),
-            'categories' => __('messages.categories'),
-            'brands' => __('messages.brands'),
+            'products'    => __('messages.products'),
+            'categories'  => __('messages.categories'),
+            'brands'      => __('messages.brands'),
             'collections' => __('messages.collections'),
-            'attributes' => __('messages.attributes'),
-            'locations' => __('messages.locations'),
-            'countries' => __('messages.countries'),
-            'cities' => __('messages.cities'),
-            'orders' => __('messages.orders'),
-            'customers' => __('messages.customers'),
-            'addresses' => __('messages.addresses'),
+            'attributes'  => __('messages.attributes'),
+            'locations'   => __('messages.locations'),
+            'countries'   => __('messages.countries'),
+            'cities'      => __('messages.cities'),
+            'orders'      => __('messages.orders'),
+            'customers'   => __('messages.customers'),
+            'addresses'   => __('messages.addresses'),
         ];
     }
 }

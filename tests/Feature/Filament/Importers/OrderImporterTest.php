@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Tests\Feature\Filament\Importers;
 
 use App\Filament\Imports\OrderImporter;
-use App\Models\Order;
 use App\Models\User;
 use Filament\Actions\Imports\Jobs\ImportCsv;
 use Filament\Actions\Imports\Models\Import;
@@ -17,7 +16,7 @@ it('can import orders', function () {
     $user = User::factory()->create();
     $admin = User::factory()->admin()->create();
 
-    $import = new Import();
+    $import = new Import;
     $import->user()->associate($admin);
     $import->file_name = 'orders.csv';
     $import->file_path = 'orders.csv';
@@ -26,20 +25,20 @@ it('can import orders', function () {
     $import->save();
 
     $row = [
-        'number' => 'ORD-12345',
-        'user' => (string) $user->id,
-        'status' => 'pending',
-        'total' => '100.50',
-        'currency' => 'EUR',
+        'number'         => 'ORD-12345',
+        'user'           => (string) $user->id,
+        'status'         => 'pending',
+        'total'          => '100.50',
+        'currency'       => 'EUR',
         'payment_status' => 'paid',
     ];
 
     $columnMap = [
-        'number' => 'number',
-        'user' => 'user',
-        'status' => 'status',
-        'total' => 'total',
-        'currency' => 'currency',
+        'number'         => 'number',
+        'user'           => 'user',
+        'status'         => 'status',
+        'total'          => 'total',
+        'currency'       => 'currency',
         'payment_status' => 'payment_status',
     ];
 
@@ -49,8 +48,8 @@ it('can import orders', function () {
 
     expect($import->successful_rows)->toBe(1);
     $this->assertDatabaseHas('orders', [
-        'number' => 'ORD-12345',
+        'number'  => 'ORD-12345',
         'user_id' => $user->id,
-        'total' => 100.50,
+        'total'   => 100.50,
     ]);
 });

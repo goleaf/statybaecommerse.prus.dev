@@ -408,7 +408,7 @@ final class ProductGalleryService
         $maxRating = $performanceFilters['max_rating'] ?? 5.0;
         $trendingOnly = $performanceFilters['trending_only'] ?? false;
 
-        return $products->skipWhile(function ($product) use ($minViews, $minSales, $minRating, $maxRating, $trendingOnly) {
+        return $products->skipWhile(function ($product) use ($minSales, $minRating, $maxRating, $trendingOnly) {
             // Skip products with low views
             // Skip products with low sales
             if ($minSales > 0 && property_exists($product, 'sales_count') && ($product->sales_count ?? 0) < $minSales) {

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Tests\Feature\Filament\Importers;
 
 use App\Filament\Imports\OrganizationImporter;
-use App\Models\Organization;
 use App\Models\User;
 use Filament\Actions\Imports\Jobs\ImportCsv;
 use Filament\Actions\Imports\Models\Import;
@@ -16,7 +15,7 @@ uses(RefreshDatabase::class);
 it('can import organizations', function () {
     $user = User::factory()->admin()->create();
 
-    $import = new Import();
+    $import = new Import;
     $import->user()->associate($user);
     $import->file_name = 'organizations.csv';
     $import->file_path = 'organizations.csv';
@@ -25,14 +24,14 @@ it('can import organizations', function () {
     $import->save();
 
     $row = [
-        'name' => 'Imported Organization',
-        'slug' => 'imported-organization',
+        'name'      => 'Imported Organization',
+        'slug'      => 'imported-organization',
         'is_active' => '1',
     ];
 
     $columnMap = [
-        'name' => 'name',
-        'slug' => 'slug',
+        'name'      => 'name',
+        'slug'      => 'slug',
         'is_active' => 'is_active',
     ];
 

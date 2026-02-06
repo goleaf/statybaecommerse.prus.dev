@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Filament\Resources\ProductFeatureResource\Schemas;
 
 use App\Models\ProductFeature;
-use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\IconEntry;
+use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\RepeatableEntry\TableColumn;
 use Filament\Infolists\Components\TextEntry;

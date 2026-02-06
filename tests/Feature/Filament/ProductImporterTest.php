@@ -8,8 +8,8 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\User;
-use Filament\Actions\Imports\Models\FailedImportRow;
 use Filament\Actions\Imports\Jobs\ImportCsv;
+use Filament\Actions\Imports\Models\FailedImportRow;
 use Filament\Actions\Imports\Models\Import;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
@@ -101,7 +101,7 @@ it('creates missing brand and categories during product import', function (): vo
 it('upserts products when sync mode matches by sku', function (): void {
     $user = User::factory()->admin()->create();
     $existing = Product::factory()->create([
-        'sku' => 'SYNC-001',
+        'sku'  => 'SYNC-001',
         'name' => 'Old Name',
     ]);
 
@@ -121,7 +121,7 @@ it('upserts products when sync mode matches by sku', function (): void {
     $columnMap = $columns->mapWithKeys(fn (string $name) => [$name => $name])->all();
     $options = [
         'should_sync' => true,
-        'sync_keys' => [
+        'sync_keys'   => [
             ['field' => 'sku'],
         ],
     ];
@@ -139,9 +139,9 @@ it('upserts products when sync mode matches by sku', function (): void {
 it('falls back to the next sync key when the first one is blank', function (): void {
     $user = User::factory()->admin()->create();
     $existing = Product::factory()->create([
-        'sku' => 'SYNC-002',
+        'sku'     => 'SYNC-002',
         'barcode' => 'BAR-002',
-        'name' => 'Old Barcode Name',
+        'name'    => 'Old Barcode Name',
     ]);
 
     $import = new Import;
@@ -160,7 +160,7 @@ it('falls back to the next sync key when the first one is blank', function (): v
     $columnMap = $columns->mapWithKeys(fn (string $name) => [$name => $name])->all();
     $options = [
         'should_sync' => true,
-        'sync_keys' => [
+        'sync_keys'   => [
             ['field' => 'sku'],
             ['field' => 'barcode'],
         ],
@@ -178,11 +178,11 @@ it('fails the row when a sync key matches multiple products', function (): void 
 
     Product::factory()->create([
         'name' => 'Duplicate Name',
-        'sku' => 'DUP-1',
+        'sku'  => 'DUP-1',
     ]);
     Product::factory()->create([
         'name' => 'Duplicate Name',
-        'sku' => 'DUP-2',
+        'sku'  => 'DUP-2',
     ]);
 
     $import = new Import;
@@ -201,7 +201,7 @@ it('fails the row when a sync key matches multiple products', function (): void 
     $columnMap = $columns->mapWithKeys(fn (string $name) => [$name => $name])->all();
     $options = [
         'should_sync' => true,
-        'sync_keys' => [
+        'sync_keys'   => [
             ['field' => 'name'],
         ],
     ];

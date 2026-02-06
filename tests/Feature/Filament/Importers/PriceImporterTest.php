@@ -6,7 +6,6 @@ namespace Tests\Feature\Filament\Importers;
 
 use App\Filament\Imports\PriceImporter;
 use App\Models\Currency;
-use App\Models\Price;
 use App\Models\Product;
 use App\Models\User;
 use Filament\Actions\Imports\Jobs\ImportCsv;
@@ -20,7 +19,7 @@ it('can import prices', function () {
     $product = Product::factory()->create();
     $currency = Currency::factory()->create(['code' => 'EUR']);
 
-    $import = new Import();
+    $import = new Import;
     $import->user()->associate($user);
     $import->file_name = 'prices.csv';
     $import->file_path = 'prices.csv';
@@ -29,19 +28,19 @@ it('can import prices', function () {
     $import->save();
 
     $row = [
-        'priceable_id' => (string) $product->id,
+        'priceable_id'   => (string) $product->id,
         'priceable_type' => Product::class,
-        'currency' => (string) $currency->id,
-        'amount' => '123.45',
-        'is_enabled' => '1',
+        'currency'       => (string) $currency->id,
+        'amount'         => '123.45',
+        'is_enabled'     => '1',
     ];
 
     $columnMap = [
-        'priceable_id' => 'priceable_id',
+        'priceable_id'   => 'priceable_id',
         'priceable_type' => 'priceable_type',
-        'currency' => 'currency',
-        'amount' => 'amount',
-        'is_enabled' => 'is_enabled',
+        'currency'       => 'currency',
+        'amount'         => 'amount',
+        'is_enabled'     => 'is_enabled',
     ];
 
     (new ImportCsv($import, [$row], $columnMap, []))->handle();
@@ -50,8 +49,8 @@ it('can import prices', function () {
 
     expect($import->successful_rows)->toBe(1);
     $this->assertDatabaseHas('prices', [
-        'priceable_id' => $product->id,
+        'priceable_id'   => $product->id,
         'priceable_type' => Product::class,
-        'amount' => 123.45,
+        'amount'         => 123.45,
     ]);
 });
