@@ -569,7 +569,7 @@ final class CheckoutProcess extends Component
             $this->selectedShippingOption = null;
             $this->selectedShippingPrice = 0.0;
             $this->selectedShippingSnapshot = [];
-            $this->addError('selectedShippingOption', __('No shipping methods are available for the provided address.'));
+            $this->addError('selectedShippingOption', __('messages.no_shipping_methods_are_available_for_the_provided_address'));
 
             return;
         }
@@ -637,7 +637,7 @@ final class CheckoutProcess extends Component
     private function ensureShippingSelection(): void
     {
         if ($this->selectedShippingOption === null) {
-            $this->addError('selectedShippingOption', __('Please choose a shipping method to continue.'));
+            $this->addError('selectedShippingOption', __('messages.please_choose_a_shipping_method_to_continue'));
         }
 
         $this->updateSelectedShippingPrice();

@@ -86,14 +86,14 @@ final class Delivery extends StepComponent
 
         $optionData = $this->findResolvedOption((int) $this->currentSelected);
         if ($optionData === null) {
-            $this->addError('currentSelected', __('Please choose a valid delivery option.'));
+            $this->addError('currentSelected', __('messages.please_choose_a_valid_delivery_option'));
 
             return;
         }
 
         $optionModel = ShippingOption::query()->find($optionData['id']);
         if ($optionModel === null) {
-            $this->addError('currentSelected', __('Please choose a valid delivery option.'));
+            $this->addError('currentSelected', __('messages.please_choose_a_valid_delivery_option'));
 
             return;
         }

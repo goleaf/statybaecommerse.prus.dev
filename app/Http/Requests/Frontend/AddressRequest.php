@@ -77,19 +77,19 @@ abstract class AddressRequest extends FormRequest
             $country = Str::upper((string) $this->input('country_code'));
 
             if ($country !== '' && ! in_array($country, $this->allowedCountries(), true)) {
-                $validator->errors()->add('country_code', __('The selected country is not supported.'));
+                $validator->errors()->add('country_code', __('messages.the_selected_country_is_not_supported'));
             }
 
             $state = (string) $this->input('state');
             $allowedRegions = $this->allowedRegionsForCountry($country);
             if ($state !== '' && $allowedRegions !== [] && ! in_array($state, $allowedRegions, true)) {
-                $validator->errors()->add('state', __('The selected region is not supported for the chosen country.'));
+                $validator->errors()->add('state', __('messages.the_selected_region_is_not_supported_for_the_chosen_country'));
             }
 
             $postalCode = (string) $this->input('postal_code');
             $pattern = $this->postalCodePattern($country);
             if ($postalCode !== '' && $pattern !== null && preg_match($pattern, $postalCode) !== 1) {
-                $validator->errors()->add('postal_code', __('The postal code format is invalid for the selected country.'));
+                $validator->errors()->add('postal_code', __('messages.the_postal_code_format_is_invalid_for_the_selected_country'));
             }
         });
     }

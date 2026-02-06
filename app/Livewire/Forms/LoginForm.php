@@ -58,7 +58,7 @@ final class LoginForm extends Form
                 $this->captchaResponse = '';
 
                 throw ValidationException::withMessages([
-                    'loginForm.captchaResponse' => __('The security check response did not match. Please try again.'),
+                    'loginForm.captchaResponse' => __('messages.the_security_check_response_did_not_match_please_try_again'),
                 ]);
             }
         } else {

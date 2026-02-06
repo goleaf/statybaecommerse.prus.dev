@@ -39,7 +39,7 @@ class CustomerGroupsTable
                     ->label(__('messages.color'))
                     ->toggleable(isToggledHiddenByDefault: true),
                 IconColumn::make('icon')
-                    ->label(__('common.Icon'))
+                    ->label(__('messages.icon'))
                     ->toggleable(isToggledHiddenByDefault: true),
                 ToggleColumn::make('is_active')
                     ->label(__('messages.active'))

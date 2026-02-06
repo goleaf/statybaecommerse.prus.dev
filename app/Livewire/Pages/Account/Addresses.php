@@ -33,7 +33,7 @@ class Addresses extends Component
             if ($address->user_id !== Auth::id()) {
                 Notification::make()
                     ->title(__('Unauthorized'))
-                    ->body(__('You are not authorized to delete this address.'))
+                    ->body(__('messages.you_are_not_authorized_to_delete_this_address'))
                     ->danger()
                     ->send();
 
@@ -44,7 +44,7 @@ class Addresses extends Component
 
             Notification::make()
                 ->title(__('Address deleted successfully'))
-                ->body(__('The address has been removed from your list.'))
+                ->body(__('messages.the_address_has_been_removed_from_your_list'))
                 ->success()
                 ->send();
 
@@ -52,7 +52,7 @@ class Addresses extends Component
         } catch (Exception $e) {
             Notification::make()
                 ->title(__('Error'))
-                ->body(__('Failed to delete address. Please try again.'))
+                ->body(__('messages.failed_to_delete_address_please_try_again'))
                 ->danger()
                 ->send();
         }
@@ -70,7 +70,7 @@ class Addresses extends Component
             if ($address->user_id !== Auth::id()) {
                 Notification::make()
                     ->title(__('Unauthorized'))
-                    ->body(__('You are not authorized to modify this address.'))
+                    ->body(__('messages.you_are_not_authorized_to_modify_this_address'))
                     ->danger()
                     ->send();
 
@@ -96,7 +96,7 @@ class Addresses extends Component
         } catch (Exception $e) {
             Notification::make()
                 ->title(__('Error'))
-                ->body(__('Failed to set default address. Please try again.'))
+                ->body(__('messages.failed_to_set_default_address_please_try_again'))
                 ->danger()
                 ->send();
         }

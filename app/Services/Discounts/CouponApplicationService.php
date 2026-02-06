@@ -72,7 +72,7 @@ final class CouponApplicationService
     {
         $code = mb_strtoupper(trim($rawCode));
         if ($code === '') {
-            return $this->failure(__('Please provide a coupon code.'));
+            return $this->failure(__('messages.please_provide_a_coupon_code'));
         }
 
         /** @var Coupon|null $coupon */

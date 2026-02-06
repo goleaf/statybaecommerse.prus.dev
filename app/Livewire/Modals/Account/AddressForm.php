@@ -175,17 +175,17 @@ class AddressForm extends ModalComponent
 
         } catch (ValidationException $e) {
             foreach ($e->errors() as $field => $messages) {
-                $this->addError($field, $messages[0] ?? __('Failed to save address.'));
+                $this->addError($field, $messages[0] ?? __('messages.failed_to_save_address'));
             }
             Notification::make()
                 ->title(__('Error'))
-                ->body(__('Failed to save address. Please review the highlighted fields.'))
+                ->body(__('messages.failed_to_save_address_please_review_the_highlighted_fields'))
                 ->danger()
                 ->send();
         } catch (Exception $e) {
             Notification::make()
                 ->title(__('Error'))
-                ->body(__('Failed to save address. Please try again.'))
+                ->body(__('messages.failed_to_save_address_please_try_again'))
                 ->danger()
                 ->send();
         }
@@ -204,19 +204,19 @@ class AddressForm extends ModalComponent
         $country = Str::upper((string) ($addressData['country_code'] ?? ''));
 
         if ($country === '' || ($allowedCountries !== [] && ! in_array($country, $allowedCountries, true))) {
-            throw ValidationException::withMessages(['country_code' => __('The selected country is not supported.')]);
+            throw ValidationException::withMessages(['country_code' => __('messages.the_selected_country_is_not_supported')]);
         }
 
         $state = (string) ($addressData['state'] ?? '');
         $allowedRegions = config("addresses.allowed_regions.$country", []);
         if ($state !== '' && $allowedRegions !== [] && ! in_array($state, $allowedRegions, true)) {
-            throw ValidationException::withMessages(['state' => __('The selected region is not supported for the chosen country.')]);
+            throw ValidationException::withMessages(['state' => __('messages.the_selected_region_is_not_supported_for_the_chosen_country')]);
         }
 
         $postal = (string) ($addressData['postal_code'] ?? '');
         $pattern = config("addresses.postal_code_patterns.$country");
         if ($postal !== '' && $pattern !== null && preg_match($pattern, $postal) !== 1) {
-            throw ValidationException::withMessages(['postal_code' => __('The postal code format is invalid for the selected country.')]);
+            throw ValidationException::withMessages(['postal_code' => __('messages.the_postal_code_format_is_invalid_for_the_selected_country')]);
         }
     }
 

@@ -56,7 +56,7 @@ class CouponForm extends Component
     {
         $this->validate();
         if (! $this->code) {
-            $this->addError('code', __('Please provide a coupon code.'));
+            $this->addError('code', __('messages.please_provide_a_coupon_code'));
 
             return;
         }
