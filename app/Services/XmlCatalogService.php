@@ -8,9 +8,9 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Support\Storage\SecureStorage;
+use BadMethodCallException;
 use DOMDocument;
 use DOMElement;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
@@ -21,31 +21,7 @@ final class XmlCatalogService
 {
     public function import(string $xmlPath, array $options = []): array
     {
-        if (! is_file($xmlPath)) {
-            return ['categories' => ['created' => 0, 'updated' => 0], 'products' => ['created' => 0, 'updated' => 0]];
-        }
-
-        $xml = simplexml_load_file($xmlPath, 'SimpleXMLElement', LIBXML_NOCDATA);
-        if ($xml === false) {
-            return ['categories' => ['created' => 0, 'updated' => 0], 'products' => ['created' => 0, 'updated' => 0]];
-        }
-
-        $only = $options['only'] ?? 'all';
-        $result = [
-            'categories' => ['created' => 0, 'updated' => 0],
-            'products'   => ['created' => 0, 'updated' => 0],
-        ];
-
-        DB::transaction(function () use ($xml, $only, &$result, $options): void {
-            if ($only === 'all' || $only === 'categories') {
-                $result['categories'] = $this->importCategories($xml->categories ?? null);
-            }
-            if ($only === 'all' || $only === 'products') {
-                $result['products'] = $this->importProducts($xml->products ?? null, $options);
-            }
-        });
-
-        return $result;
+        throw new BadMethodCallException('XML importing has been removed. Use CSV import pages instead.');
     }
 
     public function export(string $xmlPath, array $options = []): string
