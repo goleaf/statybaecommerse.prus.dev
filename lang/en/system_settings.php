@@ -3,12 +3,15 @@
 declare(strict_types=1);
 
 return [
-    'active_settings'               => 'system_settings.active_settings',
-    'api'                           => 'system_settings.api',
-    'appearance'                    => 'system_settings.appearance',
-    'cancel'                        => 'system_settings.cancel',
-    'categories'                    => 'system_settings.categories',
-    'charts'                        => 'system_settings.charts',
+    'active_settings' => 'system_settings.active_settings',
+    'api'             => 'system_settings.api',
+    'appearance'      => 'system_settings.appearance',
+    'cancel'          => 'system_settings.cancel',
+    'categories'      => 'system_settings.categories',
+    'charts'          => [
+        'settings_by_category' => 'Settings by category',
+        'settings_by_type'     => 'Settings by type',
+    ],
     'ecommerce'                     => 'system_settings.ecommerce',
     'email'                         => 'system_settings.email',
     'encrypted_settings'            => 'system_settings.encrypted_settings',
@@ -33,6 +36,15 @@ return [
     'show_public_only'              => 'system_settings.show_public_only',
     'showing_count'                 => 'system_settings.showing_count',
     'statistics'                    => 'system_settings.statistics',
-    'stats'                         => 'system_settings.stats',
-    'total_settings'                => 'system_settings.total_settings',
+    'stats'                         => [
+        'active_settings'                => 'Active settings',
+        'active_settings_description'    => 'Active settings description',
+        'encrypted_settings'             => 'Encrypted settings',
+        'encrypted_settings_description' => 'Encrypted settings description',
+        'public_settings'                => 'Public settings',
+        'public_settings_description'    => 'Public settings description',
+        'total_settings'                 => 'Total settings',
+        'total_settings_description'     => 'Total settings description',
+    ],
+    'total_settings' => 'system_settings.total_settings',
 ];

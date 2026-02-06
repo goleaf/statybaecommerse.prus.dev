@@ -59,7 +59,7 @@ class PartnerForm
                             ->step(0.01)
                             ->suffix('%'),
                         TextInput::make('commission_rate')
-                            ->label(__('messages.admin.widgets.average_order_value'))
+                            ->label(__('messages.admin_widgets.average_order_value'))
                             ->numeric()
                             ->step(0.01)
                             ->suffix('%'),

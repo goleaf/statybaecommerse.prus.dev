@@ -45,15 +45,15 @@ class EditProfile extends BaseEditProfile
                             ->tel()
                             ->maxLength(20),
                         Select::make('gender')
-                            ->label(__('Gender'))
+                            ->label(__('ui.gender'))
                             ->options([
-                                'male'   => __('Male'),
-                                'female' => __('Female'),
-                                'other'  => __('Other'),
+                                'male'   => __('ui.male'),
+                                'female' => __('ui.female'),
+                                'other'  => __('ui.other'),
                             ])
                             ->native(false),
                         FileUpload::make('avatar_url')
-                            ->label(__('Avatar'))
+                            ->label(__('ui.avatar'))
                             ->image()
                             ->imageEditor()
                             ->imageEditorAspectRatios([
@@ -67,34 +67,34 @@ class EditProfile extends BaseEditProfile
                     ->description(__('admin.profile.professional_information_description'))
                     ->schema([
                         TextInput::make('company')
-                            ->label(__('Company'))
+                            ->label(__('ui.company'))
                             ->maxLength(255),
                         TextInput::make('position')
-                            ->label(__('Position'))
+                            ->label(__('ui.position'))
                             ->maxLength(255),
                         TextInput::make('website')
-                            ->label(__('Website'))
+                            ->label(__('ui.website'))
                             ->url()
                             ->maxLength(255),
                         Textarea::make('bio')
-                            ->label(__('Bio'))
+                            ->label(__('ui.bio'))
                             ->maxLength(1000)
                             ->rows(3),
                     ])
                     ->columns(2),
-                Section::make(__('Preferences'))
+                Section::make(__('ui.preferences'))
                     ->description(__('admin.profile.preferences_description'))
                     ->schema([
                         Select::make('preferred_locale')
                             ->label(__('admin.profile.preferred_language'))
                             ->options([
-                                'lt' => __('Lithuanian'),
-                                'en' => __('English'),
+                                'lt' => __('ui.lithuanian'),
+                                'en' => __('ui.english'),
                             ])
                             ->native(false)
                             ->required(),
                         Select::make('timezone')
-                            ->label(__('Timezone'))
+                            ->label(__('ui.timezone'))
                             ->options([
                                 'Europe/Vilnius'   => 'Europe/Vilnius (GMT+2)',
                                 'Europe/London'    => 'Europe/London (GMT+0)',
@@ -108,7 +108,7 @@ class EditProfile extends BaseEditProfile
                             ->default(false),
                     ])
                     ->columns(2),
-                Section::make(__('Security'))
+                Section::make(__('ui.security'))
                     ->description(__('admin.profile.security_description'))
                     ->schema([
                         TextInput::make('password')

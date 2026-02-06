@@ -26,33 +26,33 @@ final class RequestExportBulkAction
         $columns = collect($config['columns'] ?? [])->mapWithKeys(fn ($column, $key) => [$key => $column['label']])->all();
 
         return BulkAction::make('export_' . $type->value)
-            ->label(__('Export'))
+            ->label(__('ui.export'))
             ->icon('heroicon-o-arrow-down-tray')
             ->color('info')
             ->form([
                 Grid::make(2)->schema([
                     Select::make('format')
-                        ->label(__('Format'))
+                        ->label(__('ui.format'))
                         ->options(collect(ExportFormat::cases())->mapWithKeys(fn (ExportFormat $format) => [$format->value => Str::upper($format->value)])->all())
                         ->default(ExportFormat::CSV->value)
                         ->required(),
                     TextInput::make('locale')
-                        ->label(__('Locale'))
+                        ->label(__('ui.locale'))
                         ->default(app()->getLocale()),
                     TextInput::make('timezone')
-                        ->label(__('Timezone'))
+                        ->label(__('ui.timezone'))
                         ->default(config('app.timezone')),
                 ]),
                 CheckboxList::make('columns')
-                    ->label(__('Columns'))
+                    ->label(__('ui.columns'))
                     ->options($columns)
                     ->default(array_keys($columns))
                     ->columns(2)
                     ->helperText(__('Select which columns should be included in the export. Leave empty for defaults.')),
                 KeyValue::make('filters')
-                    ->label(__('Filters'))
+                    ->label(__('ui.filters'))
                     ->helperText(__('messages.export_filters_help'))
-                    ->keyLabel(__('Field'))
+                    ->keyLabel(__('ui.field'))
                     ->valueLabel(__('messages.Value')),
             ])
             ->action(function (Collection $records, array $data, ExportService $exportService) use ($type): void {
@@ -84,7 +84,7 @@ final class RequestExportBulkAction
                 $exportService->queueExport($request, $user);
 
                 Notification::make()
-                    ->title(__('Export request queued'))
+                    ->title(__('ui.export_request_queued'))
                     ->body(__('You will be notified when the export is ready for download.'))
                     ->success()
                     ->send();

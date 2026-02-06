@@ -32,9 +32,7 @@ final class RecentOrdersWidget extends BaseWidget
                     ->searchable(),
                 Tables\Columns\TextColumn::make('user.name')
                     ->label(__('orders.customer'))
-                    ->default(fn (?Order $record): string => $record?->user?->name ?? __('messages.orders))
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('))
+                    ->default(fn (?Order $record): string => $record?->user?->name ?? '—')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('status')
                     ->label(__('orders.status'))

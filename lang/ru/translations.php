@@ -60,6 +60,7 @@ return [
     'advanced_filters'                     => 'translations.advanced_filters',
     'advanced_settings'                    => 'translations.advanced_settings',
     'advanced_settings_help'               => 'translations.advanced_settings_help',
+    'all'                                  => 'All',
     'all_addresses'                        => 'translations.all_addresses',
     'all_addresses_in_system'              => 'Все адреса',
     'all_images'                           => 'All images',

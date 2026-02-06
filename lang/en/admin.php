@@ -720,7 +720,10 @@ return [
     'orders_import'        => 'Import Orders',
     'organizations_import' => 'Import Organizations',
     'partners_import'      => 'Import Partners',
-    'prices'               => [
+    'placeholders'         => [
+        'title' => 'Title',
+    ],
+    'prices' => [
         'basic_information'             => 'Basic Information',
         'basic_information_description' => 'Price tiers and validity.',
         'created_at'                    => 'Created At',
@@ -740,7 +743,9 @@ return [
         'select_product'         => 'Select Product',
         'try_different_keywords' => 'Try different keywords',
     ],
-    'product_features'     => 'Product Features',
+    'product_features' => [
+        'basic_information' => 'Basic information',
+    ],
     'product_images'       => 'Product Images',
     'product_requests'     => 'Product Requests',
     'product_similarities' => 'Product Similarities',

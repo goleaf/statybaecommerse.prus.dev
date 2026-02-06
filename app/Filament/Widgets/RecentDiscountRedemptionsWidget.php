@@ -35,26 +35,22 @@ class RecentDiscountRedemptionsWidget extends BaseWidget
             )
             ->columns([
                 Tables\Columns\TextColumn::make('discount.name')
-                    ->label(__('messages.discount_redemptions))
-                    ->weight(FontWeight::Bold)
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('))
+                    ->label(__('frontend.discount_redemptions.fields.discount'))
                     ->weight(FontWeight::Bold)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('code.code')
-                    ->label(__('messages.discount_redemptions))
-                    ->badge()
-                    ->color('))
+                    ->label(__('frontend.discount_redemptions.fields.code'))
                     ->badge()
                     ->color('info')
                     ->copyable(),
                 Tables\Columns\TextColumn::make('user.name')
-                    ->label(__('messages.discount_redemptions))
+                    ->label(__('messages.user'))
                     ->searchable(),
-                Tables\Columns\TextColumn::make('))
+                Tables\Columns\TextColumn::make('order.number')
+                    ->label(__('frontend.discount_redemptions.fields.order'))
                     ->searchable(),
                 Tables\Columns\TextColumn::make('amount_saved')
-                    ->label(__('discount_redemptions.fields.amount_saved'))
+                    ->label(__('frontend.discount_redemptions.fields.amount_saved'))
                     ->money('EUR')
                     ->weight(FontWeight::Bold)
                     ->color('success'),
@@ -67,7 +63,7 @@ class RecentDiscountRedemptionsWidget extends BaseWidget
                         'secondary' => 'cancelled',
                     ]),
                 Tables\Columns\TextColumn::make('redeemed_at')
-                    ->label(__('discount_redemptions.fields.redeemed_at'))
+                    ->label(__('frontend.discount_redemptions.fields.redeemed_at'))
                     ->dateTime()
                     ->since()
                     ->sortable(),

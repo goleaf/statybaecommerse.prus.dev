@@ -720,7 +720,10 @@ return [
     'orders_import'        => 'Importuoti užsakymus',
     'organizations_import' => 'Importuoti organizacijas',
     'partners_import'      => 'Importuoti partnerius',
-    'prices'               => [
+    'placeholders'         => [
+        'title' => 'Title',
+    ],
+    'prices' => [
         'basic_information'             => 'Pagrindinė informacija',
         'basic_information_description' => 'Kainų lygiai ir galiojimas.',
         'created_at'                    => 'Sukurta',
@@ -740,7 +743,9 @@ return [
         'select_product'         => 'Pasirinkite produktą',
         'try_different_keywords' => 'Išbandykite kitus raktažodžius',
     ],
-    'product_features'     => 'Produkto savybės',
+    'product_features' => [
+        'basic_information' => 'Basic information',
+    ],
     'product_images'       => 'Produkto nuotraukos',
     'product_requests'     => 'Produktų užklausos',
     'product_similarities' => 'Produktų panašumai',

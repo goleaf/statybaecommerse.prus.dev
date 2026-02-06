@@ -77,28 +77,28 @@ class CustomerGroupForm
                                     ->numeric()
                                     ->minValue(0),
                                 Toggle::make('has_special_pricing')
-                                    ->label(__('Has Special Pricing')),
+                                    ->label(__('ui.has_special_pricing')),
                                 Toggle::make('has_volume_discounts')
-                                    ->label(__('Has Volume Discounts')),
+                                    ->label(__('ui.has_volume_discounts')),
                             ]),
                     ])
                     ->columnSpanFull(),
 
-                SchemaSection::make(__('Security'))
+                SchemaSection::make(__('ui.security'))
                     ->schema([
                         SchemaGrid::make(2)
                             ->schema([
                                 Toggle::make('can_view_prices')
-                                    ->label(__('Can View Prices'))
+                                    ->label(__('ui.can_view_prices'))
                                     ->default(true),
                                 Toggle::make('can_place_orders')
-                                    ->label(__('Can Place Orders'))
+                                    ->label(__('ui.can_place_orders'))
                                     ->default(true),
                                 Toggle::make('can_view_catalog')
-                                    ->label(__('Can View Catalog'))
+                                    ->label(__('ui.can_view_catalog'))
                                     ->default(true),
                                 Toggle::make('can_use_coupons')
-                                    ->label(__('Can Use Coupons'))
+                                    ->label(__('ui.can_use_coupons'))
                                     ->default(true),
                             ]),
                     ])
@@ -109,11 +109,11 @@ class CustomerGroupForm
                         SchemaGrid::make(3)
                             ->schema([
                                 TextInput::make('minimum_order_amount')
-                                    ->label(__('Minimum Order Amount'))
+                                    ->label(__('ui.minimum_order_amount'))
                                     ->numeric()
                                     ->minValue(0),
                                 TextInput::make('credit_limit')
-                                    ->label(__('Credit Limit'))
+                                    ->label(__('ui.credit_limit'))
                                     ->numeric()
                                     ->minValue(0),
                                 TextInput::make('payment_terms')
