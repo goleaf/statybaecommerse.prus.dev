@@ -32,39 +32,28 @@ final class NewsletterController extends Controller
 
         $validated = $validator->validated();
         $subscriber = $this->findSubscriberByEmail($validated['email']);
-
         $attributes = $this->prepareSubscriberAttributes($validated);
 
-        if ($subscriber) {
+        if ($subscriber !== null) {
             if ($subscriber->status === 'unsubscribed') {
                 $subscriber->update(array_merge($attributes, [
-                    'status'          => 'active',
+                    'status' => 'active',
                     'unsubscribed_at' => null,
                 ]));
 
-                return $this->respondWithMessage($request, 'success', __('messages.newsletter));
+                return $this->respondWithMessage($request, 'success', __('messages.newsletter'));
             }
 
             if ($attributes !== []) {
                 $subscriber->update($attributes);
             }
 
-            return $this->respondWithMessage($request, '));
-            }
-
-            if ($attributes !== []) {
-                $subscriber->update($attributes);
-            }
-
-            return $this->respondWithMessage($request, 'info', __('messages.newsletter));
-        }
-
-        $payload = array_merge([
-            '));
+            return $this->respondWithMessage($request, 'info', __('messages.newsletter'));
         }
 
         $payload = array_merge([
             'email' => $validated['email'],
+            'status' => 'active',
         ], $attributes);
 
         if (! array_key_exists('source', $payload)) {
@@ -73,13 +62,7 @@ final class NewsletterController extends Controller
 
         Subscriber::subscribe($payload);
 
-        return $this->respondWithMessage($request, 'success', __('messages.newsletter));
-    }
-
-    public function unsubscribe(Request $request): JsonResponse|RedirectResponse
-    {
-        $validator = Validator::make($request->all(), [
-            '));
+        return $this->respondWithMessage($request, 'success', __('messages.newsletter'));
     }
 
     public function unsubscribe(Request $request): JsonResponse|RedirectResponse
@@ -94,34 +77,24 @@ final class NewsletterController extends Controller
 
         $subscriber = $this->findSubscriberByEmail($validator->validated()['email']);
 
-        if (! $subscriber) {
-            return $this->respondWithMessage($request, 'error', __('messages.newsletter), 404);
-        }
-
-        if ($subscriber->status !== '), 404);
+        if ($subscriber === null) {
+            return $this->respondWithMessage($request, 'error', __('messages.newsletter'), 404);
         }
 
         if ($subscriber->status !== 'unsubscribed') {
             $subscriber->unsubscribe();
         }
 
-        return $this->respondWithMessage($request, 'success', __('messages.subscribers));
+        return $this->respondWithMessage($request, 'success', __('messages.subscribers'));
     }
 
     private function handleValidationFailure(Request $request, ValidatorContract $validator): JsonResponse|RedirectResponse
     {
         if ($request->expectsJson()) {
             return response()->json([
-                '));
-    }
-
-    private function handleValidationFailure(Request $request, ValidatorContract $validator): JsonResponse|RedirectResponse
-    {
-        if ($request->expectsJson()) {
-            return response()->json([
-                'status'  => 'error',
+                'status' => 'error',
                 'message' => $validator->errors()->first(),
-                'errors'  => $validator->errors(),
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -132,14 +105,14 @@ final class NewsletterController extends Controller
     {
         if ($request->expectsJson()) {
             return response()->json([
-                'status'  => $status,
+                'status' => $status,
                 'message' => $message,
             ], $code);
         }
 
         $flashKey = match ($status) {
             'error' => 'error',
-            'info'  => 'info',
+            'info' => 'info',
             default => 'success',
         };
 
@@ -150,16 +123,16 @@ final class NewsletterController extends Controller
     {
         $attributes = [
             'first_name' => $validated['first_name'] ?? null,
-            'last_name'  => $validated['last_name'] ?? null,
-            'company'    => $validated['company'] ?? null,
-            'interests'  => $validated['interests'] ?? null,
+            'last_name' => $validated['last_name'] ?? null,
+            'company' => $validated['company'] ?? null,
+            'interests' => $validated['interests'] ?? null,
         ];
 
         if (array_key_exists('source', $validated)) {
             $attributes['source'] = $validated['source'];
         }
 
-        return array_filter($attributes, static function ($value) {
+        return array_filter($attributes, static function ($value): bool {
             if (is_array($value)) {
                 return true;
             }
