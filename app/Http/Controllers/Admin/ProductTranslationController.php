@@ -132,6 +132,6 @@ final class ProductTranslationController extends Controller
         );
 
         // Redirect back to the admin panel with feedback so editors receive immediate confirmation.
-        return back()->with('status', __('Product translation updated successfully.'));
+        return back()->with('status', __('messages.product_translation_updated_successfully'));
     }
 }

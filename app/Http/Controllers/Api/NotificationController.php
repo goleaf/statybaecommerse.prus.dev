@@ -202,7 +202,7 @@ final class NotificationController extends Controller
             ->all();
 
         $locale = RequestContext::resolveLocale($request);
-        $detail = $violations[0]['messages'][0] ?? (ErrorCodes::message(ErrorCodes::VALIDATION_FAILED, $locale) ?? __('The given data was invalid.'));
+        $detail = $violations[0]['messages'][0] ?? (ErrorCodes::message(ErrorCodes::VALIDATION_FAILED, $locale) ?? __('messages.the_given_data_was_invalid'));
 
         $response = ApiErrorResponse::problem(
             request: $request,

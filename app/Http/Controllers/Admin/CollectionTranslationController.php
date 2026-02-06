@@ -103,6 +103,6 @@ final class CollectionTranslationController extends Controller
         );
 
         // Redirect back to the previous page so Filament/Livewire panels can refresh their state with the new translation.
-        return back()->with('status', __('Collection translation updated successfully.'));
+        return back()->with('status', __('messages.collection_translation_updated_successfully'));
     }
 }

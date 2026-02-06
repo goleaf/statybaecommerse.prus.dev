@@ -41,7 +41,7 @@ final class UpdatePasswordForm extends Component
         $this->password = '';
         $this->password_confirmation = '';
         $this->dispatch('password-updated');
-        session()->flash('status', __('Password updated successfully.'));
+        session()->flash('status', __('messages.password_updated_successfully'));
     }
 
     /**

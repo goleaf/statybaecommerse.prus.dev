@@ -60,7 +60,7 @@ final class RequestExportBulkAction
 
                 if (! $user) {
                     Notification::make()
-                        ->title(__('Unable to identify the authenticated user.'))
+                        ->title(__('messages.unable_to_identify_the_authenticated_user'))
                         ->danger()
                         ->send();
 
@@ -85,7 +85,7 @@ final class RequestExportBulkAction
 
                 Notification::make()
                     ->title(__('ui.export_request_queued'))
-                    ->body(__('You will be notified when the export is ready for download.'))
+                    ->body(__('messages.you_will_be_notified_when_the_export_is_ready_for_download'))
                     ->success()
                     ->send();
             });

@@ -42,7 +42,7 @@ final class UpdateProfileInformationForm extends Component
         $this->validate();
         Auth::user()->update(['name' => $this->name, 'email' => $this->email]);
         $this->dispatch('profile-updated');
-        session()->flash('status', __('Profile updated successfully.'));
+        session()->flash('status', __('messages.profile_updated_successfully'));
     }
 
     /**

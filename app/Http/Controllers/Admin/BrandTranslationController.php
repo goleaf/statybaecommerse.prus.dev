@@ -175,7 +175,7 @@ final class BrandTranslationController extends Controller
         );
 
         // Redirect back to the previous page with user-facing feedback about the successful operation.
-        return back()->with('status', __('Brand translation updated successfully.'));
+        return back()->with('status', __('messages.brand_translation_updated_successfully'));
     }
 
     /**

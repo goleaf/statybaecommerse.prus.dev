@@ -49,7 +49,7 @@ final class CartController extends Controller
             if ($request->expectsJson()) {
                 return $this->respondWithCart($request, [
                     'success'            => false,
-                    'message'            => __('The requested product is out of stock.'),
+                    'message'            => __('messages.the_requested_product_is_out_of_stock'),
                     'available_quantity' => $result['available'],
                 ], 409);
             }
@@ -77,7 +77,7 @@ final class CartController extends Controller
             ];
 
             if ($result['status'] === 'clamped') {
-                $payload['message'] = __('Requested quantity exceeds available stock.');
+                $payload['message'] = __('messages.requested_quantity_exceeds_available_stock');
                 $payload['available_quantity'] = $result['available'];
             }
 
@@ -97,7 +97,7 @@ final class CartController extends Controller
             if ($cartItem === null) {
                 return response()->json([
                     'success' => false,
-                    'message' => __('Cart item not found.'),
+                    'message' => __('messages.cart_item_not_found'),
                 ], 404);
             }
 
@@ -109,7 +109,7 @@ final class CartController extends Controller
 
                 return $this->respondWithCart($request, [
                     'success'            => false,
-                    'message'            => __('The requested product is out of stock.'),
+                    'message'            => __('messages.the_requested_product_is_out_of_stock'),
                     'available_quantity' => $result['available'],
                 ], 409);
             }
@@ -127,7 +127,7 @@ final class CartController extends Controller
             ];
 
             if ($result['status'] === 'clamped') {
-                $payload['message'] = __('Requested quantity exceeds available stock.');
+                $payload['message'] = __('messages.requested_quantity_exceeds_available_stock');
                 $payload['available_quantity'] = $result['available'];
             }
 
@@ -166,7 +166,7 @@ final class CartController extends Controller
             if ($cartItem === null) {
                 return response()->json([
                     'success' => false,
-                    'message' => __('Cart item not found.'),
+                    'message' => __('messages.cart_item_not_found'),
                 ], 404);
             }
 
@@ -176,7 +176,7 @@ final class CartController extends Controller
 
             return $this->respondWithCart($request, [
                 'success' => true,
-                'message' => __('Item removed from cart.'),
+                'message' => __('messages.item_removed_from_cart'),
             ]);
         }
 
@@ -209,7 +209,7 @@ final class CartController extends Controller
         if ($request->expectsJson()) {
             return $this->respondWithCart($request, [
                 'success' => true,
-                'message' => __('Cart cleared successfully.'),
+                'message' => __('messages.cart_cleared_successfully'),
             ]);
         }
 

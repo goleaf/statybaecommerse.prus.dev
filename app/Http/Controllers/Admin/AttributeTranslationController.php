@@ -85,6 +85,6 @@ final class AttributeTranslationController extends Controller
         );
 
         // Redirect back to the administration panel with a success flash message for user feedback.
-        return back()->with('status', __('Attribute translation updated successfully.'));
+        return back()->with('status', __('messages.attribute_translation_updated_successfully'));
     }
 }

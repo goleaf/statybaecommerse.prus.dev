@@ -26,13 +26,13 @@ trait WithCart
         $product = Product::query()->find($productId);
 
         if ($product === null) {
-            $this->notifyError(__('The selected product is no longer available.'));
+            $this->notifyError(__('messages.the_selected_product_is_no_longer_available'));
 
             return false;
         }
 
         if ($product->shouldHideAddToCart()) {
-            $this->notifyWarning(__('This product is not available for online purchase.'));
+            $this->notifyWarning(__('messages.this_product_is_not_available_for_online_purchase'));
 
             return false;
         }
@@ -47,13 +47,13 @@ trait WithCart
                 ->find($variantId);
 
             if ($variant === null) {
-                $this->notifyError(__('The selected variant is no longer available.'));
+                $this->notifyError(__('messages.the_selected_variant_is_no_longer_available'));
 
                 return false;
             }
 
             if (! $variant->isAvailableForPurchase()) {
-                $this->notifyWarning(__('This variant is not available for purchase.'));
+                $this->notifyWarning(__('messages.this_variant_is_not_available_for_purchase'));
 
                 return false;
             }
@@ -81,7 +81,7 @@ trait WithCart
                 });
 
             if ($variant === null) {
-                $this->notifyWarning(__('This product is not available for purchase.'));
+                $this->notifyWarning(__('messages.this_product_is_not_available_for_purchase'));
 
                 return false;
             }

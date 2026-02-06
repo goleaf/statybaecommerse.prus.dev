@@ -88,17 +88,17 @@ final class DiscountRedemptionController extends Controller
         $discountCode = \App\Models\DiscountCode::where('code', $validated['discount_code'])->first();
 
         if (! $discountCode) {
-            return back()->withErrors(['discount_code' => __('Invalid discount code.')]);
+            return back()->withErrors(['discount_code' => __('messages.invalid_discount_code')]);
         }
 
         // Check if code is active and not expired
         if (! $discountCode->is_active || $discountCode->expires_at < now()) {
-            return back()->withErrors(['discount_code' => __('This discount code is no longer valid.')]);
+            return back()->withErrors(['discount_code' => __('messages.this_discount_code_is_no_longer_valid')]);
         }
 
         // Check usage limits
         if ($discountCode->usage_limit && $discountCode->usage_count >= $discountCode->usage_limit) {
-            return back()->withErrors(['discount_code' => __('This discount code has reached its usage limit.')]);
+            return back()->withErrors(['discount_code' => __('messages.this_discount_code_has_reached_its_usage_limit')]);
         }
 
         // Check per-user usage limit
@@ -109,7 +109,7 @@ final class DiscountRedemptionController extends Controller
             ->count();
 
         if ($discountCode->usage_limit_per_user && $userRedemptions >= $discountCode->usage_limit_per_user) {
-            return back()->withErrors(['discount_code' => __('You have already used this discount code the maximum number of times.')]);
+            return back()->withErrors(['discount_code' => __('messages.you_have_already_used_this_discount_code_the_maximum_number_of_times')]);
         }
 
         // Create redemption

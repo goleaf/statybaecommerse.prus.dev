@@ -73,7 +73,7 @@ class ExportController extends Controller
         $path = 'exports/' . $filename;
         $disk = Storage::disk(SecureStorage::disk());
         if (! $disk->exists($path)) {
-            return redirect()->route('exports.index')->with('error', __('File not found.'));
+            return redirect()->route('exports.index')->with('error', __('messages.file_not_found'));
         }
 
         try {
@@ -81,7 +81,7 @@ class ExportController extends Controller
                 echo $disk->get($path);
             }, $filename, ['Content-Type' => 'text/csv; charset=UTF-8']);
         } catch (FileNotFoundException) {
-            return redirect()->route('exports.index')->with('error', __('File not found.'));
+            return redirect()->route('exports.index')->with('error', __('messages.file_not_found'));
         }
     }
 }

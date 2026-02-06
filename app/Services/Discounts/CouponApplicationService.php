@@ -80,7 +80,7 @@ final class CouponApplicationService
         if (! $coupon instanceof Coupon) {
             $this->session->forget('checkout.coupon');
 
-            return $this->failure(__('This coupon could not be found.'));
+            return $this->failure(__('messages.this_coupon_could_not_be_found'));
         }
 
         $subtotal = (float) Arr::get($context, 'cart.subtotal', 0.0);
@@ -100,7 +100,7 @@ final class CouponApplicationService
         if ($discountAmount <= 0) {
             $this->session->forget('checkout.coupon');
 
-            return $this->failure(__('This coupon does not provide a discount for the current cart.'));
+            return $this->failure(__('messages.this_coupon_does_not_provide_a_discount_for_the_current_cart'));
         }
 
         $pricing = (array) $this->discountEngine->evaluate(array_merge($context, ['code' => $code]));
@@ -120,7 +120,7 @@ final class CouponApplicationService
 
         return [
             'success' => true,
-            'message' => __('Coupon applied successfully.'),
+            'message' => __('messages.coupon_applied_successfully'),
             'coupon'  => $payload,
         ];
     }
@@ -137,7 +137,7 @@ final class CouponApplicationService
 
         $result = [
             'success' => true,
-            'message' => __('Coupon removed.'),
+            'message' => __('messages.coupon_removed'),
             'coupon'  => $coupon ?? ['code' => null, 'discount_amount' => 0.0],
             'pricing' => $pricing,
         ];
@@ -158,7 +158,7 @@ final class CouponApplicationService
         $candidate = collect($this->getAvailableCoupons($context))->firstWhere('is_auto_apply', true);
 
         if (! is_array($candidate)) {
-            return $this->failure(__('No auto-apply coupons are currently available.'));
+            return $this->failure(__('messages.no_auto_apply_coupons_are_currently_available'));
         }
 
         // Delegate to the core apply logic so validation and pricing adjustments remain consistent.
@@ -187,16 +187,16 @@ final class CouponApplicationService
     {
         // Ensure all baseline checks (active flags, time windows, min spend) still pass for the current cart.
         if (! $coupon->canBeUsed($subtotal)) {
-            return __('This coupon cannot be applied to your cart.');
+            return __('messages.this_coupon_cannot_be_applied_to_your_cart');
         }
 
         $userId = Arr::get($context, 'user_id');
         if ($this->userHasExceededPersonalLimit($coupon, $userId)) {
-            return __('You have already used this coupon the maximum number of times.');
+            return __('messages.you_have_already_used_this_coupon_the_maximum_number_of_times');
         }
 
         if (! $this->userIsEligibleForFirstTimeCoupon($coupon, $userId)) {
-            return __('This coupon is only available for your first order.');
+            return __('messages.this_coupon_is_only_available_for_your_first_order');
         }
 
         $groupIds = collect(Arr::get($context, 'group_ids', []))
@@ -205,17 +205,17 @@ final class CouponApplicationService
             ->values();
 
         if ($coupon->customer_group_id !== null && ! $groupIds->contains((int) $coupon->customer_group_id)) {
-            return __('This coupon is not available for your customer group.');
+            return __('messages.this_coupon_is_not_available_for_your_customer_group');
         }
 
         $applicableProducts = $this->normaliseIdCollection($coupon->applicable_products);
         if ($applicableProducts->isNotEmpty() && ($productIds->isEmpty() || $productIds->intersect($applicableProducts)->isEmpty())) {
-            return __('This coupon is not valid for the selected products.');
+            return __('messages.this_coupon_is_not_valid_for_the_selected_products');
         }
 
         $applicableCategories = $this->normaliseIdCollection($coupon->applicable_categories);
         if ($applicableCategories->isNotEmpty() && ($categoryIds->isEmpty() || $categoryIds->intersect($applicableCategories)->isEmpty())) {
-            return __('This coupon is not valid for the selected categories.');
+            return __('messages.this_coupon_is_not_valid_for_the_selected_categories');
         }
 
         return null;
