@@ -48,7 +48,7 @@ final class NotificationController extends Controller
         // Mark the notification as read in a single call to avoid refreshing the model twice.
         $notification->markAsRead();
 
-        return response()->json(['success' => true, 'message' => __('Notification marked as read')]);
+        return response()->json(['success' => true, 'message' => __('messages.notification_marked_as_read')]);
     }
 
     /**
@@ -65,7 +65,7 @@ final class NotificationController extends Controller
         // Reset the notification read timestamp to indicate it requires user attention again.
         $notification->markAsUnread();
 
-        return response()->json(['success' => true, 'message' => __('Notification marked as unread')]);
+        return response()->json(['success' => true, 'message' => __('messages.notification_marked_as_unread')]);
     }
 
     /**
@@ -84,7 +84,7 @@ final class NotificationController extends Controller
             ->whereNull('read_at')
             ->update(['read_at' => Date::now()]);
 
-        return response()->json(['success' => true, 'message' => __('All notifications marked as read')]);
+        return response()->json(['success' => true, 'message' => __('messages.all_notifications_marked_as_read')]);
     }
 
     /**
@@ -101,7 +101,7 @@ final class NotificationController extends Controller
         // Remove the notification once ownership has been validated.
         $notification->delete();
 
-        return response()->json(['success' => true, 'message' => __('Notification deleted')]);
+        return response()->json(['success' => true, 'message' => __('messages.notification_deleted')]);
     }
 
     /**
@@ -118,7 +118,7 @@ final class NotificationController extends Controller
         // Delete notifications via a scoped query to avoid loading the collection into memory.
         $this->notificationQueryForUser($user)->delete();
 
-        return response()->json(['success' => true, 'message' => __('All notifications cleared')]);
+        return response()->json(['success' => true, 'message' => __('messages.all_notifications_cleared')]);
     }
 
     /**
@@ -164,7 +164,7 @@ final class NotificationController extends Controller
             static fn (DatabaseNotification $notification): array => [
                 'id'         => (string) $notification->id,
                 'type'       => class_basename($notification->type),
-                'title'      => $notification->data['title'] ?? __('Notification'),
+                'title'      => $notification->data['title'] ?? __('messages.notification'),
                 'message'    => $notification->data['message'] ?? '',
                 'read_at'    => $notification->read_at,
                 'created_at' => $notification->created_at?->diffForHumans(),

@@ -34,6 +34,6 @@ final class Detail extends Component
     {
         return view('livewire.pages.account.orders.detail')
             ->layout('components.layouts.templates.account')
-            ->title(__('Details of your order'));
+            ->title(__('messages.details_of_your_order'));
     }
 }

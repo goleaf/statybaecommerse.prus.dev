@@ -59,7 +59,7 @@ trait WithCart
             }
 
             if ($variant->track_inventory && $variant->availableQuantity() < $normalizedQuantity) {
-                $this->notifyError(__('Not enough stock available'));
+                $this->notifyError(__('messages.not_enough_stock_available'));
 
                 return false;
             }
@@ -86,7 +86,7 @@ trait WithCart
                 return false;
             }
         } elseif ($product->availableQuantity() < $normalizedQuantity) {
-            $this->notifyError(__('Not enough stock available'));
+            $this->notifyError(__('messages.not_enough_stock_available'));
 
             return false;
         }
@@ -149,7 +149,7 @@ trait WithCart
         );
 
         $this->dispatch('cart-updated');
-        $this->notifySuccess($successMessage ?? __('Product added to cart'));
+        $this->notifySuccess($successMessage ?? __('messages.product_added_to_cart'));
     }
 
     public function removeFromCart(int $productId, ?int $variantId = null): void
@@ -160,7 +160,7 @@ trait WithCart
             unset($cartItems[$cartKey]);
             session()->put('cart', $cartItems);
             $this->dispatch('cart-updated');
-            $this->notifySuccess(__('Product removed from cart'));
+            $this->notifySuccess(__('messages.product_removed_from_cart'));
         }
     }
 
@@ -173,7 +173,7 @@ trait WithCart
         }
         $product = Product::find($productId);
         if (! $product || $product->stock_quantity < $quantity) {
-            $this->notifyError(__('Not enough stock available'));
+            $this->notifyError(__('messages.not_enough_stock_available'));
 
             return;
         }
@@ -206,7 +206,7 @@ trait WithCart
     {
         session()->forget('cart');
         $this->dispatch('cart-updated');
-        $this->notifySuccess(__('Cart cleared'));
+        $this->notifySuccess(__('messages.cart_cleared'));
     }
 
     private function resolveCartKey(int $productId, ?int $variantId): string
