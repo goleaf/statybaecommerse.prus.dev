@@ -116,6 +116,7 @@ return [
     'Yes'          => 'common.Yes',
     'actions'      => 'Actions',
     'active'       => 'Active',
+    'adding'       => 'common.Adding...',
     'all'          => 'All',
     'back'         => 'Back',
     'cancel'       => 'Cancel',
