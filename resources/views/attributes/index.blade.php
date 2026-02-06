@@ -158,7 +158,7 @@
                                     'date' => 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
                                     default => 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
                                 } }}">
-                                {{ __('ui.attributes.' . $attribute->type) }}
+                                {{ __(sprintf('ui.attributes.%s', $attribute->type)) }}
                             </span>
                             <span>
                                 <i class="fas fa-list mr-1"></i>

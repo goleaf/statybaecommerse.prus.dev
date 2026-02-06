@@ -57,7 +57,7 @@
                             {{ __('messages.admin') }}
                         </div>
                         <div class="text-2xl font-bold text-orange-900 dark:text-orange-100">
-                            {{ __('admin.search_insights_labels.intents.' . ($insights['query_analysis']['intent_classification'] ?? 'general')) }}
+                            {{ __(sprintf('admin.search_insights_labels.intents.%s', ($insights['query_analysis']['intent_classification'] ?? 'general'))) }}
                         </div>
                     </div>
                 </div>
@@ -78,7 +78,7 @@
                             <div class="flex justify-between items-center">
                                 <span class="text-sm text-gray-600 dark:text-gray-400">{{ __('messages.admin') }}</span>
                                 <span class="font-semibold text-gray-900 dark:text-white">
-                                    {{ __('admin.search_insights_labels.trend_directions.' . ($insights['search_trends']['trend_direction'] ?? 'stable')) }}
+                                    {{ __(sprintf('admin.search_insights_labels.trend_directions.%s', ($insights['search_trends']['trend_direction'] ?? 'stable'))) }}
                                 </span>
                             </div>
                             <div class="flex justify-between items-center">

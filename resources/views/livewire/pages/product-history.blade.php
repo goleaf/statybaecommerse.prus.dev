@@ -248,12 +248,12 @@
                                             <header class="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
                                                 <div class="flex flex-1 flex-wrap items-center gap-2">
                                                     <h3 class="text-base font-semibold text-slate-900">
-                                                        {{ __('frontend.products.events.' . $entry->action) }}
+                                                        {{ __(sprintf('frontend.products.events.%s', $entry->action)) }}
                                                     </h3>
 
                                                     @if($entry->field_name)
                                                         <span class="inline-flex items-center rounded-full bg-slate-100 px-2 py-1 text-xs font-medium text-slate-700">
-                                                            {{ __('frontend.products.fields.' . $entry->field_name, [], $entry->field_name) }}
+                                                            {{ __(sprintf('frontend.products.fields.%s', $entry->field_name), [], $entry->field_name) }}
                                                         </span>
                                                     @endif
 
@@ -270,7 +270,7 @@
                                                         @endphp
 
                                                         <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-semibold {{ $impactClasses }}">
-                                                            {{ __('frontend.products.impact.' . $impact) }}
+                                                            {{ __(sprintf('frontend.products.impact.%s', $impact)) }}
                                                         </span>
                                                     @endif
                                                 </div>
@@ -338,7 +338,7 @@
                                                         <div class="mt-3 space-y-2 text-sm text-slate-600">
                                                             @foreach($entry->metadata as $key => $value)
                                                                 <div class="flex justify-between gap-4 rounded-xl border border-slate-100 bg-white/60 px-3 py-2">
-                                                                    <span class="font-medium text-slate-700">{{ __('frontend.products.metadata.' . $key, [], $key) }}</span>
+                                                                    <span class="font-medium text-slate-700">{{ __(sprintf('frontend.products.metadata.%s', $key), [], $key) }}</span>
                                                                     <span class="text-right">{{ is_array($value) ? json_encode($value, JSON_UNESCAPED_UNICODE) : $value }}</span>
                                                                 </div>
                                                             @endforeach

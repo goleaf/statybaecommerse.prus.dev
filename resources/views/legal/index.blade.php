@@ -49,7 +49,7 @@
                                     {{ \App\Models\Legal::getTypes()[$type] ?? $type }}
                                 </h2>
                                 <p class="text-gray-600">
-                                    {{ __('frontend.legal.' . $type . '_description') }}
+                                    {{ __(sprintf('frontend.legal.%s_description', $type)) }}
                                 </p>
                             </div>
 

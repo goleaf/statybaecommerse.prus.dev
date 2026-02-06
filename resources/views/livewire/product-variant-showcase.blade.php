@@ -204,7 +204,7 @@
                                 {{ $this->getVariantStockStatus($selectedVariant) === 'out_of_stock' ? 'bg-red-100 text-red-800' : '' }}
                                 {{ $this->getVariantStockStatus($selectedVariant) === 'not_tracked' ? 'bg-gray-100 text-gray-800' : '' }}
                             ">
-                                {{ __('product.variants.stock_status.' . $this->getVariantStockStatus($selectedVariant)) }}
+                                {{ __(sprintf('product.variants.stock_status.%s', $this->getVariantStockStatus($selectedVariant))) }}
                             </span>
                         </div>
                     </div>
@@ -274,7 +274,7 @@
                                 {{ $this->getVariantStockStatus($variant) === 'out_of_stock' ? 'bg-red-100 text-red-800' : '' }}
                                 {{ $this->getVariantStockStatus($variant) === 'not_tracked' ? 'bg-gray-100 text-gray-800' : '' }}
                             ">
-                                {{ __('product.variants.stock_status.' . $this->getVariantStockStatus($variant)) }}
+                                {{ __(sprintf('product.variants.stock_status.%s', $this->getVariantStockStatus($variant))) }}
                             </span>
                         </div>
                     </div>

@@ -55,7 +55,7 @@
                             </span>
                             <span>
                                 <i class="fas fa-eye mr-1"></i>
-                                {{ __('collections.display_types.' . $collection->display_type) }}
+                                {{ __(sprintf('collections.display_types.%s', $collection->display_type)) }}
                             </span>
                         </div>
                     </div>
@@ -163,7 +163,7 @@
                     <div class="flex justify-between">
                         <span class="text-gray-600 dark:text-gray-300">{{ __('messages.collections') }}:</span>
                         <span class="font-medium text-gray-900 dark:text-white">
-                            {{ __('collections.display_types.' . $collection->display_type) }}
+                            {{ __(sprintf('collections.display_types.%s', $collection->display_type)) }}
                         </span>
                     </div>
                     

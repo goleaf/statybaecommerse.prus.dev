@@ -149,7 +149,7 @@
                                     @if($referralCode->reward_amount)
                                         {{ $referralCode->formatted_reward_amount }}
                                         @if($referralCode->reward_type)
-                                            <div class="text-xs text-gray-500">{{ __('referral_codes.reward_types.' . $referralCode->reward_type) }}</div>
+                                            <div class="text-xs text-gray-500">{{ __(sprintf('referral_codes.reward_types.%s', $referralCode->reward_type)) }}</div>
                                         @endif
                                     @else
                                         <span class="text-gray-400">{{ __('messages.referral_codes') }}</span>

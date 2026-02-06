@@ -27,7 +27,7 @@
                             @elseif($referral->status === 'completed') bg-green-100 text-green-800
                             @elseif($referral->status === 'expired') bg-red-100 text-red-800
                             @else bg-gray-100 text-gray-800 @endif">
-                            {{ __('referrals.statuses.' . $referral->status) }}
+                            {{ __(sprintf('referrals.statuses.%s', $referral->status)) }}
                         </span>
                     </div>
 
@@ -67,7 +67,7 @@
                                     <span class="text-sm text-gray-600">{{ number_format($reward->amount, 2) }} {{ $reward->currency ?? 'EUR' }}</span>
                                 </div>
                                 <div class="text-xs text-gray-500 mt-1">
-                                    {{ __('referrals.reward_statuses.' . $reward->status) }}
+                                    {{ __(sprintf('referrals.reward_statuses.%s', $reward->status)) }}
                                 </div>
                             </div>
                             @endforeach

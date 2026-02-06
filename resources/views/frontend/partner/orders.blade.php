@@ -100,7 +100,7 @@
                 </div>
                 <p class="text-sm text-gray-500 dark:text-gray-400">
                     {{-- Display the active filter for extra clarity on the dataset shown. --}}
-                    {{ __('partners.dashboard.tabs.' . $activeStatus) }} •
+                    {{ __(sprintf('partners.dashboard.tabs.%s', $activeStatus)) }} •
                     {{ __('partners.dashboard.result_count', ['count' => $paginator?->total() ?? 0]) }}
                 </p>
             </div>
@@ -151,7 +151,7 @@
                                         $statusBadgeClasses = $badgeColorMap[$statusColorKey] ?? 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200';
 
                                         $paymentState = (string) Arr::get($order, 'status.payment_state', '');
-                                        $paymentLabel = __('orders.payment_statuses.' . $paymentState);
+                                        $paymentLabel = __(sprintf('orders.payment_statuses.%s', $paymentState));
                                         if ($paymentLabel === 'orders.payment_statuses.' . $paymentState) {
                                             $paymentLabel = Str::headline($paymentState);
                                         }

@@ -103,7 +103,7 @@
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                             {{ __('messages.regions') }}
                         </label>
-                        <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ __('regions.levels.' . $region->level) }}</p>
+                        <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ __(sprintf('regions.levels.%s', $region->level)) }}</p>
                     </div>
                     
                     @if($region->country)

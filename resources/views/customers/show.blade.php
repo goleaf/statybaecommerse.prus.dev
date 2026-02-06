@@ -87,7 +87,7 @@
                             {{ __('customers.fields.preferred_language') }}
                         </dt>
                         <dd class="mt-1 text-sm text-gray-900 dark:text-white">
-                            {{ __('customers.locales.' . $customer->preferred_locale) }}
+                            {{ __(sprintf('customers.locales.%s', $customer->preferred_locale)) }}
                         </dd>
                     </div>
                     <div>

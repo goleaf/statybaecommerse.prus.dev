@@ -27,7 +27,7 @@
                         @elseif($campaign->type === 'banner') bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200
                         @elseif($campaign->type === 'popup') bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200
                         @else bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 @endif">
-                            {{ __('campaigns.types.' . $campaign->type) }}
+                            {{ __(sprintf('campaigns.types.%s', $campaign->type)) }}
                         </span>
 
                         @if ($campaign->is_featured)
