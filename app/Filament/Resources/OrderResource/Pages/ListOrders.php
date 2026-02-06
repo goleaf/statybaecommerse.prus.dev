@@ -12,6 +12,15 @@ class ListOrders extends BaseListRecords
 {
     protected static string $resource = OrderResource::class;
 
+    public function loadTable(): void
+    {
+        if (! isset($this->table)) {
+            $this->bootedInteractsWithTable();
+        }
+
+        $this->getTableRecords();
+    }
+
     protected function getHeaderActions(): array
     {
         return [

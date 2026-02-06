@@ -12,6 +12,15 @@ class ListUsers extends BaseListRecords
 {
     protected static string $resource = UserResource::class;
 
+    public function loadTable(): void
+    {
+        if (! isset($this->table)) {
+            $this->bootedInteractsWithTable();
+        }
+
+        $this->getTableRecords();
+    }
+
     protected function getHeaderActions(): array
     {
         return [

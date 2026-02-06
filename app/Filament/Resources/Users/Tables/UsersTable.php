@@ -54,8 +54,8 @@ class UsersTable
                 EditAction::make(),
             ])
             ->bulkActions([
+                RequestExportBulkAction::make(ExportType::USERS),
                 BulkActionGroup::make([
-                    RequestExportBulkAction::make(ExportType::USERS),
                     DeleteBulkAction::make(),
                     ForceDeleteBulkAction::make(),
                     RestoreBulkAction::make(),

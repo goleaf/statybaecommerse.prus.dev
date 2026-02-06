@@ -125,8 +125,8 @@ class ProductsTable
                 DeleteAction::make(),
             ])
             ->bulkActions([
+                RequestExportBulkAction::make(ExportType::PRODUCTS),
                 BulkActionGroup::make([
-                    RequestExportBulkAction::make(ExportType::PRODUCTS),
                     DeleteBulkAction::make(),
                     BulkAction::make('publish')
                         ->label(__('admin.products.bulk_publish'))

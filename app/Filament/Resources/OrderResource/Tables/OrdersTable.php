@@ -69,8 +69,8 @@ class OrdersTable
                 EditAction::make(),
             ])
             ->bulkActions([ // Changed to bulkActions as it makes more sense for BulkActionGroup
+                RequestExportBulkAction::make(ExportType::ORDERS),
                 BulkActionGroup::make([
-                    RequestExportBulkAction::make(ExportType::ORDERS),
                     DeleteBulkAction::make(),
                     ForceDeleteBulkAction::make(),
                     RestoreBulkAction::make(),

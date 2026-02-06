@@ -12,6 +12,15 @@ class ListProducts extends BaseListRecords
 {
     protected static string $resource = ProductResource::class;
 
+    public function loadTable(): void
+    {
+        if (! isset($this->table)) {
+            $this->bootedInteractsWithTable();
+        }
+
+        $this->getTableRecords();
+    }
+
     protected function getHeaderActions(): array
     {
         return [
