@@ -843,12 +843,12 @@ abstract class CsvImportPage extends Page implements HasForms
             return;
         }
 
-        $processed = $import->processed_rows ?? 0;
-        $total = $import->total_rows ?? 0;
-        $successful = $import->successful_rows ?? 0;
+        $total = ProgressCounter::normalizeTotal((int) ($import->total_rows ?? 0));
+        $processed = ProgressCounter::normalizeProcessed((int) ($import->processed_rows ?? 0), $total);
+        $successful = ProgressCounter::normalizeSuccessful((int) ($import->successful_rows ?? 0), $processed, $total);
         $failed = $this->calculateFailedRowsCount($import);
         $percent = $this->calculateProgressPercent($processed, $total);
-        $status = ($import->completed_at || $processed >= $total) ? 'completed' : 'running';
+        $status = ($import->completed_at !== null || ($total > 0 && $processed >= $total)) ? 'completed' : 'running';
 
         $this->importProgress = [
             'processed'  => $processed,
@@ -968,7 +968,10 @@ abstract class CsvImportPage extends Page implements HasForms
 
         $import->refresh();
 
-        if ($import->processed_rows >= $import->total_rows) {
+        $normalizedTotal = ProgressCounter::normalizeTotal((int) ($import->total_rows ?? 0));
+        $normalizedProcessed = ProgressCounter::normalizeProcessed((int) ($import->processed_rows ?? 0), $normalizedTotal);
+
+        if ($normalizedTotal > 0 && $normalizedProcessed >= $normalizedTotal) {
             $import->touch('completed_at');
             $this->isImporting = false;
             $this->notifyImportCompleted($import);
@@ -994,6 +997,7 @@ abstract class CsvImportPage extends Page implements HasForms
     protected function notifyImportCompleted(Import $import): void
     {
         $failedRowsCount = $this->calculateFailedRowsCount($import);
+        $totalRows = ProgressCounter::normalizeTotal((int) ($import->total_rows ?? 0));
         $authGuard = $this->resolveAuthGuard();
 
         Notification::make()
@@ -1004,11 +1008,11 @@ abstract class CsvImportPage extends Page implements HasForms
                 fn (Notification $notification) => $notification->success(),
             )
             ->when(
-                $failedRowsCount && ($failedRowsCount < $import->total_rows),
+                $failedRowsCount > 0 && ($totalRows === 0 || $failedRowsCount < $totalRows),
                 fn (Notification $notification) => $notification->warning(),
             )
             ->when(
-                $failedRowsCount === $import->total_rows,
+                $totalRows > 0 && $failedRowsCount === $totalRows,
                 fn (Notification $notification) => $notification->danger(),
             )
             ->when(

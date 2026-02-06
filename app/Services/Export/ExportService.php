@@ -143,13 +143,16 @@ final class ExportService
 
             $writer->close();
 
+            $safeTotal = ProgressCounter::normalizeTotal($total);
+            $safeProcessed = ProgressCounter::normalizeProcessed($processed, $safeTotal);
+
             $model->forceFill([
                 'status'            => ExportStatus::Completed,
                 'artifact_path'     => $path,
                 'artifact_filename' => $this->buildFileName($exportable, $model),
                 'completed_at'      => now(),
-                'total_rows'        => $total,
-                'processed_rows'    => $processed,
+                'total_rows'        => $safeTotal,
+                'processed_rows'    => $safeProcessed,
             ])->save();
 
             $this->notifySuccess($model);
