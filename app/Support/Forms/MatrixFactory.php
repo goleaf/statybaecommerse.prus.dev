@@ -163,7 +163,7 @@ final class MatrixFactory
                     return [
                         Placeholder::make($statePath . '_empty')
                             ->label(__('No attributes available'))
-                            ->content(__('Assign attributes to the product to configure the matrix.')),
+                            ->content(__('messages.assign_attributes_to_the_product_to_configure_the_matrix')),
                     ];
                 }
 

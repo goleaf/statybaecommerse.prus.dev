@@ -48,7 +48,7 @@ final class RequestExportBulkAction
                     ->options($columns)
                     ->default(array_keys($columns))
                     ->columns(2)
-                    ->helperText(__('Select which columns should be included in the export. Leave empty for defaults.')),
+                    ->helperText(__('messages.select_which_columns_should_be_included_in_the_export_leave_empty_for_defaults')),
                 KeyValue::make('filters')
                     ->label(__('ui.filters'))
                     ->helperText(__('messages.export_filters_help'))

@@ -43,7 +43,7 @@ final class InventoryAnomalyDetected extends Notification implements ShouldQueue
             static fn (string $item) => $message->line("• {$item}")
         );
 
-        return $message->line(__('Please investigate and correct stock levels as needed.'));
+        return $message->line(__('messages.please_investigate_and_correct_stock_levels_as_needed'));
     }
 
     /**

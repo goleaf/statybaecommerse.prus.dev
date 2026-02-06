@@ -35,7 +35,7 @@ class CustomerGroupForm
                                     ->label(__('messages.slug'))
                                     ->disabled()
                                     ->dehydrated(false)
-                                    ->helperText(__('Automatically generated from name or code.')),
+                                    ->helperText(__('messages.automatically_generated_from_name_or_code')),
                                 Select::make('type')
                                     ->label(__('messages.type'))
                                     ->options([
