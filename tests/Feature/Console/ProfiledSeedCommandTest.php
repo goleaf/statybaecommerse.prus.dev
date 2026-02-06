@@ -48,4 +48,25 @@ final class ProfiledSeedCommandTest extends TestCase
         self::assertSame(0, User::query()->count());
         self::assertGreaterThan(0, FeatureFlag::query()->count());
     }
+
+    public function test_clear_option_respects_excluded_tables_from_config(): void
+    {
+        config()->set('seeds.truncate_excluded', [
+            'migrations',
+            'users',
+        ]);
+
+        User::factory()->create();
+
+        $exitCode = Artisan::call('db:seed', [
+            '--class'          => FeatureFlagSeeder::class,
+            '--clear'          => true,
+            '--force'          => true,
+            '--no-interaction' => true,
+        ]);
+
+        self::assertSame(0, $exitCode);
+        self::assertSame(1, User::query()->count());
+        self::assertGreaterThan(0, FeatureFlag::query()->count());
+    }
 }

@@ -6,15 +6,13 @@ namespace App\Console\Commands;
 
 use function array_filter;
 use function array_map;
+use function array_unique;
 use function array_values;
 
 use Illuminate\Console\Command;
-use Illuminate\Contracts\Config\Repository as ConfigRepository;
-use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Console\Seeds\SeedCommand;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Artisan;
 
 use function in_array;
 use function is_array;
@@ -28,11 +26,8 @@ use function trim;
 
 final class ProfiledSeedCommand extends SeedCommand
 {
-    public function __construct(
-        Resolver $resolver,
-        ?Dispatcher $dispatcher = null,
-        ?ConfigRepository $configRepository = null,
-    ) {
+    public function __construct(Resolver $resolver)
+    {
         parent::__construct($resolver);
     }
 
@@ -95,41 +90,12 @@ final class ProfiledSeedCommand extends SeedCommand
         $connection = $this->resolver->connection($this->getDatabase());
         $schema = $connection->getSchemaBuilder();
         $driver = strtolower((string) $connection->getDriverName());
-        $databaseName = (string) ($connection->getDatabaseName() ?? '');
+        $excludedTables = $this->excludedTables();
+        $tables = $this->tableListing($schema);
 
         if ($driver === 'sqlite') {
-            if ($databaseName === ':memory:') {
-                return $this->clearTablesByDelete($connection, $schema);
-            }
-
-            Artisan::call('migrate:fresh', [
-                '--database'       => $this->getDatabase(),
-                '--force'          => true,
-                '--no-interaction' => true,
-            ]);
-
-            return 0;
+            return $this->clearTablesByDelete($connection, $schema, $tables, $excludedTables);
         }
-
-        $rawExcludedTables = $this->laravel['config']->get('seeds.truncate_excluded', [
-            'migrations',
-            'failed_jobs',
-            'jobs',
-            'job_batches',
-            'cache',
-            'cache_locks',
-            'sessions',
-            'personal_access_tokens',
-        ]);
-
-        $excludedTables = is_array($rawExcludedTables)
-            ? array_values(array_filter(array_map(
-                static fn (mixed $table): ?string => is_string($table) ? trim($table) : null,
-                $rawExcludedTables
-            )))
-            : [];
-
-        $tables = $schema->getTableListing();
         $clearedTables = 0;
 
         $schema->disableForeignKeyConstraints();
@@ -151,16 +117,15 @@ final class ProfiledSeedCommand extends SeedCommand
         return $clearedTables;
     }
 
-    private function clearTablesByDelete($connection, $schema): int
+    private function clearTablesByDelete($connection, $schema, array $tables, array $excludedTables): int
     {
-        $tables = $schema->getTableListing();
         $clearedTables = 0;
 
         $schema->disableForeignKeyConstraints();
 
         try {
             foreach ($tables as $table) {
-                if (! is_string($table) || $table === '' || $table === 'migrations') {
+                if (! is_string($table) || $table === '' || in_array($table, $excludedTables, true)) {
                     continue;
                 }
 
@@ -173,10 +138,79 @@ final class ProfiledSeedCommand extends SeedCommand
 
                 $clearedTables++;
             }
+
+            if (! in_array('sqlite_sequence', $excludedTables, true)) {
+                try {
+                    $connection->table('sqlite_sequence')->delete();
+                } catch (Throwable) {
+                    // sqlite_sequence does not exist until at least one AUTOINCREMENT table is present.
+                }
+            }
         } finally {
             $schema->enableForeignKeyConstraints();
         }
 
         return $clearedTables;
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function excludedTables(): array
+    {
+        $rawExcludedTables = $this->laravel['config']->get('seeds.truncate_excluded', [
+            'migrations',
+            'failed_jobs',
+            'jobs',
+            'job_batches',
+            'cache',
+            'cache_locks',
+            'sessions',
+            'personal_access_tokens',
+        ]);
+
+        if (! is_array($rawExcludedTables)) {
+            return [];
+        }
+
+        return array_values(array_unique(array_filter(array_map(
+            static fn (mixed $table): ?string => is_string($table) ? trim($table) : null,
+            $rawExcludedTables
+        ))));
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function tableListing($schema): array
+    {
+        try {
+            $tables = $schema->getTableListing(schemaQualified: false);
+        } catch (Throwable) {
+            $tables = $schema->getTableListing();
+        }
+
+        return array_values(array_filter(array_map(
+            static function (mixed $table): ?string {
+                if (! is_string($table)) {
+                    return null;
+                }
+
+                $name = trim($table);
+                if ($name === '') {
+                    return null;
+                }
+
+                if (str_contains($name, '.')) {
+                    $segments = explode('.', $name);
+                    $lastSegment = end($segments);
+
+                    return is_string($lastSegment) && $lastSegment !== '' ? $lastSegment : null;
+                }
+
+                return $name;
+            },
+            $tables
+        )));
     }
 }
