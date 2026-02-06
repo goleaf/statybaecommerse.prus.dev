@@ -25,14 +25,12 @@ final class SearchExportService
     /**
      * Handle exportSearchResults functionality with proper error handling.
      */
-    public function exportSearchResults(array $results, string $query, string $format = 'json', array $options = []): array
+    public function exportSearchResults(array $results, string $query, string $format = 'csv', array $options = []): array
     {
         try {
             $format = strtolower($format);
 
-            if ($format === 'xml') {
-                $format = 'csv';
-            }
+            $format = 'csv';
             $exportId = $this->generateExportId($query, $format, $options);
 
             // Limit results for export
@@ -158,26 +156,7 @@ final class SearchExportService
      */
     private function formatExportData(array $results, string $format, array $options): string
     {
-        return match ($format) {
-            'json'  => $this->formatAsJson($results, $options),
-            'csv'   => $this->formatAsCsv($results, $options),
-            'xlsx'  => $this->formatAsXlsx($results, $options),
-            default => $this->formatAsJson($results, $options),
-        };
-    }
-
-    /**
-     * Handle formatAsJson functionality with proper error handling.
-     */
-    private function formatAsJson(array $results, array $options): string
-    {
-        $jsonOptions = JSON_PRETTY_PRINT;
-
-        if (isset($options['minify']) && $options['minify']) {
-            $jsonOptions = 0;
-        }
-
-        return json_encode($results, $jsonOptions);
+        return $this->formatAsCsv($results, $options);
     }
 
     /**
@@ -208,14 +187,6 @@ final class SearchExportService
         fclose($output);
 
         return $csv;
-    }
-
-    /**
-     * Handle formatAsXlsx functionality with proper error handling.
-     */
-    private function formatAsXlsx(array $results, array $options): string
-    {
-        return $this->formatAsCsv($results, $options);
     }
 
     /**

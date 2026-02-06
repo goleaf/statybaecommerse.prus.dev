@@ -433,8 +433,8 @@ Route::prefix('legal')->name('legal.')->group(function () {
     Route::get('/search', [App\Http\Controllers\LegalController::class, 'search'])->name('search');
     Route::get('/type/{type}', [App\Http\Controllers\LegalController::class, 'type'])->name('type');
     // Specific endpoints must be defined before the catch-all {key}
-    Route::get('/sitemap.xml', [App\Http\Controllers\LegalController::class, 'sitemap'])->name('sitemap');
-    Route::get('/rss.xml', [App\Http\Controllers\LegalController::class, 'rss'])->name('rss');
+    Route::get('/sitemap.csv', [App\Http\Controllers\LegalController::class, 'sitemap'])->name('sitemap');
+    Route::get('/rss.csv', [App\Http\Controllers\LegalController::class, 'rss'])->name('rss');
     Route::get('/{key}/download/{format?}', [App\Http\Controllers\LegalController::class, 'download'])->name('download');
     Route::get('/{key}', [App\Http\Controllers\LegalController::class, 'show'])->name('show');
 });
@@ -496,8 +496,8 @@ Route::prefix('api')->group(function (): void {
 
 // Public utility endpoints
 Route::get('/robots.txt', App\Http\Controllers\RobotsController::class)->name('robots');
-Route::get('/sitemap.xml', [App\Http\Controllers\SitemapController::class, 'index'])->name('sitemap');
-Route::get('/{locale}/sitemap.xml', [App\Http\Controllers\SitemapController::class, 'locale'])->name('sitemap.locale');
+Route::get('/sitemap.csv', [App\Http\Controllers\SitemapController::class, 'index'])->name('sitemap');
+Route::get('/{locale}/sitemap.csv', [App\Http\Controllers\SitemapController::class, 'locale'])->name('sitemap.locale');
 
 Route::get('/catalog.csv', function (\Illuminate\Http\Request $request) {
     $only = (string) $request->query('only', 'products');

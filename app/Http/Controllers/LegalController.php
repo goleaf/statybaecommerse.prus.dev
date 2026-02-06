@@ -137,17 +137,21 @@ final class LegalController extends Controller
             ->select(['slug', 'title'])
             ->get();
 
-        $xml = '<?xml version="1.0" encoding="UTF-8"?>'
-            . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
-
-        foreach ($translations as $t) {
-            $loc = e((string) url('/legal/' . $t->slug));
-            $xml .= "<url><loc>{$loc}</loc><changefreq>weekly</changefreq></url>";
+        $handle = fopen('php://temp', 'r+');
+        if ($handle === false) {
+            return response('', 200, ['Content-Type' => 'text/csv; charset=utf-8']);
         }
 
-        $xml .= '</urlset>';
+        fputcsv($handle, ['loc', 'changefreq']);
+        foreach ($translations as $t) {
+            fputcsv($handle, [(string) url('/legal/' . $t->slug), 'weekly']);
+        }
 
-        return response($xml, 200, ['Content-Type' => 'application/xml']);
+        rewind($handle);
+        $csv = stream_get_contents($handle);
+        fclose($handle);
+
+        return response(is_string($csv) ? $csv : '', 200, ['Content-Type' => 'text/csv; charset=utf-8']);
     }
 
     public function rss(): Response
@@ -157,21 +161,24 @@ final class LegalController extends Controller
             ->take(20)
             ->get();
 
-        $rss = '<?xml version="1.0" encoding="UTF-8"?>'
-            . '<rss version="2.0"><channel>'
-            . '<title>Legal Documents</title>'
-            . '<link>' . e((string) url('/legal')) . '</link>'
-            . '<description>Latest legal documents</description>';
-
-        foreach ($translations as $t) {
-            $title = e((string) $t->title);
-            $link = e((string) url('/legal/' . $t->slug));
-            $desc = e((string) str(strip_tags((string) $t->content))->limit(200));
-            $rss .= "<item><title>{$title}</title><link>{$link}</link><description>{$desc}</description></item>";
+        $handle = fopen('php://temp', 'r+');
+        if ($handle === false) {
+            return response('', 200, ['Content-Type' => 'text/csv; charset=utf-8']);
         }
 
-        $rss .= '</channel></rss>';
+        fputcsv($handle, ['title', 'link', 'description']);
+        foreach ($translations as $t) {
+            fputcsv($handle, [
+                (string) $t->title,
+                (string) url('/legal/' . $t->slug),
+                (string) str(strip_tags((string) $t->content))->limit(200),
+            ]);
+        }
 
-        return response($rss, 200, ['Content-Type' => 'application/rss+xml']);
+        rewind($handle);
+        $csv = stream_get_contents($handle);
+        fclose($handle);
+
+        return response(is_string($csv) ? $csv : '', 200, ['Content-Type' => 'text/csv; charset=utf-8']);
     }
 }
