@@ -7,6 +7,7 @@ namespace App\Filament\Imports;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\ProductImage;
 use Filament\Actions\Imports\Exceptions\RowImportFailedException;
 use Filament\Actions\Imports\ImportColumn;
 use Filament\Actions\Imports\Models\Import;
@@ -14,10 +15,14 @@ use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Get;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Number;
 use Illuminate\Support\Str;
+use Throwable;
 
 class ProductImporter extends BaseImporter
 {
@@ -271,7 +276,22 @@ class ProductImporter extends BaseImporter
             ImportColumn::make('status')
                 ->ignoreBlankState()
                 ->rules(['nullable', 'in:draft,published,archived']),
+            ImportColumn::make('image_url')
+                ->label('Image URL')
+                ->ignoreBlankState()
+                ->rules(['nullable', 'url:http,https']),
         ];
+    }
+
+    protected function afterSave(): void
+    {
+        $imageUrl = $this->data['image_url'] ?? null;
+
+        if (! is_string($imageUrl) || trim($imageUrl) === '') {
+            return;
+        }
+
+        $this->replaceProductImageFromUrl(trim($imageUrl));
     }
 
     public function resolveRecord(): Product
@@ -573,5 +593,105 @@ class ProductImporter extends BaseImporter
         }
 
         return $categories;
+    }
+
+    private function replaceProductImageFromUrl(string $imageUrl): void
+    {
+        if (! $this->record instanceof Product || ! $this->record->exists) {
+            return;
+        }
+
+        $contents = $this->downloadImageContents($imageUrl);
+
+        if ($contents === null) {
+            throw new RowImportFailedException('Image download failed.');
+        }
+
+        $extension = $this->resolveImageExtension($imageUrl, $contents['content_type'] ?? null);
+        $path = 'product-images/' . $this->record->getKey() . '/import-' . Str::uuid() . '.' . $extension;
+
+        Storage::disk('public')->put($path, $contents['body']);
+
+        $existingImages = $this->record
+            ->images()
+            ->withoutGlobalScopes()
+            ->get();
+
+        foreach ($existingImages as $existingImage) {
+            Storage::disk('public')->delete((string) $existingImage->path);
+        }
+
+        $this->record->images()->withoutGlobalScopes()->delete();
+
+        ProductImage::query()->create([
+            'product_id' => $this->record->getKey(),
+            'path'       => $path,
+            'alt_text'   => $this->record->name,
+            'sort_order' => 0,
+            'is_default' => true,
+            'is_active'  => true,
+        ]);
+    }
+
+    /**
+     * @return array{body:string, content_type:string|null}|null
+     */
+    private function downloadImageContents(string $imageUrl): ?array
+    {
+        try {
+            $response = Http::timeout(20)
+                ->retry(1, 200)
+                ->get($imageUrl);
+        } catch (ConnectionException) {
+            return null;
+        }
+
+        if (! $response->successful()) {
+            return null;
+        }
+
+        $body = $response->body();
+
+        if ($body === '') {
+            return null;
+        }
+
+        return [
+            'body'         => $body,
+            'content_type' => $response->header('content-type'),
+        ];
+    }
+
+    private function resolveImageExtension(string $imageUrl, ?string $contentType): string
+    {
+        if (is_string($contentType) && $contentType !== '') {
+            $normalized = Str::lower($contentType);
+
+            return match (true) {
+                str_contains($normalized, 'png')  => 'png',
+                str_contains($normalized, 'webp') => 'webp',
+                str_contains($normalized, 'gif')  => 'gif',
+                str_contains($normalized, 'jpeg'), str_contains($normalized, 'jpg') => 'jpg',
+                default => 'jpg',
+            };
+        }
+
+        try {
+            $path = parse_url($imageUrl, PHP_URL_PATH);
+        } catch (Throwable) {
+            $path = null;
+        }
+
+        if (! is_string($path) || $path === '') {
+            return 'jpg';
+        }
+
+        $extension = Str::lower(pathinfo($path, PATHINFO_EXTENSION));
+
+        if (! in_array($extension, ['jpg', 'jpeg', 'png', 'webp', 'gif'], true)) {
+            return 'jpg';
+        }
+
+        return $extension === 'jpeg' ? 'jpg' : $extension;
     }
 }
