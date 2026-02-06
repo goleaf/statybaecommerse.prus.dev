@@ -44,20 +44,20 @@ return [
     'fast' => [
         'city_iso2' => array_values(array_filter(array_map(
             static fn (string $locale): string => strtoupper(trim($locale)),
-            explode(',', (string) env('DB_SEED_FAST_CITY_ISO2', 'LT,DE'))
+            explode(',', (string) env('DB_SEED_FAST_CITY_ISO2', 'LT'))
         ))),
-        'max_cities_per_country' => max(1, (int) env('DB_SEED_FAST_MAX_CITIES_PER_COUNTRY', 80)),
-        'max_root_categories' => max(1, (int) env('DB_SEED_FAST_MAX_ROOT_CATEGORIES', 4)),
-        'max_children_per_category' => max(1, (int) env('DB_SEED_FAST_MAX_CHILDREN_PER_CATEGORY', 3)),
-        'collection_limit' => max(1, (int) env('DB_SEED_FAST_COLLECTION_LIMIT', 4)),
-        'brand_limit' => max(1, (int) env('DB_SEED_FAST_BRAND_LIMIT', 8)),
-        'locales' => array_values(array_filter(array_map(
+        'max_cities_per_country'    => max(1, (int) env('DB_SEED_FAST_MAX_CITIES_PER_COUNTRY', 40)),
+        'max_root_categories'       => max(1, (int) env('DB_SEED_FAST_MAX_ROOT_CATEGORIES', 3)),
+        'max_children_per_category' => max(1, (int) env('DB_SEED_FAST_MAX_CHILDREN_PER_CATEGORY', 2)),
+        'collection_limit'          => max(1, (int) env('DB_SEED_FAST_COLLECTION_LIMIT', 3)),
+        'brand_limit'               => max(1, (int) env('DB_SEED_FAST_BRAND_LIMIT', 6)),
+        'locales'                   => array_values(array_filter(array_map(
             static fn (string $locale): string => strtolower(trim($locale)),
             explode(',', (string) env('DB_SEED_FAST_LOCALES', 'lt,en'))
         ))),
-        'generate_media' => (bool) env('DB_SEED_FAST_GENERATE_MEDIA', false),
-        'products_per_brand' => max(4, (int) env('DB_SEED_FAST_PRODUCTS_PER_BRAND', 8)),
-        'shared_image_pool_size' => max(8, (int) env('DB_SEED_FAST_SHARED_IMAGE_POOL_SIZE', 24)),
+        'generate_media'         => (bool) env('DB_SEED_FAST_GENERATE_MEDIA', false),
+        'products_per_brand'     => max(4, (int) env('DB_SEED_FAST_PRODUCTS_PER_BRAND', 6)),
+        'shared_image_pool_size' => max(8, (int) env('DB_SEED_FAST_SHARED_IMAGE_POOL_SIZE', 12)),
     ],
 
     /*

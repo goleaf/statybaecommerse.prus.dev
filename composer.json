@@ -96,6 +96,12 @@
         ],
         "analyse": "@analyze",
         "seed:fresh": "@php artisan migrate:fresh --seed --ansi",
+        "db:schema:dump": "@php artisan schema:dump --database=sqlite --no-interaction",
+        "db:seed:optimized": "@php artisan db:seed --class=Database\\\\Seeders\\\\DatabaseSeeder --profile=optimized --clear --force --no-interaction",
+        "db:reset:optimized": [
+            "@php artisan migrate:fresh --force --no-interaction",
+            "@db:seed:optimized"
+        ],
         "build": [
             "@php artisan optimize --ansi",
             "npm run build"

@@ -68,32 +68,28 @@ final class TurboEcommerceSeeder extends Seeder
         $this->sharedImagePoolDir = storage_path('app/temp/shared_product_images');
         $this->fastMode = (bool) config('seeds.fast_mode', false);
 
-        // Keep defaults development-friendly and fast while still generating realistic relations.
-        $this->productsPerBrand = max(
-            $this->fastMode ? 4 : 12,
-            (int) env('SEED_PRODUCTS_PER_BRAND', $this->defaultProductsPerBrand())
-        );
-        $this->categoriesPerProduct = (int) env(
-            'SEED_CATEGORIES_PER_PRODUCT',
-            $this->fastMode ? 1 : 2
-        );
-        $this->attributesPerProductMin = (int) env(
-            'SEED_ATTRS_PER_PRODUCT_MIN',
-            $this->fastMode ? 1 : 2
-        );
-        $this->attributesPerProductMax = (int) env(
-            'SEED_ATTRS_PER_PRODUCT_MAX',
-            $this->fastMode ? 2 : 4
-        );
-        $this->minImagesPerProduct = (int) env('SEED_IMAGES_PER_PRODUCT_MIN', 1);
-        $this->maxImagesPerProduct = (int) env(
-            'SEED_IMAGES_PER_PRODUCT_MAX',
-            $this->fastMode ? 1 : 2
-        );
+        if ($this->fastMode) {
+            $this->productsPerBrand = max(4, (int) config('seeds.fast.products_per_brand', 6));
+            $this->categoriesPerProduct = 1;
+            $this->attributesPerProductMin = 1;
+            $this->attributesPerProductMax = 2;
+            $this->minImagesPerProduct = 1;
+            $this->maxImagesPerProduct = 1;
+            $this->chunkSize = 120;
+        } else {
+            // Keep defaults development-friendly and fast while still generating realistic relations.
+            $this->productsPerBrand = max(12, (int) env('SEED_PRODUCTS_PER_BRAND', $this->defaultProductsPerBrand()));
+            $this->categoriesPerProduct = (int) env('SEED_CATEGORIES_PER_PRODUCT', 2);
+            $this->attributesPerProductMin = (int) env('SEED_ATTRS_PER_PRODUCT_MIN', 2);
+            $this->attributesPerProductMax = (int) env('SEED_ATTRS_PER_PRODUCT_MAX', 4);
+            $this->minImagesPerProduct = (int) env('SEED_IMAGES_PER_PRODUCT_MIN', 1);
+            $this->maxImagesPerProduct = (int) env('SEED_IMAGES_PER_PRODUCT_MAX', 2);
+            $this->chunkSize = (int) env('SEED_CHUNK_SIZE', 250);
+        }
+
         if ($this->maxImagesPerProduct < $this->minImagesPerProduct) {
             $this->maxImagesPerProduct = $this->minImagesPerProduct;
         }
-        $this->chunkSize = (int) env('SEED_CHUNK_SIZE', $this->fastMode ? 120 : 250);
         $this->sharedImagePoolSize = $this->fastMode
             ? max(8, (int) config('seeds.fast.shared_image_pool_size', 24))
             : 100;
