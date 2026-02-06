@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="CLI Arguments" tests="3" assertions="7" errors="2" failures="1" skipped="0" time="6.031445">
-    <testsuite name="Tests\Feature\Filament\Actions\ExportBulkActionsTest" file="Export Bulk Actions (Tests\Feature\Filament\Actions\ExportBulkActions)" tests="3" assertions="7" errors="2" failures="1" skipped="0" time="6.031445">
-      <testcase name="Users bulk export defaults to csv when no format selected" file="Export Bulk Actions (Tests\Feature\Filament\Actions\ExportBulkActions)::Users bulk export defaults to csv when no format selected" class="Tests\Feature\Filament\Actions\ExportBulkActionsTest" classname="Tests.Feature.Filament.Actions.ExportBulkActionsTest" assertions="0" time="3.829018">
+  <testsuite name="CLI Arguments" tests="3" assertions="7" errors="2" failures="1" skipped="0" time="15.016887">
+    <testsuite name="Tests\Feature\Filament\Actions\ExportBulkActionsTest" file="Export Bulk Actions (Tests\Feature\Filament\Actions\ExportBulkActions)" tests="3" assertions="7" errors="2" failures="1" skipped="0" time="15.016887">
+      <testcase name="Users bulk export defaults to csv when no format selected" file="Export Bulk Actions (Tests\Feature\Filament\Actions\ExportBulkActions)::Users bulk export defaults to csv when no format selected" class="Tests\Feature\Filament\Actions\ExportBulkActionsTest" classname="Tests.Feature.Filament.Actions.ExportBulkActionsTest" assertions="0" time="12.321390">
         <error type="Livewire\Exceptions\MethodNotFoundException">Users bulk export defaults to csv when no format selectedLivewire\Exceptions\MethodNotFoundException: Unable to call component method. Public method [loadTable] not found on component
 at vendor/livewire/livewire/src/Mechanisms/HandleComponents/HandleComponents.php:488
 at vendor/livewire/livewire/src/Mechanisms/HandleComponents/HandleComponents.php:101
@@ -34,7 +34,7 @@ at vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:252
 at vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:219
 at tests/Feature/Filament/Actions/ExportBulkActionsTest.php:104</error>
       </testcase>
-      <testcase name="Orders bulk export dispatches job with selected columns" file="Export Bulk Actions (Tests\Feature\Filament\Actions\ExportBulkActions)::Orders bulk export dispatches job with selected columns" class="Tests\Feature\Filament\Actions\ExportBulkActionsTest" classname="Tests.Feature.Filament.Actions.ExportBulkActionsTest" assertions="0" time="0.614507">
+      <testcase name="Orders bulk export dispatches job with selected columns" file="Export Bulk Actions (Tests\Feature\Filament\Actions\ExportBulkActions)::Orders bulk export dispatches job with selected columns" class="Tests\Feature\Filament\Actions\ExportBulkActionsTest" classname="Tests.Feature.Filament.Actions.ExportBulkActionsTest" assertions="0" time="0.630335">
         <error type="Livewire\Exceptions\MethodNotFoundException">Orders bulk export dispatches job with selected columnsLivewire\Exceptions\MethodNotFoundException: Unable to call component method. Public method [loadTable] not found on component
 at vendor/livewire/livewire/src/Mechanisms/HandleComponents/HandleComponents.php:488
 at vendor/livewire/livewire/src/Mechanisms/HandleComponents/HandleComponents.php:101
@@ -66,7 +66,7 @@ at vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:252
 at vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:219
 at tests/Feature/Filament/Actions/ExportBulkActionsTest.php:62</error>
       </testcase>
-      <testcase name="Products bulk export uses csv format" file="Export Bulk Actions (Tests\Feature\Filament\Actions\ExportBulkActions)::Products bulk export uses csv format" class="Tests\Feature\Filament\Actions\ExportBulkActionsTest" classname="Tests.Feature.Filament.Actions.ExportBulkActionsTest" assertions="7" time="1.587920">
+      <testcase name="Products bulk export uses csv format" file="Export Bulk Actions (Tests\Feature\Filament\Actions\ExportBulkActions)::Products bulk export uses csv format" class="Tests\Feature\Filament\Actions\ExportBulkActionsTest" classname="Tests.Feature.Filament.Actions.ExportBulkActionsTest" assertions="7" time="2.065161">
         <failure type="PHPUnit\Framework\ExpectationFailedException">Products bulk export uses csv formatFailed asserting that two arrays are identical.
 at tests/Feature/Filament/Actions/ExportBulkActionsTest.php:96</failure>
       </testcase>

@@ -71,10 +71,12 @@ final class RequestExportBulkAction
                     return ! ($value === null || $value === '');
                 });
 
+                $columns = self::normalizeSelectedColumns($data['columns'] ?? []);
+
                 $request = ExportRequestData::from([
                     'entity'   => $type->value,
                     'filters'  => $filters,
-                    'columns'  => array_values($data['columns'] ?? []),
+                    'columns'  => $columns,
                     'format'   => $data['format'],
                     'locale'   => $data['locale'] ?? app()->getLocale(),
                     'timezone' => $data['timezone'] ?? config('app.timezone'),
@@ -89,5 +91,26 @@ final class RequestExportBulkAction
                     ->success()
                     ->send();
             });
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private static function normalizeSelectedColumns(mixed $columns): array
+    {
+        if (! is_array($columns)) {
+            return [];
+        }
+
+        if (array_is_list($columns)) {
+            return array_values(array_filter($columns, static fn (mixed $column): bool => is_string($column) && $column !== ''));
+        }
+
+        return collect($columns)
+            ->filter(static fn (mixed $selected): bool => in_array($selected, [true, 1, '1', 'true', 'on', 'yes'], true))
+            ->keys()
+            ->filter(static fn (mixed $column): bool => is_string($column) && $column !== '')
+            ->values()
+            ->all();
     }
 }

@@ -13,13 +13,11 @@ use Filament\Actions\ActionGroup;
 use Filament\Forms\Components\Component;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Table;
-use Hydrat\TableLayoutToggle\Concerns\HasToggleableTable;
 use Illuminate\Contracts\Support\Htmlable;
 
 abstract class BaseRelationManager extends RelationManager
 {
     use ConfiguresToggleableTableLayout;
-    use HasToggleableTable;
 
     public function table(Table $table): Table
     {
