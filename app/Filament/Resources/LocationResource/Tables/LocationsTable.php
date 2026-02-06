@@ -113,7 +113,7 @@ class LocationsTable
                         return $query;
                     }),
                 SelectFilter::make('has_opening_hours')
-                    ->label(__('messages.Hours'))
+                    ->label(__('messages.hours'))
                     ->options([
                         'yes' => 'Yes',
                         'no'  => 'No',

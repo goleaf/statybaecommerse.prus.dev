@@ -18,7 +18,7 @@ class UserForm
     {
         return $schema
             ->components([
-                Section::make(__('messages.Profile'))
+                Section::make(__('messages.profile'))
                     ->schema([
                         TextInput::make('first_name')
                             ->label(__('messages.first_name'))
@@ -43,7 +43,7 @@ class UserForm
                             ->tel()
                             ->maxLength(255),
                         Select::make('gender')
-                            ->label(__('messages.Gender'))
+                            ->label(__('messages.gender'))
                             ->options([
                                 'male'   => __('admin.gender.male'),
                                 'female' => __('admin.gender.female'),

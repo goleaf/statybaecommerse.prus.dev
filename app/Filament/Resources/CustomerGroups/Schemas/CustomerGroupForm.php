@@ -19,7 +19,7 @@ class CustomerGroupForm
     {
         return $schema
             ->components([
-                SchemaSection::make(__('messages.General'))
+                SchemaSection::make(__('messages.general'))
                     ->schema([
                         SchemaGrid::make(2)
                             ->schema([
@@ -39,19 +39,19 @@ class CustomerGroupForm
                                 Select::make('type')
                                     ->label(__('messages.type'))
                                     ->options([
-                                        'retail'    => __('messages.Retail'),
-                                        'wholesale' => __('messages.Wholesale'),
-                                        'b2b'       => __('messages.B2B'),
-                                        'internal'  => __('messages.Internal'),
+                                        'retail'    => __('messages.retail'),
+                                        'wholesale' => __('messages.wholesale'),
+                                        'b2b'       => __('messages.b2b'),
+                                        'internal'  => __('messages.internal'),
                                     ])
                                     ->required(),
                                 ColorPicker::make('color')
-                                    ->label(__('messages.Color')),
+                                    ->label(__('messages.color')),
                                 TextInput::make('icon')
                                     ->label(__('admin.news_images.image'))
                                     ->maxLength(255),
                                 TextInput::make('sort_order')
-                                    ->label(__('messages.Sort'))
+                                    ->label(__('messages.sort'))
                                     ->numeric()
                                     ->default(0),
                             ]),

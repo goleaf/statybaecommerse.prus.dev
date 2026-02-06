@@ -40,11 +40,11 @@ class UsersRelationManager extends RelationManager
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('email')
-                    ->label(__('messages.Email'))
+                    ->label(__('messages.email'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('pivot.assigned_at')
-                    ->label(__('messages.Joined'))
+                    ->label(__('messages.joined'))
                     ->dateTime()
                     ->sortable(),
             ])

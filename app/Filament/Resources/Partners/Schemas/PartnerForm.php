@@ -18,7 +18,7 @@ class PartnerForm
     {
         return $schema
             ->components([
-                Section::make(__('messages.General'))
+                Section::make(__('messages.general'))
                     ->schema([
                         SpatieMediaLibraryFileUpload::make('logo')
                             ->label(__('messages.logo'))
@@ -77,7 +77,7 @@ class PartnerForm
                             ->label(__('messages.enabled'))
                             ->required(),
                         KeyValue::make('metadata')
-                            ->label(__('messages.Value')),
+                            ->label(__('messages.value')),
                     ])
                     ->columnSpanFull(),
             ]);

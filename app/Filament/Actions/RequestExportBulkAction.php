@@ -53,7 +53,7 @@ final class RequestExportBulkAction
                     ->label(__('ui.filters'))
                     ->helperText(__('messages.export_filters_help'))
                     ->keyLabel(__('ui.field'))
-                    ->valueLabel(__('messages.Value')),
+                    ->valueLabel(__('messages.value')),
             ])
             ->action(function (Collection $records, array $data, ExportService $exportService) use ($type): void {
                 $user = auth()->user();

@@ -36,7 +36,7 @@ class CustomerGroupsTable
                     ->badge()
                     ->sortable(),
                 ColorColumn::make('color')
-                    ->label(__('messages.Color'))
+                    ->label(__('messages.color'))
                     ->toggleable(isToggledHiddenByDefault: true),
                 IconColumn::make('icon')
                     ->label(__('common.Icon'))
@@ -48,7 +48,7 @@ class CustomerGroupsTable
                     ->label(__('messages.default'))
                     ->sortable(),
                 TextColumn::make('sort_order')
-                    ->label(__('messages.Sort'))
+                    ->label(__('messages.sort'))
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('created_at')

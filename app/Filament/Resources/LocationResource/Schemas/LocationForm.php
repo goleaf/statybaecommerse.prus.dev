@@ -33,7 +33,7 @@ class LocationForm
 
     private static function generalTab(): Tab
     {
-        return Tab::make(__('messages.General'))
+        return Tab::make(__('messages.general'))
             ->schema([
                 Section::make(__('admin.locations_page.details_title'))
                     ->schema([
@@ -126,10 +126,10 @@ class LocationForm
                             ]),
                     ])
                     ->columnSpanFull(),
-                Section::make(__('messages.Hours'))
+                Section::make(__('messages.hours'))
                     ->schema([
                         Repeater::make('opening_hours')
-                            ->label(__('messages.Hours'))
+                            ->label(__('messages.hours'))
                             ->schema([
                                 Select::make('day')
                                     ->label(__('messages.day'))
