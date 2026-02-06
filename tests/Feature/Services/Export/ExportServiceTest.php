@@ -210,7 +210,9 @@ test('it marks exports as failed when processing throws an exception', function 
 
     expect($export)
         ->status->toBe(ExportStatus::Failed)
-        ->and($export->failure_reason)->toBe('broken export');
+        ->and($export->failure_reason)->toBe('broken export')
+        ->and($export->total_rows)->toBe(1)
+        ->and($export->processed_rows)->toBe(0);
 
     $user = User::query()->find($userId);
 

@@ -281,6 +281,16 @@ final class ExportTest extends TestCase
         expect($export->progress_percentage)->toBe(0);
     }
 
+    public function test_progress_percentage_accessor_clamps_when_processed_exceeds_total(): void
+    {
+        $export = Export::factory()->create([
+            'total_rows'     => 100,
+            'processed_rows' => 250,
+        ]);
+
+        expect($export->progress_percentage)->toBe(100);
+    }
+
     public function test_is_completed_accessor_returns_true_for_completed_status(): void
     {
         $export = Export::factory()->completed()->create();
@@ -441,6 +451,21 @@ final class ExportTest extends TestCase
             ->toBe(600)
             ->and($export->fresh()->total_rows)
             ->toBe(1200);
+    }
+
+    public function test_update_progress_clamps_processed_rows_to_total_rows(): void
+    {
+        $export = Export::factory()->processing()->create([
+            'total_rows'     => 100,
+            'processed_rows' => 0,
+        ]);
+
+        $result = $export->updateProgress(250);
+
+        expect($result)
+            ->toBeTrue()
+            ->and($export->fresh()->processed_rows)
+            ->toBe(100);
     }
 
     public function test_factory_creates_export_with_default_state(): void

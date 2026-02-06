@@ -260,11 +260,15 @@ final class Export extends Model
     {
         return Attribute::make(
             get: function (): int {
-                if ($this->total_rows === 0) {
+                $totalRows = max(0, (int) ($this->total_rows ?? 0));
+
+                if ($totalRows === 0) {
                     return 0;
                 }
 
-                return (int) round(($this->processed_rows / $this->total_rows) * 100);
+                $processedRows = max(0, min((int) ($this->processed_rows ?? 0), $totalRows));
+
+                return (int) round(($processedRows / $totalRows) * 100);
             }
         );
     }
@@ -354,10 +358,14 @@ final class Export extends Model
      */
     public function updateProgress(int $processedRows, ?int $totalRows = null): bool
     {
-        $data = ['processed_rows' => $processedRows];
+        $resolvedTotalRows = $totalRows ?? (int) ($this->total_rows ?? 0);
+        $resolvedTotalRows = max(0, $resolvedTotalRows);
+        $resolvedProcessedRows = max(0, min($processedRows, $resolvedTotalRows > 0 ? $resolvedTotalRows : $processedRows));
+
+        $data = ['processed_rows' => $resolvedProcessedRows];
 
         if ($totalRows !== null) {
-            $data['total_rows'] = $totalRows;
+            $data['total_rows'] = $resolvedTotalRows;
         }
 
         return $this->update($data);
