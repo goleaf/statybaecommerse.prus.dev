@@ -330,7 +330,7 @@ abstract class CsvImportPage extends Page implements HasForms
             $totalCount++;
             if ($processedForAnalysis < $limit) {
                 try {
-                    $resolvedRecord = $this->evaluateImporterRecord($importer, $record);
+                    $resolvedRecord = $this->evaluateImporterRecord($importer, $this->normalizeCsvRecord($record));
                     if ($resolvedRecord->exists) {
                         $updatedCount++;
                     } else {
@@ -945,6 +945,7 @@ abstract class CsvImportPage extends Page implements HasForms
         $records = [];
         $rowNumber = $processed + 1;
         foreach ($statement->process($csvReader)->getRecords() as $record) {
+            $record = $this->normalizeCsvRecord($record);
             $records[] = array_merge(['__row_number' => $rowNumber], $record);
             $rowNumber++;
         }
@@ -1197,6 +1198,7 @@ abstract class CsvImportPage extends Page implements HasForms
 
     protected function guessColumnMap(array $headers): array
     {
+        $headers = $this->normalizeCsvHeaders($headers);
         $lowercaseCsvColumnValues = array_map(Str::lower(...), $headers);
         $lowercaseCsvColumnKeys = array_combine(
             $lowercaseCsvColumnValues,
@@ -1250,7 +1252,7 @@ abstract class CsvImportPage extends Page implements HasForms
 
         $csvReader->setHeaderOffset($this->getHeaderOffset());
 
-        return $csvReader->getHeader();
+        return $this->normalizeCsvHeaders($csvReader->getHeader());
     }
 
     /**
@@ -1424,6 +1426,45 @@ abstract class CsvImportPage extends Page implements HasForms
                 ]));
             },
         ];
+    }
+
+    /**
+     * @param array<string> $headers
+     * @return array<string>
+     */
+    protected function normalizeCsvHeaders(array $headers): array
+    {
+        if ($headers === []) {
+            return $headers;
+        }
+
+        $headers[0] = $this->stripBom((string) $headers[0]);
+
+        return $headers;
+    }
+
+    /**
+     * @param array<string, mixed> $record
+     * @return array<string, mixed>
+     */
+    protected function normalizeCsvRecord(array $record): array
+    {
+        $normalized = [];
+
+        foreach ($record as $key => $value) {
+            if (! is_string($key)) {
+                continue;
+            }
+
+            $normalized[$this->stripBom($key)] = $value;
+        }
+
+        return $normalized !== [] ? $normalized : $record;
+    }
+
+    protected function stripBom(string $value): string
+    {
+        return ltrim($value, "\u{FEFF}\xEF\xBB\xBF");
     }
 
     protected function resolveAuthGuard(): string

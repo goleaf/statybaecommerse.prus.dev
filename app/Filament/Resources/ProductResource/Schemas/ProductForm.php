@@ -150,6 +150,24 @@ class ProductForm
                                     ->numeric()
                                     ->suffix(__('messages.unit_cm')),
                             ]),
+                        Grid::make(3)
+                            ->schema([
+                                TextInput::make('size')
+                                    ->label(__('messages.size'))
+                                    ->maxLength(255),
+                                TextInput::make('size_type')
+                                    ->label('Size Type')
+                                    ->maxLength(255),
+                                TextInput::make('color')
+                                    ->label(__('translations.color'))
+                                    ->maxLength(255),
+                                TextInput::make('pack_size')
+                                    ->label(__('attribute.pack_size'))
+                                    ->maxLength(255),
+                                TextInput::make('pack_size_type')
+                                    ->label('Pack Size Type')
+                                    ->maxLength(255),
+                            ]),
                     ])
                     ->columnSpanFull(),
 

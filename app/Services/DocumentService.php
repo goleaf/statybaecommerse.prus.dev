@@ -203,7 +203,12 @@ HTML;
     private function validateTemplateContent(string $content): void
     {
         // Prevent XSS in templates
-        if (preg_match('/<script|javascript:|on\w+=/i', $content)) {
+        // Tighten the event-attribute detection to avoid false positives like "content=" in meta tags.
+        $hasScriptTag = preg_match('/<\s*script\b/i', $content);
+        $hasJavascriptScheme = preg_match('/\bjavascript\s*:/i', $content);
+        $hasInlineEventHandler = preg_match('/\bon[a-z]+\s*=\s*["\']?/i', $content);
+
+        if ($hasScriptTag || $hasJavascriptScheme || $hasInlineEventHandler) {
             throw new InvalidArgumentException(__('documents.errors.dangerous_content'));
         }
 

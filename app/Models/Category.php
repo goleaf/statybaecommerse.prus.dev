@@ -19,7 +19,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 use Laravel\Scout\Searchable;
+use SolutionForest\FilamentTree\Concern\ModelTree;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -58,6 +60,7 @@ final class Category extends Model implements HasMedia
     use HasFactory;
     use HasTranslations;
     use InteractsWithMedia;
+    use ModelTree;
     use OrdersByName;
     use Searchable;
     use SoftDeletes;
@@ -80,7 +83,7 @@ final class Category extends Model implements HasMedia
 
     // Allow SEO metadata and icon attributes to be mass assignable so Filament seeders can hydrate them safely.
 
-    protected $casts = ['is_visible' => 'boolean', 'is_enabled' => 'boolean', 'is_active' => 'boolean', 'is_featured' => 'boolean', 'show_in_menu' => 'boolean', 'sort_order' => 'integer', 'product_limit' => 'integer'];
+    protected $casts = ['is_visible' => 'boolean', 'is_enabled' => 'boolean', 'is_active' => 'boolean', 'is_featured' => 'boolean', 'show_in_menu' => 'boolean', 'sort_order' => 'integer', 'product_limit' => 'integer', 'parent_id' => 'integer'];
 
     /**
      * The accessors to append to the model's array form.
@@ -90,6 +93,47 @@ final class Category extends Model implements HasMedia
     protected $appends = ['full_name', 'breadcrumb', 'canonical_url', 'meta_tags', 'total_revenue', 'average_product_price', 'is_root', 'is_leaf', 'depth', 'level', 'ancestors_count', 'descendants_count', 'full_path'];
 
     protected string $translationModel = \App\Models\Translations\CategoryTranslation::class;
+
+    protected static function booted(): void
+    {
+        self::creating(function (Category $category): void {
+            if (blank($category->slug)) {
+                $category->slug = self::generateUniqueSlug((string) ($category->name ?? ''));
+            }
+        });
+
+        self::updating(function (Category $category): void {
+            if ($category->isDirty('name') && blank($category->slug)) {
+                $category->slug = self::generateUniqueSlug((string) ($category->name ?? ''), (int) $category->getKey());
+            }
+        });
+    }
+
+    public static function generateUniqueSlug(string $name, ?int $ignoreId = null): string
+    {
+        $baseSlug = Str::slug($name);
+
+        if ($baseSlug === '') {
+            $baseSlug = 'category';
+        }
+
+        $candidate = $baseSlug;
+        $suffix = 2;
+
+        while (
+            in_array($candidate, self::RESERVED_SLUGS, true)
+            || self::withoutGlobalScopes()
+                ->withTrashed()
+                ->when($ignoreId !== null, fn (Builder $query): Builder => $query->whereKeyNot($ignoreId))
+                ->where('slug', $candidate)
+                ->exists()
+        ) {
+            $candidate = sprintf('%s-%d', $baseSlug, $suffix);
+            $suffix++;
+        }
+
+        return $candidate;
+    }
 
     public function shouldBeSearchable(): bool
     {
@@ -155,7 +199,7 @@ final class Category extends Model implements HasMedia
      */
     public function children(): HasMany
     {
-        return $this->hasMany(Category::class, 'parent_id')->orderBy('sort_order');
+        return $this->hasMany(Category::class, 'parent_id')->orderBy($this->determineOrderColumnName());
     }
 
     /**
@@ -301,6 +345,26 @@ final class Category extends Model implements HasMedia
     public function scopeRoots($query)
     {
         return $query->whereNull('parent_id');
+    }
+
+    public function determineOrderColumnName(): string
+    {
+        return 'sort_order';
+    }
+
+    public function determineParentColumnName(): string
+    {
+        return 'parent_id';
+    }
+
+    public function determineTitleColumnName(): string
+    {
+        return 'name';
+    }
+
+    public static function defaultParentKey()
+    {
+        return null;
     }
 
     /**

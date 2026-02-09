@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 return array (
   '10_kl' => '10 kl.',
+  '17_laipsni' => '17 laipsnių',
   '8_8_kl' => '8.8 kl.',
   'a' => 'A',
   'a_category' => 'A Category',
@@ -164,6 +165,7 @@ return array (
   'fasad_apdaila' => 'Fasadų apdaila',
   'fasadams' => 'Fasadams',
   'fasadams_skirtos_med_iagos' => 'Fasadams skirtos medžiagos',
+  'fibrocementin_s_plok_t_s' => 'Fibrocementinės plokštės',
   'first' => 'First',
   'gamma_tools' => 'Gamma Tools',
   'gegni_sujungimai' => 'Gegnių sujungimai',

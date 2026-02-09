@@ -8,8 +8,10 @@ use App\Filament\Resources\CategoryResource;
 use App\Models\Category;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\RestoreBulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
+use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 
 class CategoriesTable
@@ -42,9 +44,13 @@ class CategoriesTable
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->filters([
+                TrashedFilter::make(),
+            ])
             ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
+                    RestoreBulkAction::make(),
                 ]),
             ])
             ->defaultSort('name');

@@ -26,6 +26,11 @@ final class ProductExport implements Exportable
         return [
             'sku'   => new ExportColumn('sku', __('messages.sku'), 'sku'),
             'name'  => new ExportColumn('name', __('messages.name'), 'name'),
+            'image' => new ExportColumn(
+                'image',
+                __('messages.image'),
+                resolver: fn (Product $product): string => (string) ($product->main_image ?? '')
+            ),
             'price' => new ExportColumn(
                 'price',
                 __('messages.price'),
@@ -39,12 +44,12 @@ final class ProductExport implements Exportable
 
     public function defaultColumns(): array
     {
-        return ['sku', 'name', 'price', 'stock_quantity'];
+        return ['sku', 'name', 'image', 'price', 'stock_quantity'];
     }
 
     public function query(array $options = []): Builder
     {
-        return Product::query();
+        return Product::query()->with('primaryImage');
     }
 
     public function fileName(Export $export): string

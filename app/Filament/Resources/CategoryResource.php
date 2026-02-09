@@ -83,7 +83,8 @@ final class CategoryResource extends BaseResource
     public static function getPages(): array
     {
         return [
-            'index'  => Pages\ListCategories::route('/'),
+            'index'  => Pages\CategoryTree::route('/'),
+            'list'   => Pages\ListCategories::route('/list'),
             'create' => Pages\CreateCategory::route('/create'),
             'edit'   => Pages\EditCategory::route('/{record}'),
         ];

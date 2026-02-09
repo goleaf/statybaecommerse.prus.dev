@@ -23,6 +23,10 @@ class CategoryImporter extends BaseImporter
             $this->data['slug'] = Str::slug($name);
         }
 
+        if ($this->record && ! $this->record->exists) {
+            $this->applyDefaults();
+        }
+
         parent::beforeValidate();
     }
 
@@ -31,44 +35,47 @@ class CategoryImporter extends BaseImporter
         return [
             ImportColumn::make('name')
                 ->requiredMapping()
-                ->rules(['required']),
+                ->rules(['required', 'string']),
             ImportColumn::make('slug')
-                ->requiredMapping()
-                ->rules(['required']),
+                ->rules(['nullable', 'string', 'max:255']),
             ImportColumn::make('description'),
             ImportColumn::make('short_description'),
             ImportColumn::make('parent')
-                ->relationship(),
+                ->relationship(resolveUsing: static function (mixed $state): ?Category {
+                    return static::resolveParentFromState($state);
+                })
+                ->ignoreBlankState(),
             ImportColumn::make('sort_order')
-                ->requiredMapping()
                 ->numeric()
-                ->rules(['required', 'integer']),
+                ->ignoreBlankState()
+                ->rules(['nullable', 'integer']),
             ImportColumn::make('is_visible')
-                ->requiredMapping()
                 ->boolean()
-                ->rules(['required', 'boolean']),
+                ->ignoreBlankState()
+                ->rules(['nullable', 'boolean']),
             ImportColumn::make('is_active')
-                ->requiredMapping()
                 ->boolean()
-                ->rules(['required', 'boolean']),
+                ->ignoreBlankState()
+                ->rules(['nullable', 'boolean']),
             ImportColumn::make('is_enabled')
-                ->requiredMapping()
                 ->boolean()
-                ->rules(['required', 'boolean']),
+                ->ignoreBlankState()
+                ->rules(['nullable', 'boolean']),
             ImportColumn::make('is_featured')
-                ->requiredMapping()
                 ->boolean()
-                ->rules(['required', 'boolean']),
+                ->ignoreBlankState()
+                ->rules(['nullable', 'boolean']),
             ImportColumn::make('color'),
             ImportColumn::make('seo_title'),
             ImportColumn::make('seo_description'),
             ImportColumn::make('show_in_menu')
-                ->requiredMapping()
                 ->boolean()
-                ->rules(['required', 'boolean']),
+                ->ignoreBlankState()
+                ->rules(['nullable', 'boolean']),
             ImportColumn::make('product_limit')
                 ->numeric()
-                ->rules(['integer']),
+                ->ignoreBlankState()
+                ->rules(['nullable', 'integer']),
             ImportColumn::make('meta_title'),
             ImportColumn::make('meta_description'),
             ImportColumn::make('icon'),
@@ -88,16 +95,25 @@ class CategoryImporter extends BaseImporter
         if (filled($slug)) {
             return Category::query()
                 ->withoutGlobalScopes()
+                ->withTrashed()
                 ->firstOrNew(['slug' => $slug]);
         }
 
         if (is_string($name) && $name !== '') {
             return Category::query()
                 ->withoutGlobalScopes()
+                ->withTrashed()
                 ->firstOrNew(['name' => $name]);
         }
 
         return new Category;
+    }
+
+    protected function beforeSave(): void
+    {
+        if ($this->record instanceof Category && method_exists($this->record, 'restore') && $this->record->trashed()) {
+            $this->record->restore();
+        }
     }
 
     public static function getCompletedNotificationBody(Import $import): string
@@ -120,5 +136,80 @@ class CategoryImporter extends BaseImporter
             'Appearance'        => ['color', 'icon'],
             'SEO'               => ['seo_title', 'seo_description', 'meta_title', 'meta_description'],
         ];
+    }
+
+    private function applyDefaults(): void
+    {
+        $defaults = [
+            'sort_order'   => 0,
+            'is_visible'   => true,
+            'is_active'    => true,
+            'is_enabled'   => true,
+            'is_featured'  => false,
+            'show_in_menu' => true,
+        ];
+
+        foreach ($defaults as $field => $value) {
+            if (
+                ! array_key_exists($field, $this->data)
+                || $this->data[$field] === null
+                || $this->data[$field] === ''
+            ) {
+                $this->data[$field] = $value;
+            }
+        }
+    }
+
+    private static function resolveParentFromState(mixed $state): ?Category
+    {
+        if ($state === null) {
+            return null;
+        }
+
+        $raw = is_string($state) ? trim($state) : $state;
+
+        if ($raw === '' || $raw === null) {
+            return null;
+        }
+
+        $query = Category::query()->withoutGlobalScopes()->withTrashed();
+
+        if (is_numeric($raw)) {
+            $category = $query->find((int) $raw);
+            if ($category) {
+                if (method_exists($category, 'restore') && $category->trashed()) {
+                    $category->restore();
+                }
+
+                return $category;
+            }
+        }
+
+        $name = is_string($raw) ? $raw : (string) $raw;
+        $slug = Str::slug($name);
+
+        $category = $query->where('slug', $slug)->first()
+            ?? $query->where('name', $name)->first();
+
+        if ($category) {
+            if (method_exists($category, 'restore') && $category->trashed()) {
+                $category->restore();
+            }
+
+            return $category;
+        }
+
+        $generatedSlug = Category::generateUniqueSlug($name);
+
+        return Category::query()->create([
+            'name'         => $name,
+            'slug'         => $generatedSlug,
+            'sort_order'   => 0,
+            'is_enabled'   => true,
+            'is_active'    => true,
+            'is_visible'   => true,
+            'is_featured'  => false,
+            'show_in_menu' => true,
+        ]);
     }
 }

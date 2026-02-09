@@ -7,6 +7,7 @@ namespace App\Filament\Imports;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\ProductImage;
 use Filament\Actions\Imports\Exceptions\RowImportFailedException;
 use Filament\Actions\Imports\ImportColumn;
 use Filament\Actions\Imports\Models\Import;
@@ -15,9 +16,11 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Get;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Number;
 use Illuminate\Support\Str;
+use Throwable;
 
 class ProductImporter extends BaseImporter
 {
@@ -173,6 +176,11 @@ class ProductImporter extends BaseImporter
             ImportColumn::make('name')
                 ->requiredMapping()
                 ->rules(['required', 'string']),
+            ImportColumn::make('image')
+                ->label(__('translations.image'))
+                ->examples(['https://example.com/product.jpg'])
+                ->ignoreBlankState()
+                ->fillRecordUsing(static function (mixed $state): void {}),
             ImportColumn::make('description'),
             ImportColumn::make('short_description'),
             ImportColumn::make('sku')
@@ -209,6 +217,26 @@ class ProductImporter extends BaseImporter
             ImportColumn::make('height')
                 ->numeric()
                 ->rules(['nullable', 'numeric']),
+            ImportColumn::make('size')
+                ->label(__('messages.size'))
+                ->guess(['size', 'dydis'])
+                ->rules(['nullable', 'string', 'max:255']),
+            ImportColumn::make('size_type')
+                ->label('Size Type')
+                ->guess(['size type', 'size_type', 'dydzio tipas'])
+                ->rules(['nullable', 'string', 'max:255']),
+            ImportColumn::make('color')
+                ->label(__('translations.color'))
+                ->guess(['color', 'colour', 'spalva'])
+                ->rules(['nullable', 'string', 'max:255']),
+            ImportColumn::make('pack_size')
+                ->label(__('attribute.pack_size'))
+                ->guess(['pack size', 'pack_size', 'pakuotes dydis'])
+                ->rules(['nullable', 'string', 'max:255']),
+            ImportColumn::make('pack_size_type')
+                ->label('Pack Size Type')
+                ->guess(['pack size type', 'pack_size_type', 'pakuotes dydzio tipas'])
+                ->rules(['nullable', 'string', 'max:255']),
             ImportColumn::make('is_enabled')
                 ->boolean()
                 ->ignoreBlankState()
@@ -231,6 +259,7 @@ class ProductImporter extends BaseImporter
                     return static::resolveCategoriesFromState($state);
                 })
                 ->multiple(';')
+                ->guess(['category', 'categories', 'kategorija', 'kategorijos'])
                 ->ignoreBlankState(),
             ImportColumn::make('is_requestable')
                 ->boolean()
@@ -299,6 +328,7 @@ class ProductImporter extends BaseImporter
         return [
             'Basic Information' => [
                 'name',
+                'image',
                 'sku',
                 'barcode',
                 'status',
@@ -328,6 +358,13 @@ class ProductImporter extends BaseImporter
                 'width',
                 'height',
             ],
+            'Attributes' => [
+                'size',
+                'size_type',
+                'color',
+                'pack_size',
+                'pack_size_type',
+            ],
             'SEO & Metadata' => [
                 'seo_title',
                 'seo_description',
@@ -350,6 +387,183 @@ class ProductImporter extends BaseImporter
                 'available_until',
             ],
         ];
+    }
+
+    protected function afterSave(): void
+    {
+        if (! $this->record instanceof Product) {
+            return;
+        }
+
+        $imageState = $this->data['image'] ?? null;
+
+        if (blank($imageState)) {
+            return;
+        }
+
+        $paths = $this->normalizeImagePaths($imageState);
+
+        if ($paths === []) {
+            return;
+        }
+
+        $this->attachImages($this->record, $paths);
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function normalizeImagePaths(mixed $state): array
+    {
+        $items = is_array($state) ? $state : [$state];
+        $paths = [];
+
+        foreach ($items as $item) {
+            if (is_array($item)) {
+                foreach ($item as $nested) {
+                    if (is_scalar($nested)) {
+                        $paths[] = (string) $nested;
+                    }
+                }
+                continue;
+            }
+
+            if (! is_scalar($item)) {
+                continue;
+            }
+
+            $value = trim((string) $item);
+
+            if ($value === '') {
+                continue;
+            }
+
+            if (str_starts_with($value, 'data:')) {
+                $paths[] = $value;
+                continue;
+            }
+
+            if (str_contains($value, ';') || str_contains($value, '|')) {
+                $parts = preg_split('/[;|]/', $value) ?: [];
+                foreach ($parts as $part) {
+                    $part = trim($part);
+                    if ($part !== '') {
+                        $paths[] = $part;
+                    }
+                }
+                continue;
+            }
+
+            $paths[] = $value;
+        }
+
+        $paths = array_filter(array_map('trim', $paths), static fn (string $path): bool => $path !== '');
+
+        return array_values(array_unique($paths));
+    }
+
+    /**
+     * @param array<int, string> $paths
+     */
+    private function attachImages(Product $product, array $paths): void
+    {
+        $existingPaths = $product->images()
+            ->withoutGlobalScopes()
+            ->pluck('path')
+            ->all();
+
+        $maxSortOrder = $product->images()
+            ->withoutGlobalScopes()
+            ->max('sort_order');
+
+        $nextSortOrder = is_numeric($maxSortOrder) ? ((int) $maxSortOrder + 1) : 0;
+        $shouldMarkDefault = empty($existingPaths);
+
+        foreach ($paths as $path) {
+            $storedPath = $this->resolveImagePath($product, $path, $nextSortOrder);
+
+            if ($storedPath === '') {
+                continue;
+            }
+
+            if (in_array($storedPath, $existingPaths, true)) {
+                continue;
+            }
+
+            ProductImage::query()->create([
+                'product_id' => $product->getKey(),
+                'path'       => $storedPath,
+                'alt_text'   => $this->resolveImageAltText($product),
+                'sort_order' => $nextSortOrder,
+                'is_default' => $shouldMarkDefault,
+                'is_active'  => true,
+            ]);
+
+            $existingPaths[] = $storedPath;
+            $nextSortOrder++;
+            $shouldMarkDefault = false;
+        }
+    }
+
+    private function resolveImageAltText(Product $product): ?string
+    {
+        $name = $this->data['name'] ?? $product->name;
+
+        if (! is_string($name)) {
+            return null;
+        }
+
+        $name = trim($name);
+
+        return $name !== '' ? $name : null;
+    }
+
+    private function resolveImagePath(Product $product, string $path, int $index): string
+    {
+        $path = trim($path);
+
+        if ($path === '') {
+            return '';
+        }
+
+        if (str_starts_with($path, 'data:')) {
+            return $this->storeDataUriImage($product, $path, $index);
+        }
+
+        return $path;
+    }
+
+    private function storeDataUriImage(Product $product, string $dataUri, int $index): string
+    {
+        if (! preg_match('/^data:(.*?);base64,(.*)$/', $dataUri, $matches)) {
+            return '';
+        }
+
+        $mime = strtolower($matches[1] ?? 'image/jpeg');
+        $extension = match ($mime) {
+            'image/png'  => 'png',
+            'image/webp' => 'webp',
+            'image/gif'  => 'gif',
+            default      => 'jpg',
+        };
+
+        $contents = base64_decode($matches[2] ?? '', true);
+
+        if (! is_string($contents) || $contents === '') {
+            return '';
+        }
+
+        $dir = 'product-images/' . $product->getKey();
+        $filename = 'image-' . $index . '-' . Str::random(8) . '.' . $extension;
+        $path = $dir . '/' . $filename;
+
+        try {
+            Storage::disk('public')->put($path, $contents);
+        } catch (Throwable) {
+            return '';
+        }
+
+        return $path;
     }
 
     private function shouldSync(): bool
@@ -545,21 +759,37 @@ class ProductImporter extends BaseImporter
         $categories = new EloquentCollection;
 
         foreach ($names as $name) {
-            $slug = Str::slug($name);
+            $category = static::resolveCategoryPath($name);
 
-            $category = Category::query()
-                ->withoutGlobalScopes()
-                ->where('slug', $slug)
-                ->first()
-                ?? Category::query()
-                    ->withoutGlobalScopes()
-                    ->where('name', $name)
-                    ->first();
+            if ($category instanceof Category) {
+                $categories->push($category);
+            }
+        }
+
+        return $categories;
+    }
+
+    private static function resolveCategoryPath(string $path): ?Category
+    {
+        $segments = collect(preg_split('/\s*\/\s*/', $path) ?: [])
+            ->map(fn (string $segment): string => trim($segment))
+            ->filter(fn (string $segment): bool => $segment !== '')
+            ->values();
+
+        if ($segments->isEmpty()) {
+            return null;
+        }
+
+        $parent = null;
+
+        foreach ($segments as $segment) {
+            $category = static::resolveCategorySegment($segment, $parent);
 
             if (! $category) {
                 $category = Category::query()->create([
-                    'name'         => $name,
-                    'slug'         => $slug,
+                    'name'         => $segment,
+                    'slug'         => Category::generateUniqueSlug($segment),
+                    'parent_id'    => $parent?->getKey(),
                     'sort_order'   => 0,
                     'is_enabled'   => true,
                     'is_active'    => true,
@@ -567,11 +797,42 @@ class ProductImporter extends BaseImporter
                     'is_featured'  => false,
                     'show_in_menu' => true,
                 ]);
+            } elseif (method_exists($category, 'restore') && $category->trashed()) {
+                $category->restore();
             }
 
-            $categories->push($category);
+            $parent = $category;
         }
 
-        return $categories;
+        return $parent;
+    }
+
+    private static function resolveCategorySegment(string $segment, ?Category $parent): ?Category
+    {
+        $segment = trim($segment);
+
+        if ($segment === '') {
+            return null;
+        }
+
+        $query = Category::query()->withoutGlobalScopes()->withTrashed();
+
+        if ($parent instanceof Category) {
+            $query->where('parent_id', $parent->getKey());
+        } else {
+            $query->whereNull('parent_id');
+        }
+
+        $category = (clone $query)->where('name', $segment)->first();
+
+        if (! $category) {
+            $slug = Str::slug($segment);
+
+            if ($slug !== '') {
+                $category = (clone $query)->where('slug', $slug)->first();
+            }
+        }
+
+        return $category;
     }
 }
