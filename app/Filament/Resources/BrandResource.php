@@ -70,6 +70,7 @@ final class BrandResource extends BaseResource
     {
         return [
             \App\Filament\Resources\BrandResource\RelationManagers\ProductsRelationManager::class,
+            \App\Filament\Resources\BrandResource\RelationManagers\ProductVariantsRelationManager::class,
         ];
     }
 

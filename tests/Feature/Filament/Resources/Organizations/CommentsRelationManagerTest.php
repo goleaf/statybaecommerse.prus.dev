@@ -41,7 +41,7 @@ it('can create a comment as an admin user with mapped user', function () {
     $user = User::factory()->create(['email' => $email]);
     $admin = AdminUser::factory()->create(['email' => $email]);
 
-    actingAs($admin, 'admin');
+    auth()->guard('admin')->login($admin);
 
     Livewire::test(CommentsRelationManager::class, [
         'ownerRecord' => $this->organization,
@@ -49,6 +49,7 @@ it('can create a comment as an admin user with mapped user', function () {
     ])
         ->assertSuccessful()
         ->mountTableAction('create')
+        ->dump()
         ->fillTableActionForm([
             'content' => 'Admin test comment',
         ])

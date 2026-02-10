@@ -1,31 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="C:\Dropbox\projects\egistatyba\phpunit.xml" tests="5" assertions="12" errors="3" failures="0" skipped="0" time="23.796699">
-    <testsuite name="Feature" tests="5" assertions="12" errors="3" failures="0" skipped="0" time="23.796699">
-      <testsuite name="Tests\Feature\Filament\Resources\Organizations\CommentsRelationManagerTest" file="tests\Feature\Filament\Resources\Organizations\CommentsRelationManagerTest.php" tests="5" assertions="12" errors="3" failures="0" skipped="0" time="23.796699">
-        <testcase name="it can create a comment as an admin user without mapped user" file="tests\Feature\Filament\Resources\Organizations\CommentsRelationManagerTest.php::it can create a comment as an admin user without mapped user" class="Tests\Feature\Filament\Resources\Organizations\CommentsRelationManagerTest" classname="Tests.Feature.Filament.Resources.Organizations.CommentsRelationManagerTest" assertions="1" time="22.363841">
-          <error type="BadMethodCallException">it can create a comment as an admin user without mapped userBadMethodCallException: Method Illuminate\Http\JsonResponse::fillTableActionForm does not exist.&#13;
-at vendor\laravel\framework\src\Illuminate\Macroable\Traits\Macroable.php:115
-at vendor\laravel\framework\src\Illuminate\Testing\TestResponse.php:2000
-at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:401
-at tests\Feature\Filament\Resources\Organizations\CommentsRelationManagerTest.php:77</error>
-        </testcase>
-        <testcase name="it can edit a comment" file="tests\Feature\Filament\Resources\Organizations\CommentsRelationManagerTest.php::it can edit a comment" class="Tests\Feature\Filament\Resources\Organizations\CommentsRelationManagerTest" classname="Tests.Feature.Filament.Resources.Organizations.CommentsRelationManagerTest" assertions="1" time="0.330467">
-          <error type="BadMethodCallException">it can edit a commentBadMethodCallException: Method Illuminate\Http\JsonResponse::fillTableActionForm does not exist.&#13;
-at vendor\laravel\framework\src\Illuminate\Macroable\Traits\Macroable.php:115
-at vendor\laravel\framework\src\Illuminate\Testing\TestResponse.php:2000
-at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:401
-at tests\Feature\Filament\Resources\Organizations\CommentsRelationManagerTest.php:107</error>
-        </testcase>
-        <testcase name="it can create a comment as an admin user with mapped user" file="tests\Feature\Filament\Resources\Organizations\CommentsRelationManagerTest.php::it can create a comment as an admin user with mapped user" class="Tests\Feature\Filament\Resources\Organizations\CommentsRelationManagerTest" classname="Tests.Feature.Filament.Resources.Organizations.CommentsRelationManagerTest" assertions="1" time="0.282310">
+  <testsuite name="C:\Dropbox\projects\egistatyba\phpunit.xml" tests="1" assertions="1" errors="1" failures="0" skipped="0" time="16.963409">
+    <testsuite name="Feature" tests="1" assertions="1" errors="1" failures="0" skipped="0" time="16.963409">
+      <testsuite name="Tests\Feature\Filament\Resources\Organizations\CommentsRelationManagerTest" file="tests\Feature\Filament\Resources\Organizations\CommentsRelationManagerTest.php" tests="1" assertions="1" errors="1" failures="0" skipped="0" time="16.963409">
+        <testcase name="it can create a comment as an admin user with mapped user" file="tests\Feature\Filament\Resources\Organizations\CommentsRelationManagerTest.php::it can create a comment as an admin user with mapped user" class="Tests\Feature\Filament\Resources\Organizations\CommentsRelationManagerTest" classname="Tests.Feature.Filament.Resources.Organizations.CommentsRelationManagerTest" assertions="1" time="16.963409">
           <error type="BadMethodCallException">it can create a comment as an admin user with mapped userBadMethodCallException: Method Illuminate\Http\JsonResponse::fillTableActionForm does not exist.&#13;
 at vendor\laravel\framework\src\Illuminate\Macroable\Traits\Macroable.php:115
 at vendor\laravel\framework\src\Illuminate\Testing\TestResponse.php:2000
 at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:401
-at tests\Feature\Filament\Resources\Organizations\CommentsRelationManagerTest.php:52</error>
+at tests\Feature\Filament\Resources\Organizations\CommentsRelationManagerTest.php:53</error>
         </testcase>
-        <testcase name="it can list comments" file="tests\Feature\Filament\Resources\Organizations\CommentsRelationManagerTest.php::it can list comments" class="Tests\Feature\Filament\Resources\Organizations\CommentsRelationManagerTest" classname="Tests.Feature.Filament.Resources.Organizations.CommentsRelationManagerTest" assertions="4" time="0.274258"/>
-        <testcase name="it can delete a comment" file="tests\Feature\Filament\Resources\Organizations\CommentsRelationManagerTest.php::it can delete a comment" class="Tests\Feature\Filament\Resources\Organizations\CommentsRelationManagerTest" classname="Tests.Feature.Filament.Resources.Organizations.CommentsRelationManagerTest" assertions="5" time="0.545824"/>
       </testsuite>
     </testsuite>
   </testsuite>
