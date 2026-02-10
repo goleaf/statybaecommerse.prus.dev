@@ -5,6 +5,7 @@ declare(strict_types=1);
 return [
     'navigation_groups' => [
         'campaigns'          => 'Кампании',
+        'customers'          => 'Клиенты',
         'content'            => 'Контент',
         'content_management' => 'Управление контентом',
         'discounts'          => 'Скидки',

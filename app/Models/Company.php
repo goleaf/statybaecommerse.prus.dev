@@ -68,6 +68,16 @@ final class Company extends Model
             ->withoutGlobalScopes([ActiveScope::class]);
     }
 
+    /**
+     * Customers belonging to this company.
+     *
+     * @return HasMany<Customer, Company>
+     */
+    public function customers(): HasMany
+    {
+        return $this->hasMany(Customer::class);
+    }
+
     // Scopes
 
     /**

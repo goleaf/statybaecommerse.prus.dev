@@ -24,6 +24,10 @@ class PartnerResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUserGroup;
 
+    protected static ?int $navigationSort = 5;
+
+    protected static bool $shouldRegisterNavigation = false;
+
     public static function getModelLabel(): string
     {
         return __('admin.navigation.partners');
@@ -53,6 +57,8 @@ class PartnerResource extends Resource
     {
         return [
             RelationManagers\UsersRelationManager::class,
+            RelationManagers\OrdersRelationManager::class,
+            RelationManagers\PriceListsRelationManager::class,
         ];
     }
 

@@ -26,6 +26,8 @@ class CustomerResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUsers;
 
+    protected static ?int $navigationSort = 2;
+
     public static function getModelLabel(): string
     {
         return __('admin.navigation.customers');

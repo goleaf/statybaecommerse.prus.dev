@@ -22,6 +22,10 @@ class CompanyResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBuildingOffice;
 
+    protected static ?int $navigationSort = 3;
+
+    protected static bool $shouldRegisterNavigation = false;
+
     public static function getModelLabel(): string
     {
         return __('messages.companies');
@@ -51,6 +55,7 @@ class CompanyResource extends Resource
     {
         return [
             RelationManagers\SubscribersRelationManager::class,
+            RelationManagers\CustomersRelationManager::class,
         ];
     }
 

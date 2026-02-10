@@ -22,6 +22,10 @@ class OrganizationResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBuildingOffice2;
 
+    protected static ?int $navigationSort = 4;
+
+    protected static bool $shouldRegisterNavigation = false;
+
     public static function getModelLabel(): string
     {
         return __('admin.navigation.organization');
@@ -52,6 +56,8 @@ class OrganizationResource extends Resource
         return [
             RelationManagers\UsersRelationManager::class,
             RelationManagers\ProjectsRelationManager::class,
+            RelationManagers\CommentsRelationManager::class,
+            RelationManagers\FilesRelationManager::class,
         ];
     }
 

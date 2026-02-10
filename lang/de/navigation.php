@@ -13,6 +13,7 @@ return [
     'import'            => 'Import',
     'navigation_groups' => [
         'campaigns'          => 'Kampagnen',
+        'customers'          => 'Kunden',
         'content'            => 'Inhalt',
         'content_management' => 'Content-Management',
         'discounts'          => 'Rabatte',

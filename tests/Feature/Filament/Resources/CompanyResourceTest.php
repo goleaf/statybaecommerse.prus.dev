@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Filament\Resources\CompanyResource;
+use App\Filament\Resources\Companies\CompanyResource;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 

@@ -28,6 +28,7 @@ enum NavigationGroup: string
     case Campaigns = 'campaigns';
     case News = 'news';
     case Referral = 'referral';
+    case Customers = 'customers';
 
     public function getLabel(): string
     {
@@ -50,6 +51,7 @@ enum NavigationGroup: string
             self::Campaigns         => __('navigation.navigation_groups.campaigns'),
             self::News              => __('navigation.navigation_groups.news'),
             self::Referral          => __('navigation.navigation_groups.referral'),
+            self::Customers         => __('navigation.navigation_groups.customers'),
         };
     }
 
@@ -84,6 +86,7 @@ enum NavigationGroup: string
             self::Campaigns         => 'heroicon-o-megaphone',
             self::News              => 'heroicon-o-newspaper',
             self::Referral          => 'heroicon-o-gift',
+            self::Customers         => 'heroicon-o-user-group',
         };
     }
 
@@ -113,6 +116,7 @@ enum NavigationGroup: string
             self::Campaigns         => 51,
             self::News              => 22,
             self::Referral          => 52,
+            self::Customers         => 9,
         };
     }
 
@@ -142,6 +146,7 @@ enum NavigationGroup: string
             self::Campaigns         => 'orange',
             self::News              => 'blue',
             self::Referral          => 'purple',
+            self::Customers         => 'sky',
         };
     }
 

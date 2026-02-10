@@ -13,6 +13,7 @@ return [
     'import'            => 'Importas',
     'navigation_groups' => [
         'campaigns'          => 'Kampanijos',
+        'customers'          => 'Klientai',
         'content'            => 'Turinys',
         'content_management' => 'Turinio valdymas',
         'discounts'          => 'Nuolaidos',

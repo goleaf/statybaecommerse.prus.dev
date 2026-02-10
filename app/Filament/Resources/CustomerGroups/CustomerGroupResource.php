@@ -26,6 +26,10 @@ class CustomerGroupResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
+    protected static ?int $navigationSort = 6;
+
+    protected static bool $shouldRegisterNavigation = false;
+
     public static function form(Schema $schema): Schema
     {
         return CustomerGroupForm::configure($schema);
@@ -45,6 +49,8 @@ class CustomerGroupResource extends Resource
     {
         return [
             RelationManagers\UsersRelationManager::class,
+            RelationManagers\DiscountsRelationManager::class,
+            RelationManagers\PriceListsRelationManager::class,
         ];
     }
 
