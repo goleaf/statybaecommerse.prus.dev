@@ -41,8 +41,28 @@ class PartnersTable
                 TextColumn::make('contact_email')
                     ->label(__('messages.email'))
                     ->searchable(),
+                TextColumn::make('contact_phone')
+                    ->label(__('messages.phone'))
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('partnerTier.name')
                     ->label(__('messages.partner_tiers'))
+                    ->sortable(),
+                TextColumn::make('users_count')
+                    ->label(__('messages.users'))
+                    ->counts('users')
+                    ->sortable(),
+                TextColumn::make('orders_count')
+                    ->label(__('messages.orders'))
+                    ->counts('orders')
+                    ->sortable(),
+                TextColumn::make('discount_rate')
+                    ->label(__('messages.discount_rate'))
+                    ->numeric(2)
+                    ->sortable(),
+                TextColumn::make('commission_rate')
+                    ->label(__('messages.commission_rate'))
+                    ->numeric(2)
                     ->sortable(),
                 IconColumn::make('is_enabled')
                     ->label(__('messages.enabled'))

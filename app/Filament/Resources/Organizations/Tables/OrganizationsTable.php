@@ -26,6 +26,11 @@ class OrganizationsTable
                 TextColumn::make('slug')
                     ->label(__('messages.slug'))
                     ->searchable(),
+                TextColumn::make('description')
+                    ->label(__('messages.description'))
+                    ->searchable()
+                    ->limit(50)
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('type')
                     ->label(__('messages.type'))
                     ->searchable()
@@ -40,6 +45,14 @@ class OrganizationsTable
                 IconColumn::make('is_active')
                     ->label(__('messages.active'))
                     ->boolean(),
+                TextColumn::make('users_count')
+                    ->label(__('messages.users'))
+                    ->counts('users')
+                    ->sortable(),
+                TextColumn::make('projects_count')
+                    ->label(__('messages.projects'))
+                    ->counts('projects')
+                    ->sortable(),
                 TextColumn::make('created_at')
                     ->label(__('messages.created'))
                     ->dateTime()

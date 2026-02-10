@@ -15,6 +15,8 @@ use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Panel;
 use Filament\PanelProvider;
+use Filament\Support\Facades\FilamentView;
+use Filament\View\PanelsRenderHook;
 use Filament\Widgets\Widget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -25,6 +27,22 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class AdminPanelProvider extends PanelProvider
 {
+    public function boot(): void
+    {
+        FilamentView::registerRenderHook(
+            PanelsRenderHook::RESOURCE_PAGES_LIST_RECORDS_TABLE_BEFORE,
+            fn (): string => view('filament.hooks.customer-tabs')->render(),
+            scopes: [
+                \App\Filament\Resources\Customers\CustomerResource::class,
+                \App\Filament\Resources\UserResource::class,
+                \App\Filament\Resources\Companies\CompanyResource::class,
+                \App\Filament\Resources\Organizations\OrganizationResource::class,
+                \App\Filament\Resources\Partners\PartnerResource::class,
+                \App\Filament\Resources\CustomerGroups\CustomerGroupResource::class,
+            ],
+        );
+    }
+
     public function panel(Panel $panel): Panel
     {
         $configuredPanel = $this->applyBaseConfiguration($panel);
@@ -46,6 +64,9 @@ class AdminPanelProvider extends PanelProvider
 
         return $configuredPanel
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
+            ->resources([
+                \App\Filament\Resources\UserResource::class,
+            ])
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             // Widget discovery is disabled until the optional tab layout plugin is installed.

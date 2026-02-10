@@ -35,10 +35,38 @@ class UsersTable
                     ->label(__('messages.phone'))
                     ->searchable()
                     ->sortable(),
+                TextColumn::make('first_name')
+                    ->label(__('messages.first_name'))
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('last_name')
+                    ->label(__('messages.last_name'))
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('job_title')
+                    ->label(__('messages.job_title'))
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('company')
+                    ->label(__('messages.company'))
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 IconColumn::make('is_active')
                     ->label(__('messages.active'))
                     ->boolean()
                     ->sortable(),
+                TextColumn::make('preferred_locale')
+                    ->label(__('admin.locale.label'))
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('orders_count')
+                    ->label(__('messages.orders'))
+                    ->counts('orders')
+                    ->sortable(),
+                TextColumn::make('customerGroups.name')
+                    ->label(__('messages.customer_groups'))
+                    ->badge()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
                     ->label(__('messages.created_at'))
                     ->dateTime()

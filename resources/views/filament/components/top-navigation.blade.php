@@ -42,6 +42,14 @@
 
             <!-- Main Navigation -->
             <nav class="hidden md:flex space-x-8">
+                @if (Route::has('filament.admin.resources.users.index'))
+                    <a href="{{ route('filament.admin.resources.users.index') }}"
+                       class="flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('filament.admin.resources.users.*') ? 'text-primary-600 bg-gray-50' : 'text-gray-700 hover:text-primary-600 hover:bg-gray-50' }} transition-colors duration-200">
+                        <x-heroicon-o-user-group class="h-4 w-4" />
+                        <span>Customers</span>
+                    </a>
+                @endif
+
                 @foreach ($navigationGroups as $group)
                     @if (canAccessGroup($group))
                         <div class="relative group">

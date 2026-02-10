@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Filament\Resources\Users;
+namespace App\Filament\Resources;
 
 use App\Filament\Resources\Users\Pages\CreateUser;
 use App\Filament\Resources\Users\Pages\EditUser;
@@ -11,9 +11,22 @@ use App\Filament\Resources\Users\Pages\ViewUser;
 use App\Filament\Resources\Users\Schemas\UserForm;
 use App\Filament\Resources\Users\Schemas\UserInfolist;
 use App\Filament\Resources\Users\Tables\UsersTable;
+use App\Filament\Resources\Users\RelationManagers\AddressesRelationManager;
+use App\Filament\Resources\Users\RelationManagers\CouponUsagesRelationManager;
+use App\Filament\Resources\Users\RelationManagers\CustomerGroupsRelationManager;
+use App\Filament\Resources\Users\RelationManagers\DiscountRedemptionsRelationManager;
+use App\Filament\Resources\Users\RelationManagers\DocumentsRelationManager;
+use App\Filament\Resources\Users\RelationManagers\NotificationsRelationManager;
+use App\Filament\Resources\Users\RelationManagers\OrdersRelationManager;
+use App\Filament\Resources\Users\RelationManagers\PartnersRelationManager;
+use App\Filament\Resources\Users\RelationManagers\ReferralCodesRelationManager;
+use App\Filament\Resources\Users\RelationManagers\ReferralRewardsRelationManager;
+use App\Filament\Resources\Users\RelationManagers\ReferralsRelationManager;
+use App\Filament\Resources\Users\RelationManagers\SubscriberRelationManager;
 use App\Models\AdminUser;
 use App\Models\User;
 use BackedEnum;
+use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -25,25 +38,27 @@ class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUsers;
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-user-group';
 
-    protected static ?int $navigationSort = 1;
+    protected static string|UnitEnum|null $navigationGroup = null;
 
-    protected static bool $shouldRegisterNavigation = false;
+    protected static ?int $navigationSort = 0;
+
+    protected static bool $shouldRegisterNavigation = true;
 
     public static function getModelLabel(): string
     {
-        return __('admin.users.model_label');
+        return 'Customer';
     }
 
     public static function getPluralModelLabel(): string
     {
-        return __('admin.users.plural_model_label');
+        return 'Customers';
     }
 
     public static function getNavigationLabel(): string
     {
-        return __('admin.navigation.users');
+        return 'Customers';
     }
 
     public static function form(Schema $schema): Schema
@@ -64,18 +79,18 @@ class UserResource extends Resource
     public static function getRelations(): array
     {
         return [
-            RelationManagers\OrdersRelationManager::class,
-            RelationManagers\AddressesRelationManager::class,
-            RelationManagers\CustomerGroupsRelationManager::class,
-            RelationManagers\PartnersRelationManager::class,
-            RelationManagers\ReferralCodesRelationManager::class,
-            RelationManagers\DocumentsRelationManager::class,
-            RelationManagers\ReferralsRelationManager::class,
-            RelationManagers\CouponUsagesRelationManager::class,
-            RelationManagers\DiscountRedemptionsRelationManager::class,
-            RelationManagers\ReferralRewardsRelationManager::class,
-            RelationManagers\NotificationsRelationManager::class,
-            RelationManagers\SubscriberRelationManager::class,
+            OrdersRelationManager::class,
+            AddressesRelationManager::class,
+            CustomerGroupsRelationManager::class,
+            PartnersRelationManager::class,
+            ReferralCodesRelationManager::class,
+            DocumentsRelationManager::class,
+            ReferralsRelationManager::class,
+            CouponUsagesRelationManager::class,
+            DiscountRedemptionsRelationManager::class,
+            ReferralRewardsRelationManager::class,
+            NotificationsRelationManager::class,
+            SubscriberRelationManager::class,
         ];
     }
 

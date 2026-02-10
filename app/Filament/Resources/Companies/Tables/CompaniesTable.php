@@ -31,6 +31,26 @@ class CompaniesTable
                     ->sortable(),
                 TextColumn::make('size')
                     ->sortable(),
+                TextColumn::make('address')
+                    ->label(__('messages.address'))
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('email')
+                    ->label(__('messages.email'))
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('phone')
+                    ->label(__('messages.phone'))
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('website')
+                    ->label(__('messages.website'))
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('customers_count')
+                    ->label(__('messages.customers'))
+                    ->counts('customers')
+                    ->sortable(),
                 IconColumn::make('is_active')
                     ->label(__('messages.active'))
                     ->boolean(),

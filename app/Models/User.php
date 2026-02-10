@@ -46,6 +46,8 @@ use Spatie\Translatable\HasTranslations;
  *
  * @mixin \Eloquent
  */
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
 #[ScopedBy([ActiveScope::class])]
 final class User extends Authenticatable implements FilamentUser, HasLocalePreferenceContract
 {
@@ -75,7 +77,34 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     // keep core identity columns (first/last name) stored as simple strings for authentication flows.
     public array $translatable = ['first_name', 'last_name', 'bio', 'company', 'position', 'website', 'job_title'];
 
-    protected $fillable = ['name', 'email', 'password', 'preferred_locale', 'preferred_currency', 'newsletter_subscription', 'sms_notifications', 'email_verified_at', 'first_name', 'last_name', 'gender', 'phone_number', 'birth_date', 'timezone', 'opt_in', 'phone', 'date_of_birth', 'is_active', 'accepts_marketing', 'last_login_at', 'preferences', 'avatar_url', 'last_login_ip', 'is_admin', 'is_verified', 'company', 'job_title', 'bio', 'company', 'position', 'website', 'social_links', 'notification_preferences', 'privacy_settings', 'marketing_preferences', 'login_count', 'last_activity_at', 'email_verified_at', 'phone_verified_at', 'remember_token', 'api_token', 'stripe_customer_id', 'stripe_account_id', 'subscription_status', 'subscription_plan', 'subscription_ends_at', 'trial_ends_at', 'status', 'verification_token', 'password_reset_token', 'password_reset_expires_at', 'referral_code', 'referral_code_generated_at', 'referral_settings'];
+    protected $fillable = [
+        'name', 'email', 'password', 'preferred_locale', 'preferred_currency', 'newsletter_subscription', 'sms_notifications', 'email_verified_at', 'first_name', 'last_name', 'gender', 'phone_number', 'birth_date', 'timezone', 'opt_in', 'phone', 'date_of_birth', 'is_active', 'accepts_marketing', 'last_login_at', 'preferences', 'avatar_url', 'last_login_ip', 'is_admin', 'is_verified', 'company', 'job_title', 'bio', 'company', 'position', 'website', 'social_links', 'notification_preferences', 'privacy_settings', 'marketing_preferences', 'login_count', 'last_activity_at', 'email_verified_at', 'phone_verified_at', 'remember_token', 'api_token', 'stripe_customer_id', 'stripe_account_id', 'subscription_status', 'subscription_plan', 'subscription_ends_at', 'trial_ends_at', 'status', 'verification_token', 'password_reset_token', 'password_reset_expires_at', 'referral_code', 'referral_code_generated_at', 'referral_settings',
+        'address', 'postal_code', 'country_id', 'city_id', 'company_id'
+    ];
+
+    /**
+     * Handle city relationship.
+     */
+    public function city(): BelongsTo
+    {
+        return $this->belongsTo(City::class);
+    }
+
+    /**
+     * Handle country relationship.
+     */
+    public function country(): BelongsTo
+    {
+        return $this->belongsTo(Country::class);
+    }
+
+    /**
+     * Handle company relationship.
+     */
+    public function organization(): BelongsTo
+    {
+        return $this->belongsTo(Company::class, 'company_id');
+    }
 
     protected $hidden = ['password', 'remember_token', 'verification_token', 'password_reset_token', 'api_token'];
 

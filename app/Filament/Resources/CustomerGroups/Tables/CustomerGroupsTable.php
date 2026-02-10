@@ -35,6 +35,11 @@ class CustomerGroupsTable
                     ->label(__('messages.type'))
                     ->badge()
                     ->sortable(),
+                TextColumn::make('description')
+                    ->label(__('messages.description'))
+                    ->searchable()
+                    ->limit(50)
+                    ->toggleable(isToggledHiddenByDefault: true),
                 ColorColumn::make('color')
                     ->label(__('messages.color'))
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -50,6 +55,18 @@ class CustomerGroupsTable
                 TextColumn::make('sort_order')
                     ->label(__('messages.sort'))
                     ->numeric()
+                    ->sortable(),
+                TextColumn::make('users_count')
+                    ->label(__('messages.users'))
+                    ->counts('users')
+                    ->sortable(),
+                TextColumn::make('customers_count')
+                    ->label(__('messages.customers'))
+                    ->counts('customers')
+                    ->sortable(),
+                TextColumn::make('discount_percentage')
+                    ->label(__('messages.discount_percentage'))
+                    ->numeric(2)
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->label(__('messages.created'))
