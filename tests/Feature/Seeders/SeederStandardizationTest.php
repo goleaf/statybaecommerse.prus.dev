@@ -71,15 +71,6 @@ test('standard seeders keep model ownership overlap minimal and explicit', funct
         'Attribute' => [
             'Database\\Seeders\\AttributeSeeder',
             'Database\\Seeders\\AttributeValueSeeder',
-            'Database\\Seeders\\TurboEcommerceSeeder',
-        ],
-        'Brand' => [
-            'Database\\Seeders\\BrandSeeder',
-            'Database\\Seeders\\TurboEcommerceSeeder',
-        ],
-        'Category' => [
-            'Database\\Seeders\\CategorySeeder',
-            'Database\\Seeders\\TurboEcommerceSeeder',
         ],
         'Country' => [
             'Database\\Seeders\\CountrySeeder',

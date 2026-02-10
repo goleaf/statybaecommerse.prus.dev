@@ -20,9 +20,6 @@ final class PriceListItemFactory extends Factory
     public function definition(): array
     {
         $netAmount = $this->faker->randomFloat(2, 5, 500);
-        $compareAmount = $this->faker->boolean(40)
-            ? round($netAmount * $this->faker->randomFloat(2, 1.05, 1.5), 2)
-            : null;
 
         $validFrom = $this->faker->optional(0.55)->dateTimeBetween('-1 month', '+1 month');
         $validUntil = $validFrom
@@ -37,12 +34,11 @@ final class PriceListItemFactory extends Factory
         $name = $this->faker->words(3, true);
 
         return [
-            'price_list_id'  => PriceList::factory(),
-            'product_id'     => null,
-            'variant_id'     => ProductVariant::factory(),
-            'net_amount'     => $netAmount,
-            'compare_amount' => $compareAmount,
-            'name'           => [
+            'price_list_id' => PriceList::factory(),
+            'product_id'    => null,
+            'variant_id'    => ProductVariant::factory(),
+            'net_amount'    => $netAmount,
+            'name'          => [
                 'en' => $name,
                 'lt' => $name,
             ],

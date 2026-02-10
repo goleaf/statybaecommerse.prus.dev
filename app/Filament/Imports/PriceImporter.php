@@ -29,9 +29,6 @@ class PriceImporter extends BaseImporter
                 ->requiredMapping()
                 ->numeric()
                 ->rules(['required', 'numeric']),
-            ImportColumn::make('compare_amount')
-                ->numeric()
-                ->rules(['numeric']),
             ImportColumn::make('type')
                 ->rules(['max:255']),
             ImportColumn::make('is_enabled')
@@ -60,7 +57,7 @@ class PriceImporter extends BaseImporter
     {
         return [
             'Target'   => ['priceable_id', 'priceable_type'],
-            'Pricing'  => ['amount', 'compare_amount', 'cost_amount', 'currency'],
+            'Pricing'  => ['amount', 'cost_amount', 'currency'],
             'Settings' => ['type', 'starts_at', 'ends_at', 'is_enabled'],
         ];
     }

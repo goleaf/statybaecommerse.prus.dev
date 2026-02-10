@@ -1,217 +1,182 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="CLI Arguments" tests="11" assertions="3" errors="10" failures="1" skipped="0" time="26.162204">
-    <testsuite name="Tests\Unit\Models\PriceRelationshipTest" file="Price Relationship (Tests\Unit\Models\PriceRelationship)" tests="4" assertions="0" errors="4" failures="0" skipped="0" time="24.080827">
-      <testcase name="It can belong to a product morphically" file="Price Relationship (Tests\Unit\Models\PriceRelationship)::It can belong to a product morphically" class="Tests\Unit\Models\PriceRelationshipTest" classname="Tests.Unit.Models.PriceRelationshipTest" assertions="0" time="23.549417">
-        <error type="ParseError">It can belong to a product morphicallyParseError: Unmatched ']'&#13;
-at lang\lt\product.php:9265
-at app\Services\TranslationHookService.php:220
-at app\Services\TranslationHookService.php:35
-at app\Traits\HasTranslations.php:52
-at app\Traits\HasTranslations.php:34
-at vendor\laravel\framework\src\Illuminate\Events\Dispatcher.php:492
-at vendor\laravel\framework\src\Illuminate\Events\Dispatcher.php:319
-at vendor\laravel\framework\src\Illuminate\Events\Dispatcher.php:299
-at vendor\laravel\framework\src\Illuminate\Events\Dispatcher.php:259
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Concerns\HasEvents.php:224
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1224
+  <testsuite name="CLI Arguments" tests="15" assertions="106" errors="4" failures="0" skipped="0" time="21.775277">
+    <testsuite name="Tests\Models\PriceTest" file="Price (Tests\Models\Price)" tests="4" assertions="29" errors="0" failures="0" skipped="0" time="19.975898">
+      <testcase name="Relationships return expected models" file="Price (Tests\Models\Price)::Relationships return expected models" class="Tests\Models\PriceTest" classname="Tests.Models.PriceTest" assertions="4" time="19.426417"/>
+      <testcase name="Price has expected configuration" file="Price (Tests\Models\Price)::Price has expected configuration" class="Tests\Models\PriceTest" classname="Tests.Models.PriceTest" assertions="7" time="0.170145"/>
+      <testcase name="Is active and discount percentage behaviour" file="Price (Tests\Models\Price)::Is active and discount percentage behaviour" class="Tests\Models\PriceTest" classname="Tests.Models.PriceTest" assertions="5" time="0.193500"/>
+      <testcase name="Scopes filter price records correctly" file="Price (Tests\Models\Price)::Scopes filter price records correctly" class="Tests\Models\PriceTest" classname="Tests.Models.PriceTest" assertions="13" time="0.185836"/>
+    </testsuite>
+    <testsuite name="Tests\Models\PriceListTest" file="Price List (Tests\Models\PriceList)" tests="4" assertions="40" errors="1" failures="0" skipped="0" time="0.742057">
+      <testcase name="Business helpers calculate expected flags and prices" file="Price List (Tests\Models\PriceList)::Business helpers calculate expected flags and prices" class="Tests\Models\PriceListTest" classname="Tests.Models.PriceListTest" assertions="0" time="0.224444">
+        <error type="Illuminate\Database\QueryException">Business helpers calculate expected flags and pricesIlluminate\Database\QueryException: SQLSTATE[HY000]: General error: 1 table product_variants has no column named compare_price (Connection: sqlite, Database: C:\Dropbox\projects\egistatyba/database/testing/databases\testing_parallel_pid_15844.sqlite, SQL: insert into "product_variants" ("product_id", "name", "sku", "barcode", "price", "compare_price", "cost_price", "stock_quantity", "weight", "track_inventory", "is_default", "is_enabled", "attributes", "variant_attribute_matrix", "updated_at", "created_at") values (1, Impedit Nesciunt, GHPYMC2KNCN0, NJQM6JFAQPB0, 190.58, ?, 100.72, 52, 8.292, 1, 0, 1, ?, [], 2024-02-01 09:00:00, 2024-02-01 09:00:00))&#13;
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:578
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:827
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:794
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:573
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:537
+at vendor\laravel\framework\src\Illuminate\Database\Query\Processors\Processor.php:32
+at vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php:4054
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Builder.php:2235
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1436
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1401
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1240
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:370
+at vendor\laravel\framework\src\Illuminate\Collections\Traits\EnumeratesValues.php:275
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:365
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:321
+at tests\Models\PriceListTest.php:312
+Caused by
+PDOException: SQLSTATE[HY000]: General error: 1 table product_variants has no column named compare_price
+
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:578
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:827
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:794
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:573
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:537
+at vendor\laravel\framework\src\Illuminate\Database\Query\Processors\Processor.php:32
+at vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php:4054
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Builder.php:2235
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1436
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1401
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1240
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:370
+at vendor\laravel\framework\src\Illuminate\Collections\Traits\EnumeratesValues.php:275
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:365
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:321
+at tests\Models\PriceListTest.php:312</error>
+      </testcase>
+      <testcase name="Price list has expected fillable and casts" file="Price List (Tests\Models\PriceList)::Price list has expected fillable and casts" class="Tests\Models\PriceListTest" classname="Tests.Models.PriceListTest" assertions="19" time="0.139750"/>
+      <testcase name="Relationships resolve expected models" file="Price List (Tests\Models\PriceList)::Relationships resolve expected models" class="Tests\Models\PriceListTest" classname="Tests.Models.PriceListTest" assertions="10" time="0.163352"/>
+      <testcase name="Scope helpers filter and order records" file="Price List (Tests\Models\PriceList)::Scope helpers filter and order records" class="Tests\Models\PriceListTest" classname="Tests.Models.PriceListTest" assertions="11" time="0.214510"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\Filament\Resources\PriceListItemResourceTest" file="tests\Feature\Filament\Resources\PriceListItemResourceTest.php" tests="3" assertions="0" errors="3" failures="0" skipped="0" time="0.466972">
+      <testcase name="it feature: lists price list items via the Filament table component" file="tests\Feature\Filament\Resources\PriceListItemResourceTest.php::it feature: lists price list items via the Filament table component" class="Tests\Feature\Filament\Resources\PriceListItemResourceTest" classname="Tests.Feature.Filament.Resources.PriceListItemResourceTest" assertions="0" time="0.167249">
+        <error type="Illuminate\Database\QueryException">it feature: lists price list items via the Filament table componentIlluminate\Database\QueryException: SQLSTATE[HY000]: General error: 1 table price_lists has no column named code (Connection: sqlite, Database: C:\Dropbox\projects\egistatyba/database/testing/databases\testing_parallel_pid_15844.sqlite, SQL: insert into "price_lists" ("name", "code", "currency_id", "is_enabled", "priority", "starts_at", "ends_at", "description", "metadata", "is_default", "auto_apply", "min_order_amount", "max_order_amount", "updated_at", "created_at") values (Livewire Coverage List, PL-9477, 1, 1, 71, 2026-01-25 09:38:46, 2026-03-20 00:30:37, Ut vel odio pariatur est enim. Id sequi voluptatem facere saepe autem vel. Numquam recusandae commodi culpa odio nemo. Commodi recusandae fuga qui laudantium nisi eum., {"source":"import","segment":"b2b"}, 0, 1, ?, ?, 2026-02-10 11:18:09, 2026-02-10 11:18:09))&#13;
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:578
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:827
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:794
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:573
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:537
+at vendor\laravel\framework\src\Illuminate\Database\Query\Processors\Processor.php:32
+at vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php:4054
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Builder.php:2235
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1436
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1401
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1240
 at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:370
 at vendor\laravel\framework\src\Illuminate\Collections\Traits\EnumeratesValues.php:275
 at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:365
 at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:321
 at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:315
-at tests\Unit\Models\PriceRelationshipTest.php:28</error>
-      </testcase>
-      <testcase name="It can eager load product relationship without sql error" file="Price Relationship (Tests\Unit\Models\PriceRelationship)::It can eager load product relationship without sql error" class="Tests\Unit\Models\PriceRelationshipTest" classname="Tests.Unit.Models.PriceRelationshipTest" assertions="0" time="0.208276">
-        <error type="ParseError">It can eager load product relationship without sql errorParseError: Unmatched ']'&#13;
-at lang\lt\product.php:9265
-at app\Services\TranslationHookService.php:220
-at app\Services\TranslationHookService.php:35
-at app\Traits\HasTranslations.php:52
-at app\Traits\HasTranslations.php:34
-at vendor\laravel\framework\src\Illuminate\Events\Dispatcher.php:492
-at vendor\laravel\framework\src\Illuminate\Events\Dispatcher.php:319
-at vendor\laravel\framework\src\Illuminate\Events\Dispatcher.php:299
-at vendor\laravel\framework\src\Illuminate\Events\Dispatcher.php:259
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Concerns\HasEvents.php:224
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1224
+at tests\Feature\Filament\Resources\PriceListItemResourceTest.php:37
+Caused by
+PDOException: SQLSTATE[HY000]: General error: 1 table price_lists has no column named code
+
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:578
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:827
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:794
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:573
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:537
+at vendor\laravel\framework\src\Illuminate\Database\Query\Processors\Processor.php:32
+at vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php:4054
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Builder.php:2235
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1436
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1401
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1240
 at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:370
 at vendor\laravel\framework\src\Illuminate\Collections\Traits\EnumeratesValues.php:275
 at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:365
 at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:321
 at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:315
-at tests\Unit\Models\PriceRelationshipTest.php:73</error>
+at tests\Feature\Filament\Resources\PriceListItemResourceTest.php:37</error>
       </testcase>
-      <testcase name="It can belong to a product variant morphically" file="Price Relationship (Tests\Unit\Models\PriceRelationship)::It can belong to a product variant morphically" class="Tests\Unit\Models\PriceRelationshipTest" classname="Tests.Unit.Models.PriceRelationshipTest" assertions="0" time="0.158970">
-        <error type="ParseError">It can belong to a product variant morphicallyParseError: Unmatched ']'&#13;
-at lang\lt\product.php:9265
-at app\Services\TranslationHookService.php:220
-at app\Services\TranslationHookService.php:35
-at app\Traits\HasTranslations.php:52
-at app\Traits\HasTranslations.php:34
-at vendor\laravel\framework\src\Illuminate\Events\Dispatcher.php:492
-at vendor\laravel\framework\src\Illuminate\Events\Dispatcher.php:319
-at vendor\laravel\framework\src\Illuminate\Events\Dispatcher.php:299
-at vendor\laravel\framework\src\Illuminate\Events\Dispatcher.php:259
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Concerns\HasEvents.php:224
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1224
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:370
-at vendor\laravel\framework\src\Illuminate\Collections\Traits\EnumeratesValues.php:275
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:365
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:321
-at tests\Unit\Models\PriceRelationshipTest.php:42</error>
-      </testcase>
-      <testcase name="It has a working product relationship helper" file="Price Relationship (Tests\Unit\Models\PriceRelationship)::It has a working product relationship helper" class="Tests\Unit\Models\PriceRelationshipTest" classname="Tests.Unit.Models.PriceRelationshipTest" assertions="0" time="0.164163">
-        <error type="ParseError">It has a working product relationship helperParseError: Unmatched ']'&#13;
-at lang\lt\product.php:9265
-at app\Services\TranslationHookService.php:220
-at app\Services\TranslationHookService.php:35
-at app\Traits\HasTranslations.php:52
-at app\Traits\HasTranslations.php:34
-at vendor\laravel\framework\src\Illuminate\Events\Dispatcher.php:492
-at vendor\laravel\framework\src\Illuminate\Events\Dispatcher.php:319
-at vendor\laravel\framework\src\Illuminate\Events\Dispatcher.php:299
-at vendor\laravel\framework\src\Illuminate\Events\Dispatcher.php:259
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Concerns\HasEvents.php:224
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1224
+      <testcase name="it feature: edits an existing price list item" file="tests\Feature\Filament\Resources\PriceListItemResourceTest.php::it feature: edits an existing price list item" class="Tests\Feature\Filament\Resources\PriceListItemResourceTest" classname="Tests.Feature.Filament.Resources.PriceListItemResourceTest" assertions="0" time="0.156085">
+        <error type="Illuminate\Database\QueryException">it feature: edits an existing price list itemIlluminate\Database\QueryException: SQLSTATE[HY000]: General error: 1 table price_lists has no column named code (Connection: sqlite, Database: C:\Dropbox\projects\egistatyba/database/testing/databases\testing_parallel_pid_15844.sqlite, SQL: insert into "price_lists" ("name", "code", "currency_id", "is_enabled", "priority", "starts_at", "ends_at", "description", "metadata", "is_default", "auto_apply", "min_order_amount", "max_order_amount", "updated_at", "created_at") values (Editable Coverage List, PL-0494, 1, 0, 43, 2026-01-19 23:42:46, 2026-05-29 20:36:38, Quia nisi autem beatae cupiditate explicabo quam. Dicta eveniet harum in dolores iste hic labore. Doloremque et doloribus quo aut impedit nulla dolores. Possimus rerum voluptas harum distinctio., {"source":"manual","segment":"retail"}, 0, 0, ?, ?, 2026-02-10 11:18:10, 2026-02-10 11:18:10))&#13;
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:578
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:827
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:794
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:573
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:537
+at vendor\laravel\framework\src\Illuminate\Database\Query\Processors\Processor.php:32
+at vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php:4054
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Builder.php:2235
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1436
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1401
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1240
 at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:370
 at vendor\laravel\framework\src\Illuminate\Collections\Traits\EnumeratesValues.php:275
 at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:365
 at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:321
 at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:315
-at tests\Unit\Models\PriceRelationshipTest.php:57</error>
+at tests\Feature\Filament\Resources\PriceListItemResourceTest.php:87
+Caused by
+PDOException: SQLSTATE[HY000]: General error: 1 table price_lists has no column named code
+
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:578
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:827
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:794
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:573
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:537
+at vendor\laravel\framework\src\Illuminate\Database\Query\Processors\Processor.php:32
+at vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php:4054
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Builder.php:2235
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1436
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1401
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1240
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:370
+at vendor\laravel\framework\src\Illuminate\Collections\Traits\EnumeratesValues.php:275
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:365
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:321
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:315
+at tests\Feature\Filament\Resources\PriceListItemResourceTest.php:87</error>
+      </testcase>
+      <testcase name="it feature: creates a price list item through the Livewire form" file="tests\Feature\Filament\Resources\PriceListItemResourceTest.php::it feature: creates a price list item through the Livewire form" class="Tests\Feature\Filament\Resources\PriceListItemResourceTest" classname="Tests.Feature.Filament.Resources.PriceListItemResourceTest" assertions="0" time="0.143638">
+        <error type="Illuminate\Database\QueryException">it feature: creates a price list item through the Livewire formIlluminate\Database\QueryException: SQLSTATE[HY000]: General error: 1 table price_lists has no column named code (Connection: sqlite, Database: C:\Dropbox\projects\egistatyba/database/testing/databases\testing_parallel_pid_15844.sqlite, SQL: insert into "price_lists" ("name", "code", "currency_id", "is_enabled", "priority", "starts_at", "ends_at", "description", "metadata", "is_default", "auto_apply", "min_order_amount", "max_order_amount", "updated_at", "created_at") values (Creation Coverage List, PL-4979, 1, 1, 64, ?, ?, Provident itaque quia repudiandae magni. Magni optio laudantium a a sapiente officiis. Quis ea possimus qui maiores., {"source":"import","segment":"retail"}, 0, 0, ?, ?, 2026-02-10 11:18:10, 2026-02-10 11:18:10))&#13;
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:578
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:827
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:794
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:573
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:537
+at vendor\laravel\framework\src\Illuminate\Database\Query\Processors\Processor.php:32
+at vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php:4054
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Builder.php:2235
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1436
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1401
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1240
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:370
+at vendor\laravel\framework\src\Illuminate\Collections\Traits\EnumeratesValues.php:275
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:365
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:321
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:315
+at tests\Feature\Filament\Resources\PriceListItemResourceTest.php:58
+Caused by
+PDOException: SQLSTATE[HY000]: General error: 1 table price_lists has no column named code
+
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:578
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:827
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:794
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:573
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:537
+at vendor\laravel\framework\src\Illuminate\Database\Query\Processors\Processor.php:32
+at vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php:4054
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Builder.php:2235
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1436
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1401
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1240
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:370
+at vendor\laravel\framework\src\Illuminate\Collections\Traits\EnumeratesValues.php:275
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:365
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:321
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:315
+at tests\Feature\Filament\Resources\PriceListItemResourceTest.php:58</error>
       </testcase>
     </testsuite>
-    <testsuite name="Tests\Feature\Filament\Resources\PriceResourceTest" file="tests\Feature\Filament\Resources\PriceResourceTest.php" tests="5" assertions="3" errors="4" failures="1" skipped="0" time="1.702855">
-      <testcase name="it can create a price for a product" file="tests\Feature\Filament\Resources\PriceResourceTest.php::it can create a price for a product" class="Tests\Feature\Filament\Resources\PriceResourceTest" classname="Tests.Feature.Filament.Resources.PriceResourceTest" assertions="0" time="0.184830">
-        <error type="ParseError">it can create a price for a productParseError: Unmatched ']'&#13;
-at lang\lt\product.php:9265
-at app\Services\TranslationHookService.php:220
-at app\Services\TranslationHookService.php:35
-at app\Traits\HasTranslations.php:52
-at app\Traits\HasTranslations.php:34
-at vendor\laravel\framework\src\Illuminate\Events\Dispatcher.php:492
-at vendor\laravel\framework\src\Illuminate\Events\Dispatcher.php:319
-at vendor\laravel\framework\src\Illuminate\Events\Dispatcher.php:299
-at vendor\laravel\framework\src\Illuminate\Events\Dispatcher.php:259
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Concerns\HasEvents.php:224
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1224
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:370
-at vendor\laravel\framework\src\Illuminate\Collections\Traits\EnumeratesValues.php:275
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:365
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:321
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:315
-at tests\Feature\Filament\Resources\PriceResourceTest.php:52</error>
-      </testcase>
-      <testcase name="it can create a price for a product variant" file="tests\Feature\Filament\Resources\PriceResourceTest.php::it can create a price for a product variant" class="Tests\Feature\Filament\Resources\PriceResourceTest" classname="Tests.Feature.Filament.Resources.PriceResourceTest" assertions="0" time="0.194055">
-        <error type="ParseError">it can create a price for a product variantParseError: Unmatched ']'&#13;
-at lang\lt\product.php:9265
-at app\Services\TranslationHookService.php:220
-at app\Services\TranslationHookService.php:35
-at app\Traits\HasTranslations.php:52
-at app\Traits\HasTranslations.php:34
-at vendor\laravel\framework\src\Illuminate\Events\Dispatcher.php:492
-at vendor\laravel\framework\src\Illuminate\Events\Dispatcher.php:319
-at vendor\laravel\framework\src\Illuminate\Events\Dispatcher.php:299
-at vendor\laravel\framework\src\Illuminate\Events\Dispatcher.php:259
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Concerns\HasEvents.php:224
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1224
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:370
-at vendor\laravel\framework\src\Illuminate\Collections\Traits\EnumeratesValues.php:275
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:365
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:321
-at tests\Feature\Filament\Resources\PriceResourceTest.php:74</error>
-      </testcase>
-      <testcase name="it can list prices" file="tests\Feature\Filament\Resources\PriceResourceTest.php::it can list prices" class="Tests\Feature\Filament\Resources\PriceResourceTest" classname="Tests.Feature.Filament.Resources.PriceResourceTest" assertions="0" time="0.201231">
-        <error type="ParseError">it can list pricesParseError: Unmatched ']'&#13;
-at lang\lt\product.php:9265
-at app\Services\TranslationHookService.php:220
-at app\Services\TranslationHookService.php:35
-at app\Traits\HasTranslations.php:52
-at app\Traits\HasTranslations.php:34
-at vendor\laravel\framework\src\Illuminate\Events\Dispatcher.php:492
-at vendor\laravel\framework\src\Illuminate\Events\Dispatcher.php:319
-at vendor\laravel\framework\src\Illuminate\Events\Dispatcher.php:299
-at vendor\laravel\framework\src\Illuminate\Events\Dispatcher.php:259
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Concerns\HasEvents.php:224
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1224
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:370
-at vendor\laravel\framework\src\Illuminate\Collections\Traits\EnumeratesValues.php:275
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:365
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:321
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:315
-at tests\Feature\Filament\Resources\PriceResourceTest.php:36</error>
-      </testcase>
-      <testcase name="it can edit a price" file="tests\Feature\Filament\Resources\PriceResourceTest.php::it can edit a price" class="Tests\Feature\Filament\Resources\PriceResourceTest" classname="Tests.Feature.Filament.Resources.PriceResourceTest" assertions="0" time="0.223180">
-        <error type="ParseError">it can edit a priceParseError: Unmatched ']'&#13;
-at lang\lt\product.php:9265
-at app\Services\TranslationHookService.php:220
-at app\Services\TranslationHookService.php:35
-at app\Traits\HasTranslations.php:52
-at app\Traits\HasTranslations.php:34
-at vendor\laravel\framework\src\Illuminate\Events\Dispatcher.php:492
-at vendor\laravel\framework\src\Illuminate\Events\Dispatcher.php:319
-at vendor\laravel\framework\src\Illuminate\Events\Dispatcher.php:299
-at vendor\laravel\framework\src\Illuminate\Events\Dispatcher.php:259
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Concerns\HasEvents.php:224
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1224
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:370
-at vendor\laravel\framework\src\Illuminate\Collections\Traits\EnumeratesValues.php:275
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:365
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:321
-at tests\Feature\Filament\Resources\PriceResourceTest.php:96</error>
-      </testcase>
-      <testcase name="it can validate price data" file="tests\Feature\Filament\Resources\PriceResourceTest.php::it can validate price data" class="Tests\Feature\Filament\Resources\PriceResourceTest" classname="Tests.Feature.Filament.Resources.PriceResourceTest" assertions="3" time="0.899558">
-        <failure type="PHPUnit\Framework\ExpectationFailedException">it can validate price dataComponent has no matching failed rule or error message [min] for [data.amount] attribute.
-Failed asserting that an array contains 'min'.&#13;
-at vendor\livewire\livewire\src\Features\SupportValidation\TestsValidation.php:100
-at vendor\livewire\livewire\src\Features\SupportValidation\TestsValidation.php:81
-at vendor\livewire\livewire\src\Features\SupportValidation\TestsValidation.php:48
-at vendor\filament\forms\src\Testing\TestsForms.php:103
-at vendor\laravel\framework\src\Illuminate\Macroable\Traits\Macroable.php:126
-at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:398
-at tests\Feature\Filament\Resources\PriceResourceTest.php:122</failure>
-      </testcase>
-    </testsuite>
-    <testsuite name="Tests\Feature\Filament\Resources\PriceTranslationsRelationManagerTest" file="tests\Feature\Filament\Resources\PriceTranslationsRelationManagerTest.php" tests="2" assertions="0" errors="2" failures="0" skipped="0" time="0.378522">
-      <testcase name="it can list price translations" file="tests\Feature\Filament\Resources\PriceTranslationsRelationManagerTest.php::it can list price translations" class="Tests\Feature\Filament\Resources\PriceTranslationsRelationManagerTest" classname="Tests.Feature.Filament.Resources.PriceTranslationsRelationManagerTest" assertions="0" time="0.202259">
-        <error type="ParseError">it can list price translationsParseError: Unmatched ']'&#13;
-at lang\lt\product.php:9265
-at app\Services\TranslationHookService.php:220
-at app\Services\TranslationHookService.php:35
-at app\Traits\HasTranslations.php:52
-at app\Traits\HasTranslations.php:34
-at vendor\laravel\framework\src\Illuminate\Events\Dispatcher.php:492
-at vendor\laravel\framework\src\Illuminate\Events\Dispatcher.php:319
-at vendor\laravel\framework\src\Illuminate\Events\Dispatcher.php:299
-at vendor\laravel\framework\src\Illuminate\Events\Dispatcher.php:259
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Concerns\HasEvents.php:224
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1224
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:370
-at vendor\laravel\framework\src\Illuminate\Collections\Traits\EnumeratesValues.php:275
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:365
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:321
-at tests\Feature\Filament\Resources\PriceTranslationsRelationManagerTest.php:33</error>
-      </testcase>
-      <testcase name="it can create price translations" file="tests\Feature\Filament\Resources\PriceTranslationsRelationManagerTest.php::it can create price translations" class="Tests\Feature\Filament\Resources\PriceTranslationsRelationManagerTest" classname="Tests.Feature.Filament.Resources.PriceTranslationsRelationManagerTest" assertions="0" time="0.176263">
-        <error type="ParseError">it can create price translationsParseError: Unmatched ']'&#13;
-at lang\lt\product.php:9265
-at app\Services\TranslationHookService.php:220
-at app\Services\TranslationHookService.php:35
-at app\Traits\HasTranslations.php:52
-at app\Traits\HasTranslations.php:34
-at vendor\laravel\framework\src\Illuminate\Events\Dispatcher.php:492
-at vendor\laravel\framework\src\Illuminate\Events\Dispatcher.php:319
-at vendor\laravel\framework\src\Illuminate\Events\Dispatcher.php:299
-at vendor\laravel\framework\src\Illuminate\Events\Dispatcher.php:259
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Concerns\HasEvents.php:224
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1224
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:370
-at vendor\laravel\framework\src\Illuminate\Collections\Traits\EnumeratesValues.php:275
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:365
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:321
-at tests\Feature\Filament\Resources\PriceTranslationsRelationManagerTest.php:52</error>
-      </testcase>
+    <testsuite name="Tests\Models\PriceListItemTest" file="Price List Item (Tests\Models\PriceListItem)" tests="4" assertions="37" errors="0" failures="0" skipped="0" time="0.590349">
+      <testcase name="Configuration defines expected fillable casts and translations" file="Price List Item (Tests\Models\PriceListItem)::Configuration defines expected fillable casts and translations" class="Tests\Models\PriceListItemTest" classname="Tests.Models.PriceListItemTest" assertions="4" time="0.133067"/>
+      <testcase name="Relationships link to price list product and variant" file="Price List Item (Tests\Models\PriceListItem)::Relationships link to price list product and variant" class="Tests\Models\PriceListItemTest" classname="Tests.Models.PriceListItemTest" assertions="7" time="0.139017"/>
+      <testcase name="Attribute accessors calculate discount labels and effective price" file="Price List Item (Tests\Models\PriceListItem)::Attribute accessors calculate discount labels and effective price" class="Tests\Models\PriceListItemTest" classname="Tests.Models.PriceListItemTest" assertions="8" time="0.134920"/>
+      <testcase name="Scopes filter and order records" file="Price List Item (Tests\Models\PriceListItem)::Scopes filter and order records" class="Tests\Models\PriceListItemTest" classname="Tests.Models.PriceListItemTest" assertions="18" time="0.183345"/>
     </testsuite>
   </testsuite>
 </testsuites>

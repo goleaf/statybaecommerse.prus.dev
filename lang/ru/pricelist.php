@@ -1,0 +1,36 @@
+<?php
+
+declare(strict_types=1);
+
+return array (
+  'aliquam_eligendi_quos_quos_voluptatem_at_quia_sed_nesciunt_iusto_commodi_est_voluptatem_ut_sunt_qui_id_blanditiis_aut_ipsum_recusandae_praesentium_ea_explicabo_eaque' => 'Aliquam eligendi quos quos voluptatem at. Quia sed nesciunt iusto commodi. Est voluptatem ut sunt qui id blanditiis aut. Ipsum recusandae praesentium ea explicabo eaque.',
+  'alpha' => 'Alpha',
+  'aut_vel_quia_ea_cupiditate_quia_commodi_voluptatem_accusantium_excepturi_optio_non_dolorem_quis_eum_harum_vero_id_eum_nisi' => 'Aut vel quia ea cupiditate quia commodi. Voluptatem accusantium excepturi optio non dolorem. Quis eum harum vero id eum nisi.',
+  'beatae_eveniet_quia_suscipit_repudiandae_eum_culpa_corrupti_pariatur_iusto_similique_minima_animi_officiis_dolore_similique_et_est_non_fuga_ut_voluptas_ut_est' => 'Beatae eveniet quia suscipit repudiandae eum culpa corrupti pariatur. Iusto similique minima animi officiis dolore. Similique et est non fuga ut voluptas ut est.',
+  'bravo' => 'Bravo',
+  'charlie' => 'Charlie',
+  'coverage_price_list' => 'Coverage Price List',
+  'creation_coverage_list' => 'Creation Coverage List',
+  'delta' => 'Delta',
+  'doloribus_dolores_laborum_veritatis_rerum_fugiat_totam_eum_quia_enim_eos_sit_optio_qui_modi_voluptatibus_accusantium_sit_qui_est_in_et_reprehenderit_quos_autem' => 'Doloribus dolores laborum veritatis rerum fugiat totam eum. Quia enim eos sit optio qui modi voluptatibus accusantium. Sit qui est in et reprehenderit quos autem.',
+  'echo' => 'Echo',
+  'editable_coverage_list' => 'Editable Coverage List',
+  'foxtrot' => 'Foxtrot',
+  'golf' => 'Golf',
+  'hotel' => 'Hotel',
+  'livewire_coverage_list' => 'Livewire Coverage List',
+  'natus_vel_quo_voluptatem_repellendus_dolores_ipsum_eaque_vel_molestiae_est_aut_sit_et_fugiat_ea_recusandae_dolores_eum_nihil_ab_quos_reprehenderit_inventore_est_doloremque_aperiam' => 'Natus vel quo voluptatem repellendus. Dolores ipsum eaque vel molestiae est aut. Sit et fugiat ea recusandae dolores. Eum nihil ab quos reprehenderit inventore est doloremque aperiam.',
+  'non_sint_tempore_dolores_voluptatibus_culpa_reprehenderit_sapiente_amet_in_cupiditate_dolor_aut_tempore_et_et_provident_rerum_expedita_dolor_qui_fuga' => 'Non sint tempore dolores voluptatibus culpa. Reprehenderit sapiente amet in cupiditate dolor aut. Tempore et et provident rerum expedita dolor qui fuga.',
+  'officiis_est_ipsum_tempore_explicabo_non_fugiat_sed_itaque_similique_at' => 'Officiis est ipsum tempore explicabo non. Fugiat sed itaque similique at.',
+  'primary_price_list' => 'Primary Price List',
+  'provident_itaque_quia_repudiandae_magni_magni_optio_laudantium_a_a_sapiente_officiis_quis_ea_possimus_qui_maiores' => 'Provident itaque quia repudiandae magni. Magni optio laudantium a a sapiente officiis. Quis ea possimus qui maiores.',
+  'qui_quos_error_sed_quod_laudantium_illum_quae_mollitia_voluptate_repudiandae_aspernatur_sapiente_quia_optio_nam_ut_officia_assumenda_quas_optio_dolorum_velit_blanditiis_hic_distinctio_aut_ad' => 'Qui quos error sed quod. Laudantium illum quae mollitia voluptate repudiandae. Aspernatur sapiente quia optio nam ut officia assumenda. Quas optio dolorum velit blanditiis hic distinctio aut ad.',
+  'quia_nisi_autem_beatae_cupiditate_explicabo_quam_dicta_eveniet_harum_in_dolores_iste_hic_labore_doloremque_et_doloribus_quo_aut_impedit_nulla_dolores_possimus_rerum_voluptas_harum_distinctio' => 'Quia nisi autem beatae cupiditate explicabo quam. Dicta eveniet harum in dolores iste hic labore. Doloremque et doloribus quo aut impedit nulla dolores. Possimus rerum voluptas harum distinctio.',
+  'quibusdam_alias_eum_laboriosam_sint_qui_nihil_ad_quo_occaecati_aut_saepe_illo_ullam_delectus_quisquam_eius_commodi_aut_voluptatem_omnis_voluptatem_aut_consequatur_nemo_est_non_ullam_doloribus_laudantium_molestiae_ducimus_qui' => 'Quibusdam alias eum laboriosam sint qui nihil ad. Quo occaecati aut saepe illo ullam delectus. Quisquam eius commodi aut voluptatem omnis voluptatem aut. Consequatur nemo est non. Ullam doloribus laudantium molestiae ducimus qui.',
+  'ratione_est_quam_vitae_velit_error_dicta_tempora_fugit_aut_maiores_laboriosam_aperiam_qui_cupiditate_nobis_sed_nulla_sequi' => 'Ratione est quam vitae velit error dicta. Tempora fugit aut maiores laboriosam aperiam. Qui cupiditate nobis sed nulla sequi.',
+  'relationship_matrix' => 'Relationship Matrix',
+  'test_price_list' => 'Test Price List',
+  'test_price_list_description' => 'Test price list description',
+  'unde_non_quae_fugiat_nam_dolor_consequatur_et_esse_rerum_et_a_voluptatibus_repudiandae_eos_ipsam_eligendi_et' => 'Unde non quae fugiat nam. Dolor consequatur et esse rerum et a voluptatibus repudiandae. Eos ipsam eligendi et.',
+  'ut_vel_odio_pariatur_est_enim_id_sequi_voluptatem_facere_saepe_autem_vel_numquam_recusandae_commodi_culpa_odio_nemo_commodi_recusandae_fuga_qui_laudantium_nisi_eum' => 'Ut vel odio pariatur est enim. Id sequi voluptatem facere saepe autem vel. Numquam recusandae commodi culpa odio nemo. Commodi recusandae fuga qui laudantium nisi eum.',
+);

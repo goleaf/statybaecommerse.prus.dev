@@ -22,7 +22,6 @@
                 $priceRecord = $product->prices->first();
                 $priceAmount = $priceRecord->amount ?? $product->price;
                 $currencySymbol = $priceRecord?->currency?->symbol ?? $priceRecord?->currency?->code ?? '€';
-                $compareAmount = $priceRecord?->compare_amount;
                 $shortDescription = $product->short_description ?? '';
             @endphp
 
@@ -57,10 +56,6 @@
                         <div class="flex items-baseline gap-2">
                             @if($priceAmount !== null)
                                 <span class="text-xl font-bold text-gray-900">{{ $currencySymbol }}{{ number_format((float) $priceAmount, 2) }}</span>
-                            @endif
-
-                            @if($compareAmount && $priceAmount !== null && (float) $compareAmount > (float) $priceAmount)
-                                <span class="text-sm text-gray-500 line-through">{{ $currencySymbol }}{{ number_format((float) $compareAmount, 2) }}</span>
                             @endif
                         </div>
 

@@ -8,7 +8,7 @@ use Database\Seeders\AllSeedersSeeder;
 use Database\Seeders\AttributeSeeder;
 use Database\Seeders\AttributeValueSeeder;
 use Database\Seeders\BrandSeeder;
-use Database\Seeders\CategorySeeder;
+
 use Database\Seeders\Cities\CitiesMergedSeeder;
 use Database\Seeders\CollectionSeeder;
 use Database\Seeders\CountrySeeder;
@@ -17,7 +17,7 @@ use Database\Seeders\CustomerGroupSeeder;
 use Database\Seeders\FeatureFlagSeeder;
 use Database\Seeders\OptimizedFullSeeder;
 use Database\Seeders\SettingsSeeder;
-use Database\Seeders\TurboEcommerceSeeder;
+
 
 return [
     /*
@@ -55,17 +55,14 @@ return [
             explode(',', (string) env('DB_SEED_FAST_CITY_ISO2', 'LT'))
         ))),
         'max_cities_per_country'    => max(1, (int) env('DB_SEED_FAST_MAX_CITIES_PER_COUNTRY', 40)),
-        'max_root_categories'       => max(1, (int) env('DB_SEED_FAST_MAX_ROOT_CATEGORIES', 3)),
-        'max_children_per_category' => max(1, (int) env('DB_SEED_FAST_MAX_CHILDREN_PER_CATEGORY', 2)),
+
         'collection_limit'          => max(1, (int) env('DB_SEED_FAST_COLLECTION_LIMIT', 3)),
         'brand_limit'               => max(1, (int) env('DB_SEED_FAST_BRAND_LIMIT', 6)),
         'locales'                   => array_values(array_filter(array_map(
             static fn (string $locale): string => strtolower(trim($locale)),
             explode(',', (string) env('DB_SEED_FAST_LOCALES', 'lt,en'))
         ))),
-        'generate_media'         => (bool) env('DB_SEED_FAST_GENERATE_MEDIA', false),
-        'products_per_brand'     => max(4, (int) env('DB_SEED_FAST_PRODUCTS_PER_BRAND', 6)),
-        'shared_image_pool_size' => max(8, (int) env('DB_SEED_FAST_SHARED_IMAGE_POOL_SIZE', 12)),
+
     ],
 
     /*
@@ -86,11 +83,9 @@ return [
         AttributeSeeder::class,
         AttributeValueSeeder::class,
         BrandSeeder::class,
-        CategorySeeder::class,
         CollectionSeeder::class,
         FeatureFlagSeeder::class,
         SettingsSeeder::class,
-        TurboEcommerceSeeder::class,
     ],
 
     /*

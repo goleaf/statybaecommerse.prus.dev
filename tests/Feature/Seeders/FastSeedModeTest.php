@@ -2,11 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Models\Category;
-use App\Models\City;
-use App\Models\Country;
-use App\Models\Translations\CategoryTranslation;
-use Database\Seeders\CategorySeeder;
+
 use Database\Seeders\Cities\CitiesMergedSeeder;
 use Database\Seeders\CountrySeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -24,22 +20,8 @@ test('country seeder switches to lightweight dataset in fast mode', function ():
     )->toBe(['DE', 'LT', 'US']);
 });
 
-test('category seeder trims tree size and locale count in fast mode', function (): void {
-    config()->set('seeds.fast_mode', true);
-    config()->set('seeds.fast.max_root_categories', 3);
-    config()->set('seeds.fast.max_children_per_category', 2);
-    config()->set('seeds.fast.locales', ['lt', 'en']);
-
-    $this->seed(CategorySeeder::class);
-
-    $categoryCount = Category::query()->withoutGlobalScopes()->count();
-
-    expect($categoryCount)->toBeGreaterThan(0);
-    expect($categoryCount)->toBeLessThan(128);
-    expect(
-        CategoryTranslation::query()->distinct()->pluck('locale')->sort()->values()->all()
-    )->toBe(['en', 'lt']);
-});
+use App\Models\City;
+use App\Models\Country;
 
 test('cities merged seeder honors fast iso and row limits', function (): void {
     config()->set('seeds.fast_mode', true);

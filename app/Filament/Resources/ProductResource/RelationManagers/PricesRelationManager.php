@@ -39,10 +39,6 @@ class PricesRelationManager extends RelationManager
                     ->required()
                     ->numeric()
                     ->step(0.0001),
-                TextInput::make('compare_amount')
-                    ->label(__('messages.compare_amount') !== 'messages.compare_amount' ? __('messages.compare_amount') : 'Compare Amount')
-                    ->numeric()
-                    ->step(0.0001),
                 TextInput::make('type')
                     ->label(__('messages.Type'))
                     ->placeholder('default, sale, etc.'),

@@ -725,7 +725,7 @@ return [
     ],
     'prices' => [
         'basic_information'             => 'Basic Information',
-        'basic_information_description' => 'Price tiers and validity.',
+        'basic_information_description' => 'Product, currency, amount and type.',
         'created_at'                    => 'Created At',
         'model_label'                   => 'Price',
         'navigation_label'              => 'Prices',
@@ -733,6 +733,7 @@ return [
         'plural_model_label'            => 'Prices',
         'valid_from'                    => 'Valid From',
         'valid_until'                   => 'Valid Until',
+        'validity'                      => 'Validity',
     ],
     'prices_import' => 'Import Prices',
     'product'       => [

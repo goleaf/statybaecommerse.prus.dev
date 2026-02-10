@@ -725,7 +725,7 @@ return [
     ],
     'prices' => [
         'basic_information'             => 'Pagrindinė informacija',
-        'basic_information_description' => 'Kainų lygiai ir galiojimas.',
+        'basic_information_description' => 'Produktas, valiuta, suma ir tipas.',
         'created_at'                    => 'Sukurta',
         'model_label'                   => 'Kaina',
         'navigation_label'              => 'Kainos',
@@ -733,6 +733,7 @@ return [
         'plural_model_label'            => 'Kainos',
         'valid_from'                    => 'Galioja nuo',
         'valid_until'                   => 'Galioja iki',
+        'validity'                      => 'Galiojimas',
     ],
     'prices_import' => 'Importuoti kainas',
     'product'       => [

@@ -34,7 +34,7 @@ trait HasProductPricing
         }
 
         $value = (float) $basePrice->amount;
-        $compare = $basePrice->compare_amount ? (float) $basePrice->compare_amount : null;
+        $compare = null;
 
         // Apply price lists (B2B/group/partner net pricing) if available
         try {

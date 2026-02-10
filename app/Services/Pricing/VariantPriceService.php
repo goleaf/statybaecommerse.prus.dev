@@ -168,7 +168,7 @@ final class VariantPriceService
         if ($priceListItem instanceof PriceListItem) {
             $priceListId = (int) $priceListItem->price_list_id;
             $priceListCurrency = strtoupper((string) optional($priceListItem->priceList->currency)->code ?: $context->baseCurrency);
-            $netAmount = $priceListItem->net_amount ?? $priceListItem->price ?? $priceListItem->compare_amount ?? 0.0;
+            $netAmount = $priceListItem->net_amount ?? $priceListItem->price ?? 0.0;
             $priceListPriceBase = $this->currencyService->convert((float) $netAmount, $priceListCurrency, $context->baseCurrency);
             $priceListPrice = $priceListPriceBase;
             $workingPrice = $priceListPriceBase;

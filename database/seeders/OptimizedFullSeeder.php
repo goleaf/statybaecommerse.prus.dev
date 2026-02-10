@@ -31,11 +31,9 @@ final class OptimizedFullSeeder extends BaseSeeder
         AttributeSeeder::class,
         AttributeValueSeeder::class,
         BrandSeeder::class,
-        CategorySeeder::class,
         CollectionSeeder::class,
         FeatureFlagSeeder::class,
         SettingsSeeder::class,
-        TurboEcommerceSeeder::class,
     ];
 
     public function run(): void

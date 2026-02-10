@@ -20,7 +20,7 @@ use Filament\Infolists\Components\Section as InfoSection;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Schemas\Components\Grid as SchemaGrid;
-use Filament\Schemas\Components\Tabs as SchemaTabs;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -55,72 +55,74 @@ final class PriceResource extends BaseResource
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
-            SchemaTabs::make('Price Details')
-                ->tabs([
-                    SchemaTabs\Tab::make(__('admin.prices.basic_information'))
+            Section::make(__('admin.prices.basic_information'))
+                ->description(__('admin.prices.basic_information_description'))
+                ->schema([
+                    SchemaGrid::make(2)
                         ->schema([
-                            SchemaGrid::make(2)
-                                ->schema([
-                                    MorphToSelect::make('priceable')
-                                        ->label(__('messages.Product'))
-                                        ->types([
-                                            MorphToSelect\Type::make(Product::class)
-                                                ->titleAttribute('name')
-                                                ->label(__('messages.Product')),
-                                            MorphToSelect\Type::make(ProductVariant::class)
-                                                ->titleAttribute('name')
-                                                ->label(__('messages.Variant')),
-                                        ])
-                                        ->required()
-                                        ->searchable()
-                                        ->preload(),
-                                    Select::make('currency_id')
-                                        ->label(__('messages.currency'))
-                                        ->relationship('currency', 'code')
-                                        ->required()
-                                        ->searchable()
-                                        ->preload(),
-                                ]),
-                            SchemaGrid::make(2)
-                                ->schema([
-                                    TextInput::make('amount')
-                                        ->label(__('messages.amount') !== 'messages.amount' ? __('messages.amount') : 'Amount')
-                                        ->required()
-                                        ->numeric()
-                                        ->minValue(0)
-                                        ->step(0.0001),
-                                    TextInput::make('cost_amount')
-                                        ->label(__('messages.cost_amount') !== 'messages.cost_amount' ? __('messages.cost_amount') : 'Cost Amount')
-                                        ->numeric()
-                                        ->minValue(0)
-                                        ->step(0.0001),
-                                ]),
-                            SchemaGrid::make(2)
-                                ->schema([
-                                    TextInput::make('type')
-                                        ->label(__('messages.Type'))
-                                        ->placeholder('default, sale, wholesale, etc.'),
-                                    Toggle::make('is_enabled')
-                                        ->label(__('messages.Enabled'))
-                                        ->default(true),
-                                ]),
+                            MorphToSelect::make('priceable')
+                                ->label(__('messages.Product'))
+                                ->types([
+                                    MorphToSelect\Type::make(Product::class)
+                                        ->titleAttribute('name')
+                                        ->label(__('messages.Product')),
+                                    MorphToSelect\Type::make(ProductVariant::class)
+                                        ->titleAttribute('name')
+                                        ->label(__('messages.Variant')),
+                                ])
+                                ->required()
+                                ->searchable()
+                                ->preload(),
+                            Select::make('currency_id')
+                                ->label(__('messages.currency'))
+                                ->relationship('currency', 'code')
+                                ->required()
+                                ->searchable()
+                                ->preload(),
                         ]),
-                    SchemaTabs\Tab::make(__('admin.prices.validity') !== 'admin.prices.validity' ? __('admin.prices.validity') : 'Validity')
+                    SchemaGrid::make(2)
                         ->schema([
-                            SchemaGrid::make(2)
-                                ->schema([
-                                    DateTimePicker::make('starts_at')
-                                        ->label(__('admin.prices.valid_from')),
-                                    DateTimePicker::make('ends_at')
-                                        ->label(__('admin.prices.valid_until')),
-                                ]),
+                            TextInput::make('amount')
+                                ->label(__('messages.amount') !== 'messages.amount' ? __('messages.amount') : 'Amount')
+                                ->required()
+                                ->numeric()
+                                ->minValue(0)
+                                ->step(0.0001),
+                            TextInput::make('cost_amount')
+                                ->label(__('messages.cost_amount') !== 'messages.cost_amount' ? __('messages.cost_amount') : 'Cost Amount')
+                                ->numeric()
+                                ->minValue(0)
+                                ->step(0.0001),
                         ]),
-                    SchemaTabs\Tab::make(__('messages.metadata'))
+                    SchemaGrid::make(2)
                         ->schema([
-                            KeyValue::make('metadata')
-                                ->label(__('messages.metadata')),
+                            TextInput::make('type')
+                                ->label(__('messages.Type'))
+                                ->placeholder('default, sale, wholesale, etc.'),
+                            Toggle::make('is_enabled')
+                                ->label(__('messages.Enabled'))
+                                ->default(true),
                         ]),
-                ]),
+                ])
+                ->columnSpanFull(),
+            Section::make(__('admin.prices.validity'))
+                ->schema([
+                    SchemaGrid::make(2)
+                        ->schema([
+                            DateTimePicker::make('starts_at')
+                                ->label(__('admin.prices.valid_from')),
+                            DateTimePicker::make('ends_at')
+                                ->label(__('admin.prices.valid_until')),
+                        ]),
+                ])
+                ->columnSpanFull(),
+            Section::make(__('messages.metadata'))
+                ->schema([
+                    KeyValue::make('metadata')
+                        ->label(__('messages.metadata')),
+                ])
+                ->columnSpanFull()
+                ->collapsed(),
         ]);
     }
 
@@ -183,7 +185,6 @@ final class PriceResource extends BaseResource
                     ->relationship('currency', 'code'),
             ])
             ->actions([
-                \Filament\Tables\Actions\ViewAction::make(),
                 \Filament\Tables\Actions\EditAction::make(),
                 \Filament\Tables\Actions\DeleteAction::make(),
             ])
@@ -243,7 +244,6 @@ final class PriceResource extends BaseResource
         return [
             'index'  => Pages\ListPrices::route('/'),
             'create' => Pages\CreatePrice::route('/create'),
-            'view'   => Pages\ViewPrice::route('/{record}'),
             'edit'   => Pages\EditPrice::route('/{record}/edit'),
         ];
     }

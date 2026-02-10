@@ -37,7 +37,6 @@ final class PriceSeeder extends BaseSeeder
 
         foreach ($products as $index => $product) {
             $amount = fake()->randomFloat(2, 8, 750);
-            $compareAmount = fake()->boolean(35) ? $amount * fake()->randomFloat(2, 1.05, 1.3) : null;
             $costAmount = fake()->boolean(40) ? $amount * fake()->randomFloat(2, 0.5, 0.9) : null;
             $startsAt = now()->subDays(fake()->numberBetween(1, 45));
             $endsAt = fake()->boolean(30) ? now()->addDays(fake()->numberBetween(7, 90)) : null;
@@ -50,13 +49,12 @@ final class PriceSeeder extends BaseSeeder
                     'type'           => $types[$index % count($types)],
                 ],
                 [
-                    'amount'         => round($amount, 2),
-                    'compare_amount' => $compareAmount !== null ? round($compareAmount, 2) : null,
-                    'cost_amount'    => $costAmount !== null ? round($costAmount, 2) : null,
-                    'starts_at'      => $startsAt,
-                    'ends_at'        => $endsAt,
-                    'is_enabled'     => true,
-                    'metadata'       => [
+                    'amount'      => round($amount, 2),
+                    'cost_amount' => $costAmount !== null ? round($costAmount, 2) : null,
+                    'starts_at'   => $startsAt,
+                    'ends_at'     => $endsAt,
+                    'is_enabled'  => true,
+                    'metadata'    => [
                         'seeded' => true,
                         'source' => self::class,
                     ],

@@ -723,7 +723,7 @@ return [
     ],
     'prices' => [
         'basic_information'             => 'Basisinformationen',
-        'basic_information_description' => 'Preisstufen und Gültigkeit.',
+        'basic_information_description' => 'Produkt, Währung, Betrag und Typ.',
         'created_at'                    => 'Erstellt am',
         'model_label'                   => 'Preis',
         'navigation_label'              => 'Preise',
@@ -731,6 +731,7 @@ return [
         'plural_model_label'            => 'Preise',
         'valid_from'                    => 'Gültig ab',
         'valid_until'                   => 'Gültig bis',
+        'validity'                      => 'Gültigkeit',
     ],
     'prices_import' => 'Preise importieren',
     'product'       => [

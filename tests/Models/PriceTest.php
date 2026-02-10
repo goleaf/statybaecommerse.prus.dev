@@ -7,7 +7,6 @@ namespace Tests\Models;
 use App\Models\Currency;
 use App\Models\Price;
 use App\Models\Product;
-use App\Models\Translations\PriceTranslation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Tests\TestCase;
@@ -27,7 +26,6 @@ final class PriceTest extends TestCase
             'priceable_type',
             'currency_id',
             'amount',
-            'compare_amount',
             'cost_amount',
             'type',
             'starts_at',
@@ -39,7 +37,6 @@ final class PriceTest extends TestCase
         // Confirm all critical casts are defined for monetary precision and boolean/date handling.
         $casts = $model->getCasts();
         self::assertSame('decimal:4', $casts['amount']);
-        self::assertSame('decimal:4', $casts['compare_amount']);
         self::assertSame('decimal:4', $casts['cost_amount']);
         self::assertSame('datetime', $casts['starts_at']);
         self::assertSame('datetime', $casts['ends_at']);
@@ -56,21 +53,15 @@ final class PriceTest extends TestCase
         $product = Product::factory()->create();
         $currency = Currency::factory()->create(['code' => 'EUR']);
 
-        // Persist the price record and attach a translated label to exercise all relations.
+        // Persist the price record to exercise all relations.
         $price = Price::factory()->create([
             'priceable_type' => $product->getMorphClass(),
             'priceable_id'   => $product->getKey(),
             'currency_id'    => $currency->getKey(),
         ]);
 
-        $translation = $price->translations()->create([
-            'locale'      => 'en',
-            'name'        => 'Retail price',
-            'description' => 'Retail price description',
-        ]);
-
         // Reload the relations to ensure we are asserting against hydrated models.
-        $price = $price->fresh(['priceable', 'currency', 'translations']);
+        $price = $price->fresh(['priceable', 'currency']);
 
         // Confirm the polymorphic relation hydrates the originating product model.
         self::assertInstanceOf(Product::class, $price->priceable);
@@ -79,12 +70,6 @@ final class PriceTest extends TestCase
         // Validate the currency relation matches the created record.
         self::assertInstanceOf(Currency::class, $price->currency);
         self::assertTrue($currency->is($price->currency));
-
-        // Ensure the translation relation returns the stored localized entry.
-        self::assertInstanceOf(PriceTranslation::class, $translation);
-        self::assertTrue(
-            $price->translations->contains(static fn (PriceTranslation $related): bool => $related->is($translation))
-        );
 
         Carbon::setTestNow();
     }
@@ -177,23 +162,13 @@ final class PriceTest extends TestCase
             'priceable_id'   => $product->getKey(),
             'currency_id'    => $currency->getKey(),
             'amount'         => 100,
-            'compare_amount' => 150,
             'is_enabled'     => true,
             'starts_at'      => now()->subDay(),
             'ends_at'        => now()->addDay(),
         ]);
 
-        // The accessors should report an active price and the rounded discount percentage.
+        // The accessors should report an active price.
         self::assertTrue($price->isActive());
-        self::assertSame(33, $price->discount_percentage);
-
-        // When no discount is configured the accessor should return null.
-        $price->forceFill(['compare_amount' => 100]);
-        self::assertNull($price->discount_percentage);
-
-        // Changing the monetary values should recompute the percentage dynamically.
-        $price->forceFill(['amount' => 150, 'compare_amount' => 200]);
-        self::assertSame(25, $price->discount_percentage);
 
         // Toggle various state flags to ensure the active check behaves as expected.
         $price->forceFill(['is_enabled' => false]);
@@ -207,51 +182,6 @@ final class PriceTest extends TestCase
 
         $price->forceFill(['ends_at' => now()->addDay()]);
         self::assertTrue($price->isActive());
-
-        Carbon::setTestNow();
-    }
-
-    public function test_translation_helpers_respect_locale_and_loaded_relations(): void
-    {
-        // Fix the clock so translation timestamps remain predictable.
-        Carbon::setTestNow('2025-01-04 09:45:00');
-
-        // Set up the underlying price record and attach multiple translations.
-        $product = Product::factory()->create();
-        $currency = Currency::factory()->create(['code' => 'EUR']);
-        $price = Price::factory()->create([
-            'priceable_type' => $product->getMorphClass(),
-            'priceable_id'   => $product->getKey(),
-            'currency_id'    => $currency->getKey(),
-        ]);
-
-        $price->translations()->create([
-            'locale'      => 'en',
-            'name'        => 'English Retail',
-            'description' => 'English retail description',
-        ]);
-
-        $price->translations()->create([
-            'locale'      => 'lt',
-            'name'        => 'Lietuviškas mažmeninis',
-            'description' => 'Lietuviškas mažmeninės kainos aprašymas',
-        ]);
-
-        // Load translations once to ensure the helper reuses the cached relation.
-        $price->load('translations');
-
-        // Default locale should follow the application setting.
-        app()->setLocale('en');
-        self::assertSame('English Retail', $price->getTranslatedName());
-        self::assertSame('English retail description', $price->getTranslatedDescription());
-
-        // Explicit locale arguments should override the application default.
-        self::assertSame('Lietuviškas mažmeninis', $price->getTranslatedName('lt'));
-        self::assertSame('Lietuviškas mažmeninės kainos aprašymas', $price->getTranslatedDescription('lt'));
-
-        // Requesting an unavailable locale should gracefully return null values.
-        self::assertNull($price->getTranslatedName('lv'));
-        self::assertNull($price->getTranslatedDescription('lv'));
 
         Carbon::setTestNow();
     }

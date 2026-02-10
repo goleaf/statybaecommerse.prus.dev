@@ -29,7 +29,6 @@ final class PriceListItemTest extends TestCase
             'variant_id',
             'price',
             'net_amount',
-            'compare_amount',
             'name',
             'description',
             'notes',
@@ -45,16 +44,15 @@ final class PriceListItemTest extends TestCase
         // Validate that the casts provide the necessary type coercion for numeric and temporal fields.
         $casts = $model->getCasts();
         $expectedCasts = [
-            'price'          => 'decimal:2',
-            'net_amount'     => 'decimal:4',
-            'compare_amount' => 'decimal:4',
-            'is_active'      => 'boolean',
-            'is_featured'    => 'boolean',
-            'priority'       => 'integer',
-            'min_quantity'   => 'integer',
-            'max_quantity'   => 'integer',
-            'valid_from'     => 'datetime',
-            'valid_until'    => 'datetime',
+            'price'        => 'decimal:2',
+            'net_amount'   => 'decimal:4',
+            'is_active'    => 'boolean',
+            'is_featured'  => 'boolean',
+            'priority'     => 'integer',
+            'min_quantity' => 'integer',
+            'max_quantity' => 'integer',
+            'valid_from'   => 'datetime',
+            'valid_until'  => 'datetime',
         ];
 
         self::assertSame($expectedCasts, array_intersect_key($casts, $expectedCasts));
@@ -103,22 +101,19 @@ final class PriceListItemTest extends TestCase
                 'en' => 'Special Bundle',
                 'lt' => 'Specialus Rinkinys',
             ],
-            'net_amount'     => 80.0,
-            'compare_amount' => 100.0,
-            'is_active'      => true,
-            'valid_from'     => Carbon::now()->subDay(),
-            'valid_until'    => Carbon::now()->addDay(),
-            'min_quantity'   => 2,
-            'max_quantity'   => 5,
+            'net_amount'   => 80.0,
+            'is_active'    => true,
+            'valid_from'   => Carbon::now()->subDay(),
+            'valid_until'  => Carbon::now()->addDay(),
+            'min_quantity' => 2,
+            'max_quantity' => 5,
         ]);
 
         // The translated name accessor should return the localized value and fallback to the base name if missing.
         self::assertSame('Special Bundle', $item->display_name);
 
-        // Discount helpers should reflect the percentage and absolute savings correctly.
-        self::assertSame(20, $item->discount_percentage);
+        // Effective price should return the net_amount.
         self::assertSame(80.0, $item->effective_price);
-        self::assertSame(20.0, $item->savings_amount);
         self::assertSame(80.0, $item->price);
 
         // Quantity validation should honour the configured thresholds.
@@ -181,11 +176,6 @@ final class PriceListItemTest extends TestCase
         self::assertStringContainsString('"net_amount" between ? and ?', $priceRange->toSql());
         self::assertSame(10.0, $priceRange->getBindings()[0]);
         self::assertSame(25.0, $priceRange->getBindings()[1]);
-
-        // Scope: withDiscount should emit a column comparison ensuring compare_amount exceeds net_amount.
-        $withDiscount = PriceListItem::query()->withDiscount();
-        self::assertStringContainsString('"compare_amount" is not null', $withDiscount->toSql());
-        self::assertStringContainsString('"compare_amount" > "net_amount"', $withDiscount->toSql());
 
         // Reset helpers to avoid side effects on other tests.
         Carbon::setTestNow();

@@ -722,14 +722,15 @@ return [
     ],
     'prices' => [
         'basic_information'             => 'Основная информация',
-        'basic_information_description' => 'Уровни цен и срок действия.',
+        'basic_information_description' => 'Товар, валюта, сумма и тип.',
         'created_at'                    => 'Создано',
         'model_label'                   => 'Цена',
-        'navigation_label'              => 'Prices',
+        'navigation_label'              => 'Цены',
         'no_expiry'                     => 'Без срока действия',
         'plural_model_label'            => 'Цены',
         'valid_from'                    => 'Действует с',
         'valid_until'                   => 'Действует до',
+        'validity'                      => 'Срок действия',
     ],
     'prices_import' => 'Import Prices',
     'product'       => [
