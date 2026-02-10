@@ -950,4 +950,5 @@ return [
     'no_attributes_available'                                                        => 'No attributes available',
     'yes'                                                                            => 'Yes',
     'no'                                                                             => 'No',
+    'private_person'                                                                 => 'Private Person',
 ];

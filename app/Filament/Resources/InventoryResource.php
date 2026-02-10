@@ -22,6 +22,8 @@ final class InventoryResource extends BaseResource
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-archive-box';
 
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static string|UnitEnum|null $navigationGroup = null;
 
     protected static ?int $navigationSort = 10;

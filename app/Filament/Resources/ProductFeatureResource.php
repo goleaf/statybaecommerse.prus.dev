@@ -26,7 +26,24 @@ final class ProductFeatureResource extends BaseResource
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-tag';
 
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static string|UnitEnum|null $navigationGroup = null;
+
+    public static function getNavigationLabel(): string
+    {
+        return __('admin.navigation.product_features');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('admin.navigation.product_features');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('admin.navigation.product_feature');
+    }
 
     public static function form(Schema $schema): Schema
     {

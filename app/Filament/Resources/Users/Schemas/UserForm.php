@@ -12,6 +12,8 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Hash;
 
+use Filament\Schemas\Components\Utilities\Get;
+
 class UserForm
 {
     public static function configure(Schema $schema): Schema
@@ -20,6 +22,22 @@ class UserForm
             ->components([
                 Section::make(__('messages.profile'))
                     ->schema([
+                        Select::make('account_type')
+                            ->label(__('messages.type'))
+                            ->options([
+                                'private' => __('messages.private_person'),
+                                'company' => __('messages.company'),
+                            ])
+                            ->live()
+                            ->dehydrated(false)
+                            ->default(fn ($record) => $record?->company_id ? 'company' : 'private'),
+                        Select::make('company_id')
+                            ->label(__('messages.company'))
+                            ->relationship('organization', 'name')
+                            ->visible(fn (Get $get) => $get('account_type') === 'company')
+                            ->required(fn (Get $get) => $get('account_type') === 'company')
+                            ->searchable()
+                            ->preload(),
                         TextInput::make('first_name')
                             ->label(__('messages.first_name'))
                             ->maxLength(255),
@@ -63,6 +81,27 @@ class UserForm
                                 'de' => __('translations.german'),
                             ])
                             ->default('lt'),
+                    ])->columns(2)
+                    ->columnSpanFull(),
+
+                Section::make(__('messages.address'))
+                    ->schema([
+                        TextInput::make('address')
+                            ->label(__('messages.address'))
+                            ->maxLength(255),
+                        TextInput::make('postal_code')
+                            ->label(__('messages.postal_code'))
+                            ->maxLength(20),
+                        Select::make('country_id')
+                            ->label(__('messages.country'))
+                            ->relationship('country', 'name')
+                            ->searchable()
+                            ->preload(),
+                        Select::make('city_id')
+                            ->label(__('messages.city'))
+                            ->relationship('city', 'name')
+                            ->searchable()
+                            ->preload(),
                     ])->columns(2)
                     ->columnSpanFull(),
             ]);

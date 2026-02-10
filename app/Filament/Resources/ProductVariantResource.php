@@ -27,7 +27,24 @@ final class ProductVariantResource extends BaseResource
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-list-bullet';
 
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static string|UnitEnum|null $navigationGroup = null;
+
+    public static function getNavigationLabel(): string
+    {
+        return __('admin.navigation.product_variants');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('admin.navigation.product_variants');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('admin.navigation.product_variant');
+    }
 
     public static function form(Schema $schema): Schema
     {

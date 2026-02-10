@@ -21,6 +21,8 @@ final class BrandResource extends BaseResource
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-tag';
 
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static string|UnitEnum|null $navigationGroup = null;
 
     protected static ?int $navigationSort = 5;

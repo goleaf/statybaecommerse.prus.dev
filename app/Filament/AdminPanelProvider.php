@@ -41,6 +41,18 @@ class AdminPanelProvider extends PanelProvider
                 \App\Filament\Resources\CustomerGroups\CustomerGroupResource::class,
             ],
         );
+
+        FilamentView::registerRenderHook(
+            PanelsRenderHook::RESOURCE_PAGES_LIST_RECORDS_TABLE_BEFORE,
+            fn (): string => view('filament.hooks.product-tabs')->render(),
+            scopes: [
+                \App\Filament\Resources\ProductResource::class,
+                \App\Filament\Resources\ProductVariantResource::class,
+                \App\Filament\Resources\InventoryResource::class,
+                \App\Filament\Resources\BrandResource::class,
+                \App\Filament\Resources\ProductFeatureResource::class,
+            ],
+        );
     }
 
     public function panel(Panel $panel): Panel

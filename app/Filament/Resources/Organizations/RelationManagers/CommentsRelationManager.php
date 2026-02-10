@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Organizations\RelationManagers;
 
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\CreateAction;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
 use Filament\Forms\Components\Textarea;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\CreateAction;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -23,7 +23,7 @@ class CommentsRelationManager extends RelationManager
     {
         return $schema
             ->components([
-                Textarea::make('body')
+                Textarea::make('content')
                     ->label(__('messages.description'))
                     ->required()
                     ->columnSpanFull(),
@@ -33,12 +33,15 @@ class CommentsRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
-            ->recordTitleAttribute('body')
+            ->recordTitleAttribute('content')
             ->columns([
-                TextColumn::make('body')
+                TextColumn::make('content')
                     ->label(__('messages.description'))
                     ->limit(50)
                     ->searchable(),
+                TextColumn::make('user.name')
+                    ->label(__('messages.user'))
+                    ->sortable(),
                 TextColumn::make('created_at')
                     ->label(__('messages.created_at'))
                     ->dateTime()
@@ -48,13 +51,25 @@ class CommentsRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                CreateAction::make(),
+                CreateAction::make()
+                    ->mutateFormDataUsing(function (array $data): array {
+                        $user = auth()->user();
+
+                        if ($user instanceof \App\Models\AdminUser) {
+                            // Find corresponding User record for the AdminUser
+                            $data['user_id'] = \App\Models\User::where('email', $user->email)->value('id');
+                        } else {
+                            $data['user_id'] = $user?->id;
+                        }
+
+                        return $data;
+                    }),
             ])
-            ->recordActions([
+            ->actions([
                 EditAction::make(),
                 DeleteAction::make(),
             ])
-            ->toolbarActions([
+            ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),

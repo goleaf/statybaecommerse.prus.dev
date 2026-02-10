@@ -26,7 +26,24 @@ final class ProductImageResource extends BaseResource
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-photo';
 
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static string|UnitEnum|null $navigationGroup = null;
+
+    public static function getNavigationLabel(): string
+    {
+        return __('admin.navigation.product_images');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('admin.navigation.product_images');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('admin.navigation.product_image');
+    }
 
     public static function form(Schema $schema): Schema
     {

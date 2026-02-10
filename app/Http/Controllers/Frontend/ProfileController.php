@@ -8,7 +8,6 @@ use App\Enums\AddressType;
 use App\Http\Controllers\Controller;
 use App\Models\Address;
 use App\Models\Country;
-use App\Models\Customer;
 use App\Models\User;
 use App\Support\Database\TableAvailability;
 use Illuminate\Http\RedirectResponse;
@@ -30,7 +29,6 @@ final class ProfileController extends Controller
         return response()->view('profile.index', [
             'user'      => $user,
             'addresses' => $user->addresses,
-            'customer'  => $this->resolveCustomerForUser($user),
         ]);
     }
 
@@ -41,14 +39,12 @@ final class ProfileController extends Controller
         return response()->view('profile.edit', [
             'user'      => $user,
             'countries' => $this->resolveCountries(),
-            'customer'  => $this->resolveCustomerForUser($user),
         ]);
     }
 
     public function update(Request $request): RedirectResponse
     {
         $user = $this->resolveUser($request);
-        $originalEmail = $user->email;
 
         $validated = $request->validate($this->profileRules($user));
 
@@ -81,14 +77,16 @@ final class ProfileController extends Controller
         $user->email = $validated['email'];
         $user->phone = $validated['phone'] ?? null;
         $user->phone_number = $validated['phone'] ?? null;
+        $user->address = $validated['address'] ?? null;
+        $user->postal_code = $validated['postal_code'] ?? null;
+        $user->country_id = $validated['country_id'] ?? null;
+        $user->city_id = $validated['city_id'] ?? null;
 
         if (! empty($validated['password'] ?? null)) {
             $user->password = Hash::make($validated['password']);
         }
 
         $user->save();
-
-        $this->updateCustomerRecord($user, $validated, $originalEmail);
 
         return redirect()->route('frontend.profile.index')->with('status', 'profile-updated');
     }
@@ -207,54 +205,6 @@ final class ProfileController extends Controller
         }
     }
 
-    private function resolveCustomerForUser(User $user): ?Customer
-    {
-        if (! $this->customersTableExists()) {
-            return null;
-        }
-
-        return Customer::query()
-            ->where('email', $user->email)
-            ->first();
-    }
-
-    private function updateCustomerRecord(User $user, array $validated, string $originalEmail): void
-    {
-        if (! $this->customersTableExists()) {
-            return;
-        }
-
-        $customer = Customer::query()->where('email', $originalEmail)->first();
-
-        if (! $customer) {
-            $customer = Customer::query()->firstOrNew(['email' => $validated['email']]);
-        }
-
-        $columns = Schema::hasTable($customer->getTable())
-            ? Schema::getColumnListing($customer->getTable())
-            : [];
-
-        $columnLookup = array_flip($columns);
-
-        $customer->fill(array_intersect_key([
-            'name'        => $user->name,
-            'email'       => $validated['email'],
-            'phone'       => $validated['phone'] ?? null,
-            'address'     => $validated['address'] ?? null,
-            'postal_code' => $validated['postal_code'] ?? null,
-            'country_id'  => $validated['country_id'] ?? null,
-            'city_id'     => $validated['city_id'] ?? null,
-        ], $columnLookup));
-
-        foreach (['is_default', 'is_billing', 'is_shipping'] as $flag) {
-            if (isset($columnLookup[$flag])) {
-                $customer->{$flag} = (bool) ($validated[$flag] ?? $customer->{$flag} ?? false);
-            }
-        }
-
-        $customer->save();
-    }
-
     /**
      * @return array<int, string|Rule>
      */
@@ -320,11 +270,6 @@ final class ProfileController extends Controller
         }
 
         return $user;
-    }
-
-    private function customersTableExists(): bool
-    {
-        return $this->tables->has('customers');
     }
 
     private function countriesTableExists(): bool
