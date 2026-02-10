@@ -15,6 +15,8 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
+use Filament\Forms\Components\Textarea;
+
 class BrandForm
 {
     public static function configure(Schema $schema): Schema
@@ -33,6 +35,18 @@ class BrandForm
                                 ->label(__('messages.slug'))
                                 ->required()
                                 ->unique(ignoreRecord: true)
+                                ->maxLength(255),
+                            TextInput::make('website')
+                                ->label(__('messages.website'))
+                                ->url()
+                                ->maxLength(255),
+                            TextInput::make('contact_email')
+                                ->label(__('messages.email'))
+                                ->email()
+                                ->maxLength(255),
+                            TextInput::make('contact_phone')
+                                ->label(__('messages.phone'))
+                                ->tel()
                                 ->maxLength(255),
                         ]),
                     RichEditor::make('description')
@@ -70,6 +84,17 @@ class BrandForm
                                 ->required(),
                         ])
                         ->columns(2),
+                ])
+                ->columnSpanFull(),
+            Section::make(__('admin.products.seo'))
+                ->schema([
+                    TextInput::make('seo_title')
+                        ->label(__('admin.products.seo_title'))
+                        ->maxLength(255),
+                    Textarea::make('seo_description')
+                        ->label(__('admin.products.seo_description'))
+                        ->rows(3)
+                        ->columnSpanFull(),
                 ])
                 ->columnSpanFull(),
         ]);
