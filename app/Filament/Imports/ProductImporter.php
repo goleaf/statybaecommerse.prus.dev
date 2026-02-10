@@ -465,6 +465,7 @@ class ProductImporter extends BaseImporter
                         $paths[] = (string) $nested;
                     }
                 }
+
                 continue;
             }
 
@@ -480,6 +481,7 @@ class ProductImporter extends BaseImporter
 
             if (str_starts_with($value, 'data:')) {
                 $paths[] = $value;
+
                 continue;
             }
 
@@ -491,6 +493,7 @@ class ProductImporter extends BaseImporter
                         $paths[] = $part;
                     }
                 }
+
                 continue;
             }
 
