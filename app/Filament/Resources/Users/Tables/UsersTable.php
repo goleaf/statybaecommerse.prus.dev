@@ -27,6 +27,15 @@ class UsersTable
                     ->label(__('messages.name'))
                     ->searchable()
                     ->sortable(),
+                TextColumn::make('account_type')
+                    ->label(__('messages.type'))
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'private' => 'gray',
+                        'company' => 'success',
+                        default   => 'gray',
+                    })
+                    ->sortable(),
                 TextColumn::make('email')
                     ->label(__('messages.email'))
                     ->searchable()

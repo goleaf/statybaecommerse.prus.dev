@@ -1,7 +1,7 @@
 @extends('components.layouts.base')
 
-@section('title', $campaign->trans('ui.meta_title') ?: $campaign->trans('ui.name'))
-@section('description', $campaign->trans('ui.meta_description') ?: $campaign->trans('ui.description'))
+@section('title', $campaign->trans('meta_title') ?: $campaign->trans('name'))
+@section('description', $campaign->trans('meta_description') ?: $campaign->trans('description'))
 
 @section('content')
     <div class="container mx-auto px-4 py-8">
@@ -16,7 +16,7 @@
                 </li>
                 <li class="text-gray-500 dark:text-gray-400">/</li>
                 <li class="text-gray-900 dark:text-white font-medium">
-                    {{ $campaign->trans('ui.name') }}
+                    {{ $campaign->trans('name') }}
                 </li>
             </ol>
         </nav>
@@ -29,7 +29,7 @@
                     @if ($campaign->banner_image)
                         <div class="aspect-w-16 aspect-h-9">
                             <img src="{{ $campaign->getBannerUrl() }}"
-                                 alt="{{ $campaign->trans('ui.banner_alt_text') }}"
+                                 alt="{{ $campaign->trans('banner_alt_text') }}"
                                  class="w-full h-64 object-cover">
                         </div>
                     @endif
@@ -78,28 +78,28 @@
                         </div>
 
                         <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-                            {{ $campaign->trans('ui.name') }}
+                            {{ $campaign->trans('name') }}
                         </h1>
 
-                        @if ($campaign->trans('ui.description'))
+                        @if ($campaign->trans('description'))
                             <div class="prose dark:prose-invert max-w-none mb-6">
-                                {!! nl2br(e($campaign->trans('ui.description'))) !!}
+                                {!! nl2br(e($campaign->trans('description'))) !!}
                             </div>
                         @endif
 
                         <!-- Campaign Content -->
-                        @if ($campaign->trans('ui.content'))
+                        @if ($campaign->trans('content'))
                             <div class="prose dark:prose-invert max-w-none mb-6">
-                                {!! $campaign->trans('ui.content') !!}
+                                {!! $campaign->trans('content') !!}
                             </div>
                         @endif
 
                         <!-- Call to Action -->
-                        @if ($campaign->trans('ui.cta_text') && $campaign->cta_url)
+                        @if ($campaign->trans('cta_text') && $campaign->cta_url)
                             <div class="mt-8">
                                 <a href="{{ $campaign->cta_url }}"
                                    class="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
-                                    {{ $campaign->trans('ui.cta_text') }}
+                                    {{ $campaign->trans('cta_text') }}
                                     <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                               d="M9 5l7 7-7 7"></path>
@@ -188,7 +188,7 @@
                             @foreach ($campaign->targetCategories as $category)
                                 <span
                                       class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                                    {{ $category->trans('ui.name') }}
+                                    {{ $category->trans('name') }}
                                 </span>
                             @endforeach
                         </div>
@@ -209,12 +209,12 @@
                                     <div class="flex items-center space-x-3">
                                         @if ($product->featured_image)
                                             <img src="{{ $product->getFeaturedImageUrl() }}"
-                                                 alt="{{ $product->trans('ui.name') }}"
+                                                 alt="{{ $product->trans('name') }}"
                                                  class="w-10 h-10 object-cover rounded">
                                         @endif
                                         <div class="flex-1 min-w-0">
                                             <p class="text-sm font-medium text-gray-900 dark:text-white truncate">
-                                                {{ $product->trans('ui.name') }}
+                                                {{ $product->trans('name') }}
                                             </p>
                                             <p class="text-sm text-gray-500 dark:text-gray-400">
                                                 €{{ number_format($product->price, 2) }}
@@ -247,7 +247,7 @@
                                     <div class="flex items-center space-x-3">
                                         @if ($relatedCampaign->banner_image)
                                             <img src="{{ $relatedCampaign->getBannerUrl() }}"
-                                                 alt="{{ $relatedCampaign->trans('ui.name') }}"
+                                                 alt="{{ $relatedCampaign->trans('name') }}"
                                                  class="w-12 h-12 object-cover rounded">
                                         @else
                                             <div
@@ -264,7 +264,7 @@
                                         <div class="flex-1 min-w-0">
                                             <p
                                                class="text-sm font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 truncate">
-                                                {{ $relatedCampaign->trans('ui.name') }}
+                                                {{ $relatedCampaign->trans('name') }}
                                             </p>
                                             <p class="text-xs text-gray-500 dark:text-gray-400">
                                                 {{ __(sprintf('campaigns.types.%s', $relatedCampaign->type)) }}

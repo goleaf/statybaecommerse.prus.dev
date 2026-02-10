@@ -2,11 +2,15 @@
     $resources = [
         \App\Filament\Resources\ProductResource::class,
         \App\Filament\Resources\CategoryResource::class,
+        \App\Filament\Resources\CollectionResource::class,
         \App\Filament\Resources\ProductVariantResource::class,
+        \App\Filament\Resources\VariantCombinationResource::class,
         \App\Filament\Resources\InventoryResource::class,
         \App\Filament\Resources\BrandResource::class,
         \App\Filament\Resources\ProductImageResource::class,
         \App\Filament\Resources\ProductFeatureResource::class,
+        \App\Filament\Resources\ProductRequestResource::class,
+        \App\Filament\Resources\PriceResource::class,
     ];
 
     $currentResource = null;

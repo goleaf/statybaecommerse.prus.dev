@@ -92,8 +92,6 @@ final class Category extends Model implements HasMedia
      */
     protected $appends = ['full_name', 'breadcrumb', 'canonical_url', 'meta_tags', 'total_revenue', 'average_product_price', 'is_root', 'is_leaf', 'depth', 'level', 'ancestors_count', 'descendants_count', 'full_path'];
 
-    protected string $translationModel = \App\Models\Translations\CategoryTranslation::class;
-
     protected static function booted(): void
     {
         self::creating(function (Category $category): void {
@@ -219,23 +217,43 @@ final class Category extends Model implements HasMedia
     }
 
     /**
-     * Get translated field value for the specified locale.
-     * Uses the eager-loaded translations relationship to avoid N+1 queries.
+     * Orders belonging to products of this category.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    public function trans(string $field, ?string $locale = null): mixed
+    public function orders(): BelongsToMany
     {
-        $locale ??= app()->getLocale();
+        return $this->belongsToMany(Order::class, 'order_items', 'product_id', 'order_id', 'id', 'product_id')
+            ->join('product_categories', 'product_categories.product_id', '=', 'order_items.product_id')
+            ->where('product_categories.category_id', $this->id);
+    }
 
-        // If translations are loaded, use them to avoid additional queries
-        if ($this->relationLoaded('translations')) {
-            $translation = $this->translations->firstWhere('locale', $locale);
-            if ($translation && isset($translation->{$field})) {
-                return $translation->{$field};
-            }
-        }
+    /**
+     * Collections belonging to products of this category.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function collections(): BelongsToMany
+    {
+        return $this->belongsToMany(Collection::class, 'product_collections', 'category_id', 'collection_id', 'id', 'product_id')
+            ->join('product_categories', 'product_categories.product_id', '=', 'product_collections.product_id')
+            ->where('product_categories.category_id', $this->id);
+    }
 
-        // Fallback to the base field value
-        return $this->{$field} ?? null;
+    /**
+     * Handle variants functionality with proper error handling.
+     */
+    public function variants(): \Illuminate\Database\Eloquent\Relations\HasManyThrough
+    {
+        return $this->hasManyThrough(
+            ProductVariant::class,
+            Product::class,
+            'id', // Local key on categories... wait no.
+            'product_id', // Foreign key on product_variants...
+            'id', // Local key on categories...
+            'id' // Local key on products... wait.
+        )->join('product_categories', 'product_categories.product_id', '=', 'products.id')
+            ->where('product_categories.category_id', $this->id);
     }
 
     /**

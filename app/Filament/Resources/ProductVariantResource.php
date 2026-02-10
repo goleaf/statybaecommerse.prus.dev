@@ -5,8 +5,16 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProductVariantResource\Pages;
+use App\Filament\Resources\ProductVariantResource\RelationManagers\AttributesRelationManager;
+use App\Filament\Resources\ProductVariantResource\RelationManagers\ImagesRelationManager;
+use App\Filament\Resources\ProductVariantResource\RelationManagers\InventoriesRelationManager;
+use App\Filament\Resources\ProductVariantResource\RelationManagers\OrdersRelationManager;
 use App\Filament\Resources\ProductVariantResource\RelationManagers\PricesRelationManager;
 use App\Filament\Resources\ProductVariantResource\RelationManagers\ProductsRelationManager;
+use App\Filament\Resources\ProductVariantResource\RelationManagers\SimilaritiesRelationManager;
+use App\Filament\Resources\ProductVariantResource\RelationManagers\StockMovementsRelationManager;
+use App\Filament\Resources\ProductVariantResource\RelationManagers\VariantCombinationsRelationManager;
+use App\Filament\Resources\ProductVariantResource\RelationManagers\DiscountsRelationManager;
 use App\Filament\Resources\ProductVariantResource\Schemas\ProductVariantForm;
 use App\Filament\Resources\ProductVariantResource\Schemas\ProductVariantInfolist;
 use App\Models\ProductVariant;
@@ -28,6 +36,8 @@ final class ProductVariantResource extends BaseResource
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-list-bullet';
 
     protected static bool $shouldRegisterNavigation = false;
+
+    protected static ?string $activeNavigationItem = ProductResource::class;
 
     protected static string|UnitEnum|null $navigationGroup = null;
 
@@ -100,8 +110,14 @@ final class ProductVariantResource extends BaseResource
         return [
             ProductsRelationManager::class,
             PricesRelationManager::class,
-            \App\Filament\Resources\ProductVariantResource\RelationManagers\InventoriesRelationManager::class,
-            \App\Filament\Resources\ProductVariantResource\RelationManagers\AttributesRelationManager::class,
+            InventoriesRelationManager::class,
+            AttributesRelationManager::class,
+            ImagesRelationManager::class,
+            OrdersRelationManager::class,
+            StockMovementsRelationManager::class,
+            SimilaritiesRelationManager::class,
+            DiscountsRelationManager::class,
+            VariantCombinationsRelationManager::class,
         ];
     }
 

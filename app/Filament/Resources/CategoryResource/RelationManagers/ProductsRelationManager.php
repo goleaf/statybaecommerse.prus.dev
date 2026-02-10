@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CategoryResource\RelationManagers;
 
+use App\Models\Product;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\PublishedScope;
 use App\Models\Scopes\VisibleScope;
@@ -44,10 +45,10 @@ class ProductsRelationManager extends RelationManager
             ->recordTitleAttribute('name')
             ->paginated(false)
             ->columns([
-                ImageColumn::make('primaryImage.path')
+                ImageColumn::make('main_image')
                     ->label(__('messages.image'))
                     ->disk('public')
-                    ->defaultImageUrl(product_placeholder_url('thumb'))
+                    ->getStateUsing(static fn (Product $record): ?string => $record->primaryImage?->path)
                     ->circular(),
                 TextColumn::make('name')
                     ->label(__('messages.name')),

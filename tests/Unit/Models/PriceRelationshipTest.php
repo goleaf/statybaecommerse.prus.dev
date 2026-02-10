@@ -18,7 +18,7 @@ class PriceRelationshipTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         Currency::factory()->create(['id' => 1, 'code' => 'EUR']);
     }
 
@@ -26,7 +26,7 @@ class PriceRelationshipTest extends TestCase
     public function it_can_belong_to_a_product_morphically(): void
     {
         $product = Product::factory()->create(['name' => 'Test Product']);
-        
+
         $price = Price::factory()->create([
             'priceable_id'   => $product->id,
             'priceable_type' => Product::class,
@@ -41,7 +41,7 @@ class PriceRelationshipTest extends TestCase
     {
         $product = Product::factory()->create();
         $variant = ProductVariant::factory()->create(['product_id' => $product->id, 'name' => 'Test Variant']);
-        
+
         $price = Price::factory()->create([
             'priceable_id'   => $variant->id,
             'priceable_type' => ProductVariant::class,
@@ -55,7 +55,7 @@ class PriceRelationshipTest extends TestCase
     public function it_has_a_working_product_relationship_helper(): void
     {
         $product = Product::factory()->create(['name' => 'Test Product']);
-        
+
         $price = Price::factory()->create([
             'priceable_id'   => $product->id,
             'priceable_type' => Product::class,
@@ -71,7 +71,7 @@ class PriceRelationshipTest extends TestCase
     public function it_can_eager_load_product_relationship_without_sql_error(): void
     {
         $product = Product::factory()->create(['name' => 'Test Product']);
-        
+
         Price::factory()->create([
             'priceable_id'   => $product->id,
             'priceable_type' => Product::class,

@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Cache;
@@ -143,10 +144,6 @@ final class Brand extends Model implements HasMedia, TranslatableRecord
 
     protected $table = 'brands';
 
-    protected string $translationModel = \App\Models\Translations\BrandTranslation::class;
-
-    protected $translatable = ['name', 'slug', 'description', 'seo_title', 'seo_description'];
-
     public function shouldBeSearchable(): bool
     {
         if (config('search.driver') !== 'scout' || ! config('search.scout.enabled')) {
@@ -242,6 +239,38 @@ final class Brand extends Model implements HasMedia, TranslatableRecord
     public function variants(): \Illuminate\Database\Eloquent\Relations\HasManyThrough
     {
         return $this->hasManyThrough(ProductVariant::class, Product::class, 'brand_id', 'product_id');
+    }
+
+    /**
+     * Categories belonging to products of this brand.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function categories(): BelongsToMany
+    {
+        return $this->belongsToMany(Category::class, 'product_categories', 'brand_id', 'category_id', 'id', 'product_id')
+            ->join('products', 'products.id', '=', 'product_categories.product_id')
+            ->where('products.brand_id', $this->id);
+    }
+
+    /**
+     * Collections belonging to products of this brand.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function collections(): BelongsToMany
+    {
+        return $this->belongsToMany(Collection::class, 'product_collections', 'brand_id', 'collection_id', 'id', 'product_id')
+            ->join('products', 'products.id', '=', 'product_collections.product_id')
+            ->where('products.brand_id', $this->id);
+    }
+
+    /**
+     * Discounts associated with this brand.
+     */
+    public function discounts(): BelongsToMany
+    {
+        return $this->belongsToMany(Discount::class, 'discount_brands');
     }
 
     /**
@@ -831,26 +860,6 @@ final class Brand extends Model implements HasMedia, TranslatableRecord
                 return ['social_links' => json_encode($normalized)];
             },
         );
-    }
-
-    /**
-     * Get translated field value for the specified locale.
-     * Uses the eager-loaded translations relationship to avoid N+1 queries.
-     */
-    public function trans(string $field, ?string $locale = null): mixed
-    {
-        $locale ??= app()->getLocale();
-
-        // If translations are loaded, use them to avoid additional queries
-        if ($this->relationLoaded('translations')) {
-            $translation = $this->translations->firstWhere('locale', $locale);
-            if ($translation && isset($translation->{$field})) {
-                return $translation->{$field};
-            }
-        }
-
-        // Fallback to the base field value
-        return $this->{$field} ?? null;
     }
 
     /**

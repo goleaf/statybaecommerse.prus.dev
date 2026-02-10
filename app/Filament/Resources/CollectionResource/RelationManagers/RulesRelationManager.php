@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CollectionResource\RelationManagers;
 
-use App\Models\CollectionRule;
+use Filament\Actions\AssociateAction;
+use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
+use Filament\Actions\DissociateAction;
+use Filament\Actions\DissociateBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -72,10 +75,18 @@ class RulesRelationManager extends RelationManager
             ])
             ->headerActions([
                 CreateAction::make(),
+                AssociateAction::make()
+                    ->preloadRecordSelect(),
             ])
             ->actions([
                 EditAction::make(),
                 DeleteAction::make(),
+                DissociateAction::make(),
+            ])
+            ->bulkActions([
+                BulkActionGroup::make([
+                    DissociateBulkAction::make(),
+                ]),
             ]);
     }
 }

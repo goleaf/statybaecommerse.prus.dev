@@ -99,7 +99,16 @@ return [
         'revenue_eur' => 'Pajamos (EUR)',
     ],
     'collections' => [
-        'translations' => [
+        'automatic_skills'  => 'Automatiniai įgūdžiai',
+        'display_type'      => 'Atvaizdavimo tipas',
+        'is_automatic'      => 'Automatinis',
+        'products_per_page' => 'Produktų skaičius puslapyje',
+        'rule_column'       => 'Stulpelis',
+        'rule_operator'     => 'Operatorius',
+        'rule_value'        => 'Reikšmė',
+        'rules'             => 'Taisyklės',
+        'show_filters'      => 'Rodyti filtrus',
+        'translations'      => [
             'save' => 'Išsaugoti vertimus',
         ],
     ],
@@ -573,6 +582,9 @@ return [
         'organization'     => 'Organizacija',
         'organizations'    => 'Organizacijos',
         'partners'         => 'Partneriai',
+        'collections'      => 'Kolekcijos',
+        'collection'       => 'Kolekcija',
+        'product_requests' => 'Produktų užklausos',
         'product_features' => 'Produkto savybės',
         'product_feature'  => 'Produkto savybė',
         'product_images'   => 'Produkto nuotraukos',

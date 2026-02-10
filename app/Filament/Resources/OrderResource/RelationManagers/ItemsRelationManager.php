@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\OrderResource\RelationManagers;
 
 use App\Models\Product;
+use App\Models\ProductVariant;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
@@ -38,6 +39,13 @@ class ItemsRelationManager extends RelationManager
                     ->reactive()
                     ->afterStateUpdated(fn ($state, callable $set) => $set('unit_price', Product::find($state)?->price ?? 0))
                     ->required(),
+                Select::make('product_variant_id')
+                    ->label(__('admin.navigation.product_variant'))
+                    ->relationship('productVariant', 'sku')
+                    ->searchable()
+                    ->preload()
+                    ->visible(fn ($get) => filled($get('product_id')))
+                    ->options(fn ($get) => ProductVariant::where('product_id', $get('product_id'))->pluck('sku', 'id')),
                 TextInput::make('quantity')
                     ->label(__('messages.quantity'))
                     ->numeric()

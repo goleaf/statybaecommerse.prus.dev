@@ -51,11 +51,27 @@ final class ProductSimilarity extends Model
     }
 
     /**
+     * Variants belonging to the first product.
+     */
+    public function variants(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(ProductVariant::class, 'product_id', 'product_id');
+    }
+
+    /**
      * Handle similarProduct functionality with proper error handling.
      */
     public function similarProduct(): BelongsTo
     {
         return $this->belongsTo(Product::class, 'similar_product_id');
+    }
+
+    /**
+     * Variants belonging to the similar product.
+     */
+    public function similarVariants(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(ProductVariant::class, 'product_id', 'similar_product_id');
     }
 
     /**

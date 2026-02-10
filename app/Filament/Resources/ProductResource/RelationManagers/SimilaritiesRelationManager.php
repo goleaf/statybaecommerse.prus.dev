@@ -56,11 +56,13 @@ class SimilaritiesRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn ($query) => $query->with(['similarProduct.primaryImage']))
             ->columns([
-                \Filament\Tables\Columns\ImageColumn::make('similarProduct.primaryImage.path')
+                \Filament\Tables\Columns\ImageColumn::make('main_image')
                     ->label(__('messages.image'))
                     ->disk('public')
-                    ->square(),
+                    ->getStateUsing(static fn ($record): ?string => $record->similarProduct?->primaryImage?->path)
+                    ->circular(),
                 TextColumn::make('similarProduct.name')
                     ->label(__('messages.similar_product'))
                     ->description(fn ($record) => $record->similarProduct?->sku)

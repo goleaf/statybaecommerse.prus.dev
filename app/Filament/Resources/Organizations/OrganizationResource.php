@@ -55,6 +55,7 @@ class OrganizationResource extends Resource
     {
         return [
             RelationManagers\UsersRelationManager::class,
+            RelationManagers\OrdersRelationManager::class,
             RelationManagers\ProjectsRelationManager::class,
             RelationManagers\CommentsRelationManager::class,
             RelationManagers\FilesRelationManager::class,

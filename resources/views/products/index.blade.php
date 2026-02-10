@@ -28,7 +28,7 @@
                         <option value="">{{ __('ui.all_categories') }}</option>
                         @foreach ($availableCategories as $category)
                             <option value="{{ $category->slug }}" @selected(($filters['categories'][0] ?? null) === $category->slug)>
-                                {{ $category->trans('ui.name') ?? $category->name }}
+                                {{ $category->trans('name') ?? $category->name }}
                             </option>
                         @endforeach
                     </select>
@@ -39,7 +39,7 @@
                         <option value="">{{ __('messages.all_brands') }}</option>
                         @foreach ($availableBrands as $brand)
                             <option value="{{ $brand->slug }}" @selected(($filters['brands'][0] ?? null) === $brand->slug)>
-                                {{ $brand->trans('ui.name') ?? $brand->name }}
+                                {{ $brand->trans('name') ?? $brand->name }}
                             </option>
                         @endforeach
                     </select>

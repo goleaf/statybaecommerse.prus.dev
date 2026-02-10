@@ -63,7 +63,10 @@ class OrderResource extends BaseResource
     {
         return [
             \App\Filament\Resources\OrderResource\RelationManagers\ItemsRelationManager::class,
+            \App\Filament\Resources\OrderResource\RelationManagers\PaymentsRelationManager::class,
+            \App\Filament\Resources\OrderResource\RelationManagers\ShipmentsRelationManager::class,
             \App\Filament\Resources\OrderResource\RelationManagers\ServicesRelationManager::class,
+            \App\Filament\Resources\OrderResource\RelationManagers\CouponRelationManager::class,
             \App\Filament\Resources\OrderResource\RelationManagers\DocumentsRelationManager::class,
         ];
     }

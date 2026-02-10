@@ -44,7 +44,7 @@ final class DiscountCondition extends Model
      */
     protected string $nameColumn = 'type';
 
-    protected string $translationModel = DiscountConditionTranslation::class;
+    
 
     protected $table = 'discount_conditions';
 

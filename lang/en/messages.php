@@ -324,6 +324,7 @@ return [
     'View category'                                                                                         => 'View category',
     'View invoice'                                                                                          => 'View invoice',
     'Visible'                                                                                               => 'Visible',
+    'warehouse'                                                                                             => 'Warehouse',
     'Warehouse Stock'                                                                                       => 'Warehouse Stock',
     'Website'                                                                                               => 'Website',
     'Wholesale'                                                                                             => 'Wholesale',

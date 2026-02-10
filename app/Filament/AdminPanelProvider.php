@@ -30,7 +30,7 @@ class AdminPanelProvider extends PanelProvider
     public function boot(): void
     {
         FilamentView::registerRenderHook(
-            PanelsRenderHook::RESOURCE_PAGES_LIST_RECORDS_TABLE_BEFORE,
+            PanelsRenderHook::PAGE_START,
             fn (): string => view('filament.hooks.customer-tabs')->render(),
             scopes: [
                 \App\Filament\Resources\Customers\CustomerResource::class,
@@ -43,14 +43,20 @@ class AdminPanelProvider extends PanelProvider
         );
 
         FilamentView::registerRenderHook(
-            PanelsRenderHook::RESOURCE_PAGES_LIST_RECORDS_TABLE_BEFORE,
+            PanelsRenderHook::PAGE_START,
             fn (): string => view('filament.hooks.product-tabs')->render(),
             scopes: [
                 \App\Filament\Resources\ProductResource::class,
+                \App\Filament\Resources\CategoryResource::class,
+                \App\Filament\Resources\CollectionResource::class,
                 \App\Filament\Resources\ProductVariantResource::class,
+                \App\Filament\Resources\VariantCombinationResource::class,
                 \App\Filament\Resources\InventoryResource::class,
                 \App\Filament\Resources\BrandResource::class,
+                \App\Filament\Resources\ProductImageResource::class,
                 \App\Filament\Resources\ProductFeatureResource::class,
+                \App\Filament\Resources\ProductRequestResource::class,
+                \App\Filament\Resources\PriceResource::class,
             ],
         );
     }
@@ -78,6 +84,7 @@ class AdminPanelProvider extends PanelProvider
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->resources([
                 \App\Filament\Resources\UserResource::class,
+                \App\Filament\Resources\CollectionResource::class,
             ])
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')

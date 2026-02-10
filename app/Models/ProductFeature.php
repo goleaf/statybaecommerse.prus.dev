@@ -61,6 +61,14 @@ final class ProductFeature extends Model
     }
 
     /**
+     * Variants belonging to the parent product.
+     */
+    public function variants(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(ProductVariant::class, 'product_id', 'product_id');
+    }
+
+    /**
      * Scope features by their declared type (e.g. specification, benefit).
      */
     public function scopeByType(Builder $query, string $type): Builder

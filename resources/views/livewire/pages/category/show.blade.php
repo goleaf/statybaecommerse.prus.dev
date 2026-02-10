@@ -410,13 +410,13 @@
                                 @foreach ($categories as $category)
                                     @php
                                         $slug = method_exists($category, 'trans')
-                                            ? ($category->trans('ui.slug') ?? $category->slug)
+                                            ? ($category->trans('slug') ?? $category->slug)
                                             : ($category->slug ?? (is_string($category) ? $category : null));
                                         $name = method_exists($category, 'trans')
-                                            ? ($category->trans('ui.name') ?? $category->name)
+                                            ? ($category->trans('name') ?? $category->name)
                                             : $category->name;
                                         $description = method_exists($category, 'trans')
-                                            ? ($category->trans('ui.description') ?? $category->description)
+                                            ? ($category->trans('description') ?? $category->description)
                                             : $category->description;
                                         $banner = method_exists($category, 'getBannerUrl') ? $category->getBannerUrl('md') : null;
                                         $image = $category->hero_image_url

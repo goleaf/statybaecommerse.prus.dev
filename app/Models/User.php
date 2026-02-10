@@ -17,6 +17,7 @@ use Illuminate\Contracts\Translation\HasLocalePreference as HasLocalePreferenceC
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -28,8 +29,6 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Arr;
 use JsonException;
 use Laravel\Sanctum\HasApiTokens;
-use Spatie\Translatable\HasTranslations;
-
 /**
  * User
  *
@@ -46,7 +45,7 @@ use Spatie\Translatable\HasTranslations;
  *
  * @mixin \Eloquent
  */
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Spatie\Translatable\HasTranslations;
 
 #[ScopedBy([ActiveScope::class])]
 final class User extends Authenticatable implements FilamentUser, HasLocalePreferenceContract
@@ -78,8 +77,8 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     public array $translatable = ['first_name', 'last_name', 'bio', 'company', 'position', 'website', 'job_title'];
 
     protected $fillable = [
-        'name', 'email', 'password', 'preferred_locale', 'preferred_currency', 'newsletter_subscription', 'sms_notifications', 'email_verified_at', 'first_name', 'last_name', 'gender', 'phone_number', 'birth_date', 'timezone', 'opt_in', 'phone', 'date_of_birth', 'is_active', 'accepts_marketing', 'last_login_at', 'preferences', 'avatar_url', 'last_login_ip', 'is_admin', 'is_verified', 'company', 'job_title', 'bio', 'company', 'position', 'website', 'social_links', 'notification_preferences', 'privacy_settings', 'marketing_preferences', 'login_count', 'last_activity_at', 'email_verified_at', 'phone_verified_at', 'remember_token', 'api_token', 'stripe_customer_id', 'stripe_account_id', 'subscription_status', 'subscription_plan', 'subscription_ends_at', 'trial_ends_at', 'status', 'verification_token', 'password_reset_token', 'password_reset_expires_at', 'referral_code', 'referral_code_generated_at', 'referral_settings',
-        'address', 'postal_code', 'country_id', 'city_id', 'company_id'
+        'name', 'email', 'account_type', 'password', 'preferred_locale', 'preferred_currency', 'newsletter_subscription', 'sms_notifications', 'email_verified_at', 'first_name', 'last_name', 'gender', 'phone_number', 'birth_date', 'timezone', 'opt_in', 'phone', 'date_of_birth', 'is_active', 'accepts_marketing', 'last_login_at', 'preferences', 'avatar_url', 'last_login_ip', 'is_admin', 'is_verified', 'company', 'job_title', 'bio', 'company', 'position', 'website', 'social_links', 'notification_preferences', 'privacy_settings', 'marketing_preferences', 'login_count', 'last_activity_at', 'email_verified_at', 'phone_verified_at', 'remember_token', 'api_token', 'stripe_customer_id', 'stripe_account_id', 'subscription_status', 'subscription_plan', 'subscription_ends_at', 'trial_ends_at', 'status', 'verification_token', 'password_reset_token', 'password_reset_expires_at', 'referral_code', 'referral_code_generated_at', 'referral_settings',
+        'address', 'postal_code', 'country_id', 'city_id', 'company_id',
     ];
 
     /**
@@ -104,6 +103,17 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     public function organization(): BelongsTo
     {
         return $this->belongsTo(Company::class, 'company_id');
+    }
+
+    /**
+     * Organizations this user belongs to.
+     */
+    public function organizations(): BelongsToMany
+    {
+        return $this->belongsToMany(Organization::class, 'organization_user')
+            ->using(\App\Models\Pivots\OrganizationUser::class)
+            ->withPivot(['role', 'permissions', 'is_active', 'joined_at', 'left_at'])
+            ->withTimestamps();
     }
 
     protected $hidden = ['password', 'remember_token', 'verification_token', 'password_reset_token', 'api_token'];
@@ -301,6 +311,14 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class);
+    }
+
+    /**
+     * Handle cartItems functionality with proper error handling.
+     */
+    public function cartItems(): HasMany
+    {
+        return $this->hasMany(CartItem::class);
     }
 
     public function couponUsages(): HasMany

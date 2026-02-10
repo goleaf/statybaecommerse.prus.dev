@@ -15,17 +15,15 @@ final class TranslationHookService
 
     private string $defaultLocale;
 
-    private array $translationFiles = [];
-
     public function __construct()
     {
         $this->supportedLocales = $this->getSupportedLocales();
         $this->defaultLocale = config('app.locale', 'lt');
-        $this->loadTranslationFiles();
     }
 
     /**
-     * Add or update a translation key across all supported locales
+     * Add or update a translation key across all supported locales.
+     * strictly for UI/static translations in lang files.
      */
     public function addTranslation(string $key, array $translations): bool
     {
@@ -34,8 +32,6 @@ final class TranslationHookService
                 $translation = $translations[$locale] ?? $translations[$this->defaultLocale] ?? $key;
                 $this->updateTranslationFile($locale, $key, $translation);
             }
-
-            $this->saveTranslationFiles();
 
             return true;
         } catch (Exception $e) {
@@ -50,7 +46,7 @@ final class TranslationHookService
     }
 
     /**
-     * Auto-generate translation key from text
+     * Auto-generate translation key from text.
      */
     public function generateTranslationKey(string $text, string $prefix = ''): string
     {
@@ -67,18 +63,14 @@ final class TranslationHookService
     }
 
     /**
-     * Detect and extract translatable strings from Blade files
+     * Detect and extract translatable strings from Blade files.
      */
     public function extractTranslatableStrings(string $content): array
     {
         $patterns = [
-            // {{ __('key') }}
             '/\{\{\s*__\([\'"]([^\'"]+)[\'"]\)\s*\}\}/',
-            // @lang('key')
             '/@lang\([\'"]([^\'"]+)[\'"]\)/',
-            // trans('key')
             '/trans\([\'"]([^\'"]+)[\'"]\)/',
-            // __('key')
             '/__\([\'"]([^\'"]+)[\'"]\)/',
         ];
 
@@ -94,7 +86,7 @@ final class TranslationHookService
     }
 
     /**
-     * Process Blade file and ensure all translations exist
+     * Process Blade file and ensure all translations exist.
      */
     public function processBladeFile(string $filePath): array
     {
@@ -109,7 +101,6 @@ final class TranslationHookService
         foreach ($keys as $key) {
             if (! $this->translationExists($key)) {
                 $missingKeys[] = $key;
-                // Auto-create translation with key as default value
                 $this->addTranslation($key, [
                     $this->defaultLocale => $this->humanizeKey($key),
                 ]);
@@ -120,37 +111,7 @@ final class TranslationHookService
     }
 
     /**
-     * Hook into model events to auto-translate model attributes
-     */
-    public function hookModelTranslations(string $modelClass, array $translatableFields): void
-    {
-        $modelClass::saving(function ($model) use ($translatableFields) {
-            foreach ($translatableFields as $field) {
-                if ($model->isDirty($field) && ! empty($model->$field)) {
-                    $key = $this->generateTranslationKey($model->$field, strtolower(class_basename($model)));
-
-                    // Create translation entry
-                    $this->addTranslation($key, [
-                        $this->defaultLocale => $model->$field,
-                    ]);
-
-                    // Store the translation key for reference
-                    $model->{$field . '_translation_key'} = $key;
-                }
-            }
-        });
-    }
-
-    /**
-     * Sync translations between different formats (deprecated, now all PHP)
-     */
-    public function syncTranslationFormats(): void
-    {
-        // JSON format is no longer used. This method is preserved for interface compatibility.
-    }
-
-    /**
-     * Get missing translations for a specific locale
+     * Get missing translations for a specific locale.
      */
     public function getMissingTranslations(string $locale): array
     {
@@ -161,7 +122,7 @@ final class TranslationHookService
     }
 
     /**
-     * Generate translation report
+     * Generate translation report.
      */
     public function generateTranslationReport(): array
     {
@@ -199,12 +160,6 @@ final class TranslationHookService
         return is_array($locales) ? $locales : ['lt', 'en'];
     }
 
-    private function loadTranslationFiles(): void
-    {
-        // No longer pre-loading all files into memory.
-        // We load them on demand in updateTranslationFile and saveTranslationFiles.
-    }
-
     private function updateTranslationFile(string $locale, string $key, string $translation): void
     {
         $parts = explode('.', $key, 2);
@@ -223,16 +178,14 @@ final class TranslationHookService
             }
         }
 
+        if (isset($translations[$subKey]) && $translations[$subKey] === $translation) {
+            return;
+        }
+
         $translations[$subKey] = $translation;
         ksort($translations);
 
         $this->savePhpTranslationFile($locale, $group, $translations);
-    }
-
-    private function saveTranslationFiles(): void
-    {
-        // Translations are saved immediately in updateTranslationFile for PHP files
-        // to avoid complex merging logic for multiple files in memory.
     }
 
     private function savePhpTranslationFile(string $locale, string $group, array $translations): void

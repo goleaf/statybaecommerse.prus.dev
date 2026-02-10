@@ -1,11 +1,11 @@
 @php
     $resources = [
-        \App\Filament\Resources\Customers\CustomerResource::class,
         \App\Filament\Resources\UserResource::class,
         \App\Filament\Resources\Companies\CompanyResource::class,
         \App\Filament\Resources\Organizations\OrganizationResource::class,
         \App\Filament\Resources\Partners\PartnerResource::class,
         \App\Filament\Resources\CustomerGroups\CustomerGroupResource::class,
+        \App\Filament\Resources\Subscribers\SubscriberResource::class,
     ];
 
     $currentResource = null;

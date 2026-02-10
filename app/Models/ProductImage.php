@@ -125,6 +125,14 @@ final class ProductImage extends Model
     }
 
     /**
+     * Variants belonging to the parent product.
+     */
+    public function variants(): HasMany
+    {
+        return $this->hasMany(ProductVariant::class, 'product_id', 'product_id');
+    }
+
+    /**
      * Get the public URL for the image.
      */
     public function getUrlAttribute(): string

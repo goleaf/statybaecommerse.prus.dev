@@ -19,7 +19,7 @@ use Filament\Tables\Table;
 
 class CustomersRelationManager extends RelationManager
 {
-    protected static string $relationship = 'customers';
+    protected static string $relationship = 'users';
 
     public function form(Schema $schema): Schema
     {

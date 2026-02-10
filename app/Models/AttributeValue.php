@@ -84,7 +84,7 @@ final class AttributeValue extends Model
         ];
     }
 
-    protected string $translationModel = \App\Models\Translations\AttributeValueTranslation::class;
+    
 
     /**
      * Handle attribute functionality with proper error handling.
@@ -124,23 +124,6 @@ final class AttributeValue extends Model
     public function valueable(): MorphTo
     {
         return $this->morphTo();
-    }
-
-    /**
-     * Get translated field value for the specified locale.
-     */
-    public function trans(string $field, ?string $locale = null): mixed
-    {
-        $locale ??= app()->getLocale();
-
-        if ($this->relationLoaded('translations')) {
-            $translation = $this->translations->firstWhere('locale', $locale);
-            if ($translation && isset($translation->{$field})) {
-                return $translation->{$field};
-            }
-        }
-
-        return $this->{$field} ?? null;
     }
 
     /**

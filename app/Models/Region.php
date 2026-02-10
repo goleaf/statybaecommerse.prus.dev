@@ -37,7 +37,7 @@ final class Region extends Model
     use HasFactory, HasTranslations, SoftDeletes;
     use OrdersByName;
 
-    protected string $translationModel = RegionTranslation::class;
+    
 
     protected $table = 'regions';
 

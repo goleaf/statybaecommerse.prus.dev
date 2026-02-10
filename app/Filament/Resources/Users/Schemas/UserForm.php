@@ -9,10 +9,9 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Hash;
-
-use Filament\Schemas\Components\Utilities\Get;
 
 class UserForm
 {
@@ -29,8 +28,8 @@ class UserForm
                                 'company' => __('messages.company'),
                             ])
                             ->live()
-                            ->dehydrated(false)
-                            ->default(fn ($record) => $record?->company_id ? 'company' : 'private'),
+                            ->default('private')
+                            ->required(),
                         Select::make('company_id')
                             ->label(__('messages.company'))
                             ->relationship('organization', 'name')

@@ -99,7 +99,16 @@ return [
         'revenue_eur' => 'Revenue (EUR)',
     ],
     'collections' => [
-        'translations' => [
+        'automatic_skills'  => 'Automatic Skills',
+        'display_type'      => 'Display Type',
+        'is_automatic'      => 'Is Automatic',
+        'products_per_page' => 'Products Per Page',
+        'rule_column'       => 'Column',
+        'rule_operator'     => 'Operator',
+        'rule_value'        => 'Value',
+        'rules'             => 'Rules',
+        'show_filters'      => 'Show Filters',
+        'translations'      => [
             'save' => 'Save Translations',
         ],
     ],
@@ -573,6 +582,9 @@ return [
         'organization'     => 'Organization',
         'organizations'    => 'Organizations',
         'partners'         => 'Partners',
+        'collections'      => 'Collections',
+        'collection'       => 'Collection',
+        'product_requests' => 'Product Requests',
         'product_features' => 'Product Features',
         'product_feature'  => 'Product Feature',
         'product_images'   => 'Product Images',

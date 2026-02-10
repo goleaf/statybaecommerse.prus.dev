@@ -324,6 +324,7 @@ return [
     'View category'                                                                                         => 'Kategorie anzeigen',
     'View invoice'                                                                                          => 'Rechnung anzeigen',
     'Visible'                                                                                               => 'Sichtbar',
+    'warehouse'                                                                                             => 'Lager',
     'Warehouse Stock'                                                                                       => 'Lagerbestand',
     'Website'                                                                                               => 'Website',
     'Wholesale'                                                                                             => 'Wholesale',

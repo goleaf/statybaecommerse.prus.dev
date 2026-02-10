@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\CollectionResource\Schemas;
 
 use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -12,7 +13,11 @@ use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
+
+use Filament\Schemas\Components\Utilities\Set;
+use Illuminate\Support\Str;
 
 class CollectionForm
 {
@@ -22,17 +27,14 @@ class CollectionForm
             ->components([
                 Section::make(__('admin.brands.basic_information'))
                     ->schema([
-                        Grid::make(2)
-                            ->schema([
-                                TextInput::make('name')
-                                    ->label(__('messages.name'))
-                                    ->required()
-                                    ->maxLength(255),
-                                TextInput::make('slug')
-                                    ->label(__('messages.slug'))
-                                    ->required()
-                                    ->maxLength(255),
-                            ]),
+                        TextInput::make('name')
+                            ->label(__('messages.name'))
+                            ->required()
+                            ->maxLength(255)
+                            ->live(onBlur: true)
+                            ->afterStateUpdated(fn (Set $set, ?string $state) => $set('slug', Str::slug($state ?? ''))),
+                        TextInput::make('slug')
+                            ->hidden(),
                         RichEditor::make('description')
                             ->label(__('messages.description'))
                             ->columnSpanFull(),
@@ -48,11 +50,12 @@ class CollectionForm
                                     ->label(__('messages.active'))
                                     ->default(true),
                             ]),
-                        Grid::make(2)
+                        Grid::make(3)
                             ->schema([
                                 Toggle::make('is_automatic')
                                     ->label(__('admin.collections.is_automatic'))
-                                    ->default(false),
+                                    ->default(false)
+                                    ->live(),
                                 TextInput::make('sort_order')
                                     ->label(__('messages.sort_order'))
                                     ->numeric()
@@ -77,6 +80,39 @@ class CollectionForm
                             ]),
                     ])->columnSpanFull(),
 
+                Section::make(__('admin.collections.automatic_skills'))
+                    ->schema([
+                        Repeater::make('rules')
+                            ->relationship()
+                            ->schema([
+                                Select::make('column')
+                                    ->label(__('admin.collections.rule_column'))
+                                    ->options([
+                                        'name'  => 'Product Name',
+                                        'price' => 'Product Price',
+                                        'sku'   => 'Product SKU',
+                                    ])
+                                    ->required(),
+                                Select::make('operator')
+                                    ->label(__('admin.collections.rule_operator'))
+                                    ->options([
+                                        '='        => 'Equals',
+                                        '!='       => 'Not Equals',
+                                        '>'        => 'Greater Than',
+                                        '<'        => 'Less Than',
+                                        'contains' => 'Contains',
+                                    ])
+                                    ->required(),
+                                TextInput::make('value')
+                                    ->label(__('admin.collections.rule_value'))
+                                    ->required(),
+                            ])
+                            ->columns(3)
+                            ->columnSpanFull(),
+                    ])
+                    ->visible(fn (Get $get): bool => (bool) $get('is_automatic'))
+                    ->columnSpanFull(),
+
                 Section::make(__('messages.media'))
                     ->schema([
                         SpatieMediaLibraryFileUpload::make('images')
@@ -84,19 +120,6 @@ class CollectionForm
                             ->collection('images')
                             ->image()
                             ->columnSpanFull(),
-                    ])->columnSpanFull(),
-
-                Section::make(__('admin.products.seo'))
-                    ->schema([
-                        Grid::make(2)
-                            ->schema([
-                                TextInput::make('seo_title')
-                                    ->label(__('admin.products.seo_title'))
-                                    ->maxLength(255),
-                                Textarea::make('seo_description')
-                                    ->label(__('admin.products.seo_description'))
-                                    ->rows(3),
-                            ]),
                     ])->columnSpanFull(),
             ]);
     }

@@ -69,13 +69,23 @@ final class Company extends Model
     }
 
     /**
-     * Customers belonging to this company.
+     * Users belonging to this company.
      *
-     * @return HasMany<Customer, Company>
+     * @return HasMany<User, Company>
      */
-    public function customers(): HasMany
+    public function users(): HasMany
     {
-        return $this->hasMany(Customer::class);
+        return $this->hasMany(User::class, 'company_id');
+    }
+
+    /**
+     * Orders belonging to users of this company.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<Order, User, Company>
+     */
+    public function orders(): \Illuminate\Database\Eloquent\Relations\HasManyThrough
+    {
+        return $this->hasManyThrough(Order::class, User::class, 'company_id', 'user_id');
     }
 
     // Scopes

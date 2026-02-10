@@ -47,8 +47,8 @@
                     @endphp
                     <a href="{{ app()->getLocale() === 'lt' ? url('/lt/naujienos/' . $slug) : url('/en/news/' . $slug) }}"
                        class="block p-4 border rounded hover:shadow">
-                        <h2 class="text-lg font-medium">{{ $item->trans('ui.title') }}</h2>
-                        <p class="text-sm text-gray-600 mt-2">{{ $item->trans('ui.summary') }}</p>
+                        <h2 class="text-lg font-medium">{{ $item->trans('title') }}</h2>
+                        <p class="text-sm text-gray-600 mt-2">{{ $item->trans('summary') }}</p>
                         <p class="text-xs text-gray-500 mt-3">{{ optional($item->published_at)->format('Y-m-d') }}</p>
                     </a>
                 @endforeach

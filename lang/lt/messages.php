@@ -324,6 +324,7 @@ return [
     'View category'                                                                                         => 'Rodyti kategoriją',
     'View invoice'                                                                                          => 'Peržiūrėti sąskaitą',
     'Visible'                                                                                               => 'Matomas',
+    'warehouse'                                                                                             => 'Sandėlis',
     'Warehouse Stock'                                                                                       => 'Sandėlio atsargos',
     'Website'                                                                                               => 'Svetainė',
     'Wholesale'                                                                                             => 'Wholesale',

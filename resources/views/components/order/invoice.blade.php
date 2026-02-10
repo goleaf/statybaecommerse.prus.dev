@@ -16,7 +16,7 @@
         <tbody>
             @foreach ($order->items as $item)
                 <tr class="border-t border-gray-100">
-                    <td class="py-1">{{ $item->product?->trans('ui.name') ?? $item->product_name }}</td>
+                    <td class="py-1">{{ $item->product?->trans('name') ?? $item->product_name }}</td>
                     <td class="py-1">{{ $item->quantity }}</td>
                     <td class="py-1 text-right">{{ format_money($item->total, $order->currency_code) }}</td>
                 </tr>

@@ -40,7 +40,7 @@ final class PriceList extends Model
     use OrdersByName;
     use SoftDeletes;
 
-    protected string $translationModel = PriceListTranslation::class;
+    
 
     protected $table = 'price_lists';
 

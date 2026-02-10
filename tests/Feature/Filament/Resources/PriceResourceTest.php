@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use App\Filament\Resources\PriceResource;
 use App\Filament\Resources\PriceResource\Pages\CreatePrice;
 use App\Filament\Resources\PriceResource\Pages\EditPrice;
 use App\Filament\Resources\PriceResource\Pages\ListPrices;

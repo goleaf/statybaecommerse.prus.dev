@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace App\Livewire\Concerns;
 
-use App\Services\TranslationHookService;
-
+/**
+ * Trait HandlesTranslations
+ * 
+ * Refactored to avoid dynamic generation of translation files.
+ * Static translations should be managed manually in /lang files.
+ */
 trait HandlesTranslations
 {
     /**
@@ -40,24 +44,11 @@ trait HandlesTranslations
     }
 
     /**
-     * Process translations for component properties
+     * Process translations for component properties - DISABLED
      */
     public function processComponentTranslations(): void
     {
-        $service = app(TranslationHookService::class);
-
-        foreach ($this->translatableProperties as $property) {
-            if (isset($this->$property) && ! empty($this->$property)) {
-                $key = $service->generateTranslationKey(
-                    $this->$property,
-                    strtolower(class_basename($this))
-                );
-
-                $service->addTranslation($key, [
-                    config('app.locale', 'lt') => $this->$property,
-                ]);
-            }
-        }
+        // Dynamic translation file generation disabled per codebase policy.
     }
 
     /**
@@ -71,63 +62,36 @@ trait HandlesTranslations
             return null;
         }
 
-        $service = app(TranslationHookService::class);
-        $key = $service->generateTranslationKey(
-            $this->$property,
-            strtolower(class_basename($this))
-        );
+        // If it's a model that has the trans method, use it
+        if (is_object($this->$property) && method_exists($this->$property, 'trans')) {
+            return $this->$property->trans($property, $locale);
+        }
 
-        $translation = __($key, [], $locale);
-
-        return $translation !== $key ? $translation : $this->$property;
+        return $this->$property;
     }
 
     /**
-     * Update property translation
+     * Update property translation - DISABLED
      */
     public function updatePropertyTranslation(string $property, string $locale, string $translation): bool
     {
-        if (! isset($this->$property)) {
-            return false;
-        }
-
-        $service = app(TranslationHookService::class);
-        $key = $service->generateTranslationKey(
-            $this->$property,
-            strtolower(class_basename($this))
-        );
-
-        return $service->addTranslation($key, [$locale => $translation]);
+        return false;
     }
 
     /**
-     * Livewire hook - called when component is dehydrated
+     * Livewire hook - DISABLED
      */
     public function dehydrate(): void
     {
-        if (! empty($this->translatableProperties)) {
-            $this->processComponentTranslations();
-        }
+        // Automatic translation discovery disabled.
     }
 
     /**
-     * Helper method to translate text on the fly
+     * Helper method to translate text on the fly - DISABLED
      */
     public function translateText(string $text, ?array $locales = null): array
     {
-        $service = app(TranslationHookService::class);
-        $key = $service->generateTranslationKey($text, 'component');
-
-        $locales = $locales ?? $this->getSupportedLocales();
-        $translations = [];
-
-        foreach ($locales as $locale) {
-            $translations[$locale] = $locale === config('app.locale', 'lt') ? $text : $text;
-        }
-
-        $service->addTranslation($key, $translations);
-
-        return $translations;
+        return [];
     }
 
     /**

@@ -265,7 +265,7 @@
         $elements = [];
         $position = 1;
         foreach ($products as $p) {
-            $productSlug = $p->trans('ui.slug') ?? $p->slug;
+            $productSlug = $p->trans('slug') ?? $p->slug;
             if (empty($productSlug)) {
                 continue; // Skip products without valid slug
             }
@@ -273,7 +273,7 @@
                 '@type' => 'ListItem',
                 'position' => $position++,
                 'url' => route('product.show', $productSlug),
-                'name' => $p->trans('ui.name') ?? $p->name,
+                'name' => $p->trans('name') ?? $p->name,
             ];
         }
         $searchUrl = route('search', ['locale' => app()->getLocale()]);

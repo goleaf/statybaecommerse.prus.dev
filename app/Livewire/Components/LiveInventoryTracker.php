@@ -183,7 +183,20 @@ final class LiveInventoryTracker extends Component
                 // Skip products that are not properly configured for inventory tracking
                 return empty($product->name) || empty($product->sku) || $product->price <= 0;
             })->map(function ($product) {
-                return ['id' => $product->id, 'name' => $product->name, 'sku' => $product->sku, 'brand' => $product->brand?->name, 'category' => $product->categories->first()?->name, 'stock_quantity' => $product->stock_quantity, 'price' => $product->price, 'total_value' => $product->stock_quantity * $product->price, 'image' => $product->getFirstMediaUrl('images', 'thumb'), 'last_updated' => $product->updated_at, 'stock_status' => $this->getStockStatus($product->stock_quantity), 'stock_percentage' => $this->getStockPercentage($product->stock_quantity)];
+                return [
+                    'id'               => $product->id,
+                    'name'             => $product->trans('name'),
+                    'sku'              => $product->sku,
+                    'brand'            => $product->brand?->trans('name'),
+                    'category'         => $product->categories->first()?->trans('name'),
+                    'stock_quantity'   => $product->stock_quantity,
+                    'price'            => $product->price,
+                    'total_value'      => $product->stock_quantity * $product->price,
+                    'image'            => $product->getFirstMediaUrl('images', 'thumb'),
+                    'last_updated'     => $product->updated_at,
+                    'stock_status'     => $this->getStockStatus($product->stock_quantity),
+                    'stock_percentage' => $this->getStockPercentage($product->stock_quantity),
+                ];
             })->toArray();
         });
     }
@@ -201,7 +214,16 @@ final class LiveInventoryTracker extends Component
                 // Skip products that are not properly configured for low stock alerts
                 return empty($product->name) || empty($product->sku) || $product->price <= 0 || $product->stock_quantity <= 0;
             })->map(function ($product) {
-                return ['id' => $product->id, 'name' => $product->name, 'sku' => $product->sku, 'brand' => $product->brand?->name, 'stock_quantity' => $product->stock_quantity, 'threshold' => $this->lowStockThreshold, 'urgency' => $this->getUrgencyLevel($product->stock_quantity), 'last_updated' => $product->updated_at];
+                return [
+                    'id'           => $product->id,
+                    'name'         => $product->trans('name'),
+                    'sku'          => $product->sku,
+                    'brand'        => $product->brand?->trans('name'),
+                    'stock_quantity' => $product->stock_quantity,
+                    'threshold'    => $this->lowStockThreshold,
+                    'urgency'      => $this->getUrgencyLevel($product->stock_quantity),
+                    'last_updated' => $product->updated_at,
+                ];
             })->toArray();
         });
     }
@@ -216,7 +238,12 @@ final class LiveInventoryTracker extends Component
             return \App\Models\Category::where('is_visible', true)->withCount(['products' => function ($query) {
                 $query->published();
             }])->orderBy('name')->get()->map(function ($category) {
-                return ['id' => $category->id, 'name' => $category->name, 'products_count' => $category->products_count, 'selected' => in_array($category->id, $this->selectedCategories)];
+                return [
+                    'id'             => $category->id,
+                    'name'           => $category->trans('name'),
+                    'products_count' => $category->products_count,
+                    'selected'       => in_array($category->id, $this->selectedCategories),
+                ];
             })->toArray();
         });
     }
@@ -231,7 +258,12 @@ final class LiveInventoryTracker extends Component
             return \App\Models\Brand::where('is_enabled', true)->withCount(['products' => function ($query) {
                 $query->published();
             }])->orderBy('name')->get()->map(function ($brand) {
-                return ['id' => $brand->id, 'name' => $brand->name, 'products_count' => $brand->products_count, 'selected' => in_array($brand->id, $this->selectedBrands)];
+                return [
+                    'id'             => $brand->id,
+                    'name'           => $brand->trans('name'),
+                    'products_count' => $brand->products_count,
+                    'selected'       => in_array($brand->id, $this->selectedBrands),
+                ];
             })->toArray();
         });
     }

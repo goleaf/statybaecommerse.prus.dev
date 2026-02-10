@@ -37,7 +37,7 @@ final class Country extends Model
 {
     use HasFactory, HasTranslations, SoftDeletes;
 
-    protected string $translationModel = CountryTranslation::class;
+    
 
     protected $table = 'countries';
 
@@ -97,23 +97,6 @@ final class Country extends Model
     public function currencies(): BelongsToMany
     {
         return $this->belongsToMany(Currency::class, 'country_currency', 'country_id', 'currency_id');
-    }
-
-    /**
-     * Get translated field value for the specified locale.
-     */
-    public function trans(string $field, ?string $locale = null): mixed
-    {
-        $locale ??= app()->getLocale();
-
-        if ($this->relationLoaded('translations')) {
-            $translation = $this->translations->firstWhere('locale', $locale);
-            if ($translation && isset($translation->{$field})) {
-                return $translation->{$field};
-            }
-        }
-
-        return $this->{$field} ?? null;
     }
 
     /**

@@ -14,11 +14,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Cache;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
+
+use Illuminate\Support\Str;
 
 /**
  * Collection
@@ -58,8 +61,6 @@ final class Collection extends Model implements HasMedia, TranslatableRecord
 
     protected $fillable = ['name', 'slug', 'description', 'is_visible', 'sort_order', 'seo_title', 'seo_description', 'is_automatic', 'is_active', 'meta_title', 'meta_description', 'meta_keywords', 'display_type', 'products_per_page', 'show_filters', 'max_products', 'rules'];
 
-    public static $translatable = ['name', 'description', 'meta_title', 'meta_description', 'meta_keywords', 'slug'];
-
     /**
      * Handle casts functionality with proper error handling.
      */
@@ -75,13 +76,25 @@ final class Collection extends Model implements HasMedia, TranslatableRecord
      */
     protected $appends = ['products_count', 'image'];
 
-    protected string $translationModel = \App\Models\Translations\CollectionTranslation::class;
+    
 
     /**
      * Handle booted functionality with proper error handling.
      */
     protected static function booted(): void
     {
+        self::creating(function (Collection $collection): void {
+            if (blank($collection->slug)) {
+                $collection->slug = Str::slug((string) ($collection->name ?? ''));
+            }
+        });
+
+        self::updating(function (Collection $collection): void {
+            if ($collection->isDirty('name') && blank($collection->slug)) {
+                $collection->slug = Str::slug((string) ($collection->name ?? ''));
+            }
+        });
+
         self::saved(function (): void {
             self::flushCaches();
         });
@@ -96,6 +109,14 @@ final class Collection extends Model implements HasMedia, TranslatableRecord
     public function getRouteKeyName(): string
     {
         return 'slug';
+    }
+
+    /**
+     * Discounts associated with this collection.
+     */
+    public function discounts(): BelongsToMany
+    {
+        return $this->belongsToMany(Discount::class, 'discount_collections');
     }
 
     /**
@@ -115,6 +136,67 @@ final class Collection extends Model implements HasMedia, TranslatableRecord
     public function products(): BelongsToMany
     {
         return $this->belongsToMany(Product::class, 'product_collections');
+    }
+
+    /**
+     * Variants belonging to products of this collection.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
+     */
+    public function variants(): \Illuminate\Database\Eloquent\Relations\HasManyThrough
+    {
+        return $this->hasManyThrough(
+            ProductVariant::class,
+            Product::class,
+            'id',
+            'product_id',
+            'id',
+            'id'
+        )->join('product_collections', 'product_collections.product_id', '=', 'products.id')
+         ->where('product_collections.collection_id', $this->id);
+    }
+
+    /**
+     * Categories belonging to products of this collection.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function categories(): BelongsToMany
+    {
+        return $this->belongsToMany(Category::class, 'product_collections', 'collection_id', 'product_id', 'id', 'id')
+            ->join('product_categories', 'product_categories.product_id', '=', 'product_collections.product_id')
+            ->whereColumn('product_categories.category_id', '=', 'categories.id')
+            ->distinct();
+    }
+
+    /**
+     * Brands belonging to products of this collection.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function brands(): BelongsToMany
+    {
+        return $this->belongsToMany(Brand::class, 'product_collections', 'collection_id', 'product_id', 'id', 'id')
+            ->join('products', 'products.id', '=', 'product_collections.product_id')
+            ->whereColumn('products.brand_id', '=', 'brands.id')
+            ->distinct();
+    }
+
+    /**
+     * Prices belonging to products of this collection.
+     */
+    public function prices(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            Price::class,
+            Product::class,
+            'id', // not correct for belongsToMany but we are using it via a join anyway
+            'priceable_id',
+            'id',
+            'id'
+        )->join('product_collections', 'product_collections.product_id', '=', 'products.id')
+         ->where('product_collections.collection_id', $this->id)
+         ->where('priceable_type', Product::class);
     }
 
     /**
@@ -443,24 +525,6 @@ final class Collection extends Model implements HasMedia, TranslatableRecord
         // Legacy conversions for backward compatibility - now in WebP
         $this->addMediaConversion('thumb')->performOnCollections('images')->width(200)->height(200)->format('webp')->quality(85)->sharpen(10)->optimize();
         $this->addMediaConversion('small')->performOnCollections('images')->width(400)->height(400)->format('webp')->quality(85)->sharpen(10)->optimize();
-    }
-
-    /**
-     * Get translated field value for the specified locale.
-     * Uses the eager-loaded translations relationship to avoid N+1 queries.
-     */
-    public function trans(string $field, ?string $locale = null): mixed
-    {
-        $locale ??= app()->getLocale();
-
-        if ($this->relationLoaded('translations')) {
-            $translation = $this->translations->firstWhere('locale', $locale);
-            if ($translation && isset($translation->{$field})) {
-                return $translation->{$field};
-            }
-        }
-
-        return $this->{$field} ?? null;
     }
 
     /**

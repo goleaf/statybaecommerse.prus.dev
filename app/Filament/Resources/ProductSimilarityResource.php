@@ -69,6 +69,15 @@ final class ProductSimilarityResource extends BaseResource
             ]);
     }
 
+    public static function getRelations(): array
+    {
+        return [
+            \App\Filament\Resources\ProductSimilarityResource\RelationManagers\ProductsRelationManager::class,
+            \App\Filament\Resources\ProductSimilarityResource\RelationManagers\ProductVariantsRelationManager::class,
+            \App\Filament\Resources\ProductSimilarityResource\RelationManagers\SimilarProductVariantsRelationManager::class,
+        ];
+    }
+
     public static function getPages(): array
     {
         return [

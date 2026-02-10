@@ -12,7 +12,7 @@
                 @if ($campaign->banner_image)
                     <div class="aspect-w-16 aspect-h-9">
                         <img src="{{ $campaign->getBannerUrl() }}"
-                             alt="{{ $campaign->trans('ui.banner_alt_text') }}"
+                             alt="{{ $campaign->trans('banner_alt_text') }}"
                              class="w-full h-48 object-cover">
                     </div>
                 @endif
@@ -40,13 +40,13 @@
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
                         <a href="{{ route('frontend.campaigns.show', $campaign) }}"
                            class="hover:text-blue-600 dark:hover:text-blue-400">
-                            {{ $campaign->trans('ui.name') }}
+                            {{ $campaign->trans('name') }}
                         </a>
                     </h3>
 
-                    @if ($campaign->trans('ui.description'))
+                    @if ($campaign->trans('description'))
                         <p class="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-3">
-                            {{ \Illuminate\Support\Str::limit($campaign->trans('ui.description'), 120) }}
+                            {{ \Illuminate\Support\Str::limit($campaign->trans('description'), 120) }}
                         </p>
                     @endif
 

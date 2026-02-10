@@ -24,6 +24,8 @@ final class InventoryResource extends BaseResource
 
     protected static bool $shouldRegisterNavigation = false;
 
+    protected static ?string $activeNavigationItem = ProductResource::class;
+
     protected static string|UnitEnum|null $navigationGroup = null;
 
     protected static ?int $navigationSort = 10;
@@ -133,6 +135,9 @@ final class InventoryResource extends BaseResource
     {
         return [
             \App\Filament\Resources\InventoryResource\RelationManagers\MovementsRelationManager::class,
+            \App\Filament\Resources\InventoryResource\RelationManagers\StockReservationsRelationManager::class,
+            \App\Filament\Resources\InventoryResource\RelationManagers\ProductsRelationManager::class,
+            \App\Filament\Resources\InventoryResource\RelationManagers\VariantsRelationManager::class,
         ];
     }
 

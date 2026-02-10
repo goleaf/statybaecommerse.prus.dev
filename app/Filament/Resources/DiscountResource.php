@@ -97,6 +97,18 @@ final class DiscountResource extends BaseResource
             ->defaultSort('created_at', 'desc');
     }
 
+    public static function getRelations(): array
+    {
+        return [
+            \App\Filament\Resources\DiscountResource\RelationManagers\ProductsRelationManager::class,
+            \App\Filament\Resources\DiscountResource\RelationManagers\CategoriesRelationManager::class,
+            \App\Filament\Resources\DiscountResource\RelationManagers\BrandsRelationManager::class,
+            \App\Filament\Resources\DiscountResource\RelationManagers\CollectionsRelationManager::class,
+            \App\Filament\Resources\DiscountResource\RelationManagers\CustomerGroupsRelationManager::class,
+            \App\Filament\Resources\DiscountResource\RelationManagers\RedemptionsRelationManager::class,
+        ];
+    }
+
     public static function getPages(): array
     {
         return [

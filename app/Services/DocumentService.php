@@ -7,13 +7,13 @@ namespace App\Services;
 use App\Contracts\DocumentServiceContract;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
-use App\Enums\PaymentStatus;
 use App\Models\Document;
 use App\Models\DocumentTemplate;
 use App\Models\Order;
 use App\Models\User;
 use App\Notifications\DocumentGenerated;
 use App\Support\Storage\SecureStorage;
+use BackedEnum;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Model;
@@ -258,11 +258,13 @@ HTML;
         foreach ($variables as $key => $value) {
             if ($value instanceof Htmlable) {
                 $sanitized[$key] = $value;
+
                 continue;
             }
 
             if (is_string($value)) {
                 $sanitized[$key] = strip_tags($value);
+
                 continue;
             }
 
@@ -275,7 +277,7 @@ HTML;
     /**
      * Merge global, model-derived, and caller-provided variables for template rendering.
      *
-     * @param array<string, mixed> $variables
+     * @param  array<string, mixed> $variables
      * @return array<string, mixed>
      */
     private function buildVariables(Model $relatedModel, array $variables): array
@@ -323,27 +325,27 @@ HTML;
             : config('app.currency', 'EUR');
 
         return [
-            '$COMPANY_NAME' => (string) $companyName,
-            '$COMPANY_ADDRESS' => (string) $companyAddress,
-            '$COMPANY_PHONE' => (string) $companyPhone,
-            '$COMPANY_EMAIL' => (string) $companyEmail,
-            '$COMPANY_WEBSITE' => (string) config('app.url'),
-            '$COMPANY_VAT' => (string) $companyVat,
-            '$CURRENT_DATE' => now()->format($dateFormat),
+            '$COMPANY_NAME'     => (string) $companyName,
+            '$COMPANY_ADDRESS'  => (string) $companyAddress,
+            '$COMPANY_PHONE'    => (string) $companyPhone,
+            '$COMPANY_EMAIL'    => (string) $companyEmail,
+            '$COMPANY_WEBSITE'  => (string) config('app.url'),
+            '$COMPANY_VAT'      => (string) $companyVat,
+            '$CURRENT_DATE'     => now()->format($dateFormat),
             '$CURRENT_DATETIME' => now()->format($dateTimeFormat),
-            '$CURRENT_YEAR' => (string) now()->year,
-            '$CURRENT_MONTH' => now()->format('F'),
-            '$CURRENT_DAY' => now()->format('d'),
-            '$STORE_CURRENCY' => (string) $storeCurrency,
-            '$STORE_LOCALE' => (string) app()->getLocale(),
-            '$STORE_TIMEZONE' => (string) config('app.timezone'),
+            '$CURRENT_YEAR'     => (string) now()->year,
+            '$CURRENT_MONTH'    => now()->format('F'),
+            '$CURRENT_DAY'      => now()->format('d'),
+            '$STORE_CURRENCY'   => (string) $storeCurrency,
+            '$STORE_LOCALE'     => (string) app()->getLocale(),
+            '$STORE_TIMEZONE'   => (string) config('app.timezone'),
         ];
     }
 
     /**
      * Expand variable keys to support multiple placeholder styles.
      *
-     * @param array<string, mixed> $variables
+     * @param  array<string, mixed> $variables
      * @return array<string, mixed>
      */
     private function expandVariableKeys(array $variables): array
@@ -397,7 +399,7 @@ HTML;
                 return is_scalar($item) || $item === null ? (string) ($item ?? '') : get_debug_type($item);
             }, $value));
         } elseif (is_object($value)) {
-            if ($value instanceof \BackedEnum) {
+            if ($value instanceof BackedEnum) {
                 $value = $value->value;
             } elseif ($value instanceof Stringable || method_exists($value, '__toString')) {
                 $value = (string) $value;
@@ -435,12 +437,12 @@ HTML;
         // 1. Process Products (OrderItems)
         foreach ($order->items as $item) {
             $lines->push([
-                'name' => (string) ($item->name ?? ''),
-                'sku' => (string) ($item->sku ?? ''),
-                'quantity' => $item->quantity,
+                'name'       => (string) ($item->name ?? ''),
+                'sku'        => (string) ($item->sku ?? ''),
+                'quantity'   => $item->quantity,
                 'unit_price' => (float) ($item->unit_price ?? $item->price ?? 0),
-                'total' => (float) ($item->total ?? 0),
-                'type' => 'product',
+                'total'      => (float) ($item->total ?? 0),
+                'type'       => 'product',
             ]);
         }
 
@@ -450,12 +452,12 @@ HTML;
             $price = (float) ($service->pivot->price ?? $service->price ?? 0);
 
             $lines->push([
-                'name' => (string) ($service->name ?? ''),
-                'sku' => '',
-                'quantity' => $quantity,
+                'name'       => (string) ($service->name ?? ''),
+                'sku'        => '',
+                'quantity'   => $quantity,
                 'unit_price' => $price,
-                'total' => $quantity * $price,
-                'type' => 'service',
+                'total'      => $quantity * $price,
+                'type'       => 'service',
             ]);
         }
 
@@ -541,63 +543,63 @@ HTML;
             : (OrderStatus::tryFrom($orderStatusValue)?->label() ?? $orderStatusValue);
 
         $variables = [
-            'order_number' => $order->number ?? $order->id,
-            'order_date' => $date->format($dateFormat),
-            'order_total' => $this->formatMoney($totalAmount),
-            'order_subtotal' => $this->formatMoney($subtotal),
-            'order_tax' => $this->formatMoney($taxAmount),
-            'order_shipping' => $this->formatMoney($shippingAmount),
-            'order_discount' => $this->formatMoney($discountAmount),
-            'order_status' => $orderStatusValue,
-            'order_status_label' => $orderStatusLabel,
-            'order_payment_method' => $order->payment_method instanceof PaymentMethod ? $order->payment_method->value : (string) ($order->payment_method ?? ''),
+            'order_number'          => $order->number ?? $order->id,
+            'order_date'            => $date->format($dateFormat),
+            'order_total'           => $this->formatMoney($totalAmount),
+            'order_subtotal'        => $this->formatMoney($subtotal),
+            'order_tax'             => $this->formatMoney($taxAmount),
+            'order_shipping'        => $this->formatMoney($shippingAmount),
+            'order_discount'        => $this->formatMoney($discountAmount),
+            'order_status'          => $orderStatusValue,
+            'order_status_label'    => $orderStatusLabel,
+            'order_payment_method'  => $order->payment_method instanceof PaymentMethod ? $order->payment_method->value : (string) ($order->payment_method ?? ''),
             'order_shipping_method' => (string) ($order->shippingOption?->name ?? ''),
-            'invoice_number' => $order->number ?? $order->id,
-            'invoice_date' => $date->format($dateFormat),
-            'receipt_number' => $order->number ?? $order->id,
-            'receipt_date' => $date->format($dateFormat),
-            'receipt_time' => $date->format($timeFormat),
-            'payment_method' => $order->payment_method instanceof PaymentMethod ? $order->payment_method->value : (string) ($order->payment_method ?? ''),
-            'payment_due_date' => '',
-            'issuer_name' => Auth::user()?->name ?? $companyName,
-            'cashier_name' => Auth::user()?->name ?? '',
-            'subtotal' => $this->formatMoney($subtotal),
-            'vat_amount' => $this->formatMoney($taxAmount),
-            'total_amount' => $this->formatMoney($totalAmount),
-            'amount_paid' => $this->formatMoney($totalAmount),
-            'change_amount' => $this->formatMoney(0),
-            'seller_name' => $companyName,
-            'seller_address' => $companyAddress,
-            'seller_company_code' => $companyCode,
-            'seller_vat_code' => $companyVat,
-            'seller_phone' => $companyPhone,
-            'seller_email' => $companyEmail,
-            'buyer_name' => $buyerName,
-            'buyer_address' => $buyerAddress,
-            'buyer_company_code' => $buyerCompanyCode,
-            'buyer_vat_code' => $buyerVatCode,
-            'buyer_phone' => $buyerPhone,
-            'buyer_email' => $buyerEmail,
-            'customer_name' => $customerName,
-            'customer_first_name' => $customerFirstName,
-            'customer_last_name' => $customerLastName,
-            'customer_email' => $customerEmail,
-            'customer_phone' => $customerPhone,
-            'customer_company' => $buyerCompany,
-            'billing_address' => $buyerAddress,
-            'billing_city' => $billingCity,
-            'billing_country' => $billingCountry,
-            'billing_postal_code' => $billingPostalCode,
-            'shipping_address' => $shippingAddressFormatted,
-            'shipping_city' => $shippingCity,
-            'shipping_country' => $shippingCountry,
-            'shipping_postal_code' => $shippingPostalCode,
-            'company_name' => $companyName,
-            'company_address' => $companyAddress,
-            'company_phone' => $companyPhone,
-            'company_email' => $companyEmail,
-            'company_code' => $companyCode,
-            'vat_code' => $companyVat,
+            'invoice_number'        => $order->number ?? $order->id,
+            'invoice_date'          => $date->format($dateFormat),
+            'receipt_number'        => $order->number ?? $order->id,
+            'receipt_date'          => $date->format($dateFormat),
+            'receipt_time'          => $date->format($timeFormat),
+            'payment_method'        => $order->payment_method instanceof PaymentMethod ? $order->payment_method->value : (string) ($order->payment_method ?? ''),
+            'payment_due_date'      => '',
+            'issuer_name'           => Auth::user()?->name ?? $companyName,
+            'cashier_name'          => Auth::user()?->name ?? '',
+            'subtotal'              => $this->formatMoney($subtotal),
+            'vat_amount'            => $this->formatMoney($taxAmount),
+            'total_amount'          => $this->formatMoney($totalAmount),
+            'amount_paid'           => $this->formatMoney($totalAmount),
+            'change_amount'         => $this->formatMoney(0),
+            'seller_name'           => $companyName,
+            'seller_address'        => $companyAddress,
+            'seller_company_code'   => $companyCode,
+            'seller_vat_code'       => $companyVat,
+            'seller_phone'          => $companyPhone,
+            'seller_email'          => $companyEmail,
+            'buyer_name'            => $buyerName,
+            'buyer_address'         => $buyerAddress,
+            'buyer_company_code'    => $buyerCompanyCode,
+            'buyer_vat_code'        => $buyerVatCode,
+            'buyer_phone'           => $buyerPhone,
+            'buyer_email'           => $buyerEmail,
+            'customer_name'         => $customerName,
+            'customer_first_name'   => $customerFirstName,
+            'customer_last_name'    => $customerLastName,
+            'customer_email'        => $customerEmail,
+            'customer_phone'        => $customerPhone,
+            'customer_company'      => $buyerCompany,
+            'billing_address'       => $buyerAddress,
+            'billing_city'          => $billingCity,
+            'billing_country'       => $billingCountry,
+            'billing_postal_code'   => $billingPostalCode,
+            'shipping_address'      => $shippingAddressFormatted,
+            'shipping_city'         => $shippingCity,
+            'shipping_country'      => $shippingCountry,
+            'shipping_postal_code'  => $shippingPostalCode,
+            'company_name'          => $companyName,
+            'company_address'       => $companyAddress,
+            'company_phone'         => $companyPhone,
+            'company_email'         => $companyEmail,
+            'company_code'          => $companyCode,
+            'vat_code'              => $companyVat,
         ];
 
         $unifiedItems = $this->getUnifiedLineItems($order);

@@ -7,6 +7,8 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\ProductResource\Pages;
 use App\Filament\Resources\ProductResource\RelationManagers\CategoriesRelationManager;
 use App\Filament\Resources\ProductResource\RelationManagers\CollectionsRelationManager;
+use App\Filament\Resources\ProductResource\RelationManagers\CommentsRelationManager;
+use App\Filament\Resources\ProductResource\RelationManagers\DiscountsRelationManager;
 use App\Filament\Resources\ProductResource\RelationManagers\FeaturesRelationManager;
 use App\Filament\Resources\ProductResource\RelationManagers\ImagesRelationManager;
 use App\Filament\Resources\ProductResource\RelationManagers\InventoryRelationManager;
@@ -14,6 +16,7 @@ use App\Filament\Resources\ProductResource\RelationManagers\OrdersRelationManage
 use App\Filament\Resources\ProductResource\RelationManagers\PricesRelationManager;
 use App\Filament\Resources\ProductResource\RelationManagers\RequestsRelationManager;
 use App\Filament\Resources\ProductResource\RelationManagers\SimilaritiesRelationManager;
+use App\Filament\Resources\ProductResource\RelationManagers\VariantCombinationsRelationManager;
 use App\Filament\Resources\ProductResource\RelationManagers\VariantsRelationManager;
 use App\Filament\Resources\ProductResource\Schemas\ProductForm;
 use App\Filament\Resources\ProductResource\Tables\ProductsTable;
@@ -62,6 +65,7 @@ final class ProductResource extends BaseResource
     {
         return [
             VariantsRelationManager::class,
+            VariantCombinationsRelationManager::class,
             PricesRelationManager::class,
             ImagesRelationManager::class,
             FeaturesRelationManager::class,
@@ -71,6 +75,8 @@ final class ProductResource extends BaseResource
             InventoryRelationManager::class,
             CategoriesRelationManager::class,
             CollectionsRelationManager::class,
+            DiscountsRelationManager::class,
+            CommentsRelationManager::class,
         ];
     }
 

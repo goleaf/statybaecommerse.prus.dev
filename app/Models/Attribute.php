@@ -125,7 +125,7 @@ final class Attribute extends Model
      */
     protected $appends = ['formatted_type', 'validation_rules_array', 'meta_data_array', 'display_name', 'formatted_description', 'type_icon', 'type_color', 'status_badge', 'status_color', 'status_label'];
 
-    protected string $translationModel = \App\Models\Translations\AttributeTranslation::class;
+    
 
     protected $translatable = ['name'];
 
@@ -197,23 +197,6 @@ final class Attribute extends Model
     public function values(): HasMany
     {
         return $this->hasMany(AttributeValue::class)->orderBy('sort_order');
-    }
-
-    /**
-     * Get translated field value for the specified locale.
-     */
-    public function trans(string $field, ?string $locale = null): mixed
-    {
-        $locale ??= app()->getLocale();
-
-        if ($this->relationLoaded('translations')) {
-            $translation = $this->translations->firstWhere('locale', $locale);
-            if ($translation && isset($translation->{$field})) {
-                return $translation->{$field};
-            }
-        }
-
-        return $this->{$field} ?? null;
     }
 
     /**

@@ -206,7 +206,7 @@
                             </button>
                         </div>
 
-                        <a href="{{ route('localized.products.show', ['locale' => app()->getLocale(), 'product' => $product->trans('ui.slug') ?? $product->slug ?? $product->getKey()]) }}"
+                        <a href="{{ route('localized.products.show', ['locale' => app()->getLocale(), 'product' => $product->trans('slug') ?? $product->slug ?? $product->getKey()]) }}"
                            class="w-full text-center py-3 text-blue-600 hover:text-blue-700 font-medium">
                             {{ __('messages.view_product') }}
                         </a>

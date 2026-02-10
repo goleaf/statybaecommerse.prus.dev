@@ -322,6 +322,7 @@ return [
     'View category'                                                                                         => 'Просмотр категории',
     'View invoice'                                                                                          => 'Просмотр счета',
     'Visible'                                                                                               => 'Видимый',
+    'warehouse'                                                                                             => 'Склад',
     'Warehouse Stock'                                                                                       => 'Запас на складе',
     'Website'                                                                                               => 'Сайт',
     'Wholesale'                                                                                             => 'Wholesale',

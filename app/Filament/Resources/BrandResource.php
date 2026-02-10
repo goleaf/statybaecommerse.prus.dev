@@ -23,6 +23,8 @@ final class BrandResource extends BaseResource
 
     protected static bool $shouldRegisterNavigation = false;
 
+    protected static ?string $activeNavigationItem = ProductResource::class;
+
     protected static string|UnitEnum|null $navigationGroup = null;
 
     protected static ?int $navigationSort = 5;
@@ -70,7 +72,11 @@ final class BrandResource extends BaseResource
     {
         return [
             \App\Filament\Resources\BrandResource\RelationManagers\ProductsRelationManager::class,
+            \App\Filament\Resources\BrandResource\RelationManagers\CategoriesRelationManager::class,
+            \App\Filament\Resources\BrandResource\RelationManagers\CollectionsRelationManager::class,
+            \App\Filament\Resources\BrandResource\RelationManagers\OrdersRelationManager::class,
             \App\Filament\Resources\BrandResource\RelationManagers\ProductVariantsRelationManager::class,
+            \App\Filament\Resources\BrandResource\RelationManagers\DiscountsRelationManager::class,
         ];
     }
 

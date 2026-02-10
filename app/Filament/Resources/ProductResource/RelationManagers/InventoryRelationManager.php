@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ProductResource\RelationManagers;
 
-use App\Models\Inventory;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -20,7 +19,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class InventoryRelationManager extends RelationManager
 {
-    protected static string $relationship = 'inventory';
+    protected static string $relationship = 'inventories';
 
     protected static ?string $recordTitleAttribute = 'sku';
 

@@ -17,8 +17,6 @@ use App\Models\Product;
 use App\Models\User;
 use Carbon\Carbon;
 use Exception;
-use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 
@@ -30,6 +28,7 @@ final class ComprehensiveOrderSeeder extends BaseSeeder
     private int $nextOrderSequence = 1;
 
     private array $shippingCarriers = ['DPD', 'Omniva', 'LP Express', 'UPS', 'FedEx', 'DHL'];
+
     private array $shippingServices = ['Standard', 'Express', 'Next Day', 'Economy', 'Premium'];
 
     private array $countrySeeds = [
@@ -109,8 +108,8 @@ final class ComprehensiveOrderSeeder extends BaseSeeder
 
         foreach ($picked as $service) {
             $order->services()->attach($service->id, [
-                'quantity' => rand(1, 3),
-                'price' => $service->price ?? rand(50, 500),
+                'quantity'   => rand(1, 3),
+                'price'      => $service->price ?? rand(50, 500),
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
@@ -157,8 +156,8 @@ final class ComprehensiveOrderSeeder extends BaseSeeder
 
         foreach ($services as $service) {
             \App\Models\Service::create([
-                'name' => $service['name'],
-                'price' => $service['price'],
+                'name'      => $service['name'],
+                'price'     => $service['price'],
                 'is_active' => true,
             ]);
         }
@@ -172,17 +171,17 @@ final class ComprehensiveOrderSeeder extends BaseSeeder
 
         for ($i = 1; $i <= 10; $i++) {
             $email = "client{$i}@statyba.lt";
-            
+
             $client = User::firstOrCreate(
                 ['email' => $email],
                 [
-                    'name' => "Client {$i}",
-                    'first_name' => 'Client',
-                    'last_name' => (string) $i,
-                    'password' => '$2y$12$UsingHashForSpeedAndSecurity.............', // "password"
+                    'name'              => "Client {$i}",
+                    'first_name'        => 'Client',
+                    'last_name'         => (string) $i,
+                    'password'          => '$2y$12$UsingHashForSpeedAndSecurity.............', // "password"
                     'email_verified_at' => now(),
-                    'is_active' => true,
-                    'is_admin' => false,
+                    'is_active'         => true,
+                    'is_admin'          => false,
                 ]
             );
 
@@ -200,7 +199,7 @@ final class ComprehensiveOrderSeeder extends BaseSeeder
         $countries = Country::query()->get();
         $invoiceTemplate = DocumentTemplate::where('type', 'invoice')->first();
         $receiptTemplate = DocumentTemplate::where('type', 'receipt')->first();
-        
+
         // Reset sequence since we truncated
         $this->nextOrderSequence = 1;
 
@@ -264,7 +263,7 @@ final class ComprehensiveOrderSeeder extends BaseSeeder
             $this->generateOrderDocuments($order, $invoiceTemplate, $receiptTemplate);
 
         } catch (Exception $e) {
-            Log::warning("Order creation failed: " . $e->getMessage());
+            Log::warning('Order creation failed: ' . $e->getMessage());
         }
     }
 
@@ -272,6 +271,7 @@ final class ComprehensiveOrderSeeder extends BaseSeeder
     {
         $number = sprintf('ORD-%06d', $this->nextOrderSequence);
         $this->nextOrderSequence++;
+
         return $number;
     }
 
@@ -342,7 +342,7 @@ final class ComprehensiveOrderSeeder extends BaseSeeder
     {
         try {
             $variables = $this->extractOrderVariables($order, $type);
-            
+
             Document::factory()
                 ->for($template, 'documentTemplate')
                 ->state([
@@ -359,7 +359,7 @@ final class ComprehensiveOrderSeeder extends BaseSeeder
                 ])
                 ->create();
         } catch (Exception $e) {
-            Log::warning("Document generation failed: " . $e->getMessage());
+            Log::warning('Document generation failed: ' . $e->getMessage());
         }
     }
 
@@ -367,11 +367,11 @@ final class ComprehensiveOrderSeeder extends BaseSeeder
     {
         // Simplify for brevity, keeping essential fields
         return [
-            '$ORDER_NUMBER'     => $order->number,
-            '$ORDER_DATE'       => $order->created_at->format('Y-m-d'),
-            '$ORDER_TOTAL'      => number_format((float) $order->total, 2) . ' €',
-            '$CUSTOMER_NAME'    => $order->user->name ?? 'Klientas',
-            '$CURRENT_DATE'     => now()->format('Y-m-d'),
+            '$ORDER_NUMBER'  => $order->number,
+            '$ORDER_DATE'    => $order->created_at->format('Y-m-d'),
+            '$ORDER_TOTAL'   => number_format((float) $order->total, 2) . ' €',
+            '$CUSTOMER_NAME' => $order->user->name ?? 'Klientas',
+            '$CURRENT_DATE'  => now()->format('Y-m-d'),
         ];
     }
 
@@ -384,6 +384,7 @@ final class ComprehensiveOrderSeeder extends BaseSeeder
     {
         if ($this->command instanceof \Illuminate\Console\Command) {
             $this->command->info($message);
+
             return;
         }
         Log::info($message);

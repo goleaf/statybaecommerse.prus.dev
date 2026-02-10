@@ -4,8 +4,8 @@
     @endphp
     @section('meta')
         <x-meta
-                :title="$product->trans('ui.seo_title') ?? $product->name"
-                :description="$product->trans('ui.seo_description') ?? Str::limit(strip_tags($product->description), 150)"
+                :title="$product->trans('seo_title') ?? $product->name"
+                :description="$product->trans('seo_description') ?? Str::limit(strip_tags($product->description), 150)"
                 :og-image="$ogImage"
                 ogType="product"
                 :canonical="url()->current()"
@@ -33,11 +33,11 @@
                         $product->brand && function_exists('route') && Route::has('localized.brands.show')
                             ? route('localized.brands.show', [
                                 'locale' => $locale,
-                                'slug' => $product->brand->trans('ui.slug') ?? $product->brand->slug,
+                                'slug' => $product->brand->trans('slug') ?? $product->brand->slug,
                             ])
                             : null,
                 ],
-                ['label' => $product->trans('ui.name') ?? $product->name],
+                ['label' => $product->trans('name') ?? $product->name],
             ]" aria-label="{{ __('frontend.navigation.breadcrumbs') }}" />
 
             <div class="grid gap-10 lg:grid-cols-12">
@@ -67,7 +67,7 @@
 
                             <div>
                                 <h1 class="text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">
-                                    {{ $product->trans('ui.name') ?? $product->name }}
+                                    {{ $product->trans('name') ?? $product->name }}
                                 </h1>
                                 <div class="mt-3 flex flex-wrap items-center gap-4 text-sm text-slate-600">
                                     @if ($product->sku)
@@ -158,19 +158,19 @@
                             <h2 class="text-lg font-semibold text-slate-900">
                                 {{ __('products.page.description') }}</h2>
                             <div class="prose prose-slate max-w-none text-slate-700">
-                                {!! $product->trans('ui.description') ??
+                                {!! $product->trans('description') ??
                                     ($product->description ?? '<p>' . __('products.page.no_description') . '</p>') !!}
                             </div>
                         </div>
                     </section>
 
-                    @if($product->trans('ui.detailed_description') || $product->detailed_description)
+                    @if($product->trans('detailed_description') || $product->detailed_description)
                         <section class="rounded-3xl border border-slate-100 bg-white shadow-sm">
                             <div class="space-y-6 p-6 lg:p-8">
                                 <h2 class="text-lg font-semibold text-slate-900">
                                     {{ __('products.page.detailed_description') }}</h2>
                                 <div class="prose prose-slate max-w-none text-slate-700">
-                                    {!! $product->trans('ui.detailed_description') ?? $product->detailed_description !!}
+                                    {!! $product->trans('detailed_description') ?? $product->detailed_description !!}
                                 </div>
                             </div>
                         </section>

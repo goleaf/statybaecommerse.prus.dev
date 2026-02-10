@@ -1,8 +1,8 @@
 @section('meta')
     <x-meta
-            :title="$collection->trans('ui.name') ?? $collection->name"
-            :description="$collection->trans('ui.description')
-                ? Str::limit(strip_tags($collection->trans('ui.description')), 150)
+            :title="$collection->trans('name') ?? $collection->name"
+            :description="$collection->trans('description')
+                ? Str::limit(strip_tags($collection->trans('description')), 150)
                 : ''"
             :og-image="$this->ogImage"
             :prev="$products->previousPageUrl()"
@@ -32,10 +32,10 @@
     @endif
     <x-breadcrumbs :items="[
         ['label' => __('messages.collections'), 'url' => route('localized.collections.index', ['locale' => app()->getLocale()])],
-        ['label' => $collection->trans('ui.name') ?? $collection->name],
+        ['label' => $collection->trans('name') ?? $collection->name],
     ]" />
     <div class="flex items-center justify-between mb-6">
-        <h1 class="text-2xl font-semibold">{{ $collection->trans('ui.name') ?? $collection->name }}</h1>
+        <h1 class="text-2xl font-semibold">{{ $collection->trans('name') ?? $collection->name }}</h1>
         <div class="flex items-center gap-2">
             <label for="sort" class="sr-only">{{ __('messages.sort') }}</label>
             <select id="sort" wire:model.live="sort" class="rounded-md border-gray-300 text-sm">
@@ -50,8 +50,8 @@
         {{ __('ui.loading') }}
     </div>
 
-    @if ($collection->trans('ui.description') ?? $collection->description)
-        <x-sanitized-html class="prose max-w-none mb-8" :content="$collection->trans('ui.description') ?? $collection->description ?? ''" />
+    @if ($collection->trans('description') ?? $collection->description)
+        <x-sanitized-html class="prose max-w-none mb-8" :content="$collection->trans('description') ?? $collection->description ?? ''" />
     @endif
 
     <div class="mb-4">
@@ -164,10 +164,10 @@
         </p>
         <div id="results" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             @foreach ($products as $product)
-                <a href="{{ route('product.show', $product->trans('ui.slug') ?? $product->slug) }}"
+                <a href="{{ route('product.show', $product->trans('slug') ?? $product->slug) }}"
                    class="block border rounded-lg p-4 hover:shadow-sm">
                     <x-product.thumbnail :product="$product" containerClass="mb-3" />
-                    <div class="text-base font-medium">{{ $product->trans('ui.name') ?? $product->name }}</div>
+                    <div class="text-base font-medium">{{ $product->trans('name') ?? $product->name }}</div>
                     <x-product.price :product="$product" class="mt-1" />
                 </a>
             @endforeach
@@ -193,8 +193,8 @@
             $elements[] = [
                 '@type' => 'ListItem',
                 'position' => $position++,
-                'url' => route('product.show', $p->trans('ui.slug') ?? $p->slug),
-                'name' => $p->trans('ui.name') ?? $p->name,
+                'url' => route('product.show', $p->trans('slug') ?? $p->slug),
+                'name' => $p->trans('name') ?? $p->name,
             ];
         }
     @endphp

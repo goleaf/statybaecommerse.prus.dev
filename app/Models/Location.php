@@ -43,7 +43,7 @@ final class Location extends Model
         'status'     => false,
     ];
 
-    protected string $translationModel = LocationTranslation::class;
+    
 
     protected $table = 'locations';
 
@@ -116,23 +116,6 @@ final class Location extends Model
     public function variantInventories(): HasMany
     {
         return $this->hasMany(VariantInventory::class);
-    }
-
-    /**
-     * Get translated field value for the specified locale.
-     */
-    public function trans(string $field, ?string $locale = null): mixed
-    {
-        $locale ??= app()->getLocale();
-
-        if ($this->relationLoaded('translations')) {
-            $translation = $this->translations->firstWhere('locale', $locale);
-            if ($translation && isset($translation->{$field})) {
-                return $translation->{$field};
-            }
-        }
-
-        return $this->{$field} ?? null;
     }
 
     /**

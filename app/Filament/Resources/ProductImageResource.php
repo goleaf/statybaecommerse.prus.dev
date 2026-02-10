@@ -28,6 +28,8 @@ final class ProductImageResource extends BaseResource
 
     protected static bool $shouldRegisterNavigation = false;
 
+    protected static ?string $activeNavigationItem = ProductResource::class;
+
     protected static string|UnitEnum|null $navigationGroup = null;
 
     public static function getNavigationLabel(): string
@@ -91,6 +93,14 @@ final class ProductImageResource extends BaseResource
             ->bulkActions([
                 DeleteBulkAction::make(),
             ]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            \App\Filament\Resources\ProductImageResource\RelationManagers\ProductsRelationManager::class,
+            \App\Filament\Resources\ProductImageResource\RelationManagers\ProductVariantsRelationManager::class,
+        ];
     }
 
     public static function getPages(): array

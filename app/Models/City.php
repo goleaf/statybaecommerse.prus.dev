@@ -39,7 +39,7 @@ final class City extends Model
     use HasFactory, HasTranslations, SoftDeletes;
     use OrdersByName; // Reuse the shared alphabetical ordering scope for consistency across models.
 
-    protected string $translationModel = CityTranslation::class;
+    
 
     protected $table = 'cities';
 

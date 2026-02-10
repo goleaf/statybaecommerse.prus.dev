@@ -55,18 +55,6 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
 
     protected $table = 'product_variants';
 
-    protected string $translationModel = \App\Models\Translations\ProductVariantTranslation::class;
-
-    /**
-     * @var array<int, string>
-     */
-    protected array $translatable = [
-        'name',
-        'description',
-        'seo_title',
-        'seo_description',
-    ];
-
     protected $fillable = [
         'product_id', 'sku', 'name', 'variant_name_lt', 'variant_name_en',
         'description_lt', 'description_en', 'price', 'cost_price',
@@ -255,6 +243,14 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
     }
 
     /**
+     * Alias for inventories() relationship.
+     */
+    public function inventory(): HasMany
+    {
+        return $this->inventories();
+    }
+
+    /**
      * Handle orderItems functionality with proper error handling.
      */
     public function orderItems(): HasMany
@@ -268,6 +264,14 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
     public function cartItems(): HasMany
     {
         return $this->hasMany(CartItem::class, 'variant_id');
+    }
+
+    /**
+     * Orders belonging to this variant.
+     */
+    public function orders(): BelongsToMany
+    {
+        return $this->belongsToMany(Order::class, 'order_items', 'variant_id', 'order_id')->distinct();
     }
 
     /**
@@ -380,6 +384,30 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
             $query->where('product_id', $this->product_id)
                 ->orWhere('product_variant_id', $this->getKey());
         });
+    }
+
+    /**
+     * Similarities belonging to the parent product.
+     */
+    public function similarities(): HasMany
+    {
+        return $this->hasMany(ProductSimilarity::class, 'product_id', 'product_id');
+    }
+
+    /**
+     * Discounts belonging to the parent product.
+     */
+    public function discounts(): BelongsToMany
+    {
+        return $this->belongsToMany(Discount::class, 'discount_products', 'product_id', 'discount_id', 'product_id');
+    }
+
+    /**
+     * Variant combinations matching this variant's hash.
+     */
+    public function variantCombinations(): HasMany
+    {
+        return $this->hasMany(VariantCombination::class, 'combination_hash', 'variant_combination_hash');
     }
 
     /**
@@ -830,25 +858,5 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
     public function translations(): HasMany
     {
         return $this->hasMany(\App\Models\Translations\ProductVariantTranslation::class);
-    }
-
-    /**
-     * Get translated field value for the specified locale.
-     * Uses the eager-loaded translations relationship to avoid N+1 queries.
-     */
-    public function trans(string $field, ?string $locale = null): mixed
-    {
-        $locale ??= app()->getLocale();
-
-        // If translations are loaded, use them to avoid additional queries
-        if ($this->relationLoaded('translations')) {
-            $translation = $this->translations->firstWhere('locale', $locale);
-            if ($translation && isset($translation->{$field})) {
-                return $translation->{$field};
-            }
-        }
-
-        // Fallback to the base field value
-        return $this->{$field} ?? null;
     }
 }

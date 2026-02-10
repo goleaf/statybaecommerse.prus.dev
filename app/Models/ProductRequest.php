@@ -106,6 +106,14 @@ final class ProductRequest extends Model
     }
 
     /**
+     * Orders belonging to the user who made the request.
+     */
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class, 'user_id', 'user_id');
+    }
+
+    /**
      * Handle respondedBy functionality with proper error handling.
      *
      * @return BelongsTo<User, ProductRequest>

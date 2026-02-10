@@ -33,6 +33,10 @@ final class PriceResource extends BaseResource
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-currency-euro';
 
+    protected static bool $shouldRegisterNavigation = false;
+
+    protected static ?string $activeNavigationItem = ProductResource::class;
+
     protected static string|UnitEnum|null $navigationGroup = null;
 
     protected static ?int $navigationSort = 15;
@@ -235,7 +239,7 @@ final class PriceResource extends BaseResource
     public static function getRelations(): array
     {
         return [
-            //
+            \App\Filament\Resources\PriceResource\RelationManagers\ProductsRelationManager::class,
         ];
     }
 

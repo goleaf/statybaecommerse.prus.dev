@@ -35,11 +35,11 @@ final class PublishedScope implements Scope
             $hints = $model::SCOPE_COLUMN_HINTS;
 
             if ($hints['published_at'] ?? false) {
-                $builder->whereNotNull('published_at')->where('published_at', '<=', now());
+                $builder->whereNotNull($model->qualifyColumn('published_at'))->where($model->qualifyColumn('published_at'), '<=', now());
             }
 
             if ($hints['status'] ?? false) {
-                $builder->whereIn('status', ['published', 'active']);
+                $builder->whereIn($model->qualifyColumn('status'), ['published', 'active']);
             }
 
             return;
@@ -67,11 +67,11 @@ final class PublishedScope implements Scope
         $columns = self::$columnPresence[$cacheKey];
 
         if ($columns['published_at']) {
-            $builder->whereNotNull('published_at')->where('published_at', '<=', now());
+            $builder->whereNotNull($model->qualifyColumn('published_at'))->where($model->qualifyColumn('published_at'), '<=', now());
         }
 
         if ($columns['status']) {
-            $builder->whereIn('status', ['published', 'active']);
+            $builder->whereIn($model->qualifyColumn('status'), ['published', 'active']);
         }
     }
 }

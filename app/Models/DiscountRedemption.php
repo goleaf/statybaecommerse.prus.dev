@@ -58,7 +58,7 @@ final class DiscountRedemption extends Model
     /**
      * @var class-string Link the HasTranslations trait with the translation model.
      */
-    protected string $translationModel = \App\Models\Translations\DiscountRedemptionTranslation::class;
+    
 
     /**
      * Cast persisted attributes to keep business logic predictable.

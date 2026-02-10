@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\BrandResource\RelationManagers;
 
+use App\Models\Product;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
@@ -34,10 +35,10 @@ class ProductsRelationManager extends RelationManager
             ->modifyQueryUsing(static fn ($query) => $query->with(['primaryImage']))
             ->recordTitleAttribute('name')
             ->columns([
-                ImageColumn::make('primaryImage.path')
+                ImageColumn::make('main_image')
                     ->label(__('messages.image'))
                     ->disk('public')
-                    ->defaultImageUrl(product_placeholder_url('thumb'))
+                    ->getStateUsing(static fn (Product $record): ?string => $record->primaryImage?->path)
                     ->circular(),
                 TextColumn::make('name'),
                 TextColumn::make('price')

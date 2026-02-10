@@ -36,6 +36,7 @@ namespace {
         \Filament\Tables\Actions\DeleteAction::class          => \Filament\Actions\DeleteAction::class,
         \Filament\Tables\Actions\DeleteBulkAction::class      => \Filament\Actions\DeleteBulkAction::class,
         \Filament\Tables\Actions\DetachAction::class          => \Filament\Actions\DetachAction::class,
+        \Filament\Tables\Actions\DetachBulkAction::class      => \Filament\Actions\DetachBulkAction::class,
         \Filament\Tables\Actions\EditAction::class            => \Filament\Actions\EditAction::class,
         \Filament\Tables\Actions\ForceDeleteBulkAction::class => \Filament\Actions\ForceDeleteBulkAction::class,
         \Filament\Tables\Actions\RestoreBulkAction::class     => \Filament\Actions\RestoreBulkAction::class,

@@ -80,7 +80,7 @@ final class News extends Model implements TranslatableRecord
         ];
     }
 
-    protected string $translationModel = \App\Models\Translations\NewsTranslation::class;
+    
 
     public function approvedBy(): BelongsTo
     {

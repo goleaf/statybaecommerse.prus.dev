@@ -16,10 +16,6 @@ final class Slider extends Model implements HasMedia
 {
     use HasFactory, HasTranslations, InteractsWithMedia;
 
-    protected string $translationModel = \App\Models\SliderTranslation::class;
-
-    protected array $translatable = ['title', 'description', 'button_text'];
-
     /**
      * @var int|null Ensures tests can request the next record when verifying toggle actions.
      */
@@ -142,26 +138,6 @@ final class Slider extends Model implements HasMedia
     public function getTranslatedButtonText(?string $locale = null): ?string
     {
         return $this->trans('button_text', $locale) ?: $this->button_text;
-    }
-
-    /**
-     * Get translated field value for the specified locale.
-     * Uses the eager-loaded translations relationship to avoid N+1 queries.
-     */
-    public function trans(string $field, ?string $locale = null): mixed
-    {
-        $locale ??= app()->getLocale();
-
-        // If translations are loaded, use them to avoid additional queries
-        if ($this->relationLoaded('translations')) {
-            $translation = $this->translations->firstWhere('locale', $locale);
-            if ($translation && isset($translation->{$field})) {
-                return $translation->{$field};
-            }
-        }
-
-        // Fallback to the base field value
-        return $this->{$field} ?? null;
     }
 
     public function getImageUrl(string $conversion = 'slider'): ?string

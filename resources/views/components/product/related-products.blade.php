@@ -28,7 +28,7 @@
                                 @if($product->getFirstMediaUrl('images'))
                                     <img 
                                         src="{{ $product->getFirstMediaUrl('images', 'medium') }}" 
-                                        alt="{{ $product->trans('ui.name') ?? $product->name }}"
+                                        alt="{{ $product->trans('name') ?? $product->name }}"
                                         class="h-full w-full object-cover object-center lg:h-full lg:w-full"
                                         loading="lazy"
                                     />
@@ -44,22 +44,22 @@
                             <div class="mt-4 flex justify-between">
                                 <div class="flex-1">
                                     <h3 class="text-sm text-gray-900">
-                                        <a href="{{ route('localized.products.show', ['locale' => app()->getLocale(), 'product' => $product->trans('ui.slug') ?? $product->slug ?? $product->getKey()]) }}" 
+                                        <a href="{{ route('localized.products.show', ['locale' => app()->getLocale(), 'product' => $product->trans('slug') ?? $product->slug ?? $product->getKey()]) }}" 
                                            class="group-hover:text-indigo-600 transition-colors duration-200">
                                             <span aria-hidden="true" class="absolute inset-0"></span>
-                                            {{ $product->trans('ui.name') ?? $product->name }}
+                                            {{ $product->trans('name') ?? $product->name }}
                                         </a>
                                     </h3>
                                     
                                     @if($product->brand)
                                         <p class="mt-1 text-sm text-gray-500">
-                                            {{ $product->brand->trans('ui.name') ?? $product->brand->name }}
+                                            {{ $product->brand->trans('name') ?? $product->brand->name }}
                                         </p>
                                     @endif
                                     
-                                    @if($product->trans('ui.short_description') ?? $product->short_description)
+                                    @if($product->trans('short_description') ?? $product->short_description)
                                         <p class="mt-1 text-sm text-gray-600 line-clamp-2">
-                                            {{ Str::limit($product->trans('ui.short_description') ?? $product->short_description, 80) }}
+                                            {{ Str::limit($product->trans('short_description') ?? $product->short_description, 80) }}
                                         </p>
                                     @endif
                                 </div>

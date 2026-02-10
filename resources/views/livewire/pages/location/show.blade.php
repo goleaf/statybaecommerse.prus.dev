@@ -32,7 +32,7 @@
                                 @if($location->postal_code) {{ $location->postal_code }}@endif
                             </div>
                             @if($location->country)
-                                <div class="font-medium">{{ $location->country->trans('ui.name') ?? $location->country->name }}</div>
+                                <div class="font-medium">{{ $location->country->trans('name') ?? $location->country->name }}</div>
                             @endif
                         </div>
                     </div>

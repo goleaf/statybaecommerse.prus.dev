@@ -393,12 +393,11 @@ final class VariantCombinationResourceTest extends TestCase
     {
         // Inspect the reusable form component graph to verify the section structure.
         $schema = VariantCombinationResource::formComponents();
-        $this->assertCount(3, $schema);
+        $this->assertCount(2, $schema);
 
         $sectionHeadings = Collection::make($schema)->map(static fn (SchemaSection $component) => $component->getHeading());
         $this->assertContains(__('admin.variant_combinations.basic_information'), $sectionHeadings->all());
         $this->assertContains(__('admin.variant_combinations.attribute_combinations'), $sectionHeadings->all());
-        $this->assertContains(__('admin.variant_combinations.additional_information'), $sectionHeadings->all());
     }
 
     public function test_form_contains_product_select_field(): void

@@ -58,6 +58,7 @@ class PartnerResource extends Resource
         return [
             RelationManagers\UsersRelationManager::class,
             RelationManagers\OrdersRelationManager::class,
+            RelationManagers\VariantInventoriesRelationManager::class,
             RelationManagers\PriceListsRelationManager::class,
         ];
     }

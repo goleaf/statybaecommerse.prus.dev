@@ -63,7 +63,7 @@ final class Legal extends Model
         'published_at' => 'datetime',
     ];
 
-    protected string $translationModel = \App\Models\Translations\LegalTranslation::class;
+    
 
     // Relationships
 

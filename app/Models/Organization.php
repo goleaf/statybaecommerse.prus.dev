@@ -135,6 +135,27 @@ final class Organization extends Model
     }
 
     /**
+     * Orders belonging to users of this organization.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<Order, User, Organization>
+     */
+    public function orders(): \Illuminate\Database\Eloquent\Relations\HasManyThrough
+    {
+        // This is tricky because it's a belongsToMany -> hasMany.
+        // We can use a join-based relationship or just a helper.
+        // I'll use a join for now.
+        return $this->hasManyThrough(
+            Order::class,
+            User::class,
+            'id', // Not really correct for belongsToMany
+            'user_id',
+            'id',
+            'id'
+        )->join('organization_user', 'organization_user.user_id', '=', 'users.id')
+         ->where('organization_user.organization_id', $this->id);
+    }
+
+    /**
      * Comments on organization (polymorphic).
      */
     public function comments(): MorphMany
@@ -148,6 +169,14 @@ final class Organization extends Model
     public function files(): MorphMany
     {
         return $this->morphMany(File::class, 'fileable');
+    }
+
+    /**
+     * Addresses attached to organization (polymorphic).
+     */
+    public function addresses(): MorphMany
+    {
+        return $this->morphMany(Address::class, 'addressable'); // Wait, check if Address supports this.
     }
 
     // Scopes

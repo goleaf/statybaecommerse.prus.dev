@@ -30,9 +30,9 @@
                         ->limit(6)
                         ->get()
                         ->map(static function (Category $category) use ($locale) {
-                            $label = (string) ($category->trans('ui.name', $locale) ?? ($category->name ?? ''));
+                            $label = (string) ($category->trans('name', $locale) ?? ($category->name ?? ''));
                             $description =
-                                (string) ($category->trans('ui.short_description', $locale) ??
+                                (string) ($category->trans('short_description', $locale) ??
                                     ($category->short_description ?? ''));
 
                             return [

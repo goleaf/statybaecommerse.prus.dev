@@ -38,7 +38,7 @@ final class EnabledScope implements Scope
                 return;
             }
 
-            $builder->where('is_enabled', true);
+            $builder->where($model->qualifyColumn('is_enabled'), true);
 
             return;
         }
@@ -76,7 +76,7 @@ final class EnabledScope implements Scope
         }
 
         if (self::$columnPresence[$cacheKey] ?? false) {
-            $builder->where('is_enabled', true);
+            $builder->where($model->qualifyColumn('is_enabled'), true);
         }
     }
 }

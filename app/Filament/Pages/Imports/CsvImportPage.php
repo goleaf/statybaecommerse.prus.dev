@@ -1444,7 +1444,7 @@ abstract class CsvImportPage extends Page implements HasForms
     }
 
     /**
-     * @param array<string> $headers
+     * @param  array<string> $headers
      * @return array<string>
      */
     protected function normalizeCsvHeaders(array $headers): array
@@ -1459,7 +1459,7 @@ abstract class CsvImportPage extends Page implements HasForms
     }
 
     /**
-     * @param array<string, mixed> $record
+     * @param  array<string, mixed> $record
      * @return array<string, mixed>
      */
     protected function normalizeCsvRecord(array $record): array

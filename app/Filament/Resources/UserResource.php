@@ -8,31 +8,32 @@ use App\Filament\Resources\Users\Pages\CreateUser;
 use App\Filament\Resources\Users\Pages\EditUser;
 use App\Filament\Resources\Users\Pages\ListUsers;
 use App\Filament\Resources\Users\Pages\ViewUser;
-use App\Filament\Resources\Users\Schemas\UserForm;
-use App\Filament\Resources\Users\Schemas\UserInfolist;
-use App\Filament\Resources\Users\Tables\UsersTable;
 use App\Filament\Resources\Users\RelationManagers\AddressesRelationManager;
+use App\Filament\Resources\Users\RelationManagers\CartItemsRelationManager;
 use App\Filament\Resources\Users\RelationManagers\CouponUsagesRelationManager;
 use App\Filament\Resources\Users\RelationManagers\CustomerGroupsRelationManager;
 use App\Filament\Resources\Users\RelationManagers\DiscountRedemptionsRelationManager;
 use App\Filament\Resources\Users\RelationManagers\DocumentsRelationManager;
 use App\Filament\Resources\Users\RelationManagers\NotificationsRelationManager;
+use App\Filament\Resources\Users\RelationManagers\OrganizationsRelationManager;
 use App\Filament\Resources\Users\RelationManagers\OrdersRelationManager;
 use App\Filament\Resources\Users\RelationManagers\PartnersRelationManager;
 use App\Filament\Resources\Users\RelationManagers\ReferralCodesRelationManager;
 use App\Filament\Resources\Users\RelationManagers\ReferralRewardsRelationManager;
 use App\Filament\Resources\Users\RelationManagers\ReferralsRelationManager;
 use App\Filament\Resources\Users\RelationManagers\SubscriberRelationManager;
+use App\Filament\Resources\Users\Schemas\UserForm;
+use App\Filament\Resources\Users\Schemas\UserInfolist;
+use App\Filament\Resources\Users\Tables\UsersTable;
 use App\Models\AdminUser;
 use App\Models\User;
 use BackedEnum;
-use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use UnitEnum;
 
 class UserResource extends Resource
 {
@@ -80,8 +81,10 @@ class UserResource extends Resource
     {
         return [
             OrdersRelationManager::class,
+            CartItemsRelationManager::class,
             AddressesRelationManager::class,
             CustomerGroupsRelationManager::class,
+            OrganizationsRelationManager::class,
             PartnersRelationManager::class,
             ReferralCodesRelationManager::class,
             DocumentsRelationManager::class,

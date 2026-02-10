@@ -43,6 +43,10 @@ final class VariantCombinationResource extends BaseResource
      */
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-squares-2x2';
 
+    protected static bool $shouldRegisterNavigation = false;
+
+    protected static ?string $activeNavigationItem = ProductResource::class;
+
     /**
      * Match Filament's required union type so sidebar grouping works with native enums while still
      * supporting plain string labels during configuration overrides.
@@ -109,8 +113,7 @@ final class VariantCombinationResource extends BaseResource
                                 }),
                             Toggle::make('is_available')
                                 ->label(__('admin.variant_combinations.is_available'))
-                                ->default(true)
-                                ->helperText(__('admin.variant_combinations.is_available_help')),
+                                ->default(true),
                         ]),
                 ]),
             SchemaSection::make(__('admin.variant_combinations.attribute_combinations'))
@@ -126,21 +129,6 @@ final class VariantCombinationResource extends BaseResource
                         ->addActionLabel(__('admin.variant_combinations.add_attribute'))
                         ->deleteActionLabel(__('admin.variant_combinations.remove_attribute'))
                         ->reorderable(),
-                ]),
-            SchemaSection::make(__('admin.variant_combinations.additional_information'))
-                ->description(__('admin.variant_combinations.additional_information_description'))
-                ->schema([
-                    Placeholder::make('combination_hash')
-                        ->label(__('admin.variant_combinations.combination_hash'))
-                        ->content(fn ($record) => $record?->combination_hash ?? __('admin.variant_combinations.will_be_generated')),
-                    Placeholder::make('formatted_combinations')
-                        ->label(__('admin.variant_combinations.formatted_combinations'))
-                        ->content(fn ($record) => $record?->formatted_combinations ?? __('admin.variant_combinations.no_combinations')),
-                    Placeholder::make('is_valid_combination')
-                        ->label(__('admin.variant_combinations.is_valid_combination'))
-                        ->content(fn ($record): string|array|null => $record?->is_valid_combination
-                            ? __('admin.variant_combinations.valid_combination')
-                            : __('admin.variant_combinations.invalid_combination')),
                 ]),
         ];
     }
@@ -458,7 +446,8 @@ final class VariantCombinationResource extends BaseResource
     public static function getRelations(): array
     {
         return [
-            //
+            \App\Filament\Resources\VariantCombinationResource\RelationManagers\ProductsRelationManager::class,
+            \App\Filament\Resources\VariantCombinationResource\RelationManagers\ProductVariantsRelationManager::class,
         ];
     }
 

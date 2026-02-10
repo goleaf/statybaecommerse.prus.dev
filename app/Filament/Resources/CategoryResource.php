@@ -26,6 +26,8 @@ final class CategoryResource extends BaseResource
 
     protected static bool $shouldRegisterNavigation = false;
 
+    protected static ?string $activeNavigationItem = ProductResource::class;
+
     protected static string|UnitEnum|null $navigationGroup = null;
 
     protected static ?int $navigationSort = 3;
@@ -79,6 +81,11 @@ final class CategoryResource extends BaseResource
     {
         return [
             \App\Filament\Resources\CategoryResource\RelationManagers\ProductsRelationManager::class,
+            \App\Filament\Resources\CategoryResource\RelationManagers\ProductVariantsRelationManager::class,
+            \App\Filament\Resources\CategoryResource\RelationManagers\CollectionsRelationManager::class,
+            \App\Filament\Resources\CategoryResource\RelationManagers\OrdersRelationManager::class,
+            \App\Filament\Resources\CategoryResource\RelationManagers\SubcategoriesRelationManager::class,
+            \App\Filament\Resources\CategoryResource\RelationManagers\DiscountsRelationManager::class,
         ];
     }
 

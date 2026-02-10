@@ -32,7 +32,7 @@ final class StatusScope implements Scope
             // Define which statuses should be included by default
             $allowedStatuses = $this->getAllowedStatuses($model);
             if (! empty($allowedStatuses)) {
-                $builder->whereIn('status', $allowedStatuses);
+                $builder->whereIn($model->qualifyColumn('status'), $allowedStatuses);
             }
         }
     }

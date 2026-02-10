@@ -258,6 +258,18 @@ final class Inventory extends Model
     }
 
     /**
+     * Expose stock reservations linked to this inventory entry.
+     */
+    public function stockReservations(): HasMany
+    {
+        self::ensureConnectionResolver();
+
+        $foreignKey = self::hasColumn('inventory_id') ? 'inventory_id' : 'variant_inventory_id';
+
+        return $this->hasMany(StockReservation::class, $foreignKey);
+    }
+
+    /**
      * Filter the query down to tracked inventory entries only.
      *
      * @param Builder<Inventory> $query

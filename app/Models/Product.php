@@ -119,11 +119,6 @@ final class Product extends Model implements HasMedia, TranslatableRecord
 
     protected $table = 'products';
 
-    protected string $translationModel = \App\Models\Translations\ProductTranslation::class;
-
-    // Translation fields that should be handled by the translation system
-    protected array $translatable = ['name', 'slug', 'description', 'short_description', 'detailed_description', 'seo_title', 'seo_description'];
-
     protected static function booted(): void
     {
         self::saving(static function (Product $product): void {
@@ -178,60 +173,6 @@ final class Product extends Model implements HasMedia, TranslatableRecord
         }
 
         self::scoutBootSearchable();
-    }
-
-    /**
-     * Normalize translatable attributes to JSON when arrays are assigned.
-     *
-     * @param mixed $value
-     */
-    public function setAttribute($key, $value)
-    {
-        if (isset($this->translatable)
-            && in_array($key, $this->translatable, true)
-            && is_array($value)) {
-            $value = $this->serialiseTranslatableAttribute($value);
-        }
-
-        return parent::setAttribute($key, $value);
-    }
-
-    /**
-     * Encode the provided translations while filtering empty payloads.
-     *
-     * @param array<string|int, mixed> $value
-     */
-    private function serialiseTranslatableAttribute(array $value): string
-    {
-        $normalised = [];
-
-        foreach ($value as $locale => $translation) {
-            if ($translation === null) {
-                continue;
-            }
-
-            if (is_scalar($translation)) {
-                $stringValue = trim((string) $translation);
-
-                if ($stringValue === '') {
-                    continue;
-                }
-
-                $normalised[(string) $locale] = $stringValue;
-            }
-        }
-
-        if ($normalised === []) {
-            return '';
-        }
-
-        try {
-            return json_encode($normalised, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
-        } catch (JsonException) {
-            $fallback = json_encode($normalised, JSON_UNESCAPED_UNICODE);
-
-            return is_string($fallback) ? $fallback : '{}';
-        }
     }
 
     /**
@@ -661,6 +602,14 @@ final class Product extends Model implements HasMedia, TranslatableRecord
         return $this->hasMany(ProductVariant::class, 'product_id');
     }
 
+    /**
+     * Handle variantCombinations functionality with proper error handling.
+     */
+    public function variantCombinations(): HasMany
+    {
+        return $this->hasMany(VariantCombination::class);
+    }
+
     public function stockReservations(): HasMany
     {
         return $this->hasMany(StockReservation::class);
@@ -672,6 +621,14 @@ final class Product extends Model implements HasMedia, TranslatableRecord
     public function latestVariant(): HasOne
     {
         return $this->variants()->one()->latestOfMany();
+    }
+
+    /**
+     * Handle comments functionality with proper error handling.
+     */
+    public function comments(): MorphMany
+    {
+        return $this->morphMany(Comment::class, 'commentable');
     }
 
     /**
@@ -717,6 +674,14 @@ final class Product extends Model implements HasMedia, TranslatableRecord
     public function collections(): BelongsToMany
     {
         return $this->belongsToMany(Collection::class, 'product_collections');
+    }
+
+    /**
+     * Handle discounts functionality with proper error handling.
+     */
+    public function discounts(): BelongsToMany
+    {
+        return $this->belongsToMany(Discount::class, 'discount_products');
     }
 
     /**
@@ -785,6 +750,14 @@ final class Product extends Model implements HasMedia, TranslatableRecord
     public function inventories(): HasMany
     {
         return $this->hasMany(Inventory::class);
+    }
+
+    /**
+     * Alias for inventories() relationship.
+     */
+    public function inventory(): HasMany
+    {
+        return $this->inventories();
     }
 
     /**
@@ -1760,26 +1733,6 @@ final class Product extends Model implements HasMedia, TranslatableRecord
     public function getFormattedPriceAttribute(): string
     {
         return $this->getFormattedPrice();
-    }
-
-    /**
-     * Get translated field value for the specified locale.
-     * Uses the eager-loaded translations relationship to avoid N+1 queries.
-     */
-    public function trans(string $field, ?string $locale = null): mixed
-    {
-        $locale ??= app()->getLocale();
-
-        // If translations are loaded, use them to avoid additional queries
-        if ($this->relationLoaded('translations')) {
-            $translation = $this->translations->firstWhere('locale', $locale);
-            if ($translation && isset($translation->{$field})) {
-                return $translation->{$field};
-            }
-        }
-
-        // Fallback to the base field value
-        return $this->{$field} ?? null;
     }
 
     /**

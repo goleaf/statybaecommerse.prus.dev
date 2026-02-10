@@ -99,7 +99,15 @@ return [
         'revenue_eur' => 'Umsatz (EUR)',
     ],
     'collections' => [
-        'translations' => [
+        'automatic_skills'  => 'Automatische Skills',
+        'display_type'      => 'Anzeigetyp',
+        'products_per_page' => 'Produkte pro Seite',
+        'rule_column'       => 'Spalte',
+        'rule_operator'     => 'Operator',
+        'rule_value'        => 'Wert',
+        'rules'             => 'Regeln',
+        'show_filters'      => 'Filter anzeigen',
+        'translations'      => [
             'save' => 'Übersetzungen speichern',
         ],
     ],

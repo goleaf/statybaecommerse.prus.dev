@@ -67,7 +67,8 @@ class ImagesRelationManager extends RelationManager
             ->modifyQueryUsing(static fn ($query) => $query->withoutGlobalScopes())
             ->columns([
                 ImageColumn::make('url')
-                    ->label(__('messages.preview')),
+                    ->label(__('messages.preview'))
+                    ->circular(),
                 TextColumn::make('alt_text')
                     ->label(__('messages.alt_text'))
                     ->searchable(),

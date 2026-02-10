@@ -99,7 +99,16 @@ return [
         'revenue_eur' => 'Доход (EUR)',
     ],
     'collections' => [
-        'translations' => [
+        'automatic_skills'  => 'Автоматические навыки',
+        'display_type'      => 'Тип отображения',
+        'is_automatic'      => 'Автоматический',
+        'products_per_page' => 'Товаров на странице',
+        'rule_column'       => 'Столбец',
+        'rule_operator'     => 'Оператор',
+        'rule_value'        => 'Значение',
+        'rules'             => 'Правила',
+        'show_filters'      => 'Показать фильтры',
+        'translations'      => [
             'save' => 'Save Translations',
         ],
     ],
