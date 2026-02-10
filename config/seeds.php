@@ -8,7 +8,6 @@ use Database\Seeders\AllSeedersSeeder;
 use Database\Seeders\AttributeSeeder;
 use Database\Seeders\AttributeValueSeeder;
 use Database\Seeders\BrandSeeder;
-
 use Database\Seeders\Cities\CitiesMergedSeeder;
 use Database\Seeders\CollectionSeeder;
 use Database\Seeders\CountrySeeder;
@@ -17,7 +16,6 @@ use Database\Seeders\CustomerGroupSeeder;
 use Database\Seeders\FeatureFlagSeeder;
 use Database\Seeders\OptimizedFullSeeder;
 use Database\Seeders\SettingsSeeder;
-
 
 return [
     /*
@@ -54,15 +52,13 @@ return [
             static fn (string $locale): string => strtoupper(trim($locale)),
             explode(',', (string) env('DB_SEED_FAST_CITY_ISO2', 'LT'))
         ))),
-        'max_cities_per_country'    => max(1, (int) env('DB_SEED_FAST_MAX_CITIES_PER_COUNTRY', 40)),
-
-        'collection_limit'          => max(1, (int) env('DB_SEED_FAST_COLLECTION_LIMIT', 3)),
-        'brand_limit'               => max(1, (int) env('DB_SEED_FAST_BRAND_LIMIT', 6)),
-        'locales'                   => array_values(array_filter(array_map(
+        'max_cities_per_country' => max(1, (int) env('DB_SEED_FAST_MAX_CITIES_PER_COUNTRY', 40)),
+        'collection_limit'       => max(1, (int) env('DB_SEED_FAST_COLLECTION_LIMIT', 3)),
+        'brand_limit'            => max(1, (int) env('DB_SEED_FAST_BRAND_LIMIT', 6)),
+        'locales'                => array_values(array_filter(array_map(
             static fn (string $locale): string => strtolower(trim($locale)),
             explode(',', (string) env('DB_SEED_FAST_LOCALES', 'lt,en'))
         ))),
-
     ],
 
     /*

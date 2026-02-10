@@ -2,7 +2,8 @@
 
 declare(strict_types=1);
 
-
+use App\Models\City;
+use App\Models\Country;
 use Database\Seeders\Cities\CitiesMergedSeeder;
 use Database\Seeders\CountrySeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -19,9 +20,6 @@ test('country seeder switches to lightweight dataset in fast mode', function ():
         Country::query()->withoutGlobalScopes()->pluck('cca2')->sort()->values()->all()
     )->toBe(['DE', 'LT', 'US']);
 });
-
-use App\Models\City;
-use App\Models\Country;
 
 test('cities merged seeder honors fast iso and row limits', function (): void {
     config()->set('seeds.fast_mode', true);
