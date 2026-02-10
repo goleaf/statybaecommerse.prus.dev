@@ -1,6 +1,7 @@
 @php
     $resources = [
         \App\Filament\Resources\ProductResource::class,
+        \App\Filament\Resources\CategoryResource::class,
         \App\Filament\Resources\ProductVariantResource::class,
         \App\Filament\Resources\InventoryResource::class,
         \App\Filament\Resources\BrandResource::class,

@@ -24,6 +24,8 @@ final class CategoryResource extends BaseResource
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-folder';
 
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static string|UnitEnum|null $navigationGroup = null;
 
     protected static ?int $navigationSort = 3;

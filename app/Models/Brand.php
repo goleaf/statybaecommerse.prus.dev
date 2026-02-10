@@ -237,6 +237,14 @@ final class Brand extends Model implements HasMedia, TranslatableRecord
     }
 
     /**
+     * Handle variants functionality with proper error handling.
+     */
+    public function variants(): \Illuminate\Database\Eloquent\Relations\HasManyThrough
+    {
+        return $this->hasManyThrough(ProductVariant::class, Product::class, 'brand_id', 'product_id');
+    }
+
+    /**
      * Handle scopeEnabled functionality with proper error handling.
      *
      * @param mixed $query

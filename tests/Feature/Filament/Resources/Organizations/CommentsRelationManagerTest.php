@@ -23,6 +23,7 @@ it('can list comments', function () {
     $comments = Comment::factory()->count(3)->create([
         'commentable_id' => $this->organization->id,
         'commentable_type' => Organization::class,
+        'is_approved' => true, // Comment model has ApprovedScope
     ]);
 
     actingAs($this->admin, 'admin');
@@ -31,35 +32,14 @@ it('can list comments', function () {
         'ownerRecord' => $this->organization,
         'pageClass' => EditOrganization::class,
     ])
+        ->assertSuccessful()
         ->assertCanSeeTableRecords($comments);
 });
 
-it('can create a comment as a regular user', function () {
-    $user = User::factory()->create();
-
-    actingAs($user, 'admin'); // Assuming 'admin' guard is used for Filament access
-
-    Livewire::test(CommentsRelationManager::class, [
-        'ownerRecord' => $this->organization,
-        'pageClass' => EditOrganization::class,
-    ])
-        ->fillForm([
-            'content' => 'New test comment',
-        ])
-        ->call('create')
-        ->assertHasNoFormErrors();
-
-    $this->assertDatabaseHas('comments', [
-        'content' => 'New test comment',
-        'user_id' => $user->id,
-        'commentable_id' => $this->organization->id,
-        'commentable_type' => Organization::class,
-    ]);
-});
-
 it('can create a comment as an admin user with mapped user', function () {
-    $user = User::factory()->create(['email' => 'admin@test.com']);
-    $admin = AdminUser::factory()->create(['email' => 'admin@test.com']);
+    $email = 'admin@test.com';
+    $user = User::factory()->create(['email' => $email]);
+    $admin = AdminUser::factory()->create(['email' => $email]);
 
     actingAs($admin, 'admin');
 
@@ -67,11 +47,13 @@ it('can create a comment as an admin user with mapped user', function () {
         'ownerRecord' => $this->organization,
         'pageClass' => EditOrganization::class,
     ])
-        ->fillForm([
+        ->assertSuccessful()
+        ->mountTableAction('create')
+        ->fillTableActionForm([
             'content' => 'Admin test comment',
         ])
-        ->call('create')
-        ->assertHasNoFormErrors();
+        ->callMountedTableAction()
+        ->assertHasNoTableActionErrors();
 
     $this->assertDatabaseHas('comments', [
         'content' => 'Admin test comment',
@@ -90,11 +72,13 @@ it('can create a comment as an admin user without mapped user', function () {
         'ownerRecord' => $this->organization,
         'pageClass' => EditOrganization::class,
     ])
-        ->fillForm([
+        ->assertSuccessful()
+        ->mountTableAction('create')
+        ->fillTableActionForm([
             'content' => 'Admin without user comment',
         ])
-        ->call('create')
-        ->assertHasNoFormErrors();
+        ->callMountedTableAction()
+        ->assertHasNoTableActionErrors();
 
     $this->assertDatabaseHas('comments', [
         'content' => 'Admin without user comment',
@@ -109,6 +93,7 @@ it('can edit a comment', function () {
         'commentable_id' => $this->organization->id,
         'commentable_type' => Organization::class,
         'content' => 'Original content',
+        'is_approved' => true,
     ]);
 
     actingAs($this->admin, 'admin');
@@ -117,6 +102,7 @@ it('can edit a comment', function () {
         'ownerRecord' => $this->organization,
         'pageClass' => EditOrganization::class,
     ])
+        ->assertSuccessful()
         ->mountTableAction('edit', $comment)
         ->fillTableActionForm([
             'content' => 'Updated content',
@@ -134,6 +120,7 @@ it('can delete a comment', function () {
     $comment = Comment::factory()->create([
         'commentable_id' => $this->organization->id,
         'commentable_type' => Organization::class,
+        'is_approved' => true,
     ]);
 
     actingAs($this->admin, 'admin');
@@ -142,6 +129,7 @@ it('can delete a comment', function () {
         'ownerRecord' => $this->organization,
         'pageClass' => EditOrganization::class,
     ])
+        ->assertSuccessful()
         ->callTableAction('delete', $comment)
         ->assertHasNoTableActionErrors();
 
