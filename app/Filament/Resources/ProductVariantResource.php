@@ -100,6 +100,7 @@ final class ProductVariantResource extends BaseResource
         return [
             ProductsRelationManager::class,
             PricesRelationManager::class,
+            \App\Filament\Resources\ProductVariantResource\RelationManagers\InventoriesRelationManager::class,
         ];
     }
 

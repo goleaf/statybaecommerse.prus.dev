@@ -9,6 +9,7 @@ use App\Filament\Resources\ProductResource\RelationManagers\FeaturesRelationMana
 use App\Filament\Resources\ProductResource\RelationManagers\ImagesRelationManager;
 use App\Filament\Resources\ProductResource\RelationManagers\OrdersRelationManager;
 use App\Filament\Resources\ProductResource\RelationManagers\PricesRelationManager;
+use App\Filament\Resources\ProductResource\RelationManagers\InventoryRelationManager;
 use App\Filament\Resources\ProductResource\RelationManagers\RequestsRelationManager;
 use App\Filament\Resources\ProductResource\RelationManagers\SimilaritiesRelationManager;
 use App\Filament\Resources\ProductResource\RelationManagers\VariantsRelationManager;
@@ -65,6 +66,7 @@ final class ProductResource extends BaseResource
             RequestsRelationManager::class,
             OrdersRelationManager::class,
             SimilaritiesRelationManager::class,
+            InventoryRelationManager::class,
         ];
     }
 

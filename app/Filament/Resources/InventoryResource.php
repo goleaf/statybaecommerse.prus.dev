@@ -129,6 +129,13 @@ final class InventoryResource extends BaseResource
             ]);
     }
 
+    public static function getRelations(): array
+    {
+        return [
+            \App\Filament\Resources\InventoryResource\RelationManagers\MovementsRelationManager::class,
+        ];
+    }
+
     public static function getPages(): array
     {
         return [
