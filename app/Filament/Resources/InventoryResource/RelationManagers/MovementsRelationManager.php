@@ -34,7 +34,7 @@ class MovementsRelationManager extends RelationManager
                 Select::make('type')
                     ->label(__('messages.type'))
                     ->options([
-                        'in' => 'In',
+                        'in'  => 'In',
                         'out' => 'Out',
                     ])
                     ->required(),
@@ -52,8 +52,8 @@ class MovementsRelationManager extends RelationManager
                     ->label(__('messages.type'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'in' => 'success',
-                        'out' => 'danger',
+                        'in'    => 'success',
+                        'out'   => 'danger',
                         default => 'gray',
                     }),
                 TextColumn::make('quantity')

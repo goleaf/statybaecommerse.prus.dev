@@ -15,6 +15,9 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
+use App\Models\ProductVariant;
+use Filament\Forms\Components\Select;
+
 class InventoryForm
 {
     public static function configure(Schema $schema): Schema
@@ -63,8 +66,25 @@ class InventoryForm
                                             ]);
                                         },
                                     );
-                                }),
-                            TextInput::make('quantity')
+                                })
+                                ->live(),
+                            Select::make('product_variant_id')
+                                ->label(__('messages.Variant'))
+                                ->options(fn (\Filament\Schemas\Components\Utilities\Get $get) => 
+                                    $get('product_id') 
+                                        ? ProductVariant::where('product_id', $get('product_id'))->pluck('sku', 'id')
+                                        : []
+                                )
+                                ->searchable()
+                                ->preload()
+                                ->visible(fn (\Filament\Schemas\Components\Utilities\Get $get) => filled($get('product_id'))),
+                            Select::make('warehouse_id')
+                                ->label(__('messages.warehouse'))
+                                ->relationship('warehouse', 'name')
+                                ->required()
+                                ->searchable()
+                                ->preload(),
+                            TextInput::make('qty')
                                 ->label(__('messages.quantity'))
                                 ->required()
                                 ->numeric()
@@ -72,12 +92,12 @@ class InventoryForm
                         ]),
                     Grid::make(2)
                         ->schema([
-                            TextInput::make('reserved_quantity')
+                            TextInput::make('reserved')
                                 ->label(__('admin.inventory.reserved_quantity'))
                                 ->numeric()
                                 ->minValue(0)
                                 ->default(0),
-                            TextInput::make('low_stock_threshold')
+                            TextInput::make('threshold')
                                 ->label(__('admin.inventory.low_stock_threshold'))
                                 ->numeric()
                                 ->minValue(0)
