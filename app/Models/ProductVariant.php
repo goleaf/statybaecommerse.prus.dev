@@ -243,6 +243,14 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
     }
 
     /**
+     * Stock movements belonging to this variant through inventories.
+     */
+    public function stockMovements(): \Illuminate\Database\Eloquent\Relations\HasManyThrough
+    {
+        return $this->hasManyThrough(StockMovement::class, VariantInventory::class, 'variant_id', 'variant_inventory_id');
+    }
+
+    /**
      * Alias for inventories() relationship.
      */
     public function inventory(): HasMany

@@ -69,10 +69,12 @@ final class PriceResource extends BaseResource
                                 ->types([
                                     MorphToSelect\Type::make(Product::class)
                                         ->titleAttribute('name')
-                                        ->label(__('messages.Product')),
+                                        ->label(__('messages.Product'))
+                                        ->getOptionLabelFromRecordUsing(fn (Product $record) => $record->name),
                                     MorphToSelect\Type::make(ProductVariant::class)
                                         ->titleAttribute('name')
-                                        ->label(__('messages.Variant')),
+                                        ->label(__('messages.Variant'))
+                                        ->getOptionLabelFromRecordUsing(fn (ProductVariant $record) => $record->display_name),
                                 ])
                                 ->required()
                                 ->searchable()
@@ -120,13 +122,6 @@ final class PriceResource extends BaseResource
                         ]),
                 ])
                 ->columnSpanFull(),
-            Section::make(__('messages.metadata'))
-                ->schema([
-                    KeyValue::make('metadata')
-                        ->label(__('messages.metadata')),
-                ])
-                ->columnSpanFull()
-                ->collapsed(),
         ]);
     }
 
@@ -145,6 +140,12 @@ final class PriceResource extends BaseResource
                     ->sortable(),
                 TextColumn::make('priceable.name')
                     ->label(__('messages.Name'))
+                    ->formatStateUsing(function ($state, $record) {
+                        if ($record->priceable instanceof ProductVariant) {
+                            return $record->priceable->display_name;
+                        }
+                        return $state;
+                    })
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('currency.code')
@@ -198,42 +199,6 @@ final class PriceResource extends BaseResource
                 ]),
             ])
             ->defaultSort('created_at', 'desc');
-    }
-
-    public static function infolist(Infolist $infolist): Infolist
-    {
-        return $infolist
-            ->schema([
-                InfoSection::make(__('admin.prices.basic_information'))
-                    ->schema([
-                        TextEntry::make('priceable.name')
-                            ->label(__('messages.Name')),
-                        TextEntry::make('priceable_type')
-                            ->label(__('messages.Type'))
-                            ->formatStateUsing(fn (string $state): string => class_basename($state)),
-                        TextEntry::make('amount')
-                            ->label(__('messages.amount') !== 'messages.amount' ? __('messages.amount') : 'Amount')
-                            ->money(fn (Price $record) => $record->currency?->code ?? 'EUR'),
-                        TextEntry::make('currency.code')
-                            ->label(__('messages.currency')),
-                        TextEntry::make('type')
-                            ->label(__('messages.Type'))
-                            ->badge(),
-                        IconEntry::make('is_enabled')
-                            ->label(__('messages.Enabled'))
-                            ->boolean(),
-                    ])->columns(2),
-                InfoSection::make(__('admin.prices.validity') !== 'admin.prices.validity' ? __('admin.prices.validity') : 'Validity')
-                    ->schema([
-                        TextEntry::make('starts_at')
-                            ->label(__('admin.prices.valid_from'))
-                            ->dateTime(),
-                        TextEntry::make('ends_at')
-                            ->label(__('admin.prices.valid_until'))
-                            ->dateTime()
-                            ->placeholder(__('admin.prices.no_expiry')),
-                    ])->columns(2),
-            ]);
     }
 
     public static function getRelations(): array

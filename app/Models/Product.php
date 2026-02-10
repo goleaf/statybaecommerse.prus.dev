@@ -610,6 +610,21 @@ final class Product extends Model implements HasMedia, TranslatableRecord
         return $this->hasMany(VariantCombination::class);
     }
 
+    /**
+     * Stock movements belonging to this product through its variants.
+     */
+    public function stockMovements(): \Illuminate\Database\Eloquent\Relations\HasManyThrough
+    {
+        return $this->hasManyThrough(
+            StockMovement::class,
+            ProductVariant::class,
+            'product_id',
+            'variant_inventory_id',
+            'id',
+            'id'
+        );
+    }
+
     public function stockReservations(): HasMany
     {
         return $this->hasMany(StockReservation::class);

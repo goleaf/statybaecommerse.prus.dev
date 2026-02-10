@@ -44,6 +44,16 @@ class ProductsRelationManager extends RelationManager
             ])
             ->filters([
                 //
+            ])
+            ->headerActions([
+                \Filament\Tables\Actions\AssociateAction::make()
+                    ->preloadRecordSelect(),
+            ])
+            ->actions([
+                \Filament\Tables\Actions\DissociateAction::make(),
+            ])
+            ->bulkActions([
+                \Filament\Tables\Actions\DissociateBulkAction::make(),
             ]);
     }
 }
