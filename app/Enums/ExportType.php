@@ -13,9 +13,9 @@ enum ExportType: string
     public function label(): string
     {
         return match ($this) {
-            self::ORDERS   => __('Orders'),
+            self::ORDERS   => __('messages.orders'),
             self::PRODUCTS => __('messages.products'),
-            self::USERS    => __('Users'),
+            self::USERS    => __('messages.users'),
         };
     }
 }

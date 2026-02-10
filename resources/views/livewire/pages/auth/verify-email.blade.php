@@ -20,7 +20,7 @@
          class="relative min-h-full flex flex-col justify-center py-12 divide-y divide-gray-200 lg:max-w-2xl lg:mx-auto">
         <div class="sm:mx-auto sm:w-full sm:max-w-md py-8">
             <div class="mb-4 text-sm text-gray-600">
-                {{ __('Thanks for signing up! Before getting started, could you verify your email address by clicking on the link we just emailed to you? If you didn\'t receive the email, we will gladly send you another.') }}
+                {{ __('ui.verify_email_prompt') }}
             </div>
 
             @if (session('status') == 'verification-link-sent')

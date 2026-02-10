@@ -59,7 +59,7 @@ final class AutocompleteSearchController extends Controller
                 };
 
                 throw ValidationException::withMessages([
-                    $messageKey => [__('The requested column :column is not available for autocomplete searches.', ['column' => $column])],
+                    $messageKey => [__('messages.the_requested_column_column_is_not_available_for_autocomplete_searches', ['column' => $column])],
                 ]);
             }
         }

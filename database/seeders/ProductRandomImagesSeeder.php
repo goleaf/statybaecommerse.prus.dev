@@ -6,11 +6,10 @@ namespace Database\Seeders;
 
 use App\Models\Product;
 use App\Services\Images\ProductImageService;
-use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
-final class ProductRandomImagesSeeder extends Seeder
+final class ProductRandomImagesSeeder extends BaseSeeder
 {
     private ProductImageService $imageService;
 

@@ -46,7 +46,7 @@ final class MarketingEmail extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         // Gracefully resolve the recipient name for the greeting.
-        $name = $notifiable->name ?? $notifiable->email ?? __('valued customer');
+        $name = $notifiable->name ?? $notifiable->email ?? __('messages.valued_customer');
 
         $mail = (new MailMessage)
             ->subject($this->subject)

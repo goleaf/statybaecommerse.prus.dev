@@ -42,7 +42,7 @@
                     <div class="flex gap-2">
                         <x-forms.input id="captcha-response" type="text" wire:model.defer="captchaResponse" required />
                         <x-buttons.secondary type="button" wire:click="refreshCaptcha" wire:loading.attr="disabled">
-                            {{ __('Refresh') }}
+                            {{ __('ui.refresh') }}
                         </x-buttons.secondary>
                     </div>
                     {{-- Keep the CAPTCHA token in sync so the backend can validate the answer reliably. --}}

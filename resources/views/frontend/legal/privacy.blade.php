@@ -19,8 +19,7 @@
         $documentName = 'privacy policy';
     }
 
-    $emptyMessage = __('messages.frontend_legal, [
-        ', [
+    $emptyMessage = __('messages.frontend_legal', [
         'document' => $documentName,
     ]);
     if ($emptyMessage === 'frontend.legal.document_unavailable') {

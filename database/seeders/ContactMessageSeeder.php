@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use App\Models\ContactMessage;
-use Illuminate\Database\Seeder;
 
-final class ContactMessageSeeder extends Seeder
+final class ContactMessageSeeder extends BaseSeeder
 {
     public function run(): void
     {

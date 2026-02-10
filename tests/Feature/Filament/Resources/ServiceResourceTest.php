@@ -17,7 +17,7 @@ beforeEach(function (): void {
     $this->resolveAdminPanel();
 
     $admin = User::factory()->create([
-        'email' => 'admin@example.com',
+        'email'    => 'admin@example.com',
         'is_admin' => true,
     ]);
 
@@ -35,41 +35,41 @@ it('lists services in the admin panel', function (): void {
 it('creates a service via the admin form', function (): void {
     livewire(CreateService::class)
         ->fillForm([
-            'name' => 'Assembly Service',
+            'name'        => 'Assembly Service',
             'description' => 'On-site assembly for construction components.',
-            'price' => 120.00,
-            'is_active' => true,
+            'price'       => 120.00,
+            'is_active'   => true,
         ])
         ->call('create')
         ->assertHasNoFormErrors();
 
     $this->assertDatabaseHas('services', [
-        'name' => 'Assembly Service',
-        'price' => 120.00,
+        'name'      => 'Assembly Service',
+        'price'     => 120.00,
         'is_active' => true,
     ]);
 });
 
 it('edits a service via the admin form', function (): void {
     $service = Service::factory()->create([
-        'name' => 'Initial Service',
-        'price' => 85.50,
+        'name'      => 'Initial Service',
+        'price'     => 85.50,
         'is_active' => true,
     ]);
 
     livewire(EditService::class, ['record' => $service->getRouteKey()])
         ->fillForm([
-            'name' => 'Updated Service',
-            'price' => 99.00,
+            'name'      => 'Updated Service',
+            'price'     => 99.00,
             'is_active' => false,
         ])
         ->call('save')
         ->assertHasNoFormErrors();
 
     $this->assertDatabaseHas('services', [
-        'id' => $service->id,
-        'name' => 'Updated Service',
-        'price' => 99.00,
+        'id'        => $service->id,
+        'name'      => 'Updated Service',
+        'price'     => 99.00,
         'is_active' => false,
     ]);
 });

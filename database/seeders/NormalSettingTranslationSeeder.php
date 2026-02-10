@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-
-final class NormalSettingTranslationSeeder extends Seeder
+final class NormalSettingTranslationSeeder extends BaseSeeder
 {
     public function run(): void
     {

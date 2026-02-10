@@ -8,7 +8,7 @@ use App\Models\User;
 use Illuminate\Database\Seeder;
 use Throwable;
 
-final class CustomerSeeder extends Seeder
+final class CustomerSeeder extends BaseSeeder
 {
     public function run(): void
     {

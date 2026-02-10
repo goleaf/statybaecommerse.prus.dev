@@ -18,7 +18,7 @@ final class ProductExport implements Exportable
 
     public function name(): string
     {
-        return __('Products Export');
+        return __('messages.products_export');
     }
 
     public function columns(): array

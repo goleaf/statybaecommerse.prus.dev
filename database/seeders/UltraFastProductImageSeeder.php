@@ -5,13 +5,12 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use App\Models\Product;
-use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Throwable;
 
-final class UltraFastProductImageSeeder extends Seeder
+final class UltraFastProductImageSeeder extends BaseSeeder
 {
     private const BATCH_SIZE = 50;
 

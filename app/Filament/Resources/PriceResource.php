@@ -7,17 +7,22 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\PriceResource\Pages;
 use App\Models\Price;
 use App\Models\Product;
-use App\Support\Filament\Components\SearchableInput;
-use App\Support\Filament\SearchableInputHelper;
-use App\Support\Search\ProductSearch;
-use App\Support\Search\SearchResult;
-use App\Support\Search\SearchResultPayload;
+use App\Models\ProductVariant;
 use BackedEnum;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\MorphToSelect;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Infolists\Components\IconEntry;
+use Filament\Infolists\Components\Section as InfoSection;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Infolist;
 use Filament\Schemas\Components\Grid as SchemaGrid;
-use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Schemas\Components\Tabs as SchemaTabs;
 use Filament\Schemas\Schema;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use UnitEnum;
@@ -50,64 +55,70 @@ final class PriceResource extends BaseResource
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
-            SchemaSection::make(__('admin.prices.basic_information'))
-                ->description(__('admin.prices.basic_information_description'))
-                ->schema([
-                    SchemaGrid::make(2)
+            SchemaTabs::make('Price Details')
+                ->tabs([
+                    SchemaTabs\Tab::make(__('admin.prices.basic_information'))
                         ->schema([
-                            SearchableInput::make('product_id')
-                                ->label(__('messages.product'))
-                                ->required()
-                                ->searchable()
-                                ->searchUsing(static fn (string $search): array => ProductSearch::complex($search))
-                                ->dehydrateStateUsing(static fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
-                                ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
-                                    SearchableInputHelper::hydrate(
-                                        $component,
-                                        $state,
-                                        static function (int|string $value): ?SearchResult {
-                                            $product = Product::query()
-                                                ->select(['id', 'sku', 'name', 'price'])
-                                                ->find((int) $value);
-
-                                            if (! $product instanceof Product) {
-                                                return null;
-                                            }
-
-                                            $name = $product->getAttribute('name');
-                                            if (is_array($name)) {
-                                                $locale = app()->getLocale();
-                                                $name = $name[$locale] ?? reset($name);
-                                            }
-
-                                            $result = SearchResult::make(
-                                                (string) $product->getKey(),
-                                                ProductSearch::label($product),
-                                            );
-
-                                            return SearchResultPayload::normalise($result, [
-                                                'product_id' => $product->getKey(),
-                                                'sku'        => (string) ($product->getAttribute('sku') ?? ''),
-                                                'name'       => is_string($name) ? $name : '',
-                                                'price'      => is_numeric($product->getAttribute('price')) ? (float) $product->getAttribute('price') : 0.0,
-                                            ]);
-                                        },
-                                    );
-                                }),
-                            TextInput::make('price')
-                                ->label(__('messages.price'))
-                                ->required()
-                                ->numeric()
-                                ->minValue(0)
-                                ->step(0.01),
+                            SchemaGrid::make(2)
+                                ->schema([
+                                    MorphToSelect::make('priceable')
+                                        ->label(__('messages.Product'))
+                                        ->types([
+                                            MorphToSelect\Type::make(Product::class)
+                                                ->titleAttribute('name')
+                                                ->label(__('messages.Product')),
+                                            MorphToSelect\Type::make(ProductVariant::class)
+                                                ->titleAttribute('name')
+                                                ->label(__('messages.Variant')),
+                                        ])
+                                        ->required()
+                                        ->searchable()
+                                        ->preload(),
+                                    Select::make('currency_id')
+                                        ->label(__('messages.currency'))
+                                        ->relationship('currency', 'code')
+                                        ->required()
+                                        ->searchable()
+                                        ->preload(),
+                                ]),
+                            SchemaGrid::make(2)
+                                ->schema([
+                                    TextInput::make('amount')
+                                        ->label(__('messages.amount') !== 'messages.amount' ? __('messages.amount') : 'Amount')
+                                        ->required()
+                                        ->numeric()
+                                        ->minValue(0)
+                                        ->step(0.0001),
+                                    TextInput::make('cost_amount')
+                                        ->label(__('messages.cost_amount') !== 'messages.cost_amount' ? __('messages.cost_amount') : 'Cost Amount')
+                                        ->numeric()
+                                        ->minValue(0)
+                                        ->step(0.0001),
+                                ]),
+                            SchemaGrid::make(2)
+                                ->schema([
+                                    TextInput::make('type')
+                                        ->label(__('messages.Type'))
+                                        ->placeholder('default, sale, wholesale, etc.'),
+                                    Toggle::make('is_enabled')
+                                        ->label(__('messages.Enabled'))
+                                        ->default(true),
+                                ]),
                         ]),
-                    SchemaGrid::make(2)
+                    SchemaTabs\Tab::make(__('admin.prices.validity') !== 'admin.prices.validity' ? __('admin.prices.validity') : 'Validity')
                         ->schema([
-                            DateTimePicker::make('valid_from')
-                                ->label(__('admin.prices.valid_from'))
-                                ->default(now()),
-                            DateTimePicker::make('valid_until')
-                                ->label(__('admin.prices.valid_until')),
+                            SchemaGrid::make(2)
+                                ->schema([
+                                    DateTimePicker::make('starts_at')
+                                        ->label(__('admin.prices.valid_from')),
+                                    DateTimePicker::make('ends_at')
+                                        ->label(__('admin.prices.valid_until')),
+                                ]),
+                        ]),
+                    SchemaTabs\Tab::make(__('messages.metadata'))
+                        ->schema([
+                            KeyValue::make('metadata')
+                                ->label(__('messages.metadata')),
                         ]),
                 ]),
         ]);
@@ -117,23 +128,40 @@ final class PriceResource extends BaseResource
     {
         return $table
             ->columns([
-                TextColumn::make('product.name')
-                    ->label(__('messages.product'))
+                TextColumn::make('id')
+                    ->label('ID')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('priceable_type')
+                    ->label(__('messages.Type'))
+                    ->formatStateUsing(fn (string $state): string => class_basename($state))
+                    ->badge()
+                    ->sortable(),
+                TextColumn::make('priceable.name')
+                    ->label(__('messages.Name'))
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('product.sku')
-                    ->label(__('messages.sku'))
-                    ->searchable()
+                TextColumn::make('currency.code')
+                    ->label(__('messages.currency'))
+                    ->badge()
                     ->sortable(),
-                TextColumn::make('price')
-                    ->label(__('messages.price'))
-                    ->money('EUR')
+                TextColumn::make('amount')
+                    ->label(__('messages.amount') !== 'messages.amount' ? __('messages.amount') : 'Amount')
+                    ->money(fn (Price $record) => $record->currency?->code ?? 'EUR')
                     ->sortable(),
-                TextColumn::make('valid_from')
+                TextColumn::make('type')
+                    ->label(__('messages.Type'))
+                    ->badge()
+                    ->sortable(),
+                IconColumn::make('is_enabled')
+                    ->label(__('messages.Enabled'))
+                    ->boolean()
+                    ->sortable(),
+                TextColumn::make('starts_at')
                     ->label(__('admin.prices.valid_from'))
                     ->dateTime()
                     ->sortable(),
-                TextColumn::make('valid_until')
+                TextColumn::make('ends_at')
                     ->label(__('admin.prices.valid_until'))
                     ->dateTime()
                     ->sortable()
@@ -144,7 +172,70 @@ final class PriceResource extends BaseResource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->defaultSort('valid_from', 'desc');
+            ->filters([
+                \Filament\Tables\Filters\TernaryFilter::make('is_enabled')
+                    ->label(__('messages.Enabled')),
+                \Filament\Tables\Filters\SelectFilter::make('type')
+                    ->label(__('messages.Type'))
+                    ->options(fn () => Price::query()->whereNotNull('type')->distinct()->pluck('type', 'type')->toArray()),
+                \Filament\Tables\Filters\SelectFilter::make('currency_id')
+                    ->label(__('messages.currency'))
+                    ->relationship('currency', 'code'),
+            ])
+            ->actions([
+                \Filament\Tables\Actions\ViewAction::make(),
+                \Filament\Tables\Actions\EditAction::make(),
+                \Filament\Tables\Actions\DeleteAction::make(),
+            ])
+            ->bulkActions([
+                \Filament\Tables\Actions\BulkActionGroup::make([
+                    \Filament\Tables\Actions\DeleteBulkAction::make(),
+                ]),
+            ])
+            ->defaultSort('created_at', 'desc');
+    }
+
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                InfoSection::make(__('admin.prices.basic_information'))
+                    ->schema([
+                        TextEntry::make('priceable.name')
+                            ->label(__('messages.Name')),
+                        TextEntry::make('priceable_type')
+                            ->label(__('messages.Type'))
+                            ->formatStateUsing(fn (string $state): string => class_basename($state)),
+                        TextEntry::make('amount')
+                            ->label(__('messages.amount') !== 'messages.amount' ? __('messages.amount') : 'Amount')
+                            ->money(fn (Price $record) => $record->currency?->code ?? 'EUR'),
+                        TextEntry::make('currency.code')
+                            ->label(__('messages.currency')),
+                        TextEntry::make('type')
+                            ->label(__('messages.Type'))
+                            ->badge(),
+                        IconEntry::make('is_enabled')
+                            ->label(__('messages.Enabled'))
+                            ->boolean(),
+                    ])->columns(2),
+                InfoSection::make(__('admin.prices.validity') !== 'admin.prices.validity' ? __('admin.prices.validity') : 'Validity')
+                    ->schema([
+                        TextEntry::make('starts_at')
+                            ->label(__('admin.prices.valid_from'))
+                            ->dateTime(),
+                        TextEntry::make('ends_at')
+                            ->label(__('admin.prices.valid_until'))
+                            ->dateTime()
+                            ->placeholder(__('admin.prices.no_expiry')),
+                    ])->columns(2),
+            ]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            //
+        ];
     }
 
     public static function getPages(): array

@@ -259,7 +259,7 @@
                                 </div>
                                 @if ($order->carrier)
                                     <div>
-                                        <span class="text-sm text-gray-600">{{ __('Carrier') }}:</span>
+                                        <span class="text-sm text-gray-600">{{ __('ui.carrier') }}:</span>
                                         <p class="font-medium">{{ $order->carrier }}</p>
                                     </div>
                                 @endif
@@ -279,7 +279,7 @@
         {{-- Actions --}}
         @if ($showActions)
             <div class="bg-white border border-gray-200 rounded-2xl p-6">
-                <h2 class="text-xl font-semibold text-gray-900 mb-6">{{ __('Actions') }}</h2>
+                <h2 class="text-xl font-semibold text-gray-900 mb-6">{{ __('ui.actions') }}</h2>
 
                 <div class="flex flex-col sm:flex-row gap-4">
                     {{-- Download Invoice --}}
@@ -301,7 +301,7 @@
                                   d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
                             </path>
                         </svg>
-                        {{ __('Reorder') }}
+                        {{ __('ui.reorder') }}
                     </button>
 
                     {{-- Contact Support --}}

@@ -114,7 +114,7 @@ final readonly class CreateOrder
             try {
                 $payment = app(\App\Services\Payments\PaymentService::class)->process($order, (array) data_get($checkout, 'payment.0', []));
                 $order->payment_status = (string) ($payment['status'] ?? 'pending');
-                $existing = safe_json_decode_array((string) ($order->transactions ?? '[]'));
+                $existing = is_array($order->transactions) ? $order->transactions : safe_json_decode_array((string) ($order->transactions ?? '[]'));
                 $existing[] = (array) ($payment['transaction'] ?? []);
                 $order->transactions = $existing;
                 $order->save();

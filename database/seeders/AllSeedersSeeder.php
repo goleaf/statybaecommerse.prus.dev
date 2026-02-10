@@ -14,22 +14,28 @@ use function str_starts_with;
 /**
  * Seeder that automatically executes every seeder class found in the database/seeders directory.
  */
-final class AllSeedersSeeder extends Seeder
+final class AllSeedersSeeder extends BaseSeeder
 {
     /**
      * Core seeders that must run before the remaining classes to satisfy dependencies.
      *
      * @var array<int, class-string<Seeder>>
      */
-    private const PRIORITY_SEEDERS = [
+    private const DEFAULT_STANDARD_SEEDERS = [
+        CurrencySeeder::class,
         CountrySeeder::class,
         \Database\Seeders\Cities\CitiesMergedSeeder::class,
-        CurrencySeeder::class,
-        AttributeSeeder::class,
-        AttributeValueSeeder::class,
+        AdminAuthorizationSeeder::class,
         AdminUserSeeder::class,
         CustomerGroupSeeder::class,
+        AttributeSeeder::class,
+        AttributeValueSeeder::class,
+        BrandSeeder::class,
+        CategorySeeder::class,
         CollectionSeeder::class,
+        FeatureFlagSeeder::class,
+        SettingsSeeder::class,
+        TurboEcommerceSeeder::class,
     ];
 
     /**
@@ -37,14 +43,27 @@ final class AllSeedersSeeder extends Seeder
      */
     public function run(): void
     {
+        $standardSeeders = $this->standardSeeders();
+
+        foreach ($standardSeeders as $seederClass) {
+            if (! class_exists($seederClass)) {
+                continue;
+            }
+
+            $this->call($seederClass);
+        }
+
+        if (! (bool) config('seeds.include_experimental', false)) {
+            return;
+        }
+
         // Gather every concrete seeder class within the seeders directory tree.
         $discoveredSeeders = $this->discoverSeeders();
 
-        // Run the priority seeders first to guarantee dependent data is available.
-        foreach (self::PRIORITY_SEEDERS as $prioritySeeder) {
-            if (isset($discoveredSeeders[$prioritySeeder])) {
-                $this->call($prioritySeeder);
-                unset($discoveredSeeders[$prioritySeeder]);
+        // Execute only the seeders not already included in the canonical standard list.
+        foreach ($standardSeeders as $standardSeeder) {
+            if (isset($discoveredSeeders[$standardSeeder])) {
+                unset($discoveredSeeders[$standardSeeder]);
             }
         }
 
@@ -126,5 +145,28 @@ final class AllSeedersSeeder extends Seeder
 
         // Compose the namespaced class string using the parsed namespace and class name.
         return sprintf('%s\\%s', $namespace, $class);
+    }
+
+    /**
+     * @return array<int, class-string<Seeder>>
+     */
+    private function standardSeeders(): array
+    {
+        $configured = config('seeds.standard_seeders', self::DEFAULT_STANDARD_SEEDERS);
+
+        if (! is_array($configured)) {
+            return self::DEFAULT_STANDARD_SEEDERS;
+        }
+
+        $seeders = array_values(array_filter(
+            $configured,
+            static fn (mixed $class): bool => is_string($class) && $class !== ''
+        ));
+
+        if ($seeders === []) {
+            return self::DEFAULT_STANDARD_SEEDERS;
+        }
+
+        return $seeders;
     }
 }

@@ -16,6 +16,8 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Get;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Number;
@@ -26,11 +28,19 @@ class ProductImporter extends BaseImporter
 {
     protected static ?string $model = Product::class;
 
+    private ?string $pendingImageUrl = null;
+
+    private const IMPORT_IMAGE_MAX_WIDTH = 1600;
+
+    private const IMPORT_IMAGE_MAX_HEIGHT = 1600;
+
+    private const IMPORT_IMAGE_QUALITY = 85;
+
     private const SYNC_KEY_FIELDS = [
-        'sku' => 'SKU',
+        'sku'     => 'SKU',
         'barcode' => 'Barcode',
-        'slug' => 'Slug',
-        'name' => 'Name',
+        'slug'    => 'Slug',
+        'name'    => 'Name',
     ];
 
     /**
@@ -111,6 +121,15 @@ class ProductImporter extends BaseImporter
 
     protected function beforeFill(): void
     {
+        $rawImageUrl = $this->data['image_url'] ?? $this->data['image'] ?? null;
+        $this->pendingImageUrl = is_string($rawImageUrl) ? trim($rawImageUrl) : null;
+
+        if ($this->pendingImageUrl === '') {
+            $this->pendingImageUrl = null;
+        }
+
+        unset($this->data['image_url'], $this->data['image']);
+
         if ($this->record && ! $this->record->exists) {
             $this->applyVisibilityDefaults();
         }
@@ -300,7 +319,26 @@ class ProductImporter extends BaseImporter
             ImportColumn::make('status')
                 ->ignoreBlankState()
                 ->rules(['nullable', 'in:draft,published,archived']),
+            ImportColumn::make('image_url')
+                ->label('Image URL')
+                ->ignoreBlankState()
+                ->rules(['nullable', 'url:http,https']),
+            ImportColumn::make('image')
+                ->label('Image')
+                ->ignoreBlankState()
+                ->rules(['nullable', 'url:http,https']),
         ];
+    }
+
+    protected function afterSave(): void
+    {
+        $imageUrl = $this->pendingImageUrl;
+
+        if (! is_string($imageUrl) || trim($imageUrl) === '') {
+            return;
+        }
+
+        $this->replaceProductImageFromUrl(trim($imageUrl));
     }
 
     public function resolveRecord(): Product
@@ -316,7 +354,7 @@ class ProductImporter extends BaseImporter
     {
         $body = 'Your product import has completed and ' . Number::format($import->successful_rows) . ' ' . str('row')->plural($import->successful_rows) . ' imported.';
 
-        if ($failedRowsCount = $import->getFailedRowsCount()) {
+        if ($failedRowsCount = static::calculateFailedRowsCount($import)) {
             $body .= ' ' . Number::format($failedRowsCount) . ' ' . str('row')->plural($failedRowsCount) . ' failed to import.';
         }
 
@@ -383,6 +421,8 @@ class ProductImporter extends BaseImporter
                 'is_featured',
                 'published_at',
                 'external_url',
+                'image_url',
+                'image',
                 'available_from',
                 'available_until',
             ],
@@ -834,5 +874,185 @@ class ProductImporter extends BaseImporter
         }
 
         return $category;
+    }
+
+    private function replaceProductImageFromUrl(string $imageUrl): void
+    {
+        if (! $this->record instanceof Product || ! $this->record->exists) {
+            return;
+        }
+
+        $contents = $this->downloadImageContents($imageUrl);
+
+        if ($contents === null) {
+            throw new RowImportFailedException('Image download failed.');
+        }
+
+        $extension = $this->resolveImageExtension($imageUrl, $contents['content_type'] ?? null);
+        $path = 'product-images/' . $this->record->getKey() . '/import-' . Str::uuid() . '.' . $extension;
+
+        $resizedImageContents = $this->resizeImageContents($contents['body'], $extension);
+
+        Storage::disk('public')->put($path, $resizedImageContents);
+
+        $existingImages = $this->record
+            ->images()
+            ->withoutGlobalScopes()
+            ->get();
+
+        foreach ($existingImages as $existingImage) {
+            Storage::disk('public')->delete((string) $existingImage->path);
+        }
+
+        $this->record->images()->withoutGlobalScopes()->delete();
+
+        ProductImage::query()->create([
+            'product_id' => $this->record->getKey(),
+            'path'       => $path,
+            'alt_text'   => $this->record->name,
+            'sort_order' => 0,
+            'is_default' => true,
+            'is_active'  => true,
+        ]);
+    }
+
+    /**
+     * @return array{body:string, content_type:string|null}|null
+     */
+    private function downloadImageContents(string $imageUrl): ?array
+    {
+        try {
+            $response = Http::timeout(20)
+                ->retry(1, 200)
+                ->get($imageUrl);
+        } catch (ConnectionException) {
+            return null;
+        }
+
+        if (! $response->successful()) {
+            return null;
+        }
+
+        $body = $response->body();
+
+        if ($body === '') {
+            return null;
+        }
+
+        return [
+            'body'         => $body,
+            'content_type' => $response->header('content-type'),
+        ];
+    }
+
+    private function resolveImageExtension(string $imageUrl, ?string $contentType): string
+    {
+        if (is_string($contentType) && $contentType !== '') {
+            $normalized = Str::lower($contentType);
+
+            return match (true) {
+                str_contains($normalized, 'png')  => 'png',
+                str_contains($normalized, 'webp') => 'webp',
+                str_contains($normalized, 'gif')  => 'gif',
+                str_contains($normalized, 'jpeg'), str_contains($normalized, 'jpg') => 'jpg',
+                default => 'jpg',
+            };
+        }
+
+        try {
+            $path = parse_url($imageUrl, PHP_URL_PATH);
+        } catch (Throwable) {
+            $path = null;
+        }
+
+        if (! is_string($path) || $path === '') {
+            return 'jpg';
+        }
+
+        $extension = Str::lower(pathinfo($path, PATHINFO_EXTENSION));
+
+        if (! in_array($extension, ['jpg', 'jpeg', 'png', 'webp', 'gif'], true)) {
+            return 'jpg';
+        }
+
+        return $extension === 'jpeg' ? 'jpg' : $extension;
+    }
+
+    private function resizeImageContents(string $imageContents, string $extension): string
+    {
+        if (! function_exists('imagecreatefromstring')) {
+            return $imageContents;
+        }
+
+        $sourceImage = @imagecreatefromstring($imageContents);
+
+        if ($sourceImage === false) {
+            return $imageContents;
+        }
+
+        $sourceWidth = imagesx($sourceImage);
+        $sourceHeight = imagesy($sourceImage);
+
+        if ($sourceWidth <= self::IMPORT_IMAGE_MAX_WIDTH && $sourceHeight <= self::IMPORT_IMAGE_MAX_HEIGHT) {
+            imagedestroy($sourceImage);
+
+            return $imageContents;
+        }
+
+        $scaleRatio = min(
+            self::IMPORT_IMAGE_MAX_WIDTH / max($sourceWidth, 1),
+            self::IMPORT_IMAGE_MAX_HEIGHT / max($sourceHeight, 1),
+            1
+        );
+
+        $targetWidth = max((int) floor($sourceWidth * $scaleRatio), 1);
+        $targetHeight = max((int) floor($sourceHeight * $scaleRatio), 1);
+        $targetImage = imagecreatetruecolor($targetWidth, $targetHeight);
+
+        if ($targetImage === false) {
+            imagedestroy($sourceImage);
+
+            return $imageContents;
+        }
+
+        if (in_array($extension, ['png', 'gif', 'webp'], true)) {
+            imagealphablending($targetImage, false);
+            imagesavealpha($targetImage, true);
+            $transparentColor = imagecolorallocatealpha($targetImage, 0, 0, 0, 127);
+            imagefilledrectangle($targetImage, 0, 0, $targetWidth, $targetHeight, $transparentColor);
+        }
+
+        imagecopyresampled(
+            $targetImage,
+            $sourceImage,
+            0,
+            0,
+            0,
+            0,
+            $targetWidth,
+            $targetHeight,
+            $sourceWidth,
+            $sourceHeight
+        );
+
+        ob_start();
+
+        $wasEncoded = match ($extension) {
+            'png'   => imagepng($targetImage, null, 6),
+            'gif'   => imagegif($targetImage),
+            'webp'  => function_exists('imagewebp') ? imagewebp($targetImage, null, self::IMPORT_IMAGE_QUALITY) : imagejpeg($targetImage, null, self::IMPORT_IMAGE_QUALITY),
+            default => imagejpeg($targetImage, null, self::IMPORT_IMAGE_QUALITY),
+        };
+
+        $encodedContents = (string) ob_get_clean();
+
+        imagedestroy($sourceImage);
+        imagedestroy($targetImage);
+
+        if (! $wasEncoded || $encodedContents === '') {
+            return $imageContents;
+        }
+
+        return $encodedContents;
     }
 }

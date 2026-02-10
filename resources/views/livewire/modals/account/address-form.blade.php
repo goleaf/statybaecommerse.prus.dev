@@ -60,7 +60,7 @@
 
         <div class="space-y-2">
             <label for="street_address_plus" class="block text-sm font-medium text-gray-700">
-                {{ __('Apartment', suite, etc.') }}
+                {{ __('ui.apartment', suite, etc.') }}
             </label>
             {{-- Debounced model binding for optional address info mirrors the primary field. --}}
             <input
@@ -69,7 +69,7 @@
                 id="street_address_plus"
                 name="street_address_plus"
                 type="text"
-                placeholder="{{ __('Apartment', suite, unit, etc.') }}"
+                placeholder="{{ __('ui.apartment', suite, unit, etc.') }}"
             />
             @error('street_address_plus')
                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -79,7 +79,7 @@
         <div class="grid grid-cols-2 gap-4">
             <div class="space-y-2">
                 <label for="city" class="block text-sm font-medium text-gray-700">
-                    {{ __('City') }} <span class="text-red-500">*</span>
+                    {{ __('ui.city') }} <span class="text-red-500">*</span>
                 </label>
                 {{-- Debounced model binding for locality reduces noisy Livewire requests. --}}
                 <input
@@ -114,7 +114,7 @@
 
         <div class="space-y-2">
             <label for="country_code" class="block text-sm font-medium text-gray-700">
-                {{ __('Country') }} <span class="text-red-500">*</span>
+                {{ __('ui.country') }} <span class="text-red-500">*</span>
             </label>
             {{-- Debounced select binding settles the chosen country before resolving shipping. --}}
             <select
@@ -208,7 +208,7 @@
                 class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
                 <span wire:loading.remove wire:target="save">{{ __('messages.save') }}</span>
-                <span wire:loading wire:target="save">{{ __('Saving...') }}</span>
+                <span wire:loading wire:target="save">{{ __('ui.saving') }}</span>
             </button>
         </div>
     </x-slot>

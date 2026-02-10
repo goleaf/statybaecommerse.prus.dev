@@ -86,14 +86,14 @@ final class Delivery extends StepComponent
 
         $optionData = $this->findResolvedOption((int) $this->currentSelected);
         if ($optionData === null) {
-            $this->addError('currentSelected', __('Please choose a valid delivery option.'));
+            $this->addError('currentSelected', __('messages.please_choose_a_valid_delivery_option'));
 
             return;
         }
 
         $optionModel = ShippingOption::query()->find($optionData['id']);
         if ($optionModel === null) {
-            $this->addError('currentSelected', __('Please choose a valid delivery option.'));
+            $this->addError('currentSelected', __('messages.please_choose_a_valid_delivery_option'));
 
             return;
         }
@@ -128,7 +128,7 @@ final class Delivery extends StepComponent
     public function stepInfo(): array
     {
         return [
-            'label'    => __('Delivery method'),
+            'label'    => __('messages.delivery_method'),
             'complete' => session()->exists('checkout') && data_get(session()->get('checkout'), 'shipping_option') !== null,
         ];
     }
@@ -336,15 +336,7 @@ final class Delivery extends StepComponent
         if ($finalAmount <= 0.0) {
             $badges[] = [
                 'type'  => 'free',
-                'label' => __('messages.ecommerce),
-            ];
-
-            return $badges;
-        }
-
-        if ($discountAmount > 0.0 && $finalAmount < $baseAmount) {
-            $badges[] = [
-                '),
+                'label' => __('translations.free_shipping_from'),
             ];
 
             return $badges;
@@ -355,6 +347,8 @@ final class Delivery extends StepComponent
                 'type'  => 'capped',
                 'label' => __('messages.shipping_capped_at_amount', ['amount' => app_money_format($finalAmount, $currency)]),
             ];
+
+            return $badges;
         }
 
         return $badges;

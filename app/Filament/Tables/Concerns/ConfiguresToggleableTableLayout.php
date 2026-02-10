@@ -10,11 +10,10 @@ use Filament\Tables\Columns\ColumnGroup;
 use Filament\Tables\Columns\Layout\Component as ColumnLayoutComponent;
 use Filament\Tables\Table;
 
-/**
- * @mixin HasToggleableTable
- */
 trait ConfiguresToggleableTableLayout
 {
+    protected string $tableLayout = 'list';
+
     /**
      * @var array<int, Column | ColumnGroup | ColumnLayoutComponent> | null
      */
@@ -89,5 +88,25 @@ trait ConfiguresToggleableTableLayout
         }
 
         return $table;
+    }
+
+    public function setTableLayout(string $layout): void
+    {
+        $this->tableLayout = $layout === 'grid' ? 'grid' : 'list';
+    }
+
+    public function toggleTableLayout(): void
+    {
+        $this->tableLayout = $this->isGridLayout() ? 'list' : 'grid';
+    }
+
+    public function isGridLayout(): bool
+    {
+        return $this->tableLayout === 'grid';
+    }
+
+    public function isListLayout(): bool
+    {
+        return ! $this->isGridLayout();
     }
 }

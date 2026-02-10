@@ -6,6 +6,7 @@ namespace Database\Seeders;
 
 use App\Support\Authorization\AuthorizationMatrix;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Schema;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
@@ -15,13 +16,27 @@ use Spatie\Permission\Models\Role;
  * This seeder creates all the necessary roles and permissions
  * for the admin panel authorization system.
  */
-class AdminAuthorizationSeeder extends Seeder
+class AdminAuthorizationSeeder extends BaseSeeder
 {
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
+        $requiredTables = ['permissions', 'roles', 'role_has_permissions'];
+        $missingTables = collect($requiredTables)
+            ->reject(static fn (string $table): bool => Schema::hasTable($table))
+            ->values()
+            ->all();
+
+        if ($missingTables !== []) {
+            $this->command?->warn(
+                'Skipping AdminAuthorizationSeeder because required tables are missing: ' . implode(', ', $missingTables)
+            );
+
+            return;
+        }
+
         // Clear cached permissions
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 

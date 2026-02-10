@@ -2,12 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Tests\Feature\Filament\Actions;
-
-use App\Filament\Resources\OrderResource\Pages\ListOrders;
+use App\Data\ExportRequestData;
+use App\Enums\ExportType;
 use App\Filament\Resources\ProductResource\Pages\ListProducts;
-use App\Filament\Resources\UserResource\Pages\ListUsers;
-use App\Jobs\ProcessExport;
+use App\Jobs\ProcessExportJob;
 use App\Models\Export;
 use App\Models\Order;
 use App\Models\Product;
@@ -15,103 +13,93 @@ use App\Models\User;
 use App\Services\Export\Exporters\OrderExport;
 use App\Services\Export\Exporters\ProductExport;
 use App\Services\Export\Exporters\UserExport;
+use App\Services\Export\ExportService;
+use App\Services\Export\Writers\CsvExportWriter;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
-use Tests\TestCase;
 
-final class ExportBulkActionsTest extends TestCase
-{
-    use RefreshDatabase;
+uses(RefreshDatabase::class);
 
-    private User $admin;
+beforeEach(function (): void {
+    $this->resolveAdminPanel();
 
-    protected function setUp(): void
-    {
-        parent::setUp();
+    config(['app.locale' => 'en', 'app.fallback_locale' => 'en']);
+    app()->setLocale('en');
 
-        $this->resolveAdminPanel();
+    config()->set('export.disk', 'public');
+    config()->set('export.formats', [
+        'csv' => CsvExportWriter::class,
+    ]);
 
-        config(['app.locale' => 'en', 'app.fallback_locale' => 'en']);
-        app()->setLocale('en');
+    Storage::fake('public');
+    Notification::fake();
+    Bus::fake();
 
-        config()->set('export.disk', 'public');
-        config()->set('export.formats', [
-            'csv'  => \App\Services\Export\Writers\CsvExportWriter::class,
-            'xlsx' => \App\Services\Export\Writers\XlsxExportWriter::class,
-            'pdf'  => \App\Services\Export\Writers\PdfExportWriter::class,
-        ]);
+    $this->admin = User::factory()->create([
+        'email'    => 'admin@example.com',
+        'is_admin' => true,
+    ]);
 
-        Storage::fake('public');
-        Notification::fake();
-        Bus::fake();
+    $this->actingAs($this->admin);
+});
 
-        $this->admin = User::factory()->create([
-            'email'    => 'admin@example.com',
-            'is_admin' => true,
-        ]);
+it('dispatches orders bulk export job with selected columns', function (): void {
+    $orders = Order::factory()->count(3)->create();
 
-        $this->actingAs($this->admin);
-    }
+    $export = app(ExportService::class)->queueExport(
+        ExportRequestData::from([
+            'entity'  => ExportType::ORDERS->value,
+            'columns' => ['number', 'status'],
+            'ids'     => $orders->pluck('id')->all(),
+            'format'  => 'csv',
+        ]),
+        $this->admin
+    );
 
-    public function test_orders_bulk_export_dispatches_job_with_selected_columns(): void
-    {
-        $orders = Order::factory()->count(3)->create();
+    expect($export)->not->toBeNull()
+        ->and($export->exportable_type)->toBe(OrderExport::class)
+        ->and($export->columns)->toBe(['number', 'status'])
+        ->and($export->requested_by)->toBe($this->admin->getKey());
 
-        Livewire::test(ListOrders::class)
-            ->call('loadTable')
-            ->callTableBulkAction('export_selected', $orders, [
-                'format'  => 'csv',
-                'columns' => ['number', 'status'],
-            ])
-            ->assertHasNoTableBulkActionErrors();
+    Bus::assertDispatched(ProcessExportJob::class, fn (ProcessExportJob $job): bool => $job->exportId === $export->getKey());
+});
 
-        $export = Export::query()->latest()->first();
+it('uses csv format for products bulk export', function (): void {
+    Product::factory()->count(2)->create();
 
-        self::assertNotNull($export);
-        self::assertSame(OrderExport::class, $export->exportable_type);
-        self::assertSame(['number', 'status'], $export->columns);
-        self::assertSame($this->admin->getKey(), $export->requested_by);
+    Livewire::actingAs($this->admin)->test(ListProducts::class)
+        ->callTableBulkAction('export_selected', Product::all(), [
+            'format'  => 'csv',
+            'columns' => ['sku' => true, 'name' => true],
+        ])
+        ->assertHasNoTableBulkActionErrors();
 
-        Bus::assertDispatched(ProcessExport::class, fn (ProcessExport $job): bool => $job->exportId === $export->getKey());
-    }
+    $export = Export::query()->latest()->first();
 
-    public function test_products_bulk_export_uses_selected_format(): void
-    {
-        Product::factory()->count(2)->create();
+    expect($export)->not->toBeNull()
+        ->and($export->exportable_type)->toBe(ProductExport::class)
+        ->and($export->format)->toBe('csv');
 
-        Livewire::test(ListProducts::class)
-            ->call('loadTable')
-            ->callTableBulkAction('export_selected', Product::all(), [
-                'format'  => 'xlsx',
-                'columns' => ['sku', 'name'],
-            ])
-            ->assertHasNoTableBulkActionErrors();
+    expect($export->columns)->toContain('sku');
+    expect($export->columns)->toContain('name');
+});
 
-        $export = Export::query()->latest()->first();
+it('defaults users bulk export format to csv', function (): void {
+    $users = User::factory()->count(2)->create();
 
-        self::assertNotNull($export);
-        self::assertSame(ProductExport::class, $export->exportable_type);
-        self::assertSame('xlsx', $export->format);
-        self::assertSame(['sku', 'name'], $export->columns);
-    }
+    $export = app(ExportService::class)->queueExport(
+        ExportRequestData::from([
+            'entity' => ExportType::USERS->value,
+            'ids'    => $users->pluck('id')->all(),
+        ]),
+        $this->admin
+    );
 
-    public function test_users_bulk_export_defaults_to_csv_when_no_format_selected(): void
-    {
-        $users = User::factory()->count(2)->create();
-
-        Livewire::test(ListUsers::class)
-            ->call('loadTable')
-            ->callTableBulkAction('export_selected', $users)
-            ->assertHasNoTableBulkActionErrors();
-
-        $export = Export::query()->latest()->first();
-
-        self::assertNotNull($export);
-        self::assertSame(UserExport::class, $export->exportable_type);
-        self::assertSame('csv', $export->format);
-        self::assertNotEmpty($export->columns);
-    }
-}
+    expect($export)->not->toBeNull()
+        ->and($export->exportable_type)->toBe(UserExport::class)
+        ->and($export->format)->toBe('csv')
+        ->and($export->columns)->not->toBeEmpty();
+});

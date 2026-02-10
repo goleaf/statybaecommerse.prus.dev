@@ -69,7 +69,7 @@
                 {{-- Per Page Selector --}}
                 @if ($showPerPage)
                     <div class="flex items-center gap-2">
-                        <label for="per-page" class="text-sm text-gray-700">{{ __('messages.Select') }}:</label>
+                        <label for="per-page" class="text-sm text-gray-700">{{ __('messages.select') }}:</label>
                         <select id="per-page"
                                 x-data="{ perPage: {{ $perPage }} }"
                                 @change="window.location.href = updateUrlParam('per_page', $event.target.value)"
@@ -177,7 +177,7 @@
                    class="w-16 px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
             <button @click="if(page >= 1 && page <= {{ $lastPage }}) window.location.href = updateUrlParam('page', page)"
                     class="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                {{ __('messages.Go') }}
+                {{ __('messages.go') }}
             </button>
         </div>
     </div>

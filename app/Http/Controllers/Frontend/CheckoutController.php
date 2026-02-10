@@ -58,8 +58,7 @@ final class CheckoutController extends Controller
 
             return $this->respondError(
                 $request,
-                __('messages.auth, [
-                    ', [
+                __('auth.throttle', [
                     'seconds' => $seconds,
                     'minutes' => (int) ceil($seconds / 60),
                 ]),
@@ -153,18 +152,7 @@ final class CheckoutController extends Controller
                 'exception' => $exception,
             ]);
 
-            return $this->respondError($request, __('messages.ecommerce), 500);
-        }
-
-        $cartLifecycleService->clearAfterCheckout(
-            $request->user()?->id,
-            $request->session()->getId(),
-            $order->payment_status ?? null
-        );
-
-        RateLimiter::clear($throttleKey);
-
-        Session::forget('), 500);
+            return $this->respondError($request, __('messages.ecommerce'), 500);
         }
 
         $cartLifecycleService->clearAfterCheckout(
@@ -184,9 +172,8 @@ final class CheckoutController extends Controller
 
         if ($request->wantsJson()) {
             return response()->json([
-                'success' => true,
-                'message' => __('messages.ecommerce),
-                '),
+                'success'  => true,
+                'message'  => __('messages.ecommerce'),
                 'order_id' => $order->getKey(),
                 'order'    => [
                     'id'     => $order->getKey(),
@@ -195,12 +182,7 @@ final class CheckoutController extends Controller
             ], 201);
         }
 
-        return redirect()->route('frontend.checkout.success')->with('status', __('messages.ecommerce));
-    }
-
-    public function success(Request $request): View
-    {
-        $orderId = Session::get('));
+        return redirect()->route('frontend.checkout.success')->with('status', __('messages.ecommerce'));
     }
 
     public function success(Request $request): View

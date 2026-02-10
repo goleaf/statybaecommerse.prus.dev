@@ -217,7 +217,7 @@ final class DataPrivacyController extends Controller
             $anonymisedEmail = sprintf('deleted-user-%s@deleted.example', $emailKey);
 
             $account->forceFill([
-                'name'                     => __('Deleted User'),
+                'name'                     => __('messages.deleted_user'),
                 'first_name'               => null,
                 'last_name'                => null,
                 'email'                    => $anonymisedEmail,

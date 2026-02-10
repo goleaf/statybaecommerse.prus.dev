@@ -16,7 +16,7 @@ uses(RefreshDatabase::class);
 it('can import users', function () {
     $admin = User::factory()->admin()->create();
 
-    $import = new Import();
+    $import = new Import;
     $import->user()->associate($admin);
     $import->file_name = 'users.csv';
     $import->file_path = 'users.csv';
@@ -25,18 +25,18 @@ it('can import users', function () {
     $import->save();
 
     $row = [
-        'name' => 'John Doe',
-        'email' => 'john@example.com',
-        'password' => 'Password123!',
-        'is_admin' => '0',
+        'name'      => 'John Doe',
+        'email'     => 'john@example.com',
+        'password'  => 'Password123!',
+        'is_admin'  => '0',
         'is_active' => '1',
     ];
 
     $columnMap = [
-        'name' => 'name',
-        'email' => 'email',
-        'password' => 'password',
-        'is_admin' => 'is_admin',
+        'name'      => 'name',
+        'email'     => 'email',
+        'password'  => 'password',
+        'is_admin'  => 'is_admin',
         'is_active' => 'is_active',
     ];
 
@@ -46,7 +46,7 @@ it('can import users', function () {
 
     expect($import->successful_rows)->toBe(1);
     $this->assertDatabaseHas('users', [
-        'name' => 'John Doe',
+        'name'  => 'John Doe',
         'email' => 'john@example.com',
     ]);
 

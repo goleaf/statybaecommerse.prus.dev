@@ -27,7 +27,7 @@ use Throwable;
  * - Generates local placeholder images via LocalImageGeneratorService
  * - Leverages model events and relationships for data integrity
  */
-final class TurboEcommerceSeeder extends Seeder
+final class TurboEcommerceSeeder extends BaseSeeder
 {
     private LocalImageGeneratorService $imageGen;
 
@@ -53,21 +53,46 @@ final class TurboEcommerceSeeder extends Seeder
 
     private int $chunkSize;
 
+    private int $sharedImagePoolSize;
+
+    private bool $fastMode;
+
+    /**
+     * @var array<int, string>|null
+     */
+    private ?array $productTranslationColumns = null;
+
     public function __construct()
     {
         $this->imageGen = app(LocalImageGeneratorService::class);
         $this->sharedImagePoolDir = storage_path('app/temp/shared_product_images');
+        $this->fastMode = (bool) config('seeds.fast_mode', false);
 
-        $this->productsPerBrand = max(100, (int) env('SEED_PRODUCTS_PER_BRAND', 100));
-        $this->categoriesPerProduct = (int) env('SEED_CATEGORIES_PER_PRODUCT', 3);
-        $this->attributesPerProductMin = (int) env('SEED_ATTRS_PER_PRODUCT_MIN', 3);
-        $this->attributesPerProductMax = (int) env('SEED_ATTRS_PER_PRODUCT_MAX', 6);
-        $this->minImagesPerProduct = (int) env('SEED_IMAGES_PER_PRODUCT_MIN', 3);
-        $this->maxImagesPerProduct = (int) env('SEED_IMAGES_PER_PRODUCT_MAX', 6);
+        if ($this->fastMode) {
+            $this->productsPerBrand = max(4, (int) config('seeds.fast.products_per_brand', 6));
+            $this->categoriesPerProduct = 1;
+            $this->attributesPerProductMin = 1;
+            $this->attributesPerProductMax = 2;
+            $this->minImagesPerProduct = 1;
+            $this->maxImagesPerProduct = 1;
+            $this->chunkSize = 120;
+        } else {
+            // Keep defaults development-friendly and fast while still generating realistic relations.
+            $this->productsPerBrand = max(12, (int) env('SEED_PRODUCTS_PER_BRAND', $this->defaultProductsPerBrand()));
+            $this->categoriesPerProduct = (int) env('SEED_CATEGORIES_PER_PRODUCT', 2);
+            $this->attributesPerProductMin = (int) env('SEED_ATTRS_PER_PRODUCT_MIN', 2);
+            $this->attributesPerProductMax = (int) env('SEED_ATTRS_PER_PRODUCT_MAX', 4);
+            $this->minImagesPerProduct = (int) env('SEED_IMAGES_PER_PRODUCT_MIN', 1);
+            $this->maxImagesPerProduct = (int) env('SEED_IMAGES_PER_PRODUCT_MAX', 2);
+            $this->chunkSize = (int) env('SEED_CHUNK_SIZE', 250);
+        }
+
         if ($this->maxImagesPerProduct < $this->minImagesPerProduct) {
             $this->maxImagesPerProduct = $this->minImagesPerProduct;
         }
-        $this->chunkSize = (int) env('SEED_CHUNK_SIZE', 500);
+        $this->sharedImagePoolSize = $this->fastMode
+            ? max(8, (int) config('seeds.fast.shared_image_pool_size', 24))
+            : 100;
     }
 
     public function run(): void
@@ -88,7 +113,7 @@ final class TurboEcommerceSeeder extends Seeder
         }])->get();
 
         // Prepare a shared pool of images used across all products
-        $this->buildSharedImagePool(100);
+        $this->buildSharedImagePool($this->sharedImagePoolSize);
 
         // Generate products per brand using factories with timeout protection
         $timeout = now()->addMinutes(60);  // 60 minute timeout for seeder operations
@@ -234,22 +259,32 @@ final class TurboEcommerceSeeder extends Seeder
             return;
         }
 
+        $translationColumns = array_flip($this->productTranslationColumns());
+
+        if ($translationColumns === []) {
+            return;
+        }
+
         foreach ($products as $product) {
             foreach ($locales as $locale) {
-                // Create translation using factory with relationship
+                $name = $this->translateLike($product->name, $locale);
+                $translationPayload = [
+                    'name'              => $name,
+                    'slug'              => Str::slug($name . '-' . substr($product->slug, -6)),
+                    'summary'           => null,
+                    'description'       => $this->translateLike('Aukštos kokybės produktas profesionalams ir mėgėjams.', $locale),
+                    'short_description' => $this->translateLike('Aukštos kokybės produktas profesionalams ir mėgėjams.', $locale),
+                    'seo_title'         => $name,
+                    'seo_description'   => $this->translateLike('Pirkite geriausia kaina. Greitas pristatymas.', $locale),
+                    'meta_keywords'     => [],
+                    'alt_text'          => $name,
+                ];
+
+                $translationPayload = array_intersect_key($translationPayload, $translationColumns);
+
                 $product->translations()->firstOrCreate(
                     ['locale' => $locale],
-                    ProductTranslation::factory()
-                        ->for($product, 'product')
-                        ->make([
-                            'locale'          => $locale,
-                            'name'            => $this->translateLike($product->name, $locale),
-                            'slug'            => Str::slug($this->translateLike($product->name, $locale) . '-' . substr($product->slug, -6)),
-                            'description'     => $this->translateLike('Aukštos kokybės produktas profesionalams ir mėgėjams.', $locale),
-                            'seo_title'       => $this->translateLike($product->name, $locale),
-                            'seo_description' => $this->translateLike('Pirkite geriausia kaina. Greitas pristatymas.', $locale),
-                        ])
-                        ->toArray()
+                    $translationPayload
                 );
             }
         }
@@ -259,7 +294,7 @@ final class TurboEcommerceSeeder extends Seeder
     {
         // Ensure pool is available
         if (empty($this->sharedImagePool)) {
-            $this->buildSharedImagePool(100);
+            $this->buildSharedImagePool($this->sharedImagePoolSize);
         }
 
         foreach ($products as $product) {
@@ -366,16 +401,66 @@ final class TurboEcommerceSeeder extends Seeder
         // @rmdir($this->sharedImagePoolDir);
     }
 
+    private function defaultProductsPerBrand(): int
+    {
+        if ($this->fastMode) {
+            return max(4, (int) config('seeds.fast.products_per_brand', 8));
+        }
+
+        return 24;
+    }
+
     private function supportedLocales(): array
     {
         $raw = (string) config('app.supported_locales', 'lt');
-
-        return collect(explode(',', $raw))
+        $locales = collect(explode(',', $raw))
             ->map(fn ($v) => trim((string) $v))
             ->filter()
             ->unique()
             ->values()
             ->all();
+
+        if (! $this->fastMode) {
+            return $locales;
+        }
+
+        $preferredFastLocales = collect(config('seeds.fast.locales', ['lt', 'en']))
+            ->map(fn ($locale) => trim((string) $locale))
+            ->filter()
+            ->values();
+
+        $fastLocales = collect($locales)
+            ->intersect($preferredFastLocales)
+            ->values()
+            ->all();
+
+        if ($fastLocales !== []) {
+            return $fastLocales;
+        }
+
+        return array_slice($locales, 0, 2);
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function productTranslationColumns(): array
+    {
+        if ($this->productTranslationColumns !== null) {
+            return $this->productTranslationColumns;
+        }
+
+        try {
+            $translationModel = new ProductTranslation;
+            $this->productTranslationColumns = $translationModel
+                ->getConnection()
+                ->getSchemaBuilder()
+                ->getColumnListing($translationModel->getTable());
+        } catch (Throwable) {
+            $this->productTranslationColumns = [];
+        }
+
+        return $this->productTranslationColumns;
     }
 
     private function translateLike(string $text, string $locale): string

@@ -6,10 +6,9 @@ namespace Database\Seeders;
 
 use App\Models\Brand;
 use App\Services\Images\LocalImageGeneratorService;
-use Illuminate\Database\Seeder;
 use Throwable;
 
-final class BrandSeeder extends Seeder
+final class BrandSeeder extends BaseSeeder
 {
     public function run(): void
     {
@@ -26,10 +25,18 @@ final class BrandSeeder extends Seeder
             ['name' => 'Kärcher', 'featured' => false],
         ]);
 
+        if ($this->seedFastModeEnabled()) {
+            $definitions = $definitions
+                ->take($this->seedFastInt('brand_limit', 8))
+                ->values();
+        }
+
+        $shouldGenerateMedia = $this->seedShouldGenerateMedia();
+
         /** @var LocalImageGeneratorService $imageGenerator */
         $imageGenerator = app(LocalImageGeneratorService::class);
 
-        $definitions->each(function (array $definition) use ($imageGenerator): void {
+        $definitions->each(function (array $definition) use ($imageGenerator, $shouldGenerateMedia): void {
             $slug = str($definition['name'])->slug()->toString();
 
             // Check if brand already exists to maintain idempotency
@@ -68,8 +75,10 @@ final class BrandSeeder extends Seeder
                     ],
                 ]);
 
-                $this->attachGeneratedLogo($brand, $imageGenerator);
-            } else {
+                if ($shouldGenerateMedia) {
+                    $this->attachGeneratedLogo($brand, $imageGenerator);
+                }
+            } elseif ($shouldGenerateMedia) {
                 $this->attachGeneratedLogo($existingBrand, $imageGenerator);
             }
         });

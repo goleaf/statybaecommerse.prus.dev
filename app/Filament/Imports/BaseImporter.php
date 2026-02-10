@@ -4,13 +4,24 @@ declare(strict_types=1);
 
 namespace App\Filament\Imports;
 
+use App\Support\ImportExport\ProgressCounter;
 use Filament\Actions\Imports\Importer;
+use Filament\Actions\Imports\Models\Import;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Throwable;
 
 abstract class BaseImporter extends Importer
 {
+    protected static function calculateFailedRowsCount(Import $import): int
+    {
+        return ProgressCounter::failedRows(
+            (int) ($import->processed_rows ?? 0),
+            (int) ($import->successful_rows ?? 0),
+            (int) ($import->total_rows ?? 0),
+        );
+    }
+
     protected function beforeValidate(): void
     {
         $this->ensureUniqueColumnValues();

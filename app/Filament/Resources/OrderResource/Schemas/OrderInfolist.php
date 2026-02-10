@@ -102,9 +102,11 @@ class OrderInfolist
                     ->schema([
                         TextEntry::make('payment_method')
                             ->label(__('messages.payment_method'))
+                            ->formatStateUsing(fn ($state) => $state instanceof \App\Enums\PaymentMethod ? $state->getLabel() : $state)
                             ->badge(),
                         TextEntry::make('payment_status')
                             ->label(__('messages.payment_status'))
+                            ->formatStateUsing(fn ($state) => $state instanceof \App\Enums\PaymentStatus ? $state->getLabel() : $state)
                             ->badge(),
                     ])
                     ->columns(2)
@@ -126,8 +128,15 @@ class OrderInfolist
             ]);
     }
 
-    private static function resolveStreet(?array $address): ?string
+    private static function resolveStreet(array|string|null $address): ?string
     {
+        if (is_string($address) && $address !== '') {
+            $decoded = json_decode($address, true);
+            if (is_array($decoded)) {
+                $address = $decoded;
+            }
+        }
+
         if (! is_array($address) || $address === []) {
             return null;
         }
@@ -150,8 +159,15 @@ class OrderInfolist
         return trim($line1 . ($line2 !== '' ? ', ' . $line2 : ''));
     }
 
-    private static function resolvePostalCode(?array $address): ?string
+    private static function resolvePostalCode(array|string|null $address): ?string
     {
+        if (is_string($address) && $address !== '') {
+            $decoded = json_decode($address, true);
+            if (is_array($decoded)) {
+                $address = $decoded;
+            }
+        }
+
         if (! is_array($address) || $address === []) {
             return null;
         }

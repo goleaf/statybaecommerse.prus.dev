@@ -47,7 +47,7 @@
                             <div class="space-y-5 max-w-3xl">
                                 <div class="flex flex-wrap items-center gap-3">
                                     <span class="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.3em] text-blue-600">
-                                        {{ __('frontend.collections.types.' . $typeKey) }}
+                                        {{ __(sprintf('frontend.collections.types.%s', $typeKey)) }}
                                     </span>
                                     <span class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.3em] text-slate-500">
                                         {{ trans_choice('frontend.collections.stats.products', $productCount, ['count' => $productCount]) }}

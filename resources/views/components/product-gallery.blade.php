@@ -111,7 +111,7 @@
         @if ($showThumbnails && $totalImages > 1)
             <div class="lg:col-span-1">
                 <div class="space-y-3">
-                    <h3 class="text-sm font-semibold text-gray-900">{{ __('Images') }}</h3>
+                    <h3 class="text-sm font-semibold text-gray-900">{{ __('ui.images') }}</h3>
                     <div class="space-y-2 max-h-96 overflow-y-auto">
                         @foreach ($images as $index => $image)
                             <button @click="setCurrentImage({{ $index }})"

@@ -101,7 +101,7 @@ final class DiscountPreviewController extends Controller
             report($exception);
 
             throw ValidationException::withMessages([
-                'preview' => __('Unable to build the discount preview at this time.'),
+                'preview' => __('messages.unable_to_build_the_discount_preview_at_this_time'),
             ]);
         }
 

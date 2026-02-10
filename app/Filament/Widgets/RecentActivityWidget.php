@@ -29,7 +29,7 @@ class RecentActivityWidget extends BaseWidget
             ->query($this->getTableQuery())
             ->columns([
                 Tables\Columns\TextColumn::make('type')
-                    ->label(__('Type'))
+                    ->label(__('ui.type'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'Order'          => 'success',
@@ -44,12 +44,12 @@ class RecentActivityWidget extends BaseWidget
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('title')
-                    ->label(__('Description'))
+                    ->label(__('ui.description'))
                     ->searchable()
                     ->sortable()
                     ->limit(50),
                 Tables\Columns\TextColumn::make('description')
-                    ->label(__('Subject'))
+                    ->label(__('ui.subject'))
                     ->searchable()
                     ->limit(100)
                     ->tooltip(function (Tables\Columns\TextColumn $column): ?string {
@@ -58,7 +58,7 @@ class RecentActivityWidget extends BaseWidget
                         return strlen($state) > 100 ? $state : null;
                     }),
                 Tables\Columns\TextColumn::make('status')
-                    ->label(__('User'))
+                    ->label(__('ui.user'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'active', 'completed', 'published', 'approved' => 'success',
@@ -69,12 +69,12 @@ class RecentActivityWidget extends BaseWidget
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label(__('System'))
+                    ->label(__('ui.system'))
                     ->dateTime()
                     ->sortable()
                     ->since(),
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->label(__('Time'))
+                    ->label(__('ui.time'))
                     ->dateTime()
                     ->sortable()
                     ->since(),

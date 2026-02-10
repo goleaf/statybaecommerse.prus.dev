@@ -73,7 +73,7 @@
                 <div class="ml-4 flex-shrink-0">
                     <button @click="show = false"
                             class="inline-flex {{ $config['text'] }} hover:opacity-75 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 rounded-md">
-                        <span class="sr-only">{{ __('Close') }}</span>
+                        <span class="sr-only">{{ __('ui.close') }}</span>
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                   d="M6 18L18 6M6 6l12 12"></path>

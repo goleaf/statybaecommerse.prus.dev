@@ -66,7 +66,7 @@ class CustomerForm
                             ->label(__('messages.active'))
                             ->required(),
                         KeyValue::make('metadata')
-                            ->label(__('messages.Value')),
+                            ->label(__('messages.value')),
                     ])
                     ->columnSpanFull(),
             ]);

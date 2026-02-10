@@ -6,9 +6,8 @@ namespace Database\Seeders;
 
 use App\Models\News;
 use App\Models\NewsImage;
-use Illuminate\Database\Seeder;
 
-final class NewsImageSeeder extends Seeder
+final class NewsImageSeeder extends BaseSeeder
 {
     public function run(): void
     {

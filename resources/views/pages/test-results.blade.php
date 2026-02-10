@@ -190,7 +190,7 @@
                                                       class="text-sm font-semibold text-white">{{ $presentation['label'] }}</span>
                                             </dt>
                                             <dd class="text-xs text-slate-400">
-                                                {{ __('frontend.test_results.status.legend.descriptions.' . $status) }}
+                                                {{ __(sprintf('frontend.test_results.status.legend.descriptions.%s', $status)) }}
                                             </dd>
                                         </div>
                                     @endforeach

@@ -23,7 +23,9 @@ it('has required columns', function () {
         ->toContain('sku')
         ->toContain('price')
         ->toContain('manage_stock')
-        ->toContain('stock_quantity');
+        ->toContain('stock_quantity')
+        ->toContain('image_url')
+        ->toContain('image');
 });
 
 it('has correct notification body', function () {
@@ -34,4 +36,11 @@ it('has correct notification body', function () {
 
     expect($body)->toContain('Your product import has completed')
         ->toContain('5 rows imported');
+});
+
+it('includes image columns in grouped mapping', function () {
+    $groups = ProductImporter::getColumnGroups();
+
+    expect($groups['Other'] ?? [])->toContain('image_url')
+        ->toContain('image');
 });

@@ -179,7 +179,7 @@
                                           d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
                                     </path>
                                 </svg>
-                                {{ __('common.Adding...') }}
+                                {{ __('common.adding') }}
                             </span>
                         </button>
 
@@ -192,7 +192,7 @@
                                           d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
                                     </path>
                                 </svg>
-                                {{ __('common.Wishlist') }}
+                                {{ __('common.wishlist') }}
                             </button>
 
                             <button @click="compareProduct()"
@@ -202,11 +202,11 @@
                                           d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
                                     </path>
                                 </svg>
-                                {{ __('common.Compare') }}
+                                {{ __('common.compare') }}
                             </button>
                         </div>
 
-                        <a href="{{ route('localized.products.show', ['locale' => app()->getLocale(), 'product' => $product->trans('slug') ?? $product->slug ?? $product->getKey()]) }}"
+                        <a href="{{ route('localized.products.show', ['locale' => app()->getLocale(), 'product' => $product->trans('ui.slug') ?? $product->slug ?? $product->getKey()]) }}"
                            class="w-full text-center py-3 text-blue-600 hover:text-blue-700 font-medium">
                             {{ __('messages.view_product') }}
                         </a>
@@ -249,7 +249,7 @@
 
                     {{-- Shipping Info --}}
                     <div class="bg-gray-50 rounded-xl p-4">
-                        <h4 class="font-semibold text-gray-900 mb-2">{{ __('messages.Shipping') }}</h4>
+                        <h4 class="font-semibold text-gray-900 mb-2">{{ __('messages.shipping') }}</h4>
                         <div class="space-y-2 text-sm text-gray-600">
                             <div class="flex items-center gap-2">
                                 <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor"

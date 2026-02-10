@@ -32,8 +32,8 @@ class Addresses extends Component
             // Check if user owns this address
             if ($address->user_id !== Auth::id()) {
                 Notification::make()
-                    ->title(__('Unauthorized'))
-                    ->body(__('You are not authorized to delete this address.'))
+                    ->title(__('messages.unauthorized'))
+                    ->body(__('messages.you_are_not_authorized_to_delete_this_address'))
                     ->danger()
                     ->send();
 
@@ -43,16 +43,16 @@ class Addresses extends Component
             $address->delete();
 
             Notification::make()
-                ->title(__('Address deleted successfully'))
-                ->body(__('The address has been removed from your list.'))
+                ->title(__('messages.address_deleted_successfully'))
+                ->body(__('messages.the_address_has_been_removed_from_your_list'))
                 ->success()
                 ->send();
 
             $this->dispatch('addresses-updated');
         } catch (Exception $e) {
             Notification::make()
-                ->title(__('Error'))
-                ->body(__('Failed to delete address. Please try again.'))
+                ->title(__('messages.error'))
+                ->body(__('messages.failed_to_delete_address_please_try_again'))
                 ->danger()
                 ->send();
         }
@@ -69,8 +69,8 @@ class Addresses extends Component
             // Check if user owns this address
             if ($address->user_id !== Auth::id()) {
                 Notification::make()
-                    ->title(__('Unauthorized'))
-                    ->body(__('You are not authorized to modify this address.'))
+                    ->title(__('messages.unauthorized'))
+                    ->body(__('messages.you_are_not_authorized_to_modify_this_address'))
                     ->danger()
                     ->send();
 
@@ -87,16 +87,16 @@ class Addresses extends Component
             $address->update(['is_default' => true]);
 
             Notification::make()
-                ->title(__('Default address updated'))
-                ->body(__('The address has been set as your default :type address.', ['type' => $address->type]))
+                ->title(__('messages.default_address_updated'))
+                ->body(__('messages.the_address_has_been_set_as_your_default_type_address', ['type' => $address->type]))
                 ->success()
                 ->send();
 
             $this->dispatch('addresses-updated');
         } catch (Exception $e) {
             Notification::make()
-                ->title(__('Error'))
-                ->body(__('Failed to set default address. Please try again.'))
+                ->title(__('messages.error'))
+                ->body(__('messages.failed_to_set_default_address_please_try_again'))
                 ->danger()
                 ->send();
         }
@@ -122,6 +122,6 @@ class Addresses extends Component
 
         return view('livewire.pages.account.addresses', [
             'addresses' => $addresses,
-        ])->title(__('My addresses'));
+        ])->title(__('messages.my_addresses'));
     }
 }

@@ -4,14 +4,16 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ProductResource\Tables;
 
+use App\Enums\ExportType;
+use App\Filament\Actions\RequestExportBulkAction;
 use App\Models\Product;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
-use Filament\Tables\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
@@ -27,9 +29,10 @@ class ProductsTable
         return $table
             ->modifyQueryUsing(fn ($query) => $query->with(['brand', 'primaryImage']))
             ->columns([
-                ImageColumn::make('primaryImage.path')
+                ImageColumn::make('main_image')
                     ->label(__('messages.image'))
                     ->disk('public')
+                    ->getStateUsing(static fn (Product $record): ?string => $record->primaryImage?->path)
                     ->circular(),
                 TextColumn::make('name')
                     ->label(__('messages.name'))
@@ -122,6 +125,7 @@ class ProductsTable
                 DeleteAction::make(),
             ])
             ->bulkActions([
+                RequestExportBulkAction::make(ExportType::PRODUCTS),
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                     BulkAction::make('publish')

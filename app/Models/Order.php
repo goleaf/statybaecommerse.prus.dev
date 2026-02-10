@@ -59,7 +59,7 @@ final class Order extends Model implements HasDocuments
 {
     use HasFactory, HasTranslations, InteractsWithDocuments, SoftDeletes;
 
-    public array $translatable = ['notes', 'billing_address', 'shipping_address'];
+    public array $translatable = ['notes'];
 
     protected $fillable = ['number', 'user_id', 'status', 'locale', 'subtotal', 'tax_amount', 'shipping_amount', 'discount_amount', 'total', 'currency', 'billing_address', 'shipping_address', 'notes', 'shipped_at', 'delivered_at', 'channel_id', 'shipping_option_id', 'partner_id', 'coupon_id', 'payment_status', 'payment_state', 'payment_method', 'payment_reference'];
 

@@ -3,20 +3,20 @@
 declare(strict_types=1);
 
 return [
-    'industry'       => [
+    'industry' => [
         'construction'  => 'Statyba',
-        'technology'    => 'Technologijos',
-        'manufacturing' => 'Gamyba',
-        'retail'        => 'Mažmeninė prekyba',
-        'finance'       => 'Finansai',
         'education'     => 'Švietimas',
+        'finance'       => 'Finansai',
         'healthcare'    => 'Sveikatos priežiūra',
+        'manufacturing' => 'Gamyba',
         'other'         => 'Kita',
+        'retail'        => 'Mažmeninė prekyba',
+        'technology'    => 'Technologijos',
     ],
     'organization_type' => [
         'company'    => 'Įmonė',
-        'team'       => 'Komanda',
         'department' => 'Skyrius',
+        'team'       => 'Komanda',
     ],
     'payment_method' => [
         'apple_pay'        => 'Apple Pay',

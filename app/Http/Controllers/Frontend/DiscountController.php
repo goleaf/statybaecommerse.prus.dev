@@ -48,7 +48,7 @@ final class DiscountController extends Controller
 
         if (! $expectsJson && empty($cart)) {
             return redirect()->route('frontend.cart.index')->withErrors([
-                'cart' => __('Add items to your cart before applying a coupon.'),
+                'cart' => __('messages.add_items_to_your_cart_before_applying_a_coupon'),
             ]);
         }
 
@@ -64,12 +64,12 @@ final class DiscountController extends Controller
             if ($expectsJson) {
                 return response()->json([
                     'success' => false,
-                    'message' => __('The provided coupon code is not valid.'),
+                    'message' => __('messages.the_provided_coupon_code_is_not_valid'),
                 ], 422);
             }
 
             return redirect()->back()->withErrors([
-                'code' => __('The provided coupon code is not valid.'),
+                'code' => __('messages.the_provided_coupon_code_is_not_valid'),
             ]);
         }
 
@@ -81,14 +81,14 @@ final class DiscountController extends Controller
             if ($expectsJson) {
                 return response()->json([
                     'success' => false,
-                    'message' => __('This coupon requires a minimum order amount of :amount.', [
+                    'message' => __('messages.this_coupon_requires_a_minimum_order_amount_of_amount', [
                         'amount' => app_money_format($minimumAmount),
                     ]),
                 ], 422);
             }
 
             return redirect()->back()->withErrors([
-                'code' => __('This coupon requires a minimum order amount of :amount.', ['amount' => app_money_format($coupon->minimum_amount ?? 0)]),
+                'code' => __('messages.this_coupon_requires_a_minimum_order_amount_of_amount', ['amount' => app_money_format($coupon->minimum_amount ?? 0)]),
             ]);
         }
 

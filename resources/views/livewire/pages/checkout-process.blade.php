@@ -11,11 +11,11 @@
             'description' => __('frontend.contact_billing_details'),
         ],
         2 => [
-            'label'       => __('messages.Shipping'),
+            'label'       => __('messages.shipping'),
             'description' => __('frontend.delivery_options'),
         ],
         3 => [
-            'label'       => __('messages.Payment'),
+            'label'       => __('messages.payment'),
             'description' => __('frontend.review_pay'),
         ],
     ];
@@ -30,7 +30,7 @@
             </p>
         </header>
 
-        <nav aria-label="{{ __('frontend.checkout_steps') }}">
+        <nav aria-label="{{ __('frontend.checkout_steps.progress') }}">
             <ol class="flex flex-col gap-6 sm:flex-row sm:items-center sm:gap-8">
                 @foreach ($steps as $number => $meta)
                     @php

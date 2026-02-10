@@ -63,7 +63,7 @@ final class ForgotPassword extends Component
                     $this->captchaResponse = '';
 
                     throw ValidationException::withMessages([
-                        'captchaResponse' => __('The security check response did not match. Please try again.'),
+                        'captchaResponse' => __('messages.the_security_check_response_did_not_match_please_try_again'),
                     ]);
                 }
             } else {

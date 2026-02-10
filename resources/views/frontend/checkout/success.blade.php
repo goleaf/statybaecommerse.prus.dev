@@ -16,7 +16,7 @@
                     <dd>{{ app_money_format($order->subtotal) }}</dd>
                 </div>
                 <div class="flex justify-between">
-                    <dt>{{ __('Tax') }}</dt>
+                    <dt>{{ __('ui.tax') }}</dt>
                     <dd>{{ app_money_format($order->tax_amount) }}</dd>
                 </div>
                 <div class="flex justify-between">

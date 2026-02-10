@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\OrderResource\Tables;
 
+use App\Enums\ExportType;
+use App\Filament\Actions\RequestExportBulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -39,6 +41,7 @@ class OrdersTable
                     ->sortable(),
                 TextColumn::make('payment_status')
                     ->label(__('messages.payment_status'))
+                    ->formatStateUsing(fn ($state) => $state instanceof \App\Enums\PaymentStatus ? $state->getLabel() : $state)
                     ->badge()
                     ->searchable(),
                 TextColumn::make('created_at')
@@ -67,6 +70,7 @@ class OrdersTable
                 EditAction::make(),
             ])
             ->bulkActions([ // Changed to bulkActions as it makes more sense for BulkActionGroup
+                RequestExportBulkAction::make(ExportType::ORDERS),
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                     ForceDeleteBulkAction::make(),

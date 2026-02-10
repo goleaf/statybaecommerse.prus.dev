@@ -58,7 +58,7 @@ final class AddressTableWidget extends BaseWidget
 
                             $fallback = __('translations.unknown');
 
-                            return $fallback === 'translations.unknown' ? __('Unknown') : $fallback;
+                            return $fallback === 'translations.unknown' ? __('ui.unknown') : $fallback;
                         }
                     )
                     ->badge()

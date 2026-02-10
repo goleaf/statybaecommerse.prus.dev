@@ -12,7 +12,7 @@
                 @if ($campaign->banner_image)
                     <div class="aspect-w-16 aspect-h-9">
                         <img src="{{ $campaign->getBannerUrl() }}"
-                             alt="{{ $campaign->trans('banner_alt_text') }}"
+                             alt="{{ $campaign->trans('ui.banner_alt_text') }}"
                              class="w-full h-48 object-cover">
                     </div>
                 @endif
@@ -27,7 +27,7 @@
                         @elseif($campaign->type === 'banner') bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200
                         @elseif($campaign->type === 'popup') bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200
                         @else bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 @endif">
-                            {{ __('campaigns.types.' . $campaign->type) }}
+                            {{ __(sprintf('campaigns.types.%s', $campaign->type)) }}
                         </span>
 
                         @if ($campaign->is_featured)
@@ -40,13 +40,13 @@
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
                         <a href="{{ route('frontend.campaigns.show', $campaign) }}"
                            class="hover:text-blue-600 dark:hover:text-blue-400">
-                            {{ $campaign->trans('name') }}
+                            {{ $campaign->trans('ui.name') }}
                         </a>
                     </h3>
 
-                    @if ($campaign->trans('description'))
+                    @if ($campaign->trans('ui.description'))
                         <p class="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-3">
-                            {{ \Illuminate\Support\Str::limit($campaign->trans('description'), 120) }}
+                            {{ \Illuminate\Support\Str::limit($campaign->trans('ui.description'), 120) }}
                         </p>
                     @endif
 

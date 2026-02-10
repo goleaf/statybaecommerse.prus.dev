@@ -9,7 +9,6 @@ use App\Filament\Widgets\SliderManagementWidget;
 use App\Models\Slider;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
-use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -32,8 +31,6 @@ class ListSliders extends ListRecords
     {
         return [
             CreateAction::make(),
-            $this->bulkImportAction(),
-            $this->exportSlidersAction(),
             $this->settingsAction(),
             $this->toggleAllSlidersAction(),
         ];
@@ -59,56 +56,6 @@ class ListSliders extends ListRecords
 
                 Notification::make()
                     ->title($message)
-                    ->success()
-                    ->send();
-            });
-    }
-
-    public function bulkImportAction(): Action
-    {
-        return Action::make('bulkImport')
-            ->label(__('translations.bulk_import'))
-            ->color('info')
-            ->form([
-                FileUpload::make('import_file')
-                    ->label(__('translations.import_file'))
-                    ->acceptedFileTypes(['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'text/csv'])
-                    ->required(),
-                Toggle::make('update_existing')
-                    ->label(__('translations.update_existing'))
-                    ->default(false),
-            ])
-            ->action(function (array $data): void {
-                // Handle bulk import logic here
-                Notification::make()
-                    ->title(__('translations.import_started'))
-                    ->success()
-                    ->send();
-            });
-    }
-
-    public function exportSlidersAction(): Action
-    {
-        return Action::make('exportSliders')
-            ->label(__('translations.export_sliders'))
-            ->color('success')
-            ->form([
-                Select::make('format')
-                    ->label(__('translations.export_format'))
-                    ->options([
-                        'excel' => __('translations.excel'),
-                        'csv'   => __('translations.csv'),
-                        'json'  => __('translations.json'),
-                    ])
-                    ->default('excel'),
-                Toggle::make('include_images')
-                    ->label(__('translations.include_images'))
-                    ->default(false),
-            ])
-            ->action(function (array $data): void {
-                // Handle export logic here
-                Notification::make()
-                    ->title(__('translations.export_started'))
                     ->success()
                     ->send();
             });

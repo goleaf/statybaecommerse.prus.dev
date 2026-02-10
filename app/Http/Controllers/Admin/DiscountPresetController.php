@@ -73,6 +73,6 @@ final class DiscountPresetController extends Controller
         // Redirect back to the index with a friendly flash message.
         return redirect()
             ->route('admin.discounts.presets')
-            ->with('status', __('Discount preset saved successfully.'));
+            ->with('status', __('messages.discount_preset_saved_successfully'));
     }
 }

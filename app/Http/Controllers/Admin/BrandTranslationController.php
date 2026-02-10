@@ -107,7 +107,7 @@ final class BrandTranslationController extends Controller
         $name = trim($validated['name']);
         if ($name === '') {
             return back()->withInput()->withErrors([
-                'name' => __('messages.validation, [', ['attribute' => 'name']),
+                'name' => __('validation.required', ['attribute' => 'name']),
             ]);
         }
 
@@ -175,7 +175,7 @@ final class BrandTranslationController extends Controller
         );
 
         // Redirect back to the previous page with user-facing feedback about the successful operation.
-        return back()->with('status', __('Brand translation updated successfully.'));
+        return back()->with('status', __('messages.brand_translation_updated_successfully'));
     }
 
     /**

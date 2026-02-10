@@ -20,20 +20,20 @@ final class NewsCategoryStatsWidget extends BaseWidget
         $averageNewsPerCategory = 0;
 
         return [
-            Stat::make(__('Total Categories'), $totalCategories)
-                ->description(__('All news categories'))
+            Stat::make(__('ui.total_categories'), $totalCategories)
+                ->description(__('ui.all_news_categories'))
                 ->descriptionIcon('heroicon-m-tag')
                 ->color('primary'),
-            Stat::make(__('Visible Categories'), $visibleCategories)
-                ->description(__('Publicly visible categories'))
+            Stat::make(__('ui.visible_categories'), $visibleCategories)
+                ->description(__('ui.publicly_visible_categories'))
                 ->descriptionIcon('heroicon-m-eye')
                 ->color('success'),
-            Stat::make(__('Categories with News'), $categoriesWithNews)
-                ->description(__('Categories containing news articles'))
+            Stat::make(__('ui.categories_with_news'), $categoriesWithNews)
+                ->description(__('ui.categories_containing_news_articles'))
                 ->descriptionIcon('heroicon-m-document-text')
                 ->color('info'),
-            Stat::make(__('Avg News per Category'), $averageNewsPerCategory)
-                ->description(__('Average news articles per category'))
+            Stat::make(__('ui.avg_news_per_category'), $averageNewsPerCategory)
+                ->description(__('ui.average_news_articles_per_category'))
                 ->descriptionIcon('heroicon-m-chart-bar')
                 ->color('warning'),
         ];

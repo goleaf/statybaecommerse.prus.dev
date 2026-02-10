@@ -108,10 +108,10 @@ class LocationInfolist
                             ]),
                     ])
                     ->columnSpanFull(),
-                Section::make(__('messages.Hours'))
+                Section::make(__('messages.hours'))
                     ->schema([
                         TextEntry::make('opening_hours')
-                            ->label(__('messages.Hours'))
+                            ->label(__('messages.hours'))
                             ->formatStateUsing(static function ($state): string {
                                 if (blank($state)) {
                                     return '-';

@@ -15,6 +15,11 @@ class EditDocumentTemplate extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            Actions\Action::make('preview')
+                ->label(__('admin.document_templates.actions.preview'))
+                ->icon('heroicon-o-eye')
+                ->url(fn (): string => route('admin.document-templates.preview', $this->record))
+                ->openUrlInNewTab(),
             Actions\ViewAction::make(),
             Actions\DeleteAction::make(),
         ];

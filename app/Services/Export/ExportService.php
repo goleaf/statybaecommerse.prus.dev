@@ -19,9 +19,8 @@ use App\Services\Export\Exporters\OrderExport;
 use App\Services\Export\Exporters\ProductExport;
 use App\Services\Export\Exporters\UserExport;
 use App\Services\Export\Writers\CsvExportWriter;
-use App\Services\Export\Writers\PdfExportWriter;
-use App\Services\Export\Writers\XlsxExportWriter;
 use App\Support\Exports\ExportUrlGenerator;
+use App\Support\ImportExport\ProgressCounter;
 use App\Support\Storage\SecureStorage;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Database\Eloquent\Builder;
@@ -65,9 +64,7 @@ final class ExportService
         $this->downloadUrlTtl = $this->resolveInteger($config['download_url_ttl'] ?? null, 60);
 
         $this->writerMap = [
-            'csv'  => CsvExportWriter::class,
-            'xlsx' => XlsxExportWriter::class,
-            'pdf'  => PdfExportWriter::class,
+            'csv' => CsvExportWriter::class,
         ];
 
         foreach (($config['formats'] ?? []) as $key => $writer) {
@@ -75,7 +72,11 @@ final class ExportService
                 continue;
             }
 
-            $this->writerMap[Str::lower($key)] = $writer;
+            if (Str::lower($key) !== 'csv') {
+                continue;
+            }
+
+            $this->writerMap['csv'] = $writer;
         }
     }
 
@@ -102,13 +103,6 @@ final class ExportService
             return $model;
         }
 
-        $model->forceFill([
-            'status'         => ExportStatus::Processing,
-            'processed_rows' => 0,
-            'failure_reason' => null,
-            'failed_at'      => null,
-        ])->save();
-
         $disk = $model->artifact_disk ?? $this->disk;
         $path = null;
 
@@ -116,6 +110,16 @@ final class ExportService
             $exportable = $this->resolveExportable($model->exportable_type);
             $columns = $this->resolveColumns($exportable, $model->columns ?? []);
             $query = $this->buildQuery($exportable, $model->exportable_options ?? []);
+            $total = ProgressCounter::normalizeTotal((int) (clone $query)->count());
+
+            $model->forceFill([
+                'status'         => ExportStatus::Processing,
+                'processed_rows' => 0,
+                'total_rows'     => $total,
+                'failure_reason' => null,
+                'failed_at'      => null,
+            ])->save();
+
             $writer = $this->makeWriter($model->format);
             $headers = Collection::make($columns)
                 ->map(static fn (ExportColumn $column): string => $column->label)
@@ -126,24 +130,29 @@ final class ExportService
 
             $writer->open($disk, $path, $headers);
 
-            $total = 0;
-            $query->chunkById($this->chunkSize, function (Collection $chunk) use (&$total, $writer, $exportable, $columns): void {
+            $processed = 0;
+            $query->chunkById($this->chunkSize, function (Collection $chunk) use (&$processed, $total, $writer, $exportable, $columns, $model): void {
                 /** @var Model $record */
                 foreach ($chunk as $record) {
                     $writer->append($exportable->map($record, $columns));
-                    $total++;
+                    $processed++;
                 }
+
+                $this->persistExportProgress($model, $processed, $total);
             });
 
             $writer->close();
+
+            $safeTotal = ProgressCounter::normalizeTotal($total);
+            $safeProcessed = ProgressCounter::normalizeProcessed($processed, $safeTotal);
 
             $model->forceFill([
                 'status'            => ExportStatus::Completed,
                 'artifact_path'     => $path,
                 'artifact_filename' => $this->buildFileName($exportable, $model),
                 'completed_at'      => now(),
-                'total_rows'        => $total,
-                'processed_rows'    => $total,
+                'total_rows'        => $safeTotal,
+                'processed_rows'    => $safeProcessed,
             ])->save();
 
             $this->notifySuccess($model);
@@ -167,6 +176,17 @@ final class ExportService
         }
 
         return $model;
+    }
+
+    private function persistExportProgress(Export $export, int $processed, int $total): void
+    {
+        $safeTotal = ProgressCounter::normalizeTotal($total);
+        $safeProcessed = ProgressCounter::normalizeProcessed($processed, $safeTotal);
+
+        $export->forceFill([
+            'processed_rows' => $safeProcessed,
+            'total_rows'     => $safeTotal,
+        ])->save();
     }
 
     private function queueExportable(Exportable $exportable, ExportRequestData $data, ?User $user = null): Export

@@ -24,7 +24,7 @@ class CustomerInfolist
                             ->label(__('messages.phone')),
                     ])->columns(2),
 
-                Section::make(__('messages.Profile'))
+                Section::make(__('messages.profile'))
                     ->schema([
                         TextEntry::make('first_name')
                             ->label(__('messages.first_name')),

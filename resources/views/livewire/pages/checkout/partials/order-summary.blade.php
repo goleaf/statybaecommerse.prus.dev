@@ -60,7 +60,7 @@
         </div>
 
         <div class="flex justify-between">
-            <dt>{{ __('Tax') }}</dt>
+            <dt>{{ __('ui.tax') }}</dt>
             <dd class="font-medium text-gray-900">
                 {{ $summary['formatted_tax_amount'] ?? app_money_format($summary['tax_amount'] ?? 0) }}
             </dd>

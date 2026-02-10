@@ -26,7 +26,6 @@ use Spatie\Translatable\HasTranslations;
  * @property int|null                          $product_id
  * @property int|null                          $variant_id
  * @property float|null                        $net_amount
- * @property float|null                        $compare_amount
  * @property float|null                        $price
  * @property array<string, string>|string|null $name
  * @property array<string, string>|string|null $description
@@ -40,7 +39,6 @@ use Spatie\Translatable\HasTranslations;
  * @property \Illuminate\Support\Carbon|null   $valid_until
  * @property-read string                                    $display_name
  * @property-read float                                     $effective_price
- * @property-read float|null                                $savings_amount
  * @property-read PriceList|null                            $priceList
  * @property-read Product|null                              $product
  * @property-read ProductVariant|null                       $variant
@@ -78,7 +76,6 @@ final class PriceListItem extends Model
         'variant_id',
         'price',
         'net_amount',
-        'compare_amount',
         'name',
         'description',
         'notes',
@@ -103,16 +100,15 @@ final class PriceListItem extends Model
     {
         // Cast the numeric and date attributes to ensure consistent data when retrieved from persistence.
         return [
-            'price'          => 'decimal:2',
-            'net_amount'     => 'decimal:4',
-            'compare_amount' => 'decimal:4',
-            'is_active'      => 'boolean',
-            'is_featured'    => 'boolean',
-            'priority'       => 'integer',
-            'min_quantity'   => 'integer',
-            'max_quantity'   => 'integer',
-            'valid_from'     => 'datetime',
-            'valid_until'    => 'datetime',
+            'price'        => 'decimal:2',
+            'net_amount'   => 'decimal:4',
+            'is_active'    => 'boolean',
+            'is_featured'  => 'boolean',
+            'priority'     => 'integer',
+            'min_quantity' => 'integer',
+            'max_quantity' => 'integer',
+            'valid_from'   => 'datetime',
+            'valid_until'  => 'datetime',
         ];
     }
 
@@ -162,18 +158,6 @@ final class PriceListItem extends Model
     }
 
     /**
-     * Handle getDiscountPercentageAttribute functionality with proper error handling.
-     */
-    public function getDiscountPercentageAttribute(): ?int
-    {
-        if (! $this->compare_amount || $this->compare_amount <= $this->net_amount) {
-            return null;
-        }
-
-        return (int) round(($this->compare_amount - $this->net_amount) / $this->compare_amount * 100);
-    }
-
-    /**
      * Handle getDisplayNameAttribute functionality with proper error handling.
      */
     public function getDisplayNameAttribute(): string
@@ -217,18 +201,6 @@ final class PriceListItem extends Model
     }
 
     /**
-     * Handle getSavingsAmountAttribute functionality with proper error handling.
-     */
-    public function getSavingsAmountAttribute(): ?float
-    {
-        if (! $this->compare_amount || $this->compare_amount <= $this->net_amount) {
-            return null;
-        }
-
-        return (float) ($this->compare_amount - $this->net_amount);
-    }
-
-    /**
      * Handle isActive functionality with proper error handling.
      */
     public function isActive(): bool
@@ -266,9 +238,6 @@ final class PriceListItem extends Model
     /**
      * Handle scopeActive functionality with proper error handling.
      *
-     * @param mixed $query
-     */
-    /**
      * @param  Builder<self> $query
      * @return Builder<self>
      */
@@ -280,9 +249,6 @@ final class PriceListItem extends Model
     /**
      * Handle scopeValid functionality with proper error handling.
      *
-     * @param mixed $query
-     */
-    /**
      * @param  Builder<self> $query
      * @return Builder<self>
      */
@@ -300,9 +266,6 @@ final class PriceListItem extends Model
     /**
      * Handle scopeByPriority functionality with proper error handling.
      *
-     * @param mixed $query
-     */
-    /**
      * @param  Builder<self> $query
      * @return Builder<self>
      */
@@ -315,9 +278,6 @@ final class PriceListItem extends Model
     /**
      * Handle scopeForProduct functionality with proper error handling.
      *
-     * @param mixed $query
-     */
-    /**
      * @param  Builder<self> $query
      * @return Builder<self>
      */
@@ -329,9 +289,6 @@ final class PriceListItem extends Model
     /**
      * Handle scopeForVariant functionality with proper error handling.
      *
-     * @param mixed $query
-     */
-    /**
      * @param  Builder<self> $query
      * @return Builder<self>
      */
@@ -343,29 +300,12 @@ final class PriceListItem extends Model
     /**
      * Handle scopeInPriceRange functionality with proper error handling.
      *
-     * @param mixed $query
-     */
-    /**
      * @param  Builder<self> $query
      * @return Builder<self>
      */
     public function scopeInPriceRange(Builder $query, float $minPrice, float $maxPrice): Builder
     {
         return $query->whereBetween('net_amount', [$minPrice, $maxPrice]);
-    }
-
-    /**
-     * Handle scopeWithDiscount functionality with proper error handling.
-     *
-     * @param mixed $query
-     */
-    /**
-     * @param  Builder<self> $query
-     * @return Builder<self>
-     */
-    public function scopeWithDiscount(Builder $query): Builder
-    {
-        return $query->whereNotNull('compare_amount')->whereColumn('compare_amount', '>', 'net_amount');
     }
 
     /**

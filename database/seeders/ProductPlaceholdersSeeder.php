@@ -6,11 +6,10 @@ namespace Database\Seeders;
 
 use App\Models\Product;
 use App\Services\Images\GradientImageService;
-use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
-final class ProductPlaceholdersSeeder extends Seeder
+final class ProductPlaceholdersSeeder extends BaseSeeder
 {
     public function run(): void
     {

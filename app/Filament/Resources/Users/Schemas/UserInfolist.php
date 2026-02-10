@@ -15,7 +15,7 @@ class UserInfolist
     {
         return $schema
             ->components([
-                Section::make(__('messages.Profile'))
+                Section::make(__('messages.profile'))
                     ->schema([
                         TextEntry::make('first_name')
                             ->label(__('messages.first_name')),
@@ -26,7 +26,7 @@ class UserInfolist
                         TextEntry::make('phone_number')
                             ->label(__('messages.phone')),
                         TextEntry::make('gender')
-                            ->label(__('messages.Gender'))
+                            ->label(__('messages.gender'))
                             ->formatStateUsing(fn ($state) => match ($state) {
                                 'male'   => __('admin.gender.male'),
                                 'female' => __('admin.gender.female'),

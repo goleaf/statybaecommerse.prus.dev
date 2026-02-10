@@ -17,8 +17,8 @@
 
 @extends('errors.layout', [
     'code' => '503',
-    'title' => __('frontend.errors.503.title'),
-    'description' => __('frontend.errors.503.description'),
+    'title' => __('frontend.errors.error_503.title'),
+    'description' => __('frontend.errors.error_503.description'),
     'primaryAction' => [
         'label' => __('frontend.errors.actions.view_status_page'),
         'url' => $statusUrl,
@@ -27,8 +27,8 @@
         'label' => __('frontend.errors.actions.return_home'),
         'url' => $homeUrl,
     ],
-    'supportTitle' => __('frontend.errors.503.support_title'),
-    'supportDescription' => __('frontend.errors.503.support_description'),
+    'supportTitle' => __('frontend.errors.error_503.support_title'),
+    'supportDescription' => __('frontend.errors.error_503.support_description'),
     'links' => [
         [
             'label' => __('frontend.errors.actions.browse_products'),

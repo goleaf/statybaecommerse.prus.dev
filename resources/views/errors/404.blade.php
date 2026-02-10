@@ -30,9 +30,9 @@
                         ->limit(6)
                         ->get()
                         ->map(static function (Category $category) use ($locale) {
-                            $label = (string) ($category->trans('name', $locale) ?? ($category->name ?? ''));
+                            $label = (string) ($category->trans('ui.name', $locale) ?? ($category->name ?? ''));
                             $description =
-                                (string) ($category->trans('short_description', $locale) ??
+                                (string) ($category->trans('ui.short_description', $locale) ??
                                     ($category->short_description ?? ''));
 
                             return [
@@ -82,14 +82,14 @@
                 ],
                 $resolvedSupportEmail
                     ? [
-                        'label' => __('frontend.errors.404.actions.email_us'),
+                        'label' => __('frontend.errors.error_404.actions.email_us'),
                         'url' => 'mailto:' . $resolvedSupportEmail,
                         'style' => 'secondary',
                     ]
                     : null,
                 Route::has('localized.contact.index')
                     ? [
-                        'label' => __('frontend.errors.404.actions.visit_contact'),
+                        'label' => __('frontend.errors.error_404.actions.visit_contact'),
                         'url' => $contactUrl . '#contact-form',
                         'style' => 'secondary',
                     ]
@@ -102,13 +102,13 @@
 
 @extends('errors.4xx', [
     'code' => '404',
-    'title' => __('frontend.errors.404.title'),
-    'description' => __('frontend.errors.404.description'),
+    'title' => __('frontend.errors.error_404.title'),
+    'description' => __('frontend.errors.error_404.description'),
     'showSearch' => true,
-    'searchTitle' => __('frontend.errors.404.search_title'),
-    'searchPlaceholder' => __('frontend.errors.404.search_placeholder'),
+    'searchTitle' => __('frontend.errors.error_404.search_title'),
+    'searchPlaceholder' => __('frontend.errors.error_404.search_placeholder'),
     'topCategories' => $topCategories->toArray(),
-    'topCategoriesTitle' => __('frontend.errors.404.top_categories_title'),
+    'topCategoriesTitle' => __('frontend.errors.error_404.top_categories_title'),
     'primaryAction' => [
         'label' => __('frontend.errors.actions.go_home'),
         'url' => route('localized.home', ['locale' => $locale]) ?? url('/'),
@@ -117,11 +117,11 @@
         'label' => __('frontend.errors.actions.go_back'),
         'type' => 'back',
     ],
-    'supportTitle' => __('frontend.errors.404.support_title'),
-    'supportDescription' => __('frontend.errors.404.support_description'),
+    'supportTitle' => __('frontend.errors.error_404.support_title'),
+    'supportDescription' => __('frontend.errors.error_404.support_description'),
     'contactCta' => [
-        'title' => __('frontend.errors.404.contact_cta.title'),
-        'description' => __('frontend.errors.404.contact_cta.description'),
+        'title' => __('frontend.errors.error_404.contact_cta.title'),
+        'description' => __('frontend.errors.error_404.contact_cta.description'),
         'actions' => $contactActions,
     ],
     'links' => [

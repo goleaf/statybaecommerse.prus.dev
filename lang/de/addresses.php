@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 return [
     'countries' => [
+        'de' => 'Deutschland',
+        'ee' => 'Estland',
         'lt' => 'Litauen',
         'lv' => 'Lettland',
-        'ee' => 'Estland',
         'pl' => 'Polen',
-        'de' => 'Deutschland',
     ],
 ];

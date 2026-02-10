@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Tests\Feature\Filament\Importers;
 
 use App\Filament\Imports\BrandImporter;
-use App\Models\Brand;
 use App\Models\User;
 use Filament\Actions\Imports\Jobs\ImportCsv;
 use Filament\Actions\Imports\Models\Import;
@@ -16,7 +15,7 @@ uses(RefreshDatabase::class);
 it('can import brands', function () {
     $user = User::factory()->admin()->create();
 
-    $import = new Import();
+    $import = new Import;
     $import->user()->associate($user);
     $import->file_name = 'brands.csv';
     $import->file_path = 'brands.csv';
@@ -25,14 +24,14 @@ it('can import brands', function () {
     $import->save();
 
     $row = [
-        'name' => 'Imported Brand',
-        'slug' => 'imported-brand',
+        'name'       => 'Imported Brand',
+        'slug'       => 'imported-brand',
         'is_enabled' => '1',
     ];
 
     $columnMap = [
-        'name' => 'name',
-        'slug' => 'slug',
+        'name'       => 'name',
+        'slug'       => 'slug',
         'is_enabled' => 'is_enabled',
     ];
 

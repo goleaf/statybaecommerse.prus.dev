@@ -7,9 +7,8 @@ namespace Database\Seeders;
 use App\Models\Category;
 use App\Models\Menu;
 use App\Models\MenuItem;
-use Illuminate\Database\Seeder;
 
-final class MenuSeeder extends Seeder
+final class MenuSeeder extends BaseSeeder
 {
     public function run(): void
     {

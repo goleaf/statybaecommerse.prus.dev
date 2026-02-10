@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace App\Services\ImportExport;
 
 use App\Models\ImportRowResult;
+use App\Support\ImportExport\ProgressCounter;
 use Filament\Actions\Imports\Exceptions\RowImportFailedException;
 use Filament\Actions\Imports\ImportColumn;
 use Filament\Actions\Imports\Importer;
 use Filament\Actions\Imports\Models\Import;
-use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -89,29 +89,29 @@ final class CsvImportProcessor
                 $processedRows++;
             }
 
-            $import::query()
+            /** @var Import|null $lockedImport */
+            $lockedImport = $import::query()
                 ->whereKey($import)
                 ->lockForUpdate()
-                ->update([
-                    'processed_rows'  => new Expression('processed_rows + ' . $processedRows),
-                    'successful_rows' => new Expression('successful_rows + ' . $successfulRows),
-                ]);
+                ->first();
 
-            $import::query()
-                ->whereKey($import)
-                ->whereColumn('processed_rows', '>', 'total_rows')
-                ->lockForUpdate()
-                ->update([
-                    'processed_rows' => new Expression('total_rows'),
-                ]);
+            if ($lockedImport) {
+                $totalRows = ProgressCounter::normalizeTotal((int) ($lockedImport->total_rows ?? 0));
+                $nextProcessedRows = ProgressCounter::normalizeProcessed(
+                    (int) ($lockedImport->processed_rows ?? 0) + $processedRows,
+                    $totalRows,
+                );
+                $nextSuccessfulRows = ProgressCounter::normalizeSuccessful(
+                    (int) ($lockedImport->successful_rows ?? 0) + $successfulRows,
+                    $nextProcessedRows,
+                    $totalRows,
+                );
 
-            $import::query()
-                ->whereKey($import)
-                ->whereColumn('successful_rows', '>', 'total_rows')
-                ->lockForUpdate()
-                ->update([
-                    'successful_rows' => new Expression('total_rows'),
-                ]);
+                $lockedImport->forceFill([
+                    'processed_rows'  => $nextProcessedRows,
+                    'successful_rows' => $nextSuccessfulRows,
+                ])->save();
+            }
 
             if (count($failedRows)) {
                 $import->failedRows()->createMany($failedRows);

@@ -45,4 +45,3 @@ it('unit: can get SliderResource relations', function () {
     $relations = SliderResource::getRelations();
     expect($relations)->toBeArray();
 });
-

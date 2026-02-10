@@ -3,19 +3,65 @@
 declare(strict_types=1);
 
 return [
-    'actions'       => 'discount_conditions.actions',
-    'empty'         => 'discount_conditions.empty',
-    'fields'        => 'discount_conditions.fields',
-    'filters'       => 'discount_conditions.filters',
-    'helpers'       => 'discount_conditions.helpers',
-    'index'         => 'discount_conditions.index',
-    'list'          => 'discount_conditions.list',
+    'actions' => [
+        'test_all'       => 'Test all',
+        'test_condition' => 'Test condition',
+        'view_discount'  => 'View discount',
+    ],
+    'empty' => [
+        'description' => 'Description',
+        'title'       => 'Title',
+    ],
+    'fields' => [
+        'condition'  => 'Condition',
+        'created_at' => 'Created at',
+        'discount'   => 'Discount',
+        'is_active'  => 'Is active',
+        'metadata'   => 'Metadata',
+        'operator'   => 'Operator',
+        'position'   => 'Position',
+        'priority'   => 'Priority',
+        'test_value' => 'Test value',
+        'type'       => 'Type',
+        'value'      => 'Value',
+    ],
+    'filters' => [
+        'title' => 'Title',
+    ],
+    'helpers' => [
+        'test_value' => 'Test value',
+    ],
+    'index' => [
+        'title' => 'Title',
+    ],
+    'list' => [
+        'title' => 'Title',
+    ],
     'messages'      => 'discount_conditions.messages',
     'operators'     => 'discount_conditions.operators',
-    'quick_actions' => 'discount_conditions.quick_actions',
-    'sections'      => 'discount_conditions.sections',
-    'show'          => 'discount_conditions.show',
-    'stats'         => 'discount_conditions.stats',
-    'test'          => 'discount_conditions.test',
-    'types'         => 'discount_conditions.types',
+    'quick_actions' => [
+        'title' => 'Title',
+    ],
+    'sections' => [
+        'basic_info'   => 'Basic info',
+        'translations' => 'Translations',
+    ],
+    'show' => [
+        'subtitle' => 'Subtitle',
+        'title'    => 'Title',
+    ],
+    'stats' => [
+        'active_conditions'        => 'Active conditions',
+        'high_priority_conditions' => 'High priority conditions',
+        'inactive_conditions'      => 'Inactive conditions',
+        'position'                 => 'Position',
+        'priority'                 => 'Priority',
+        'status'                   => 'Status',
+        'title'                    => 'Title',
+        'total_conditions'         => 'Total conditions',
+    ],
+    'test' => [
+        'title' => 'Title',
+    ],
+    'types' => 'discount_conditions.types',
 ];

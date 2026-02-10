@@ -13,10 +13,9 @@ use App\Models\ProductVariant;
 use App\Models\VariantInventory;
 use App\Models\VariantPricingRule;
 use App\Services\ProductVariantAttributeMatrixService;
-use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
-final class ProductVariantSeeder extends Seeder
+final class ProductVariantSeeder extends BaseSeeder
 {
     /**
      * Run the database seeds.

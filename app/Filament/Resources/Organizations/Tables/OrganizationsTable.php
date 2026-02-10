@@ -27,7 +27,7 @@ class OrganizationsTable
                     ->label(__('messages.slug'))
                     ->searchable(),
                 TextColumn::make('type')
-                    ->label(__('messages.Type'))
+                    ->label(__('messages.type'))
                     ->searchable()
                     ->sortable()
                     ->formatStateUsing(static function ($state): string {

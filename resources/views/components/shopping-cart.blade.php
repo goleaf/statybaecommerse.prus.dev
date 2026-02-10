@@ -154,7 +154,7 @@
                 {{-- Tax --}}
                 @if ($showTax && $tax > 0)
                     <div class="flex justify-between text-gray-700">
-                        <span>{{ __('Tax') }}</span>
+                        <span>{{ __('ui.tax') }}</span>
                         <span>{{ \Illuminate\Support\Number::currency($tax, current_currency(), app()->getLocale()) }}</span>
                     </div>
                 @endif
@@ -167,7 +167,7 @@
                             @if ($shipping > 0)
                                 {{ \Illuminate\Support\Number::currency($shipping, current_currency(), app()->getLocale()) }}
                             @else
-                                {{ __('Free') }}
+                                {{ __('ui.free') }}
                             @endif
                         </span>
                     </div>
@@ -211,7 +211,7 @@
 
             <h3 class="text-2xl font-bold text-gray-900 mb-4">{{ __('messages.your_cart_is_empty') }}</h3>
             <p class="text-gray-600 mb-8 max-w-md mx-auto">
-                {{ __('Looks like you haven\'t added any items to your cart yet. Start shopping to fill it up!') }}
+                {{ __('ui.cart_empty_hint') }}
             </p>
 
             <div class="flex flex-col sm:flex-row gap-4 justify-center">

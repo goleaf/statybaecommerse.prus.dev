@@ -19,7 +19,7 @@
 
         <form wire:submit="deleteUser" class="mt-6 space-y-6">
             <div>
-                <x-forms.label for="password" :value="__('Password')" />
+                <x-forms.label for="password" :value="__('ui.password')" />
                 <x-forms.input id="password" type="password" class="mt-1 block w-full" wire:model="password" required
                                autocomplete="current-password" />
                 <x-forms.errors class="mt-2" :messages="$errors->get('password')" />

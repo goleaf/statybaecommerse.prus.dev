@@ -43,7 +43,6 @@ use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Cache\RateLimiter as BaseRateLimiter;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Auth\MustVerifyEmail as MustVerifyEmailContract;
-use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Http\JsonResponse;
@@ -125,10 +124,7 @@ class AppServiceProvider extends ServiceProvider
             )));
 
             $this->app->extend('command.db.seed', function ($command, $app): \App\Console\Commands\ProfiledSeedCommand {
-                /** @var Dispatcher|null $dispatcher */
-                $dispatcher = $app->bound('events') ? $app->make('events') : null;
-
-                return new ProfiledSeedCommand($app->make('db'), $dispatcher, $app->make('config'));
+                return new ProfiledSeedCommand($app->make('db'));
             });
         }
 

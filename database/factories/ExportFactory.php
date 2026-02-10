@@ -22,7 +22,7 @@ final class ExportFactory extends Factory
         return [
             'uuid'               => (string) Str::uuid(),
             'name'               => $this->faker->words(3, true) . ' Export',
-            'format'             => $this->faker->randomElement(['csv', 'xlsx', 'json', 'xml']),
+            'format'             => 'csv',
             'status'             => ExportStatus::Queued,
             'exportable_type'    => $this->faker->randomElement(['Product', 'Order', 'Customer', 'User']),
             'columns'            => ['id', 'name', 'created_at'],

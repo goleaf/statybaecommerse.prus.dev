@@ -6,10 +6,9 @@ namespace Database\Seeders;
 
 use App\Models\Location;
 use App\Models\Translations\LocationTranslation;
-use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
-final class LocationSeeder extends Seeder
+final class LocationSeeder extends BaseSeeder
 {
     public function run(): void
     {

@@ -296,7 +296,7 @@
                                 class="rounded-full border border-sage/30 p-2 text-sage transition hover:border-sage hover:bg-sage/10"
                                 wire:click="$toggle('sidebarOpen')"
                                 wire:confirm="{{ __('translations.confirm_toggle_sidebar') }}"
-                                aria-label="{{ __('Close') }}">
+                                aria-label="{{ __('ui.close') }}">
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                             </svg>

@@ -273,7 +273,7 @@
                                                 @elseif($result['type'] === 'collection') bg-orange-100 text-orange-800
                                                 @endif
                                             ">
-                                                {{ __('frontend.search.type_' . $result['type']) }}
+                                                {{ __('frontend.search.type' . $result['type']) }}
                                             </span>
                                         </div>
                                     </div>

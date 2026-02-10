@@ -80,7 +80,7 @@ final class ProductShelf extends Component implements HasSchemas
                 ->whereNull('deleted_at');
 
             $query = match ($this->preset) {
-                'latest' => $query->orderByDesc('published_at'),
+                'latest'   => $query->orderByDesc('published_at'),
                 'trending' => $query
                     ->withSum('orderItems as orders_quantity', 'quantity')
                     ->orderByDesc('orders_quantity')

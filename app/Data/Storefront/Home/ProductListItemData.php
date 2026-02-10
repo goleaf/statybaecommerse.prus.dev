@@ -179,19 +179,19 @@ final class ProductListItemData implements Arrayable
     public function toArray(): array
     {
         return [
-            'id'                  => $this->id,
-            'name'                => $this->name,
-            'slug'                => $this->slug,
-            'detail_url'          => $this->detailUrl,
-            'brand_name'          => $this->brandName,
-            'category_labels'     => $this->categoryLabels,
-            'price'               => $this->price,
-            'average_rating'      => $this->averageRating,
-            'reviews_count'       => $this->reviewsCount,
-            'stock_quantity'      => $this->stockQuantity,
-            'image_url'           => $this->imageUrl,
-            'initials'            => $this->initials,
-            'short_description'   => $this->shortDescription,
+            'id'                => $this->id,
+            'name'              => $this->name,
+            'slug'              => $this->slug,
+            'detail_url'        => $this->detailUrl,
+            'brand_name'        => $this->brandName,
+            'category_labels'   => $this->categoryLabels,
+            'price'             => $this->price,
+            'average_rating'    => $this->averageRating,
+            'reviews_count'     => $this->reviewsCount,
+            'stock_quantity'    => $this->stockQuantity,
+            'image_url'         => $this->imageUrl,
+            'initials'          => $this->initials,
+            'short_description' => $this->shortDescription,
         ];
     }
 }

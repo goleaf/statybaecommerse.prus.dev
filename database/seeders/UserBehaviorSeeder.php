@@ -16,7 +16,7 @@ use Illuminate\Support\Collection;
  *
  * Seeder for creating realistic user behavior data for testing and development.
  */
-final class UserBehaviorSeeder extends Seeder
+final class UserBehaviorSeeder extends BaseSeeder
 {
     public function run(): void
     {

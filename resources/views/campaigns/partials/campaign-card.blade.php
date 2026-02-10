@@ -11,7 +11,7 @@
             @if($featured)
                 <div class="absolute top-2 right-2">
                     <span class="bg-yellow-400 text-yellow-900 px-2 py-1 rounded-full text-xs font-semibold">
-                        <i class="fas fa-star mr-1"></i>{{ __('campaigns.featured') }}
+                        <i class="fas fa-star mr-1"></i>{{ __('campaigns.featured.title') }}
                     </span>
                 </div>
             @endif
@@ -104,7 +104,6 @@
         @endif
     </div>
 </div>
-
 
 
 

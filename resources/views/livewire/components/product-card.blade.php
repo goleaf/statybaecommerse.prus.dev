@@ -12,7 +12,7 @@
         @else
             <div class="w-full h-full bg-gray-200 flex items-center justify-center">
                 <span
-                      class="text-lg text-gray-500 font-medium">{{ strtoupper(substr($product->trans('name') ?? $product->name, 0, 3)) }}</span>
+                      class="text-lg text-gray-500 font-medium">{{ strtoupper(substr($product->trans('ui.name') ?? $product->name, 0, 3)) }}</span>
             </div>
         @endif
 

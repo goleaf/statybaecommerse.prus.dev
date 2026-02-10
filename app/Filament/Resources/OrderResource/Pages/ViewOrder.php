@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\OrderResource\Pages;
 
 use App\Filament\Actions\DocumentAction;
+use App\Filament\Actions\InvoicePdfAction;
 use App\Filament\Resources\OrderResource;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
@@ -18,6 +19,7 @@ class ViewOrder extends ViewRecord
         return [
             EditAction::make(),
             DocumentAction::make(),
+            InvoicePdfAction::make(),
         ];
     }
 }

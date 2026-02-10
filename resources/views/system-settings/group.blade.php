@@ -1,6 +1,6 @@
 @extends('components.layouts.base')
 
-@section('title', __('admin.system_settings.' . $group) . ' - ' . __('admin.system_settings.frontend.title'))
+@section('title', __(sprintf('admin.system_settings.%s', $group)) . ' - ' . __('admin.system_settings.frontend.title'))
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
@@ -15,7 +15,7 @@
                 </li>
                 <li class="flex items-center">
                     <x-heroicon-o-chevron-right class="w-4 h-4 mx-2" />
-                    {{ __('admin.system_settings.' . $group) }}
+                    {{ __(sprintf('admin.system_settings.%s', $group)) }}
                 </li>
             </ol>
         </nav>
@@ -29,7 +29,7 @@
                     </div>
                     <div>
                         <h1 class="text-3xl font-bold text-white">
-                            {{ __('admin.system_settings.' . $group) }}
+                            {{ __(sprintf('admin.system_settings.%s', $group)) }}
                         </h1>
                         <p class="text-green-100 mt-1">
                             {{ $settings->count() }} {{ __('admin.system_settings.settings') }}
@@ -88,7 +88,7 @@
                         <div class="flex items-center justify-between">
                             <div class="flex items-center space-x-2">
                                 <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                                    {{ __('admin.system_settings.' . $setting->type) }}
+                                    {{ __(sprintf('admin.system_settings.%s', $setting->type)) }}
                                 </span>
                                 @if($setting->is_required)
                                     <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">

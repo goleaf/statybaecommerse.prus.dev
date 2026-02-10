@@ -17,22 +17,22 @@ class ProductRequestForm
     {
         return $schema
             ->components([
-                Section::make(__('messages.Product'))
+                Section::make(__('messages.product'))
                     ->schema([
                         Select::make('product_id')
-                            ->label(__('messages.Product'))
+                            ->label(__('messages.product'))
                             ->relationship('product', 'name')
                             ->required()
                             ->searchable()
                             ->preload(),
                         TextInput::make('requested_quantity')
-                            ->label(__('messages.Quantity'))
+                            ->label(__('messages.quantity'))
                             ->numeric()
                             ->default(1)
                             ->minValue(1),
                     ])->columns(2),
 
-                Section::make(__('messages.Customer Information'))
+                Section::make(__('messages.customer_information'))
                     ->schema([
                         Select::make('user_id')
                             ->label(__('messages.user'))
@@ -52,15 +52,15 @@ class ProductRequestForm
                             ->maxLength(255),
                     ])->columns(2),
 
-                Section::make(__('messages.Request Details'))
+                Section::make(__('messages.request_details'))
                     ->schema([
                         Textarea::make('message')
-                            ->label(__('messages.Message'))
+                            ->label(__('messages.message'))
                             ->rows(5)
                             ->columnSpanFull(),
                     ]),
 
-                Section::make(__('messages.Status & Response'))
+                Section::make(__('messages.status_response'))
                     ->schema([
                         Select::make('status')
                             ->label(__('messages.status'))
@@ -75,7 +75,7 @@ class ProductRequestForm
                             ->selectablePlaceholder(false)
                             ->native(false),
                         Textarea::make('admin_notes')
-                            ->label(__('messages.Notes'))
+                            ->label(__('messages.notes'))
                             ->rows(3)
                             ->columnSpanFull(),
                     ])->columns(2),

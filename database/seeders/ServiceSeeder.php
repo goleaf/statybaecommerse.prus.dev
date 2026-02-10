@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use App\Models\Service;
-use Illuminate\Database\Seeder;
 
-class ServiceSeeder extends Seeder
+class ServiceSeeder extends BaseSeeder
 {
     /**
      * Run the database seeds.

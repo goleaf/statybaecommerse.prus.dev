@@ -24,8 +24,9 @@ final class RunMinimalSeedJob implements ShouldQueue
     public function handle(): void
     {
         Artisan::call('db:seed', [
-            '--class' => 'SimpleAdminSeeder',
-            '--force' => true,
+            '--class'   => 'Database\\Seeders\\DatabaseSeeder',
+            '--profile' => 'minimal',
+            '--force'   => true,
         ]);
 
         Log::info('Dashboard quick action: minimal seed executed.');

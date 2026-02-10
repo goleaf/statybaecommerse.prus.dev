@@ -9,7 +9,7 @@ use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
-final class CustomerSegmentationSeeder extends Seeder
+final class CustomerSegmentationSeeder extends BaseSeeder
 {
     public function run(): void
     {

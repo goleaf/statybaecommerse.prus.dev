@@ -11,9 +11,9 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             @foreach($products as $product)
                 @php
-                    $loopProductName = $product->trans('name') ?? $product->name;
-                    $loopProductDescription = $product->trans('short_description') ?? $product->short_description ?? $product->trans('description') ?? $product->description;
-                    $loopProductBrand = optional($product->brand)?->trans('name') ?? optional($product->brand)->name;
+                    $loopProductName = $product->trans('ui.name') ?? $product->name;
+                    $loopProductDescription = $product->trans('ui.short_description') ?? $product->short_description ?? $product->trans('ui.description') ?? $product->description;
+                    $loopProductBrand = optional($product->brand)?->trans('ui.name') ?? optional($product->brand)->name;
                 @endphp
                 <div class="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors cursor-pointer
                     {{ $selectedProduct && $selectedProduct->id === $product->id ? 'border-blue-500 bg-blue-50' : '' }}"
@@ -50,9 +50,9 @@
             
             @php
                 $stats = $this->getProductStats();
-                $selectedProductName = $selectedProduct->trans('name') ?? $selectedProduct->name;
-                $selectedProductDescription = $selectedProduct->trans('description') ?? $selectedProduct->description;
-                $selectedProductBrand = optional($selectedProduct->brand)?->trans('name') ?? optional($selectedProduct->brand)->name;
+                $selectedProductName = $selectedProduct->trans('ui.name') ?? $selectedProduct->name;
+                $selectedProductDescription = $selectedProduct->trans('ui.description') ?? $selectedProduct->description;
+                $selectedProductBrand = optional($selectedProduct->brand)?->trans('ui.name') ?? optional($selectedProduct->brand)->name;
             @endphp
             
             <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
@@ -204,7 +204,7 @@
                                 {{ $this->getVariantStockStatus($selectedVariant) === 'out_of_stock' ? 'bg-red-100 text-red-800' : '' }}
                                 {{ $this->getVariantStockStatus($selectedVariant) === 'not_tracked' ? 'bg-gray-100 text-gray-800' : '' }}
                             ">
-                                {{ __('product.variants.stock_status.' . $this->getVariantStockStatus($selectedVariant)) }}
+                                {{ __(sprintf('product.variants.stock_status.%s', $this->getVariantStockStatus($selectedVariant))) }}
                             </span>
                         </div>
                     </div>
@@ -274,7 +274,7 @@
                                 {{ $this->getVariantStockStatus($variant) === 'out_of_stock' ? 'bg-red-100 text-red-800' : '' }}
                                 {{ $this->getVariantStockStatus($variant) === 'not_tracked' ? 'bg-gray-100 text-gray-800' : '' }}
                             ">
-                                {{ __('product.variants.stock_status.' . $this->getVariantStockStatus($variant)) }}
+                                {{ __(sprintf('product.variants.stock_status.%s', $this->getVariantStockStatus($variant))) }}
                             </span>
                         </div>
                     </div>

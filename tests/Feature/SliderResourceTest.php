@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Enums\NavigationGroup;
 use App\Filament\Resources\Sliders\SliderResource;
 use App\Models\AdminUser;
 use App\Models\Slider;
 use Exception;
-use App\Enums\NavigationGroup;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;

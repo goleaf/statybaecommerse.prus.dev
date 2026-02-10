@@ -358,7 +358,7 @@ it('has correct form fields in create page', function () {
         ->assertFormFieldExists('height')
         ->assertFormFieldExists('seo_title')
         ->assertFormFieldExists('seo_description')
-                ->assertFormFieldExists('tags');
+        ->assertFormFieldExists('tags');
 });
 
 it('can access table actions', function () {
@@ -371,13 +371,13 @@ it('can access table actions', function () {
 it('validates price fields are numeric', function () {
     Livewire::test(ProductResource\Pages\CreateProduct::class)
         ->fillForm([
-            'name'          => 'Test Product',
-            'sku'           => 'TEST-002',
-            'price'         => 'not-a-number',
+            'name'  => 'Test Product',
+            'sku'   => 'TEST-002',
+            'price' => 'not-a-number',
         ])
         ->call('create')
         ->assertHasFormErrors([
-            'price'         => 'numeric',
+            'price' => 'numeric',
         ]);
 });
 

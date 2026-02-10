@@ -355,6 +355,7 @@ return array (
   'original_brand' => 'Original Brand',
   'osram' => 'OSRAM',
   'osram_work_lights_and_electrical_distribution_products' => 'OSRAM work lights and electrical distribution products.',
+  'overflow_brand' => 'Overflow Brand',
   'patikimi_black_decker_lt_rankiai_profesionaliems_statybininkams_lietuvoje' => 'Patikimi Black & Decker LT įrankiai profesionaliems statybininkams Lietuvoje.',
   'patikimi_bosch_lietuva_rankiai_profesionaliems_statybininkams_lietuvoje' => 'Patikimi Bosch Lietuva įrankiai profesionaliems statybininkams Lietuvoje.',
   'patikimi_ceresit_lithuania_rankiai_profesionaliems_statybininkams_lietuvoje' => 'Patikimi Ceresit Lithuania įrankiai profesionaliems statybininkams Lietuvoje.',

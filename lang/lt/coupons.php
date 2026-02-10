@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-return array (
-  'fields' => 'coupons.fields',
-  'messages' => 'coupons.messages',
-);
+return [
+    'fields'   => 'coupons.fields',
+    'messages' => 'coupons.messages',
+];

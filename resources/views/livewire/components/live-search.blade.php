@@ -181,7 +181,7 @@
                                         @elseif($result['type'] === 'brand') bg-sage/20 text-sage
                                         @endif
                                     ">
-                                        {{ __('frontend.search.type_' . $result['type']) }}
+                                        {{ __('frontend.search.type' . $result['type']) }}
                                     </span>
                                 </div>
                             </div>

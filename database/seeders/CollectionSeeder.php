@@ -8,10 +8,9 @@ use App\Models\Collection;
 use App\Models\Translations\CollectionTranslation;
 use App\Services\Images\LocalImageGeneratorService;
 use Database\Seeders\Data\HouseBuilderCollections;
-use Illuminate\Database\Seeder;
 use Throwable;
 
-class CollectionSeeder extends Seeder
+final class CollectionSeeder extends BaseSeeder
 {
     private LocalImageGeneratorService $imageGenerator;
 
@@ -23,7 +22,18 @@ class CollectionSeeder extends Seeder
     public function run(): void
     {
         $definitions = HouseBuilderCollections::collections();
+
+        if ($this->seedFastModeEnabled()) {
+            $definitions = array_slice(
+                $definitions,
+                0,
+                $this->seedFastInt('collection_limit', 4),
+                true
+            );
+        }
+
         $locales = $this->supportedLocales();
+        $shouldGenerateMedia = $this->seedShouldGenerateMedia();
 
         foreach ($definitions as $slug => $definition) {
             $primaryTranslation = $definition['translations']['en'];
@@ -88,7 +98,9 @@ class CollectionSeeder extends Seeder
                 }
             }
 
-            $this->ensureCollectionMedia($collection, $definition['image_text'] ?? $primaryTranslation['name']);
+            if ($shouldGenerateMedia) {
+                $this->ensureCollectionMedia($collection, $definition['image_text'] ?? $primaryTranslation['name']);
+            }
 
             $this->command?->info(sprintf('CollectionSeeder: prepared "%s" collection.', $primaryTranslation['name']));
         }
@@ -129,6 +141,10 @@ class CollectionSeeder extends Seeder
 
     private function supportedLocales(): array
     {
+        if ($this->seedFastModeEnabled()) {
+            return $this->seedFastLocales(['lt', 'en']);
+        }
+
         return collect(explode(',', (string) config('app.supported_locales', 'lt,en,ru,de')))
             ->map(fn ($locale) => trim($locale))
             ->filter()

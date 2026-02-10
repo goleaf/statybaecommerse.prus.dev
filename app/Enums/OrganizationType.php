@@ -46,8 +46,8 @@ enum OrganizationType: string implements EnumInterface, HasLabel
     public function icon(): string
     {
         return match ($this) {
-            self::COMPANY => 'heroicon-o-building-office',
-            self::TEAM => 'heroicon-o-user-group',
+            self::COMPANY    => 'heroicon-o-building-office',
+            self::TEAM       => 'heroicon-o-user-group',
             self::DEPARTMENT => 'heroicon-o-squares-2x2',
         };
     }
@@ -60,8 +60,8 @@ enum OrganizationType: string implements EnumInterface, HasLabel
     public function priority(): int
     {
         return match ($this) {
-            self::COMPANY => 1,
-            self::TEAM => 2,
+            self::COMPANY    => 1,
+            self::TEAM       => 2,
             self::DEPARTMENT => 3,
         };
     }

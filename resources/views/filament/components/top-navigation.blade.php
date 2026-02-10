@@ -61,48 +61,37 @@
                                         <p class="text-xs text-gray-500 mt-1">{{ $group->description() }}</p>
                                     </div>
 
-                                    @if ($group->value === 'Products')
+                                    @php($groupValue = strtolower((string) $group->value))
+                                    @if ($groupValue === 'products')
                                         @if (Route::has('filament.admin.resources.products.index'))
                                             <a href="{{ route('filament.admin.resources.products.index') }}"
                                                class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                                                 <x-heroicon-o-cube class="h-4 w-4 mr-3" />
-                                                {{ __('messages.admin) }}
-                                            </a>
-                                        @endif
-                                        @if (Route::has(') }}
+                                                {{ __('admin.models.products') }}
                                             </a>
                                         @endif
                                         @if (Route::has('filament.admin.resources.categories.index'))
                                             <a href="{{ route('filament.admin.resources.categories.index') }}"
                                                class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                                                 <x-heroicon-o-tag class="h-4 w-4 mr-3" />
-                                                {{ __('messages.admin) }}
-                                            </a>
-                                        @endif
-                                        @if (Route::has(') }}
+                                                {{ __('admin.models.categories') }}
                                             </a>
                                         @endif
                                         @if (Route::has('filament.admin.resources.brands.index'))
                                             <a href="{{ route('filament.admin.resources.brands.index') }}"
                                                class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                                                 <x-heroicon-o-star class="h-4 w-4 mr-3" />
-                                                {{ __('messages.admin) }}
-                                            </a>
-                                        @endif
-                                        @if (Route::has(') }}
+                                                {{ __('admin.models.brands') }}
                                             </a>
                                         @endif
                                         @if (Route::has('filament.admin.resources.collections.index'))
                                             <a href="{{ route('filament.admin.resources.collections.index') }}"
                                                class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                                                 <x-heroicon-o-folder class="h-4 w-4 mr-3" />
-                                                {{ __('messages.admin) }}
+                                                {{ __('admin.models.collections') }}
                                             </a>
                                         @endif
-                                    @elseif($group->value === ') }}
-                                            </a>
-                                        @endif
-                                    @elseif($group->value === 'Orders')
+                                    @elseif ($groupValue === 'orders')
                                         @if (Route::has('filament.admin.resources.orders.index'))
                                             <a href="{{ route('filament.admin.resources.orders.index') }}"
                                                class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
@@ -117,7 +106,7 @@
                                                 {{ __('admin.models.cart_items') }}
                                             </a>
                                         @endif
-                                    @elseif($group->value === 'Users')
+                                    @elseif ($groupValue === 'users')
                                         @if (Route::has('filament.admin.resources.users.index'))
                                             <a href="{{ route('filament.admin.resources.users.index') }}"
                                                class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
@@ -132,7 +121,7 @@
                                                 {{ __('admin.models.customer_groups') }}
                                             </a>
                                         @endif
-                                    @elseif($group->value === 'Inventory')
+                                    @elseif ($groupValue === 'inventory')
                                         @if (Route::has('filament.admin.resources.stocks.index'))
                                             <a href="{{ route('filament.admin.resources.stocks.index') }}"
                                                class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
@@ -147,7 +136,7 @@
                                                 {{ __('admin.models.product_variants') }}
                                             </a>
                                         @endif
-                                    @elseif($group->value === 'Locations')
+                                    @elseif ($groupValue === 'locations')
                                         @if (Route::has('filament.admin.resources.locations.index'))
                                             <a href="{{ route('filament.admin.resources.locations.index') }}"
                                                class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
@@ -169,7 +158,7 @@
                                                 {{ __('admin.models.zones') }}
                                             </a>
                                         @endif
-                                    @elseif($group->value === 'Marketing')
+                                    @elseif ($groupValue === 'marketing')
                                         @if (Route::has('filament.admin.resources.campaigns.index'))
                                             <a href="{{ route('filament.admin.resources.campaigns.index') }}"
                                                class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
@@ -188,13 +177,10 @@
                                             <a href="{{ route('filament.admin.resources.coupons.index') }}"
                                                class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                                                 <x-heroicon-o-gift class="h-4 w-4 mr-3" />
-                                                {{ __('messages.admin) }}
+                                                {{ __('admin.models.coupons') }}
                                             </a>
                                         @endif
-                                    @elseif($group->value === ') }}
-                                            </a>
-                                        @endif
-                                    @elseif($group->value === 'Reports')
+                                    @elseif ($groupValue === 'reports')
                                         @if (Route::has('filament.admin.resources.reports.index'))
                                             <a href="{{ route('filament.admin.resources.reports.index') }}"
                                                class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
@@ -202,25 +188,19 @@
                                                 {{ __('admin.models.reports') }}
                                             </a>
                                         @endif
-                                    @elseif($group->value === 'Content')
+                                    @elseif ($groupValue === 'content')
                                         @if (Route::has('filament.admin.resources.news.index'))
                                             <a href="{{ route('filament.admin.resources.news.index') }}"
                                                class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                                                 <x-heroicon-o-newspaper class="h-4 w-4 mr-3" />
-                                                {{ __('messages.admin) }}
-                                            </a>
-                                        @endif
-                                        @if (Route::has(') }}
+                                                {{ __('admin.models.news') }}
                                             </a>
                                         @endif
                                         @if (Route::has('filament.admin.resources.posts.index'))
                                             <a href="{{ route('filament.admin.resources.posts.index') }}"
                                                class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                                                 <x-heroicon-o-document-text class="h-4 w-4 mr-3" />
-                                                {{ __('messages.admin) }}
-                                            </a>
-                                        @endif
-                                        @if (Route::has(') }}
+                                                {{ __('admin.models.posts') }}
                                             </a>
                                         @endif
                                         @if (Route::has('filament.admin.resources.legal.index'))
@@ -230,7 +210,7 @@
                                                 {{ __('admin.models.legal') }}
                                             </a>
                                         @endif
-                                    @elseif($group->value === 'System')
+                                    @elseif ($groupValue === 'system')
                                         @if (Route::has('filament.admin.resources.system-settings.index'))
                                             <a href="{{ route('filament.admin.resources.system-settings.index') }}"
                                                class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">

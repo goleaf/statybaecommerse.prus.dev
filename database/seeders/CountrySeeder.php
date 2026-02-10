@@ -6,12 +6,17 @@ namespace Database\Seeders;
 
 use App\Models\Country;
 use App\Models\Translations\CountryTranslation;
-use Illuminate\Database\Seeder;
 
-final class CountrySeeder extends Seeder
+final class CountrySeeder extends BaseSeeder
 {
     public function run(): void
     {
+        if ((bool) config('seeds.fast_mode', false)) {
+            $this->call(SimpleCountrySeeder::class);
+
+            return;
+        }
+
         $countries = $this->getCountriesData();
 
         foreach ($countries as $countryData) {

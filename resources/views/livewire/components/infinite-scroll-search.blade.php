@@ -124,7 +124,7 @@
                         @if(!empty($filterOptions))
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    {{ __('frontend.' . $filterType) }}
+                                    {{ __(sprintf('ui.frontend.%s', $filterType)) }}
                                 </label>
                                 <div class="space-y-1 max-h-32 overflow-y-auto">
                                     @foreach($filterOptions as $option => $count)
@@ -174,7 +174,7 @@
                             <div class="p-4">
                                 <!-- Type Badge -->
                                 <span class="inline-block px-2 py-1 text-xs font-medium text-blue-800 bg-blue-100 rounded-full mb-2">
-                                    {{ __('frontend.' . $result['type']) }}
+                                    {{ __(sprintf('ui.frontend.%s', $result['type'])) }}
                                 </span>
 
                                 <!-- Title -->

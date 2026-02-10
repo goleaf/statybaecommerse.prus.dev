@@ -26,7 +26,7 @@
             <form wire:submit="confirmPassword" class="mt-6">
                 <!-- Password -->
                 <div>
-                    <x-forms.label for="password" :value="__('Password')" />
+                    <x-forms.label for="password" :value="__('ui.password')" />
                     <x-forms.input wire:model="password"
                                    id="password"
                                    class="block mt-1 w-full"
@@ -38,7 +38,7 @@
                 </div>
 
                 <div class="flex justify-end mt-4">
-                    <x-buttons.submit :title="__('Confirm')" wire:loading.attr="data-loading" />
+                    <x-buttons.submit :title="__('ui.confirm')" wire:loading.attr="data-loading" />
                 </div>
             </form>
         </div>

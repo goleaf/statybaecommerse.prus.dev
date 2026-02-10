@@ -1,3 +1,3 @@
-<x-layouts.base title="{{ __('Checkout') }}">
+<x-layouts.base title="{{ __('ui.checkout') }}">
     <livewire:pages.checkout-process />
 </x-layouts.base>

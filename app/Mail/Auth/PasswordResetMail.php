@@ -17,9 +17,6 @@ final class PasswordResetMail extends Mailable implements ShouldQueue
     use Queueable;
     use SerializesModels;
 
-    /**
-     * Cache the resolved locale to avoid recomputation.
-     */
     private ?string $cachedLocale = null;
 
     public function __construct(
@@ -31,26 +28,15 @@ final class PasswordResetMail extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         $locale = $this->resolveLocale();
-        $this->locale($locale); // Ensure translations respect the intended locale.
+        $this->locale($locale);
 
         return new Envelope(
-            subject: __('messages.mail, [], $locale)
+            subject: __('messages.mail', [], $locale)
         );
     }
 
     public function content(): Content
     {
-        $locale = $this->resolveLocale();
-
-        return new Content(
-            markdown: ', [], $locale)
-        );
-    }
-
-    public function content(): Content
-    {
-        $locale = $this->resolveLocale();
-
         return new Content(
             markdown: 'emails.auth.password-reset',
             with: [
@@ -65,13 +51,11 @@ final class PasswordResetMail extends Mailable implements ShouldQueue
      */
     public function attachments(): array
     {
-        // Auth transactional emails do not include attachments, but we keep the signature explicit.
         return [];
     }
 
     private function resolveLocale(): string
     {
-        // Prefer the caller-provided locale while gracefully falling back to the app default.
         if ($this->cachedLocale !== null) {
             return $this->cachedLocale;
         }

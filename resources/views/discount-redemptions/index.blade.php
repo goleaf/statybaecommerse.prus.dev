@@ -190,7 +190,7 @@
                                                 @elseif($redemption->status === 'cancelled') bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200
                                                 @else bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200
                                                 @endif">
-                                                {{ __('frontend.discount_redemptions.status.' . $redemption->status) }}
+                                                {{ __(sprintf('frontend.discount_redemptions.status.%s', $redemption->status)) }}
                                             </span>
                                         </div>
                                         <div class="flex-1 min-w-0">

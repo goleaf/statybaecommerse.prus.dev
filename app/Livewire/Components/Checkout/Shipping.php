@@ -89,7 +89,7 @@ class Shipping extends StepComponent
             ->find($this->shippingAddressId);
 
         if ($shippingAddress === null) {
-            $this->addError('shippingAddressId', __('Please choose a valid delivery address.'));
+            $this->addError('shippingAddressId', __('messages.please_choose_a_valid_delivery_address'));
 
             return;
         }
@@ -99,7 +99,7 @@ class Shipping extends StepComponent
             : Address::query()->where('user_id', Auth::id())->find($this->billingAddressId);
 
         if (! $this->sameAsShipping && $billingAddress === null) {
-            $this->addError('billingAddressId', __('Please choose a valid billing address.'));
+            $this->addError('billingAddressId', __('messages.please_choose_a_valid_billing_address'));
 
             return;
         }

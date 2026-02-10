@@ -6,9 +6,8 @@ namespace Database\Seeders;
 
 use App\Models\Partner;
 use App\Models\User;
-use Illuminate\Database\Seeder;
 
-final class UserPartnerSeeder extends Seeder
+final class UserPartnerSeeder extends BaseSeeder
 {
     /**
      * Run the database seeds.

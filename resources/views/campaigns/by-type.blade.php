@@ -1,7 +1,7 @@
 @extends('components.layouts.base')
 
 @php
-    $typeLabel = __('campaigns.types.' . $type);
+    $typeLabel = __(sprintf('campaigns.types.%s', $type));
 @endphp
 
 @section('title', __('campaigns.by_type.title', ['type' => $typeLabel]))

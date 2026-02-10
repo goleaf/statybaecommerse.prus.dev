@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use App\Models\Discount;
-use Illuminate\Database\Seeder;
 
-final class DiscountSeeder extends Seeder
+final class DiscountSeeder extends BaseSeeder
 {
     public function run(): void
     {

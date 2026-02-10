@@ -7,9 +7,8 @@ namespace Database\Seeders;
 use App\Models\CustomerGroup;
 use App\Models\Discount;
 use App\Models\DiscountCode;
-use Illuminate\Database\Seeder;
 
-final class AdminPresetDiscountsSeeder extends Seeder
+final class AdminPresetDiscountsSeeder extends BaseSeeder
 {
     public function run(): void
     {

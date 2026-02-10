@@ -16,10 +16,9 @@ use App\Models\VariantInventory;
 use App\Models\VariantPricingRule;
 use App\Services\ProductVariantAttributeMatrixService;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
-use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
-final class EnhancedProductVariantSeeder extends Seeder
+final class EnhancedProductVariantSeeder extends BaseSeeder
 {
     public function run(): void
     {

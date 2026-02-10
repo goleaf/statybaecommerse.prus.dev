@@ -17,9 +17,6 @@ final class VerifyEmailMail extends Mailable implements ShouldQueue
     use Queueable;
     use SerializesModels;
 
-    /**
-     * Store the resolved locale so translations remain consistent.
-     */
     private ?string $cachedLocale = null;
 
     public function __construct(
@@ -30,26 +27,15 @@ final class VerifyEmailMail extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         $locale = $this->resolveLocale();
-        $this->locale($locale); // Ensure Markdown components use the same locale as the subject.
+        $this->locale($locale);
 
         return new Envelope(
-            subject: __('messages.mail, [], $locale)
+            subject: __('messages.mail', [], $locale)
         );
     }
 
     public function content(): Content
     {
-        $locale = $this->resolveLocale();
-
-        return new Content(
-            markdown: ', [], $locale)
-        );
-    }
-
-    public function content(): Content
-    {
-        $locale = $this->resolveLocale();
-
         return new Content(
             markdown: 'emails.auth.verify',
             with: [
@@ -63,13 +49,11 @@ final class VerifyEmailMail extends Mailable implements ShouldQueue
      */
     public function attachments(): array
     {
-        // Verification emails intentionally avoid attachments to keep delivery lightweight.
         return [];
     }
 
     private function resolveLocale(): string
     {
-        // Respect preferred locales while staying resilient to null/empty values.
         if ($this->cachedLocale !== null) {
             return $this->cachedLocale;
         }

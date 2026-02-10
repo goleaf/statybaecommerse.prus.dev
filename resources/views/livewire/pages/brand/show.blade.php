@@ -79,8 +79,8 @@
                             <div class="text-blue-100">{{ __('ui.products_available') }}</div>
                         </div>
                         <div class="text-center">
-                            <div class="text-3xl font-bold text-white">{{ __('Premium') }}</div>
-                            <div class="text-blue-100">{{ __('Quality') }}</div>
+                            <div class="text-3xl font-bold text-white">{{ __('ui.premium') }}</div>
+                            <div class="text-blue-100">{{ __('ui.quality') }}</div>
                         </div>
                     </div>
                     
@@ -271,7 +271,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                 </svg>
                                 <span class="text-gray-600 dark:text-gray-300">{{ __('ui.quality') }}</span>
-                                <span class="ml-2 font-medium text-gray-900 dark:text-white">{{ __('Premium') }}</span>
+                                <span class="ml-2 font-medium text-gray-900 dark:text-white">{{ __('ui.premium') }}</span>
                             </div>
                         </div>
                     </div>

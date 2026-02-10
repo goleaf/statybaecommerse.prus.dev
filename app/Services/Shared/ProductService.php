@@ -261,6 +261,7 @@ final class ProductService
                 $q->whereNull('stock_quantity')->orWhere('stock_quantity', '>', 0);
             });
         }
+
         return $query;
     }
 

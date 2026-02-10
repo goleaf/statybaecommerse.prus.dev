@@ -15,14 +15,14 @@ final class UserExport implements Exportable
 {
     public function name(): string
     {
-        return __('Users Export');
+        return __('messages.users_export');
     }
 
     public function columns(): array
     {
         return [
-            'name'          => new ExportColumn('name', __('messages.users), '), 'name'),
-            'email'         => new ExportColumn('email', __('messages.users), '), 'email'),
+            'name'          => new ExportColumn('name', __('messages.users'), 'name'),
+            'email'         => new ExportColumn('email', __('messages.users'), 'email'),
             'is_active'     => new ExportColumn('is_active', __('users.fields.is_active'), 'is_active'),
             'last_login_at' => new ExportColumn('last_login_at', __('users.fields.last_login_at'), 'last_login_at'),
             'created_at'    => new ExportColumn('created_at', __('users.fields.created_at'), 'created_at'),

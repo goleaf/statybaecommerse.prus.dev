@@ -8,7 +8,7 @@
     @endcomponent
 
     @php($expiresIn = (int) ($minutes ?? config('auth.passwords.' . config('auth.defaults.passwords') . '.expire')))
-    {{ trans_choice('messages.mail, $expiresIn, ['count' => $expiresIn]) }}
+    {{ __('messages.mail', ['count' => $expiresIn]) }}
 
     {{ __('messages.mail') }}
 

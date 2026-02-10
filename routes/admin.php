@@ -5,7 +5,6 @@ declare(strict_types=1);
 use App\Http\Controllers\Admin\AttributeValueTranslationController;
 use App\Http\Controllers\Admin\DiscountPresetController;
 use App\Http\Controllers\Admin\EnumValueController;
-use App\Http\Controllers\Admin\LocationController as AdminLocationController;
 use App\Models\Inventory;
 use App\Models\NewsImage;
 use App\Support\Storage\SecureStorage;
@@ -47,6 +46,11 @@ Route::middleware('auth')->group(function (): void {
             Route::delete('/{attributeValueTranslation}', [AttributeValueTranslationController::class, 'destroy'])
                 ->name('destroy');
         });
+
+    Route::get('/admin/document-templates/{documentTemplate}/preview', function (\App\Models\DocumentTemplate $documentTemplate) {
+        return response($documentTemplate->content, 200)
+            ->header('Content-Type', 'text/html; charset=utf-8');
+    })->name('admin.document-templates.preview');
 
     Route::get('/admin/news-image-resources', function (Request $request) {
         $forwarded = Request::create('/admin/news-images', 'GET', $request->query());

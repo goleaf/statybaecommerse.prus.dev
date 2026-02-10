@@ -19,7 +19,7 @@ class CustomerGroupForm
     {
         return $schema
             ->components([
-                SchemaSection::make(__('messages.General'))
+                SchemaSection::make(__('messages.general'))
                     ->schema([
                         SchemaGrid::make(2)
                             ->schema([
@@ -35,23 +35,23 @@ class CustomerGroupForm
                                     ->label(__('messages.slug'))
                                     ->disabled()
                                     ->dehydrated(false)
-                                    ->helperText(__('Automatically generated from name or code.')),
+                                    ->helperText(__('messages.automatically_generated_from_name_or_code')),
                                 Select::make('type')
                                     ->label(__('messages.type'))
                                     ->options([
-                                        'retail'    => __('messages.Retail'),
-                                        'wholesale' => __('messages.Wholesale'),
-                                        'b2b'       => __('messages.B2B'),
-                                        'internal'  => __('messages.Internal'),
+                                        'retail'    => __('messages.retail'),
+                                        'wholesale' => __('messages.wholesale'),
+                                        'b2b'       => __('messages.b2b'),
+                                        'internal'  => __('messages.internal'),
                                     ])
                                     ->required(),
                                 ColorPicker::make('color')
-                                    ->label(__('messages.Color')),
+                                    ->label(__('messages.color')),
                                 TextInput::make('icon')
                                     ->label(__('admin.news_images.image'))
                                     ->maxLength(255),
                                 TextInput::make('sort_order')
-                                    ->label(__('messages.Sort'))
+                                    ->label(__('messages.sort'))
                                     ->numeric()
                                     ->default(0),
                             ]),
@@ -77,28 +77,28 @@ class CustomerGroupForm
                                     ->numeric()
                                     ->minValue(0),
                                 Toggle::make('has_special_pricing')
-                                    ->label(__('Has Special Pricing')),
+                                    ->label(__('ui.has_special_pricing')),
                                 Toggle::make('has_volume_discounts')
-                                    ->label(__('Has Volume Discounts')),
+                                    ->label(__('ui.has_volume_discounts')),
                             ]),
                     ])
                     ->columnSpanFull(),
 
-                SchemaSection::make(__('Security'))
+                SchemaSection::make(__('ui.security'))
                     ->schema([
                         SchemaGrid::make(2)
                             ->schema([
                                 Toggle::make('can_view_prices')
-                                    ->label(__('Can View Prices'))
+                                    ->label(__('ui.can_view_prices'))
                                     ->default(true),
                                 Toggle::make('can_place_orders')
-                                    ->label(__('Can Place Orders'))
+                                    ->label(__('ui.can_place_orders'))
                                     ->default(true),
                                 Toggle::make('can_view_catalog')
-                                    ->label(__('Can View Catalog'))
+                                    ->label(__('ui.can_view_catalog'))
                                     ->default(true),
                                 Toggle::make('can_use_coupons')
-                                    ->label(__('Can Use Coupons'))
+                                    ->label(__('ui.can_use_coupons'))
                                     ->default(true),
                             ]),
                     ])
@@ -109,11 +109,11 @@ class CustomerGroupForm
                         SchemaGrid::make(3)
                             ->schema([
                                 TextInput::make('minimum_order_amount')
-                                    ->label(__('Minimum Order Amount'))
+                                    ->label(__('ui.minimum_order_amount'))
                                     ->numeric()
                                     ->minValue(0),
                                 TextInput::make('credit_limit')
-                                    ->label(__('Credit Limit'))
+                                    ->label(__('ui.credit_limit'))
                                     ->numeric()
                                     ->minValue(0),
                                 TextInput::make('payment_terms')

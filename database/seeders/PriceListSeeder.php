@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use App\Models\Currency;
-use Illuminate\Database\Seeder;
 
-final class PriceListSeeder extends Seeder
+final class PriceListSeeder extends BaseSeeder
 {
     public function run(): void
     {

@@ -73,18 +73,16 @@ final class MailPreviewController
     {
         return [
             'order-confirmation' => [
-                'label' => static fn (string $locale): string => __('messages.mail, [], $locale),
-                ', [], $locale),
-                'make' => function (string $locale): Mailable {
+                'label' => static fn (string $locale): string => __('messages.mail', [], $locale),
+                'make'  => function (string $locale): Mailable {
                     $order = $this->fakeOrder($locale);
 
                     return new OrderConfirmationMail($order);
                 },
             ],
             'password-reset' => [
-                'label' => static fn (string $locale): string => __('messages.mail, [], $locale),
-                ', [], $locale),
-                'make' => function (string $locale): Mailable {
+                'label' => static fn (string $locale): string => __('messages.mail', [], $locale),
+                'make'  => function (string $locale): Mailable {
                     $passwordBroker = config('auth.defaults.passwords', 'users');
                     $passwordBroker = is_string($passwordBroker) && $passwordBroker !== '' ? $passwordBroker : 'users';
                     $expireConfig = config("auth.passwords.{$passwordBroker}.expire", 60);
@@ -95,9 +93,8 @@ final class MailPreviewController
                 },
             ],
             'verify-email' => [
-                'label' => static fn (string $locale): string => __('messages.mail, [], $locale),
-                ', [], $locale),
-                'make' => function (string $locale): Mailable {
+                'label' => static fn (string $locale): string => __('messages.mail', [], $locale),
+                'make'  => function (string $locale): Mailable {
                     $url = url('verify-email/' . Str::random(32) . '/' . Str::random(64));
 
                     return new VerifyEmailMail($url, $locale);

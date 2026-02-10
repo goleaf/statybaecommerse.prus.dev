@@ -10,7 +10,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\View\View;
-use SimpleXMLElement;
 
 /**
  * HandlesContentNegotiation
@@ -31,12 +30,6 @@ trait HandlesContentNegotiation
         // JSON response (API clients, AJAX requests)
         if ($request->accepts(['application/json', 'text/json'])) {
             return response()->json($payload);
-        }
-        // XML response (legacy systems, RSS feeds)
-        if ($request->accepts(['application/xml', 'text/xml'])) {
-            $xml = $this->arrayToXml($payload, 'response');
-
-            return response($xml, 200, ['Content-Type' => 'application/xml; charset=utf-8']);
         }
         // CSV response (data export, spreadsheet applications)
         if ($request->accepts(['text/csv', 'application/csv'])) {
@@ -124,38 +117,6 @@ trait HandlesContentNegotiation
         }
 
         return ['categories' => []];
-    }
-
-    /**
-     * Convert array to XML
-     */
-    protected function arrayToXml(array $data, string $rootElement = 'root'): string
-    {
-        $xml = new SimpleXMLElement("<?xml version='1.0' encoding='UTF-8'?><{$rootElement}></{$rootElement}>");
-        $this->arrayToXmlRecursive($data, $xml);
-
-        return $xml->asXML();
-    }
-
-    /**
-     * Recursively convert array to XML
-     */
-    protected function arrayToXmlRecursive(array $data, SimpleXMLElement $xml): void
-    {
-        foreach ($data as $key => $value) {
-            if (is_array($value)) {
-                if (is_numeric($key)) {
-                    $key = 'item';
-                }
-                $subnode = $xml->addChild($key);
-                $this->arrayToXmlRecursive($value, $subnode);
-            } else {
-                if (is_numeric($key)) {
-                    $key = 'item';
-                }
-                $xml->addChild($key, htmlspecialchars((string) $value));
-            }
-        }
     }
 
     /**

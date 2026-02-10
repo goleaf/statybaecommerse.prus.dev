@@ -4,12 +4,19 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use function array_filter;
 use function array_key_exists;
+use function array_unique;
 
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-final class DatabaseSeeder extends Seeder
+use function is_string;
+
+final class DatabaseSeeder extends BaseSeeder
 {
+    use WithoutModelEvents;
+
     /**
      * Seed the application's database using the configured profile.
      */
@@ -36,6 +43,15 @@ final class DatabaseSeeder extends Seeder
                 : $defaultProfile;
 
             $seeders = $profiles[$resolvedProfile] ?? [];
+        }
+
+        $seeders = array_values(array_unique(array_filter(
+            is_array($seeders) ? $seeders : [],
+            static fn (mixed $seeder): bool => is_string($seeder) && class_exists($seeder)
+        )));
+
+        if ($seeders === []) {
+            return;
         }
 
         try {

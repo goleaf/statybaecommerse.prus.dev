@@ -6,9 +6,8 @@ namespace Database\Seeders;
 
 use App\Models\Post;
 use App\Models\User;
-use Illuminate\Database\Seeder;
 
-final class PostSeeder extends Seeder
+final class PostSeeder extends BaseSeeder
 {
     private const PLACEHOLDER_IMAGE_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAACXBIWXMAAAsTAAALEwEAmpwYAAAA8ElEQVR4nO3QsQmDMBAF0exE4nWjBE7RRL3sLFOTxB9VRLpMWaBt55z/nM8AhIsfADAAwDMAwzAMAzDMAzDMAzDMAzDwN4E7n/BTu+BSH8CIfwIh/AgfEJ4BwiH8CCP8CBMQvgXCIjwAwDMAwzAMAzDMAzDMAzDwDwQngHCIfwII/wIEwRvgcAiP8CBD+D8ARwiL8CwCMMwzAMAzDMAzDMAzD8NMBPEI4BMKHP7x36V95gDBuFZ7nbwQEAAQIECBAgACB/wE3AbQqPp+xbSMAAAAASUVORK5CYII=';
 

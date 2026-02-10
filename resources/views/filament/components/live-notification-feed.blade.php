@@ -141,7 +141,7 @@
                         {{ __('admin.notifications.no_notifications') }}
                     </h3>
                     <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                        {{ __('You\'re all caught up!') }}
+                        {{ __('ui.all_caught_up') }}
                     </p>
                 </div>
             @endif

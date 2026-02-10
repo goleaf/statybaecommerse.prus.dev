@@ -21,14 +21,14 @@ class ProductRequestsTable
             ->defaultSort('created_at', 'desc')
             ->columns([
                 TextColumn::make('product.name')
-                    ->label(__('messages.Product'))
+                    ->label(__('messages.product'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('user.name')
                     ->label(__('messages.user'))
                     ->searchable()
                     ->sortable()
-                    ->placeholder(__('messages.Guest')),
+                    ->placeholder(__('messages.guest')),
                 TextColumn::make('name')
                     ->label(__('messages.name'))
                     ->searchable()
@@ -41,7 +41,7 @@ class ProductRequestsTable
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('requested_quantity')
-                    ->label(__('messages.Quantity'))
+                    ->label(__('messages.quantity'))
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('status')
@@ -56,7 +56,7 @@ class ProductRequestsTable
                     })
                     ->formatStateUsing(fn (string $state): string => __("translations.status_{$state}")),
                 TextColumn::make('created_at')
-                    ->label(__('messages.Created At'))
+                    ->label(__('messages.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

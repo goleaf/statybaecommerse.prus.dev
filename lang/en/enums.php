@@ -3,20 +3,20 @@
 declare(strict_types=1);
 
 return [
-    'industry'       => [
+    'industry' => [
         'construction'  => 'Construction',
-        'technology'    => 'Technology',
-        'manufacturing' => 'Manufacturing',
-        'retail'        => 'Retail',
-        'finance'       => 'Finance',
         'education'     => 'Education',
+        'finance'       => 'Finance',
         'healthcare'    => 'Healthcare',
+        'manufacturing' => 'Manufacturing',
         'other'         => 'Other',
+        'retail'        => 'Retail',
+        'technology'    => 'Technology',
     ],
     'organization_type' => [
         'company'    => 'Company',
-        'team'       => 'Team',
         'department' => 'Department',
+        'team'       => 'Team',
     ],
     'payment_method' => [
         'apple_pay'        => 'Apple Pay',

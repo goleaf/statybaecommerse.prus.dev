@@ -13,21 +13,21 @@ trait WithNotifications
 {
     public function notifySuccess(string $message, ?string $title = null): void
     {
-        $this->dispatch('notify', ['type' => 'success', 'title' => $title ?? __('Success'), 'message' => $message]);
+        $this->dispatch('notify', ['type' => 'success', 'title' => $title ?? __('messages.success'), 'message' => $message]);
     }
 
     public function notifyError(string $message, ?string $title = null): void
     {
-        $this->dispatch('notify', ['type' => 'error', 'title' => $title ?? __('Error'), 'message' => $message]);
+        $this->dispatch('notify', ['type' => 'error', 'title' => $title ?? __('messages.error'), 'message' => $message]);
     }
 
     public function notifyWarning(string $message, ?string $title = null): void
     {
-        $this->dispatch('notify', ['type' => 'warning', 'title' => $title ?? __('Warning'), 'message' => $message]);
+        $this->dispatch('notify', ['type' => 'warning', 'title' => $title ?? __('messages.warning'), 'message' => $message]);
     }
 
     public function notifyInfo(string $message, ?string $title = null): void
     {
-        $this->dispatch('notify', ['type' => 'info', 'title' => $title ?? __('Information'), 'message' => $message]);
+        $this->dispatch('notify', ['type' => 'info', 'title' => $title ?? __('messages.information'), 'message' => $message]);
     }
 }

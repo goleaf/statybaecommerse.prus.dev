@@ -229,16 +229,7 @@ final class CouponUsage extends Model
             return __('admin.coupon_usages.periods.this_month');
         }
 
-        return __('messages.admin_coupon_usages);
-    }
-
-    /**
-     * @param  Builder<self> $query
-     * @return Builder<self>
-     */
-    public function scopeRecent(Builder $query, int $days = 7): Builder
-    {
-        return $query->where(');
+        return __('messages.admin_coupon_usages');
     }
 
     /**

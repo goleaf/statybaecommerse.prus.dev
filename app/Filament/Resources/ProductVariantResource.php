@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProductVariantResource\Pages;
+use App\Filament\Resources\ProductVariantResource\RelationManagers\PricesRelationManager;
 use App\Filament\Resources\ProductVariantResource\RelationManagers\ProductsRelationManager;
 use App\Filament\Resources\ProductVariantResource\Schemas\ProductVariantForm;
 use App\Filament\Resources\ProductVariantResource\Schemas\ProductVariantInfolist;
@@ -81,6 +82,7 @@ final class ProductVariantResource extends BaseResource
     {
         return [
             ProductsRelationManager::class,
+            PricesRelationManager::class,
         ];
     }
 

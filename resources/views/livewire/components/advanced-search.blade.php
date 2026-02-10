@@ -240,7 +240,7 @@
                                     {{ $result['title'] }}
                                 </h3>
                                 <span class="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded-full">
-                                    {{ __('frontend.search.type_' . $result['type']) }}
+                                    {{ __('frontend.search.type' . $result['type']) }}
                                 </span>
                             </div>
                             

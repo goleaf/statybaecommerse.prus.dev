@@ -57,6 +57,6 @@ final class SystemNotification extends Notification implements ShouldQueue
         return (new MailMessage)
             ->subject($this->data['title'])
             ->line($this->data['message'])
-            ->line(__('This message was sent from the system administration console.'));
+            ->line(__('messages.this_message_was_sent_from_the_system_administration_console'));
     }
 }

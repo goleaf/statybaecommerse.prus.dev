@@ -7,9 +7,8 @@ namespace Database\Seeders;
 use App\Models\Product;
 use App\Models\ProductRequest;
 use App\Models\User;
-use Illuminate\Database\Seeder;
 
-final class ProductRequestSeeder extends Seeder
+final class ProductRequestSeeder extends BaseSeeder
 {
     /**
      * Run the database seeds.

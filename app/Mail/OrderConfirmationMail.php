@@ -28,7 +28,7 @@ final class OrderConfirmationMail extends Mailable implements ShouldQueue
 
         return $this
             ->locale($locale)
-            ->subject(__('messages.mail, [', ['number' => $this->order->number], $locale))
+            ->subject(__('messages.mail', ['number' => $this->order->number], $locale))
             ->markdown('emails.orders.placed', [
                 'order'    => $this->order,
                 'orderUrl' => route('account.orders.detail', [

@@ -8,6 +8,7 @@ use App\Filament\Resources\ProductResource\Pages;
 use App\Filament\Resources\ProductResource\RelationManagers\FeaturesRelationManager;
 use App\Filament\Resources\ProductResource\RelationManagers\ImagesRelationManager;
 use App\Filament\Resources\ProductResource\RelationManagers\OrdersRelationManager;
+use App\Filament\Resources\ProductResource\RelationManagers\PricesRelationManager;
 use App\Filament\Resources\ProductResource\RelationManagers\RequestsRelationManager;
 use App\Filament\Resources\ProductResource\RelationManagers\SimilaritiesRelationManager;
 use App\Filament\Resources\ProductResource\RelationManagers\VariantsRelationManager;
@@ -58,6 +59,7 @@ final class ProductResource extends BaseResource
     {
         return [
             VariantsRelationManager::class,
+            PricesRelationManager::class,
             ImagesRelationManager::class,
             FeaturesRelationManager::class,
             RequestsRelationManager::class,

@@ -171,6 +171,6 @@ class Cart extends Component
             $sessionItems = $cart->getContent();
         }
 
-        return view('livewire.pages.cart', ['items' => $sessionItems, 'subtotal' => $this->subtotal])->title(__('Your cart'));
+        return view('livewire.pages.cart', ['items' => $sessionItems, 'subtotal' => $this->subtotal])->title(__('messages.your_cart'));
     }
 }

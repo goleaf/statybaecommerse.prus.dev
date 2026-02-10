@@ -58,7 +58,7 @@
                 <p class="text-2xl font-bold text-yellow-900">{{ $stats['brands'] }}</p>
             </div>
             <div class="bg-red-50 rounded-lg p-4">
-                <h3 class="text-sm font-medium text-red-600">{{ __('common.Reviews') }}</h3>
+                <h3 class="text-sm font-medium text-red-600">{{ __('common.reviews') }}</h3>
                 <p class="text-2xl font-bold text-red-900">{{ $stats['reviews'] }}</p>
             </div>
         </div>
@@ -120,12 +120,12 @@
                     <h3 class="font-medium text-gray-900 mb-2">{{ __('ui.current_filters') }}</h3>
                     <ul class="text-sm text-gray-600 space-y-1">
                         <li>{{ __('ui.time_filter') }}: {{ ucfirst($summaryReport['filter_applied']) }}</li>
-                        <li>{{ __('messages.category') }}: {{ $summaryReport['category_filter'] ?: __('All') }}</li>
-                        <li>{{ __('ui.expensive_only') }}: {{ $summaryReport['expensive_only'] ? __('Yes') : __('No') }}</li>
+                        <li>{{ __('messages.category') }}: {{ $summaryReport['category_filter'] ?: __('ui.all') }}</li>
+                        <li>{{ __('ui.expensive_only') }}: {{ $summaryReport['expensive_only'] ? __('ui.yes') : __('ui.no') }}</li>
                     </ul>
                 </div>
                 <div>
-                    <h3 class="font-medium text-gray-900 mb-2">{{ __('Metrics') }}</h3>
+                    <h3 class="font-medium text-gray-900 mb-2">{{ __('ui.metrics') }}</h3>
                     <ul class="text-sm text-gray-600 space-y-1">
                         <li>{{ __('ui.filtered_results') }}: {{ $summaryReport['filtered_count'] }}</li>
                         <li>{{ __('ui.percentage_of_total') }}: {{ $summaryReport['percentage_of_total'] }}%</li>

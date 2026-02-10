@@ -8,9 +8,8 @@ use App\Models\Country;
 use App\Models\Region;
 use App\Models\Translations\RegionTranslation;
 use App\Models\Zone;
-use Illuminate\Database\Seeder;
 
-class RegionSeeder extends Seeder
+class RegionSeeder extends BaseSeeder
 {
     public function run(): void
     {

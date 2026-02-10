@@ -12,11 +12,10 @@ use App\Models\ReferralCodeUsageLog;
 use App\Models\ReferralReward;
 use App\Models\ReferralRewardLog;
 use App\Models\User;
-use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
-final class ReferralSystemComprehensiveSeeder extends Seeder
+final class ReferralSystemComprehensiveSeeder extends BaseSeeder
 {
     public function run(): void
     {

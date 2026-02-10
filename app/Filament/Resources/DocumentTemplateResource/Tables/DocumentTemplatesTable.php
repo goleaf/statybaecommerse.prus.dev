@@ -4,16 +4,15 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DocumentTemplateResource\Tables;
 
-use App\Enums\DocumentTemplateCategory;
-use App\Enums\DocumentTemplateType;
 use App\Models\DocumentTemplate;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Select;
 use Filament\Notifications\Notification;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -77,14 +76,15 @@ class DocumentTemplatesTable
                     ->label(__('admin.document_templates.filters.is_active')),
             ])
             ->actions([
-                ViewAction::make(),
-                EditAction::make(),
                 Action::make('preview_template')
                     ->label(__('admin.document_templates.actions.preview'))
                     ->icon('heroicon-o-eye')
-                    ->modalHeading(__('admin.document_templates.actions.preview'))
-                    ->modalContent(fn (DocumentTemplate $record) => new HtmlString($record->content))
-                    ->action(static function (): void {}),
+                    ->color('info')
+                    ->button()
+                    ->url(fn (DocumentTemplate $record): string => route('admin.document-templates.preview', $record))
+                    ->openUrlInNewTab(),
+                ViewAction::make(),
+                EditAction::make(),
                 Action::make('duplicate_template')
                     ->label(__('admin.document_templates.actions.duplicate'))
                     ->icon('heroicon-o-document-duplicate')

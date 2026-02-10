@@ -7,14 +7,13 @@ namespace Database\Seeders;
 use App\Models\Product;
 use App\Services\Images\ProductImageService;
 use App\Services\Images\WebPConversionService;
-use Illuminate\Database\Seeder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use RuntimeException;
 use Throwable;
 
-final class OptimizedProductImageSeeder extends Seeder
+final class OptimizedProductImageSeeder extends BaseSeeder
 {
     private ProductImageService $imageService;
 

@@ -46,7 +46,7 @@ final class NotificationDropdown extends Component
         }
         $this->unreadCount = auth()->user()->unreadNotifications->count();
         $this->recentNotifications = auth()->user()->notifications()->latest()->limit(5)->get()->map(function ($notification) {
-            return ['id' => $notification->id, 'type' => class_basename($notification->type), 'title' => $notification->data['title'] ?? __('Notification'), 'message' => $notification->data['message'] ?? '', 'read_at' => $notification->read_at, 'created_at' => $notification->created_at->diffForHumans()];
+            return ['id' => $notification->id, 'type' => class_basename($notification->type), 'title' => $notification->data['title'] ?? __('messages.notification'), 'message' => $notification->data['message'] ?? '', 'read_at' => $notification->read_at, 'created_at' => $notification->created_at->diffForHumans()];
         });
     }
 

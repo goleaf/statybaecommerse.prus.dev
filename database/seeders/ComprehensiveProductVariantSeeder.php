@@ -11,10 +11,9 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\VariantAttributeValue;
-use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
-final class ComprehensiveProductVariantSeeder extends Seeder
+final class ComprehensiveProductVariantSeeder extends BaseSeeder
 {
     /**
      * Run the database seeds.

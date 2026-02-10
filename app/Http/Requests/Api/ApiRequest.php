@@ -94,7 +94,7 @@ abstract class ApiRequest extends FormRequest
 
         $locale = RequestContext::resolveLocale($this);
         $detail = $validator->errors()->first()
-            ?? (ErrorCodes::message(ErrorCodes::VALIDATION_FAILED, $locale) ?? __('The given data was invalid.'));
+            ?? (ErrorCodes::message(ErrorCodes::VALIDATION_FAILED, $locale) ?? __('messages.the_given_data_was_invalid'));
 
         $response = ApiErrorResponse::problem(
             request: $this,

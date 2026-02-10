@@ -586,7 +586,7 @@ final class ApiServiceProvider extends ServiceProvider
                 'status' => SymfonyResponse::HTTP_TOO_MANY_REQUESTS,
                 'error'  => [
                     'code'    => 'rate_limit_exceeded',
-                    'message' => __('Too many requests.'),
+                    'message' => __('messages.too_many_requests'),
                 ],
             ], SymfonyResponse::HTTP_TOO_MANY_REQUESTS)
             ->withHeaders($headers);

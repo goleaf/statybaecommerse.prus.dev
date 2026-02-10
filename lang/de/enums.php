@@ -3,20 +3,20 @@
 declare(strict_types=1);
 
 return [
-    'industry'       => [
+    'industry' => [
         'construction'  => 'Bau',
-        'technology'    => 'Technologie',
-        'manufacturing' => 'Fertigung',
-        'retail'        => 'Einzelhandel',
-        'finance'       => 'Finanzen',
         'education'     => 'Bildung',
+        'finance'       => 'Finanzen',
         'healthcare'    => 'Gesundheitswesen',
+        'manufacturing' => 'Fertigung',
         'other'         => 'Sonstiges',
+        'retail'        => 'Einzelhandel',
+        'technology'    => 'Technologie',
     ],
     'organization_type' => [
         'company'    => 'Unternehmen',
-        'team'       => 'Team',
         'department' => 'Abteilung',
+        'team'       => 'Team',
     ],
     'payment_method' => [
         'apple_pay'        => 'Apple Pay',

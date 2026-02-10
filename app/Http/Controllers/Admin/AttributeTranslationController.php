@@ -69,7 +69,7 @@ final class AttributeTranslationController extends Controller
         $name = trim($validated['name']);
         if ($name === '') {
             return back()->withInput()->withErrors([
-                'name' => __('messages.validation, [', ['attribute' => 'name']),
+                'name' => __('validation.required', ['attribute' => 'name']),
             ]);
         }
 
@@ -85,6 +85,6 @@ final class AttributeTranslationController extends Controller
         );
 
         // Redirect back to the administration panel with a success flash message for user feedback.
-        return back()->with('status', __('Attribute translation updated successfully.'));
+        return back()->with('status', __('messages.attribute_translation_updated_successfully'));
     }
 }

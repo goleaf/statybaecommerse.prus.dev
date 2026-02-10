@@ -7,6 +7,7 @@ namespace App\Filament\Pages\Imports;
 use App\Jobs\ProcessCsvImport;
 use App\Models\AdminUser;
 use App\Models\ImportRowResult;
+use App\Support\ImportExport\ProgressCounter;
 use App\Support\Storage\SecureStorage;
 use BackedEnum;
 use Closure;
@@ -129,8 +130,6 @@ abstract class CsvImportPage extends Page implements HasForms
                                             'application/x-csv',
                                             'text/comma-separated-values',
                                             'text/x-comma-separated-values',
-                                            'text/plain',
-                                            'application/vnd.ms-excel',
                                         ])
                                         ->rules($this->getFileValidationRules())
                                         ->afterStateUpdated(function (FileUpload $component, Component $livewire, Set $set, ?TemporaryUploadedFile $state) use ($page): void {
@@ -842,12 +841,12 @@ abstract class CsvImportPage extends Page implements HasForms
             return;
         }
 
-        $processed = $import->processed_rows ?? 0;
-        $total = $import->total_rows ?? 0;
-        $successful = $import->successful_rows ?? 0;
-        $failed = $import->getFailedRowsCount();
+        $total = ProgressCounter::normalizeTotal((int) ($import->total_rows ?? 0));
+        $processed = ProgressCounter::normalizeProcessed((int) ($import->processed_rows ?? 0), $total);
+        $successful = ProgressCounter::normalizeSuccessful((int) ($import->successful_rows ?? 0), $processed, $total);
+        $failed = $this->calculateFailedRowsCount($import);
         $percent = $this->calculateProgressPercent($processed, $total);
-        $status = ($import->completed_at || $processed >= $total) ? 'completed' : 'running';
+        $status = $this->resolveImportStatus($import, $processed, $total);
 
         $this->importProgress = [
             'processed'  => $processed,
@@ -909,8 +908,8 @@ abstract class CsvImportPage extends Page implements HasForms
             return;
         }
 
-        $processed = (int) ($import->processed_rows ?? 0);
-        $total = (int) ($import->total_rows ?? 0);
+        $total = ProgressCounter::normalizeTotal((int) ($import->total_rows ?? 0));
+        $processed = ProgressCounter::normalizeProcessed((int) ($import->processed_rows ?? 0), $total);
 
         if ($total > 0 && $processed >= $total) {
             $import->touch('completed_at');
@@ -968,11 +967,21 @@ abstract class CsvImportPage extends Page implements HasForms
 
         $import->refresh();
 
-        if ($import->processed_rows >= $import->total_rows) {
+        $normalizedTotal = ProgressCounter::normalizeTotal((int) ($import->total_rows ?? 0));
+        $normalizedProcessed = ProgressCounter::normalizeProcessed((int) ($import->processed_rows ?? 0), $normalizedTotal);
+
+        if ($this->resolveImportStatus($import, $normalizedProcessed, $normalizedTotal) === 'completed') {
             $import->touch('completed_at');
             $this->isImporting = false;
             $this->notifyImportCompleted($import);
         }
+    }
+
+    protected function resolveImportStatus(Import $import, int $processedRows, int $totalRows): string
+    {
+        return ($import->completed_at !== null || ($totalRows > 0 && $processedRows >= $totalRows))
+            ? 'completed'
+            : 'running';
     }
 
     protected function normalizeImportPayload(mixed $payload): mixed
@@ -993,7 +1002,8 @@ abstract class CsvImportPage extends Page implements HasForms
 
     protected function notifyImportCompleted(Import $import): void
     {
-        $failedRowsCount = $import->getFailedRowsCount();
+        $failedRowsCount = $this->calculateFailedRowsCount($import);
+        $totalRows = ProgressCounter::normalizeTotal((int) ($import->total_rows ?? 0));
         $authGuard = $this->resolveAuthGuard();
 
         Notification::make()
@@ -1004,11 +1014,11 @@ abstract class CsvImportPage extends Page implements HasForms
                 fn (Notification $notification) => $notification->success(),
             )
             ->when(
-                $failedRowsCount && ($failedRowsCount < $import->total_rows),
+                $failedRowsCount > 0 && ($totalRows === 0 || $failedRowsCount < $totalRows),
                 fn (Notification $notification) => $notification->warning(),
             )
             ->when(
-                $failedRowsCount === $import->total_rows,
+                $totalRows > 0 && $failedRowsCount === $totalRows,
                 fn (Notification $notification) => $notification->danger(),
             )
             ->when(
@@ -1029,11 +1039,16 @@ abstract class CsvImportPage extends Page implements HasForms
 
     protected function calculateProgressPercent(int $processed, int $total): int
     {
-        if ($total <= 0) {
-            return 0;
-        }
+        return ProgressCounter::percent($processed, $total);
+    }
 
-        return min(100, (int) floor(($processed / $total) * 100));
+    protected function calculateFailedRowsCount(Import $import): int
+    {
+        return ProgressCounter::failedRows(
+            (int) ($import->processed_rows ?? 0),
+            (int) ($import->successful_rows ?? 0),
+            (int) ($import->total_rows ?? 0),
+        );
     }
 
     public function import(): void
@@ -1387,7 +1402,7 @@ abstract class CsvImportPage extends Page implements HasForms
     protected function getFileValidationRules(): array
     {
         return [
-            'extensions:csv,txt',
+            'extensions:csv',
             fn (): Closure => function (string $attribute, mixed $value, Closure $fail): void {
                 $csvStream = $this->getUploadedFileStream($value);
 

@@ -137,12 +137,12 @@ final class LegalTranslationController extends Controller
             report($throwable);
 
             return back()->withInput()->withErrors([
-                'translation' => __('Unable to save legal translation.'),
+                'translation' => __('messages.unable_to_save_legal_translation'),
             ]);
         }
 
         // Provide user feedback in the UI to confirm the translation was stored successfully.
-        return back()->with('status', __('Legal translation updated successfully.'));
+        return back()->with('status', __('messages.legal_translation_updated_successfully'));
     }
 
     /**

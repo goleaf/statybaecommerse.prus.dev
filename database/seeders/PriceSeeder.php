@@ -7,9 +7,8 @@ namespace Database\Seeders;
 use App\Models\Currency;
 use App\Models\Price;
 use App\Models\Product;
-use Illuminate\Database\Seeder;
 
-final class PriceSeeder extends Seeder
+final class PriceSeeder extends BaseSeeder
 {
     /**
      * Run the database seeds.

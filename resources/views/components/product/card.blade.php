@@ -6,9 +6,9 @@
     <div class="mt-4 flex justify-between">
         <div>
             <h3 class="text-sm font-medium text-gray-700">
-                <x-link :href="route('product.show', $product->trans('slug') ?? $product->slug ?? $product)">
+                <x-link :href="route('product.show', $product->trans('ui.slug') ?? $product->slug ?? $product)">
                     <span aria-hidden="true" class="absolute inset-0"></span>
-                    {{ $product->trans('name') ?? $product->name }}
+                    {{ $product->trans('ui.name') ?? $product->name }}
                 </x-link>
             </h3>
 
@@ -16,10 +16,10 @@
                 <p class="mt-1 text-sm text-gray-500">
                     @if ($product->brand)
                         <x-link :href="route('brands.show', $product->brand)">
-                            {{ $product->brand?->trans('name') ?? $product->brand?->name }}
+                            {{ $product->brand?->trans('ui.name') ?? $product->brand?->name }}
                         </x-link>
                     @else
-                        {{ $product->brand?->trans('name') ?? $product->brand?->name }}
+                        {{ $product->brand?->trans('ui.name') ?? $product->brand?->name }}
                     @endif
                 </p>
             @endif

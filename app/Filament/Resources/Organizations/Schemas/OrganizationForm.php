@@ -33,7 +33,7 @@ class OrganizationForm
                             ->dehydrateStateUsing(fn (Get $get): string => Str::slug((string) $get('name')))
                             ->unique(ignoreRecord: true),
                         Select::make('type')
-                            ->label(__('messages.Type'))
+                            ->label(__('messages.type'))
                             ->options(OrganizationType::options())
                             ->required()
                             ->default(OrganizationType::COMPANY->value)
@@ -41,10 +41,10 @@ class OrganizationForm
                     ])->columns(2)
                     ->columnSpanFull(),
 
-                Section::make(__('messages.Description'))
+                Section::make(__('messages.description'))
                     ->schema([
                         RichEditor::make('description')
-                            ->label(__('messages.Description'))
+                            ->label(__('messages.description'))
                             ->columnSpanFull(),
                     ])
                     ->columnSpanFull(),

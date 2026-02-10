@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 return [
-    'descriptions' => 'legal.descriptions',
-    'types'        => 'legal.types',
+    'descriptions'  => 'legal.descriptions',
+    'return_policy' => 'Return policy',
+    'types'         => 'legal.types',
 ];

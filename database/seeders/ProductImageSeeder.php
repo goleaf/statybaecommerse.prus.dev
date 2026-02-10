@@ -11,7 +11,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Collection;
 use Throwable;
 
-final class ProductImageSeeder extends Seeder
+final class ProductImageSeeder extends BaseSeeder
 {
     private const FALLBACK_PIXEL = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO2aXhQAAAAASUVORK5CYII=';
 

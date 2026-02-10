@@ -1,6 +1,6 @@
 <x-layouts.base :title="__('ui.update_order')">
     <x-container class="py-8">
-        <x-breadcrumbs :items="[['label' => __('Orders')], ['label' => $order->number], ['label' => __('messages.update')]]" />
+        <x-breadcrumbs :items="[['label' => __('ui.orders')], ['label' => $order->number], ['label' => __('messages.update')]]" />
 
         @if (session('status'))
             <x-alert type="success" class="mb-4">{{ session('status') }}</x-alert>
@@ -9,7 +9,7 @@
         <div class="flex items-center justify-between max-w-xl mb-4">
             <div class="text-sm text-gray-600">
                 {{ __('messages.order') }} #{{ $order->number }} — {{ __('ui.current_status') }}:
-                <strong>{{ $order->status }}</strong>
+                <strong>{{ $order->status instanceof \BackedEnum ? $order->status->value : $order->status }}</strong>
             </div>
             <x-link :href="route('admin.orders.packing-slip', ['number' => $order->number])">{{ __('ui.packing_slip') }}</x-link>
         </div>
@@ -21,17 +21,17 @@
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm font-medium">{{ __('ui.order_status') }}</label>
-                        <input type="text" name="status" value="{{ old('status', $order->status) }}"
+                        <input type="text" name="status" value="{{ old('status', $order->status instanceof \BackedEnum ? $order->status->value : $order->status) }}"
                                class="mt-1 w-full border-gray-300 rounded" />
                     </div>
                     <div>
                         <label class="block text-sm font-medium">{{ __('ui.payment_status') }}</label>
                         <input type="text" name="payment_status"
-                               value="{{ old('payment_status', $order->payment_status) }}"
+                               value="{{ old('payment_status', $order->payment_status instanceof \BackedEnum ? $order->payment_status->value : $order->payment_status) }}"
                                class="mt-1 w-full border-gray-300 rounded" />
                     </div>
                     <div>
-                        <label class="block text-sm font-medium">{{ __('Note') }}</label>
+                        <label class="block text-sm font-medium">{{ __('ui.note') }}</label>
                         <textarea name="note" rows="4" class="mt-1 w-full border-gray-300 rounded">{{ old('note') }}</textarea>
                     </div>
                 </div>

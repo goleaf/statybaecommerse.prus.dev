@@ -7,8 +7,6 @@ namespace App\Services\Export;
 enum ExportFormat: string
 {
     case Csv = 'csv';
-    case Xlsx = 'xlsx';
-    case Pdf = 'pdf';
 
     public function extension(): string
     {
@@ -18,9 +16,7 @@ enum ExportFormat: string
     public function label(): string
     {
         return match ($this) {
-            self::Csv  => 'CSV',
-            self::Xlsx => 'Excel (XLSX)',
-            self::Pdf  => 'PDF',
+            self::Csv => 'CSV',
         };
     }
 }

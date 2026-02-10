@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Tests\Feature\Filament\Importers;
 
 use App\Filament\Imports\CategoryImporter;
-use App\Models\Category;
 use App\Models\User;
 use Filament\Actions\Imports\Jobs\ImportCsv;
 use Filament\Actions\Imports\Models\Import;
@@ -16,7 +15,7 @@ uses(RefreshDatabase::class);
 it('can import categories', function () {
     $user = User::factory()->admin()->create();
 
-    $import = new Import();
+    $import = new Import;
     $import->user()->associate($user);
     $import->file_name = 'categories.csv';
     $import->file_path = 'categories.csv';
@@ -25,14 +24,14 @@ it('can import categories', function () {
     $import->save();
 
     $row = [
-        'name' => 'Test Category',
-        'slug' => 'test-category',
+        'name'      => 'Test Category',
+        'slug'      => 'test-category',
         'is_active' => '1',
     ];
 
     $columnMap = [
-        'name' => 'name',
-        'slug' => 'slug',
+        'name'      => 'name',
+        'slug'      => 'slug',
         'is_active' => 'is_active',
     ];
 

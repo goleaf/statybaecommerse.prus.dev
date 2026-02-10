@@ -46,7 +46,7 @@ final class ExportColumn
         }
 
         if (is_bool($value)) {
-            return $value ? __('Yes') : __('No');
+            return $value ? __('messages.yes') : __('messages.no');
         }
 
         if (is_array($value) || is_object($value)) {

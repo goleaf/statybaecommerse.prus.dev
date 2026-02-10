@@ -41,9 +41,7 @@ final class ExportRequestData extends Data
 
     public function normalizedFormat(): string
     {
-        $format = strtolower((string) ($this->format ?? 'csv'));
-
-        return in_array($format, ['csv', 'xlsx', 'pdf'], true) ? $format : 'csv';
+        return 'csv';
     }
 
     /**

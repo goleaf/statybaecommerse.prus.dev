@@ -18,7 +18,7 @@
         <div
              {{ $attributes->merge(['class' => 'size-full max-w-none bg-gray-200 flex items-center justify-center']) }}>
             <span
-                  class="text-sm text-gray-500 font-medium">{{ strtoupper(substr($product->trans('name'), 0, 3)) }}</span>
+                  class="text-sm text-gray-500 font-medium">{{ strtoupper(substr($product->trans('ui.name'), 0, 3)) }}</span>
         </div>
     @endif
 </div>

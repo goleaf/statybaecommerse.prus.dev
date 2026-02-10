@@ -149,7 +149,7 @@
                                         <div class="mt-1 flex items-center space-x-2 text-xs text-gray-400">
                                             <span>{{ $notification['time_ago'] }}</span>
                                             <span>•</span>
-                                            <span class="capitalize">{{ __('notifications.types.' . $notification['type']) }}</span>
+                                            <span class="capitalize">{{ __(sprintf('notifications.types.%s', $notification['type'])) }}</span>
                                         </div>
                                     </div>
                                 </div>

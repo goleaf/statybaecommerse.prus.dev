@@ -63,7 +63,7 @@ class ShoppingCart extends SlideOverComponent
     public function removeToCart(int $id): void
     {
         CartFacade::session($this->sessionKey)->remove($id);
-        Notification::make()->title(__('messages.cart_updated'))->body(__('The product  has been removed from your cart !'))->success()->send();
+        Notification::make()->title(__('messages.cart_updated'))->body(__('messages.the_product_has_been_removed_from_your_cart'))->success()->send();
         $this->dispatch('cart-updated'); // Relay the update to other cart-aware components.
         $this->dispatch('closePanel');
     }

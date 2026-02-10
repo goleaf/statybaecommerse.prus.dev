@@ -339,7 +339,7 @@
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
                                         {{ $customer->preferred_locale === 'lt' ? 'bg-blue-100 text-blue-800' : 
                                            ($customer->preferred_locale === 'en' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800') }}">
-                                        {{ __('customers.locales.' . $customer->preferred_locale) }}
+                                        {{ __(sprintf('customers.locales.%s', $customer->preferred_locale)) }}
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">

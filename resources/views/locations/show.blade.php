@@ -67,7 +67,7 @@
                     
                     <div class="text-center">
                         <div class="text-2xl font-bold text-green-600 dark:text-green-400">
-                            {{ __('locations.type_' . $location->type) }}
+                            {{ __('locations.type' . $location->type) }}
                         </div>
                         <div class="text-sm text-gray-600 dark:text-gray-400">{{ __('messages.locations') }}</div>
                     </div>
@@ -123,7 +123,7 @@
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                             {{ __('messages.locations') }}
                         </label>
-                        <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ __('locations.type_' . $location->type) }}</p>
+                        <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ __('locations.type' . $location->type) }}</p>
                     </div>
                     
                     @if($location->sort_order)
@@ -257,7 +257,7 @@
                     <div class="flex justify-between">
                         <span class="text-sm text-gray-600 dark:text-gray-400">{{ __('messages.locations') }}:</span>
                         <span class="text-sm font-medium text-gray-900 dark:text-white">
-                            {{ __('locations.type_' . $location->type) }}
+                            {{ __('locations.type' . $location->type) }}
                         </span>
                     </div>
                     

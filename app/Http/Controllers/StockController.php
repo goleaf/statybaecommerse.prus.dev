@@ -166,7 +166,7 @@ final class StockController extends Controller
 
             $fresh = $stock->fresh() ?? $stock;
 
-            return response()->json(['success' => true, 'message' => __('messages.inventory), '), 'data' => ['new_stock' => $fresh->stock, 'available_stock' => $fresh->available_stock, 'correlation_id' => $correlationId]]);
+            return response()->json(['success' => true, 'message' => __('messages.inventory'), 'data' => ['new_stock' => $fresh->stock, 'available_stock' => $fresh->available_stock, 'correlation_id' => $correlationId]]);
         } catch (Exception $e) {
             return response()->json(['success' => false, 'message' => __('inventory.adjustment_failed'), 'error' => $e->getMessage()], 500);
         }
@@ -187,7 +187,7 @@ final class StockController extends Controller
                 // Refresh the model once so we return consistent post-reservation values.
                 $freshStock = $stock->fresh() ?? $stock;
 
-                return response()->json(['success' => true, 'message' => __('messages.inventory), '), 'data' => ['reserved' => $freshStock->reserved, 'available_stock' => $freshStock->available_stock]]);
+                return response()->json(['success' => true, 'message' => __('messages.inventory'), 'data' => ['reserved' => $freshStock->reserved, 'available_stock' => $freshStock->available_stock]]);
             } else {
                 return response()->json(['success' => false, 'message' => __('inventory.reserve_failed_message')], 400);
             }
@@ -211,7 +211,7 @@ final class StockController extends Controller
             // Refresh once so the response mirrors the persisted inventory state.
             $freshStock = $stock->fresh() ?? $stock;
 
-            return response()->json(['success' => true, 'message' => __('messages.inventory), '), 'data' => ['reserved' => $freshStock->reserved, 'available_stock' => $freshStock->available_stock]]);
+            return response()->json(['success' => true, 'message' => __('messages.inventory'), 'data' => ['reserved' => $freshStock->reserved, 'available_stock' => $freshStock->available_stock]]);
         } catch (Exception $e) {
             return response()->json(['success' => false, 'message' => __('inventory.unreserve_failed'), 'error' => $e->getMessage()], 500);
         }

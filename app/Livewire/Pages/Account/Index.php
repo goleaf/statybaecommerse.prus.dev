@@ -12,6 +12,6 @@ class Index extends Component
     {
         return view('livewire.pages.account.index')
             ->layout('components.layouts.templates.account')
-            ->title(__('Overview'));
+            ->title(__('messages.overview'));
     }
 }

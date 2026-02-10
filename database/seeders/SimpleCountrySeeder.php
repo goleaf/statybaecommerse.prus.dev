@@ -6,9 +6,8 @@ namespace Database\Seeders;
 
 use App\Models\Country;
 use App\Models\Translations\CountryTranslation;
-use Illuminate\Database\Seeder;
 
-final class SimpleCountrySeeder extends Seeder
+final class SimpleCountrySeeder extends BaseSeeder
 {
     public function run(): void
     {

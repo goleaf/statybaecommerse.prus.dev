@@ -9,9 +9,8 @@ use App\Models\File;
 use App\Models\Organization;
 use App\Models\Project;
 use App\Models\User;
-use Illuminate\Database\Seeder;
 
-final class OrganizationSeeder extends Seeder
+final class OrganizationSeeder extends BaseSeeder
 {
     /**
      * Run the database seeds.
