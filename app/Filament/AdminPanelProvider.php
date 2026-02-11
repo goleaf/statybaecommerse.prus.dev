@@ -30,34 +30,8 @@ class AdminPanelProvider extends PanelProvider
     public function boot(): void
     {
         FilamentView::registerRenderHook(
-            PanelsRenderHook::PAGE_START,
-            fn (): string => view('filament.hooks.customer-tabs')->render(),
-            scopes: [
-                \App\Filament\Resources\Customers\CustomerResource::class,
-                \App\Filament\Resources\UserResource::class,
-                \App\Filament\Resources\Companies\CompanyResource::class,
-                \App\Filament\Resources\Organizations\OrganizationResource::class,
-                \App\Filament\Resources\Partners\PartnerResource::class,
-                \App\Filament\Resources\CustomerGroups\CustomerGroupResource::class,
-            ],
-        );
-
-        FilamentView::registerRenderHook(
-            PanelsRenderHook::PAGE_START,
-            fn (): string => view('filament.hooks.product-tabs')->render(),
-            scopes: [
-                \App\Filament\Resources\ProductResource::class,
-                \App\Filament\Resources\CategoryResource::class,
-                \App\Filament\Resources\CollectionResource::class,
-                \App\Filament\Resources\ProductVariantResource::class,
-                \App\Filament\Resources\VariantCombinationResource::class,
-                \App\Filament\Resources\InventoryResource::class,
-                \App\Filament\Resources\BrandResource::class,
-                \App\Filament\Resources\ProductImageResource::class,
-                \App\Filament\Resources\ProductFeatureResource::class,
-                \App\Filament\Resources\ProductRequestResource::class,
-                \App\Filament\Resources\PriceResource::class,
-            ],
+            PanelsRenderHook::TOPBAR_LOGO_AFTER,
+            fn (): string => view('filament.hooks.topbar-product-menu')->render(),
         );
     }
 

@@ -7,15 +7,17 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\VariantCombinationResource\Pages;
 use App\Models\Product;
 use App\Models\VariantCombination;
+use App\Models\Scopes\ActiveScope;
+use App\Models\Scopes\EnabledScope;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\KeyValue;
-use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
@@ -83,6 +85,15 @@ final class VariantCombinationResource extends BaseResource
         // Re-use the shared schema definition so both Filament and the test suite operate on
         // the exact same component graph without duplicating configuration details.
         return $schema->components(self::formComponents());
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                ActiveScope::class,
+                EnabledScope::class,
+            ]);
     }
 
     /**
@@ -190,7 +201,7 @@ final class VariantCombinationResource extends BaseResource
                 ->sortable()
                 ->searchable()
                 ->url(fn (VariantCombination $record): ?string => $record->product_id
-                    ? route('filament.admin.resources.products.view', $record->product_id)
+                    ? \App\Filament\Resources\ProductResource::getUrl('edit', ['record' => $record->product_id])
                     : null)
                 ->color('primary'),
             TextColumn::make('attribute_combinations')
@@ -295,20 +306,7 @@ final class VariantCombinationResource extends BaseResource
     public static function tableHeaderActions(): array
     {
         return [
-            Action::make('generate_combinations')
-                ->label(__('admin.variant_combinations.generate_combinations'))
-                ->icon('heroicon-o-cog-6-tooth')
-                ->color('primary')
-                ->action(function (): void {
-                    Notification::make()
-                        ->title(__('admin.variant_combinations.combinations_generation_started'))
-                        ->success()
-                        ->send();
-                })
-                ->requiresConfirmation()
-                ->modalHeading(__('admin.variant_combinations.generate_combinations'))
-                ->modalDescription(__('admin.variant_combinations.generate_combinations_description'))
-                ->modalSubmitActionLabel(__('admin.variant_combinations.generate')),
+            CreateAction::make(),
         ];
     }
 
@@ -350,17 +348,6 @@ final class VariantCombinationResource extends BaseResource
                         ->send();
                 })
                 ->requiresConfirmation(),
-            Action::make('validate_combination')
-                ->label(__('admin.variant_combinations.validate_combination'))
-                ->icon('heroicon-o-check-circle')
-                ->color('success')
-                ->action(function (VariantCombination $record): void {
-                    $isValid = $record->is_valid_combination;
-                    Notification::make()
-                        ->title($isValid ? __('admin.variant_combinations.combination_is_valid') : __('admin.variant_combinations.combination_is_invalid'))
-                        ->color($isValid ? 'success' : 'danger')
-                        ->send();
-                }),
         ];
     }
 
@@ -423,22 +410,6 @@ final class VariantCombinationResource extends BaseResource
                     ->modalHeading(__('admin.variant_combinations.duplicate_selected'))
                     ->modalDescription(__('admin.variant_combinations.duplicate_selected_description'))
                     ->modalSubmitActionLabel(__('admin.variant_combinations.duplicate')),
-                BulkAction::make('validate_selected')
-                    ->label(__('admin.variant_combinations.validate_selected'))
-                    ->icon('heroicon-o-check-circle')
-                    ->color('primary')
-                    ->action(function (Collection $records): void {
-                        $validCount = $records->filter(fn ($record) => $record->is_valid_combination)->count();
-                        $totalCount = $records->count();
-
-                        Notification::make()
-                            ->title(__('admin.variant_combinations.validation_completed', [
-                                'valid' => $validCount,
-                                'total' => $totalCount,
-                            ]))
-                            ->color($validCount === $totalCount ? 'success' : 'warning')
-                            ->send();
-                    }),
             ]),
         ];
     }

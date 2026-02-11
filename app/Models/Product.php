@@ -597,9 +597,10 @@ final class Product extends Model implements HasMedia, TranslatableRecord
     /**
      * Handle variants functionality with proper error handling.
      */
-    public function variants(): HasMany
+    public function variants(): BelongsToMany
     {
-        return $this->hasMany(ProductVariant::class, 'product_id');
+        return $this->belongsToMany(ProductVariant::class, 'product_variant_product', 'product_id', 'product_variant_id')
+            ->withTimestamps();
     }
 
     /**
@@ -633,9 +634,9 @@ final class Product extends Model implements HasMedia, TranslatableRecord
     /**
      * Handle latestVariant functionality with proper error handling.
      */
-    public function latestVariant(): HasOne
+    public function latestVariant(): BelongsToMany
     {
-        return $this->variants()->one()->latestOfMany();
+        return $this->variants()->orderByPivot('created_at', 'desc');
     }
 
     /**

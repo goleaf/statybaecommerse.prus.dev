@@ -44,7 +44,7 @@ class ProductVariantFactory extends Factory
             unset($attributes['variant_attribute_matrix']);
         }
 
-        return $attributes;
+        return $this->guardForMissingColumns($attributes);
     }
 
     public function configure(): static
@@ -106,6 +106,29 @@ class ProductVariantFactory extends Factory
                 'attribute_' . $attribute->getKey() => $attribute->values->first()->getKey(),
             ])
             ->all();
+    }
+
+    /**
+     * Strip attributes that don't exist on the product_variants table for lightweight test schemas.
+     *
+     * @param  array<string, mixed> $attributes
+     * @return array<string, mixed>
+     */
+    private function guardForMissingColumns(array $attributes): array
+    {
+        $table = (new ProductVariant)->getTable();
+
+        if (! Schema::hasTable($table)) {
+            return $attributes;
+        }
+
+        foreach (array_keys($attributes) as $column) {
+            if (! Schema::hasColumn($table, $column)) {
+                unset($attributes[$column]);
+            }
+        }
+
+        return $attributes;
     }
 
     private function createTranslations(ProductVariant $variant): void

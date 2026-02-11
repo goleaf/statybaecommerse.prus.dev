@@ -197,14 +197,6 @@ final class VariantCombinationResourceTest extends TestCase
         $this->assertSame(2, VariantCombination::query()->where('product_id', $this->product->id)->count());
     }
 
-    public function test_can_validate_variant_combination_from_table_action(): void
-    {
-        // Run the validation action to confirm it triggers Filament notifications without errors.
-        Livewire::test(ListVariantCombinations::class)
-            ->callTableAction('validate_combination', $this->variantCombination)
-            ->assertNotified();
-    }
-
     public function test_bulk_action_can_make_combinations_available(): void
     {
         // Create an additional unavailable combination to verify the bulk action updates multiple records.
@@ -287,28 +279,6 @@ final class VariantCombinationResourceTest extends TestCase
         $this->assertSame([$olderCombination->id, $this->variantCombination->id], $sortedIds);
     }
 
-    public function test_header_action_can_generate_combinations(): void
-    {
-        // Execute the custom header action to ensure it emits the expected notification.
-        Livewire::test(ListVariantCombinations::class)
-            ->callTableAction('generate_combinations')
-            ->assertNotified();
-    }
-
-    public function test_bulk_action_can_validate_selected_combinations(): void
-    {
-        // Add an invalid combination lacking attributes to confirm the validation bulk action still completes.
-        $invalidCombination = VariantCombination::factory()->create([
-            'product_id'             => $this->product->id,
-            'attribute_combinations' => [],
-        ]);
-
-        // Run the validation bulk action and verify that a notification is dispatched.
-        Livewire::test(ListVariantCombinations::class)
-            ->callTableBulkAction('validate_selected', [$this->variantCombination, $invalidCombination])
-            ->assertNotified();
-    }
-
     public function test_bulk_action_can_duplicate_selected_combinations(): void
     {
         // Seed an additional combination to ensure duplication handles multiple records.
@@ -345,9 +315,9 @@ final class VariantCombinationResourceTest extends TestCase
     public function test_resource_exposes_expected_navigation_labels(): void
     {
         // Assert the resource returns the translation keys used for navigation labelling.
-        $this->assertSame('admin.variant_combinations.navigation_label', VariantCombinationResource::getNavigationLabel());
-        $this->assertSame('admin.variant_combinations.plural_model_label', VariantCombinationResource::getPluralModelLabel());
-        $this->assertSame('admin.variant_combinations.model_label', VariantCombinationResource::getModelLabel());
+        $this->assertSame(__('admin.variant_combinations.navigation_label'), VariantCombinationResource::getNavigationLabel());
+        $this->assertSame(__('admin.variant_combinations.plural_model_label'), VariantCombinationResource::getPluralModelLabel());
+        $this->assertSame(__('admin.variant_combinations.model_label'), VariantCombinationResource::getModelLabel());
     }
 
     public function test_resource_navigation_configuration_matches_nav_support(): void
@@ -510,7 +480,6 @@ final class VariantCombinationResourceTest extends TestCase
         $this->assertContains('edit', $actions->all());
         $this->assertContains('toggle_availability', $actions->all());
         $this->assertContains('duplicate', $actions->all());
-        $this->assertContains('validate_combination', $actions->all());
     }
 
     public function test_table_bulk_actions_configuration_matches_expectations(): void
@@ -524,7 +493,6 @@ final class VariantCombinationResourceTest extends TestCase
         $this->assertContains('make_available', $bulkActionNames->all());
         $this->assertContains('make_unavailable', $bulkActionNames->all());
         $this->assertContains('duplicate_selected', $bulkActionNames->all());
-        $this->assertContains('validate_selected', $bulkActionNames->all());
     }
 
     public function test_table_header_actions_configuration_matches_expectations(): void
@@ -533,6 +501,6 @@ final class VariantCombinationResourceTest extends TestCase
         $headerActionNames = Collection::make(VariantCombinationResource::tableHeaderActions())
             ->map(static fn ($action) => $action->getName());
 
-        $this->assertContains('generate_combinations', $headerActionNames->all());
+        $this->assertContains('create', $headerActionNames->all());
     }
 }

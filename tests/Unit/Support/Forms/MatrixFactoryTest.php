@@ -162,7 +162,7 @@ function evaluate_schema_components(Component $component): array
             return null;
         }
 
-        public function getSchemaComponent(string $key, bool $withHidden = false, ?Component $skipComponentChildContainersWhileSearching = null): Component|Action|ActionGroup|null
+        public function getSchemaComponent(string $key, bool $withHidden = false, array $skipComponentsChildContainersWhileSearching = []): Component|Action|ActionGroup|null
         {
             return null;
         }

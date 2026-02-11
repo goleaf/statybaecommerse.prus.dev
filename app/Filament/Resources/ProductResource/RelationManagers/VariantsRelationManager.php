@@ -20,6 +20,7 @@ use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class VariantsRelationManager extends RelationManager
@@ -60,6 +61,7 @@ class VariantsRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(static fn (Builder $query): Builder => $query->withoutGlobalScopes())
             ->columns([
                 SpatieMediaLibraryImageColumn::make('media')
                     ->label(__('messages.image'))
@@ -87,8 +89,16 @@ class VariantsRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                CreateAction::make(),
-                AssociateAction::make(),
+                CreateAction::make()
+                    ->mutateFormDataUsing(function (array $data, RelationManager $livewire): array {
+                        $data['product_id'] = $livewire->getOwnerRecord()->getKey();
+
+                        return $data;
+                    }),
+                AssociateAction::make()
+                    ->preloadRecordSelect()
+                    ->recordSelectSearchColumns(['sku', 'name'])
+                    ->recordSelectOptionsQuery(static fn (Builder $query): Builder => $query->withoutGlobalScopes()),
             ])
             ->actions([
                 EditAction::make(),

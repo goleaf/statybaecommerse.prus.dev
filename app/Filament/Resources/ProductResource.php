@@ -21,9 +21,13 @@ use App\Filament\Resources\ProductResource\RelationManagers\VariantsRelationMana
 use App\Filament\Resources\ProductResource\Schemas\ProductForm;
 use App\Filament\Resources\ProductResource\Tables\ProductsTable;
 use App\Models\Product;
+use App\Models\Scopes\ActiveScope;
+use App\Models\Scopes\PublishedScope;
+use App\Models\Scopes\VisibleScope;
 use BackedEnum;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 
 final class ProductResource extends BaseResource
@@ -35,6 +39,8 @@ final class ProductResource extends BaseResource
     protected static string|UnitEnum|null $navigationGroup = null;
 
     protected static ?int $navigationSort = 1;
+
+    protected static ?string $recordRouteKeyName = 'id';
 
     public static function getNavigationLabel(): string
     {
@@ -54,6 +60,16 @@ final class ProductResource extends BaseResource
     public static function form(Schema $schema): Schema
     {
         return ProductForm::configure($schema);
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                ActiveScope::class,
+                PublishedScope::class,
+                VisibleScope::class,
+            ]);
     }
 
     public static function table(Table $table): Table

@@ -23,6 +23,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Number;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -54,6 +55,27 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
     use SoftDeletes;
 
     protected $table = 'product_variants';
+
+    protected static function booted(): void
+    {
+        static::created(static function (ProductVariant $variant): void {
+            $variant->syncPrimaryProductPivot();
+        });
+
+        static::updated(static function (ProductVariant $variant): void {
+            if (! $variant->wasChanged('product_id')) {
+                return;
+            }
+
+            $originalProductId = $variant->getOriginal('product_id');
+
+            if ($originalProductId && Schema::hasTable('product_variant_product')) {
+                $variant->products()->detach($originalProductId);
+            }
+
+            $variant->syncPrimaryProductPivot();
+        });
+    }
 
     /**
      * Stock movements belonging to this variant through inventories.
@@ -120,6 +142,28 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class, 'product_id');
+    }
+
+    /**
+     * Products associated with this variant (shared variants).
+     */
+    public function products(): BelongsToMany
+    {
+        return $this->belongsToMany(Product::class, 'product_variant_product', 'product_variant_id', 'product_id')
+            ->withTimestamps();
+    }
+
+    private function syncPrimaryProductPivot(): void
+    {
+        if (! $this->product_id) {
+            return;
+        }
+
+        if (! Schema::hasTable('product_variant_product')) {
+            return;
+        }
+
+        $this->products()->syncWithoutDetaching([(int) $this->product_id]);
     }
 
     /**
@@ -580,10 +624,25 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
      */
     public function getVariantAttributes(): array
     {
-        $attributes = [];
+        $payload = $this->getAttribute('attributes');
 
-        foreach ($this->attributes as $attributeValue) {
-            $attributes[$attributeValue->attribute->name] = $attributeValue->value;
+        if (is_array($payload) && $payload !== []) {
+            return $payload;
+        }
+
+        $attributes = [];
+        $attributeValues = $this->relationLoaded('attributes')
+            ? $this->getRelation('attributes')
+            : $this->attributes()->with('attribute')->get();
+
+        foreach ($attributeValues as $attributeValue) {
+            $attribute = $attributeValue->attribute ?? null;
+
+            if (! $attribute) {
+                continue;
+            }
+
+            $attributes[$attribute->name] = $attributeValue->value;
         }
 
         return $attributes;

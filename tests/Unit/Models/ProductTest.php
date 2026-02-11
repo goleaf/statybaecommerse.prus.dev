@@ -70,7 +70,7 @@ describe('Product model', function () {
     it('has variants relationship', function () {
         $product = new Product;
 
-        expect($product->variants())->toBeInstanceOf(HasMany::class);
+        expect($product->variants())->toBeInstanceOf(BelongsToMany::class);
     });
 
     it('has images relationship', function () {

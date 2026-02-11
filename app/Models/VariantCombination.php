@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\SQLiteConnection;
 use JsonException;
@@ -126,9 +126,10 @@ final class VariantCombination extends Model
     /**
      * Variants belonging to the parent product.
      */
-    public function variants(): HasMany
+    public function variants(): BelongsToMany
     {
-        return $this->hasMany(ProductVariant::class, 'product_id', 'product_id');
+        return $this->belongsToMany(ProductVariant::class, 'product_variant_product', 'product_id', 'product_variant_id', 'product_id', 'id')
+            ->withTimestamps();
     }
 
     /**

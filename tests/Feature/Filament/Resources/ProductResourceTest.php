@@ -7,6 +7,7 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Collection;
 use App\Models\Product;
+use App\Models\ProductVariant;
 use App\Models\User;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -394,9 +395,10 @@ it('validates stock quantity is integer', function () {
 });
 
 it('can handle product with variants', function () {
-    $productWithVariants = Product::factory()
-        ->hasVariants(3)
-        ->create();
+    $productWithVariants = Product::factory()->create();
+    ProductVariant::factory()->count(3)->create([
+        'product_id' => $productWithVariants->id,
+    ]);
 
     Livewire::test(ProductResource\Pages\ViewProduct::class, [
         'record' => $productWithVariants->getRouteKey(),

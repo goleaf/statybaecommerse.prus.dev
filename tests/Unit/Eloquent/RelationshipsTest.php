@@ -29,13 +29,13 @@ final class RelationshipsTest extends TestCase
         $this->assertInstanceOf(BelongsTo::class, $product->brand());
         $this->assertNotNull($product->brand()->first());
 
-        // HasMany: variants
+        // BelongsToMany: variants
         ProductVariant::factory()->create(['product_id' => $product->getKey()]);
-        $this->assertInstanceOf(HasMany::class, $product->variants());
+        $this->assertInstanceOf(BelongsToMany::class, $product->variants());
         $this->assertNotNull($product->variants()->first());
 
-        // HasOne (latestOfMany): latestVariant
-        $this->assertInstanceOf(HasOne::class, $product->latestVariant());
+        // BelongsToMany (latest via pivot): latestVariant
+        $this->assertInstanceOf(BelongsToMany::class, $product->latestVariant());
         $this->assertNotNull($product->latestVariant()->first());
 
         // BelongsToMany: categories
