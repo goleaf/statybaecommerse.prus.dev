@@ -97,8 +97,8 @@ final class ProductController extends Controller
         // Always ensure the product payload includes the relations our resource expects.
         $product->loadMissing(['media', 'variants', 'categories', 'brand']);
 
-        // Abort for soft-deleted or unpublished products to prevent leaking draft catalogue data.
-        if ($product->trashed() || ! $product->isPublished()) {
+        // Abort unpublished products to prevent leaking draft catalogue data.
+        if (! $product->isPublished()) {
             abort(404);
         }
 

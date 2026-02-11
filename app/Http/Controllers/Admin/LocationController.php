@@ -173,7 +173,7 @@ final class LocationController extends Controller
     public function destroy(int $location): RedirectResponse
     {
         $record = Location::withoutGlobalScopes()->findOrFail($location);
-        $record->forceDelete();
+        $record->delete();
 
         return redirect()->route('admin.locations.index');
     }

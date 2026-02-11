@@ -544,7 +544,7 @@ final class CustomerGroupTest extends TestCase
         $customerGroup->delete();
 
         $this->assertSoftDeleted('customer_groups', ['id' => $id]);
-        $deleted = CustomerGroup::withTrashed()->find($id);
+        $deleted = CustomerGroup::query()->find($id);
         $this->assertNotNull($deleted);
         $this->assertNotNull($deleted->deleted_at);
     }

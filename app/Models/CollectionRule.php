@@ -75,7 +75,7 @@ final class CollectionRule extends Model
         return $this->belongsTo(Collection::class)->withoutGlobalScopes([
             ActiveScope::class,
             VisibleScope::class,
-        ])->withTrashed();
+        ]);
     }
 
     /**

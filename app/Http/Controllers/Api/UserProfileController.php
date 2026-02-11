@@ -25,10 +25,6 @@ final class UserProfileController extends Controller
             abort(401);
         }
 
-        if ($user->trashed()) {
-            abort(404);
-        }
-
         $user->refresh();
 
         $payload = UserContract::forUser($user);

@@ -61,7 +61,7 @@ final class UserPreferenceTest extends TestCase
         $preferenceId = $preference->id;
 
         // Force delete since User model uses soft deletes
-        $user->forceDelete();
+        $user->delete();
 
         $this->assertDatabaseMissing('user_preferences', ['id' => $preferenceId]);
     }

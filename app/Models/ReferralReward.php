@@ -15,7 +15,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Translatable\HasTranslations;
 
 /**
@@ -41,7 +40,6 @@ final class ReferralReward extends Model
     use HasFactory;
     use HasTranslations;
     use OrdersByName;
-    use SoftDeletes;
 
     /**
      * Sort referral rewards by their translated title so finance teams can

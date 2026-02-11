@@ -140,17 +140,13 @@ final class CustomerGroupSeeder extends BaseSeeder
             ];
 
             /** @var CustomerGroup $customerGroup */
-            $customerGroup = CustomerGroup::withTrashed()->updateOrCreate(
+            $customerGroup = CustomerGroup::query()->updateOrCreate(
                 ['code' => $group['code']],
                 $attributes,
             );
 
-            if ($customerGroup->trashed()) {
-                $customerGroup->restore();
-            }
-
             if ($group['is_default']) {
-                CustomerGroup::withTrashed()
+                CustomerGroup::query()
                     ->where('id', '!=', $customerGroup->id)
                     ->where('is_default', true)
                     ->update(['is_default' => false]);

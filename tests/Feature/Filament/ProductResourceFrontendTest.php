@@ -48,7 +48,7 @@ final class ProductResourceFrontendTest extends TestCase
         $this->assertNotEmpty($schema->getComponents());
     }
 
-    public function test_can_create_update_and_soft_delete_product(): void
+    public function test_can_create_update_and_delete_product(): void
     {
         $product = Product::create([
             'name'         => 'Test Product',
@@ -78,6 +78,6 @@ final class ProductResourceFrontendTest extends TestCase
 
         $product->delete();
 
-        $this->assertSoftDeleted('products', ['id' => $product->id]);
+        $this->assertDatabaseMissing('products', ['id' => $product->id]);
     }
 }

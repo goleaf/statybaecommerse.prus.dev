@@ -18,8 +18,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use JsonSerializable;
 
 /**
@@ -43,7 +41,7 @@ use JsonSerializable;
 final class AttributeValue extends Model
 {
     /** @phpstan-ignore-next-line */
-    use HasFactory, HasTranslations, SoftDeletes;
+    use HasFactory, HasTranslations;
 
     protected $table = 'attribute_values';
 
@@ -83,8 +81,6 @@ final class AttributeValue extends Model
             'deleted_at'    => 'datetime',
         ];
     }
-
-    
 
     /**
      * Handle attribute functionality with proper error handling.
@@ -268,7 +264,6 @@ final class AttributeValue extends Model
         $fresh = self::withoutGlobalScopes([
             ActiveScope::class,
             EnabledScope::class,
-            SoftDeletingScope::class,
         ])->whereKey($this->getKey())->first();
 
         if ($fresh === null) {

@@ -23,7 +23,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Arr;
@@ -51,7 +50,7 @@ use Spatie\Translatable\HasTranslations;
 final class User extends Authenticatable implements FilamentUser, HasLocalePreferenceContract
 {
     use HasApiTokens;
-    use HasFactory, HasSafeSerialization, HasTranslations, Notifiable, OrdersByName, SoftDeletes;
+    use HasFactory, HasSafeSerialization, HasTranslations, Notifiable, OrdersByName;
 
     // Allow issuing API tokens for Sanctum-protected endpoints.
     use SecurePasswordHandling;

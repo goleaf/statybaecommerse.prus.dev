@@ -13,7 +13,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 use function is_string;
 
@@ -35,9 +34,7 @@ use function is_string;
 #[ScopedBy([ActiveScope::class])]
 final class Country extends Model
 {
-    use HasFactory, HasTranslations, SoftDeletes;
-
-    
+    use HasFactory, HasTranslations;
 
     protected $table = 'countries';
 

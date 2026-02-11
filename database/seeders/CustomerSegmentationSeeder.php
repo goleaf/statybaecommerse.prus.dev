@@ -221,7 +221,7 @@ final class CustomerSegmentationSeeder extends BaseSeeder
             // Persist deterministic segmentation data while keeping the seeder idempotent so
             // repeated executions during local development or CI do not trigger unique slug
             // violations on the `customer_groups` table.
-            CustomerGroup::query()->withoutGlobalScopes()->withTrashed()->updateOrCreate(
+            CustomerGroup::query()->withoutGlobalScopes()->updateOrCreate(
                 ['slug' => $groupData['slug']],
                 $groupData,
             );

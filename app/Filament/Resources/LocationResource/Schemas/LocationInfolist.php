@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\LocationResource\Schemas;
 
-use App\Models\Location;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Grid;
@@ -137,7 +136,7 @@ class LocationInfolist
                                 TextEntry::make('deleted_at')
                                     ->label(__('messages.deleted_at'))
                                     ->dateTime()
-                                    ->visible(static fn (Location $record): bool => $record->trashed()),
+                                    ->visible(false),
                             ]),
                     ])
                     ->columnSpanFull(),

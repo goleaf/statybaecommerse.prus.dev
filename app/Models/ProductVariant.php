@@ -21,7 +21,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Number;
@@ -52,17 +51,16 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
     use HasTranslations;
     use InteractsWithMedia;
     use OrdersByName;
-    use SoftDeletes;
 
     protected $table = 'product_variants';
 
     protected static function booted(): void
     {
-        static::created(static function (ProductVariant $variant): void {
+        self::created(static function (ProductVariant $variant): void {
             $variant->syncPrimaryProductPivot();
         });
 
-        static::updated(static function (ProductVariant $variant): void {
+        self::updated(static function (ProductVariant $variant): void {
             if (! $variant->wasChanged('product_id')) {
                 return;
             }

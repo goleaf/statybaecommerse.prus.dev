@@ -12,7 +12,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * ProductRequest
@@ -34,8 +33,6 @@ final class ProductRequest extends Model
 {
     /** @use HasFactory<ProductRequestFactory> */
     use HasFactory;
-
-    use SoftDeletes;
 
     /**
      * Centralised status constants to avoid string duplication throughout the model logic.

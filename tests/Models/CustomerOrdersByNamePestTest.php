@@ -57,7 +57,7 @@ it('supports soft deletes when the deleted_at column is present', function (): v
 
     $customer->delete();
 
-    expect(Customer::withTrashed()->find($customer->id))->not()->toBeNull();
+    expect(Customer::query()->find($customer->id))->not()->toBeNull();
     expect(Customer::find($customer->id))->toBeNull();
 });
 

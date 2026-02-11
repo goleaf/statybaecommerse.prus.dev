@@ -15,13 +15,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
-
-use Illuminate\Support\Str;
 
 /**
  * Collection
@@ -44,7 +42,7 @@ use Illuminate\Support\Str;
 #[ScopedBy([ActiveScope::class, VisibleScope::class])]
 final class Collection extends Model implements HasMedia, TranslatableRecord
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
     use HasTranslations;
     use InteractsWithMedia;
     use OrdersByName;
@@ -75,8 +73,6 @@ final class Collection extends Model implements HasMedia, TranslatableRecord
      * @var array<int, string>
      */
     protected $appends = ['products_count', 'image'];
-
-    
 
     /**
      * Handle booted functionality with proper error handling.
@@ -140,8 +136,6 @@ final class Collection extends Model implements HasMedia, TranslatableRecord
 
     /**
      * Variants belonging to products of this collection.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
      */
     public function variants(): \Illuminate\Database\Eloquent\Relations\HasManyThrough
     {
@@ -153,13 +147,11 @@ final class Collection extends Model implements HasMedia, TranslatableRecord
             'id',
             'id'
         )->join('product_collections', 'product_collections.product_id', '=', 'products.id')
-         ->where('product_collections.collection_id', $this->id);
+            ->where('product_collections.collection_id', $this->id);
     }
 
     /**
      * Categories belonging to products of this collection.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function categories(): BelongsToMany
     {
@@ -171,8 +163,6 @@ final class Collection extends Model implements HasMedia, TranslatableRecord
 
     /**
      * Brands belonging to products of this collection.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function brands(): BelongsToMany
     {
@@ -195,8 +185,8 @@ final class Collection extends Model implements HasMedia, TranslatableRecord
             'id',
             'id'
         )->join('product_collections', 'product_collections.product_id', '=', 'products.id')
-         ->where('product_collections.collection_id', $this->id)
-         ->where('priceable_type', Product::class);
+            ->where('product_collections.collection_id', $this->id)
+            ->where('priceable_type', Product::class);
     }
 
     /**

@@ -25,11 +25,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
-use JsonException;
 use Laravel\Scout\Searchable;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -77,7 +76,6 @@ final class Product extends Model implements HasMedia, TranslatableRecord
     use Searchable {
         Searchable::bootSearchable as scoutBootSearchable;
     }
-    use SoftDeletes;
 
     public const SCOPE_COLUMN_HINTS = [
         'is_active'    => false,
@@ -150,18 +148,42 @@ final class Product extends Model implements HasMedia, TranslatableRecord
         });
 
         self::deleting(static function (Product $product): void {
-            if (! $product->isForceDeleting()) {
-                return;
+            // Always detach pivot relationships before deleting so hard deletes
+            // cannot fail due to inconsistent pivot state in local/test DBs.
+            if (Schema::hasTable('product_categories')) {
+                $product->categories()->detach();
+            }
+            if (Schema::hasTable('product_collections')) {
+                $product->collections()->detach();
+            }
+            if (Schema::hasTable('discount_products')) {
+                $product->discounts()->detach();
+            }
+            if (Schema::hasTable('product_variant_product')) {
+                $product->variants()->detach();
+            }
+            if (Schema::hasTable('product_attributes')) {
+                $product->attributes()->detach();
             }
 
-            // Manually remove related images during force deletes so SQLite-based
-            // test runs mimic the foreign key cascades enforced in production.
+            // Manually remove related images so SQLite-based test runs mimic the
+            // foreign key cascades enforced in production.
             foreach ($product->images()->withoutGlobalScopes()->get() as $image) {
                 if ($image instanceof ProductImage) {
                     $image->delete();
                 }
             }
         });
+    }
+
+    /**
+     * Always execute physical deletes for this model.
+     */
+    protected function performDeleteOnModel()
+    {
+        $this->setKeysForSaveQuery($this->newModelQuery())->delete();
+
+        $this->exists = false;
     }
 
     public static function bootSearchable(): void

@@ -16,7 +16,6 @@ use BackedEnum;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use UnitEnum;
 
 class OrderResource extends BaseResource
@@ -92,7 +91,6 @@ class OrderResource extends BaseResource
     {
         return parent::getRecordRouteBindingEloquentQuery()
             ->withoutGlobalScopes([
-                SoftDeletingScope::class,
             ]);
     }
 }

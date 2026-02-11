@@ -179,7 +179,7 @@ final class CartService
             })
             ->get()
             ->each(static function (CartItem $item): void {
-                $item->forceDelete();
+                $item->delete();
             });
 
         DB::table('cart_items')

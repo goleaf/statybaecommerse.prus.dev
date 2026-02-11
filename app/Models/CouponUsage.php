@@ -13,7 +13,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Number;
@@ -44,8 +43,6 @@ final class CouponUsage extends Model
 {
     /** @use HasFactory<CouponUsageFactory> */
     use HasFactory;
-
-    use SoftDeletes;
 
     /**
      * @var list<string>

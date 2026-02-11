@@ -19,7 +19,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 
 /**
@@ -42,7 +41,6 @@ final class News extends Model implements TranslatableRecord
 {
     use HasFactory;
     use HasTranslations;
-    use SoftDeletes;
 
     protected $table = 'news';
 
@@ -79,8 +77,6 @@ final class News extends Model implements TranslatableRecord
             'meta_data'               => 'array',
         ];
     }
-
-    
 
     public function approvedBy(): BelongsTo
     {

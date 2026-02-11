@@ -26,12 +26,12 @@ final class UserRelationsSeeder extends BaseSeeder
     public function run(): void
     {
         // 0. Cleanup existing test user to allow re-runs
-        User::withTrashed()->where('email', 'test@example.com')->each(function (User $user): void {
+        User::query()->where('email', 'test@example.com')->each(function (User $user): void {
             $user->customerGroups()->detach();
             $user->partners()->detach();
-            $user->forceDelete();
+            $user->delete();
         });
-        Subscriber::withTrashed()->where('email', 'test@example.com')->forceDelete();
+        Subscriber::query()->where('email', 'test@example.com')->delete();
 
         // 1. Create a primary test user with ALL relationships
         $testUser = User::factory()->create([
@@ -108,9 +108,8 @@ final class UserRelationsSeeder extends BaseSeeder
         ]);
 
         // 12. Subscriber
-        $subscriber = Subscriber::withTrashed()->where('email', $user->email)->first();
+        $subscriber = Subscriber::query()->where('email', $user->email)->first();
         if ($subscriber) {
-            $subscriber->restore();
             $subscriber->update([
                 'user_id'       => $user->id,
                 'first_name'    => $user->first_name ?? 'First',

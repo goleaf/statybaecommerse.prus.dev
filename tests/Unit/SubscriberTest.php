@@ -69,12 +69,6 @@ final class SubscriberTest extends TestCase
         $this->assertEquals('boolean', $casts['newsletter_subscription']);
     }
 
-    public function test_subscriber_uses_soft_deletes(): void
-    {
-        $subscriber = new Subscriber;
-        $this->assertTrue(in_array(\Illuminate\Database\Eloquent\SoftDeletes::class, class_uses($subscriber)));
-    }
-
     public function test_subscriber_uses_has_factory(): void
     {
         $subscriber = new Subscriber;

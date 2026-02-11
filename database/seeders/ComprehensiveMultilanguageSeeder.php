@@ -682,7 +682,7 @@ final class ComprehensiveMultilanguageSeeder extends BaseSeeder
 
         foreach ($products as $productData) {
             /** @var Product $product */
-            $product = Product::withoutGlobalScopes()->withTrashed()->updateOrCreate(
+            $product = Product::withoutGlobalScopes()->updateOrCreate(
                 ['sku' => $productData['sku']],
                 [
                     'name'        => $productData['name'],
@@ -694,10 +694,6 @@ final class ComprehensiveMultilanguageSeeder extends BaseSeeder
                     'brand_id'    => $brands->random()->id,
                 ]
             );
-
-            if ($product->trashed()) {
-                $product->restore();
-            }
 
             // Attach random categories to the product
             $randomCategories = $categories->random(rand(1, 2));

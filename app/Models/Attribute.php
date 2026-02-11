@@ -18,7 +18,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use JsonException;
@@ -104,7 +103,7 @@ use Stringable;
 #[ScopedBy([ActiveScope::class, EnabledScope::class, VisibleScope::class])]
 final class Attribute extends Model
 {
-    use HasFactory, HasTranslations, OrdersByName, SoftDeletes;
+    use HasFactory, HasTranslations, OrdersByName;
 
     protected $table = 'attributes';
 
@@ -124,8 +123,6 @@ final class Attribute extends Model
      * @var array<int, string>
      */
     protected $appends = ['formatted_type', 'validation_rules_array', 'meta_data_array', 'display_name', 'formatted_description', 'type_icon', 'type_color', 'status_badge', 'status_color', 'status_label'];
-
-    
 
     protected $translatable = ['name'];
 

@@ -16,7 +16,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\SQLiteConnection;
 use JsonException;
 
@@ -48,8 +47,6 @@ final class VariantCombination extends Model
 {
     /** @use HasFactory<VariantCombinationFactory> */
     use HasFactory;
-
-    use SoftDeletes;
 
     protected $table = 'variant_combinations';
 
@@ -96,7 +93,6 @@ final class VariantCombination extends Model
 
         self::saved($flushCallback);
         self::deleted($flushCallback);
-        self::restored($flushCallback);
     }
 
     protected function casts(): array
@@ -383,7 +379,7 @@ final class VariantCombination extends Model
             $normalisedCombination = self::normaliseCombination($combination);
             $hash = self::deterministicHashFor($normalisedCombination, $product->id);
 
-            $record = self::withTrashed()->updateOrCreate(
+            $record = self::query()->updateOrCreate(
                 [
                     'product_id'       => $product->id,
                     'combination_hash' => $hash,
@@ -394,9 +390,7 @@ final class VariantCombination extends Model
                 ]
             );
 
-            if ($record->trashed()) {
-                $record->restore();
-            }
+            // No restore step is required because records are hard deleted.
         }
 
         self::refreshCombinationCacheForProduct($product->id);

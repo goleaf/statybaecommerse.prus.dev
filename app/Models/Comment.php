@@ -14,7 +14,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Comment
@@ -40,7 +39,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 #[ScopedBy([ApprovedScope::class])]
 final class Comment extends Model
 {
-    use HasFactory, HasHierarchy, SoftDeletes;
+    use HasFactory, HasHierarchy;
 
     protected $fillable = [
         'content',

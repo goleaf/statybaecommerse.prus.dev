@@ -71,7 +71,7 @@ class ProductResourceTest extends TestCase
 
         $product->delete();
 
-        $this->assertSoftDeleted('products', ['id' => $product->id]);
+        $this->assertDatabaseMissing('products', ['id' => $product->id]);
     }
 
     public function test_product_sku_must_be_unique(): void

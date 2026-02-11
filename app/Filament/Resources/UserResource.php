@@ -15,8 +15,8 @@ use App\Filament\Resources\Users\RelationManagers\CustomerGroupsRelationManager;
 use App\Filament\Resources\Users\RelationManagers\DiscountRedemptionsRelationManager;
 use App\Filament\Resources\Users\RelationManagers\DocumentsRelationManager;
 use App\Filament\Resources\Users\RelationManagers\NotificationsRelationManager;
-use App\Filament\Resources\Users\RelationManagers\OrganizationsRelationManager;
 use App\Filament\Resources\Users\RelationManagers\OrdersRelationManager;
+use App\Filament\Resources\Users\RelationManagers\OrganizationsRelationManager;
 use App\Filament\Resources\Users\RelationManagers\PartnersRelationManager;
 use App\Filament\Resources\Users\RelationManagers\ReferralCodesRelationManager;
 use App\Filament\Resources\Users\RelationManagers\ReferralRewardsRelationManager;
@@ -32,7 +32,6 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use UnitEnum;
 
 class UserResource extends Resource
@@ -111,7 +110,6 @@ class UserResource extends Resource
     {
         return parent::getEloquentQuery()
             ->withoutGlobalScopes([
-                SoftDeletingScope::class,
             ])
             ->where(function (Builder $query): void {
                 $query->whereNull('is_admin')

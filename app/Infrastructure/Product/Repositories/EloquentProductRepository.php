@@ -22,8 +22,6 @@ use App\Models\Scopes\StatusScope;
 use App\Models\Scopes\VisibleScope;
 use App\Support\Media\ProductImageUrlResolver;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use JsonException;
 
 /**
@@ -37,7 +35,7 @@ final class EloquentProductRepository implements ProductRepositoryInterface
     {
         $query = Product::query()
             // Allow draft fixtures during tests while downstream specs filter displayable records.
-            ->withoutGlobalScopes([ActiveScope::class, PublishedScope::class, VisibleScope::class, SoftDeletingScope::class])
+            ->withoutGlobalScopes([ActiveScope::class, PublishedScope::class, VisibleScope::class])
             ->where(static function ($builder) use ($criteria): void {
                 $term = $criteria->getQuery();
                 $builder->where('name', 'like', "%{$term}%")
@@ -77,7 +75,7 @@ final class EloquentProductRepository implements ProductRepositoryInterface
     public function getCatalogProducts(ProductCatalogQuery $query): ProductCollection
     {
         $builder = Product::query()
-            ->withoutGlobalScopes([ActiveScope::class, PublishedScope::class, VisibleScope::class, SoftDeletingScope::class])
+            ->withoutGlobalScopes([ActiveScope::class, PublishedScope::class, VisibleScope::class])
             ->with([
                 'brand'      => static fn ($relation) => $relation->withoutGlobalScopes([ActiveScope::class, EnabledScope::class]),
                 'categories' => static fn ($relation) => $relation->withoutGlobalScopes([ActiveScope::class, EnabledScope::class, VisibleScope::class]),
@@ -125,7 +123,7 @@ final class EloquentProductRepository implements ProductRepositoryInterface
     public function findBySlug(ProductSlug $slug): ?DomainProduct
     {
         $builder = Product::query()
-            ->withoutGlobalScopes([SoftDeletingScope::class])
+            ->withoutGlobalScopes([])
             ->where('slug', $slug->getValue())
             ->with([
                 'brand',
@@ -287,17 +285,5 @@ final class EloquentProductRepository implements ProductRepositoryInterface
         return is_array($decoded) ? $decoded : $value;
     }
 
-    private function applySoftDeleteConstraint(Builder $builder): void
-    {
-        $model = $builder->getModel();
-
-        if (! in_array(SoftDeletes::class, class_uses_recursive($model::class), true)) {
-            return;
-        }
-
-        $column = $model->getDeletedAtColumn();
-        $table = $model->getTable();
-
-        $builder->whereNull("{$table}.{$column}");
-    }
+    private function applySoftDeleteConstraint(Builder $builder): void {}
 }

@@ -14,7 +14,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Translatable\HasTranslations;
 
@@ -37,7 +36,7 @@ use Spatie\Translatable\HasTranslations;
 #[ScopedBy([UserOwnedScope::class])]
 final class Address extends Model
 {
-    use HasFactory, HasTranslations, SoftDeletes;
+    use HasFactory, HasTranslations;
 
     protected $table = 'addresses';
 

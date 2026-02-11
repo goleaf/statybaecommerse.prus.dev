@@ -13,7 +13,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 
 /**
@@ -35,7 +34,6 @@ final class Discount extends Model
 {
     use HasFactory;
     use OrdersByName;
-    use SoftDeletes;
 
     /**
      * Declare the sortable column so the shared OrdersByName trait knows which
@@ -210,7 +208,7 @@ final class Discount extends Model
         $suffix = 2;
 
         while (self::withoutGlobalScopes()
-            ->withTrashed()
+
             ->when($ignoreId !== null, fn ($query) => $query->where('id', '!=', $ignoreId))
             ->where('slug', $candidate)
             ->exists()) {

@@ -7,14 +7,12 @@ namespace App\Models;
 use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
-use App\Models\Translations\RegionTranslation;
 use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Region
@@ -34,10 +32,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 #[ScopedBy([ActiveScope::class, EnabledScope::class])]
 final class Region extends Model
 {
-    use HasFactory, HasTranslations, SoftDeletes;
+    use HasFactory, HasTranslations;
     use OrdersByName;
-
-    
 
     protected $table = 'regions';
 

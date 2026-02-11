@@ -822,8 +822,6 @@ class ProductImporter extends BaseImporter
                     'is_featured'  => false,
                     'show_in_menu' => true,
                 ]);
-            } elseif (method_exists($category, 'restore') && $category->trashed()) {
-                $category->restore();
             }
 
             $parent = $category;
@@ -840,7 +838,7 @@ class ProductImporter extends BaseImporter
             return null;
         }
 
-        $query = Category::query()->withoutGlobalScopes()->withTrashed();
+        $query = Category::query()->withoutGlobalScopes();
 
         if ($parent instanceof Category) {
             $query->where('parent_id', $parent->getKey());

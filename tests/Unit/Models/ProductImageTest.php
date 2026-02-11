@@ -457,7 +457,7 @@ final class ProductImageTest extends TestCase
         ]);
 
         $imageId = $image->id;
-        $this->product->forceDelete();  // Use forceDelete because Product uses SoftDeletes
+        $this->product->delete();
 
         expect(ProductImage::withoutGlobalScopes()->find($imageId))->toBeNull();
     }

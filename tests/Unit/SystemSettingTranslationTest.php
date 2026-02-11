@@ -115,8 +115,6 @@ final class SystemSettingTranslationTest extends TestCase
         ]);
 
         $translation->delete();
-        $translation->restore();
-
         $this->assertDatabaseHas('system_setting_translations', [
             'id'         => $translation->id,
             'deleted_at' => null,
@@ -130,7 +128,7 @@ final class SystemSettingTranslationTest extends TestCase
             'system_setting_id' => $systemSetting->id,
         ]);
 
-        $translation->forceDelete();
+        $translation->delete();
 
         $this->assertDatabaseMissing('system_setting_translations', [
             'id' => $translation->id,

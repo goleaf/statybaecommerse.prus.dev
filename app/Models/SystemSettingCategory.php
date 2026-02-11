@@ -12,7 +12,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory as LaravelHasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 
@@ -36,7 +35,6 @@ final class SystemSettingCategory extends Model
     use HasSlug;
     use LaravelHasFactory;
     use OrdersByName;
-    use SoftDeletes;
 
     /**
      * Configure alphabetical ordering to rely on the translated name column so

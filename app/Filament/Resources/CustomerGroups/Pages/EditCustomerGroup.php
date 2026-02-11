@@ -6,8 +6,6 @@ namespace App\Filament\Resources\CustomerGroups\Pages;
 
 use App\Filament\Resources\CustomerGroups\CustomerGroupResource;
 use Filament\Actions\DeleteAction;
-use Filament\Actions\ForceDeleteAction;
-use Filament\Actions\RestoreAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
 
@@ -20,8 +18,6 @@ class EditCustomerGroup extends EditRecord
         return [
             ViewAction::make(),
             DeleteAction::make(),
-            ForceDeleteAction::make(),
-            RestoreAction::make(),
         ];
     }
 }

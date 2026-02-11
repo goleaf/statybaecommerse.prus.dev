@@ -14,7 +14,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Location
@@ -34,7 +33,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 #[ScopedBy([ActiveScope::class, EnabledScope::class])]
 final class Location extends Model
 {
-    use HasFactory, HasTranslations, SoftDeletes;
+    use HasFactory, HasTranslations;
 
     public const SCOPE_COLUMN_HINTS = [
         'is_active'  => false,
@@ -42,8 +41,6 @@ final class Location extends Model
         'is_enabled' => false,
         'status'     => false,
     ];
-
-    
 
     protected $table = 'locations';
 

@@ -12,7 +12,6 @@ use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * VariantPricingRule
@@ -35,7 +34,6 @@ final class VariantPricingRule extends Model
 {
     use HasFactory;
     use OrdersByName;
-    use SoftDeletes;
 
     protected $table = 'variant_pricing_rules';
 

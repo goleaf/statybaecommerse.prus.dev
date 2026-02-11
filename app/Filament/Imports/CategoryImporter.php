@@ -91,26 +91,21 @@ class CategoryImporter extends BaseImporter
         if (filled($slug)) {
             return Category::query()
                 ->withoutGlobalScopes()
-                ->withTrashed()
+
                 ->firstOrNew(['slug' => $slug]);
         }
 
         if (is_string($name) && $name !== '') {
             return Category::query()
                 ->withoutGlobalScopes()
-                ->withTrashed()
+
                 ->firstOrNew(['name' => $name]);
         }
 
         return new Category;
     }
 
-    protected function beforeSave(): void
-    {
-        if ($this->record instanceof Category && method_exists($this->record, 'restore') && $this->record->trashed()) {
-            $this->record->restore();
-        }
-    }
+    protected function beforeSave(): void {}
 
     public static function getCompletedNotificationBody(Import $import): string
     {
@@ -167,15 +162,11 @@ class CategoryImporter extends BaseImporter
             return null;
         }
 
-        $query = Category::query()->withoutGlobalScopes()->withTrashed();
+        $query = Category::query()->withoutGlobalScopes();
 
         if (is_numeric($raw)) {
             $category = $query->find((int) $raw);
             if ($category) {
-                if (method_exists($category, 'restore') && $category->trashed()) {
-                    $category->restore();
-                }
-
                 return $category;
             }
         }
@@ -187,10 +178,6 @@ class CategoryImporter extends BaseImporter
             ?? $query->where('name', $name)->first();
 
         if ($category) {
-            if (method_exists($category, 'restore') && $category->trashed()) {
-                $category->restore();
-            }
-
             return $category;
         }
 

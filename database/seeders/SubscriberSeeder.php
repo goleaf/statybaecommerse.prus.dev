@@ -35,7 +35,7 @@ final class SubscriberSeeder extends BaseSeeder
     {
         collect(range(1, 40))->each(function (int $index) use ($companies): void {
             $email = "subscriber{$index}@statybae.test";
-            Subscriber::withTrashed()->where('email', $email)->forceDelete();
+            Subscriber::query()->where('email', $email)->delete();
 
             Subscriber::factory()
                 ->state([
@@ -70,8 +70,8 @@ final class SubscriberSeeder extends BaseSeeder
 
         collect(range(1, 10))->each(function (int $index) use ($companies, $password): void {
             $email = "company.user{$index}@statybae.test";
-            User::withTrashed()->where('email', $email)->forceDelete();
-            Subscriber::withTrashed()->where('email', $email)->forceDelete();
+            User::query()->where('email', $email)->delete();
+            Subscriber::query()->where('email', $email)->delete();
 
             $firstName = "Įmonės vartotojas {$index}";
             $lastName = 'Statyba';
@@ -106,8 +106,8 @@ final class SubscriberSeeder extends BaseSeeder
 
     private function seedAdminSubscriber(string $company): void
     {
-        User::withTrashed()->where('email', 'admin@example.com')->forceDelete();
-        Subscriber::withTrashed()->where('email', 'admin@example.com')->forceDelete();
+        User::query()->where('email', 'admin@example.com')->delete();
+        Subscriber::query()->where('email', 'admin@example.com')->delete();
 
         // Use a strong password so SecurePasswordHandling validates before hashing.
         $password = 'Admin123!';

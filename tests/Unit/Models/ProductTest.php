@@ -45,8 +45,7 @@ describe('Product model', function () {
 
         expect($casts)->toHaveKey('price', 'decimal:2')
             ->and($casts)->toHaveKey('is_active', 'boolean')
-            ->and($casts)->toHaveKey('published_at', 'datetime')
-            ->and($casts)->toHaveKey('deleted_at', 'datetime'); // SoftDeletes adds this
+            ->and($casts)->toHaveKey('published_at', 'datetime');
     });
 
     it('has brand relationship', function () {

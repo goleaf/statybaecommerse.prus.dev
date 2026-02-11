@@ -39,13 +39,6 @@ final class AuthenticatedUserController extends Controller
             );
         }
 
-        if ($user->trashed()) {
-            return response()->json([
-                'success' => false,
-                'message' => __('errors.' . ErrorCodes::NOT_FOUND),
-            ], 404);
-        }
-
         try {
             $user->refresh();
             $payload = UserContract::forUser($user);

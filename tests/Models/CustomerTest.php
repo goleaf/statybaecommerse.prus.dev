@@ -57,9 +57,8 @@ final class CustomerTest extends TestCase
         // Capture the traits currently applied to the model instance.
         $traits = class_uses(new Customer);
 
-        // Verify both translation and soft delete behaviours remain active.
+        // Verify translation behaviour remains active.
         $this->assertContains('App\\Traits\\HasTranslations', $traits);
-        $this->assertContains('Illuminate\\Database\\Eloquent\\SoftDeletes', $traits);
     }
 
     public function test_city_relationship_definition(): void

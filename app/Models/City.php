@@ -14,7 +14,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 use Throwable;
 
@@ -36,10 +35,8 @@ use Throwable;
 #[ScopedBy([ActiveScope::class, EnabledScope::class])]
 final class City extends Model
 {
-    use HasFactory, HasTranslations, SoftDeletes;
+    use HasFactory, HasTranslations;
     use OrdersByName; // Reuse the shared alphabetical ordering scope for consistency across models.
-
-    
 
     protected $table = 'cities';
 

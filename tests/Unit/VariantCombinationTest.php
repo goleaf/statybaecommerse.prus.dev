@@ -238,31 +238,10 @@ describe('VariantCombination Model', function (): void {
         expect($availableCombinations)->toBeArray();
     });
 
-    it('unit: can be soft deleted', function (): void {
-        $this->variantCombination->delete();
-
-        expect($this->variantCombination->trashed())->toBeTrue();
-
-        // Should still exist in database but soft deleted
-        $this->assertDatabaseHas('variant_combinations', [
-            'id' => $this->variantCombination->id,
-        ]);
-    });
-
-    it('unit: can be restored from soft delete', function (): void {
-        $this->variantCombination->delete();
-
-        expect($this->variantCombination->trashed())->toBeTrue();
-
-        $this->variantCombination->restore();
-
-        expect($this->variantCombination->trashed())->toBeFalse();
-    });
-
-    it('unit: can be force deleted', function (): void {
+    it('unit: can be deleted', function (): void {
         $combinationId = $this->variantCombination->id;
 
-        $this->variantCombination->forceDelete();
+        $this->variantCombination->delete();
 
         $this->assertDatabaseMissing('variant_combinations', [
             'id' => $combinationId,

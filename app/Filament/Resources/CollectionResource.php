@@ -14,7 +14,6 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use UnitEnum;
 
 class CollectionResource extends Resource
@@ -69,9 +68,9 @@ class CollectionResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCollections::route('/'),
+            'index'  => Pages\ListCollections::route('/'),
             'create' => Pages\CreateCollection::route('/create'),
-            'edit' => Pages\EditCollection::route('/{record}/edit'),
+            'edit'   => Pages\EditCollection::route('/{record}/edit'),
         ];
     }
 
@@ -79,7 +78,6 @@ class CollectionResource extends Resource
     {
         return parent::getRecordRouteBindingEloquentQuery()
             ->withoutGlobalScopes([
-                SoftDeletingScope::class,
             ]);
     }
 }

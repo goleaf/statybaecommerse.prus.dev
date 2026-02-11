@@ -35,7 +35,7 @@ final class ImportProducts extends CsvImportPage
         }
 
         $existing = User::withoutGlobalScopes()
-            ->withTrashed()
+
             ->where('email', $user->email)
             ->first();
 

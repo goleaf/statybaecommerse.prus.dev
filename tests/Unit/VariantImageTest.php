@@ -369,9 +369,6 @@ class VariantImageTest extends TestCase
     {
         $variantImage = VariantImage::factory()->create();
         $variantImage->delete();
-
-        $variantImage->restore();
-
         $this->assertDatabaseHas('variant_images', [
             'id'         => $variantImage->id,
             'deleted_at' => null,

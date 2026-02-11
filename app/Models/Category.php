@@ -17,8 +17,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Laravel\Scout\Searchable;
 use SolutionForest\FilamentTree\Concern\ModelTree;
@@ -63,7 +63,6 @@ final class Category extends Model implements HasMedia
     use ModelTree;
     use OrdersByName;
     use Searchable;
-    use SoftDeletes;
 
     /**
      * Reserved slugs that map to dedicated API endpoints.
@@ -94,6 +93,12 @@ final class Category extends Model implements HasMedia
 
     protected static function booted(): void
     {
+        self::deleting(function (Category $category): void {
+            if (Schema::hasTable('product_categories')) {
+                $category->products()->detach();
+            }
+        });
+
         self::creating(function (Category $category): void {
             if (blank($category->slug)) {
                 $category->slug = self::generateUniqueSlug((string) ($category->name ?? ''));
@@ -121,7 +126,7 @@ final class Category extends Model implements HasMedia
         while (
             in_array($candidate, self::RESERVED_SLUGS, true)
             || self::withoutGlobalScopes()
-                ->withTrashed()
+
                 ->when($ignoreId !== null, fn (Builder $query): Builder => $query->whereKeyNot($ignoreId))
                 ->where('slug', $candidate)
                 ->exists()
@@ -218,8 +223,6 @@ final class Category extends Model implements HasMedia
 
     /**
      * Orders belonging to products of this category.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function orders(): BelongsToMany
     {
@@ -230,8 +233,6 @@ final class Category extends Model implements HasMedia
 
     /**
      * Collections belonging to products of this category.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function collections(): BelongsToMany
     {
@@ -656,9 +657,9 @@ final class Category extends Model implements HasMedia
         return $this->translations()->firstOrCreate(
             ['locale' => $locale],
             [
-                'name'            => $this->name,
-                'slug'            => $this->slug,
-                'description'     => $this->description,
+                'name'        => $this->name,
+                'slug'        => $this->slug,
+                'description' => $this->description,
             ]
         );
     }
@@ -1093,5 +1094,15 @@ final class Category extends Model implements HasMedia
         // API endpoints (e.g. /api/categories/tree) do not get intercepted by
         // implicit model binding when editors reuse the slug with new casing.
         return '(?i)^(?!(?:' . implode('|', $escaped) . ')$)[a-z0-9\\-]+$';
+    }
+
+    /**
+     * Always execute physical deletes for this model.
+     */
+    protected function performDeleteOnModel()
+    {
+        $this->setKeysForSaveQuery($this->newModelQuery())->delete();
+
+        $this->exists = false;
     }
 }

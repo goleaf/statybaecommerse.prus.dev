@@ -13,7 +13,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 
 /**
@@ -25,7 +24,6 @@ final class DiscountRedemption extends Model
 {
     use HasFactory;
     use HasTranslations;
-    use SoftDeletes;
 
     /**
      * @var string Explicitly define the backing table so refactors remain safe.
@@ -58,7 +56,6 @@ final class DiscountRedemption extends Model
     /**
      * @var class-string Link the HasTranslations trait with the translation model.
      */
-    
 
     /**
      * Cast persisted attributes to keep business logic predictable.

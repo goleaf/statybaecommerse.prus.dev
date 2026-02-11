@@ -25,7 +25,7 @@ return new class extends Migration
         });
 
         // Backfill deterministic hashes for any existing rows.
-        VariantCombination::withTrashed()->each(function (VariantCombination $combination): void {
+        VariantCombination::query()->each(function (VariantCombination $combination): void {
             if (! blank($combination->combination_hash)) {
                 return;
             }

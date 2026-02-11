@@ -17,7 +17,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
@@ -61,7 +60,6 @@ final class Brand extends Model implements HasMedia, TranslatableRecord
     // Keep alphabetical listings predictable by piping queries through the shared OrdersByName scope.
     use OrdersByName;
     use Searchable;
-    use SoftDeletes;
 
     public const SCOPE_COLUMN_HINTS = [
         'is_active'    => true,
@@ -194,12 +192,31 @@ final class Brand extends Model implements HasMedia, TranslatableRecord
      */
     protected static function booted(): void
     {
+        self::deleting(function (Brand $brand): void {
+            if (Schema::hasTable('discount_brands')) {
+                $brand->discounts()->detach();
+            }
+            if (Schema::hasTable('products')) {
+                $brand->products()->update(['brand_id' => null]);
+            }
+        });
+
         self::saved(function (): void {
             self::flushCaches();
         });
         self::deleted(function (): void {
             self::flushCaches();
         });
+    }
+
+    /**
+     * Always execute physical deletes for this model.
+     */
+    protected function performDeleteOnModel()
+    {
+        $this->setKeysForSaveQuery($this->newModelQuery())->delete();
+
+        $this->exists = false;
     }
 
     /**
@@ -239,8 +256,6 @@ final class Brand extends Model implements HasMedia, TranslatableRecord
 
     /**
      * Categories belonging to products of this brand.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function categories(): BelongsToMany
     {
@@ -251,8 +266,6 @@ final class Brand extends Model implements HasMedia, TranslatableRecord
 
     /**
      * Collections belonging to products of this brand.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function collections(): BelongsToMany
     {

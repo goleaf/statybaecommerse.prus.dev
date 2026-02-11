@@ -14,7 +14,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Translatable\HasTranslations;
 
 /**
@@ -37,7 +36,6 @@ final class Referral extends Model
     use HasFactory;
     use HasTranslations;
     use OrdersByName;
-    use SoftDeletes;
 
     /**
      * Sort referral listings by their translated title to keep marketing teams

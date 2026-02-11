@@ -22,7 +22,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
@@ -57,7 +56,7 @@ use ValueError;
 #[ScopedBy([StatusScope::class])]
 final class Order extends Model implements HasDocuments
 {
-    use HasFactory, HasTranslations, InteractsWithDocuments, SoftDeletes;
+    use HasFactory, HasTranslations, InteractsWithDocuments;
 
     public array $translatable = ['notes'];
 

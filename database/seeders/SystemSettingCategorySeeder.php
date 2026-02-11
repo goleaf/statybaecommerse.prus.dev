@@ -17,9 +17,9 @@ final class SystemSettingCategorySeeder extends BaseSeeder
     public function run(): void
     {
         collect($this->categoryDefinitions())->each(function (array $definition): void {
-            SystemSettingCategory::withTrashed()
+            SystemSettingCategory::query()
                 ->where('slug', $definition['attributes']['slug'])
-                ->forceDelete();
+                ->delete();
 
             $category = SystemSettingCategory::factory()
                 ->state($definition['attributes'])

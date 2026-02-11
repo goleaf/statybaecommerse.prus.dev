@@ -171,7 +171,7 @@ final class CartController extends Controller
             }
 
             $productId = (int) $cartItem->product_id;
-            $cartItem->forceDelete();
+            $cartItem->delete();
             $this->removeFromSessionCart($productId);
 
             return $this->respondWithCart($request, [
@@ -186,7 +186,7 @@ final class CartController extends Controller
             $cartItem = $this->findCartItemForRequest($request, $productId);
 
             if ($cartItem !== null) {
-                $cartItem->forceDelete();
+                $cartItem->delete();
             }
         });
 
@@ -288,7 +288,7 @@ final class CartController extends Controller
 
         if ($available <= 0) {
             if ($cartItem !== null) {
-                $cartItem->forceDelete();
+                $cartItem->delete();
             }
 
             return [

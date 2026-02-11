@@ -123,7 +123,7 @@ class OrderFactory extends Factory
             // Pull the highest stored order number that matches our ORD- prefix
             // so rerunning factories never reuses an existing identifier.
             $maxNumber = Order::withoutGlobalScopes()
-                ->withTrashed()
+
                 ->where('number', 'like', 'ORD-%')
                 ->orderByRaw('CAST(SUBSTR(number, 5) AS INTEGER) DESC')
                 ->value('number');

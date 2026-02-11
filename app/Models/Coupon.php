@@ -13,7 +13,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 
 /**
@@ -37,7 +36,6 @@ final class Coupon extends Model
     use HasFactory;
 
     use OrdersByName;
-    use SoftDeletes;
 
     /**
      * Ensure alphabetical ordering defaults to the human-readable name column

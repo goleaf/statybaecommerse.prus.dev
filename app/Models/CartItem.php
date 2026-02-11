@@ -11,7 +11,6 @@ use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * CartItem
@@ -38,8 +37,6 @@ final class CartItem extends Model
 {
     /** @use HasFactory<CartItemFactory> */
     use HasFactory;
-
-    use SoftDeletes;
 
     protected $fillable = ['session_id', 'user_id', 'product_id', 'variant_id', 'product_variant_id', 'quantity', 'minimum_quantity', 'unit_price', 'discount_amount', 'total_price', 'price', 'product_snapshot', 'notes', 'attributes'];
 
@@ -230,7 +227,7 @@ final class CartItem extends Model
         $this->quantity = max(0, $this->quantity - $amount);
 
         if ($this->quantity === 0) {
-            $this->forceDelete();
+            $this->delete();
 
             return;
         }

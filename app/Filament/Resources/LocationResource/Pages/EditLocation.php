@@ -8,8 +8,6 @@ use App\Filament\Concerns\InteractsWithTranslationTabs;
 use App\Filament\Resources\LocationResource;
 use App\Models\Location;
 use Filament\Actions\DeleteAction;
-use Filament\Actions\ForceDeleteAction;
-use Filament\Actions\RestoreAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
 
@@ -63,8 +61,6 @@ class EditLocation extends EditRecord
         return [
             ViewAction::make(),
             DeleteAction::make(),
-            ForceDeleteAction::make(),
-            RestoreAction::make(),
         ];
     }
 }

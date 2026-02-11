@@ -11,7 +11,6 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * SystemSettingTranslation
@@ -32,7 +31,6 @@ final class SystemSettingTranslation extends Model
     use HasFactory;
 
     use OrdersByName;
-    use SoftDeletes;
 
     /**
      * Hook into the model lifecycle so locale codes are stored in a consistent
@@ -103,7 +101,7 @@ final class SystemSettingTranslation extends Model
         $relation = $this->belongsTo(SystemSetting::class);
 
         // Ensure the parent record remains accessible even when soft deleted or scoped elsewhere.
-        return $relation->withoutGlobalScopes()->withTrashed();
+        return $relation->withoutGlobalScopes();
     }
 
     /**

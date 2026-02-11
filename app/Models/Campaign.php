@@ -11,7 +11,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Campaign Model (Deprecated)
@@ -27,8 +26,6 @@ final class Campaign extends Model
 {
     /** @use HasFactory<CampaignFactory> */
     use HasFactory;
-
-    use SoftDeletes;
 
     protected $table = 'discount_campaigns';
 

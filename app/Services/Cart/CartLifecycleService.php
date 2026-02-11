@@ -86,14 +86,14 @@ final class CartLifecycleService
         $items = $items->unique('id')->values();
 
         if ($items->isNotEmpty()) {
-            $this->baseQuery()->whereIn('id', $items->pluck('id'))->forceDelete();
+            $this->baseQuery()->whereIn('id', $items->pluck('id'))->delete();
         }
 
         if ($userId !== null) {
             $this->baseQuery()
                 ->where('user_id', $userId)
                 ->whereNull('session_id')
-                ->forceDelete();
+                ->delete();
         }
 
         $sessionKeys = $items->pluck('session_id')
