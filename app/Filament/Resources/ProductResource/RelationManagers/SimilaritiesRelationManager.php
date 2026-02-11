@@ -53,14 +53,6 @@ class SimilaritiesRelationManager extends RelationManager
                     ->description(fn ($record) => $record->similarProduct?->sku)
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('score')
-                    ->label(__('messages.score'))
-                    ->numeric(2)
-                    ->sortable(),
-                TextColumn::make('calculated_at')
-                    ->label(__('messages.calculated_at'))
-                    ->dateTime()
-                    ->sortable(),
             ])
             ->filters([
                 //
@@ -96,24 +88,21 @@ class SimilaritiesRelationManager extends RelationManager
 
         return Select::make('similar_product_id')
             ->label(__('messages.similar_product'))
+            ->columnSpanFull()
             ->required()
             ->searchable()
             ->preload()
-            ->getSearchResultsUsing(function (string $search) use ($ownerId): array {
+            ->options(function () use ($ownerId): array {
                 $existingIds = ProductSimilarity::query()
                     ->where('product_id', $ownerId)
                     ->pluck('similar_product_id');
 
                 return Product::query()
+                    ->withoutGlobalScopes()
                     ->whereKeyNot($ownerId)
                     ->whereNotIn('id', $existingIds)
-                    ->where(function (Builder $query) use ($search): void {
-                        $query
-                            ->where('name', 'like', "%{$search}%")
-                            ->orWhere('sku', 'like', "%{$search}%");
-                    })
                     ->orderBy('name')
-                    ->limit(50)
+                    ->limit(500)
                     ->get()
                     ->mapWithKeys(static fn (Product $product): array => [
                         (string) $product->getKey() => trim(($product->name ?? '') . ' [' . ($product->sku ?? '-') . ']'),
@@ -121,7 +110,7 @@ class SimilaritiesRelationManager extends RelationManager
                     ->all();
             })
             ->getOptionLabelUsing(static function ($value): ?string {
-                $product = Product::query()->find($value);
+                $product = Product::query()->withoutGlobalScopes()->find($value);
 
                 if (! $product instanceof Product) {
                     return null;
