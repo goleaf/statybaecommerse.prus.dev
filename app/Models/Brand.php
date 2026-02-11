@@ -210,16 +210,6 @@ final class Brand extends Model implements HasMedia, TranslatableRecord
     }
 
     /**
-     * Always execute physical deletes for this model.
-     */
-    protected function performDeleteOnModel()
-    {
-        $this->setKeysForSaveQuery($this->newModelQuery())->delete();
-
-        $this->exists = false;
-    }
-
-    /**
      * Handle getRouteKeyName functionality with proper error handling.
      */
     public function getRouteKeyName(): string

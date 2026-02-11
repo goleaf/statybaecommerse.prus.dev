@@ -57,8 +57,6 @@ final class EloquentProductRepository implements ProductRepositoryInterface
                 },
             ], 'quantity');
 
-        $this->applySoftDeleteConstraint($query);
-
         $timeout = now()->addSeconds($criteria->getTimeoutSeconds());
 
         $products = $query->limit($criteria->getLimit())
@@ -90,8 +88,6 @@ final class EloquentProductRepository implements ProductRepositoryInterface
                     $relation->active();
                 },
             ], 'quantity');
-
-        $this->applySoftDeleteConstraint($builder);
 
         if ($query->getCategorySlug()) {
             $builder->whereHas('categories', static function ($relation) use ($query): void {
@@ -139,8 +135,6 @@ final class EloquentProductRepository implements ProductRepositoryInterface
                     $relation->active();
                 },
             ], 'quantity');
-
-        $this->applySoftDeleteConstraint($builder);
 
         $product = $builder->first();
 
@@ -284,6 +278,4 @@ final class EloquentProductRepository implements ProductRepositoryInterface
 
         return is_array($decoded) ? $decoded : $value;
     }
-
-    private function applySoftDeleteConstraint(Builder $builder): void {}
 }

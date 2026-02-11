@@ -1,63 +1,195 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="CLI Arguments" tests="54" assertions="142" errors="0" failures="0" skipped="0" time="31.316973">
-    <testsuite name="Tests\Unit\VariantCombinationTest" file="tests\Unit\VariantCombinationTest.php" tests="26" assertions="58" errors="0" failures="0" skipped="0" time="25.333939">
-      <testcase name="`VariantCombination Model` → it unit: can be created" file="tests\Unit\VariantCombinationTest.php::`VariantCombination Model` → it unit: can be created" class="Tests\Unit\VariantCombinationTest" classname="Tests.Unit.VariantCombinationTest" assertions="3" time="14.495430"/>
-      <testcase name="`VariantCombination Model` → it unit: has correct fillable attributes" file="tests\Unit\VariantCombinationTest.php::`VariantCombination Model` → it unit: has correct fillable attributes" class="Tests\Unit\VariantCombinationTest" classname="Tests.Unit.VariantCombinationTest" assertions="4" time="0.617798"/>
-      <testcase name="`VariantCombination Model` → it unit: has correct casts" file="tests\Unit\VariantCombinationTest.php::`VariantCombination Model` → it unit: has correct casts" class="Tests\Unit\VariantCombinationTest" classname="Tests.Unit.VariantCombinationTest" assertions="2" time="0.428349"/>
-      <testcase name="`VariantCombination Model` → it unit: has correct appends" file="tests\Unit\VariantCombinationTest.php::`VariantCombination Model` → it unit: has correct appends" class="Tests\Unit\VariantCombinationTest" classname="Tests.Unit.VariantCombinationTest" assertions="3" time="0.427130"/>
-      <testcase name="`VariantCombination Model` → it unit: belongs to a product" file="tests\Unit\VariantCombinationTest.php::`VariantCombination Model` → it unit: belongs to a product" class="Tests\Unit\VariantCombinationTest" classname="Tests.Unit.VariantCombinationTest" assertions="2" time="0.420934"/>
-      <testcase name="`VariantCombination Model` → it unit: can format combinations correctly" file="tests\Unit\VariantCombinationTest.php::`VariantCombination Model` → it unit: can format combinations correctly" class="Tests\Unit\VariantCombinationTest" classname="Tests.Unit.VariantCombinationTest" assertions="2" time="0.439019"/>
-      <testcase name="`VariantCombination Model` → it unit: generates combination hash correctly" file="tests\Unit\VariantCombinationTest.php::`VariantCombination Model` → it unit: generates combination hash correctly" class="Tests\Unit\VariantCombinationTest" classname="Tests.Unit.VariantCombinationTest" assertions="2" time="0.440300"/>
-      <testcase name="`VariantCombination Model` → it unit: validates combination correctly" file="tests\Unit\VariantCombinationTest.php::`VariantCombination Model` → it unit: validates combination correctly" class="Tests\Unit\VariantCombinationTest" classname="Tests.Unit.VariantCombinationTest" assertions="1" time="0.443255"/>
-      <testcase name="`VariantCombination Model` → it unit: can scope available combinations" file="tests\Unit\VariantCombinationTest.php::`VariantCombination Model` → it unit: can scope available combinations" class="Tests\Unit\VariantCombinationTest" classname="Tests.Unit.VariantCombinationTest" assertions="2" time="0.389722"/>
-      <testcase name="`VariantCombination Model` → it unit: can scope by product" file="tests\Unit\VariantCombinationTest.php::`VariantCombination Model` → it unit: can scope by product" class="Tests\Unit\VariantCombinationTest" classname="Tests.Unit.VariantCombinationTest" assertions="2" time="0.446943"/>
-      <testcase name="`VariantCombination Model` → it unit: can scope by attribute value" file="tests\Unit\VariantCombinationTest.php::`VariantCombination Model` → it unit: can scope by attribute value" class="Tests\Unit\VariantCombinationTest" classname="Tests.Unit.VariantCombinationTest" assertions="2" time="0.366588"/>
-      <testcase name="`VariantCombination Model` → it unit: can scope by combination" file="tests\Unit\VariantCombinationTest.php::`VariantCombination Model` → it unit: can scope by combination" class="Tests\Unit\VariantCombinationTest" classname="Tests.Unit.VariantCombinationTest" assertions="2" time="0.357612"/>
-      <testcase name="`VariantCombination Model` → it unit: can generate combinations for a product" file="tests\Unit\VariantCombinationTest.php::`VariantCombination Model` → it unit: can generate combinations for a product" class="Tests\Unit\VariantCombinationTest" classname="Tests.Unit.VariantCombinationTest" assertions="3" time="0.431807"/>
-      <testcase name="`VariantCombination Model` → it unit: falls back to deterministic payloads when no attributes exist" file="tests\Unit\VariantCombinationTest.php::`VariantCombination Model` → it unit: falls back to deterministic payloads when no attributes exist" class="Tests\Unit\VariantCombinationTest" classname="Tests.Unit.VariantCombinationTest" assertions="2" time="0.474420"/>
-      <testcase name="`VariantCombination Model` → it unit: can create combinations for a product" file="tests\Unit\VariantCombinationTest.php::`VariantCombination Model` → it unit: can create combinations for a product" class="Tests\Unit\VariantCombinationTest" classname="Tests.Unit.VariantCombinationTest" assertions="1" time="0.430991"/>
-      <testcase name="`VariantCombination Model` → it unit: can find variant by combination" file="tests\Unit\VariantCombinationTest.php::`VariantCombination Model` → it unit: can find variant by combination" class="Tests\Unit\VariantCombinationTest" classname="Tests.Unit.VariantCombinationTest" assertions="1" time="0.455432"/>
-      <testcase name="`VariantCombination Model` → it unit: can get available combinations for a product" file="tests\Unit\VariantCombinationTest.php::`VariantCombination Model` → it unit: can get available combinations for a product" class="Tests\Unit\VariantCombinationTest" classname="Tests.Unit.VariantCombinationTest" assertions="1" time="0.454578"/>
-      <testcase name="`VariantCombination Model` → it unit: can be deleted" file="tests\Unit\VariantCombinationTest.php::`VariantCombination Model` → it unit: can be deleted" class="Tests\Unit\VariantCombinationTest" classname="Tests.Unit.VariantCombinationTest" assertions="1" time="0.454442"/>
-      <testcase name="`VariantCombination Model` → it unit: has correct table name" file="tests\Unit\VariantCombinationTest.php::`VariantCombination Model` → it unit: has correct table name" class="Tests\Unit\VariantCombinationTest" classname="Tests.Unit.VariantCombinationTest" assertions="1" time="0.570074"/>
-      <testcase name="`VariantCombination Model` → it unit: can be replicated" file="tests\Unit\VariantCombinationTest.php::`VariantCombination Model` → it unit: can be replicated" class="Tests\Unit\VariantCombinationTest" classname="Tests.Unit.VariantCombinationTest" assertions="4" time="0.434544"/>
-      <testcase name="`VariantCombination Model` → it unit: handles empty attribute combinations" file="tests\Unit\VariantCombinationTest.php::`VariantCombination Model` → it unit: handles empty attribute combinations" class="Tests\Unit\VariantCombinationTest" classname="Tests.Unit.VariantCombinationTest" assertions="2" time="0.399724"/>
-      <testcase name="`VariantCombination Model` → it unit: handles null attribute combinations" file="tests\Unit\VariantCombinationTest.php::`VariantCombination Model` → it unit: handles null attribute combinations" class="Tests\Unit\VariantCombinationTest" classname="Tests.Unit.VariantCombinationTest" assertions="2" time="0.431212"/>
-      <testcase name="`VariantCombination Model` → it unit: normalises nested combination values for deterministic hashing" file="tests\Unit\VariantCombinationTest.php::`VariantCombination Model` → it unit: normalises nested combination values for deterministic hashing" class="Tests\Unit\VariantCombinationTest" classname="Tests.Unit.VariantCombinationTest" assertions="3" time="0.412469"/>
-      <testcase name="`VariantCombination Model` → it unit: can be created with factory" file="tests\Unit\VariantCombinationTest.php::`VariantCombination Model` → it unit: can be created with factory" class="Tests\Unit\VariantCombinationTest" classname="Tests.Unit.VariantCombinationTest" assertions="4" time="0.386165"/>
-      <testcase name="`VariantCombination Model` → it unit: can be created with specific attributes" file="tests\Unit\VariantCombinationTest.php::`VariantCombination Model` → it unit: can be created with specific attributes" class="Tests\Unit\VariantCombinationTest" classname="Tests.Unit.VariantCombinationTest" assertions="3" time="0.358642"/>
-      <testcase name="`VariantCombination Model` → it unit: hydrates cached combinations for strict model comparisons" file="tests\Unit\VariantCombinationTest.php::`VariantCombination Model` → it unit: hydrates cached combinations for strict model comparisons" class="Tests\Unit\VariantCombinationTest" classname="Tests.Unit.VariantCombinationTest" assertions="3" time="0.366359"/>
+  <testsuite name="CLI Arguments" tests="65" assertions="155" errors="3" failures="1" skipped="0" time="21.269471">
+    <testsuite name="Tests\Unit\VariantCombinationTest" file="tests\Unit\VariantCombinationTest.php" tests="26" assertions="58" errors="0" failures="0" skipped="0" time="14.538669">
+      <testcase name="`VariantCombination Model` → it unit: has correct casts" file="tests\Unit\VariantCombinationTest.php::`VariantCombination Model` → it unit: has correct casts" class="Tests\Unit\VariantCombinationTest" classname="Tests.Unit.VariantCombinationTest" assertions="2" time="9.932885"/>
+      <testcase name="`VariantCombination Model` → it unit: has correct appends" file="tests\Unit\VariantCombinationTest.php::`VariantCombination Model` → it unit: has correct appends" class="Tests\Unit\VariantCombinationTest" classname="Tests.Unit.VariantCombinationTest" assertions="3" time="0.228959"/>
+      <testcase name="`VariantCombination Model` → it unit: can be replicated" file="tests\Unit\VariantCombinationTest.php::`VariantCombination Model` → it unit: can be replicated" class="Tests\Unit\VariantCombinationTest" classname="Tests.Unit.VariantCombinationTest" assertions="4" time="0.167901"/>
+      <testcase name="`VariantCombination Model` → it unit: can be created with specific attributes" file="tests\Unit\VariantCombinationTest.php::`VariantCombination Model` → it unit: can be created with specific attributes" class="Tests\Unit\VariantCombinationTest" classname="Tests.Unit.VariantCombinationTest" assertions="3" time="0.172424"/>
+      <testcase name="`VariantCombination Model` → it unit: hydrates cached combinations for strict model comparisons" file="tests\Unit\VariantCombinationTest.php::`VariantCombination Model` → it unit: hydrates cached combinations for strict model comparisons" class="Tests\Unit\VariantCombinationTest" classname="Tests.Unit.VariantCombinationTest" assertions="3" time="0.171415"/>
+      <testcase name="`VariantCombination Model` → it unit: belongs to a product" file="tests\Unit\VariantCombinationTest.php::`VariantCombination Model` → it unit: belongs to a product" class="Tests\Unit\VariantCombinationTest" classname="Tests.Unit.VariantCombinationTest" assertions="2" time="0.173809"/>
+      <testcase name="`VariantCombination Model` → it unit: has correct table name" file="tests\Unit\VariantCombinationTest.php::`VariantCombination Model` → it unit: has correct table name" class="Tests\Unit\VariantCombinationTest" classname="Tests.Unit.VariantCombinationTest" assertions="1" time="0.171261"/>
+      <testcase name="`VariantCombination Model` → it unit: can scope by combination" file="tests\Unit\VariantCombinationTest.php::`VariantCombination Model` → it unit: can scope by combination" class="Tests\Unit\VariantCombinationTest" classname="Tests.Unit.VariantCombinationTest" assertions="2" time="0.186818"/>
+      <testcase name="`VariantCombination Model` → it unit: handles empty attribute combinations" file="tests\Unit\VariantCombinationTest.php::`VariantCombination Model` → it unit: handles empty attribute combinations" class="Tests\Unit\VariantCombinationTest" classname="Tests.Unit.VariantCombinationTest" assertions="2" time="0.206752"/>
+      <testcase name="`VariantCombination Model` → it unit: can format combinations correctly" file="tests\Unit\VariantCombinationTest.php::`VariantCombination Model` → it unit: can format combinations correctly" class="Tests\Unit\VariantCombinationTest" classname="Tests.Unit.VariantCombinationTest" assertions="2" time="0.192517"/>
+      <testcase name="`VariantCombination Model` → it unit: can scope by attribute value" file="tests\Unit\VariantCombinationTest.php::`VariantCombination Model` → it unit: can scope by attribute value" class="Tests\Unit\VariantCombinationTest" classname="Tests.Unit.VariantCombinationTest" assertions="2" time="0.176079"/>
+      <testcase name="`VariantCombination Model` → it unit: handles null attribute combinations" file="tests\Unit\VariantCombinationTest.php::`VariantCombination Model` → it unit: handles null attribute combinations" class="Tests\Unit\VariantCombinationTest" classname="Tests.Unit.VariantCombinationTest" assertions="2" time="0.175679"/>
+      <testcase name="`VariantCombination Model` → it unit: has correct fillable attributes" file="tests\Unit\VariantCombinationTest.php::`VariantCombination Model` → it unit: has correct fillable attributes" class="Tests\Unit\VariantCombinationTest" classname="Tests.Unit.VariantCombinationTest" assertions="4" time="0.174133"/>
+      <testcase name="`VariantCombination Model` → it unit: generates combination hash correctly" file="tests\Unit\VariantCombinationTest.php::`VariantCombination Model` → it unit: generates combination hash correctly" class="Tests\Unit\VariantCombinationTest" classname="Tests.Unit.VariantCombinationTest" assertions="2" time="0.171602"/>
+      <testcase name="`VariantCombination Model` → it unit: can scope available combinations" file="tests\Unit\VariantCombinationTest.php::`VariantCombination Model` → it unit: can scope available combinations" class="Tests\Unit\VariantCombinationTest" classname="Tests.Unit.VariantCombinationTest" assertions="2" time="0.174936"/>
+      <testcase name="`VariantCombination Model` → it unit: can be deleted" file="tests\Unit\VariantCombinationTest.php::`VariantCombination Model` → it unit: can be deleted" class="Tests\Unit\VariantCombinationTest" classname="Tests.Unit.VariantCombinationTest" assertions="1" time="0.174718"/>
+      <testcase name="`VariantCombination Model` → it unit: validates combination correctly" file="tests\Unit\VariantCombinationTest.php::`VariantCombination Model` → it unit: validates combination correctly" class="Tests\Unit\VariantCombinationTest" classname="Tests.Unit.VariantCombinationTest" assertions="1" time="0.178674"/>
+      <testcase name="`VariantCombination Model` → it unit: can scope by product" file="tests\Unit\VariantCombinationTest.php::`VariantCombination Model` → it unit: can scope by product" class="Tests\Unit\VariantCombinationTest" classname="Tests.Unit.VariantCombinationTest" assertions="2" time="0.185739"/>
+      <testcase name="`VariantCombination Model` → it unit: normalises nested combination values for deterministic hashing" file="tests\Unit\VariantCombinationTest.php::`VariantCombination Model` → it unit: normalises nested combination values for deterministic hashing" class="Tests\Unit\VariantCombinationTest" classname="Tests.Unit.VariantCombinationTest" assertions="3" time="0.189312"/>
+      <testcase name="`VariantCombination Model` → it unit: can be created with factory" file="tests\Unit\VariantCombinationTest.php::`VariantCombination Model` → it unit: can be created with factory" class="Tests\Unit\VariantCombinationTest" classname="Tests.Unit.VariantCombinationTest" assertions="4" time="0.190706"/>
+      <testcase name="`VariantCombination Model` → it unit: can get available combinations for a product" file="tests\Unit\VariantCombinationTest.php::`VariantCombination Model` → it unit: can get available combinations for a product" class="Tests\Unit\VariantCombinationTest" classname="Tests.Unit.VariantCombinationTest" assertions="1" time="0.186591"/>
+      <testcase name="`VariantCombination Model` → it unit: falls back to deterministic payloads when no attributes exist" file="tests\Unit\VariantCombinationTest.php::`VariantCombination Model` → it unit: falls back to deterministic payloads when no attributes exist" class="Tests\Unit\VariantCombinationTest" classname="Tests.Unit.VariantCombinationTest" assertions="2" time="0.197715"/>
+      <testcase name="`VariantCombination Model` → it unit: can find variant by combination" file="tests\Unit\VariantCombinationTest.php::`VariantCombination Model` → it unit: can find variant by combination" class="Tests\Unit\VariantCombinationTest" classname="Tests.Unit.VariantCombinationTest" assertions="1" time="0.188952"/>
+      <testcase name="`VariantCombination Model` → it unit: can create combinations for a product" file="tests\Unit\VariantCombinationTest.php::`VariantCombination Model` → it unit: can create combinations for a product" class="Tests\Unit\VariantCombinationTest" classname="Tests.Unit.VariantCombinationTest" assertions="1" time="0.197502"/>
+      <testcase name="`VariantCombination Model` → it unit: can be created" file="tests\Unit\VariantCombinationTest.php::`VariantCombination Model` → it unit: can be created" class="Tests\Unit\VariantCombinationTest" classname="Tests.Unit.VariantCombinationTest" assertions="3" time="0.170045"/>
+      <testcase name="`VariantCombination Model` → it unit: can generate combinations for a product" file="tests\Unit\VariantCombinationTest.php::`VariantCombination Model` → it unit: can generate combinations for a product" class="Tests\Unit\VariantCombinationTest" classname="Tests.Unit.VariantCombinationTest" assertions="3" time="0.201544"/>
     </testsuite>
-    <testsuite name="Tests\Unit\SubscriberTest" file="Subscriber (Tests\Unit\Subscriber)" tests="28" assertions="84" errors="0" failures="0" skipped="0" time="5.983033">
-      <testcase name="Subscriber casts" file="Subscriber (Tests\Unit\Subscriber)::Subscriber casts" class="Tests\Unit\SubscriberTest" classname="Tests.Unit.SubscriberTest" assertions="18" time="0.301107"/>
-      <testcase name="Subscriber fillable attributes" file="Subscriber (Tests\Unit\Subscriber)::Subscriber fillable attributes" class="Tests\Unit\SubscriberTest" classname="Tests.Unit.SubscriberTest" assertions="1" time="0.330434"/>
-      <testcase name="Subscriber uses has factory" file="Subscriber (Tests\Unit\Subscriber)::Subscriber uses has factory" class="Tests\Unit\SubscriberTest" classname="Tests.Unit.SubscriberTest" assertions="1" time="0.360925"/>
-      <testcase name="Subscriber static get recent subscribers" file="Subscriber (Tests\Unit\Subscriber)::Subscriber static get recent subscribers" class="Tests\Unit\SubscriberTest" classname="Tests.Unit.SubscriberTest" assertions="4" time="0.396794"/>
-      <testcase name="Subscriber full name with empty names" file="Subscriber (Tests\Unit\Subscriber)::Subscriber full name with empty names" class="Tests\Unit\SubscriberTest" classname="Tests.Unit.SubscriberTest" assertions="1" time="0.409313"/>
-      <testcase name="Subscriber remove interest method" file="Subscriber (Tests\Unit\Subscriber)::Subscriber remove interest method" class="Tests\Unit\SubscriberTest" classname="Tests.Unit.SubscriberTest" assertions="3" time="0.419637"/>
-      <testcase name="Subscriber has interest method" file="Subscriber (Tests\Unit\Subscriber)::Subscriber has interest method" class="Tests\Unit\SubscriberTest" classname="Tests.Unit.SubscriberTest" assertions="3" time="0.208272"/>
-      <testcase name="Subscriber static find by email" file="Subscriber (Tests\Unit\Subscriber)::Subscriber static find by email" class="Tests\Unit\SubscriberTest" classname="Tests.Unit.SubscriberTest" assertions="3" time="0.209989"/>
-      <testcase name="Subscriber is unsubscribed accessor" file="Subscriber (Tests\Unit\Subscriber)::Subscriber is unsubscribed accessor" class="Tests\Unit\SubscriberTest" classname="Tests.Unit.SubscriberTest" assertions="2" time="0.166995"/>
-      <testcase name="Subscriber by source scope" file="Subscriber (Tests\Unit\Subscriber)::Subscriber by source scope" class="Tests\Unit\SubscriberTest" classname="Tests.Unit.SubscriberTest" assertions="3" time="0.166469"/>
-      <testcase name="Subscriber add interest duplicate" file="Subscriber (Tests\Unit\Subscriber)::Subscriber add interest duplicate" class="Tests\Unit\SubscriberTest" classname="Tests.Unit.SubscriberTest" assertions="2" time="0.171250"/>
-      <testcase name="Subscriber static subscribe without existing user" file="Subscriber (Tests\Unit\Subscriber)::Subscriber static subscribe without existing user" class="Tests\Unit\SubscriberTest" classname="Tests.Unit.SubscriberTest" assertions="3" time="0.184312"/>
-      <testcase name="Subscriber boot method preserves existing subscribed at" file="Subscriber (Tests\Unit\Subscriber)::Subscriber boot method preserves existing subscribed at" class="Tests\Unit\SubscriberTest" classname="Tests.Unit.SubscriberTest" assertions="1" time="0.193765"/>
-      <testcase name="Subscriber with interests scope" file="Subscriber (Tests\Unit\Subscriber)::Subscriber with interests scope" class="Tests\Unit\SubscriberTest" classname="Tests.Unit.SubscriberTest" assertions="3" time="0.202673"/>
-      <testcase name="Subscriber recent scope" file="Subscriber (Tests\Unit\Subscriber)::Subscriber recent scope" class="Tests\Unit\SubscriberTest" classname="Tests.Unit.SubscriberTest" assertions="3" time="0.172329"/>
-      <testcase name="Subscriber unsubscribe method" file="Subscriber (Tests\Unit\Subscriber)::Subscriber unsubscribe method" class="Tests\Unit\SubscriberTest" classname="Tests.Unit.SubscriberTest" assertions="3" time="0.166254"/>
-      <testcase name="Subscriber increment email count method" file="Subscriber (Tests\Unit\Subscriber)::Subscriber increment email count method" class="Tests\Unit\SubscriberTest" classname="Tests.Unit.SubscriberTest" assertions="3" time="0.155571"/>
-      <testcase name="Subscriber boot method sets subscribed at" file="Subscriber (Tests\Unit\Subscriber)::Subscriber boot method sets subscribed at" class="Tests\Unit\SubscriberTest" classname="Tests.Unit.SubscriberTest" assertions="1" time="0.156463"/>
-      <testcase name="Subscriber add interest method" file="Subscriber (Tests\Unit\Subscriber)::Subscriber add interest method" class="Tests\Unit\SubscriberTest" classname="Tests.Unit.SubscriberTest" assertions="3" time="0.155399"/>
-      <testcase name="Subscriber inactive scope" file="Subscriber (Tests\Unit\Subscriber)::Subscriber inactive scope" class="Tests\Unit\SubscriberTest" classname="Tests.Unit.SubscriberTest" assertions="3" time="0.158493"/>
-      <testcase name="Subscriber resubscribe method" file="Subscriber (Tests\Unit\Subscriber)::Subscriber resubscribe method" class="Tests\Unit\SubscriberTest" classname="Tests.Unit.SubscriberTest" assertions="3" time="0.155792"/>
-      <testcase name="Subscriber unsubscribed scope" file="Subscriber (Tests\Unit\Subscriber)::Subscriber unsubscribed scope" class="Tests\Unit\SubscriberTest" classname="Tests.Unit.SubscriberTest" assertions="3" time="0.162461"/>
-      <testcase name="Subscriber is active accessor" file="Subscriber (Tests\Unit\Subscriber)::Subscriber is active accessor" class="Tests\Unit\SubscriberTest" classname="Tests.Unit.SubscriberTest" assertions="2" time="0.156635"/>
-      <testcase name="Subscriber active scope" file="Subscriber (Tests\Unit\Subscriber)::Subscriber active scope" class="Tests\Unit\SubscriberTest" classname="Tests.Unit.SubscriberTest" assertions="3" time="0.161715"/>
-      <testcase name="Subscriber static get active count" file="Subscriber (Tests\Unit\Subscriber)::Subscriber static get active count" class="Tests\Unit\SubscriberTest" classname="Tests.Unit.SubscriberTest" assertions="1" time="0.158240"/>
-      <testcase name="Subscriber full name accessor" file="Subscriber (Tests\Unit\Subscriber)::Subscriber full name accessor" class="Tests\Unit\SubscriberTest" classname="Tests.Unit.SubscriberTest" assertions="1" time="0.158682"/>
-      <testcase name="Subscriber static subscribe method" file="Subscriber (Tests\Unit\Subscriber)::Subscriber static subscribe method" class="Tests\Unit\SubscriberTest" classname="Tests.Unit.SubscriberTest" assertions="5" time="0.168101"/>
-      <testcase name="Subscriber relationship with user" file="Subscriber (Tests\Unit\Subscriber)::Subscriber relationship with user" class="Tests\Unit\SubscriberTest" classname="Tests.Unit.SubscriberTest" assertions="2" time="0.174962"/>
+    <testsuite name="Tests\Feature\ProductResourceTest" file="Product Resource (Tests\Feature\ProductResource)" tests="11" assertions="13" errors="3" failures="1" skipped="0" time="2.022614">
+      <testcase name="Can create product" file="Product Resource (Tests\Feature\ProductResource)::Can create product" class="Tests\Feature\ProductResourceTest" classname="Tests.Feature.ProductResourceTest" assertions="0" time="0.188945">
+        <error type="Illuminate\Database\QueryException">Can create productIlluminate\Database\QueryException: SQLSTATE[HY000]: General error: 1 table products has no column named is_visible (Connection: sqlite, Database: C:\Dropbox\projects\egistatyba/database/testing/databases\testing_parallel_pid_34708.sqlite, SQL: insert into "products" ("name", "slug", "sku", "description", "short_description", "price", "brand_id", "stock_quantity", "low_stock_threshold", "weight", "length", "width", "height", "is_enabled", "is_featured", "manage_stock", "status", "seo_title", "seo_description", "published_at", "is_visible", "updated_at", "created_at") values (Test Product, test-product, TEST-001, &lt;p&gt;Aukštos kokybės Apsauginė kaukė profesionaliems statybos darbams. Patikimas ir ilgalaikis sprendimas jūsų projektams.&lt;/p&gt;&lt;p&gt;Tinka tiek profesionaliems statybininkams, tiek namų meistrams. Garantuojame kokybę ir patikimumą.&lt;/p&gt;, Kokybiškas Apsauginė kaukė geriausia kaina, 99.99, 1, 159, 17, 24.03, 182.64, 116.33, 40.33, 1, 0, 1, published, Apsauginė kaukė - Profesionalūs statybos įrankiai, Pirkite apsauginė kaukė geriausia kaina Lietuvoje. Greitas pristatymas visoje šalyje., 2026-02-08 17:20:06, 1, 2026-02-11 17:20:06, 2026-02-11 17:20:06))&#13;
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:578
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:827
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:794
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:573
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:537
+at vendor\laravel\framework\src\Illuminate\Database\Query\Processors\Processor.php:32
+at vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php:4054
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Builder.php:2235
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1436
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1401
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1240
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:370
+at vendor\laravel\framework\src\Illuminate\Collections\Traits\EnumeratesValues.php:275
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:365
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:321
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:315
+at tests\Feature\ProductResourceTest.php:28
+Caused by
+PDOException: SQLSTATE[HY000]: General error: 1 table products has no column named is_visible
+
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:578
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:827
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:794
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:573
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:537
+at vendor\laravel\framework\src\Illuminate\Database\Query\Processors\Processor.php:32
+at vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php:4054
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Builder.php:2235
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1436
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1401
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1240
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:370
+at vendor\laravel\framework\src\Illuminate\Collections\Traits\EnumeratesValues.php:275
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:365
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:321
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:315
+at tests\Feature\ProductResourceTest.php:28</error>
+      </testcase>
+      <testcase name="Can toggle product visibility" file="Product Resource (Tests\Feature\ProductResource)::Can toggle product visibility" class="Tests\Feature\ProductResourceTest" classname="Tests.Feature.ProductResourceTest" assertions="0" time="0.174603">
+        <error type="Illuminate\Database\QueryException">Can toggle product visibilityIlluminate\Database\QueryException: SQLSTATE[HY000]: General error: 1 table products has no column named is_visible (Connection: sqlite, Database: C:\Dropbox\projects\egistatyba/database/testing/databases\testing_parallel_pid_34708.sqlite, SQL: insert into "products" ("name", "slug", "sku", "description", "short_description", "price", "brand_id", "stock_quantity", "low_stock_threshold", "weight", "length", "width", "height", "is_enabled", "is_featured", "manage_stock", "status", "seo_title", "seo_description", "published_at", "is_visible", "updated_at", "created_at") values (Pirmos pagalbos vaistinėlė, pirmos-pagalbos-vaistinele-17831, LT-OBMRVSNA, &lt;p&gt;Patikimas Pirmos pagalbos vaistinėlė su išplėsta garantija. Sukurtas atsižvelgiant į Lietuvos statybininkų poreikius.&lt;/p&gt;&lt;p&gt;Lengvai naudojamas, saugus ir efektyvus darbo įrankis.&lt;/p&gt;, Patikimas Pirmos pagalbos vaistinėlė statybos darbams, 1185.11, ?, 20, 19, 7.11, 199.73, 67.79, 5.07, 1, 0, 0, published, Pirmos pagalbos vaistinėlė - Profesionalūs statybos įrankiai, Pirkite pirmos pagalbos vaistinėlė geriausia kaina Lietuvoje. Greitas pristatymas visoje šalyje., 2026-02-08 17:20:07, 0, 2026-02-11 17:20:07, 2026-02-11 17:20:07))&#13;
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:578
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:827
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:794
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:573
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:537
+at vendor\laravel\framework\src\Illuminate\Database\Query\Processors\Processor.php:32
+at vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php:4054
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Builder.php:2235
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1436
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1401
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1240
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:370
+at vendor\laravel\framework\src\Illuminate\Collections\Traits\EnumeratesValues.php:275
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:365
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:321
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:315
+at tests\Feature\ProductResourceTest.php:97
+Caused by
+PDOException: SQLSTATE[HY000]: General error: 1 table products has no column named is_visible
+
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:578
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:827
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:794
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:573
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:537
+at vendor\laravel\framework\src\Illuminate\Database\Query\Processors\Processor.php:32
+at vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php:4054
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Builder.php:2235
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1436
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1401
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1240
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:370
+at vendor\laravel\framework\src\Illuminate\Collections\Traits\EnumeratesValues.php:275
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:365
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:321
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:315
+at tests\Feature\ProductResourceTest.php:97</error>
+      </testcase>
+      <testcase name="Product can calculate discount percentage" file="Product Resource (Tests\Feature\ProductResource)::Product can calculate discount percentage" class="Tests\Feature\ProductResourceTest" classname="Tests.Feature.ProductResourceTest" assertions="0" time="0.179392">
+        <error type="Illuminate\Database\QueryException">Product can calculate discount percentageIlluminate\Database\QueryException: SQLSTATE[HY000]: General error: 1 table products has no column named compare_price (Connection: sqlite, Database: C:\Dropbox\projects\egistatyba/database/testing/databases\testing_parallel_pid_34708.sqlite, SQL: insert into "products" ("name", "slug", "sku", "description", "short_description", "price", "brand_id", "stock_quantity", "low_stock_threshold", "weight", "length", "width", "height", "is_enabled", "is_featured", "manage_stock", "status", "seo_title", "seo_description", "published_at", "compare_price", "updated_at", "created_at") values (Atsuktuvų rinkinys, atsuktuvu-rinkinys-27896, LT-JKDRV8GI, &lt;p&gt;Universalus Atsuktuvų rinkinys daugeliui statybos darbų. Kompaktiškas, patogus ir funkcionalus.&lt;/p&gt;&lt;p&gt;Puikiai tinka tiek vidaus, tiek lauko darbams. Atsparumas lietuviškoms oro sąlygoms.&lt;/p&gt;, Efektyvus Atsuktuvų rinkinys su garantija, 80, ?, 22, 13, 24.07, 149.22, 93.72, 41.99, 1, 0, 1, published, Atsuktuvų rinkinys - Profesionalūs statybos įrankiai, Pirkite atsuktuvų rinkinys geriausia kaina Lietuvoje. Greitas pristatymas visoje šalyje., 2026-02-08 17:20:07, 100, 2026-02-11 17:20:07, 2026-02-11 17:20:07))&#13;
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:578
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:827
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:794
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:573
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:537
+at vendor\laravel\framework\src\Illuminate\Database\Query\Processors\Processor.php:32
+at vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php:4054
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Builder.php:2235
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1436
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1401
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1240
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:370
+at vendor\laravel\framework\src\Illuminate\Collections\Traits\EnumeratesValues.php:275
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:365
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:321
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:315
+at tests\Feature\ProductResourceTest.php:130
+Caused by
+PDOException: SQLSTATE[HY000]: General error: 1 table products has no column named compare_price
+
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:578
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:827
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:794
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:573
+at vendor\laravel\framework\src\Illuminate\Database\Connection.php:537
+at vendor\laravel\framework\src\Illuminate\Database\Query\Processors\Processor.php:32
+at vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php:4054
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Builder.php:2235
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1436
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1401
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1240
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:370
+at vendor\laravel\framework\src\Illuminate\Collections\Traits\EnumeratesValues.php:275
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:365
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:321
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:315
+at tests\Feature\ProductResourceTest.php:130</error>
+      </testcase>
+      <testcase name="Can delete product" file="Product Resource (Tests\Feature\ProductResource)::Can delete product" class="Tests\Feature\ProductResourceTest" classname="Tests.Feature.ProductResourceTest" assertions="1" time="0.183617"/>
+      <testcase name="Product sku must be unique" file="Product Resource (Tests\Feature\ProductResource)::Product sku must be unique" class="Tests\Feature\ProductResourceTest" classname="Tests.Feature.ProductResourceTest" assertions="1" time="0.194263">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Product sku must be uniqueFailed asserting that exception of type "Illuminate\Database\QueryException" is thrown.</failure>
+      </testcase>
+      <testcase name="Product can have brand" file="Product Resource (Tests\Feature\ProductResource)::Product can have brand" class="Tests\Feature\ProductResourceTest" classname="Tests.Feature.ProductResourceTest" assertions="2" time="0.177420"/>
+      <testcase name="Product stock status" file="Product Resource (Tests\Feature\ProductResource)::Product stock status" class="Tests\Feature\ProductResourceTest" classname="Tests.Feature.ProductResourceTest" assertions="3" time="0.194165"/>
+      <testcase name="Product out of stock status" file="Product Resource (Tests\Feature\ProductResource)::Product out of stock status" class="Tests\Feature\ProductResourceTest" classname="Tests.Feature.ProductResourceTest" assertions="3" time="0.185155"/>
+      <testcase name="Can update product" file="Product Resource (Tests\Feature\ProductResource)::Can update product" class="Tests\Feature\ProductResourceTest" classname="Tests.Feature.ProductResourceTest" assertions="1" time="0.179920"/>
+      <testcase name="Can toggle product featured status" file="Product Resource (Tests\Feature\ProductResource)::Can toggle product featured status" class="Tests\Feature\ProductResourceTest" classname="Tests.Feature.ProductResourceTest" assertions="1" time="0.175178"/>
+      <testcase name="Product slug must be unique" file="Product Resource (Tests\Feature\ProductResource)::Product slug must be unique" class="Tests\Feature\ProductResourceTest" classname="Tests.Feature.ProductResourceTest" assertions="1" time="0.189956"/>
+    </testsuite>
+    <testsuite name="Tests\Unit\SubscriberTest" file="Subscriber (Tests\Unit\Subscriber)" tests="28" assertions="84" errors="0" failures="0" skipped="0" time="4.708187">
+      <testcase name="Subscriber fillable attributes" file="Subscriber (Tests\Unit\Subscriber)::Subscriber fillable attributes" class="Tests\Unit\SubscriberTest" classname="Tests.Unit.SubscriberTest" assertions="1" time="0.162577"/>
+      <testcase name="Subscriber casts" file="Subscriber (Tests\Unit\Subscriber)::Subscriber casts" class="Tests\Unit\SubscriberTest" classname="Tests.Unit.SubscriberTest" assertions="18" time="0.152662"/>
+      <testcase name="Subscriber full name accessor" file="Subscriber (Tests\Unit\Subscriber)::Subscriber full name accessor" class="Tests\Unit\SubscriberTest" classname="Tests.Unit.SubscriberTest" assertions="1" time="0.167750"/>
+      <testcase name="Subscriber resubscribe method" file="Subscriber (Tests\Unit\Subscriber)::Subscriber resubscribe method" class="Tests\Unit\SubscriberTest" classname="Tests.Unit.SubscriberTest" assertions="3" time="0.163089"/>
+      <testcase name="Subscriber boot method sets subscribed at" file="Subscriber (Tests\Unit\Subscriber)::Subscriber boot method sets subscribed at" class="Tests\Unit\SubscriberTest" classname="Tests.Unit.SubscriberTest" assertions="1" time="0.169535"/>
+      <testcase name="Subscriber is unsubscribed accessor" file="Subscriber (Tests\Unit\Subscriber)::Subscriber is unsubscribed accessor" class="Tests\Unit\SubscriberTest" classname="Tests.Unit.SubscriberTest" assertions="2" time="0.164105"/>
+      <testcase name="Subscriber inactive scope" file="Subscriber (Tests\Unit\Subscriber)::Subscriber inactive scope" class="Tests\Unit\SubscriberTest" classname="Tests.Unit.SubscriberTest" assertions="3" time="0.164312"/>
+      <testcase name="Subscriber increment email count method" file="Subscriber (Tests\Unit\Subscriber)::Subscriber increment email count method" class="Tests\Unit\SubscriberTest" classname="Tests.Unit.SubscriberTest" assertions="3" time="0.164520"/>
+      <testcase name="Subscriber uses has factory" file="Subscriber (Tests\Unit\Subscriber)::Subscriber uses has factory" class="Tests\Unit\SubscriberTest" classname="Tests.Unit.SubscriberTest" assertions="1" time="0.162981"/>
+      <testcase name="Subscriber by source scope" file="Subscriber (Tests\Unit\Subscriber)::Subscriber by source scope" class="Tests\Unit\SubscriberTest" classname="Tests.Unit.SubscriberTest" assertions="3" time="0.162911"/>
+      <testcase name="Subscriber with interests scope" file="Subscriber (Tests\Unit\Subscriber)::Subscriber with interests scope" class="Tests\Unit\SubscriberTest" classname="Tests.Unit.SubscriberTest" assertions="3" time="0.177277"/>
+      <testcase name="Subscriber add interest method" file="Subscriber (Tests\Unit\Subscriber)::Subscriber add interest method" class="Tests\Unit\SubscriberTest" classname="Tests.Unit.SubscriberTest" assertions="3" time="0.162080"/>
+      <testcase name="Subscriber add interest duplicate" file="Subscriber (Tests\Unit\Subscriber)::Subscriber add interest duplicate" class="Tests\Unit\SubscriberTest" classname="Tests.Unit.SubscriberTest" assertions="2" time="0.167577"/>
+      <testcase name="Subscriber static find by email" file="Subscriber (Tests\Unit\Subscriber)::Subscriber static find by email" class="Tests\Unit\SubscriberTest" classname="Tests.Unit.SubscriberTest" assertions="3" time="0.168135"/>
+      <testcase name="Subscriber static get active count" file="Subscriber (Tests\Unit\Subscriber)::Subscriber static get active count" class="Tests\Unit\SubscriberTest" classname="Tests.Unit.SubscriberTest" assertions="1" time="0.167965"/>
+      <testcase name="Subscriber boot method preserves existing subscribed at" file="Subscriber (Tests\Unit\Subscriber)::Subscriber boot method preserves existing subscribed at" class="Tests\Unit\SubscriberTest" classname="Tests.Unit.SubscriberTest" assertions="1" time="0.163220"/>
+      <testcase name="Subscriber is active accessor" file="Subscriber (Tests\Unit\Subscriber)::Subscriber is active accessor" class="Tests\Unit\SubscriberTest" classname="Tests.Unit.SubscriberTest" assertions="2" time="0.173097"/>
+      <testcase name="Subscriber active scope" file="Subscriber (Tests\Unit\Subscriber)::Subscriber active scope" class="Tests\Unit\SubscriberTest" classname="Tests.Unit.SubscriberTest" assertions="3" time="0.164672"/>
+      <testcase name="Subscriber recent scope" file="Subscriber (Tests\Unit\Subscriber)::Subscriber recent scope" class="Tests\Unit\SubscriberTest" classname="Tests.Unit.SubscriberTest" assertions="3" time="0.163417"/>
+      <testcase name="Subscriber unsubscribe method" file="Subscriber (Tests\Unit\Subscriber)::Subscriber unsubscribe method" class="Tests\Unit\SubscriberTest" classname="Tests.Unit.SubscriberTest" assertions="3" time="0.164185"/>
+      <testcase name="Subscriber has interest method" file="Subscriber (Tests\Unit\Subscriber)::Subscriber has interest method" class="Tests\Unit\SubscriberTest" classname="Tests.Unit.SubscriberTest" assertions="3" time="0.176348"/>
+      <testcase name="Subscriber static subscribe without existing user" file="Subscriber (Tests\Unit\Subscriber)::Subscriber static subscribe without existing user" class="Tests\Unit\SubscriberTest" classname="Tests.Unit.SubscriberTest" assertions="3" time="0.184395"/>
+      <testcase name="Subscriber relationship with user" file="Subscriber (Tests\Unit\Subscriber)::Subscriber relationship with user" class="Tests\Unit\SubscriberTest" classname="Tests.Unit.SubscriberTest" assertions="2" time="0.166165"/>
+      <testcase name="Subscriber unsubscribed scope" file="Subscriber (Tests\Unit\Subscriber)::Subscriber unsubscribed scope" class="Tests\Unit\SubscriberTest" classname="Tests.Unit.SubscriberTest" assertions="3" time="0.163195"/>
+      <testcase name="Subscriber static subscribe method" file="Subscriber (Tests\Unit\Subscriber)::Subscriber static subscribe method" class="Tests\Unit\SubscriberTest" classname="Tests.Unit.SubscriberTest" assertions="5" time="0.172884"/>
+      <testcase name="Subscriber full name with empty names" file="Subscriber (Tests\Unit\Subscriber)::Subscriber full name with empty names" class="Tests\Unit\SubscriberTest" classname="Tests.Unit.SubscriberTest" assertions="1" time="0.160491"/>
+      <testcase name="Subscriber remove interest method" file="Subscriber (Tests\Unit\Subscriber)::Subscriber remove interest method" class="Tests\Unit\SubscriberTest" classname="Tests.Unit.SubscriberTest" assertions="3" time="0.164135"/>
+      <testcase name="Subscriber static get recent subscribers" file="Subscriber (Tests\Unit\Subscriber)::Subscriber static get recent subscribers" class="Tests\Unit\SubscriberTest" classname="Tests.Unit.SubscriberTest" assertions="4" time="0.214508"/>
     </testsuite>
   </testsuite>
 </testsuites>

@@ -79,7 +79,7 @@ final class CollectionSeeder extends BaseSeeder
                         'description'      => $translation['description'],
                         'meta_title'       => $translation['name'] . ' | ' . config('app.name'),
                         'meta_description' => $translation['description'],
-                        'meta_keywords'    => $translation['keywords'] ?? [],
+                        'meta_keywords'    => $this->stringifyKeywords($translation['keywords'] ?? []),
                     ]);
                 } else {
                     // Use factory to create translation
@@ -92,7 +92,7 @@ final class CollectionSeeder extends BaseSeeder
                             'description'      => $translation['description'],
                             'meta_title'       => $translation['name'] . ' | ' . config('app.name'),
                             'meta_description' => $translation['description'],
-                            'meta_keywords'    => $translation['keywords'] ?? [],
+                            'meta_keywords'    => $this->stringifyKeywords($translation['keywords'] ?? []),
                         ])
                         ->create();
                 }
@@ -151,5 +151,25 @@ final class CollectionSeeder extends BaseSeeder
             ->unique()
             ->values()
             ->toArray();
+    }
+
+    private function stringifyKeywords(mixed $keywords): ?string
+    {
+        if (is_string($keywords)) {
+            $normalized = trim($keywords);
+
+            return $normalized === '' ? null : $normalized;
+        }
+
+        if (! is_array($keywords)) {
+            return null;
+        }
+
+        $values = array_values(array_filter(array_map(
+            static fn (mixed $value): string => trim((string) $value),
+            $keywords,
+        )));
+
+        return $values === [] ? null : implode(', ', $values);
     }
 }

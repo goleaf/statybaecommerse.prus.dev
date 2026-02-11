@@ -10,9 +10,12 @@ use BackedEnum;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -50,21 +53,53 @@ final class ProductImageResource extends BaseResource
     public static function form(Schema $schema): Schema
     {
         return $schema
+            ->columns(2)
             ->components([
-                Select::make('product_id')
-                    ->relationship('product', 'name')
-                    ->required()
-                    ->searchable(),
-                TextInput::make('path')
-                    ->required()
-                    ->maxLength(255),
-                TextInput::make('alt_text')
-                    ->maxLength(255),
-                TextInput::make('sort_order')
-                    ->numeric()
-                    ->default(0),
-                Toggle::make('is_active')
-                    ->default(true),
+                Section::make(__('messages.media'))
+                    ->description(__('admin.navigation.product_images'))
+                    ->schema([
+                        FileUpload::make('path')
+                            ->label(__('messages.image'))
+                            ->required()
+                            ->image()
+                            ->imageEditor()
+                            ->imageResizeMode('cover')
+                            ->imageCropAspectRatio('1:1')
+                            ->disk('public')
+                            ->directory('product-images')
+                            ->visibility('public')
+                            ->maxSize(5120)
+                            ->columnSpanFull(),
+                    ])
+                    ->columnSpan(1),
+                Section::make(__('messages.details'))
+                    ->schema([
+                        Grid::make(1)
+                            ->schema([
+                                Select::make('product_id')
+                                    ->label(__('messages.product'))
+                                    ->relationship('product', 'name')
+                                    ->required()
+                                    ->searchable()
+                                    ->preload(),
+                                TextInput::make('alt_text')
+                                    ->label(__('messages.description'))
+                                    ->maxLength(255)
+                                    ->placeholder('e.g. Front view of the product'),
+                                TextInput::make('sort_order')
+                                    ->label(__('messages.sort_order'))
+                                    ->numeric()
+                                    ->integer()
+                                    ->default(0),
+                                Toggle::make('is_default')
+                                    ->label(__('admin.navigation.product_image'))
+                                    ->helperText('Mark as primary image for this product.'),
+                                Toggle::make('is_active')
+                                    ->label(__('messages.active'))
+                                    ->default(true),
+                            ]),
+                    ])
+                    ->columnSpan(1),
             ]);
     }
 

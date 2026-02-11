@@ -37,7 +37,13 @@ class ProductsTable
                 TextColumn::make('name')
                     ->label(__('messages.name'))
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->limit(60)
+                    ->tooltip(static function (TextColumn $column): ?string {
+                        $state = (string) $column->getState();
+
+                        return mb_strlen($state) > 60 ? $state : null;
+                    }),
                 TextColumn::make('sku')
                     ->label(__('messages.sku'))
                     ->searchable()

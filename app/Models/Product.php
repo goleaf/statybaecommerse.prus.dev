@@ -176,16 +176,6 @@ final class Product extends Model implements HasMedia, TranslatableRecord
         });
     }
 
-    /**
-     * Always execute physical deletes for this model.
-     */
-    protected function performDeleteOnModel()
-    {
-        $this->setKeysForSaveQuery($this->newModelQuery())->delete();
-
-        $this->exists = false;
-    }
-
     public static function bootSearchable(): void
     {
         $container = Container::getInstance();

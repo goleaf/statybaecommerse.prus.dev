@@ -1095,14 +1095,4 @@ final class Category extends Model implements HasMedia
         // implicit model binding when editors reuse the slug with new casing.
         return '(?i)^(?!(?:' . implode('|', $escaped) . ')$)[a-z0-9\\-]+$';
     }
-
-    /**
-     * Always execute physical deletes for this model.
-     */
-    protected function performDeleteOnModel()
-    {
-        $this->setKeysForSaveQuery($this->newModelQuery())->delete();
-
-        $this->exists = false;
-    }
 }
