@@ -28,8 +28,6 @@ final class LegalTranslation extends Model
         'title',
         'slug',
         'content',
-        'seo_title',
-        'seo_description',
         'meta_data',
     ];
 
@@ -107,12 +105,12 @@ final class LegalTranslation extends Model
 
     public function getFormattedSeoTitleAttribute(): ?string
     {
-        return $this->seo_title ?: $this->title;
+        return $this->title;
     }
 
     public function getFormattedSeoDescriptionAttribute(): ?string
     {
-        return $this->seo_description ?: \Illuminate\Support\Str::limit(strip_tags((string) $this->content), 160);
+        return \Illuminate\Support\Str::limit(strip_tags((string) $this->content), 160);
     }
 
     public function getMetaDataArrayAttribute(): array
@@ -137,12 +135,12 @@ final class LegalTranslation extends Model
 
     public function hasSeoTitle(): bool
     {
-        return ! empty($this->seo_title);
+        return true;
     }
 
     public function hasSeoDescription(): bool
     {
-        return ! empty($this->seo_description);
+        return true;
     }
 
     public function hasMetaData(): bool

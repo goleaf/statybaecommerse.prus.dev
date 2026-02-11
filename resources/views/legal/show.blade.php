@@ -1,10 +1,10 @@
 @extends('components.layouts.base')
 
-@section('title', $translation->seo_title ?: $translation->title)
+@section('title', $translation->getFormattedTitleAttribute())
 
 @section('meta')
     <meta name="description"
-          content="{{ $translation->seo_description ?: Str::limit(strip_tags($translation->content), 160) }}">
+          content="{{ $translation->getFormattedSeoDescriptionAttribute() }}">
     <meta name="keywords" content="{{ $document->type }}, {{ __('messages.frontend_legal') }}">
 
     @if ($document->meta_data && isset($document->meta_data['version']))

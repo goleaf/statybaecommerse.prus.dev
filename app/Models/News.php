@@ -282,7 +282,7 @@ final class News extends Model implements TranslatableRecord
      */
     public function getSeoTitleAttribute(): ?string
     {
-        return $this->getTranslation('seo_title', app()->getLocale());
+        return $this->getTitleAttribute();
     }
 
     /**
@@ -290,7 +290,7 @@ final class News extends Model implements TranslatableRecord
      */
     public function getSeoDescriptionAttribute(): ?string
     {
-        return $this->getTranslation('seo_description', app()->getLocale());
+        return $this->getSummaryAttribute() ?: strip_tags((string) $this->getContentAttribute());
     }
 
     /**

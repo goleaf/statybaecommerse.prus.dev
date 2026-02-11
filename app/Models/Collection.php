@@ -59,14 +59,14 @@ final class Collection extends Model implements HasMedia, TranslatableRecord
 
     protected $table = 'collections';
 
-    protected $fillable = ['name', 'slug', 'description', 'is_visible', 'sort_order', 'seo_title', 'seo_description', 'is_automatic', 'is_active', 'meta_title', 'meta_description', 'meta_keywords', 'display_type', 'products_per_page', 'show_filters', 'max_products', 'rules'];
+    protected $fillable = ['name', 'slug', 'description', 'is_visible', 'sort_order', 'is_automatic', 'is_active', 'display_type', 'products_per_page', 'show_filters', 'max_products', 'rules'];
 
     /**
      * Handle casts functionality with proper error handling.
      */
     protected function casts(): array
     {
-        return ['is_visible' => 'boolean', 'sort_order' => 'integer', 'is_automatic' => 'boolean', 'is_active' => 'boolean', 'products_per_page' => 'integer', 'show_filters' => 'boolean', 'meta_keywords' => 'array', 'max_products' => 'integer'];
+        return ['is_visible' => 'boolean', 'sort_order' => 'integer', 'is_automatic' => 'boolean', 'is_active' => 'boolean', 'products_per_page' => 'integer', 'show_filters' => 'boolean', 'max_products' => 'integer'];
     }
 
     /**
@@ -374,9 +374,7 @@ final class Collection extends Model implements HasMedia, TranslatableRecord
      */
     public function getTranslatedMetaTitle(?string $locale = null): ?string
     {
-        $translated = $this->trans('meta_title', $locale);
-
-        return $translated ?: $this->meta_title;
+        return $this->getTranslatedName($locale);
     }
 
     /**
@@ -384,9 +382,7 @@ final class Collection extends Model implements HasMedia, TranslatableRecord
      */
     public function getTranslatedMetaDescription(?string $locale = null): ?string
     {
-        $translated = $this->trans('meta_description', $locale);
-
-        return $translated ?: $this->meta_description;
+        return strip_tags((string) $this->getTranslatedDescription($locale));
     }
 
     /**
@@ -394,9 +390,7 @@ final class Collection extends Model implements HasMedia, TranslatableRecord
      */
     public function getTranslatedMetaKeywords(?string $locale = null): ?array
     {
-        $translated = $this->trans('messages.meta_keywords', $locale);
-
-        return $translated ?: $this->meta_keywords;
+        return [];
     }
 
     // Scope for translated collections
@@ -438,7 +432,7 @@ final class Collection extends Model implements HasMedia, TranslatableRecord
      */
     public function getOrCreateTranslation(string $locale): \App\Models\Translations\CollectionTranslation
     {
-        return $this->translations()->firstOrCreate(['locale' => $locale], ['name' => $this->name, 'slug' => $this->slug, 'description' => $this->description, 'meta_title' => $this->meta_title, 'meta_description' => $this->meta_description, 'meta_keywords' => $this->meta_keywords]);
+        return $this->translations()->firstOrCreate(['locale' => $locale], ['name' => $this->name, 'slug' => $this->slug, 'description' => $this->description]);
     }
 
     /**
@@ -489,7 +483,7 @@ final class Collection extends Model implements HasMedia, TranslatableRecord
      */
     public function getSeoInfo(): array
     {
-        return ['seo_title' => $this->seo_title, 'seo_description' => $this->seo_description, 'meta_title' => $this->meta_title, 'meta_description' => $this->meta_description, 'meta_keywords' => $this->meta_keywords];
+        return ['seo_title' => $this->getTranslatedName(), 'seo_description' => strip_tags((string) $this->getTranslatedDescription()), 'meta_title' => $this->getTranslatedName(), 'meta_description' => strip_tags((string) $this->getTranslatedDescription()), 'meta_keywords' => []];
     }
 
     /**

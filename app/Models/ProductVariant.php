@@ -55,6 +55,14 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
 
     protected $table = 'product_variants';
 
+    /**
+     * Stock movements belonging to this variant through inventories.
+     */
+    public function stockMovements(): \Illuminate\Database\Eloquent\Relations\HasManyThrough
+    {
+        return $this->hasManyThrough(StockMovement::class, VariantInventory::class, 'variant_id', 'variant_inventory_id');
+    }
+
     protected $fillable = [
         'product_id', 'sku', 'name', 'variant_name_lt', 'variant_name_en',
         'description_lt', 'description_en', 'price', 'cost_price',
@@ -62,7 +70,6 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
         'stock_quantity', 'reserved_quantity', 'available_quantity', 'sold_quantity',
         'weight', 'track_inventory', 'is_default', 'is_default_variant', 'is_enabled', 'barcode', 'attributes', 'variant_attribute_matrix',
         'is_on_sale', 'sale_start_date', 'sale_end_date', 'is_featured', 'is_new', 'is_bestseller',
-        'seo_title_lt', 'seo_title_en', 'seo_description_lt', 'seo_description_en',
         'variant_combination_hash',
     ];
 
@@ -240,14 +247,6 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
     public function inventories(): HasMany
     {
         return $this->hasMany(VariantInventory::class, 'variant_id');
-    }
-
-    /**
-     * Stock movements belonging to this variant through inventories.
-     */
-    public function stockMovements(): \Illuminate\Database\Eloquent\Relations\HasManyThrough
-    {
-        return $this->hasManyThrough(StockMovement::class, VariantInventory::class, 'variant_id', 'variant_inventory_id');
     }
 
     /**
@@ -683,17 +682,14 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
     {
         $locale ??= app()->getLocale();
 
-        $translated = $this->trans('seo_title', $locale);
+        $name = $this->getLocalizedName($locale);
+        $productName = $this->product?->getTranslatedName($locale);
 
-        if (! filled($translated)) {
-            $translated = match ($locale) {
-                'lt'    => $this->seo_title_lt,
-                'en'    => $this->seo_title_en,
-                default => null,
-            };
+        if ($name && $productName && str_contains($name, $productName)) {
+            return $name;
         }
 
-        return $translated;
+        return $name . ($productName ? ' - ' . $productName : '');
     }
 
     /**
@@ -703,17 +699,7 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
     {
         $locale ??= app()->getLocale();
 
-        $translated = $this->trans('seo_description', $locale);
-
-        if (! filled($translated)) {
-            $translated = match ($locale) {
-                'lt'    => $this->seo_description_lt,
-                'en'    => $this->seo_description_en,
-                default => null,
-            };
-        }
-
-        return $translated;
+        return $this->getLocalizedDescription($locale) ?: $this->product?->getTranslatedShortDescription($locale);
     }
 
     /**

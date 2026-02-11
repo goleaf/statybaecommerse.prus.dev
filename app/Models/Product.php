@@ -86,7 +86,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
         'published_at' => true,
     ];
 
-    protected $fillable = ['name', 'slug', 'description', 'short_description', 'detailed_description', 'sku', 'barcode', 'price', 'cost_price', 'manage_stock', 'allow_backorder', 'stock_quantity', 'low_stock_threshold', 'weight', 'length', 'width', 'height', 'size', 'size_type', 'color', 'pack_size', 'pack_size_type', 'is_active', 'is_enabled', 'is_featured', 'is_requestable', 'minimum_quantity', 'hide_add_to_cart', 'request_message', 'published_at', 'seo_title', 'seo_description', 'brand_id', 'status', 'variant_attribute_matrix', 'shipping_class', 'external_url'];
+    protected $fillable = ['name', 'slug', 'description', 'short_description', 'detailed_description', 'sku', 'barcode', 'price', 'cost_price', 'manage_stock', 'allow_backorder', 'stock_quantity', 'low_stock_threshold', 'weight', 'length', 'width', 'height', 'size', 'size_type', 'color', 'pack_size', 'pack_size_type', 'is_active', 'is_enabled', 'is_featured', 'is_requestable', 'minimum_quantity', 'hide_add_to_cart', 'request_message', 'published_at', 'brand_id', 'status', 'variant_attribute_matrix', 'shipping_class', 'external_url'];
 
     protected $casts = [
         // Monetary and numeric fields use native casting for precise calculations within tests.
@@ -1380,7 +1380,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
      */
     public function getTranslatedSeoTitle(?string $locale = null): ?string
     {
-        return $this->trans('seo_title', $locale) ?: $this->seo_title;
+        return $this->getTranslatedName($locale);
     }
 
     /**
@@ -1388,7 +1388,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
      */
     public function getTranslatedSeoDescription(?string $locale = null): ?string
     {
-        return $this->trans('seo_description', $locale) ?: $this->seo_description;
+        return $this->getTranslatedShortDescription($locale) ?: strip_tags((string) $this->getTranslatedDescription($locale));
     }
 
     /**
@@ -1444,7 +1444,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
      */
     public function getOrCreateTranslation(string $locale): \App\Models\Translations\ProductTranslation
     {
-        return $this->translations()->firstOrCreate(['locale' => $locale], ['name' => $this->name, 'slug' => $this->slug, 'description' => $this->description, 'short_description' => $this->short_description, 'seo_title' => $this->seo_title, 'seo_description' => $this->seo_description]);
+        return $this->translations()->firstOrCreate(['locale' => $locale], ['name' => $this->name, 'slug' => $this->slug, 'description' => $this->description, 'short_description' => $this->short_description]);
     }
 
     // Update translation for specific locale
@@ -1600,7 +1600,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
      */
     public function getSeoInfo(): array
     {
-        return ['seo_title' => $this->seo_title, 'seo_description' => $this->seo_description, 'meta_keywords' => $this->meta_keywords ?? [], 'canonical_url' => $this->getCanonicalUrl()];
+        return ['seo_title' => $this->getTranslatedSeoTitle(), 'seo_description' => $this->getTranslatedSeoDescription(), 'meta_keywords' => [], 'canonical_url' => $this->getCanonicalUrl()];
     }
 
     /**

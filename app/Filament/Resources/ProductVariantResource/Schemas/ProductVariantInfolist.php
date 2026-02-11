@@ -109,21 +109,6 @@ class ProductVariantInfolist
                                     ->markdown(),
                             ]),
                     ]),
-
-                Section::make(__('admin.product_variants.seo'))
-                    ->schema([
-                        Grid::make(2)
-                            ->schema([
-                                TextEntry::make('seo_title_lt')
-                                    ->label(__('admin.fields.seo_title_lt')),
-                                TextEntry::make('seo_title_en')
-                                    ->label(__('admin.fields.seo_title_en')),
-                                TextEntry::make('seo_description_lt')
-                                    ->label(__('admin.fields.seo_description_lt')),
-                                TextEntry::make('seo_description_en')
-                                    ->label(__('admin.fields.seo_description_en')),
-                            ]),
-                    ]),
             ]);
     }
 }

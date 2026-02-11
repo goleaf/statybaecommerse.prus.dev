@@ -214,7 +214,7 @@ final class Legal extends Model
      */
     public function getTranslatedSeoTitle(?string $locale = null): ?string
     {
-        return $this->getTranslatedField('seo_title', $locale);
+        return $this->getTranslatedTitle($locale);
     }
 
     /**
@@ -222,7 +222,7 @@ final class Legal extends Model
      */
     public function getTranslatedSeoDescription(?string $locale = null): ?string
     {
-        return $this->getTranslatedField('seo_description', $locale);
+        return strip_tags((string) $this->getTranslatedContent($locale));
     }
 
     /**
@@ -298,8 +298,6 @@ final class Legal extends Model
             'title'           => $this->key,
             'slug'            => \Illuminate\Support\Str::slug($this->key) . '-' . $locale,
             'content'         => '',
-            'seo_title'       => $this->key,
-            'seo_description' => '',
         ];
     }
 

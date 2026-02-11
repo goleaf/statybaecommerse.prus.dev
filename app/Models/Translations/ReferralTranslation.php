@@ -30,7 +30,7 @@ final class ReferralTranslation extends Model
 
     protected $table = 'referral_translations';
 
-    protected $fillable = ['referral_id', 'locale', 'title', 'description', 'terms_conditions', 'benefits_description', 'how_it_works', 'seo_title', 'seo_description', 'seo_keywords'];
+    protected $fillable = ['referral_id', 'locale', 'title', 'description', 'terms_conditions', 'benefits_description', 'how_it_works'];
 
     protected $casts = ['referral_id' => 'integer', 'seo_keywords' => 'array'];
 

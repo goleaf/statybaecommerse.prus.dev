@@ -32,9 +32,9 @@ final class ProductTranslation extends Model
 
     protected $table = 'product_translations';
 
-    protected $fillable = ['product_id', 'locale', 'name', 'slug', 'description', 'short_description', 'detailed_description', 'seo_title', 'seo_description', 'meta_keywords', 'alt_text'];
+    protected $fillable = ['product_id', 'locale', 'name', 'slug', 'description', 'short_description', 'detailed_description', 'alt_text'];
 
-    protected $casts = ['product_id' => 'integer', 'meta_keywords' => 'array'];
+    protected $casts = ['product_id' => 'integer'];
 
     public $timestamps = true;
 

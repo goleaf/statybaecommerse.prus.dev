@@ -19,7 +19,7 @@ trait ManagesNewsTranslationTabs
      */
     protected function getTranslatableFields(): array
     {
-        return ['title', 'slug', 'summary', 'content', 'meta_title', 'meta_description'];
+        return ['title', 'slug', 'summary', 'content'];
     }
 
     /**

@@ -20,8 +20,6 @@ final class ProductVariantTranslation extends Model
         'locale',
         'name',
         'description',
-        'seo_title',
-        'seo_description',
     ];
 
     protected $casts = [

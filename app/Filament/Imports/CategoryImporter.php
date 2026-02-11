@@ -66,8 +66,6 @@ class CategoryImporter extends BaseImporter
                 ->ignoreBlankState()
                 ->rules(['nullable', 'boolean']),
             ImportColumn::make('color'),
-            ImportColumn::make('seo_title'),
-            ImportColumn::make('seo_description'),
             ImportColumn::make('show_in_menu')
                 ->boolean()
                 ->ignoreBlankState()
@@ -76,8 +74,6 @@ class CategoryImporter extends BaseImporter
                 ->numeric()
                 ->ignoreBlankState()
                 ->rules(['nullable', 'integer']),
-            ImportColumn::make('meta_title'),
-            ImportColumn::make('meta_description'),
             ImportColumn::make('icon'),
         ];
     }
@@ -134,7 +130,6 @@ class CategoryImporter extends BaseImporter
             'Descriptions'      => ['description', 'short_description'],
             'Settings'          => ['sort_order', 'is_visible', 'is_active', 'is_enabled', 'is_featured', 'show_in_menu'],
             'Appearance'        => ['color', 'icon'],
-            'SEO'               => ['seo_title', 'seo_description', 'meta_title', 'meta_description'],
         ];
     }
 

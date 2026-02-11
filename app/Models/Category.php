@@ -79,7 +79,7 @@ final class Category extends Model implements HasMedia
         'status'     => false,
     ];
 
-    protected $fillable = ['name', 'slug', 'description', 'short_description', 'parent_id', 'sort_order', 'is_visible', 'is_enabled', 'is_active', 'is_featured', 'color', 'icon', 'seo_title', 'seo_description', 'meta_title', 'meta_description', 'show_in_menu', 'product_limit'];
+    protected $fillable = ['name', 'slug', 'description', 'short_description', 'parent_id', 'sort_order', 'is_visible', 'is_enabled', 'is_active', 'is_featured', 'color', 'icon', 'show_in_menu', 'product_limit'];
 
     // Allow SEO metadata and icon attributes to be mass assignable so Filament seeders can hydrate them safely.
 
@@ -524,9 +524,9 @@ final class Category extends Model implements HasMedia
     public function getMetaTagsAttribute(): array
     {
         return [
-            'title'       => $this->seo_title ?? $this->name,
-            'description' => $this->seo_description ?? $this->description,
-            'keywords'    => $this->seo_keywords ?? [],
+            'title'       => $this->getTranslatedName() ?: $this->name,
+            'description' => strip_tags((string) $this->getTranslatedDescription()) ?: $this->description,
+            'keywords'    => [],
             'canonical'   => $this->canonical_url,
         ];
     }
@@ -659,8 +659,6 @@ final class Category extends Model implements HasMedia
                 'name'            => $this->name,
                 'slug'            => $this->slug,
                 'description'     => $this->description,
-                'seo_title'       => $this->seo_title,
-                'seo_description' => $this->seo_description,
             ]
         );
     }
@@ -718,7 +716,7 @@ final class Category extends Model implements HasMedia
      */
     public function getSeoInfo(): array
     {
-        return ['seo_title' => $this->seo_title, 'seo_description' => $this->seo_description, 'canonical_url' => $this->getCanonicalUrl(), 'meta_tags' => $this->getMetaTags()];
+        return ['seo_title' => $this->getTranslatedName(), 'seo_description' => strip_tags((string) $this->getTranslatedDescription()), 'canonical_url' => $this->getCanonicalUrl(), 'meta_tags' => $this->getMetaTags()];
     }
 
     /**
@@ -760,7 +758,10 @@ final class Category extends Model implements HasMedia
      */
     public function getMetaTags(): array
     {
-        return ['title' => $this->seo_title ?: $this->name, 'description' => ($this->seo_description ?: $this->short_description) ?: $this->description, 'og:title' => $this->seo_title ?: $this->name, 'og:description' => ($this->seo_description ?: $this->short_description) ?: $this->description, 'og:image' => $this->getImageUrl(), 'og:url' => $this->getCanonicalUrl()];
+        $title = $this->getTranslatedName();
+        $description = strip_tags((string) $this->getTranslatedDescription());
+
+        return ['title' => $title ?: $this->name, 'description' => $description ?: $this->description, 'og:title' => $title ?: $this->name, 'og:description' => $description ?: $this->description, 'og:image' => $this->getImageUrl(), 'og:url' => $this->getCanonicalUrl()];
     }
 
     /**

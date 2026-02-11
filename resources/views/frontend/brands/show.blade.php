@@ -1,7 +1,7 @@
 @extends('frontend.layouts.app')
 
-@section('title', $brand->seo_title ?: $brand->name)
-@section('description', $brand->seo_description ?: str($brand->description)->stripTags()->limit(160))
+@section('title', $brand->getTranslatedSeoTitle())
+@section('description', strip_tags((string) $brand->getTranslatedDescription()))
 
 @section('content')
 <div class="min-h-screen bg-sage brand-products-page">

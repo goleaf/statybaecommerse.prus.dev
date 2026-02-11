@@ -86,17 +86,6 @@ class BrandForm
                         ->columns(2),
                 ])
                 ->columnSpanFull(),
-            Section::make(__('admin.products.seo'))
-                ->schema([
-                    TextInput::make('seo_title')
-                        ->label(__('admin.products.seo_title'))
-                        ->maxLength(255),
-                    Textarea::make('seo_description')
-                        ->label(__('admin.products.seo_description'))
-                        ->rows(3)
-                        ->columnSpanFull(),
-                ])
-                ->columnSpanFull(),
         ]);
     }
 }

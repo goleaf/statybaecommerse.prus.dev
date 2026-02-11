@@ -33,14 +33,14 @@ final class CollectionTranslation extends Model
 
     protected $table = 'collection_translations';
 
-    protected $fillable = ['collection_id', 'locale', 'name', 'slug', 'description', 'meta_title', 'meta_description', 'meta_keywords'];
+    protected $fillable = ['collection_id', 'locale', 'name', 'slug', 'description'];
 
     /**
      * Handle casts functionality with proper error handling.
      */
     protected function casts(): array
     {
-        return ['meta_keywords' => 'array'];
+        return [];
     }
 
     public $timestamps = true;

@@ -4,8 +4,8 @@
     @endphp
     @section('meta')
         <x-meta
-                :title="$product->trans('seo_title') ?? $product->name"
-                :description="$product->trans('seo_description') ?? Str::limit(strip_tags($product->description), 150)"
+                :title="$product->getTranslatedSeoTitle()"
+                :description="$product->getTranslatedSeoDescription()"
                 :og-image="$ogImage"
                 ogType="product"
                 :canonical="url()->current()"

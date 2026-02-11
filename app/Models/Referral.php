@@ -45,9 +45,9 @@ final class Referral extends Model
      */
     protected string $nameColumn = 'title';
 
-    protected $fillable = ['referrer_id', 'referred_id', 'referral_code', 'status', 'completed_at', 'expires_at', 'metadata', 'meta', 'source', 'campaign', 'utm_source', 'utm_medium', 'utm_campaign', 'ip_address', 'user_agent', 'title', 'description', 'terms_conditions', 'benefits_description', 'how_it_works', 'seo_title', 'seo_description', 'seo_keywords'];
+    protected $fillable = ['referrer_id', 'referred_id', 'referral_code', 'status', 'completed_at', 'expires_at', 'metadata', 'meta', 'source', 'campaign', 'utm_source', 'utm_medium', 'utm_campaign', 'ip_address', 'user_agent', 'title', 'description', 'terms_conditions', 'benefits_description', 'how_it_works'];
 
-    public array $translatable = ['title', 'description', 'terms_conditions', 'benefits_description', 'how_it_works', 'seo_title', 'seo_description', 'seo_keywords'];
+    public array $translatable = ['title', 'description', 'terms_conditions', 'benefits_description', 'how_it_works'];
 
     /**
      * Handle casts functionality with proper error handling.

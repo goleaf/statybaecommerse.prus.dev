@@ -30,7 +30,7 @@ final class BrandTranslation extends Model
 
     protected $table = 'brand_translations';
 
-    protected $fillable = ['brand_id', 'locale', 'name', 'slug', 'description', 'seo_title', 'seo_description'];
+    protected $fillable = ['brand_id', 'locale', 'name', 'slug', 'description'];
 
     /**
      * Create a new factory instance for the model.

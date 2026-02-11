@@ -3,10 +3,10 @@
 @section('title', $news->title)
 
 @section('meta')
-<meta name="description" content="{{ $news->seo_description ?? $news->summary }}">
+<meta name="description" content="{{ $news->seo_description }}">
 <meta name="keywords" content="{{ $news->tags->pluck('name')->join(', ') }}">
-<meta property="og:title" content="{{ $news->seo_title ?? $news->title }}">
-<meta property="og:description" content="{{ $news->seo_description ?? $news->summary }}">
+<meta property="og:title" content="{{ $news->seo_title }}">
+<meta property="og:description" content="{{ $news->seo_description }}">
 <meta property="og:type" content="article">
 <meta property="og:url" content="{{ route('news.show', $news->slug) }}">
 @if($news->images->where('is_featured', true)->first())

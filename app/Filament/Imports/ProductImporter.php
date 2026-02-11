@@ -266,8 +266,6 @@ class ProductImporter extends BaseImporter
                 ->rules(['nullable', 'boolean']),
             ImportColumn::make('published_at')
                 ->rules(['nullable', 'date']),
-            ImportColumn::make('seo_title'),
-            ImportColumn::make('seo_description'),
             ImportColumn::make('brand')
                 ->relationship(resolveUsing: static function (string $state): ?Brand {
                     return static::resolveBrandFromState($state);
@@ -293,9 +291,6 @@ class ProductImporter extends BaseImporter
                 ->ignoreBlankState()
                 ->rules(['nullable', 'boolean']),
             ImportColumn::make('request_message'),
-            ImportColumn::make('meta_title'),
-            ImportColumn::make('meta_description'),
-            ImportColumn::make('meta_keywords'),
             ImportColumn::make('barcode'),
             ImportColumn::make('track_inventory')
                 ->boolean()
@@ -328,17 +323,6 @@ class ProductImporter extends BaseImporter
                 ->ignoreBlankState()
                 ->rules(['nullable', 'url:http,https']),
         ];
-    }
-
-    protected function afterSave(): void
-    {
-        $imageUrl = $this->pendingImageUrl;
-
-        if (! is_string($imageUrl) || trim($imageUrl) === '') {
-            return;
-        }
-
-        $this->replaceProductImageFromUrl(trim($imageUrl));
     }
 
     public function resolveRecord(): Product
@@ -403,14 +387,6 @@ class ProductImporter extends BaseImporter
                 'pack_size',
                 'pack_size_type',
             ],
-            'SEO & Metadata' => [
-                'seo_title',
-                'seo_description',
-                'meta_title',
-                'meta_description',
-                'meta_keywords',
-                'tags',
-            ],
             'Relations' => [
                 'brand',
                 'categories',
@@ -433,6 +409,12 @@ class ProductImporter extends BaseImporter
     {
         if (! $this->record instanceof Product) {
             return;
+        }
+
+        $imageUrl = $this->pendingImageUrl;
+
+        if (is_string($imageUrl) && trim($imageUrl) !== '') {
+            $this->replaceProductImageFromUrl(trim($imageUrl));
         }
 
         $imageState = $this->data['image'] ?? null;

@@ -89,10 +89,6 @@ final class Brand extends Model implements HasMedia, TranslatableRecord
         'is_featured',
         'is_premium',
         'sort_order',
-        'meta_title',
-        'meta_description',
-        'seo_title',
-        'seo_description',
         'social_links',
     ];
 
@@ -372,7 +368,7 @@ final class Brand extends Model implements HasMedia, TranslatableRecord
      */
     public function getTranslatedSeoTitle(?string $locale = null): ?string
     {
-        return $this->trans('seo_title', $locale) ?: $this->seo_title;
+        return $this->getTranslatedName($locale);
     }
 
     /**
@@ -380,7 +376,7 @@ final class Brand extends Model implements HasMedia, TranslatableRecord
      */
     public function getTranslatedSeoDescription(?string $locale = null): ?string
     {
-        return $this->trans('seo_description', $locale) ?: $this->seo_description;
+        return strip_tags((string) $this->getTranslatedDescription($locale));
     }
 
     /**
@@ -428,7 +424,7 @@ final class Brand extends Model implements HasMedia, TranslatableRecord
      */
     public function getOrCreateTranslation(string $locale): \App\Models\Translations\BrandTranslation
     {
-        return $this->translations()->firstOrCreate(['locale' => $locale], ['name' => $this->name, 'slug' => $this->slug, 'description' => $this->description, 'seo_title' => $this->seo_title, 'seo_description' => $this->seo_description]);
+        return $this->translations()->firstOrCreate(['locale' => $locale], ['name' => $this->name, 'slug' => $this->slug, 'description' => $this->description]);
     }
 
     /**
@@ -460,7 +456,7 @@ final class Brand extends Model implements HasMedia, TranslatableRecord
      */
     public function getBrandInfo(): array
     {
-        return ['id' => $this->id, 'name' => $this->name, 'slug' => $this->slug, 'description' => $this->description, 'website' => $this->website, 'is_enabled' => $this->is_enabled, 'seo_title' => $this->seo_title, 'seo_description' => $this->seo_description];
+        return ['id' => $this->id, 'name' => $this->name, 'slug' => $this->slug, 'description' => $this->description, 'website' => $this->website, 'is_enabled' => $this->is_enabled];
     }
 
     /**
@@ -476,7 +472,7 @@ final class Brand extends Model implements HasMedia, TranslatableRecord
      */
     public function getSeoInfo(): array
     {
-        return ['seo_title' => $this->seo_title, 'seo_description' => $this->seo_description, 'canonical_url' => $this->getCanonicalUrl(), 'meta_tags' => $this->getMetaTags()];
+        return ['seo_title' => $this->getTranslatedSeoTitle(), 'seo_description' => $this->getTranslatedSeoDescription(), 'canonical_url' => $this->getCanonicalUrl(), 'meta_tags' => $this->getMetaTags()];
     }
 
     /**
@@ -550,7 +546,10 @@ final class Brand extends Model implements HasMedia, TranslatableRecord
      */
     public function getMetaTags(): array
     {
-        return ['title' => $this->seo_title ?: $this->name, 'description' => $this->seo_description ?: $this->description, 'og:title' => $this->seo_title ?: $this->name, 'og:description' => $this->seo_description ?: $this->description, 'og:image' => $this->getLogoUrl('lg'), 'og:url' => $this->getCanonicalUrl()];
+        $title = $this->getTranslatedSeoTitle();
+        $description = $this->getTranslatedSeoDescription();
+
+        return ['title' => $title ?: $this->name, 'description' => $description ?: $this->description, 'og:title' => $title ?: $this->name, 'og:description' => $description ?: $this->description, 'og:image' => $this->getLogoUrl('lg'), 'og:url' => $this->getCanonicalUrl()];
     }
 
     /**

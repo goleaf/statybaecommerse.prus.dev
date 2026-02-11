@@ -1,7 +1,7 @@
 @extends('frontend.layouts.app')
 
-@section('title', $category->seo_title ?: $category->name)
-@section('description', $category->seo_description ?: str($category->description)->stripTags()->limit(160))
+@section('title', $category->getTranslatedSeoTitle())
+@section('description', strip_tags((string) $category->getTranslatedDescription()))
 
 @section('content')
     <div class="bg-gray-50 py-12">

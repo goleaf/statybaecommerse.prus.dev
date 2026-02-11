@@ -76,8 +76,6 @@ class PartnerForm
                         Toggle::make('is_enabled')
                             ->label(__('messages.enabled'))
                             ->required(),
-                        KeyValue::make('metadata')
-                            ->label(__('messages.value')),
                     ])
                     ->columnSpanFull(),
             ]);

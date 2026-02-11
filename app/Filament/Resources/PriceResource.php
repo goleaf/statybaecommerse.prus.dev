@@ -70,11 +70,11 @@ final class PriceResource extends BaseResource
                                     MorphToSelect\Type::make(Product::class)
                                         ->titleAttribute('name')
                                         ->label(__('messages.Product'))
-                                        ->getOptionLabelFromRecordUsing(fn (Product $record) => $record->name),
+                                        ->getOptionLabelFromRecordUsing(fn ($record) => $record->getFullDisplayName()),
                                     MorphToSelect\Type::make(ProductVariant::class)
                                         ->titleAttribute('name')
                                         ->label(__('messages.Variant'))
-                                        ->getOptionLabelFromRecordUsing(fn (ProductVariant $record) => $record->display_name),
+                                        ->getOptionLabelFromRecordUsing(fn ($record) => $record->getVariantDisplayName()),
                                 ])
                                 ->required()
                                 ->searchable()

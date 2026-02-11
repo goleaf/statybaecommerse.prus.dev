@@ -51,10 +51,6 @@ final class Post extends Model implements HasMedia
         'approved_by_id',
         'published_at',
         'user_id',
-        'meta_title',
-        'meta_title_translations',
-        'meta_description',
-        'meta_description_translations',
         'featured',
         'tags',
         'tags_translations',
@@ -76,8 +72,6 @@ final class Post extends Model implements HasMedia
             'title_translations'            => 'array',
             'content_translations'          => 'array',
             'excerpt_translations'          => 'array',
-            'meta_title_translations'       => 'array',
-            'meta_description_translations' => 'array',
             'tags_translations'             => 'array',
             'allow_comments'                => 'boolean',
             'is_pinned'                     => 'boolean',
@@ -185,10 +179,7 @@ final class Post extends Model implements HasMedia
      */
     public function getTranslatedMetaTitle(?string $locale = null): ?string
     {
-        $locale ??= app()->getLocale();
-        $translations = $this->meta_title_translations ?? [];
-
-        return $translations[$locale] ?? $this->meta_title;
+        return $this->getTranslatedTitle($locale);
     }
 
     /**
@@ -198,6 +189,17 @@ final class Post extends Model implements HasMedia
     {
         $locale ??= app()->getLocale();
         $translationField = $field . '_translations';
+        
+        // Return title if field is meta_title
+        if ($field === 'meta_title') {
+            return $this->getTranslatedTitle($locale);
+        }
+        
+        // Return excerpt if field is meta_description
+        if ($field === 'meta_description') {
+            return $this->getTranslatedExcerpt($locale);
+        }
+
         if (property_exists($this, $translationField)) {
             $translations = $this->{$translationField} ?? [];
 
@@ -212,10 +214,7 @@ final class Post extends Model implements HasMedia
      */
     public function getTranslatedMetaDescription(?string $locale = null): ?string
     {
-        $locale ??= app()->getLocale();
-        $translations = $this->meta_description_translations ?? [];
-
-        return $translations[$locale] ?? $this->meta_description;
+        return $this->getTranslatedExcerpt($locale) ?: strip_tags((string) $this->getTranslatedContent($locale));
     }
 
     /**
@@ -325,7 +324,7 @@ final class Post extends Model implements HasMedia
     public function getAvailableLocales(): array
     {
         $locales = [];
-        $translationFields = ['title_translations', 'content_translations', 'excerpt_translations', 'meta_title_translations', 'meta_description_translations', 'tags_translations'];
+        $translationFields = ['title_translations', 'content_translations', 'excerpt_translations', 'tags_translations'];
         foreach ($translationFields as $field) {
             if (isset($this->{$field}) && is_array($this->{$field})) {
                 $locales = array_merge($locales, array_keys($this->{$field}));
@@ -340,7 +339,7 @@ final class Post extends Model implements HasMedia
      */
     public function hasTranslationFor(string $locale): bool
     {
-        $translationFields = ['title_translations', 'content_translations', 'excerpt_translations', 'meta_title_translations', 'meta_description_translations', 'tags_translations'];
+        $translationFields = ['title_translations', 'content_translations', 'excerpt_translations', 'tags_translations'];
         foreach ($translationFields as $field) {
             if (isset($this->{$field}) && is_array($this->{$field}) && isset($this->{$field}[$locale])) {
                 return true;
@@ -355,7 +354,7 @@ final class Post extends Model implements HasMedia
      */
     public function updateTranslation(string $locale, array $data): bool
     {
-        $translationFields = ['title', 'content', 'excerpt', 'meta_title', 'meta_description', 'tags'];
+        $translationFields = ['title', 'content', 'excerpt', 'tags'];
         foreach ($translationFields as $field) {
             if (isset($data[$field])) {
                 $translationField = $field . '_translations';
@@ -374,7 +373,7 @@ final class Post extends Model implements HasMedia
     public function getOrCreateTranslation(string $locale): array
     {
         $translation = [];
-        $translationFields = ['title', 'content', 'excerpt', 'meta_title', 'meta_description', 'tags'];
+        $translationFields = ['title', 'content', 'excerpt', 'tags'];
         foreach ($translationFields as $field) {
             $translationField = $field . '_translations';
             $translations = $this->{$translationField} ?? [];
@@ -415,7 +414,7 @@ final class Post extends Model implements HasMedia
      */
     public function getSeoInfo(): array
     {
-        return ['meta_title' => $this->meta_title, 'meta_description' => $this->meta_description, 'tags' => $this->tags, 'canonical_url' => $this->getCanonicalUrl()];
+        return ['meta_title' => $this->getTranslatedTitle(), 'meta_description' => $this->getTranslatedExcerpt(), 'tags' => $this->getTranslatedTags(), 'canonical_url' => $this->getCanonicalUrl()];
     }
 
     /**

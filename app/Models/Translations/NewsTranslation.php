@@ -27,7 +27,7 @@ final class NewsTranslation extends Model
 
     protected $table = 'news_translations';
 
-    protected $fillable = ['news_id', 'locale', 'title', 'slug', 'summary', 'content', 'seo_title', 'seo_description'];
+    protected $fillable = ['news_id', 'locale', 'title', 'slug', 'summary', 'content'];
 
     /**
      * Handle casts functionality with proper error handling.

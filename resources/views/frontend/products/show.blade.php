@@ -1,7 +1,7 @@
 @extends('frontend.layouts.app')
 
-@section('title', $product->seo_title ?: $product->name)
-@section('description', $product->seo_description ?: str($product->short_description)->stripTags()->limit(160))
+@section('title', $product->getTranslatedSeoTitle())
+@section('description', $product->getTranslatedSeoDescription())
 
 @section('content')
     <div class="bg-gray-50 py-12">

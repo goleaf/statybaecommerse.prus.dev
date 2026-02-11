@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ProductsRelationManager extends RelationManager
 {
-    protected static string $relationship = 'priceable';
+    protected static string $relationship = 'product';
 
     protected static ?string $recordTitleAttribute = 'name';
 
@@ -46,14 +46,35 @@ class ProductsRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                \Filament\Tables\Actions\AssociateAction::make()
-                    ->preloadRecordSelect(),
+                \Filament\Tables\Actions\Action::make('attach_product')
+                    ->label(__('admin.actions.associate'))
+                    ->form([
+                        \Filament\Forms\Components\Select::make('product_id')
+                            ->label(__('messages.product'))
+                            ->options(Product::pluck('name', 'id'))
+                            ->required()
+                            ->searchable()
+                            ->preload(),
+                    ])
+                    ->action(function (array $data, Model $ownerRecord) {
+                        $ownerRecord->update([
+                            'priceable_id' => $data['product_id'],
+                            'priceable_type' => Product::class,
+                        ]);
+                    }),
             ])
             ->actions([
-                \Filament\Tables\Actions\DissociateAction::make(),
-            ])
-            ->bulkActions([
-                \Filament\Tables\Actions\DissociateBulkAction::make(),
+                \Filament\Tables\Actions\Action::make('detach')
+                    ->label(__('admin.actions.dissociate'))
+                    ->color('danger')
+                    ->icon('heroicon-o-x-mark')
+                    ->requiresConfirmation()
+                    ->action(function (Model $ownerRecord) {
+                        $ownerRecord->update([
+                            'priceable_id' => null,
+                            'priceable_type' => null,
+                        ]);
+                    }),
             ]);
     }
 }

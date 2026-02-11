@@ -45,8 +45,6 @@ class BrandImporter extends BaseImporter
                 ->requiredMapping()
                 ->numeric()
                 ->rules(['required', 'integer']),
-            ImportColumn::make('seo_title'),
-            ImportColumn::make('seo_description'),
             ImportColumn::make('customer_group_id')
                 ->numeric()
                 ->rules(['integer']),
@@ -67,8 +65,6 @@ class BrandImporter extends BaseImporter
                 ->requiredMapping()
                 ->boolean()
                 ->rules(['required', 'boolean']),
-            ImportColumn::make('meta_title'),
-            ImportColumn::make('meta_description'),
             ImportColumn::make('contact_email')
                 ->rules(['email']),
             ImportColumn::make('contact_phone'),
@@ -116,7 +112,6 @@ class BrandImporter extends BaseImporter
         return [
             'Identification' => ['name', 'slug'],
             'Settings'       => ['is_enabled', 'sort_order', 'is_premium', 'is_featured', 'is_visible', 'is_active'],
-            'SEO'            => ['seo_title', 'seo_description', 'meta_title', 'meta_description'],
             'Contact'        => ['website', 'contact_email', 'contact_phone', 'social_links'],
         ];
     }

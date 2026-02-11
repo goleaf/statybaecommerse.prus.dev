@@ -802,8 +802,6 @@ Route::middleware('auth')->group(function (): void {
                     'slug'            => $t['slug'] ?? str($t['title'] ?? '')->slug()->toString(),
                     'summary'         => $t['summary'] ?? null,
                     'content'         => $t['content'] ?? null,
-                    'seo_title'       => $t['seo_title'] ?? null,
-                    'seo_description' => $t['seo_description'] ?? null,
                 ]
             );
         }
@@ -844,8 +842,6 @@ Route::middleware('auth')->group(function (): void {
                     'slug'            => $t['slug'] ?? null,
                     'summary'         => $t['summary'] ?? null,
                     'content'         => $t['content'] ?? null,
-                    'seo_title'       => $t['seo_title'] ?? null,
-                    'seo_description' => $t['seo_description'] ?? null,
                 ]
             );
         }
@@ -893,14 +889,6 @@ Route::middleware('auth')->group(function (): void {
 // Localized notification routes
 Route::middleware(['auth', 'localize'])->group(function (): void {
     Route::get('/{locale}/notifications', [App\Http\Controllers\NotificationController::class, 'index'])->name('localized.notifications.index');
-});
-
-// SEO Data Routes
-Route::prefix('seo-data')->name('seo-data.')->group(function () {
-    Route::get('/', [App\Http\Controllers\SeoDataController::class, 'index'])->name('index');
-    Route::get('/statistics', [App\Http\Controllers\SeoDataController::class, 'statistics'])->name('statistics');
-    Route::get('/type/{type}', [App\Http\Controllers\SeoDataController::class, 'byType'])->name('by-type');
-    Route::get('/{seoData}', [App\Http\Controllers\SeoDataController::class, 'show'])->name('show');
 });
 
 // Attribute Frontend Routes
@@ -977,8 +965,6 @@ Route::middleware('auth')->group(function (): void {
                     'slug'            => $t['slug'] ?? str($t['title'] ?? '')->slug()->toString(),
                     'summary'         => $t['summary'] ?? null,
                     'content'         => $t['content'] ?? null,
-                    'seo_title'       => $t['seo_title'] ?? null,
-                    'seo_description' => $t['seo_description'] ?? null,
                 ]
             );
         }
@@ -1019,8 +1005,6 @@ Route::middleware('auth')->group(function (): void {
                     'slug'            => $t['slug'] ?? null,
                     'summary'         => $t['summary'] ?? null,
                     'content'         => $t['content'] ?? null,
-                    'seo_title'       => $t['seo_title'] ?? null,
-                    'seo_description' => $t['seo_description'] ?? null,
                 ]
             );
         }
@@ -1068,13 +1052,6 @@ Route::middleware('auth')->group(function (): void {
 // Localized notification routes
 Route::middleware(['auth', 'localize'])->group(function (): void {
     Route::get('/{locale}/notifications', [App\Http\Controllers\NotificationController::class, 'index'])->name('localized.notifications.index');
-});
-
-// SEO Data Routes
-Route::prefix('seo-data')->name('seo-data.')->group(function () {
-    Route::get('/', [App\Http\Controllers\SeoDataController::class, 'index'])->name('index');
-    Route::get('/type/{type}', [App\Http\Controllers\SeoDataController::class, 'byType'])->name('by-type');
-    Route::get('/{seoData}', [App\Http\Controllers\SeoDataController::class, 'show'])->name('show');
 });
 
 // Attribute Frontend Routes
