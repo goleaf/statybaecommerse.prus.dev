@@ -10,11 +10,14 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class CategoriesRelationManager extends RelationManager
 {
     protected static string $relationship = 'categories';
+
+    protected static ?string $relatedResource = CategoryResource::class;
 
     protected static ?string $recordTitleAttribute = 'name';
 
@@ -26,6 +29,9 @@ class CategoriesRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->query(fn (): Builder => Category::query()
+                ->whereHas('products', fn (Builder $query): Builder => $query->where('products.brand_id', $this->getOwnerRecord()->getKey()))
+                ->distinct())
             ->recordUrl(fn (Category $record): string => CategoryResource::getUrl('edit', ['record' => $record]))
             ->columns([
                 TextColumn::make('name')

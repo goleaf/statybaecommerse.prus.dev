@@ -6,6 +6,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProductImageResource\Pages as ImagePages;
 use App\Models\ProductImage;
+use App\Support\Filament\Forms\Components\SortOrderInput;
 use BackedEnum;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -86,11 +87,7 @@ final class ProductImageResource extends BaseResource
                                     ->label(__('messages.description'))
                                     ->maxLength(255)
                                     ->placeholder('e.g. Front view of the product'),
-                                TextInput::make('sort_order')
-                                    ->label(__('messages.sort_order'))
-                                    ->numeric()
-                                    ->integer()
-                                    ->default(0),
+                                SortOrderInput::make(),
                                 Toggle::make('is_default')
                                     ->label(__('admin.navigation.product_image'))
                                     ->helperText('Mark as primary image for this product.'),

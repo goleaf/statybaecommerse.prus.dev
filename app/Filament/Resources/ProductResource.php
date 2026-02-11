@@ -27,6 +27,7 @@ use App\Models\Scopes\VisibleScope;
 use BackedEnum;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 
@@ -70,6 +71,27 @@ final class ProductResource extends BaseResource
                 PublishedScope::class,
                 VisibleScope::class,
             ]);
+    }
+
+    public static function resolveRecordRouteBinding(int | string $key, ?\Closure $modifyQuery = null): ?Model
+    {
+        $query = static::getRecordRouteBindingEloquentQuery();
+
+        if ($modifyQuery) {
+            $query = $modifyQuery($query) ?? $query;
+        }
+
+        $record = (clone $query)
+            ->whereKey($key)
+            ->first();
+
+        if ($record instanceof Model) {
+            return $record;
+        }
+
+        return (clone $query)
+            ->where('slug', (string) $key)
+            ->first();
     }
 
     public static function table(Table $table): Table

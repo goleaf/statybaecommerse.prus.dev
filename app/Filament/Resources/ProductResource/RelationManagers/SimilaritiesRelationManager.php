@@ -5,16 +5,18 @@ declare(strict_types=1);
 namespace App\Filament\Resources\ProductResource\RelationManagers;
 
 use App\Models\Product;
+use App\Models\ProductSimilarity;
 use Filament\Forms\Components\Select;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\CreateAction;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class SimilaritiesRelationManager extends RelationManager
@@ -32,24 +34,7 @@ class SimilaritiesRelationManager extends RelationManager
     {
         return $schema
             ->schema([
-                Select::make('similar_product_id')
-                    ->label(__('messages.similar_product'))
-                    ->relationship('similarProduct', 'name')
-                    ->getOptionLabelFromRecordUsing(fn (Product $record) => "
-                        <div class='flex items-center gap-3 py-1'>
-                            <div class='flex-shrink-0 w-10 h-10 overflow-hidden rounded-lg bg-gray-100 border border-gray-200'>
-                                <img src='{$record->thumbnail}' alt='{$record->name}' class='w-full h-full object-cover' onerror=\"this.src='https://ui-avatars.com/api/?name=" . urlencode($record->name) . "&color=7F9CF5&background=EBF4FF'\" />
-                            </div>
-                            <div class='flex flex-col min-w-0'>
-                                <span class='text-sm font-medium text-gray-900 truncate'>{$record->name}</span>
-                                <span class='text-xs text-gray-500 truncate'>{$record->sku}</span>
-                            </div>
-                        </div>
-                    ")
-                    ->allowHtml()
-                    ->required()
-                    ->searchable()
-                    ->preload(),
+                $this->makeSimilarProductSelect(),
             ]);
     }
 
@@ -81,7 +66,18 @@ class SimilaritiesRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                CreateAction::make(),
+                Action::make('assign_existing_product')
+                    ->label('Assign Existing Product')
+                    ->icon('heroicon-o-plus')
+                    ->form([
+                        $this->makeSimilarProductSelect(),
+                    ])
+                    ->action(function (array $data): void {
+                        ProductSimilarity::query()->firstOrCreate([
+                            'product_id' => $this->getOwnerRecord()->getKey(),
+                            'similar_product_id' => (int) $data['similar_product_id'],
+                        ]);
+                    }),
             ])
             ->actions([
                 EditAction::make(),
@@ -92,5 +88,46 @@ class SimilaritiesRelationManager extends RelationManager
                     DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+    protected function makeSimilarProductSelect(): Select
+    {
+        $ownerId = (int) $this->getOwnerRecord()->getKey();
+
+        return Select::make('similar_product_id')
+            ->label(__('messages.similar_product'))
+            ->required()
+            ->searchable()
+            ->preload()
+            ->getSearchResultsUsing(function (string $search) use ($ownerId): array {
+                $existingIds = ProductSimilarity::query()
+                    ->where('product_id', $ownerId)
+                    ->pluck('similar_product_id');
+
+                return Product::query()
+                    ->whereKeyNot($ownerId)
+                    ->whereNotIn('id', $existingIds)
+                    ->where(function (Builder $query) use ($search): void {
+                        $query
+                            ->where('name', 'like', "%{$search}%")
+                            ->orWhere('sku', 'like', "%{$search}%");
+                    })
+                    ->orderBy('name')
+                    ->limit(50)
+                    ->get()
+                    ->mapWithKeys(static fn (Product $product): array => [
+                        (string) $product->getKey() => trim(($product->name ?? '') . ' [' . ($product->sku ?? '-') . ']'),
+                    ])
+                    ->all();
+            })
+            ->getOptionLabelUsing(static function ($value): ?string {
+                $product = Product::query()->find($value);
+
+                if (! $product instanceof Product) {
+                    return null;
+                }
+
+                return trim(($product->name ?? '') . ' [' . ($product->sku ?? '-') . ']');
+            });
     }
 }

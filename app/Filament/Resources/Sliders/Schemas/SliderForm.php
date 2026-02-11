@@ -7,6 +7,7 @@ namespace App\Filament\Resources\Sliders\Schemas;
 use App\Models\Slider;
 use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use App\Support\Filament\Components\SearchableInput;
+use App\Support\Filament\Forms\Components\SortOrderInput;
 use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\ContentLinkSearch;
 use Filament\Forms\Components\CheckboxList;
@@ -220,11 +221,7 @@ class SliderForm
                 Section::make(__('translations.all_sliders_activated'))
                     ->schema([
                         Grid::make(2)->schema([
-                            TextInput::make('sort_order')
-                                ->label(__('translations.reorder_sliders'))
-                                ->numeric()
-                                ->default(0)
-                                ->minValue(0),
+                            SortOrderInput::make(label: __('translations.reorder_sliders')),
                             Select::make('priority')
                                 ->label(__('translations.priority'))
                                 ->options([

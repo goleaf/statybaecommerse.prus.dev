@@ -226,9 +226,10 @@ final class Category extends Model implements HasMedia
      */
     public function orders(): BelongsToMany
     {
-        return $this->belongsToMany(Order::class, 'order_items', 'product_id', 'order_id', 'id', 'product_id')
-            ->join('product_categories', 'product_categories.product_id', '=', 'order_items.product_id')
-            ->where('product_categories.category_id', $this->id);
+        return $this->belongsToMany(Order::class, 'product_categories', 'category_id', 'product_id', 'id', 'id')
+            ->join('order_items', 'order_items.product_id', '=', 'product_categories.product_id')
+            ->whereColumn('order_items.order_id', 'orders.id')
+            ->distinct();
     }
 
     /**
@@ -236,9 +237,18 @@ final class Category extends Model implements HasMedia
      */
     public function collections(): BelongsToMany
     {
-        return $this->belongsToMany(Collection::class, 'product_collections', 'category_id', 'collection_id', 'id', 'product_id')
-            ->join('product_categories', 'product_categories.product_id', '=', 'product_collections.product_id')
-            ->where('product_categories.category_id', $this->id);
+        return $this->belongsToMany(Collection::class, 'product_categories', 'category_id', 'product_id', 'id', 'id')
+            ->join('product_collections', 'product_collections.product_id', '=', 'product_categories.product_id')
+            ->whereColumn('product_collections.collection_id', 'collections.id')
+            ->distinct();
+    }
+
+    /**
+     * Discounts directly attached to this category.
+     */
+    public function discounts(): BelongsToMany
+    {
+        return $this->belongsToMany(Discount::class, 'discount_categories');
     }
 
     /**
@@ -647,6 +657,30 @@ final class Category extends Model implements HasMedia
     public function hasTranslationFor(string $locale): bool
     {
         return $this->translations()->where('locale', $locale)->exists();
+    }
+
+    /**
+     * Resolve the localized category name with a fallback to the base attribute.
+     */
+    public function getTranslatedName(?string $locale = null): ?string
+    {
+        return $this->trans('name', $locale) ?: $this->name;
+    }
+
+    /**
+     * Resolve the localized category description with a fallback to the base attribute.
+     */
+    public function getTranslatedDescription(?string $locale = null): ?string
+    {
+        return $this->trans('description', $locale) ?: $this->description;
+    }
+
+    /**
+     * Resolve the localized slug with a fallback to the base attribute.
+     */
+    public function getTranslatedSlug(?string $locale = null): ?string
+    {
+        return $this->trans('slug', $locale) ?: $this->slug;
     }
 
     /**

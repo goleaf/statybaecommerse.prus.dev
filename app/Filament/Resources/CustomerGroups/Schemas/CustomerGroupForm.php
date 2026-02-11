@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CustomerGroups\Schemas;
 
+use App\Support\Filament\Forms\Components\SortOrderInput;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -50,10 +51,7 @@ class CustomerGroupForm
                                 TextInput::make('icon')
                                     ->label(__('admin.news_images.image'))
                                     ->maxLength(255),
-                                TextInput::make('sort_order')
-                                    ->label(__('messages.sort'))
-                                    ->numeric()
-                                    ->default(0),
+                                SortOrderInput::make(label: __('messages.sort')),
                             ]),
                         Textarea::make('description')
                             ->label(__('messages.description'))

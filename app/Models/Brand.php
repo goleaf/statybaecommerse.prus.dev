@@ -245,23 +245,45 @@ final class Brand extends Model implements HasMedia, TranslatableRecord
     }
 
     /**
-     * Categories belonging to products of this brand.
+     * Categories used by products of this brand.
+     *
+     * @return Builder<Category>
      */
-    public function categories(): BelongsToMany
+    public function categories(): Builder
     {
-        return $this->belongsToMany(Category::class, 'product_categories', 'brand_id', 'category_id', 'id', 'product_id')
-            ->join('products', 'products.id', '=', 'product_categories.product_id')
-            ->where('products.brand_id', $this->id);
+        return Category::query()
+            ->whereHas('products', function (Builder $query): void {
+                $query->where('products.brand_id', $this->getKey());
+            })
+            ->distinct('categories.id');
     }
 
     /**
-     * Collections belonging to products of this brand.
+     * Collections used by products of this brand.
+     *
+     * @return Builder<Collection>
      */
-    public function collections(): BelongsToMany
+    public function collections(): Builder
     {
-        return $this->belongsToMany(Collection::class, 'product_collections', 'brand_id', 'collection_id', 'id', 'product_id')
-            ->join('products', 'products.id', '=', 'product_collections.product_id')
-            ->where('products.brand_id', $this->id);
+        return Collection::query()
+            ->whereHas('products', function (Builder $query): void {
+                $query->where('products.brand_id', $this->getKey());
+            })
+            ->distinct('collections.id');
+    }
+
+    /**
+     * Orders containing products of this brand.
+     *
+     * @return Builder<Order>
+     */
+    public function orders(): Builder
+    {
+        return Order::query()
+            ->whereHas('items.product', function (Builder $query): void {
+                $query->where('products.brand_id', $this->getKey());
+            })
+            ->distinct('orders.id');
     }
 
     /**

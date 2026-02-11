@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\LocationResource\Schemas;
 
+use App\Support\Filament\Forms\Components\SortOrderInput;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -48,10 +49,7 @@ class LocationForm
                                     ->label(__('messages.type'))
                                     ->options(self::typeOptions())
                                     ->required(),
-                                TextInput::make('sort_order')
-                                    ->label(__('messages.sort_order'))
-                                    ->numeric()
-                                    ->default(0),
+                                SortOrderInput::make(),
                             ]),
                         Grid::make(2)
                             ->schema([

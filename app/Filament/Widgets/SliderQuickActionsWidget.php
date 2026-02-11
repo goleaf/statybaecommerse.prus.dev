@@ -6,6 +6,7 @@ namespace App\Filament\Widgets;
 
 use App\Models\Slider;
 use App\Support\Filament\Components\SearchableInput;
+use App\Support\Filament\Forms\Components\SortOrderInput;
 use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\ContentLinkSearch;
 use Exception;
@@ -74,10 +75,7 @@ final class SliderQuickActionsWidget extends Widget implements HasActions, HasFo
                 ColorPicker::make('text_color')
                     ->label(__('translations.text_color'))
                     ->default('#000000'),
-                TextInput::make('sort_order')
-                    ->label(__('translations.sort_order'))
-                    ->numeric()
-                    ->default(0),
+                SortOrderInput::make(label: __('translations.sort_order')),
                 Toggle::make('is_active')
                     ->label(__('translations.is_active'))
                     ->default(true),

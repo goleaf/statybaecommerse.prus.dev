@@ -4,19 +4,18 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CollectionResource\Schemas;
 
+use App\Support\Filament\Forms\Components\SortOrderInput;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Utilities\Get;
-use Filament\Schemas\Schema;
-
 use Filament\Schemas\Components\Utilities\Set;
+use Filament\Schemas\Schema;
 use Illuminate\Support\Str;
 
 class CollectionForm
@@ -56,10 +55,7 @@ class CollectionForm
                                     ->label(__('admin.collections.is_automatic'))
                                     ->default(false)
                                     ->live(),
-                                TextInput::make('sort_order')
-                                    ->label(__('messages.sort_order'))
-                                    ->numeric()
-                                    ->default(0),
+                                SortOrderInput::make(),
                             ]),
                         Grid::make(3)
                             ->schema([

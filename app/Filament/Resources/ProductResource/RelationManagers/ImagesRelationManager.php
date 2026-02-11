@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ProductResource\RelationManagers;
 
+use App\Support\Filament\Forms\Components\SortOrderInput;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -45,10 +46,7 @@ class ImagesRelationManager extends RelationManager
                 TextInput::make('alt_text')
                     ->label(__('messages.alt_text'))
                     ->maxLength(255),
-                TextInput::make('sort_order')
-                    ->label(__('messages.sort_order'))
-                    ->numeric()
-                    ->default(0),
+                SortOrderInput::make(),
                 Toggle::make('is_default')
                     ->label(__('messages.is_main'))
                     ->default(fn (RelationManager $livewire): bool => $livewire->getOwnerRecord()

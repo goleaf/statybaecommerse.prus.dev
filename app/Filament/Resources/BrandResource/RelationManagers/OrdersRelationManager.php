@@ -10,11 +10,14 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class OrdersRelationManager extends RelationManager
 {
     protected static string $relationship = 'orders';
+
+    protected static ?string $relatedResource = OrderResource::class;
 
     protected static ?string $recordTitleAttribute = 'number';
 
@@ -26,6 +29,9 @@ class OrdersRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->query(fn (): Builder => Order::query()
+                ->whereHas('items.product', fn (Builder $query): Builder => $query->where('products.brand_id', $this->getOwnerRecord()->getKey()))
+                ->distinct())
             ->recordUrl(fn (Order $record): string => OrderResource::getUrl('edit', ['record' => $record]))
             ->columns([
                 TextColumn::make('number')
