@@ -1,0 +1,8 @@
+<?php
+
+declare(strict_types=1);
+
+return [
+    'enabled' => 'Ijungta',
+    'Enabled' => 'Ijungta',
+];

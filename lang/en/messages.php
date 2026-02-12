@@ -950,6 +950,7 @@ return [
     'deleted_user'                                                                   => 'Deleted User',
     'discount_code_redeemed_successfully'                                            => 'Discount code redeemed successfully!',
     'no_attributes_available'                                                        => 'No attributes available',
+    'enabled'                                                                        => 'Enabled',
     'yes'                                                                            => 'Yes',
     'no'                                                                             => 'No',
     'private_person'                                                                 => 'Private Person',

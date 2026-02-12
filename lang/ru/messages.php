@@ -945,6 +945,7 @@ return [
     'deleted_user'                                                                   => 'Deleted User',
     'discount_code_redeemed_successfully'                                            => 'Discount code redeemed successfully!',
     'no_attributes_available'                                                        => 'No attributes available',
+    'enabled'                                                                        => 'Включено',
     'no'                                                                             => 'No',
     'Out of Stock'                                                                   => 'Out of Stock',
     'Qty'                                                                            => 'Qty',

@@ -670,9 +670,9 @@ final class Product extends Model implements HasMedia, TranslatableRecord
     /**
      * Handle prices functionality with proper error handling.
      */
-    public function prices(): HasMany
+    public function prices(): MorphMany
     {
-        return $this->hasMany(Price::class, 'priceable_id')->where('priceable_type', self::class);
+        return $this->morphMany(Price::class, 'priceable');
     }
 
     /**

@@ -39,9 +39,16 @@ class PricesRelationManager extends RelationManager
                     ->required()
                     ->numeric()
                     ->step(0.0001),
-                TextInput::make('type')
+                Select::make('type')
                     ->label(__('messages.Type'))
-                    ->placeholder('default, sale, etc.'),
+                    ->options([
+                        'retail' => 'retail',
+                        'wholesale' => 'wholesale',
+                        'special' => 'special',
+                        'sale' => 'sale',
+                    ])
+                    ->default('retail')
+                    ->required(),
                 DateTimePicker::make('starts_at')
                     ->label(__('admin.prices.valid_from')),
                 DateTimePicker::make('ends_at')

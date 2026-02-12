@@ -32,6 +32,15 @@ final class Price extends Model
 
     protected $fillable = ['priceable_id', 'priceable_type', 'currency_id', 'amount', 'cost_amount', 'type', 'starts_at', 'ends_at', 'is_enabled', 'metadata'];
 
+    protected static function booted(): void
+    {
+        self::creating(static function (self $price): void {
+            if (! is_string($price->type) || trim($price->type) === '') {
+                $price->type = 'retail';
+            }
+        });
+    }
+
     /**
      * Handle casts functionality with proper error handling.
      *
