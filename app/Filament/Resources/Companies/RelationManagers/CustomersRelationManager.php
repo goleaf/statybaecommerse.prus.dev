@@ -57,9 +57,11 @@ class CustomersRelationManager extends RelationManager
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('phone')
+                    ->sortable()
                     ->label(__('messages.phone'))
                     ->searchable(),
                 IconColumn::make('is_active')
+                    ->sortable()
                     ->label(__('messages.active'))
                     ->boolean(),
             ])

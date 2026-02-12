@@ -51,6 +51,7 @@ class ServicesRelationManager extends RelationManager
             ->recordTitleAttribute('name')
             ->columns([
                 TextColumn::make('name')
+                    ->sortable()
                     ->searchable(),
                 TextColumn::make('pivot.price')
                     ->label(__('messages.price'))

@@ -67,18 +67,23 @@ class PricesRelationManager extends RelationManager
                     ->label(__('messages.currency'))
                     ->badge(),
                 TextColumn::make('amount')
+                    ->sortable()
                     ->label(__('messages.amount') !== 'messages.amount' ? __('messages.amount') : 'Amount')
                     ->money(fn (Price $record) => $record->currency?->code ?? 'EUR'),
                 TextColumn::make('type')
+                    ->sortable()
                     ->label(__('messages.type'))
                     ->badge(),
                 IconColumn::make('is_enabled')
+                    ->sortable()
                     ->label(__('messages.enabled'))
                     ->boolean(),
                 TextColumn::make('starts_at')
+                    ->sortable()
                     ->label(__('admin.prices.valid_from'))
                     ->dateTime(),
                 TextColumn::make('ends_at')
+                    ->sortable()
                     ->label(__('admin.prices.valid_until'))
                     ->dateTime()
                     ->placeholder(__('admin.prices.no_expiry')),

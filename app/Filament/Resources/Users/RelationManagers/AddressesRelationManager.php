@@ -90,6 +90,7 @@ class AddressesRelationManager extends RelationManager
             ->recordTitleAttribute('address_line_1')
             ->columns([
                 TextColumn::make('type')
+                    ->sortable()
                     ->label(__('messages.type'))
                     ->badge()
                     ->searchable(),
@@ -97,21 +98,26 @@ class AddressesRelationManager extends RelationManager
                     ->label(__('messages.name'))
                     ->searchable(['first_name', 'last_name']),
                 TextColumn::make('address_line_1')
+                    ->sortable()
                     ->label(__('messages.address_line_1'))
                     ->searchable(),
                 TextColumn::make('city')
+                    ->sortable()
                     ->label(__('messages.city'))
                     ->searchable(),
                 TextColumn::make('postal_code')
+                    ->sortable()
                     ->label(__('messages.postal_code'))
                     ->searchable(),
                 TextColumn::make('country.name')
                     ->label(__('messages.country'))
                     ->searchable(),
                 IconColumn::make('is_default')
+                    ->sortable()
                     ->boolean()
                     ->label(__('messages.is_default')),
                 IconColumn::make('is_active')
+                    ->sortable()
                     ->boolean()
                     ->label(__('messages.active')),
             ])

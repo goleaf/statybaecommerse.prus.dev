@@ -60,6 +60,7 @@ class SubcategoriesRelationManager extends RelationManager
                     ->sortable()
                     ->searchable(),
                 IconColumn::make('is_visible')
+                    ->sortable()
                     ->label(__('messages.visible'))
                     ->boolean(),
             ])

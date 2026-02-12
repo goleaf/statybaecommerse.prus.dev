@@ -68,6 +68,7 @@ class ProductVariantsRelationManager extends RelationManager
                     ->label(__('messages.price'))
                     ->sortable(),
                 ToggleColumn::make('is_enabled')
+                    ->sortable()
                     ->label(__('messages.enabled')),
             ])
             ->filters([

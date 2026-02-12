@@ -74,9 +74,11 @@ class ImagesRelationManager extends RelationManager
                     ->label(__('messages.sort_order'))
                     ->sortable(),
                 IconColumn::make('is_primary')
+                    ->sortable()
                     ->label(__('messages.is_main'))
                     ->boolean(),
                 IconColumn::make('is_active')
+                    ->sortable()
                     ->label(__('messages.active'))
                     ->boolean(),
             ])

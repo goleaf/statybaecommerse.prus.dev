@@ -22,12 +22,16 @@ class LocationsTable
         return $table
             ->columns([
                 TextColumn::make('code')
+                    ->sortable()
                     ->searchable(),
                 TextColumn::make('name')
+                    ->sortable()
                     ->searchable(),
                 TextColumn::make('slug')
+                    ->sortable()
                     ->searchable(),
                 TextColumn::make('type')
+                    ->sortable()
                     ->searchable(),
                 TextColumn::make('address_line_1')
                     ->searchable(),

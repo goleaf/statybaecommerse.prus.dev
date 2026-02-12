@@ -77,6 +77,7 @@ class FeaturesRelationManager extends RelationManager
                     ->label(__('messages.weight'))
                     ->sortable(),
                 ToggleColumn::make('is_active')
+                    ->sortable()
                     ->label(__('messages.active')),
             ])
             ->filters([

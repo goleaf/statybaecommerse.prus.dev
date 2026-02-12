@@ -60,6 +60,7 @@ class CategoriesRelationManager extends RelationManager
                     ->sortable()
                     ->searchable(),
                 IconColumn::make('is_active')
+                    ->sortable()
                     ->label(__('messages.active'))
                     ->boolean(),
             ])

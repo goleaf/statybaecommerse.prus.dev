@@ -40,6 +40,7 @@ class PricesRelationManager extends RelationManager
                     ->money(fn (Price $record) => $record->currency?->code ?? 'EUR')
                     ->sortable(),
                 TextColumn::make('type')
+                    ->sortable()
                     ->label(__('messages.type'))
                     ->badge(),
             ])

@@ -70,6 +70,7 @@ class EditProfile extends BaseEditProfile
                             ->label(__('ui.company'))
                             ->maxLength(255),
                         TextInput::make('position')
+                            ->numeric()
                             ->label(__('ui.position'))
                             ->maxLength(255),
                         TextInput::make('website')

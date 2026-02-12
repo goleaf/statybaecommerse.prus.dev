@@ -573,6 +573,7 @@ return [
         'contact_messages' => 'Kontaktanfragen',
         'content'          => 'Inhalt',
         'coupons'          => 'Gutscheine',
+        'customer_groups'  => 'Kundengruppen',
         'customers'        => 'Kunden',
         'dashboard'        => 'Dashboard',
         'marketing'        => 'Marketing',

@@ -6,6 +6,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProductVariantResource\Pages;
 use App\Filament\Resources\ProductVariantResource\RelationManagers\AttributesRelationManager;
+use App\Filament\Resources\ProductVariantResource\RelationManagers\DiscountsRelationManager;
 use App\Filament\Resources\ProductVariantResource\RelationManagers\ImagesRelationManager;
 use App\Filament\Resources\ProductVariantResource\RelationManagers\InventoriesRelationManager;
 use App\Filament\Resources\ProductVariantResource\RelationManagers\OrdersRelationManager;
@@ -14,7 +15,6 @@ use App\Filament\Resources\ProductVariantResource\RelationManagers\ProductsRelat
 use App\Filament\Resources\ProductVariantResource\RelationManagers\SimilaritiesRelationManager;
 use App\Filament\Resources\ProductVariantResource\RelationManagers\StockMovementsRelationManager;
 use App\Filament\Resources\ProductVariantResource\RelationManagers\VariantCombinationsRelationManager;
-use App\Filament\Resources\ProductVariantResource\RelationManagers\DiscountsRelationManager;
 use App\Filament\Resources\ProductVariantResource\Schemas\ProductVariantForm;
 use App\Filament\Resources\ProductVariantResource\Schemas\ProductVariantInfolist;
 use App\Models\ProductVariant;
@@ -91,6 +91,7 @@ final class ProductVariantResource extends BaseResource
                     ->label(__('messages.stock_quantity'))
                     ->sortable(),
                 ToggleColumn::make('is_enabled')
+                    ->sortable()
                     ->label(__('messages.is_enabled')),
             ])
             ->filters([

@@ -34,18 +34,18 @@ class RulesRelationManager extends RelationManager
                 Select::make('column')
                     ->label(__('admin.collections.rule_column'))
                     ->options([
-                        'name' => 'Product Name',
+                        'name'  => 'Product Name',
                         'price' => 'Product Price',
-                        'sku' => 'Product SKU',
+                        'sku'   => 'Product SKU',
                     ])
                     ->required(),
                 Select::make('operator')
                     ->label(__('admin.collections.rule_operator'))
                     ->options([
-                        '=' => 'Equals',
-                        '!=' => 'Not Equals',
-                        '>' => 'Greater Than',
-                        '<' => 'Less Than',
+                        '='        => 'Equals',
+                        '!='       => 'Not Equals',
+                        '>'        => 'Greater Than',
+                        '<'        => 'Less Than',
                         'contains' => 'Contains',
                     ])
                     ->required(),
@@ -63,8 +63,10 @@ class RulesRelationManager extends RelationManager
                     ->label(__('admin.collections.rule_column'))
                     ->sortable(),
                 TextColumn::make('operator')
+                    ->sortable()
                     ->label(__('admin.collections.rule_operator')),
                 TextColumn::make('value')
+                    ->sortable()
                     ->label(__('admin.collections.rule_value')),
             ])
             ->filters([

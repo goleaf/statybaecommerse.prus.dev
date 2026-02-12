@@ -51,8 +51,10 @@ class ProductsRelationManager extends RelationManager
                     ->getStateUsing(static fn (Product $record): ?string => $record->primaryImage?->path)
                     ->circular(),
                 TextColumn::make('name')
+                    ->sortable()
                     ->label(__('messages.name')),
                 TextColumn::make('price')
+                    ->sortable()
                     ->label(__('messages.price'))
                     ->money('EUR'),
             ])

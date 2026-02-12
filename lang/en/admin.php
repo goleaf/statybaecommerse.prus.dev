@@ -576,6 +576,7 @@ return [
         'contact_messages' => 'Contact Messages',
         'content'          => 'Content',
         'coupons'          => 'Coupons',
+        'customer_groups'  => 'Customer Groups',
         'customers'        => 'Customers',
         'dashboard'        => 'Dashboard',
         'marketing'        => 'Marketing',

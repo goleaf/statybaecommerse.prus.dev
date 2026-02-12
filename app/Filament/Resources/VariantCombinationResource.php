@@ -6,9 +6,9 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\VariantCombinationResource\Pages;
 use App\Models\Product;
-use App\Models\VariantCombination;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
+use App\Models\VariantCombination;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
@@ -235,6 +235,7 @@ final class VariantCombinationResource extends BaseResource
                 ])
                 ->sortable(),
             TextColumn::make('combination_hash')
+                ->sortable()
                 ->label(__('admin.variant_combinations.combination_hash'))
                 ->limit(20)
                 ->tooltip(fn ($record) => $record->combination_hash)

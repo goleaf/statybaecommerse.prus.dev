@@ -65,6 +65,7 @@ class DiscountsRelationManager extends RelationManager
                     ->sortable()
                     ->searchable(),
                 \Filament\Tables\Columns\IconColumn::make('is_active')
+                    ->sortable()
                     ->label(__('admin.discounts.is_active'))
                     ->boolean(),
             ])

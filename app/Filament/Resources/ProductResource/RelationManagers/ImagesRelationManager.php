@@ -78,6 +78,7 @@ class ImagesRelationManager extends RelationManager
                     ->label(__('messages.sort_order'))
                     ->sortable(),
                 IconColumn::make('is_default')
+                    ->sortable()
                     ->label(__('messages.is_main'))
                     ->boolean()
                     ->trueIcon('heroicon-m-star')
@@ -85,6 +86,7 @@ class ImagesRelationManager extends RelationManager
                     ->trueColor('warning')
                     ->falseColor('gray'),
                 ToggleColumn::make('is_active')
+                    ->sortable()
                     ->label(__('messages.active')),
             ])
             ->filters([

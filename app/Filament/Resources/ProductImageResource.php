@@ -113,7 +113,8 @@ final class ProductImageResource extends BaseResource
                     ->searchable(),
                 TextColumn::make('sort_order')
                     ->sortable(),
-                ToggleColumn::make('is_active'),
+                ToggleColumn::make('is_active')
+                    ->sortable(),
             ])
             ->filters([
                 //

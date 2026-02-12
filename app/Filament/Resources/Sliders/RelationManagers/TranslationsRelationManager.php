@@ -55,6 +55,7 @@ class TranslationsRelationManager extends RelationManager
                     ->label(__('messages.locale'))
                     ->sortable(),
                 TextColumn::make('title')
+                    ->sortable()
                     ->label(__('translations.title'))
                     ->searchable(),
             ])

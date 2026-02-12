@@ -10,6 +10,8 @@ use App\Filament\Resources\DiscountResource\Schemas\DiscountInfolist;
 use App\Models\Discount;
 use BackedEnum;
 use Filament\Schemas\Schema;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
@@ -96,6 +98,11 @@ final class DiscountResource extends BaseResource
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+            ])
+            ->recordUrl(fn (Discount $record): string => self::getUrl('edit', ['record' => $record]))
+            ->actions([
+                EditAction::make(),
+                DeleteAction::make(),
             ])
             ->defaultSort('created_at', 'desc');
     }

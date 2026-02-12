@@ -101,9 +101,11 @@ class InventoriesRelationManager extends RelationManager
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('status')
+                    ->sortable()
                     ->label(__('messages.status'))
                     ->badge(),
                 IconColumn::make('is_tracked')
+                    ->sortable()
                     ->label(__('messages.enabled'))
                     ->boolean(),
             ])

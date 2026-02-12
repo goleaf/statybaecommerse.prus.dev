@@ -47,6 +47,7 @@ class CustomerGroupsRelationManager extends RelationManager
                     ->suffix('%')
                     ->sortable(),
                 IconColumn::make('is_active')
+                    ->sortable()
                     ->boolean(),
             ])
             ->filters([

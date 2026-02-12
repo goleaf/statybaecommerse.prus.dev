@@ -28,6 +28,7 @@ class VariantCombinationsRelationManager extends RelationManager
                 TextColumn::make('formatted_combinations')
                     ->label(__('admin.variant_combinations.attribute_combinations')),
                 IconColumn::make('is_available')
+                    ->sortable()
                     ->label(__('admin.variant_combinations.is_available'))
                     ->boolean(),
             ])

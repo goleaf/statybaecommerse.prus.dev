@@ -38,8 +38,10 @@ class PartnersRelationManager extends RelationManager
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('contact_email')
+                    ->sortable()
                     ->searchable(),
                 IconColumn::make('is_enabled')
+                    ->sortable()
                     ->boolean(),
             ])
             ->filters([

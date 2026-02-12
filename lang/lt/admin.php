@@ -576,6 +576,7 @@ return [
         'contact_messages' => 'Susisiekimo žinutės',
         'content'          => 'Turinys',
         'coupons'          => 'Kuponai',
+        'customer_groups'  => 'Klientų grupės',
         'customers'        => 'Klientai',
         'dashboard'        => 'Skydelis',
         'marketing'        => 'Rinkodara',

@@ -38,6 +38,7 @@ class SubscribersRelationManager extends RelationManager
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('status')
+                    ->sortable()
                     ->badge(),
             ])
             ->filters([

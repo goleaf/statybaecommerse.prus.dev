@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\OrderResource\Tables;
 
+use App\Enums\ExportType;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentStatus;
-use App\Enums\ExportType;
 use App\Filament\Actions\RequestExportBulkAction;
+use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use BackedEnum;
 use Illuminate\Support\Str;
 
 class OrdersTable
@@ -60,6 +60,7 @@ class OrdersTable
                     ->label(__('messages.shipping'))
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('tracking_number')
+                    ->sortable()
                     ->label(__('messages.tracking_number'))
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),

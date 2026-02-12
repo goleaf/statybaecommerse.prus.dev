@@ -60,6 +60,7 @@ class ProductsRelationManager extends RelationManager
                     ->sortable()
                     ->searchable(),
                 TextColumn::make('price')
+                    ->sortable()
                     ->label(__('messages.price'))
                     ->money('EUR'),
             ])
