@@ -3,7 +3,6 @@
     use App\Services\Shared\CacheService;
     use Illuminate\Support\Facades\Route;
     use Illuminate\Support\Str;
-    use Throwable;
 
     $locale = app()->getLocale();
     $cacheService = app(CacheService::class);
@@ -52,7 +51,7 @@
                         ->toArray();
                 }),
             );
-        } catch (Throwable $exception) {
+        } catch (\Throwable $exception) {
             report($exception);
             $topCategories = collect();
         }

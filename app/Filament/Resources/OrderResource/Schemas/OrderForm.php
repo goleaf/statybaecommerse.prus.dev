@@ -32,10 +32,11 @@ class OrderForm
                         TextInput::make('number')
                             ->label(__('messages.order_number'))
                             ->required()
+                            ->unique(ignoreRecord: true)
                             ->maxLength(255),
                         Select::make('status')
                             ->label(__('messages.status'))
-                            ->options(OrderStatus::class)
+                            ->options(OrderStatus::options())
                             ->required()
                             ->default(OrderStatus::PENDING),
                         Select::make('currency')
@@ -333,10 +334,10 @@ class OrderForm
                     ->schema([
                         Select::make('payment_method')
                             ->label(__('messages.payment_method'))
-                            ->options(PaymentMethod::class),
+                            ->options(PaymentMethod::options()),
                         Select::make('payment_status')
                             ->label(__('messages.payment_status'))
-                            ->options(PaymentStatus::class)
+                            ->options(PaymentStatus::options())
                             ->required(),
                     ])->columns(2)
                     ->columnSpanFull(),

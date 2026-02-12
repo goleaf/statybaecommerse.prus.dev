@@ -7,7 +7,6 @@ namespace App\Filament\Resources\OrderResource\RelationManagers;
 use App\Models\Service;
 use Filament\Actions\AttachAction;
 use Filament\Actions\BulkActionGroup;
-use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\DetachAction;
@@ -66,7 +65,6 @@ class ServicesRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                CreateAction::make(),
                 AttachAction::make()
                     ->multiple(false)
                     ->preloadRecordSelect()

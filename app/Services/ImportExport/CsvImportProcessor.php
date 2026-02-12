@@ -10,6 +10,7 @@ use Filament\Actions\Imports\Exceptions\RowImportFailedException;
 use Filament\Actions\Imports\ImportColumn;
 use Filament\Actions\Imports\Importer;
 use Filament\Actions\Imports\Models\Import;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -34,92 +35,96 @@ final class CsvImportProcessor
         $rowResults = [];
         $timestamp = now();
 
-        DB::transaction(function () use ($import, $importer, $rows, $columnMap, $timestamp, &$processedRows, &$successfulRows, &$failedRows, &$rowResults): void {
-            foreach ($rows as $row) {
-                $rowNumber = $row['__row_number'] ?? null;
-                unset($row['__row_number']);
+        foreach ($rows as $row) {
+            $rowNumber = $row['__row_number'] ?? null;
+            unset($row['__row_number']);
 
-                $row = $this->utf8Encode($row);
+            $row = $this->utf8Encode($row);
 
-                try {
+            try {
+                $this->runWithLockRetry(static function () use ($importer, $row): void {
                     ($importer)($row);
-                    $successfulRows++;
-                    $rowResults[] = $this->formatRowResult(
-                        $importer,
-                        $row,
-                        $columnMap,
-                        $rowNumber,
-                        $timestamp,
-                    );
-                } catch (RowImportFailedException $exception) {
-                    $failedRows[] = $this->formatFailedRow($row, $exception->getMessage(), $importer, $columnMap);
-                    $rowResults[] = $this->formatRowFailure(
-                        $importer,
-                        $row,
-                        $columnMap,
-                        $rowNumber,
-                        $exception->getMessage(),
-                        $timestamp,
-                    );
-                } catch (ValidationException $exception) {
-                    $message = collect($exception->errors())->flatten()->implode(' ');
-                    $failedRows[] = $this->formatFailedRow($row, $message, $importer, $columnMap);
-                    $rowResults[] = $this->formatRowFailure(
-                        $importer,
-                        $row,
-                        $columnMap,
-                        $rowNumber,
-                        $message,
-                        $timestamp,
-                    );
-                } catch (Throwable $exception) {
-                    report($exception);
+                });
+                $successfulRows++;
+                $rowResults[] = $this->formatRowResult(
+                    $importer,
+                    $row,
+                    $columnMap,
+                    $rowNumber,
+                    $timestamp,
+                );
+            } catch (RowImportFailedException $exception) {
+                $failedRows[] = $this->formatFailedRow($row, $exception->getMessage(), $importer, $columnMap);
+                $rowResults[] = $this->formatRowFailure(
+                    $importer,
+                    $row,
+                    $columnMap,
+                    $rowNumber,
+                    $exception->getMessage(),
+                    $timestamp,
+                );
+            } catch (ValidationException $exception) {
+                $message = collect($exception->errors())->flatten()->implode(' ');
+                $failedRows[] = $this->formatFailedRow($row, $message, $importer, $columnMap);
+                $rowResults[] = $this->formatRowFailure(
+                    $importer,
+                    $row,
+                    $columnMap,
+                    $rowNumber,
+                    $message,
+                    $timestamp,
+                );
+            } catch (Throwable $exception) {
+                report($exception);
 
-                    $failedRows[] = $this->formatFailedRow($row, null, $importer, $columnMap);
-                    $rowResults[] = $this->formatRowFailure(
-                        $importer,
-                        $row,
-                        $columnMap,
-                        $rowNumber,
-                        $exception->getMessage(),
-                        $timestamp,
+                $failedRows[] = $this->formatFailedRow($row, null, $importer, $columnMap);
+                $rowResults[] = $this->formatRowFailure(
+                    $importer,
+                    $row,
+                    $columnMap,
+                    $rowNumber,
+                    $exception->getMessage(),
+                    $timestamp,
+                );
+            }
+
+            $processedRows++;
+        }
+
+        $this->runWithLockRetry(function () use ($import, $processedRows, $successfulRows, $failedRows, $rowResults): void {
+            DB::transaction(function () use ($import, $processedRows, $successfulRows, $failedRows, $rowResults): void {
+                /** @var Import|null $lockedImport */
+                $lockedImport = $import::query()
+                    ->whereKey($import)
+                    ->lockForUpdate()
+                    ->first();
+
+                if ($lockedImport) {
+                    $totalRows = ProgressCounter::normalizeTotal((int) ($lockedImport->total_rows ?? 0));
+                    $nextProcessedRows = ProgressCounter::normalizeProcessed(
+                        (int) ($lockedImport->processed_rows ?? 0) + $processedRows,
+                        $totalRows,
                     );
+                    $nextSuccessfulRows = ProgressCounter::normalizeSuccessful(
+                        (int) ($lockedImport->successful_rows ?? 0) + $successfulRows,
+                        $nextProcessedRows,
+                        $totalRows,
+                    );
+
+                    $lockedImport->forceFill([
+                        'processed_rows'  => $nextProcessedRows,
+                        'successful_rows' => $nextSuccessfulRows,
+                    ])->save();
                 }
 
-                $processedRows++;
-            }
+                if (count($failedRows)) {
+                    $import->failedRows()->createMany($failedRows);
+                }
 
-            /** @var Import|null $lockedImport */
-            $lockedImport = $import::query()
-                ->whereKey($import)
-                ->lockForUpdate()
-                ->first();
-
-            if ($lockedImport) {
-                $totalRows = ProgressCounter::normalizeTotal((int) ($lockedImport->total_rows ?? 0));
-                $nextProcessedRows = ProgressCounter::normalizeProcessed(
-                    (int) ($lockedImport->processed_rows ?? 0) + $processedRows,
-                    $totalRows,
-                );
-                $nextSuccessfulRows = ProgressCounter::normalizeSuccessful(
-                    (int) ($lockedImport->successful_rows ?? 0) + $successfulRows,
-                    $nextProcessedRows,
-                    $totalRows,
-                );
-
-                $lockedImport->forceFill([
-                    'processed_rows'  => $nextProcessedRows,
-                    'successful_rows' => $nextSuccessfulRows,
-                ])->save();
-            }
-
-            if (count($failedRows)) {
-                $import->failedRows()->createMany($failedRows);
-            }
-
-            if (count($rowResults)) {
-                ImportRowResult::query()->insert($rowResults);
-            }
+                if (count($rowResults)) {
+                    ImportRowResult::query()->insert($rowResults);
+                }
+            }, attempts: 3);
         });
 
         return [
@@ -243,5 +248,45 @@ final class CsvImportProcessor
         }
 
         return $value;
+    }
+
+    /**
+     * Retry transient SQLite lock errors with short backoff to avoid surfacing 500
+     * from overlapping import tick requests.
+     */
+    private function runWithLockRetry(callable $callback): mixed
+    {
+        $delaysMs = [120, 240, 480, 960, 1500];
+        $attempt = 0;
+
+        beginning:
+        try {
+            return $callback();
+        } catch (Throwable $exception) {
+            if (! $this->isDatabaseLockedException($exception)) {
+                throw $exception;
+            }
+
+            if ($attempt >= count($delaysMs)) {
+                throw $exception;
+            }
+
+            usleep($delaysMs[$attempt] * 1000);
+            $attempt++;
+
+            goto beginning;
+        }
+    }
+
+    private function isDatabaseLockedException(Throwable $exception): bool
+    {
+        if (! $exception instanceof QueryException) {
+            return false;
+        }
+
+        $message = Str::lower($exception->getMessage());
+
+        return str_contains($message, 'database is locked')
+            || str_contains($message, 'database table is locked');
     }
 }

@@ -19,8 +19,39 @@ enum PaymentMethod: string implements HasLabel
     case APPLE_PAY = 'apple_pay';
     case GOOGLE_PAY = 'google_pay';
 
+    private const LABEL_DEFAULTS = [
+        'credit_card'      => 'Credit card',
+        'bank_transfer'    => 'Bank transfer',
+        'cash_on_delivery' => 'Cash on delivery',
+        'paypal'           => 'PayPal',
+        'stripe'           => 'Stripe',
+        'apple_pay'        => 'Apple Pay',
+        'google_pay'       => 'Google Pay',
+    ];
+
     public function getLabel(): ?string
     {
-        return __('enums.payment_method.' . $this->value);
+        $key = 'enums.payment_method.' . $this->value;
+        $translation = __($key);
+
+        if (! is_string($translation) || $translation === $key) {
+            return self::LABEL_DEFAULTS[$this->value] ?? $this->value;
+        }
+
+        return $translation;
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public static function options(): array
+    {
+        $options = [];
+
+        foreach (self::cases() as $case) {
+            $options[$case->value] = (string) $case->getLabel();
+        }
+
+        return $options;
     }
 }

@@ -8,6 +8,9 @@ use App\Contracts\DocumentServiceContract;
 use App\Filament\Resources\OrderResource;
 use App\Models\DocumentTemplate;
 use App\Models\Order;
+use Illuminate\Database\UniqueConstraintViolationException;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Validation\ValidationException;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateOrder extends CreateRecord
@@ -18,6 +21,23 @@ class CreateOrder extends CreateRecord
      * @var array<int, array<string, mixed>>
      */
     private array $serviceAttachments = [];
+
+    protected function handleRecordCreation(array $data): Model
+    {
+        try {
+            return parent::handleRecordCreation($data);
+        } catch (UniqueConstraintViolationException $exception) {
+            if (str_contains(strtolower($exception->getMessage()), 'orders.number')) {
+                throw ValidationException::withMessages([
+                    'data.number' => __('validation.unique', [
+                        'attribute' => __('messages.order_number'),
+                    ]),
+                ]);
+            }
+
+            throw $exception;
+        }
+    }
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {

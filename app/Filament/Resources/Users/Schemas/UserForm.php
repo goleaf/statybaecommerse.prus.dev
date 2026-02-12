@@ -11,6 +11,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Hash;
 
 class UserForm
@@ -33,6 +34,7 @@ class UserForm
                         Select::make('company_id')
                             ->label(__('messages.company'))
                             ->relationship('organization', 'name')
+                            ->getOptionLabelFromRecordUsing(static fn (Model $record): string => (string) ($record->getAttribute('name') ?: ('#' . $record->getKey())))
                             ->visible(fn (Get $get) => $get('account_type') === 'company')
                             ->required(fn (Get $get) => $get('account_type') === 'company')
                             ->searchable()
@@ -94,11 +96,13 @@ class UserForm
                         Select::make('country_id')
                             ->label(__('messages.country'))
                             ->relationship('country', 'name')
+                            ->getOptionLabelFromRecordUsing(static fn (Model $record): string => (string) ($record->getAttribute('name') ?: ('#' . $record->getKey())))
                             ->searchable()
                             ->preload(),
                         Select::make('city_id')
                             ->label(__('messages.city'))
                             ->relationship('city', 'name')
+                            ->getOptionLabelFromRecordUsing(static fn (Model $record): string => (string) ($record->getAttribute('name') ?: ('#' . $record->getKey())))
                             ->searchable()
                             ->preload(),
                     ])->columns(2)
