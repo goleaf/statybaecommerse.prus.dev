@@ -88,20 +88,31 @@ class PricesRelationManager extends RelationManager
             ])
             ->headerActions([
                 CreateAction::make()
-                    ->mutateDataUsing(function (array $data): array {
-                        $type = is_string($data['type'] ?? null) ? trim((string) $data['type']) : '';
-                        $data['type'] = $type !== '' ? $type : 'retail';
-
-                        return $data;
-                    })
+                    ->mutateDataUsing(fn (array $data): array => $this->normalizePayload($data))
                     ->using(fn (array $data): Price => $this->getOwnerRecord()->prices()->create($data)),
             ])
             ->actions([
-                EditAction::make(),
+                EditAction::make()
+                    ->mutateDataUsing(fn (array $data): array => $this->normalizePayload($data)),
                 DeleteAction::make(),
             ])
             ->bulkActions([
                 //
             ]);
+    }
+
+    /**
+     * @param  array<string, mixed> $data
+     * @return array<string, mixed>
+     */
+    private function normalizePayload(array $data): array
+    {
+        $type = is_string($data['type'] ?? null) ? trim((string) $data['type']) : '';
+
+        if (! in_array($type, Price::ALLOWED_TYPES, true)) {
+            $data['type'] = 'retail';
+        }
+
+        return $data;
     }
 }

@@ -103,6 +103,14 @@ final class VariantInventory extends Model
         return $this->belongsTo(Location::class, 'location_id');
     }
 
+    /**
+     * Backwards-compatible alias used by older Filament forms and tables.
+     */
+    public function warehouse(): BelongsTo
+    {
+        return $this->location();
+    }
+
     public function supplier(): BelongsTo
     {
         return $this->belongsTo(Partner::class, 'supplier_id');

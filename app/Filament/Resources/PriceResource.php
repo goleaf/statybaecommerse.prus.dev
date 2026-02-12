@@ -97,9 +97,11 @@ final class PriceResource extends BaseResource
                         ]),
                     SchemaGrid::make(2)
                         ->schema([
-                            TextInput::make('type')
+                            Select::make('type')
                                 ->label(__('messages.type'))
-                                ->placeholder('default, sale, wholesale, etc.'),
+                                ->options(array_combine(Price::ALLOWED_TYPES, Price::ALLOWED_TYPES))
+                                ->default('retail')
+                                ->required(),
                             Toggle::make('is_enabled')
                                 ->label(__('messages.enabled'))
                                 ->default(true),

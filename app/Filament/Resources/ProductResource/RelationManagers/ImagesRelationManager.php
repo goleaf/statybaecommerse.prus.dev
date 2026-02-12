@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ProductResource\RelationManagers;
 
+use App\Models\ProductImage;
 use App\Support\Filament\Forms\Components\SortOrderInput;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\TextInput;
@@ -89,7 +90,6 @@ class ImagesRelationManager extends RelationManager
             ])
             ->headerActions([
                 CreateAction::make()
-                    ->relationship(fn () => $this->getOwnerRecord()->images())
                     ->mutateDataUsing(function (array $data): array {
                         $ownerRecord = $this->getOwnerRecord();
 
@@ -112,7 +112,8 @@ class ImagesRelationManager extends RelationManager
                         }
 
                         return $data;
-                    }),
+                    })
+                    ->using(fn (array $data): ProductImage => $this->getOwnerRecord()->images()->create($data)),
             ])
             ->actions([
                 EditAction::make(),

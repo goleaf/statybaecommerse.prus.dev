@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuites>
-  <testsuite name="Tests\Feature\Filament\Resources\ProductImagesRelationManagerTest" file="Product Images Relation Manager (Tests\Feature\Filament\Resources\ProductImagesRelationManager)" tests="1" assertions="4" errors="0" failures="0" skipped="0" time="11.164837">
-    <testcase name="Can create image from product relation manager" file="Product Images Relation Manager (Tests\Feature\Filament\Resources\ProductImagesRelationManager)::Can create image from product relation manager" class="Tests\Feature\Filament\Resources\ProductImagesRelationManagerTest" classname="Tests.Feature.Filament.Resources.ProductImagesRelationManagerTest" assertions="4" time="11.164837"/>
-  </testsuite>
-</testsuites>

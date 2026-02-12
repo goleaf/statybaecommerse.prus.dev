@@ -28,6 +28,13 @@ final class Price extends Model
 {
     use HasFactory;
 
+    public const ALLOWED_TYPES = [
+        'retail',
+        'wholesale',
+        'special',
+        'sale',
+    ];
+
     protected $table = 'prices';
 
     protected $fillable = ['priceable_id', 'priceable_type', 'currency_id', 'amount', 'cost_amount', 'type', 'starts_at', 'ends_at', 'is_enabled', 'metadata'];
@@ -35,10 +42,27 @@ final class Price extends Model
     protected static function booted(): void
     {
         self::creating(static function (self $price): void {
-            if (! is_string($price->type) || trim($price->type) === '') {
-                $price->type = 'retail';
-            }
+            $price->type = self::normalizeType($price->type);
         });
+
+        self::updating(static function (self $price): void {
+            $price->type = self::normalizeType($price->type);
+        });
+    }
+
+    private static function normalizeType(mixed $value): string
+    {
+        if (! is_string($value)) {
+            return 'retail';
+        }
+
+        $type = trim($value);
+
+        if ($type === '' || ! in_array($type, self::ALLOWED_TYPES, true)) {
+            return 'retail';
+        }
+
+        return $type;
     }
 
     /**

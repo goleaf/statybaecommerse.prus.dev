@@ -39,9 +39,11 @@ class PricesRelationManager extends RelationManager
                     ->required()
                     ->numeric()
                     ->step(0.0001),
-                TextInput::make('type')
+                Select::make('type')
                     ->label(__('messages.type'))
-                    ->placeholder('default, sale, etc.'),
+                    ->options(array_combine(Price::ALLOWED_TYPES, Price::ALLOWED_TYPES))
+                    ->default('retail')
+                    ->required(),
                 DateTimePicker::make('starts_at')
                     ->label(__('admin.prices.valid_from')),
                 DateTimePicker::make('ends_at')
@@ -81,20 +83,31 @@ class PricesRelationManager extends RelationManager
             ])
             ->headerActions([
                 CreateAction::make()
-                    ->mutateDataUsing(function (array $data): array {
-                        $type = is_string($data['type'] ?? null) ? trim((string) $data['type']) : '';
-                        $data['type'] = $type !== '' ? $type : 'retail';
-
-                        return $data;
-                    })
+                    ->mutateDataUsing(fn (array $data): array => $this->normalizePayload($data))
                     ->using(fn (array $data): Price => $this->getOwnerRecord()->prices()->create($data)),
             ])
             ->actions([
-                EditAction::make(),
+                EditAction::make()
+                    ->mutateDataUsing(fn (array $data): array => $this->normalizePayload($data)),
                 DeleteAction::make(),
             ])
             ->bulkActions([
                 //
             ]);
+    }
+
+    /**
+     * @param  array<string, mixed> $data
+     * @return array<string, mixed>
+     */
+    private function normalizePayload(array $data): array
+    {
+        $type = is_string($data['type'] ?? null) ? trim((string) $data['type']) : '';
+
+        if (! in_array($type, Price::ALLOWED_TYPES, true)) {
+            $data['type'] = 'retail';
+        }
+
+        return $data;
     }
 }
