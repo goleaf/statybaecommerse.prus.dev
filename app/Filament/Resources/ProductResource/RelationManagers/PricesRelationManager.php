@@ -88,12 +88,15 @@ class PricesRelationManager extends RelationManager
             ])
             ->headerActions([
                 CreateAction::make()
+                    ->relationship(fn () => $this->getOwnerRecord()->prices())
                     ->mutateDataUsing(function (array $data): array {
                         $ownerRecord = $this->getOwnerRecord();
 
-                        $data['priceable_id'] ??= $ownerRecord->getKey();
-                        $data['priceable_type'] ??= $ownerRecord::class;
-                        $data['type'] ??= 'retail';
+                        $data['priceable_id'] = $ownerRecord->getKey();
+                        $data['priceable_type'] = $ownerRecord::class;
+
+                        $type = is_string($data['type'] ?? null) ? trim((string) $data['type']) : '';
+                        $data['type'] = $type !== '' ? $type : 'retail';
 
                         return $data;
                     }),
