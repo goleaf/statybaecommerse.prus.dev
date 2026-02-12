@@ -597,6 +597,7 @@ return [
         'subscribers'      => 'Subscribers',
         'system'           => 'System',
         'users'            => 'Users',
+        'warehouses'       => 'Warehouses',
     ],
     'news-images' => [
         'bulk' => [

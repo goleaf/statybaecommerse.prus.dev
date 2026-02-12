@@ -597,6 +597,7 @@ return [
         'subscribers'      => 'Prenumeratoriai',
         'system'           => 'Sistema',
         'users'            => 'Vartotojai',
+        'warehouses'       => 'Sandėliai',
     ],
     'news-images' => [
         'bulk' => [

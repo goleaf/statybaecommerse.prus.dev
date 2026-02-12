@@ -7,6 +7,7 @@ namespace App\Filament\Resources\ProductResource\RelationManagers;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\CreateAction;
@@ -32,20 +33,26 @@ class InventoryRelationManager extends RelationManager
     {
         return $schema
             ->schema([
-                Select::make('warehouse_id')
-                    ->label(__('messages.warehouse'))
-                    ->relationship('warehouse', 'name')
-                    ->required()
-                    ->searchable()
-                    ->preload(),
-                TextInput::make('sku')
-                    ->label(__('messages.sku'))
-                    ->maxLength(255),
-                TextInput::make('qty')
-                    ->label(__('messages.quantity'))
-                    ->numeric()
-                    ->default(0)
-                    ->required(),
+                Grid::make([
+                    'default' => 1,
+                    'md'      => 3,
+                ])
+                    ->schema([
+                        Select::make('warehouse_id')
+                            ->label(__('messages.warehouse'))
+                            ->relationship('warehouse', 'name')
+                            ->required()
+                            ->searchable()
+                            ->preload(),
+                        TextInput::make('sku')
+                            ->label(__('messages.sku'))
+                            ->maxLength(255),
+                        TextInput::make('qty')
+                            ->label(__('messages.quantity'))
+                            ->numeric()
+                            ->default(0)
+                            ->required(),
+                    ]),
             ]);
     }
 

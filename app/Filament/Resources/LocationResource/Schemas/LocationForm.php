@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\LocationResource\Schemas;
 
 use App\Support\Filament\Forms\Components\SortOrderInput;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -19,21 +20,31 @@ use Illuminate\Support\Str;
 
 class LocationForm
 {
-    public static function configure(Schema $schema): Schema
+    public static function configure(Schema $schema, ?string $forcedType = null): Schema
     {
         return $schema
             ->components([
                 Tabs::make('locationTabs')
                     ->tabs(array_merge(
-                        [self::generalTab()],
+                        [self::generalTab($forcedType)],
                         self::localeTabs(),
                     ))
                     ->columnSpanFull(),
             ]);
     }
 
-    private static function generalTab(): Tab
+    private static function generalTab(?string $forcedType): Tab
     {
+        $typeField = $forcedType === null
+            ? Select::make('type')
+                ->label(__('messages.type'))
+                ->options(self::typeOptions())
+                ->required()
+            : Hidden::make('type')
+                ->default($forcedType)
+                ->dehydrated()
+                ->required();
+
         return Tab::make(__('messages.general'))
             ->schema([
                 Section::make(__('admin.locations_page.details_title'))
@@ -45,10 +56,7 @@ class LocationForm
                                     ->required()
                                     ->maxLength(50)
                                     ->unique(ignoreRecord: true),
-                                Select::make('type')
-                                    ->label(__('messages.type'))
-                                    ->options(self::typeOptions())
-                                    ->required(),
+                                $typeField,
                                 SortOrderInput::make(),
                             ]),
                         Grid::make(2)
