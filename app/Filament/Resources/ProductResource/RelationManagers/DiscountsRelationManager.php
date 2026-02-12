@@ -17,6 +17,7 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Schema as SchemaFacade;
 
 class DiscountsRelationManager extends RelationManager
 {
@@ -27,6 +28,11 @@ class DiscountsRelationManager extends RelationManager
     public static function getTitle(Model $ownerRecord, string $pageClass): string
     {
         return __('admin.discounts.plural_model_label');
+    }
+
+    public static function canViewForRecord(Model $ownerRecord, string $pageClass): bool
+    {
+        return SchemaFacade::hasTable('discounts') && SchemaFacade::hasTable('discount_products');
     }
 
     public function form(Schema $schema): Schema

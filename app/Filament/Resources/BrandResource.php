@@ -13,6 +13,7 @@ use BackedEnum;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Schema as SchemaFacade;
 use UnitEnum;
 
 final class BrandResource extends BaseResource
@@ -70,14 +71,19 @@ final class BrandResource extends BaseResource
 
     public static function getRelations(): array
     {
-        return [
+        $relations = [
             \App\Filament\Resources\BrandResource\RelationManagers\ProductsRelationManager::class,
             \App\Filament\Resources\BrandResource\RelationManagers\CategoriesRelationManager::class,
             \App\Filament\Resources\BrandResource\RelationManagers\CollectionsRelationManager::class,
             \App\Filament\Resources\BrandResource\RelationManagers\OrdersRelationManager::class,
             \App\Filament\Resources\BrandResource\RelationManagers\ProductVariantsRelationManager::class,
-            \App\Filament\Resources\BrandResource\RelationManagers\DiscountsRelationManager::class,
         ];
+
+        if (SchemaFacade::hasTable('discounts') && SchemaFacade::hasTable('discount_brands')) {
+            $relations[] = \App\Filament\Resources\BrandResource\RelationManagers\DiscountsRelationManager::class;
+        }
+
+        return $relations;
     }
 
     public static function getPages(): array

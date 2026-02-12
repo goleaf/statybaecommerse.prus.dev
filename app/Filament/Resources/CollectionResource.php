@@ -14,6 +14,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Schema as SchemaFacade;
 use UnitEnum;
 
 class CollectionResource extends Resource
@@ -55,14 +56,19 @@ class CollectionResource extends Resource
 
     public static function getRelations(): array
     {
-        return [
+        $relations = [
             \App\Filament\Resources\CollectionResource\RelationManagers\ProductsRelationManager::class,
             \App\Filament\Resources\CollectionResource\RelationManagers\CategoriesRelationManager::class,
             \App\Filament\Resources\CollectionResource\RelationManagers\BrandsRelationManager::class,
             \App\Filament\Resources\CollectionResource\RelationManagers\PricesRelationManager::class,
-            \App\Filament\Resources\CollectionResource\RelationManagers\DiscountsRelationManager::class,
             \App\Filament\Resources\CollectionResource\RelationManagers\RulesRelationManager::class,
         ];
+
+        if (SchemaFacade::hasTable('discounts') && SchemaFacade::hasTable('discount_collections')) {
+            $relations[] = \App\Filament\Resources\CollectionResource\RelationManagers\DiscountsRelationManager::class;
+        }
+
+        return $relations;
     }
 
     public static function getPages(): array
