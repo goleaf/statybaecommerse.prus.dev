@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ProductResource\RelationManagers;
 
+use App\Models\AdminUser;
 use App\Models\Comment;
+use App\Models\User;
 use Filament\Forms\Components\Textarea;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
@@ -14,7 +16,7 @@ use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 
 class CommentsRelationManager extends RelationManager
 {
@@ -62,8 +64,12 @@ class CommentsRelationManager extends RelationManager
                         $data['content'] = trim((string) ($data['content'] ?? $data['body'] ?? ''));
                         unset($data['body']);
 
-                        if (Auth::id() !== null) {
-                            $data['user_id'] = Auth::id();
+                        $data['user_id'] = $this->resolveCommentUserId();
+
+                        if ($data['content'] === '') {
+                            throw ValidationException::withMessages([
+                                'content' => __('validation.required', ['attribute' => __('messages.comment')]),
+                            ]);
                         }
 
                         $data['is_approved'] ??= true;
@@ -71,11 +77,31 @@ class CommentsRelationManager extends RelationManager
                         $data['likes_count'] ??= 0;
 
                         return $data;
-                    }),
+                    })
+                    ->using(fn (array $data): Comment => $this->getOwnerRecord()->comments()->create($data)),
             ])
             ->actions([
                 EditAction::make(),
                 DeleteAction::make(),
             ]);
+    }
+
+    private function resolveCommentUserId(): ?int
+    {
+        $authenticatedUser = auth()->user() ?? auth('admin')->user();
+
+        if ($authenticatedUser instanceof User) {
+            return $authenticatedUser->getKey();
+        }
+
+        if ($authenticatedUser instanceof AdminUser) {
+            $mappedUserId = User::query()
+                ->where('email', $authenticatedUser->email)
+                ->value('id');
+
+            return is_numeric($mappedUserId) ? (int) $mappedUserId : null;
+        }
+
+        return null;
     }
 }

@@ -40,12 +40,12 @@ class PricesRelationManager extends RelationManager
                     ->numeric()
                     ->step(0.0001),
                 Select::make('type')
-                    ->label(__('messages.Type'))
+                    ->label(__('messages.type'))
                     ->options([
-                        'retail' => 'retail',
+                        'retail'    => 'retail',
                         'wholesale' => 'wholesale',
-                        'special' => 'special',
-                        'sale' => 'sale',
+                        'special'   => 'special',
+                        'sale'      => 'sale',
                     ])
                     ->default('retail')
                     ->required(),
@@ -70,7 +70,7 @@ class PricesRelationManager extends RelationManager
                     ->label(__('messages.amount') !== 'messages.amount' ? __('messages.amount') : 'Amount')
                     ->money(fn (Price $record) => $record->currency?->code ?? 'EUR'),
                 TextColumn::make('type')
-                    ->label(__('messages.Type'))
+                    ->label(__('messages.type'))
                     ->badge(),
                 IconColumn::make('is_enabled')
                     ->label(__('messages.enabled'))
@@ -88,18 +88,13 @@ class PricesRelationManager extends RelationManager
             ])
             ->headerActions([
                 CreateAction::make()
-                    ->relationship(fn () => $this->getOwnerRecord()->prices())
                     ->mutateDataUsing(function (array $data): array {
-                        $ownerRecord = $this->getOwnerRecord();
-
-                        $data['priceable_id'] = $ownerRecord->getKey();
-                        $data['priceable_type'] = $ownerRecord::class;
-
                         $type = is_string($data['type'] ?? null) ? trim((string) $data['type']) : '';
                         $data['type'] = $type !== '' ? $type : 'retail';
 
                         return $data;
-                    }),
+                    })
+                    ->using(fn (array $data): Price => $this->getOwnerRecord()->prices()->create($data)),
             ])
             ->actions([
                 EditAction::make(),

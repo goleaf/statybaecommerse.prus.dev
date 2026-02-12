@@ -10,15 +10,10 @@ use App\Models\Product;
 use App\Models\ProductVariant;
 use BackedEnum;
 use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\MorphToSelect;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Infolists\Components\IconEntry;
-use Filament\Infolists\Components\Section as InfoSection;
-use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -103,7 +98,7 @@ final class PriceResource extends BaseResource
                     SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('type')
-                                ->label(__('messages.Type'))
+                                ->label(__('messages.type'))
                                 ->placeholder('default, sale, wholesale, etc.'),
                             Toggle::make('is_enabled')
                                 ->label(__('messages.enabled'))
@@ -134,7 +129,7 @@ final class PriceResource extends BaseResource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('priceable_type')
-                    ->label(__('messages.Type'))
+                    ->label(__('messages.type'))
                     ->formatStateUsing(fn (string $state): string => class_basename($state))
                     ->badge()
                     ->sortable(),
@@ -144,6 +139,7 @@ final class PriceResource extends BaseResource
                         if ($record->priceable instanceof ProductVariant) {
                             return $record->priceable->display_name;
                         }
+
                         return $state;
                     })
                     ->searchable()
@@ -157,7 +153,7 @@ final class PriceResource extends BaseResource
                     ->money(fn (Price $record) => $record->currency?->code ?? 'EUR')
                     ->sortable(),
                 TextColumn::make('type')
-                    ->label(__('messages.Type'))
+                    ->label(__('messages.type'))
                     ->badge()
                     ->sortable(),
                 IconColumn::make('is_enabled')
@@ -183,7 +179,7 @@ final class PriceResource extends BaseResource
                 \Filament\Tables\Filters\TernaryFilter::make('is_enabled')
                     ->label(__('messages.enabled')),
                 \Filament\Tables\Filters\SelectFilter::make('type')
-                    ->label(__('messages.Type'))
+                    ->label(__('messages.type'))
                     ->options(fn () => Price::query()->whereNotNull('type')->distinct()->pluck('type', 'type')->toArray()),
                 \Filament\Tables\Filters\SelectFilter::make('currency_id')
                     ->label(__('messages.currency'))
