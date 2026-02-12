@@ -54,7 +54,7 @@ class PricesRelationManager extends RelationManager
                 DateTimePicker::make('ends_at')
                     ->label(__('admin.prices.valid_until')),
                 Toggle::make('is_enabled')
-                    ->label(__('messages.Enabled'))
+                    ->label(__('messages.enabled'))
                     ->default(true),
             ]);
     }
@@ -73,7 +73,7 @@ class PricesRelationManager extends RelationManager
                     ->label(__('messages.Type'))
                     ->badge(),
                 IconColumn::make('is_enabled')
-                    ->label(__('messages.Enabled'))
+                    ->label(__('messages.enabled'))
                     ->boolean(),
                 TextColumn::make('starts_at')
                     ->label(__('admin.prices.valid_from'))

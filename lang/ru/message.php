@@ -4,5 +4,4 @@ declare(strict_types=1);
 
 return [
     'enabled' => 'Vklyucheno',
-    'Enabled' => 'Vklyucheno',
 ];

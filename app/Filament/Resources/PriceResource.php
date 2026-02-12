@@ -106,7 +106,7 @@ final class PriceResource extends BaseResource
                                 ->label(__('messages.Type'))
                                 ->placeholder('default, sale, wholesale, etc.'),
                             Toggle::make('is_enabled')
-                                ->label(__('messages.Enabled'))
+                                ->label(__('messages.enabled'))
                                 ->default(true),
                         ]),
                 ])
@@ -161,7 +161,7 @@ final class PriceResource extends BaseResource
                     ->badge()
                     ->sortable(),
                 IconColumn::make('is_enabled')
-                    ->label(__('messages.Enabled'))
+                    ->label(__('messages.enabled'))
                     ->boolean()
                     ->sortable(),
                 TextColumn::make('starts_at')
@@ -181,7 +181,7 @@ final class PriceResource extends BaseResource
             ])
             ->filters([
                 \Filament\Tables\Filters\TernaryFilter::make('is_enabled')
-                    ->label(__('messages.Enabled')),
+                    ->label(__('messages.enabled')),
                 \Filament\Tables\Filters\SelectFilter::make('type')
                     ->label(__('messages.Type'))
                     ->options(fn () => Price::query()->whereNotNull('type')->distinct()->pluck('type', 'type')->toArray()),
