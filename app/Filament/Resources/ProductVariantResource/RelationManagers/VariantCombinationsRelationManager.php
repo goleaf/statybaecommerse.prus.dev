@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ProductVariantResource\RelationManagers;
 
-use App\Models\VariantCombination;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -27,8 +26,7 @@ class VariantCombinationsRelationManager extends RelationManager
         return $table
             ->columns([
                 TextColumn::make('formatted_combinations')
-                    ->label(__('admin.variant_combinations.attribute_combinations'))
-                    ->sortable(),
+                    ->label(__('admin.variant_combinations.attribute_combinations')),
                 IconColumn::make('is_available')
                     ->label(__('admin.variant_combinations.is_available'))
                     ->boolean(),

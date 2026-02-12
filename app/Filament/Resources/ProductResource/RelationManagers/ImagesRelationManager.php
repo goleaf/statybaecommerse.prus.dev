@@ -6,6 +6,7 @@ namespace App\Filament\Resources\ProductResource\RelationManagers;
 
 use App\Models\ProductImage;
 use App\Support\Filament\Forms\Components\SortOrderInput;
+use Filament\Actions\AssociateAction;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -19,6 +20,7 @@ use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 
@@ -26,7 +28,7 @@ class ImagesRelationManager extends RelationManager
 {
     protected static string $relationship = 'images';
 
-    protected static ?string $recordTitleAttribute = 'alt_text';
+    protected static ?string $recordTitleAttribute = 'path';
 
     public static function getTitle(Model $ownerRecord, string $pageClass): string
     {
@@ -89,6 +91,12 @@ class ImagesRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
+                AssociateAction::make()
+                    ->preloadRecordSelect()
+                    ->recordSelectSearchColumns(['alt_text', 'path'])
+                    ->recordSelectOptionsQuery(fn (Builder $query): Builder => $query
+                        ->withoutGlobalScopes()
+                        ->where('product_id', '!=', $this->getOwnerRecord()->getKey())),
                 CreateAction::make()
                     ->mutateDataUsing(function (array $data): array {
                         $ownerRecord = $this->getOwnerRecord();

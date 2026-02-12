@@ -40,7 +40,7 @@ return [
             'last_name_placeholder'    => 'Pavardė',
             'or_login_with'            => 'Arba prisijunkite su',
             'password_confirm'         => 'Patvirtinkite slaptažodį',
-            'password_requirements'    => 'Mažiausiai 8 simboliai',
+            'password_requirements'    => 'Mažiausiai 8 simboliai, su didžiąja ir mažąja raide, skaičiumi ir specialiuoju simboliu',
             'security_notice'          => 'Jūsų duomenys yra saugūs',
             'subtitle'                 => 'Sukurkite naują paskyrą, kad pradėtumėte',
             'terms_agreement'          => 'Kurdami paskyrą sutinkate su mūsų',

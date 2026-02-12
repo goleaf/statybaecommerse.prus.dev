@@ -197,7 +197,7 @@
                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h18M9 7h6m-3 0v14" />
                                 </svg>
-                                {{ $products->count() }} {{ trans_choice('products', $products->count()) }}
+                                {{ $products->count() }} {{ __('messages.products') }}
                             </span>
                             <span>{{ __('ui.updated_weekly_with_fresh_arrivals_and_promotions') }}</span>
                         </div>
@@ -332,7 +332,7 @@
                                 
                                 <div class="flex items-center justify-between">
                                     <x-shared.badge variant="primary" size="sm">
-                                        {{ $relatedBrand->products_count }} {{ trans_choice('products', $relatedBrand->products_count) }}
+                                        {{ $relatedBrand->products_count }} {{ __('messages.products') }}
                                     </x-shared.badge>
                                     
                                     <svg class="h-4 w-4 text-gray-400 group-hover:text-blue-500 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">

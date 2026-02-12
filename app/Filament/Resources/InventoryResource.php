@@ -73,16 +73,15 @@ final class InventoryResource extends BaseResource
                     ->label(__('messages.quantity'))
                     ->numeric()
                     ->sortable(),
-                TextColumn::make('reserved_quantity')
+                TextColumn::make('reserved')
                     ->label(__('admin.inventory.reserved_quantity'))
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('available_quantity')
                     ->label(__('admin.inventory.available_quantity'))
-                    ->getStateUsing(fn ($record) => $record->quantity - $record->reserved_quantity)
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('low_stock_threshold')
+                    ->getStateUsing(static fn (Inventory $record): int => max(0, (int) $record->quantity - (int) $record->reserved))
+                    ->numeric(),
+                TextColumn::make('threshold')
                     ->label(__('admin.inventory.low_stock_threshold'))
                     ->numeric()
                     ->sortable()

@@ -57,6 +57,11 @@
             'icon'  => 'inbox',
         ],
         [
+            'route' => 'filament.admin.resources.discounts.index',
+            'label' => __('admin.discounts.navigation_label'),
+            'icon'  => 'receipt-percent',
+        ],
+        [
             'route' => 'filament.admin.resources.prices.index',
             'label' => __('admin.prices.navigation_label'),
             'icon'  => 'currency-dollar',

@@ -68,10 +68,10 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
                 }
 
                 DB::table('product_variant_product')->insertOrIgnore([
-                    'product_id' => $productId,
+                    'product_id'         => $productId,
                     'product_variant_id' => $variantId,
-                    'created_at' => now(),
-                    'updated_at' => now(),
+                    'created_at'         => now(),
+                    'updated_at'         => now(),
                 ]);
             });
         });
@@ -181,10 +181,10 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
         }
 
         DB::table('product_variant_product')->insertOrIgnore([
-            'product_id' => $productId,
+            'product_id'         => $productId,
             'product_variant_id' => $variantId,
-            'created_at' => now(),
-            'updated_at' => now(),
+            'created_at'         => now(),
+            'updated_at'         => now(),
         ]);
     }
 
@@ -684,13 +684,26 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
      */
     public function getVariantDisplayName(): string
     {
-        $name = $this->product->name;
+        $productName = '';
+        $product = $this->product;
+
+        if ($product instanceof Product) {
+            $translated = $product->getTranslatedName();
+            $productName = is_string($translated) ? trim($translated) : '';
+
+            if ($productName === '') {
+                $rawName = $product->getAttribute('name');
+                $productName = is_scalar($rawName) ? trim((string) $rawName) : '';
+            }
+        }
+
+        $name = $productName !== '' ? $productName : ('#' . $this->getKey());
         $attributes = $this->getVariantAttributes();
 
         if ($attributes !== []) {
             $attributeStrings = [];
             foreach ($attributes as $key => $value) {
-                $attributeStrings[] = ucfirst((string) $key) . ': ' . $value;
+                $attributeStrings[] = ucfirst((string) $key) . ': ' . (string) $value;
             }
             $name .= ' (' . implode(', ', $attributeStrings) . ')';
         }

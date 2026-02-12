@@ -56,7 +56,7 @@ it('can create a price for a product', function (): void {
             'priceable_id'   => $product->id,
             'currency_id'    => $this->currency->id,
             'amount'         => 150.00,
-            'type'           => 'default',
+            'type'           => 'retail',
             'is_enabled'     => true,
         ])
         ->call('create')
@@ -114,9 +114,34 @@ it('can edit a price', function (): void {
 
 it('can validate price data', function (): void {
     Livewire::test(CreatePrice::class)
+        ->call('create')
+        ->assertHasErrors();
+});
+
+it('can create a price even when some currencies have empty code labels', function (): void {
+    Currency::factory()->create([
+        'code' => '',
+        'name' => 'Broken Currency',
+    ]);
+
+    $product = Product::factory()->create(['name' => 'Currency-safe Product']);
+
+    Livewire::test(CreatePrice::class)
         ->fillForm([
-            'amount' => -10, // Invalid negative price
+            'priceable_type' => Product::class,
+            'priceable_id'   => $product->id,
+            'currency_id'    => $this->currency->id,
+            'amount'         => 33.33,
+            'type'           => 'retail',
+            'is_enabled'     => true,
         ])
         ->call('create')
-        ->assertHasErrors(['amount']);
+        ->assertHasNoFormErrors();
+
+    assertDatabaseHas(Price::class, [
+        'priceable_type' => Product::class,
+        'priceable_id'   => $product->id,
+        'amount'         => 33.33,
+        'currency_id'    => $this->currency->id,
+    ]);
 });

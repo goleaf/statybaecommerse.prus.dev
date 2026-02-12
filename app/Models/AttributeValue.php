@@ -113,6 +113,14 @@ final class AttributeValue extends Model
     }
 
     /**
+     * Backwards-compatible inverse name expected by Filament relation manager conventions.
+     */
+    public function productVariants(): BelongsToMany
+    {
+        return $this->variants();
+    }
+
+    /**
      * Handle valueable functionality with proper error handling.
      *
      * @return MorphTo<Model, $this>

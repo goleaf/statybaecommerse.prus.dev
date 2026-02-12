@@ -40,7 +40,7 @@ return [
             'last_name_placeholder'    => 'Иванов',
             'or_login_with'            => 'Или войдите с помощью',
             'password_confirm'         => 'Подтвердите пароль',
-            'password_requirements'    => 'Минимум 8 символов',
+            'password_requirements'    => 'Минимум 8 символов, включая заглавную и строчную букву, цифру и спецсимвол',
             'security_notice'          => 'Ваши данные защищены',
             'subtitle'                 => 'Создайте новый аккаунт, чтобы начать',
             'terms_agreement'          => 'Создавая аккаунт, вы соглашаетесь с',

@@ -447,7 +447,7 @@
                                                 </h3>
                                                 <span class="inline-flex items-center gap-1 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-dark shadow-sm">
                                                     {{ $productCount }}
-                                                    <span class="text-ash">{{ trans_choice('products', $productCount) }}</span>
+                                                    <span class="text-ash">{{ __('messages.products') }}</span>
                                                 </span>
                                             </div>
                                         </div>

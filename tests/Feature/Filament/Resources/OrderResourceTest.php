@@ -2,10 +2,13 @@
 
 declare(strict_types=1);
 
+use App\Enums\OrderStatus;
 use App\Enums\PaymentStatus;
+use App\Filament\Resources\OrderResource;
 use App\Filament\Resources\OrderResource\Pages\CreateOrder;
 use App\Filament\Resources\OrderResource\Pages\EditOrder;
 use App\Filament\Resources\OrderResource\Pages\ListOrders;
+use App\Filament\Resources\OrderResource\RelationManagers\PaymentsRelationManager;
 use App\Models\AdminUser;
 use App\Models\Document;
 use App\Models\DocumentTemplate;
@@ -14,6 +17,7 @@ use App\Models\Product;
 use App\Models\Service;
 use Filament\Actions\DeleteAction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Notification;
 use Livewire\Livewire;
 
 uses(RefreshDatabase::class);
@@ -36,6 +40,10 @@ it('can list orders', function () {
         ->call('loadTable')
         ->assertCanSeeTableRecords($orders)
         ->assertCountTableRecords(10);
+});
+
+it('does not register legacy payments relation manager', function (): void {
+    expect(OrderResource::getRelations())->not->toContain(PaymentsRelationManager::class);
 });
 
 it('can render create order page', function () {
@@ -67,6 +75,26 @@ it('can create an order', function () {
     ]);
 });
 
+it('renders orders list when status and payment status are enum instances', function (): void {
+    $order = Order::factory()->create([
+        'status'         => OrderStatus::PROCESSING,
+        'payment_status' => PaymentStatus::PAID,
+    ]);
+
+    Livewire::test(ListOrders::class)
+        ->call('loadTable')
+        ->assertCanSeeTableRecords([$order])
+        ->assertSuccessful();
+});
+
+it('does not return server error for legacy relation query index on edit page', function (): void {
+    $order = Order::factory()->create();
+
+    $response = $this->get("/admin/orders/{$order->getRouteKey()}/edit?relation=5");
+
+    expect($response->status())->toBeLessThan(500);
+});
+
 it('can edit an order', function () {
     $order = Order::factory()->create();
 
@@ -91,10 +119,14 @@ it('can delete an order', function () {
     ])
         ->callAction(DeleteAction::class);
 
-    $this->assertSoftDeleted($order);
+    $this->assertDatabaseMissing('orders', [
+        'id' => $order->getKey(),
+    ]);
 });
 
 it('creates an order with products, services, and documents', function () {
+    Notification::fake();
+
     $product = Product::factory()->create([
         'price' => 25.00,
     ]);

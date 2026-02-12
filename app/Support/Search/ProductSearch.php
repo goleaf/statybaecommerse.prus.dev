@@ -143,8 +143,8 @@ final class ProductSearch
 
         if (in_array($driver, ['mysql', 'mariadb'], true)) {
             $query
-                ->orWhereRaw("JSON_UNQUOTE(JSON_EXTRACT({$column}, '$.en')) LIKE ?", [$like])
-                ->orWhereRaw("JSON_UNQUOTE(JSON_EXTRACT({$column}, '$.lt')) LIKE ?", [$like]);
+                ->orWhereRaw("CASE WHEN JSON_VALID({$column}) THEN JSON_UNQUOTE(JSON_EXTRACT({$column}, '$.en')) ELSE NULL END LIKE ?", [$like])
+                ->orWhereRaw("CASE WHEN JSON_VALID({$column}) THEN JSON_UNQUOTE(JSON_EXTRACT({$column}, '$.lt')) ELSE NULL END LIKE ?", [$like]);
         } elseif ($driver === 'pgsql') {
             $query
                 ->orWhereRaw("({$column}->>'en') ILIKE ?", [$like])

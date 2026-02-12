@@ -30,9 +30,9 @@ final class RegistrationForm extends Form
 
     private const EMAIL_RULES = 'required|string|email:filter|max:255|lowercase|unique:users,email';
 
-    private const PASSWORD_RULES = 'required|string|min:8|confirmed|same:password_confirmation';
+    private const PASSWORD_RULES = 'required|string|min:8|confirmed|regex:/[A-Z]/|regex:/[a-z]/|regex:/[0-9]/|regex:/[^A-Za-z0-9]/';
 
-    private const PASSWORD_LIVE_RULES = 'required|string|min:8';
+    private const PASSWORD_LIVE_RULES = 'required|string|min:8|regex:/[A-Z]/|regex:/[a-z]/|regex:/[0-9]/|regex:/[^A-Za-z0-9]/';
 
     private const PASSWORD_CONFIRMATION_RULES = 'required|string|min:8';
 

@@ -40,7 +40,7 @@ return [
             'last_name_placeholder'    => 'Doe',
             'or_login_with'            => 'Or login with',
             'password_confirm'         => 'Confirm Password',
-            'password_requirements'    => 'Minimum 8 characters',
+            'password_requirements'    => 'Minimum 8 characters, including uppercase, lowercase, number, and symbol',
             'security_notice'          => 'Your data is protected',
             'subtitle'                 => 'Create a new account to get started',
             'terms_agreement'          => 'By creating an account, you agree to our',

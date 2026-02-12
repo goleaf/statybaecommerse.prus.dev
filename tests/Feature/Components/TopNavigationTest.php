@@ -24,6 +24,13 @@ it('feature: can render top navigation widget', function (): void {
     $component->assertSuccessful();
 });
 
+it('feature: includes discounts in products top menu', function (): void {
+    $this->actingAs($this->user);
+
+    Livewire::test(TopNavigation::class)
+        ->assertSee(__('admin.discounts.navigation_label'));
+});
+
 it('feature: provides navigation groups data', function (): void {
     $this->actingAs($this->user);
 

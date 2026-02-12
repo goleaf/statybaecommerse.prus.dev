@@ -105,7 +105,7 @@
     <div class="rounded-xl border border-dashed border-sage/30 bg-dark/30 px-4 py-3 text-sm text-sage/80">
         @if($activeFilterCount > 0)
             <span class="font-semibold text-sage">
-                {{ trans_choice('brands_index_status', $activeFilterCount, ['count' => $activeFilterCount]) }}
+                {{ trans_choice('messages.brands_index_status', $activeFilterCount, ['count' => $activeFilterCount]) }}
             </span>
             <span class="mt-1 block text-xs text-sage/60">
                 {{ __('messages.brands_index_status_hint_some') }}

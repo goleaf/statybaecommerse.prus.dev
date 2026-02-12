@@ -133,7 +133,7 @@ final class VariantCombination extends Model
      */
     public function getFormattedCombinationsAttribute(): string
     {
-        $combinations = $this->attribute_combinations;
+        $combinations = $this->resolveAttributeCombinations();
 
         if ($combinations === []) {
             return 'No combinations';
@@ -152,7 +152,7 @@ final class VariantCombination extends Model
      */
     public function getCombinationHashAttribute(): string
     {
-        if (! $this->attribute_combinations) {
+        if ($this->resolveAttributeCombinations() === []) {
             // Reuse the deterministic fallback so that attribute-less payloads remain consistent across requests.
             return $this->deterministicFallbackHash();
         }
@@ -165,7 +165,7 @@ final class VariantCombination extends Model
      */
     public function getIsValidCombinationAttribute(): bool
     {
-        $combinations = $this->attribute_combinations;
+        $combinations = $this->resolveAttributeCombinations();
 
         if ($combinations === []) {
             return false;
@@ -586,15 +586,13 @@ final class VariantCombination extends Model
      */
     private function generateDeterministicHash(): string
     {
-        $combinations = $this->attribute_combinations;
+        $combinations = $this->resolveAttributeCombinations();
 
         if ($combinations === []) {
             return $this->deterministicFallbackHash();
         }
 
-        $normalised = self::normaliseCombination($combinations);
-
-        return self::deterministicHashFor($normalised, $this->product_id);
+        return self::deterministicHashFor($combinations, $this->product_id);
     }
 
     /**
@@ -611,6 +609,22 @@ final class VariantCombination extends Model
     private static function resolveProductKey(int|string|null $productKey): string
     {
         return (string) ($productKey ?? '');
+    }
+
+    /**
+     * Normalise the attribute payload while tolerating malformed legacy values.
+     *
+     * @return array<string, mixed>
+     */
+    private function resolveAttributeCombinations(): array
+    {
+        $combinations = $this->getAttribute('attribute_combinations');
+
+        if (! is_array($combinations)) {
+            return [];
+        }
+
+        return self::normaliseCombination($combinations);
     }
 
     /**

@@ -28,15 +28,15 @@ class InventoryInfolist
                         ->schema([
                             TextEntry::make('quantity')
                                 ->label(__('messages.quantity')),
-                            TextEntry::make('reserved_quantity')
+                            TextEntry::make('reserved')
                                 ->label(__('admin.inventory.reserved_quantity')),
                             TextEntry::make('available_quantity')
                                 ->label(__('admin.inventory.available_quantity'))
-                                ->getStateUsing(fn ($record) => $record->quantity - $record->reserved_quantity),
+                                ->getStateUsing(static fn ($record): int => max(0, (int) $record->quantity - (int) $record->reserved)),
                         ]),
                     Grid::make(2)
                         ->schema([
-                            TextEntry::make('low_stock_threshold')
+                            TextEntry::make('threshold')
                                 ->label(__('admin.inventory.low_stock_threshold')),
                             TextEntry::make('updated_at')
                                 ->label(__('admin.inventory.updated_at'))

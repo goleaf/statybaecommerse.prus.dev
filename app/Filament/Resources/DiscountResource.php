@@ -20,6 +20,8 @@ final class DiscountResource extends BaseResource
 {
     protected static ?string $model = Discount::class;
 
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-receipt-percent';
 
     protected static string|UnitEnum|null $navigationGroup = null;

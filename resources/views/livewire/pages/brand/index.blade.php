@@ -43,7 +43,7 @@
                     </div>
                     <div class="rounded-2xl border border-sage/30 bg-sage/10 px-4 py-3 text-sm text-sage/80 shadow-sm">
                         @if ($activeFilterCount > 0)
-                            {{ trans_choice('brands_index_status', $activeFilterCount, ['count' => $activeFilterCount]) }}
+                            {{ trans_choice('messages.brands_index_status', $activeFilterCount, ['count' => $activeFilterCount]) }}
                         @else
                             {{ __('messages.brands_index_status_none') }}
                         @endif
@@ -181,7 +181,7 @@
                                             </h3>
                                             <span class="inline-flex items-center gap-1 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-dark shadow-sm">
                                                 {{ $brand->products_count ?? 0 }}
-                                                <span class="text-ash">{{ trans_choice('products', $brand->products_count ?? 0) }}</span>
+                                                <span class="text-ash">{{ __('messages.products') }}</span>
                                             </span>
                                         </div>
                                             </div>

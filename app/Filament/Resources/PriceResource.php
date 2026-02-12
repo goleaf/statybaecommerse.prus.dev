@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\PriceResource\Pages;
+use App\Models\Currency;
 use App\Models\Price;
 use App\Models\Product;
 use App\Models\ProductVariant;
@@ -20,6 +21,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 
 final class PriceResource extends BaseResource
@@ -65,18 +67,31 @@ final class PriceResource extends BaseResource
                                     MorphToSelect\Type::make(Product::class)
                                         ->titleAttribute('name')
                                         ->label(__('messages.Product'))
-                                        ->getOptionLabelFromRecordUsing(fn ($record) => $record->getFullDisplayName()),
+                                        ->modifyOptionsQueryUsing(static fn (Builder $query): Builder => $query->withoutGlobalScopes())
+                                        ->getOptionLabelFromRecordUsing(static fn (Product $record): string => self::resolveProductLabel($record)),
                                     MorphToSelect\Type::make(ProductVariant::class)
                                         ->titleAttribute('name')
                                         ->label(__('messages.Variant'))
-                                        ->getOptionLabelFromRecordUsing(fn ($record) => $record->getVariantDisplayName()),
+                                        ->modifyOptionsQueryUsing(static fn (Builder $query): Builder => $query
+                                            ->withoutGlobalScopes()
+                                            ->whereHas('product'))
+                                        ->getOptionLabelFromRecordUsing(static fn (ProductVariant $record): string => self::resolveVariantLabel($record)),
                                 ])
                                 ->required()
                                 ->searchable()
-                                ->preload(),
+                                ->optionsLimit(50),
                             Select::make('currency_id')
                                 ->label(__('messages.currency'))
-                                ->relationship('currency', 'code')
+                                ->relationship(
+                                    name: 'currency',
+                                    titleAttribute: 'code',
+                                    modifyQueryUsing: static fn (Builder $query): Builder => $query
+                                        ->withoutGlobalScopes()
+                                        ->whereNotNull('code')
+                                        ->where('code', '!=', '')
+                                        ->orderBy('code'),
+                                )
+                                ->getOptionLabelFromRecordUsing(static fn (Currency $record): string => self::resolveCurrencyLabel($record))
                                 ->required()
                                 ->searchable()
                                 ->preload(),
@@ -197,6 +212,73 @@ final class PriceResource extends BaseResource
                 ]),
             ])
             ->defaultSort('created_at', 'desc');
+    }
+
+    private static function resolveProductLabel(Product $product): string
+    {
+        $name = trim((string) ($product->getTranslatedName() ?? ''));
+
+        if ($name === '') {
+            $rawName = $product->getAttribute('name');
+            $name = is_scalar($rawName) ? trim((string) $rawName) : '';
+        }
+
+        $sku = trim((string) ($product->getAttribute('sku') ?? ''));
+
+        if ($name === '' && $sku === '') {
+            return '#' . $product->getKey();
+        }
+
+        if ($name === '') {
+            return $sku;
+        }
+
+        return $sku !== '' ? "{$name} ({$sku})" : $name;
+    }
+
+    private static function resolveVariantLabel(ProductVariant $variant): string
+    {
+        $productName = '';
+        $product = $variant->product;
+
+        if ($product instanceof Product) {
+            $productName = trim((string) ($product->getTranslatedName() ?? $product->getAttribute('name') ?? ''));
+        }
+
+        $variantName = trim((string) ($variant->getAttribute('name') ?? ''));
+        $sku = trim((string) ($variant->getAttribute('sku') ?? ''));
+
+        $parts = array_values(array_filter([
+            $productName,
+            $variantName,
+            $sku !== '' ? "SKU: {$sku}" : '',
+        ], static fn (string $part): bool => $part !== ''));
+
+        if ($parts !== []) {
+            return implode(' | ', $parts);
+        }
+
+        return '#' . $variant->getKey();
+    }
+
+    private static function resolveCurrencyLabel(Currency $currency): string
+    {
+        $code = trim((string) ($currency->getAttribute('code') ?? ''));
+        $name = trim((string) ($currency->getAttribute('name') ?? ''));
+
+        if ($code !== '' && $name !== '') {
+            return "{$code} - {$name}";
+        }
+
+        if ($code !== '') {
+            return $code;
+        }
+
+        if ($name !== '') {
+            return $name;
+        }
+
+        return '#' . $currency->getKey();
     }
 
     public static function getRelations(): array

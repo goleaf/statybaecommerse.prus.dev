@@ -40,7 +40,7 @@ return [
             'last_name_placeholder'    => 'Mustermann',
             'or_login_with'            => 'Oder anmelden mit',
             'password_confirm'         => 'Passwort bestätigen',
-            'password_requirements'    => 'Mindestens 8 Zeichen',
+            'password_requirements'    => 'Mindestens 8 Zeichen, einschließlich Groß- und Kleinbuchstaben, Zahl und Sonderzeichen',
             'security_notice'          => 'Ihre Daten sind geschützt',
             'subtitle'                 => 'Erstellen Sie ein neues Konto, um zu starten',
             'terms_agreement'          => 'Durch die Erstellung eines Kontos stimmen Sie unseren',

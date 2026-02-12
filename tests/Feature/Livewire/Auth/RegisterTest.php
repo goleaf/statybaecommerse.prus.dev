@@ -84,6 +84,22 @@ it('requires the password confirmation field before creating an account', functi
     expect(Auth::check())->toBeFalse();
 });
 
+it('rejects passwords that do not satisfy the secure password policy', function (): void {
+    // Act: attempt registration with a weak password that previously caused a server exception.
+    $component = Livewire::test(Register::class)
+        ->set('registrationForm.first_name', 'Policy')
+        ->set('registrationForm.last_name', 'Failure')
+        ->set('registrationForm.email', 'policy@example.com')
+        ->set('registrationForm.password', 'password1')
+        ->set('registrationForm.password_confirmation', 'password1')
+        ->call('register');
+
+    // Assert: validation errors are shown on the password field and no user is created.
+    $component->assertHasErrors(['registrationForm.password']);
+    expect(User::where('email', 'policy@example.com')->exists())->toBeFalse();
+    expect(Auth::check())->toBeFalse();
+});
+
 it('normalizes uppercase email input before storing the user record', function (): void {
     // Act: submit mixed-case email data to confirm the lowercase validation mutates the payload.
     $component = Livewire::test(Register::class)

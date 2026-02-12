@@ -60,6 +60,12 @@
                     'label' => __('admin.variant_combinations.navigation_label'),
                     'icon' => 'heroicon-o-squares-2x2',
                 ],
+                [
+                    'route' => 'filament.admin.resources.discounts.index',
+                    'active' => 'filament.admin.resources.discounts.*',
+                    'label' => __('admin.discounts.navigation_label'),
+                    'icon' => 'heroicon-o-receipt-percent',
+                ],
             ],
         ],
         [
