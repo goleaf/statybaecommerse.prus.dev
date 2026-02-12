@@ -22,6 +22,7 @@ use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class VariantsRelationManager extends RelationManager
 {
@@ -101,7 +102,17 @@ class VariantsRelationManager extends RelationManager
                     ->recordSelectOptionsQuery(fn (Builder $query): Builder => $query
                         ->withoutGlobalScopes()
                         ->whereDoesntHave('products', fn (Builder $productsQuery): Builder => $productsQuery
-                            ->whereKey($this->getOwnerRecord()->getKey()))),
+                            ->whereKey($this->getOwnerRecord()->getKey())))
+                    ->using(function (AttachAction $action, BelongsToMany $relationship): void {
+                        $record = $action->getRecord();
+
+                        if (! $record instanceof Model) {
+                            return;
+                        }
+
+                        // Avoid duplicate pivot insert failures when a variant is re-attached.
+                        $relationship->syncWithoutDetaching([$record->getKey()]);
+                    }),
             ])
             ->actions([
                 EditAction::make(),

@@ -328,7 +328,7 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
      */
     public function orderItems(): HasMany
     {
-        return $this->hasMany(OrderItem::class, 'variant_id');
+        return $this->hasMany(OrderItem::class, self::orderItemsVariantForeignKey());
     }
 
     /**
@@ -344,7 +344,16 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
      */
     public function orders(): BelongsToMany
     {
-        return $this->belongsToMany(Order::class, 'order_items', 'variant_id', 'order_id')->distinct();
+        return $this->belongsToMany(Order::class, 'order_items', self::orderItemsVariantForeignKey(), 'order_id')->distinct();
+    }
+
+    private static function orderItemsVariantForeignKey(): string
+    {
+        if (Schema::hasColumn('order_items', 'product_variant_id')) {
+            return 'product_variant_id';
+        }
+
+        return 'variant_id';
     }
 
     /**
