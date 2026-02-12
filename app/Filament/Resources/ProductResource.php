@@ -29,6 +29,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Schema as SchemaFacade;
 use UnitEnum;
 
 final class ProductResource extends BaseResource
@@ -101,7 +102,7 @@ final class ProductResource extends BaseResource
 
     public static function getRelations(): array
     {
-        return [
+        $relations = [
             VariantsRelationManager::class,
             VariantCombinationsRelationManager::class,
             PricesRelationManager::class,
@@ -113,9 +114,14 @@ final class ProductResource extends BaseResource
             InventoryRelationManager::class,
             CategoriesRelationManager::class,
             CollectionsRelationManager::class,
-            DiscountsRelationManager::class,
             CommentsRelationManager::class,
         ];
+
+        if (SchemaFacade::hasTable('discounts') && SchemaFacade::hasTable('discount_products')) {
+            $relations[] = DiscountsRelationManager::class;
+        }
+
+        return $relations;
     }
 
     public static function getPages(): array

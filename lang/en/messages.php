@@ -488,6 +488,7 @@ return [
     'email'                                                                          => 'Email',
     'email_verified_at'                                                              => 'Email Verified At',
     'enabled'                                                                        => 'Enabled',
+    'comments'                                                                       => 'Comments',
     'enter_description_placeholder'                                                  => 'Enter a description...',
     'export_filters_help'                                                            => 'Export filters help',
     'exports'                                                                        => 'Exports',

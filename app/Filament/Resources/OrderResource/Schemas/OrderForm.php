@@ -20,6 +20,7 @@ use Filament\Forms\Set;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use BackedEnum;
 use Illuminate\Support\Str;
 
 class OrderForm
@@ -38,7 +39,7 @@ class OrderForm
                         Select::make('status')
                             ->label(__('messages.status'))
                             ->options(OrderStatus::options())
-                            ->getOptionLabelUsing(static fn ($value): ?string => OrderStatus::tryFrom((string) $value)?->label() ?? Str::headline((string) $value))
+                            ->getOptionLabelUsing(static fn ($value): ?string => OrderStatus::tryFrom(self::normalizeEnumValue($value))?->label() ?? Str::headline(self::normalizeEnumValue($value)))
                             ->required()
                             ->default(OrderStatus::PENDING),
                         Select::make('currency')
@@ -337,11 +338,11 @@ class OrderForm
                         Select::make('payment_method')
                             ->label(__('messages.payment_method'))
                             ->options(PaymentMethod::options())
-                            ->getOptionLabelUsing(static fn ($value): ?string => PaymentMethod::tryFrom((string) $value)?->getLabel() ?? Str::headline((string) $value)),
+                            ->getOptionLabelUsing(static fn ($value): ?string => PaymentMethod::tryFrom(self::normalizeEnumValue($value))?->getLabel() ?? Str::headline(self::normalizeEnumValue($value))),
                         Select::make('payment_status')
                             ->label(__('messages.payment_status'))
                             ->options(PaymentStatus::options())
-                            ->getOptionLabelUsing(static fn ($value): ?string => PaymentStatus::tryFrom((string) $value)?->getLabel() ?? Str::headline((string) $value))
+                            ->getOptionLabelUsing(static fn ($value): ?string => PaymentStatus::tryFrom(self::normalizeEnumValue($value))?->getLabel() ?? Str::headline(self::normalizeEnumValue($value)))
                             ->required(),
                     ])->columns(2)
                     ->columnSpanFull(),
@@ -361,5 +362,18 @@ class OrderForm
                     ])->columns(4)
                     ->columnSpanFull(),
             ]);
+    }
+
+    private static function normalizeEnumValue(mixed $value): string
+    {
+        if ($value instanceof BackedEnum) {
+            return (string) $value->value;
+        }
+
+        if (is_scalar($value) || $value === null) {
+            return (string) ($value ?? '');
+        }
+
+        return '';
     }
 }

@@ -488,6 +488,7 @@ return [
     'email'                                                                          => 'El. paštas',
     'email_verified_at'                                                              => 'El. pašto patvirtinimo data',
     'enabled'                                                                        => 'Įjungta',
+    'comments'                                                                       => 'Komentarai',
     'enter_description_placeholder'                                                  => 'Įveskite aprašymą...',
     'export_filters_help'                                                            => 'Export filters help',
     'exports'                                                                        => 'Exports',

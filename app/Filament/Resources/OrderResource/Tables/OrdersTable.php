@@ -14,6 +14,7 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use BackedEnum;
 use Illuminate\Support\Str;
 
 class OrdersTable
@@ -33,7 +34,7 @@ class OrdersTable
                     ->sortable(),
                 TextColumn::make('status')
                     ->label(__('messages.status'))
-                    ->formatStateUsing(static fn ($state): string => OrderStatus::tryFrom((string) $state)?->label() ?? Str::headline((string) $state))
+                    ->formatStateUsing(static fn ($state): string => OrderStatus::tryFrom(self::normalizeEnumValue($state))?->label() ?? Str::headline(self::normalizeEnumValue($state)))
                     ->badge()
                     ->searchable(),
                 TextColumn::make('total')
@@ -42,7 +43,7 @@ class OrdersTable
                     ->sortable(),
                 TextColumn::make('payment_status')
                     ->label(__('messages.payment_status'))
-                    ->formatStateUsing(static fn ($state): string => PaymentStatus::tryFrom((string) $state)?->getLabel() ?? Str::headline((string) $state))
+                    ->formatStateUsing(static fn ($state): string => PaymentStatus::tryFrom(self::normalizeEnumValue($state))?->getLabel() ?? Str::headline(self::normalizeEnumValue($state)))
                     ->badge()
                     ->searchable(),
                 TextColumn::make('created_at')
@@ -75,5 +76,18 @@ class OrdersTable
                     DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+    private static function normalizeEnumValue(mixed $value): string
+    {
+        if ($value instanceof BackedEnum) {
+            return (string) $value->value;
+        }
+
+        if (is_scalar($value) || $value === null) {
+            return (string) ($value ?? '');
+        }
+
+        return '';
     }
 }

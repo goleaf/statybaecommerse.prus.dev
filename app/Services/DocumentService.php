@@ -6,7 +6,6 @@ namespace App\Services;
 
 use App\Contracts\DocumentServiceContract;
 use App\Enums\OrderStatus;
-use App\Enums\PaymentMethod;
 use App\Models\Document;
 use App\Models\DocumentTemplate;
 use App\Models\Order;
@@ -535,9 +534,7 @@ HTML;
         $shippingAddressFormatted = $this->formatAddress($shippingAddress);
 
         $orderStatus = $order->status;
-        $orderStatusValue = $orderStatus instanceof OrderStatus
-            ? $orderStatus->value
-            : (is_string($orderStatus) ? $orderStatus : '');
+        $orderStatusValue = $this->normalizeTemplateScalar($orderStatus);
         $orderStatusLabel = $orderStatus instanceof OrderStatus
             ? $orderStatus->label()
             : (OrderStatus::tryFrom($orderStatusValue)?->label() ?? $orderStatusValue);
@@ -552,14 +549,14 @@ HTML;
             'order_discount'        => $this->formatMoney($discountAmount),
             'order_status'          => $orderStatusValue,
             'order_status_label'    => $orderStatusLabel,
-            'order_payment_method'  => $order->payment_method instanceof PaymentMethod ? $order->payment_method->value : (string) ($order->payment_method ?? ''),
+            'order_payment_method'  => $this->normalizeTemplateScalar($order->payment_method),
             'order_shipping_method' => (string) ($order->shippingOption?->name ?? ''),
             'invoice_number'        => $order->number ?? $order->id,
             'invoice_date'          => $date->format($dateFormat),
             'receipt_number'        => $order->number ?? $order->id,
             'receipt_date'          => $date->format($dateFormat),
             'receipt_time'          => $date->format($timeFormat),
-            'payment_method'        => $order->payment_method instanceof PaymentMethod ? $order->payment_method->value : (string) ($order->payment_method ?? ''),
+            'payment_method'        => $this->normalizeTemplateScalar($order->payment_method),
             'payment_due_date'      => '',
             'issuer_name'           => Auth::user()?->name ?? $companyName,
             'cashier_name'          => Auth::user()?->name ?? '',
@@ -884,5 +881,26 @@ HTML;
     private function escapeHtml(string $value): string
     {
         return htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    }
+
+    private function normalizeTemplateScalar(mixed $value): string
+    {
+        if ($value instanceof BackedEnum) {
+            return (string) $value->value;
+        }
+
+        if ($value instanceof \UnitEnum) {
+            return $value->name;
+        }
+
+        if ($value instanceof Stringable) {
+            return (string) $value;
+        }
+
+        if (is_scalar($value) || $value === null) {
+            return (string) ($value ?? '');
+        }
+
+        return '';
     }
 }

@@ -485,6 +485,7 @@ return [
     'email'                                                                          => 'Email',
     'email_verified_at'                                                              => 'Email Verified At',
     'enabled'                                                                        => 'Enabled',
+    'comments'                                                                       => 'Комментарии',
     'export_filters_help'                                                            => 'Export filters help',
     'exports'                                                                        => 'Exports',
     'feature_key'                                                                    => 'Ключ характеристики',
