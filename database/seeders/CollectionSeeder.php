@@ -39,12 +39,15 @@ final class CollectionSeeder extends BaseSeeder
             $primaryTranslation = $definition['translations']['en'];
 
             // Check if collection already exists to maintain idempotency
-            $existingCollection = Collection::where('slug', $slug)->first();
+            $existingCollection = Collection::withoutGlobalScopes()
+                ->where('slug', $slug)
+                ->first();
 
             if ($existingCollection) {
                 $existingCollection->update([
                     'name'         => $primaryTranslation['name'],
                     'sort_order'   => $definition['sort_order'],
+                    'is_active'    => true,
                     'is_visible'   => true,
                     'is_automatic' => $definition['is_automatic'] ?? false,
                     'display_type' => $definition['display_type'] ?? 'grid',
@@ -57,6 +60,7 @@ final class CollectionSeeder extends BaseSeeder
                         'slug'         => $slug,
                         'name'         => $primaryTranslation['name'],
                         'sort_order'   => $definition['sort_order'],
+                        'is_active'    => true,
                         'is_visible'   => true,
                         'is_automatic' => $definition['is_automatic'] ?? false,
                         'display_type' => $definition['display_type'] ?? 'grid',
