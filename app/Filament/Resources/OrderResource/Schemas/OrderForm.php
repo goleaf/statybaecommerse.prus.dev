@@ -20,6 +20,7 @@ use Filament\Forms\Set;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Illuminate\Support\Str;
 
 class OrderForm
 {
@@ -37,6 +38,7 @@ class OrderForm
                         Select::make('status')
                             ->label(__('messages.status'))
                             ->options(OrderStatus::options())
+                            ->getOptionLabelUsing(static fn ($value): ?string => OrderStatus::tryFrom((string) $value)?->label() ?? Str::headline((string) $value))
                             ->required()
                             ->default(OrderStatus::PENDING),
                         Select::make('currency')
@@ -334,10 +336,12 @@ class OrderForm
                     ->schema([
                         Select::make('payment_method')
                             ->label(__('messages.payment_method'))
-                            ->options(PaymentMethod::options()),
+                            ->options(PaymentMethod::options())
+                            ->getOptionLabelUsing(static fn ($value): ?string => PaymentMethod::tryFrom((string) $value)?->getLabel() ?? Str::headline((string) $value)),
                         Select::make('payment_status')
                             ->label(__('messages.payment_status'))
                             ->options(PaymentStatus::options())
+                            ->getOptionLabelUsing(static fn ($value): ?string => PaymentStatus::tryFrom((string) $value)?->getLabel() ?? Str::headline((string) $value))
                             ->required(),
                     ])->columns(2)
                     ->columnSpanFull(),

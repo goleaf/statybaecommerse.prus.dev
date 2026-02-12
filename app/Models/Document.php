@@ -123,6 +123,16 @@ final class Document extends Model
     }
 
     /**
+     * Backward-compatible alias for legacy Filament resources.
+     *
+     * @return BelongsTo<DocumentTemplate, Document>
+     */
+    public function documentTemplate(): BelongsTo
+    {
+        return $this->template();
+    }
+
+    /**
      * Handle documentable functionality with proper error handling.
      *
      * @return MorphTo<Model, Document>

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ProductResource\RelationManagers;
 
-use Filament\Actions\AssociateAction;
+use Filament\Actions\AttachAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
@@ -90,15 +90,18 @@ class VariantsRelationManager extends RelationManager
             ])
             ->headerActions([
                 CreateAction::make()
-                    ->mutateFormDataUsing(function (array $data, RelationManager $livewire): array {
-                        $data['product_id'] = $livewire->getOwnerRecord()->getKey();
-
-                        return $data;
-                    }),
-                AssociateAction::make()
+                    ->relationship(fn () => null)
+                    ->mutateFormDataUsing(fn (array $data): array => [
+                        ...$data,
+                        'product_id' => $this->getOwnerRecord()->getKey(),
+                    ]),
+                AttachAction::make()
                     ->preloadRecordSelect()
                     ->recordSelectSearchColumns(['sku', 'name'])
-                    ->recordSelectOptionsQuery(static fn (Builder $query): Builder => $query->withoutGlobalScopes()),
+                    ->recordSelectOptionsQuery(fn (Builder $query): Builder => $query
+                        ->withoutGlobalScopes()
+                        ->whereDoesntHave('products', fn (Builder $productsQuery): Builder => $productsQuery
+                            ->whereKey($this->getOwnerRecord()->getKey()))),
             ])
             ->actions([
                 EditAction::make(),

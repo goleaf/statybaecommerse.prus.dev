@@ -575,6 +575,7 @@ return [
         'commerce'         => 'E-prekyba',
         'contact_messages' => 'Susisiekimo žinutės',
         'content'          => 'Turinys',
+        'coupons'          => 'Kuponai',
         'customers'        => 'Klientai',
         'dashboard'        => 'Skydelis',
         'marketing'        => 'Rinkodara',

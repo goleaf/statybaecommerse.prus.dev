@@ -572,6 +572,7 @@ return [
         'commerce'         => 'Commerce',
         'contact_messages' => 'Contact Messages',
         'content'          => 'Content',
+        'coupons'          => 'Купоны',
         'customers'        => 'Customers',
         'dashboard'        => 'Dashboard',
         'marketing'        => 'Marketing',

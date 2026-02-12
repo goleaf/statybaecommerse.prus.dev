@@ -647,9 +647,9 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     /**
      * Handle notifications functionality with proper error handling.
      */
-    public function notifications(): HasMany
+    public function notifications(): MorphMany
     {
-        return $this->hasMany(\App\Models\Notification::class);
+        return $this->morphMany(\App\Models\Notification::class, 'notifiable');
     }
 
     /**

@@ -13,6 +13,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Schema as SchemaFacade;
 use UnitEnum;
 
 final class DiscountResource extends BaseResource
@@ -99,14 +100,33 @@ final class DiscountResource extends BaseResource
 
     public static function getRelations(): array
     {
-        return [
-            \App\Filament\Resources\DiscountResource\RelationManagers\ProductsRelationManager::class,
-            \App\Filament\Resources\DiscountResource\RelationManagers\CategoriesRelationManager::class,
-            \App\Filament\Resources\DiscountResource\RelationManagers\BrandsRelationManager::class,
-            \App\Filament\Resources\DiscountResource\RelationManagers\CollectionsRelationManager::class,
-            \App\Filament\Resources\DiscountResource\RelationManagers\CustomerGroupsRelationManager::class,
-            \App\Filament\Resources\DiscountResource\RelationManagers\RedemptionsRelationManager::class,
-        ];
+        $relations = [];
+
+        if (SchemaFacade::hasTable('discount_products')) {
+            $relations[] = \App\Filament\Resources\DiscountResource\RelationManagers\ProductsRelationManager::class;
+        }
+
+        if (SchemaFacade::hasTable('discount_categories')) {
+            $relations[] = \App\Filament\Resources\DiscountResource\RelationManagers\CategoriesRelationManager::class;
+        }
+
+        if (SchemaFacade::hasTable('discount_brands')) {
+            $relations[] = \App\Filament\Resources\DiscountResource\RelationManagers\BrandsRelationManager::class;
+        }
+
+        if (SchemaFacade::hasTable('discount_collections')) {
+            $relations[] = \App\Filament\Resources\DiscountResource\RelationManagers\CollectionsRelationManager::class;
+        }
+
+        if (SchemaFacade::hasTable('discount_customer_groups')) {
+            $relations[] = \App\Filament\Resources\DiscountResource\RelationManagers\CustomerGroupsRelationManager::class;
+        }
+
+        if (SchemaFacade::hasTable('discount_redemptions')) {
+            $relations[] = \App\Filament\Resources\DiscountResource\RelationManagers\RedemptionsRelationManager::class;
+        }
+
+        return $relations;
     }
 
     public static function getPages(): array

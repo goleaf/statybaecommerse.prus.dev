@@ -1,92 +1,185 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="Tests\Feature\Filament\Resources\OrderResourceTest" file="tests\Feature\Filament\Resources\OrderResourceTest.php" tests="6" assertions="18" errors="2" failures="0" skipped="0" time="11.294402">
-    <testcase name="it can delete an order" file="tests\Feature\Filament\Resources\OrderResourceTest.php::it can delete an order" class="Tests\Feature\Filament\Resources\OrderResourceTest" classname="Tests.Feature.Filament.Resources.OrderResourceTest" assertions="2" time="9.004836">
-      <error type="BadMethodCallException">it can delete an orderBadMethodCallException: Call to undefined method App\Models\Order::getDeletedAtColumn()&#13;
-at vendor\laravel\framework\src\Illuminate\Support\Traits\ForwardsCalls.php:67
-at vendor\laravel\framework\src\Illuminate\Support\Traits\ForwardsCalls.php:36
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:2540
-at vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\InteractsWithDatabase.php:339
-at vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\InteractsWithDatabase.php:150
-at tests\Feature\Filament\Resources\OrderResourceTest.php:94</error>
-    </testcase>
-    <testcase name="it can edit an order" file="tests\Feature\Filament\Resources\OrderResourceTest.php::it can edit an order" class="Tests\Feature\Filament\Resources\OrderResourceTest" classname="Tests.Feature.Filament.Resources.OrderResourceTest" assertions="2" time="0.494387"/>
-    <testcase name="it can list orders" file="tests\Feature\Filament\Resources\OrderResourceTest.php::it can list orders" class="Tests\Feature\Filament\Resources\OrderResourceTest" classname="Tests.Feature.Filament.Resources.OrderResourceTest" assertions="11" time="0.518427"/>
-    <testcase name="it creates an order with products, services, and documents" file="tests\Feature\Filament\Resources\OrderResourceTest.php::it creates an order with products, services, and documents" class="Tests\Feature\Filament\Resources\OrderResourceTest" classname="Tests.Feature.Filament.Resources.OrderResourceTest" assertions="0" time="0.581043">
-      <error type="Error">it creates an order with products, services, and documentsError: Call to undefined method Illuminate\Notifications\Messages\MailMessage::locale()&#13;
-at app\Notifications\DocumentGenerated.php:50
-at vendor\laravel\framework\src\Illuminate\Notifications\Channels\MailChannel.php:55
-at vendor\laravel\framework\src\Illuminate\Notifications\NotificationSender.php:163
-at vendor\laravel\framework\src\Illuminate\Notifications\NotificationSender.php:118
-at vendor\laravel\framework\src\Illuminate\Support\Traits\Localizable.php:19
-at vendor\laravel\framework\src\Illuminate\Notifications\NotificationSender.php:113
-at vendor\laravel\framework\src\Illuminate\Notifications\ChannelManager.php:60
-at vendor\laravel\framework\src\Illuminate\Notifications\SendQueuedNotifications.php:118
+  <testsuite name="Tests\Feature\ProductVariantResourceTest" file="Product Variant Resource (Tests\Feature\ProductVariantResource)" tests="3" assertions="0" errors="3" failures="0" skipped="0" time="0.000000">
+    <testcase name="List page displays variants with product context" file="Product Variant Resource (Tests\Feature\ProductVariantResource)::List page displays variants with product context" class="Tests\Feature\ProductVariantResourceTest" classname="Tests.Feature.ProductVariantResourceTest" assertions="0" time="0.000000">
+      <error type="Illuminate\Contracts\Container\BindingResolutionException">List page displays variants with product contextIlluminate\Contracts\Container\BindingResolutionException: Target class [Database\Seeders\RolesAndPermissionsSeeder] does not exist.&#13;
+at vendor\laravel\framework\src\Illuminate\Container\Container.php:1122
+at vendor\laravel\framework\src\Illuminate\Container\Container.php:933
+at vendor\laravel\framework\src\Illuminate\Foundation\Application.php:1078
+at vendor\laravel\framework\src\Illuminate\Container\Container.php:864
+at vendor\laravel\framework\src\Illuminate\Foundation\Application.php:1058
+at vendor\laravel\framework\src\Illuminate\Database\Console\Seeds\SeedCommand.php:99
+at app\Console\Commands\ProfiledSeedCommand.php:56
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Concerns\GuardsAttributes.php:157
+at app\Console\Commands\ProfiledSeedCommand.php:55
 at vendor\laravel\framework\src\Illuminate\Container\BoundMethod.php:36
 at vendor\laravel\framework\src\Illuminate\Container\Util.php:43
 at vendor\laravel\framework\src\Illuminate\Container\BoundMethod.php:96
 at vendor\laravel\framework\src\Illuminate\Container\BoundMethod.php:35
 at vendor\laravel\framework\src\Illuminate\Container\Container.php:799
-at vendor\laravel\framework\src\Illuminate\Bus\Dispatcher.php:129
-at vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php:180
-at vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php:137
-at vendor\laravel\framework\src\Illuminate\Bus\Dispatcher.php:133
-at vendor\laravel\framework\src\Illuminate\Queue\CallQueuedHandler.php:135
-at vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php:180
-at vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php:137
-at vendor\laravel\framework\src\Illuminate\Queue\CallQueuedHandler.php:128
-at vendor\laravel\framework\src\Illuminate\Queue\CallQueuedHandler.php:69
-at vendor\laravel\framework\src\Illuminate\Queue\Jobs\Job.php:102
-at vendor\laravel\framework\src\Illuminate\Queue\SyncQueue.php:131
-at vendor\laravel\framework\src\Illuminate\Queue\SyncQueue.php:111
-at vendor\laravel\framework\src\Illuminate\Bus\Dispatcher.php:246
-at vendor\laravel\framework\src\Illuminate\Bus\Dispatcher.php:230
-at vendor\laravel\framework\src\Illuminate\Bus\Dispatcher.php:80
-at vendor\laravel\framework\src\Illuminate\Notifications\NotificationSender.php:271
-at vendor\laravel\framework\src\Illuminate\Notifications\NotificationSender.php:88
-at vendor\laravel\framework\src\Illuminate\Notifications\ChannelManager.php:47
-at vendor\laravel\framework\src\Illuminate\Notifications\RoutesNotifications.php:18
-at app\Services\DocumentService.php:113
-at app\Filament\Resources\OrderResource\Pages\CreateOrder.php:112
-at app\Filament\Resources\OrderResource\Pages\CreateOrder.php:60
-at vendor\filament\filament\src\Pages\BasePage.php:140
-at vendor\filament\filament\src\Resources\Pages\CreateRecord.php:109
+at vendor\laravel\framework\src\Illuminate\Console\Command.php:211
+at vendor\symfony\console\Command\Command.php:341
+at vendor\laravel\framework\src\Illuminate\Console\Command.php:180
+at vendor\symfony\console\Application.php:1079
+at vendor\symfony\console\Application.php:356
+at vendor\symfony\console\Application.php:195
+at vendor\laravel\framework\src\Illuminate\Console\Application.php:165
+at vendor\laravel\framework\src\Illuminate\Foundation\Console\Kernel.php:447
+at vendor\laravel\framework\src\Illuminate\Testing\PendingCommand.php:451
+at vendor\laravel\framework\src\Illuminate\Testing\PendingCommand.php:675
+at vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\InteractsWithConsole.php:87
+at vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\InteractsWithDatabase.php:362
+at tests\Feature\ProductVariantResourceTest.php:29
+Caused by
+ReflectionException: Class "Database\Seeders\RolesAndPermissionsSeeder" does not exist
+
+at vendor\laravel\framework\src\Illuminate\Container\Container.php:1122
+at vendor\laravel\framework\src\Illuminate\Container\Container.php:933
+at vendor\laravel\framework\src\Illuminate\Foundation\Application.php:1078
+at vendor\laravel\framework\src\Illuminate\Container\Container.php:864
+at vendor\laravel\framework\src\Illuminate\Foundation\Application.php:1058
+at vendor\laravel\framework\src\Illuminate\Database\Console\Seeds\SeedCommand.php:99
+at app\Console\Commands\ProfiledSeedCommand.php:56
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Concerns\GuardsAttributes.php:157
+at app\Console\Commands\ProfiledSeedCommand.php:55
 at vendor\laravel\framework\src\Illuminate\Container\BoundMethod.php:36
 at vendor\laravel\framework\src\Illuminate\Container\Util.php:43
 at vendor\laravel\framework\src\Illuminate\Container\BoundMethod.php:96
 at vendor\laravel\framework\src\Illuminate\Container\BoundMethod.php:35
-at vendor\livewire\livewire\src\Wrapped.php:23
-at vendor\livewire\livewire\src\Mechanisms\HandleComponents\HandleComponents.php:492
-at vendor\livewire\livewire\src\Mechanisms\HandleComponents\HandleComponents.php:101
-at vendor\livewire\livewire\src\LivewireManager.php:102
-at vendor\livewire\livewire\src\Mechanisms\HandleRequests\HandleRequests.php:131
-at vendor\laravel\framework\src\Illuminate\Routing\ControllerDispatcher.php:46
-at vendor\laravel\framework\src\Illuminate\Routing\Route.php:265
-at vendor\laravel\framework\src\Illuminate\Routing\Route.php:211
-at vendor\laravel\framework\src\Illuminate\Routing\Router.php:822
-at vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php:180
-at vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php:137
-at vendor\laravel\framework\src\Illuminate\Routing\Router.php:821
-at vendor\laravel\framework\src\Illuminate\Routing\Router.php:800
-at vendor\laravel\framework\src\Illuminate\Routing\Router.php:764
-at vendor\laravel\framework\src\Illuminate\Routing\Router.php:753
-at vendor\laravel\framework\src\Illuminate\Foundation\Http\Kernel.php:200
-at vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php:180
-at vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php:137
-at vendor\laravel\framework\src\Illuminate\Foundation\Http\Kernel.php:175
-at vendor\laravel\framework\src\Illuminate\Foundation\Http\Kernel.php:144
-at vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\MakesHttpRequests.php:607
-at vendor\livewire\livewire\src\Features\SupportTesting\SubsequentRender.php:36
-at vendor\livewire\livewire\src\Features\SupportTesting\RequestBroker.php:30
-at vendor\livewire\livewire\src\Features\SupportTesting\SubsequentRender.php:35
-at vendor\livewire\livewire\src\Features\SupportTesting\Render.php:24
-at vendor\livewire\livewire\src\Features\SupportTesting\SubsequentRender.php:34
-at vendor\livewire\livewire\src\Features\SupportTesting\SubsequentRender.php:16
-at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:252
-at vendor\livewire\livewire\src\Features\SupportTesting\Testable.php:219
-at tests\Feature\Filament\Resources\OrderResourceTest.php:140</error>
+at vendor\laravel\framework\src\Illuminate\Container\Container.php:799
+at vendor\laravel\framework\src\Illuminate\Console\Command.php:211
+at vendor\symfony\console\Command\Command.php:341
+at vendor\laravel\framework\src\Illuminate\Console\Command.php:180
+at vendor\symfony\console\Application.php:1079
+at vendor\symfony\console\Application.php:356
+at vendor\symfony\console\Application.php:195
+at vendor\laravel\framework\src\Illuminate\Console\Application.php:165
+at vendor\laravel\framework\src\Illuminate\Foundation\Console\Kernel.php:447
+at vendor\laravel\framework\src\Illuminate\Testing\PendingCommand.php:451
+at vendor\laravel\framework\src\Illuminate\Testing\PendingCommand.php:675
+at vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\InteractsWithConsole.php:87
+at vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\InteractsWithDatabase.php:362
+at tests\Feature\ProductVariantResourceTest.php:29</error>
     </testcase>
-    <testcase name="it can create an order" file="tests\Feature\Filament\Resources\OrderResourceTest.php::it can create an order" class="Tests\Feature\Filament\Resources\OrderResourceTest" classname="Tests.Feature.Filament.Resources.OrderResourceTest" assertions="2" time="0.405505"/>
-    <testcase name="it can render create order page" file="tests\Feature\Filament\Resources\OrderResourceTest.php::it can render create order page" class="Tests\Feature\Filament\Resources\OrderResourceTest" classname="Tests.Feature.Filament.Resources.OrderResourceTest" assertions="1" time="0.290204"/>
+    <testcase name="Product lookup filter restricts results by name" file="Product Variant Resource (Tests\Feature\ProductVariantResource)::Product lookup filter restricts results by name" class="Tests\Feature\ProductVariantResourceTest" classname="Tests.Feature.ProductVariantResourceTest" assertions="0" time="0.000000">
+      <error type="Illuminate\Contracts\Container\BindingResolutionException">Product lookup filter restricts results by nameIlluminate\Contracts\Container\BindingResolutionException: Target class [Database\Seeders\RolesAndPermissionsSeeder] does not exist.&#13;
+at vendor\laravel\framework\src\Illuminate\Container\Container.php:1122
+at vendor\laravel\framework\src\Illuminate\Container\Container.php:933
+at vendor\laravel\framework\src\Illuminate\Foundation\Application.php:1078
+at vendor\laravel\framework\src\Illuminate\Container\Container.php:864
+at vendor\laravel\framework\src\Illuminate\Foundation\Application.php:1058
+at vendor\laravel\framework\src\Illuminate\Database\Console\Seeds\SeedCommand.php:99
+at app\Console\Commands\ProfiledSeedCommand.php:56
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Concerns\GuardsAttributes.php:157
+at app\Console\Commands\ProfiledSeedCommand.php:55
+at vendor\laravel\framework\src\Illuminate\Container\BoundMethod.php:36
+at vendor\laravel\framework\src\Illuminate\Container\Util.php:43
+at vendor\laravel\framework\src\Illuminate\Container\BoundMethod.php:96
+at vendor\laravel\framework\src\Illuminate\Container\BoundMethod.php:35
+at vendor\laravel\framework\src\Illuminate\Container\Container.php:799
+at vendor\laravel\framework\src\Illuminate\Console\Command.php:211
+at vendor\symfony\console\Command\Command.php:341
+at vendor\laravel\framework\src\Illuminate\Console\Command.php:180
+at vendor\symfony\console\Application.php:1079
+at vendor\symfony\console\Application.php:356
+at vendor\symfony\console\Application.php:195
+at vendor\laravel\framework\src\Illuminate\Console\Application.php:165
+at vendor\laravel\framework\src\Illuminate\Foundation\Console\Kernel.php:447
+at vendor\laravel\framework\src\Illuminate\Testing\PendingCommand.php:451
+at vendor\laravel\framework\src\Illuminate\Testing\PendingCommand.php:675
+at vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\InteractsWithConsole.php:87
+at vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\InteractsWithDatabase.php:362
+at tests\Feature\ProductVariantResourceTest.php:29
+Caused by
+ReflectionException: Class "Database\Seeders\RolesAndPermissionsSeeder" does not exist
+
+at vendor\laravel\framework\src\Illuminate\Container\Container.php:1122
+at vendor\laravel\framework\src\Illuminate\Container\Container.php:933
+at vendor\laravel\framework\src\Illuminate\Foundation\Application.php:1078
+at vendor\laravel\framework\src\Illuminate\Container\Container.php:864
+at vendor\laravel\framework\src\Illuminate\Foundation\Application.php:1058
+at vendor\laravel\framework\src\Illuminate\Database\Console\Seeds\SeedCommand.php:99
+at app\Console\Commands\ProfiledSeedCommand.php:56
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Concerns\GuardsAttributes.php:157
+at app\Console\Commands\ProfiledSeedCommand.php:55
+at vendor\laravel\framework\src\Illuminate\Container\BoundMethod.php:36
+at vendor\laravel\framework\src\Illuminate\Container\Util.php:43
+at vendor\laravel\framework\src\Illuminate\Container\BoundMethod.php:96
+at vendor\laravel\framework\src\Illuminate\Container\BoundMethod.php:35
+at vendor\laravel\framework\src\Illuminate\Container\Container.php:799
+at vendor\laravel\framework\src\Illuminate\Console\Command.php:211
+at vendor\symfony\console\Command\Command.php:341
+at vendor\laravel\framework\src\Illuminate\Console\Command.php:180
+at vendor\symfony\console\Application.php:1079
+at vendor\symfony\console\Application.php:356
+at vendor\symfony\console\Application.php:195
+at vendor\laravel\framework\src\Illuminate\Console\Application.php:165
+at vendor\laravel\framework\src\Illuminate\Foundation\Console\Kernel.php:447
+at vendor\laravel\framework\src\Illuminate\Testing\PendingCommand.php:451
+at vendor\laravel\framework\src\Illuminate\Testing\PendingCommand.php:675
+at vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\InteractsWithConsole.php:87
+at vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\InteractsWithDatabase.php:362
+at tests\Feature\ProductVariantResourceTest.php:29</error>
+    </testcase>
+    <testcase name="Stock status filter exposes out of stock variants" file="Product Variant Resource (Tests\Feature\ProductVariantResource)::Stock status filter exposes out of stock variants" class="Tests\Feature\ProductVariantResourceTest" classname="Tests.Feature.ProductVariantResourceTest" assertions="0" time="0.000000">
+      <error type="Illuminate\Contracts\Container\BindingResolutionException">Stock status filter exposes out of stock variantsIlluminate\Contracts\Container\BindingResolutionException: Target class [Database\Seeders\RolesAndPermissionsSeeder] does not exist.&#13;
+at vendor\laravel\framework\src\Illuminate\Container\Container.php:1122
+at vendor\laravel\framework\src\Illuminate\Container\Container.php:933
+at vendor\laravel\framework\src\Illuminate\Foundation\Application.php:1078
+at vendor\laravel\framework\src\Illuminate\Container\Container.php:864
+at vendor\laravel\framework\src\Illuminate\Foundation\Application.php:1058
+at vendor\laravel\framework\src\Illuminate\Database\Console\Seeds\SeedCommand.php:99
+at app\Console\Commands\ProfiledSeedCommand.php:56
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Concerns\GuardsAttributes.php:157
+at app\Console\Commands\ProfiledSeedCommand.php:55
+at vendor\laravel\framework\src\Illuminate\Container\BoundMethod.php:36
+at vendor\laravel\framework\src\Illuminate\Container\Util.php:43
+at vendor\laravel\framework\src\Illuminate\Container\BoundMethod.php:96
+at vendor\laravel\framework\src\Illuminate\Container\BoundMethod.php:35
+at vendor\laravel\framework\src\Illuminate\Container\Container.php:799
+at vendor\laravel\framework\src\Illuminate\Console\Command.php:211
+at vendor\symfony\console\Command\Command.php:341
+at vendor\laravel\framework\src\Illuminate\Console\Command.php:180
+at vendor\symfony\console\Application.php:1079
+at vendor\symfony\console\Application.php:356
+at vendor\symfony\console\Application.php:195
+at vendor\laravel\framework\src\Illuminate\Console\Application.php:165
+at vendor\laravel\framework\src\Illuminate\Foundation\Console\Kernel.php:447
+at vendor\laravel\framework\src\Illuminate\Testing\PendingCommand.php:451
+at vendor\laravel\framework\src\Illuminate\Testing\PendingCommand.php:675
+at vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\InteractsWithConsole.php:87
+at vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\InteractsWithDatabase.php:362
+at tests\Feature\ProductVariantResourceTest.php:29
+Caused by
+ReflectionException: Class "Database\Seeders\RolesAndPermissionsSeeder" does not exist
+
+at vendor\laravel\framework\src\Illuminate\Container\Container.php:1122
+at vendor\laravel\framework\src\Illuminate\Container\Container.php:933
+at vendor\laravel\framework\src\Illuminate\Foundation\Application.php:1078
+at vendor\laravel\framework\src\Illuminate\Container\Container.php:864
+at vendor\laravel\framework\src\Illuminate\Foundation\Application.php:1058
+at vendor\laravel\framework\src\Illuminate\Database\Console\Seeds\SeedCommand.php:99
+at app\Console\Commands\ProfiledSeedCommand.php:56
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Concerns\GuardsAttributes.php:157
+at app\Console\Commands\ProfiledSeedCommand.php:55
+at vendor\laravel\framework\src\Illuminate\Container\BoundMethod.php:36
+at vendor\laravel\framework\src\Illuminate\Container\Util.php:43
+at vendor\laravel\framework\src\Illuminate\Container\BoundMethod.php:96
+at vendor\laravel\framework\src\Illuminate\Container\BoundMethod.php:35
+at vendor\laravel\framework\src\Illuminate\Container\Container.php:799
+at vendor\laravel\framework\src\Illuminate\Console\Command.php:211
+at vendor\symfony\console\Command\Command.php:341
+at vendor\laravel\framework\src\Illuminate\Console\Command.php:180
+at vendor\symfony\console\Application.php:1079
+at vendor\symfony\console\Application.php:356
+at vendor\symfony\console\Application.php:195
+at vendor\laravel\framework\src\Illuminate\Console\Application.php:165
+at vendor\laravel\framework\src\Illuminate\Foundation\Console\Kernel.php:447
+at vendor\laravel\framework\src\Illuminate\Testing\PendingCommand.php:451
+at vendor\laravel\framework\src\Illuminate\Testing\PendingCommand.php:675
+at vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\InteractsWithConsole.php:87
+at vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\InteractsWithDatabase.php:362
+at tests\Feature\ProductVariantResourceTest.php:29</error>
+    </testcase>
   </testsuite>
 </testsuites>

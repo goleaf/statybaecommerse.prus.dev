@@ -759,6 +759,7 @@ return [
     'shared'                                                                         => 'Shared',
     'shipped_at'                                                                     => 'Išsiųsta',
     'shipping'                                                                       => 'Pristatymas',
+    'shipping_method'                                                                => 'Pristatymo būdas',
     'shipping_capped_at_amount'                                                      => 'Pristatymas ribojamas iki :amount',
     'short_description'                                                              => 'Trumpas aprašymas',
     'similar_product'                                                                => 'Panašus produktas',

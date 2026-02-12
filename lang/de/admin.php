@@ -572,6 +572,7 @@ return [
         'commerce'         => 'E-Commerce',
         'contact_messages' => 'Kontaktanfragen',
         'content'          => 'Inhalt',
+        'coupons'          => 'Gutscheine',
         'customers'        => 'Kunden',
         'dashboard'        => 'Dashboard',
         'marketing'        => 'Marketing',

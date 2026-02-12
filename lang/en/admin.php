@@ -575,6 +575,7 @@ return [
         'commerce'         => 'Commerce',
         'contact_messages' => 'Contact Messages',
         'content'          => 'Content',
+        'coupons'          => 'Coupons',
         'customers'        => 'Customers',
         'dashboard'        => 'Dashboard',
         'marketing'        => 'Marketing',

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\OrderResource\Tables;
 
+use App\Enums\OrderStatus;
+use App\Enums\PaymentStatus;
 use App\Enums\ExportType;
 use App\Filament\Actions\RequestExportBulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -12,6 +14,7 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
 
 class OrdersTable
 {
@@ -30,6 +33,7 @@ class OrdersTable
                     ->sortable(),
                 TextColumn::make('status')
                     ->label(__('messages.status'))
+                    ->formatStateUsing(static fn ($state): string => OrderStatus::tryFrom((string) $state)?->label() ?? Str::headline((string) $state))
                     ->badge()
                     ->searchable(),
                 TextColumn::make('total')
@@ -38,7 +42,7 @@ class OrdersTable
                     ->sortable(),
                 TextColumn::make('payment_status')
                     ->label(__('messages.payment_status'))
-                    ->formatStateUsing(fn ($state) => $state instanceof \App\Enums\PaymentStatus ? $state->getLabel() : $state)
+                    ->formatStateUsing(static fn ($state): string => PaymentStatus::tryFrom((string) $state)?->getLabel() ?? Str::headline((string) $state))
                     ->badge()
                     ->searchable(),
                 TextColumn::make('created_at')
