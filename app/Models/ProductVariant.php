@@ -57,7 +57,23 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
     protected static function booted(): void
     {
         self::created(static function (ProductVariant $variant): void {
-            $variant->syncPrimaryProductPivot();
+            $variantId = (int) ($variant->getKey() ?? 0);
+            $productId = (int) ($variant->product_id ?? 0);
+
+            // Defer pivot synchronization until request termination so relation-based
+            // create flows can finish their own attach without duplicate-key failures.
+            app()->terminating(static function () use ($variantId, $productId): void {
+                if ($variantId < 1 || $productId < 1 || ! Schema::hasTable('product_variant_product')) {
+                    return;
+                }
+
+                DB::table('product_variant_product')->insertOrIgnore([
+                    'product_id' => $productId,
+                    'product_variant_id' => $variantId,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            });
         });
 
         self::updated(static function (ProductVariant $variant): void {
@@ -153,7 +169,10 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
 
     private function syncPrimaryProductPivot(): void
     {
-        if (! $this->product_id) {
+        $productId = (int) ($this->product_id ?? 0);
+        $variantId = (int) ($this->getKey() ?? 0);
+
+        if ($productId < 1 || $variantId < 1) {
             return;
         }
 
@@ -161,7 +180,12 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
             return;
         }
 
-        $this->products()->syncWithoutDetaching([(int) $this->product_id]);
+        DB::table('product_variant_product')->insertOrIgnore([
+            'product_id' => $productId,
+            'product_variant_id' => $variantId,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
     }
 
     /**
