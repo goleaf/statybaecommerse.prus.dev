@@ -87,7 +87,16 @@ class PricesRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                CreateAction::make(),
+                CreateAction::make()
+                    ->mutateDataUsing(function (array $data): array {
+                        $ownerRecord = $this->getOwnerRecord();
+
+                        $data['priceable_id'] ??= $ownerRecord->getKey();
+                        $data['priceable_type'] ??= $ownerRecord::class;
+                        $data['type'] ??= 'retail';
+
+                        return $data;
+                    }),
             ])
             ->actions([
                 EditAction::make(),

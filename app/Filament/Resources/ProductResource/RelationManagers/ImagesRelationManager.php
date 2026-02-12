@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace App\Filament\Resources\ProductResource\RelationManagers;
 
 use App\Support\Filament\Forms\Components\SortOrderInput;
-use Filament\Actions\CreateAction;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\EditAction;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
+use Filament\Tables\Actions\CreateAction;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -87,7 +87,14 @@ class ImagesRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                CreateAction::make(),
+                CreateAction::make()
+                    ->mutateDataUsing(function (array $data): array {
+                        if (! isset($data['sort_order'])) {
+                            $data['sort_order'] = 0;
+                        }
+
+                        return $data;
+                    }),
             ])
             ->actions([
                 EditAction::make(),
