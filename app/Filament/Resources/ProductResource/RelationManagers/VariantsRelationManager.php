@@ -9,8 +9,8 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\DissociateAction;
-use Filament\Actions\DissociateBulkAction;
+use Filament\Actions\DetachAction;
+use Filament\Actions\DetachBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -105,12 +105,12 @@ class VariantsRelationManager extends RelationManager
             ])
             ->actions([
                 EditAction::make(),
-                DissociateAction::make(),
+                DetachAction::make(),
                 DeleteAction::make(),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
-                    DissociateBulkAction::make(),
+                    DetachBulkAction::make(),
                     DeleteBulkAction::make(),
                 ]),
             ]);
