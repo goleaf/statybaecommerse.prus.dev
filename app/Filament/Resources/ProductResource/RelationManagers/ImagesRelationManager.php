@@ -19,6 +19,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 
 class ImagesRelationManager extends RelationManager
 {
@@ -88,9 +89,26 @@ class ImagesRelationManager extends RelationManager
             ])
             ->headerActions([
                 CreateAction::make()
+                    ->relationship(fn () => $this->getOwnerRecord()->images())
                     ->mutateDataUsing(function (array $data): array {
-                        if (! isset($data['sort_order'])) {
-                            $data['sort_order'] = 0;
+                        $ownerRecord = $this->getOwnerRecord();
+
+                        $path = $data['path'] ?? null;
+                        if (is_array($path)) {
+                            $data['path'] = Arr::first($path);
+                        }
+
+                        $data['product_id'] = $ownerRecord->getKey();
+
+                        if (! is_numeric($data['sort_order'] ?? null)) {
+                            $nextSortOrder = (int) (
+                                $ownerRecord->images()
+                                    ->withoutGlobalScopes()
+                                    ->max('sort_order')
+                                ?? -1
+                            ) + 1;
+
+                            $data['sort_order'] = max(0, $nextSortOrder);
                         }
 
                         return $data;
