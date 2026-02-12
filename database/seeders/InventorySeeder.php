@@ -16,7 +16,9 @@ final class InventorySeeder extends BaseSeeder
     public function run(): void
     {
         if (! Product::query()->exists()) {
-            $this->call(ProductSeeder::class);
+            $this->command?->warn('InventorySeeder: no products found, skipping.');
+
+            return;
         }
 
         if (! Location::query()->where('type', 'warehouse')->exists()) {

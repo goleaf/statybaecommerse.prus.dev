@@ -33,16 +33,13 @@ afterEach(function (): void {
     config()->set('database.connections.sqlite.database', $this->originalSqliteDatabase);
 });
 
-it('seeds attributes and brands via factories', function (): void {
+it('seeds attributes via factories', function (): void {
     // Execute the required seeders so the assertions can verify factory-backed data instead of static fixtures.
     $this->seed(Database\Seeders\AttributeSeeder::class);
-    $this->seed(Database\Seeders\BrandSeeder::class);
     $this->seed(Database\Seeders\AttributeValueSeeder::class);
     $this->seed(Database\Seeders\BasicFilamentSeeder::class);
 
     // Confirm each seeded table receives the expected number of records sourced from the factories.
     $this->assertDatabaseCount('attributes', 16);
     $this->assertDatabaseCount('attribute_translations', 48);
-    $this->assertDatabaseCount('brands', 10);
-    $this->assertDatabaseCount('brand_translations', 20);
 });

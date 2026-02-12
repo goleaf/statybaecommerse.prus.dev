@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="Tests\Feature\Seeders\CollectionSeederTest" file="tests\Feature\Seeders\CollectionSeederTest.php" tests="2" assertions="9" errors="0" failures="0" skipped="0" time="50.776682">
-    <testcase name="it creates non-empty active and visible collections" file="tests\Feature\Seeders\CollectionSeederTest.php::it creates non-empty active and visible collections" class="Tests\Feature\Seeders\CollectionSeederTest" classname="Tests.Feature.Seeders.CollectionSeederTest" assertions="3" time="28.624583"/>
-    <testcase name="it is idempotent for collection slugs" file="tests\Feature\Seeders\CollectionSeederTest.php::it is idempotent for collection slugs" class="Tests\Feature\Seeders\CollectionSeederTest" classname="Tests.Feature.Seeders.CollectionSeederTest" assertions="6" time="22.152099"/>
+  <testsuite name="Tests\Feature\Filament\Resources\DocumentTemplateResourceTest" file="Document Template Resource (Tests\Feature\Filament\Resources\DocumentTemplateResource)" tests="2" assertions="5" errors="0" failures="0" skipped="0" time="14.224783">
+    <testcase name="List page displays document templates" file="Document Template Resource (Tests\Feature\Filament\Resources\DocumentTemplateResource)::List page displays document templates" class="Tests\Feature\Filament\Resources\DocumentTemplateResourceTest" classname="Tests.Feature.Filament.Resources.DocumentTemplateResourceTest" assertions="2" time="13.874779"/>
+    <testcase name="Can filter document templates by type" file="Document Template Resource (Tests\Feature\Filament\Resources\DocumentTemplateResource)::Can filter document templates by type" class="Tests\Feature\Filament\Resources\DocumentTemplateResourceTest" classname="Tests.Feature.Filament.Resources.DocumentTemplateResourceTest" assertions="3" time="0.350004"/>
   </testsuite>
 </testsuites>

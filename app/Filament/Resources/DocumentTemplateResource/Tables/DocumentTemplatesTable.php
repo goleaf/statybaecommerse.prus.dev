@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DocumentTemplateResource\Tables;
 
+use App\Enums\DocumentTemplateCategory;
+use App\Enums\DocumentTemplateType;
 use App\Models\DocumentTemplate;
 use Filament\Notifications\Notification;
 use Filament\Tables\Actions\Action;

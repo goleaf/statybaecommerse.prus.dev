@@ -35,13 +35,13 @@ final class UserBehaviorSeeder extends BaseSeeder
         }
 
         if ($products->isEmpty()) {
-            $this->command->error('No products found. Please run ProductSeeder first.');
+            $this->command->error('No products found. Please seed products first.');
 
             return;
         }
 
         if ($categories->isEmpty()) {
-            $this->command->error('No categories found. Please run CategorySeeder first.');
+            $this->command->error('No categories found. Please seed categories first.');
 
             return;
         }
