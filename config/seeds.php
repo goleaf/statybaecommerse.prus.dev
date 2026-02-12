@@ -14,8 +14,11 @@ use Database\Seeders\CountrySeeder;
 use Database\Seeders\CurrencySeeder;
 use Database\Seeders\CustomerGroupSeeder;
 use Database\Seeders\FeatureFlagSeeder;
+use Database\Seeders\InventorySeeder;
 use Database\Seeders\OptimizedFullSeeder;
+use Database\Seeders\ProductSeeder;
 use Database\Seeders\SettingsSeeder;
+use Database\Seeders\WarehouseSeeder;
 
 return [
     /*
@@ -80,6 +83,9 @@ return [
         AttributeValueSeeder::class,
         BrandSeeder::class,
         CollectionSeeder::class,
+        ProductSeeder::class,
+        WarehouseSeeder::class,
+        InventorySeeder::class,
         FeatureFlagSeeder::class,
         SettingsSeeder::class,
     ],

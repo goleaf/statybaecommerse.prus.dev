@@ -272,7 +272,7 @@ class ProductFactory extends Factory
                 'short_description' => $locale === $defaultLocale ? (string) ($product->short_description ?? $this->generateShortDescription($name)) : $this->faker->sentence(6),
                 'seo_title'         => $this->faker->sentence(6),
                 'seo_description'   => $this->faker->sentence(12),
-                'meta_keywords'     => $this->faker->words(5),
+                'meta_keywords'     => implode(', ', $this->faker->words(5)),
                 'alt_text'          => $this->faker->sentence(3),
             ];
         })
