@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Spatie\Translatable\HasTranslations;
 
@@ -43,7 +44,7 @@ final class Referral extends Model
      */
     protected string $nameColumn = 'title';
 
-    protected $fillable = ['referrer_id', 'referred_id', 'referral_code', 'status', 'completed_at', 'expires_at', 'metadata', 'meta', 'source', 'campaign', 'utm_source', 'utm_medium', 'utm_campaign', 'ip_address', 'user_agent', 'title', 'description', 'terms_conditions', 'benefits_description', 'how_it_works'];
+    protected $fillable = ['referrer_id', 'referred_id', 'referral_code', 'status', 'completed_at', 'expires_at', 'metadata', 'meta', 'source', 'campaign', 'utm_source', 'utm_medium', 'utm_campaign', 'ip_address', 'user_agent', 'title', 'description', 'terms_conditions', 'benefits_description', 'how_it_works', 'seo_title', 'seo_description', 'seo_keywords'];
 
     public array $translatable = ['title', 'description', 'terms_conditions', 'benefits_description', 'how_it_works'];
 
@@ -52,7 +53,7 @@ final class Referral extends Model
      */
     protected function casts(): array
     {
-        return ['completed_at' => 'datetime', 'expires_at' => 'datetime', 'metadata' => 'array', 'meta' => 'array', 'seo_keywords' => 'array'];
+        return ['completed_at' => 'datetime', 'expires_at' => 'datetime', 'metadata' => 'array', 'meta' => 'array', 'seo_title' => 'array', 'seo_description' => 'array', 'seo_keywords' => 'array'];
     }
 
     /**
@@ -77,6 +78,82 @@ final class Referral extends Model
     public function rewards(): HasMany
     {
         return $this->hasMany(ReferralReward::class);
+    }
+
+    /**
+     * Resolve the referral code entity linked by the stored referral code string.
+     */
+    public function codes(): HasMany
+    {
+        return $this->hasMany(ReferralCode::class, 'code', 'referral_code');
+    }
+
+    /**
+     * Surface campaign records connected through referral codes.
+     */
+    public function campaigns(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            ReferralCampaign::class,
+            ReferralCode::class,
+            'code',
+            'id',
+            'referral_code',
+            'campaign_id',
+        );
+    }
+
+    /**
+     * Expose aggregated daily statistics related to this referral code.
+     */
+    public function codeStatistics(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            ReferralCodeStatistics::class,
+            ReferralCode::class,
+            'code',
+            'referral_code_id',
+            'referral_code',
+            'id',
+        );
+    }
+
+    /**
+     * Expose usage log records captured for this referral code.
+     */
+    public function codeUsageLogs(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            ReferralCodeUsageLog::class,
+            ReferralCode::class,
+            'code',
+            'referral_code_id',
+            'referral_code',
+            'id',
+        );
+    }
+
+    /**
+     * Expose reward logs connected through referral rewards.
+     */
+    public function rewardLogs(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            ReferralRewardLog::class,
+            ReferralReward::class,
+            'referral_id',
+            'referral_reward_id',
+            'id',
+            'id',
+        );
+    }
+
+    /**
+     * Expose daily statistics for the referral owner.
+     */
+    public function statistics(): HasMany
+    {
+        return $this->hasMany(ReferralStatistics::class, 'user_id', 'referrer_id');
     }
 
     /**

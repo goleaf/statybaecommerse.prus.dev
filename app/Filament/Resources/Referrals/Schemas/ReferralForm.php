@@ -8,8 +8,8 @@ use App\Models\Referral;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 
 final class ReferralForm
@@ -33,9 +33,9 @@ final class ReferralForm
                 ->default(static fn (): string => Referral::generateUniqueCode()),
             Select::make('status')
                 ->options([
-                    'pending' => 'pending',
+                    'pending'   => 'pending',
                     'completed' => 'completed',
-                    'expired' => 'expired',
+                    'expired'   => 'expired',
                 ])
                 ->default('pending')
                 ->required(),

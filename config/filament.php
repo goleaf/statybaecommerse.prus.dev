@@ -39,6 +39,7 @@ return [
             ],
         ],
         'resources' => [
+            App\Filament\Resources\SystemSettingResource::class,
         ],
         'pages' => [
             App\Filament\Pages\Dashboard::class,

@@ -11,6 +11,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
@@ -25,9 +26,15 @@ class ReferralRewardsRelationManager extends RelationManager
     {
         return $schema
             ->components([
+                Select::make('referral_id')
+                    ->relationship('referral', 'referral_code')
+                    ->searchable()
+                    ->preload(),
                 TextInput::make('title')
                     ->required()
                     ->maxLength(255),
+                Textarea::make('description')
+                    ->columnSpanFull(),
                 TextInput::make('amount')
                     ->numeric()
                     ->prefix('€')
@@ -44,6 +51,7 @@ class ReferralRewardsRelationManager extends RelationManager
                         'referrer_bonus'    => 'Referrer Bonus',
                         'referred_discount' => 'Referred Discount',
                     ])
+                    ->default('referrer_bonus')
                     ->required(),
                 DateTimePicker::make('expires_at'),
             ]);
@@ -77,7 +85,25 @@ class ReferralRewardsRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                CreateAction::make(),
+                CreateAction::make()
+                    ->mutateDataUsing(static function (array $data): array {
+                        $title = trim((string) ($data['title'] ?? ''));
+                        $description = trim((string) ($data['description'] ?? ''));
+
+                        $data['title'] = [
+                            'lt' => $title !== '' ? $title : 'Referral reward',
+                            'en' => $title !== '' ? $title : 'Referral reward',
+                        ];
+                        $data['description'] = $description !== '' ? [
+                            'lt' => $description,
+                            'en' => $description,
+                        ] : null;
+                        $data['currency_code'] = (string) ($data['currency_code'] ?? 'EUR');
+                        $data['status'] = (string) ($data['status'] ?? 'pending');
+                        $data['is_active'] = (bool) ($data['is_active'] ?? true);
+
+                        return $data;
+                    }),
             ])
             ->recordActions([
                 EditAction::make(),

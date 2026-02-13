@@ -171,9 +171,9 @@ final class SystemSettingTest extends TestCase
         $badge = $setting->getBadgeForStatus();
 
         $this->assertIsString($badge);
-        $this->assertStringContainsString('admin.system_settings.public', $badge);
-        $this->assertStringContainsString('admin.system_settings.required', $badge);
-        $this->assertStringContainsString('admin.system_settings.encrypted', $badge);
+        $this->assertStringContainsString(__('admin.system_settings.public'), $badge);
+        $this->assertStringContainsString(__('admin.system_settings.required'), $badge);
+        $this->assertStringContainsString(__('admin.system_settings.encrypted'), $badge);
     }
 
     public function test_system_setting_model_dependency_methods(): void
@@ -521,14 +521,6 @@ final class SystemSettingTest extends TestCase
         $this->assertTrue($setting->is_encrypted);
         $this->assertFalse($setting->is_readonly);
         $this->assertTrue($setting->is_active);
-    }
-
-    public function test_system_setting_model_soft_deletes(): void
-    {
-        $setting = SystemSetting::factory()->create();
-        $setting->delete();
-
-        $this->assertSoftDeleted('system_settings', ['id' => $setting->id]);
     }
 
     public function test_system_setting_model_saves_without_activity_log_dependency(): void

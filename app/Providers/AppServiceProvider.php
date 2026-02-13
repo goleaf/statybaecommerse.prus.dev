@@ -154,6 +154,7 @@ class AppServiceProvider extends ServiceProvider
         );
 
         $this->registerFilamentResourceAutoloader();
+        $this->registerLegacyReferralFilamentAliases();
 
         if ($this->app->runningUnitTests()) {
             // Ensure Livewire exposes throttling validation exceptions to the test harness
@@ -264,7 +265,7 @@ class AppServiceProvider extends ServiceProvider
             });
         }
 
-        Testable::macro('callAction', function (string|array $actions, array $data = [], array $arguments = []): Testable {
+        Testable::macro('callAction', function ($actions, array $data = [], array $arguments = []): Testable {
             $initialMountedActionsCount = count($this->instance()->mountedActions);
 
             /** @var array<array<string, mixed>> $actions */
@@ -896,6 +897,44 @@ class AppServiceProvider extends ServiceProvider
         }, true, false);
 
         self::$filamentResourceAutoloaderRegistered = true;
+    }
+
+    /**
+     * Preserve backwards-compatible class names for referral resources and pages.
+     */
+    private function registerLegacyReferralFilamentAliases(): void
+    {
+        $aliases = [
+            'App\\Filament\\Resources\\ReferralResource'                                                => 'App\\Filament\\Resources\\Referrals\\ReferralResource',
+            'App\\Filament\\Resources\\ReferralResource\\Pages\\ListReferrals'                          => 'App\\Filament\\Resources\\Referrals\\Pages\\ListReferrals',
+            'App\\Filament\\Resources\\ReferralResource\\Pages\\CreateReferral'                         => 'App\\Filament\\Resources\\Referrals\\Pages\\CreateReferral',
+            'App\\Filament\\Resources\\ReferralResource\\Pages\\EditReferral'                           => 'App\\Filament\\Resources\\Referrals\\Pages\\EditReferral',
+            'App\\Filament\\Resources\\ReferralResource\\Pages\\ViewReferral'                           => 'App\\Filament\\Resources\\Referrals\\Pages\\ViewReferral',
+            'App\\Filament\\Resources\\ReferralCodeResource'                                            => 'App\\Filament\\Resources\\ReferralCodes\\ReferralCodeResource',
+            'App\\Filament\\Resources\\ReferralCodeResource\\Pages\\ListReferralCodes'                  => 'App\\Filament\\Resources\\ReferralCodes\\Pages\\ListReferralCodes',
+            'App\\Filament\\Resources\\ReferralCodeResource\\Pages\\CreateReferralCode'                 => 'App\\Filament\\Resources\\ReferralCodes\\Pages\\CreateReferralCode',
+            'App\\Filament\\Resources\\ReferralCodeResource\\Pages\\EditReferralCode'                   => 'App\\Filament\\Resources\\ReferralCodes\\Pages\\EditReferralCode',
+            'App\\Filament\\Resources\\ReferralRewardResource'                                          => 'App\\Filament\\Resources\\ReferralRewards\\ReferralRewardResource',
+            'App\\Filament\\Resources\\ReferralRewardResource\\Pages\\ListReferralRewards'              => 'App\\Filament\\Resources\\ReferralRewards\\Pages\\ListReferralRewards',
+            'App\\Filament\\Resources\\ReferralRewardResource\\Pages\\CreateReferralReward'             => 'App\\Filament\\Resources\\ReferralRewards\\Pages\\CreateReferralReward',
+            'App\\Filament\\Resources\\ReferralRewardResource\\Pages\\EditReferralReward'               => 'App\\Filament\\Resources\\ReferralRewards\\Pages\\EditReferralReward',
+            'App\\Filament\\Resources\\ReferralRewardResource\\Pages\\ViewReferralReward'               => 'App\\Filament\\Resources\\ReferralRewards\\Pages\\ViewReferralReward',
+            'App\\Filament\\Resources\\ReferralRewardLogResource'                                       => 'App\\Filament\\Resources\\ReferralRewardLogs\\ReferralRewardLogResource',
+            'App\\Filament\\Resources\\ReferralRewardLogResource\\Pages\\ListReferralRewardLogs'        => 'App\\Filament\\Resources\\ReferralRewardLogs\\Pages\\ListReferralRewardLogs',
+            'App\\Filament\\Resources\\ReferralRewardLogResource\\Pages\\CreateReferralRewardLog'       => 'App\\Filament\\Resources\\ReferralRewardLogs\\Pages\\CreateReferralRewardLog',
+            'App\\Filament\\Resources\\ReferralRewardLogResource\\Pages\\EditReferralRewardLog'         => 'App\\Filament\\Resources\\ReferralRewardLogs\\Pages\\EditReferralRewardLog',
+            'App\\Filament\\Resources\\ReferralRewardLogResource\\Pages\\ViewReferralRewardLog'         => 'App\\Filament\\Resources\\ReferralRewardLogs\\Pages\\ViewReferralRewardLog',
+            'App\\Filament\\Resources\\ReferralCodeUsageLogResource'                                    => 'App\\Filament\\Resources\\ReferralCodeUsageLogs\\ReferralCodeUsageLogResource',
+            'App\\Filament\\Resources\\ReferralCodeUsageLogResource\\Pages\\ListReferralCodeUsageLogs'  => 'App\\Filament\\Resources\\ReferralCodeUsageLogs\\Pages\\ListReferralCodeUsageLogs',
+            'App\\Filament\\Resources\\ReferralCodeUsageLogResource\\Pages\\CreateReferralCodeUsageLog' => 'App\\Filament\\Resources\\ReferralCodeUsageLogs\\Pages\\CreateReferralCodeUsageLog',
+            'App\\Filament\\Resources\\ReferralCodeUsageLogResource\\Pages\\EditReferralCodeUsageLog'   => 'App\\Filament\\Resources\\ReferralCodeUsageLogs\\Pages\\EditReferralCodeUsageLog',
+        ];
+
+        foreach ($aliases as $legacy => $current) {
+            if (class_exists($current) && ! class_exists($legacy, false)) {
+                class_alias($current, $legacy);
+            }
+        }
     }
 
     /**

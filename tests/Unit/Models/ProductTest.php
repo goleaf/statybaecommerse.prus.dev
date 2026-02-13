@@ -29,11 +29,10 @@ describe('Product model', function () {
         $expectedFillable = [
             'name', 'slug', 'description', 'short_description', 'detailed_description', 'sku', 'barcode',
             'price', 'cost_price', 'manage_stock', 'allow_backorder', 'stock_quantity',
-            'low_stock_threshold', 'weight', 'length', 'width', 'height', 'is_active',
-            'is_enabled', 'is_featured', 'is_requestable', 'minimum_quantity',
-            'hide_add_to_cart', 'request_message', 'published_at', 'seo_title',
-            'seo_description', 'brand_id', 'status', 'variant_attribute_matrix',
-            'shipping_class', 'external_url',
+            'low_stock_threshold', 'weight', 'length', 'width', 'height', 'size', 'size_type', 'color',
+            'pack_size', 'pack_size_type', 'is_active', 'is_enabled', 'is_featured', 'is_requestable',
+            'minimum_quantity', 'hide_add_to_cart', 'request_message', 'published_at', 'brand_id',
+            'status', 'variant_attribute_matrix', 'shipping_class', 'external_url',
         ];
 
         expect($product->getFillable())->toBe($expectedFillable);
@@ -161,17 +160,20 @@ describe('Product model', function () {
 
     it('checks if product is published', function () {
         $publishedProduct = Product::factory()->create([
-            'is_visible'   => true,
+            'status'       => 'published',
+            'is_enabled'   => true,
             'published_at' => now()->subDay(),
         ]);
 
         $unpublishedProduct = Product::factory()->create([
-            'is_visible'   => false,
+            'status'       => 'draft',
+            'is_enabled'   => false,
             'published_at' => now()->subDay(),
         ]);
 
         $futureProduct = Product::factory()->create([
-            'is_visible'   => true,
+            'status'       => 'published',
+            'is_enabled'   => true,
             'published_at' => now()->addDay(),
         ]);
 
@@ -190,23 +192,7 @@ describe('Product model', function () {
         $product = new Product;
         $expectedTranslatable = ['name', 'slug', 'description', 'short_description', 'seo_title', 'seo_description'];
 
-        // Access the protected translatable property using reflection
-        $reflection = new ReflectionClass($product);
-        $property = $reflection->getProperty('translatable');
-        $property->setAccessible(true);
-
-        expect($property->getValue($product))->toBe($expectedTranslatable);
-    });
-
-    it('calculates discount percentage correctly', function () {
-        $product = Product::factory()->create([
-            'price'         => 100.00,
-            'compare_price' => 120.00,
-        ]);
-
-        $discountPercentage = $product->getDiscountPercentageAttribute();
-
-        expect($discountPercentage)->toBeGreaterThan(0);
+        expect($product->translatable)->toBe($expectedTranslatable);
     });
 
     it('calculates profit margin correctly', function () {

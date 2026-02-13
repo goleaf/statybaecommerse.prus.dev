@@ -562,7 +562,7 @@ class Show extends Component
     private function resolveCollectionRules(CollectionModel $collection): Collection
     {
         return $collection->rules()
-            ->where('is_active', true)
+            ->active()
             ->orderBy('position')
             ->get(['field', 'operator', 'value'])
             ->map(static function (CollectionRule $rule): array {

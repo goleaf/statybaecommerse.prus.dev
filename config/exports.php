@@ -39,7 +39,7 @@ return [
                 'customer' => [
                     'label'    => 'Customer',
                     'type'     => 'string',
-                    'resolver' => 'customer_name',
+                    'resolver' => static fn (Order $order): ?string => $order->user?->name,
                 ],
                 'items' => [
                     'label'    => 'Items',

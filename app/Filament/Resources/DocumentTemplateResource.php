@@ -24,7 +24,7 @@ final class DocumentTemplateResource extends BaseResource
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-document-text';
 
-    protected static string|UnitEnum|null $navigationGroup = null;
+    protected static string|UnitEnum|null $navigationGroup = 'Documents';
 
     protected static ?int $navigationSort = 4;
 

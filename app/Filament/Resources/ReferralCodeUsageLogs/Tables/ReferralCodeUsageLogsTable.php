@@ -1,10 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\ReferralCodeUsageLogs\Tables;
 
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
 class ReferralCodeUsageLogsTable
@@ -13,10 +17,24 @@ class ReferralCodeUsageLogsTable
     {
         return $table
             ->columns([
-                //
+                TextColumn::make('referralCode.code')
+                    ->label('Referral Code')
+                    ->searchable(),
+                TextColumn::make('user.name')
+                    ->searchable(),
+                TextColumn::make('ip_address')
+                    ->searchable(),
+                TextColumn::make('referrer')
+                    ->searchable(),
+                TextColumn::make('created_at')
+                    ->dateTime()
+                    ->sortable(),
             ])
             ->filters([
-                //
+                SelectFilter::make('referral_code_id')
+                    ->relationship('referralCode', 'code'),
+                SelectFilter::make('user_id')
+                    ->relationship('user', 'name'),
             ])
             ->recordActions([
                 EditAction::make(),

@@ -26,7 +26,7 @@ final class VariantBulkPriceUpdate extends Action
     {
         // Respect a custom name when callers provide one while keeping the historical default intact.
         return parent::make($name ?? 'bulk_price_update')
-            ->label(__('product.variants.actions.bulk_price_update'))
+            ->label(__('product_variants.actions.bulk_price_update'))
             ->icon('heroicon-o-currency-euro')
             ->color('warning')
             ->form([

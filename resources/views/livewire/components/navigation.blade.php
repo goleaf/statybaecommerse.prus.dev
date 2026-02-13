@@ -241,13 +241,13 @@
                     <div class="space-y-3">
                         @foreach ($quickLinks as $link)
                             <a href="{{ $link['url'] }}" 
-                               class="w-full flex items-center gap-5 border-b border-dark text-dark py-2 hover:text-stone transition-colors"
+                               class="w-full flex items-center gap-5 border-b border-gray-200 text-dark py-2 hover:text-stone transition-colors"
                                wire:click="toggleMobileMenu">
                                 <p class="capitalize font-normal font-montserrat">{{ $link['label'] }}</p>
                             </a>
                         @endforeach
                         
-                        <div class="pt-4 mt-4 border-t border-dark/20">
+                        <div class="pt-4 mt-4 border-t border-gray-200">
                             <x-language-switcher class="w-full justify-between !text-dark hover:!bg-dark/5" />
                         </div>
                     </div>

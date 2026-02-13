@@ -24,7 +24,6 @@ class UserInfolist
                     ->tabs([
                         self::profileTab(),
                         self::companyTab(),
-                        self::addressesTab(),
                         self::customerGroupsTab(),
                         self::partnersTab(),
                     ])

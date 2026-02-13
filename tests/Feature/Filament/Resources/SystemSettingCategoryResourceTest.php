@@ -8,7 +8,7 @@ use App\Filament\Resources\SystemSettingCategoryResource\Pages\CreateSystemSetti
 use App\Filament\Resources\SystemSettingCategoryResource\Pages\EditSystemSettingCategory;
 use App\Filament\Resources\SystemSettingCategoryResource\Pages\ListSystemSettingCategories;
 use App\Models\SystemSettingCategory;
-use App\Models\User;
+use App\Models\AdminUser;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -18,7 +18,7 @@ final class SystemSettingCategoryResourceTest extends TestCase
 {
     use RefreshDatabase;
 
-    private User $admin;
+    private AdminUser $admin;
 
     protected function setUp(): void
     {
@@ -35,14 +35,13 @@ final class SystemSettingCategoryResourceTest extends TestCase
         $this->seed(RolesAndPermissionsSeeder::class);
 
         // Create and authenticate the canonical administrator used throughout the assertions.
-        $this->admin = User::factory()->create([
+        $this->admin = AdminUser::factory()->create([
             'email'    => 'admin@example.com',
-            'is_admin' => true,
         ]);
 
-        $this->admin->assignRole('administrator');
+        $this->admin->assignRole('super_admin');
 
-        $this->actingAs($this->admin);
+        $this->actingAs($this->admin, 'admin');
     }
 
     public function test_list_page_displays_categories(): void

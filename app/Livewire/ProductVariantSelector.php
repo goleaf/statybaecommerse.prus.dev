@@ -463,8 +463,8 @@ final class ProductVariantSelector extends Component
         if ($compare === null) {
             $fallbackAnchors = array_filter([
                 $result->regularPrice,
-                $result->salePrice,
                 $result->priceListPrice,
+                $variant->compare_price !== null ? (float) $variant->compare_price : null,
             ], static fn (?float $amount) => $amount !== null && $amount > ($result->finalPrice + 0.0001));
 
             if ($fallbackAnchors !== []) {
@@ -476,7 +476,7 @@ final class ProductVariantSelector extends Component
             'final'      => (float) $result->finalPrice,
             'compare'    => $compare !== null ? (float) $compare : null,
             'regular'    => (float) $result->regularPrice,
-            'sale'       => $result->salePrice !== null ? (float) $result->salePrice : null,
+            'sale'       => null,
             'price_list' => $result->priceListPrice !== null ? (float) $result->priceListPrice : null,
             'currency'   => $result->currency,
         ];

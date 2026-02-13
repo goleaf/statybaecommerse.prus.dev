@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\ReferralCampaigns\Tables;
 
 use Filament\Actions\BulkActionGroup;
@@ -15,6 +17,9 @@ class ReferralCampaignsTable
     {
         return $table
             ->columns([
+                TextColumn::make('localized_name')
+                    ->label('Name')
+                    ->searchable(),
                 IconColumn::make('is_active')
                     ->boolean(),
                 TextColumn::make('start_date')

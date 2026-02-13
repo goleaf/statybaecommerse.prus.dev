@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="ExceptionHandlerSecurityTest" file="Exception Handler Security" tests="1" assertions="0" errors="1" failures="0" skipped="0" time="26.739276">
+    <testcase name="It prevents log injection attacks" file="Exception Handler Security::It prevents log injection attacks" class="ExceptionHandlerSecurityTest" classname="ExceptionHandlerSecurityTest" assertions="0" time="26.739276">
+      <error type="Mockery\Exception\InvalidCountException">It prevents log injection attacksMockery\Exception\InvalidCountException: Method error(&lt;Any Arguments&gt;) from Mockery_0_Illuminate_Log_LogManager should be called&#13;
+ at least 1 times but called 0 times.&#13;
+at vendor\mockery\mockery\library\Mockery\CountValidator\AtLeast.php:42
+at vendor\mockery\mockery\library\Mockery\Expectation.php:739
+at vendor\mockery\mockery\library\Mockery\ReceivedMethodCalls.php:36
+at vendor\mockery\mockery\library\Mockery\VerificationDirector.php:86
+at vendor\mockery\mockery\library\Mockery\VerificationDirector.php:143
+at vendor\mockery\mockery\library\Mockery\VerificationDirector.php:98
+at tests\Unit\Security\ExceptionHandlerSecurityTest.php:86</error>
+    </testcase>
+  </testsuite>
+</testsuites>

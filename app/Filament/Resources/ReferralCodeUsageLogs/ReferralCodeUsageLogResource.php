@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\ReferralCodeUsageLogs;
 
 use App\Filament\Resources\ReferralCodeUsageLogs\Pages\CreateReferralCodeUsageLog;
@@ -19,6 +21,8 @@ class ReferralCodeUsageLogResource extends Resource
     protected static ?string $model = ReferralCodeUsageLog::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
+    protected static bool $shouldRegisterNavigation = false;
 
     public static function form(Schema $schema): Schema
     {
@@ -40,9 +44,9 @@ class ReferralCodeUsageLogResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListReferralCodeUsageLogs::route('/'),
+            'index'  => ListReferralCodeUsageLogs::route('/'),
             'create' => CreateReferralCodeUsageLog::route('/create'),
-            'edit' => EditReferralCodeUsageLog::route('/{record}/edit'),
+            'edit'   => EditReferralCodeUsageLog::route('/{record}/edit'),
         ];
     }
 }

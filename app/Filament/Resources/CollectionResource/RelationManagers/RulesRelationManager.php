@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CollectionResource\RelationManagers;
 
-use Filament\Actions\AssociateAction;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -30,7 +29,7 @@ class RulesRelationManager extends RelationManager
     public function form(Schema $schema): Schema
     {
         return $schema
-            ->schema([
+            ->components([
                 Select::make('field')
                     ->label(__('admin.collections.rule_column'))
                     ->options([
@@ -74,8 +73,6 @@ class RulesRelationManager extends RelationManager
             ])
             ->headerActions([
                 CreateAction::make(),
-                AssociateAction::make()
-                    ->preloadRecordSelect(),
             ])
             ->actions([
                 EditAction::make(),

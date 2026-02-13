@@ -26,7 +26,9 @@ use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Schema as SchemaFacade;
 use UnitEnum;
 
@@ -95,7 +97,34 @@ final class ProductVariantResource extends BaseResource
                     ->label(__('messages.is_enabled')),
             ])
             ->filters([
-                //
+                SelectFilter::make('stock_status')
+                    ->label('Stock Status')
+                    ->options([
+                        'in_stock'     => 'In Stock',
+                        'low_stock'    => 'Low Stock',
+                        'out_of_stock' => 'Out of Stock',
+                        'not_tracked'  => 'Not Tracked',
+                    ])
+                    ->query(static function (Builder $query, array $data): Builder {
+                        $selected = $data['value'] ?? null;
+                        $availableExpression = '(COALESCE(stock_quantity, 0) - COALESCE(reserved_quantity, 0))';
+
+                        return match ($selected) {
+                            'in_stock' => $query
+                                ->where('track_inventory', true)
+                                ->whereRaw($availableExpression . ' > COALESCE(low_stock_threshold, 0)'),
+                            'low_stock' => $query
+                                ->where('track_inventory', true)
+                                ->whereRaw($availableExpression . ' > 0')
+                                ->whereRaw($availableExpression . ' <= COALESCE(low_stock_threshold, 0)'),
+                            'out_of_stock' => $query
+                                ->where('track_inventory', true)
+                                ->whereRaw($availableExpression . ' <= 0'),
+                            'not_tracked' => $query
+                                ->where('track_inventory', false),
+                            default => $query,
+                        };
+                    }),
             ])
             ->actions([
                 ViewAction::make(),

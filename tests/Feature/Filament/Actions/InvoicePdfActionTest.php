@@ -107,6 +107,43 @@ final class InvoicePdfActionTest extends TestCase
         ]);
     }
 
+    public function test_backfills_invoice_template_on_generated_document_before_pdf_generation(): void
+    {
+        $order = Order::factory()->create();
+        $template = DocumentTemplate::factory()->invoice()->active()->create();
+
+        $action = InvoicePdfAction::make();
+        $handler = $action->getActionFunction();
+        $this->assertNotNull($handler);
+
+        $document = Document::make([
+            'title'   => 'Invoice',
+            'content' => '<p>Invoice content</p>',
+        ]);
+
+        $service = $this->makeDocumentServiceFake(
+            $document,
+            function (DocumentTemplate $passedTemplate, Order $passedOrder) use ($template, $order): void {
+                expect($passedTemplate->is($template))->toBeTrue();
+                expect($passedOrder->is($order))->toBeTrue();
+            },
+            function (Document $passedDocument) use ($template): string {
+                expect((int) ($passedDocument->document_template_id ?? 0))->toBe((int) $template->getKey());
+                expect($passedDocument->template)->toBeInstanceOf(DocumentTemplate::class);
+                expect($passedDocument->template?->is($template))->toBeTrue();
+
+                return 'https://example.test/invoice.pdf';
+            }
+        );
+
+        $response = $handler($order, $service);
+
+        expect($response)
+            ->toBeInstanceOf(RedirectResponse::class)
+            ->and($response->getTargetUrl())
+            ->toBe('https://example.test/invoice.pdf');
+    }
+
     /**
      * @param callable(DocumentTemplate, Order):void $assertion
      * @param callable(Document):string|null         $pdfHandler

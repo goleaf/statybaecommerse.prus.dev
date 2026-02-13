@@ -23,6 +23,7 @@ use Illuminate\Support\Str;
 use InvalidArgumentException;
 use RuntimeException;
 use Stringable;
+use UnitEnum;
 
 /**
  * DocumentService
@@ -887,7 +888,7 @@ HTML;
             return (string) $value->value;
         }
 
-        if ($value instanceof \UnitEnum) {
+        if ($value instanceof UnitEnum) {
             return $value->name;
         }
 

@@ -17,4 +17,3 @@ it('always emits eur currency for payment transactions', function (): void {
     expect(data_get($result, 'transaction.currency'))->toBe('EUR');
     expect(data_get($result, 'transaction.amount'))->toBe(199.99);
 });
-

@@ -725,9 +725,9 @@ return [
             'update' => 'Update Tracking',
         ],
     ],
-    'orders_import'        => 'Import Orders',
-    'partners_import'      => 'Import Partners',
-    'placeholders'         => [
+    'orders_import'   => 'Import Orders',
+    'partners_import' => 'Import Partners',
+    'placeholders'    => [
         'title' => 'Title',
     ],
     'prices' => [

@@ -3,10 +3,10 @@
 declare(strict_types=1);
 
 use App\Filament\Resources\ProductResource;
+use App\Models\AdminUser;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Collection;
-use App\Models\AdminUser;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use Filament\Actions\DeleteAction;
@@ -340,6 +340,11 @@ it('has correct form fields in create page', function () {
         ->assertFormFieldExists('length')
         ->assertFormFieldExists('width')
         ->assertFormFieldExists('height');
+});
+
+it('does not expose categories field directly in product form', function () {
+    Livewire::test(ProductResource\Pages\CreateProduct::class)
+        ->assertFormFieldDoesNotExist('categories');
 });
 
 it('can access table actions', function () {

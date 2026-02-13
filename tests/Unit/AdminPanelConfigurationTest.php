@@ -24,7 +24,7 @@ describe('Admin Panel Configuration', function (): void {
 
         expect($panel->getId())->toBe('admin');
         expect($panel->getPath())->toBe('admin');
-        expect($panel->hasTopbar())->toBeFalse();
+        expect($panel->hasTopbar())->toBeTrue();
     });
 
     it('panel configures authentication middleware correctly', function (): void {

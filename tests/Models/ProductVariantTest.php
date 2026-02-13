@@ -8,6 +8,7 @@ use App\Models\ProductVariant;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -32,7 +33,6 @@ final class ProductVariantTest extends TestCase
             'description_lt',
             'description_en',
             'price',
-            'compare_price',
             'cost_price',
             'wholesale_price',
             'member_price',
@@ -44,28 +44,23 @@ final class ProductVariantTest extends TestCase
             'weight',
             'track_inventory',
             'is_default',
+            'is_default_variant',
             'is_enabled',
             'barcode',
             'attributes',
             'variant_attribute_matrix',
-            'variant_metadata',
             'is_on_sale',
             'sale_start_date',
             'sale_end_date',
             'is_featured',
             'is_new',
             'is_bestseller',
-            'seo_title_lt',
-            'seo_title_en',
-            'seo_description_lt',
-            'seo_description_en',
             'variant_combination_hash',
         ], $model->getFillable());
 
         // Confirm financial and state attributes use strict casting for reliable arithmetic.
         $casts = $model->getCasts();
         self::assertSame('decimal:4', $casts['price']);
-        self::assertSame('decimal:4', $casts['compare_price']);
         self::assertSame('decimal:4', $casts['cost_price']);
         self::assertSame('decimal:4', $casts['wholesale_price']);
         self::assertSame('decimal:4', $casts['member_price']);
@@ -73,9 +68,9 @@ final class ProductVariantTest extends TestCase
         self::assertSame('decimal:2', $casts['weight']);
         self::assertSame('array', $casts['attributes']);
         self::assertSame('array', $casts['variant_attribute_matrix']);
-        self::assertSame('array', $casts['variant_metadata']);
         self::assertSame('boolean', $casts['track_inventory']);
         self::assertSame('boolean', $casts['is_default']);
+        self::assertSame('boolean', $casts['is_default_variant']);
         self::assertSame('boolean', $casts['is_enabled']);
         self::assertSame('boolean', $casts['is_on_sale']);
         self::assertSame('boolean', $casts['is_featured']);
@@ -89,17 +84,22 @@ final class ProductVariantTest extends TestCase
         $model = new ProductVariant;
 
         self::assertInstanceOf(BelongsTo::class, $model->product());
+        self::assertInstanceOf(BelongsToMany::class, $model->products());
         self::assertInstanceOf(MorphMany::class, $model->prices());
         self::assertInstanceOf(BelongsToMany::class, $model->attributes());
         self::assertInstanceOf(HasMany::class, $model->variantAttributeValues());
-        self::assertInstanceOf(HasMany::class, $model->priceHistory());
-        self::assertInstanceOf(HasMany::class, $model->stockHistory());
+        self::assertInstanceOf(HasManyThrough::class, $model->stockMovements());
         self::assertInstanceOf(HasMany::class, $model->inventories());
         self::assertInstanceOf(HasMany::class, $model->orderItems());
         self::assertInstanceOf(HasMany::class, $model->cartItems());
+        self::assertInstanceOf(BelongsToMany::class, $model->orders());
         self::assertInstanceOf(HasMany::class, $model->images());
         self::assertInstanceOf(HasOne::class, $model->primaryImage());
         self::assertInstanceOf(HasMany::class, $model->pricingRules());
+        self::assertInstanceOf(HasMany::class, $model->similarities());
+        self::assertInstanceOf(BelongsToMany::class, $model->discounts());
+        self::assertInstanceOf(HasMany::class, $model->variantCombinations());
+        self::assertInstanceOf(HasMany::class, $model->translations());
     }
 
     public function test_scopes_configure_expected_query_constraints(): void

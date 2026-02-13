@@ -8,8 +8,10 @@ use App\Filament\Resources\SystemSettingCategoryResource\Pages;
 use App\Filament\Resources\SystemSettingCategoryResource\Schemas\SystemSettingCategoryForm;
 use App\Filament\Resources\SystemSettingCategoryResource\Tables\SystemSettingCategoriesTable;
 use App\Models\SystemSettingCategory;
+use App\Models\Scopes\ActiveScope;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use BackedEnum;
 use UnitEnum;
 
@@ -51,6 +53,13 @@ class SystemSettingCategoryResource extends BaseResource
     public static function table(Table $table): Table
     {
         return SystemSettingCategoriesTable::configure($table);
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->withoutGlobalScopes([
+            ActiveScope::class,
+        ]);
     }
 
     public static function getPages(): array

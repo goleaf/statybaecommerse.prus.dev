@@ -54,13 +54,8 @@ class Handler extends ExceptionHandler
      */
     public function register(): void
     {
-        $this->reportable(function (Throwable $e): void {
-            // Enhanced boot error handling with actionable messages
-            if ($this->getBootErrorDetector()->shouldProcess($e)) {
-                $this->getBootErrorLogger()->log($e);
-                $this->getMetricsTracker()->track($e);
-            }
-        });
+        // Boot-error processing is handled directly in report() so direct handler
+        // invocations in tests and runtime paths share the same behavior.
     }
 
     private function getBootErrorDetector(): BootErrorDetector
@@ -124,40 +119,12 @@ class Handler extends ExceptionHandler
             return;
         }
 
-        // Optimized boot error detection with early exit
-        if (! $this->shouldProcessBootError($e)) {
-            parent::report($e);
-
-            return;
+        if ($this->getBootErrorDetector()->shouldProcess($e)) {
+            $this->getBootErrorLogger()->log($e);
+            $this->getMetricsTracker()->track($e);
         }
 
         parent::report($e);
-    }
-
-    /**
-     * Optimized boot error processing check.
-     */
-    private function shouldProcessBootError(Throwable $e): bool
-    {
-        // Cache config check to avoid repeated config() calls
-        static $bootErrorEnabled = null;
-
-        if ($bootErrorEnabled === null || app()->environment('testing')) {
-            $bootErrorEnabled = config('exception-handling.boot_error_detection.enabled', true);
-        }
-
-        if (! $bootErrorEnabled) {
-            return true; // Process normally if boot error detection is disabled
-        }
-
-        $detector = $this->getBootErrorDetector();
-
-        // If it's a boot error and detection is enabled, let the detector handle it
-        if ($detector->isBootError($e)) {
-            return false; // Skip normal processing, let boot error handler take over
-        }
-
-        return true; // Process normally
     }
 
     protected function unauthenticated($request, AuthenticationException $exception): JsonResponse|RedirectResponse

@@ -737,9 +737,9 @@ return [
             'update' => 'Atnaujinti sekimą',
         ],
     ],
-    'orders_import'        => 'Importuoti užsakymus',
-    'partners_import'      => 'Importuoti partnerius',
-    'placeholders'         => [
+    'orders_import'   => 'Importuoti užsakymus',
+    'partners_import' => 'Importuoti partnerius',
+    'placeholders'    => [
         'title' => 'Title',
     ],
     'prices' => [

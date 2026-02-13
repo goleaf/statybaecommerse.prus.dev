@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\ReferralCampaigns\Schemas;
 
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Schema;
 
@@ -14,13 +16,13 @@ class ReferralCampaignForm
     {
         return $schema
             ->components([
-                Textarea::make('name')
+                KeyValue::make('name')
                     ->required()
                     ->columnSpanFull(),
-                Textarea::make('description')
+                KeyValue::make('description')
                     ->columnSpanFull(),
                 Toggle::make('is_active')
-                    ->required(),
+                    ->default(true),
                 DateTimePicker::make('start_date'),
                 DateTimePicker::make('end_date'),
                 TextInput::make('reward_amount')
@@ -30,9 +32,9 @@ class ReferralCampaignForm
                     ->numeric(),
                 TextInput::make('max_total_referrals')
                     ->numeric(),
-                Textarea::make('conditions')
+                KeyValue::make('conditions')
                     ->columnSpanFull(),
-                Textarea::make('metadata')
+                KeyValue::make('metadata')
                     ->columnSpanFull(),
                 DateTimePicker::make('deprecated_at'),
             ]);

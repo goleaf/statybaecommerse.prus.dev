@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\ReferralCampaigns;
 
 use App\Filament\Resources\ReferralCampaigns\Pages\CreateReferralCampaign;
@@ -19,6 +21,8 @@ class ReferralCampaignResource extends Resource
     protected static ?string $model = ReferralCampaign::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
+    protected static bool $shouldRegisterNavigation = false;
 
     public static function form(Schema $schema): Schema
     {
@@ -40,9 +44,9 @@ class ReferralCampaignResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListReferralCampaigns::route('/'),
+            'index'  => ListReferralCampaigns::route('/'),
             'create' => CreateReferralCampaign::route('/create'),
-            'edit' => EditReferralCampaign::route('/{record}/edit'),
+            'edit'   => EditReferralCampaign::route('/{record}/edit'),
         ];
     }
 }

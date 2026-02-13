@@ -84,6 +84,8 @@ final class Product extends Model implements HasMedia, TranslatableRecord
         'published_at' => true,
     ];
 
+    public $translatable = ['name', 'slug', 'description', 'short_description', 'seo_title', 'seo_description'];
+
     protected $fillable = ['name', 'slug', 'description', 'short_description', 'detailed_description', 'sku', 'barcode', 'price', 'cost_price', 'manage_stock', 'allow_backorder', 'stock_quantity', 'low_stock_threshold', 'weight', 'length', 'width', 'height', 'size', 'size_type', 'color', 'pack_size', 'pack_size_type', 'is_active', 'is_enabled', 'is_featured', 'is_requestable', 'minimum_quantity', 'hide_add_to_cart', 'request_message', 'published_at', 'brand_id', 'status', 'variant_attribute_matrix', 'shipping_class', 'external_url'];
 
     protected $casts = [
@@ -113,7 +115,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
      *
      * @var array<int, string>
      */
-    protected $appends = ['main_image', 'thumbnail', 'stock_status', 'is_in_stock', 'formatted_price'];
+    protected $appends = ['main_image', 'thumbnail', 'stock_status', 'is_in_stock', 'formatted_price', 'available_quantity'];
 
     protected $table = 'products';
 
@@ -1649,7 +1651,9 @@ final class Product extends Model implements HasMedia, TranslatableRecord
      */
     private function calculateDiscountPercentage(): ?float
     {
-        return null;
+        $priceData = $this->getPrice();
+
+        return $priceData ? $priceData->percentage : null;
     }
 
     /**

@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Throwable;
 
 /**
  * CollectionRule
@@ -30,6 +31,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 final class CollectionRule extends Model
 {
     use HasFactory;
+
+    /**
+     * @var array<string, bool>
+     */
+    private static array $columnExistenceCache = [];
 
     protected $table = 'collection_rules';
 
@@ -51,7 +57,7 @@ final class CollectionRule extends Model
     {
         self::creating(function (CollectionRule $rule): void {
             // Guarantee that soft-deactivated rules still persist with an explicit boolean flag.
-            if ($rule->is_active === null) {
+            if ($rule->is_active === null && self::hasTableColumn($rule, 'is_active')) {
                 $rule->is_active = true;
             }
 
@@ -64,6 +70,36 @@ final class CollectionRule extends Model
                 $rule->position = $nextPosition + 1;
             }
         });
+    }
+
+    private static function hasTableColumn(self $rule, string $column): bool
+    {
+        $cacheKey = implode('|', [
+            $rule->getConnectionName() ?: 'default',
+            $rule->getTable(),
+            $column,
+        ]);
+
+        if (array_key_exists($cacheKey, self::$columnExistenceCache)) {
+            return self::$columnExistenceCache[$cacheKey];
+        }
+
+        try {
+            $exists = $rule->getConnection()
+                ->getSchemaBuilder()
+                ->hasColumn($rule->getTable(), $column);
+        } catch (Throwable) {
+            $exists = false;
+        }
+
+        self::$columnExistenceCache[$cacheKey] = $exists;
+
+        return $exists;
+    }
+
+    public static function flushColumnExistenceCache(): void
+    {
+        self::$columnExistenceCache = [];
     }
 
     /**
@@ -93,6 +129,10 @@ final class CollectionRule extends Model
     public function scopeActive(Builder $query): Builder
     {
         // Provide an opt-in scope for diagnostics that disable the global ActiveScope.
+        if (! self::hasTableColumn($this, 'is_active')) {
+            return $query;
+        }
+
         return $query->where('is_active', true);
     }
 

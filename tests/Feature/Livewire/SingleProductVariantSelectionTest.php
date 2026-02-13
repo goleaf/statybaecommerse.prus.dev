@@ -76,7 +76,7 @@ final class SingleProductVariantSelectionTest extends TestCase
         ], $component->get('inventorySummary'));
         $this->assertEquals((float) $defaultVariant->price, $component->get('pricingSummary')['current']);
         $this->assertSame(
-            __('product_variants.messages.in_stock', ['quantity' => 18]),
+            __('product.variants.messages.in_stock', ['quantity' => 18]),
             $component->get('stockMessage')
         );
 
@@ -91,7 +91,7 @@ final class SingleProductVariantSelectionTest extends TestCase
         ], $component->get('inventorySummary'));
         $this->assertEquals((float) $lowStockVariant->price, $component->get('pricingSummary')['current']);
         $this->assertSame(
-            __('product_variants.messages.low_stock', ['quantity' => 2]),
+            __('product.variants.messages.low_stock', ['quantity' => 2]),
             $component->get('stockMessage')
         );
     }

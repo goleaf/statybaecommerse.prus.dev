@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\ReferralRewardLogs;
 
 use App\Filament\Resources\ReferralRewardLogs\Pages\CreateReferralRewardLog;
@@ -19,6 +21,8 @@ class ReferralRewardLogResource extends Resource
     protected static ?string $model = ReferralRewardLog::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
+    protected static bool $shouldRegisterNavigation = false;
 
     public static function form(Schema $schema): Schema
     {
@@ -40,9 +44,9 @@ class ReferralRewardLogResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListReferralRewardLogs::route('/'),
+            'index'  => ListReferralRewardLogs::route('/'),
             'create' => CreateReferralRewardLog::route('/create'),
-            'edit' => EditReferralRewardLog::route('/{record}/edit'),
+            'edit'   => EditReferralRewardLog::route('/{record}/edit'),
         ];
     }
 }

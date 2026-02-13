@@ -39,9 +39,9 @@ final class ReferralsTable
             ->filters([
                 SelectFilter::make('status')
                     ->options([
-                        'pending' => 'pending',
+                        'pending'   => 'pending',
                         'completed' => 'completed',
-                        'expired' => 'expired',
+                        'expired'   => 'expired',
                     ]),
             ])
             ->recordActions([

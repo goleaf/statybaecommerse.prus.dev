@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit;
 
+use App\Enums\Industry;
 use App\Models\Company;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schema;
@@ -112,13 +113,13 @@ final class CompanyModelTest extends TestCase
 
     public function test_company_by_industry_scope_works(): void
     {
-        Company::factory()->create(['industry' => 'Technology']);
-        Company::factory()->create(['industry' => 'Healthcare']);
+        Company::factory()->create(['industry' => Industry::TECHNOLOGY->value]);
+        Company::factory()->create(['industry' => Industry::HEALTHCARE->value]);
 
-        $techCompanies = Company::byIndustry('Technology')->get();
+        $techCompanies = Company::byIndustry(Industry::TECHNOLOGY->value)->get();
 
         $this->assertCount(1, $techCompanies);
-        $this->assertEquals('Technology', $techCompanies->first()->industry);
+        $this->assertSame(Industry::TECHNOLOGY, $techCompanies->first()->industry);
     }
 
     public function test_company_by_size_scope_works(): void

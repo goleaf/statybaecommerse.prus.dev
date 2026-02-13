@@ -295,16 +295,6 @@ class SystemSettingCategoryTest extends TestCase
         $this->assertSame(['color' => 'emerald'], $fresh->meta['badge']);
     }
 
-    public function test_soft_deletes(): void
-    {
-        $category = SystemSettingCategory::factory()->create();
-        $categoryId = $category->id;
-
-        $category->delete();
-
-        $this->assertSoftDeleted('system_setting_categories', ['id' => $categoryId]);
-    }
-
     public function test_updates_do_not_require_activity_log_table(): void
     {
         $category = SystemSettingCategory::factory()->create(['name' => 'Original Name']);

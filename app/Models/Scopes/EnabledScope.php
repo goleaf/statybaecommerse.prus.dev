@@ -38,6 +38,16 @@ final class EnabledScope implements Scope
                 return;
             }
 
+            try {
+                $schema = $model->getConnection()->getSchemaBuilder();
+
+                if (! $schema->hasTable($model->getTable()) || ! $schema->hasColumn($model->getTable(), 'is_enabled')) {
+                    return;
+                }
+            } catch (Throwable) {
+                return;
+            }
+
             $builder->where($model->qualifyColumn('is_enabled'), true);
 
             return;
@@ -45,7 +55,23 @@ final class EnabledScope implements Scope
 
         $connection = $model->getConnection();
         $table = $model->getTable();
-        $cacheKey = sprintf('%s::%s', $connection->getName() ?: 'default', $table);
+
+        if (app()->runningUnitTests()) {
+            try {
+                $schema = $connection->getSchemaBuilder();
+
+                if ($schema->hasTable($table) && $schema->hasColumn($table, 'is_enabled')) {
+                    $builder->where($model->qualifyColumn('is_enabled'), true);
+                }
+            } catch (Throwable) {
+                return;
+            }
+
+            return;
+        }
+
+        $database = $connection->getDatabaseName() ?: 'default-db';
+        $cacheKey = sprintf('%s::%s::%s', $connection->getName() ?: 'default', $database, $table);
 
         $shouldRefresh = ! array_key_exists($cacheKey, self::$columnPresence);
 

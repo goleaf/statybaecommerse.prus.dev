@@ -10,20 +10,30 @@ use App\Filament\Resources\Users\Pages\CreateUser;
 use App\Filament\Resources\Users\Pages\EditUser;
 use App\Filament\Resources\Users\Pages\ListUsers;
 use App\Filament\Resources\Users\Pages\ViewUser;
+use App\Filament\Resources\Users\RelationManagers\AddressesRelationManager;
+use App\Filament\Resources\Users\RelationManagers\CartItemsRelationManager;
+use App\Filament\Resources\Users\RelationManagers\CouponUsagesRelationManager;
 use App\Filament\Resources\Users\RelationManagers\CustomerGroupsRelationManager;
+use App\Filament\Resources\Users\RelationManagers\DiscountRedemptionsRelationManager;
+use App\Filament\Resources\Users\RelationManagers\DocumentsRelationManager;
+use App\Filament\Resources\Users\RelationManagers\NotificationsRelationManager;
 use App\Filament\Resources\Users\RelationManagers\OrdersRelationManager;
 use App\Filament\Resources\Users\RelationManagers\PartnersRelationManager;
+use App\Filament\Resources\Users\RelationManagers\ReferralCodesRelationManager;
+use App\Filament\Resources\Users\RelationManagers\ReferralRewardsRelationManager;
 use App\Filament\Resources\Users\RelationManagers\ReferralsRelationManager;
+use App\Filament\Resources\Users\RelationManagers\SubscriberRelationManager;
 use App\Models\Address;
 use App\Models\AdminUser;
 use App\Models\CartItem;
-use App\Models\CouponUsage;
 use App\Models\Company;
+use App\Models\CouponUsage;
 use App\Models\CustomerGroup;
 use App\Models\Discount;
 use App\Models\DiscountCode;
 use App\Models\DiscountRedemption;
 use App\Models\Document;
+use App\Models\DocumentTemplate;
 use App\Models\Notification;
 use App\Models\Order;
 use App\Models\Partner;
@@ -60,6 +70,24 @@ class UserResourceTest extends TestCase
         $this->assertTrue($table->getColumn('phone_number')->isSortable());
         $this->assertTrue($table->getColumn('is_active')->isSortable());
         $this->assertTrue($table->getColumn('created_at')->isSortable());
+    }
+
+    public function test_users_table_record_url_defaults_to_edit_page(): void
+    {
+        $this->resolveAdminPanel();
+        $this->actingAs(AdminUser::factory()->create(), 'admin');
+
+        $user = User::factory()->create();
+
+        $component = Livewire::test(ListUsers::class)
+            ->assertSuccessful();
+
+        $table = $component->instance()->getTable();
+
+        $this->assertSame(
+            UserResource::getUrl('edit', ['record' => $user]),
+            $table->getRecordUrl($user),
+        );
     }
 
     public function test_admins_are_hidden_from_list(): void
@@ -722,6 +750,80 @@ class UserResourceTest extends TestCase
         ]);
     }
 
+    public function test_documents_relation_manager_can_create_document_for_user(): void
+    {
+        $this->resolveAdminPanel();
+
+        $this->actingAs(AdminUser::factory()->create(), 'admin');
+
+        $user = User::factory()->create();
+        $template = DocumentTemplate::factory()->create([
+            'name'      => 'User Contract',
+            'is_active' => true,
+        ]);
+
+        Livewire::test(DocumentsRelationManager::class, [
+            'ownerRecord' => $user,
+            'pageClass'   => EditUser::class,
+        ])
+            ->assertSuccessful()
+            ->mountTableAction('create')
+            ->set('mountedActions.0.data.document_template_id', $template->getKey())
+            ->set('mountedActions.0.data.title', 'Contract for customer')
+            ->set('mountedActions.0.data.status', 'draft')
+            ->callMountedTableAction()
+            ->assertHasNoTableActionErrors();
+
+        $this->assertDatabaseHas('documents', [
+            'document_template_id' => $template->getKey(),
+            'documentable_type'    => User::class,
+            'documentable_id'      => $user->getKey(),
+            'title'                => 'Contract for customer',
+            'status'               => 'draft',
+        ]);
+    }
+
+    public function test_referral_rewards_relation_manager_can_create_reward_for_user(): void
+    {
+        $this->resolveAdminPanel();
+
+        $this->actingAs(AdminUser::factory()->create(), 'admin');
+
+        $owner = User::factory()->create();
+        $referred = User::factory()->create();
+        $referral = Referral::factory()->create([
+            'referrer_id' => $owner->getKey(),
+            'referred_id' => $referred->getKey(),
+        ]);
+
+        Livewire::test(ReferralRewardsRelationManager::class, [
+            'ownerRecord' => $owner,
+            'pageClass'   => EditUser::class,
+        ])
+            ->assertSuccessful()
+            ->mountTableAction('create')
+            ->set('mountedActions.0.data.referral_id', $referral->getKey())
+            ->set('mountedActions.0.data.title', 'Reward from tab')
+            ->set('mountedActions.0.data.amount', 15.5)
+            ->set('mountedActions.0.data.status', 'pending')
+            ->set('mountedActions.0.data.type', 'referrer_bonus')
+            ->callMountedTableAction()
+            ->assertHasNoTableActionErrors();
+
+        /** @var ReferralReward|null $reward */
+        $reward = ReferralReward::query()
+            ->where('user_id', $owner->getKey())
+            ->where('referral_id', $referral->getKey())
+            ->where('type', 'referrer_bonus')
+            ->latest('id')
+            ->first();
+
+        $this->assertNotNull($reward);
+        $this->assertSame(15.5, (float) $reward->amount);
+        $this->assertSame('pending', $reward->status);
+        $this->assertSame('Reward from tab', $reward->getTranslation('title', 'lt'));
+    }
+
     public function test_can_render_user_view_page_with_related_tabs(): void
     {
         $this->resolveAdminPanel();
@@ -735,12 +837,27 @@ class UserResourceTest extends TestCase
         ])
             ->assertSuccessful()
             ->assertSee(__('messages.profile'))
-            ->assertSee(__('messages.address'))
-            ->assertDontSee(__('messages.orders'));
+            ->assertSee(__('messages.orders'));
     }
 
-    public function test_orders_relation_manager_is_not_registered_for_users_resource(): void
+    public function test_user_resource_registers_all_existing_relation_managers(): void
     {
-        $this->assertNotContains(OrdersRelationManager::class, UserResource::getRelations());
+        $relations = UserResource::getRelations();
+
+        $this->assertEqualsCanonicalizing([
+            CustomerGroupsRelationManager::class,
+            PartnersRelationManager::class,
+            OrdersRelationManager::class,
+            AddressesRelationManager::class,
+            CartItemsRelationManager::class,
+            CouponUsagesRelationManager::class,
+            DiscountRedemptionsRelationManager::class,
+            NotificationsRelationManager::class,
+            SubscriberRelationManager::class,
+            DocumentsRelationManager::class,
+            ReferralCodesRelationManager::class,
+            ReferralsRelationManager::class,
+            ReferralRewardsRelationManager::class,
+        ], $relations);
     }
 }

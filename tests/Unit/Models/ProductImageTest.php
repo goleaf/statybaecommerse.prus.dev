@@ -189,7 +189,7 @@ final class ProductImageTest extends TestCase
         $otherProduct = Product::factory()->create([
             'status'       => 'published',
             'published_at' => now(),
-            'is_visible'   => true,
+            'is_enabled'   => true,
         ]);
 
         ProductImage::factory()->count(2)->create([

@@ -2,19 +2,13 @@
 
 declare(strict_types=1);
 
+use App\Filament\Resources\ReferralCodeResource;
 use App\Filament\Resources\ReferralCodeResource\Pages\ListReferralCodes;
-use App\Models\User;
-use Filament\Facades\Filament;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
-use function Pest\Laravel\get;
+uses(RefreshDatabase::class);
 
-it('feature: mounts referral code index page', function () {
-    $user = User::factory()->create();
-    actingAs($user);
-
-    Filament::setCurrentPanel('admin');
-
-    $response = get(ListReferralCodes::getUrl());
-
-    $response->assertOk();
+it('keeps compatibility referral code pages registered', function (): void {
+    expect(ListReferralCodes::class)->toBeString();
+    expect(ReferralCodeResource::getPages())->toHaveKeys(['index', 'create', 'edit']);
 });

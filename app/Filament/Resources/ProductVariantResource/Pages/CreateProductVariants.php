@@ -6,11 +6,11 @@ namespace App\Filament\Resources\ProductVariantResource\Pages;
 
 use App\Filament\Resources\ProductVariantResource;
 use App\Models\ProductVariant;
+use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\ValidationException;
-use Filament\Resources\Pages\CreateRecord;
 
 class CreateProductVariants extends CreateRecord
 {
@@ -18,7 +18,7 @@ class CreateProductVariants extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        $table = (new ProductVariant())->getTable();
+        $table = (new ProductVariant)->getTable();
 
         if (! Schema::hasTable($table)) {
             return $data;
@@ -30,21 +30,37 @@ class CreateProductVariants extends CreateRecord
         // columns that currently exist in the underlying product_variants table.
         $filteredData = array_intersect_key($data, $columns);
 
-        foreach (['track_inventory', 'allow_backorder', 'is_enabled', 'is_default_variant', 'is_featured', 'is_new', 'is_bestseller'] as $booleanField) {
-            if (! array_key_exists($booleanField, $filteredData)) {
+        $booleanDefaults = [
+            'track_inventory'    => true,
+            'allow_backorder'    => false,
+            'is_enabled'         => true,
+            'is_default_variant' => false,
+            'is_featured'        => false,
+            'is_new'             => false,
+            'is_bestseller'      => false,
+        ];
+
+        foreach ($booleanDefaults as $booleanField => $defaultValue) {
+            if (! array_key_exists($booleanField, $columns)) {
+                continue;
+            }
+
+            if (
+                ! array_key_exists($booleanField, $filteredData)
+                || $filteredData[$booleanField] === null
+                || $filteredData[$booleanField] === ''
+            ) {
+                $filteredData[$booleanField] = $defaultValue;
+
                 continue;
             }
 
             $normalizedValue = filter_var($filteredData[$booleanField], FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE);
-            $filteredData[$booleanField] = $normalizedValue ?? (bool) $filteredData[$booleanField];
+            $filteredData[$booleanField] = $normalizedValue ?? $defaultValue;
         }
 
         if (array_key_exists('status', $columns) && ! array_key_exists('status', $filteredData)) {
             $filteredData['status'] = 'active';
-        }
-
-        if (array_key_exists('is_enabled', $columns) && ! array_key_exists('is_enabled', $filteredData)) {
-            $filteredData['is_enabled'] = true;
         }
 
         if (array_key_exists('available_quantity', $columns) && ! array_key_exists('available_quantity', $filteredData)) {

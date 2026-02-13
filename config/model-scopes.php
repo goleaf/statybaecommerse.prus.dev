@@ -57,7 +57,6 @@ return [
         App\Models\SystemSetting::class,
         App\Models\SystemSettingCategory::class,
         App\Models\EmailCampaign::class,
-        App\Models\SeoData::class,
         App\Models\Referral::class,
         App\Models\ReferralCampaign::class,
         App\Models\ReferralCode::class,

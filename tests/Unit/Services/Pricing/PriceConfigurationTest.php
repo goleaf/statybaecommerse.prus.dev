@@ -14,4 +14,3 @@ it('always resolves eur as pricing currency', function (): void {
     expect($usdConfigured->currency())->toBe('EUR');
     expect($emptyConfigured->currency())->toBe('EUR');
 });
-

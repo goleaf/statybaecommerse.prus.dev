@@ -76,6 +76,33 @@ test('standard seeders keep model ownership overlap minimal and explicit', funct
             'Database\\Seeders\\CountrySeeder',
             'Database\\Seeders\\Cities\\CitiesMergedSeeder',
         ],
+        'Company' => [
+            'Database\\Seeders\\UsersCompanyTabSeeder',
+            'Database\\Seeders\\UsersCustomerGroupsTabSeeder',
+            'Database\\Seeders\\UsersPartnersTabSeeder',
+        ],
+        'CustomerGroup' => [
+            'Database\\Seeders\\CustomerGroupSeeder',
+            'Database\\Seeders\\UsersCompanyTabSeeder',
+            'Database\\Seeders\\UsersCustomerGroupsTabSeeder',
+        ],
+        'Location' => [
+            'Database\\Seeders\\InventorySeeder',
+            'Database\\Seeders\\WarehouseSeeder',
+        ],
+        'Partner' => [
+            'Database\\Seeders\\UsersCompanyTabSeeder',
+            'Database\\Seeders\\UsersPartnersTabSeeder',
+        ],
+        'Product' => [
+            'Database\\Seeders\\InventorySeeder',
+            'Database\\Seeders\\UsersCompanyTabSeeder',
+        ],
+        'User' => [
+            'Database\\Seeders\\UsersCompanyTabSeeder',
+            'Database\\Seeders\\UsersCustomerGroupsTabSeeder',
+            'Database\\Seeders\\UsersPartnersTabSeeder',
+        ],
     ];
 
     $classes = config('seeds.standard_seeders', []);

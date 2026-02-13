@@ -7,10 +7,6 @@ namespace App\Filament\Resources\CollectionResource\RelationManagers;
 use App\Filament\Resources\PriceResource;
 use App\Models\Price;
 use Filament\Actions\Action;
-use Filament\Actions\AttachAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DetachAction;
-use Filament\Actions\DetachBulkAction;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -47,19 +43,9 @@ class PricesRelationManager extends RelationManager
             ->filters([
                 //
             ])
-            ->headerActions([
-                AttachAction::make()
-                    ->preloadRecordSelect(),
-            ])
-            ->actions([
+            ->recordActions([
                 Action::make('view')
                     ->url(fn (Price $record): string => PriceResource::getUrl('edit', ['record' => $record])),
-                DetachAction::make(),
-            ])
-            ->bulkActions([
-                BulkActionGroup::make([
-                    DetachBulkAction::make(),
-                ]),
             ]);
     }
 }

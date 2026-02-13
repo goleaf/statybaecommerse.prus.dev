@@ -6,6 +6,8 @@ namespace App\Filament\Resources\Users\Tables;
 
 use App\Enums\ExportType;
 use App\Filament\Actions\RequestExportBulkAction;
+use App\Filament\Resources\UserResource;
+use App\Models\User;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -152,9 +154,10 @@ class UsersTable
                 TernaryFilter::make('is_active')
                     ->label(__('messages.active')),
             ])
+            ->recordUrl(fn (User $record): string => UserResource::getUrl('edit', ['record' => $record]))
             ->recordActions([
-                ViewAction::make(),
                 EditAction::make(),
+                ViewAction::make(),
             ])
             ->bulkActions([
                 RequestExportBulkAction::make(ExportType::USERS),

@@ -725,9 +725,9 @@ return [
             'update' => 'Tracking aktualisieren',
         ],
     ],
-    'orders_import'        => 'Bestellungen importieren',
-    'partners_import'      => 'Partner importieren',
-    'placeholders'         => [
+    'orders_import'   => 'Bestellungen importieren',
+    'partners_import' => 'Partner importieren',
+    'placeholders'    => [
         'title' => 'Title',
     ],
     'prices' => [

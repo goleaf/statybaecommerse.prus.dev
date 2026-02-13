@@ -22,7 +22,7 @@ class AttributeFactory extends Factory
         $types = ['text', 'number', 'boolean', 'select', 'multiselect', 'color', 'date', 'textarea', 'file', 'image'];
         $groupNames = ['basic_info', 'technical_specs', 'appearance', 'dimensions', 'materials', 'features', 'compatibility', 'warranty', 'shipping', 'seo'];
 
-        return [
+        return $this->guardForMissingColumns([
             'name'             => $label,
             'slug'             => strtolower(str_replace(' ', '-', $label)),
             'type'             => $this->faker->randomElement($types),
@@ -63,7 +63,7 @@ class AttributeFactory extends Factory
                 ['format' => 'currency', 'currency' => 'EUR'],
                 ['format' => 'percentage'],
             ]),
-        ];
+        ]);
     }
 
     private static function ensureSchema(): void
@@ -379,5 +379,52 @@ class AttributeFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'category_id' => $categoryId,
         ]);
+    }
+
+    public function configure(): static
+    {
+        return $this->afterMaking(function (\App\Models\Attribute $attribute): void {
+            $this->stripMissingAttributesFromModel($attribute);
+        });
+    }
+
+    /**
+     * @param  array<string, mixed>  $attributes
+     * @return array<string, mixed>
+     */
+    private function guardForMissingColumns(array $attributes): array
+    {
+        $table = (new \App\Models\Attribute)->getTable();
+
+        if (! Schema::hasTable($table)) {
+            return $attributes;
+        }
+
+        foreach (array_keys($attributes) as $column) {
+            if (! Schema::hasColumn($table, $column)) {
+                unset($attributes[$column]);
+            }
+        }
+
+        return $attributes;
+    }
+
+    private function stripMissingAttributesFromModel(\App\Models\Attribute $attribute): void
+    {
+        $table = $attribute->getTable();
+
+        if (! Schema::hasTable($table)) {
+            return;
+        }
+
+        $columns = array_flip(Schema::getColumnListing($table));
+
+        foreach (array_keys($attribute->getAttributes()) as $key) {
+            if (array_key_exists($key, $columns)) {
+                continue;
+            }
+
+            $attribute->offsetUnset($key);
+        }
     }
 }

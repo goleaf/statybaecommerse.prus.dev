@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
+use App\Enums\Industry;
 use App\Models\Company;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -27,18 +28,7 @@ final class CompanyFactory extends Factory
             'phone'    => fake()->e164PhoneNumber(), // Use E.164 format to satisfy tel validation in admin forms.
             'address'  => fake()->address(),
             'website'  => fake()->url(),
-            'industry' => fake()->randomElement([
-                'Technology',
-                'Healthcare',
-                'Finance',
-                'Education',
-                'Manufacturing',
-                'Retail',
-                'Real Estate',
-                'Consulting',
-                'Media',
-                'Transportation',
-            ]),
+            'industry' => fake()->randomElement(Industry::values()),
             'size'        => fake()->randomElement(['small', 'medium', 'large']),
             'description' => fake()->paragraph(),
             'is_active'   => true,
@@ -106,7 +96,7 @@ final class CompanyFactory extends Factory
     public function technology(): static
     {
         return $this->state(fn (array $attributes) => [
-            'industry' => 'Technology',
+            'industry' => Industry::TECHNOLOGY->value,
         ]);
     }
 
@@ -116,7 +106,7 @@ final class CompanyFactory extends Factory
     public function healthcare(): static
     {
         return $this->state(fn (array $attributes) => [
-            'industry' => 'Healthcare',
+            'industry' => Industry::HEALTHCARE->value,
         ]);
     }
 }

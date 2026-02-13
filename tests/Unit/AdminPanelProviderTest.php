@@ -10,10 +10,10 @@ beforeEach(function (): void {
     RefreshDatabaseState::$migrated = true;
 });
 
-it('unit: disables the topbar', function (): void {
+it('unit: keeps the topbar enabled', function (): void {
     $provider = new AdminPanelProvider(app());
 
     $panel = $provider->panel(Panel::make());
 
-    expect($panel->hasTopbar())->toBeFalse();
+    expect($panel->hasTopbar())->toBeTrue();
 });

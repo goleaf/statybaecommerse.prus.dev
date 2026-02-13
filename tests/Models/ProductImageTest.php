@@ -29,6 +29,7 @@ final class ProductImageTest extends TestCase
             'alt_text',
             'sort_order',
             'is_active',
+            'is_default',
         ], $model->getFillable());
 
         // Ensure the casts map the important attributes to strong native types.
@@ -36,10 +37,12 @@ final class ProductImageTest extends TestCase
             'product_id' => 'integer',
             'sort_order' => 'integer',
             'is_active'  => 'boolean',
+            'is_default' => 'boolean',
         ], $model->getCasts());
 
         // Check that images default to the active state when the attribute is not provided.
         self::assertTrue((bool) $model->getAttribute('is_active'));
+        self::assertFalse((bool) $model->getAttribute('is_default'));
     }
 
     public function test_product_relationship_returns_parent_model(): void

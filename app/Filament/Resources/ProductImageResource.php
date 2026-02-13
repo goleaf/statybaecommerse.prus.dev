@@ -22,6 +22,7 @@ use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 
 final class ProductImageResource extends BaseResource
@@ -79,7 +80,11 @@ final class ProductImageResource extends BaseResource
                             ->schema([
                                 Select::make('product_id')
                                     ->label(__('messages.product'))
-                                    ->relationship('product', 'name')
+                                    ->relationship(
+                                        name: 'product',
+                                        titleAttribute: 'name',
+                                        modifyQueryUsing: static fn (Builder $query): Builder => $query->withoutGlobalScopes(),
+                                    )
                                     ->required()
                                     ->searchable()
                                     ->preload(),

@@ -11,7 +11,6 @@ use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -41,7 +40,6 @@ final class ProductImageResourceTest extends TestCase
         $this->product = Product::factory()->create([
             'status'       => 'published',
             'published_at' => now(),
-            'is_visible'   => true,
         ]);
 
         Storage::fake('public');
@@ -65,12 +63,12 @@ final class ProductImageResourceTest extends TestCase
 
     public function test_can_create_product_image(): void
     {
-        $file = UploadedFile::fake()->image('product.jpg');
+        Storage::disk('public')->put('product-images/product-resource.jpg', 'binary-content');
 
         Livewire::test(CreateProductImage::class)
             ->fillForm([
                 'product_id' => $this->product->id,
-                'path'       => $file,
+                'path'       => ['product-images/product-resource.jpg'],
                 'alt_text'   => 'Gallery image',
                 'sort_order' => 2,
             ])
@@ -81,6 +79,33 @@ final class ProductImageResourceTest extends TestCase
         $this->assertNotNull($image);
         $this->assertSame('Gallery image', $image->alt_text);
         $this->assertSame(2, $image->sort_order);
+    }
+
+    public function test_can_create_product_image_for_existing_unpublished_product(): void
+    {
+        $existingProduct = Product::factory()->create([
+            'status'       => 'draft',
+            'published_at' => null,
+            'is_enabled'   => false,
+        ]);
+
+        Storage::disk('public')->put('product-images/draft-product.jpg', 'binary-content');
+
+        Livewire::test(CreateProductImage::class)
+            ->fillForm([
+                'product_id' => $existingProduct->id,
+                'path'       => ['product-images/draft-product.jpg'],
+                'alt_text'   => 'Draft product image',
+                'sort_order' => 1,
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $this->assertDatabaseHas('product_images', [
+            'product_id' => $existingProduct->id,
+            'alt_text'   => 'Draft product image',
+            'sort_order' => 1,
+        ]);
     }
 
     public function test_can_edit_product_image(): void

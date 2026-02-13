@@ -28,6 +28,9 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Arr;
 use JsonException;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
+use Spatie\Translatable\HasTranslations;
+
 /**
  * User
  *
@@ -44,13 +47,11 @@ use Laravel\Sanctum\HasApiTokens;
  *
  * @mixin \Eloquent
  */
-use Spatie\Translatable\HasTranslations;
-
 #[ScopedBy([ActiveScope::class])]
 final class User extends Authenticatable implements FilamentUser, HasLocalePreferenceContract
 {
     use HasApiTokens;
-    use HasFactory, HasSafeSerialization, HasTranslations, Notifiable, OrdersByName;
+    use HasFactory, HasRoles, HasSafeSerialization, HasTranslations, Notifiable, OrdersByName;
 
     // Allow issuing API tokens for Sanctum-protected endpoints.
     use SecurePasswordHandling;
@@ -727,22 +728,6 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     public function files(): MorphMany
     {
         return $this->morphMany(\App\Models\File::class, 'fileable');
-    }
-
-    /**
-     * Determine if the user has the given role.
-     */
-    public function hasRole(string $role): bool
-    {
-        if ($role === 'admin') {
-            return (bool) $this->is_admin;
-        }
-
-        if ($role === 'super_admin') {
-            return (bool) $this->is_admin;
-        }
-
-        return false;
     }
 
     // Scopes for filtering

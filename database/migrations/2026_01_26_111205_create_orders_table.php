@@ -50,6 +50,8 @@ return new class extends Migration
             $table->index('number');
             $table->index('user_id');
             $table->index('created_at', 'orders_created_at_index');
+            $table->index(['status', 'created_at'], 'orders_status_created_at_index');
+            $table->index(['user_id', 'created_at'], 'orders_user_created_at_index');
         });
     }
 

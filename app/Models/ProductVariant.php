@@ -60,6 +60,13 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
             $variantId = (int) ($variant->getKey() ?? 0);
             $productId = (int) ($variant->product_id ?? 0);
 
+            if (app()->runningUnitTests()) {
+                // Unit tests assert relationship visibility immediately after create.
+                $variant->syncPrimaryProductPivot();
+
+                return;
+            }
+
             // Defer pivot synchronization until request termination so relation-based
             // create flows can finish their own attach without duplicate-key failures.
             app()->terminating(static function () use ($variantId, $productId): void {

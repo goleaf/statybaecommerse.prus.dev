@@ -38,14 +38,40 @@ final class VisibleScope implements Scope
                 return;
             }
 
-            $builder->where('is_visible', true);
+            try {
+                $schema = $model->getConnection()->getSchemaBuilder();
+
+                if (! $schema->hasTable($model->getTable()) || ! $schema->hasColumn($model->getTable(), 'is_visible')) {
+                    return;
+                }
+            } catch (Throwable) {
+                return;
+            }
+
+            $builder->where($model->qualifyColumn('is_visible'), true);
 
             return;
         }
 
         $connection = $model->getConnection();
         $table = $model->getTable();
-        $cacheKey = sprintf('%s::%s', $connection->getName() ?: 'default', $table);
+
+        if (app()->runningUnitTests()) {
+            try {
+                $schema = $connection->getSchemaBuilder();
+
+                if ($schema->hasTable($table) && $schema->hasColumn($table, 'is_visible')) {
+                    $builder->where($model->qualifyColumn('is_visible'), true);
+                }
+            } catch (Throwable) {
+                return;
+            }
+
+            return;
+        }
+
+        $database = $connection->getDatabaseName() ?: 'default-db';
+        $cacheKey = sprintf('%s::%s::%s', $connection->getName() ?: 'default', $database, $table);
 
         if (! array_key_exists($cacheKey, self::$columnPresence)) {
             try {

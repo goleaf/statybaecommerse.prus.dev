@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\ReferralCodeStatistics;
 
 use App\Filament\Resources\ReferralCodeStatistics\Pages\CreateReferralCodeStatistics;
@@ -19,6 +21,8 @@ class ReferralCodeStatisticsResource extends Resource
     protected static ?string $model = ReferralCodeStatistics::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
+    protected static bool $shouldRegisterNavigation = false;
 
     public static function form(Schema $schema): Schema
     {
@@ -40,9 +44,9 @@ class ReferralCodeStatisticsResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListReferralCodeStatistics::route('/'),
+            'index'  => ListReferralCodeStatistics::route('/'),
             'create' => CreateReferralCodeStatistics::route('/create'),
-            'edit' => EditReferralCodeStatistics::route('/{record}/edit'),
+            'edit'   => EditReferralCodeStatistics::route('/{record}/edit'),
         ];
     }
 }

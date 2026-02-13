@@ -60,7 +60,7 @@ final class ReferralCampaign extends Model
      */
     protected string $nameColumn = 'name';
 
-    protected $fillable = ['name', 'description', 'is_active', 'start_date', 'end_date', 'reward_amount', 'reward_type', 'max_referrals_per_user', 'max_total_referrals', 'conditions', 'metadata', 'meta'];
+    protected $fillable = ['name', 'description', 'is_active', 'start_date', 'end_date', 'reward_amount', 'reward_type', 'max_referrals_per_user', 'max_total_referrals', 'conditions', 'metadata', 'meta', 'deprecated_at'];
 
     /** @var array<int, string> */
     public array $translatable = ['name', 'description'];
@@ -70,7 +70,7 @@ final class ReferralCampaign extends Model
      */
     protected function casts(): array
     {
-        return ['is_active' => 'boolean', 'start_date' => 'datetime', 'end_date' => 'datetime', 'reward_amount' => 'float', 'max_referrals_per_user' => 'integer', 'max_total_referrals' => 'integer', 'conditions' => 'array', 'metadata' => 'array', 'meta' => 'array'];
+        return ['is_active' => 'boolean', 'start_date' => 'datetime', 'end_date' => 'datetime', 'reward_amount' => 'float', 'max_referrals_per_user' => 'integer', 'max_total_referrals' => 'integer', 'conditions' => 'array', 'metadata' => 'array', 'meta' => 'array', 'deprecated_at' => 'datetime'];
     }
 
     /**

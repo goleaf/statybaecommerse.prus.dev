@@ -26,7 +26,6 @@ final class ProductTest extends TestCase
 
         // Casting rules should ensure numeric precision and boolean flags are hydrated consistently.
         self::assertSame('decimal:2', $model->getCasts()['price'] ?? null);
-        self::assertSame('boolean', $model->getCasts()['is_visible'] ?? null);
 
         // Appended accessors should expose computed inventory metadata to API consumers by default.
         self::assertContains('available_quantity', $model->getAppends());
@@ -61,27 +60,6 @@ final class ProductTest extends TestCase
             $beta->getKey(),
             $gamma->getKey(),
         ], $orderedIds);
-    }
-
-    public function test_translatable_attributes_are_serialised_when_arrays_are_assigned(): void
-    {
-        // Work with a fresh model instance so assignments happen in-memory.
-        $product = new Product;
-
-        // Provide multilingual payloads that should be normalised into JSON storage.
-        $product->setAttribute('name', [
-            'en' => 'Safety Helmet',
-            'lt' => 'Apsauginis šalmas',
-        ]);
-
-        // Extract the raw attribute to confirm it was serialised and retains the translations.
-        $raw = $product->getAttributes()['name'] ?? null;
-        self::assertIsString($raw);
-        self::assertJson($raw);
-        self::assertSame([
-            'en' => 'Safety Helmet',
-            'lt' => 'Apsauginis šalmas',
-        ], json_decode($raw, true, 512, JSON_THROW_ON_ERROR));
     }
 
     public function test_available_quantity_excludes_released_or_expired_reservations(): void

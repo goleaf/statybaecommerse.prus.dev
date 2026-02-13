@@ -160,6 +160,8 @@ class ProductFactory extends Factory
     {
         return $this
             ->afterMaking(function (Product $product): void {
+                $this->stripMissingAttributesFromModel($product);
+
                 if ($product->brand_id === null && ! $product->relationLoaded('brand')) {
                     $product->setRelation('brand', Brand::factory()->make());
                 }
@@ -326,6 +328,25 @@ class ProductFactory extends Factory
         }
 
         return $attributes;
+    }
+
+    private function stripMissingAttributesFromModel(Product $product): void
+    {
+        $table = $product->getTable();
+
+        if (! Schema::hasTable($table)) {
+            return;
+        }
+
+        $columns = array_flip(Schema::getColumnListing($table));
+
+        foreach (array_keys($product->getAttributes()) as $attribute) {
+            if (array_key_exists($attribute, $columns)) {
+                continue;
+            }
+
+            $product->offsetUnset($attribute);
+        }
     }
 
     public function sequence(...$sequence)

@@ -7,6 +7,7 @@ namespace App\Filament\Actions;
 use App\Contracts\DocumentServiceContract;
 use App\Enums\DocumentTemplateCategory;
 use App\Enums\DocumentTemplateType;
+use App\Models\Document;
 use App\Models\DocumentTemplate;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
@@ -30,6 +31,8 @@ final class InvoicePdfAction
                         relatedModel: $record,
                         title: sprintf('%s_%s_%s', $template->name, $record->getAttribute('number') ?? $record->getKey(), now()->format('Y-m-d_H-i'))
                     );
+
+                    self::ensureDocumentTemplate($document, $template);
 
                     $downloadUrl = $documentService->generatePdf($document);
 
@@ -76,6 +79,20 @@ final class InvoicePdfAction
         ])->saveQuietly();
 
         return $template;
+    }
+
+    private static function ensureDocumentTemplate(Document $document, DocumentTemplate $template): void
+    {
+        if ($document->template instanceof DocumentTemplate) {
+            return;
+        }
+
+        $document->setAttribute('document_template_id', $template->getKey());
+        $document->setRelation('template', $template);
+
+        if ($document->exists) {
+            $document->saveQuietly();
+        }
     }
 
     /**

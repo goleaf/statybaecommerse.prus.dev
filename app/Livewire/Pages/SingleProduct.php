@@ -153,10 +153,11 @@ final class SingleProduct extends Component
     /**
      * Structured pricing summary for the currently selected context (product or variant).
      *
-     * @var array{current: float|null, discount: float|null, currency: string|null}
+     * @var array{current: float|null, compare: float|null, discount: float|null, currency: string|null}
      */
     public array $pricingSummary = [
         'current'  => null,
+        'compare'  => null,
         'discount' => null,
         'currency' => null,
     ];
@@ -721,11 +722,29 @@ final class SingleProduct extends Component
             $result = $priceService->calculate($variant, $context);
 
             $current = (float) $result->finalPrice;
+            $compare = $result->compareAtPrice;
+
+            if ($compare === null) {
+                $fallbackAnchors = array_filter([
+                    $result->regularPrice,
+                    $result->priceListPrice,
+                    $variant->compare_price !== null ? (float) $variant->compare_price : null,
+                ], static fn (?float $amount): bool => $amount !== null && $amount > ($current + 0.0001));
+
+                if ($fallbackAnchors !== []) {
+                    $compare = max($fallbackAnchors);
+                }
+            }
 
             $discount = null;
 
+            if ($compare !== null && $compare > ($current + 0.0001)) {
+                $discount = round((($compare - $current) / $compare) * 100, 0);
+            }
+
             return [
                 'current'  => $current,
+                'compare'  => $compare !== null ? (float) $compare : null,
                 'discount' => $discount,
                 'currency' => $result->currency ?: $currency,
             ];
@@ -733,10 +752,16 @@ final class SingleProduct extends Component
 
         $priceData = $this->product->getPrice();
         $current = $priceData?->value ?? ($this->product->price !== null ? (float) $this->product->price : null);
+        $compare = $priceData?->compare;
         $discount = $priceData?->percentage;
+
+        if ($discount === null && $compare !== null && $current !== null && $compare > ($current + 0.0001)) {
+            $discount = round((($compare - $current) / $compare) * 100, 0);
+        }
 
         return [
             'current'  => $current,
+            'compare'  => $compare !== null ? (float) $compare : null,
             'discount' => $discount,
             'currency' => $currency,
         ];

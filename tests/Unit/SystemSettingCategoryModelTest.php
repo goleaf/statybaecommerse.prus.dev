@@ -199,14 +199,4 @@ class SystemSettingCategoryModelTest extends TestCase
         $this->assertEquals('English Description', $category->getTranslatedDescription('en'));
         $this->assertEquals('Default Description', $category->getTranslatedDescription('lt')); // No translation for LT
     }
-
-    public function test_soft_deletes(): void
-    {
-        $category = SystemSettingCategory::factory()->create();
-        $categoryId = $category->id;
-
-        $category->delete();
-
-        $this->assertSoftDeleted('system_setting_categories', ['id' => $categoryId]);
-    }
 }

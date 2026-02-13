@@ -20,7 +20,7 @@ it('unit: has expected navigation sort', function () {
     $prop = $ref->getProperty('navigationSort');
     $prop->setAccessible(true);
 
-    expect($prop->getValue())->toBe(3);
+    expect($prop->getValue())->toBe(4);
 });
 
 it('unit: has expected navigation icon', function () {

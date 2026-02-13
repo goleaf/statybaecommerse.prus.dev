@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\ReferralRewards;
 
 use App\Filament\Resources\ReferralRewards\Pages\CreateReferralReward;
@@ -19,6 +21,8 @@ class ReferralRewardResource extends Resource
     protected static ?string $model = ReferralReward::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
+    protected static bool $shouldRegisterNavigation = false;
 
     public static function form(Schema $schema): Schema
     {
@@ -40,9 +44,9 @@ class ReferralRewardResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListReferralRewards::route('/'),
+            'index'  => ListReferralRewards::route('/'),
             'create' => CreateReferralReward::route('/create'),
-            'edit' => EditReferralReward::route('/{record}/edit'),
+            'edit'   => EditReferralReward::route('/{record}/edit'),
         ];
     }
 }

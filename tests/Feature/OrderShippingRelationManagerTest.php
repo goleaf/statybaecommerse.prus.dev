@@ -9,8 +9,6 @@ use App\Filament\Resources\OrderResource\RelationManagers\OrderShippingRelationM
 use App\Models\Order;
 use App\Models\OrderShipping;
 use App\Models\User;
-use Filament\Actions\CreateAction;
-use Filament\Actions\Testing\TestAction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use PHPUnit\Framework\Attributes\Test;
@@ -57,19 +55,16 @@ final class OrderShippingRelationManagerTest extends TestCase
         ]);
 
         $component
-            ->callAction(
-                TestAction::make(CreateAction::class)->table(),
-                [
-                    'shipping_method' => 'express',
-                    'tracking_number' => 'TRK123456789',
-                    'carrier'         => 'DHL',
-                    'service_type'    => 'Express',
-                    'base_cost'       => 15.0,
-                    'insurance_cost'  => 5.0,
-                    'total_cost'      => 20.0,
-                ]
-            )
-            ->assertNotified();
+            ->mountTableAction('create')
+            ->set('mountedActions.0.data.shipping_method', 'express')
+            ->set('mountedActions.0.data.tracking_number', 'TRK123456789')
+            ->set('mountedActions.0.data.carrier', 'DHL')
+            ->set('mountedActions.0.data.service_type', 'Express')
+            ->set('mountedActions.0.data.base_cost', 15.0)
+            ->set('mountedActions.0.data.insurance_cost', 5.0)
+            ->set('mountedActions.0.data.total_cost', 20.0)
+            ->callMountedTableAction()
+            ->assertHasNoTableActionErrors();
 
         $this->assertDatabaseHas('order_shippings', [
             'order_id'        => $this->order->id,

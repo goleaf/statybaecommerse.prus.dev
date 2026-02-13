@@ -106,11 +106,11 @@ final class ActiveScope implements Scope
     {
         $connection = $model->getConnection();
         $cacheKey = $this->buildMetadataCacheKey($connection, $model->getTable());
+        $runningUnitTests = app()->runningUnitTests();
 
         if (defined($model::class . '::SCOPE_COLUMN_HINTS')) {
             $hints = $model::SCOPE_COLUMN_HINTS;
-
-            return self::$tableMetadataCache[$cacheKey] = [
+            $metadata = [
                 'exists'  => true,
                 'columns' => [
                     'is_active'  => (bool) ($hints['is_active'] ?? false),
@@ -119,9 +119,39 @@ final class ActiveScope implements Scope
                     'status'     => (bool) ($hints['status'] ?? false),
                 ],
             ];
+
+            try {
+                $schema = $connection->getSchemaBuilder();
+                $table = $model->getTable();
+
+                if (! $schema->hasTable($table)) {
+                    $metadata['exists'] = false;
+                } else {
+                    foreach (array_keys($metadata['columns']) as $column) {
+                        if (! $metadata['columns'][$column]) {
+                            continue;
+                        }
+
+                        $metadata['columns'][$column] = $schema->hasColumn($table, $column);
+                    }
+                }
+            } catch (Throwable) {
+                // If schema checks fail we still retain the hint-based fallback metadata.
+            }
+
+            if ($runningUnitTests) {
+                return $metadata;
+            }
+
+            return self::$tableMetadataCache[$cacheKey] = $metadata;
         }
 
         $table = $model->getTable();
+
+        if ($runningUnitTests) {
+            // Unit tests may rebuild tables at runtime; bypass stale cache entries.
+            return $this->introspectTable($connection, $table);
+        }
 
         $shouldRefresh = ! array_key_exists($cacheKey, self::$tableMetadataCache);
 
@@ -158,7 +188,9 @@ final class ActiveScope implements Scope
      */
     private function buildMetadataCacheKey(Connection $connection, string $table): string
     {
-        return sprintf('%s::%s', $connection->getName() ?: 'default', $table);
+        $database = $connection->getDatabaseName() ?: 'default-db';
+
+        return sprintf('%s::%s::%s', $connection->getName() ?: 'default', $database, $table);
     }
 
     /**
@@ -189,5 +221,10 @@ final class ActiveScope implements Scope
         }
 
         return $metadata;
+    }
+
+    public static function flushTableMetadataCache(): void
+    {
+        self::$tableMetadataCache = [];
     }
 }

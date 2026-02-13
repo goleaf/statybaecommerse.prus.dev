@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ReferralCodes\Schemas;
 
+use App\Models\ReferralCampaign;
 use App\Models\ReferralCode;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\KeyValue;
@@ -47,9 +48,11 @@ final class ReferralCodeForm
                 ->maxLength(255),
             KeyValue::make('conditions')
                 ->columnSpanFull(),
-            TextInput::make('campaign_id')
-                ->label('Campaign')
-                ->maxLength(255),
+            Select::make('campaign_id')
+                ->relationship('campaign', 'id')
+                ->getOptionLabelFromRecordUsing(static fn (ReferralCampaign $record): string => $record->localized_name)
+                ->searchable()
+                ->preload(),
             TextInput::make('source')
                 ->maxLength(255),
             KeyValue::make('tags')

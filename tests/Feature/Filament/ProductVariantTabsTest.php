@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature\Filament;
 
 use App\Filament\Resources\ProductVariantResource\Pages\ListProductVariants;
+use App\Models\Product;
 use App\Models\ProductVariant;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -13,34 +14,41 @@ final class ProductVariantTabsTest extends TestCase
 {
     use RefreshDatabase;
 
+    private Product $product;
+
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->withoutVite();
 
-        ProductVariant::factory()->create([
+        $this->product = Product::factory()->create([
+            'status'       => 'published',
+            'published_at' => now(),
+        ]);
+
+        ProductVariant::factory()->for($this->product)->create([
             'track_inventory'     => false,
             'available_quantity'  => 0,
             'stock_quantity'      => 0,
             'low_stock_threshold' => 5,
         ]);
 
-        ProductVariant::factory()->create([
+        ProductVariant::factory()->for($this->product)->create([
             'track_inventory'     => true,
             'available_quantity'  => 10,
             'stock_quantity'      => 12,
             'low_stock_threshold' => 5,
         ]);
 
-        ProductVariant::factory()->create([
+        ProductVariant::factory()->for($this->product)->create([
             'track_inventory'     => true,
             'available_quantity'  => 2,
             'stock_quantity'      => 4,
             'low_stock_threshold' => 5,
         ]);
 
-        ProductVariant::factory()->create([
+        ProductVariant::factory()->for($this->product)->create([
             'track_inventory'     => true,
             'available_quantity'  => 0,
             'stock_quantity'      => 3,
@@ -53,7 +61,9 @@ final class ProductVariantTabsTest extends TestCase
         $page = app(ListProductVariants::class);
         $tabs = $page->getTabs();
 
-        $this->assertSame(3, $tabs['in_stock']->modifyQuery(ProductVariant::query())->count());
+        $query = ProductVariant::query()->where('product_id', $this->product->id);
+
+        $this->assertSame(3, $tabs['in_stock']->modifyQuery($query)->count());
     }
 
     public function test_low_stock_tab_query_uses_available_quantities(): void
@@ -61,7 +71,9 @@ final class ProductVariantTabsTest extends TestCase
         $page = app(ListProductVariants::class);
         $tabs = $page->getTabs();
 
-        $this->assertSame(2, $tabs['low_stock']->modifyQuery(ProductVariant::query())->count());
+        $query = ProductVariant::query()->where('product_id', $this->product->id);
+
+        $this->assertSame(2, $tabs['low_stock']->modifyQuery($query)->count());
     }
 
     public function test_out_of_stock_tab_query_uses_available_quantities(): void
@@ -69,6 +81,8 @@ final class ProductVariantTabsTest extends TestCase
         $page = app(ListProductVariants::class);
         $tabs = $page->getTabs();
 
-        $this->assertSame(1, $tabs['out_of_stock']->modifyQuery(ProductVariant::query())->count());
+        $query = ProductVariant::query()->where('product_id', $this->product->id);
+
+        $this->assertSame(1, $tabs['out_of_stock']->modifyQuery($query)->count());
     }
 }

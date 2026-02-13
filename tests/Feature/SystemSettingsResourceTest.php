@@ -7,7 +7,8 @@ namespace Tests\Feature;
 use App\Filament\Resources\SystemSettingsResource;
 use App\Models\SystemSetting;
 use App\Models\SystemSettingCategory;
-use App\Models\User;
+use App\Models\AdminUser;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use App\Support\Nav;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Features\SupportTesting\Testable;
@@ -101,7 +102,7 @@ final class SystemSettingsResourceTest extends TestCase
         'clear_cache',
     ];
 
-    private User $adminUser;
+    private AdminUser $adminUser;
 
     private SystemSettingCategory $category;
 
@@ -117,10 +118,14 @@ final class SystemSettingsResourceTest extends TestCase
         parent::setUp();
 
         // Provision a deterministic administrator that mirrors the Filament guard expectations.
-        $this->adminUser = User::factory()->create([
+        $this->adminUser = AdminUser::factory()->create([
             'email' => 'admin@example.com',
             'name'  => 'Admin User',
         ]);
+
+        // Seed roles and permissions
+        $this->seed(RolesAndPermissionsSeeder::class);
+        $this->adminUser->assignRole('super_admin');
 
         // Create the canonical category so downstream factories inherit the relationship effortlessly.
         $this->category = SystemSettingCategory::factory()->create([
@@ -651,6 +656,6 @@ final class SystemSettingsResourceTest extends TestCase
      */
     private function livewire(string $component, array $parameters = []): Testable
     {
-        return Livewire::actingAs($this->adminUser)->test($component, $parameters);
+        return Livewire::actingAs($this->adminUser, 'admin')->test($component, $parameters);
     }
 }

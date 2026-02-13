@@ -38,7 +38,7 @@
                     </h1>
                     @if($this->sliders->count() > 1)
                         <button @click="autoPlay = !autoPlay" 
-                                class="inline-flex items-center gap-2 px-3 py-2 rounded-full border border-dark text-dark transition-colors duration-200"
+                                class="inline-flex items-center gap-2 px-3 py-2 rounded-full text-dark transition-colors duration-200"
                                 :class="autoPlay ? 'bg-sage' : 'bg-transparent'"
                                 :aria-pressed="autoPlay">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" x-show="!autoPlay">
@@ -73,14 +73,14 @@
                 @if($this->sliders->count() > 1)
                     <div class="pointer-events-none absolute top-1/2 left-0 right-0 z-30 -translate-y-1/2 transform flex items-center justify-between px-4 md:px-6">
                         <button @click="prevSlide()" 
-                                class="pointer-events-auto bg-white/90 hover:bg-white text-dark p-3 md:p-4 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl backdrop-blur-sm border-2 border-dark/20 hover:border-dark/40"
+                                class="pointer-events-auto bg-white/90 hover:bg-white text-dark p-3 md:p-4 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl backdrop-blur-sm border-2 border-gray-200 hover:border-gray-300"
                                 aria-label="{{ __('messages.home_slider_previous_slide') }}">
                             <svg class="w-6 h-6 md:w-7 md:h-7" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
                             </svg>
                         </button>
                         <button @click="nextSlide()" 
-                                class="pointer-events-auto bg-white/90 hover:bg-white text-dark p-3 md:p-4 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl backdrop-blur-sm border-2 border-dark/20 hover:border-dark/40"
+                                class="pointer-events-auto bg-white/90 hover:bg-white text-dark p-3 md:p-4 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl backdrop-blur-sm border-2 border-gray-200 hover:border-gray-300"
                                 aria-label="{{ __('messages.home_slider_next_slide') }}">
                             <svg class="w-6 h-6 md:w-7 md:h-7" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path>

@@ -34,6 +34,7 @@ class ReferralsRelationManager extends RelationManager
                         modifyQueryUsing: fn (Builder $query): Builder => $query
                             ->withoutGlobalScopes()
                             ->whereKeyNot($this->getOwnerRecord()->getKey())
+                            ->whereDoesntHave('referredBy')
                             ->orderBy('name'),
                     )
                     ->searchable()
@@ -89,6 +90,7 @@ class ReferralsRelationManager extends RelationManager
 
                         $data['referral_code'] = $resolvedCode !== '' ? $resolvedCode : Referral::generateUniqueCode();
                         $data['status'] = (string) ($data['status'] ?? 'pending');
+                        $data['source'] = (string) ($data['source'] ?? 'admin');
 
                         return $data;
                     }),

@@ -6,6 +6,7 @@ namespace Database\Factories;
 
 use App\Models\AttributeValue;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\AttributeValue>
@@ -26,7 +27,7 @@ final class AttributeValueFactory extends Factory
         // Append a deterministic sequence to the colour name to avoid Faker's limited unique pool exhausting during heavy seeders.
         $value = sprintf('%s %s', $this->faker->colorName(), $sequence);
 
-        return [
+        return $this->guardForMissingColumns([
             'attribute_id'         => fn () => \App\Models\Attribute::factory(),
             'value'                => $value,
             'slug'                 => str($value)->slug()->toString(),
@@ -40,7 +41,7 @@ final class AttributeValueFactory extends Factory
             'is_default'           => false,
             'is_searchable'        => false,
             'display_value'        => str($value)->headline()->toString(),
-        ];
+        ]);
     }
 
     public function enabled(): static
@@ -102,9 +103,13 @@ final class AttributeValueFactory extends Factory
 
     public function configure(): static
     {
-        return $this->afterCreating(function (AttributeValue $attributeValue): void {
-            $this->createTranslations($attributeValue);
-        });
+        return $this
+            ->afterMaking(function (AttributeValue $attributeValue): void {
+                $this->stripMissingAttributesFromModel($attributeValue);
+            })
+            ->afterCreating(function (AttributeValue $attributeValue): void {
+                $this->createTranslations($attributeValue);
+            });
     }
 
     private function createTranslations(AttributeValue $attributeValue): void
@@ -165,5 +170,45 @@ final class AttributeValueFactory extends Factory
             ->unique()
             ->values()
             ->all();
+    }
+
+    /**
+     * @param  array<string, mixed>  $attributes
+     * @return array<string, mixed>
+     */
+    private function guardForMissingColumns(array $attributes): array
+    {
+        $table = (new AttributeValue)->getTable();
+
+        if (! Schema::hasTable($table)) {
+            return $attributes;
+        }
+
+        foreach (array_keys($attributes) as $column) {
+            if (! Schema::hasColumn($table, $column)) {
+                unset($attributes[$column]);
+            }
+        }
+
+        return $attributes;
+    }
+
+    private function stripMissingAttributesFromModel(AttributeValue $attributeValue): void
+    {
+        $table = $attributeValue->getTable();
+
+        if (! Schema::hasTable($table)) {
+            return;
+        }
+
+        $columns = array_flip(Schema::getColumnListing($table));
+
+        foreach (array_keys($attributeValue->getAttributes()) as $column) {
+            if (array_key_exists($column, $columns)) {
+                continue;
+            }
+
+            $attributeValue->offsetUnset($column);
+        }
     }
 }

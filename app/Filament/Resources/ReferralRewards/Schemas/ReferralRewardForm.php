@@ -7,8 +7,8 @@ namespace App\Filament\Resources\ReferralRewards\Schemas;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Schema;
 
@@ -32,9 +32,9 @@ final class ReferralRewardForm
                 ->preload(),
             Select::make('type')
                 ->options([
-                    'discount' => 'discount',
-                    'credit' => 'credit',
-                    'referrer_bonus' => 'referrer_bonus',
+                    'discount'          => 'discount',
+                    'credit'            => 'credit',
+                    'referrer_bonus'    => 'referrer_bonus',
                     'referred_discount' => 'referred_discount',
                 ])
                 ->required(),

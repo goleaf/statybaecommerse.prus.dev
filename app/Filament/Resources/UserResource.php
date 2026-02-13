@@ -8,8 +8,19 @@ use App\Filament\Resources\Users\Pages\CreateUser;
 use App\Filament\Resources\Users\Pages\EditUser;
 use App\Filament\Resources\Users\Pages\ListUsers;
 use App\Filament\Resources\Users\Pages\ViewUser;
+use App\Filament\Resources\Users\RelationManagers\AddressesRelationManager;
+use App\Filament\Resources\Users\RelationManagers\CartItemsRelationManager;
+use App\Filament\Resources\Users\RelationManagers\CouponUsagesRelationManager;
 use App\Filament\Resources\Users\RelationManagers\CustomerGroupsRelationManager;
+use App\Filament\Resources\Users\RelationManagers\DiscountRedemptionsRelationManager;
+use App\Filament\Resources\Users\RelationManagers\DocumentsRelationManager;
+use App\Filament\Resources\Users\RelationManagers\NotificationsRelationManager;
+use App\Filament\Resources\Users\RelationManagers\OrdersRelationManager;
 use App\Filament\Resources\Users\RelationManagers\PartnersRelationManager;
+use App\Filament\Resources\Users\RelationManagers\ReferralCodesRelationManager;
+use App\Filament\Resources\Users\RelationManagers\ReferralRewardsRelationManager;
+use App\Filament\Resources\Users\RelationManagers\ReferralsRelationManager;
+use App\Filament\Resources\Users\RelationManagers\SubscriberRelationManager;
 use App\Filament\Resources\Users\Schemas\UserForm;
 use App\Filament\Resources\Users\Schemas\UserInfolist;
 use App\Filament\Resources\Users\Tables\UsersTable;
@@ -69,6 +80,17 @@ class UserResource extends Resource
         return [
             CustomerGroupsRelationManager::class,
             PartnersRelationManager::class,
+            OrdersRelationManager::class,
+            AddressesRelationManager::class,
+            CartItemsRelationManager::class,
+            CouponUsagesRelationManager::class,
+            DiscountRedemptionsRelationManager::class,
+            NotificationsRelationManager::class,
+            SubscriberRelationManager::class,
+            DocumentsRelationManager::class,
+            ReferralCodesRelationManager::class,
+            ReferralsRelationManager::class,
+            ReferralRewardsRelationManager::class,
         ];
     }
 

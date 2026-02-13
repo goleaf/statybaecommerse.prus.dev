@@ -51,6 +51,8 @@ class ProductVariantFactory extends Factory
     {
         return $this
             ->afterMaking(function (ProductVariant $variant): void {
+                $this->stripMissingAttributesFromModel($variant);
+
                 if (! Schema::hasColumn($variant->getTable(), 'variant_attribute_matrix')) {
                     return;
                 }
@@ -129,6 +131,25 @@ class ProductVariantFactory extends Factory
         }
 
         return $attributes;
+    }
+
+    private function stripMissingAttributesFromModel(ProductVariant $variant): void
+    {
+        $table = $variant->getTable();
+
+        if (! Schema::hasTable($table)) {
+            return;
+        }
+
+        $columns = array_flip(Schema::getColumnListing($table));
+
+        foreach (array_keys($variant->getAttributes()) as $column) {
+            if (array_key_exists($column, $columns)) {
+                continue;
+            }
+
+            $variant->offsetUnset($column);
+        }
     }
 
     private function createTranslations(ProductVariant $variant): void

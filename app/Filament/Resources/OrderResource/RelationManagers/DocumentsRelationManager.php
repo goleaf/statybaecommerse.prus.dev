@@ -22,7 +22,7 @@ class DocumentsRelationManager extends RelationManager
     {
         return $schema
             ->components([
-                Select::make('template_id')
+                Select::make('document_template_id')
                     ->relationship('template', 'name')
                     ->required(),
                 TextInput::make('title')
@@ -72,17 +72,27 @@ class DocumentsRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                // We typically generate documents via the main resource action,
-                // but a manual create can remain if needed.
-                // CreateAction::make(),
+                CreateAction::make(),
             ])
-            ->actions([
+            ->recordActions([
+                Action::make('view')
+                    ->label(__('admin.actions.view'))
+                    ->icon('heroicon-m-eye')
+                    ->url(fn (Document $record): ?string => $record->getFileUrl())
+                    ->openUrlInNewTab()
+                    ->visible(
+                        fn (Document $record): bool => $record->isGenerated() && filled($record->file_path)
+                    ),
                 Action::make('download')
                     ->label(__('admin.actions.download'))
                     ->icon('heroicon-m-arrow-down-tray')
                     ->url(fn (Document $record): ?string => $record->getFileUrl())
                     ->openUrlInNewTab()
-                    ->visible(fn (Document $record): bool => $record->isGenerated()),
+                    ->visible(
+                        fn (Document $record): bool => $record->isGenerated()
+                            && $record->isDownloadable()
+                            && filled($record->file_path)
+                    ),
             ])
             ->bulkActions([
                 //

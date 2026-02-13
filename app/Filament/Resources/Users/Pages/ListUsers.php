@@ -23,8 +23,18 @@ class ListUsers extends ListRecords
             'all'     => Tab::make('All'),
             'company' => Tab::make(__('messages.company'))
                 ->modifyQueryUsing(static fn (Builder $query): Builder => $query->whereNotNull('company_id')),
-            'customer_groups' => self::relationTab('customerGroups', __('admin.navigation.customer_groups')),
-            'partners' => self::relationTab('partners', __('messages.partners')),
+            'addresses'            => self::relationTab('addresses', __('messages.address')),
+            'cart_items'           => self::relationTab('cartItems', __('messages.cart_items')),
+            'customer_groups'      => self::relationTab('customerGroups', __('admin.navigation.customer_groups')),
+            'partners'             => self::relationTab('partners', __('messages.partners')),
+            'referral_codes'       => self::relationTab('referralCodes', __('messages.referral_codes')),
+            'referrals'            => self::relationTab('referrals', __('messages.referrals')),
+            'referral_rewards'     => self::relationTab('referralRewards', __('messages.referral_rewards')),
+            'documents'            => self::relationTab('documents', __('messages.documents')),
+            'coupon_usages'        => self::relationTab('couponUsages', __('messages.coupon_usages')),
+            'discount_redemptions' => self::relationTab('discountRedemptions', __('messages.discount_redemptions')),
+            'notifications'        => self::relationTab('notifications', __('messages.notifications')),
+            'subscriber'           => self::relationTab('subscriber', __('navigation.subscribers')),
         ];
     }
 

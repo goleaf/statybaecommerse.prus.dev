@@ -17,6 +17,7 @@ use App\Models\Inventory;
 use App\Models\Price;
 use App\Models\Product;
 use Filament\Resources\Resource;
+use Filament\Resources\Pages\PageRegistration;
 use Tests\TestCase;
 
 /**
@@ -140,6 +141,15 @@ final class CoreResourcesIntegrationTest extends TestCase
                 $this->assertIsString(
                     $pageName,
                     "Page name should be a string for resource {$resourceClass}"
+                );
+
+                if ($pageClass instanceof PageRegistration) {
+                    $pageClass = $pageClass->getPage();
+                }
+
+                $this->assertIsString(
+                    $pageClass,
+                    "Page registration should resolve to a page class string for resource {$resourceClass}"
                 );
 
                 $this->assertTrue(

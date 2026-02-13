@@ -102,26 +102,31 @@ class ProductVariantForm
                         Radio::make('is_enabled')
                             ->label(__('messages.is_enabled'))
                             ->boolean()
+                            ->default(true)
                             ->inline()
                             ->columnSpanFull(),
                         Radio::make('is_default_variant')
                             ->label(__('messages.is_default_variant'))
                             ->boolean()
+                            ->default(false)
                             ->inline()
                             ->columnSpanFull(),
                         Radio::make('is_featured')
                             ->label(__('messages.is_featured'))
                             ->boolean()
+                            ->default(false)
                             ->inline()
                             ->columnSpanFull(),
                         Radio::make('is_new')
                             ->label(__('messages.is_new'))
                             ->boolean()
+                            ->default(false)
                             ->inline()
                             ->columnSpanFull(),
                         Radio::make('is_bestseller')
                             ->label(__('messages.is_bestseller'))
                             ->boolean()
+                            ->default(false)
                             ->inline()
                             ->columnSpanFull(),
                     ])->columns(1),

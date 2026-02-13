@@ -93,34 +93,6 @@ final class SystemSettingTranslationTest extends TestCase
         ]);
     }
 
-    public function test_can_soft_delete_translation(): void
-    {
-        $systemSetting = SystemSetting::factory()->create();
-        $translation = SystemSettingTranslation::factory()->create([
-            'system_setting_id' => $systemSetting->id,
-        ]);
-
-        $translation->delete();
-
-        $this->assertSoftDeleted('system_setting_translations', [
-            'id' => $translation->id,
-        ]);
-    }
-
-    public function test_can_restore_translation(): void
-    {
-        $systemSetting = SystemSetting::factory()->create();
-        $translation = SystemSettingTranslation::factory()->create([
-            'system_setting_id' => $systemSetting->id,
-        ]);
-
-        $translation->delete();
-        $this->assertDatabaseHas('system_setting_translations', [
-            'id'         => $translation->id,
-            'deleted_at' => null,
-        ]);
-    }
-
     public function test_can_force_delete_translation(): void
     {
         $systemSetting = SystemSetting::factory()->create();

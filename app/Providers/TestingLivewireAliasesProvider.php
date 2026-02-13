@@ -16,25 +16,6 @@ final class TestingLivewireAliasesProvider extends ServiceProvider
     public function register(): void
     {
         // Map expected aliases used in tests to actual page classes
-        Livewire::component(
-            'filament.admin.resources.system-setting-categories.pages.list-system-setting-categories',
-            \App\Filament\Resources\SystemSettingCategoryResource\Pages\ListSystemSettingCategories::class,
-        );
-
-        Livewire::component(
-            'filament.admin.resources.system-setting-categories.pages.create-system-setting-category',
-            \App\Filament\Resources\SystemSettingCategoryResource\Pages\CreateSystemSettingCategory::class,
-        );
-
-        Livewire::component(
-            'filament.admin.resources.system-setting-categories.pages.edit-system-setting-category',
-            \App\Filament\Resources\SystemSettingCategoryResource\Pages\EditSystemSettingCategory::class,
-        );
-
-        Livewire::component(
-            'filament.admin.resources.system-setting-categories.pages.view-system-setting-category',
-            \App\Filament\Resources\SystemSettingCategoryResource\Pages\ViewSystemSettingCategory::class,
-        );
     }
 
     public function boot(): void

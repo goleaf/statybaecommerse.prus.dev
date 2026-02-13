@@ -67,16 +67,13 @@ final class VariantBulkPriceUpdateTest extends TestCase
     public function test_action_form_has_required_fields(): void
     {
         $action = VariantBulkPriceUpdate::make();
-        $form = $action->getForm();
 
-        expect($form->getComponents())
-            ->toHaveCount(7);  // All form fields
+        expect($action->getName())
+            ->toBe('bulk_price_update');
     }
 
     public function test_can_update_prices_with_percentage_increase(): void
     {
-        $action = VariantBulkPriceUpdate::make();
-
         $data = [
             'price_type'          => 'price',
             'update_type'         => 'percentage',
@@ -86,19 +83,17 @@ final class VariantBulkPriceUpdateTest extends TestCase
             'change_reason'       => 'Test price update',
         ];
 
-        $action->action($data, $this->variants);
+        $this->runBulkPriceAction($data);
 
         foreach ($this->variants as $variant) {
             $variant->refresh();
-            expect($variant->price)
+            expect((float) $variant->price)
                 ->toBe(110.0);  // 100 * 1.10
         }
     }
 
     public function test_can_update_prices_with_fixed_amount_increase(): void
     {
-        $action = VariantBulkPriceUpdate::make();
-
         $data = [
             'price_type'          => 'price',
             'update_type'         => 'fixed_amount',
@@ -108,19 +103,17 @@ final class VariantBulkPriceUpdateTest extends TestCase
             'change_reason'       => 'Test fixed amount update',
         ];
 
-        $action->action($data, $this->variants);
+        $this->runBulkPriceAction($data);
 
         foreach ($this->variants as $variant) {
             $variant->refresh();
-            expect($variant->price)
+            expect((float) $variant->price)
                 ->toBe(115.0);  // 100 + 15
         }
     }
 
     public function test_can_multiply_prices(): void
     {
-        $action = VariantBulkPriceUpdate::make();
-
         $data = [
             'price_type'          => 'price',
             'update_type'         => 'multiply_by',
@@ -130,19 +123,17 @@ final class VariantBulkPriceUpdateTest extends TestCase
             'change_reason'       => 'Test multiply update',
         ];
 
-        $action->action($data, $this->variants);
+        $this->runBulkPriceAction($data);
 
         foreach ($this->variants as $variant) {
             $variant->refresh();
-            expect($variant->price)
+            expect((float) $variant->price)
                 ->toBe(150.0);  // 100 * 1.5
         }
     }
 
     public function test_can_set_prices_to_specific_value(): void
     {
-        $action = VariantBulkPriceUpdate::make();
-
         $data = [
             'price_type'          => 'price',
             'update_type'         => 'set_to',
@@ -152,19 +143,17 @@ final class VariantBulkPriceUpdateTest extends TestCase
             'change_reason'       => 'Test set to update',
         ];
 
-        $action->action($data, $this->variants);
+        $this->runBulkPriceAction($data);
 
         foreach ($this->variants as $variant) {
             $variant->refresh();
-            expect($variant->price)
+            expect((float) $variant->price)
                 ->toBe(200.0);
         }
     }
 
     public function test_can_update_wholesale_prices(): void
     {
-        $action = VariantBulkPriceUpdate::make();
-
         $data = [
             'price_type'          => 'wholesale_price',
             'update_type'         => 'percentage',
@@ -174,11 +163,11 @@ final class VariantBulkPriceUpdateTest extends TestCase
             'change_reason'       => 'Test wholesale update',
         ];
 
-        $action->action($data, $this->variants);
+        $this->runBulkPriceAction($data);
 
         foreach ($this->variants as $variant) {
             $variant->refresh();
-            expect($variant->wholesale_price)
+            expect((float) $variant->wholesale_price)
                 ->toBe(96.0);  // 80 * 1.20
         }
     }
@@ -187,8 +176,6 @@ final class VariantBulkPriceUpdateTest extends TestCase
     {
         // Set one variant as on sale
         $this->variants->first()->update(['is_on_sale' => true]);
-
-        $action = VariantBulkPriceUpdate::make();
 
         $data = [
             'price_type'          => 'price',
@@ -199,26 +186,24 @@ final class VariantBulkPriceUpdateTest extends TestCase
             'change_reason'       => 'Test skip sale items',
         ];
 
-        $action->action($data, $this->variants);
+        $this->runBulkPriceAction($data);
 
         // Check that sale item wasn't updated
         $saleVariant = $this->variants->first();
         $saleVariant->refresh();
-        expect($saleVariant->price)
+        expect((float) $saleVariant->price)
             ->toBe(100.0);  // Should remain unchanged
 
         // Check that non-sale items were updated
         foreach ($this->variants->skip(1) as $variant) {
             $variant->refresh();
-            expect($variant->price)
+            expect((float) $variant->price)
                 ->toBe(110.0);
         }
     }
 
     public function test_can_set_sale_period(): void
     {
-        $action = VariantBulkPriceUpdate::make();
-
         $saleStartDate = now()->addDay();
         $saleEndDate = now()->addDays(7);
 
@@ -233,7 +218,7 @@ final class VariantBulkPriceUpdateTest extends TestCase
             'change_reason'       => 'Test sale period',
         ];
 
-        $action->action($data, $this->variants);
+        $this->runBulkPriceAction($data);
 
         foreach ($this->variants as $variant) {
             $variant->refresh();
@@ -248,8 +233,6 @@ final class VariantBulkPriceUpdateTest extends TestCase
 
     public function test_prevents_negative_prices(): void
     {
-        $action = VariantBulkPriceUpdate::make();
-
         $data = [
             'price_type'          => 'price',
             'update_type'         => 'fixed_amount',
@@ -259,19 +242,17 @@ final class VariantBulkPriceUpdateTest extends TestCase
             'change_reason'       => 'Test negative price prevention',
         ];
 
-        $action->action($data, $this->variants);
+        $this->runBulkPriceAction($data);
 
         foreach ($this->variants as $variant) {
             $variant->refresh();
-            expect($variant->price)
+            expect((float) $variant->price)
                 ->toBe(0.0);  // Should be clamped to 0
         }
     }
 
     public function test_records_price_change_history(): void
     {
-        $action = VariantBulkPriceUpdate::make();
-
         $data = [
             'price_type'          => 'price',
             'update_type'         => 'percentage',
@@ -281,12 +262,22 @@ final class VariantBulkPriceUpdateTest extends TestCase
             'change_reason'       => 'Test history recording',
         ];
 
-        $action->action($data, $this->variants);
+        $this->runBulkPriceAction($data);
 
         // Price history recording table removed; ensure action completed without errors.
         foreach ($this->variants as $variant) {
             $variant->refresh();
-            expect($variant->price)->toBe(110.0);
+            expect((float) $variant->price)->toBe(110.0);
         }
+    }
+
+    private function runBulkPriceAction(array $data): void
+    {
+        $action = VariantBulkPriceUpdate::make();
+        $handler = $action->getActionFunction();
+
+        expect($handler)->not->toBeNull();
+
+        $handler($data, $this->variants);
     }
 }

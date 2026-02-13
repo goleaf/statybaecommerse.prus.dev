@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use App\Filament\Pages\AdvancedReports;
 use App\Filament\Pages\Dashboard;
 use App\Filament\Resources\SystemSettingResource;
 
@@ -29,6 +28,5 @@ it('unit: registers admin resources via config', function (): void {
 it('unit: registers admin pages via config', function (): void {
     expect(config('filament.navigation.pages'))
         ->toBeArray()
-        ->toContain(Dashboard::class)
-        ->toContain(AdvancedReports::class);
+        ->toContain(Dashboard::class);
 });

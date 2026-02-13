@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\ReferralCodes;
 
 use App\Filament\Resources\ReferralCodes\Pages\CreateReferralCode;
@@ -19,6 +21,8 @@ class ReferralCodeResource extends Resource
     protected static ?string $model = ReferralCode::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
+    protected static bool $shouldRegisterNavigation = false;
 
     public static function form(Schema $schema): Schema
     {
@@ -40,9 +44,9 @@ class ReferralCodeResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListReferralCodes::route('/'),
+            'index'  => ListReferralCodes::route('/'),
             'create' => CreateReferralCode::route('/create'),
-            'edit' => EditReferralCode::route('/{record}/edit'),
+            'edit'   => EditReferralCode::route('/{record}/edit'),
         ];
     }
 }
