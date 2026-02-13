@@ -64,14 +64,13 @@ final class ReferralRewardService
     {
         try {
             $category = $rewardData['category'] ?? 'credit';
-            $currency = $rewardData['currency'] ?? ($category === 'points' ? 'PTS' : config('referral.referrer_bonus_currency', 'EUR'));
             $expiresIn = (int) ($rewardData['expires_in_days'] ?? config('referral.referrer_bonus_expiration_days', 90));
             $reward = ReferralReward::create([
                 'referral_id'   => $referralId,
                 'user_id'       => $userId,
                 'type'          => 'referrer_bonus',
                 'amount'        => $amount,
-                'currency_code' => $currency,
+                'currency_code' => 'EUR',
                 'status'        => 'pending',
                 'expires_at'    => now()->addDays(max(1, $expiresIn)),
                 // 90 days to claim by default
@@ -117,7 +116,6 @@ final class ReferralRewardService
         }
 
         $category = (string) ($selectedTier['category'] ?? 'credit');
-        $currency = (string) ($selectedTier['currency'] ?? ($category === 'points' ? 'PTS' : config('referral.referrer_bonus_currency', 'EUR')));
 
         return $this->createReferrerBonus(
             $referral->id,
@@ -125,7 +123,6 @@ final class ReferralRewardService
             $amount,
             [
                 'category'       => $category,
-                'currency'       => $currency,
                 'tier_threshold' => (int) ($selectedTier['threshold'] ?? 0),
             ]
         );

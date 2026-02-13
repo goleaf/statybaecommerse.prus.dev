@@ -33,12 +33,15 @@ class CollectionsTable
                     ->searchable()
                     ->sortable(),
                 IconColumn::make('is_visible')
+                    ->sortable()
                     ->label(__('messages.visible'))
                     ->boolean(),
                 IconColumn::make('is_enabled')
+                    ->sortable()
                     ->label(__('messages.enabled'))
                     ->boolean(),
                 IconColumn::make('is_automatic')
+                    ->sortable()
                     ->label(__('admin.collections.is_automatic'))
                     ->boolean(),
                 TextColumn::make('products_count')

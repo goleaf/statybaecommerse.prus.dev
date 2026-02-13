@@ -110,6 +110,7 @@ final class ProductImageResource extends BaseResource
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('alt_text')
+                    ->sortable()
                     ->searchable(),
                 TextColumn::make('sort_order')
                     ->sortable(),

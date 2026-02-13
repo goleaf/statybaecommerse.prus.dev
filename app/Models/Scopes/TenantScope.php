@@ -49,7 +49,7 @@ final class TenantScope implements Scope
         $schema = $model->getConnection()->getSchemaBuilder();
         $tenantColumns = [];
         // Check for common tenant column names
-        $possibleColumns = ['tenant_id', 'company_id', 'organization_id', 'workspace_id'];
+        $possibleColumns = ['tenant_id', 'company_id', 'workspace_id'];
         foreach ($possibleColumns as $column) {
             if ($schema->hasColumn($table, $column)) {
                 $tenantColumns[] = $column;

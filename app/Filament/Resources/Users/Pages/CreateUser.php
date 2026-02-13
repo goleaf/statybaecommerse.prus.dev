@@ -15,11 +15,6 @@ class CreateUser extends CreateRecord
     /**
      * @var array<int, int>
      */
-    private array $organizationIds = [];
-
-    /**
-     * @var array<int, int>
-     */
     private array $customerGroupIds = [];
 
     /**
@@ -29,11 +24,10 @@ class CreateUser extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        $this->organizationIds = $this->normalizeIds($data['organization_ids'] ?? []);
         $this->customerGroupIds = $this->normalizeIds($data['customer_group_ids'] ?? []);
         $this->partnerIds = $this->normalizeIds($data['partner_ids'] ?? []);
 
-        unset($data['organization_ids'], $data['customer_group_ids'], $data['partner_ids']);
+        unset($data['customer_group_ids'], $data['partner_ids']);
 
         return $data;
     }
@@ -63,16 +57,6 @@ class CreateUser extends CreateRecord
     private function syncRelations(User $user): void
     {
         $now = now();
-
-        $organizationPayload = [];
-        foreach ($this->organizationIds as $organizationId) {
-            $organizationPayload[$organizationId] = [
-                'role'      => 'member',
-                'is_active' => true,
-                'joined_at' => $now,
-            ];
-        }
-        $user->organizations()->sync($organizationPayload);
 
         $customerGroupPayload = [];
         foreach ($this->customerGroupIds as $customerGroupId) {

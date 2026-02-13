@@ -6,11 +6,20 @@ namespace Tests\Feature\Filament\Importers;
 
 use App\Filament\Imports\OrderImporter;
 use App\Models\User;
+use Filament\Actions\Imports\ImportColumn;
 use Filament\Actions\Imports\Jobs\ImportCsv;
 use Filament\Actions\Imports\Models\Import;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
+
+it('does not expose a currency import column', function (): void {
+    $columnNames = collect(OrderImporter::getColumns())
+        ->map(fn (ImportColumn $column): string => $column->getName())
+        ->all();
+
+    expect($columnNames)->not->toContain('currency');
+});
 
 it('can import orders', function () {
     $user = User::factory()->create();
@@ -29,7 +38,6 @@ it('can import orders', function () {
         'user'           => (string) $user->id,
         'status'         => 'pending',
         'total'          => '100.50',
-        'currency'       => 'EUR',
         'payment_status' => 'paid',
     ];
 
@@ -38,7 +46,6 @@ it('can import orders', function () {
         'user'           => 'user',
         'status'         => 'status',
         'total'          => 'total',
-        'currency'       => 'currency',
         'payment_status' => 'payment_status',
     ];
 
@@ -48,8 +55,9 @@ it('can import orders', function () {
 
     expect($import->successful_rows)->toBe(1);
     $this->assertDatabaseHas('orders', [
-        'number'  => 'ORD-12345',
-        'user_id' => $user->id,
-        'total'   => 100.50,
+        'number'   => 'ORD-12345',
+        'user_id'  => $user->id,
+        'total'    => 100.50,
+        'currency' => 'EUR',
     ]);
 });

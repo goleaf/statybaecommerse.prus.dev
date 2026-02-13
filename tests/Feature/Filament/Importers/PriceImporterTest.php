@@ -8,11 +8,20 @@ use App\Filament\Imports\PriceImporter;
 use App\Models\Currency;
 use App\Models\Product;
 use App\Models\User;
+use Filament\Actions\Imports\ImportColumn;
 use Filament\Actions\Imports\Jobs\ImportCsv;
 use Filament\Actions\Imports\Models\Import;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
+
+it('does not expose a currency import column', function (): void {
+    $columnNames = collect(PriceImporter::getColumns())
+        ->map(fn (ImportColumn $column): string => $column->getName())
+        ->all();
+
+    expect($columnNames)->not->toContain('currency');
+});
 
 it('can import prices', function () {
     $user = User::factory()->admin()->create();
@@ -30,7 +39,6 @@ it('can import prices', function () {
     $row = [
         'priceable_id'   => (string) $product->id,
         'priceable_type' => Product::class,
-        'currency'       => (string) $currency->id,
         'amount'         => '123.45',
         'is_enabled'     => '1',
     ];
@@ -38,7 +46,6 @@ it('can import prices', function () {
     $columnMap = [
         'priceable_id'   => 'priceable_id',
         'priceable_type' => 'priceable_type',
-        'currency'       => 'currency',
         'amount'         => 'amount',
         'is_enabled'     => 'is_enabled',
     ];
@@ -51,6 +58,7 @@ it('can import prices', function () {
     $this->assertDatabaseHas('prices', [
         'priceable_id'   => $product->id,
         'priceable_type' => Product::class,
+        'currency_id'    => $currency->id,
         'amount'         => 123.45,
     ]);
 });

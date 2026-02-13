@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Actions;
 
 use App\Contracts\DocumentServiceContract;
+use App\Enums\DocumentTemplateCategory;
 use App\Enums\DocumentTemplateType;
 use App\Models\DocumentTemplate;
 use Filament\Actions\Action;
@@ -22,21 +23,7 @@ final class InvoicePdfAction
             ->color('success')
             ->action(function (Model $record, DocumentServiceContract $documentService) {
                 try {
-                    $template = DocumentTemplate::query()
-                        ->active()
-                        ->where('type', DocumentTemplateType::Invoice->value)
-                        ->orderByDesc('updated_at')
-                        ->first();
-
-                    if (! $template) {
-                        Notification::make()
-                            ->title(__('admin.notifications.document_generation_failed'))
-                            ->body(__('Invoice template not found.'))
-                            ->danger()
-                            ->send();
-
-                        return null;
-                    }
+                    $template = self::resolveInvoiceTemplate();
 
                     $document = $documentService->generateDocument(
                         template: $template,
@@ -63,5 +50,52 @@ final class InvoicePdfAction
                     throw $e;
                 }
             });
+    }
+
+    private static function resolveInvoiceTemplate(): DocumentTemplate
+    {
+        $template = DocumentTemplate::query()
+            ->where('type', DocumentTemplateType::Invoice->value)
+            ->orderByDesc('is_active')
+            ->orderByDesc('updated_at')
+            ->first();
+
+        if ($template instanceof DocumentTemplate) {
+            return $template;
+        }
+
+        $template = DocumentTemplate::query()->firstOrCreate(
+            ['slug' => 'invoice-template'],
+            self::defaultInvoiceTemplateData()
+        );
+
+        $template->forceFill([
+            'type'      => DocumentTemplateType::Invoice->value,
+            'category'  => DocumentTemplateCategory::Financial->value,
+            'is_active' => true,
+        ])->saveQuietly();
+
+        return $template;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private static function defaultInvoiceTemplateData(): array
+    {
+        return [
+            'name'        => 'Invoice Template',
+            'description' => 'Standard invoice template for billing',
+            'content'     => '<h1>Invoice #{{invoice_number}}</h1><p>Date: {{invoice_date}}</p><p>Customer: {{customer_name}}</p><p>Amount: €{{total_amount}}</p>',
+            'variables'   => ['invoice_number', 'invoice_date', 'customer_name', 'total_amount'],
+            'type'        => DocumentTemplateType::Invoice->value,
+            'category'    => DocumentTemplateCategory::Financial->value,
+            'settings'    => [
+                'page_size'   => 'A4',
+                'orientation' => 'portrait',
+                'margins'     => ['top' => 20, 'right' => 20, 'bottom' => 20, 'left' => 20],
+            ],
+            'is_active' => true,
+        ];
     }
 }

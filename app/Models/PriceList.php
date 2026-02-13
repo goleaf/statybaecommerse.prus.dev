@@ -46,6 +46,23 @@ final class PriceList extends Model
 
     protected $fillable = ['name', 'code', 'currency_id', 'is_enabled', 'priority', 'starts_at', 'ends_at', 'description', 'metadata', 'is_default', 'auto_apply', 'min_order_amount', 'max_order_amount'];
 
+    protected static function booted(): void
+    {
+        self::creating(static function (self $priceList): void {
+            $euroCurrencyId = self::resolveEuroCurrencyId();
+            if ($euroCurrencyId !== null) {
+                $priceList->currency_id = $euroCurrencyId;
+            }
+        });
+
+        self::updating(static function (self $priceList): void {
+            $euroCurrencyId = self::resolveEuroCurrencyId();
+            if ($euroCurrencyId !== null) {
+                $priceList->currency_id = $euroCurrencyId;
+            }
+        });
+    }
+
     /**
      * Handle casts functionality with proper error handling.
      */
@@ -254,5 +271,20 @@ final class PriceList extends Model
     public function getPartnersCountAttribute(): int
     {
         return $this->partners()->count();
+    }
+
+    private static function resolveEuroCurrencyId(): ?int
+    {
+        $currencyId = Currency::query()
+            ->where('code', 'EUR')
+            ->value('id');
+
+        if (! is_numeric($currencyId)) {
+            $currencyId = Currency::query()
+                ->where('is_default', true)
+                ->value('id');
+        }
+
+        return is_numeric($currencyId) ? (int) $currencyId : null;
     }
 }

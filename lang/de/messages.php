@@ -177,6 +177,7 @@ return [
     'Min price'                                                                                             => 'Min. Preis',
     'Minimal E‑Shop'                                                                                        => 'Minimaler E-Shop',
     'Most products'                                                                                         => 'Meiste Produkte',
+    'movements'                                                                                             => 'Bewegungen',
     'My orders'                                                                                             => 'Meine Bestellungen',
     'Name'                                                                                                  => 'Name',
     'Name (A–Z)'                                                                                            => 'Name (A–Z)',

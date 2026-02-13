@@ -30,13 +30,16 @@ class ProductRequestsTable
                     ->sortable()
                     ->placeholder(__('messages.guest')),
                 TextColumn::make('name')
+                    ->sortable()
                     ->label(__('messages.name'))
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('email')
+                    ->sortable()
                     ->label(__('messages.email'))
                     ->searchable(),
                 TextColumn::make('phone')
+                    ->sortable()
                     ->label(__('messages.phone'))
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -45,6 +48,7 @@ class ProductRequestsTable
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('status')
+                    ->sortable()
                     ->label(__('messages.status'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {

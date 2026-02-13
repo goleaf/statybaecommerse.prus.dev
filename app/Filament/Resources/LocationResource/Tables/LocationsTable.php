@@ -34,24 +34,32 @@ class LocationsTable
                     ->sortable()
                     ->searchable(),
                 TextColumn::make('address_line_1')
+                    ->sortable()
                     ->searchable(),
                 TextColumn::make('address_line_2')
+                    ->sortable()
                     ->searchable(),
                 TextColumn::make('city')
+                    ->sortable()
                     ->searchable(),
                 TextColumn::make('state')
+                    ->sortable()
                     ->searchable(),
                 TextColumn::make('postal_code')
+                    ->sortable()
                     ->searchable(),
                 TextColumn::make('country_code')
+                    ->sortable()
                     ->searchable(),
                 TextColumn::make('country.name')
                     ->searchable(),
                 TextColumn::make('city.name')
                     ->searchable(),
                 TextColumn::make('phone')
+                    ->sortable()
                     ->searchable(),
                 TextColumn::make('email')
+                    ->sortable()
                     ->label('Email address')
                     ->searchable(),
                 TextColumn::make('latitude')
@@ -61,8 +69,10 @@ class LocationsTable
                     ->numeric()
                     ->sortable(),
                 IconColumn::make('is_enabled')
+                    ->sortable()
                     ->boolean(),
                 IconColumn::make('is_default')
+                    ->sortable()
                     ->boolean(),
                 TextColumn::make('sort_order')
                     ->numeric()

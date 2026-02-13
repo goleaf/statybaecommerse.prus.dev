@@ -49,6 +49,7 @@ class MovementsRelationManager extends RelationManager
         return $table
             ->columns([
                 TextColumn::make('type')
+                    ->sortable()
                     ->label(__('messages.type'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {

@@ -170,7 +170,7 @@ final class Delivery extends StepComponent
                 $identifier = (int) $option['id'];
                 $model = $optionModels->get($identifier);
                 $baseAmount = (float) $option['price'];
-                $currency = (string) ($option['currency'] ?? $model?->currency_code ?? current_currency());
+                $currency = 'EUR';
 
                 $discount = $this->calculateShippingDiscount($baseAmount);
                 $finalAmount = max(0.0, round($baseAmount - $discount, 2));
@@ -238,7 +238,7 @@ final class Delivery extends StepComponent
     private function buildPersistablePayload(array $optionData, ShippingOption $optionModel): array
     {
         $baseAmount = (float) ($optionData['original_price'] ?? $optionData['price'] ?? 0.0);
-        $currency = (string) ($optionData['currency_code'] ?? $optionModel->currency_code ?? current_currency());
+        $currency = 'EUR';
 
         $discount = $this->calculateShippingDiscount($baseAmount);
         $finalAmount = max(0.0, round($baseAmount - $discount, 2));

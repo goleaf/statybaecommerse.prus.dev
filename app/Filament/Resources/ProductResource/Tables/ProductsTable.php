@@ -64,9 +64,11 @@ class ProductsTable
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 ToggleColumn::make('is_enabled')
+                    ->sortable()
                     ->label(__('messages.is_enabled'))
                     ->toggleable(isToggledHiddenByDefault: true),
                 ToggleColumn::make('is_featured')
+                    ->sortable()
                     ->label(__('admin.products.is_featured'))
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('sales_sparkline')

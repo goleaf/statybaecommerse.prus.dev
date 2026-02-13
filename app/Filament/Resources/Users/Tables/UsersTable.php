@@ -9,6 +9,7 @@ use App\Filament\Actions\RequestExportBulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
@@ -42,20 +43,28 @@ class UsersTable
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('first_name')
+                    ->sortable()
                     ->label(__('messages.first_name'))
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('last_name')
+                    ->sortable()
                     ->label(__('messages.last_name'))
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('job_title')
+                    ->sortable()
                     ->label(__('messages.job_title'))
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('company')
+                    ->sortable()
                     ->label(__('messages.company'))
                     ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('companyRelation.name')
+                    ->label(__('messages.company'))
+                    ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 IconColumn::make('is_active')
                     ->label(__('messages.active'))
@@ -70,8 +79,68 @@ class UsersTable
                     ->counts('orders')
                     ->sortable(),
                 TextColumn::make('customerGroups.name')
-                    ->label(__('messages.customer_groups'))
+                    ->label(__('admin.navigation.customer_groups'))
                     ->badge()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('addresses_count')
+                    ->label(__('messages.address'))
+                    ->counts('addresses')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('cart_items_count')
+                    ->label(__('messages.cart_items'))
+                    ->counts('cartItems')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('customer_groups_count')
+                    ->label(__('admin.navigation.customer_groups'))
+                    ->counts('customerGroups')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('partners_count')
+                    ->label(__('messages.partners'))
+                    ->counts('partners')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('referral_codes_count')
+                    ->label(__('messages.referral_codes'))
+                    ->counts('referralCodes')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('referrals_count')
+                    ->label(__('messages.referrals'))
+                    ->counts('referrals')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('referral_rewards_count')
+                    ->label('Referral rewards')
+                    ->counts('referralRewards')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('documents_count')
+                    ->label('Documents')
+                    ->counts('documents')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('coupon_usages_count')
+                    ->label('Coupon usages')
+                    ->counts('couponUsages')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('discount_redemptions_count')
+                    ->label(__('messages.discount_redemptions'))
+                    ->counts('discountRedemptions')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('notifications_count')
+                    ->label(__('messages.notifications'))
+                    ->counts('notifications')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('subscriber_count')
+                    ->label(__('navigation.subscribers'))
+                    ->counts('subscriber')
+                    ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
                     ->label(__('messages.created_at'))
@@ -84,6 +153,7 @@ class UsersTable
                     ->label(__('messages.active')),
             ])
             ->recordActions([
+                ViewAction::make(),
                 EditAction::make(),
             ])
             ->bulkActions([

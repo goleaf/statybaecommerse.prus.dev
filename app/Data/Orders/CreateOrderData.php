@@ -38,7 +38,7 @@ class CreateOrderData extends Data
 
         public ?float $discountTotal = null,
         public ?float $shippingTotal = null,
-        public ?string $currencyCode = null,
+        public ?string $currencyCode = 'EUR',
         public ?string $notes = null,
     ) {}
 
@@ -55,7 +55,7 @@ class CreateOrderData extends Data
             'items'             => ['required', 'array', 'min:1'],
             'discountTotal'     => ['nullable', 'numeric', 'min:0'],
             'shippingTotal'     => ['nullable', 'numeric', 'min:0'],
-            'currencyCode'      => ['nullable', 'string', 'size:3'],
+            'currencyCode'      => ['nullable', 'string', 'in:EUR'],
             'notes'             => ['nullable', 'string', 'max:1000'],
         ];
     }

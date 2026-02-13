@@ -45,6 +45,7 @@ final class AddressTableWidget extends BaseWidget
                     ->label(__('translations.full_name'))
                     ->searchable(['first_name', 'last_name', 'company_name']),
                 TextColumn::make('type')
+                    ->sortable()
                     ->label(__('translations.type'))
                     ->formatStateUsing(
                         /**

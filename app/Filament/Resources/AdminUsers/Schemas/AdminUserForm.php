@@ -9,7 +9,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password as PasswordRule;
 
 class AdminUserForm
 {
@@ -35,7 +35,7 @@ class AdminUserForm
                                 TextInput::make('password')
                                     ->label(__('messages.password'))
                                     ->password()
-                                    ->dehydrateStateUsing(fn ($state) => Hash::make($state))
+                                    ->rule(PasswordRule::min(8)->mixedCase()->numbers()->symbols())
                                     ->dehydrated(fn ($state) => filled($state))
                                     ->required(fn (string $context): bool => $context === 'create')
                                     ->revealable(),

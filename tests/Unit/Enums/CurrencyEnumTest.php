@@ -12,18 +12,18 @@ use Tests\TestCase;
 final class CurrencyEnumTest extends TestCase
 {
     #[Test]
-    public function it_includes_south_korean_won_case(): void
+    public function it_only_exposes_eur_case(): void
     {
-        // Ensure the newly added enum case can be resolved from its ISO code.
-        self::assertSame(CurrencyEnum::KRW, CurrencyEnum::tryFrom('KRW'));
-        self::assertSame('₩', CurrencyEnum::KRW->getSymbol());
-        self::assertSame('South Korean Won (₩)', CurrencyEnum::KRW->getLabel());
+        self::assertSame([CurrencyEnum::EUR], CurrencyEnum::cases());
+        self::assertSame(CurrencyEnum::EUR, CurrencyEnum::tryFrom('EUR'));
+        self::assertNull(CurrencyEnum::tryFrom('USD'));
+        self::assertSame('€', CurrencyEnum::EUR->getSymbol());
+        self::assertSame('Euro (€)', CurrencyEnum::EUR->getLabel());
     }
 
     #[Test]
-    public function it_delegates_decimal_place_logic_to_feature_toggle_service(): void
+    public function it_always_uses_two_decimal_places(): void
     {
-        // Use a lightweight stub to expose deterministic zero-decimal currencies.
         $stub = new class
         {
             public int $calls = 0;
@@ -44,13 +44,7 @@ final class CurrencyEnumTest extends TestCase
 
         $this->app->instance(FeatureToggleService::class, $stub);
 
-        // Verify currencies present in the zero-decimal list report no fractional digits.
-        self::assertSame(0, CurrencyEnum::JPY->getDecimalPlaces());
-        self::assertSame(0, CurrencyEnum::KRW->getDecimalPlaces());
-        // Other currencies should default back to the standard two decimal places.
-        self::assertSame(2, CurrencyEnum::USD->getDecimalPlaces());
-
-        // Ensure the enum consulted the stub for each invocation.
-        self::assertSame(3, $stub->calls);
+        self::assertSame(2, CurrencyEnum::EUR->getDecimalPlaces());
+        self::assertSame(0, $stub->calls);
     }
 }

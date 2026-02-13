@@ -68,6 +68,7 @@ class ImagesRelationManager extends RelationManager
                 ImageColumn::make('image_url')
                     ->label(__('messages.preview')),
                 TextColumn::make('alt_text')
+                    ->sortable()
                     ->label(__('messages.alt_text'))
                     ->searchable(),
                 TextColumn::make('sort_order')

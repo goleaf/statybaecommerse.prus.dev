@@ -83,6 +83,7 @@ final class DiscountResource extends BaseResource
                     )
                     ->sortable(),
                 ToggleColumn::make('is_active')
+                    ->sortable()
                     ->label(__('admin.discounts.is_active')),
                 TextColumn::make('valid_from')
                     ->label(__('admin.discounts.valid_from'))

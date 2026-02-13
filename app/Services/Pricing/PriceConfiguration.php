@@ -23,7 +23,7 @@ final class PriceConfiguration
 
     public function currency(): string
     {
-        return (string) Arr::get($this->config, 'currency', current_currency());
+        return 'EUR';
     }
 
     public function precision(): int

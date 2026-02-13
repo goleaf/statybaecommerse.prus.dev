@@ -72,6 +72,7 @@ class ImagesRelationManager extends RelationManager
                     ->label(__('messages.preview'))
                     ->circular(),
                 TextColumn::make('alt_text')
+                    ->sortable()
                     ->label(__('messages.alt_text'))
                     ->searchable(),
                 TextColumn::make('sort_order')

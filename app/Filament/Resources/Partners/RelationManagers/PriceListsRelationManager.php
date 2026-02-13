@@ -40,6 +40,7 @@ class PriceListsRelationManager extends RelationManager
                     ->searchable()
                     ->sortable(),
                 IconColumn::make('is_enabled')
+                    ->sortable()
                     ->label(__('messages.enabled'))
                     ->boolean(),
                 TextColumn::make('priority')

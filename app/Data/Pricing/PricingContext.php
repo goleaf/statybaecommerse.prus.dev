@@ -36,15 +36,8 @@ class PricingContext extends Data
             ->map(fn ($id) => (int) $id)
             ->values();
 
-        $baseCurrency = strtoupper((string) ($context['base_currency'] ?? config('pricing.base_currency', 'EUR')));
-        $targetCurrency = strtoupper((string) ($context['currency'] ?? current_currency()));
-
-        if ($targetCurrency === '') {
-            $targetCurrency = $baseCurrency;
-        }
-        if ($baseCurrency === '') {
-            $baseCurrency = $targetCurrency;
-        }
+        $baseCurrency = 'EUR';
+        $targetCurrency = 'EUR';
 
         return new self(
             quantity: $quantity,

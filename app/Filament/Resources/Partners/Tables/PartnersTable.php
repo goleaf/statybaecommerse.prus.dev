@@ -36,9 +36,11 @@ class PartnersTable
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('contact_email')
+                    ->sortable()
                     ->label(__('messages.email'))
                     ->searchable(),
                 TextColumn::make('contact_phone')
+                    ->sortable()
                     ->label(__('messages.phone'))
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -62,6 +64,7 @@ class PartnersTable
                     ->numeric(2)
                     ->sortable(),
                 IconColumn::make('is_enabled')
+                    ->sortable()
                     ->label(__('messages.enabled'))
                     ->boolean(),
             ])

@@ -32,7 +32,6 @@ return [
         'user_management'    => 'Vartotojų valdymas',
         'users'              => 'Vartotojai',
     ],
-    'organizations'        => 'Organizacijos',
     'partners'             => 'Partneriai',
     'product_features'     => 'Produkto savybės',
     'product_images'       => 'Produkto nuotraukos',

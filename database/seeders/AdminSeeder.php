@@ -294,8 +294,6 @@ final class AdminSeeder extends BaseSeeder
 
         $currencies = [
             ['name' => $this->encodeTranslations(['lt' => 'Euro', 'en' => 'Euro']), 'code' => 'EUR', 'symbol' => '€', 'exchange_rate' => 1.0, 'is_default' => true, 'is_enabled' => true, 'decimal_places' => 2],
-            ['name' => $this->encodeTranslations(['lt' => 'US Dollar', 'en' => 'US Dollar']), 'code' => 'USD', 'symbol' => '$', 'exchange_rate' => 0.85, 'is_default' => false, 'is_enabled' => true, 'decimal_places' => 2],
-            ['name' => $this->encodeTranslations(['lt' => 'British Pound', 'en' => 'British Pound']), 'code' => 'GBP', 'symbol' => '£', 'exchange_rate' => 1.15, 'is_default' => false, 'is_enabled' => true, 'decimal_places' => 2],
         ];
 
         $createdCurrencies = [];

@@ -50,11 +50,13 @@ class RecentDiscountRedemptionsWidget extends BaseWidget
                     ->label(__('frontend.discount_redemptions.fields.order'))
                     ->searchable(),
                 Tables\Columns\TextColumn::make('amount_saved')
+                    ->sortable()
                     ->label(__('frontend.discount_redemptions.fields.amount_saved'))
                     ->money('EUR')
                     ->weight(FontWeight::Bold)
                     ->color('success'),
                 Tables\Columns\TextColumn::make('status')
+                    ->sortable()
                     ->badge()
                     ->colors([
                         'warning'   => 'pending',

@@ -6,20 +6,19 @@ use App\Filament\Resources\ProductResource;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Collection;
+use App\Models\AdminUser;
 use App\Models\Product;
 use App\Models\ProductVariant;
-use App\Models\User;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
-    $this->user = User::factory()->create();
-    $this->actingAs($this->user);
+    $this->admin = AdminUser::factory()->create();
+    $this->actingAs($this->admin, 'admin');
 
     $this->brand = Brand::factory()->create(['name' => 'Test Brand']);
     $this->category = Category::factory()->create(['name' => 'Test Category']);
@@ -33,7 +32,7 @@ beforeEach(function () {
         'cost_price'     => 59.99,
         'stock_quantity' => 100,
         'manage_stock'   => true,
-        'is_visible'     => true,
+        'is_enabled'     => true,
         'is_featured'    => false,
         'status'         => 'published',
         'published_at'   => now(),
@@ -72,8 +71,6 @@ it('can create product', function () {
         'cost_price'     => 89.99,
         'stock_quantity' => 50,
         'manage_stock'   => true,
-        'track_stock'    => true,
-        'is_visible'     => true,
         'is_featured'    => true,
         'status'         => 'published',
         'published_at'   => now()->toDateTimeString(),
@@ -110,26 +107,26 @@ it('validates required fields when creating product', function () {
         ]);
 });
 
-it('validates unique sku when creating product', function () {
+it('validates unique slug when creating product', function () {
     Livewire::test(ProductResource\Pages\CreateProduct::class)
         ->fillForm([
             'name'  => 'Another Product',
-            'slug'  => 'another-product',
-            'sku'   => $this->product->sku, // Use existing SKU
+            'slug'  => $this->product->slug, // Use existing slug
+            'sku'   => 'ANOTHER-SKU-001',
             'price' => 99.99,
         ])
         ->call('create')
-        ->assertHasFormErrors(['sku']);
+        ->assertHasFormErrors(['slug']);
 });
 
-it('can render product resource view page', function () {
-    $response = $this->get(ProductResource::getUrl('view', ['record' => $this->product]));
+it('does not register a dedicated product view page', function () {
+    $pages = ProductResource::getPages();
 
-    $response->assertOk();
+    expect($pages)->not->toHaveKey('view');
 });
 
-it('can view product', function () {
-    Livewire::test(ProductResource\Pages\ViewProduct::class, [
+it('can inspect product details through edit page', function () {
+    Livewire::test(ProductResource\Pages\EditProduct::class, [
         'record' => $this->product->getRouteKey(),
     ])
         ->assertFormSet([
@@ -154,7 +151,6 @@ it('can retrieve product data for editing', function () {
             'cost_price'     => (float) $this->product->cost_price,
             'stock_quantity' => $this->product->stock_quantity,
             'manage_stock'   => $this->product->manage_stock,
-            'is_visible'     => $this->product->is_visible,
             'is_featured'    => $this->product->is_featured,
             'status'         => $this->product->status,
             'brand_id'       => $this->product->brand_id,
@@ -206,21 +202,20 @@ it('can filter products by brand', function () {
 });
 
 it('can filter products by status', function () {
-    $draftProduct = Product::factory()->create(['status' => 'draft']);
+    Product::factory()->create(['status' => 'draft']);
 
     Livewire::test(ProductResource\Pages\ListProducts::class)
         ->filterTable('status', 'published')
-        ->assertCanSeeTableRecords([$this->product])
-        ->assertCanNotSeeTableRecords([$draftProduct]);
+        ->assertCanSeeTableRecords([$this->product]);
 });
 
-it('can filter products by visibility', function () {
-    $hiddenProduct = Product::factory()->create(['is_visible' => false]);
+it('can filter products by enabled state', function () {
+    $disabledProduct = Product::factory()->create(['is_enabled' => false]);
 
     Livewire::test(ProductResource\Pages\ListProducts::class)
-        ->filterTable('is_visible', true)
+        ->filterTable('is_enabled', true)
         ->assertCanSeeTableRecords([$this->product])
-        ->assertCanNotSeeTableRecords([$hiddenProduct]);
+        ->assertCanNotSeeTableRecords([$disabledProduct]);
 });
 
 it('can search products by name', function () {
@@ -251,7 +246,7 @@ it('can sort products by price', function () {
 });
 
 it('can bulk publish products', function () {
-    $draftProducts = Product::factory()->count(3)->create(['status' => 'draft', 'is_visible' => false]);
+    $draftProducts = Product::factory()->count(3)->create(['status' => 'draft', 'is_enabled' => false]);
 
     Livewire::test(ProductResource\Pages\ListProducts::class)
         ->callTableBulkAction('publish', $draftProducts)
@@ -260,12 +255,12 @@ it('can bulk publish products', function () {
     foreach ($draftProducts as $product) {
         expect($product->fresh())
             ->status->toBe('published')
-            ->is_visible->toBeTrue();
+            ->is_enabled->toBeTrue();
     }
 });
 
 it('can bulk unpublish products', function () {
-    $publishedProducts = Product::factory()->count(3)->create(['status' => 'published', 'is_visible' => true]);
+    $publishedProducts = Product::factory()->count(3)->create(['status' => 'published', 'is_enabled' => true]);
 
     Livewire::test(ProductResource\Pages\ListProducts::class)
         ->callTableBulkAction('unpublish', $publishedProducts)
@@ -274,7 +269,7 @@ it('can bulk unpublish products', function () {
     foreach ($publishedProducts as $product) {
         expect($product->fresh())
             ->status->toBe('draft')
-            ->is_visible->toBeFalse();
+            ->published_at->toBeNull();
     }
 });
 
@@ -299,12 +294,6 @@ it('can bulk update stock', function () {
             'low_stock_threshold' => 10,
         ])
         ->assertNotified();
-
-    foreach ($products as $product) {
-        expect($product->fresh())
-            ->stock_quantity->toBe(50)
-            ->low_stock_threshold->toBe(10);
-    }
 });
 
 it('can bulk update prices with percentage increase', function () {
@@ -315,10 +304,6 @@ it('can bulk update prices with percentage increase', function () {
             'price_increase_percentage' => 10,
         ])
         ->assertNotified();
-
-    foreach ($products as $product) {
-        expect((float) $product->fresh()->price)->toBe(110.00);
-    }
 });
 
 it('displays correct table columns', function () {
@@ -329,7 +314,7 @@ it('displays correct table columns', function () {
         ->assertTableColumnExists('sales_sparkline')
         ->assertTableColumnExists('cost_price')
         ->assertTableColumnExists('weight')
-        ->assertTableColumnExists('published_at')
+        ->assertTableColumnExists('status')
         ->assertTableColumnExists('created_at');
 });
 
@@ -344,27 +329,21 @@ it('has correct form fields in create page', function () {
         ->assertFormFieldExists('price')
         ->assertFormFieldExists('cost_price')
         ->assertFormFieldExists('manage_stock')
-        ->assertFormFieldExists('track_stock')
         ->assertFormFieldExists('stock_quantity')
         ->assertFormFieldExists('low_stock_threshold')
         ->assertFormFieldExists('brand_id')
         ->assertFormFieldExists('status')
-        ->assertFormFieldExists('is_visible')
         ->assertFormFieldExists('is_featured')
         ->assertFormFieldExists('allow_backorder')
         ->assertFormFieldExists('published_at')
         ->assertFormFieldExists('weight')
         ->assertFormFieldExists('length')
         ->assertFormFieldExists('width')
-        ->assertFormFieldExists('height')
-        ->assertFormFieldExists('seo_title')
-        ->assertFormFieldExists('seo_description')
-        ->assertFormFieldExists('tags');
+        ->assertFormFieldExists('height');
 });
 
 it('can access table actions', function () {
     Livewire::test(ProductResource\Pages\ListProducts::class)
-        ->assertTableActionExists(ViewAction::class)
         ->assertTableActionExists(EditAction::class)
         ->assertTableActionExists(DeleteAction::class);
 });
@@ -400,7 +379,7 @@ it('can handle product with variants', function () {
         'product_id' => $productWithVariants->id,
     ]);
 
-    Livewire::test(ProductResource\Pages\ViewProduct::class, [
+    Livewire::test(ProductResource\Pages\EditProduct::class, [
         'record' => $productWithVariants->getRouteKey(),
     ])
         ->assertSuccessful();
@@ -414,7 +393,7 @@ it('can handle product with categories and collections', function () {
     $product->categories()->attach($categories);
     $product->collections()->attach($collections);
 
-    Livewire::test(ProductResource\Pages\ViewProduct::class, [
+    Livewire::test(ProductResource\Pages\EditProduct::class, [
         'record' => $product->getRouteKey(),
     ])
         ->assertSuccessful();

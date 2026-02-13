@@ -14,6 +14,7 @@ use Database\Seeders\CustomerGroupSeeder;
 use Database\Seeders\FeatureFlagSeeder;
 use Database\Seeders\InventorySeeder;
 use Database\Seeders\OptimizedFullSeeder;
+use Database\Seeders\ServiceSeeder;
 use Database\Seeders\SettingsSeeder;
 use Database\Seeders\WarehouseSeeder;
 
@@ -74,6 +75,7 @@ return [
         AdminAuthorizationSeeder::class,
         AdminUserSeeder::class,
         CustomerGroupSeeder::class,
+        ServiceSeeder::class,
         AttributeSeeder::class,
         AttributeValueSeeder::class,
         WarehouseSeeder::class,

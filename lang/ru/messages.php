@@ -177,6 +177,7 @@ return [
     'Min price'                                                                                             => 'Мин. цена',
     'Minimal E‑Shop'                                                                                        => 'Минималистичный магазин',
     'Most products'                                                                                         => 'Больше всего товаров',
+    'movements'                                                                                             => 'Движения',
     'My orders'                                                                                             => 'Мои заказы',
     'Name'                                                                                                  => 'Имя',
     'Name (A–Z)'                                                                                            => 'Имя (А–Я)',

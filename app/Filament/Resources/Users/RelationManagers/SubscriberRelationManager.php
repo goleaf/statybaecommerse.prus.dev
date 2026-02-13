@@ -55,13 +55,16 @@ class SubscriberRelationManager extends RelationManager
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('first_name')
+                    ->sortable()
                     ->searchable(),
                 TextColumn::make('last_name')
+                    ->sortable()
                     ->searchable(),
                 TextColumn::make('status')
                     ->badge()
                     ->sortable(),
                 IconColumn::make('newsletter_subscription')
+                    ->sortable()
                     ->boolean()
                     ->label('Newsletter'),
                 TextColumn::make('subscribed_at')

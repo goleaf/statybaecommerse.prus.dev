@@ -441,6 +441,7 @@ return [
         'navigation_label'              => 'Inventar',
         'plural_model_label'            => 'Inventare',
         'reserved_quantity'             => 'Reservierte Menge',
+        'stock_reservations'            => 'Bestandsreservierungen',
         'updated_at'                    => 'Aktualisiert am',
     ],
     'inventory_management' => [
@@ -578,8 +579,6 @@ return [
         'dashboard'        => 'Dashboard',
         'marketing'        => 'Marketing',
         'orders'           => 'Bestellungen',
-        'organization'     => 'Organisation',
-        'organizations'    => 'Organisationen',
         'partners'         => 'Partner',
         'products'         => 'Produkte',
         'settings'         => 'Einstellungen',
@@ -727,7 +726,6 @@ return [
         ],
     ],
     'orders_import'        => 'Bestellungen importieren',
-    'organizations_import' => 'Organisationen importieren',
     'partners_import'      => 'Partner importieren',
     'placeholders'         => [
         'title' => 'Title',
@@ -810,6 +808,7 @@ return [
         'seo_description'               => 'SEO-Beschreibung',
         'seo_title'                     => 'SEO-Titel',
         'short_description'             => 'Kurzbeschreibung',
+        'similar_products'              => 'Ähnliche Produkte',
         'status'                        => 'Status',
         'status_archived'               => 'Archiviert',
         'status_draft'                  => 'Entwurf',

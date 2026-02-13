@@ -38,7 +38,7 @@ return [
     'reward_tiers' => [
         ['threshold' => 0, 'category' => 'credit', 'amount' => 5.00, 'currency' => 'EUR'],
         ['threshold' => 5, 'category' => 'credit', 'amount' => 10.00, 'currency' => 'EUR'],
-        ['threshold' => 10, 'category' => 'points', 'amount' => 250.0, 'currency' => 'PTS'],
+        ['threshold' => 10, 'category' => 'points', 'amount' => 250.0, 'currency' => 'EUR'],
     ],
 
     /*

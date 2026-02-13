@@ -73,12 +73,6 @@ class ProductForm
                             ->columnSpanFull(),
                         Grid::make(2)
                             ->schema([
-                                Select::make('categories')
-                                    ->label(__('messages.categories'))
-                                    ->relationship('categories', 'name')
-                                    ->multiple()
-                                    ->searchable()
-                                    ->preload(),
                                 Select::make('collections')
                                     ->label(__('messages.collections'))
                                     ->relationship('collections', 'name')

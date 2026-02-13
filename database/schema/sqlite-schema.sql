@@ -158,22 +158,6 @@ CREATE TABLE IF NOT EXISTS "exports"(
   foreign key("requested_by") references "users"("id") on delete set null
 );
 CREATE UNIQUE INDEX "exports_uuid_unique" on "exports"("uuid");
-CREATE TABLE IF NOT EXISTS "organizations"(
-  "id" integer primary key autoincrement not null,
-  "name" varchar not null,
-  "slug" varchar not null,
-  "description" text,
-  "type" varchar not null default 'company',
-  "is_active" tinyint(1) not null default '1',
-  "settings" text,
-  "created_at" datetime,
-  "updated_at" datetime
-);
-CREATE INDEX "organizations_is_active_type_index" on "organizations"(
-  "is_active",
-  "type"
-);
-CREATE UNIQUE INDEX "organizations_slug_unique" on "organizations"("slug");
 CREATE TABLE IF NOT EXISTS "projects"(
   "id" integer primary key autoincrement not null,
   "name" varchar not null,
@@ -182,21 +166,15 @@ CREATE TABLE IF NOT EXISTS "projects"(
   "status" varchar not null default 'active',
   "type" varchar not null default 'organizational',
   "user_id" integer,
-  "organization_id" integer,
   "start_date" date,
   "end_date" date,
   "metadata" text,
   "created_at" datetime,
   "updated_at" datetime,
-  foreign key("user_id") references "users"("id") on delete set null,
-  foreign key("organization_id") references "organizations"("id") on delete cascade
+  foreign key("user_id") references "users"("id") on delete set null
 );
 CREATE INDEX "projects_status_type_index" on "projects"("status", "type");
 CREATE INDEX "projects_user_id_type_index" on "projects"("user_id", "type");
-CREATE INDEX "projects_organization_id_status_index" on "projects"(
-  "organization_id",
-  "status"
-);
 CREATE UNIQUE INDEX "projects_slug_unique" on "projects"("slug");
 CREATE TABLE IF NOT EXISTS "tasks"(
   "id" integer primary key autoincrement not null,
@@ -307,32 +285,6 @@ CREATE INDEX "files_fileable_type_fileable_id_index" on "files"(
 CREATE INDEX "files_uploaded_by_index" on "files"("uploaded_by");
 CREATE INDEX "files_hash_index" on "files"("hash");
 CREATE INDEX "files_mime_type_index" on "files"("mime_type");
-CREATE TABLE IF NOT EXISTS "organization_user"(
-  "id" integer primary key autoincrement not null,
-  "organization_id" integer not null,
-  "user_id" integer not null,
-  "role" varchar not null default 'member',
-  "permissions" text,
-  "is_active" tinyint(1) not null default '1',
-  "joined_at" datetime not null,
-  "left_at" datetime,
-  "created_at" datetime,
-  "updated_at" datetime,
-  foreign key("organization_id") references "organizations"("id") on delete cascade,
-  foreign key("user_id") references "users"("id") on delete cascade
-);
-CREATE UNIQUE INDEX "organization_user_organization_id_user_id_unique" on "organization_user"(
-  "organization_id",
-  "user_id"
-);
-CREATE INDEX "organization_user_user_id_role_index" on "organization_user"(
-  "user_id",
-  "role"
-);
-CREATE INDEX "organization_user_organization_id_is_active_index" on "organization_user"(
-  "organization_id",
-  "is_active"
-);
 CREATE TABLE IF NOT EXISTS "task_user"(
   "id" integer primary key autoincrement not null,
   "task_id" integer not null,
@@ -4339,7 +4291,6 @@ INSERT INTO migrations VALUES(5,'2024_05_13_000000_create_stock_reservations_tab
 INSERT INTO migrations VALUES(6,'2024_05_23_000000_update_product_images_paths',1);
 INSERT INTO migrations VALUES(7,'2024_10_21_000000_create_exports_table',1);
 INSERT INTO migrations VALUES(8,'2024_12_16_000001_optimize_storefront_indexes',1);
-INSERT INTO migrations VALUES(9,'2024_12_22_000001_create_organizations_table',1);
 INSERT INTO migrations VALUES(10,'2024_12_22_000002_create_projects_table',1);
 INSERT INTO migrations VALUES(11,'2024_12_22_000003_create_tasks_table',1);
 INSERT INTO migrations VALUES(12,'2024_12_22_000004_create_tags_table',1);

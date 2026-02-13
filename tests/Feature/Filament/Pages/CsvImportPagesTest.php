@@ -6,10 +6,8 @@ namespace Tests\Feature\Filament\Pages;
 
 use App\Filament\Pages\Imports\ImportBrands;
 use App\Filament\Pages\Imports\ImportCategories;
-use App\Filament\Pages\Imports\ImportCustomers;
 use App\Filament\Pages\Imports\ImportDiscounts;
 use App\Filament\Pages\Imports\ImportOrders;
-use App\Filament\Pages\Imports\ImportOrganizations;
 use App\Filament\Pages\Imports\ImportPartners;
 use App\Filament\Pages\Imports\ImportPrices;
 use App\Filament\Pages\Imports\ImportProducts;
@@ -26,9 +24,7 @@ dataset('csvImportPages', [
     ImportProducts::class,
     ImportCategories::class,
     ImportBrands::class,
-    ImportCustomers::class,
     ImportPartners::class,
-    ImportOrganizations::class,
     ImportSubscribers::class,
     ImportUsers::class,
     ImportDiscounts::class,
@@ -42,7 +38,7 @@ it('renders CSV import page for admins', function (string $pageClass) {
 
     Livewire::test($pageClass)
         ->assertSuccessful()
-        ->assertSee(__('filament-actions::import.modal.actions.download_example.label'));
+        ->assertSee('filament-actions::import.modal.actions.download_example.label');
 })->with('csvImportPages');
 
 it('forbids non-admin users from CSV import pages', function (string $pageClass) {

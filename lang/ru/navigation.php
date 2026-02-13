@@ -32,7 +32,6 @@ return [
     'export'               => 'Export',
     'global_search'        => 'Global Search',
     'import'               => 'Import',
-    'organizations'        => 'Organizations',
     'partners'             => 'Partners',
     'product_features'     => 'Product Features',
     'product_images'       => 'Product Images',

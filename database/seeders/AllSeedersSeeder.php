@@ -28,6 +28,7 @@ final class AllSeedersSeeder extends BaseSeeder
         AdminAuthorizationSeeder::class,
         AdminUserSeeder::class,
         CustomerGroupSeeder::class,
+        ServiceSeeder::class,
         AttributeSeeder::class,
         AttributeValueSeeder::class,
         WarehouseSeeder::class,

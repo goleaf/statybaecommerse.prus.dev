@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CategoryResource\RelationManagers;
 
+use App\Models\Category;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -37,10 +38,6 @@ class SubcategoriesRelationManager extends RelationManager
                     ->label(__('messages.name'))
                     ->required()
                     ->maxLength(255),
-                TextInput::make('slug')
-                    ->label(__('messages.slug'))
-                    ->required()
-                    ->maxLength(255),
                 Toggle::make('is_visible')
                     ->label(__('messages.visible'))
                     ->default(true),
@@ -68,7 +65,12 @@ class SubcategoriesRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                CreateAction::make(),
+                CreateAction::make()
+                    ->mutateDataUsing(static function (array $data): array {
+                        $data['slug'] = Category::generateUniqueSlug((string) ($data['name'] ?? ''));
+
+                        return $data;
+                    }),
             ])
             ->actions([
                 EditAction::make(),

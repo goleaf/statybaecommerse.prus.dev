@@ -99,20 +99,9 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     /**
      * Handle company relationship.
      */
-    public function organization(): BelongsTo
+    public function companyRelation(): BelongsTo
     {
         return $this->belongsTo(Company::class, 'company_id');
-    }
-
-    /**
-     * Organizations this user belongs to.
-     */
-    public function organizations(): BelongsToMany
-    {
-        return $this->belongsToMany(Organization::class, 'organization_user')
-            ->using(\App\Models\Pivots\OrganizationUser::class)
-            ->withPivot(['role', 'permissions', 'is_active', 'joined_at', 'left_at'])
-            ->withTimestamps();
     }
 
     protected $hidden = ['password', 'remember_token', 'verification_token', 'password_reset_token', 'api_token'];

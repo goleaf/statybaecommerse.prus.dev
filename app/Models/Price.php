@@ -43,10 +43,20 @@ final class Price extends Model
     {
         self::creating(static function (self $price): void {
             $price->type = self::normalizeType($price->type);
+
+            $euroCurrencyId = self::resolveEuroCurrencyId();
+            if ($euroCurrencyId !== null) {
+                $price->currency_id = $euroCurrencyId;
+            }
         });
 
         self::updating(static function (self $price): void {
             $price->type = self::normalizeType($price->type);
+
+            $euroCurrencyId = self::resolveEuroCurrencyId();
+            if ($euroCurrencyId !== null) {
+                $price->currency_id = $euroCurrencyId;
+            }
         });
     }
 
@@ -63,6 +73,21 @@ final class Price extends Model
         }
 
         return $type;
+    }
+
+    private static function resolveEuroCurrencyId(): ?int
+    {
+        $currencyId = Currency::query()
+            ->where('code', 'EUR')
+            ->value('id');
+
+        if (! is_numeric($currencyId)) {
+            $currencyId = Currency::query()
+                ->where('is_default', true)
+                ->value('id');
+        }
+
+        return is_numeric($currencyId) ? (int) $currencyId : null;
     }
 
     /**

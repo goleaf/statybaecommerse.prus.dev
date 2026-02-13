@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 use App\Filament\Imports\BrandImporter;
 use App\Filament\Imports\CategoryImporter;
-use App\Filament\Imports\CustomerImporter;
 use App\Filament\Imports\DiscountImporter;
 use App\Filament\Imports\OrderImporter;
-use App\Filament\Imports\OrganizationImporter;
 use App\Filament\Imports\PartnerImporter;
 use App\Filament\Imports\PriceImporter;
 use App\Filament\Imports\ProductImporter;
@@ -21,10 +19,8 @@ it('runs filament imports on the sync connection', function () {
     $importers = [
         BrandImporter::class,
         CategoryImporter::class,
-        CustomerImporter::class,
         DiscountImporter::class,
         OrderImporter::class,
-        OrganizationImporter::class,
         PartnerImporter::class,
         PriceImporter::class,
         ProductImporter::class,

@@ -29,6 +29,7 @@ class SubscribersTable
                     ->badge()
                     ->sortable(),
                 IconColumn::make('is_verified')
+                    ->sortable()
                     ->label(__('messages.verified'))
                     ->boolean(),
                 TextColumn::make('subscribed_at')

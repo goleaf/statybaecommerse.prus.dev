@@ -177,6 +177,7 @@ return [
     'Min price'                                                                                             => 'Min. kaina',
     'Minimal E‑Shop'                                                                                        => 'Minimali el. parduotuvė',
     'Most products'                                                                                         => 'Daugiausiai produktų',
+    'movements'                                                                                             => 'Judėjimai',
     'My orders'                                                                                             => 'Mano užsakymai',
     'Name'                                                                                                  => 'Pavadinimas',
     'Name (A–Z)'                                                                                            => 'Pavadinimas (A–Z)',

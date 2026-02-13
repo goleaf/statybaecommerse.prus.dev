@@ -65,9 +65,9 @@ final class ShippingOptionResolver
                     'name'               => $option->name,
                     'description'        => $option->description,
                     'price'              => $price,
-                    'currency'           => $option->currency_code,
+                    'currency'           => 'EUR',
                     'eta'                => $option->estimated_delivery_text,
-                    'formatted_price'    => app_money_format($price, $option->currency_code),
+                    'formatted_price'    => app_money_format($price, 'EUR'),
                     'estimated_delivery' => $option->estimated_delivery_text,
                 ];
             })

@@ -121,23 +121,20 @@ describe('current_currency function', function () {
         }
     });
 
-    it('returns session currency when forced', function () {
+    it('returns eur even when session currency is forced', function () {
         session(['forced_currency' => 'USD']);
         Config::set('app.currency', 'EUR');
 
-        // Test the function behavior - it should prioritize session
         $result = current_currency();
-        expect($result)->toBeString();
-        expect(strlen($result))->toBeGreaterThan(0);
+        expect($result)->toBe('EUR');
     });
 
-    it('returns config currency as fallback', function () {
+    it('ignores config currency fallback and keeps eur', function () {
         session()->forget('forced_currency');
         Config::set('app.currency', 'GBP');
 
         $result = current_currency();
-        expect($result)->toBeString();
-        expect(strlen($result))->toBeGreaterThan(0);
+        expect($result)->toBe('EUR');
     });
 
     it('returns EUR as default fallback', function () {
@@ -145,8 +142,7 @@ describe('current_currency function', function () {
         Config::set('app.currency', null);
 
         $result = current_currency();
-        expect($result)->toBeString();
-        expect(strlen($result))->toBeGreaterThan(0);
+        expect($result)->toBe('EUR');
     });
 
     it('handles empty session currency', function () {
@@ -154,8 +150,7 @@ describe('current_currency function', function () {
         Config::set('app.currency', 'USD');
 
         $result = current_currency();
-        expect($result)->toBeString();
-        expect(strlen($result))->toBeGreaterThan(0);
+        expect($result)->toBe('EUR');
     });
 });
 
@@ -321,21 +316,15 @@ describe('safe_asset function', function () {
 });
 
 describe('validate_currency_code function', function () {
-    it('validates common currency codes', function () {
-        expect(validate_currency_code('USD'))->toBeTrue();
+    it('validates only eur currency code', function () {
         expect(validate_currency_code('EUR'))->toBeTrue();
-        expect(validate_currency_code('GBP'))->toBeTrue();
-        expect(validate_currency_code('JPY'))->toBeTrue();
-    });
-
-    it('handles lowercase currency codes', function () {
-        expect(validate_currency_code('usd'))->toBeTrue();
         expect(validate_currency_code('eur'))->toBeTrue();
     });
 
     it('rejects invalid currency codes', function () {
         expect(validate_currency_code('INVALID'))->toBeFalse();
         expect(validate_currency_code('XYZ'))->toBeFalse();
+        expect(validate_currency_code('USD'))->toBeFalse();
         expect(validate_currency_code(''))->toBeFalse();
     });
 });

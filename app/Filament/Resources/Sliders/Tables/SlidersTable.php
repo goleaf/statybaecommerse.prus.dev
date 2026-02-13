@@ -33,6 +33,7 @@ class SlidersTable
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('slug')
+                    ->sortable()
                     ->label(__('messages.slug'))
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),

@@ -11,7 +11,9 @@ use App\Models\Address;
 use App\Models\Product;
 use App\Models\Service;
 use App\Models\User;
+use BackedEnum;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -20,7 +22,6 @@ use Filament\Forms\Set;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use BackedEnum;
 use Illuminate\Support\Str;
 
 class OrderForm
@@ -42,11 +43,8 @@ class OrderForm
                             ->getOptionLabelUsing(static fn ($value): ?string => OrderStatus::tryFrom(self::normalizeEnumValue($value))?->label() ?? Str::headline(self::normalizeEnumValue($value)))
                             ->required()
                             ->default(OrderStatus::PENDING),
-                        Select::make('currency')
-                            ->label(__('messages.currency'))
-                            ->options(['EUR' => 'EUR', 'USD' => 'USD'])
-                            ->default('EUR')
-                            ->required(),
+                        Hidden::make('currency')
+                            ->default('EUR'),
                     ])->columns(3)
                     ->columnSpanFull(),
 

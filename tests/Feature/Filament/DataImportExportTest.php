@@ -57,7 +57,6 @@ it('shows CSV import links', function () {
         ->assertSee(__('admin.brands_import'))
         ->assertSee(__('admin.customers_import'))
         ->assertSee(__('admin.partners_import'))
-        ->assertSee(__('admin.organizations_import'))
         ->assertSee(__('admin.subscribers_import'))
         ->assertSee(__('admin.users_import'))
         ->assertSee(__('admin.discounts_import'))

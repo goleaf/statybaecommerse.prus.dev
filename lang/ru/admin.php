@@ -441,6 +441,7 @@ return [
         'navigation_label'              => 'Инвентарь',
         'plural_model_label'            => 'Инвентарь',
         'reserved_quantity'             => 'Зарезервированное количество',
+        'stock_reservations'            => 'Резервирование запасов',
         'updated_at'                    => 'Обновлено',
     ],
     'inventory_management' => [
@@ -578,8 +579,6 @@ return [
         'dashboard'        => 'Dashboard',
         'marketing'        => 'Marketing',
         'orders'           => 'Orders',
-        'organization'     => 'Organization',
-        'organizations'    => 'Organizations',
         'partners'         => 'Partners',
         'products'         => 'Products',
         'settings'         => 'Settings',
@@ -727,7 +726,6 @@ return [
         ],
     ],
     'orders_import'        => 'Import Orders',
-    'organizations_import' => 'Import Organizations',
     'partners_import'      => 'Import Partners',
     'placeholders'         => [
         'title' => 'Title',
@@ -807,6 +805,7 @@ return [
         'seo_description'               => 'SEO описание',
         'seo_title'                     => 'SEO заголовок',
         'short_description'             => 'Краткое описание',
+        'similar_products'              => 'Похожие товары',
         'status'                        => 'Статус',
         'status_archived'               => 'Архивирован',
         'status_draft'                  => 'Черновик',

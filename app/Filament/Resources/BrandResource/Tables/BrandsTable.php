@@ -30,6 +30,7 @@ class BrandsTable
                     ->searchable()
                     ->sortable(),
                 ToggleColumn::make('is_active')
+                    ->sortable()
                     ->label(__('admin.brands.is_active')),
                 TextColumn::make('products_count')
                     ->label(__('admin.brands.products_count'))

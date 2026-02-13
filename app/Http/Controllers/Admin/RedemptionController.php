@@ -46,7 +46,7 @@ final class RedemptionController extends Controller
             'code_id'     => ['nullable', 'integer', 'min:1'],
             'user_id'     => ['nullable', 'integer', 'min:1'],
             'order_id'    => ['nullable', 'integer', 'min:1'],
-            'currency'    => ['nullable', 'string', 'size:3'],
+            'currency'    => ['nullable', 'string', Rule::in(['EUR'])],
             'date_from'   => ['nullable', 'date'],
             'date_to'     => ['nullable', 'date', 'after_or_equal:date_from'],
             'search'      => ['nullable', 'string', 'max:255'],
@@ -138,7 +138,7 @@ final class RedemptionController extends Controller
         }
 
         if (! empty($filters['currency'])) {
-            $query->where('currency_code', strtoupper((string) $filters['currency']));
+            $query->where('currency_code', 'EUR');
         }
 
         if (! empty($filters['date_from'])) {

@@ -128,8 +128,6 @@ final class ComprehensiveMultilanguageSeeder extends BaseSeeder
 
         $currenciesData = [
             ['code' => 'EUR', 'symbol' => '€', 'exchange_rate' => 1.0, 'is_default' => true, 'name' => 'Euro'],
-            ['code' => 'USD', 'symbol' => '$', 'exchange_rate' => 1.08, 'is_default' => false, 'name' => 'US Dollar'],
-            ['code' => 'GBP', 'symbol' => '£', 'exchange_rate' => 0.85, 'is_default' => false, 'name' => 'British Pound'],
         ];
 
         foreach ($currenciesData as $data) {

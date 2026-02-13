@@ -78,6 +78,7 @@ final class InventoryResource extends BaseResource
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('available_quantity')
+                    ->sortable()
                     ->label(__('admin.inventory.available_quantity'))
                     ->getStateUsing(static fn (Inventory $record): int => max(0, (int) $record->quantity - (int) $record->reserved))
                     ->numeric(),

@@ -8,7 +8,7 @@ it('provides companies and locale translations in the messages group', function 
     expect($path)->toBeFile();
 
     $messages = include $path;
-    $keys = ['companies', 'locale'];
+    $keys = ['companies', 'locale', 'movements'];
 
     expect($messages)->toBeArray();
 

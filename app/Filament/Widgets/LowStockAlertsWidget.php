@@ -45,11 +45,13 @@ final class LowStockAlertsWidget extends BaseWidget
                     ->orderBy('stock_quantity', 'asc')
             )
             ->columns([
-                TextColumn::make('name')->searchable(),
+                TextColumn::make('name')
+                    ->sortable()->searchable(),
                 TextColumn::make('sku')->searchable(),
                 TextColumn::make('stock_quantity')->sortable(),
                 TextColumn::make('low_stock_threshold')->sortable(),
                 BadgeColumn::make('status')
+                    ->sortable()
                     ->label(__('messages.product'))
                     ->getStateUsing(fn (Product $record): string => $record->stock_quantity <= 0 ? 'out_of_stock' : 'low_stock')
                     ->colors([

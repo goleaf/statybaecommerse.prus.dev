@@ -20,7 +20,7 @@ return [
         'discount'         => true,
         'review'           => true,
         'inventory'        => true,
-        'multi_currency'   => true,
+        'multi_currency'   => false,
         'multi_language'   => true,
         'seo'              => true,
         'advanced_pricing' => true,

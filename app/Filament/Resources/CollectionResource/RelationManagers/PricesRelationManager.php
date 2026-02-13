@@ -37,7 +37,7 @@ class PricesRelationManager extends RelationManager
                     ->sortable(),
                 TextColumn::make('amount')
                     ->label(__('messages.amount'))
-                    ->money(fn (Price $record) => $record->currency?->code ?? 'EUR')
+                    ->money('EUR')
                     ->sortable(),
                 TextColumn::make('type')
                     ->sortable()

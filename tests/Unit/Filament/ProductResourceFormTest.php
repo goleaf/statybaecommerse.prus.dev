@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Filament\Resources\ProductResource;
+use App\Filament\Resources\ProductResource\RelationManagers\CategoriesRelationManager;
 use App\Support\Filament\Schemas\TestingSchemaHost;
 use Filament\Schemas\Schema;
 use Livewire\Component as LivewireComponent;
@@ -14,20 +15,20 @@ if (! class_exists(\Filament\Forms\Form::class)) {
 
 uses()->group('filament');
 
-it('product resource form returns a Schema instance and includes images field', function (): void {
+it('product resource form returns a Schema instance and includes core product fields', function (): void {
     $schema = Schema::make(new TestingSchemaHost);
     $form = ProductResource::form($schema);
 
     expect($form)->toBeInstanceOf(Schema::class);
 
-    $components = $form->getFlatComponents(withActions: false, withHidden: true);
-
-    // Ensure a file upload field for images exists somewhere in the flattened schema
-    $hasImagesField = collect($components)
+    $componentKeys = collect($form->getFlatComponents(withActions: false, withHidden: true))
         ->keys()
-        ->contains(fn ($key) => is_string($key) && str_contains($key, 'images'));
+        ->filter(static fn ($key): bool => is_string($key))
+        ->values();
 
-    expect($hasImagesField)->toBeTrue();
+    expect($componentKeys)->toContain('name');
+    expect($componentKeys)->toContain('slug');
+    expect($componentKeys)->toContain('sku');
 });
 
 it('bootstraps a testing schema host when none is provided', function (): void {
@@ -71,4 +72,26 @@ it('respects an existing schema host that was already assigned', function (): vo
     // The form should be buildable without errors and maintain the custom host
     expect($form)->toBeInstanceOf(Schema::class);
     expect($form->getComponents())->not->toBeEmpty();
+});
+
+it('does not expose categories as a direct product form field', function (): void {
+    $schema = Schema::make(new TestingSchemaHost);
+    $form = ProductResource::form($schema);
+
+    $componentKeys = collect($form->getFlatComponents(withActions: false, withHidden: true))
+        ->keys()
+        ->filter(static fn ($key): bool => is_string($key))
+        ->values();
+
+    $containsCategoriesField = $componentKeys->contains(
+        static fn (string $key): bool => $key === 'categories'
+            || str_ends_with($key, '.categories')
+            || str_contains($key, 'categories.')
+    );
+
+    expect($containsCategoriesField)->toBeFalse();
+});
+
+it('keeps categories management in product relation tabs', function (): void {
+    expect(ProductResource::getRelations())->toContain(CategoriesRelationManager::class);
 });

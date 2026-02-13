@@ -49,7 +49,7 @@ class OrdersRelationManager extends RelationManager
                     ->badge()
                     ->sortable(),
                 TextColumn::make('total')
-                    ->money(fn ($record) => $record->currency ?? 'EUR')
+                    ->money('EUR')
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime()

@@ -72,6 +72,12 @@ final class Order extends Model implements HasDocuments
             if (! is_string($order->number) || trim($order->number) === '') {
                 $order->number = self::generateUniqueNumber();
             }
+
+            $order->currency = 'EUR';
+        });
+
+        self::updating(function (Order $order): void {
+            $order->currency = 'EUR';
         });
     }
 

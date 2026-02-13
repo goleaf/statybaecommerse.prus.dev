@@ -11,7 +11,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 
 /**
  * Project
@@ -23,7 +22,6 @@ use Illuminate\Database\Eloquent\Relations\HasOneThrough;
  * @property string                          $status
  * @property string                          $type
  * @property int|null                        $user_id
- * @property int|null                        $organization_id
  * @property \Illuminate\Support\Carbon|null $start_date
  * @property \Illuminate\Support\Carbon|null $end_date
  * @property array|null                      $metadata
@@ -46,7 +44,6 @@ final class Project extends Model
         'status',
         'type',
         'user_id',
-        'organization_id',
         'start_date',
         'end_date',
         'metadata',
@@ -66,14 +63,6 @@ final class Project extends Model
     public function owner(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
-    }
-
-    /**
-     * Organization for organizational projects.
-     */
-    public function organization(): BelongsTo
-    {
-        return $this->belongsTo(Organization::class);
     }
 
     /**
@@ -101,26 +90,6 @@ final class Project extends Model
     public function contributors(): BelongsToMany
     {
         return $this->members()->wherePivot('role', 'contributor');
-    }
-
-    /**
-     * Organization owner through organization (has-one-through).
-     */
-    public function organizationOwner(): HasOneThrough
-    {
-        return $this->hasOneThrough(
-            User::class,
-            Organization::class,
-            'id', // organization.id
-            'id', // user.id
-            'organization_id', // project.organization_id
-            'id' // organization.id (local key on intermediate)
-        )->join('organization_user', function ($join) {
-            $join->on('users.id', '=', 'organization_user.user_id')
-                ->on('organizations.id', '=', 'organization_user.organization_id')
-                ->where('organization_user.role', 'owner')
-                ->where('organization_user.is_active', true);
-        });
     }
 
     // Scopes
@@ -151,9 +120,6 @@ final class Project extends Model
             $q->where('user_id', $user->id) // personal projects
                 ->orWhereHas('members', function ($memberQuery) use ($user) {
                     $memberQuery->where('user_id', $user->id);
-                })
-                ->orWhereHas('organization.users', function ($orgQuery) use ($user) {
-                    $orgQuery->where('user_id', $user->id);
                 });
         });
     }
@@ -185,7 +151,7 @@ final class Project extends Model
             return $this->owner;
         }
 
-        return $this->leads()->first() ?? $this->organization?->owners()->first();
+        return $this->leads()->first() ?? $this->owner;
     }
 
     /**

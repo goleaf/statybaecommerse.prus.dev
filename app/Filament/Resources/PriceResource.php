@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\PriceResource\Pages;
-use App\Models\Currency;
 use App\Models\Price;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use BackedEnum;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\MorphToSelect;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -80,21 +80,8 @@ final class PriceResource extends BaseResource
                                 ->required()
                                 ->searchable()
                                 ->optionsLimit(50),
-                            Select::make('currency_id')
-                                ->label(__('messages.currency'))
-                                ->relationship(
-                                    name: 'currency',
-                                    titleAttribute: 'code',
-                                    modifyQueryUsing: static fn (Builder $query): Builder => $query
-                                        ->withoutGlobalScopes()
-                                        ->whereNotNull('code')
-                                        ->where('code', '!=', '')
-                                        ->orderBy('code'),
-                                )
-                                ->getOptionLabelFromRecordUsing(static fn (Currency $record): string => self::resolveCurrencyLabel($record))
-                                ->required()
-                                ->searchable()
-                                ->preload(),
+                            Hidden::make('currency_id')
+                                ->default(static fn (): ?int => self::resolveEuroCurrencyId()),
                         ]),
                     SchemaGrid::make(2)
                         ->schema([
@@ -167,7 +154,7 @@ final class PriceResource extends BaseResource
                     ->sortable(),
                 TextColumn::make('amount')
                     ->label(__('messages.amount') !== 'messages.amount' ? __('messages.amount') : 'Amount')
-                    ->money(fn (Price $record) => $record->currency?->code ?? 'EUR')
+                    ->money('EUR')
                     ->sortable(),
                 TextColumn::make('type')
                     ->label(__('messages.type'))
@@ -198,9 +185,6 @@ final class PriceResource extends BaseResource
                 \Filament\Tables\Filters\SelectFilter::make('type')
                     ->label(__('messages.type'))
                     ->options(fn () => Price::query()->whereNotNull('type')->distinct()->pluck('type', 'type')->toArray()),
-                \Filament\Tables\Filters\SelectFilter::make('currency_id')
-                    ->label(__('messages.currency'))
-                    ->relationship('currency', 'code'),
             ])
             ->actions([
                 \Filament\Tables\Actions\EditAction::make(),
@@ -261,24 +245,19 @@ final class PriceResource extends BaseResource
         return '#' . $variant->getKey();
     }
 
-    private static function resolveCurrencyLabel(Currency $currency): string
+    private static function resolveEuroCurrencyId(): ?int
     {
-        $code = trim((string) ($currency->getAttribute('code') ?? ''));
-        $name = trim((string) ($currency->getAttribute('name') ?? ''));
+        $currencyId = \App\Models\Currency::query()
+            ->where('code', 'EUR')
+            ->value('id');
 
-        if ($code !== '' && $name !== '') {
-            return "{$code} - {$name}";
+        if (! is_numeric($currencyId)) {
+            $currencyId = \App\Models\Currency::query()
+                ->where('is_default', true)
+                ->value('id');
         }
 
-        if ($code !== '') {
-            return $code;
-        }
-
-        if ($name !== '') {
-            return $name;
-        }
-
-        return '#' . $currency->getKey();
+        return is_numeric($currencyId) ? (int) $currencyId : null;
     }
 
     public static function getRelations(): array

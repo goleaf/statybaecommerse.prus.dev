@@ -546,13 +546,13 @@ final class CheckoutProcess extends Component
                     $payload = $option instanceof ShippingOptionData ? $option->toArray() : (array) $option;
                     $payload['id'] = (int) ($payload['id'] ?? 0);
                     $baseAmount = (float) ($payload['price'] ?? 0.0);
-                    $currency = (string) ($payload['currency'] ?? $payload['currency_code'] ?? current_currency());
+                    $currency = 'EUR';
                     $discount = $this->calculateShippingDiscount($baseAmount);
                     $finalAmount = max(0.0, round($baseAmount - $discount, 2));
 
                     $payload['original_price'] = $baseAmount;
                     $payload['price'] = $finalAmount;
-                    $payload['formatted_price'] = (string) ($payload['formatted_price'] ?? app_money_format($finalAmount, $currency));
+                    $payload['formatted_price'] = app_money_format($finalAmount, $currency);
                     $payload['currency'] = $currency;
                     $payload['currency_code'] = $currency;
                     $payload['badges'] = $this->buildShippingBadges($baseAmount, $finalAmount, $discount, $currency);

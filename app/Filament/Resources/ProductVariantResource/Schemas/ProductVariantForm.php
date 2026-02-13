@@ -25,8 +25,7 @@ class ProductVariantForm
                             ->label(__('messages.product'))
                             ->relationship('product', 'name')
                             ->required()
-                            ->searchable()
-                            ->preload(),
+                            ->searchable(),
                         TextInput::make('sku')
                             ->label(__('messages.sku'))
                             ->required(),

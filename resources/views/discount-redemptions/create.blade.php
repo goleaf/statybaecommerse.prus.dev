@@ -117,18 +117,17 @@
 
                         <!-- Currency Code -->
                         <div>
-                            <label for="currency_code" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                {{ __('frontend.discount_redemptions.fields.currency_code') }} <span class="text-red-500">*</span>
+                            <label for="currency_code_display" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                {{ __('frontend.discount_redemptions.fields.currency_code') }}
                             </label>
-                            <select name="currency_code" id="currency_code" required
-                                    class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 @error('currency_code') border-red-500 @enderror">
-                                <option value="EUR" {{ old('currency_code', 'EUR') === 'EUR' ? 'selected' : '' }}>{{ __('messages.discount_redemptions') }}</option>
-                                <option value="USD" {{ old('currency_code') === 'USD' ? 'selected' : '' }}>{{ __('messages.discount_redemptions') }}</option>
-                                <option value="GBP" {{ old('currency_code') === 'GBP' ? 'selected' : '' }}>{{ __('messages.discount_redemptions') }}</option>
-                            </select>
-                            @error('currency_code')
-                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
-                            @enderror
+                            <input
+                                id="currency_code_display"
+                                type="text"
+                                value="EUR"
+                                readonly
+                                class="w-full rounded-md border-gray-300 bg-gray-100 text-gray-700 shadow-sm dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                            >
+                            <input type="hidden" name="currency_code" value="EUR">
                         </div>
                     </div>
 

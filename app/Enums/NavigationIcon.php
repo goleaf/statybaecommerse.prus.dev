@@ -72,7 +72,7 @@ enum NavigationIcon: string
             self::Gift, self::Referral => 'heroicon-o-gift',
             self::Globe    => 'heroicon-o-globe-alt',
             self::Building => 'heroicon-o-building-office',
-            self::Currency, self::Price => 'heroicon-o-currency-dollar',
+            self::Currency, self::Price => 'heroicon-o-currency-euro',
             self::Location    => 'heroicon-o-map-pin',
             self::Collection  => 'heroicon-o-folder',
             self::Media       => 'heroicon-o-photo',

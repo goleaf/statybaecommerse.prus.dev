@@ -21,12 +21,15 @@ class ContactMessagesTable
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('email')
+                    ->sortable()
                     ->label(__('messages.email'))
                     ->searchable(),
                 TextColumn::make('subject')
+                    ->sortable()
                     ->label(__('messages.subject'))
                     ->searchable(),
                 TextColumn::make('order_number')
+                    ->sortable()
                     ->label(__('messages.order_number'))
                     ->searchable(),
                 TextColumn::make('created_at')

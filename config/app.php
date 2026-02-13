@@ -135,7 +135,7 @@ return [
      * |
      * | Example:
      * | 'locale_mapping' => [
-     * |     'en' => ['currency' => 'USD', 'zone' => 'US'],
+     * |     'en' => ['currency' => 'EUR', 'zone' => 'US'],
      * |     'lt' => ['currency' => 'EUR', 'zone' => 'EU'],
      * | ],
      * |

@@ -32,7 +32,6 @@ return [
         'user_management'    => 'User Management',
         'users'              => 'Users',
     ],
-    'organizations'        => 'Organizations',
     'partners'             => 'Partners',
     'product_features'     => 'Product Features',
     'product_images'       => 'Product Images',

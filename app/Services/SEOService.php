@@ -228,7 +228,7 @@ final class SEOService
                 'price'         => $price,
                 'priceCurrency' => $currency,
                 'availability'  => $product->stock_quantity > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
-                'seller'        => ['@type' => 'Organization', 'name' => $siteName],
+                'seller'        => ['@type' => 'LocalBusiness', 'name' => $siteName],
             ],
         ];
     }

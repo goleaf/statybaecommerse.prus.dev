@@ -33,7 +33,7 @@ final class CountryIndexRequest extends FormRequest
         // Enforce strict validation on filter, sort and pagination parameters.
         return [
             'region'       => ['nullable', 'string', 'max:255'],
-            'currency'     => ['nullable', 'string', 'max:3'],
+            'currency'     => ['nullable', 'string', 'in:EUR'],
             'is_eu_member' => ['nullable', 'boolean'],
             'requires_vat' => ['nullable', 'boolean'],
             'search'       => ['nullable', 'string', 'max:255'],

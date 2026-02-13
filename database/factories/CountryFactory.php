@@ -17,7 +17,7 @@ final class CountryFactory extends Factory
     public function definition(): array
     {
         $regions = ['Europe', 'Asia', 'Africa', 'North America', 'South America', 'Oceania', 'Antarctica'];
-        $currencies = ['EUR', 'USD', 'GBP', 'JPY', 'CHF', 'CAD', 'AUD', 'CNY', 'RUB', 'INR'];
+        $currencies = ['EUR'];
 
         $cca2 = $this->faker->unique()->regexify('[A-Z][A-Z0-9]');
         $cca3 = $this->faker->unique()->regexify('[A-Z][A-Z0-9]{2}');
@@ -32,7 +32,7 @@ final class CountryFactory extends Factory
             'code'               => $this->faker->optional(0.5)->regexify('[A-Z]{3}'),
             'iso_code'           => $this->faker->optional(0.5)->regexify('[A-Z]{3}'),
             'currency_code'      => $this->faker->randomElement($currencies),
-            'currency_symbol'    => $this->faker->optional(0.7)->randomElement(['€', '$', '£', '¥', 'CHF', 'C$', 'A$', '¥', '₽', '₹']),
+            'currency_symbol'    => '€',
             'phone_code'         => $this->faker->optional(0.8)->numerify('###'),
             'phone_calling_code' => $this->faker->optional(0.8)->numerify('###'),
             'flag'               => $this->faker->optional(0.6)->lexify('??.png'),
@@ -43,16 +43,7 @@ final class CountryFactory extends Factory
             'longitude'          => $this->faker->optional(0.8)->longitude(),
             'currencies'         => $this->faker->optional(0.6)->randomElements([
                 'EUR' => 'Euro',
-                'USD' => 'US Dollar',
-                'GBP' => 'British Pound',
-                'JPY' => 'Japanese Yen',
-                'CHF' => 'Swiss Franc',
-                'CAD' => 'Canadian Dollar',
-                'AUD' => 'Australian Dollar',
-                'CNY' => 'Chinese Yuan',
-                'RUB' => 'Russian Ruble',
-                'INR' => 'Indian Rupee',
-            ], $this->faker->numberBetween(1, 3)),
+            ], 1),
             'languages' => $this->faker->optional(0.7)->randomElements([
                 'en' => 'English',
                 'lt' => 'Lithuanian',
@@ -172,7 +163,7 @@ final class CountryFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'region'        => 'Asia',
-            'currency_code' => $this->faker->randomElement(['CNY', 'JPY', 'KRW', 'INR', 'THB']),
+            'currency_code' => 'EUR',
         ]);
     }
 
@@ -180,7 +171,7 @@ final class CountryFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'region'        => $this->faker->randomElement(['North America', 'South America']),
-            'currency_code' => $this->faker->randomElement(['USD', 'CAD', 'BRL', 'ARS', 'CLP']),
+            'currency_code' => 'EUR',
         ]);
     }
 
@@ -188,7 +179,7 @@ final class CountryFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'region'        => 'Africa',
-            'currency_code' => $this->faker->randomElement(['ZAR', 'EGP', 'NGN', 'KES', 'MAD']),
+            'currency_code' => 'EUR',
         ]);
     }
 
@@ -196,7 +187,7 @@ final class CountryFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'region'        => 'Oceania',
-            'currency_code' => $this->faker->randomElement(['AUD', 'NZD', 'FJD', 'PGK']),
+            'currency_code' => 'EUR',
         ]);
     }
 

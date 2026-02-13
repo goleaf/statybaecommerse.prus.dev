@@ -146,23 +146,22 @@ describe('current_currency helper', function () {
     it('returns database currency setting when available', function () {
         $setting = Setting::factory()->create([
             'key'   => 'currency_code',
-            'value' => 'GBP',
+            'value' => 'EUR',
             'type'  => 'string',
         ]);
 
         // Verify the setting was created
         expect($setting->key)->toBe('currency_code')
-            ->and($setting->value)->toBe('GBP');
+            ->and($setting->value)->toBe('EUR');
 
         // Test that app_setting works correctly for currency
-        expect(app_setting('currency_code'))->toBe('GBP');
+        expect(app_setting('currency_code'))->toBe('EUR');
+        expect(current_currency())->toBe('EUR');
     });
 
     it('uses config fallback when no database setting exists', function () {
         config(['app.currency' => 'USD']);
-
-        // Since current_currency has static caching, test the logic indirectly
-        expect(config('app.currency'))->toBe('USD');
+        expect(current_currency())->toBe('EUR');
     });
 });
 
@@ -217,7 +216,7 @@ describe('format_money helper', function () {
     });
 
     it('formats money with specified currency', function () {
-        $result = format_money(100.50, 'USD');
+        $result = format_money(100.50, 'EUR');
 
         expect($result)->toContain('100')
             ->and($result)->toContain('50');
@@ -239,7 +238,7 @@ describe('format_price helper', function () {
 
     it('formats price using format_money', function () {
         $amount = 99.99;
-        $currency = 'USD';
+        $currency = 'EUR';
 
         expect(format_price($amount, $currency))
             ->toBe(format_money($amount, $currency));
@@ -343,11 +342,9 @@ describe('asset helpers', function () {
 });
 
 describe('validate_currency_code helper', function () {
-    it('validates common currency codes', function () {
-        expect(validate_currency_code('USD'))->toBeTrue()
-            ->and(validate_currency_code('EUR'))->toBeTrue()
-            ->and(validate_currency_code('GBP'))->toBeTrue()
-            ->and(validate_currency_code('JPY'))->toBeTrue();
+    it('validates only eur currency code', function () {
+        expect(validate_currency_code('EUR'))->toBeTrue()
+            ->and(validate_currency_code('eur'))->toBeTrue();
     });
 
     it('rejects invalid currency codes', function () {
@@ -358,9 +355,8 @@ describe('validate_currency_code helper', function () {
     });
 
     it('handles case insensitive validation', function () {
-        expect(validate_currency_code('usd'))->toBeTrue()
-            ->and(validate_currency_code('eur'))->toBeTrue()
-            ->and(validate_currency_code('Gbp'))->toBeTrue();
+        expect(validate_currency_code('eur'))->toBeTrue()
+            ->and(validate_currency_code('EuR'))->toBeTrue();
     });
 });
 

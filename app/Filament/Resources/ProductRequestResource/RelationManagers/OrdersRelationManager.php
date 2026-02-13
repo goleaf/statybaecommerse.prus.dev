@@ -10,7 +10,6 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class OrdersRelationManager extends RelationManager
@@ -37,7 +36,7 @@ class OrdersRelationManager extends RelationManager
                     ->sortable(),
                 TextColumn::make('total')
                     ->label(__('messages.total'))
-                    ->money(fn (Order $record) => $record->currency)
+                    ->money('EUR')
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->label(__('messages.created_at'))

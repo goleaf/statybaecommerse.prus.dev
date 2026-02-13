@@ -39,6 +39,7 @@ final class LatestOrdersWidget extends BaseWidget
                     ->label(__('messages.email'))
                     ->searchable(),
                 Tables\Columns\TextColumn::make('status')
+                    ->sortable()
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'pending'    => 'warning',

@@ -319,9 +319,7 @@ HTML;
         $companyVat = function_exists('app_setting')
             ? (app_setting('company_vat') ?? config('app.company_vat', ''))
             : config('app.company_vat', '');
-        $storeCurrency = function_exists('app_setting')
-            ? (app_setting('currency_code') ?? config('app.currency', 'EUR'))
-            : config('app.currency', 'EUR');
+        $storeCurrency = 'EUR';
 
         return [
             '$COMPANY_NAME'     => (string) $companyName,

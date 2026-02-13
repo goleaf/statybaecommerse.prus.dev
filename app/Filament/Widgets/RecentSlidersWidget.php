@@ -40,12 +40,14 @@ final class RecentSlidersWidget extends BaseWidget
                     ->sortable()
                     ->limit(30),
                 TextColumn::make('button_text')
+                    ->sortable()
                     ->label(__('translations.button_text'))
                     ->limit(20),
                 TextColumn::make('sort_order')
                     ->label(__('translations.sort_order'))
                     ->sortable(),
                 IconColumn::make('is_active')
+                    ->sortable()
                     ->label(__('translations.status'))
                     ->boolean()
                     ->trueIcon('heroicon-o-check-circle')

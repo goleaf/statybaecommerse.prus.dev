@@ -93,7 +93,7 @@ final class SimpleCountrySeeder extends BaseSeeder
                 'subregion'          => 'North America',
                 'latitude'           => 37.09024,
                 'longitude'          => -95.712891,
-                'currencies'         => ['USD'],
+                'currencies'         => ['EUR'],
                 'is_enabled'         => true,
                 'sort_order'         => 3,
             ]

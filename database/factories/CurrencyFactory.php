@@ -23,27 +23,6 @@ final class CurrencyFactory extends Factory
             'decimal_places' => 2,
             'is_default'     => true,
         ],
-        'usd' => [
-            'name'           => 'US Dollar',
-            'code'           => 'USD',
-            'symbol'         => '$',
-            'exchange_rate'  => 1.10,
-            'decimal_places' => 2,
-        ],
-        'gbp' => [
-            'name'           => 'British Pound Sterling',
-            'code'           => 'GBP',
-            'symbol'         => '£',
-            'exchange_rate'  => 0.85,
-            'decimal_places' => 2,
-        ],
-        'sek' => [
-            'name'           => 'Swedish Krona',
-            'code'           => 'SEK',
-            'symbol'         => 'kr',
-            'exchange_rate'  => 10.50,
-            'decimal_places' => 2,
-        ],
     ];
 
     public function definition(): array
@@ -53,7 +32,7 @@ final class CurrencyFactory extends Factory
 
         $sequenceOrder = max(0, self::$codeSequence - 1);
 
-        $symbols = ['€', '$', '£', '¥', '₿'];
+        $symbols = ['€'];
         $symbolPositionOptions = ['before', 'after'];
         $thousandsSeparators = [',', ' ', '.'];
         $decimalSeparators = ['.', ','];
@@ -121,17 +100,17 @@ final class CurrencyFactory extends Factory
 
     public function usd(): static
     {
-        return $this->state(fn (array $attributes): array => $this->preset('usd'));
+        return $this->eur();
     }
 
     public function gbp(): static
     {
-        return $this->state(fn (array $attributes): array => $this->preset('gbp'));
+        return $this->eur();
     }
 
     public function sek(): static
     {
-        return $this->state(fn (array $attributes): array => $this->preset('sek'));
+        return $this->eur();
     }
 
     /**

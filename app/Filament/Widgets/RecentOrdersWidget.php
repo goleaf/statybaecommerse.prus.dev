@@ -35,6 +35,7 @@ final class RecentOrdersWidget extends BaseWidget
                     ->default(fn (?Order $record): string => $record?->user?->name ?? '—')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('status')
+                    ->sortable()
                     ->label(__('orders.status'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {

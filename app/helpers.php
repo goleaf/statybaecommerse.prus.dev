@@ -114,7 +114,6 @@ if (! function_exists('current_currency')) {
      */
     function current_currency(bool $reset = false): string
     {
-        // Per-request memoization to avoid duplicate lookups
         static $resolved = null;
 
         if ($reset) {
@@ -127,25 +126,7 @@ if (! function_exists('current_currency')) {
             return $resolved;
         }
 
-        // Priority 1: Session forced currency (user preference) with validation
-        if (session()->has('forced_currency')) {
-            $forced = session('forced_currency');
-            if (is_string($forced) && $forced !== '' && validate_currency_code($forced)) {
-                return $resolved = $forced;
-            }
-        }
-
-        // Priority 2: Database setting with validation
-        $dbCurrency = app_setting('currency_code');
-        if (is_string($dbCurrency) && $dbCurrency !== '' && validate_currency_code($dbCurrency)) {
-            return $resolved = $dbCurrency;
-        }
-
-        // Priority 3: Application config with validation and fallback
-        $configCurrency = config('app.currency', 'EUR');
-        $validatedCurrency = validate_currency_code($configCurrency) ? $configCurrency : 'EUR';
-
-        return $resolved = (string) $validatedCurrency;
+        return $resolved = 'EUR';
     }
 }
 
@@ -202,7 +183,7 @@ if (! function_exists('format_money')) {
             return '';
         }
 
-        $currency = $currency ?: current_currency();
+        $currency = 'EUR';
         $locale = $locale ?: app()->getLocale();
         $numericAmount = (float) $amount;
 
@@ -267,10 +248,25 @@ if (! function_exists('current_currency_model')) {
      */
     function current_currency_model(): \App\Models\Currency
     {
+        $currencyCode = current_currency();
+
         return \Illuminate\Support\Facades\Cache::remember(
-            'current_currency_model_' . current_currency(),
+            'current_currency_model_' . $currencyCode,
             now()->addHours(1),
-            fn () => \App\Models\Currency::where('code', current_currency())->first() ?? \App\Models\Currency::where('is_default', true)->first()
+            static fn () => \App\Models\Currency::query()
+                ->where('code', 'EUR')
+                ->first()
+                ?? \App\Models\Currency::query()->where('code', current_currency())->first()
+                ?? \App\Models\Currency::query()->where('is_default', true)->first()
+                ?? \App\Models\Currency::query()->orderBy('id')->first()
+                ?? new \App\Models\Currency([
+                    'name'       => 'Euro',
+                    'code'       => 'EUR',
+                    'symbol'     => '€',
+                    'is_default' => true,
+                    'is_enabled' => true,
+                    'is_active'  => true,
+                ])
         );
     }
 }
@@ -278,7 +274,7 @@ if (! function_exists('current_currency_model')) {
 if (! function_exists('app_money_format')) {
     function app_money_format(float|int|string $amount, ?string $currency = null): string
     {
-        return format_money((float) $amount, $currency ?: current_currency());
+        return format_money((float) $amount, 'EUR');
     }
 }
 
@@ -289,7 +285,7 @@ if (! function_exists('format_price')) {
             return '';
         }
 
-        $currency = $currency ?: current_currency();
+        $currency = 'EUR';
         $locale = $locale ?: app()->getLocale();
 
         // Use the existing format_money function for consistency
@@ -626,174 +622,7 @@ if (! function_exists('validate_currency_code')) {
      */
     function validate_currency_code(string $currencyCode): bool
     {
-        // Common ISO 4217 currency codes
-        $validCurrencies = [
-            'AED',
-            'AFN',
-            'ALL',
-            'AMD',
-            'ANG',
-            'AOA',
-            'ARS',
-            'AUD',
-            'AWG',
-            'AZN',
-            'BAM',
-            'BBD',
-            'BDT',
-            'BGN',
-            'BHD',
-            'BIF',
-            'BMD',
-            'BND',
-            'BOB',
-            'BRL',
-            'BSD',
-            'BTN',
-            'BWP',
-            'BYN',
-            'BZD',
-            'CAD',
-            'CDF',
-            'CHF',
-            'CLP',
-            'CNY',
-            'COP',
-            'CRC',
-            'CUC',
-            'CUP',
-            'CVE',
-            'CZK',
-            'DJF',
-            'DKK',
-            'DOP',
-            'DZD',
-            'EGP',
-            'ERN',
-            'ETB',
-            'EUR',
-            'FJD',
-            'FKP',
-            'GBP',
-            'GEL',
-            'GGP',
-            'GHS',
-            'GIP',
-            'GMD',
-            'GNF',
-            'GTQ',
-            'GYD',
-            'HKD',
-            'HNL',
-            'HRK',
-            'HTG',
-            'HUF',
-            'IDR',
-            'ILS',
-            'IMP',
-            'INR',
-            'IQD',
-            'IRR',
-            'ISK',
-            'JEP',
-            'JMD',
-            'JOD',
-            'JPY',
-            'KES',
-            'KGS',
-            'KHR',
-            'KMF',
-            'KPW',
-            'KRW',
-            'KWD',
-            'KYD',
-            'KZT',
-            'LAK',
-            'LBP',
-            'LKR',
-            'LRD',
-            'LSL',
-            'LYD',
-            'MAD',
-            'MDL',
-            'MGA',
-            'MKD',
-            'MMK',
-            'MNT',
-            'MOP',
-            'MRU',
-            'MUR',
-            'MVR',
-            'MWK',
-            'MXN',
-            'MYR',
-            'MZN',
-            'NAD',
-            'NGN',
-            'NIO',
-            'NOK',
-            'NPR',
-            'NZD',
-            'OMR',
-            'PAB',
-            'PEN',
-            'PGK',
-            'PHP',
-            'PKR',
-            'PLN',
-            'PYG',
-            'QAR',
-            'RON',
-            'RSD',
-            'RUB',
-            'RWF',
-            'SAR',
-            'SBD',
-            'SCR',
-            'SDG',
-            'SEK',
-            'SGD',
-            'SHP',
-            'SLE',
-            'SLL',
-            'SOS',
-            'SRD',
-            'STN',
-            'SYP',
-            'SZL',
-            'THB',
-            'TJS',
-            'TMT',
-            'TND',
-            'TOP',
-            'TRY',
-            'TTD',
-            'TVD',
-            'TWD',
-            'TZS',
-            'UAH',
-            'UGX',
-            'USD',
-            'UYU',
-            'UYW',
-            'UZS',
-            'VED',
-            'VES',
-            'VND',
-            'VUV',
-            'WST',
-            'XAF',
-            'XCD',
-            'XDR',
-            'XOF',
-            'XPF',
-            'YER',
-            'ZAR',
-            'ZMW',
-            'ZWL',
-        ];
-
-        return in_array(strtoupper($currencyCode), $validCurrencies, true);
+        return strtoupper(trim($currencyCode)) === 'EUR';
     }
 }
 

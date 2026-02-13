@@ -18,7 +18,6 @@ return new class extends Migration
             $table->string('status')->default('active'); // active, completed, archived
             $table->string('type')->default('organizational'); // personal, organizational
             $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete(); // owner for personal projects
-            $table->foreignId('organization_id')->nullable()->constrained()->cascadeOnDelete(); // for organizational projects
             $table->date('start_date')->nullable();
             $table->date('end_date')->nullable();
             $table->json('metadata')->nullable();
@@ -26,7 +25,6 @@ return new class extends Migration
 
             $table->index(['status', 'type']);
             $table->index(['user_id', 'type']);
-            $table->index(['organization_id', 'status']);
         });
     }
 

@@ -62,6 +62,7 @@ final class DashboardLowStockTable extends BaseTableWidget
                     ->formatStateUsing(fn ($state) => Number::format((int) ($state ?? config('inventory.low_stock_threshold')), locale: app()->getLocale()))
                     ->sortable(),
                 IconColumn::make('is_in_stock')
+                    ->sortable()
                     ->label(trans('messages.inventory'))
                     ->boolean(),
             ])

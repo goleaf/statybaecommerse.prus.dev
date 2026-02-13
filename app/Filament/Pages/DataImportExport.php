@@ -9,7 +9,6 @@ use App\Filament\Pages\Imports\ImportCategories;
 use App\Filament\Pages\Imports\ImportCustomers;
 use App\Filament\Pages\Imports\ImportDiscounts;
 use App\Filament\Pages\Imports\ImportOrders;
-use App\Filament\Pages\Imports\ImportOrganizations;
 use App\Filament\Pages\Imports\ImportPartners;
 use App\Filament\Pages\Imports\ImportPrices;
 use App\Filament\Pages\Imports\ImportProducts;
@@ -57,7 +56,6 @@ final class DataImportExport extends Page
             ['label' => __('admin.brands_import'), 'url' => ImportBrands::getUrl()],
             ['label' => __('admin.customers_import'), 'url' => ImportCustomers::getUrl()],
             ['label' => __('admin.partners_import'), 'url' => ImportPartners::getUrl()],
-            ['label' => __('admin.organizations_import'), 'url' => ImportOrganizations::getUrl()],
             ['label' => __('admin.subscribers_import'), 'url' => ImportSubscribers::getUrl()],
             ['label' => __('admin.users_import'), 'url' => ImportUsers::getUrl()],
             ['label' => __('admin.discounts_import'), 'url' => ImportDiscounts::getUrl()],

@@ -18,11 +18,13 @@ class ServicesTable
         return $table
             ->columns([
                 TextColumn::make('name')
+                    ->sortable()
                     ->searchable(),
                 TextColumn::make('price')
-                    ->money()
+                    ->money('EUR')
                     ->sortable(),
                 IconColumn::make('is_active')
+                    ->sortable()
                     ->boolean(),
                 TextColumn::make('created_at')
                     ->dateTime()

@@ -94,8 +94,7 @@ final class CommentQueryOptimizationService
                 'user:id,name,email',
                 'commentable' => function ($morphTo) {
                     $morphTo->morphWith([
-                        \App\Models\Project::class      => ['id', 'name'],
-                        \App\Models\Organization::class => ['id', 'name'],
+                        \App\Models\Project::class => ['id', 'name'],
                     ]);
                 },
             ])

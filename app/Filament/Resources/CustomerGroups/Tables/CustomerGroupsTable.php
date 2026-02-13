@@ -41,6 +41,7 @@ class CustomerGroupsTable
                     ->label(__('messages.color'))
                     ->toggleable(isToggledHiddenByDefault: true),
                 IconColumn::make('icon')
+                    ->sortable()
                     ->label(__('messages.icon'))
                     ->toggleable(isToggledHiddenByDefault: true),
                 ToggleColumn::make('is_active')

@@ -68,6 +68,17 @@ final class ShippingOption extends Model
         'shipping_matrix',
     ];
 
+    protected static function booted(): void
+    {
+        self::creating(static function (self $shippingOption): void {
+            $shippingOption->currency_code = 'EUR';
+        });
+
+        self::updating(static function (self $shippingOption): void {
+            $shippingOption->currency_code = 'EUR';
+        });
+    }
+
     protected function casts(): array
     {
         return [

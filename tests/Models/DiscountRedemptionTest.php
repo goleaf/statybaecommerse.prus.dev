@@ -95,13 +95,14 @@ it('applies currency, status, and recency helpers', function (): void {
     ]);
 
     DiscountRedemption::factory()->create([
-        'currency_code' => 'USD',
+        'currency_code' => 'EUR',
         'status'        => 'cancelled',
         'redeemed_at'   => Carbon::now()->subDays(10),
     ]);
 
     // Assert: confirm the scopes and helper methods behave as expected.
-    expect(DiscountRedemption::query()->forCurrency('EUR')->sole()->is($recent))->toBeTrue();
+    expect(DiscountRedemption::query()->forCurrency('EUR')->count())->toBe(2);
+    expect(DiscountRedemption::query()->forCurrency('USD')->count())->toBe(2);
     expect(DiscountRedemption::query()->byStatus('pending')->sole()->is($recent))->toBeTrue();
     expect(DiscountRedemption::query()->recent(3)->sole()->is($recent))->toBeTrue();
 

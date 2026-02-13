@@ -50,6 +50,7 @@ class DocumentsRelationManager extends RelationManager
                     ->label('Template')
                     ->sortable(),
                 TextColumn::make('file_path')
+                    ->sortable()
                     ->searchable(),
                 TextColumn::make('status')
                     ->badge()

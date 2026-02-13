@@ -269,7 +269,7 @@ return [
         ],
         'document_form' => [
             'sections' => [
-                'organization' => 'Organization Information',
+                'organization' => 'Company Information',
             ],
         ],
         'fields' => [
@@ -444,6 +444,7 @@ return [
         'navigation_label'              => 'Inventory',
         'plural_model_label'            => 'Inventories',
         'reserved_quantity'             => 'Reserved Quantity',
+        'stock_reservations'            => 'Stock Reservations',
         'updated_at'                    => 'Updated At',
     ],
     'inventory_management' => [
@@ -581,8 +582,6 @@ return [
         'dashboard'        => 'Dashboard',
         'marketing'        => 'Marketing',
         'orders'           => 'Orders',
-        'organization'     => 'Organization',
-        'organizations'    => 'Organizations',
         'partners'         => 'Partners',
         'collections'      => 'Collections',
         'collection'       => 'Collection',
@@ -739,7 +738,6 @@ return [
         ],
     ],
     'orders_import'        => 'Import Orders',
-    'organizations_import' => 'Import Organizations',
     'partners_import'      => 'Import Partners',
     'placeholders'         => [
         'title' => 'Title',
@@ -822,6 +820,7 @@ return [
         'seo_description'               => 'SEO Description',
         'seo_title'                     => 'SEO Title',
         'short_description'             => 'Short Description',
+        'similar_products'              => 'Similar Products',
         'status'                        => 'Status',
         'status_archived'               => 'Archived',
         'status_draft'                  => 'Draft',

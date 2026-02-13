@@ -26,7 +26,7 @@ final class DiscountRedemptionFactory extends Factory
             'user_id'       => User::factory(),
             'order_id'      => Order::factory(),
             'amount_saved'  => $this->faker->randomFloat(2, 5, 100),
-            'currency_code' => $this->faker->randomElement(['EUR', 'USD', 'GBP']),
+            'currency_code' => 'EUR',
             'redeemed_at'   => $this->faker->dateTimeBetween('-30 days', 'now'),
             'status'        => $this->faker->randomElement(['pending', 'redeemed', 'expired', 'cancelled']),
             'notes'         => $this->faker->optional(0.3)->sentence(),

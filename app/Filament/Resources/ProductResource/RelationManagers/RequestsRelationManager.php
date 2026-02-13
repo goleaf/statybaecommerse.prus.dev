@@ -76,12 +76,15 @@ class RequestsRelationManager extends RelationManager
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('name')
+                    ->sortable()
                     ->label(__('messages.name'))
                     ->searchable(),
                 TextColumn::make('email')
+                    ->sortable()
                     ->label(__('messages.email'))
                     ->searchable(),
                 TextColumn::make('status')
+                    ->sortable()
                     ->label(__('messages.status'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {

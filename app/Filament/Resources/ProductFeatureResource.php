@@ -75,7 +75,8 @@ final class ProductFeatureResource extends BaseResource
                     ->searchable(),
                 TextColumn::make('weight')
                     ->sortable(),
-                ToggleColumn::make('is_active'),
+                ToggleColumn::make('is_active')
+                    ->sortable(),
             ])
             ->recordUrl(fn (ProductFeature $record): string => self::getUrl('edit', ['record' => $record]))
             ->filters([

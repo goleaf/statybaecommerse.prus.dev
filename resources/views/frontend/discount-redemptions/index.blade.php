@@ -91,7 +91,7 @@
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow mb-6">
                 <div class="p-6">
                     <form method="GET" action="{{ route('frontend.discount-redemptions.index') }}"
-                          class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                          class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
                             <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 {{ __('messages.status') }}
@@ -107,19 +107,6 @@
                                     {{ __('ui.expired') }}</option>
                                 <option value="cancelled" {{ request('status') === 'cancelled' ? 'selected' : '' }}>
                                     {{ __('ui.cancelled') }}</option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label for="currency" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                {{ __('ui.currency') }}
-                            </label>
-                            <select name="currency" id="currency"
-                                    class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
-                                <option value="">{{ __('ui.all_currencies') }}</option>
-                                <option value="EUR" {{ request('currency') === 'EUR' ? 'selected' : '' }}>EUR</option>
-                                <option value="USD" {{ request('currency') === 'USD' ? 'selected' : '' }}>USD</option>
-                                <option value="GBP" {{ request('currency') === 'GBP' ? 'selected' : '' }}>GBP</option>
                             </select>
                         </div>
 

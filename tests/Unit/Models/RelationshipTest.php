@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use App\Models\Comment;
-use App\Models\Organization;
 use App\Models\Project;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -12,40 +11,20 @@ uses(RefreshDatabase::class);
 
 beforeEach(function () {
     $this->user = User::factory()->create();
-    $this->organization = Organization::factory()->create();
-    $this->project = Project::factory()->create(['organization_id' => $this->organization->id]);
-});
-
-describe('Organization Relationships', function () {
-    test('organization has users with roles', function () {
-        $this->organization->addUser($this->user, 'admin', ['manage_projects']);
-
-        expect($this->organization->users)->toHaveCount(1);
-        expect($this->organization->users->first()->pivot->role)->toBe('admin');
-        expect($this->organization->users->first()->pivot->permissions)->toContain('manage_projects');
-    });
-
-    test('organization has projects', function () {
-        expect($this->organization->projects)->toHaveCount(1);
-        expect($this->organization->projects->first()->id)->toBe($this->project->id);
-    });
-
-    test('organization can check user membership', function () {
-        $this->organization->addUser($this->user, 'member');
-
-        expect($this->organization->hasMember($this->user))->toBeTrue();
-        expect($this->organization->userHasRole($this->user, 'member'))->toBeTrue();
-        expect($this->organization->userHasRole($this->user, 'admin'))->toBeFalse();
-    });
+    $this->project = Project::factory()->create([
+        'user_id' => $this->user->id,
+        'type'    => 'personal',
+    ]);
 });
 
 describe('Project Relationships', function () {
-    test('project belongs to organization', function () {
-        expect($this->project->organization->id)->toBe($this->organization->id);
+    test('project belongs to owner', function () {
+        expect($this->project->owner->id)->toBe($this->user->id);
     });
 
     test('project can add members', function () {
-        $this->project->addMember($this->user, 'lead', ['manage_projects']);
+        $member = User::factory()->create();
+        $this->project->addMember($member, 'lead', ['manage_projects']);
 
         expect($this->project->members)->toHaveCount(1);
         expect($this->project->leads)->toHaveCount(1);
@@ -53,13 +32,13 @@ describe('Project Relationships', function () {
     });
 
     test('project scopes work correctly', function () {
-        $personalProject = Project::factory()->create(['type' => 'personal', 'user_id' => $this->user->id]);
+        $teamProject = Project::factory()->create(['type' => 'organizational']);
 
         expect(Project::personal()->count())->toBe(1);
         expect(Project::organizational()->count())->toBe(1);
         expect(Project::forUser($this->user)->count())->toBe(1);
-        expect($personalProject->isPersonal())->toBeTrue();
-        expect($this->project->isOrganizational())->toBeTrue();
+        expect($this->project->isPersonal())->toBeTrue();
+        expect($teamProject->isOrganizational())->toBeTrue();
     });
 });
 
@@ -128,13 +107,13 @@ describe('Nested Comments', function () {
 });
 
 describe('Complex Queries', function () {
-    test('can get user projects across organizations', function () {
-        $this->organization->addUser($this->user, 'member');
-        $personalProject = Project::factory()->create(['type' => 'personal', 'user_id' => $this->user->id]);
+    test('can get user projects across ownership and membership', function () {
+        $memberProject = Project::factory()->create(['type' => 'organizational']);
+        $memberProject->addMember($this->user, 'member');
 
         $userProjects = Project::forUser($this->user)->get();
 
         expect($userProjects)->toHaveCount(2);
-        expect($userProjects->pluck('id'))->toContain($this->project->id, $personalProject->id);
+        expect($userProjects->pluck('id'))->toContain($memberProject->id, $this->project->id);
     });
 });

@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\Collection;
 final class RelationshipQueryService
 {
     /**
-     * Get all projects for a user across all organizations.
+     * Get all projects for a user across ownership and membership.
      */
     public function getUserProjects(User $user): Collection
     {
@@ -25,13 +25,9 @@ final class RelationshipQueryService
                 $query->where('user_id', $user->id) // Personal projects
                     ->orWhereHas('members', function (Builder $memberQuery) use ($user) {
                         $memberQuery->where('user_id', $user->id);
-                    })
-                    ->orWhereHas('organization.users', function (Builder $orgQuery) use ($user) {
-                        $orgQuery->where('user_id', $user->id)
-                            ->where('is_active', true);
                     });
             })
-            ->with(['organization', 'members'])
+            ->with(['owner', 'members'])
             ->get();
     }
 
@@ -52,21 +48,19 @@ final class RelationshipQueryService
     }
 
     /**
-     * Complex whereHas query: Users who are organization owners with active projects.
+     * Users who lead active projects.
      */
-    public function getActiveOrganizationOwners(): Collection
+    public function getActiveProjectLeads(): Collection
     {
         return User::query()
-            ->whereHas('organizations', function (Builder $query) {
-                $query->where('organization_user.role', 'owner')
-                    ->where('organization_user.is_active', true)
-                    ->whereHas('projects', function (Builder $projectQuery) {
-                        $projectQuery->where('status', 'active');
-                    });
+            ->whereExists(function (Builder $query) {
+                $query->selectRaw('1')
+                    ->from('project_user')
+                    ->join('projects', 'projects.id', '=', 'project_user.project_id')
+                    ->whereColumn('project_user.user_id', 'users.id')
+                    ->where('project_user.role', 'lead')
+                    ->where('projects.status', 'active');
             })
-            ->with(['organizations.projects' => function ($query) {
-                $query->where('status', 'active');
-            }])
             ->get();
     }
 }

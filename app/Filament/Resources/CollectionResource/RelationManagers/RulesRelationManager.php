@@ -20,7 +20,7 @@ class RulesRelationManager extends RelationManager
 {
     protected static string $relationship = 'rules';
 
-    protected static ?string $recordTitleAttribute = 'column';
+    protected static ?string $recordTitleAttribute = 'field';
 
     public static function getTitle(Model $ownerRecord, string $pageClass): string
     {
@@ -31,7 +31,7 @@ class RulesRelationManager extends RelationManager
     {
         return $schema
             ->schema([
-                Select::make('column')
+                Select::make('field')
                     ->label(__('admin.collections.rule_column'))
                     ->options([
                         'name'  => 'Product Name',
@@ -59,7 +59,7 @@ class RulesRelationManager extends RelationManager
     {
         return $table
             ->columns([
-                TextColumn::make('column')
+                TextColumn::make('field')
                     ->label(__('admin.collections.rule_column'))
                     ->sortable(),
                 TextColumn::make('operator')

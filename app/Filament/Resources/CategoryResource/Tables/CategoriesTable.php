@@ -31,6 +31,7 @@ class CategoriesTable
                     ->label(__('messages.category'))
                     ->sortable(),
                 ToggleColumn::make('is_active')
+                    ->sortable()
                     ->label(__('admin.categories.is_active')),
                 TextColumn::make('products_count')
                     ->label(__('admin.categories.products_count'))

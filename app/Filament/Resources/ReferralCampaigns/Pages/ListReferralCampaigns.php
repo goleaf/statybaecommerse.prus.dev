@@ -1,0 +1,19 @@
+<?php
+
+namespace App\Filament\Resources\ReferralCampaigns\Pages;
+
+use App\Filament\Resources\ReferralCampaigns\ReferralCampaignResource;
+use Filament\Actions\CreateAction;
+use Filament\Resources\Pages\ListRecords;
+
+class ListReferralCampaigns extends ListRecords
+{
+    protected static string $resource = ReferralCampaignResource::class;
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            CreateAction::make(),
+        ];
+    }
+}

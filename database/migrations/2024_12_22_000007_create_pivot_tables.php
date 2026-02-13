@@ -10,23 +10,6 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // User-Organization pivot with roles
-        Schema::create('organization_user', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('organization_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->string('role')->default('member'); // owner, admin, member, viewer
-            $table->json('permissions')->nullable();
-            $table->boolean('is_active')->default(true);
-            $table->datetime('joined_at');
-            $table->datetime('left_at')->nullable();
-            $table->timestamps();
-
-            $table->unique(['organization_id', 'user_id']);
-            $table->index(['user_id', 'role']);
-            $table->index(['organization_id', 'is_active']);
-        });
-
         // Task-User assignments with responsibilities
         Schema::create('task_user', function (Blueprint $table) {
             $table->id();
@@ -75,6 +58,5 @@ return new class extends Migration
         Schema::dropIfExists('project_user');
         Schema::dropIfExists('taggables');
         Schema::dropIfExists('task_user');
-        Schema::dropIfExists('organization_user');
     }
 };

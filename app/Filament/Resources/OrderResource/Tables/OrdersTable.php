@@ -33,15 +33,17 @@ class OrdersTable
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('status')
+                    ->sortable()
                     ->label(__('messages.status'))
                     ->formatStateUsing(static fn ($state): string => OrderStatus::tryFrom(self::normalizeEnumValue($state))?->label() ?? Str::headline(self::normalizeEnumValue($state)))
                     ->badge()
                     ->searchable(),
                 TextColumn::make('total')
                     ->label(__('messages.total'))
-                    ->money(fn ($record) => $record->currency)
+                    ->money('EUR')
                     ->sortable(),
                 TextColumn::make('payment_status')
+                    ->sortable()
                     ->label(__('messages.payment_status'))
                     ->formatStateUsing(static fn ($state): string => PaymentStatus::tryFrom(self::normalizeEnumValue($state))?->getLabel() ?? Str::headline(self::normalizeEnumValue($state)))
                     ->badge()

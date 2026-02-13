@@ -35,7 +35,7 @@ it('updates the locale, persists the preference, and redirects back safely', fun
     $response->assertRedirect('/dashboard');
     $response->assertSessionHas('locale', 'lt');
     $response->assertSessionHas('app.locale', 'lt');
-    $response->assertSessionHas('forced_currency', 'EUR');
+    $response->assertSessionMissing('forced_currency');
     $response->assertCookie('app_locale', 'lt');
 
     // Confirm the application locale and stored preference were updated.
@@ -89,5 +89,5 @@ it('rejects redirects that attempt to escape the current application origin', fu
         'redirect_to' => 'https://malicious.example:8443/phish',
     ]);
 
-    $response->assertRedirect(route('localized.home', ['locale' => 'en']));
+    $response->assertRedirect(route('localized.home', ['locale' => 'lt']));
 });

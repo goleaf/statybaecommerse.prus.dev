@@ -55,7 +55,7 @@ class ServicesRelationManager extends RelationManager
                     ->searchable(),
                 TextColumn::make('pivot.price')
                     ->label(__('messages.price'))
-                    ->money(),
+                    ->money('EUR'),
                 TextColumn::make('pivot.quantity')
                     ->label(__('messages.quantity')),
                 TextColumn::make('pivot.created_at')

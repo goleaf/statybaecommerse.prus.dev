@@ -32,7 +32,7 @@ final readonly class CreateOrderAction
         $order = Order::create([
             'number'                => $this->generateOrderNumber(),
             'customer_id'           => $orderData->customerId,
-            'currency_code'         => $orderData->currencyCode ?? current_currency(),
+            'currency_code'         => 'EUR',
             'shipping_address_id'   => $orderData->shippingAddressId,
             'billing_address_id'    => $orderData->billingAddressId,
             'shipping_option_id'    => $orderData->shippingOptionId,

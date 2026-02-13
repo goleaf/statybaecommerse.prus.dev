@@ -26,10 +26,6 @@ final class DiscountRedemptionController extends Controller
             $query->where('status', $request->status);
         }
 
-        if ($request->filled('currency')) {
-            $query->where('currency_code', $request->currency);
-        }
-
         if ($request->filled('date_from')) {
             $query->whereDate('redeemed_at', '>=', $request->date_from);
         }

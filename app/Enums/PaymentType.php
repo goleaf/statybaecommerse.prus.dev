@@ -41,7 +41,7 @@ enum PaymentType: string implements EnumInterface
         return match ($this) {
             self::Stripe   => 'heroicon-o-credit-card',
             self::NotchPay => 'heroicon-o-banknotes',
-            self::Cash     => 'heroicon-o-currency-dollar',
+            self::Cash     => 'heroicon-o-currency-euro',
         };
     }
 
@@ -141,11 +141,7 @@ enum PaymentType: string implements EnumInterface
 
     public function supportedCurrencies(): array
     {
-        return match ($this) {
-            self::Stripe   => ['EUR', 'USD', 'GBP', 'CAD', 'AUD'],
-            self::NotchPay => ['EUR', 'USD', 'XOF', 'XAF'],
-            self::Cash     => ['EUR', 'USD', 'GBP', 'CAD', 'AUD'],
-        };
+        return ['EUR'];
     }
 
     public function priority(): int

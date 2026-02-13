@@ -80,7 +80,7 @@ final class CountrySeeder extends BaseSeeder
                 'subregion'          => 'Southern Europe',
                 'latitude'           => 41.1533,
                 'longitude'          => 20.1683,
-                'currencies'         => ['ALL'],
+                'currencies'         => ['EUR'],
                 'translations'       => [
                     'lt' => ['name' => 'Albanija', 'name_official' => 'Albanijos Respublika'],
                     'en' => ['name' => 'Albania', 'name_official' => 'Republic of Albania'],
@@ -114,7 +114,7 @@ final class CountrySeeder extends BaseSeeder
                 'subregion'          => 'Western Asia',
                 'latitude'           => 40.0691,
                 'longitude'          => 45.0382,
-                'currencies'         => ['AMD'],
+                'currencies'         => ['EUR'],
                 'translations'       => [
                     'lt' => ['name' => 'Armėnija', 'name_official' => 'Armėnijos Respublika'],
                     'en' => ['name' => 'Armenia', 'name_official' => 'Republic of Armenia'],
@@ -148,7 +148,7 @@ final class CountrySeeder extends BaseSeeder
                 'subregion'          => 'Western Asia',
                 'latitude'           => 40.1431,
                 'longitude'          => 47.5769,
-                'currencies'         => ['AZN'],
+                'currencies'         => ['EUR'],
                 'translations'       => [
                     'lt' => ['name' => 'Azerbaidžanas', 'name_official' => 'Azerbaidžano Respublika'],
                     'en' => ['name' => 'Azerbaijan', 'name_official' => 'Republic of Azerbaijan'],
@@ -182,7 +182,7 @@ final class CountrySeeder extends BaseSeeder
                 'subregion'          => 'Southern Europe',
                 'latitude'           => 43.9159,
                 'longitude'          => 17.6791,
-                'currencies'         => ['BAM'],
+                'currencies'         => ['EUR'],
                 'translations'       => [
                     'lt' => ['name' => 'Bosnija ir Hercegovina', 'name_official' => 'Bosnija ir Hercegovina'],
                     'en' => ['name' => 'Bosnia and Herzegovina', 'name_official' => 'Bosnia and Herzegovina'],
@@ -199,7 +199,7 @@ final class CountrySeeder extends BaseSeeder
                 'subregion'          => 'Eastern Europe',
                 'latitude'           => 42.7339,
                 'longitude'          => 25.4858,
-                'currencies'         => ['BGN'],
+                'currencies'         => ['EUR'],
                 'translations'       => [
                     'lt' => ['name' => 'Bulgarija', 'name_official' => 'Bulgarijos Respublika'],
                     'en' => ['name' => 'Bulgaria', 'name_official' => 'Republic of Bulgaria'],
@@ -250,7 +250,7 @@ final class CountrySeeder extends BaseSeeder
                 'subregion'          => 'Central Europe',
                 'latitude'           => 49.8175,
                 'longitude'          => 15.4730,
-                'currencies'         => ['CZK'],
+                'currencies'         => ['EUR'],
                 'translations'       => [
                     'lt' => ['name' => 'Čekija', 'name_official' => 'Čekijos Respublika'],
                     'en' => ['name' => 'Czech Republic', 'name_official' => 'Czech Republic'],
@@ -267,7 +267,7 @@ final class CountrySeeder extends BaseSeeder
                 'subregion'          => 'Northern Europe',
                 'latitude'           => 56.2639,
                 'longitude'          => 9.5018,
-                'currencies'         => ['DKK'],
+                'currencies'         => ['EUR'],
                 'translations'       => [
                     'lt' => ['name' => 'Danija', 'name_official' => 'Danijos Karalystė'],
                     'en' => ['name' => 'Denmark', 'name_official' => 'Kingdom of Denmark'],
@@ -335,7 +335,7 @@ final class CountrySeeder extends BaseSeeder
                 'subregion'          => 'Western Asia',
                 'latitude'           => 42.3154,
                 'longitude'          => 43.3569,
-                'currencies'         => ['GEL'],
+                'currencies'         => ['EUR'],
                 'translations'       => [
                     'lt' => ['name' => 'Gruzija', 'name_official' => 'Sakartvelas'],
                     'en' => ['name' => 'Georgia', 'name_official' => 'Georgia'],
@@ -386,7 +386,7 @@ final class CountrySeeder extends BaseSeeder
                 'subregion'          => 'Central Europe',
                 'latitude'           => 47.1625,
                 'longitude'          => 19.5033,
-                'currencies'         => ['HUF'],
+                'currencies'         => ['EUR'],
                 'translations'       => [
                     'lt' => ['name' => 'Vengrija', 'name_official' => 'Vengrija'],
                     'en' => ['name' => 'Hungary', 'name_official' => 'Hungary'],
@@ -403,7 +403,7 @@ final class CountrySeeder extends BaseSeeder
                 'subregion'          => 'Northern Europe',
                 'latitude'           => 64.9631,
                 'longitude'          => -19.0208,
-                'currencies'         => ['ISK'],
+                'currencies'         => ['EUR'],
                 'translations'       => [
                     'lt' => ['name' => 'Islandija', 'name_official' => 'Islandijos Respublika'],
                     'en' => ['name' => 'Iceland', 'name_official' => 'Republic of Iceland'],
@@ -454,7 +454,7 @@ final class CountrySeeder extends BaseSeeder
                 'subregion'          => 'Central Asia',
                 'latitude'           => 48.0196,
                 'longitude'          => 66.9237,
-                'currencies'         => ['KZT'],
+                'currencies'         => ['EUR'],
                 'translations'       => [
                     'lt' => ['name' => 'Kazachstanas', 'name_official' => 'Kazachstano Respublika'],
                     'en' => ['name' => 'Kazakhstan', 'name_official' => 'Republic of Kazakhstan'],
@@ -505,7 +505,7 @@ final class CountrySeeder extends BaseSeeder
                 'subregion'          => 'Western Europe',
                 'latitude'           => 47.1660,
                 'longitude'          => 9.5554,
-                'currencies'         => ['CHF'],
+                'currencies'         => ['EUR'],
                 'translations'       => [
                     'lt' => ['name' => 'Lichtenšteinas', 'name_official' => 'Lichtenšteino Kunigaikštystė'],
                     'en' => ['name' => 'Liechtenstein', 'name_official' => 'Principality of Liechtenstein'],
@@ -573,7 +573,7 @@ final class CountrySeeder extends BaseSeeder
                 'subregion'          => 'Eastern Europe',
                 'latitude'           => 47.4116,
                 'longitude'          => 28.3699,
-                'currencies'         => ['MDL'],
+                'currencies'         => ['EUR'],
                 'translations'       => [
                     'lt' => ['name' => 'Moldova', 'name_official' => 'Moldovos Respublika'],
                     'en' => ['name' => 'Moldova', 'name_official' => 'Republic of Moldova'],
@@ -641,7 +641,7 @@ final class CountrySeeder extends BaseSeeder
                 'subregion'          => 'Southern Europe',
                 'latitude'           => 41.6086,
                 'longitude'          => 21.7453,
-                'currencies'         => ['MKD'],
+                'currencies'         => ['EUR'],
                 'translations'       => [
                     'lt' => ['name' => 'Šiaurės Makedonija', 'name_official' => 'Šiaurės Makedonijos Respublika'],
                     'en' => ['name' => 'North Macedonia', 'name_official' => 'Republic of North Macedonia'],
@@ -658,7 +658,7 @@ final class CountrySeeder extends BaseSeeder
                 'subregion'          => 'Northern Europe',
                 'latitude'           => 60.4720,
                 'longitude'          => 8.4689,
-                'currencies'         => ['NOK'],
+                'currencies'         => ['EUR'],
                 'translations'       => [
                     'lt' => ['name' => 'Norvegija', 'name_official' => 'Norvegijos Karalystė'],
                     'en' => ['name' => 'Norway', 'name_official' => 'Kingdom of Norway'],
@@ -675,7 +675,7 @@ final class CountrySeeder extends BaseSeeder
                 'subregion'          => 'Central Europe',
                 'latitude'           => 51.9194,
                 'longitude'          => 19.1451,
-                'currencies'         => ['PLN'],
+                'currencies'         => ['EUR'],
                 'translations'       => [
                     'lt' => ['name' => 'Lenkija', 'name_official' => 'Lenkijos Respublika'],
                     'en' => ['name' => 'Poland', 'name_official' => 'Republic of Poland'],
@@ -709,7 +709,7 @@ final class CountrySeeder extends BaseSeeder
                 'subregion'          => 'Eastern Europe',
                 'latitude'           => 45.9432,
                 'longitude'          => 24.9668,
-                'currencies'         => ['RON'],
+                'currencies'         => ['EUR'],
                 'translations'       => [
                     'lt' => ['name' => 'Rumunija', 'name_official' => 'Rumunija'],
                     'en' => ['name' => 'Romania', 'name_official' => 'Romania'],
@@ -743,7 +743,7 @@ final class CountrySeeder extends BaseSeeder
                 'subregion'          => 'Southern Europe',
                 'latitude'           => 44.0165,
                 'longitude'          => 21.0059,
-                'currencies'         => ['RSD'],
+                'currencies'         => ['EUR'],
                 'translations'       => [
                     'lt' => ['name' => 'Serbija', 'name_official' => 'Serbijos Respublika'],
                     'en' => ['name' => 'Serbia', 'name_official' => 'Republic of Serbia'],
@@ -811,7 +811,7 @@ final class CountrySeeder extends BaseSeeder
                 'subregion'          => 'Northern Europe',
                 'latitude'           => 60.1282,
                 'longitude'          => 18.6435,
-                'currencies'         => ['SEK'],
+                'currencies'         => ['EUR'],
                 'translations'       => [
                     'lt' => ['name' => 'Švedija', 'name_official' => 'Švedijos Karalystė'],
                     'en' => ['name' => 'Sweden', 'name_official' => 'Kingdom of Sweden'],
@@ -828,7 +828,7 @@ final class CountrySeeder extends BaseSeeder
                 'subregion'          => 'Western Europe',
                 'latitude'           => 46.8182,
                 'longitude'          => 8.2275,
-                'currencies'         => ['CHF'],
+                'currencies'         => ['EUR'],
                 'translations'       => [
                     'lt' => ['name' => 'Šveicarija', 'name_official' => 'Šveicarijos Konfederacija'],
                     'en' => ['name' => 'Switzerland', 'name_official' => 'Swiss Confederation'],
@@ -845,7 +845,7 @@ final class CountrySeeder extends BaseSeeder
                 'subregion'          => 'Western Asia',
                 'latitude'           => 38.9637,
                 'longitude'          => 35.2433,
-                'currencies'         => ['TRY'],
+                'currencies'         => ['EUR'],
                 'translations'       => [
                     'lt' => ['name' => 'Turkija', 'name_official' => 'Turkijos Respublika'],
                     'en' => ['name' => 'Turkey', 'name_official' => 'Republic of Turkey'],
@@ -862,7 +862,7 @@ final class CountrySeeder extends BaseSeeder
                 'subregion'          => 'Eastern Europe',
                 'latitude'           => 48.3794,
                 'longitude'          => 31.1656,
-                'currencies'         => ['UAH'],
+                'currencies'         => ['EUR'],
                 'translations'       => [
                     'lt' => ['name' => 'Ukraina', 'name_official' => 'Ukraina'],
                     'en' => ['name' => 'Ukraine', 'name_official' => 'Ukraine'],
@@ -879,7 +879,7 @@ final class CountrySeeder extends BaseSeeder
                 'subregion'          => 'Northern Europe',
                 'latitude'           => 55.3781,
                 'longitude'          => -3.4360,
-                'currencies'         => ['GBP'],
+                'currencies'         => ['EUR'],
                 'translations'       => [
                     'lt' => ['name' => 'Jungtinė Karalystė', 'name_official' => 'Didžiosios Britanijos ir Šiaurės Airijos Jungtinė Karalystė'],
                     'en' => ['name' => 'United Kingdom', 'name_official' => 'United Kingdom of Great Britain and Northern Ireland'],

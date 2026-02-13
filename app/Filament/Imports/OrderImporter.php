@@ -28,8 +28,6 @@ class OrderImporter extends BaseImporter
                 ->requiredMapping()
                 ->numeric()
                 ->rules(['required', 'numeric']),
-            ImportColumn::make('currency')
-                ->rules(['max:255']),
             ImportColumn::make('billing_address'),
             ImportColumn::make('shipping_address'),
             ImportColumn::make('payment_status')
@@ -57,7 +55,7 @@ class OrderImporter extends BaseImporter
     {
         return [
             'General'   => ['number', 'user', 'status'],
-            'Financial' => ['total', 'currency', 'payment_status'],
+            'Financial' => ['total', 'payment_status'],
             'Address'   => ['billing_address', 'shipping_address'],
         ];
     }

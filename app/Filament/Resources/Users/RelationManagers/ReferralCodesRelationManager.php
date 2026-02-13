@@ -59,6 +59,7 @@ class ReferralCodesRelationManager extends RelationManager
                     ->label('Limit')
                     ->sortable(),
                 IconColumn::make('is_active')
+                    ->sortable()
                     ->boolean(),
                 TextColumn::make('expires_at')
                     ->dateTime()

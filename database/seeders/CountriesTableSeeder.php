@@ -92,7 +92,7 @@ final class CountriesTableSeeder extends BaseSeeder
                 'latitude'           => 41.1533,
                 'longitude'          => 20.1683,
                 'phone_calling_code' => '355',
-                'currencies'         => ['ALL'],
+                'currencies'         => ['EUR'],
                 'translations'       => [
                     'en' => ['name' => 'Albania', 'name_official' => 'Republic of Albania'],
                     'lt' => ['name' => 'Albanija', 'name_official' => 'Albanijos Respublika'],
@@ -137,7 +137,7 @@ final class CountriesTableSeeder extends BaseSeeder
                 'latitude'           => 53.7098,
                 'longitude'          => 27.9534,
                 'phone_calling_code' => '375',
-                'currencies'         => ['BYN'],
+                'currencies'         => ['EUR'],
                 'translations'       => [
                     'en' => ['name' => 'Belarus', 'name_official' => 'Republic of Belarus'],
                     'lt' => ['name' => 'Baltarusija', 'name_official' => 'Baltarusijos Respublika'],
@@ -167,7 +167,7 @@ final class CountriesTableSeeder extends BaseSeeder
                 'latitude'           => 43.9159,
                 'longitude'          => 17.6791,
                 'phone_calling_code' => '387',
-                'currencies'         => ['BAM'],
+                'currencies'         => ['EUR'],
                 'translations'       => [
                     'en' => ['name' => 'Bosnia and Herzegovina', 'name_official' => 'Bosnia and Herzegovina'],
                     'lt' => ['name' => 'Bosnija ir Hercegovina', 'name_official' => 'Bosnija ir Hercegovina'],
@@ -182,7 +182,7 @@ final class CountriesTableSeeder extends BaseSeeder
                 'latitude'           => 42.7339,
                 'longitude'          => 25.4858,
                 'phone_calling_code' => '359',
-                'currencies'         => ['BGN'],
+                'currencies'         => ['EUR'],
                 'translations'       => [
                     'en' => ['name' => 'Bulgaria', 'name_official' => 'Republic of Bulgaria'],
                     'lt' => ['name' => 'Bulgarija', 'name_official' => 'Bulgarijos Respublika'],
@@ -227,7 +227,7 @@ final class CountriesTableSeeder extends BaseSeeder
                 'latitude'           => 49.8175,
                 'longitude'          => 15.473,
                 'phone_calling_code' => '420',
-                'currencies'         => ['CZK'],
+                'currencies'         => ['EUR'],
                 'translations'       => [
                     'en' => ['name' => 'Czech Republic', 'name_official' => 'Czech Republic'],
                     'lt' => ['name' => 'Čekija', 'name_official' => 'Čekijos Respublika'],
@@ -242,7 +242,7 @@ final class CountriesTableSeeder extends BaseSeeder
                 'latitude'           => 56.2639,
                 'longitude'          => 9.5018,
                 'phone_calling_code' => '45',
-                'currencies'         => ['DKK'],
+                'currencies'         => ['EUR'],
                 'translations'       => [
                     'en' => ['name' => 'Denmark', 'name_official' => 'Kingdom of Denmark'],
                     'lt' => ['name' => 'Danija', 'name_official' => 'Danijos Karalystė'],
@@ -272,7 +272,7 @@ final class CountriesTableSeeder extends BaseSeeder
                 'latitude'           => 61.8926,
                 'longitude'          => -6.9118,
                 'phone_calling_code' => '298',
-                'currencies'         => ['DKK'],
+                'currencies'         => ['EUR'],
                 'translations'       => [
                     'en' => ['name' => 'Faroe Islands', 'name_official' => 'Faroe Islands'],
                     'lt' => ['name' => 'Farerų salos', 'name_official' => 'Farerų salos'],
@@ -332,7 +332,7 @@ final class CountriesTableSeeder extends BaseSeeder
                 'latitude'           => 36.1408,
                 'longitude'          => -5.3536,
                 'phone_calling_code' => '350',
-                'currencies'         => ['GIP'],
+                'currencies'         => ['EUR'],
                 'translations'       => [
                     'en' => ['name' => 'Gibraltar', 'name_official' => 'Gibraltar'],
                     'lt' => ['name' => 'Gibraltaras', 'name_official' => 'Gibraltaras'],
@@ -362,7 +362,7 @@ final class CountriesTableSeeder extends BaseSeeder
                 'latitude'           => 49.4658,
                 'longitude'          => -2.5854,
                 'phone_calling_code' => '44',
-                'currencies'         => ['GBP'],
+                'currencies'         => ['EUR'],
                 'translations'       => [
                     'en' => ['name' => 'Guernsey', 'name_official' => 'Bailiwick of Guernsey'],
                     'lt' => ['name' => 'Gernsis', 'name_official' => 'Gernsio Bailivikas'],
@@ -377,7 +377,7 @@ final class CountriesTableSeeder extends BaseSeeder
                 'latitude'           => 47.1625,
                 'longitude'          => 19.5033,
                 'phone_calling_code' => '36',
-                'currencies'         => ['HUF'],
+                'currencies'         => ['EUR'],
                 'translations'       => [
                     'en' => ['name' => 'Hungary', 'name_official' => 'Hungary'],
                     'lt' => ['name' => 'Vengrija', 'name_official' => 'Vengrija'],
@@ -392,7 +392,7 @@ final class CountriesTableSeeder extends BaseSeeder
                 'latitude'           => 64.9631,
                 'longitude'          => -19.0208,
                 'phone_calling_code' => '354',
-                'currencies'         => ['ISK'],
+                'currencies'         => ['EUR'],
                 'translations'       => [
                     'en' => ['name' => 'Iceland', 'name_official' => 'Iceland'],
                     'lt' => ['name' => 'Islandija', 'name_official' => 'Islandija'],
@@ -422,7 +422,7 @@ final class CountriesTableSeeder extends BaseSeeder
                 'latitude'           => 54.2361,
                 'longitude'          => -4.5481,
                 'phone_calling_code' => '44',
-                'currencies'         => ['GBP'],
+                'currencies'         => ['EUR'],
                 'translations'       => [
                     'en' => ['name' => 'Isle of Man', 'name_official' => 'Isle of Man'],
                     'lt' => ['name' => 'Meno sala', 'name_official' => 'Meno sala'],
@@ -452,7 +452,7 @@ final class CountriesTableSeeder extends BaseSeeder
                 'latitude'           => 49.2144,
                 'longitude'          => -2.1312,
                 'phone_calling_code' => '44',
-                'currencies'         => ['GBP'],
+                'currencies'         => ['EUR'],
                 'translations'       => [
                     'en' => ['name' => 'Jersey', 'name_official' => 'Bailiwick of Jersey'],
                     'lt' => ['name' => 'Džersis', 'name_official' => 'Džersio Bailivikas'],
@@ -482,7 +482,7 @@ final class CountriesTableSeeder extends BaseSeeder
                 'latitude'           => 47.166,
                 'longitude'          => 9.5554,
                 'phone_calling_code' => '423',
-                'currencies'         => ['CHF'],
+                'currencies'         => ['EUR'],
                 'translations'       => [
                     'en' => ['name' => 'Liechtenstein', 'name_official' => 'Principality of Liechtenstein'],
                     'lt' => ['name' => 'Lichtenšteinas', 'name_official' => 'Lichtenšteino Kunigaikštystė'],
@@ -542,7 +542,7 @@ final class CountriesTableSeeder extends BaseSeeder
                 'latitude'           => 47.4116,
                 'longitude'          => 28.3699,
                 'phone_calling_code' => '373',
-                'currencies'         => ['MDL'],
+                'currencies'         => ['EUR'],
                 'translations'       => [
                     'en' => ['name' => 'Moldova', 'name_official' => 'Republic of Moldova'],
                     'lt' => ['name' => 'Moldova', 'name_official' => 'Moldovos Respublika'],
@@ -602,7 +602,7 @@ final class CountriesTableSeeder extends BaseSeeder
                 'latitude'           => 41.6086,
                 'longitude'          => 21.7453,
                 'phone_calling_code' => '389',
-                'currencies'         => ['MKD'],
+                'currencies'         => ['EUR'],
                 'translations'       => [
                     'en' => ['name' => 'North Macedonia', 'name_official' => 'Republic of North Macedonia'],
                     'lt' => ['name' => 'Šiaurės Makedonija', 'name_official' => 'Šiaurės Makedonijos Respublika'],
@@ -617,7 +617,7 @@ final class CountriesTableSeeder extends BaseSeeder
                 'latitude'           => 60.472,
                 'longitude'          => 8.4689,
                 'phone_calling_code' => '47',
-                'currencies'         => ['NOK'],
+                'currencies'         => ['EUR'],
                 'translations'       => [
                     'en' => ['name' => 'Norway', 'name_official' => 'Kingdom of Norway'],
                     'lt' => ['name' => 'Norvegija', 'name_official' => 'Norvegijos Karalystė'],
@@ -632,7 +632,7 @@ final class CountriesTableSeeder extends BaseSeeder
                 'latitude'           => 51.9194,
                 'longitude'          => 19.1451,
                 'phone_calling_code' => '48',
-                'currencies'         => ['PLN'],
+                'currencies'         => ['EUR'],
                 'translations'       => [
                     'en' => ['name' => 'Poland', 'name_official' => 'Republic of Poland'],
                     'lt' => ['name' => 'Lenkija', 'name_official' => 'Lenkijos Respublika'],
@@ -662,7 +662,7 @@ final class CountriesTableSeeder extends BaseSeeder
                 'latitude'           => 45.9432,
                 'longitude'          => 24.9668,
                 'phone_calling_code' => '40',
-                'currencies'         => ['RON'],
+                'currencies'         => ['EUR'],
                 'translations'       => [
                     'en' => ['name' => 'Romania', 'name_official' => 'Romania'],
                     'lt' => ['name' => 'Rumunija', 'name_official' => 'Rumunija'],
@@ -677,7 +677,7 @@ final class CountriesTableSeeder extends BaseSeeder
                 'latitude'           => 61.524,
                 'longitude'          => 105.3188,
                 'phone_calling_code' => '7',
-                'currencies'         => ['RUB'],
+                'currencies'         => ['EUR'],
                 'translations'       => [
                     'en' => ['name' => 'Russia', 'name_official' => 'Russian Federation'],
                     'lt' => ['name' => 'Rusija', 'name_official' => 'Rusijos Federacija'],
@@ -707,7 +707,7 @@ final class CountriesTableSeeder extends BaseSeeder
                 'latitude'           => 44.0165,
                 'longitude'          => 21.0059,
                 'phone_calling_code' => '381',
-                'currencies'         => ['RSD'],
+                'currencies'         => ['EUR'],
                 'translations'       => [
                     'en' => ['name' => 'Serbia', 'name_official' => 'Republic of Serbia'],
                     'lt' => ['name' => 'Serbija', 'name_official' => 'Serbijos Respublika'],
@@ -767,7 +767,7 @@ final class CountriesTableSeeder extends BaseSeeder
                 'latitude'           => 77.5536,
                 'longitude'          => 23.6703,
                 'phone_calling_code' => '47',
-                'currencies'         => ['NOK'],
+                'currencies'         => ['EUR'],
                 'translations'       => [
                     'en' => ['name' => 'Svalbard and Jan Mayen', 'name_official' => 'Svalbard and Jan Mayen'],
                     'lt' => ['name' => 'Svalbardas ir Jan Majenas', 'name_official' => 'Svalbardas ir Jan Majenas'],
@@ -782,7 +782,7 @@ final class CountriesTableSeeder extends BaseSeeder
                 'latitude'           => 60.1282,
                 'longitude'          => 18.6435,
                 'phone_calling_code' => '46',
-                'currencies'         => ['SEK'],
+                'currencies'         => ['EUR'],
                 'translations'       => [
                     'en' => ['name' => 'Sweden', 'name_official' => 'Kingdom of Sweden'],
                     'lt' => ['name' => 'Švedija', 'name_official' => 'Švedijos Karalystė'],
@@ -797,7 +797,7 @@ final class CountriesTableSeeder extends BaseSeeder
                 'latitude'           => 46.8182,
                 'longitude'          => 8.2275,
                 'phone_calling_code' => '41',
-                'currencies'         => ['CHF'],
+                'currencies'         => ['EUR'],
                 'translations'       => [
                     'en' => ['name' => 'Switzerland', 'name_official' => 'Swiss Confederation'],
                     'lt' => ['name' => 'Šveicarija', 'name_official' => 'Šveicarijos Konfederacija'],
@@ -812,7 +812,7 @@ final class CountriesTableSeeder extends BaseSeeder
                 'latitude'           => 48.3794,
                 'longitude'          => 31.1656,
                 'phone_calling_code' => '380',
-                'currencies'         => ['UAH'],
+                'currencies'         => ['EUR'],
                 'translations'       => [
                     'en' => ['name' => 'Ukraine', 'name_official' => 'Ukraine'],
                     'lt' => ['name' => 'Ukraina', 'name_official' => 'Ukraina'],
@@ -827,7 +827,7 @@ final class CountriesTableSeeder extends BaseSeeder
                 'latitude'           => 55.3781,
                 'longitude'          => -3.436,
                 'phone_calling_code' => '44',
-                'currencies'         => ['GBP'],
+                'currencies'         => ['EUR'],
                 'translations'       => [
                     'en' => ['name' => 'United Kingdom', 'name_official' => 'United Kingdom of Great Britain and Northern Ireland'],
                     'lt' => ['name' => 'Jungtinė Karalystė', 'name_official' => 'Didžiosios Britanijos ir Šiaurės Airijos Jungtinė Karalystė'],

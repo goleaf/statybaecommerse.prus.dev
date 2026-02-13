@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\OrderResource\RelationManagers;
 
-use App\Models\Payment;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
@@ -35,7 +33,7 @@ class PaymentsRelationManager extends RelationManager
                     ->sortable(),
                 TextColumn::make('amount')
                     ->label(__('messages.amount'))
-                    ->money(fn (Payment $record) => $record->currency)
+                    ->money('EUR')
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->label(__('messages.created_at'))

@@ -6,6 +6,7 @@ namespace App\Filament\Resources\ProductResource\RelationManagers;
 
 use App\Models\Price;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -28,12 +29,8 @@ class PricesRelationManager extends RelationManager
     {
         return $schema
             ->components([
-                Select::make('currency_id')
-                    ->label(__('messages.currency'))
-                    ->relationship('currency', 'code')
-                    ->required()
-                    ->searchable()
-                    ->preload(),
+                Hidden::make('currency_id')
+                    ->default(static fn (): ?int => self::resolveEuroCurrencyId()),
                 TextInput::make('amount')
                     ->label(__('messages.amount') !== 'messages.amount' ? __('messages.amount') : 'Amount')
                     ->required()
@@ -69,7 +66,7 @@ class PricesRelationManager extends RelationManager
                 TextColumn::make('amount')
                     ->sortable()
                     ->label(__('messages.amount') !== 'messages.amount' ? __('messages.amount') : 'Amount')
-                    ->money(fn (Price $record) => $record->currency?->code ?? 'EUR'),
+                    ->money('EUR'),
                 TextColumn::make('type')
                     ->sortable()
                     ->label(__('messages.type'))
@@ -112,6 +109,11 @@ class PricesRelationManager extends RelationManager
      */
     private function normalizePayload(array $data): array
     {
+        $euroCurrencyId = self::resolveEuroCurrencyId();
+        if ($euroCurrencyId !== null) {
+            $data['currency_id'] = $euroCurrencyId;
+        }
+
         $type = is_string($data['type'] ?? null) ? trim((string) $data['type']) : '';
 
         if (! in_array($type, Price::ALLOWED_TYPES, true)) {
@@ -119,5 +121,20 @@ class PricesRelationManager extends RelationManager
         }
 
         return $data;
+    }
+
+    private static function resolveEuroCurrencyId(): ?int
+    {
+        $currencyId = \App\Models\Currency::query()
+            ->where('code', 'EUR')
+            ->value('id');
+
+        if (! is_numeric($currencyId)) {
+            $currencyId = \App\Models\Currency::query()
+                ->where('is_default', true)
+                ->value('id');
+        }
+
+        return is_numeric($currencyId) ? (int) $currencyId : null;
     }
 }

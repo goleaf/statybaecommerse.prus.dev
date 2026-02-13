@@ -44,7 +44,7 @@ class OrdersRelationManager extends RelationManager
                     ->sortable(),
                 TextColumn::make('total')
                     ->label(__('messages.total'))
-                    ->money(fn (Order $record) => $record->currency)
+                    ->money('EUR')
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->label(__('messages.created_at'))

@@ -144,16 +144,7 @@ final class LocaleService
      */
     public function applyLocaleConfiguration(string $locale): void
     {
-        $mappingConfig = config('app.locale_mapping', []);
-        $mapping = is_array($mappingConfig) ? $mappingConfig : [];
-        $localeMapping = $mapping[$locale] ?? null;
-
-        if (is_array($localeMapping)) {
-            $currency = $localeMapping['currency'] ?? null;
-            if (is_string($currency) && $currency !== '') {
-                Session::put('forced_currency', $currency);
-            }
-        }
+        // Currency remains fixed to EUR across all locales.
     }
 
     private function resolveSupportedLocales(): array

@@ -36,11 +36,10 @@ final class RelationshipServiceProvider extends ServiceProvider
     {
         Relation::morphMap([
             // Core models
-            'user'         => \App\Models\User::class,
-            'organization' => \App\Models\Organization::class,
-            'project'      => \App\Models\Project::class,
-            'comment'      => \App\Models\Comment::class,
-            'file'         => \App\Models\File::class,
+            'user'    => \App\Models\User::class,
+            'project' => \App\Models\Project::class,
+            'comment' => \App\Models\Comment::class,
+            'file'    => \App\Models\File::class,
 
             // Existing models
             'product'    => \App\Models\Product::class,

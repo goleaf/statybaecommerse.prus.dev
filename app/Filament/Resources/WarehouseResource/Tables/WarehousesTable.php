@@ -21,20 +21,28 @@ final class WarehousesTable
         return $table
             ->columns([
                 TextColumn::make('code')
+                    ->sortable()
                     ->searchable(),
                 TextColumn::make('name')
+                    ->sortable()
                     ->searchable(),
                 TextColumn::make('city')
+                    ->sortable()
                     ->searchable(),
                 TextColumn::make('country_code')
+                    ->sortable()
                     ->searchable(),
                 TextColumn::make('phone')
+                    ->sortable()
                     ->searchable(),
                 TextColumn::make('email')
+                    ->sortable()
                     ->searchable(),
                 IconColumn::make('is_enabled')
+                    ->sortable()
                     ->boolean(),
                 IconColumn::make('is_default')
+                    ->sortable()
                     ->boolean(),
                 TextColumn::make('sort_order')
                     ->numeric()

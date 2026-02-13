@@ -31,7 +31,7 @@ test('creates pricing context with provided values', function () {
 
     expect($context->quantity)->toBe(5);
     expect($context->customerGroupIds->toArray())->toBe([1, 2, 3]);
-    expect($context->targetCurrency)->toBe('USD');
+    expect($context->targetCurrency)->toBe('EUR');
     expect($context->baseCurrency)->toBe('EUR');
     expect($context->moment)->toBe($moment);
     expect($context->recordHistory)->toBeTrue();
@@ -70,7 +70,7 @@ test('normalizes currency codes to uppercase', function () {
         'base_currency' => 'eur',
     ]);
 
-    expect($context->targetCurrency)->toBe('USD');
+    expect($context->targetCurrency)->toBe('EUR');
     expect($context->baseCurrency)->toBe('EUR');
 });
 

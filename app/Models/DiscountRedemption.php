@@ -53,6 +53,17 @@ final class DiscountRedemption extends Model
         'updated_by_name',
     ];
 
+    protected static function booted(): void
+    {
+        self::creating(static function (self $redemption): void {
+            $redemption->currency_code = 'EUR';
+        });
+
+        self::updating(static function (self $redemption): void {
+            $redemption->currency_code = 'EUR';
+        });
+    }
+
     /**
      * @var class-string Link the HasTranslations trait with the translation model.
      */
@@ -207,7 +218,7 @@ final class DiscountRedemption extends Model
      */
     public function scopeForCurrency(Builder $query, string $currencyCode): Builder
     {
-        return $query->where('currency_code', $currencyCode);
+        return $query->where('currency_code', 'EUR');
     }
 
     /**

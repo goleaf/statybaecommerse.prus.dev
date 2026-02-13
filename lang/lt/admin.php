@@ -444,6 +444,7 @@ return [
         'navigation_label'              => 'Atsargos',
         'plural_model_label'            => 'Atsargos',
         'reserved_quantity'             => 'Rezervuotas kiekis',
+        'stock_reservations'            => 'Atsargų rezervacijos',
         'updated_at'                    => 'Atnaujinta',
     ],
     'inventory_management' => [
@@ -581,8 +582,6 @@ return [
         'dashboard'        => 'Skydelis',
         'marketing'        => 'Rinkodara',
         'orders'           => 'Užsakymai',
-        'organization'     => 'Organizacija',
-        'organizations'    => 'Organizacijos',
         'partners'         => 'Partneriai',
         'collections'      => 'Kolekcijos',
         'collection'       => 'Kolekcija',
@@ -739,7 +738,6 @@ return [
         ],
     ],
     'orders_import'        => 'Importuoti užsakymus',
-    'organizations_import' => 'Importuoti organizacijas',
     'partners_import'      => 'Importuoti partnerius',
     'placeholders'         => [
         'title' => 'Title',
@@ -822,6 +820,7 @@ return [
         'seo_description'               => 'SEO aprašymas',
         'seo_title'                     => 'SEO antraštė',
         'short_description'             => 'Trumpas aprašymas',
+        'similar_products'              => 'Panašūs produktai',
         'status'                        => 'Būsena',
         'status_archived'               => 'Archyvuota',
         'status_draft'                  => 'Juodraštis',

@@ -23,8 +23,6 @@ class PriceImporter extends BaseImporter
             ImportColumn::make('priceable_type')
                 ->requiredMapping()
                 ->rules(['required', 'max:255']),
-            ImportColumn::make('currency')
-                ->relationship(),
             ImportColumn::make('amount')
                 ->requiredMapping()
                 ->numeric()
@@ -57,7 +55,7 @@ class PriceImporter extends BaseImporter
     {
         return [
             'Target'   => ['priceable_id', 'priceable_type'],
-            'Pricing'  => ['amount', 'cost_amount', 'currency'],
+            'Pricing'  => ['amount', 'cost_amount'],
             'Settings' => ['type', 'starts_at', 'ends_at', 'is_enabled'],
         ];
     }
