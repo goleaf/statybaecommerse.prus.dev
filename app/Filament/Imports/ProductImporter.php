@@ -865,38 +865,44 @@ class ProductImporter extends BaseImporter
             return;
         }
 
-        $contents = $this->downloadImageContents($imageUrl);
+        try {
+            $contents = $this->downloadImageContents($imageUrl);
 
-        if ($contents === null) {
-            throw new RowImportFailedException('Image download failed.');
+            // Don't fail the row if the image can't be downloaded: import the product without an image.
+            if ($contents === null) {
+                return;
+            }
+
+            $extension = $this->resolveImageExtension($imageUrl, $contents['content_type'] ?? null);
+            $path = 'product-images/' . $this->record->getKey() . '/import-' . Str::uuid() . '.' . $extension;
+
+            $resizedImageContents = $this->resizeImageContents($contents['body'], $extension);
+
+            Storage::disk('public')->put($path, $resizedImageContents);
+
+            $existingImages = $this->record
+                ->images()
+                ->withoutGlobalScopes()
+                ->get();
+
+            foreach ($existingImages as $existingImage) {
+                Storage::disk('public')->delete((string) $existingImage->path);
+            }
+
+            $this->record->images()->withoutGlobalScopes()->delete();
+
+            ProductImage::query()->create([
+                'product_id' => $this->record->getKey(),
+                'path'       => $path,
+                'alt_text'   => $this->record->name,
+                'sort_order' => 0,
+                'is_default' => true,
+                'is_active'  => true,
+            ]);
+        } catch (Throwable) {
+            // Best-effort image import. Ignore errors so the product row still imports successfully.
+            return;
         }
-
-        $extension = $this->resolveImageExtension($imageUrl, $contents['content_type'] ?? null);
-        $path = 'product-images/' . $this->record->getKey() . '/import-' . Str::uuid() . '.' . $extension;
-
-        $resizedImageContents = $this->resizeImageContents($contents['body'], $extension);
-
-        Storage::disk('public')->put($path, $resizedImageContents);
-
-        $existingImages = $this->record
-            ->images()
-            ->withoutGlobalScopes()
-            ->get();
-
-        foreach ($existingImages as $existingImage) {
-            Storage::disk('public')->delete((string) $existingImage->path);
-        }
-
-        $this->record->images()->withoutGlobalScopes()->delete();
-
-        ProductImage::query()->create([
-            'product_id' => $this->record->getKey(),
-            'path'       => $path,
-            'alt_text'   => $this->record->name,
-            'sort_order' => 0,
-            'is_default' => true,
-            'is_active'  => true,
-        ]);
     }
 
     /**

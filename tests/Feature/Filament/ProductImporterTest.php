@@ -280,3 +280,43 @@ it('downloads image_url and keeps exactly one image for the product', function (
 
     Storage::disk('public')->assertExists($storedPath);
 });
+
+it('skips image import when image_url download fails and still imports the product', function (): void {
+    Storage::fake('public');
+    Http::fake([
+        'https://example.com/images/missing.png' => Http::response('', 404),
+    ]);
+
+    $user = User::factory()->admin()->create();
+
+    $import = new Import;
+    $import->user()->associate($user);
+    $import->file_name = 'product-import.csv';
+    $import->file_path = base_path('storage/imports/product-import.csv');
+    $import->importer = ProductImporter::class;
+    $import->total_rows = 1;
+    $import->save();
+
+    $columns = collect(ProductImporter::getColumns())->map->getName()->values();
+    $row = $columns->mapWithKeys(fn (string $name) => [$name => ''])->all();
+    $row['name'] = 'Product Without Image';
+    $row['sku'] = 'IMG-FAIL-001';
+    $row['image_url'] = 'https://example.com/images/missing.png';
+
+    $columnMap = $columns->mapWithKeys(fn (string $name) => [$name => $name])->all();
+
+    (new ImportCsv($import, [$row], $columnMap, []))->handle();
+
+    $import->refresh();
+
+    expect($import->successful_rows)->toBe(1)
+        ->and($import->failedRows)->toHaveCount(0);
+
+    $product = Product::withoutGlobalScopes()->firstWhere('sku', 'IMG-FAIL-001');
+
+    expect($product)->not->toBeNull();
+
+    $images = $product?->images()->withoutGlobalScopes()->get();
+
+    expect($images)->toHaveCount(0);
+});

@@ -1,16 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="ExceptionHandlerSecurityTest" file="Exception Handler Security" tests="1" assertions="0" errors="1" failures="0" skipped="0" time="26.739276">
-    <testcase name="It prevents log injection attacks" file="Exception Handler Security::It prevents log injection attacks" class="ExceptionHandlerSecurityTest" classname="ExceptionHandlerSecurityTest" assertions="0" time="26.739276">
-      <error type="Mockery\Exception\InvalidCountException">It prevents log injection attacksMockery\Exception\InvalidCountException: Method error(&lt;Any Arguments&gt;) from Mockery_0_Illuminate_Log_LogManager should be called&#13;
- at least 1 times but called 0 times.&#13;
-at vendor\mockery\mockery\library\Mockery\CountValidator\AtLeast.php:42
-at vendor\mockery\mockery\library\Mockery\Expectation.php:739
-at vendor\mockery\mockery\library\Mockery\ReceivedMethodCalls.php:36
-at vendor\mockery\mockery\library\Mockery\VerificationDirector.php:86
-at vendor\mockery\mockery\library\Mockery\VerificationDirector.php:143
-at vendor\mockery\mockery\library\Mockery\VerificationDirector.php:98
-at tests\Unit\Security\ExceptionHandlerSecurityTest.php:86</error>
-    </testcase>
+  <testsuite name="Tests\Feature\Filament\ProductImporterTest" file="tests\Feature\Filament\ProductImporterTest.php" tests="7" assertions="32" errors="0" failures="0" skipped="0" time="18.156624">
+    <testcase name="it imports a fully mapped product row with blank optional fields" file="tests\Feature\Filament\ProductImporterTest.php::it imports a fully mapped product row with blank optional fields" class="Tests\Feature\Filament\ProductImporterTest" classname="Tests.Feature.Filament.ProductImporterTest" assertions="10" time="16.787221"/>
+    <testcase name="it creates missing brand and categories during product import" file="tests\Feature\Filament\ProductImporterTest.php::it creates missing brand and categories during product import" class="Tests\Feature\Filament\ProductImporterTest" classname="Tests.Feature.Filament.ProductImporterTest" assertions="6" time="0.262174"/>
+    <testcase name="it falls back to the next sync key when the first one is blank" file="tests\Feature\Filament\ProductImporterTest.php::it falls back to the next sync key when the first one is blank" class="Tests\Feature\Filament\ProductImporterTest" classname="Tests.Feature.Filament.ProductImporterTest" assertions="1" time="0.199851"/>
+    <testcase name="it skips image import when image_url download fails and still imports the product" file="tests\Feature\Filament\ProductImporterTest.php::it skips image import when image_url download fails and still imports the product" class="Tests\Feature\Filament\ProductImporterTest" classname="Tests.Feature.Filament.ProductImporterTest" assertions="4" time="0.271163"/>
+    <testcase name="it upserts products when sync mode matches by sku" file="tests\Feature\Filament\ProductImporterTest.php::it upserts products when sync mode matches by sku" class="Tests\Feature\Filament\ProductImporterTest" classname="Tests.Feature.Filament.ProductImporterTest" assertions="3" time="0.200974"/>
+    <testcase name="it fails the row when a sync key matches multiple products" file="tests\Feature\Filament\ProductImporterTest.php::it fails the row when a sync key matches multiple products" class="Tests\Feature\Filament\ProductImporterTest" classname="Tests.Feature.Filament.ProductImporterTest" assertions="2" time="0.217543"/>
+    <testcase name="it downloads image_url and keeps exactly one image for the product" file="tests\Feature\Filament\ProductImporterTest.php::it downloads image_url and keeps exactly one image for the product" class="Tests\Feature\Filament\ProductImporterTest" classname="Tests.Feature.Filament.ProductImporterTest" assertions="6" time="0.217697"/>
   </testsuite>
 </testsuites>
