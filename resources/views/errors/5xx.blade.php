@@ -1,15 +1,15 @@
 @php
-    use Illuminate\Support\Facades\Route;
-
     $locale = app()->getLocale();
-    $homeUrl = route('localized.home', ['locale' => $locale]) ?? url('/');
-    $statusUrl = Route::has('status.page')
+    $homeUrl = \Illuminate\Support\Facades\Route::has('localized.home')
+        ? route('localized.home', ['locale' => $locale])
+        : url('/');
+    $statusUrl = \Illuminate\Support\Facades\Route::has('status.page')
         ? route('status.page', ['locale' => $locale])
         : url('/status');
-    $supportUrl = Route::has('localized.support.index')
+    $supportUrl = \Illuminate\Support\Facades\Route::has('localized.support.index')
         ? route('localized.support.index', ['locale' => $locale])
         : url('/support');
-    $contactUrl = Route::has('localized.contact.index')
+    $contactUrl = \Illuminate\Support\Facades\Route::has('localized.contact.index')
         ? route('localized.contact.index', ['locale' => $locale])
         : url('/contact');
 

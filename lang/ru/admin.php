@@ -580,6 +580,7 @@ return [
         'marketing'        => 'Marketing',
         'orders'           => 'Orders',
         'partners'         => 'Partners',
+        'product_request'  => 'Запрос на товар',
         'products'         => 'Products',
         'settings'         => 'Settings',
         'sliders'          => 'Sliders',
@@ -909,6 +910,11 @@ return [
         'index'  => 'Settings List',
         'stats'  => 'Settings Statistics',
         'update' => 'Update Setting',
+    ],
+    'system_setting_categories' => [
+        'model_label'        => 'Категория системных настроек',
+        'navigation_label'   => 'Категории настроек',
+        'plural_model_label' => 'Категории системных настроек',
     ],
     'system_setting_translations' => [
         'active_translations'             => 'Активные переводы',

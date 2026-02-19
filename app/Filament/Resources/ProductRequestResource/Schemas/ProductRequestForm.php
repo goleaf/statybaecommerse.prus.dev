@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace App\Filament\Resources\ProductRequestResource\Schemas;
 
 use App\Models\ProductRequest;
+use App\Models\User;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Set;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
@@ -37,13 +39,31 @@ class ProductRequestForm
                         Select::make('user_id')
                             ->label(__('messages.user'))
                             ->relationship('user', 'name')
+                            ->required()
                             ->searchable()
-                            ->preload(),
+                            ->preload()
+                            ->live()
+                            ->afterStateUpdated(function ($state, Set $set): void {
+                                if (! filled($state)) {
+                                    return;
+                                }
+
+                                $user = User::query()->find((int) $state);
+                                if ($user === null) {
+                                    return;
+                                }
+
+                                $set('name', (string) $user->name);
+                                $set('email', (string) $user->email);
+                                $set('phone', (string) ($user->phone ?? $user->phone_number ?? ''));
+                            }),
                         TextInput::make('name')
                             ->label(__('messages.name'))
+                            ->required()
                             ->maxLength(255),
                         TextInput::make('email')
                             ->label(__('messages.email'))
+                            ->required()
                             ->email()
                             ->maxLength(255),
                         TextInput::make('phone')

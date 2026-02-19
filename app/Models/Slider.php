@@ -17,6 +17,35 @@ final class Slider extends Model implements HasMedia
     use HasFactory, HasTranslations, InteractsWithMedia;
 
     /**
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'title',
+        'slug',
+        'description',
+        'button_text',
+        'button_url',
+        'image',
+        'background_color',
+        'text_color',
+        'button_color',
+        'text_alignment',
+        'content_position',
+        'sort_order',
+        'priority',
+        'tags',
+        'custom_attributes',
+        'target_audience',
+        'is_active',
+        'is_featured',
+        'is_scheduled',
+        'start_date',
+        'end_date',
+        'settings',
+        'slides',
+    ];
+
+    /**
      * @var int|null Ensures tests can request the next record when verifying toggle actions.
      */
     public static ?int $skipFirstIdForTests = null;

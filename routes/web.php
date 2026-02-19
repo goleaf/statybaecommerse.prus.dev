@@ -25,6 +25,17 @@ use Illuminate\Support\Facades\Route;
 // Include admin routes
 require __DIR__ . '/admin.php';
 
+// Backward-compatible alias used by legacy links and some admin components.
+if (! Route::has('admin.system-settings.index')) {
+    Route::get('/admin/system-settings/index', function () {
+        if (Route::has('filament.admin.resources.system-settings.index')) {
+            return redirect()->route('filament.admin.resources.system-settings.index');
+        }
+
+        return redirect('/admin/system-settings');
+    })->name('admin.system-settings.index');
+}
+
 // Fallback login handler for browsers that cannot run Livewire on the login page.
 Route::post('/admin/login', FilamentLoginController::class)
     ->middleware('panel:admin')

@@ -12,6 +12,15 @@ class EditDiscountRedemption extends EditRecord
 {
     protected static string $resource = DiscountRedemptionResource::class;
 
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        return DiscountRedemptionResource::normalizePayload($data);
+    }
+
     protected function getHeaderActions(): array
     {
         return [
@@ -19,4 +28,3 @@ class EditDiscountRedemption extends EditRecord
         ];
     }
 }
-

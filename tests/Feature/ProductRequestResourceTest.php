@@ -80,6 +80,24 @@ class ProductRequestResourceTest extends TestCase
         ]);
     }
 
+    public function test_create_product_request_requires_customer_identity_fields(): void
+    {
+        $product = $this->makePublishedProduct();
+
+        Livewire::test(\App\Filament\Resources\ProductRequestResource\Pages\CreateProductRequest::class)
+            ->fillForm([
+                'product_id'         => $product->id,
+                'requested_quantity' => 1,
+                'status'             => 'pending',
+            ])
+            ->call('create')
+            ->assertHasFormErrors([
+                'user_id' => ['required'],
+                'name'    => ['required'],
+                'email'   => ['required'],
+            ]);
+    }
+
     public function test_can_edit_product_request(): void
     {
         $product = $this->makePublishedProduct();

@@ -58,6 +58,7 @@ final class StatusScope implements Scope
             // Ensure discount redemption records remain queryable across Filament resources and tests.
             \App\Models\DiscountRedemption::class => ['pending', 'redeemed', 'expired', 'cancelled'],
             \App\Models\Referral::class           => ['pending', 'active', 'completed', 'expired', 'cancelled'],
+            \App\Models\ReferralReward::class     => ['pending', 'applied', 'expired'],
             default                               => ['active', 'enabled', 'published', 'confirmed', 'completed'],
         };
     }

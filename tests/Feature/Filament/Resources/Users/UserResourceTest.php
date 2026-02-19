@@ -554,6 +554,100 @@ class UserResourceTest extends TestCase
         ]);
     }
 
+    public function test_customer_groups_relation_manager_defaults_financial_fields_when_left_empty(): void
+    {
+        $this->resolveAdminPanel();
+
+        $this->actingAs(AdminUser::factory()->create(), 'admin');
+
+        $user = User::factory()->create();
+        $code = 'CG-EMPTY-' . strtoupper(substr(md5((string) microtime(true)), 0, 6));
+
+        Livewire::test(CustomerGroupsRelationManager::class, [
+            'ownerRecord' => $user,
+            'pageClass'   => EditUser::class,
+        ])
+            ->assertSuccessful()
+            ->mountTableAction('create')
+            ->set('mountedActions.0.data.name', 'Default Financial Group')
+            ->set('mountedActions.0.data.code', $code)
+            ->set('mountedActions.0.data.type', 'retail')
+            ->callMountedTableAction()
+            ->assertHasNoTableActionErrors();
+
+        /** @var CustomerGroup|null $group */
+        $group = CustomerGroup::query()->where('code', $code)->first();
+
+        $this->assertNotNull($group);
+        $this->assertSame(0.0, (float) $group->discount_percentage);
+        $this->assertSame(0.0, (float) $group->discount_fixed);
+        $this->assertSame(0.0, (float) $group->minimum_order_amount);
+        $this->assertSame(0.0, (float) $group->credit_limit);
+
+        $this->assertDatabaseHas('customer_group_user', [
+            'user_id'           => $user->getKey(),
+            'customer_group_id' => $group->getKey(),
+        ]);
+    }
+
+    public function test_orders_relation_manager_rejects_invalid_status_without_server_error(): void
+    {
+        $this->resolveAdminPanel();
+
+        $this->actingAs(AdminUser::factory()->create(), 'admin');
+
+        $user = User::factory()->create();
+
+        Livewire::test(OrdersRelationManager::class, [
+            'ownerRecord' => $user,
+            'pageClass'   => EditUser::class,
+        ])
+            ->assertSuccessful()
+            ->mountTableAction('create')
+            ->set('mountedActions.0.data.status', '123')
+            ->set('mountedActions.0.data.total', 42.5)
+            ->callMountedTableAction()
+            ->assertHasTableActionErrors();
+
+        $this->assertSame(0, $user->orders()->count());
+    }
+
+    public function test_addresses_relation_manager_can_create_address_for_owner_user(): void
+    {
+        $this->resolveAdminPanel();
+
+        $this->actingAs(AdminUser::factory()->create(), 'admin');
+
+        $user = User::factory()->create();
+
+        Livewire::test(AddressesRelationManager::class, [
+            'ownerRecord' => $user,
+            'pageClass'   => EditUser::class,
+        ])
+            ->assertSuccessful()
+            ->mountTableAction('create')
+            ->set('mountedActions.0.data.type', 'shipping')
+            ->set('mountedActions.0.data.first_name', 'Jonas')
+            ->set('mountedActions.0.data.last_name', 'Jonaitis')
+            ->set('mountedActions.0.data.address_line_1', 'Gedimino pr. 1')
+            ->set('mountedActions.0.data.city', 'Vilnius')
+            ->set('mountedActions.0.data.postal_code', '01103')
+            ->set('mountedActions.0.data.country_code', 'lt')
+            ->callMountedTableAction()
+            ->assertHasNoTableActionErrors();
+
+        /** @var Address|null $address */
+        $address = Address::query()
+            ->where('user_id', $user->getKey())
+            ->latest('id')
+            ->first();
+
+        $this->assertNotNull($address);
+        $this->assertSame('shipping', $address->type);
+        $this->assertSame('LT', $address->country_code);
+        $this->assertTrue((bool) $address->is_active);
+    }
+
     public function test_partners_relation_manager_can_attach_existing_partner_from_list(): void
     {
         $this->resolveAdminPanel();
@@ -783,6 +877,68 @@ class UserResourceTest extends TestCase
         ]);
     }
 
+    public function test_documents_relation_manager_defaults_status_to_draft_when_not_provided(): void
+    {
+        $this->resolveAdminPanel();
+
+        $this->actingAs(AdminUser::factory()->create(), 'admin');
+
+        $user = User::factory()->create();
+        $template = DocumentTemplate::factory()->create([
+            'name'      => 'Default Status Template',
+            'is_active' => true,
+        ]);
+
+        Livewire::test(DocumentsRelationManager::class, [
+            'ownerRecord' => $user,
+            'pageClass'   => EditUser::class,
+        ])
+            ->assertSuccessful()
+            ->mountTableAction('create')
+            ->set('mountedActions.0.data.document_template_id', $template->getKey())
+            ->set('mountedActions.0.data.title', 'Document without explicit status')
+            ->callMountedTableAction()
+            ->assertHasNoTableActionErrors();
+
+        $this->assertDatabaseHas('documents', [
+            'document_template_id' => $template->getKey(),
+            'documentable_type'    => User::class,
+            'documentable_id'      => $user->getKey(),
+            'title'                => 'Document without explicit status',
+            'status'               => Document::STATUS_DRAFT,
+        ]);
+    }
+
+    public function test_documents_relation_manager_lists_documents_with_legacy_status_values(): void
+    {
+        $this->resolveAdminPanel();
+
+        $this->actingAs(AdminUser::factory()->create(), 'admin');
+
+        $user = User::factory()->create();
+        $template = DocumentTemplate::factory()->create([
+            'name'      => 'Legacy Status Template',
+            'is_active' => true,
+        ]);
+
+        $legacyDocument = Document::withoutGlobalScopes()->create([
+            'document_template_id' => $template->getKey(),
+            'title'                => 'Legacy status document',
+            'content'              => '<h1>Legacy</h1>',
+            'status'               => 'legacy',
+            'format'               => Document::FORMAT_HTML,
+            'documentable_type'    => User::class,
+            'documentable_id'      => $user->getKey(),
+        ]);
+
+        Livewire::test(DocumentsRelationManager::class, [
+            'ownerRecord' => $user,
+            'pageClass'   => EditUser::class,
+        ])
+            ->assertSuccessful()
+            ->assertCanSeeTableRecords([$legacyDocument]);
+    }
+
     public function test_referral_rewards_relation_manager_can_create_reward_for_user(): void
     {
         $this->resolveAdminPanel();
@@ -822,6 +978,43 @@ class UserResourceTest extends TestCase
         $this->assertSame(15.5, (float) $reward->amount);
         $this->assertSame('pending', $reward->status);
         $this->assertSame('Reward from tab', $reward->getTranslation('title', 'lt'));
+    }
+
+    public function test_referral_rewards_relation_manager_defaults_status_when_not_provided(): void
+    {
+        $this->resolveAdminPanel();
+
+        $this->actingAs(AdminUser::factory()->create(), 'admin');
+
+        $owner = User::factory()->create();
+        $referred = User::factory()->create();
+        $referral = Referral::factory()->create([
+            'referrer_id' => $owner->getKey(),
+            'referred_id' => $referred->getKey(),
+        ]);
+
+        Livewire::test(ReferralRewardsRelationManager::class, [
+            'ownerRecord' => $owner,
+            'pageClass'   => EditUser::class,
+        ])
+            ->assertSuccessful()
+            ->mountTableAction('create')
+            ->set('mountedActions.0.data.referral_id', $referral->getKey())
+            ->set('mountedActions.0.data.title', 'Auto status reward')
+            ->set('mountedActions.0.data.amount', 9.99)
+            ->callMountedTableAction()
+            ->assertHasNoTableActionErrors();
+
+        /** @var ReferralReward|null $reward */
+        $reward = ReferralReward::query()
+            ->where('user_id', $owner->getKey())
+            ->latest('id')
+            ->first();
+
+        $this->assertNotNull($reward);
+        $this->assertSame('pending', $reward->status);
+        $this->assertSame('Auto status reward', $reward->getTranslation('title', 'lt'));
+        $this->assertSame('referrer_bonus', $reward->type);
     }
 
     public function test_can_render_user_view_page_with_related_tabs(): void

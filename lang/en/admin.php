@@ -585,6 +585,7 @@ return [
         'partners'         => 'Partners',
         'collections'      => 'Collections',
         'collection'       => 'Collection',
+        'product_request'  => 'Product Request',
         'product_requests' => 'Product Requests',
         'product_features' => 'Product Features',
         'product_feature'  => 'Product Feature',
@@ -924,6 +925,11 @@ return [
         'index'  => 'Settings List',
         'stats'  => 'Settings Statistics',
         'update' => 'Update Setting',
+    ],
+    'system_setting_categories' => [
+        'model_label'        => 'System Setting Category',
+        'navigation_label'   => 'Setting Categories',
+        'plural_model_label' => 'System Setting Categories',
     ],
     'system_setting_translations' => [
         'active_translations'             => 'Active Translations',

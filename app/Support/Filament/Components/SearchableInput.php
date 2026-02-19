@@ -24,6 +24,23 @@ class SearchableInput extends Select
      */
     protected array $lastSearchResults = [];
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // Filament validates selected values for Select-based components and requires
+        // a deterministic label resolver when options are loaded dynamically.
+        $this->getOptionLabelUsing(static function (mixed $value): ?string {
+            if ($value === null) {
+                return null;
+            }
+
+            $resolved = trim((string) $value);
+
+            return $resolved !== '' ? $resolved : null;
+        });
+    }
+
     public function payload(array $payload): static
     {
         $this->payload = $payload;

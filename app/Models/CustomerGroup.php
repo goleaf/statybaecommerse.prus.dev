@@ -200,6 +200,16 @@ final class CustomerGroup extends Model
             } else {
                 $group->setAttribute('payment_terms', 'net_30');
             }
+
+            // Keep non-nullable numeric columns aligned with DB constraints even
+            // when Filament submits empty values for optional-looking fields.
+            $group->setAttribute('discount_percentage', self::normalizeDecimalOrDefault($group->getAttribute('discount_percentage')));
+            $group->setAttribute('discount_fixed', self::normalizeDecimalOrDefault($group->getAttribute('discount_fixed')));
+            $group->setAttribute('minimum_order_amount', self::normalizeDecimalOrDefault($group->getAttribute('minimum_order_amount')));
+            $group->setAttribute('credit_limit', self::normalizeDecimalOrDefault($group->getAttribute('credit_limit')));
+
+            $sortOrder = $group->getAttribute('sort_order');
+            $group->setAttribute('sort_order', is_numeric($sortOrder) ? (int) $sortOrder : 0);
         });
     }
 
@@ -708,6 +718,15 @@ final class CustomerGroup extends Model
         }
 
         return (bool) $value;
+    }
+
+    private static function normalizeDecimalOrDefault(mixed $value, float $default = 0.0): float
+    {
+        if (! is_numeric($value)) {
+            return $default;
+        }
+
+        return round((float) $value, 2);
     }
 
     /**

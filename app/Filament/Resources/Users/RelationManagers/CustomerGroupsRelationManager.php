@@ -64,11 +64,15 @@ class CustomerGroupsRelationManager extends RelationManager
                     ->numeric()
                     ->minValue(0)
                     ->maxValue(100)
+                    ->default(0)
+                    ->dehydrateStateUsing(static fn ($state): float => self::normalizeNumericAmount($state))
                     ->suffix('%'),
                 TextInput::make('discount_fixed')
                     ->label(__('messages.discount_amount'))
                     ->numeric()
-                    ->minValue(0),
+                    ->minValue(0)
+                    ->default(0)
+                    ->dehydrateStateUsing(static fn ($state): float => self::normalizeNumericAmount($state)),
                 Toggle::make('has_special_pricing')
                     ->label(__('ui.has_special_pricing'))
                     ->default(false),
@@ -90,19 +94,26 @@ class CustomerGroupsRelationManager extends RelationManager
                 TextInput::make('minimum_order_amount')
                     ->label(__('ui.minimum_order_amount'))
                     ->numeric()
-                    ->minValue(0),
+                    ->minValue(0)
+                    ->default(0)
+                    ->dehydrateStateUsing(static fn ($state): float => self::normalizeNumericAmount($state)),
                 TextInput::make('credit_limit')
                     ->label(__('ui.credit_limit'))
                     ->numeric()
-                    ->minValue(0),
+                    ->minValue(0)
+                    ->default(0)
+                    ->dehydrateStateUsing(static fn ($state): float => self::normalizeNumericAmount($state)),
                 TextInput::make('payment_terms')
-                    ->label(__('messages.payment_method'))
+                    ->label(__('messages.payment_terms'))
                     ->maxLength(255)
-                    ->default('net_30'),
+                    ->default('net_30')
+                    ->required()
+                    ->dehydrateStateUsing(static fn ($state): string => self::normalizePaymentTerms($state)),
                 TextInput::make('sort_order')
                     ->label(__('messages.sort'))
                     ->numeric()
-                    ->default(0),
+                    ->default(0)
+                    ->dehydrateStateUsing(static fn ($state): int => is_numeric($state) ? (int) $state : 0),
                 KeyValue::make('metadata')
                     ->label('Metadata')
                     ->nullable()
@@ -145,7 +156,8 @@ class CustomerGroupsRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                CreateAction::make(),
+                CreateAction::make()
+                    ->mutateDataUsing(static fn (array $data): array => self::normalizePayload($data)),
                 AttachAction::make()
                     ->preloadRecordSelect()
                     ->recordSelectSearchColumns(['name', 'code'])
@@ -156,7 +168,8 @@ class CustomerGroupsRelationManager extends RelationManager
                     ),
             ])
             ->recordActions([
-                EditAction::make(),
+                EditAction::make()
+                    ->mutateDataUsing(static fn (array $data): array => self::normalizePayload($data)),
                 DetachAction::make(),
             ])
             ->toolbarActions([
@@ -187,5 +200,41 @@ class CustomerGroupsRelationManager extends RelationManager
         }
 
         return (string) $record->getKey();
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    private static function normalizePayload(array $data): array
+    {
+        foreach (['discount_percentage', 'discount_fixed', 'minimum_order_amount', 'credit_limit'] as $field) {
+            $data[$field] = self::normalizeNumericAmount($data[$field] ?? null);
+        }
+
+        $data['payment_terms'] = self::normalizePaymentTerms($data['payment_terms'] ?? null);
+        $data['sort_order'] = is_numeric($data['sort_order'] ?? null) ? (int) $data['sort_order'] : 0;
+
+        return $data;
+    }
+
+    private static function normalizeNumericAmount(mixed $value, float $default = 0.0): float
+    {
+        if (! is_numeric($value)) {
+            return $default;
+        }
+
+        return round((float) $value, 2);
+    }
+
+    private static function normalizePaymentTerms(mixed $value, string $default = 'net_30'): string
+    {
+        if (! is_scalar($value)) {
+            return $default;
+        }
+
+        $normalized = strtolower(trim((string) $value));
+
+        return $normalized !== '' ? str_replace([' ', '-'], '_', $normalized) : $default;
     }
 }

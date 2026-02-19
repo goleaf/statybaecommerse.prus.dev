@@ -6,6 +6,7 @@ namespace App\Filament\Resources\Users\RelationManagers;
 
 use App\Enums\DocumentTemplateCategory;
 use App\Enums\DocumentTemplateType;
+use App\Models\Document;
 use App\Models\DocumentTemplate;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
@@ -19,6 +20,7 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class DocumentsRelationManager extends RelationManager
 {
@@ -75,24 +77,23 @@ class DocumentsRelationManager extends RelationManager
                     ->default('<h1>{{title}}</h1>')
                     ->columnSpanFull(),
                 Select::make('format')
-                    ->options([
-                        'html' => 'HTML',
-                        'pdf'  => 'PDF',
-                        'docx' => 'DOCX',
-                    ])
-                    ->default('html')
+                    ->options($this->formatOptions())
+                    ->default(Document::FORMAT_HTML)
                     ->required(),
                 TextInput::make('file_path')
                     ->maxLength(255),
-                TextInput::make('status')
+                Select::make('status')
+                    ->options($this->statusOptions())
+                    ->default(Document::STATUS_DRAFT)
                     ->required()
-                    ->maxLength(255),
+                    ->native(false),
             ]);
     }
 
     public function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(static fn (Builder $query): Builder => $query->withoutGlobalScopes())
             ->recordTitleAttribute('title')
             ->columns([
                 TextColumn::make('title')
@@ -116,28 +117,22 @@ class DocumentsRelationManager extends RelationManager
             ])
             ->headerActions([
                 CreateAction::make()
-                    ->mutateDataUsing(static function (array $data): array {
-                        $template = null;
+                    ->mutateDataUsing(fn (array $data): array => $this->normalizeDocumentData($data))
+                    ->using(function (array $data): Document {
+                        $payload = $this->normalizeDocumentData($data);
+                        $ownerRecord = $this->getOwnerRecord();
 
-                        if (isset($data['document_template_id'])) {
-                            $template = DocumentTemplate::query()->find((int) $data['document_template_id']);
-                        }
+                        $payload['documentable_type'] = $ownerRecord::class;
+                        $payload['documentable_id'] = (int) $ownerRecord->getKey();
+                        $payload['created_by'] = null;
+                        $payload['updated_by'] = null;
 
-                        $content = trim((string) ($data['content'] ?? ''));
-                        if ($content === '' && $template instanceof DocumentTemplate) {
-                            $content = (string) $template->content;
-                        }
-
-                        $data['content'] = $content !== '' ? $content : '<h1>{{title}}</h1>';
-                        $data['type'] = (string) ($data['type'] ?? ($template?->type ?? DocumentTemplateType::Document->value));
-                        $data['format'] = (string) ($data['format'] ?? 'html');
-                        $data['status'] = (string) ($data['status'] ?? 'draft');
-
-                        return $data;
+                        return Document::withoutGlobalScopes()->create($payload);
                     }),
             ])
             ->recordActions([
-                EditAction::make(),
+                EditAction::make()
+                    ->mutateDataUsing(fn (array $data): array => $this->normalizeDocumentData($data)),
                 DeleteAction::make(),
             ])
             ->toolbarActions([
@@ -145,5 +140,67 @@ class DocumentsRelationManager extends RelationManager
                     DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+    /**
+     * @param  array<string, mixed> $data
+     * @return array<string, mixed>
+     */
+    private function normalizeDocumentData(array $data): array
+    {
+        $template = null;
+
+        if (isset($data['document_template_id'])) {
+            $template = DocumentTemplate::query()
+                ->withoutGlobalScopes()
+                ->find((int) $data['document_template_id']);
+        }
+
+        $content = trim((string) ($data['content'] ?? ''));
+        if ($content === '' && $template instanceof DocumentTemplate) {
+            $content = (string) $template->content;
+        }
+
+        $status = (string) ($data['status'] ?? Document::STATUS_DRAFT);
+        if (! in_array($status, array_keys($this->statusOptions()), true)) {
+            $status = Document::STATUS_DRAFT;
+        }
+
+        $format = (string) ($data['format'] ?? Document::FORMAT_HTML);
+        if (! in_array($format, array_keys($this->formatOptions()), true)) {
+            $format = Document::FORMAT_HTML;
+        }
+
+        $data['content'] = $content !== '' ? $content : '<h1>{{title}}</h1>';
+        $data['type'] = (string) ($data['type'] ?? ($template?->type ?? DocumentTemplateType::Document->value));
+        $data['format'] = $format;
+        $data['status'] = $status;
+
+        return $data;
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function formatOptions(): array
+    {
+        return [
+            Document::FORMAT_HTML => 'HTML',
+            Document::FORMAT_PDF  => 'PDF',
+            Document::FORMAT_DOCX => 'DOCX',
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function statusOptions(): array
+    {
+        return [
+            Document::STATUS_DRAFT     => 'Draft',
+            Document::STATUS_GENERATED => 'Generated',
+            Document::STATUS_PUBLISHED => 'Published',
+            Document::STATUS_ARCHIVED  => 'Archived',
+        ];
     }
 }

@@ -22,12 +22,18 @@ Route::prefix('admin/system-settings')->middleware(['web'])->group(function () {
             ->groupBy('category_name');
 
         return view('admin.system-settings.index', compact('categories', 'settings'));
-    })->name('admin.system-settings.index');
-
-    // Alias route name used by Filament resource components
-    Route::get('/', function () {
-        return redirect()->route('admin.system-settings.index');
     })->name('filament.admin.resources.system-settings.index');
+
+    // Legacy admin route name alias without clashing with the root index URI.
+    if (! Route::has('admin.system-settings.index')) {
+        Route::get('/index', function () {
+            if (Route::has('filament.admin.resources.system-settings.index')) {
+                return redirect()->route('filament.admin.resources.system-settings.index');
+            }
+
+            return redirect('/admin/system-settings');
+        })->name('admin.system-settings.index');
+    }
 
     Route::post('/update', function (Request $request) {
         $settings = $request->input('settings', []);

@@ -10,5 +10,13 @@ use Filament\Resources\Pages\CreateRecord;
 class CreateDiscountRedemption extends CreateRecord
 {
     protected static string $resource = DiscountRedemptionResource::class;
-}
 
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    protected function mutateFormDataBeforeCreate(array $data): array
+    {
+        return DiscountRedemptionResource::normalizePayload($data);
+    }
+}

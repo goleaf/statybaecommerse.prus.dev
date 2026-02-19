@@ -111,6 +111,32 @@ final class SliderResourceTest extends TestCase
             ->assertCanSeeTableRecords(Slider::all());
     }
 
+    public function test_slider_resource_can_create_slider_with_searchable_button_url(): void
+    {
+        $slug = 'new-test-slider-' . uniqid();
+
+        Livewire::test(\App\Filament\Resources\Sliders\Pages\CreateSlider::class)
+            ->fillForm([
+                'title'            => 'New Test Slider',
+                'slug'             => $slug,
+                'description'      => 'Test description',
+                'button_text'      => 'Click Me',
+                'button_url'       => '/products',
+                'background_color' => '#ff0000',
+                'text_color'       => '#ffffff',
+                'is_active'        => true,
+                'sort_order'       => 1,
+                'slides'           => [],
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $this->assertDatabaseHas('sliders', [
+            'slug'       => $slug,
+            'button_url' => '/products',
+        ]);
+    }
+
     /*
     // Commented out: SearchableInput component causes Filament validation errors
     // when testing form submission. See: button_url field uses searchUsing() not options()

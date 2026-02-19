@@ -580,6 +580,7 @@ return [
         'marketing'        => 'Marketing',
         'orders'           => 'Bestellungen',
         'partners'         => 'Partner',
+        'product_request'  => 'Produktanfrage',
         'products'         => 'Produkte',
         'settings'         => 'Einstellungen',
         'sliders'          => 'Slider',
@@ -912,6 +913,11 @@ return [
         'index'  => 'Einstellungsliste',
         'stats'  => 'Einstellungsstatistiken',
         'update' => 'Einstellung aktualisieren',
+    ],
+    'system_setting_categories' => [
+        'model_label'        => 'Systemeinstellungskategorie',
+        'navigation_label'   => 'Einstellungskategorien',
+        'plural_model_label' => 'Systemeinstellungskategorien',
     ],
     'system_setting_translations' => [
         'active_translations'             => 'Aktive Übersetzungen',

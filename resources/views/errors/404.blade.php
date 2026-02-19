@@ -1,7 +1,3 @@
-@php
-    $locale = app()->getLocale();
-@endphp
-
 @extends('errors.4xx', [
     'code' => '404',
     'title' => __('frontend.errors.error_404.title'),

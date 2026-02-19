@@ -772,7 +772,7 @@ return [
     'price_low_to_high'                                                              => 'Price low to high',
     'price_range_eur'                                                                => 'Price range eur',
     'print'                                                                          => 'Print',
-    'private_person'                                                                 => 'messages.private_person',
+    'private_person'                                                                 => 'Privatperson',
     'proceed_to_checkout'                                                            => 'Proceed to checkout',
     'product'                                                                        => 'Produkt',
     'product_added_to_cart'                                                          => 'Product added to cart',

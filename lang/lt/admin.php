@@ -585,6 +585,7 @@ return [
         'partners'         => 'Partneriai',
         'collections'      => 'Kolekcijos',
         'collection'       => 'Kolekcija',
+        'product_request'  => 'Produkto užklausa',
         'product_requests' => 'Produktų užklausos',
         'product_features' => 'Produkto savybės',
         'product_feature'  => 'Produkto savybė',
@@ -924,6 +925,11 @@ return [
         'index'  => 'Nustatymų sąrašas',
         'stats'  => 'Nustatymų statistika',
         'update' => 'Atnaujinti nustatymą',
+    ],
+    'system_setting_categories' => [
+        'model_label'        => 'Sistemos nustatymų kategorija',
+        'navigation_label'   => 'Nustatymų kategorijos',
+        'plural_model_label' => 'Sistemos nustatymų kategorijos',
     ],
     'system_setting_translations' => [
         'active_translations'             => 'Aktyvūs vertimai',
