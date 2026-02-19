@@ -6,7 +6,6 @@ namespace App\Filament\Resources\Users\RelationManagers;
 
 use App\Enums\AddressType;
 use App\Models\Address;
-use Filament\Actions\AssociateAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
@@ -22,6 +21,7 @@ use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class AddressesRelationManager extends RelationManager
 {
@@ -87,6 +87,7 @@ class AddressesRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(static fn (Builder $query): Builder => $query->withoutGlobalScopes())
             ->recordTitleAttribute('address_line_1')
             ->columns([
                 TextColumn::make('type')
@@ -125,8 +126,13 @@ class AddressesRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                CreateAction::make(),
-                AssociateAction::make(),
+                CreateAction::make()
+                    ->using(function (array $data): Address {
+                        $payload = $this->normalizeAddressData($data);
+                        $payload['user_id'] = $this->getOwnerRecord()->getKey();
+
+                        return Address::withoutGlobalScopes()->create($payload);
+                    }),
             ])
             ->recordActions([
                 Action::make('set_default')
@@ -134,14 +140,23 @@ class AddressesRelationManager extends RelationManager
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
                     ->action(function (Address $record) {
-                        $record->setAsDefault();
+                        Address::withoutGlobalScopes()
+                            ->where('user_id', $record->user_id)
+                            ->where('id', '!=', $record->id)
+                            ->update(['is_default' => false]);
+
+                        Address::withoutGlobalScopes()
+                            ->whereKey($record->getKey())
+                            ->update(['is_default' => true]);
+
                         Notification::make()
                             ->title(__('messages.address_set_as_default') ?? 'Address set as default successfully.')
                             ->success()
                             ->send();
                     })
                     ->hidden(fn (Address $record): bool => $record->is_default),
-                EditAction::make(),
+                EditAction::make()
+                    ->mutateDataUsing(fn (array $data): array => $this->normalizeAddressData($data)),
                 DeleteAction::make(),
             ])
             ->toolbarActions([
@@ -149,5 +164,19 @@ class AddressesRelationManager extends RelationManager
                     DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    private function normalizeAddressData(array $data): array
+    {
+        $data['type'] = AddressType::tryFrom((string) ($data['type'] ?? ''))?->value ?? AddressType::SHIPPING->value;
+        $data['country_code'] = strtoupper((string) ($data['country_code'] ?? ''));
+        $data['is_default'] = (bool) ($data['is_default'] ?? false);
+        $data['is_active'] = (bool) ($data['is_active'] ?? true);
+
+        return $data;
     }
 }
