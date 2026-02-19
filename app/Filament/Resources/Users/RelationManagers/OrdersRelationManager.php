@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Users\RelationManagers;
 
+use App\Enums\OrderPaymentState;
 use App\Enums\OrderStatus;
+use App\Enums\PaymentStatus;
 use BackedEnum;
 use Filament\Actions\AssociateAction;
 use Filament\Actions\BulkActionGroup;
@@ -12,6 +14,7 @@ use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -33,6 +36,22 @@ class OrdersRelationManager extends RelationManager
                     ->options(OrderStatus::options())
                     ->default(OrderStatus::PENDING->value)
                     ->required(),
+                Select::make('payment_status')
+                    ->options(PaymentStatus::options())
+                    ->default(PaymentStatus::PENDING->value)
+                    ->required(),
+                Hidden::make('payment_state')
+                    ->default(OrderPaymentState::CREATED->value),
+                Hidden::make('currency')
+                    ->default('EUR'),
+                Hidden::make('subtotal')
+                    ->default(0),
+                Hidden::make('tax_amount')
+                    ->default(0),
+                Hidden::make('shipping_amount')
+                    ->default(0),
+                Hidden::make('discount_amount')
+                    ->default(0),
                 TextInput::make('total')
                     ->numeric()
                     ->default(0)
@@ -88,6 +107,13 @@ class OrdersRelationManager extends RelationManager
     private static function normalizeOrderPayload(array $data): array
     {
         $data['status'] = self::normalizeOrderStatus($data['status'] ?? null);
+        $data['payment_status'] = self::normalizePaymentStatus($data['payment_status'] ?? null);
+        $data['payment_state'] = self::normalizePaymentState($data['payment_state'] ?? null);
+        $data['currency'] = 'EUR';
+        $data['subtotal'] = self::normalizeNumericAmount($data['subtotal'] ?? null);
+        $data['tax_amount'] = self::normalizeNumericAmount($data['tax_amount'] ?? null);
+        $data['shipping_amount'] = self::normalizeNumericAmount($data['shipping_amount'] ?? null);
+        $data['discount_amount'] = self::normalizeNumericAmount($data['discount_amount'] ?? null);
         $data['total'] = self::normalizeNumericAmount($data['total'] ?? null);
 
         return $data;
@@ -111,6 +137,46 @@ class OrdersRelationManager extends RelationManager
 
         return OrderStatus::tryFrom($normalizedValue)?->value
             ?? OrderStatus::PENDING->value;
+    }
+
+    private static function normalizePaymentStatus(mixed $value): string
+    {
+        if ($value instanceof PaymentStatus) {
+            return $value->value;
+        }
+
+        if ($value instanceof BackedEnum) {
+            $value = $value->value;
+        }
+
+        if (! is_scalar($value) && $value !== null) {
+            return PaymentStatus::PENDING->value;
+        }
+
+        $normalizedValue = strtolower(trim((string) ($value ?? '')));
+
+        return PaymentStatus::tryFrom($normalizedValue)?->value
+            ?? PaymentStatus::PENDING->value;
+    }
+
+    private static function normalizePaymentState(mixed $value): string
+    {
+        if ($value instanceof OrderPaymentState) {
+            return $value->value;
+        }
+
+        if ($value instanceof BackedEnum) {
+            $value = $value->value;
+        }
+
+        if (! is_scalar($value) && $value !== null) {
+            return OrderPaymentState::CREATED->value;
+        }
+
+        $normalizedValue = strtolower(trim((string) ($value ?? '')));
+
+        return OrderPaymentState::tryFrom($normalizedValue)?->value
+            ?? OrderPaymentState::CREATED->value;
     }
 
     private static function normalizeNumericAmount(mixed $value, float $default = 0.0): float

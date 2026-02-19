@@ -11,6 +11,7 @@ use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
 use App\Models\Concerns\InteractsWithDocuments;
 use App\Models\Scopes\StatusScope;
+use BackedEnum;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
 use DateTimeInterface;
@@ -67,17 +68,15 @@ final class Order extends Model implements HasDocuments
      */
     protected static function booted(): void
     {
+        self::saving(function (Order $order): void {
+            self::normalizeForPersistence($order);
+        });
+
         // Automatically assign a human friendly unique identifier whenever an order is created.
         self::creating(function (Order $order): void {
             if (! is_string($order->number) || trim($order->number) === '') {
                 $order->number = self::generateUniqueNumber();
             }
-
-            $order->currency = 'EUR';
-        });
-
-        self::updating(function (Order $order): void {
-            $order->currency = 'EUR';
         });
     }
 
@@ -102,6 +101,26 @@ final class Order extends Model implements HasDocuments
             'shipped_at'       => 'datetime',
             'delivered_at'     => 'datetime',
         ];
+    }
+
+    public function setStatusAttribute(mixed $value): void
+    {
+        $this->attributes['status'] = self::normalizeOrderStatusValue($value);
+    }
+
+    public function setPaymentStatusAttribute(mixed $value): void
+    {
+        $this->attributes['payment_status'] = self::normalizePaymentStatusValue($value);
+    }
+
+    public function setPaymentStateAttribute(mixed $value): void
+    {
+        $this->attributes['payment_state'] = self::normalizePaymentStateValue($value);
+    }
+
+    public function setPaymentMethodAttribute(mixed $value): void
+    {
+        $this->attributes['payment_method'] = self::normalizePaymentMethodValue($value);
     }
 
     /**
@@ -706,6 +725,116 @@ final class Order extends Model implements HasDocuments
         }
 
         throw new RuntimeException('Unable to allocate a unique order number after multiple attempts.');
+    }
+
+    /**
+     * Normalize order lifecycle and totals before persisting so invalid admin payloads
+     * cannot trigger enum ValueError exceptions during Livewire response rendering.
+     */
+    private static function normalizeForPersistence(self $order): void
+    {
+        $attributes = $order->getAttributes();
+
+        $order->status = self::normalizeOrderStatusValue($attributes['status'] ?? null);
+        $order->payment_status = self::normalizePaymentStatusValue($attributes['payment_status'] ?? null);
+        $order->payment_state = self::normalizePaymentStateValue($attributes['payment_state'] ?? null);
+        $order->payment_method = self::normalizePaymentMethodValue($attributes['payment_method'] ?? null);
+
+        foreach (['subtotal', 'tax_amount', 'shipping_amount', 'discount_amount', 'total'] as $field) {
+            $order->{$field} = self::normalizeNumericAmount($attributes[$field] ?? null);
+        }
+
+        $currency = strtoupper(trim((string) ($attributes['currency'] ?? '')));
+        $order->currency = strlen($currency) === 3 ? $currency : 'EUR';
+    }
+
+    private static function normalizeOrderStatusValue(mixed $value): string
+    {
+        if ($value instanceof OrderStatus) {
+            return $value->value;
+        }
+
+        if ($value instanceof BackedEnum) {
+            $value = $value->value;
+        }
+
+        if (! is_scalar($value) && $value !== null) {
+            return OrderStatus::PENDING->value;
+        }
+
+        $normalizedValue = strtolower(trim((string) ($value ?? '')));
+
+        return OrderStatus::tryFrom($normalizedValue)?->value
+            ?? OrderStatus::PENDING->value;
+    }
+
+    private static function normalizePaymentStatusValue(mixed $value): string
+    {
+        if ($value instanceof PaymentStatus) {
+            return $value->value;
+        }
+
+        if ($value instanceof BackedEnum) {
+            $value = $value->value;
+        }
+
+        if (! is_scalar($value) && $value !== null) {
+            return PaymentStatus::PENDING->value;
+        }
+
+        $normalizedValue = strtolower(trim((string) ($value ?? '')));
+
+        return PaymentStatus::tryFrom($normalizedValue)?->value
+            ?? PaymentStatus::PENDING->value;
+    }
+
+    private static function normalizePaymentStateValue(mixed $value): string
+    {
+        if ($value instanceof OrderPaymentState) {
+            return $value->value;
+        }
+
+        if ($value instanceof BackedEnum) {
+            $value = $value->value;
+        }
+
+        if (! is_scalar($value) && $value !== null) {
+            return OrderPaymentState::CREATED->value;
+        }
+
+        $normalizedValue = strtolower(trim((string) ($value ?? '')));
+
+        return OrderPaymentState::tryFrom($normalizedValue)?->value
+            ?? OrderPaymentState::CREATED->value;
+    }
+
+    private static function normalizePaymentMethodValue(mixed $value): ?string
+    {
+        if ($value instanceof PaymentMethod) {
+            return $value->value;
+        }
+
+        if ($value instanceof BackedEnum) {
+            $value = $value->value;
+        }
+
+        if (! is_scalar($value) && $value !== null) {
+            return null;
+        }
+
+        $normalizedValue = strtolower(trim((string) ($value ?? '')));
+
+        return PaymentMethod::tryFrom($normalizedValue)?->value
+            ?? null;
+    }
+
+    private static function normalizeNumericAmount(mixed $value, float $default = 0.0): float
+    {
+        if (! is_numeric($value)) {
+            return $default;
+        }
+
+        return round((float) $value, 2);
     }
 
     /**

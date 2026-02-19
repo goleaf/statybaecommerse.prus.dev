@@ -612,6 +612,43 @@ class UserResourceTest extends TestCase
         $this->assertSame(0, $user->orders()->count());
     }
 
+    public function test_orders_relation_manager_can_create_order_with_safe_defaults(): void
+    {
+        $this->resolveAdminPanel();
+
+        $this->actingAs(AdminUser::factory()->create(), 'admin');
+
+        $user = User::factory()->create();
+
+        Livewire::test(OrdersRelationManager::class, [
+            'ownerRecord' => $user,
+            'pageClass'   => EditUser::class,
+        ])
+            ->assertSuccessful()
+            ->mountTableAction('create')
+            ->set('mountedActions.0.data.status', 'pending')
+            ->set('mountedActions.0.data.total', 99.99)
+            ->callMountedTableAction()
+            ->assertHasNoTableActionErrors();
+
+        /** @var Order|null $order */
+        $order = Order::query()
+            ->where('user_id', $user->getKey())
+            ->latest('id')
+            ->first();
+
+        $this->assertNotNull($order);
+        $this->assertSame('pending', (string) $order->getRawOriginal('status'));
+        $this->assertSame('pending', (string) $order->getRawOriginal('payment_status'));
+        $this->assertSame('created', (string) $order->getRawOriginal('payment_state'));
+        $this->assertSame('EUR', (string) $order->currency);
+        $this->assertSame(0.0, (float) $order->subtotal);
+        $this->assertSame(0.0, (float) $order->tax_amount);
+        $this->assertSame(0.0, (float) $order->shipping_amount);
+        $this->assertSame(0.0, (float) $order->discount_amount);
+        $this->assertSame(99.99, (float) $order->total);
+    }
+
     public function test_addresses_relation_manager_can_create_address_for_owner_user(): void
     {
         $this->resolveAdminPanel();
