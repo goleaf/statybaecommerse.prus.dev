@@ -52,6 +52,15 @@ final class SliderQuickActionsWidget extends Widget implements HasActions, HasFo
                     ->label(__('translations.button_url'))
                     ->placeholder(__('translations.slider_link_placeholder'))
                     ->searchUsing(fn (string $value): array => ContentLinkSearch::results($value))
+                    ->getOptionLabelUsing(static function (mixed $value): ?string {
+                        if ($value === null) {
+                            return null;
+                        }
+
+                        $resolved = trim((string) $value);
+
+                        return $resolved !== '' ? $resolved : null;
+                    })
                     ->dehydrateStateUsing(fn (?string $state): ?string => $state !== null && $state !== '' ? $state : null)
                     ->afterStateHydrated(function (SearchableInput $component, ?string $state): void {
                         // Hydrate via helper per docs/forms/SEARCHABLE_INPUT_METADATA.md expectations.

@@ -28,6 +28,9 @@ class SearchableInput extends Select
     {
         parent::setUp();
 
+        // Ensure Select validation always has a deterministic option source.
+        $this->options([]);
+
         // Filament validates selected values for Select-based components and requires
         // a deterministic label resolver when options are loaded dynamically.
         $this->getOptionLabelUsing(static function (mixed $value): ?string {

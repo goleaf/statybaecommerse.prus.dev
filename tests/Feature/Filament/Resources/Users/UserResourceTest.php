@@ -685,6 +685,39 @@ class UserResourceTest extends TestCase
         $this->assertTrue((bool) $address->is_active);
     }
 
+    public function test_addresses_relation_manager_applies_default_type_and_country(): void
+    {
+        $this->resolveAdminPanel();
+
+        $this->actingAs(AdminUser::factory()->create(), 'admin');
+
+        $user = User::factory()->create();
+
+        Livewire::test(AddressesRelationManager::class, [
+            'ownerRecord' => $user,
+            'pageClass'   => EditUser::class,
+        ])
+            ->assertSuccessful()
+            ->mountTableAction('create')
+            ->set('mountedActions.0.data.first_name', 'Petras')
+            ->set('mountedActions.0.data.last_name', 'Petraitis')
+            ->set('mountedActions.0.data.address_line_1', 'Vilniaus g. 10')
+            ->set('mountedActions.0.data.city', 'Kaunas')
+            ->set('mountedActions.0.data.postal_code', '44280')
+            ->callMountedTableAction()
+            ->assertHasNoTableActionErrors();
+
+        /** @var Address|null $address */
+        $address = Address::query()
+            ->where('user_id', $user->getKey())
+            ->latest('id')
+            ->first();
+
+        $this->assertNotNull($address);
+        $this->assertSame('shipping', $address->type);
+        $this->assertSame('LT', $address->country_code);
+    }
+
     public function test_partners_relation_manager_can_attach_existing_partner_from_list(): void
     {
         $this->resolveAdminPanel();
@@ -881,6 +914,70 @@ class UserResourceTest extends TestCase
         ]);
     }
 
+    public function test_referral_codes_relation_manager_can_create_code_for_owner_user(): void
+    {
+        $this->resolveAdminPanel();
+
+        $this->actingAs(AdminUser::factory()->create(), 'admin');
+
+        $user = User::factory()->create();
+        $code = 'REF-' . strtoupper(substr(md5((string) microtime(true)), 0, 10));
+
+        Livewire::test(ReferralCodesRelationManager::class, [
+            'ownerRecord' => $user,
+            'pageClass'   => EditUser::class,
+        ])
+            ->assertSuccessful()
+            ->mountTableAction('create')
+            ->set('mountedActions.0.data.code', $code)
+            ->set('mountedActions.0.data.reward_amount', 19.99)
+            ->set('mountedActions.0.data.usage_limit', 5)
+            ->set('mountedActions.0.data.is_active', true)
+            ->callMountedTableAction()
+            ->assertHasNoTableActionErrors();
+
+        /** @var ReferralCode|null $referralCode */
+        $referralCode = ReferralCode::withoutGlobalScopes()
+            ->where('user_id', $user->getKey())
+            ->latest('id')
+            ->first();
+
+        $this->assertNotNull($referralCode);
+        $this->assertSame($code, $referralCode->code);
+        $this->assertSame(19.99, (float) $referralCode->reward_amount);
+        $this->assertSame(5, (int) $referralCode->usage_limit);
+        $this->assertTrue((bool) $referralCode->is_active);
+    }
+
+    public function test_referral_codes_relation_manager_generates_code_by_default_when_missing(): void
+    {
+        $this->resolveAdminPanel();
+
+        $this->actingAs(AdminUser::factory()->create(), 'admin');
+
+        $user = User::factory()->create();
+
+        Livewire::test(ReferralCodesRelationManager::class, [
+            'ownerRecord' => $user,
+            'pageClass'   => EditUser::class,
+        ])
+            ->assertSuccessful()
+            ->mountTableAction('create')
+            ->callMountedTableAction()
+            ->assertHasNoTableActionErrors();
+
+        /** @var ReferralCode|null $referralCode */
+        $referralCode = ReferralCode::withoutGlobalScopes()
+            ->where('user_id', $user->getKey())
+            ->latest('id')
+            ->first();
+
+        $this->assertNotNull($referralCode);
+        $this->assertNotSame('', trim((string) $referralCode->code));
+        $this->assertLessThanOrEqual(20, strlen((string) $referralCode->code));
+        $this->assertTrue((bool) $referralCode->is_active);
+    }
+
     public function test_documents_relation_manager_can_create_document_for_user(): void
     {
         $this->resolveAdminPanel();
@@ -943,6 +1040,40 @@ class UserResourceTest extends TestCase
             'documentable_id'      => $user->getKey(),
             'title'                => 'Document without explicit status',
             'status'               => Document::STATUS_DRAFT,
+        ]);
+    }
+
+    public function test_documents_relation_manager_can_create_document_without_selecting_template(): void
+    {
+        $this->resolveAdminPanel();
+
+        $this->actingAs(AdminUser::factory()->create(), 'admin');
+
+        $user = User::factory()->create();
+
+        DocumentTemplate::query()->delete();
+
+        Livewire::test(DocumentsRelationManager::class, [
+            'ownerRecord' => $user,
+            'pageClass'   => EditUser::class,
+        ])
+            ->assertSuccessful()
+            ->mountTableAction('create')
+            ->set('mountedActions.0.data.title', 'Fallback template document')
+            ->callMountedTableAction()
+            ->assertHasNoTableActionErrors();
+
+        /** @var Document|null $document */
+        $document = Document::withoutGlobalScopes()
+            ->where('documentable_type', User::class)
+            ->where('documentable_id', $user->getKey())
+            ->latest('id')
+            ->first();
+
+        $this->assertNotNull($document);
+        $this->assertNotNull($document->document_template_id);
+        $this->assertDatabaseHas('document_templates', [
+            'id' => $document->document_template_id,
         ]);
     }
 
@@ -1052,6 +1183,120 @@ class UserResourceTest extends TestCase
         $this->assertSame('pending', $reward->status);
         $this->assertSame('Auto status reward', $reward->getTranslation('title', 'lt'));
         $this->assertSame('referrer_bonus', $reward->type);
+    }
+
+    public function test_referral_rewards_relation_manager_can_create_reward_with_minimal_defaults(): void
+    {
+        $this->resolveAdminPanel();
+
+        $this->actingAs(AdminUser::factory()->create(), 'admin');
+
+        $owner = User::factory()->create();
+
+        Livewire::test(ReferralRewardsRelationManager::class, [
+            'ownerRecord' => $owner,
+            'pageClass'   => EditUser::class,
+        ])
+            ->assertSuccessful()
+            ->mountTableAction('create')
+            ->callMountedTableAction()
+            ->assertHasNoTableActionErrors();
+
+        /** @var ReferralReward|null $reward */
+        $reward = ReferralReward::query()
+            ->where('user_id', $owner->getKey())
+            ->latest('id')
+            ->first();
+
+        $this->assertNotNull($reward);
+        $this->assertSame('pending', $reward->status);
+        $this->assertSame('referrer_bonus', $reward->type);
+        $this->assertSame(0.0, (float) $reward->amount);
+        $this->assertSame('Referral reward', $reward->getTranslation('title', 'lt'));
+    }
+
+    public function test_view_user_page_relation_managers_can_create_records_for_reported_relations(): void
+    {
+        $this->resolveAdminPanel();
+
+        $this->actingAs(AdminUser::factory()->create(), 'admin');
+
+        $owner = User::factory()->create();
+        $groupCode = 'VIEW-GRP-' . strtoupper(substr(md5((string) microtime(true)), 0, 8));
+
+        DocumentTemplate::query()->delete();
+
+        Livewire::test(CustomerGroupsRelationManager::class, [
+            'ownerRecord' => $owner,
+            'pageClass'   => ViewUser::class,
+        ])
+            ->assertSuccessful()
+            ->mountTableAction('create')
+            ->set('mountedActions.0.data.name', 'View page customer group')
+            ->set('mountedActions.0.data.code', $groupCode)
+            ->callMountedTableAction()
+            ->assertHasNoTableActionErrors();
+
+        Livewire::test(OrdersRelationManager::class, [
+            'ownerRecord' => $owner,
+            'pageClass'   => ViewUser::class,
+        ])
+            ->assertSuccessful()
+            ->mountTableAction('create')
+            ->callMountedTableAction()
+            ->assertHasNoTableActionErrors();
+
+        Livewire::test(AddressesRelationManager::class, [
+            'ownerRecord' => $owner,
+            'pageClass'   => ViewUser::class,
+        ])
+            ->assertSuccessful()
+            ->mountTableAction('create')
+            ->set('mountedActions.0.data.first_name', 'View')
+            ->set('mountedActions.0.data.last_name', 'User')
+            ->set('mountedActions.0.data.address_line_1', 'Test st. 1')
+            ->set('mountedActions.0.data.city', 'Vilnius')
+            ->set('mountedActions.0.data.postal_code', '01100')
+            ->callMountedTableAction()
+            ->assertHasNoTableActionErrors();
+
+        Livewire::test(DocumentsRelationManager::class, [
+            'ownerRecord' => $owner,
+            'pageClass'   => ViewUser::class,
+        ])
+            ->assertSuccessful()
+            ->mountTableAction('create')
+            ->set('mountedActions.0.data.title', 'View page document')
+            ->callMountedTableAction()
+            ->assertHasNoTableActionErrors();
+
+        Livewire::test(ReferralCodesRelationManager::class, [
+            'ownerRecord' => $owner,
+            'pageClass'   => ViewUser::class,
+        ])
+            ->assertSuccessful()
+            ->mountTableAction('create')
+            ->callMountedTableAction()
+            ->assertHasNoTableActionErrors();
+
+        Livewire::test(ReferralRewardsRelationManager::class, [
+            'ownerRecord' => $owner,
+            'pageClass'   => ViewUser::class,
+        ])
+            ->assertSuccessful()
+            ->mountTableAction('create')
+            ->callMountedTableAction()
+            ->assertHasNoTableActionErrors();
+
+        $this->assertSame(1, $owner->customerGroups()->count());
+        $this->assertSame(1, Order::query()->where('user_id', $owner->getKey())->count());
+        $this->assertSame(1, Address::query()->where('user_id', $owner->getKey())->count());
+        $this->assertSame(1, Document::withoutGlobalScopes()
+            ->where('documentable_type', User::class)
+            ->where('documentable_id', $owner->getKey())
+            ->count());
+        $this->assertSame(1, ReferralCode::withoutGlobalScopes()->where('user_id', $owner->getKey())->count());
+        $this->assertSame(1, ReferralReward::query()->where('user_id', $owner->getKey())->count());
     }
 
     public function test_can_render_user_view_page_with_related_tabs(): void

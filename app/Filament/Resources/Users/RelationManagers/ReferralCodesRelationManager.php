@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Users\RelationManagers;
 
+use App\Models\ReferralCode;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
@@ -17,6 +18,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class ReferralCodesRelationManager extends RelationManager
 {
@@ -29,7 +31,8 @@ class ReferralCodesRelationManager extends RelationManager
                 TextInput::make('code')
                     ->required()
                     ->unique(ignoreRecord: true)
-                    ->maxLength(255),
+                    ->default(static fn (): string => ReferralCode::generateUniqueCode())
+                    ->maxLength(20),
                 TextInput::make('reward_amount')
                     ->numeric()
                     ->prefix('€'),
@@ -44,6 +47,7 @@ class ReferralCodesRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(static fn (Builder $query): Builder => $query->withoutGlobalScopes())
             ->recordTitleAttribute('code')
             ->columns([
                 TextColumn::make('code')
@@ -69,10 +73,18 @@ class ReferralCodesRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                CreateAction::make(),
+                CreateAction::make()
+                    ->mutateDataUsing(fn (array $data): array => $this->normalizePayload($data))
+                    ->using(function (array $data): ReferralCode {
+                        $payload = $this->normalizePayload($data);
+                        $payload['user_id'] = $this->getOwnerRecord()->getKey();
+
+                        return ReferralCode::withoutGlobalScopes()->create($payload);
+                    }),
             ])
             ->recordActions([
-                EditAction::make(),
+                EditAction::make()
+                    ->mutateDataUsing(fn (array $data): array => $this->normalizePayload($data)),
                 DeleteAction::make(),
             ])
             ->toolbarActions([
@@ -80,5 +92,26 @@ class ReferralCodesRelationManager extends RelationManager
                     DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+    /**
+     * @param  array<string, mixed> $data
+     * @return array<string, mixed>
+     */
+    private function normalizePayload(array $data): array
+    {
+        $code = strtoupper(trim((string) ($data['code'] ?? '')));
+        $resolvedCode = $code !== '' ? $code : ReferralCode::generateUniqueCode();
+
+        $data['code'] = substr($resolvedCode, 0, 20);
+        $data['reward_amount'] = is_numeric($data['reward_amount'] ?? null)
+            ? round((float) $data['reward_amount'], 2)
+            : null;
+        $data['usage_limit'] = is_numeric($data['usage_limit'] ?? null)
+            ? max(0, (int) $data['usage_limit'])
+            : null;
+        $data['is_active'] = (bool) ($data['is_active'] ?? true);
+
+        return $data;
     }
 }

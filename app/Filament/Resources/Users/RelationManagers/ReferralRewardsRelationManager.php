@@ -40,6 +40,7 @@ class ReferralRewardsRelationManager extends RelationManager
                     ->preload(),
                 TextInput::make('title')
                     ->required()
+                    ->default('Referral reward')
                     ->maxLength(255),
                 Textarea::make('description')
                     ->columnSpanFull(),
@@ -47,14 +48,17 @@ class ReferralRewardsRelationManager extends RelationManager
                     ->numeric()
                     ->prefix('€')
                     ->minValue(0)
+                    ->default(0)
                     ->required(),
                 Select::make('status')
                     ->options($this->statusOptions())
                     ->default('pending')
+                    ->native(false)
                     ->required(),
                 Select::make('type')
                     ->options($this->typeOptions())
                     ->default('referrer_bonus')
+                    ->native(false)
                     ->required(),
                 DateTimePicker::make('expires_at'),
             ]);
@@ -137,10 +141,19 @@ class ReferralRewardsRelationManager extends RelationManager
             'lt' => $description,
             'en' => $description,
         ] : null;
+        $data['referral_id'] = is_numeric($data['referral_id'] ?? null)
+            ? (int) $data['referral_id']
+            : null;
+        $data['amount'] = is_numeric($data['amount'] ?? null)
+            ? round((float) $data['amount'], 2)
+            : 0.0;
         $data['currency_code'] = strtoupper((string) ($data['currency_code'] ?? 'EUR'));
         $data['status'] = $status;
         $data['type'] = $type;
         $data['is_active'] = (bool) ($data['is_active'] ?? true);
+        $data['priority'] = is_numeric($data['priority'] ?? null)
+            ? (int) $data['priority']
+            : 0;
 
         return $data;
     }

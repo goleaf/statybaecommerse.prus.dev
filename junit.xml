@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="Tests\Feature\Filament\Resources\OrderResourceTest" file="tests\Feature\Filament\Resources\OrderResourceTest.php" tests="2" assertions="6" errors="0" failures="0" skipped="0" time="14.997823">
-    <testcase name="it creates an order with products, services, and documents" file="tests\Feature\Filament\Resources\OrderResourceTest.php::it creates an order with products, services, and documents" class="Tests\Feature\Filament\Resources\OrderResourceTest" classname="Tests.Feature.Filament.Resources.OrderResourceTest" assertions="5" time="14.594577"/>
-    <testcase name="it can render create order page" file="tests\Feature\Filament\Resources\OrderResourceTest.php::it can render create order page" class="Tests\Feature\Filament\Resources\OrderResourceTest" classname="Tests.Feature.Filament.Resources.OrderResourceTest" assertions="1" time="0.403247"/>
+  <testsuite name="Tests\Feature\Livewire\Pages\Category\IndexTest" file="Index (Tests\Feature\Livewire\Pages\Category\Index)" tests="2" assertions="3" errors="0" failures="0" skipped="0" time="16.842951">
+    <testcase name="It renders successfully" file="Index (Tests\Feature\Livewire\Pages\Category\Index)::It renders successfully" class="Tests\Feature\Livewire\Pages\Category\IndexTest" classname="Tests.Feature.Livewire.Pages.Category.IndexTest" assertions="2" time="16.462583"/>
+    <testcase name="Localized categories route renders when visible categories exist" file="Index (Tests\Feature\Livewire\Pages\Category\Index)::Localized categories route renders when visible categories exist" class="Tests\Feature\Livewire\Pages\Category\IndexTest" classname="Tests.Feature.Livewire.Pages.Category.IndexTest" assertions="1" time="0.380368"/>
   </testsuite>
 </testsuites>

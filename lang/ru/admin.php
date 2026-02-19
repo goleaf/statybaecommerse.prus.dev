@@ -581,6 +581,7 @@ return [
         'orders'           => 'Orders',
         'partners'         => 'Partners',
         'product_request'  => 'Запрос на товар',
+        'product_requests' => 'Запросы на товар',
         'products'         => 'Products',
         'settings'         => 'Settings',
         'sliders'          => 'Sliders',

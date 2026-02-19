@@ -148,7 +148,18 @@ export const forms = {
 // UI utilities
 export const ui = {
     smoothScroll(target) {
-        const element = document.querySelector(target);
+        if (typeof target !== 'string' || target === '' || target === '#') {
+            return;
+        }
+
+        let element = null;
+
+        try {
+            element = document.querySelector(target);
+        } catch {
+            return;
+        }
+
         if (element) {
             element.scrollIntoView({ behavior: 'smooth' });
         }
@@ -241,8 +252,13 @@ document.addEventListener('DOMContentLoaded', function () {
     // Initialize smooth scrolling for anchor links
     document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
         anchor.addEventListener('click', function (e) {
+            const target = this.getAttribute('href');
+            if (!target || target === '#') {
+                return;
+            }
+
             e.preventDefault();
-            ui.smoothScroll(this.getAttribute('href'));
+            ui.smoothScroll(target);
         });
     });
 

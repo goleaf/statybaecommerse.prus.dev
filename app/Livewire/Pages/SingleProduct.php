@@ -75,13 +75,17 @@ final class SingleProduct extends Component
     {
         $priceData = $this->product->getPrice();
         $brandName = $this->product->brand?->trans('name') ?? $this->product->brand?->name;
+        $rawDescription = $this->product->trans('description') ?? $this->product->description;
+        $schemaDescription = is_string($rawDescription)
+            ? Str::limit(strip_tags($rawDescription), 300)
+            : '';
 
         $schema = [
             '@context'    => 'https://schema.org',
             '@type'       => 'Product',
             'name'        => $this->product->trans('name') ?? $this->product->name,
             'image'       => $this->ogImage ? [$this->ogImage] : [],
-            'description' => Str::limit(strip_tags($this->product->trans('description') ?? $this->product->description), 300),
+            'description' => $schemaDescription,
         ];
 
         if ($brandName) {

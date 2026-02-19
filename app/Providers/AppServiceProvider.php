@@ -55,6 +55,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\LazyCollection;
@@ -165,6 +166,32 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // Normalize accidental mixed-case translation groups (e.g. `Admin.*`)
+        // so Linux deployments keep resolving the existing lowercase files.
+        Lang::handleMissingKeysUsing(static function (
+            string $key,
+            array $replace,
+            ?string $locale,
+            bool $fallback
+        ): string {
+            [$group, $item] = array_pad(explode('.', $key, 2), 2, null);
+
+            if (! is_string($item) || $item === '') {
+                return $key;
+            }
+
+            $normalizedGroup = strtolower($group);
+
+            if ($normalizedGroup === $group) {
+                return $key;
+            }
+
+            $normalizedKey = $normalizedGroup . '.' . $item;
+            $translation = app('translator')->get($normalizedKey, $replace, $locale, $fallback);
+
+            return $translation !== $normalizedKey ? $translation : $key;
+        });
+
         // Register Laravel Loop Filament Toolkit
         if (class_exists(Loop::class) && class_exists(FilamentToolkit::class)) {
             Loop::toolkit(FilamentToolkit::make());

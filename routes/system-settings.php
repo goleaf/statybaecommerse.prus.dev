@@ -27,10 +27,7 @@ Route::prefix('admin/system-settings')->middleware(['web'])->group(function () {
     // Legacy admin route name alias without clashing with the root index URI.
     if (! Route::has('admin.system-settings.index')) {
         Route::get('/index', function () {
-            if (Route::has('filament.admin.resources.system-settings.index')) {
-                return redirect()->route('filament.admin.resources.system-settings.index');
-            }
-
+            // Resolve through the concrete URI to avoid route-name dependency loops.
             return redirect('/admin/system-settings');
         })->name('admin.system-settings.index');
     }

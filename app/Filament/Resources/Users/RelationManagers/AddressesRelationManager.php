@@ -6,6 +6,7 @@ namespace App\Filament\Resources\Users\RelationManagers;
 
 use App\Enums\AddressType;
 use App\Models\Address;
+use App\Models\Country;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
@@ -34,6 +35,7 @@ class AddressesRelationManager extends RelationManager
                 Select::make('type')
                     ->options(AddressType::options())
                     ->label(__('messages.type'))
+                    ->default(AddressType::SHIPPING->value)
                     ->required(),
                 TextInput::make('first_name')
                     ->label(__('messages.first_name'))
@@ -64,10 +66,54 @@ class AddressesRelationManager extends RelationManager
                     ->label(__('messages.postal_code'))
                     ->required()
                     ->maxLength(20),
-                TextInput::make('country_code')
-                    ->label(__('messages.country_code'))
+                Select::make('country_code')
+                    ->label(__('messages.country'))
+                    ->options(static fn (): array => self::countryOptions())
+                    ->searchable()
+                    ->preload()
+                    ->getSearchResultsUsing(static function (string $search): array {
+                        $needle = '%' . trim($search) . '%';
+
+                        return Country::query()
+                            ->withoutGlobalScopes()
+                            ->where(function (Builder $query) use ($needle): void {
+                                $query
+                                    ->where('cca2', 'like', $needle)
+                                    ->orWhere('name', 'like', $needle);
+                            })
+                            ->orderByRaw('COALESCE(name, cca2)')
+                            ->limit(50)
+                            ->get(['cca2', 'name'])
+                            ->mapWithKeys(static fn (Country $country): array => [
+                                strtoupper((string) $country->cca2) => self::countryLabel($country),
+                            ])
+                            ->all();
+                    })
+                    ->getOptionLabelUsing(static function (mixed $value): ?string {
+                        if (! is_scalar($value)) {
+                            return null;
+                        }
+
+                        $code = strtoupper(trim((string) $value));
+
+                        if ($code === '') {
+                            return null;
+                        }
+
+                        $country = Country::query()
+                            ->withoutGlobalScopes()
+                            ->where('cca2', $code)
+                            ->first(['cca2', 'name']);
+
+                        if ($country instanceof Country) {
+                            return self::countryLabel($country);
+                        }
+
+                        return $code;
+                    })
+                    ->default('LT')
                     ->required()
-                    ->maxLength(2),
+                    ->native(false),
                 TextInput::make('phone')
                     ->label(__('messages.phone'))
                     ->tel()
@@ -167,16 +213,44 @@ class AddressesRelationManager extends RelationManager
     }
 
     /**
-     * @param  array<string, mixed>  $data
+     * @param  array<string, mixed> $data
      * @return array<string, mixed>
      */
     private function normalizeAddressData(array $data): array
     {
         $data['type'] = AddressType::tryFrom((string) ($data['type'] ?? ''))?->value ?? AddressType::SHIPPING->value;
-        $data['country_code'] = strtoupper((string) ($data['country_code'] ?? ''));
+        $countryCode = strtoupper(trim((string) ($data['country_code'] ?? '')));
+        $data['country_code'] = strlen($countryCode) === 2 ? $countryCode : 'LT';
         $data['is_default'] = (bool) ($data['is_default'] ?? false);
         $data['is_active'] = (bool) ($data['is_active'] ?? true);
 
         return $data;
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private static function countryOptions(): array
+    {
+        return Country::query()
+            ->withoutGlobalScopes()
+            ->orderByRaw('COALESCE(name, cca2)')
+            ->get(['cca2', 'name'])
+            ->mapWithKeys(static fn (Country $country): array => [
+                strtoupper((string) $country->cca2) => self::countryLabel($country),
+            ])
+            ->all();
+    }
+
+    private static function countryLabel(Country $country): string
+    {
+        $code = strtoupper((string) $country->cca2);
+        $name = trim((string) ($country->name ?? ''));
+
+        if ($name === '') {
+            return $code;
+        }
+
+        return sprintf('%s (%s)', $name, $code);
     }
 }

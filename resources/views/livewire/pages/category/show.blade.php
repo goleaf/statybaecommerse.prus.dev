@@ -717,6 +717,4 @@
                                         </div>
                                     @endif
                                 
-
-    <x-filament-actions::modals />
 </div>

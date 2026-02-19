@@ -76,6 +76,15 @@ class SliderForm
                                 ->label(__('translations.button_url'))
                                 ->placeholder(__('translations.button_url'))
                                 ->searchUsing(fn (string $value): array => ContentLinkSearch::results($value))
+                                ->getOptionLabelUsing(static function (mixed $value): ?string {
+                                    if ($value === null) {
+                                        return null;
+                                    }
+
+                                    $resolved = trim((string) $value);
+
+                                    return $resolved !== '' ? $resolved : null;
+                                })
                                 ->dehydrateStateUsing(fn (?string $state): ?string => $state !== null && $state !== '' ? $state : null)
                                 ->afterStateHydrated(function (SearchableInput $component, ?string $state): void {
                                     SearchableInputHelper::hydrate(
@@ -253,6 +262,15 @@ class SliderForm
                                     ->label(__('translations.button_url'))
                                     ->placeholder(__('translations.button_url'))
                                     ->searchUsing(fn (string $value): array => ContentLinkSearch::results($value))
+                                    ->getOptionLabelUsing(static function (mixed $value): ?string {
+                                        if ($value === null) {
+                                            return null;
+                                        }
+
+                                        $resolved = trim((string) $value);
+
+                                        return $resolved !== '' ? $resolved : null;
+                                    })
                                     ->dehydrateStateUsing(fn (?string $state): ?string => $state !== null && $state !== '' ? $state : null)
                                     ->afterStateHydrated(function (SearchableInput $component, ?string $state): void {
                                         SearchableInputHelper::hydrate(

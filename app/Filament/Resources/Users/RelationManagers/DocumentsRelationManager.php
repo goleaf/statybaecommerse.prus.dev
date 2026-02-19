@@ -21,6 +21,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Str;
 
 class DocumentsRelationManager extends RelationManager
 {
@@ -34,7 +35,9 @@ class DocumentsRelationManager extends RelationManager
                     ->relationship(
                         name: 'documentTemplate',
                         titleAttribute: 'name',
-                        modifyQueryUsing: static fn ($query) => $query->orderBy('name'),
+                        modifyQueryUsing: static fn (Builder $query): Builder => $query
+                            ->withoutGlobalScopes()
+                            ->orderBy('name'),
                     )
                     ->searchable()
                     ->preload()
@@ -67,10 +70,10 @@ class DocumentsRelationManager extends RelationManager
                         ]);
 
                         return (int) $template->getKey();
-                    })
-                    ->required(),
+                    }),
                 TextInput::make('title')
                     ->required()
+                    ->default('Document')
                     ->maxLength(255),
                 Textarea::make('content')
                     ->required()
@@ -156,6 +159,10 @@ class DocumentsRelationManager extends RelationManager
                 ->find((int) $data['document_template_id']);
         }
 
+        if (! $template instanceof DocumentTemplate) {
+            $template = $this->resolveFallbackTemplate();
+        }
+
         $content = trim((string) ($data['content'] ?? ''));
         if ($content === '' && $template instanceof DocumentTemplate) {
             $content = (string) $template->content;
@@ -172,6 +179,10 @@ class DocumentsRelationManager extends RelationManager
         }
 
         $data['content'] = $content !== '' ? $content : '<h1>{{title}}</h1>';
+        $data['document_template_id'] = (int) $template->getKey();
+        $data['title'] = trim((string) ($data['title'] ?? '')) !== ''
+            ? trim((string) $data['title'])
+            : 'Document';
         $data['type'] = (string) ($data['type'] ?? ($template?->type ?? DocumentTemplateType::Document->value));
         $data['format'] = $format;
         $data['status'] = $status;
@@ -202,5 +213,34 @@ class DocumentsRelationManager extends RelationManager
             Document::STATUS_PUBLISHED => 'Published',
             Document::STATUS_ARCHIVED  => 'Archived',
         ];
+    }
+
+    private function resolveFallbackTemplate(): DocumentTemplate
+    {
+        $existingTemplate = DocumentTemplate::query()
+            ->withoutGlobalScopes()
+            ->orderByDesc('is_active')
+            ->orderBy('id')
+            ->first();
+
+        if ($existingTemplate instanceof DocumentTemplate) {
+            return $existingTemplate;
+        }
+
+        $suffix = strtolower(Str::random(8));
+
+        return DocumentTemplate::query()
+            ->withoutGlobalScopes()
+            ->create([
+                'name'        => 'Auto Template ' . strtoupper($suffix),
+                'slug'        => 'auto-template-' . $suffix,
+                'description' => 'Auto-created fallback template for user documents.',
+                'content'     => '<h1>{{title}}</h1>',
+                'variables'   => ['title'],
+                'type'        => DocumentTemplateType::Document->value,
+                'category'    => DocumentTemplateCategory::Business->value,
+                'settings'    => null,
+                'is_active'   => true,
+            ]);
     }
 }
