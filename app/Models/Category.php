@@ -646,9 +646,11 @@ final class Category extends Model implements HasMedia
     {
         $locale = $locale ?: app()->getLocale();
 
-        return $query->with(['translations' => function ($q) use ($locale): void {
-            $q->where('locale', $locale);
-        }]);
+        return $query->with([
+            'translations' => function ($q) use ($locale): void {
+                $q->where('locale', $locale);
+            },
+        ]);
     }
 
     /**
@@ -681,6 +683,14 @@ final class Category extends Model implements HasMedia
     public function getTranslatedSlug(?string $locale = null): ?string
     {
         return $this->trans('slug', $locale) ?: $this->slug;
+    }
+
+    /**
+     * Resolve the localized SEO title with a fallback to the translated name then the base name.
+     */
+    public function getTranslatedSeoTitle(?string $locale = null): ?string
+    {
+        return $this->trans('seo_title', $locale) ?: $this->getTranslatedName($locale);
     }
 
     /**

@@ -1,7 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="Tests\Feature\Livewire\Pages\Category\IndexTest" file="Index (Tests\Feature\Livewire\Pages\Category\Index)" tests="2" assertions="3" errors="0" failures="0" skipped="0" time="16.842951">
-    <testcase name="It renders successfully" file="Index (Tests\Feature\Livewire\Pages\Category\Index)::It renders successfully" class="Tests\Feature\Livewire\Pages\Category\IndexTest" classname="Tests.Feature.Livewire.Pages.Category.IndexTest" assertions="2" time="16.462583"/>
-    <testcase name="Localized categories route renders when visible categories exist" file="Index (Tests\Feature\Livewire\Pages\Category\Index)::Localized categories route renders when visible categories exist" class="Tests\Feature\Livewire\Pages\Category\IndexTest" classname="Tests.Feature.Livewire.Pages.Category.IndexTest" assertions="1" time="0.380368"/>
+  <testsuite name="CLI Arguments" tests="6" assertions="16" errors="0" failures="0" skipped="0" time="11.688242">
+    <testsuite name="Tests\Feature\Frontend\CategoryBrowsingTest" file="Category Browsing (Tests\Feature\Frontend\CategoryBrowsing)" tests="4" assertions="10" errors="0" failures="0" skipped="0" time="10.676328">
+      <testcase name="Category show lists products" file="Category Browsing (Tests\Feature\Frontend\CategoryBrowsing)::Category show lists products" class="Tests\Feature\Frontend\CategoryBrowsingTest" classname="Tests.Feature.Frontend.CategoryBrowsingTest" assertions="3" time="8.644775"/>
+      <testcase name="Category show handles empty product list" file="Category Browsing (Tests\Feature\Frontend\CategoryBrowsing)::Category show handles empty product list" class="Tests\Feature\Frontend\CategoryBrowsingTest" classname="Tests.Feature.Frontend.CategoryBrowsingTest" assertions="3" time="0.727610"/>
+      <testcase name="Category show returns 404 for hidden category" file="Category Browsing (Tests\Feature\Frontend\CategoryBrowsing)::Category show returns 404 for hidden category" class="Tests\Feature\Frontend\CategoryBrowsingTest" classname="Tests.Feature.Frontend.CategoryBrowsingTest" assertions="1" time="0.672511"/>
+      <testcase name="Category index shows visible categories only" file="Category Browsing (Tests\Feature\Frontend\CategoryBrowsing)::Category index shows visible categories only" class="Tests\Feature\Frontend\CategoryBrowsingTest" classname="Tests.Feature.Frontend.CategoryBrowsingTest" assertions="3" time="0.631433"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\Feature\Frontend\CategoryLegacyRedirectTest" file="tests/Feature/Feature/Frontend/CategoryLegacyRedirectTest.php" tests="2" assertions="6" errors="0" failures="0" skipped="0" time="1.011914">
+      <testcase name="it redirects /category/{slug} to localized /lt/categories/{slug} with 301" file="tests/Feature/Feature/Frontend/CategoryLegacyRedirectTest.php::it redirects /category/{slug} to localized /lt/categories/{slug} with 301" class="Tests\Feature\Feature\Frontend\CategoryLegacyRedirectTest" classname="Tests.Feature.Feature.Frontend.CategoryLegacyRedirectTest" assertions="3" time="0.434072"/>
+      <testcase name="it handles any slug in /category/{slug} redirect" file="tests/Feature/Feature/Frontend/CategoryLegacyRedirectTest.php::it handles any slug in /category/{slug} redirect" class="Tests\Feature\Feature\Frontend\CategoryLegacyRedirectTest" classname="Tests.Feature.Feature.Frontend.CategoryLegacyRedirectTest" assertions="3" time="0.577841"/>
+    </testsuite>
   </testsuite>
 </testsuites>

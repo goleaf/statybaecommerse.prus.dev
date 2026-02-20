@@ -404,6 +404,10 @@ Route::get('/categories', function () {
 Route::get('/categories/{category}', function ($category) {
     return redirect('/' . app()->getLocale() . '/categories/' . $category);
 })->name('categories.show');
+// Legacy singular /category/{slug} redirect → localized page (permanent)
+Route::get('/category/{category}', function (string $category) {
+    return redirect('/' . app()->getLocale() . '/categories/' . $category, 301);
+})->name('category.show.legacy');
 // Brands
 Route::get('/brands', function () {
     return redirect('/' . app()->getLocale() . '/brands');
@@ -748,6 +752,15 @@ Route::prefix('{locale}')
         Route::get('/collections', \App\Livewire\Pages\Collection\Index::class)->name('localized.collections.index');
         Route::get('/collections/{collection}', \App\Livewire\Pages\Collection\Show::class)->name('localized.collections.show');
 
+        // Legal pages
+        Route::prefix('legal')->name('localized.legal.')->group(function (): void {
+            Route::get('/privacy', [App\Http\Controllers\Frontend\LegalController::class, 'privacy'])->name('privacy');
+            Route::get('/terms', [App\Http\Controllers\Frontend\LegalController::class, 'terms'])->name('terms');
+            Route::get('/cookies', [App\Http\Controllers\Frontend\LegalController::class, 'cookies'])->name('cookies');
+            Route::get('/shipping', [App\Http\Controllers\Frontend\LegalController::class, 'shipping'])->name('shipping');
+            Route::get('/returns', [App\Http\Controllers\Frontend\LegalController::class, 'returns'])->name('returns');
+        });
+
         // Order confirmation by number (must be authed in tests)
         Route::middleware('auth')->get('/order/confirmed/{number}', function (string $locale, string $number) {
             if (\Illuminate\Support\Facades\Schema::hasTable('orders')) {
@@ -798,10 +811,10 @@ Route::middleware('auth')->group(function (): void {
                     'locale'  => $locale,
                 ],
                 [
-                    'title'           => $t['title'] ?? null,
-                    'slug'            => $t['slug'] ?? str($t['title'] ?? '')->slug()->toString(),
-                    'summary'         => $t['summary'] ?? null,
-                    'content'         => $t['content'] ?? null,
+                    'title'   => $t['title'] ?? null,
+                    'slug'    => $t['slug'] ?? str($t['title'] ?? '')->slug()->toString(),
+                    'summary' => $t['summary'] ?? null,
+                    'content' => $t['content'] ?? null,
                 ]
             );
         }
@@ -838,10 +851,10 @@ Route::middleware('auth')->group(function (): void {
                     'locale'  => $locale,
                 ],
                 [
-                    'title'           => $t['title'] ?? null,
-                    'slug'            => $t['slug'] ?? null,
-                    'summary'         => $t['summary'] ?? null,
-                    'content'         => $t['content'] ?? null,
+                    'title'   => $t['title'] ?? null,
+                    'slug'    => $t['slug'] ?? null,
+                    'summary' => $t['summary'] ?? null,
+                    'content' => $t['content'] ?? null,
                 ]
             );
         }
@@ -961,10 +974,10 @@ Route::middleware('auth')->group(function (): void {
                     'locale'  => $locale,
                 ],
                 [
-                    'title'           => $t['title'] ?? null,
-                    'slug'            => $t['slug'] ?? str($t['title'] ?? '')->slug()->toString(),
-                    'summary'         => $t['summary'] ?? null,
-                    'content'         => $t['content'] ?? null,
+                    'title'   => $t['title'] ?? null,
+                    'slug'    => $t['slug'] ?? str($t['title'] ?? '')->slug()->toString(),
+                    'summary' => $t['summary'] ?? null,
+                    'content' => $t['content'] ?? null,
                 ]
             );
         }
@@ -1001,10 +1014,10 @@ Route::middleware('auth')->group(function (): void {
                     'locale'  => $locale,
                 ],
                 [
-                    'title'           => $t['title'] ?? null,
-                    'slug'            => $t['slug'] ?? null,
-                    'summary'         => $t['summary'] ?? null,
-                    'content'         => $t['content'] ?? null,
+                    'title'   => $t['title'] ?? null,
+                    'slug'    => $t['slug'] ?? null,
+                    'summary' => $t['summary'] ?? null,
+                    'content' => $t['content'] ?? null,
                 ]
             );
         }

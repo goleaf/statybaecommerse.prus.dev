@@ -30,23 +30,12 @@
 
     <title>{{ $resolvedTitle }}</title>
 
-    <x-meta
-        :title="$resolvedTitle"
-        :description="$resolvedDescription"
-        :og-title="$resolvedOgTitle"
-        :og-description="$resolvedOgDescription"
-        :og-image="$resolvedOgImage"
-        :og-type="$resolvedOgType"
-        :og-url="$canonicalLink"
-        :twitter-card="$resolvedTwitterCard"
-        :twitter-title="$resolvedOgTitle"
-        :twitter-description="$resolvedOgDescription"
-        :twitter-url="$canonicalLink"
-        :canonical="$canonicalLink"
-        :keywords="$metaKeywords"
-        :alternate-locales="is_array($alternateLinks) ? $alternateLinks : null"
-        :jsonld="$structuredPayload"
-    />
+    <x-meta :title="$resolvedTitle" :description="$resolvedDescription" :og-title="$resolvedOgTitle"
+        :og-description="$resolvedOgDescription" :og-image="$resolvedOgImage" :og-type="$resolvedOgType"
+        :og-url="$canonicalLink" :twitter-card="$resolvedTwitterCard" :twitter-title="$resolvedOgTitle"
+        :twitter-description="$resolvedOgDescription" :twitter-url="$canonicalLink" :canonical="$canonicalLink"
+        :keywords="$metaKeywords" :alternate-locales="is_array($alternateLinks) ? $alternateLinks : null"
+        :jsonld="$structuredPayload" />
 
     @yield('meta')
 
@@ -62,16 +51,16 @@
         // Decide whether to include compiled Vite assets; during tests the manifest can be empty which
         // would otherwise trigger rendering errors when Laravel attempts to resolve missing entries.
         $viteEntries = ['resources/css/app.css', 'resources/js/app.js'];
-        $shouldLoadViteAssets = ! app()->runningUnitTests();
+        $shouldLoadViteAssets = !app()->runningUnitTests();
 
-        if (! $shouldLoadViteAssets) {
+        if (!$shouldLoadViteAssets) {
             $manifestPath = public_path('build/manifest.json');
 
             if (file_exists($manifestPath)) {
                 $manifest = json_decode(file_get_contents($manifestPath), true);
 
                 $shouldLoadViteAssets = is_array($manifest)
-                    && collect($viteEntries)->every(static fn (string $entry): bool => array_key_exists($entry, $manifest));
+                    && collect($viteEntries)->every(static fn(string $entry): bool => array_key_exists($entry, $manifest));
             }
         }
     @endphp
@@ -83,7 +72,7 @@
         $jsFile = $manifest['resources/js/app.js']['file'] ?? null;
         $useViteDev = app()->environment('local') && $shouldLoadViteAssets;
     @endphp
-    
+
     @if ($useViteDev)
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     @elseif ($cssFile && $jsFile)
@@ -96,8 +85,9 @@
         <script type="module" src="{{ asset('js/app.js') }}"></script>
     @endif
 
-    <!-- Livewire Styles -->
-    @livewireStyles
+    @if(!($suppressLivewire ?? false))
+        @livewireStyles
+    @endif
 
     @stack('styles')
 
@@ -127,7 +117,9 @@
     <div id="notifications" class="fixed top-4 right-4 z-50 space-y-2"></div>
 
     <!-- Livewire Scripts -->
-    @livewireScripts()
+    @if(!($suppressLivewire ?? false))
+        @livewireScripts()
+    @endif
 
     <!-- Livewire client hardening: avoid accidental $wire.toJSON() server calls -->
     <script>
@@ -143,7 +135,7 @@
                             configurable: true,
                         });
                     }
-                } catch (_) {}
+                } catch (_) { }
             };
 
             try {
@@ -153,7 +145,7 @@
                         const cmp = window.Livewire?.find?.(id);
                         if (cmp) patchComponent(cmp);
                     });
-            } catch (_) {}
+            } catch (_) { }
 
             window.Livewire?.hook?.('message.processed', (message, component) => patchComponent(component));
         });
@@ -283,43 +275,43 @@
     <!-- Alpine.js - Load after app.js to ensure Alpine components are registered -->
     <script>
         // Ensure Alpine loads only once and after app.js components are registered
-        (function() {
+        (function () {
             if (typeof window.Alpine !== 'undefined') {
                 return; // Alpine already loaded
             }
-            
+
             function checkComponentsReady() {
                 return typeof window.createDesktopSearchComponent !== 'undefined' &&
-                       typeof window.createMobileSearchComponent !== 'undefined' &&
-                       typeof window.createCartButtonComponent !== 'undefined';
+                    typeof window.createMobileSearchComponent !== 'undefined' &&
+                    typeof window.createCartButtonComponent !== 'undefined';
             }
-            
+
             function loadAlpine() {
                 if (typeof window.Alpine !== 'undefined') {
                     return; // Already loaded
                 }
-                
+
                 const script = document.createElement('script');
                 script.src = 'https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js';
                 script.defer = true;
                 document.head.appendChild(script);
             }
-            
+
             function initAlpine() {
                 if (typeof window.Alpine !== 'undefined') {
                     return; // Already initialized
                 }
-                
+
                 // Check if components are ready
                 if (checkComponentsReady()) {
                     loadAlpine();
                     return;
                 }
-                
+
                 // Wait for app.js module to load and register components
                 let attempts = 0;
                 const maxAttempts = 200; // 10 seconds max wait
-                
+
                 const checkInterval = setInterval(() => {
                     attempts++;
                     if (checkComponentsReady()) {
@@ -333,7 +325,7 @@
                     }
                 }, 50);
             }
-            
+
             // Wait for all scripts to load
             if (document.readyState === 'loading') {
                 document.addEventListener('DOMContentLoaded', () => {
@@ -348,17 +340,17 @@
             }
         })();
     </script>
-    
+
     {{-- Filament Alpine functions stub for compatibility --}}
     <script>
-        (function() {
+        (function () {
             if (typeof window.filamentSchema === 'undefined') {
-                window.filamentSchema = function() {
+                window.filamentSchema = function () {
                     return {};
                 };
             }
             if (typeof window.filamentSchemaComponent === 'undefined') {
-                window.filamentSchemaComponent = function() {
+                window.filamentSchemaComponent = function () {
                     return {};
                 };
             }
