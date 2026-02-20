@@ -3619,17 +3619,17 @@ main .grid .lg\:col-span-3 > section {
 
 .search-module {
   position: relative;
-  z-index: 9998 !important;
+  z-index: 40 !important;
 }
 .search-module > div {
   position: relative;
-  z-index: 9998 !important;
+  z-index: 40 !important;
 }
 
 .live-search,
 [class*=live-search] {
   position: relative;
-  z-index: 9998 !important;
+  z-index: 40 !important;
 }
 .live-search [x-show*=showResults],
 .live-search [x-show*=showSuggestions],
@@ -3642,6 +3642,27 @@ main .grid .lg\:col-span-3 > section {
 [class*=live-search] [class*=results],
 [class*=live-search] [class*=suggestions] {
   position: absolute !important;
-  z-index: 9999 !important;
+  z-index: 50 !important;
 }
 
+@media (max-width: 1023px) {
+  .search-module,
+  .search-module > div,
+  .live-search,
+  [class*=live-search] {
+    z-index: 20 !important;
+  }
+
+  .live-search [x-show*=showResults],
+  .live-search [x-show*=showSuggestions],
+  .live-search [class*=dropdown],
+  .live-search [class*=results],
+  .live-search [class*=suggestions],
+  [class*=live-search] [x-show*=showResults],
+  [class*=live-search] [x-show*=showSuggestions],
+  [class*=live-search] [class*=dropdown],
+  [class*=live-search] [class*=results],
+  [class*=live-search] [class*=suggestions] {
+    z-index: 30 !important;
+  }
+}

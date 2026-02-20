@@ -47,7 +47,6 @@ final class DocumentGenerated extends Notification implements ShouldQueue
         $generatedAt = $this->document->generated_at?->format('Y-m-d H:i') ?? now()->format('Y-m-d H:i');
 
         $message = (new MailMessage)
-            ->locale($locale)
             ->subject(__('messages.documents', [], $locale))
             ->greeting(__('messages.documents', [], $locale) . ': ' . $displayName)
             ->line(__('messages.documents', [], $locale) . ': ' . (string) $this->document->title)

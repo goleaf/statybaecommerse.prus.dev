@@ -177,20 +177,27 @@ return [
     ],
     'collections' => [
         'buttons' => [
-            'view_collection' => 'View collection',
+            'view_collection' => 'Kollektion ansehen',
         ],
         'empty' => [
-            'collections' => 'Collections',
-            'products'    => 'Products',
+            'collections' => 'Derzeit sind keine Kollektionen verfügbar.',
+            'products'    => 'Diese Kollektion enthält derzeit keine Produkte.',
         ],
         'hero' => [
-            'badge'    => 'Badge',
-            'subtitle' => 'Subtitle',
-            'title'    => 'Title',
+            'badge'    => 'Kuratiere Auswahl',
+            'subtitle' => 'Entdecken Sie sorgfältig zusammengestellte Kollektionen für echte Bau- und Ausbauprojekte.',
+            'title'    => 'Kollektionen',
         ],
         'meta' => [
-            'description' => 'Description',
-            'title'       => 'Title',
+            'description' => 'Durchsuchen Sie kuratierte Produktkollektionen für Bau, Renovierung und professionellen Einsatz.',
+            'title'       => 'Kollektionen',
+        ],
+        'stats' => [
+            'products' => '{1} :count Produkt|[2,*] :count Produkte',
+        ],
+        'types' => [
+            'automatic' => 'Automatische Kollektion',
+            'manual'    => 'Manuelle Kollektion',
         ],
     ],
     'component_showcase' => [

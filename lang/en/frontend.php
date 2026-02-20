@@ -180,17 +180,24 @@ return [
             'view_collection' => 'View collection',
         ],
         'empty' => [
-            'collections' => 'Collections',
-            'products'    => 'Products',
+            'collections' => 'No collections available yet.',
+            'products'    => 'No products in this collection yet.',
         ],
         'hero' => [
-            'badge'    => 'Badge',
-            'subtitle' => 'Subtitle',
-            'title'    => 'Title',
+            'badge'    => 'Curated selections',
+            'subtitle' => 'Explore handpicked collections built for real-world construction and finishing projects.',
+            'title'    => 'Collections',
         ],
         'meta' => [
-            'description' => 'Description',
-            'title'       => 'Title',
+            'description' => 'Browse curated product collections tailored for construction, renovation, and professional use.',
+            'title'       => 'Collections',
+        ],
+        'stats' => [
+            'products' => '{1} :count product|[2,*] :count products',
+        ],
+        'types' => [
+            'automatic' => 'Automatic collection',
+            'manual'    => 'Manual collection',
         ],
     ],
     'component_showcase' => [

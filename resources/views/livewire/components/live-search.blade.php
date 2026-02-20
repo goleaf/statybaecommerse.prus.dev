@@ -21,8 +21,7 @@
 @endphp
 
 <div
-    class="relative"
-    style="position: relative; z-index: 9998;"
+    class="relative live-search z-40"
     x-data="createDesktopSearchComponent({
         entangle: {
             showResults: @entangle('showResults'),
@@ -87,8 +86,7 @@
         x-transition:leave="transition ease-in duration-150"
         x-transition:leave-start="opacity-100 scale-100"
         x-transition:leave-end="opacity-0 scale-95"
-        class="absolute w-full mt-2 bg-dark border border-sage/30 rounded-lg shadow-2xl max-h-96 overflow-y-auto"
-        style="z-index: 9999; position: absolute;"
+        class="absolute z-50 w-full mt-2 bg-dark border border-sage/30 rounded-lg shadow-2xl max-h-96 overflow-y-auto"
     >
         @if($isSearching)
             {{-- Loading State --}}
@@ -231,8 +229,7 @@
         x-transition:leave="transition ease-in duration-150"
         x-transition:leave-start="opacity-100 scale-100"
         x-transition:leave-end="opacity-0 scale-95"
-        class="absolute w-full mt-2 bg-dark border border-sage/30 rounded-lg shadow-2xl max-h-96 overflow-y-auto"
-        style="z-index: 9999; position: absolute;"
+        class="absolute z-50 w-full mt-2 bg-dark border border-sage/30 rounded-lg shadow-2xl max-h-96 overflow-y-auto"
     >
         @if(count($suggestions) > 0)
             {{-- Suggestions Header --}}

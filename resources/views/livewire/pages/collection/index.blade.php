@@ -60,10 +60,25 @@
                             </h2>
 
                             @if ($collectionDescription)
-                                <p class="text-sm sm:text-base text-slate-600 leading-relaxed">
-                                    {{ Str::limit(strip_tags($collectionDescription), 220) }}
+                                <p class="text-sm sm:text-base text-slate-600 leading-relaxed whitespace-pre-line">
+                                    {{ strip_tags($collectionDescription) }}
                                 </p>
                             @endif
+
+                            <div class="grid grid-cols-1 gap-2 text-xs text-slate-500 sm:grid-cols-2">
+                                <div class="rounded-xl border border-slate-200 bg-white px-3 py-2">
+                                    <span class="font-semibold text-slate-700">Slug:</span> {{ $collection->slug }}
+                                </div>
+                                <div class="rounded-xl border border-slate-200 bg-white px-3 py-2">
+                                    <span class="font-semibold text-slate-700">Display Type:</span> {{ (string) ($collection->display_type ?? '-') }}
+                                </div>
+                                <div class="rounded-xl border border-slate-200 bg-white px-3 py-2">
+                                    <span class="font-semibold text-slate-700">Products Per Page:</span> {{ (string) ($collection->products_per_page ?? '-') }}
+                                </div>
+                                <div class="rounded-xl border border-slate-200 bg-white px-3 py-2">
+                                    <span class="font-semibold text-slate-700">Max Products:</span> {{ (string) ($collection->max_products ?? '-') }}
+                                </div>
+                            </div>
                         </div>
 
                         <div class="w-full max-w-xs self-stretch overflow-hidden rounded-2xl border border-slate-200 bg-white">

@@ -177,20 +177,27 @@ return [
     ],
     'collections' => [
         'buttons' => [
-            'view_collection' => 'View collection',
+            'view_collection' => 'Открыть коллекцию',
         ],
         'empty' => [
-            'collections' => 'Collections',
-            'products'    => 'Products',
+            'collections' => 'Коллекции пока недоступны.',
+            'products'    => 'В этой коллекции пока нет товаров.',
         ],
         'hero' => [
-            'badge'    => 'Badge',
-            'subtitle' => 'Subtitle',
-            'title'    => 'Title',
+            'badge'    => 'Подборки товаров',
+            'subtitle' => 'Изучайте тщательно подобранные коллекции для реальных строительных и отделочных задач.',
+            'title'    => 'Коллекции',
         ],
         'meta' => [
-            'description' => 'Description',
-            'title'       => 'Title',
+            'description' => 'Просматривайте подборки товаров для строительства, ремонта и профессионального использования.',
+            'title'       => 'Коллекции',
+        ],
+        'stats' => [
+            'products' => '{1} :count товар|[2,4] :count товара|[5,*] :count товаров',
+        ],
+        'types' => [
+            'automatic' => 'Автоматическая коллекция',
+            'manual'    => 'Ручная коллекция',
         ],
     ],
     'component_showcase' => [

@@ -177,20 +177,27 @@ return [
     ],
     'collections' => [
         'buttons' => [
-            'view_collection' => 'View collection',
+            'view_collection' => 'Peržiūrėti kolekciją',
         ],
         'empty' => [
-            'collections' => 'Collections',
-            'products'    => 'Products',
+            'collections' => 'Kolekcijų kol kas nėra.',
+            'products'    => 'Šioje kolekcijoje kol kas nėra produktų.',
         ],
         'hero' => [
-            'badge'    => 'Badge',
-            'subtitle' => 'Subtitle',
-            'title'    => 'Title',
+            'badge'    => 'Atrinkti pasiūlymai',
+            'subtitle' => 'Atraskite kruopščiai atrinktas kolekcijas realiems statybos ir apdailos projektams.',
+            'title'    => 'Kolekcijos',
         ],
         'meta' => [
-            'description' => 'Description',
-            'title'       => 'Title',
+            'description' => 'Naršykite atrinktas produktų kolekcijas statybai, renovacijai ir profesionaliam naudojimui.',
+            'title'       => 'Kolekcijos',
+        ],
+        'stats' => [
+            'products' => '{1} :count produktas|[2,*] :count produktai',
+        ],
+        'types' => [
+            'automatic' => 'Automatinė kolekcija',
+            'manual'    => 'Rankinė kolekcija',
         ],
     ],
     'component_showcase' => [

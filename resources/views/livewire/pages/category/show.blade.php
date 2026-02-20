@@ -64,30 +64,30 @@
         canonical="{{ url()->current() }}" />
 @endsection
 
-<div x-data="{ showFilters: false, viewMode: 'grid' }" class="min-h-screen bg-sage">
+<div x-data="{ showFilters: false, viewMode: 'grid' }" class="min-h-screen bg-slate-50">
     <!-- Dark Banner Section -->
-    <div class="bg-dark text-sage">
+    <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-cyan-900 text-slate-100">
         <x-container class="px-4 py-12 sm:py-16">
-            <nav class="text-xs font-medium uppercase tracking-[0.3em] text-sage/80" aria-label="{{ __('ui.breadcrumb') }}">
+            <nav class="text-xs font-medium uppercase tracking-[0.3em] text-slate-300" aria-label="{{ __('ui.breadcrumb') }}">
                 <ol class="flex items-center gap-3">
                     <li>
                         <a href="{{ route('localized.home', ['locale' => app()->getLocale()]) }}"
-                           class="inline-flex items-center gap-2 text-sage transition hover:text-white">
+                           class="inline-flex items-center gap-2 text-slate-200 transition hover:text-white">
                             <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h12a1 1 0 001-1V10" />
                             </svg>
                             {{ __('frontend.navigation.home') }}
                         </a>
                     </li>
-                    <li class="text-sage/60">/</li>
+                    <li class="text-slate-400">/</li>
                     @if (!$isIndex)
                         <li>
                             <a href="{{ route('localized.categories.index', ['locale' => app()->getLocale()]) }}"
-                               class="text-sage transition hover:text-white">
+                               class="text-slate-200 transition hover:text-white">
                                 {{ __('categories.index.meta_title') }}
                             </a>
                         </li>
-                        <li class="text-sage/60">/</li>
+                        <li class="text-slate-400">/</li>
                         <li class="text-white">{{ $category->name }}</li>
                     @else
                         <li class="text-white">{{ __('categories.index.meta_title') }}</li>
@@ -97,7 +97,7 @@
 
             <div class="mt-8 flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
                 <div class="max-w-2xl space-y-5">
-                    <span class="inline-flex items-center gap-2 rounded-full border border-sage bg-sage px-4 py-1 text-[11px] font-semibold uppercase tracking-[0.35em] text-dark">
+                    <span class="inline-flex items-center gap-2 rounded-full border border-cyan-200/40 bg-white/10 px-4 py-1 text-[11px] font-semibold uppercase tracking-[0.35em] text-cyan-100 backdrop-blur-sm">
                         @if ($isIndex)
                             {{ __('categories.index.badge') }}
                         @else
@@ -112,7 +112,7 @@
                         @endif
                     </h1>
                     @if ($isIndex)
-                        <p class="text-base text-sage sm:text-lg">
+                        <p class="text-base text-slate-200 sm:text-lg">
                             {{ __('categories.index.description') }}
                         </p>
                     @elseif (!empty($category->description))
@@ -126,9 +126,9 @@
                     @if ($isIndex)
                         @php
                             $categories = $this->categories;
-                            $totalCategories = $categories->count();
-                            $from = $categories->count() ? 1 : 0;
-                            $to = $categories->count();
+                            $totalCategories = $categories->total();
+                            $from = $categories->firstItem();
+                            $to = $categories->lastItem();
                             $activeFilterCount = collect([
                                 !empty($search ?? ''),
                                 $inStock ?? false,
@@ -141,10 +141,10 @@
                                 !empty($selectedCategoryIds ?? []),
                             ])->filter()->count();
                         @endphp
-                        <div class="rounded-2xl border border-sage/30 bg-sage/10 px-4 py-3 text-sm font-semibold text-sage shadow-sm">
+                        <div class="rounded-2xl border border-white/20 bg-white/10 px-4 py-3 text-sm font-semibold text-white shadow-sm backdrop-blur-sm">
                             {{ __('categories.index.catalogue_count', ['count' => number_format($totalCategories)]) }}
                         </div>
-                        <div class="rounded-2xl border border-sage/30 bg-sage/10 px-4 py-3 text-sm text-sage/80 shadow-sm">
+                        <div class="rounded-2xl border border-white/20 bg-white/10 px-4 py-3 text-sm text-slate-100 shadow-sm backdrop-blur-sm">
                             @if ($activeFilterCount > 0)
                                 {{ __('categories.index.filters_active', ['count' => $activeFilterCount]) }}
                             @else
@@ -154,17 +154,17 @@
                         <button type="button"
                                 wire:click="$toggle('sidebarOpen')"
                                 wire:confirm="{{ __('translations.confirm_toggle_sidebar') }}"
-                                class="inline-flex items-center gap-2 rounded-full border border-sage/30 bg-sage/10 px-4 py-2 text-sm font-semibold text-sage shadow-sm transition hover:border-sage hover:bg-sage/20 lg:hidden">
+                                class="inline-flex items-center gap-2 rounded-full border border-cyan-200/40 bg-white/10 px-4 py-2 text-sm font-semibold text-cyan-100 shadow-sm transition hover:border-cyan-200 hover:bg-white/15 lg:hidden">
                             <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 5h6M3 12h6m-6 7h6M13 5h8M13 12h8m-8 7h8" />
                             </svg>
                             {{ __('categories.index.filters_button') }}
                         </button>
                     @else
-                        <div class="rounded-2xl border border-sage/30 bg-sage/10 px-4 py-3 text-sm font-semibold text-sage shadow-sm">
+                        <div class="rounded-2xl border border-white/20 bg-white/10 px-4 py-3 text-sm font-semibold text-white shadow-sm backdrop-blur-sm">
                             {{ __('categories.show.products_count', ['count' => number_format($products->total())]) }}
                         </div>
-                        <div class="rounded-2xl border border-sage/30 bg-sage/10 px-4 py-3 text-sm text-sage/80 shadow-sm">
+                        <div class="rounded-2xl border border-white/20 bg-white/10 px-4 py-3 text-sm text-slate-100 shadow-sm backdrop-blur-sm">
                             @if ($products->firstItem() && $products->lastItem())
                                 {{ __('categories.show.showing', ['from' => $products->firstItem(), 'to' => $products->lastItem()]) }}
                             @else
@@ -173,7 +173,7 @@
                         </div>
                         <button type="button"
                                 @click="showFilters = true"
-                                class="inline-flex items-center gap-2 rounded-full border border-sage/30 bg-sage/10 px-4 py-2 text-sm font-semibold text-sage shadow-sm transition hover:border-sage hover:bg-sage/20 lg:hidden">
+                                class="inline-flex items-center gap-2 rounded-full border border-cyan-200/40 bg-white/10 px-4 py-2 text-sm font-semibold text-cyan-100 shadow-sm transition hover:border-cyan-200 hover:bg-white/15 lg:hidden">
                             <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 5h6M3 12h6m-6 7h6M13 5h8M13 12h8m-8 7h8" />
                             </svg>
@@ -236,10 +236,10 @@
         @endphp
 
         <div class="grid gap-8 lg:grid-cols-12">
-            <aside class="hidden lg:col-span-3 lg:block">
-                <div class="rounded-3xl border border-sage/30 bg-dark p-6 shadow-lg">
+            <aside class="hidden lg:col-span-3 lg:block lg:sticky lg:top-24 self-start">
+                <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-lg">
                     <div class="mb-6 space-y-2">
-                        <span class="inline-flex items-center gap-2 rounded-full border border-sage/30 bg-sage/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.35em] text-sage">
+                        <span class="inline-flex items-center gap-2 rounded-full border border-cyan-200 bg-cyan-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.35em] text-cyan-700">
                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                             </svg>
@@ -249,14 +249,14 @@
                                 {{ __('categories.show.filter') }}
                             @endif
                         </span>
-                        <h2 class="text-xl font-semibold text-white">
+                        <h2 class="text-xl font-semibold text-slate-900">
                             @if ($isIndex)
                                 {{ __('categories.index.filters_title') }}
                             @else
                                 {{ __('categories.show.filters_title') }}
                             @endif
                         </h2>
-                        <p class="text-sm leading-relaxed text-sage/80">
+                        <p class="text-sm leading-relaxed text-slate-600">
                             @if ($isIndex)
                                 {{ __('categories.index.filters_description') }}
                             @else
@@ -269,8 +269,8 @@
                             @include('livewire.pages.category.partials.filters', ['variant' => 'desktop'])
                         @else
                             <!-- Categories Filter -->
-                            <div class="rounded-2xl border border-sage/30 bg-dark/50 p-4">
-                                <h3 class="mb-3 text-sm font-semibold text-sage flex items-center gap-2">
+                            <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                                <h3 class="mb-3 flex items-center gap-2 text-sm font-semibold text-slate-700">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
                                     </svg>
@@ -282,8 +282,8 @@
                             </div>
 
                             <!-- Advanced Filters -->
-                            <div class="rounded-2xl border border-sage/30 bg-dark/50 p-4">
-                                <h3 class="mb-3 text-sm font-semibold text-sage flex items-center gap-2">
+                            <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                                <h3 class="mb-3 flex items-center gap-2 text-sm font-semibold text-slate-700">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707l-6.414 6.414A1 1 0 0014 13v6l-4-2v-4a1 1 0 00-.293-.707L3.293 6.707A1 1 0 013 6V4z"></path>
                                     </svg>
@@ -300,10 +300,10 @@
 
             <section class="lg:col-span-9 space-y-6" x-data="{ view: 'grid' }">
                 <!-- Sort and Filter Controls -->
-                <div class="rounded-3xl border border-sage/30 bg-dark p-4 shadow-sm sm:p-6">
+                <div class="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
                     <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                        <div class="flex flex-wrap items-center gap-3 text-sm text-sage">
-                            <span class="inline-flex items-center gap-2 rounded-full border border-sage/30 bg-sage/10 px-3 py-1 text-xs font-semibold text-sage">
+                        <div class="flex flex-wrap items-center gap-3 text-sm text-slate-700">
+                            <span class="inline-flex items-center gap-2 rounded-full border border-cyan-200 bg-cyan-50 px-3 py-1 text-xs font-semibold text-cyan-700">
                                 <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2" />
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -316,61 +316,61 @@
                             </span>
                             @if ($isIndex)
                                 @if ($from && $to)
-                                    <span class="text-sage/80">{{ __('categories.index.showing_results', ['from' => $from, 'to' => $to, 'total' => $totalCategories]) }}</span>
+                                    <span class="text-slate-500">{{ __('categories.index.showing_results', ['from' => $from, 'to' => $to, 'total' => $totalCategories]) }}</span>
                                 @else
-                                    <span class="text-sage/80">{{ __('categories.index.no_results') }}</span>
+                                    <span class="text-slate-500">{{ __('categories.index.no_results') }}</span>
                                 @endif
                             @else
                                 @if ($products->firstItem() && $products->lastItem())
-                                    <span class="text-sage/80">{{ __('categories.show.showing_results', ['from' => $products->firstItem(), 'to' => $products->lastItem(), 'total' => $products->total()]) }}</span>
+                                    <span class="text-slate-500">{{ __('categories.show.showing_results', ['from' => $products->firstItem(), 'to' => $products->lastItem(), 'total' => $products->total()]) }}</span>
                                 @else
-                                    <span class="text-sage/80">{{ __('categories.show.no_results') }}</span>
+                                    <span class="text-slate-500">{{ __('categories.show.no_results') }}</span>
                                 @endif
                             @endif
                         </div>
 
                         <div class="flex flex-wrap items-center gap-3">
                             @if ($isIndex)
-                                <div class="flex items-center gap-2 rounded-xl border border-sage/30 bg-dark/30 px-3 py-2 text-sm text-sage">
-                                    <label for="sort" class="text-xs font-semibold uppercase tracking-wide text-sage/60">
+                                <div class="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700">
+                                    <label for="sort" class="text-xs font-semibold uppercase tracking-wide text-slate-500">
                                         {{ __('categories.index.sort') }}
                                     </label>
-                                    <select id="sort" wire:model.live="sort" class="border-0 bg-transparent text-sm font-medium text-sage focus:outline-none focus:ring-0">
-                                        <option value="name_asc" class="bg-dark text-sage">{{ __('categories.index.sort_name_asc') }}</option>
-                                        <option value="name_desc" class="bg-dark text-sage">{{ __('categories.index.sort_name_desc') }}</option>
-                                        <option value="products_desc" class="bg-dark text-sage">{{ __('categories.index.sort_products_desc') }}</option>
-                                        <option value="products_asc" class="bg-dark text-sage">{{ __('categories.index.sort_products_asc') }}</option>
+                                    <select id="sort" wire:model.live="sort" class="border-0 bg-transparent text-sm font-medium text-slate-700 focus:outline-none focus:ring-0">
+                                        <option value="name_asc" class="bg-white text-slate-700">{{ __('categories.index.sort_name_asc') }}</option>
+                                        <option value="name_desc" class="bg-white text-slate-700">{{ __('categories.index.sort_name_desc') }}</option>
+                                        <option value="products_desc" class="bg-white text-slate-700">{{ __('categories.index.sort_products_desc') }}</option>
+                                        <option value="products_asc" class="bg-white text-slate-700">{{ __('categories.index.sort_products_asc') }}</option>
                                     </select>
                                 </div>
                             @else
-                                <div class="flex items-center gap-2 rounded-xl border border-sage/30 bg-dark/30 px-3 py-2 text-sm text-sage">
-                                    <label for="sort-by" class="text-xs font-semibold uppercase tracking-wide text-sage/60">
+                                <div class="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700">
+                                    <label for="sort-by" class="text-xs font-semibold uppercase tracking-wide text-slate-500">
                                         {{ __('categories.show.sort') }}
                                     </label>
-                                    <select id="sort-by" wire:model.live="sortBy" class="border-0 bg-transparent text-sm font-medium text-sage focus:outline-none focus:ring-0">
-                                        <option value="created_at" class="bg-dark text-sage">{{ __('categories.show.sort_newest') }}</option>
-                                        <option value="name" class="bg-dark text-sage">{{ __('categories.show.sort_name') }}</option>
-                                        <option value="price" class="bg-dark text-sage">{{ __('categories.show.sort_price') }}</option>
-                                        <option value="rating" class="bg-dark text-sage">{{ __('categories.show.sort_rating') }}</option>
+                                    <select id="sort-by" wire:model.live="sortBy" class="border-0 bg-transparent text-sm font-medium text-slate-700 focus:outline-none focus:ring-0">
+                                        <option value="created_at" class="bg-white text-slate-700">{{ __('categories.show.sort_newest') }}</option>
+                                        <option value="name" class="bg-white text-slate-700">{{ __('categories.show.sort_name') }}</option>
+                                        <option value="price" class="bg-white text-slate-700">{{ __('categories.show.sort_price') }}</option>
+                                        <option value="rating" class="bg-white text-slate-700">{{ __('categories.show.sort_rating') }}</option>
                                     </select>
                                 </div>
 
-                                <div class="flex items-center gap-2 rounded-xl border border-sage/30 bg-dark/30 px-3 py-2 text-sm text-sage">
-                                    <label for="sort-direction" class="text-xs font-semibold uppercase tracking-wide text-sage/60">
+                                <div class="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700">
+                                    <label for="sort-direction" class="text-xs font-semibold uppercase tracking-wide text-slate-500">
                                         {{ __('categories.show.order') }}
                                     </label>
-                                    <select id="sort-direction" wire:model.live="sortDirection" class="border-0 bg-transparent text-sm font-medium text-sage focus:outline-none focus:ring-0">
-                                        <option value="asc" class="bg-dark text-sage">{{ __('categories.show.order_ascending') }}</option>
-                                        <option value="desc" class="bg-dark text-sage">{{ __('categories.show.order_descending') }}</option>
+                                    <select id="sort-direction" wire:model.live="sortDirection" class="border-0 bg-transparent text-sm font-medium text-slate-700 focus:outline-none focus:ring-0">
+                                        <option value="asc" class="bg-white text-slate-700">{{ __('categories.show.order_ascending') }}</option>
+                                        <option value="desc" class="bg-white text-slate-700">{{ __('categories.show.order_descending') }}</option>
                                     </select>
                                 </div>
                             @endif
 
-                            <div class="hidden items-center gap-1 rounded-xl border border-sage/30 bg-dark/30 p-1 text-sage shadow-sm md:flex">
+                            <div class="hidden items-center gap-1 rounded-xl border border-slate-200 bg-slate-50 p-1 text-slate-600 shadow-sm md:flex">
                                 <button type="button"
                                         @click="view = 'grid'; viewMode = 'grid'"
-                                        :class="view === 'grid' ? 'bg-sage text-dark shadow-sm' : 'hover:text-white hover:bg-sage/10'"
-                                        class="inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-semibold transition text-sage">
+                                        :class="view === 'grid' ? 'bg-cyan-100 text-cyan-800 shadow-sm' : 'hover:text-cyan-700 hover:bg-cyan-50'"
+                                        class="inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-semibold transition">
                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h7v7H4V6zm9 0h7v7h-7V6zM4 13h7v7H4v-7zm9 0h7v7h-7v-7z" />
                                     </svg>
@@ -382,8 +382,8 @@
                                 </button>
                                 <button type="button"
                                         @click="view = 'list'; viewMode = 'list'"
-                                        :class="view === 'list' ? 'bg-sage text-dark shadow-sm' : 'hover:text-white hover:bg-sage/10'"
-                                        class="inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-semibold transition text-sage">
+                                        :class="view === 'list' ? 'bg-cyan-100 text-cyan-800 shadow-sm' : 'hover:text-cyan-700 hover:bg-cyan-50'"
+                                        class="inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-semibold transition">
                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
                                     </svg>
@@ -399,8 +399,8 @@
                 </div>
 
                 <div class="relative">
-                    <div wire:loading.delay.longer class="absolute inset-0 z-10 flex items-center justify-center rounded-3xl bg-dark/80 backdrop-blur-sm">
-                        <div class="h-10 w-10 animate-spin rounded-full border-2 border-sage border-t-transparent"></div>
+                    <div wire:loading.delay.longer class="absolute inset-0 z-10 flex items-center justify-center rounded-3xl bg-slate-900/30 backdrop-blur-sm">
+                        <div class="h-10 w-10 animate-spin rounded-full border-2 border-cyan-500 border-t-transparent"></div>
                     </div>
 
                     @if ($isIndex)
@@ -428,7 +428,7 @@
                                             ?? ($category->published_products_count ?? ($category->products?->count() ?? 0));
                                     @endphp
 
-                                    <article class="group flex flex-col overflow-hidden rounded-3xl border border-ash/30 bg-white shadow-sm transition hover:-translate-y-1 hover:border-ash/60 hover:shadow-xl"
+                                    <article class="group flex flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:border-cyan-300 hover:shadow-xl"
                                              :class="view === 'list' ? 'sm:flex-row' : ''">
                                         <div class="relative h-48 overflow-hidden sm:h-52" :class="view === 'list' ? 'sm:h-auto sm:w-64' : ''">
                                             @if ($image)
@@ -437,7 +437,7 @@
                                                      loading="lazy"
                                                      class="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
                                             @else
-                                                <div class="flex h-full w-full items-center justify-center bg-ash/10 text-4xl font-semibold text-dark">
+                                                <div class="flex h-full w-full items-center justify-center bg-slate-100 text-4xl font-semibold text-slate-700">
                                                     {{ mb_strtoupper(mb_substr($name, 0, 2)) }}
                                                 </div>
                                             @endif
@@ -445,27 +445,27 @@
                                                 <h3 class="text-lg font-semibold text-white drop-shadow-lg">
                                                     {{ $name }}
                                                 </h3>
-                                                <span class="inline-flex items-center gap-1 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-dark shadow-sm">
+                                                <span class="inline-flex items-center gap-1 rounded-full bg-white/95 px-3 py-1 text-xs font-semibold text-slate-800 shadow-sm">
                                                     {{ $productCount }}
-                                                    <span class="text-ash">{{ __('messages.products') }}</span>
+                                                    <span class="text-slate-400">{{ __('messages.products') }}</span>
                                                 </span>
                                             </div>
                                         </div>
 
                                         <div class="flex flex-1 flex-col justify-between gap-4 px-5 py-6">
                                             @if ($description)
-                                                <p class="text-sm leading-relaxed text-stone line-clamp-3">
+                                                <p class="text-sm leading-relaxed text-slate-600 line-clamp-3">
                                                     {{ \Illuminate\Support\Str::limit(strip_tags($description), 180) }}
                                                 </p>
                                             @else
-                                                <p class="text-sm text-ash">
+                                                <p class="text-sm text-slate-400">
                                                     {{ __('categories.index.description_placeholder') }}
                                                 </p>
                                             @endif
 
                                             <div class="flex items-center justify-center">
                                                 <a href="{{ route('localized.categories.show', ['locale' => $locale, 'category' => $slug]) }}"
-                                                   class="inline-flex items-center gap-2 rounded-full bg-sage px-4 py-2 text-sm font-semibold text-dark transition hover:bg-sage/90">
+                                                   class="inline-flex items-center gap-2 rounded-full bg-cyan-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-cyan-700">
                                                     {{ __('categories.index.view_category') }}
                                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
@@ -475,6 +475,10 @@
                                         </div>
                                     </article>
                                 @endforeach
+                            </div>
+
+                            <div class="mt-10">
+                                {{ $categories->links() }}
                             </div>
                         @else
                             <x-shared.empty-state
@@ -503,18 +507,18 @@
                             </div>
 
                             <!-- Pagination -->
-                            <div class="mt-12 rounded-3xl border border-sage/30 bg-dark p-6 shadow-lg">
+                            <div class="mt-12 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
                                 <nav class="flex items-center justify-center" aria-label="{{ __('categories.show.pagination_navigation') }}">
                                     <div class="flex items-center justify-center">
                                         <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
                                             @if ($products->onFirstPage())
-                                                <span class="relative inline-flex items-center rounded-l-md px-2 py-2 text-sage/60 ring-1 ring-inset ring-sage/30">
+                                                <span class="relative inline-flex items-center rounded-l-md px-2 py-2 text-slate-400 ring-1 ring-inset ring-slate-200">
                                                     <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                                         <path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clip-rule="evenodd" />
                                                     </svg>
                                                 </span>
                                             @else
-                                                <button wire:click="previousPage('page')" wire:loading.attr="disabled" class="relative inline-flex items-center rounded-l-md px-2 py-2 text-sage ring-1 ring-inset ring-sage/30 hover:bg-sage/10 hover:text-white focus:z-20 focus:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed">
+                                                <button wire:click="previousPage('page')" wire:loading.attr="disabled" class="relative inline-flex items-center rounded-l-md px-2 py-2 text-slate-600 ring-1 ring-inset ring-slate-200 hover:bg-cyan-50 hover:text-cyan-700 focus:z-20 focus:outline-offset-0 disabled:cursor-not-allowed disabled:opacity-50">
                                                     <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                                         <path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clip-rule="evenodd" />
                                                     </svg>
@@ -529,21 +533,21 @@
                                             @endphp
 
                                             @if ($startPage > 1)
-                                                <button wire:click="gotoPage(1, 'page')" class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-sage ring-1 ring-inset ring-sage/30 hover:bg-sage/10 hover:text-white focus:z-20 focus:outline-offset-0">
+                                                <button wire:click="gotoPage(1, 'page')" class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-slate-700 ring-1 ring-inset ring-slate-200 hover:bg-cyan-50 hover:text-cyan-700 focus:z-20 focus:outline-offset-0">
                                                     1
                                                 </button>
                                                 @if ($startPage > 2)
-                                                    <span class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-sage/60">...</span>
+                                                    <span class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-slate-400">...</span>
                                                 @endif
                                             @endif
 
                                             @for ($page = $startPage; $page <= $endPage; $page++)
                                                 @if ($page == $currentPage)
-                                                    <span class="relative z-10 inline-flex items-center bg-sage px-4 py-2 text-sm font-semibold text-dark focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sage">
+                                                    <span class="relative z-10 inline-flex items-center bg-cyan-600 px-4 py-2 text-sm font-semibold text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600">
                                                         {{ $page }}
                                                     </span>
                                                 @else
-                                                    <button wire:click="gotoPage({{ $page }}, 'page')" class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-sage ring-1 ring-inset ring-sage/30 hover:bg-sage/10 hover:text-white focus:z-20 focus:outline-offset-0">
+                                                    <button wire:click="gotoPage({{ $page }}, 'page')" class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-slate-700 ring-1 ring-inset ring-slate-200 hover:bg-cyan-50 hover:text-cyan-700 focus:z-20 focus:outline-offset-0">
                                                         {{ $page }}
                                                     </button>
                                                 @endif
@@ -551,21 +555,21 @@
 
                                             @if ($endPage < $lastPage)
                                                 @if ($endPage < $lastPage - 1)
-                                                    <span class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-sage/60">...</span>
+                                                    <span class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-slate-400">...</span>
                                                 @endif
-                                                <button wire:click="gotoPage({{ $lastPage }}, 'page')" class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-sage ring-1 ring-inset ring-sage/30 hover:bg-sage/10 hover:text-white focus:z-20 focus:outline-offset-0">
+                                                <button wire:click="gotoPage({{ $lastPage }}, 'page')" class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-slate-700 ring-1 ring-inset ring-slate-200 hover:bg-cyan-50 hover:text-cyan-700 focus:z-20 focus:outline-offset-0">
                                                     {{ $lastPage }}
                                                 </button>
                                             @endif
 
                                             @if ($products->hasMorePages())
-                                                <button wire:click="nextPage('page')" wire:loading.attr="disabled" class="relative inline-flex items-center rounded-r-md px-2 py-2 text-sage ring-1 ring-inset ring-sage/30 hover:bg-sage/10 hover:text-white focus:z-20 focus:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed">
+                                                <button wire:click="nextPage('page')" wire:loading.attr="disabled" class="relative inline-flex items-center rounded-r-md px-2 py-2 text-slate-600 ring-1 ring-inset ring-slate-200 hover:bg-cyan-50 hover:text-cyan-700 focus:z-20 focus:outline-offset-0 disabled:cursor-not-allowed disabled:opacity-50">
                                                     <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                                         <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
                                                     </svg>
                                                 </button>
                                             @else
-                                                <span class="relative inline-flex items-center rounded-r-md px-2 py-2 text-sage/60 ring-1 ring-inset ring-sage/30">
+                                                <span class="relative inline-flex items-center rounded-r-md px-2 py-2 text-slate-400 ring-1 ring-inset ring-slate-200">
                                                     <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                                         <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
                                                     </svg>
@@ -577,29 +581,29 @@
                             </div>
                         @else
                             <!-- Empty State -->
-                            <div class="rounded-3xl border border-dashed border-sage/30 bg-dark/50 p-12 text-center shadow-sm">
-                                <div class="mx-auto mb-6 h-16 w-16 text-sage/60">
+                            <div class="rounded-3xl border border-dashed border-slate-300 bg-white p-12 text-center shadow-sm">
+                                <div class="mx-auto mb-6 h-16 w-16 text-slate-400">
                                     <svg class="h-16 w-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                                               d="M21 21l-4.35-4.35m1.1-4.4a7.5 7.5 0 11-15 0 7.5 7.5 0 0115 0z" />
                                     </svg>
                                                                 </div>
-                                                                <h3 class="text-xl font-bold text-white mb-2">
+                                                                <h3 class="mb-2 text-xl font-bold text-slate-900">
                                                                     {{ __('categories.show.no_products_found') }}
                                                                 </h3>
-                                                                <p class="text-sage/80 mb-8 max-w-md mx-auto">
+                                                                <p class="mx-auto mb-8 max-w-md text-slate-600">
                                                                     {{ __('categories.show.try_different_search') }}
                                                                 </p>
                                                                 <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
                                                                     <a href="{{ route('localized.categories.index', ['locale' => app()->getLocale()]) }}"
-                                                                       class="inline-flex items-center gap-2 rounded-full border border-sage/30 bg-sage/10 px-6 py-3 text-sm font-semibold text-sage transition hover:border-sage hover:bg-sage/20 shadow-sm">
+                                                                       class="inline-flex items-center gap-2 rounded-full border border-slate-300 bg-slate-50 px-6 py-3 text-sm font-semibold text-slate-700 transition hover:border-cyan-300 hover:bg-cyan-50 hover:text-cyan-700 shadow-sm">
                                                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
                                                                         </svg>
                                                                         {{ __('categories.show.browse_categories') }}
                                                                     </a>
                                                                     <a href="{{ route('localized.products.index', ['locale' => app()->getLocale()]) }}"
-                                                                       class="inline-flex items-center gap-2 rounded-full bg-sage px-6 py-3 text-sm font-semibold text-dark transition hover:bg-sage/90 shadow-sm">
+                                                                       class="inline-flex items-center gap-2 rounded-full bg-cyan-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-cyan-700 shadow-sm">
                                                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
                                                                         </svg>
@@ -621,23 +625,23 @@
                                                 <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
                                                      wire:click="$toggle('sidebarOpen')"></div>
                                 
-                                                <div class="absolute inset-y-0 right-0 w-11/12 max-w-md rounded-l-3xl bg-dark shadow-2xl">
+                                                <div class="absolute inset-y-0 right-0 w-11/12 max-w-md rounded-l-3xl bg-white shadow-2xl">
                                                     <div class="flex h-full flex-col overflow-y-auto">
-                                                        <div class="flex items-center justify-between border-b border-sage/30 p-6">
+                                                        <div class="flex items-center justify-between border-b border-slate-200 p-6">
                                                             <div class="space-y-2">
-                                                                <span class="inline-flex items-center gap-2 rounded-full border border-sage/30 bg-sage/10 px-3 py-1 text-xs font-semibold text-sage">
+                                                                <span class="inline-flex items-center gap-2 rounded-full border border-cyan-200 bg-cyan-50 px-3 py-1 text-xs font-semibold text-cyan-700">
                                                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                                                                     </svg>
                                                                     {{ __('categories.index.filters_button') }}
                                                                 </span>
-                                                                <h2 class="text-xl font-semibold text-white">{{ __('categories.index.filters_title') }}</h2>
-                                                                <p class="text-sm leading-relaxed text-sage/80">
+                                                                <h2 class="text-xl font-semibold text-slate-900">{{ __('categories.index.filters_title') }}</h2>
+                                                                <p class="text-sm leading-relaxed text-slate-600">
                                                                     {{ __('categories.index.filters_description') }}
                                                                 </p>
                                                             </div>
                                                             <button type="button"
-                                                                    class="rounded-full border border-sage/30 p-2 text-sage transition hover:border-sage hover:bg-sage/10"
+                                                                    class="rounded-full border border-slate-200 p-2 text-slate-500 transition hover:border-cyan-200 hover:bg-cyan-50 hover:text-cyan-700"
                                                                     wire:click="$toggle('sidebarOpen')"
                                                                     aria-label="{{ __('categories.index.close') }}">
                                                                 <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -651,7 +655,7 @@
                                                                 'category' => $category ?? null,
                                                             ])
                                                         </div>
-                                                        <div class="border-t border-sage/30 p-6">
+                                                        <div class="border-t border-slate-200 p-6">
                                                             <x-shared.button
                                                                 type="button"
                                                                 variant="primary"
@@ -668,23 +672,23 @@
                                     @else
                                         <div x-cloak x-show="showFilters" class="fixed inset-0 z-40 lg:hidden">
                                             <div @click="showFilters = false" class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
-                                            <div class="absolute inset-y-0 right-0 w-11/12 max-w-md rounded-l-3xl bg-dark shadow-2xl">
+                                            <div class="absolute inset-y-0 right-0 w-11/12 max-w-md rounded-l-3xl bg-white shadow-2xl">
                                                 <div class="flex h-full flex-col overflow-y-auto">
-                                                    <div class="flex items-center justify-between border-b border-sage/30 p-6">
+                                                    <div class="flex items-center justify-between border-b border-slate-200 p-6">
                                                         <div class="space-y-2">
-                                                            <span class="inline-flex items-center gap-2 rounded-full border border-sage/30 bg-sage/10 px-3 py-1 text-xs font-semibold text-sage">
+                                                            <span class="inline-flex items-center gap-2 rounded-full border border-cyan-200 bg-cyan-50 px-3 py-1 text-xs font-semibold text-cyan-700">
                                                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                                                                 </svg>
                                                                 {{ __('categories.show.filter') }}
                                                             </span>
-                                                            <h2 class="text-xl font-semibold text-white">{{ __('categories.show.filter') }}</h2>
-                                                            <p class="text-sm leading-relaxed text-sage/80">
+                                                            <h2 class="text-xl font-semibold text-slate-900">{{ __('categories.show.filter') }}</h2>
+                                                            <p class="text-sm leading-relaxed text-slate-600">
                                                                 {{ __('categories.show.adjust_filters') }}
                                                             </p>
                                                         </div>
                                                         <button type="button"
-                                                                class="rounded-full border border-sage/30 p-2 text-sage transition hover:border-sage hover:bg-sage/10"
+                                                                class="rounded-full border border-slate-200 p-2 text-slate-500 transition hover:border-cyan-200 hover:bg-cyan-50 hover:text-cyan-700"
                                                                 @click="showFilters = false"
                                                                 aria-label="{{ __('categories.index.close') }}">
                                                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -693,8 +697,8 @@
                                                         </button>
                                                     </div>
                                                     <div class="flex-1 space-y-6 overflow-y-auto p-6">
-                                                        <div class="rounded-2xl border border-sage/30 bg-dark/50 p-4">
-                                                            <h4 class="mb-3 text-sm font-semibold text-sage flex items-center gap-2">
+                                                        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                                                            <h4 class="mb-3 flex items-center gap-2 text-sm font-semibold text-slate-700">
                                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                                                                 </svg>
@@ -705,10 +709,10 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div class="border-t border-sage/30 p-6">
+                                                    <div class="border-t border-slate-200 p-6">
                                                         <button type="button"
                                                                 @click="showFilters = false"
-                                                                class="w-full rounded-2xl bg-sage px-6 py-4 text-center text-sm font-bold text-dark transition hover:bg-sage/90">
+                                                                class="w-full rounded-2xl bg-cyan-600 px-6 py-4 text-center text-sm font-bold text-white transition hover:bg-cyan-700">
                                                             {{ __('categories.show.apply_filters') }}
                                                         </button>
                                                     </div>

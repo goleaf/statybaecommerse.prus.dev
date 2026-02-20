@@ -221,13 +221,36 @@
 
     {{-- Mobile menu overlay --}}
     @if ($mobileMenuOpen)
-        <div class="fixed inset-0 z-50 lg:hidden" x-data="{ open: @entangle('mobileMenuOpen') }" x-show="open" x-transition>
+        <div
+            class="fixed inset-0 z-[1200] lg:hidden"
+            x-data="{ open: @entangle('mobileMenuOpen') }"
+            x-show="open"
+            x-cloak
+            x-on:keydown.escape.window="open = false"
+        >
             {{-- Backdrop --}}
-            <div class="fixed inset-0 bg-black/30" x-on:click="open = false"></div>
+            <div
+                class="fixed inset-0 bg-black/45 backdrop-blur-sm"
+                x-on:click="open = false"
+                x-transition:enter="transition-opacity ease-out duration-300"
+                x-transition:enter-start="opacity-0"
+                x-transition:enter-end="opacity-100"
+                x-transition:leave="transition-opacity ease-in duration-200"
+                x-transition:leave-start="opacity-100"
+                x-transition:leave-end="opacity-0"
+            ></div>
 
             {{-- Mobile menu panel --}}
-            <div class="fixed top-0 right-0 h-full w-full max-w-[350px] bg-sage transform transition-transform duration-300"
-                x-show="open">
+            <div
+                class="fixed inset-y-0 right-0 h-full w-[88vw] max-w-[360px] bg-sage shadow-2xl"
+                x-show="open"
+                x-transition:enter="transform transition ease-out duration-300"
+                x-transition:enter-start="translate-x-full"
+                x-transition:enter-end="translate-x-0"
+                x-transition:leave="transform transition ease-in duration-200"
+                x-transition:leave-start="translate-x-0"
+                x-transition:leave-end="translate-x-full"
+            >
                 {{-- Header --}}
                 <div class="flex justify-between items-center py-3 px-4 bg-dark text-sage">
                     <h3 class="font-bold font-montserrat">{{ __('messages.frontend_header') }}</h3>

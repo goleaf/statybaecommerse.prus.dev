@@ -24,6 +24,14 @@ class Index extends Component
         $collections = CollectionModel::query()
             ->where('is_visible', true)
             ->orderBy('name')
+            ->withCount([
+                'products as published_products_count' => function ($query): void {
+                    $query
+                        ->where('is_visible', true)
+                        ->whereNotNull('published_at')
+                        ->where('published_at', '<=', now());
+                },
+            ])
             ->with(['products' => function ($query): void {
                 $query
                     ->where('is_visible', true)

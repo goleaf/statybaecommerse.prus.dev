@@ -182,7 +182,7 @@ return [
     'confirm_remove_coupon'                => 'Confirm remove coupon',
     'confirm_remove_discount_code'         => 'Confirm remove discount code',
     'confirm_remove_filter'                => 'Confirm remove filter',
-    'confirm_reset_newsletter_form'        => 'Confirm reset newsletter form',
+    'confirm_reset_newsletter_form'        => 'Are you sure you want to reset the form?',
     'confirm_reset_search_filters'         => 'Confirm reset search filters',
     'confirm_reset_system_settings'        => 'Confirm reset system settings',
     'confirm_toggle_attribute'             => 'Confirm toggle attribute',

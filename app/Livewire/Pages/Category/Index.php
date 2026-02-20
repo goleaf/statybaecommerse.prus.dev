@@ -21,8 +21,11 @@ use Filament\Schemas\Schema;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Schema as SchemaFacade;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 /**
  * Category listing page with reactive filters, caching and schema-driven filters.
@@ -34,6 +37,7 @@ use Livewire\Component;
  * @property float|null      $priceMin
  * @property float|null      $priceMax
  * @property bool            $inStock
+ * @property bool            $onSale
  * @property bool            $hasProducts
  * @property string          $sort
  * @property bool            $sidebarOpen
@@ -43,6 +47,7 @@ use Livewire\Component;
 final class Index extends Component implements HasSchemas
 {
     use InteractsWithSchemas;
+    use WithPagination;
 
     public string $search = '';
 
@@ -66,6 +71,8 @@ final class Index extends Component implements HasSchemas
     public ?float $priceMax = null;
 
     public bool $inStock = false;
+
+    public bool $onSale = false;
 
     public bool $hasProducts = false;
 
@@ -92,6 +99,24 @@ final class Index extends Component implements HasSchemas
         // Normalize legacy single brand parameter to the modern multi-select input.
         if (property_exists($this, 'brandId') && $this->brandId) {
             $this->selectedBrandIds = [(int) $this->brandId];
+        }
+    }
+
+    public function updated(string $name): void
+    {
+        if (in_array($name, [
+            'search',
+            'selectedBrandIds',
+            'selectedCollectionIds',
+            'selectedCategoryIds',
+            'priceMin',
+            'priceMax',
+            'inStock',
+            'onSale',
+            'hasProducts',
+            'sort',
+        ], true)) {
+            $this->resetPage();
         }
     }
 
@@ -290,6 +315,10 @@ final class Index extends Component implements HasSchemas
             ->when($this->priceMin !== null, fn (Builder $q): Builder => $q->where('price', '>=', (float) $this->priceMin))
             ->when($this->priceMax !== null, fn (Builder $q): Builder => $q->where('price', '<=', (float) $this->priceMax))
             ->when($this->inStock, fn (Builder $q): Builder => $q->where('stock_quantity', '>', 0))
+            ->when(
+                $this->onSale && SchemaFacade::hasTable('discount_products') && SchemaFacade::hasTable('discounts'),
+                fn (Builder $q): Builder => $q->whereHas('discounts', static fn (Builder $discountQuery): Builder => $discountQuery->active())
+            )
             ->when($this->search !== '', function (Builder $q): void {
                 $q->where(function (Builder $inner): void {
                     $inner
@@ -301,74 +330,65 @@ final class Index extends Component implements HasSchemas
     }
 
     /**
-     * @return EloquentCollection<int, Category>
+     * @return LengthAwarePaginator<int, Category>
      */
     #[Computed]
-    public function categories(): EloquentCollection
+    public function categories(): LengthAwarePaginator
     {
-        $locale = app()->getLocale();
-        $filters = $this->filtersForCache();
-
-        return TagAwareCache::remember(
-            CacheKeys::categoryIndexCategories($locale, $filters),
-            now()->addSeconds(180),
-            function (): EloquentCollection {
-                $query = Category::query()
-                    ->with(['media'])
-                    ->withCount(['products' => function (Builder $q): void {
-                        $q->published()
-                            ->when(
-                                ! empty($this->selectedBrandIds),
-                                fn (Builder $qq): Builder => $qq->whereIn('brand_id', $this->selectedBrandIds)
-                            )
-                            ->when(
-                                ! empty($this->selectedCollectionIds),
-                                fn (Builder $qq): Builder => $qq->whereHas(
-                                    'collections',
-                                    fn (Builder $c): Builder => $c->whereIn('collections.id', $this->selectedCollectionIds)
-                                )
-                            )
-                            ->when($this->priceMin !== null, fn (Builder $qq): Builder => $qq->where('price', '>=', (float) $this->priceMin))
-                            ->when($this->priceMax !== null, fn (Builder $qq): Builder => $qq->where('price', '<=', (float) $this->priceMax))
-                            ->when($this->inStock, fn (Builder $qq): Builder => $qq->where('stock_quantity', '>', 0));
-                    }])
-                    ->where('is_visible', true);
-
-                if ($this->search !== '') {
-                    $query->where(function (Builder $q): void {
-                        $q->where('name', 'like', '%' . $this->search . '%')
-                            ->orWhere('description', 'like', '%' . $this->search . '%');
-                    });
-                }
-
-                if ($this->hasProducts) {
-                    $query->has('products');
-                }
-
-                if (! empty($this->selectedCategoryIds)) {
-                    $query->where(function (Builder $q): void {
-                        $q->whereIn('id', $this->selectedCategoryIds)
-                            ->orWhereIn('parent_id', $this->selectedCategoryIds);
-                    });
-                }
-
-                $query
-                    ->when($this->sort === 'name_asc', fn (Builder $q): Builder => $q->orderBy('name'))
-                    ->when($this->sort === 'name_desc', fn (Builder $q): Builder => $q->orderByDesc('name'))
-                    ->when($this->sort === 'products_desc', fn (Builder $q): Builder => $q->orderByDesc('products_count'))
-                    ->when($this->sort === 'products_asc', fn (Builder $q): Builder => $q->orderBy('products_count'))
+        $query = Category::query()
+            ->with(['media'])
+            ->withCount(['products' => function (Builder $q): void {
+                $q->published()
                     ->when(
-                        ! in_array($this->sort, ['name_asc', 'name_desc', 'products_desc', 'products_asc'], true),
-                        fn (Builder $q): Builder => $q->orderBy('name')
+                        ! empty($this->selectedBrandIds),
+                        fn (Builder $qq): Builder => $qq->whereIn('brand_id', $this->selectedBrandIds)
+                    )
+                    ->when(
+                        ! empty($this->selectedCollectionIds),
+                        fn (Builder $qq): Builder => $qq->whereHas(
+                            'collections',
+                            fn (Builder $c): Builder => $c->whereIn('collections.id', $this->selectedCollectionIds)
+                        )
+                    )
+                    ->when($this->priceMin !== null, fn (Builder $qq): Builder => $qq->where('price', '>=', (float) $this->priceMin))
+                    ->when($this->priceMax !== null, fn (Builder $qq): Builder => $qq->where('price', '<=', (float) $this->priceMax))
+                    ->when($this->inStock, fn (Builder $qq): Builder => $qq->where('stock_quantity', '>', 0))
+                    ->when(
+                        $this->onSale && SchemaFacade::hasTable('discount_products') && SchemaFacade::hasTable('discounts'),
+                        fn (Builder $qq): Builder => $qq->whereHas('discounts', static fn (Builder $discountQuery): Builder => $discountQuery->active())
                     );
+            }])
+            ->where('is_visible', true);
 
-                return $query->get();
-            },
-            $this->tagsForCategoryIndex([
-                CacheTags::categories(),
-                CacheTags::products(),
-            ])
-        );
+        if ($this->search !== '') {
+            $query->where(function (Builder $q): void {
+                $q->where('name', 'like', '%' . $this->search . '%')
+                    ->orWhere('description', 'like', '%' . $this->search . '%');
+            });
+        }
+
+        if ($this->hasProducts) {
+            $query->has('products');
+        }
+
+        if (! empty($this->selectedCategoryIds)) {
+            $query->where(function (Builder $q): void {
+                $q->whereIn('id', $this->selectedCategoryIds)
+                    ->orWhereIn('parent_id', $this->selectedCategoryIds);
+            });
+        }
+
+        $query
+            ->when($this->sort === 'name_asc', fn (Builder $q): Builder => $q->orderBy('name'))
+            ->when($this->sort === 'name_desc', fn (Builder $q): Builder => $q->orderByDesc('name'))
+            ->when($this->sort === 'products_desc', fn (Builder $q): Builder => $q->orderByDesc('products_count'))
+            ->when($this->sort === 'products_asc', fn (Builder $q): Builder => $q->orderBy('products_count'))
+            ->when(
+                ! in_array($this->sort, ['name_asc', 'name_desc', 'products_desc', 'products_asc'], true),
+                fn (Builder $q): Builder => $q->orderBy('name')
+            );
+
+        return $query->paginate(24);
     }
 
     public function render(): View
@@ -392,6 +412,7 @@ final class Index extends Component implements HasSchemas
             'priceMin'              => $this->priceMin,
             'priceMax'              => $this->priceMax,
             'inStock'               => $this->inStock,
+            'onSale'                => $this->onSale,
             'hasProducts'           => $this->hasProducts,
             'sort'                  => $this->sort,
         ];
