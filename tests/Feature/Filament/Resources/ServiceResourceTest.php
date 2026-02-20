@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Filament\Resources\Services\Pages\CreateService;
 use App\Filament\Resources\Services\Pages\EditService;
 use App\Filament\Resources\Services\Pages\ListServices;
+use App\Filament\Resources\Services\ServiceResource;
 use App\Models\Service;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -72,4 +73,20 @@ it('edits a service via the admin form', function (): void {
         'price'     => 99.00,
         'is_active' => false,
     ]);
+});
+
+it('uses translated resource labels in lithuanian locale', function (): void {
+    $previousLocale = app()->getLocale();
+
+    app()->setLocale('lt');
+
+    try {
+        expect(ServiceResource::getModelLabel())->toBe(__('translations.service'))
+            ->and(ServiceResource::getPluralModelLabel())->toBe(__('translations.services'))
+            ->and(ServiceResource::getNavigationLabel())->toBe(__('translations.services'))
+            ->and(ServiceResource::getModelLabel())->toBe('Paslauga')
+            ->and(ServiceResource::getPluralModelLabel())->toBe('Paslaugos');
+    } finally {
+        app()->setLocale($previousLocale);
+    }
 });

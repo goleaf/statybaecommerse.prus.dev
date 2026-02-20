@@ -18,19 +18,24 @@ class ServicesTable
         return $table
             ->columns([
                 TextColumn::make('name')
+                    ->label(__('messages.name'))
                     ->sortable()
                     ->searchable(),
                 TextColumn::make('price')
+                    ->label(__('messages.price'))
                     ->money('EUR')
                     ->sortable(),
                 IconColumn::make('is_active')
+                    ->label(__('messages.is_active'))
                     ->sortable()
                     ->boolean(),
                 TextColumn::make('created_at')
+                    ->label(__('messages.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
+                    ->label(__('messages.updated_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

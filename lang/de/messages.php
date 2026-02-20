@@ -509,7 +509,7 @@ return [
     'discount_fixed'                                                                 => 'Discount fixed',
     'discount_percentage'                                                            => 'Discount percentage',
     'discount_preset_saved_successfully'                                             => 'Discount preset saved successfully.',
-    'discount_redemptions'                                                           => 'Discount redemptions',
+    'discount_redemptions'                                                           => 'Rabatteinlösungen',
     'discount_settings'                                                              => 'Discount settings',
     'discounts'                                                                      => 'Discounts',
     'ecommerce'                                                                      => 'E-Commerce',

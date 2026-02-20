@@ -11,6 +11,7 @@ use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -86,6 +87,69 @@ final class ProductImagesRelationManagerTest extends TestCase
         Storage::disk('public')->assertExists($image->path);
     }
 
+    public function test_can_create_image_with_uploaded_file_from_product_relation_manager(): void
+    {
+        $upload = UploadedFile::fake()->image('fresh-upload.jpg', 1200, 800);
+
+        Livewire::test(ImagesRelationManager::class, [
+            'ownerRecord' => $this->product,
+            'pageClass'   => EditProduct::class,
+        ])
+            ->mountTableAction('create')
+            ->set('mountedActions.0.data.path', $upload)
+            ->set('mountedActions.0.data.alt_text', 'Fresh upload image')
+            ->set('mountedActions.0.data.sort_order', 0)
+            ->set('mountedActions.0.data.is_default', true)
+            ->set('mountedActions.0.data.is_active', true)
+            ->callMountedTableAction()
+            ->assertHasNoTableActionErrors();
+
+        $image = ProductImage::withoutGlobalScopes()
+            ->where('product_id', $this->product->getKey())
+            ->latest('id')
+            ->first();
+
+        $this->assertNotNull($image);
+        $this->assertNotSame('', (string) $image->path);
+        Storage::disk('public')->assertExists($image->path);
+    }
+
+    public function test_can_edit_image_with_uploaded_file_from_product_relation_manager(): void
+    {
+        Storage::disk('public')->put('product-images/original-image.jpg', 'original-binary');
+
+        $image = ProductImage::withoutGlobalScopes()->create([
+            'product_id' => $this->product->getKey(),
+            'path'       => 'product-images/original-image.jpg',
+            'alt_text'   => 'Original image',
+            'sort_order' => 0,
+            'is_default' => true,
+            'is_active'  => true,
+        ]);
+
+        $replacementUpload = UploadedFile::fake()->image('replacement-image.jpg', 1000, 700);
+
+        Livewire::test(ImagesRelationManager::class, [
+            'ownerRecord' => $this->product,
+            'pageClass'   => EditProduct::class,
+        ])
+            ->mountTableAction('edit', $image->getKey())
+            ->set('mountedActions.0.data.path', [$replacementUpload])
+            ->set('mountedActions.0.data.alt_text', 'Updated image')
+            ->set('mountedActions.0.data.sort_order', 1)
+            ->set('mountedActions.0.data.is_default', true)
+            ->set('mountedActions.0.data.is_active', true)
+            ->callMountedTableAction()
+            ->assertHasNoTableActionErrors();
+
+        $image->refresh();
+
+        $this->assertSame('Updated image', $image->alt_text);
+        $this->assertSame(1, $image->sort_order);
+        $this->assertNotSame('product-images/original-image.jpg', $image->path);
+        Storage::disk('public')->assertExists($image->path);
+    }
+
     public function test_product_edit_images_relation_page_does_not_return_server_error(): void
     {
         ProductImage::withoutGlobalScopes()->create([
@@ -138,6 +202,46 @@ final class ProductImagesRelationManagerTest extends TestCase
         $this->assertDatabaseHas('product_images', [
             'id'         => $existingImage->getKey(),
             'product_id' => $this->product->getKey(),
+        ]);
+    }
+
+    public function test_can_associate_inactive_image_to_product_from_relation_manager(): void
+    {
+        $otherProduct = Product::query()->create([
+            'name'           => 'Inactive Image Owner',
+            'slug'           => 'inactive-image-owner',
+            'sku'            => 'REL-IMG-INACTIVE-001',
+            'price'          => 29.99,
+            'manage_stock'   => false,
+            'stock_quantity' => 0,
+            'status'         => 'published',
+            'is_enabled'     => true,
+            'is_featured'    => false,
+            'published_at'   => now(),
+        ]);
+
+        $inactiveImage = ProductImage::withoutGlobalScopes()->create([
+            'product_id' => $otherProduct->getKey(),
+            'path'       => 'product-images/inactive-associated-image.jpg',
+            'alt_text'   => 'Inactive image',
+            'sort_order' => 0,
+            'is_default' => true,
+            'is_active'  => false,
+        ]);
+
+        Livewire::test(ImagesRelationManager::class, [
+            'ownerRecord' => $this->product,
+            'pageClass'   => EditProduct::class,
+        ])
+            ->mountTableAction('associate')
+            ->set('mountedActions.0.data.recordId', $inactiveImage->getKey())
+            ->callMountedTableAction()
+            ->assertHasNoTableActionErrors();
+
+        $this->assertDatabaseHas('product_images', [
+            'id'         => $inactiveImage->getKey(),
+            'product_id' => $this->product->getKey(),
+            'is_active'  => 0,
         ]);
     }
 }

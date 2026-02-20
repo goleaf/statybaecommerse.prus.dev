@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\ProductResource\RelationManagers;
 
 use App\Models\ProductImage;
+use App\Support\Filament\ProductImageDataNormalizer;
 use App\Support\Filament\Forms\Components\SortOrderInput;
 use Filament\Actions\AssociateAction;
 use Filament\Forms\Components\FileUpload;
@@ -22,7 +23,10 @@ use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Arr;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\Relation;
 
 class ImagesRelationManager extends RelationManager
 {
@@ -45,7 +49,6 @@ class ImagesRelationManager extends RelationManager
                     ->disk('public')
                     ->directory('product-images')
                     ->required(fn (string $operation): bool => $operation === 'create')
-                    ->imageEditor()
                     ->imagePreviewHeight('250'),
                 TextInput::make('alt_text')
                     ->label(__('messages.alt_text'))
@@ -97,17 +100,55 @@ class ImagesRelationManager extends RelationManager
                 AssociateAction::make()
                     ->preloadRecordSelect()
                     ->recordSelectSearchColumns(['alt_text', 'path'])
-                    ->recordSelectOptionsQuery(fn (Builder $query): Builder => $query
-                        ->withoutGlobalScopes()
-                        ->where('product_id', '!=', $this->getOwnerRecord()->getKey())),
+                    ->recordSelectOptionsQuery(fn (Builder $query): Builder => $query->withoutGlobalScopes())
+                    ->action(function (
+                        AssociateAction $action,
+                        array $arguments,
+                        array $data,
+                        Schema $schema,
+                        Table $table,
+                    ): void {
+                        /** @var HasMany|MorphMany $relationship */
+                        $relationship = Relation::noConstraints(fn () => $table->getRelationship());
+
+                        /** @var ProductImage|null $record */
+                        $record = ProductImage::query()
+                            ->withoutGlobalScopes()
+                            ->find($data['recordId'] ?? null);
+
+                        if (! $record instanceof ProductImage) {
+                            return;
+                        }
+
+                        $action->record($record);
+
+                        /** @var BelongsTo $inverseRelationship */
+                        $inverseRelationship = $table->getInverseRelationshipFor($record);
+
+                        $action->process(function () use ($inverseRelationship, $record, $relationship): void {
+                            $inverseRelationship->associate($relationship->getParent());
+                            $record->save();
+                        }, [
+                            'inverseRelationship' => $inverseRelationship,
+                            'relationship'        => $relationship,
+                        ]);
+
+                        if ($arguments['another'] ?? false) {
+                            $action->callAfter();
+                            $action->sendSuccessNotification();
+                            $action->record(null);
+                            $schema->fill();
+                            $action->halt();
+
+                            return;
+                        }
+
+                        $action->success();
+                    }),
                 CreateAction::make()
                     ->mutateDataUsing(function (array $data): array {
                         $ownerRecord = $this->getOwnerRecord();
-
-                        $path = $data['path'] ?? null;
-                        if (is_array($path)) {
-                            $data['path'] = Arr::first($path);
-                        }
+                        $data = ProductImageDataNormalizer::normalize($data);
 
                         $data['product_id'] = $ownerRecord->getKey();
 
@@ -127,7 +168,8 @@ class ImagesRelationManager extends RelationManager
                     ->using(fn (array $data): ProductImage => $this->getOwnerRecord()->images()->create($data)),
             ])
             ->actions([
-                EditAction::make(),
+                EditAction::make()
+                    ->mutateDataUsing(static fn (array $data): array => ProductImageDataNormalizer::normalize($data, forUpdate: true)),
                 DeleteAction::make(),
             ])
             ->reorderable('sort_order')

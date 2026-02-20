@@ -22,21 +22,25 @@ class ServiceForm
                         Grid::make(2)
                             ->schema([
                                 TextInput::make('name')
+                                    ->label(__('messages.name'))
                                     ->required(),
                                 TextInput::make('price')
+                                    ->label(__('messages.price'))
                                     ->required()
                                     ->numeric()
                                     ->default(0)
                                     ->prefix('€'),
                                 Toggle::make('is_active')
+                                    ->label(__('messages.is_active'))
                                     ->required(),
                             ]),
                         Textarea::make('description')
+                            ->label(__('messages.description'))
                             ->columnSpanFull(),
                     ])
                     ->columnSpanFull()
                     ->extraAttributes([
-                        'class' => 'bg-slate-50/90 border border-slate-200 rounded-2xl p-6',
+                        'class' => 'bg-slate-50/90 rounded-2xl p-6',
                     ]),
             ]);
     }

@@ -509,7 +509,7 @@ return [
     'discount_fixed'                                                                 => 'Фиксированная скидка',
     'discount_percentage'                                                            => 'Процентная скидка',
     'discount_preset_saved_successfully'                                             => 'Discount preset saved successfully.',
-    'discount_redemptions'                                                           => 'Discount redemptions',
+    'discount_redemptions'                                                           => 'Погашения скидок',
     'discount_settings'                                                              => 'Discount settings',
     'discounts'                                                                      => 'Discounts',
     'ecommerce'                                                                      => 'Электронная коммерция',

@@ -6,6 +6,7 @@ namespace App\Support\Uploads;
 
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
@@ -215,22 +216,51 @@ final class SecureUpload
             return;
         }
 
-        // If the file cannot be parsed as an image we immediately reject the upload.
-        if (@getimagesize($path) === false) {
+        // Validate common raster formats to reject spoofed uploads early.
+        if (self::shouldValidateRasterImage($mimeType) && @getimagesize($path) === false) {
             throw ValidationException::withMessages([
                 'file' => __('validation.image', ['attribute' => 'file']),
             ]);
         }
 
+        $format = self::spatieFormatForMimeType($mimeType);
+
+        if ($format === null) {
+            return;
+        }
+
         try {
-            // The Spatie image library handles metadata stripping without altering the actual pixels.
+            // Re-encode to strip metadata while still supporting temp files with no image extension.
             Image::load($path)
-                ->strip()
-                ->save();
-        } catch (FileNotFoundException|Throwable) {
+                ->format($format)
+                ->save($path);
+        } catch (FileNotFoundException) {
             throw ValidationException::withMessages([
                 'file' => __('validation.image', ['attribute' => 'file']),
             ]);
+        } catch (Throwable $exception) {
+            Log::warning('SecureUpload metadata stripping skipped after encoder failure.', [
+                'mime_type' => $mimeType,
+                'path'      => $path,
+                'error'     => $exception->getMessage(),
+            ]);
         }
+    }
+
+    private static function shouldValidateRasterImage(string $mimeType): bool
+    {
+        return in_array($mimeType, ['image/jpeg', 'image/png', 'image/gif', 'image/webp'], true);
+    }
+
+    private static function spatieFormatForMimeType(string $mimeType): ?string
+    {
+        return match ($mimeType) {
+            'image/jpeg' => 'jpg',
+            'image/png'  => 'png',
+            'image/gif'  => 'gif',
+            'image/webp' => 'webp',
+            'image/avif' => 'avif',
+            default      => null,
+        };
     }
 }
