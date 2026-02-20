@@ -1,7 +1,8 @@
 {
-  "source": "github",
-  "repo": "anthropics/skills",
+  "source": "git",
+  "url": "https://github.com/ComposioHQ/awesome-claude-skills",
+  "ref": null,
   "skillPath": "webapp-testing",
-  "installedAt": "2026-02-06T11:15:26.589Z",
-  "updatedAt": "2026-02-06T11:15:26.589Z"
+  "installedAt": "2026-02-07T13:57:29.114Z",
+  "updatedAt": "2026-02-07T13:57:29.114Z"
 }
