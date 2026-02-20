@@ -8,7 +8,6 @@
     'showViewToggle' => true,
     'showPagination' => true,
     'perPage' => 12,
-    'viewMode' => 'grid', // grid, list
 ])
 
 @php
@@ -38,33 +37,6 @@
                 <p class="text-lg text-gray-600">{{ $subtitle }}</p>
             </div>
 
-            {{-- View Toggle --}}
-            @if ($showViewToggle)
-                <div class="flex items-center gap-2">
-                    <span class="text-sm text-gray-600">{{ __('messages.view') }}:</span>
-                    <div class="flex border border-gray-300 rounded-lg overflow-hidden">
-                        <button @click="viewMode = 'grid'"
-                                :class="viewMode === 'grid' ? 'bg-blue-600 text-white' :
-                                    'bg-white text-gray-700 hover:bg-gray-50'"
-                                class="px-3 py-2 text-sm font-medium transition-colors duration-200">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                      d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z">
-                                </path>
-                            </svg>
-                        </button>
-                        <button @click="viewMode = 'list'"
-                                :class="viewMode === 'list' ? 'bg-blue-600 text-white' :
-                                    'bg-white text-gray-700 hover:bg-gray-50'"
-                                class="px-3 py-2 text-sm font-medium transition-colors duration-200">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                      d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-            @endif
         </div>
 
         {{-- Filters and Sorting --}}
@@ -217,98 +189,9 @@
 
                 {{-- Products Display --}}
                 @if ($products->count() > 0)
-                    {{-- Grid View --}}
-                    <div x-show="viewMode === 'grid'"
-                         class="grid {{ $gridClass }} gap-6 mb-8">
+                    <div class="grid {{ $gridClass }} gap-6 mb-8">
                         @foreach ($products as $product)
                             <x-product-card :product="$product" />
-                        @endforeach
-                    </div>
-
-                    {{-- List View --}}
-                    <div x-show="viewMode === 'list'" class="space-y-4 mb-8" x-cloak>
-                        @foreach ($products as $product)
-                            <div
-                                 class="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-medium transition-shadow duration-200">
-                                <div class="flex flex-col md:flex-row gap-6">
-                                    {{-- Product Image --}}
-                                    <div class="md:w-48 flex-shrink-0">
-                                        <div class="aspect-w-1 aspect-h-1 bg-gray-100 rounded-lg overflow-hidden">
-                                            <img src="{{ $product->getFirstMediaUrl('images') ?? product_placeholder_url('large') }}"
-                                                 alt="{{ $product->name }}"
-                                                 class="w-full h-48 object-cover">
-                                        </div>
-                                    </div>
-
-                                    {{-- Product Details --}}
-                                    <div class="flex-1">
-                                        <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
-                                            <div class="flex-1">
-                                                <h3 class="text-xl font-semibold text-gray-900 mb-2">
-                                                    <a href="{{ route('product.show', $product->slug ?? $product) }}"
-                                                       class="hover:text-blue-600 transition-colors duration-200">
-                                                        {{ $product->name }}
-                                                    </a>
-                                                </h3>
-
-                                                @if ($product->brand)
-                                                    <p class="text-sm text-gray-600 mb-2">{{ $product->brand->name }}
-                                                    </p>
-                                                @endif
-
-                                                <p class="text-gray-700 mb-4 line-clamp-3">
-                                                    {{ Str::limit($product->description, 200) }}
-                                                </p>
-
-                                                {{-- Rating --}}
-                                                @if ($product->avg_rating > 0)
-                                                    <div class="flex items-center gap-2 mb-4">
-                                                        <div class="flex items-center">
-                                                            @for ($i = 1; $i <= 5; $i++)
-                                                                <svg class="w-4 h-4 {{ $i <= $product->avg_rating ? 'text-yellow-400' : 'text-gray-300' }}"
-                                                                     fill="currentColor" viewBox="0 0 20 20">
-                                                                    <path
-                                                                          d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                                                </svg>
-                                                            @endfor
-                                                        </div>
-                                                        <span
-                                                              class="text-sm text-gray-600">({{ $product->reviews_count ?? 0 }})</span>
-                                                    </div>
-                                                @endif
-                                            </div>
-
-                                            {{-- Price and Actions --}}
-                                            <div class="lg:w-48 flex-shrink-0">
-                                                <div class="text-right mb-4">
-                                                    <span class="text-2xl font-bold text-gray-900">
-                                                        {{ \Illuminate\Support\Number::currency($product->price, current_currency(), app()->getLocale()) }}
-                                                    </span>
-                                                </div>
-
-                                                <div class="space-y-2">
-                                                    <button wire:click="addToCart({{ $product->id }})"
-                                                            @if ($product->stock_quantity <= 0) disabled @endif
-                                                            class="w-full btn-gradient py-2 rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed">
-                                                        {{ __('ui.add_to_cart') }}
-                                                    </button>
-
-                                                    <button wire:click="toggleWishlist({{ $product->id }})"
-                                                            wire:confirm="{{ __('translations.confirm_toggle_wishlist') }}"
-                                                            class="w-full border border-gray-300 text-gray-700 py-2 rounded-lg font-medium hover:bg-gray-50 transition-colors duration-200">
-                                                        {{ __('ui.add_to_wishlist') }}
-                                                    </button>
-
-                                                    <button @click="openQuickView({{ $product->id }})"
-                                                            class="w-full text-blue-600 hover:text-blue-700 py-2 font-medium">
-                                                        {{ __('messages.quick_view') }}
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                         @endforeach
                     </div>
 
@@ -342,7 +225,6 @@
 <script>
     function productShowcase() {
         return {
-            viewMode: '{{ $viewMode }}',
             sortBy: 'relevance',
             filters: {
                 priceMin: '',

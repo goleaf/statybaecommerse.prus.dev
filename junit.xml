@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="Tests\Feature\Frontend\CollectionRoutesTest" file="Collection Routes (Tests\Feature\Frontend\CollectionRoutes)" tests="2" assertions="2" errors="0" failures="0" skipped="0" time="9.880481">
-    <testcase name="Collections show route resolves" file="Collection Routes (Tests\Feature\Frontend\CollectionRoutes)::Collections show route resolves" class="Tests\Feature\Frontend\CollectionRoutesTest" classname="Tests.Feature.Frontend.CollectionRoutesTest" assertions="1" time="9.266457"/>
-    <testcase name="Collections index route resolves" file="Collection Routes (Tests\Feature\Frontend\CollectionRoutes)::Collections index route resolves" class="Tests\Feature\Frontend\CollectionRoutesTest" classname="Tests.Feature.Frontend.CollectionRoutesTest" assertions="1" time="0.614025"/>
+  <testsuite name="Tests\Feature\Frontend\BrandFrontendTest" file="Brand Frontend (Tests\Feature\Frontend\BrandFrontend)" tests="2" assertions="5" errors="0" failures="0" skipped="0" time="7.166792">
+    <testcase name="Brand index lists brands" file="Brand Frontend (Tests\Feature\Frontend\BrandFrontend)::Brand index lists brands" class="Tests\Feature\Frontend\BrandFrontendTest" classname="Tests.Feature.Frontend.BrandFrontendTest" assertions="2" time="6.360343"/>
+    <testcase name="Brand show displays products" file="Brand Frontend (Tests\Feature\Frontend\BrandFrontend)::Brand show displays products" class="Tests\Feature\Frontend\BrandFrontendTest" classname="Tests.Feature.Frontend.BrandFrontendTest" assertions="3" time="0.806448"/>
   </testsuite>
 </testsuites>

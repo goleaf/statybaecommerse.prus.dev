@@ -34,7 +34,6 @@ use Livewire\WithPagination;
  * @property string     $sortBy
  * @property string     $sortDirection
  * @property bool       $inStock
- * @property string     $viewMode
  * @property int        $perPage
  * @property mixed      $queryString
  */
@@ -61,12 +60,9 @@ final class SearchWidget extends Component
 
     public bool $inStock = false;
 
-    public string $viewMode = 'grid';
-
-    // grid, list
     public int $perPage = 12;
 
-    protected $queryString = ['query' => ['except' => ''], 'selectedCategories' => ['except' => []], 'selectedBrands' => ['except' => []], 'selectedAttributes' => ['except' => []], 'minPrice' => ['except' => null], 'maxPrice' => ['except' => null], 'sortBy' => ['except' => 'relevance'], 'inStock' => ['except' => false], 'viewMode' => ['except' => 'grid']];
+    protected $queryString = ['query' => ['except' => ''], 'selectedCategories' => ['except' => []], 'selectedBrands' => ['except' => []], 'selectedAttributes' => ['except' => []], 'minPrice' => ['except' => null], 'maxPrice' => ['except' => null], 'sortBy' => ['except' => 'relevance'], 'inStock' => ['except' => false]];
 
     /**
      * Initialize the Livewire component with parameters.

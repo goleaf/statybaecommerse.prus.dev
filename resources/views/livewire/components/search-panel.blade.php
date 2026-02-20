@@ -161,26 +161,6 @@
             <!-- Toolbar -->
             <div class="flex items-center justify-between mb-6 bg-white rounded-lg shadow-sm border p-4">
                 <div class="flex items-center space-x-4">
-                    <!-- View Mode Toggle -->
-                    <div class="flex border border-gray-300 rounded">
-                        <button 
-                            wire:click="$set('viewMode', 'grid')"
-                            class="p-2 {{ $viewMode === 'grid' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100' }}"
-                        >
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
-                            </svg>
-                        </button>
-                        <button 
-                            wire:click="$set('viewMode', 'list')"
-                            class="p-2 {{ $viewMode === 'list' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100' }}"
-                        >
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 8a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 12a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 16a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"></path>
-                            </svg>
-                        </button>
-                    </div>
-
                     <!-- Per Page -->
                     <select wire:model.live="perPage" class="border border-gray-300 rounded px-3 py-2 text-sm">
                         <option value="12">12 {{ __('frontend.pagination.per_page') }}</option>
@@ -203,42 +183,11 @@
                 </div>
             </div>
 
-            <!-- Products Grid/List -->
+            <!-- Products Grid -->
             @if($products->count() > 0)
-                <div class="{{ $viewMode === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6' : 'space-y-4' }}">
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     @foreach($products as $product)
-                        @if($viewMode === 'grid')
-                            <livewire:components.product-card :product="$product" :key="'product-' . $product->id" />
-                        @else
-                            <!-- List View -->
-                            <div class="bg-white rounded-lg shadow-sm border p-4 flex space-x-4">
-                                <div class="w-24 h-24 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                                    @if($product->getFirstMediaUrl('images'))
-                                        <img 
-                                            src="{{ $product->getFirstMediaUrl('images', 'image-sm') ?: $product->getFirstMediaUrl('images') }}" 
-                                            alt="{{ $product->name }}"
-                                            class="w-full h-full object-cover"
-                                        >
-                                    @endif
-                                </div>
-                                <div class="flex-1">
-                                    <h3 class="font-semibold text-gray-900 mb-1">
-                                        <a href="{{ route('product.show', $product->slug ?? $product) }}" class="hover:text-blue-600">
-                                            {{ $product->name }}
-                                        </a>
-                                    </h3>
-                                    <p class="text-gray-600 text-sm mb-2">{{ Str::limit($product->description, 100) }}</p>
-                                    <div class="flex items-center justify-between">
-                                        <div class="text-lg font-bold text-gray-900">
-                                            €{{ number_format($product->variants->first()?->price ?? 0, 2) }}
-                                        </div>
-                                        <button class="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700">
-                                            {{ __('frontend.cart.add_to_cart') }}
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        @endif
+                        <livewire:components.product-card :product="$product" :key="'product-' . $product->id" />
                     @endforeach
                 </div>
 

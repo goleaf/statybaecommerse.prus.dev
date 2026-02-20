@@ -6,45 +6,6 @@
 @endsection
 
 <x-auth-page>
-    <x-slot:aside>
-        <div class="flex h-full flex-col justify-between">
-            <div class="space-y-8">
-                <div class="space-y-4">
-                    <span class="inline-flex items-center gap-2 rounded-full bg-white/70 px-4 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-dark">
-                        {{ __('frontend.home.mission.badge') }}
-                    </span>
-
-                    <h2 class="text-3xl font-semibold leading-tight text-dark">
-                        {{ __('frontend.home.mission.title') }}
-                    </h2>
-
-                    <p class="text-sm leading-relaxed text-slate-800">
-                        {{ __('frontend.home.mission.subtitle') }}
-                    </p>
-                </div>
-
-                <div class="rounded-3xl border border-ash bg-white/70 p-6 text-dark">
-                    <div class="space-y-3">
-                        <span class="inline-flex items-center gap-2 rounded-full bg-white/80 px-4 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-dark">
-                            {{ __('frontend.home.loyalty.badge') }}
-                        </span>
-                        <h3 class="text-2xl font-bold text-dark">{{ __('frontend.home.loyalty.title') }}</h3>
-                        <p class="text-slate-800">{{ __('frontend.home.loyalty.subtitle') }}</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="mt-10 rounded-2xl border border-ash bg-white/70 p-6">
-                <p class="text-sm text-slate-800">
-                    {{ __('auth.ui.login.already_have_account') }}
-                    <x-link :href="route('login')" class="ml-1 font-semibold text-dark hover:text-black/80">
-                        {{ __('auth.ui.login.title') }}
-                    </x-link>
-                </p>
-            </div>
-        </div>
-    </x-slot:aside>
-
     <div class="space-y-10">
         <div class="space-y-4 text-center">
             <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-dark text-sage shadow-lg">
@@ -169,23 +130,6 @@
         </form>
         </div>
 
-        <div class="space-y-5">
-            <div class="relative">
-                <div class="absolute inset-0 flex items-center" aria-hidden="true">
-                    <div class="w-full border-t border-ash"></div>
-                </div>
-                <div class="relative flex justify-center">
-                    <span class="bg-white px-4 text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">
-                        {{ __('auth.ui.register.or_login_with') }}
-                    </span>
-                </div>
-            </div>
-
-            <div class="grid gap-3">
-                <x-auth-oauth />
-            </div>
-        </div>
-
         <div class="rounded-2xl border border-ash bg-sage px-5 py-4 text-center text-sm text-dark">
             {{ __('auth.ui.login.already_have_account') }}
             <x-link :href="route('login')" class="font-semibold text-dark hover:text-stone">
@@ -201,4 +145,3 @@
         </p>
     </div>
 </x-auth-page>
-

@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Filament\Resources;
 
+use App\Filament\Resources\CategoryResource\Pages\EditCategory;
+use App\Filament\Resources\CategoryResource\RelationManagers\SubcategoriesRelationManager;
+use App\Models\AdminUser;
 use App\Models\Category;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
 use Tests\TestCase;
 
 final class CategorySubcategoriesRelationManagerTest extends TestCase
@@ -21,11 +24,9 @@ final class CategorySubcategoriesRelationManagerTest extends TestCase
 
         $this->resolveAdminPanel();
 
-        $admin = User::factory()->create([
-            'is_admin' => true,
-        ]);
+        $admin = AdminUser::factory()->create();
 
-        $this->actingAs($admin);
+        $this->actingAs($admin, 'admin');
 
         $this->parentCategory = Category::withoutGlobalScopes()->create([
             'name'       => 'Parent Category',
@@ -54,5 +55,23 @@ final class CategorySubcategoriesRelationManagerTest extends TestCase
         $response = $this->get("/admin/categories/{$this->parentCategory->getRouteKey()}/edit?relation=4");
 
         $this->assertLessThan(500, $response->status());
+    }
+
+    public function test_category_edit_page_can_create_subcategory_via_relation_manager_action(): void
+    {
+        Livewire::test(SubcategoriesRelationManager::class, [
+            'ownerRecord' => $this->parentCategory,
+            'pageClass'   => EditCategory::class,
+        ])
+            ->mountTableAction('create')
+            ->set('mountedActions.0.data.name', 'Nauja subkategorija')
+            ->set('mountedActions.0.data.is_visible', true)
+            ->callMountedTableAction()
+            ->assertHasNoTableActionErrors();
+
+        $this->assertDatabaseHas('categories', [
+            'name'      => 'Nauja subkategorija',
+            'parent_id' => $this->parentCategory->getKey(),
+        ]);
     }
 }

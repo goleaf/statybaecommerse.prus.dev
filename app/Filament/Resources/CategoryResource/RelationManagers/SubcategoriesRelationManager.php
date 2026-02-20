@@ -68,8 +68,17 @@ class SubcategoriesRelationManager extends RelationManager
                 CreateAction::make()
                     ->mutateDataUsing(static function (array $data): array {
                         $data['slug'] = Category::generateUniqueSlug((string) ($data['name'] ?? ''));
+                        $data['is_active'] = (bool) ($data['is_active'] ?? true);
+                        $data['is_enabled'] = (bool) ($data['is_enabled'] ?? true);
 
                         return $data;
+                    })
+                    ->using(function (array $data): Model {
+                        $record = $this->getRelationship()->create($data);
+
+                        return $record
+                            ->withoutRelations()
+                            ->setAppends([]);
                     }),
             ])
             ->actions([

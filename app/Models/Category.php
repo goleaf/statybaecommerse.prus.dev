@@ -85,11 +85,14 @@ final class Category extends Model implements HasMedia
     protected $casts = ['is_visible' => 'boolean', 'is_enabled' => 'boolean', 'is_active' => 'boolean', 'is_featured' => 'boolean', 'show_in_menu' => 'boolean', 'sort_order' => 'integer', 'product_limit' => 'integer', 'parent_id' => 'integer'];
 
     /**
-     * The accessors to append to the model's array form.
+     * Keep array / JSON serialization lightweight.
+     *
+     * Category append accessors trigger recursive relationship traversal and aggregate
+     * queries, which can exceed request time limits during Livewire admin actions.
      *
      * @var array<int, string>
      */
-    protected $appends = ['full_name', 'breadcrumb', 'canonical_url', 'meta_tags', 'total_revenue', 'average_product_price', 'is_root', 'is_leaf', 'depth', 'level', 'ancestors_count', 'descendants_count', 'full_path'];
+    protected $appends = [];
 
     protected static function booted(): void
     {

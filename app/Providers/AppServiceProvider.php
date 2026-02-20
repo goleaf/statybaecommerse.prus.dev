@@ -12,6 +12,7 @@ use App\Database\Connectors\GracefulSQLiteConnector;
 use App\Domain\Product\Repositories\ProductRepositoryInterface;
 use App\Filament\Components\LiveNotificationFeed;
 use App\Infrastructure\Product\Repositories\EloquentProductRepository;
+use App\Mail\Auth\PasswordResetMail;
 use App\Mail\Auth\VerifyEmailMail;
 use App\Services\CacheInvalidationService;
 use App\Services\CurrencyRateSyncService;
@@ -48,7 +49,6 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response as HttpResponse;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -645,17 +645,26 @@ class AppServiceProvider extends ServiceProvider
         });
 
         // Use localized Markdown templates for auth notifications
-        ResetPassword::toMailUsing(function ($notifiable, string $url) {
+        ResetPassword::toMailUsing(function ($notifiable, string $token): PasswordResetMail {
             $locale = method_exists($notifiable, 'preferredLocale') ? ($notifiable->preferredLocale() ?: app()->getLocale()) : app()->getLocale();
             $minutes = (int) config('auth.passwords.' . config('auth.defaults.passwords') . '.expire');
+            $email = method_exists($notifiable, 'getEmailForPasswordReset') ? (string) $notifiable->getEmailForPasswordReset() : '';
+            $url = url(route('password.reset', [
+                'token' => $token,
+                'email' => $email,
+            ], false));
 
-            return (new MailMessage)
-                ->locale($locale)
-                ->subject(__('messages.email_password_reset', [], $locale))
-                ->markdown('emails.auth.password-reset', [
-                    'url'     => $url,
-                    'minutes' => $minutes,
-                ]);
+            $mail = new PasswordResetMail(
+                resetUrl: $url,
+                expiresInMinutes: $minutes,
+                preferredLocale: $locale,
+            );
+
+            if ($email !== '') {
+                $mail->to($email);
+            }
+
+            return $mail;
         });
 
         VerifyEmail::toMailUsing(function ($notifiable, string $url): VerifyEmailMail {

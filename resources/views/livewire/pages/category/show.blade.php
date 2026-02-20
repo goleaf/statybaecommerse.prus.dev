@@ -64,7 +64,7 @@
         canonical="{{ url()->current() }}" />
 @endsection
 
-<div x-data="{ showFilters: false, viewMode: 'grid' }" class="min-h-screen bg-slate-50">
+<div x-data="{ showFilters: false }" class="min-h-screen bg-slate-50">
     <!-- Dark Banner Section -->
     <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-cyan-900 text-slate-100">
         <x-container class="px-4 py-12 sm:py-16">
@@ -298,7 +298,7 @@
                 </div>
             </aside>
 
-            <section class="lg:col-span-9 space-y-6" x-data="{ view: 'grid' }">
+            <section class="lg:col-span-9 space-y-6">
                 <!-- Sort and Filter Controls -->
                 <div class="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
                     <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
@@ -366,34 +366,6 @@
                                 </div>
                             @endif
 
-                            <div class="hidden items-center gap-1 rounded-xl border border-slate-200 bg-slate-50 p-1 text-slate-600 shadow-sm md:flex">
-                                <button type="button"
-                                        @click="view = 'grid'; viewMode = 'grid'"
-                                        :class="view === 'grid' ? 'bg-cyan-100 text-cyan-800 shadow-sm' : 'hover:text-cyan-700 hover:bg-cyan-50'"
-                                        class="inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-semibold transition">
-                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h7v7H4V6zm9 0h7v7h-7V6zM4 13h7v7H4v-7zm9 0h7v7h-7v-7z" />
-                                    </svg>
-                                    @if ($isIndex)
-                                        {{ __('categories.index.view_grid') }}
-                                    @else
-                                        {{ __('categories.show.view_grid') }}
-                                    @endif
-                                </button>
-                                <button type="button"
-                                        @click="view = 'list'; viewMode = 'list'"
-                                        :class="view === 'list' ? 'bg-cyan-100 text-cyan-800 shadow-sm' : 'hover:text-cyan-700 hover:bg-cyan-50'"
-                                        class="inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-semibold transition">
-                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-                                    </svg>
-                                    @if ($isIndex)
-                                        {{ __('categories.index.view_list') }}
-                                    @else
-                                        {{ __('categories.show.view_list') }}
-                                    @endif
-                                </button>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -406,7 +378,7 @@
                     @if ($isIndex)
                         {{-- Categories Display --}}
                         @if ($categories->count() > 0)
-                            <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" :class="view === 'list' ? 'sm:grid-cols-1 xl:grid-cols-1' : 'sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'">
+                            <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                                 @foreach ($categories as $category)
                                     @php
                                         $slug = method_exists($category, 'trans')
@@ -428,9 +400,8 @@
                                             ?? ($category->published_products_count ?? ($category->products?->count() ?? 0));
                                     @endphp
 
-                                    <article class="group flex flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:border-cyan-300 hover:shadow-xl"
-                                             :class="view === 'list' ? 'sm:flex-row' : ''">
-                                        <div class="relative h-48 overflow-hidden sm:h-52" :class="view === 'list' ? 'sm:h-auto sm:w-64' : ''">
+                                    <article class="group flex flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:border-cyan-300 hover:shadow-xl">
+                                        <div class="relative h-48 overflow-hidden sm:h-52">
                                             @if ($image)
                                                 <img src="{{ $image }}"
                                                      alt="{{ $name }}"
@@ -493,8 +464,7 @@
                         {{-- Products Display --}}
                         @if ($products->count() > 0)
                             <!-- Products Grid -->
-                            <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-                                 :class="view === 'list' ? 'sm:grid-cols-1 xl:grid-cols-1' : 'sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'">
+                            <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                                 @foreach ($products as $product)
                                     <div class="animate-fade-in-up animate-delay" data-delay="{{ $loop->index * 0.1 }}">
                                         @include('livewire.home.partials.product-card', [

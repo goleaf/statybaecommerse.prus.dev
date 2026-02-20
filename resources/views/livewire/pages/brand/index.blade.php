@@ -8,7 +8,7 @@
 <div class="bg-sage">
     <div class="bg-dark text-sage">
         <x-container class="px-4 py-12 sm:py-16">
-            <nav class="text-xs font-medium uppercase tracking-[0.3em] text-sage/80" aria-label="{{ __('messages.shared') }}">
+            <nav class="text-xs font-medium uppercase tracking-[0.3em] text-sage/80" aria-label="{{ __('messages.brands') }}">
                 <ol class="flex items-center gap-3">
                     <li>
                         <a href="{{ route('localized.home', ['locale' => app()->getLocale()]) }}"
@@ -20,7 +20,7 @@
                         </a>
                     </li>
                     <li class="text-sage/60">/</li>
-                    <li class="text-white">{{ __('messages.shared') }}</li>
+                    <li class="text-white">{{ __('messages.brands') }}</li>
                 </ol>
             </nav>
 
@@ -37,21 +37,21 @@
                     </p>
                 </div>
 
-                <div class="flex flex-col items-start gap-3 sm:flex-row sm:items-end sm:gap-6">
-                    <div class="rounded-2xl border border-sage/30 bg-sage/10 px-4 py-3 text-sm font-semibold text-sage shadow-sm">
+                <div class="flex w-full flex-col items-start gap-3 sm:flex-row sm:flex-wrap sm:items-end sm:gap-4 lg:w-auto">
+                    <div class="w-full rounded-2xl border border-sage/30 bg-sage/10 px-4 py-3 text-sm font-semibold text-sage shadow-sm sm:w-auto">
                         {{ __('messages.brands_index_catalogue_count', ['count' => number_format($totalBrands)]) }}
                     </div>
-                    <div class="rounded-2xl border border-sage/30 bg-sage/10 px-4 py-3 text-sm text-sage/80 shadow-sm">
+                    <div class="w-full rounded-2xl border border-sage/30 bg-sage/10 px-4 py-3 text-sm text-sage/80 shadow-sm sm:w-auto">
                         @if ($activeFilterCount > 0)
                             {{ trans_choice('messages.brands_index_status', $activeFilterCount, ['count' => $activeFilterCount]) }}
                         @else
                             {{ __('messages.brands_index_status_none') }}
                         @endif
-            </div>
+                    </div>
                     <button type="button"
                             wire:click="$toggle('sidebarOpen')"
                             wire:confirm="{{ __('translations.confirm_toggle_sidebar') }}"
-                            class="inline-flex items-center gap-2 rounded-full border border-sage/30 bg-sage/10 px-4 py-2 text-sm font-semibold text-sage shadow-sm transition hover:border-sage hover:bg-sage/20 lg:hidden">
+                            class="inline-flex w-full items-center justify-center gap-2 rounded-full border border-sage/30 bg-sage/10 px-4 py-2 text-sm font-semibold text-sage shadow-sm transition hover:border-sage hover:bg-sage/20 sm:w-auto lg:hidden">
                         <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M3 5h6M3 12h6m-6 7h6M13 5h8M13 12h8m-8 7h8" />
                         </svg>
@@ -65,6 +65,7 @@
     <x-container class="px-4 pb-16 pt-12">
         <div class="grid gap-8 lg:grid-cols-12">
             <aside class="hidden lg:col-span-3 lg:block">
+                <div class="lg:sticky lg:top-24">
                 <div class="rounded-3xl border border-sage/30 bg-dark p-6 shadow-lg">
                     <div class="mb-6 space-y-2">
                         <span class="inline-flex items-center gap-2 rounded-full border border-sage/30 bg-sage/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.35em] text-sage">
@@ -84,9 +85,10 @@
                         @include('livewire.pages.brand.partials.filters', ['variant' => 'desktop'])
                         </div>
                         </div>
+                </div>
             </aside>
 
-            <section class="lg:col-span-9 space-y-6" x-data="{ view: 'grid' }">
+            <section class="lg:col-span-9 space-y-6">
                 <div class="rounded-3xl border border-sage/30 bg-dark p-4 shadow-sm sm:p-6">
                     <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                         <div class="flex flex-wrap items-center gap-3 text-sm text-sage">
@@ -118,26 +120,6 @@
                                 </select>
                             </div>
 
-                            <div class="hidden items-center gap-1 rounded-xl border border-sage/30 bg-dark/30 p-1 text-sage shadow-sm md:flex">
-                                <button type="button"
-                                        @click="view = 'grid'"
-                                        :class="view === 'grid' ? 'bg-sage text-dark shadow-sm' : 'hover:text-white hover:bg-sage/10'"
-                                        class="inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-semibold transition text-sage">
-                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h7v7H4V6zm9 0h7v7h-7V6zM4 13h7v7H4v-7zm9 0h7v7h-7v-7z" />
-                                    </svg>
-                                    {{ __('messages.brands_index_view_grid') }}
-                                </button>
-                                <button type="button"
-                                        @click="view = 'list'"
-                                        :class="view === 'list' ? 'bg-sage text-dark shadow-sm' : 'hover:text-white hover:bg-sage/10'"
-                                        class="inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-semibold transition text-sage">
-                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-                                    </svg>
-                                    {{ __('messages.brands_index_view_list') }}
-                                </button>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -148,11 +130,10 @@
                             </div>
 
                     @if ($paginator->count() > 0)
-                        <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" :class="view === 'list' ? 'sm:grid-cols-1 xl:grid-cols-1' : 'sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'">
+                        <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                             @foreach ($paginator as $brand)
-                                <article class="group flex flex-col overflow-hidden rounded-3xl border border-ash/30 bg-white shadow-sm transition hover:-translate-y-1 hover:border-ash/60 hover:shadow-xl"
-                                         :class="view === 'list' ? 'sm:flex-row' : ''">
-                                    <div class="relative h-48 overflow-hidden sm:h-52" :class="view === 'list' ? 'sm:h-auto sm:w-64' : ''">
+                                <article class="group flex flex-col overflow-hidden rounded-3xl border border-ash/30 bg-white shadow-sm transition hover:-translate-y-1 hover:border-ash/60 hover:shadow-xl">
+                                    <div class="relative h-48 overflow-hidden sm:h-52">
                                         @if ($brand->getFirstMediaUrl('logo'))
                                             <div class="flex h-full w-full items-center justify-center bg-ash/10 p-8">
                                                 <img src="{{ $brand->getFirstMediaUrl('logo') }}"
@@ -214,7 +195,7 @@
                         @if ($paginator->hasPages())
                             <div class="mt-12 rounded-3xl border border-sage/30 bg-dark p-6 shadow-lg">
                                 <nav class="flex items-center justify-center" aria-label="{{ __('messages.brands_index_pagination_navigation') }}">
-                                    <div class="flex items-center justify-center">
+                                    <div class="w-full overflow-x-auto pb-2 sm:w-auto">
                                         <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
                                             @if ($paginator->onFirstPage())
                                                 <span class="relative inline-flex items-center rounded-l-md px-2 py-2 text-sage/60 ring-1 ring-inset ring-sage/30">
@@ -280,7 +261,7 @@
                  wire:click="$toggle('sidebarOpen')"
                  wire:confirm="{{ __('translations.confirm_toggle_sidebar') }}"></div>
 
-            <div class="absolute inset-y-0 right-0 w-11/12 max-w-md rounded-l-3xl bg-dark shadow-2xl">
+            <div class="absolute inset-y-0 right-0 w-full max-w-md rounded-l-none bg-dark shadow-2xl sm:w-11/12 sm:rounded-l-3xl">
                 <div class="flex h-full flex-col overflow-y-auto">
                     <div class="flex items-center justify-between border-b border-sage/30 p-6">
                         <div class="space-y-2">
