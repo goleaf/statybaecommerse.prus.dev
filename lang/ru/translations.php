@@ -18,7 +18,7 @@ return [
     'add_new_address'                      => 'Add new address',
     'add_products_to_cart'                 => 'Add products to cart',
     'add_tags'                             => 'Добавить теги',
-    'add_to_cart'                          => 'Add to Cart',
+    'add_to_cart'                          => 'В корзину',
     'add_to_compare'                       => 'Add to compare',
     'add_to_wishlist'                      => 'Add to Wishlist',
     'add_translation'                      => 'Add Translation',

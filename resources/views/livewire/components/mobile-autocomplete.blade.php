@@ -164,7 +164,6 @@
             
             {{-- Suggestions --}}
             <div x-show="showSuggestions && suggestions.length > 0" class="p-4">
-                <h3 class="text-sm font-medium text-gray-900 mb-3">{{ __('messages.frontend') }}</h3>
                 <div class="space-y-2">
                     <template x-for="(suggestion, index) in suggestions" :key="index">
                     <button

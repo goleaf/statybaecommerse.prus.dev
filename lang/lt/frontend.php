@@ -115,7 +115,7 @@ return [
     'cart' => [
         'add_error'           => 'Add error',
         'add_success'         => 'Add success',
-        'add_to_cart'         => 'Add to cart',
+        'add_to_cart'         => 'Pridėti į krepšelį',
         'continue_shopping'   => 'Continue shopping',
         'coupon_code'         => 'Coupon code',
         'empty_description'   => 'Empty description',
@@ -778,7 +778,7 @@ return [
         'premium_message' => 'Premium message',
         'products'        => [
             'actions' => [
-                'add_to_cart' => 'Add to cart',
+                'add_to_cart' => 'Pridėti į krepšelį',
             ],
             'badges' => [
                 'new'     => 'New',

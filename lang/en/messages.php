@@ -408,7 +408,6 @@ return [
     'brands_index_quick_actions'                                                     => 'Quick actions',
     'brands_index_quick_featured'                                                    => 'Featured first',
     'brands_index_quick_products'                                                    => 'Most products',
-    'brands_index_real_time_results'                                                 => 'Live results',
     'brands_index_reset_filters'                                                     => 'Reset filters',
     'brands_index_search_label'                                                      => 'Search brands',
     'brands_index_search_placeholder'                                                => 'Type brand name...',

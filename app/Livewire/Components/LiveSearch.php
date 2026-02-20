@@ -29,6 +29,8 @@ use Livewire\Component;
  */
 final class LiveSearch extends Component
 {
+    public ?string $placeholder = null;
+
     #[Validate('nullable|string|max:255')]
     public string $query = '';
 

@@ -92,13 +92,6 @@
                 <div class="rounded-3xl border border-sage/30 bg-dark p-4 shadow-sm sm:p-6">
                     <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                         <div class="flex flex-wrap items-center gap-3 text-sm text-sage">
-                            <span class="inline-flex items-center gap-2 rounded-full border border-sage/30 bg-sage/10 px-3 py-1 text-xs font-semibold text-sage">
-                                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                {{ __('messages.brands_index_real_time_results') }}
-                            </span>
                             @if ($paginator->count() > 0)
                                 <span class="text-sage/80">{{ __('messages.brands_index_showing_results', ['from' => $paginator->firstItem() ?? 0, 'to' => $paginator->lastItem() ?? 0, 'total' => $totalBrands]) }}</span>
                             @else
