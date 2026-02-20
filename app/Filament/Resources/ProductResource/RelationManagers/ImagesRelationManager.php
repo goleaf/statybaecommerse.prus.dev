@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Filament\Resources\ProductResource\RelationManagers;
 
 use App\Models\ProductImage;
-use App\Support\Filament\ProductImageDataNormalizer;
 use App\Support\Filament\Forms\Components\SortOrderInput;
+use App\Support\Filament\ProductImageDataNormalizer;
 use Filament\Actions\AssociateAction;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\TextInput;
@@ -53,7 +53,8 @@ class ImagesRelationManager extends RelationManager
                 TextInput::make('alt_text')
                     ->label(__('messages.alt_text'))
                     ->maxLength(255),
-                SortOrderInput::make(),
+                SortOrderInput::make()
+                    ->default(null),
                 Toggle::make('is_default')
                     ->label(__('messages.is_main'))
                     ->default(fn (RelationManager $livewire): bool => $livewire->getOwnerRecord()
@@ -148,11 +149,17 @@ class ImagesRelationManager extends RelationManager
                 CreateAction::make()
                     ->mutateDataUsing(function (array $data): array {
                         $ownerRecord = $this->getOwnerRecord();
+
+                        $rawSortOrder = $data['sort_order'] ?? null;
+                        $sortOrderWasProvided = is_string($rawSortOrder)
+                            ? trim($rawSortOrder) !== ''
+                            : $rawSortOrder !== null;
+
                         $data = ProductImageDataNormalizer::normalize($data);
 
                         $data['product_id'] = $ownerRecord->getKey();
 
-                        if (! is_numeric($data['sort_order'] ?? null)) {
+                        if (! $sortOrderWasProvided) {
                             $nextSortOrder = (int) (
                                 $ownerRecord->images()
                                     ->withoutGlobalScopes()

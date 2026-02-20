@@ -114,6 +114,45 @@ final class ProductImagesRelationManagerTest extends TestCase
         Storage::disk('public')->assertExists($image->path);
     }
 
+    public function test_uploading_images_assigns_incremental_sort_order_automatically(): void
+    {
+        $firstUpload = UploadedFile::fake()->image('first-upload.jpg', 1200, 800);
+        $secondUpload = UploadedFile::fake()->image('second-upload.jpg', 1200, 800);
+
+        Livewire::test(ImagesRelationManager::class, [
+            'ownerRecord' => $this->product,
+            'pageClass'   => EditProduct::class,
+        ])
+            ->mountTableAction('create')
+            ->set('mountedActions.0.data.path', $firstUpload)
+            ->set('mountedActions.0.data.alt_text', 'First upload')
+            ->set('mountedActions.0.data.is_default', true)
+            ->set('mountedActions.0.data.is_active', true)
+            ->callMountedTableAction()
+            ->assertHasNoTableActionErrors();
+
+        Livewire::test(ImagesRelationManager::class, [
+            'ownerRecord' => $this->product,
+            'pageClass'   => EditProduct::class,
+        ])
+            ->mountTableAction('create')
+            ->set('mountedActions.0.data.path', $secondUpload)
+            ->set('mountedActions.0.data.alt_text', 'Second upload')
+            ->set('mountedActions.0.data.is_default', false)
+            ->set('mountedActions.0.data.is_active', true)
+            ->callMountedTableAction()
+            ->assertHasNoTableActionErrors();
+
+        $sortOrders = ProductImage::withoutGlobalScopes()
+            ->where('product_id', $this->product->getKey())
+            ->orderBy('sort_order')
+            ->pluck('sort_order')
+            ->values()
+            ->all();
+
+        $this->assertSame([0, 1], $sortOrders);
+    }
+
     public function test_can_edit_image_with_uploaded_file_from_product_relation_manager(): void
     {
         Storage::disk('public')->put('product-images/original-image.jpg', 'original-binary');

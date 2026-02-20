@@ -59,3 +59,4 @@ junit.xml
 phpstan-baseline.neon
 junit.xml
 junit.xml
+database/seeders/AdminUserSeeder.php
