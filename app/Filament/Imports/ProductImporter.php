@@ -36,6 +36,10 @@ class ProductImporter extends BaseImporter
 
     private const IMPORT_IMAGE_QUALITY = 85;
 
+    private const IMPORT_IMAGE_DOWNLOAD_TIMEOUT_SECONDS = 300;
+
+    private const IMPORT_IMAGE_CONNECT_TIMEOUT_SECONDS = 30;
+
     private const SYNC_KEY_FIELDS = [
         'sku'     => 'SKU',
         'barcode' => 'Barcode',
@@ -911,7 +915,8 @@ class ProductImporter extends BaseImporter
     private function downloadImageContents(string $imageUrl): ?array
     {
         try {
-            $response = Http::timeout(20)
+            $response = Http::connectTimeout(self::IMPORT_IMAGE_CONNECT_TIMEOUT_SECONDS)
+                ->timeout(self::IMPORT_IMAGE_DOWNLOAD_TIMEOUT_SECONDS)
                 ->retry(1, 200)
                 ->get($imageUrl);
         } catch (ConnectionException) {

@@ -60,4 +60,14 @@ final class ImportProducts extends CsvImportPage
 
         return str_shuffle($lower . $upper . $digit . $special . Str::random(4));
     }
+
+    protected function getChunkSize(): int
+    {
+        return 20;
+    }
+
+    protected function getImportProcessingTimeoutSeconds(): int
+    {
+        return 300;
+    }
 }

@@ -7,6 +7,7 @@ namespace Tests\Unit\Filament\Importers;
 use App\Filament\Imports\ProductImporter;
 use Filament\Actions\Imports\Models\Import;
 use Illuminate\Support\Facades\Http;
+use ReflectionClass;
 use ReflectionMethod;
 
 it('resolves image extension from content type and url fallback', function (): void {
@@ -48,6 +49,13 @@ it('returns null when image download fails', function (): void {
     $result = $method->invoke($importer, 'https://example.com/missing.png');
 
     expect($result)->toBeNull();
+});
+
+it('uses a 300-second timeout for image downloads during product import', function (): void {
+    $reflection = new ReflectionClass(ProductImporter::class);
+
+    expect($reflection->getConstant('IMPORT_IMAGE_DOWNLOAD_TIMEOUT_SECONDS'))->toBe(300)
+        ->and($reflection->getConstant('IMPORT_IMAGE_CONNECT_TIMEOUT_SECONDS'))->toBe(30);
 });
 
 it('resizes oversized downloaded image contents', function (): void {

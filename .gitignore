@@ -54,9 +54,7 @@ database/*.sqlite
 package-lock.json
 composer.lock
 composer.lock
-junit.xml
 /docs/
 phpstan-baseline.neon
-junit.xml
-junit.xml
 database/seeders/AdminUserSeeder.php
+junit.xml

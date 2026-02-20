@@ -919,6 +919,12 @@ abstract class CsvImportPage extends Page implements HasForms
             return;
         }
 
+        $timeoutSeconds = max(1, $this->getImportProcessingTimeoutSeconds());
+        @ini_set('max_execution_time', (string) $timeoutSeconds);
+        if (function_exists('set_time_limit')) {
+            @set_time_limit($timeoutSeconds);
+        }
+
         $columnMap = $this->normalizeImportPayload($import->column_map);
         $options = $this->normalizeImportPayload($import->options);
         $disk = (string) ($import->file_disk ?: SecureStorage::disk());
@@ -1139,6 +1145,7 @@ abstract class CsvImportPage extends Page implements HasForms
                 disk: SecureStorage::disk(),
                 path: $import->file_path,
                 chunkSize: $this->getChunkSize(),
+                timeoutSeconds: $this->getImportProcessingTimeoutSeconds(),
             ));
         }
 
@@ -1354,6 +1361,11 @@ abstract class CsvImportPage extends Page implements HasForms
     protected function getChunkSize(): int
     {
         return 100;
+    }
+
+    protected function getImportProcessingTimeoutSeconds(): int
+    {
+        return 120;
     }
 
     protected function getMaxRows(): ?int

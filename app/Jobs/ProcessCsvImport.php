@@ -30,6 +30,8 @@ final class ProcessCsvImport implements ShouldQueue
     use Queueable;
     use SerializesModels;
 
+    public int $timeout;
+
     /**
      * @param array<string, string> $columnMap
      * @param array<string, mixed>  $options
@@ -41,10 +43,18 @@ final class ProcessCsvImport implements ShouldQueue
         public string $disk,
         public string $path,
         public int $chunkSize,
-    ) {}
+        public int $timeoutSeconds = 120,
+    ) {
+        $this->timeout = max(1, $this->timeoutSeconds);
+    }
 
     public function handle(CsvImportProcessor $processor): void
     {
+        @ini_set('max_execution_time', (string) $this->timeout);
+        if (function_exists('set_time_limit')) {
+            @set_time_limit($this->timeout);
+        }
+
         $import = Import::query()->find($this->importId);
 
         if (! $import) {
