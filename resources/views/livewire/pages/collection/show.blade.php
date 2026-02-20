@@ -160,7 +160,7 @@
         <div class="text-slate-500" aria-live="polite">{{ __('messages.no_products_in_this_collection_yet') }}</div>
     @else
         <p class="text-sm text-gray-600 mb-2" aria-live="polite">
-            {{ trans_choice(':count result found|:count results found', $products->total() ?? $products->count(), ['count' => $products->total() ?? $products->count()]) }}
+            {{ trans_choice('frontend.collections.results_found', $products->total() ?? $products->count(), ['count' => $products->total() ?? $products->count()]) }}
         </p>
         <div id="results" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             @foreach ($products as $product)

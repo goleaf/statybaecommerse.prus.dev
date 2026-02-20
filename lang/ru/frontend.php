@@ -106,7 +106,7 @@ return [
         ],
     ],
     'buttons' => [
-        'back_to_collections' => 'Back to collections',
+        'back_to_collections' => 'Назад к коллекциям',
         'back_to_home'        => 'Back to home',
         'back_to_news'        => 'Back to news',
         'back_to_product'     => 'Back to product',
@@ -179,6 +179,12 @@ return [
         'buttons' => [
             'view_collection' => 'Открыть коллекцию',
         ],
+        'fields' => [
+            'display_type'      => 'Тип отображения',
+            'max_products'      => 'Макс. товаров',
+            'products_per_page' => 'Товаров на странице',
+            'slug'              => 'Слаг',
+        ],
         'empty' => [
             'collections' => 'Коллекции пока недоступны.',
             'products'    => 'В этой коллекции пока нет товаров.',
@@ -192,6 +198,7 @@ return [
             'description' => 'Просматривайте подборки товаров для строительства, ремонта и профессионального использования.',
             'title'       => 'Коллекции',
         ],
+        'results_found' => '{1} Найден :count результат|[2,4] Найдено :count результата|[5,*] Найдено :count результатов',
         'stats' => [
             'products' => '{1} :count товар|[2,4] :count товара|[5,*] :count товаров',
         ],
@@ -933,7 +940,7 @@ return [
     ],
     'navigation' => [
         'breadcrumbs' => 'Навигация',
-        'home'        => 'Home',
+        'home'        => 'Главная',
         'products'    => 'Товары',
     ],
     'notifications' => [

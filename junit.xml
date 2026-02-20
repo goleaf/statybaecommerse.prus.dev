@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="Tests\Feature\Livewire\Pages\Category\IndexTest" file="Index (Tests\Feature\Livewire\Pages\Category\Index)" tests="2" assertions="3" errors="0" failures="0" skipped="0" time="10.823868">
-    <testcase name="It renders successfully" file="Index (Tests\Feature\Livewire\Pages\Category\Index)::It renders successfully" class="Tests\Feature\Livewire\Pages\Category\IndexTest" classname="Tests.Feature.Livewire.Pages.Category.IndexTest" assertions="2" time="9.455961"/>
-    <testcase name="Localized categories route renders when visible categories exist" file="Index (Tests\Feature\Livewire\Pages\Category\Index)::Localized categories route renders when visible categories exist" class="Tests\Feature\Livewire\Pages\Category\IndexTest" classname="Tests.Feature.Livewire.Pages.Category.IndexTest" assertions="1" time="1.367907"/>
+  <testsuite name="Tests\Feature\Frontend\CollectionRoutesTest" file="Collection Routes (Tests\Feature\Frontend\CollectionRoutes)" tests="2" assertions="2" errors="0" failures="0" skipped="0" time="9.880481">
+    <testcase name="Collections show route resolves" file="Collection Routes (Tests\Feature\Frontend\CollectionRoutes)::Collections show route resolves" class="Tests\Feature\Frontend\CollectionRoutesTest" classname="Tests.Feature.Frontend.CollectionRoutesTest" assertions="1" time="9.266457"/>
+    <testcase name="Collections index route resolves" file="Collection Routes (Tests\Feature\Frontend\CollectionRoutes)::Collections index route resolves" class="Tests\Feature\Frontend\CollectionRoutesTest" classname="Tests.Feature.Frontend.CollectionRoutesTest" assertions="1" time="0.614025"/>
   </testsuite>
 </testsuites>

@@ -106,7 +106,7 @@ return [
         ],
     ],
     'buttons' => [
-        'back_to_collections' => 'Back to collections',
+        'back_to_collections' => 'Zurück zu den Kollektionen',
         'back_to_home'        => 'Back to home',
         'back_to_news'        => 'Back to news',
         'back_to_product'     => 'Back to product',
@@ -179,6 +179,12 @@ return [
         'buttons' => [
             'view_collection' => 'Kollektion ansehen',
         ],
+        'fields' => [
+            'display_type'      => 'Anzeigetyp',
+            'max_products'      => 'Max. Produkte',
+            'products_per_page' => 'Produkte pro Seite',
+            'slug'              => 'URL-Name',
+        ],
         'empty' => [
             'collections' => 'Derzeit sind keine Kollektionen verfügbar.',
             'products'    => 'Diese Kollektion enthält derzeit keine Produkte.',
@@ -192,6 +198,7 @@ return [
             'description' => 'Durchsuchen Sie kuratierte Produktkollektionen für Bau, Renovierung und professionellen Einsatz.',
             'title'       => 'Kollektionen',
         ],
+        'results_found' => '{1} :count Ergebnis gefunden|[2,*] :count Ergebnisse gefunden',
         'stats' => [
             'products' => '{1} :count Produkt|[2,*] :count Produkte',
         ],
@@ -933,7 +940,7 @@ return [
     ],
     'navigation' => [
         'breadcrumbs' => 'Brotkrumen',
-        'home'        => 'Home',
+        'home'        => 'Startseite',
         'products'    => 'Produkte',
     ],
     'notifications' => [

@@ -179,6 +179,12 @@ return [
         'buttons' => [
             'view_collection' => 'View collection',
         ],
+        'fields' => [
+            'display_type'      => 'Display type',
+            'max_products'      => 'Max products',
+            'products_per_page' => 'Products per page',
+            'slug'              => 'Slug',
+        ],
         'empty' => [
             'collections' => 'No collections available yet.',
             'products'    => 'No products in this collection yet.',
@@ -192,6 +198,7 @@ return [
             'description' => 'Browse curated product collections tailored for construction, renovation, and professional use.',
             'title'       => 'Collections',
         ],
+        'results_found' => '{1} :count result found|[2,*] :count results found',
         'stats' => [
             'products' => '{1} :count product|[2,*] :count products',
         ],

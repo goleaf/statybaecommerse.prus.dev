@@ -106,7 +106,7 @@ return [
         ],
     ],
     'buttons' => [
-        'back_to_collections' => 'Atgal į kolekijas',
+        'back_to_collections' => 'Atgal į kolekcijas',
         'back_to_home'        => 'Atgal į pradžią',
         'back_to_news'        => 'Atgal į naujienas',
         'back_to_product'     => 'Atgal į prekę',
@@ -179,6 +179,12 @@ return [
         'buttons' => [
             'view_collection' => 'Peržiūrėti kolekciją',
         ],
+        'fields' => [
+            'display_type'      => 'Rodinio tipas',
+            'max_products'      => 'Maks. produktų',
+            'products_per_page' => 'Produktų puslapyje',
+            'slug'              => 'Nuorodos identifikatorius',
+        ],
         'empty' => [
             'collections' => 'Kolekcijų kol kas nėra.',
             'products'    => 'Šioje kolekcijoje kol kas nėra produktų.',
@@ -192,6 +198,7 @@ return [
             'description' => 'Naršykite atrinktas produktų kolekcijas statybai, renovacijai ir profesionaliam naudojimui.',
             'title'       => 'Kolekcijos',
         ],
+        'results_found' => '{1} Rastas :count rezultatas|[2,*] Rasti :count rezultatai',
         'stats' => [
             'products' => '{1} :count produktas|[2,*] :count produktai',
         ],
