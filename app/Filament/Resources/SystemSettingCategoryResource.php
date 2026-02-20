@@ -7,12 +7,12 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\SystemSettingCategoryResource\Pages;
 use App\Filament\Resources\SystemSettingCategoryResource\Schemas\SystemSettingCategoryForm;
 use App\Filament\Resources\SystemSettingCategoryResource\Tables\SystemSettingCategoriesTable;
-use App\Models\SystemSettingCategory;
 use App\Models\Scopes\ActiveScope;
+use App\Models\SystemSettingCategory;
+use BackedEnum;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use BackedEnum;
 use UnitEnum;
 
 class SystemSettingCategoryResource extends BaseResource
@@ -21,9 +21,26 @@ class SystemSettingCategoryResource extends BaseResource
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-folder-open';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Settings';
+    protected static bool $shouldRegisterNavigation = false;
+
+    protected static string|UnitEnum|null $navigationGroup = null;
 
     protected static ?int $navigationSort = 11;
+
+    public static function getNavigationGroup(): string|UnitEnum|null
+    {
+        return __('admin.navigation.settings');
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
+
+    public static function getNavigationItems(): array
+    {
+        return [];
+    }
 
     public static function getRecordTitleAttribute(): ?string
     {

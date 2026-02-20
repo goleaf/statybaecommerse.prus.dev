@@ -18,7 +18,7 @@
         
         <div class="relative mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
             {{-- Breadcrumbs --}}
-            <nav class="flex mb-8" aria-label="Breadcrumb">
+            <nav class="flex mb-8" aria-label="{{ __('frontend.navigation.breadcrumbs') }}">
                 <ol class="inline-flex items-center space-x-1 md:space-x-3">
                     <li class="inline-flex items-center">
                         <a href="{{ route('localized.home', ['locale' => app()->getLocale()]) }}" class="inline-flex items-center text-blue-100 hover:text-white">

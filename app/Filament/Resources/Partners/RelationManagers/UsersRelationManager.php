@@ -58,7 +58,7 @@ class UsersRelationManager extends RelationManager
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('pivot.role')
-                    ->label('Role')
+                    ->label(__('admin.labels.role'))
                     ->badge(),
             ])
             ->filters([

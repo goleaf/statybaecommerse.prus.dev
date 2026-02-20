@@ -64,7 +64,7 @@ class ReferralsRelationManager extends RelationManager
             ->recordTitleAttribute('referral_code')
             ->columns([
                 TextColumn::make('referred.name')
-                    ->label('Referred User')
+                    ->label(__('admin.labels.referred_user'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('referral_code')

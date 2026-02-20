@@ -116,7 +116,7 @@ class CustomerGroupForm
                                     ->minValue(0),
                                 TextInput::make('payment_terms')
                                     ->label(__('messages.payment_method'))
-                                    ->placeholder('net_30')
+                                    ->placeholder(__('messages.net_30'))
                                     ->maxLength(255),
                             ]),
                     ])

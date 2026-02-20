@@ -19,7 +19,7 @@
 						<h2 class="text-2xl sm:text-3xl font-bold">{{ __('messages.home_mission_title') }}</h2>
 						<p class="text-white/80 leading-relaxed">{{ __('messages.home_mission_subtitle') }}</p>
                         <div class="flex flex-wrap items-center gap-3">
-                            <a href="mailto:{{ config('app.email', 'support@statybae.com') }}" class="px-6 py-3 bg-sage font-semibold transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2 relative overflow-hidden group rounded-md">
+                            <a href="mailto:{{ config('app.email', 'eegidia@gmail.com') }}" class="px-6 py-3 bg-sage font-semibold transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2 relative overflow-hidden group rounded-md">
 								<div class="absolute inset-0 bg-gradient-to-r from-brand-primary to-brand-primary-dark opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"></div>
 								<svg class="w-4 h-4 relative z-30 transition-all duration-300 group-hover:scale-110 !text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2 12l9 9 11-18" />

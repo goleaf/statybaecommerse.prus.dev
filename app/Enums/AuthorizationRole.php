@@ -20,15 +20,13 @@ enum AuthorizationRole: string
      */
     public function label(): string
     {
-        return match ($this) {
-            self::SUPER_ADMIN   => 'Super Admin',
-            self::ADMIN         => 'Admin',
-            self::ADMINISTRATOR => 'Administrator',
-            self::MANAGER       => 'Manager',
-            self::EDITOR        => 'Editor',
-            self::SUPPORT       => 'Support',
-            self::VIEWER        => 'Viewer',
-            self::USER          => 'User',
-        };
+        $key = 'enums.authorization_role.' . $this->value;
+        $translation = __($key);
+
+        if (! is_string($translation) || $translation === $key) {
+            return str($this->value)->replace('_', ' ')->title()->toString();
+        }
+
+        return $translation;
     }
 }

@@ -521,6 +521,15 @@ final class SystemSettingsResourceTest extends TestCase
     }
 
     /**
+     * The resource should stay accessible by URL but hidden from the Filament sidebar.
+     */
+    public function test_resource_does_not_register_navigation_item(): void
+    {
+        self::assertFalse(SystemSettingsResource::shouldRegisterNavigation());
+        self::assertSame([], SystemSettingsResource::getNavigationItems());
+    }
+
+    /**
      * Administrators should be able to create a new category inline from the setting form.
      */
     public function test_can_create_category_from_form(): void

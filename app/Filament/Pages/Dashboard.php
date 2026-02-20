@@ -29,22 +29,21 @@ class Dashboard extends BaseDashboard
         return 'heroicon-o-home';
     }
 
-    protected static ?string $title = 'Dashboard';
+    protected static ?string $title = null;
 
     public static function getNavigationLabel(): string
     {
-        return trans('messages.admin');
+        return __('admin.navigation.dashboard');
     }
 
     public function getTitle(): string
     {
-        return trans('messages.admin');
+        return __('admin.navigation.dashboard');
     }
 
     public function getHeading(): string
     {
-        // Keep the visible dashboard heading in English so feature assertions spot the expected label.
-        return 'Dashboard';
+        return __('admin.navigation.dashboard');
     }
 
     public function getWidgets(): array

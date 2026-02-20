@@ -3,6 +3,8 @@
  * All helpers avoid inline styles so they remain compatible with strict CSP headers.
  */
 
+import { t } from './i18n.js';
+
 const NOTIFICATION_BASE_CLASS = 'csp-notification';
 const NOTIFICATION_VISIBLE_CLASS = 'csp-notification--visible';
 const HIDDEN_CLASS = 'csp-hidden';
@@ -40,7 +42,7 @@ export const notifications = {
         const closeButton = document.createElement('button');
         closeButton.type = 'button';
         closeButton.classList.add('csp-notification__close');
-        closeButton.setAttribute('aria-label', 'Dismiss notification');
+        closeButton.setAttribute('aria-label', t('js.notifications.dismiss'));
         closeButton.innerHTML = `
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -85,7 +87,7 @@ export const cart = {
     addAnimation(productName) {
         const notification = document.createElement('div');
         notification.classList.add(NOTIFICATION_BASE_CLASS, 'csp-notification--success');
-        notification.textContent = `${productName} added to cart!`;
+        notification.textContent = t('js.cart.quick_add_message', { product: productName });
 
         document.body.appendChild(notification);
         requestAnimationFrame(() => notification.classList.add(NOTIFICATION_VISIBLE_CLASS));

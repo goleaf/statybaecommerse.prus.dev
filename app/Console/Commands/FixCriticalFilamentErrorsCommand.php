@@ -14,12 +14,13 @@ final class FixCriticalFilamentErrorsCommand extends Command
                             {--dry-run : Show what would be changed without making changes}
                             {--resource=* : Specific resources to fix (optional)}';
 
-    protected $description = 'Apply quick fixes for known critical syntax issues in Filament resources.';
+    protected $description = '';
 
     public function __construct(
         private readonly FilamentResourceFixer $fixer
     ) {
         parent::__construct();
+        $this->setDescription(__('messages.fix_critical_filament_errors_command_description'));
     }
 
     public function handle(): int

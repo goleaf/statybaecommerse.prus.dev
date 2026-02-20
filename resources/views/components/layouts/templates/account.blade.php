@@ -24,10 +24,6 @@
                                             :title="__('messages.frontend')"
                                             :active="request()->routeIs('account.orders*')" />
                         <x-nav.account-link
-                                            :href="route('account.wishlist')"
-                                            :title="__('messages.frontend')"
-                                            :active="request()->routeIs('account.wishlist')" />
-                        <x-nav.account-link
                                             :href="route('account.documents')"
                                             :title="__('messages.frontend')"
                                             :active="request()->routeIs('account.documents')" />

@@ -90,7 +90,7 @@ final class VariantBulkPriceUpdate extends Action
                     $rawReason = $data['change_reason'] ?? $data['reason'] ?? null;
                     $reason = is_string($rawReason) ? trim((string) $rawReason) : '';
                     if ($reason === '') {
-                        $reason = 'Bulk price update';
+                        $reason = __('product.variants.defaults.bulk_price_update_reason');
                     }
 
                     foreach ($records as $record) {

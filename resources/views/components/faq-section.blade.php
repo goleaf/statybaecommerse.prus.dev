@@ -173,7 +173,7 @@
             <p class="text-gray-600 mb-6">
                 {{ __('messages.frontend') }}</p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="{{ route('contact', ['locale' => app()->getLocale()]) ?? '/contact' }}"
+                <a href="{{ \Illuminate\Support\Facades\Route::has('frontend.contact.index') ? route('frontend.contact.index') : url('/contact') }}"
                    class="btn-gradient px-6 py-3 rounded-xl font-semibold">
                     {{ __('messages.frontend') }}
                 </a>

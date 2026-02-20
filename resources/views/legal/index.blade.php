@@ -132,9 +132,9 @@
                 <p class="text-gray-600 mb-4">
                     {{ __('messages.frontend_legal') }}
                 </p>
-                @if (\Illuminate\Support\Facades\Route::has('contact'))
+                @if (\Illuminate\Support\Facades\Route::has('frontend.contact.index'))
                     <a
-                       href="{{ route('contact') }}"
+                       href="{{ route('frontend.contact.index') }}"
                        class="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
                         {{ __('messages.frontend_legal') }}
                     </a>

@@ -120,7 +120,9 @@ final class NavigationMenu extends Component
         $this->redirect(
             Route::has('localized.search')
                 ? route('localized.search', ['locale' => app()->getLocale(), 'q' => $this->searchQuery])
-                : route('search', ['q' => $this->searchQuery])
+                : (Route::has('frontend.search.index')
+                    ? route('frontend.search.index', ['q' => $this->searchQuery])
+                    : url('/search?q=' . urlencode($this->searchQuery)))
         );
     }
 

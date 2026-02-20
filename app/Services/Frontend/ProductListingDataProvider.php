@@ -15,12 +15,12 @@ use Illuminate\Support\Collection;
 final class ProductListingDataProvider
 {
     private const SORTS = [
-        'latest'     => ['label' => 'Newest arrivals', 'sort_by' => 'created_at', 'direction' => 'desc'],
-        'name'       => ['label' => 'Name A-Z', 'sort_by' => 'name', 'direction' => 'asc'],
-        'price_asc'  => ['label' => 'Price: Low to High', 'sort_by' => 'price', 'direction' => 'asc'],
-        'price_desc' => ['label' => 'Price: High to Low', 'sort_by' => 'price', 'direction' => 'desc'],
-        'popular'    => ['label' => 'Most popular', 'sort_by' => 'popularity', 'direction' => 'desc'],
-        'rating'     => ['label' => 'Best rated', 'sort_by' => 'rating', 'direction' => 'desc'],
+        'latest'     => ['label_key' => 'ui.newest_first', 'sort_by' => 'created_at', 'direction' => 'desc'],
+        'name'       => ['label_key' => 'ui.name_a_to_z', 'sort_by' => 'name', 'direction' => 'asc'],
+        'price_asc'  => ['label_key' => 'messages.price_low_to_high', 'sort_by' => 'price', 'direction' => 'asc'],
+        'price_desc' => ['label_key' => 'ui.price_high_to_low', 'sort_by' => 'price', 'direction' => 'desc'],
+        'popular'    => ['label_key' => 'ui.most_popular', 'sort_by' => 'popularity', 'direction' => 'desc'],
+        'rating'     => ['label_key' => 'ui.highest_rated', 'sort_by' => 'rating', 'direction' => 'desc'],
     ];
 
     public function __construct(private readonly ProductService $productService) {}
@@ -66,7 +66,7 @@ final class ProductListingDataProvider
     public function availableSorts(): array
     {
         return collect(self::SORTS)
-            ->mapWithKeys(static fn (array $config, string $key) => [$key => $config['label']])
+            ->mapWithKeys(static fn (array $config, string $key) => [$key => __($config['label_key'])])
             ->all();
     }
 

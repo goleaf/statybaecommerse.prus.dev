@@ -303,17 +303,6 @@
                 <div class="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
                     <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                         <div class="flex flex-wrap items-center gap-3 text-sm text-slate-700">
-                            <span class="inline-flex items-center gap-2 rounded-full border border-cyan-200 bg-cyan-50 px-3 py-1 text-xs font-semibold text-cyan-700">
-                                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                @if ($isIndex)
-                                    {{ __('categories.index.real_time_results') }}
-                                @else
-                                    {{ __('categories.show.real_time_results') }}
-                                @endif
-                            </span>
                             @if ($isIndex)
                                 @if ($from && $to)
                                     <span class="text-slate-500">{{ __('categories.index.showing_results', ['from' => $from, 'to' => $to, 'total' => $totalCategories]) }}</span>
@@ -480,7 +469,7 @@
                             <div class="mt-12 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
                                 <nav class="flex items-center justify-center" aria-label="{{ __('categories.show.pagination_navigation') }}">
                                     <div class="flex items-center justify-center">
-                                        <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+                                        <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="{{ __('messages.pagination') }}">
                                             @if ($products->onFirstPage())
                                                 <span class="relative inline-flex items-center rounded-l-md px-2 py-2 text-slate-400 ring-1 ring-inset ring-slate-200">
                                                     <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">

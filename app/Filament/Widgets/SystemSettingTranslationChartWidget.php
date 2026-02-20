@@ -10,9 +10,14 @@ use Illuminate\Support\Facades\DB;
 
 final class SystemSettingTranslationChartWidget extends ChartWidget
 {
-    protected ?string $heading = 'Translations by Language';
+    protected ?string $heading = null;
 
     protected static ?int $sort = 2;
+
+    public function getHeading(): string
+    {
+        return __('admin.widgets.translations_by_language');
+    }
 
     protected function getData(): array
     {
@@ -38,13 +43,13 @@ final class SystemSettingTranslationChartWidget extends ChartWidget
                 ],
             ],
             'labels' => $data->pluck('locale')->map(fn ($locale) => match ($locale) {
-                'en'    => '🇺🇸 English',
-                'lt'    => '🇱🇹 Lithuanian',
-                'de'    => '🇩🇪 German',
-                'fr'    => '🇫🇷 French',
-                'es'    => '🇪🇸 Spanish',
-                'pl'    => '🇵🇱 Polish',
-                'ru'    => '🇷🇺 Russian',
+                'en'    => '🇺🇸 ' . __('translations.english'),
+                'lt'    => '🇱🇹 ' . __('translations.lithuanian'),
+                'de'    => '🇩🇪 ' . __('translations.german'),
+                'fr'    => '🇫🇷 ' . __('translations.french'),
+                'es'    => '🇪🇸 ' . __('translations.spanish'),
+                'pl'    => '🇵🇱 ' . __('admin.labels.polish'),
+                'ru'    => '🇷🇺 ' . __('translations.russian'),
                 default => $locale,
             })->toArray(),
         ];

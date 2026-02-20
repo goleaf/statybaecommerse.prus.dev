@@ -61,9 +61,11 @@ class UserForm
                             ->required(),
                         TextInput::make('first_name')
                             ->label(__('messages.first_name'))
+                            ->formatStateUsing(static fn (mixed $state): ?string => self::normalizeLocalizedText($state))
                             ->maxLength(255),
                         TextInput::make('last_name')
                             ->label(__('messages.last_name'))
+                            ->formatStateUsing(static fn (mixed $state): ?string => self::normalizeLocalizedText($state))
                             ->maxLength(255),
                         TextInput::make('email')
                             ->label(__('messages.email'))
@@ -147,7 +149,7 @@ class UserForm
                                     ->label(__('messages.company'))
                                     ->maxLength(255),
                                 TextInput::make('company_vat')
-                                    ->label('VAT code')
+                                    ->label(__('admin.labels.vat_code'))
                                     ->maxLength(255),
                                 TextInput::make('address_line_1')
                                     ->label(__('messages.address'))
@@ -311,6 +313,75 @@ class UserForm
             ]);
     }
 
+    private static function normalizeLocalizedText(mixed $state): ?string
+    {
+        if ($state === null) {
+            return null;
+        }
+
+        if (is_object($state)) {
+            $state = (array) $state;
+        }
+
+        if (is_array($state)) {
+            return self::resolveLocalizedValue($state);
+        }
+
+        if (! is_string($state)) {
+            return (string) $state;
+        }
+
+        $trimmed = trim($state);
+        if ($trimmed === '') {
+            return '';
+        }
+
+        if (! str_starts_with($trimmed, '{') && ! str_starts_with($trimmed, '[')) {
+            return $state;
+        }
+
+        $decoded = json_decode($trimmed, true);
+
+        if (! is_array($decoded)) {
+            return $state;
+        }
+
+        return self::resolveLocalizedValue($decoded) ?? $state;
+    }
+
+    /**
+     * @param array<string|int, mixed> $values
+     */
+    private static function resolveLocalizedValue(array $values): ?string
+    {
+        $locale = (string) app()->getLocale();
+        $fallbackLocale = (string) config('app.fallback_locale', 'en');
+
+        foreach ([$locale, $fallbackLocale, 'lt', 'en'] as $candidateLocale) {
+            $candidate = $values[$candidateLocale] ?? null;
+
+            if (is_scalar($candidate)) {
+                $candidateText = trim((string) $candidate);
+
+                if ($candidateText !== '') {
+                    return $candidateText;
+                }
+            }
+        }
+
+        foreach ($values as $value) {
+            if (is_scalar($value)) {
+                $valueText = trim((string) $value);
+
+                if ($valueText !== '') {
+                    return $valueText;
+                }
+            }
+        }
+
+        return null;
+    }
+
     /**
      * @return array<int, \Filament\Forms\Components\Component>
      */
@@ -353,7 +424,7 @@ class UserForm
                 ->label(__('messages.description'))
                 ->columnSpanFull(),
             KeyValue::make('metadata')
-                ->label('Metadata')
+                ->label(__('admin.labels.metadata'))
                 ->nullable()
                 ->columnSpanFull(),
             Toggle::make('is_active')
@@ -439,11 +510,11 @@ class UserForm
                 ->numeric()
                 ->default(0),
             KeyValue::make('metadata')
-                ->label('Metadata')
+                ->label(__('admin.labels.metadata'))
                 ->nullable()
                 ->columnSpanFull(),
             KeyValue::make('conditions')
-                ->label('Conditions')
+                ->label(__('admin.labels.conditions'))
                 ->nullable()
                 ->columnSpanFull(),
             Toggle::make('is_active')
@@ -499,7 +570,7 @@ class UserForm
                 ->searchable()
                 ->preload(),
             KeyValue::make('metadata')
-                ->label('Metadata')
+                ->label(__('admin.labels.metadata'))
                 ->nullable()
                 ->columnSpanFull(),
             Toggle::make('is_enabled')

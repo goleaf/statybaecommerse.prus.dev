@@ -6,7 +6,7 @@
 @section('content')
 <div class="container mx-auto px-4 py-8">
     <!-- Breadcrumb -->
-    <nav class="flex mb-8" aria-label="Breadcrumb">
+    <nav class="flex mb-8" aria-label="{{ __('frontend.navigation.breadcrumbs') }}">
         <ol class="inline-flex items-center space-x-1 md:space-x-3">
             <li class="inline-flex items-center">
                 <a href="{{ route('home') }}" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white">

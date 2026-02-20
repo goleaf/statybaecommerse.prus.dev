@@ -6,14 +6,22 @@
     $companyAddress = $hasSettings ? app_setting('company_address') ?? null : null;
     $socialFacebook = $hasSettings ? app_setting('social_facebook') ?? '#' : '#';
     $socialInstagram = $hasSettings ? app_setting('social_instagram') ?? '#' : '#';
+    $blockedGithubFooterUrl = 'github.com/prus-dev/statybaecommerse.prus.dev';
+
+    if (str_contains(strtolower((string) $socialFacebook), $blockedGithubFooterUrl)) {
+        $socialFacebook = null;
+    }
+
+    if (str_contains(strtolower((string) $socialInstagram), $blockedGithubFooterUrl)) {
+        $socialInstagram = null;
+    }
+
     $locale = app()->getLocale();
     $homeUrl = \Illuminate\Support\Facades\Route::has('localized.home')
         ? route('localized.home', ['locale' => $locale])
         : (\Illuminate\Support\Facades\Route::has('home')
             ? route('home')
             : url('/'));
-    $docsUrl = \Illuminate\Support\Facades\Route::has('docs.api') ? route('docs.api') : url('/docs/api');
-    $githubUrl = 'https://github.com/prus-dev/statybaecommerse.prus.dev';
     $aboutUrl = \Illuminate\Support\Facades\Route::has('localized.about')
         ? route('localized.about', ['locale' => $locale])
         : (\Illuminate\Support\Facades\Route::has('frontend.about.index') ? route('frontend.about.index') : url('/about'));
@@ -63,24 +71,6 @@
                             // {{ __('messages.footer_about') }}
                         </p>
                         <div class="space-y-3 footer-nav">
-                            <div>
-                                <x-footer-link :spa="false" href="{{ $docsUrl }}"
-                                    class="text-ash hover:text-sage transition-colors duration-200 footer-nav-link">
-                                    <svg class="text-ash" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                        <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
-                                    </svg>
-                                    <span>{{ __('messages.footer_documentation') }}</span>
-                                </x-footer-link>
-                            </div>
-                            <div>
-                                <x-footer-link :spa="false" href="{{ $githubUrl }}" target="_blank" rel="noopener"
-                                    class="text-ash hover:text-sage transition-colors duration-200 footer-nav-link">
-                                    <svg class="text-ash" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                        <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
-                                    </svg>
-                                    <span>{{ __('messages.footer_github') }}</span>
-                                </x-footer-link>
-                            </div>
                             <div>
                                 <x-footer-link href="{{ $aboutUrl }}"
                                     class="text-ash hover:text-sage transition-colors duration-200 footer-nav-link">

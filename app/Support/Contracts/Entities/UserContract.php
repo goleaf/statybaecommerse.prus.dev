@@ -45,23 +45,10 @@ final class UserContract
             $relationsToLoad[] = 'orders';
         }
 
-        $hasWishlistTables = Schema::hasTable('user_wishlists')
-            && Schema::hasColumn('user_wishlists', 'product_id')
-            && Schema::hasTable('products')
-            && Schema::hasTable('wishlist_items');
-
-        if ($hasWishlistTables) {
-            $relationsToLoad[] = 'wishlist';
-        }
-
         if ($relationsToLoad !== []) {
             $user->loadMissing($relationsToLoad);
         }
         $safeAttributes = $user->toApiSafeArray();
-
-        if ($hasWishlistTables) {
-            $user->loadMissing(['wishlists.items.product']);
-        }
 
         return [
             'id'         => $user->getKey(),
@@ -101,11 +88,6 @@ final class UserContract
             'orders' => $user->relationLoaded('orders')
                 ? $user->orders->map(static function ($order) {
                     return Arr::except($order->toArray(), ['user_id']);
-                })->all()
-                : [],
-            'wishlist' => $hasWishlistTables && $user->relationLoaded('wishlist')
-                ? $user->wishlist->map(static function ($product) {
-                    return Arr::except($product->toArray(), ['pivot']);
                 })->all()
                 : [],
             'links' => [

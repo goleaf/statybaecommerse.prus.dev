@@ -4,31 +4,31 @@ declare(strict_types=1);
 
 return [
     'actions' => [
-        'create_new' => 'Create new',
-        'edit'       => 'Edit',
-        'view'       => 'View',
+        'create_new' => 'Sukurti naują',
+        'edit'       => 'Redaguoti',
+        'view'       => 'Žiūrėti',
     ],
     'fields' => [
-        'actions'    => 'Actions',
-        'created_at' => 'Created at',
-        'reward'     => 'Reward',
-        'status'     => 'Status',
-        'usage'      => 'Usage',
+        'actions'    => 'Veiksmai',
+        'created_at' => 'Sukurta',
+        'reward'     => 'Atlygis',
+        'status'     => 'Būsena',
+        'usage'      => 'Naudojimas',
     ],
     'messages' => [
-        'url_copied' => 'Url copied',
+        'url_copied' => 'URL nukopijuotas',
     ],
     'pages' => [
         'index' => [
-            'no_codes'             => 'No codes',
-            'no_codes_description' => 'No codes description',
-            'your_codes'           => 'Your codes',
+            'no_codes'             => 'Jokių kodų',
+            'no_codes_description' => 'Nėra kodų aprašymo',
+            'your_codes'           => 'Jūsų kodai',
         ],
     ],
     'stats' => [
-        'active_codes'  => 'Active codes',
-        'total_codes'   => 'Total codes',
-        'total_rewards' => 'Total rewards',
-        'total_usage'   => 'Total usage',
+        'active_codes'  => 'Aktyvūs kodai',
+        'total_codes'   => 'Iš viso kodų',
+        'total_rewards' => 'Iš viso apdovanojimai',
+        'total_usage'   => 'Bendras naudojimas',
     ],
 ];

@@ -189,7 +189,7 @@
                             <div class="mt-12 rounded-3xl border border-sage/30 bg-dark p-6 shadow-lg">
                                 <nav class="flex items-center justify-center" aria-label="{{ __('messages.brands_index_pagination_navigation') }}">
                                     <div class="w-full overflow-x-auto pb-2 sm:w-auto">
-                                        <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+                                        <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="{{ __('messages.pagination') }}">
                                             @if ($paginator->onFirstPage())
                                                 <span class="relative inline-flex items-center rounded-l-md px-2 py-2 text-sage/60 ring-1 ring-inset ring-sage/30">
                                                     <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">

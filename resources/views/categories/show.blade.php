@@ -4,7 +4,7 @@
 
 @section('content')
     <div class="container mx-auto px-4">
-        <nav class="mb-6 text-sm text-gray-500 dark:text-gray-400" aria-label="Breadcrumb">
+        <nav class="mb-6 text-sm text-gray-500 dark:text-gray-400" aria-label="{{ __('frontend.navigation.breadcrumbs') }}">
             <ol class="flex flex-wrap items-center gap-1">
                 <li><a href="{{ route('home') }}" class="hover:text-blue-600 dark:hover:text-blue-300">{{ __('messages.frontend') }}</a></li>
                 <li aria-hidden="true" class="px-1">/</li>

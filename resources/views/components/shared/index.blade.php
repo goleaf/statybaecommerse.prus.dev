@@ -157,7 +157,6 @@
 <x-shared.product-card 
     :product="$product"
     :show-quick-add="true"
-    :show-wishlist="true"
     :show-compare="true"
     layout="grid|list"
 />

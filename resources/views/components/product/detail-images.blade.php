@@ -98,13 +98,6 @@
                             #{{ $index + 1 }}
                         </div>
 
-                        {{-- Generated Badge --}}
-                        @if($image['generated'])
-                            <div class="absolute top-2 right-2 bg-green-500 text-white px-2 py-1 rounded text-xs">
-                                {{ __('translations.random_image') }}
-                            </div>
-                        @endif
-
                         {{-- WebP Badge --}}
                         <div class="absolute bottom-2 right-2 bg-blue-500 text-white px-1 py-0.5 rounded text-xs">
                             {{ __('frontend.images.webp_badge') }}

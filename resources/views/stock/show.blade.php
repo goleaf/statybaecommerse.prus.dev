@@ -7,7 +7,7 @@
     <!-- Header -->
     <div class="flex justify-between items-center mb-8">
         <div>
-            <nav class="flex" aria-label="Breadcrumb">
+            <nav class="flex" aria-label="{{ __('frontend.navigation.breadcrumbs') }}">
                 <ol class="inline-flex items-center space-x-1 md:space-x-3">
                     <li class="inline-flex items-center">
                         <a href="{{ route('stock.index') }}" class="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">

@@ -61,10 +61,10 @@
                                               d="M3 7h18M3 12h18M3 17h18" />
                                     </svg>
                                     @php($productCount = (int) ($category['products_count'] ?? 0))
-                                    {{ trans_choice('{0}Нет товаров|{1}1 товар|[2,*]:count товаров', $productCount, ['count' => $productCount]) }}
+                                    {{ trans_choice(__('messages.home_collections_products_count'), $productCount, ['count' => $productCount]) }}
                                 </span>
                                 <span class="inline-flex items-center gap-1 text-white/70">
-                                    {{ __('ui.text_2') }}
+                                    {{ __('messages.view') }}
                                     <svg class="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1"
                                          fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />

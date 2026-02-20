@@ -34,7 +34,6 @@
             },
             "addresses": [],
             "orders": [],
-            "wishlist": [],
             "links": {
                 "self": "https://example.com/api/users/me"
             }

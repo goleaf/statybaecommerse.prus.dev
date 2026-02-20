@@ -30,7 +30,7 @@ class DiscountRedemptionResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-receipt-percent';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Discounts';
+    protected static string|UnitEnum|null $navigationGroup = null;
 
     public static function getEloquentQuery(): Builder
     {
@@ -38,6 +38,11 @@ class DiscountRedemptionResource extends Resource
             UserOwnedScope::class,
             StatusScope::class,
         ]);
+    }
+
+    public static function getNavigationGroup(): string|UnitEnum|null
+    {
+        return __('messages.discounts');
     }
 
     public static function form(Schema $schema): Schema
@@ -114,16 +119,16 @@ class DiscountRedemptionResource extends Resource
                 TextColumn::make('id')
                     ->sortable(),
                 TextColumn::make('discount.name')
-                    ->label('Discount')
+                    ->label(__('admin.labels.discount'))
                     ->toggleable(),
                 TextColumn::make('code.code')
-                    ->label('Code')
+                    ->label(__('admin.labels.code'))
                     ->toggleable(),
                 TextColumn::make('order.number')
-                    ->label('Order')
+                    ->label(__('admin.labels.order'))
                     ->toggleable(),
                 TextColumn::make('user.name')
-                    ->label('User')
+                    ->label(__('admin.labels.user'))
                     ->toggleable(),
                 TextColumn::make('amount_saved')
                     ->money('EUR')

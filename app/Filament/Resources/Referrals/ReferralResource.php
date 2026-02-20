@@ -31,7 +31,7 @@ class ReferralResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return 'Referrals';
+        return __('messages.referrals');
     }
 
     public static function form(Schema $schema): Schema

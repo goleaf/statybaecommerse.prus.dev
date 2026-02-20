@@ -69,7 +69,7 @@
             {{-- Categories Filter --}}
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">
-                    {{ __('messages.frontend') }}
+                    {{ __('frontend.search.category') }}
                 </label>
                 <div class="space-y-2 max-h-32 overflow-y-auto">
                     @foreach($availableCategories as $category)
@@ -89,7 +89,7 @@
             {{-- Brands Filter --}}
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">
-                    {{ __('messages.frontend') }}
+                    {{ __('frontend.search.brand') }}
                 </label>
                 <div class="space-y-2 max-h-32 overflow-y-auto">
                     @foreach($availableBrands as $brand)
@@ -109,7 +109,7 @@
             {{-- Collections Filter --}}
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">
-                    {{ __('messages.frontend') }}
+                    {{ __('messages.collections') }}
                 </label>
                 <div class="space-y-2 max-h-32 overflow-y-auto">
                     @foreach($availableCollections as $collection)
@@ -150,7 +150,7 @@
             {{-- Stock Filter --}}
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">
-                    {{ __('messages.frontend') }}
+                    {{ __('frontend.search.quick_filters') }}
                 </label>
                 <label class="flex items-center">
                     <input
@@ -171,8 +171,8 @@
                     wire:model.live="sortBy"
                     class="block w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
-                    <option value="relevance">{{ __('messages.frontend') }}</option>
-                    <option value="name">{{ __('messages.frontend') }}</option>
+                    <option value="relevance">{{ __('frontend.search_results.sort.relevance') }}</option>
+                    <option value="name">{{ __('frontend.search_results.sort.name_a_z') }}</option>
                     <option value="price_low">{{ __('frontend.search.price_low_to_high') }}</option>
                     <option value="price_high">{{ __('frontend.search.price_high_to_low') }}</option>
                 </select>
@@ -192,7 +192,7 @@
             
             <div class="flex items-center space-x-2">
                 <span class="text-sm text-gray-500">
-                    {{ count($results) }} {{ __('messages.frontend') }}
+                    {{ count($results) }} {{ __('frontend.search.results_found') }}
                 </span>
             </div>
         </div>
@@ -240,7 +240,7 @@
                                     {{ $result['title'] }}
                                 </h3>
                                 <span class="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded-full">
-                                    {{ __('frontend.search.type' . $result['type']) }}
+                                    {{ __('frontend.search.types.' . $result['type']) }}
                                 </span>
                             </div>
                             

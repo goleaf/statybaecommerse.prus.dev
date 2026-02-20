@@ -9,7 +9,7 @@
             <a href="{{ route('frontend.products.show', $product) }}" class="flex flex-1 flex-col">
                 <div class="relative aspect-square overflow-hidden bg-gray-100">
                     <img
-                        src="{{ $product->thumbnail ?: 'https://via.placeholder.com/600x600.png?text=Product' }}"
+                        src="{{ $product->thumbnail ?: ('https://via.placeholder.com/600x600.png?text=' . rawurlencode((string) __('messages.product'))) }}"
                         alt="{{ $product->name }}"
                         class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                         loading="lazy"

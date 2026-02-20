@@ -5,7 +5,7 @@
         @foreach ($nodes as $node)
             <li>
                 <a href="{{ route('localized.categories.show', ['locale' => app()->getLocale(), 'category' => $node['slug']]) }}"
-                   class="text-sm text-white transition hover:text-sage hover:underline">
+                   class="text-sm text-slate-700 transition hover:text-cyan-700 hover:underline">
                     {{ $node['name'] }}
                 </a>
                 @if (($node['children'] ?? collect())->isNotEmpty())

@@ -1,4 +1,4 @@
-<nav class="breadcrumb-nav" aria-label="Breadcrumb">
+<nav class="breadcrumb-nav" aria-label="{{ __('frontend.navigation.breadcrumbs') }}">
     <div class="breadcrumb-container">
         <ol class="breadcrumb-list">
             @foreach($breadcrumbs as $url => $label)

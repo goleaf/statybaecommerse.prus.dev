@@ -62,13 +62,6 @@ class AdminUserResource extends JsonResource
             })->toArray();
         }
 
-        if ($this->resource->relationLoaded('wishlist')) {
-            $meta['wishlist'] = $this->resource->wishlist->map(static function ($product): array {
-                // Wishlist entries are simple product arrays, so return them as-is.
-                return $product->toArray();
-            })->toArray();
-        }
-
         if ($this->resource->relationLoaded('partners')) {
             $meta['partners'] = $this->resource->partners->map(static function ($partner): array {
                 // Partners expose their complete data set in the admin panel.

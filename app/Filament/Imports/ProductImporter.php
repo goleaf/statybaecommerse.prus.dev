@@ -203,7 +203,7 @@ class ProductImporter extends BaseImporter
             ImportColumn::make('description'),
             ImportColumn::make('short_description'),
             ImportColumn::make('sku')
-                ->label('SKU')
+                ->label(__('admin.labels.sku'))
                 ->requiredMapping()
                 ->rules(['required']),
             ImportColumn::make('price')
@@ -241,7 +241,7 @@ class ProductImporter extends BaseImporter
                 ->guess(['size', 'dydis'])
                 ->rules(['nullable', 'string', 'max:255']),
             ImportColumn::make('size_type')
-                ->label('Size Type')
+                ->label(__('admin.labels.size_type'))
                 ->guess(['size type', 'size_type', 'dydzio tipas'])
                 ->rules(['nullable', 'string', 'max:255']),
             ImportColumn::make('color')
@@ -253,7 +253,7 @@ class ProductImporter extends BaseImporter
                 ->guess(['pack size', 'pack_size', 'pakuotes dydis'])
                 ->rules(['nullable', 'string', 'max:255']),
             ImportColumn::make('pack_size_type')
-                ->label('Pack Size Type')
+                ->label(__('admin.labels.pack_size_type'))
                 ->guess(['pack size type', 'pack_size_type', 'pakuotes dydzio tipas'])
                 ->rules(['nullable', 'string', 'max:255']),
             ImportColumn::make('is_enabled')
@@ -315,11 +315,11 @@ class ProductImporter extends BaseImporter
                 ->ignoreBlankState()
                 ->rules(['nullable', 'in:draft,published,archived']),
             ImportColumn::make('image_url')
-                ->label('Image URL')
+                ->label(__('admin.labels.image_url'))
                 ->ignoreBlankState()
                 ->rules(['nullable', 'url:http,https']),
             ImportColumn::make('image')
-                ->label('Image')
+                ->label(__('admin.labels.image'))
                 ->ignoreBlankState()
                 ->rules(['nullable', 'url:http,https']),
         ];

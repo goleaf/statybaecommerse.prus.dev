@@ -180,17 +180,6 @@ final class UserController extends Controller
     }
 
     /**
-     * Handle wishlist functionality with proper error handling.
-     */
-    public function wishlist(): View
-    {
-        $user = Auth::user();
-        $wishlist = $user->wishlist()->with('product')->latest()->paginate(10);
-
-        return view('users.wishlist', compact('wishlist'));
-    }
-
-    /**
      * Handle documents functionality with proper error handling.
      */
     public function documents(): View
@@ -238,7 +227,6 @@ final class UserController extends Controller
                 'average_order_value' => $user->average_order_value,
             ],
             'reviews'   => ['total' => 0, 'average_rating' => 0],
-            'wishlist'  => ['total' => $user->wishlist()->count()],
             'addresses' => ['total' => $user->addresses()->count()],
             'documents' => ['total' => $user->documents()->count()],
         ];

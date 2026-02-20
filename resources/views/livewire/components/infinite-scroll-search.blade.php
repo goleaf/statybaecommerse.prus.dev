@@ -8,7 +8,7 @@
                     <input 
                         type="text" 
                         wire:model.live.debounce.300ms="query"
-                        placeholder="{{ __('messages.frontend') }}"
+                        placeholder="{{ __('frontend.search.search_placeholder') }}"
                         class="w-full px-4 py-3 pl-12 pr-4 text-lg border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -30,7 +30,7 @@
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
                     </svg>
-                    {{ __('messages.frontend') }}
+                    {{ __('frontend.search.show_filters') }}
                     @if($filterCount > 0)
                         <span class="inline-flex items-center px-2 py-1 text-xs font-medium text-white bg-blue-600 rounded-full">
                             {{ $filterCount }}
@@ -88,7 +88,7 @@
                     wire:confirm="{{ __('translations.confirm_clear_search_filters') }}"
                     class="text-sm text-gray-600 hover:text-gray-800 underline"
                 >
-                    {{ __('messages.frontend') }}
+                    {{ __('frontend.search.clear_filters') }}
                 </button>
             </div>
         @endif
@@ -101,7 +101,7 @@
                 <!-- Type Filters -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">
-                        {{ __('messages.frontend') }}
+                        {{ __('frontend.search.type') }}
                     </label>
                     <div class="space-y-2">
                         @foreach($typeOptions as $value => $label)
@@ -124,7 +124,7 @@
                         @if(!empty($filterOptions))
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    {{ __(sprintf('ui.frontend.%s', $filterType)) }}
+                                    {{ __('frontend.search.' . $filterType) }}
                                 </label>
                                 <div class="space-y-1 max-h-32 overflow-y-auto">
                                     @foreach($filterOptions as $option => $count)
@@ -174,7 +174,7 @@
                             <div class="p-4">
                                 <!-- Type Badge -->
                                 <span class="inline-block px-2 py-1 text-xs font-medium text-blue-800 bg-blue-100 rounded-full mb-2">
-                                    {{ __(sprintf('ui.frontend.%s', $result['type'])) }}
+                                    {{ __('frontend.search.types.' . $result['type']) }}
                                 </span>
 
                                 <!-- Title -->
@@ -208,7 +208,7 @@
                                     href="{{ $result['url'] }}"
                                     class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                                 >
-                                    {{ __('messages.frontend') }}
+                                    {{ __('frontend.search.view_product') }}
                                     <svg class="ml-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                                     </svg>
@@ -227,7 +227,7 @@
                             class="inline-flex items-center px-6 py-3 text-base font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             <span wire:loading.remove wire:target="loadMore">
-                                {{ __('messages.frontend') }}
+                                {{ __('frontend.search_results.load_more') }}
                             </span>
                             <span wire:loading wire:target="loadMore">
                                 {{ __('frontend.loading') }}...
@@ -236,7 +236,7 @@
                     </div>
                 @else
                     <div class="text-center text-gray-500 py-8">
-                        {{ __('messages.frontend') }}
+                        {{ __('frontend.search.no_results_found') }}
                     </div>
                 @endif
 
@@ -246,8 +246,8 @@
                     <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                     </svg>
-                    <h3 class="mt-2 text-sm font-medium text-gray-900">{{ __('messages.frontend') }}</h3>
-                    <p class="mt-1 text-sm text-gray-500">{{ __('messages.frontend') }}</p>
+                    <h3 class="mt-2 text-sm font-medium text-gray-900">{{ __('frontend.search.no_results') }}</h3>
+                    <p class="mt-1 text-sm text-gray-500">{{ __('frontend.search.try_different_keywords') }}</p>
                 </div>
             @endif
         @else
@@ -256,8 +256,8 @@
                 <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                 </svg>
-                <h3 class="mt-2 text-sm font-medium text-gray-900">{{ __('messages.frontend') }}</h3>
-                <p class="mt-1 text-sm text-gray-500">{{ __('messages.frontend') }}</p>
+                <h3 class="mt-2 text-sm font-medium text-gray-900">{{ __('frontend.search.start_typing') }}</h3>
+                <p class="mt-1 text-sm text-gray-500">{{ __('frontend.search.tip_1') }}</p>
             </div>
         @endif
     </div>
@@ -270,7 +270,7 @@
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                <span class="text-gray-700">{{ __('messages.frontend') }}...</span>
+                <span class="text-gray-700">{{ __('frontend.search.please_wait') }}...</span>
             </div>
         </div>
     @endif

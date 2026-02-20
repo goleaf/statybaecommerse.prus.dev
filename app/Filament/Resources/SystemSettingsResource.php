@@ -20,9 +20,21 @@ class SystemSettingsResource extends BaseResource
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-cog-6-tooth';
 
+    protected static bool $shouldRegisterNavigation = false;
+
     public static function getNavigationGroup(): ?string
     {
         return Nav::groupForResource(static::class);
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
+
+    public static function getNavigationItems(): array
+    {
+        return [];
     }
 
     public static function getNavigationSort(): ?int

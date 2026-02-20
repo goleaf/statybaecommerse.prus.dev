@@ -20,18 +20,18 @@ class ListProductVariants extends ListRecords
     public function getTabs(): array
     {
         return [
-            'all' => Tab::make('All'),
-            'in_stock' => Tab::make('In Stock')
+            'all' => Tab::make(__('common.all')),
+            'in_stock' => Tab::make(__('admin.product_variants.in_stock'))
                 ->modifyQueryUsing(static fn (Builder $query): Builder => $query->where(static function (Builder $stockQuery): Builder {
                     return $stockQuery
                         ->where('track_inventory', false)
                         ->orWhere('available_quantity', '>', 0);
                 })),
-            'low_stock' => Tab::make('Low Stock')
+            'low_stock' => Tab::make(__('admin.product_variants.low_stock'))
                 ->modifyQueryUsing(static fn (Builder $query): Builder => $query
                     ->where('track_inventory', true)
                     ->whereColumn('available_quantity', '<=', 'low_stock_threshold')),
-            'out_of_stock' => Tab::make('Out of Stock')
+            'out_of_stock' => Tab::make(__('admin.product_variants.out_of_stock'))
                 ->modifyQueryUsing(static fn (Builder $query): Builder => $query
                     ->where('track_inventory', true)
                     ->where('available_quantity', '<=', 0)),

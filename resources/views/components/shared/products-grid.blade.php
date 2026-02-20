@@ -3,7 +3,6 @@
     'title' => null,
     'description' => null,
     'showQuickAdd' => true,
-    'showWishlist' => true,
     'showCompare' => true,
     'showPagination' => true,
     'columns' => 'lg:grid-cols-4', // sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4
@@ -31,7 +30,6 @@
                 <x-shared.product-card 
                     :product="$product" 
                     :showQuickAdd="$showQuickAdd" 
-                    :showWishlist="$showWishlist" 
                     :showCompare="$showCompare" 
                 />
             @endforeach

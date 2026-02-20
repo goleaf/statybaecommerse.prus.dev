@@ -73,7 +73,7 @@ class UsersTable
                     ->boolean()
                     ->sortable(),
                 TextColumn::make('preferred_locale')
-                    ->label(__('admin.locale.label'))
+                    ->label(__('messages.locale'))
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('orders_count')
@@ -115,17 +115,17 @@ class UsersTable
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('referral_rewards_count')
-                    ->label('Referral rewards')
+                    ->label(__('admin.labels.referral_rewards'))
                     ->counts('referralRewards')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('documents_count')
-                    ->label('Documents')
+                    ->label(__('admin.labels.documents'))
                     ->counts('documents')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('coupon_usages_count')
-                    ->label('Coupon usages')
+                    ->label(__('admin.labels.coupon_usages'))
                     ->counts('couponUsages')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

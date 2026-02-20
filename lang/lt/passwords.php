@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 return [
-    'reset'     => 'Your password has been reset.',
-    'sent'      => 'We have emailed your password reset link.',
-    'throttled' => 'Please wait before retrying.',
-    'token'     => 'This password reset token is invalid.',
-    'user'      => 'We can\'t find a user with that email address.',
+    'reset'     => 'Jūsų slaptažodis nustatytas iš naujo.',
+    'sent'      => 'El. paštu išsiuntėme slaptažodžio nustatymo iš naujo nuorodą.',
+    'throttled' => 'Palaukite prieš bandydami dar kartą.',
+    'token'     => 'Šis slaptažodžio nustatymo iš naujo prieigos raktas neteisingas.',
+    'user'      => 'Negalime rasti naudotojo su šiuo el. pašto adresu.',
 ];

@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 return [
-    'all_rights_reserved' => 'All rights reserved',
-    'email'               => 'Email',
-    'generated_on'        => 'Generated on',
-    'phone'               => 'Phone',
-    'vat_number'          => 'Vat number',
+    'all_rights_reserved' => 'Visos teisės saugomos',
+    'email'               => 'El. paštas',
+    'generated_on'        => 'Sukurta',
+    'phone'               => 'Telefonas',
+    'vat_number'          => 'PVM numeris',
 ];

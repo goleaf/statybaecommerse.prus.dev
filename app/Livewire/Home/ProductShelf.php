@@ -60,9 +60,9 @@ final class ProductShelf extends Component implements HasSchemas
 
         $this->title = $title !== ''
             ? $title
-            : __($titleMap[$sectionKey] ?? 'home_products_featured_title');
+            : __('messages.' . ($titleMap[$sectionKey] ?? 'home_products_featured_title'));
 
-        $this->subtitle = $subtitle ?? __($subtitleMap[$sectionKey] ?? 'home_products_featured_subtitle');
+        $this->subtitle = $subtitle ?? __('messages.' . ($subtitleMap[$sectionKey] ?? 'home_products_featured_subtitle'));
     }
 
     #[Computed]

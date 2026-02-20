@@ -62,16 +62,16 @@ final class PriceResource extends BaseResource
                     SchemaGrid::make(2)
                         ->schema([
                             MorphToSelect::make('priceable')
-                                ->label(__('messages.Product'))
+                                ->label(__('messages.product'))
                                 ->types([
                                     MorphToSelect\Type::make(Product::class)
                                         ->titleAttribute('name')
-                                        ->label(__('messages.Product'))
+                                        ->label(__('messages.product'))
                                         ->modifyOptionsQueryUsing(static fn (Builder $query): Builder => $query->withoutGlobalScopes())
                                         ->getOptionLabelFromRecordUsing(static fn (Product $record): string => self::resolveProductLabel($record)),
                                     MorphToSelect\Type::make(ProductVariant::class)
                                         ->titleAttribute('name')
-                                        ->label(__('messages.Variant'))
+                                        ->label(__('messages.variant'))
                                         ->modifyOptionsQueryUsing(static fn (Builder $query): Builder => $query
                                             ->withoutGlobalScopes()
                                             ->whereHas('product'))
@@ -129,7 +129,7 @@ final class PriceResource extends BaseResource
         return $table
             ->columns([
                 TextColumn::make('id')
-                    ->label('ID')
+                    ->label(__('admin.labels.id'))
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('priceable_type')
@@ -138,7 +138,7 @@ final class PriceResource extends BaseResource
                     ->badge()
                     ->sortable(),
                 TextColumn::make('priceable.name')
-                    ->label(__('messages.Name'))
+                    ->label(__('messages.name'))
                     ->formatStateUsing(function ($state, $record) {
                         if ($record->priceable instanceof ProductVariant) {
                             return $record->priceable->display_name;

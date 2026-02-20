@@ -51,7 +51,7 @@ class QueryOptimizationService
         if ($this->hasRelationshipAccess($query)) {
             $optimizations[] = [
                 'type'        => 'eager_loading',
-                'description' => 'Use eager loading to prevent N+1 queries',
+                'description' => __('messages.query_optimization_eager_loading'),
                 'code'        => $this->generateEagerLoadingCode($model),
             ];
         }
@@ -59,14 +59,14 @@ class QueryOptimizationService
         // Select optimization
         $optimizations[] = [
             'type'        => 'select_optimization',
-            'description' => 'Only select needed columns',
+            'description' => __('messages.query_optimization_select_needed_columns'),
             'code'        => $this->generateSelectOptimization($model),
         ];
 
         // Chunking for large datasets
         $optimizations[] = [
             'type'        => 'chunking',
-            'description' => 'Use chunking for memory efficiency',
+            'description' => __('messages.query_optimization_chunking_memory_efficiency'),
             'code'        => $this->generateChunkingCode($model),
         ];
 
@@ -83,7 +83,7 @@ class QueryOptimizationService
         return [
             [
                 'type'        => 'query_builder',
-                'description' => 'Use DB facade for better performance',
+                'description' => __('messages.query_optimization_db_facade_performance'),
                 'code'        => "DB::table('{$table}')
     ->select(['id', 'name', 'created_at']) // Only needed columns
     ->where('status', 'active')
@@ -94,7 +94,7 @@ class QueryOptimizationService
             ],
             [
                 'type'        => 'join_optimization',
-                'description' => 'Optimize joins',
+                'description' => __('messages.query_optimization_optimize_joins'),
                 'code'        => "DB::table('{$table}')
     ->join('users', '{$table}.user_id', '=', 'users.id')
     ->select(['{$table}.id', '{$table}.name', 'users.email'])
@@ -114,7 +114,7 @@ class QueryOptimizationService
         return [
             [
                 'type'        => 'raw_sql',
-                'description' => 'Direct SQL for maximum performance',
+                'description' => __('messages.query_optimization_direct_sql_max_performance'),
                 'code'        => "DB::select('
                     SELECT id, name, created_at 
                     FROM {$table} 
@@ -126,7 +126,7 @@ class QueryOptimizationService
             ],
             [
                 'type'        => 'prepared_statement',
-                'description' => 'Use prepared statements for repeated queries',
+                'description' => __('messages.query_optimization_prepared_statements_repeated_queries'),
                 'code'        => "\$stmt = DB::getPdo()->prepare('
                     SELECT * FROM {$table} 
                     WHERE status = ? AND user_id = ?

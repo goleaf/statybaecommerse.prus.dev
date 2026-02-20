@@ -1,5 +1,6 @@
 import './bootstrap';
 import './shared/utilities.js';
+import { t } from './shared/i18n.js';
 // Register Alpine data factories that keep search/autocomplete widgets CSP-compliant.
 import './alpine/search-components.js';
 // Bind cart badge helpers that avoid inline Alpine expressions.
@@ -104,28 +105,30 @@ function initializeEnhancedInteractions() {
 // Enhanced cart notifications with modern design
 function initializeCartNotifications() {
     window.addEventListener('cart:added', function (e) {
+        const productName = e?.detail?.product ?? '';
         createNotification({
             type: 'success',
-            title: 'Product Added!',
-            message: `${e.detail.product} has been added to your cart`,
+            title: t('js.cart.product_added_title'),
+            message: t('js.cart.product_added_message', { product: productName }),
             duration: 4000,
         });
     });
 
     window.addEventListener('cart:removed', function (e) {
+        const productName = e?.detail?.product ?? '';
         createNotification({
             type: 'info',
-            title: 'Product Removed',
-            message: `${e.detail.product} has been removed from your cart`,
+            title: t('js.cart.product_removed_title'),
+            message: t('js.cart.product_removed_message', { product: productName }),
             duration: 3000,
         });
     });
 
-    window.addEventListener('cart:updated', function (e) {
+    window.addEventListener('cart:updated', function () {
         createNotification({
             type: 'success',
-            title: 'Cart Updated',
-            message: 'Your cart has been updated successfully',
+            title: t('js.cart.updated_title'),
+            message: t('js.cart.updated_message'),
             duration: 2000,
         });
     });
@@ -158,7 +161,7 @@ function createNotification({ type = 'info', title, message, duration = 3000 }) 
     const closeButton = document.createElement('button');
     closeButton.type = 'button';
     closeButton.classList.add('csp-notification__close');
-    closeButton.setAttribute('aria-label', 'Dismiss notification');
+    closeButton.setAttribute('aria-label', t('js.notifications.dismiss'));
     closeButton.innerHTML = `
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -255,7 +258,7 @@ function initializeLoadingStates() {
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    Loading...
+                    ${t('js.forms.loading')}
                 `;
             }
         });

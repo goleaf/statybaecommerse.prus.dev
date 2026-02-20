@@ -34,7 +34,7 @@ class StockReservationsRelationManager extends RelationManager
                     ->badge()
                     ->sortable(),
                 TextColumn::make('expires_at')
-                    ->label(__('admin.inventory.expires_at'))
+                    ->label(__('messages.expires_at'))
                     ->dateTime()
                     ->sortable(),
                 TextColumn::make('created_at')

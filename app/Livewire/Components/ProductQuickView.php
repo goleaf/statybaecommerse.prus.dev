@@ -104,18 +104,6 @@ final class ProductQuickView extends Component
     }
 
     /**
-     * Handle addToWishlist functionality with proper error handling.
-     */
-    public function addToWishlist(): void
-    {
-        if (! $this->product) {
-            return;
-        }
-        $this->dispatch('wishlist-toggle', productId: $this->product->id);
-        $this->notifySuccess(__('ecommerce.added_to_wishlist'));
-    }
-
-    /**
      * Handle averageRating functionality with proper error handling.
      */
     #[Computed]

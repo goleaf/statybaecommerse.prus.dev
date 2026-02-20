@@ -14,13 +14,20 @@ enum StatusEnum: string
 
     public function getLabel(): string
     {
-        return match ($this) {
-            self::ACTIVE    => 'Active',
-            self::INACTIVE  => 'Inactive',
-            self::PENDING   => 'Pending',
-            self::SUSPENDED => 'Suspended',
-            self::ARCHIVED  => 'Archived',
-        };
+        $key = 'enums.status.' . $this->value;
+        $translation = __($key);
+
+        if (! is_string($translation) || $translation === $key) {
+            return match ($this) {
+                self::ACTIVE    => 'Active',
+                self::INACTIVE  => 'Inactive',
+                self::PENDING   => 'Pending',
+                self::SUSPENDED => 'Suspended',
+                self::ARCHIVED  => 'Archived',
+            };
+        }
+
+        return $translation;
     }
 
     public function getColor(): string

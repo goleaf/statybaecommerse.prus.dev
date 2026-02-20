@@ -95,22 +95,22 @@ final class ContentLinkSearch
     {
         return [
             [
-                'label'       => 'Home',
+                'label'       => __('messages.home'),
                 'url'         => '/',
                 'icon'        => 'heroicon-o-home',
-                'description' => 'Main landing page',
+                'description' => __('messages.main_landing_page'),
             ],
             [
-                'label'       => 'Products',
+                'label'       => __('messages.products'),
                 'url'         => '/products',
                 'icon'        => 'heroicon-o-shopping-bag',
-                'description' => 'Browse all products',
+                'description' => __('messages.browse_all_products'),
             ],
             [
-                'label'       => 'News',
+                'label'       => __('messages.news'),
                 'url'         => '/news',
                 'icon'        => 'heroicon-o-newspaper',
-                'description' => 'Latest articles and updates',
+                'description' => __('messages.latest_articles_and_updates'),
             ],
         ];
     }
@@ -289,7 +289,7 @@ final class ContentLinkSearch
         }
 
         $name = self::resolveTranslatableName($product->getAttribute('name'));
-        $label = trim(sprintf('%s • %s', 'Product', $name !== '' ? $name : (string) $product->getAttribute('slug')));
+        $label = trim(sprintf('%s • %s', __('messages.product'), $name !== '' ? $name : (string) $product->getAttribute('slug')));
 
         $result = SearchResult::make($url, $label);
         $result
@@ -309,7 +309,7 @@ final class ContentLinkSearch
         }
 
         $name = self::resolveTranslatableName($category->getAttribute('name'));
-        $label = trim(sprintf('%s • %s', 'Category', $name !== '' ? $name : (string) $category->getAttribute('slug')));
+        $label = trim(sprintf('%s • %s', __('messages.category'), $name !== '' ? $name : (string) $category->getAttribute('slug')));
 
         $result = SearchResult::make($url, $label);
         $result
@@ -329,7 +329,7 @@ final class ContentLinkSearch
         }
 
         $name = self::resolveTranslatableName($collection->getAttribute('name'));
-        $label = trim(sprintf('%s • %s', 'Collection', $name !== '' ? $name : (string) $collection->getAttribute('slug')));
+        $label = trim(sprintf('%s • %s', __('messages.collection'), $name !== '' ? $name : (string) $collection->getAttribute('slug')));
 
         $result = SearchResult::make($url, $label);
         $result
@@ -349,7 +349,7 @@ final class ContentLinkSearch
         }
 
         $title = self::resolveTranslatableName($post->getAttribute('title'));
-        $label = trim(sprintf('%s • %s', 'Post', $title !== '' ? $title : (string) $post->getAttribute('slug')));
+        $label = trim(sprintf('%s • %s', __('messages.post'), $title !== '' ? $title : (string) $post->getAttribute('slug')));
 
         $result = SearchResult::make($url, $label);
         $result
@@ -464,7 +464,7 @@ final class ContentLinkSearch
                     return null;
                 }
 
-                $label = sprintf('%s · %s', 'News', (string) ($news->title ?? $news->slug));
+                $label = sprintf('%s · %s', __('messages.news'), (string) ($news->title ?? $news->slug));
                 $result = SearchResult::make($url, $label);
 
                 return $result

@@ -12,9 +12,16 @@ enum CurrencyEnum: string
 
     public function getLabel(): string
     {
-        return match ($this) {
-            self::EUR => 'Euro (€)',
-        };
+        $key = 'enums.currency.' . strtolower($this->value);
+        $translation = __($key);
+
+        if (! is_string($translation) || $translation === $key) {
+            return match ($this) {
+                self::EUR => 'Euro (€)',
+            };
+        }
+
+        return $translation;
     }
 
     public function getSymbol(): string

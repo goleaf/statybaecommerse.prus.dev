@@ -29,7 +29,7 @@ class NotificationsRelationManager extends RelationManager
                     ->required()
                     ->maxLength(255),
                 KeyValue::make('data')
-                    ->label('Data'),
+                    ->label(__('admin.labels.data')),
                 DateTimePicker::make('read_at'),
             ]);
     }

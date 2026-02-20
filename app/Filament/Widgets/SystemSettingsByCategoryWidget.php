@@ -10,7 +10,12 @@ use Illuminate\Support\Facades\DB;
 
 final class SystemSettingsByCategoryWidget extends ChartWidget
 {
-    protected ?string $heading = 'System Settings by Category';
+    protected ?string $heading = null;
+
+    public function getHeading(): string
+    {
+        return __('admin.widgets.system_settings_by_category');
+    }
 
     protected function getData(): array
     {

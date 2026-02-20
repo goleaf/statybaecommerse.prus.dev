@@ -7,7 +7,7 @@
     <div class="bg-gray-50 py-12">
         <div class="mx-auto max-w-7xl space-y-12 px-4 sm:px-6 lg:px-8">
             <div class="space-y-4">
-                <nav class="text-sm text-gray-500" aria-label="Breadcrumb">
+                <nav class="text-sm text-gray-500" aria-label="{{ __('frontend.navigation.breadcrumbs') }}">
                     <ol class="flex flex-wrap items-center gap-2">
                         <li><a href="{{ route('home') }}" class="text-blue-600 hover:text-blue-700">{{ __('messages.frontend') }}</a></li>
                         <li>/</li>

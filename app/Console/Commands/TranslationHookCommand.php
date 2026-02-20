@@ -12,7 +12,13 @@ final class TranslationHookCommand extends Command
 {
     protected $signature = 'translation:hook {action : scan, report, sync, process} {--path= : Path to scan} {--fix : Auto-fix missing translations} {--exclude= : Files to exclude}';
 
-    protected $description = 'Manage translations via hooks and scanning';
+    protected $description = '';
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->setDescription(__('messages.translation_hook_command_description'));
+    }
 
     public function handle(TranslationHookService $service): int
     {

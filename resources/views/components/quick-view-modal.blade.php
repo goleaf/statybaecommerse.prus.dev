@@ -183,18 +183,7 @@
                             </span>
                         </button>
 
-                        <div class="grid grid-cols-2 gap-3">
-                            <button wire:click="toggleWishlist({{ $product->id }})" @click="toggleWishlist()"
-                                    wire:confirm="{{ __('translations.confirm_toggle_wishlist') }}"
-                                    class="flex items-center justify-center gap-2 py-3 border border-gray-300 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors duration-200">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                          d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
-                                    </path>
-                                </svg>
-                                {{ __('common.wishlist') }}
-                            </button>
-
+                        <div class="grid grid-cols-1 gap-3">
                             <button @click="compareProduct()"
                                     class="flex items-center justify-center gap-2 py-3 border border-gray-300 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors duration-200">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -355,29 +344,6 @@
                     this.showNotification('{{ __('frontend.cart.network_error') }}', 'error');
                 } finally {
                     this.loading = false;
-                }
-            },
-
-            async toggleWishlist() {
-                try {
-                    const response = await fetch('/wishlist/toggle', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
-                                'content')
-                        },
-                        body: JSON.stringify({
-                            product_id: {{ $product->id }}
-                        })
-                    });
-
-                    if (response.ok) {
-                        const data = await response.json();
-                        this.showNotification(data.message, 'success');
-                    }
-                } catch (error) {
-                    this.showNotification('{{ __('ui.network_error_please_try_again') }}', 'error');
                 }
             },
 

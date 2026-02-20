@@ -14,13 +14,20 @@ enum PriorityEnum: int
 
     public function getLabel(): string
     {
-        return match ($this) {
-            self::LOW      => 'Low',
-            self::NORMAL   => 'Normal',
-            self::HIGH     => 'High',
-            self::URGENT   => 'Urgent',
-            self::CRITICAL => 'Critical',
-        };
+        $key = 'enums.priority_enum.' . strtolower($this->name);
+        $translation = __($key);
+
+        if (! is_string($translation) || $translation === $key) {
+            return match ($this) {
+                self::LOW      => 'Low',
+                self::NORMAL   => 'Normal',
+                self::HIGH     => 'High',
+                self::URGENT   => 'Urgent',
+                self::CRITICAL => 'Critical',
+            };
+        }
+
+        return $translation;
     }
 
     public function getColor(): string

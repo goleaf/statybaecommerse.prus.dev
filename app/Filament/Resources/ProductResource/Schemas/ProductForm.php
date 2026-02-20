@@ -150,7 +150,7 @@ class ProductForm
                                     ->label(__('messages.size'))
                                     ->maxLength(255),
                                 TextInput::make('size_type')
-                                    ->label('Size Type')
+                                    ->label(__('admin.labels.size_type'))
                                     ->maxLength(255),
                                 TextInput::make('color')
                                     ->label(__('translations.color'))
@@ -159,7 +159,7 @@ class ProductForm
                                     ->label(__('attribute.pack_size'))
                                     ->maxLength(255),
                                 TextInput::make('pack_size_type')
-                                    ->label('Pack Size Type')
+                                    ->label(__('admin.labels.pack_size_type'))
                                     ->maxLength(255),
                             ]),
                     ])

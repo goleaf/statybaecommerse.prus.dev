@@ -25,9 +25,13 @@ final class LocaleController
         $requestedRaw = $locale ?? $request->input('locale');
         $requested = is_string($requestedRaw) ? $requestedRaw : null;
 
+        $requestedContext = strtolower(trim((string) $request->input('context', '')));
+
         // Check if this is an admin panel request
-        $isAdminPanel = $request->is('admin') || $request->is('admin/*') ||
-                       str_contains($request->header('referer', ''), '/admin');
+        $isAdminPanel = $requestedContext === 'admin'
+            || $request->is('admin')
+            || $request->is('admin/*')
+            || str_contains($request->header('referer', ''), '/admin');
 
         // Create a temporary request with the locale parameter for resolution
         $tempRequest = $request->duplicate();
@@ -41,6 +45,7 @@ final class LocaleController
         // Store locale in appropriate session key
         if ($isAdminPanel) {
             Session::put('admin_locale', $resolved);
+            Session::put('app.locale', $resolved);
         } else {
             $this->localeService->persistLocale($resolved, $tempRequest);
         }

@@ -11,9 +11,14 @@ final class NotificationTypesWidget extends ChartWidget
 {
     protected static bool $isHeadingHidden = false;
 
-    protected ?string $heading = 'Notification Types Distribution';
+    protected ?string $heading = null;
 
     protected int|string|array $columnSpan = 'full';
+
+    public function getHeading(): string
+    {
+        return __('admin.widgets.notification_types_distribution');
+    }
 
     protected function getData(): array
     {

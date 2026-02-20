@@ -37,6 +37,6 @@ return [
     'product_images'       => 'Product Images',
     'product_requests'     => 'Product Requests',
     'product_similarities' => 'Product Similarities',
-    'product_variants'     => 'Product Variants',
+    'product_variants'     => 'Варианты товаров',
     'subscribers'          => 'Subscribers',
 ];

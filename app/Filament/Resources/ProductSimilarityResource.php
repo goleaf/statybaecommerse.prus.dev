@@ -46,11 +46,11 @@ final class ProductSimilarityResource extends BaseResource
         return $table
             ->columns([
                 TextColumn::make('product.name')
-                    ->label('Product')
+                    ->label(__('admin.labels.product'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('similarProduct.name')
-                    ->label('Similar Product')
+                    ->label(__('admin.labels.similar_product'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('calculated_at')

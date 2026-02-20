@@ -9,6 +9,7 @@ use App\Models\SystemSetting;
 use App\Models\SystemSettingCategory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 /**
@@ -123,7 +124,7 @@ final class SystemSettingsController extends Controller
     {
         $setting = SystemSetting::where('key', $key)->where('is_active', true)->where('is_public', true)->first();
         if (! $setting) {
-            return response()->json(['success' => false, 'message' => __('admin.system_settings.setting_not_found')], 404);
+            return response()->json(['success' => false, 'message' => __('system_settings.frontend.setting_not_found')], 404);
         }
 
         return response()->json(['success' => true, 'data' => ['key' => $setting->key, 'value' => $setting->value, 'type' => $setting->type, 'updated_at' => $setting->updated_at]]);
@@ -148,8 +149,17 @@ final class SystemSettingsController extends Controller
     {
         $groups = SystemSetting::select('group')->where('is_active', true)->where('is_public', true)->distinct()->orderBy('group')->get()->map(function ($setting) {
             $count = SystemSetting::where('group', $setting->group)->where('is_active', true)->where('is_public', true)->count();
+            $normalizedGroup = trim((string) $setting->group);
+            $translationKey = 'system_settings.' . $normalizedGroup;
+            $translatedLabel = __($translationKey);
 
-            return ['name' => $setting->group, 'label' => __('admin.system_settings.' . $setting->group), 'count' => $count];
+            return [
+                'name'  => $normalizedGroup,
+                'label' => $translatedLabel === $translationKey
+                    ? Str::headline($normalizedGroup)
+                    : $translatedLabel,
+                'count' => $count,
+            ];
         });
 
         return response()->json(['success' => true, 'data' => $groups]);

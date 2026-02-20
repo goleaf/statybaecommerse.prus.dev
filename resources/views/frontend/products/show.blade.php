@@ -6,7 +6,7 @@
 @section('content')
     <div class="bg-gray-50 py-12">
         <div class="mx-auto max-w-6xl space-y-12 px-4 sm:px-6 lg:px-8">
-            <nav class="text-sm text-gray-500" aria-label="Breadcrumb">
+            <nav class="text-sm text-gray-500" aria-label="{{ __('frontend.navigation.breadcrumbs') }}">
                 <ol class="flex flex-wrap items-center gap-2">
                     <li>
                         <a href="{{ route('home') }}" class="text-blue-600 hover:text-blue-700">{{ __('messages.frontend') }}</a>
@@ -23,7 +23,7 @@
             <div class="mt-10 grid gap-10 lg:grid-cols-[1.1fr_1fr]">
                 <div class="space-y-6">
                     <div class="overflow-hidden rounded-3xl border border-gray-200 bg-gray-50">
-                        <img src="{{ $product->main_image ?: 'https://via.placeholder.com/1200x1200.png?text=Product' }}" alt="{{ $product->name }}" class="h-full w-full object-cover" loading="lazy" />
+                        <img src="{{ $product->main_image ?: ('https://via.placeholder.com/1200x1200.png?text=' . rawurlencode((string) __('messages.product'))) }}" alt="{{ $product->name }}" class="h-full w-full object-cover" loading="lazy" />
                     </div>
                     @if ($product->description)
                         <article class="prose prose-indigo max-w-none">

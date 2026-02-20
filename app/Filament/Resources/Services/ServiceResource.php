@@ -23,7 +23,7 @@ class ServiceResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return 'Services';
+        return __('translations.services');
     }
 
     public static function form(Schema $schema): Schema

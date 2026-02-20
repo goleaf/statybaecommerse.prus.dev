@@ -7,4 +7,6 @@ return [
     'active_url' => 'validation.active_url',
     'unique'     => 'Unique',
     'after'      => 'The :attribute must be a date after :date.',
+    'exists'     => 'Выбранное значение :attribute недопустимо.',
+    'required'   => 'Поле :attribute обязательно.',
 ];

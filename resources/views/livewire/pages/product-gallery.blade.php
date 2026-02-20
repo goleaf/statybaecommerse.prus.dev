@@ -94,12 +94,6 @@
                                     WebP
                                 </div>
 
-                                {{-- Generated Badge --}}
-                                @if($mainImage['generated'] ?? false)
-                                    <div class="absolute bottom-2 right-2 bg-blue-500 text-white px-2 py-1 rounded text-xs">
-                                        {{ __('translations.random_image') }}
-                                    </div>
-                                @endif
                             @else
                                 <div class="w-full h-full flex items-center justify-center">
                                     <svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

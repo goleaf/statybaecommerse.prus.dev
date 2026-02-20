@@ -42,7 +42,7 @@ class SubscriberRelationManager extends RelationManager
                     ])
                     ->required(),
                 Toggle::make('newsletter_subscription')
-                    ->label('Newsletter'),
+                    ->label(__('admin.labels.newsletter')),
             ]);
     }
 
@@ -66,7 +66,7 @@ class SubscriberRelationManager extends RelationManager
                 IconColumn::make('newsletter_subscription')
                     ->sortable()
                     ->boolean()
-                    ->label('Newsletter'),
+                    ->label(__('admin.labels.newsletter')),
                 TextColumn::make('subscribed_at')
                     ->dateTime()
                     ->sortable(),

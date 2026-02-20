@@ -16,7 +16,7 @@
     // If no images, use placeholder
     if ($images->isEmpty()) {
         $images = collect([
-            (object) ['url' => product_placeholder_url('large'), 'alt' => $product->name ?? 'Product Image'],
+            (object) ['url' => product_placeholder_url('large'), 'alt' => $product->name ?? __('ui.product_image')],
         ]);
     }
 
@@ -119,7 +119,7 @@
                                         'hover:ring-2 hover:ring-gray-300'"
                                     class="w-full aspect-w-1 aspect-h-1 bg-gray-100 rounded-lg overflow-hidden transition-all duration-200">
                                 <img src="{{ $image->url ?? $image }}"
-                                     alt="{{ $image->alt ?? ($product->name ?? 'Product Image') }}"
+                                     alt="{{ $image->alt ?? ($product->name ?? __('ui.product_image')) }}"
                                      class="w-full h-full object-cover">
                             </button>
                         @endforeach
@@ -192,7 +192,7 @@
 <script>
     function productGallery() {
         return {
-            images: {{ $images->map(function ($img) {return ['url' => $img->url ?? $img, 'alt' => $img->alt ?? 'Product Image'];})->toJson() }},
+            images: {{ $images->map(function ($img) {return ['url' => $img->url ?? $img, 'alt' => $img->alt ?? __('ui.product_image')];})->toJson() }},
             currentIndex: 0,
             showZoom: false,
             zoomEnabled: {{ $showZoom ? 'true' : 'false' }},

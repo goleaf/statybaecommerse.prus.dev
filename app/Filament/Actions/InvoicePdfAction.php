@@ -19,7 +19,7 @@ final class InvoicePdfAction
     public static function make(): Action
     {
         return Action::make('generate_invoice_pdf')
-            ->label(__('Generate Invoice PDF'))
+            ->label(__('admin.actions.generate_document'))
             ->icon('heroicon-m-document-text')
             ->color('success')
             ->action(function (Model $record, DocumentServiceContract $documentService) {
@@ -101,8 +101,8 @@ final class InvoicePdfAction
     private static function defaultInvoiceTemplateData(): array
     {
         return [
-            'name'        => 'Invoice Template',
-            'description' => 'Standard invoice template for billing',
+            'name'        => __('admin.labels.invoice_template'),
+            'description' => __('admin.labels.standard_invoice_template_for_billing'),
             'content'     => '<h1>Invoice #{{invoice_number}}</h1><p>Date: {{invoice_date}}</p><p>Customer: {{customer_name}}</p><p>Amount: €{{total_amount}}</p>',
             'variables'   => ['invoice_number', 'invoice_date', 'customer_name', 'total_amount'],
             'type'        => DocumentTemplateType::Invoice->value,

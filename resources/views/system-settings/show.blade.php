@@ -1,6 +1,6 @@
 @extends('components.layouts.base')
 
-@section('title', $setting->getTranslatedName() . ' - ' . __('messages.frontend_system_settings'))
+@section('title', $setting->getTranslatedName() . ' - ' . __('system_settings.frontend.title'))
 @section('description', $setting->getTranslatedDescription())
 
 @section('content')
@@ -11,7 +11,7 @@
             <ol class="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
                 <li>
                     <a href="{{ route('frontend.system-settings.index') }}" class="hover:text-blue-600 dark:hover:text-blue-400">
-                        {{ __('messages.frontend_system_settings') }}
+                        {{ __('system_settings.frontend.title') }}
                     </a>
                 </li>
                 <li>
@@ -35,6 +35,13 @@
             </ol>
         </nav>
 
+        @php
+            $groupKey = "system_settings.{$setting->group}";
+            $groupLabel = __($groupKey);
+            $typeKey = "system_settings.types.{$setting->type}";
+            $typeLabel = __($typeKey);
+        @endphp
+
         <!-- Setting Details -->
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
             <!-- Header -->
@@ -49,14 +56,14 @@
                                 {{ $setting->key }}
                             </span>
                             <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full dark:bg-blue-900 dark:text-blue-200">
-                                {{ ucfirst($setting->group) }}
+                                {{ $groupLabel === $groupKey ? \Illuminate\Support\Str::headline((string) $setting->group) : $groupLabel }}
                             </span>
                             <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full dark:bg-green-900 dark:text-green-200">
-                                {{ ucfirst($setting->type) }}
+                                {{ $typeLabel === $typeKey ? \Illuminate\Support\Str::headline((string) $setting->type) : $typeLabel }}
                             </span>
                         </div>
                     </div>
-                    
+
                     @if($setting->category)
                         <div class="flex items-center text-sm text-gray-500 dark:text-gray-400">
                             <i class="{{ $setting->category->getIconClass() }} mr-2"></i>
@@ -75,37 +82,37 @@
             <!-- Value Section -->
             <div class="mb-8">
                 <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                    {{ __('messages.frontend_system_settings') }}
+                    {{ __('system_settings.frontend.value_title') }}
                 </h2>
-                
+
                 <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
                     @switch($setting->type)
                         @case('boolean')
                             <div class="flex items-center">
                                 <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium {{ $setting->value ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' }}">
-                                    {{ $setting->value ? __('messages.frontend_system_settings') : __('messages.frontend_system_settings') }}
+                                    {{ $setting->value ? __('system_settings.frontend.enabled') : __('system_settings.frontend.disabled') }}
                                 </span>
                             </div>
                             @break
-                            
+
                         @case('array')
                         @case('json')
                             <pre class="text-sm text-gray-800 dark:text-gray-200 bg-white dark:bg-gray-800 p-4 rounded border overflow-x-auto"><code>{{ json_encode($setting->value, JSON_PRETTY_PRINT) }}</code></pre>
                             @break
-                            
+
                         @case('color')
                             <div class="flex items-center space-x-3">
                                 <div class="w-12 h-12 rounded-lg border-2 border-gray-300 dark:border-gray-600 bg-var" data-color="{{ $setting->value }}"></div>
                                 <span class="text-lg font-mono text-gray-800 dark:text-gray-200">{{ $setting->value }}</span>
                             </div>
                             @break
-                            
+
                         @case('file')
                         @case('image')
                             @if($setting->value)
                                 <div class="flex items-center space-x-3">
                                     @if($setting->type === 'image')
-                                        <img src="{{ $setting->value }}" alt="{{ $setting->getTranslatedName() }}" 
+                                        <img src="{{ $setting->value }}" alt="{{ $setting->getTranslatedName() }}"
                                              class="w-16 h-16 object-cover rounded-lg">
                                     @else
                                         <div class="w-16 h-16 bg-gray-200 dark:bg-gray-600 rounded-lg flex items-center justify-center">
@@ -116,17 +123,17 @@
                                     @endif
                                     <div>
                                         <p class="text-sm text-gray-600 dark:text-gray-300">{{ basename($setting->value) }}</p>
-                                        <a href="{{ $setting->value }}" target="_blank" 
+                                        <a href="{{ $setting->value }}" target="_blank"
                                            class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-sm">
-                                            {{ __('messages.frontend_system_settings') }}
+                                            {{ __('system_settings.frontend.open_file') }}
                                         </a>
                                     </div>
                                 </div>
                             @else
-                                <p class="text-gray-500 dark:text-gray-400">{{ __('messages.frontend_system_settings') }}</p>
+                                <p class="text-gray-500 dark:text-gray-400">{{ __('system_settings.frontend.not_set') }}</p>
                             @endif
                             @break
-                            
+
                         @default
                             <p class="text-lg text-gray-800 dark:text-gray-200 font-mono">{{ $setting->value }}</p>
                     @endswitch
@@ -137,7 +144,7 @@
             @if($setting->getTranslatedHelpText())
                 <div class="mb-8">
                     <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                        {{ __('messages.frontend_system_settings') }}
+                        {{ __('system_settings.frontend.help_text_title') }}
                     </h2>
                     <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6">
                         <p class="text-blue-800 dark:text-blue-200">
@@ -150,35 +157,39 @@
             <!-- Technical Details -->
             <div class="mb-8">
                 <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                    {{ __('messages.frontend_system_settings') }}
+                    {{ __('system_settings.frontend.technical_details_title') }}
                 </h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">
-                            {{ __('messages.frontend_system_settings') }}
+                            {{ __('system_settings.frontend.technical_type') }}
                         </h3>
-                        <p class="text-gray-900 dark:text-white">{{ ucfirst($setting->type) }}</p>
+                        <p class="text-gray-900 dark:text-white">
+                            {{ $typeLabel === $typeKey ? \Illuminate\Support\Str::headline((string) $setting->type) : $typeLabel }}
+                        </p>
                     </div>
-                    
+
                     <div>
                         <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">
-                            {{ __('messages.frontend_system_settings') }}
+                            {{ __('system_settings.frontend.technical_group') }}
                         </h3>
-                        <p class="text-gray-900 dark:text-white">{{ ucfirst($setting->group) }}</p>
+                        <p class="text-gray-900 dark:text-white">
+                            {{ $groupLabel === $groupKey ? \Illuminate\Support\Str::headline((string) $setting->group) : $groupLabel }}
+                        </p>
                     </div>
-                    
+
                     @if($setting->default_value)
                         <div>
                             <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">
-                                {{ __('messages.frontend_system_settings') }}
+                                {{ __('system_settings.frontend.technical_default') }}
                             </h3>
                             <p class="text-gray-900 dark:text-white font-mono">{{ $setting->default_value }}</p>
                         </div>
                     @endif
-                    
+
                     <div>
                         <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">
-                            {{ __('messages.frontend_system_settings') }}
+                            {{ __('system_settings.frontend.technical_updated_at') }}
                         </h3>
                         <p class="text-gray-900 dark:text-white">{{ $setting->updated_at->format('Y-m-d H:i:s') }}</p>
                     </div>
@@ -190,7 +201,7 @@
         @if($relatedSettings->isNotEmpty())
             <div class="mt-12">
                 <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-                    {{ __('messages.frontend_system_settings') }}
+                    {{ __('system_settings.frontend.related_settings_title') }}
                 </h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     @foreach($relatedSettings as $relatedSetting)
@@ -206,9 +217,9 @@
                                     {{ Str::limit($relatedSetting->getTranslatedDescription(), 100) }}
                                 </p>
                             @endif
-                            <a href="{{ route('frontend.system-settings.show', $relatedSetting->key) }}" 
+                            <a href="{{ route('frontend.system-settings.show', $relatedSetting->key) }}"
                                class="inline-flex items-center text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
-                                {{ __('messages.frontend_system_settings') }}
+                                {{ __('system_settings.frontend.view_setting') }}
                                 <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                                 </svg>

@@ -57,10 +57,10 @@ class ReferralCodesRelationManager extends RelationManager
                     ->money('EUR')
                     ->sortable(),
                 TextColumn::make('usage_count')
-                    ->label('Used')
+                    ->label(__('admin.labels.used'))
                     ->sortable(),
                 TextColumn::make('usage_limit')
-                    ->label('Limit')
+                    ->label(__('admin.labels.limit'))
                     ->sortable(),
                 IconColumn::make('is_active')
                     ->sortable()

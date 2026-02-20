@@ -8,6 +8,7 @@ use App\Models\SystemSetting;
 use App\Models\SystemSettingCategory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 /**
@@ -67,7 +68,7 @@ final class SystemSettingController extends Controller
             // Provide a lightweight fallback category so the view can still render even when the original has been removed.
             $setting->setRelation('category', SystemSettingCategory::make([
                 'slug' => 'uncategorized',
-                'name' => 'Uncategorized',
+                'name' => __('system_settings.frontend.uncategorized'),
             ]));
         }
         // Update access count and last accessed time
@@ -191,7 +192,7 @@ final class SystemSettingController extends Controller
     {
         $setting = SystemSetting::where('key', $key)->active()->public()->first();
         if (! $setting) {
-            return response()->json(['error' => 'Setting not found'], 404);
+            return response()->json(['error' => __('system_settings.frontend.setting_not_found')], 404);
         }
         // Update access count
         $setting->increment('access_count');
@@ -232,11 +233,15 @@ final class SystemSettingController extends Controller
             })
             ->map(static function ($group): array {
                 $normalizedGroup = trim((string) $group->group);
+                $translationKey = 'system_settings.' . $normalizedGroup;
+                $translatedLabel = __($translationKey);
 
                 return [
                     'name' => $normalizedGroup,
-                    // Provide a simple human-readable label for the group list while keeping formatting predictable.
-                    'label'          => ucfirst($normalizedGroup),
+                    // Translate known group names and provide a readable fallback for custom values.
+                    'label' => $translatedLabel === $translationKey
+                        ? Str::headline($normalizedGroup)
+                        : $translatedLabel,
                     'settings_count' => $group->settings_count,
                 ];
             })

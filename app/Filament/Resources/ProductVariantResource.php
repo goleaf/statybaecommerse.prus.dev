@@ -72,6 +72,7 @@ final class ProductVariantResource extends BaseResource
     public static function table(Table $table): Table
     {
         return $table
+            ->emptyStateHeading(__('admin.product_variants.no_product_variants'))
             ->columns([
                 TextColumn::make('sku')
                     ->label(__('messages.sku'))
@@ -98,12 +99,12 @@ final class ProductVariantResource extends BaseResource
             ])
             ->filters([
                 SelectFilter::make('stock_status')
-                    ->label('Stock Status')
+                    ->label(__('admin.labels.stock_status'))
                     ->options([
-                        'in_stock'     => 'In Stock',
-                        'low_stock'    => 'Low Stock',
-                        'out_of_stock' => 'Out of Stock',
-                        'not_tracked'  => 'Not Tracked',
+                        'in_stock'     => __('admin.product_variants.in_stock'),
+                        'low_stock'    => __('admin.product_variants.low_stock'),
+                        'out_of_stock' => __('admin.product_variants.out_of_stock'),
+                        'not_tracked'  => __('admin.product_variants.not_tracked'),
                     ])
                     ->query(static function (Builder $query, array $data): Builder {
                         $selected = $data['value'] ?? null;

@@ -91,11 +91,11 @@ final class ProductImageResource extends BaseResource
                                 TextInput::make('alt_text')
                                     ->label(__('messages.description'))
                                     ->maxLength(255)
-                                    ->placeholder('e.g. Front view of the product'),
+                                    ->placeholder(__('admin.labels.image_alt_placeholder')),
                                 SortOrderInput::make(),
                                 Toggle::make('is_default')
                                     ->label(__('admin.navigation.product_image'))
-                                    ->helperText('Mark as primary image for this product.'),
+                                    ->helperText(__('admin.labels.primary_image_help')),
                                 Toggle::make('is_active')
                                     ->label(__('messages.active'))
                                     ->default(true),
@@ -110,7 +110,7 @@ final class ProductImageResource extends BaseResource
         return $table
             ->columns([
                 ImageColumn::make('url')
-                    ->label('Preview'),
+                    ->label(__('admin.labels.preview')),
                 TextColumn::make('product.name')
                     ->searchable()
                     ->sortable(),

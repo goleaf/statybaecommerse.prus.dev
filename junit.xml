@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="Tests\Feature\Frontend\BrandFrontendTest" file="Brand Frontend (Tests\Feature\Frontend\BrandFrontend)" tests="2" assertions="5" errors="0" failures="0" skipped="0" time="7.166792">
-    <testcase name="Brand index lists brands" file="Brand Frontend (Tests\Feature\Frontend\BrandFrontend)::Brand index lists brands" class="Tests\Feature\Frontend\BrandFrontendTest" classname="Tests.Feature.Frontend.BrandFrontendTest" assertions="2" time="6.360343"/>
-    <testcase name="Brand show displays products" file="Brand Frontend (Tests\Feature\Frontend\BrandFrontend)::Brand show displays products" class="Tests\Feature\Frontend\BrandFrontendTest" classname="Tests.Feature.Frontend.BrandFrontendTest" assertions="3" time="0.806448"/>
+  <testsuite name="Tests\Feature\SystemSettingsResourceTest" file="System Settings Resource (Tests\Feature\SystemSettingsResource)" tests="1" assertions="2" errors="0" failures="0" skipped="0" time="13.510483">
+    <testcase name="Resource does not register navigation item" file="System Settings Resource (Tests\Feature\SystemSettingsResource)::Resource does not register navigation item" class="Tests\Feature\SystemSettingsResourceTest" classname="Tests.Feature.SystemSettingsResourceTest" assertions="2" time="13.510483"/>
   </testsuite>
 </testsuites>

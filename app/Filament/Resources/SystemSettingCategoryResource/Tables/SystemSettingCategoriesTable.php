@@ -31,7 +31,7 @@ class SystemSettingCategoriesTable
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('parent.name')
-                    ->label('Parent')
+                    ->label(__('admin.labels.parent'))
                     ->placeholder('-')
                     ->sortable(),
                 IconColumn::make('is_active')
@@ -43,13 +43,13 @@ class SystemSettingCategoriesTable
             ])
             ->filters([
                 SelectFilter::make('parent_id')
-                    ->label('Parent')
+                    ->label(__('admin.labels.parent'))
                     ->options(static fn (): array => SystemSettingCategory::query()
                         ->orderBy('name')
                         ->pluck('name', 'id')
                         ->all()),
                 TernaryFilter::make('is_active')
-                    ->label('Active'),
+                    ->label(__('admin.labels.active')),
             ])
             ->recordActions([
                 Action::make('duplicate')

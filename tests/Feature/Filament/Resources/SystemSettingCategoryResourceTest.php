@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Filament\Resources;
 
+use App\Filament\Resources\SystemSettingCategoryResource;
 use App\Filament\Resources\SystemSettingCategoryResource\Pages\CreateSystemSettingCategory;
 use App\Filament\Resources\SystemSettingCategoryResource\Pages\EditSystemSettingCategory;
 use App\Filament\Resources\SystemSettingCategoryResource\Pages\ListSystemSettingCategories;
-use App\Models\SystemSettingCategory;
 use App\Models\AdminUser;
+use App\Models\SystemSettingCategory;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -36,7 +37,7 @@ final class SystemSettingCategoryResourceTest extends TestCase
 
         // Create and authenticate the canonical administrator used throughout the assertions.
         $this->admin = AdminUser::factory()->create([
-            'email'    => 'admin@example.com',
+            'email' => 'admin@example.com',
         ]);
 
         $this->admin->assignRole('super_admin');
@@ -55,6 +56,12 @@ final class SystemSettingCategoryResourceTest extends TestCase
         Livewire::test(ListSystemSettingCategories::class)
             ->call('loadTable')
             ->assertCanSeeTableRecords([$category]);
+    }
+
+    public function test_resource_does_not_register_admin_navigation_item(): void
+    {
+        $this->assertFalse(SystemSettingCategoryResource::shouldRegisterNavigation());
+        $this->assertSame([], SystemSettingCategoryResource::getNavigationItems());
     }
 
     public function test_admin_can_create_category_with_generated_slug(): void

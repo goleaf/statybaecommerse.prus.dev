@@ -18,9 +18,7 @@ use Livewire\Component;
  * @property Product $product
  * @property bool    $showQuickView
  * @property bool    $showCompare
- * @property bool    $showWishlist
  * @property string  $layout
- * @property bool    $isInWishlist
  * @property bool    $isInComparison
  */
 final class ProductCardDetailed extends Component
@@ -36,13 +34,9 @@ final class ProductCardDetailed extends Component
 
     public bool $showCompare = true;
 
-    public bool $showWishlist = true;
-
     public string $layout = 'grid';
 
     // grid, list, minimal
-    public bool $isInWishlist = false;
-
     public bool $isInComparison = false;
 
     /**
@@ -55,7 +49,6 @@ final class ProductCardDetailed extends Component
             $product->load(['brand', 'media', 'categories']);
         }
         $this->product = $product;
-        $this->checkWishlistStatus();
         $this->checkComparisonStatus();
     }
 
@@ -80,48 +73,12 @@ final class ProductCardDetailed extends Component
     }
 
     /**
-     * Handle toggleWishlist functionality with proper error handling.
-     */
-    public function toggleWishlist(): void
-    {
-        if (! auth()->check()) {
-            $this->dispatch('notify', ['type' => 'error', 'message' => __('translations.login_required_for_wishlist')]);
-
-            return;
-        }
-        $this->dispatch('add-to-wishlist', productId: $this->product->id);
-        $this->dispatch('notify', ['type' => 'success', 'message' => __('translations.product_added_to_cart', ['name' => $this->product->name])]);
-    }
-
-    /**
      * Handle toggleComparison functionality with proper error handling.
      */
     public function toggleComparison(): void
     {
         $this->dispatch('add-to-comparison', productId: $this->product->id);
-        $this->dispatch('notify', ['type' => 'success', 'message' => __('translations.product_added_to_wishlist', ['name' => $this->product->name])]);
-    }
-
-    /**
-     * Handle quickView functionality with proper error handling.
-     */
-    public function quickView(): void
-    {
-        $this->dispatch('product-quick-view', productId: $this->product->id);
-    }
-
-    /**
-     * Handle checkWishlistStatus functionality with proper error handling.
-     */
-    private function checkWishlistStatus(): void
-    {
-        if (! auth()->check()) {
-            $this->isInWishlist = false;
-
-            return;
-        }
-        $this->isInWishlist = false;
-        // Simplified for now
+        $this->dispatch('notify', ['type' => 'success', 'message' => __('translations.add_to_compare')]);
     }
 
     /**
@@ -131,6 +88,14 @@ final class ProductCardDetailed extends Component
     {
         $this->isInComparison = false;
         // Simplified for now
+    }
+
+    /**
+     * Handle quickView functionality with proper error handling.
+     */
+    public function quickView(): void
+    {
+        $this->dispatch('product-quick-view', productId: $this->product->id);
     }
 
     /**

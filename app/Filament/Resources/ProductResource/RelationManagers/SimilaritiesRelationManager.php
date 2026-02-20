@@ -59,7 +59,7 @@ class SimilaritiesRelationManager extends RelationManager
             ])
             ->headerActions([
                 Action::make('assign_existing_product')
-                    ->label('Assign Existing Product')
+                    ->label(__('admin.labels.assign_existing_product'))
                     ->icon('heroicon-o-plus')
                     ->form([
                         $this->makeSimilarProductSelect(),

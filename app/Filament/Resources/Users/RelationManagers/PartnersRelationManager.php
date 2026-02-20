@@ -66,7 +66,7 @@ class PartnersRelationManager extends RelationManager
                     ->searchable()
                     ->preload(),
                 KeyValue::make('metadata')
-                    ->label('Metadata')
+                    ->label(__('admin.labels.metadata'))
                     ->nullable()
                     ->columnSpanFull(),
                 Toggle::make('is_enabled')

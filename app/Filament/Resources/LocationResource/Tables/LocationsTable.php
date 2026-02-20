@@ -60,7 +60,7 @@ class LocationsTable
                     ->searchable(),
                 TextColumn::make('email')
                     ->sortable()
-                    ->label('Email address')
+                    ->label(__('admin.labels.email_address'))
                     ->searchable(),
                 TextColumn::make('latitude')
                     ->numeric()

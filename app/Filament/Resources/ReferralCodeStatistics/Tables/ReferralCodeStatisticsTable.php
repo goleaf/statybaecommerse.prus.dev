@@ -18,7 +18,7 @@ class ReferralCodeStatisticsTable
         return $table
             ->columns([
                 TextColumn::make('referralCode.code')
-                    ->label('Referral Code')
+                    ->label(__('admin.labels.referral_code'))
                     ->searchable(),
                 TextColumn::make('date')
                     ->date()

@@ -21,6 +21,6 @@ final class SortOrderInput
             ->inputMode('numeric')
             ->suffixIcon(Heroicon::Bars3BottomLeft)
             ->suffixIconColor('gray')
-            ->helperText('Lower number appears first.');
+            ->helperText(__('translations.sort_order_help'));
     }
 }

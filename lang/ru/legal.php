@@ -3,7 +3,27 @@
 declare(strict_types=1);
 
 return [
-    'descriptions'  => 'legal.descriptions',
-    'return_policy' => 'Return policy',
-    'types'         => 'legal.types',
+    'types' => [
+        'privacy_policy'  => 'Политика конфиденциальности',
+        'terms_of_use'    => 'Условия использования',
+        'refund_policy'   => 'Политика возврата средств',
+        'shipping_policy' => 'Политика доставки',
+        'cookie_policy'   => 'Политика cookies',
+        'gdpr_policy'     => 'Политика GDPR',
+        'legal_notice'    => 'Юридическая информация',
+        'imprint'         => 'Выходные данные',
+        'legal_document'  => 'Юридический документ',
+    ],
+    'descriptions' => [
+        'privacy_policy'  => 'Как мы собираем, используем и защищаем персональные данные.',
+        'terms_of_use'    => 'Условия использования сайта и сервисов.',
+        'refund_policy'   => 'Правила и условия возврата средств и товаров.',
+        'shipping_policy' => 'Способы доставки, сроки и условия отправки.',
+        'cookie_policy'   => 'Как используются cookies и похожие технологии.',
+        'gdpr_policy'     => 'Как реализуются и соблюдаются права GDPR.',
+        'legal_notice'    => 'Юридическая и нормативная информация о компании.',
+        'imprint'         => 'Обязательные сведения об издателе и компании.',
+        'legal_document'  => 'Общая юридическая и комплаенс-информация.',
+    ],
+    'return_policy' => 'Политика возврата',
 ];

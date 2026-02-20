@@ -65,7 +65,7 @@ class DocumentsRelationManager extends RelationManager
                             'type'        => (string) ($data['type'] ?? DocumentTemplateType::Document->value),
                             'category'    => (string) ($data['category'] ?? DocumentTemplateCategory::Business->value),
                             'is_active'   => true,
-                            'description' => 'Auto-created from user relation manager',
+                            'description' => __('messages.auto_created_from_user_relation_manager'),
                             'variables'   => ['title'],
                         ]);
 
@@ -103,7 +103,7 @@ class DocumentsRelationManager extends RelationManager
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('documentTemplate.name')
-                    ->label('Template')
+                    ->label(__('admin.labels.template'))
                     ->sortable(),
                 TextColumn::make('file_path')
                     ->sortable()
@@ -234,7 +234,7 @@ class DocumentsRelationManager extends RelationManager
             ->create([
                 'name'        => 'Auto Template ' . strtoupper($suffix),
                 'slug'        => 'auto-template-' . $suffix,
-                'description' => 'Auto-created fallback template for user documents.',
+                'description' => __('messages.auto_created_fallback_template_for_user_documents'),
                 'content'     => '<h1>{{title}}</h1>',
                 'variables'   => ['title'],
                 'type'        => DocumentTemplateType::Document->value,

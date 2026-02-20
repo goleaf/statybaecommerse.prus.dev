@@ -4,7 +4,6 @@
     'subtitle' => null,
     'showStats' => true,
     'showRecentOrders' => true,
-    'showWishlist' => true,
     'showAddresses' => true,
     'showProfile' => true,
 ])
@@ -17,7 +16,6 @@
     // Get user statistics
     $totalOrders = $user->orders()->count();
     $totalSpent = $user->orders()->sum('total');
-    $wishlistCount = $user->wishlist()->count();
     $recentOrders = $user->orders()->latest()->take(5)->get();
 @endphp
 
@@ -71,24 +69,6 @@
                     </div>
                 </div>
 
-                {{-- Wishlist Items --}}
-                <div
-                     class="bg-white border border-gray-200 rounded-2xl p-6 hover:shadow-medium transition-shadow duration-200">
-                    <div class="flex items-center">
-                        <div class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center">
-                            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
-                                </path>
-                            </svg>
-                        </div>
-                        <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-600">{{ __('frontend.user_dashboard.stats.wishlist_items') }}</p>
-                            <p class="text-2xl font-bold text-gray-900">{{ $wishlistCount }}</p>
-                        </div>
-                    </div>
-                </div>
-
                 {{-- Account Status --}}
                 <div
                      class="bg-white border border-gray-200 rounded-2xl p-6 hover:shadow-medium transition-shadow duration-200">
@@ -122,16 +102,6 @@
                         </path>
                     </svg>
                     <span class="text-sm font-medium text-gray-900">{{ __('frontend.user_dashboard.quick_actions.view_orders') }}</span>
-                </a>
-
-                <a href="{{ route('frontend.wishlist.index') }}"
-                   class="flex flex-col items-center p-4 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors duration-200">
-                    <svg class="w-8 h-8 text-red-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
-                        </path>
-                    </svg>
-                    <span class="text-sm font-medium text-gray-900">{{ __('frontend.user_dashboard.quick_actions.wishlist') }}</span>
                 </a>
 
                 <a href="{{ route('addresses.index', ['locale' => app()->getLocale()]) ?? '/addresses' }}"
@@ -277,36 +247,7 @@
         </div>
 
         {{-- Additional Sections --}}
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
-            {{-- Wishlist Preview --}}
-            @if ($showWishlist && $user->wishlist()->count() > 0)
-                <div class="bg-white border border-gray-200 rounded-2xl p-6">
-                    <div class="flex items-center justify-between mb-6">
-                        <h2 class="text-xl font-semibold text-gray-900">{{ __('frontend.user_dashboard.wishlist.title') }}</h2>
-                        <a href="{{ route('frontend.wishlist.index') }}"
-                           class="text-blue-600 hover:text-blue-700 font-medium text-sm">
-                            {{ __('frontend.user_dashboard.actions.view_all') }}
-                        </a>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-4">
-                        @foreach ($user->wishlist()->take(4) as $item)
-                            <div
-                                 class="border border-gray-200 rounded-xl p-3 hover:shadow-medium transition-shadow duration-200">
-                                <div class="w-full h-24 bg-gray-100 rounded-lg mb-2 overflow-hidden">
-                                    <img src="{{ $item->getFirstMediaUrl('images') ?? product_placeholder_url('medium') }}"
-                                         alt="{{ $item->name }}" class="w-full h-full object-cover">
-                                </div>
-                                <h3 class="font-medium text-gray-900 text-sm line-clamp-2">{{ $item->name }}</h3>
-                                <p class="text-sm font-semibold text-gray-900 mt-1">
-                                    {{ \Illuminate\Support\Number::currency($item->price, current_currency(), app()->getLocale()) }}
-                                </p>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
-            @endif
-
+        <div class="mt-8">
             {{-- Addresses --}}
             @if ($showAddresses)
                 <div class="bg-white border border-gray-200 rounded-2xl p-6">

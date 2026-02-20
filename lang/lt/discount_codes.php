@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 return [
     'page' => [
-        'available_title' => 'Available title',
-        'details_title'   => 'Details title',
+        'available_title' => 'Galimas pavadinimas',
+        'details_title'   => 'Išsamios informacijos pavadinimas',
         'errors'          => [
-            'enter_code'  => 'Enter code',
-            'load_failed' => 'Load failed',
+            'enter_code'  => 'Įveskite kodą',
+            'load_failed' => 'Įkelti nepavyko',
         ],
-        'search_placeholder' => 'Search placeholder',
-        'view_details'       => 'View details',
+        'search_placeholder' => 'Paieškos rezervuota vieta',
+        'view_details'       => 'Peržiūrėkite išsamią informaciją',
     ],
 ];

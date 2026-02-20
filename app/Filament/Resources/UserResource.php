@@ -9,7 +9,6 @@ use App\Filament\Resources\Users\Pages\EditUser;
 use App\Filament\Resources\Users\Pages\ListUsers;
 use App\Filament\Resources\Users\Pages\ViewUser;
 use App\Filament\Resources\Users\RelationManagers\AddressesRelationManager;
-use App\Filament\Resources\Users\RelationManagers\CartItemsRelationManager;
 use App\Filament\Resources\Users\RelationManagers\CouponUsagesRelationManager;
 use App\Filament\Resources\Users\RelationManagers\CustomerGroupsRelationManager;
 use App\Filament\Resources\Users\RelationManagers\DiscountRedemptionsRelationManager;
@@ -47,17 +46,17 @@ class UserResource extends Resource
 
     public static function getModelLabel(): string
     {
-        return 'Customer';
+        return __('messages.customer');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return 'Customers';
+        return __('messages.customers');
     }
 
     public static function getNavigationLabel(): string
     {
-        return 'Customers';
+        return __('messages.customers');
     }
 
     public static function form(Schema $schema): Schema
@@ -82,7 +81,6 @@ class UserResource extends Resource
             PartnersRelationManager::class,
             OrdersRelationManager::class,
             AddressesRelationManager::class,
-            CartItemsRelationManager::class,
             CouponUsagesRelationManager::class,
             DiscountRedemptionsRelationManager::class,
             NotificationsRelationManager::class,

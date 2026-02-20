@@ -17,7 +17,7 @@ final class ReferralCodesRelationManager extends RelationManager
 
     public static function getTitle(Model $ownerRecord, string $pageClass): string
     {
-        return 'Referral Codes';
+        return __('messages.referral_codes');
     }
 
     public function form(Schema $schema): Schema

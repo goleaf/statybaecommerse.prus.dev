@@ -11,6 +11,7 @@
     $order = $order ?? new \App\Models\Order();
     $title = $title ?? __('translations.order_tracking');
     $subtitle = $subtitle ?? __('translations.track_order_status');
+    $notAvailable = __('frontend.order_summary.not_available');
 
     // Order status timeline
     $statusTimeline = [
@@ -65,14 +66,14 @@
                 {{-- Order Number --}}
                 <div>
                     <h3 class="text-sm font-medium text-gray-500 mb-1">{{ __('translations.order_number') }}</h3>
-                    <p class="text-lg font-semibold text-gray-900">{{ $order->order_number ?? 'N/A' }}</p>
+                    <p class="text-lg font-semibold text-gray-900">{{ $order->order_number ?? $notAvailable }}</p>
                 </div>
 
                 {{-- Order Date --}}
                 <div>
                     <h3 class="text-sm font-medium text-gray-500 mb-1">{{ __('translations.order_date') }}</h3>
                     <p class="text-lg font-semibold text-gray-900">
-                        {{ $order->created_at ? $order->created_at->format('Y-m-d') : 'N/A' }}
+                        {{ $order->created_at ? $order->created_at->format('Y-m-d') : $notAvailable }}
                     </p>
                 </div>
 
@@ -80,7 +81,7 @@
                 <div>
                     <h3 class="text-sm font-medium text-gray-500 mb-1">{{ __('translations.total_amount') }}</h3>
                     <p class="text-lg font-semibold text-gray-900">
-                        {{ $order->total ? \Illuminate\Support\Number::currency($order->total, current_currency(), app()->getLocale()) : 'N/A' }}
+                        {{ $order->total ? \Illuminate\Support\Number::currency($order->total, current_currency(), app()->getLocale()) : $notAvailable }}
                     </p>
                 </div>
             </div>
@@ -236,15 +237,15 @@
                     <div>
                         <h3 class="font-semibold text-gray-900 mb-2">{{ __('ui.shipping_address') }}</h3>
                         <div class="text-gray-600">
-                            <p>{{ $order->shipping_address->name ?? 'N/A' }}</p>
-                            <p>{{ $order->shipping_address->address_line_1 ?? 'N/A' }}</p>
+                            <p>{{ $order->shipping_address->name ?? $notAvailable }}</p>
+                            <p>{{ $order->shipping_address->address_line_1 ?? $notAvailable }}</p>
                             @if ($order->shipping_address->address_line_2)
                                 <p>{{ $order->shipping_address->address_line_2 }}</p>
                             @endif
-                            <p>{{ $order->shipping_address->city ?? 'N/A' }},
-                                {{ $order->shipping_address->state ?? 'N/A' }}
-                                {{ $order->shipping_address->postal_code ?? 'N/A' }}</p>
-                            <p>{{ $order->shipping_address->country ?? 'N/A' }}</p>
+                            <p>{{ $order->shipping_address->city ?? $notAvailable }},
+                                {{ $order->shipping_address->state ?? $notAvailable }}
+                                {{ $order->shipping_address->postal_code ?? $notAvailable }}</p>
+                            <p>{{ $order->shipping_address->country ?? $notAvailable }}</p>
                         </div>
                     </div>
 
@@ -305,7 +306,7 @@
                     </button>
 
                     {{-- Contact Support --}}
-                    <a href="{{ route('contact', ['locale' => app()->getLocale()]) ?? '/contact' }}"
+                    <a href="{{ \Illuminate\Support\Facades\Route::has('frontend.contact.index') ? route('frontend.contact.index') : url('/contact') }}"
                        class="flex items-center justify-center gap-2 px-6 py-3 border border-gray-300 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors duration-200">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

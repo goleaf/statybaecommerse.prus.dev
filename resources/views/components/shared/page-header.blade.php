@@ -13,7 +13,7 @@
     <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {{-- Breadcrumbs --}}
         @if(!empty($breadcrumbs))
-            <nav class="mb-6" aria-label="Breadcrumb">
+            <nav class="mb-6" aria-label="{{ __('frontend.navigation.breadcrumbs') }}">
                 <ol class="flex items-center space-x-2 text-sm">
                     @foreach($breadcrumbs as $index => $breadcrumb)
                         <li class="flex items-center">

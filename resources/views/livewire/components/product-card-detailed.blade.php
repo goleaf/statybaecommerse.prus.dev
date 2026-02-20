@@ -35,21 +35,6 @@
 
         {{-- Action Buttons --}}
         <div class="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            @if($showWishlist)
-                <button 
-                    wire:click="toggleWishlist"
-                    wire:confirm="{{ __('translations.confirm_toggle_wishlist') }}"
-                    class="w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center hover:bg-gray-50 transition-colors duration-200 {{ $isInWishlist ? 'text-red-500' : 'text-gray-400 hover:text-red-500' }}"
-                    title="{{ $isInWishlist ? __('translations.remove_from_wishlist') : __('translations.add_to_wishlist') }}"
-                >
-                    @if($isInWishlist)
-                        <x-heroicon-s-heart class="w-5 h-5" />
-                    @else
-                        <x-heroicon-o-heart class="w-5 h-5" />
-                    @endif
-                </button>
-            @endif
-
             @if($showQuickView)
                 <button 
                     wire:click="quickView"

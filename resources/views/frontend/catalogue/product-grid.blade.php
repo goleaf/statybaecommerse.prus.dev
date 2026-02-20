@@ -9,7 +9,6 @@
         <x-product-card
             :product="$product"
             :showQuickView="false"
-            :showWishlist="false"
             :showCompare="false"
             :showAddToCart="false"
         />

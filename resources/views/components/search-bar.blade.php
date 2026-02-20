@@ -1,7 +1,7 @@
 @props(['placeholder' => null, 'showSuggestions' => true])
 
 @php
-    $placeholder = $placeholder ?? __('messages.frontend');
+    $placeholder = $placeholder ?? __('frontend.search_results.search_placeholder');
 @endphp
 
 <div class="relative" x-data="searchBar()">
@@ -31,7 +31,7 @@
             {{-- Search Button --}}
             <button type="submit"
                     class="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-500 hover:text-blue-600 transition-colors duration-200"
-                    aria-label="{{ __('messages.frontend') }}">
+                    aria-label="{{ __('frontend.search_results.search_action') }}">
                 <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                     <path fill-rule="evenodd"
                           d="M12.9 14.32a8 8 0 111.414-1.414l4.387 4.387a1 1 0 01-1.414 1.414l-4.387-4.387zM14 8a6 6 0 11-12 0 6 6 0 0112 0z"
@@ -57,10 +57,10 @@
             <template x-if="suggestions.length > 0">
                 <div>
                     <div class="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                        {{ __('messages.frontend') }}
+                        {{ __('frontend.search_results.suggestions.title') }}
                     </div>
                     <template x-for="suggestion in suggestions" :key="suggestion.id">
-                        <a :href="`/search?q=${suggestion.name}`"
+                        <a :href="`${searchUrl}?q=${encodeURIComponent(suggestion.name)}`"
                            class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors duration-200">
                             <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -109,6 +109,8 @@
             recentSearches: JSON.parse(localStorage.getItem('recentSearches') || '[]'),
             showSuggestions: false,
             loading: false,
+            searchUrl: @js(route('localized.search', ['locale' => app()->getLocale()])),
+            suggestionsUrl: @js(route('frontend.search.suggestions')),
 
             async getSuggestions() {
                 if (this.query.length < 2) {
@@ -119,7 +121,7 @@
                 this.loading = true;
 
                 try {
-                    const response = await fetch(`/api/search/suggestions?q=${encodeURIComponent(this.query)}`);
+                    const response = await fetch(`${this.suggestionsUrl}?q=${encodeURIComponent(this.query)}`);
                     const data = await response.json();
                     this.suggestions = data.suggestions || [];
                 } catch (error) {
@@ -137,7 +139,7 @@
                 this.addToRecentSearches(this.query);
 
                 // Navigate to search results
-                window.location.href = `/search?q=${encodeURIComponent(this.query)}`;
+                window.location.href = `${this.searchUrl}?q=${encodeURIComponent(this.query)}`;
             },
 
             addToRecentSearches(searchTerm) {

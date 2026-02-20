@@ -17,7 +17,7 @@ final class ReferralRewardLogsRelationManager extends RelationManager
 
     public static function getTitle(Model $ownerRecord, string $pageClass): string
     {
-        return 'Referral Reward Logs';
+        return __('messages.referral_reward_logs');
     }
 
     public function form(Schema $schema): Schema

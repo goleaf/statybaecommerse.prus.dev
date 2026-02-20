@@ -7,4 +7,6 @@ return [
     'active_url' => 'validation.active_url',
     'unique'     => 'Unique',
     'after'      => 'The :attribute must be a date after :date.',
+    'exists'     => 'Der ausgewählte :attribute ist ungültig.',
+    'required'   => 'Das Feld :attribute ist erforderlich.',
 ];

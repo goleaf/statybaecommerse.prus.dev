@@ -83,7 +83,7 @@
             [
                 'key' => 'support',
                 'label' => __('messages.nav_support_center'),
-                'url' => 'mailto:support@statybae.com',
+                'url' => 'mailto:eegidia@gmail.com',
             ],
         ])->filter(fn($link) => !empty($link['url']));
     @endphp

@@ -43,6 +43,7 @@ use App\Models\ReferralCode;
 use App\Models\ReferralReward;
 use App\Models\Subscriber;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -100,6 +101,31 @@ class UserResourceTest extends TestCase
         Livewire::test(ListUsers::class)
             ->assertCanSeeTableRecords([$user])
             ->assertCanNotSeeTableRecords([$adminUser]);
+    }
+
+    public function test_edit_user_form_normalizes_translated_name_fields_to_plain_strings(): void
+    {
+        $this->resolveAdminPanel();
+        $this->actingAs(AdminUser::factory()->create(), 'admin');
+
+        $user = User::factory()->create([
+            'first_name' => null,
+            'last_name'  => null,
+        ]);
+
+        DB::table('users')
+            ->where('id', $user->getKey())
+            ->update([
+                'first_name' => json_encode(['lt' => 'Naomi', 'en' => 'Naomi']),
+                'last_name'  => json_encode(['lt' => 'McCullough', 'en' => 'McCullough']),
+            ]);
+
+        Livewire::test(EditUser::class, [
+            'record' => $user->getRouteKey(),
+        ])
+            ->assertSuccessful()
+            ->assertSet('data.first_name', 'Naomi')
+            ->assertSet('data.last_name', 'McCullough');
     }
 
     public function test_users_list_page_has_tabs_for_all_related_information(): void

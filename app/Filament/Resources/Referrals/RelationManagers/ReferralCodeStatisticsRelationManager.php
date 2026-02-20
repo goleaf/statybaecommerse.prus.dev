@@ -17,7 +17,7 @@ final class ReferralCodeStatisticsRelationManager extends RelationManager
 
     public static function getTitle(Model $ownerRecord, string $pageClass): string
     {
-        return 'Referral Code Statistics';
+        return __('messages.referral_code_statistics');
     }
 
     public function form(Schema $schema): Schema

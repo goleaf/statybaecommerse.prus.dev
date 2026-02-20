@@ -71,7 +71,22 @@
         $cssFile = $manifest['resources/css/app.css']['file'] ?? null;
         $jsFile = $manifest['resources/js/app.js']['file'] ?? null;
         $useViteDev = app()->environment('local') && $shouldLoadViteAssets;
+        $javascriptTranslations = [
+            'js.cart.product_added_title'    => __('frontend.js.cart.product_added_title'),
+            'js.cart.product_added_message'  => __('frontend.js.cart.product_added_message'),
+            'js.cart.product_removed_title'  => __('frontend.js.cart.product_removed_title'),
+            'js.cart.product_removed_message' => __('frontend.js.cart.product_removed_message'),
+            'js.cart.quick_add_message'      => __('frontend.js.cart.quick_add_message'),
+            'js.cart.updated_title'          => __('frontend.js.cart.updated_title'),
+            'js.cart.updated_message'        => __('frontend.js.cart.updated_message'),
+            'js.forms.loading'               => __('frontend.js.forms.loading'),
+            'js.notifications.dismiss'       => __('frontend.js.notifications.dismiss'),
+        ];
     @endphp
+
+    <script>
+        window.appTranslations = @json($javascriptTranslations);
+    </script>
 
     @if ($useViteDev)
         @vite(['resources/css/app.css', 'resources/js/app.js'])

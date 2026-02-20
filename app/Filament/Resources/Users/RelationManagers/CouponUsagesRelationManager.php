@@ -46,11 +46,11 @@ class CouponUsagesRelationManager extends RelationManager
             ->recordTitleAttribute('discount_amount')
             ->columns([
                 TextColumn::make('coupon.code')
-                    ->label('Coupon')
+                    ->label(__('admin.labels.coupon'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('order.number')
-                    ->label('Order')
+                    ->label(__('admin.labels.order'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('discount_amount')

@@ -36,7 +36,6 @@
                 :products="$products"
                 title="{{ __('messages.products_found', ['count' => $products->total()]) }}"
                 :showQuickAdd="true"
-                :showWishlist="true"
                 :showCompare="true"
                 :showPagination="true"
                 columns="xl:grid-cols-4"

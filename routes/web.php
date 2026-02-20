@@ -10,7 +10,6 @@ use App\Http\Controllers\Admin\LegalTranslationController;
 use App\Http\Controllers\Admin\ProductTranslationController;
 use App\Http\Controllers\Api\NotificationStreamController;
 use App\Http\Controllers\Api\V1\HealthController;
-use App\Http\Controllers\ApiDocsController;
 use App\Http\Controllers\Frontend\UserController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\NewsController;
@@ -45,8 +44,6 @@ Route::middleware(['web'])
     ->name('api.notifications.stream');
 
 Route::middleware(['web'])->group(function () {
-    Route::get('/docs/api', ApiDocsController::class)->name('docs.api');
-
     // Live Demo Route
     Route::get('/live-demo', App\Livewire\Pages\LiveDemo::class)->name('live-demo');
 

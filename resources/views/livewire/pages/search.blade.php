@@ -160,7 +160,7 @@
                 <p class="font-semibold">{{ __('ui.search_support_need_help') }}</p>
                 <p class="mt-1">{{ __('ui.search_support_contact_cta') }}</p>
                 <a
-                    href="{{ route('contact', ['locale' => app()->getLocale()]) }}"
+                    href="{{ \Illuminate\Support\Facades\Route::has('frontend.contact.index') ? route('frontend.contact.index') : url('/contact') }}"
                     class="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-blue-700 hover:text-blue-600 dark:text-blue-200 dark:hover:text-blue-100"
                 >
                     <x-heroicon-o-chat-bubble-left-right class="h-4 w-4" />
@@ -193,7 +193,7 @@
                 {{ __('messages.search_no_results_found') }}
             </h2>
             <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">
-                {{ __('messages.frontend') }}
+                {{ __('frontend.search.try_different_search') }}
             </p>
             <div class="mt-6 flex flex-wrap justify-center gap-3">
                 <button
@@ -218,7 +218,7 @@
             <header class="flex flex-col gap-2 md:flex-row md:items-baseline md:justify-between">
                 {{-- Result summary anchors the layout for screen readers too --}}
                 <p class="text-sm text-slate-600 dark:text-slate-400" aria-live="polite">
-                    {{ trans_choice(__('messages.search_result_count'), $products->total() ?? $products->count(), ['count' => $products->total() ?? $products->count()]) }}
+                    {{ trans_choice('messages.search_result_count', $products->total() ?? $products->count(), ['count' => $products->total() ?? $products->count()]) }}
                     @if ($term)
                         — {{ __('messages.search_for') }} "{{ $term }}"
                     @endif
@@ -250,8 +250,13 @@
 
     {{-- Back button guides the shopper to continue browsing --}}
     <div class="mt-16 text-center">
+        @php
+            $homeUrl = \Illuminate\Support\Facades\Route::has('localized.home')
+                ? route('localized.home', ['locale' => app()->getLocale()])
+                : route('home');
+        @endphp
         <a
-            href="{{ route('home', ['locale' => app()->getLocale()]) }}"
+            href="{{ $homeUrl }}"
             class="inline-flex items-center gap-2 rounded-full bg-slate-900 px-5 py-3 text-sm font-semibold text-white shadow transition hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-200"
         >
             <x-heroicon-o-arrow-left class="h-4 w-4" />
@@ -276,7 +281,11 @@
                 'name' => $p->trans('name') ?? $p->name,
             ];
         }
-        $searchUrl = route('search', ['locale' => app()->getLocale()]);
+        $searchUrl = \Illuminate\Support\Facades\Route::has('localized.search')
+            ? route('localized.search', ['locale' => app()->getLocale()])
+            : (\Illuminate\Support\Facades\Route::has('frontend.search.index')
+                ? route('frontend.search.index')
+                : url('/search'));
         $websiteSchema = [
             '@context' => 'https://schema.org',
             '@type' => 'WebSite',

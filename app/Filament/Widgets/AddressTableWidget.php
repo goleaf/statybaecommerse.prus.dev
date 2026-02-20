@@ -17,9 +17,14 @@ use Filament\Widgets\TableWidget as BaseWidget;
  */
 final class AddressTableWidget extends BaseWidget
 {
-    protected static ?string $heading = 'Recent Addresses';
+    protected static ?string $heading = null;
 
     protected int|string|array $columnSpan = 'full';
+
+    public function getHeading(): string
+    {
+        return __('admin.widgets.recent_addresses');
+    }
 
     protected static ?int $sort = 3;
 

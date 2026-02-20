@@ -22,12 +22,6 @@ $links = [
     [
         'title' => __('messages.frontend'),
         'description' => __('messages.frontend'),
-        'href' => route('account.wishlist'),
-        'icon' => 'untitledui-heart',
-    ],
-    [
-        'title' => __('messages.frontend'),
-        'description' => __('messages.frontend'),
         'href' => route('account.documents'),
         'icon' => 'untitledui-file-02',
     ],

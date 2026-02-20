@@ -17,7 +17,7 @@ final class ReferralCodeUsageLogsRelationManager extends RelationManager
 
     public static function getTitle(Model $ownerRecord, string $pageClass): string
     {
-        return 'Referral Code Usage Logs';
+        return __('messages.referral_code_usage_logs');
     }
 
     public function form(Schema $schema): Schema

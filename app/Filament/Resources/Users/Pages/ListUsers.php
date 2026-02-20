@@ -20,11 +20,10 @@ class ListUsers extends ListRecords
     public function getTabs(): array
     {
         return [
-            'all'     => Tab::make('All'),
+            'all'     => Tab::make(__('common.all')),
             'company' => Tab::make(__('messages.company'))
                 ->modifyQueryUsing(static fn (Builder $query): Builder => $query->whereNotNull('company_id')),
             'addresses'            => self::relationTab('addresses', __('messages.address')),
-            'cart_items'           => self::relationTab('cartItems', __('messages.cart_items')),
             'customer_groups'      => self::relationTab('customerGroups', __('admin.navigation.customer_groups')),
             'partners'             => self::relationTab('partners', __('messages.partners')),
             'referral_codes'       => self::relationTab('referralCodes', __('messages.referral_codes')),

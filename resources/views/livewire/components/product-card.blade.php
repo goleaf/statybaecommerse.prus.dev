@@ -30,19 +30,6 @@
             </div>
         @endif
 
-        <!-- Quick Actions -->
-        <div class="absolute bottom-2 right-2 flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
-            <button
-                    wire:click="addToWishlist"
-                    class="p-2 bg-white rounded-full shadow-md hover:bg-gray-50"
-                    title="{{ __('messages.add_to_wishlist') }}">
-                <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
-                    </path>
-                </svg>
-            </button>
-        </div>
     </div>
 
     <!-- Product Info -->

@@ -4,24 +4,24 @@ declare(strict_types=1);
 
 return [
     'filters' => [
-        'all_posts'     => 'All posts',
-        'featured_only' => 'Featured only',
+        'all_posts'     => 'Visi įrašai',
+        'featured_only' => 'Tik paminėtos',
     ],
-    'gallery' => 'Gallery',
+    'gallery' => 'Galerija',
     'index'   => [
-        'description' => 'Description',
+        'description' => 'Aprašymas',
     ],
-    'last_updated' => 'Last updated',
-    'like'         => 'Like',
+    'last_updated' => 'Paskutinį kartą atnaujinta',
+    'like'         => 'Patinka',
     'no_posts'     => [
-        'description' => 'Description',
-        'title'       => 'Title',
+        'description' => 'Aprašymas',
+        'title'       => 'Pavadinimas',
     ],
-    'related_posts' => 'Related posts',
+    'related_posts' => 'Susiję įrašai',
     'search'        => [
-        'placeholder' => 'Placeholder',
+        'placeholder' => 'Vietos rezervuaras',
     ],
-    'share' => 'Share',
-    'tags'  => 'Tags',
-    'views' => 'Views',
+    'share' => 'Dalintis',
+    'tags'  => 'Žymos',
+    'views' => 'Peržiūros',
 ];

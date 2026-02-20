@@ -3,11 +3,11 @@
 declare(strict_types=1);
 
 return [
-    'all_categories'                => 'home.all_categories',
-    'browse_categories'             => 'home.browse_categories',
-    'browse_categories_description' => 'home.browse_categories_description',
-    'catalog_categories'            => 'home.catalog_categories',
-    'categories'                    => 'home.categories',
-    'categories_grid'               => 'home.categories_grid',
-    'explore_store_sections'        => 'home.explore_store_sections',
+    'all_categories'                => 'Visos kategorijos',
+    'browse_categories'             => 'Naršyti kategorijas',
+    'browse_categories_description' => 'Raskite reikiamą prekę greitai – peržiūrėkite visas kategorijas ir po-kategorijas',
+    'catalog_categories'            => 'Katalogas pagal kategorijas',
+    'categories'                    => 'Kategorijos',
+    'categories_grid'               => 'Kategorijų tinklelis',
+    'explore_store_sections'        => 'Naršyti parduotuvės skyrius',
 ];

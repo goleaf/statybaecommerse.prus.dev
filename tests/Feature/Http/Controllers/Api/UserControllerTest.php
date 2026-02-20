@@ -7,28 +7,14 @@ namespace Tests\Feature\Http\Controllers\Api;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Resources\UserResource;
 use App\Models\User;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
 final class UserControllerTest extends TestCase
 {
     use RefreshDatabase;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        // Ensure the wishlist pivot includes a product column so profile hydration queries never fail.
-        if (Schema::hasTable('user_wishlists') && ! Schema::hasColumn('user_wishlists', 'product_id')) {
-            Schema::table('user_wishlists', static function (Blueprint $table): void {
-                $table->unsignedBigInteger('product_id')->nullable();
-            });
-        }
-    }
 
     public function test_profile_returns_authenticated_user_resource(): void
     {

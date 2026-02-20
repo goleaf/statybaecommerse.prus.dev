@@ -1,30 +1,14 @@
 @extends('frontend.layouts.app')
 
 @php
-    $defaultTitleKey = 'frontend.legal.privacy_policy';
-    $defaultTitle = __($defaultTitleKey);
-    if ($defaultTitle === $defaultTitleKey) {
-        $defaultTitle = 'Privacy Policy';
-    }
-
+    $defaultTitle = __('frontend.legal.privacy_policy');
     $pageTitle = $legal?->getTranslatedSeoTitle() ?? $legal?->getTranslatedTitle() ?? $defaultTitle;
-    $defaultDescriptionKey = 'frontend.legal.descriptions.privacy';
-    $pageDescription = $legal?->getTranslatedSeoDescription() ?? __($defaultDescriptionKey);
-    if ($pageDescription === $defaultDescriptionKey) {
-        $pageDescription = 'Review how we collect, use, and protect your personal information.';
-    }
+    $pageDescription = $legal?->getTranslatedSeoDescription() ?? __('frontend.legal.descriptions.privacy');
 
     $documentName = \Illuminate\Support\Str::lower($defaultTitle);
-    if ($documentName === 'frontend.legal.privacy_policy') {
-        $documentName = 'privacy policy';
-    }
-
-    $emptyMessage = __('messages.frontend_legal', [
+    $emptyMessage = __('frontend.legal.document_unavailable', [
         'document' => $documentName,
     ]);
-    if ($emptyMessage === 'frontend.legal.document_unavailable') {
-        $emptyMessage = sprintf('Our %s is currently unavailable.', $documentName);
-    }
 @endphp
 
 @section('title', $pageTitle)

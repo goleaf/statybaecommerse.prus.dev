@@ -18,7 +18,7 @@ class ReferralCampaignsTable
         return $table
             ->columns([
                 TextColumn::make('localized_name')
-                    ->label('Name')
+                    ->label(__('admin.labels.name'))
                     ->searchable(),
                 IconColumn::make('is_active')
                     ->boolean(),

@@ -107,65 +107,61 @@ class Search extends Component
     }
 
     /**
-     * Extract product data from SearchService results
+     * Extract product models from SearchService results.
+     *
+     * @return Collection<int, Product>
      */
     private function extractProductsFromSearchResults(array $searchResults): Collection
     {
-        $products = collect();
+        $productIds = $this->extractProductIds($searchResults);
 
-        // Get products from the aggregated data structure
-        if (isset($searchResults['data']['products']['items'])) {
-            $productItems = $searchResults['data']['products']['items'];
-        } elseif (isset($searchResults['data']) && is_array($searchResults['data'])) {
-            // Handle flat data structure
-            $productItems = array_filter($searchResults['data'], fn ($item) => is_array($item) && ($item['type'] ?? null) === 'product'
-            );
-        } else {
-            $productItems = [];
+        if ($productIds === []) {
+            return collect();
         }
 
-        foreach ($productItems as $item) {
-            if (! is_array($item) || ! isset($item['id'])) {
-                continue;
-            }
+        $productsById = Product::query()
+            ->with(['brand', 'translations', 'media'])
+            ->withCount('variants')
+            ->whereIn('id', $productIds)
+            ->get()
+            ->keyBy('id');
 
-            // Create a Product-like object from search result data
-            $product = (object) [
-                'id'             => $item['id'],
-                'slug'           => $this->extractSlugFromUrl($item['url'] ?? ''),
-                'name'           => $item['title'] ?? '',
-                'summary'        => $item['description'] ?? '',
-                'brand_id'       => null, // Not available in search results
-                'published_at'   => now(), // Assume published since it's in results
-                'brand'          => $item['subtitle'] ? (object) ['name' => $item['subtitle']] : null,
-                'media'          => collect(), // Empty collection for compatibility
-                'prices'         => collect(), // Empty collection for compatibility
-                'variants_count' => 0, // Not available in search results
-            ];
-
-            $products->push($product);
-        }
-
-        return $products;
+        return collect($productIds)
+            ->map(static fn (int $id): ?Product => $productsById->get($id))
+            ->filter(static fn ($product): bool => $product instanceof Product)
+            ->values();
     }
 
     /**
-     * Extract slug from product URL
+     * @return array<int, int>
      */
-    private function extractSlugFromUrl(string $url): string
+    private function extractProductIds(array $searchResults): array
     {
-        if (empty($url)) {
-            return '';
+        $productItems = [];
+
+        if (isset($searchResults['data']['products']['items']) && is_array($searchResults['data']['products']['items'])) {
+            $productItems = $searchResults['data']['products']['items'];
+        } elseif (isset($searchResults['data']) && is_array($searchResults['data'])) {
+            $productItems = array_filter(
+                $searchResults['data'],
+                static fn ($item): bool => is_array($item) && ($item['type'] ?? null) === 'product'
+            );
         }
 
-        $path = parse_url($url, PHP_URL_PATH);
-        if (! $path) {
-            return '';
+        $ids = [];
+
+        foreach ($productItems as $item) {
+            if (! is_array($item) || ! isset($item['id']) || ! is_numeric($item['id'])) {
+                continue;
+            }
+
+            $id = (int) $item['id'];
+            if ($id > 0) {
+                $ids[] = $id;
+            }
         }
 
-        $segments = explode('/', trim($path, '/'));
-
-        return end($segments) ?: '';
+        return array_values(array_unique($ids));
     }
 
     /**
@@ -211,6 +207,6 @@ class Search extends Component
      */
     public function render(): View
     {
-        return view('livewire.pages.search', ['products' => $this->searchResults, 'term' => $this->q])->title(__('messages.frontend'));
+        return view('livewire.pages.search', ['products' => $this->searchResults, 'term' => $this->q])->title(__('messages.search'));
     }
 }

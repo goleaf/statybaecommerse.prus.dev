@@ -25,9 +25,10 @@ test('language switching works for admin panel', function () {
     $user = User::factory()->create();
 
     // Switch to Lithuanian in admin panel
-    $response = $this->actingAs($user)
-        ->get('/lang/lt')
-        ->assertRedirect();
+    $this->actingAs($user)
+        ->from('/admin/login')
+        ->get('/lang/lt?context=admin')
+        ->assertRedirect('/admin/login');
 
     // Check that admin locale is stored in session
     expect(session('admin_locale'))->toBe('lt');
@@ -42,10 +43,21 @@ test('language switching works for frontend', function () {
     expect(session('locale'))->toBe('en');
 });
 
+test('admin locale selection persists across filament page loads', function () {
+    $this->from('/admin/login')
+        ->get('/lang/lt?context=admin')
+        ->assertRedirect('/admin/login');
+
+    expect(session('admin_locale'))->toBe('lt');
+
+    $this->get('/admin/login')->assertOk();
+    expect(app()->getLocale())->toBe('lt');
+});
+
 test('language switcher translations exist', function () {
     app()->setLocale('en');
-    expect(__('filament::layout.buttons.language_switcher.label'))->toBe('Select Language');
+    expect(__('filament::layout.actions.open_user_menu.label'))->toBe('User menu');
 
     app()->setLocale('lt');
-    expect(__('filament::layout.buttons.language_switcher.label'))->toBe('Pasirinkti kalbą');
+    expect(__('filament::layout.actions.open_user_menu.label'))->toBe('Vartotojo meniu');
 });

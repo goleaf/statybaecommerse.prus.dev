@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use App\Livewire\Components\ProductCardDetailed;
 use App\Models\Product;
-use App\Models\User;
 use Livewire\Livewire;
 
 beforeEach(function () {
@@ -32,22 +31,6 @@ it('feature: can add product to cart', function () {
     $component->assertDispatched('add-to-cart');
 });
 
-it('feature: can add product to wishlist when authenticated', function () {
-    $user = User::factory()->create();
-    $this->actingAs($user);
-
-    Livewire::test(ProductCardDetailed::class, ['product' => $this->product])
-        ->call('toggleWishlist')
-        ->assertDispatched('notify')
-        ->assertDispatched('add-to-wishlist');
-});
-
-it('feature: shows login required message when adding to wishlist as guest', function () {
-    Livewire::test(ProductCardDetailed::class, ['product' => $this->product])
-        ->call('toggleWishlist')
-        ->assertDispatched('notify');
-});
-
 it('feature: can toggle product comparison', function () {
     Livewire::test(ProductCardDetailed::class, ['product' => $this->product])
         ->call('toggleComparison')
@@ -67,30 +50,14 @@ it('feature: can navigate to product page', function () {
         ->assertRedirect(route('product.show', $this->product));
 });
 
-it('feature: shows correct wishlist status', function () {
-    $user = User::factory()->create();
-    $this->actingAs($user);
-
-    Livewire::test(ProductCardDetailed::class, ['product' => $this->product])
-        ->assertSet('isInWishlist', false); // Simplified for now
-});
-
 it('feature: shows correct comparison status', function () {
     Livewire::test(ProductCardDetailed::class, ['product' => $this->product])
         ->assertSet('isInComparison', false); // Simplified for now
 });
 
 it('feature: refreshes status on events', function () {
-    $user = User::factory()->create();
-    $this->actingAs($user);
-
     $component = Livewire::test(ProductCardDetailed::class, ['product' => $this->product]);
 
-    // Test wishlist toggle
-    $component->call('toggleWishlist');
-    $component->assertDispatched('add-to-wishlist');
-
-    // Test comparison toggle
     $component->call('toggleComparison');
     $component->assertDispatched('add-to-comparison');
 });
@@ -100,12 +67,10 @@ it('feature: handles component properties correctly', function () {
         'product'       => $this->product,
         'showQuickView' => true,
         'showCompare'   => false,
-        'showWishlist'  => true,
         'layout'        => 'list',
     ]);
 
     $component->assertSet('showQuickView', true)
         ->assertSet('showCompare', false)
-        ->assertSet('showWishlist', true)
         ->assertSet('layout', 'list');
 });

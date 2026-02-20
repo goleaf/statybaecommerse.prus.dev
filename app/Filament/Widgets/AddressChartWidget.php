@@ -15,9 +15,14 @@ use Illuminate\Support\Carbon;
  */
 final class AddressChartWidget extends ChartWidget
 {
-    protected ?string $heading = 'Address Statistics';
+    protected ?string $heading = null;
 
     protected static ?int $sort = 2;
+
+    public function getHeading(): string
+    {
+        return __('admin.widgets.address_statistics');
+    }
 
     protected int|string|array $columnSpan = 'full';
 

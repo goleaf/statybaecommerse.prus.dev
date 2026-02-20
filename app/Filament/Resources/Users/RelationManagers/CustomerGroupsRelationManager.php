@@ -115,11 +115,11 @@ class CustomerGroupsRelationManager extends RelationManager
                     ->default(0)
                     ->dehydrateStateUsing(static fn ($state): int => is_numeric($state) ? (int) $state : 0),
                 KeyValue::make('metadata')
-                    ->label('Metadata')
+                    ->label(__('admin.labels.metadata'))
                     ->nullable()
                     ->columnSpanFull(),
                 KeyValue::make('conditions')
-                    ->label('Conditions')
+                    ->label(__('admin.labels.conditions'))
                     ->nullable()
                     ->columnSpanFull(),
                 Toggle::make('is_active')

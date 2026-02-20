@@ -48,12 +48,6 @@
                     {{ __('frontend.images.webp_badge') }}
                 </div>
 
-                {{-- Generated Image Badge --}}
-                @if ($this->currentImage['generated'] ?? false)
-                    <div class="absolute top-2 right-2 bg-blue-500 text-white px-2 py-1 rounded text-xs font-medium">
-                        {{ __('frontend.images.random_image') }}
-                    </div>
-                @endif
             @endif
         </div>
 

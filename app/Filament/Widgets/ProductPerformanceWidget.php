@@ -9,9 +9,14 @@ use Filament\Widgets\ChartWidget;
 
 final class ProductPerformanceWidget extends ChartWidget
 {
-    protected ?string $heading = 'Product Performance';
+    protected ?string $heading = null;
 
     protected static ?int $sort = 3;
+
+    public function getHeading(): string
+    {
+        return __('admin.widgets.product_performance');
+    }
 
     protected function getData(): array
     {

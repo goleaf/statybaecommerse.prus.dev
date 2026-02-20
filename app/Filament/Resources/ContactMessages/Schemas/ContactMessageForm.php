@@ -51,10 +51,10 @@ class ContactMessageForm
                 Section::make(__('admin.navigation.settings'))
                     ->schema([
                         TextInput::make('ip_address')
-                            ->label('IP Address')
+                            ->label(__('admin.labels.ip_address'))
                             ->disabled(),
                         TextInput::make('user_agent')
-                            ->label('User Agent')
+                            ->label(__('admin.labels.user_agent'))
                             ->disabled()
                             ->columnSpanFull(),
                     ])->columns(2),

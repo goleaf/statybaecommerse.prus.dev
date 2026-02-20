@@ -92,24 +92,6 @@ final class ProductCard extends Component
     }
 
     /**
-     * Handle isInWishlist functionality with proper error handling.
-     */
-    #[Computed]
-    public function isInWishlist(): bool
-    {
-        if (! auth()->check()) {
-            return false;
-        }
-        $user = auth()->user();
-        $wishlist = $user->wishlists()->where('is_default', true)->first();
-        if (! $wishlist) {
-            return false;
-        }
-
-        return $wishlist->hasProduct($this->product->id);
-    }
-
-    /**
      * Handle discountPercentage functionality with proper error handling.
      */
     #[Computed]
@@ -144,14 +126,6 @@ final class ProductCard extends Component
     public function isOutOfStock(): bool
     {
         return $this->product->track_inventory && $this->product->stock_quantity <= 0;
-    }
-
-    /**
-     * Handle getListeners functionality with proper error handling.
-     */
-    protected function getListeners(): array
-    {
-        return ['wishlist-updated' => '$refresh'];
     }
 
     /**

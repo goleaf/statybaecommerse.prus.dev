@@ -3,7 +3,6 @@
     'columns' => 4, // 2, 3, 4, 5, 6
     'layout' => 'grid', // grid, list
     'showQuickAdd' => true,
-    'showWishlist' => true,
     'showCompare' => true,
     'showPagination' => true,
     'emptyTitle' => null,
@@ -42,7 +41,6 @@ if (method_exists($products, 'splitIn') && $products->count() > $columns) {
                                 :product="$product"
                                 :layout="$layout"
                                 :show-quick-add="$showQuickAdd"
-                                :show-wishlist="$showWishlist"
                                 :show-compare="$showCompare"
                             />
                         @endforeach
@@ -61,7 +59,6 @@ if (method_exists($products, 'splitIn') && $products->count() > $columns) {
                         :product="$product"
                         :layout="$layout"
                         :show-quick-add="$showQuickAdd"
-                        :show-wishlist="$showWishlist"
                         :show-compare="$showCompare"
                     />
                 @endforeach

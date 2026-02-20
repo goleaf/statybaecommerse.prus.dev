@@ -46,11 +46,11 @@ class DiscountRedemptionsRelationManager extends RelationManager
             ->recordTitleAttribute('amount_saved')
             ->columns([
                 TextColumn::make('discount.name')
-                    ->label('Discount')
+                    ->label(__('admin.labels.discount'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('order.number')
-                    ->label('Order')
+                    ->label(__('admin.labels.order'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('amount_saved')

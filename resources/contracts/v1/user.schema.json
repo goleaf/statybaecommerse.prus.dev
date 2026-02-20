@@ -169,13 +169,6 @@
                         "additionalProperties": true
                     }
                 },
-                "wishlist": {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "additionalProperties": true
-                    }
-                },
                 "links": {
                     "type": "object",
                     "additionalProperties": false,

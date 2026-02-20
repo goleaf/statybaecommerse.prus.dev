@@ -42,16 +42,16 @@ class SystemSettingsForm
                                 ->label(__('messages.type'))
                                 ->required()
                                 ->options([
-                                    'string'   => 'String',
-                                    'text'     => 'Text',
-                                    'integer'  => 'Integer',
-                                    'float'    => 'Float',
-                                    'boolean'  => 'Boolean',
-                                    'json'     => 'JSON',
-                                    'array'    => 'Array',
-                                    'color'    => 'Color',
-                                    'date'     => 'Date',
-                                    'datetime' => 'DateTime',
+                                    'string'   => __('admin.normal_settings.types.string'),
+                                    'text'     => __('admin.normal_settings.types.text'),
+                                    'integer'  => __('admin.normal_settings.types.integer'),
+                                    'float'    => __('admin.normal_settings.types.float'),
+                                    'boolean'  => __('admin.normal_settings.types.boolean'),
+                                    'json'     => __('admin.normal_settings.types.json'),
+                                    'array'    => __('admin.normal_settings.types.array'),
+                                    'color'    => __('admin.normal_settings.types.color'),
+                                    'date'     => __('admin.normal_settings.types.date'),
+                                    'datetime' => __('admin.normal_settings.types.datetime'),
                                 ])
                                 ->live(),
                             Select::make('category_id')

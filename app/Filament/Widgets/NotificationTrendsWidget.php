@@ -11,9 +11,14 @@ final class NotificationTrendsWidget extends ChartWidget
 {
     protected static bool $isHeadingHidden = false;
 
-    protected ?string $heading = 'Notification Trends (Last 30 Days)';
+    protected ?string $heading = null;
 
     protected int|string|array $columnSpan = 'full';
+
+    public function getHeading(): string
+    {
+        return __('admin.widgets.notification_trends_last_30_days');
+    }
 
     protected function getData(): array
     {
