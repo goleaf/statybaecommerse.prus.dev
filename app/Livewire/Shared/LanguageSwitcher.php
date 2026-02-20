@@ -8,8 +8,8 @@ use App\Data\Storefront\Shared\LanguageLinkData;
 use App\Support\Cache\CacheKeys;
 use App\Support\Cache\CacheTags;
 use App\Support\Cache\TagAwareCache;
+use App\Support\Locales;
 use Illuminate\Contracts\View\View;
-use Illuminate\Support\Str;
 use Livewire\Component;
 
 /**
@@ -75,7 +75,7 @@ class LanguageSwitcher extends Component
 
                     $links[$locale] = (new LanguageLinkData(
                         $locale,
-                        Str::upper($locale),
+                        Locales::label($locale),
                         $href . $queryString,
                         $locale === $this->current,
                     ))->toArray();

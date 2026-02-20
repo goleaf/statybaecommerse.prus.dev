@@ -14,26 +14,26 @@ final class LanguageSwitcher extends Component
     /**
      * @var array<string, array{name?: string, native?: string, flag?: string, direction?: string}>
      */
-    public array $supportedLocales = [];
+    public array $switcherLocales = [];
 
     /**
      * @var array<string, string>
      */
-    public array $localeLinks = [];
+    public array $switcherLocaleLinks = [];
 
-    public string $currentLocale;
+    public string $switcherCurrentLocale;
 
     public function __construct()
     {
-        $this->currentLocale = app()->getLocale();
+        $this->switcherCurrentLocale = app()->getLocale();
 
         $localeConfig = config('app.locales', []);
-        $this->supportedLocales = array_intersect_key(
+        $this->switcherLocales = array_intersect_key(
             $localeConfig,
             array_flip(Locales::supported())
         );
 
-        $this->localeLinks = $this->buildLocaleLinks();
+        $this->switcherLocaleLinks = $this->buildLocaleLinks();
     }
 
     public function render(): View
@@ -49,7 +49,7 @@ final class LanguageSwitcher extends Component
         $route = request()->route();
         $links = [];
 
-        foreach (array_keys($this->supportedLocales) as $locale) {
+        foreach (array_keys($this->switcherLocales) as $locale) {
             $targetUrl = null;
 
             if ($route && ($name = $route->getName()) && str_starts_with($name, 'localized.')) {

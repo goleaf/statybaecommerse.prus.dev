@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="Tests\Feature\Livewire\Pages\Category\IndexTest" file="Index (Tests\Feature\Livewire\Pages\Category\Index)" tests="2" assertions="3" errors="0" failures="0" skipped="0" time="9.821887">
-    <testcase name="It renders successfully" file="Index (Tests\Feature\Livewire\Pages\Category\Index)::It renders successfully" class="Tests\Feature\Livewire\Pages\Category\IndexTest" classname="Tests.Feature.Livewire.Pages.Category.IndexTest" assertions="2" time="9.001531"/>
-    <testcase name="Localized categories route renders when visible categories exist" file="Index (Tests\Feature\Livewire\Pages\Category\Index)::Localized categories route renders when visible categories exist" class="Tests\Feature\Livewire\Pages\Category\IndexTest" classname="Tests.Feature.Livewire.Pages.Category.IndexTest" assertions="1" time="0.820356"/>
+  <testsuite name="Tests\Feature\Livewire\Pages\Category\IndexTest" file="Index (Tests\Feature\Livewire\Pages\Category\Index)" tests="2" assertions="3" errors="0" failures="0" skipped="0" time="10.823868">
+    <testcase name="It renders successfully" file="Index (Tests\Feature\Livewire\Pages\Category\Index)::It renders successfully" class="Tests\Feature\Livewire\Pages\Category\IndexTest" classname="Tests.Feature.Livewire.Pages.Category.IndexTest" assertions="2" time="9.455961"/>
+    <testcase name="Localized categories route renders when visible categories exist" file="Index (Tests\Feature\Livewire\Pages\Category\Index)::Localized categories route renders when visible categories exist" class="Tests\Feature\Livewire\Pages\Category\IndexTest" classname="Tests.Feature.Livewire.Pages.Category.IndexTest" assertions="1" time="1.367907"/>
   </testsuite>
 </testsuites>

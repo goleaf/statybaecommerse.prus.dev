@@ -1,6 +1,6 @@
 <div class="text-sm">
     <div class="inline-flex items-center gap-2">
-        @foreach ($this->links as $link)
+        @foreach ($this->languages as $link)
             <form method="POST" action="{{ route('locale.switch') }}" class="inline">
                 @csrf
                 <input type="hidden" name="locale" value="{{ data_get($link, 'locale') }}">
