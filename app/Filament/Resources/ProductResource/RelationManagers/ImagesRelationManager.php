@@ -7,6 +7,7 @@ namespace App\Filament\Resources\ProductResource\RelationManagers;
 use App\Models\ProductImage;
 use App\Support\Filament\Forms\Components\SortOrderInput;
 use App\Support\Filament\ProductImageDataNormalizer;
+use App\Support\Storage\SecureStorage;
 use Filament\Actions\AssociateAction;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\TextInput;
@@ -46,8 +47,9 @@ class ImagesRelationManager extends RelationManager
                 FileUpload::make('path')
                     ->label(__('messages.image'))
                     ->image()
-                    ->disk('public')
+                    ->disk(SecureStorage::disk())
                     ->directory('product-images')
+                    ->visibility('private')
                     ->required(fn (string $operation): bool => $operation === 'create')
                     ->imagePreviewHeight('250'),
                 TextInput::make('alt_text')

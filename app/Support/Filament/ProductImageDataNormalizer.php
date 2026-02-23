@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace App\Support\Filament;
 
+use App\Support\Storage\SecureStorage;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 final class ProductImageDataNormalizer
 {
+    private const PRODUCT_IMAGES_DIRECTORY = 'product-images';
+
     /**
      * @param  array<string, mixed> $data
      * @return array<string, mixed>
@@ -23,13 +26,21 @@ final class ProductImageDataNormalizer
         }
 
         if ($path instanceof TemporaryUploadedFile || $path instanceof UploadedFile) {
-            $storedPath = $path->store('product-images', 'public');
+            $storedPath = $path->store(self::PRODUCT_IMAGES_DIRECTORY, SecureStorage::disk());
 
             $path = is_string($storedPath) ? $storedPath : null;
         }
 
         if (is_string($path) && trim($path) !== '') {
-            $data['path'] = trim($path);
+            $normalizedPath = self::normalizePath(trim($path));
+
+            if ($normalizedPath !== null) {
+                $data['path'] = $normalizedPath;
+            } elseif ($forUpdate) {
+                unset($data['path']);
+            } else {
+                $data['path'] = null;
+            }
         } elseif ($forUpdate) {
             unset($data['path']);
         }
@@ -40,5 +51,26 @@ final class ProductImageDataNormalizer
 
         return $data;
     }
-}
 
+    private static function normalizePath(string $path): ?string
+    {
+        $normalized = trim(str_replace('\\', '/', $path), '/');
+
+        if ($normalized === '' || str_contains($normalized, '../')) {
+            return null;
+        }
+
+        foreach (['public/', 'storage/', 'app/public/', 'app/secure-media/'] as $prefix) {
+            if (str_starts_with($normalized, $prefix)) {
+                $normalized = ltrim(substr($normalized, strlen($prefix)), '/');
+                break;
+            }
+        }
+
+        if (! str_starts_with($normalized, self::PRODUCT_IMAGES_DIRECTORY . '/')) {
+            return null;
+        }
+
+        return $normalized;
+    }
+}

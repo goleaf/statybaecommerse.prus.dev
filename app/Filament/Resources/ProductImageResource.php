@@ -7,6 +7,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\ProductImageResource\Pages as ImagePages;
 use App\Models\ProductImage;
 use App\Support\Filament\Forms\Components\SortOrderInput;
+use App\Support\Storage\SecureStorage;
 use BackedEnum;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -64,9 +65,9 @@ final class ProductImageResource extends BaseResource
                             ->label(__('messages.image'))
                             ->required()
                             ->image()
-                            ->disk('public')
+                            ->disk(SecureStorage::disk())
                             ->directory('product-images')
-                            ->visibility('public')
+                            ->visibility('private')
                             ->maxSize(5120)
                             ->columnSpanFull(),
                     ])
