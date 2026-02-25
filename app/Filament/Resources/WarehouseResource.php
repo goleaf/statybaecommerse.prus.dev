@@ -81,6 +81,6 @@ final class WarehouseResource extends BaseResource
 
     public static function getRecordRouteBindingEloquentQuery(): Builder
     {
-        return static::getEloquentQuery();
+        return self::getEloquentQuery();
     }
 }

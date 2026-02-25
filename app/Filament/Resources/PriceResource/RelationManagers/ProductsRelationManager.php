@@ -6,7 +6,6 @@ namespace App\Filament\Resources\PriceResource\RelationManagers;
 
 use App\Models\Product;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Schemas\Schema;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -58,7 +57,7 @@ class ProductsRelationManager extends RelationManager
                     ])
                     ->action(function (array $data, Model $ownerRecord) {
                         $ownerRecord->update([
-                            'priceable_id' => $data['product_id'],
+                            'priceable_id'   => $data['product_id'],
                             'priceable_type' => Product::class,
                         ]);
                     }),
@@ -71,7 +70,7 @@ class ProductsRelationManager extends RelationManager
                     ->requiresConfirmation()
                     ->action(function (Model $ownerRecord) {
                         $ownerRecord->update([
-                            'priceable_id' => null,
+                            'priceable_id'   => null,
                             'priceable_type' => null,
                         ]);
                     }),

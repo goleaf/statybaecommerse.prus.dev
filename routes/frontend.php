@@ -73,17 +73,23 @@ Route::middleware(['web'])->group(function () {
         Route::get('/cancel', [App\Http\Controllers\Frontend\CheckoutController::class, 'cancel'])->name('cancel');
     });
 
-    // User Profile
-    Route::middleware(['auth'])->prefix('profile')->name('frontend.profile.')->group(function () {
-        Route::get('/', [App\Http\Controllers\Frontend\ProfileController::class, 'index'])->name('index');
-        Route::get('/edit', [App\Http\Controllers\Frontend\ProfileController::class, 'edit'])->name('edit');
-        Route::put('/update', [App\Http\Controllers\Frontend\ProfileController::class, 'update'])->name('update');
-        Route::get('/addresses', [App\Http\Controllers\Frontend\ProfileController::class, 'addresses'])->name('addresses');
-        Route::post('/addresses', [App\Http\Controllers\Frontend\ProfileController::class, 'storeAddress'])->name('store-address');
-        Route::put('/addresses/{address}', [App\Http\Controllers\Frontend\ProfileController::class, 'updateAddress'])->name('update-address');
-        Route::delete('/addresses/{address}', [App\Http\Controllers\Frontend\ProfileController::class, 'deleteAddress'])->name('delete-address');
-        Route::post('/data/export', [App\Http\Controllers\Frontend\DataPrivacyController::class, 'export'])->name('data.export');
-        Route::delete('/data', [App\Http\Controllers\Frontend\DataPrivacyController::class, 'destroy'])->name('data.destroy');
+    // User Profile - Redirects to new Livewire Account Dashboard
+    Route::prefix('profile')->name('frontend.profile.')->group(function () {
+        Route::get('/', function () {
+            return redirect()->route('account.index');
+        })->name('index');
+        Route::get('/edit', function () {
+            return redirect()->route('account.profile');
+        })->name('edit');
+        Route::get('/addresses', function () {
+            return redirect()->route('account.addresses');
+        })->name('addresses');
+
+        // Data Privacy Routes
+        Route::middleware(['auth'])->group(function () {
+            Route::post('/data/export', [App\Http\Controllers\Frontend\DataPrivacyController::class, 'export'])->name('data.export');
+            Route::delete('/data', [App\Http\Controllers\Frontend\DataPrivacyController::class, 'destroy'])->name('data.destroy');
+        });
     });
 
     Route::middleware(['auth'])

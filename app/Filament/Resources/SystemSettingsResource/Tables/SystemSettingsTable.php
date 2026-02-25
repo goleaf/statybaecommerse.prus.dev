@@ -68,10 +68,10 @@ class SystemSettingsTable
                 SelectFilter::make('type')
                     ->label(__('messages.type'))
                     ->options([
-                        'string' => 'String',
+                        'string'  => 'String',
                         'integer' => 'Integer',
                         'boolean' => 'Boolean',
-                        'json' => 'JSON',
+                        'json'    => 'JSON',
                     ]),
                 SelectFilter::make('category_id')
                     ->label(__('messages.category'))

@@ -67,18 +67,18 @@ final class Post extends Model implements HasMedia
     protected function casts(): array
     {
         return [
-            'published_at'                  => 'datetime',
-            'featured'                      => 'boolean',
-            'title_translations'            => 'array',
-            'content_translations'          => 'array',
-            'excerpt_translations'          => 'array',
-            'tags_translations'             => 'array',
-            'allow_comments'                => 'boolean',
-            'is_pinned'                     => 'boolean',
-            'moderation_state'              => ModerationState::class,
-            'submitted_for_review_at'       => 'datetime',
-            'approved_at'                   => 'datetime',
-            'approved_by_id'                => 'integer',
+            'published_at'            => 'datetime',
+            'featured'                => 'boolean',
+            'title_translations'      => 'array',
+            'content_translations'    => 'array',
+            'excerpt_translations'    => 'array',
+            'tags_translations'       => 'array',
+            'allow_comments'          => 'boolean',
+            'is_pinned'               => 'boolean',
+            'moderation_state'        => ModerationState::class,
+            'submitted_for_review_at' => 'datetime',
+            'approved_at'             => 'datetime',
+            'approved_by_id'          => 'integer',
         ];
     }
 
@@ -189,12 +189,12 @@ final class Post extends Model implements HasMedia
     {
         $locale ??= app()->getLocale();
         $translationField = $field . '_translations';
-        
+
         // Return title if field is meta_title
         if ($field === 'meta_title') {
             return $this->getTranslatedTitle($locale);
         }
-        
+
         // Return excerpt if field is meta_description
         if ($field === 'meta_description') {
             return $this->getTranslatedExcerpt($locale);

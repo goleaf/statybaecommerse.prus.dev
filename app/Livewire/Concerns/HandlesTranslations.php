@@ -6,7 +6,7 @@ namespace App\Livewire\Concerns;
 
 /**
  * Trait HandlesTranslations
- * 
+ *
  * Refactored to avoid dynamic generation of translation files.
  * Static translations should be managed manually in /lang files.
  */

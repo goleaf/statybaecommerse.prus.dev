@@ -73,8 +73,8 @@ final class SharedComponentTestHelper
     public static function assertProductCardHasActions(TestView $view, array $actions): void
     {
         $actionMap = [
-            'compare'  => 'addToCompare',
-            'cart'     => 'addToCart',
+            'compare' => 'addToCompare',
+            'cart'    => 'addToCart',
         ];
 
         foreach ($actions as $action) {

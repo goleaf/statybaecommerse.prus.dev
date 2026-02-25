@@ -86,27 +86,29 @@ final class Product extends Model implements HasMedia, TranslatableRecord
 
     public $translatable = ['name', 'slug', 'description', 'short_description', 'seo_title', 'seo_description'];
 
-    protected $fillable = ['name', 'slug', 'description', 'short_description', 'detailed_description', 'sku', 'barcode', 'price', 'cost_price', 'manage_stock', 'allow_backorder', 'stock_quantity', 'low_stock_threshold', 'weight', 'length', 'width', 'height', 'size', 'size_type', 'color', 'pack_size', 'pack_size_type', 'is_active', 'is_enabled', 'is_featured', 'is_requestable', 'minimum_quantity', 'hide_add_to_cart', 'request_message', 'published_at', 'brand_id', 'status', 'variant_attribute_matrix', 'shipping_class', 'external_url'];
+    protected $fillable = ['name', 'slug', 'description', 'short_description', 'detailed_description', 'sku', 'barcode', 'price', 'cost_price', 'manage_stock', 'allow_backorder', 'stock_quantity', 'low_stock_threshold', 'weight', 'length', 'width', 'height', 'size', 'size_type', 'color', 'pack_size', 'pack_size_type', 'is_active', 'is_enabled', 'is_featured', 'is_requestable', 'minimum_quantity', 'hide_add_to_cart', 'request_message', 'published_at', 'brand_id', 'status', 'variant_attribute_matrix', 'shipping_class', 'external_url', 'is_venipak_locker_excluded', 'is_venipak_courier_excluded'];
 
     protected $casts = [
         // Monetary and numeric fields use native casting for precise calculations within tests.
-        'price'               => 'decimal:2',
-        'cost_price'          => 'decimal:2',
-        'weight'              => 'decimal:2',
-        'length'              => 'decimal:2',
-        'width'               => 'decimal:2',
-        'height'              => 'decimal:2',
-        'is_active'           => 'boolean',
-        'is_enabled'          => 'boolean',
-        'is_featured'         => 'boolean',
-        'is_requestable'      => 'boolean',
-        'hide_add_to_cart'    => 'boolean',
-        'manage_stock'        => 'boolean',
-        'allow_backorder'     => 'boolean',
-        'published_at'        => 'datetime',
-        'stock_quantity'      => 'integer',
-        'low_stock_threshold' => 'integer',
-        'minimum_quantity'    => 'integer',
+        'price'                       => 'decimal:2',
+        'cost_price'                  => 'decimal:2',
+        'weight'                      => 'decimal:2',
+        'length'                      => 'decimal:2',
+        'width'                       => 'decimal:2',
+        'height'                      => 'decimal:2',
+        'is_active'                   => 'boolean',
+        'is_enabled'                  => 'boolean',
+        'is_featured'                 => 'boolean',
+        'is_requestable'              => 'boolean',
+        'hide_add_to_cart'            => 'boolean',
+        'manage_stock'                => 'boolean',
+        'allow_backorder'             => 'boolean',
+        'is_venipak_locker_excluded'  => 'boolean',
+        'is_venipak_courier_excluded' => 'boolean',
+        'published_at'                => 'datetime',
+        'stock_quantity'              => 'integer',
+        'low_stock_threshold'         => 'integer',
+        'minimum_quantity'            => 'integer',
     ];
 
     /**

@@ -22,7 +22,7 @@ final class TranslationHookServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Dynamic translation macros and hooks disabled to ensure database-only 
+        // Dynamic translation macros and hooks disabled to ensure database-only
         // translations for dynamic content.
     }
 }

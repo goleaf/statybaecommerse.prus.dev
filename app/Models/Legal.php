@@ -63,8 +63,6 @@ final class Legal extends Model
         'published_at' => 'datetime',
     ];
 
-    
-
     // Relationships
 
     /**
@@ -295,9 +293,9 @@ final class Legal extends Model
     private function getDefaultTranslationData(string $locale): array
     {
         return [
-            'title'           => $this->key,
-            'slug'            => \Illuminate\Support\Str::slug($this->key) . '-' . $locale,
-            'content'         => '',
+            'title'   => $this->key,
+            'slug'    => \Illuminate\Support\Str::slug($this->key) . '-' . $locale,
+            'content' => '',
         ];
     }
 

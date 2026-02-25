@@ -85,7 +85,7 @@ class SystemSettingsForm
                     KeyValue::make('value')
                         ->label(__('messages.value'))
                         ->visible(fn (Get $get) => in_array($get('type'), ['json', 'array'])),
-                    
+
                     TextInput::make('default_value')
                         ->label(__('messages.default_value')),
                 ]),

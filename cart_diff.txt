@@ -1,0 +1,24 @@
+diff --git a/resources/views/frontend/cart/index.blade.php b/resources/views/frontend/cart/index.blade.php
+index 14646a92f..92c6ce25f 100644
+--- a/resources/views/frontend/cart/index.blade.php
++++ b/resources/views/frontend/cart/index.blade.php
+@@ -27,8 +27,8 @@
+         </div>
+     </div>
+     <x-container class="px-4 py-10">
+-        <div class="max-w-site mx-auto grid gap-10 lg:grid-cols-12">
+-            <div class="lg:col-span-9 space-y-8">
++        <div class="max-w-site mx-auto grid grid-cols-1 gap-10 lg:grid-cols-12">
++            <div class="col-span-full space-y-8 lg:col-span-9">
+         <h1 class="text-3xl font-semibold text-gray-900 dark:text-gray-100">{{ __('messages.frontend') }}</h1>
+         @if ($items)
+                     <section class="bg-dark border border-sage/30 rounded-2xl shadow-sm">
+@@ -68,7 +68,7 @@
+             <p class="text-gray-500 dark:text-gray-400">{{ __('messages.frontend') }}</p>
+         @endif
+             </div>
+-            <aside class="lg:col-span-3">
++            <aside class="col-span-full lg:col-span-3">
+                 <section class="bg-dark border border-sage/30 rounded-2xl shadow-sm p-6">
+             <h2 class="text-2xl font-semibold mb-4">{{ __('frontend.cart.order_summary') }}</h2>
+                     <dl class="space-y-3 text-sm text-sage">

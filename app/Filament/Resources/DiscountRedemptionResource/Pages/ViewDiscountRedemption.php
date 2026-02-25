@@ -11,4 +11,3 @@ class ViewDiscountRedemption extends ViewRecord
 {
     protected static string $resource = DiscountRedemptionResource::class;
 }
-

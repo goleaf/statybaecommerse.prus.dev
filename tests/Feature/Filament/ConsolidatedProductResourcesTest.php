@@ -4,27 +4,19 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Filament;
 
+use App\Filament\Resources\BrandResource;
+use App\Filament\Resources\CategoryResource;
+use App\Filament\Resources\CollectionResource;
+use App\Filament\Resources\ProductRequestResource;
+use App\Filament\Resources\ProductResource;
+use App\Filament\Resources\ProductVariantResource;
+use App\Filament\Resources\VariantCombinationResource;
 use App\Models\AdminUser;
-use App\Models\Brand;
-use App\Models\Category;
 use App\Models\Collection;
 use App\Models\Currency;
 use App\Models\Product;
-use App\Models\ProductFeature;
-use App\Models\ProductImage;
-use App\Models\ProductRequest;
-use App\Models\ProductVariant;
-use App\Models\VariantCombination;
-use App\Filament\Resources\ProductResource;
-use App\Filament\Resources\CategoryResource;
-use App\Filament\Resources\CollectionResource;
-use App\Filament\Resources\BrandResource;
-use App\Filament\Resources\ProductVariantResource;
-use App\Filament\Resources\VariantCombinationResource;
-use App\Filament\Resources\ProductRequestResource;
-use Filament\Actions\DeleteAction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Livewire\Livewire;
+
 use function Pest\Livewire\livewire;
 
 uses(RefreshDatabase::class);
@@ -32,7 +24,7 @@ uses(RefreshDatabase::class);
 beforeEach(function () {
     $this->admin = AdminUser::factory()->create();
     $this->actingAs($this->admin, 'admin');
-    
+
     // Seed default currency
     Currency::factory()->create(['code' => 'EUR', 'is_default' => true]);
 });
@@ -74,30 +66,30 @@ it('can list variant combinations', function () {
 
 it('can manage product variants from product', function () {
     $product = Product::factory()->create();
-    
+
     livewire(ProductResource\RelationManagers\VariantsRelationManager::class, [
         'ownerRecord' => $product,
-        'pageClass' => ProductResource\Pages\EditProduct::class,
+        'pageClass'   => ProductResource\Pages\EditProduct::class,
     ])
         ->assertSuccessful();
 });
 
 it('can manage collections from product', function () {
     $product = Product::factory()->create();
-    
+
     livewire(ProductResource\RelationManagers\CollectionsRelationManager::class, [
         'ownerRecord' => $product,
-        'pageClass' => ProductResource\Pages\EditProduct::class,
+        'pageClass'   => ProductResource\Pages\EditProduct::class,
     ])
         ->assertSuccessful();
 });
 
 it('can manage products from collection', function () {
     $collection = Collection::factory()->create();
-    
+
     livewire(CollectionResource\RelationManagers\ProductsRelationManager::class, [
         'ownerRecord' => $collection,
-        'pageClass' => CollectionResource\Pages\EditCollection::class,
+        'pageClass'   => CollectionResource\Pages\EditCollection::class,
     ])
         ->assertSuccessful();
 });

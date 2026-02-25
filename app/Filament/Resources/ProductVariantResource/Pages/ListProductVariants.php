@@ -20,7 +20,7 @@ class ListProductVariants extends ListRecords
     public function getTabs(): array
     {
         return [
-            'all' => Tab::make(__('common.all')),
+            'all'      => Tab::make(__('common.all')),
             'in_stock' => Tab::make(__('admin.product_variants.in_stock'))
                 ->modifyQueryUsing(static fn (Builder $query): Builder => $query->where(static function (Builder $stockQuery): Builder {
                     return $stockQuery

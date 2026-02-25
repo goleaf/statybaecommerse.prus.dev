@@ -1,6 +1,5 @@
 <x-layouts.base title="{{ __('frontend.home.home.title') }}">
-    <div class="max-w-7xl mx-auto px-4 py-10 space-y-12">
-        <section>
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 py-10">
             <h1 class="text-3xl font-semibold mb-4">{{ __('frontend.home.featured_products') }}</h1>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 @forelse ($featuredProducts as $product)
@@ -15,9 +14,9 @@
                     <p class="text-gray-500 dark:text-gray-400">{{ __('frontend.home.featured_empty') }}</p>
                 @endforelse
             </div>
-        </section>
+    </section>
 
-        <section>
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 py-6">
             <h2 class="text-2xl font-semibold mb-4">{{ __('frontend.home.latest_arrivals') }}</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 @forelse ($latestProducts as $product)
@@ -30,9 +29,9 @@
                     <p class="text-gray-500 dark:text-gray-400">{{ __('frontend.home.latest_empty') }}</p>
                 @endforelse
             </div>
-        </section>
+    </section>
 
-        <section class="relative bg-gray-50 py-16 sm:py-20">
+    <section class="relative bg-gray-50 py-16 sm:py-20">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div class="flex flex-col gap-16">
                     <div class="space-y-4 text-center">
@@ -52,9 +51,9 @@
             </div>
         </section>
 
-        <section class="relative bg-white py-16 sm:py-20">
+    <section class="relative bg-white py-16 sm:py-20">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <div class="grid gap-12 lg:grid-cols-[1.2fr_1fr] lg:items-center">
+                <div class="grid grid-cols-1 gap-12 lg:grid-cols-[1.2fr_1fr] lg:items-center">
                     <div class="space-y-8">
                         <div class="space-y-4">
                             <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
@@ -132,7 +131,7 @@
             </div>
         </section>
 
-        <section class="relative bg-slate-950 py-16 text-slate-100 sm:py-20">
+    <section class="relative bg-slate-950 py-16 text-slate-100 sm:py-20">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div class="flex flex-col gap-12">
                     <div class="space-y-4 text-center">
@@ -166,9 +165,9 @@
             </div>
         </section>
 
-        <section class="relative bg-white py-16 sm:py-20">
+    <section class="relative bg-white py-16 sm:py-20">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <div class="grid gap-12 lg:grid-cols-[1.2fr_1fr] lg:items-center">
+                <div class="grid grid-cols-1 gap-12 lg:grid-cols-[1.2fr_1fr] lg:items-center">
                     <div class="space-y-6">
                         <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
                             {{ __('frontend.home.sections.discovery.title') }}
@@ -207,9 +206,9 @@
             </div>
         </section>
 
-        <section class="relative bg-gray-900 py-16 text-white sm:py-20">
+    <section class="relative bg-gray-900 py-16 text-white sm:py-20">
             <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-                <div class="grid gap-12 lg:grid-cols-[1.2fr_1fr] lg:items-center">
+                <div class="grid grid-cols-1 gap-12 lg:grid-cols-[1.2fr_1fr] lg:items-center">
                     <div class="space-y-6">
                         <h2 class="text-3xl font-bold tracking-tight sm:text-4xl">
                             {{ __('frontend.home.sections.cta.title') }}
@@ -272,5 +271,5 @@
                 </div>
             </div>
         </section>
-    </div>
+
 </x-layouts.base>

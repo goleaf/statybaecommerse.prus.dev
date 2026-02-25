@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Filament\Resources\SystemSettingsResource;
+use App\Models\AdminUser;
 use App\Models\SystemSetting;
 use App\Models\SystemSettingCategory;
-use App\Models\AdminUser;
-use Database\Seeders\RolesAndPermissionsSeeder;
 use App\Support\Nav;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Features\SupportTesting\Testable;
 use Livewire\Livewire;

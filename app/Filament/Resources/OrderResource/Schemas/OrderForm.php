@@ -122,25 +122,39 @@ class OrderForm
                                 Select::make('product_id')
                                     ->label(__('messages.product'))
                                     ->relationship('product', 'name')
-                                    ->searchable()
+                                    ->searchable(['name', 'sku'])
+                                    ->getOptionLabelFromRecordUsing(fn (Product $record) => view('filament.forms.components.product-select-option', ['product' => $record])->render())
+                                    ->getSearchResultsUsing(function (Select $component, string $search): array {
+                                        return Product::query()
+                                            ->where('name', 'like', "%{$search}%")
+                                            ->orWhere('sku', 'like', "%{$search}%")
+                                            ->limit(50)
+                                            ->get()
+                                            ->mapWithKeys(fn (Product $record) => [$record->getKey() => $component->getOptionLabelFromRecord($record)])
+                                            ->toArray();
+                                    })
+                                    ->allowHtml()
                                     ->preload()
                                     ->reactive()
                                     ->afterStateUpdated(function ($state, Set $set): void {
                                         $set('unit_price', Product::find($state)?->price ?? 0);
                                     })
-                                    ->required(),
+                                    ->required()
+                                    ->columnSpan(3),
                                 TextInput::make('quantity')
                                     ->label(__('messages.quantity'))
                                     ->numeric()
                                     ->default(1)
-                                    ->required(),
+                                    ->required()
+                                    ->columnSpan(1),
                                 TextInput::make('unit_price')
                                     ->label(__('messages.unit_price'))
                                     ->numeric()
                                     ->prefix('€')
-                                    ->required(),
+                                    ->required()
+                                    ->columnSpan(1),
                             ])
-                            ->columns(3)
+                            ->columns(5)
                             ->defaultItems(0),
                     ])
                     ->columnSpanFull(),
@@ -148,7 +162,7 @@ class OrderForm
                     ->schema([
                         Repeater::make('services')
                             ->schema([
-                                Grid::make(3)
+                                Grid::make(5)
                                     ->schema([
                                         Select::make('service_id')
                                             ->label(__('translations.service'))
@@ -159,17 +173,20 @@ class OrderForm
                                                 ->all())
                                             ->searchable()
                                             ->preload()
-                                            ->required(),
+                                            ->required()
+                                            ->columnSpan(3),
                                         TextInput::make('quantity')
                                             ->label(__('messages.quantity'))
                                             ->numeric()
                                             ->default(1)
-                                            ->required(),
+                                            ->required()
+                                            ->columnSpan(1),
                                         TextInput::make('price')
                                             ->label(__('messages.price'))
                                             ->numeric()
                                             ->prefix('€')
-                                            ->required(),
+                                            ->required()
+                                            ->columnSpan(1),
                                     ]),
                             ])
                             ->defaultItems(0)

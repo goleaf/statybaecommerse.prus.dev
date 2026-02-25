@@ -37,10 +37,10 @@ return new class extends Migration
 
                     foreach ($rows as $row) {
                         $payload[] = [
-                            'product_id' => $row->product_id,
+                            'product_id'         => $row->product_id,
                             'product_variant_id' => $row->id,
-                            'created_at' => $now,
-                            'updated_at' => $now,
+                            'created_at'         => $now,
+                            'updated_at'         => $now,
                         ];
                     }
 

@@ -37,17 +37,17 @@ return [
     'list' => [
         'title' => 'Sąlygų sąrašas',
     ],
-    'messages'      => [
+    'messages' => [
         'created' => 'Sąlyga sėkmingai sukurta',
         'deleted' => 'Sąlyga sėkmingai ištrinta',
         'updated' => 'Sąlyga sėkmingai atnaujinta',
     ],
-    'operators'     => [
-        'equals'            => 'Lygu',
-        'greater_than'      => 'Daugiau nei',
-        'less_than'         => 'Mažiau nei',
-        'contains'          => 'Yra',
-        'not_contains'      => 'Nėra',
+    'operators' => [
+        'equals'       => 'Lygu',
+        'greater_than' => 'Daugiau nei',
+        'less_than'    => 'Mažiau nei',
+        'contains'     => 'Yra',
+        'not_contains' => 'Nėra',
     ],
     'quick_actions' => [
         'title' => 'Greiti veiksmai',
@@ -77,6 +77,6 @@ return [
         'cart_total'       => 'Krepšelio suma',
         'customer_group'   => 'Klientų grupė',
         'product_category' => 'Produkto kategorija',
-        'product_quantity'  => 'Produkto kiekis',
+        'product_quantity' => 'Produkto kiekis',
     ],
 ];

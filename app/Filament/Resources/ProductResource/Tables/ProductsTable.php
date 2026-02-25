@@ -81,9 +81,45 @@ class ProductsTable
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('weight')
-                    ->label(__('admin.products.weight'))
+                    ->label(__('admin.products.weight') . ' kg')
                     ->numeric()
                     ->sortable()
+                    ->suffix(' kg')
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('length')
+                    ->label('Length cm')
+                    ->numeric()
+                    ->sortable()
+                    ->suffix(' cm')
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('width')
+                    ->label('Width cm')
+                    ->numeric()
+                    ->sortable()
+                    ->suffix(' cm')
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('height')
+                    ->label('Height cm')
+                    ->numeric()
+                    ->sortable()
+                    ->suffix(' cm')
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('size')
+                    ->label('Size')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('size_type')
+                    ->label('Size Type')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('color')
+                    ->label('Color')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('pack_size_combined')
+                    ->label('Pack size + Pack Size Type')
+                    ->state(fn (Product $record): string => trim(($record->pack_size ?? '') . ' ' . ($record->pack_size_type ?? '')))
+                    ->sortable(['pack_size', 'pack_size_type'])
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
                     ->label(__('admin.products.created_at'))

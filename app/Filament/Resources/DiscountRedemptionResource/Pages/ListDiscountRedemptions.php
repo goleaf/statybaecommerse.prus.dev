@@ -19,4 +19,3 @@ class ListDiscountRedemptions extends ListRecords
         ];
     }
 }
-

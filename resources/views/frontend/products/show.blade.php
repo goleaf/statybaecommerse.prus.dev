@@ -9,7 +9,7 @@
             <nav class="text-sm text-gray-500" aria-label="{{ __('frontend.navigation.breadcrumbs') }}">
                 <ol class="flex flex-wrap items-center gap-2">
                     <li>
-                        <a href="{{ route('home') }}" class="text-blue-600 hover:text-blue-700">{{ __('messages.frontend') }}</a>
+                        <a href="{{ route('home') }}" class="text-blue-600 hover:text-blue-700">{{ __('frontend.home', 'Home') }}</a>
                     </li>
                     <li>/</li>
                     <li>
@@ -20,14 +20,10 @@
                 </ol>
             </nav>
 
-            <div class="mt-10 grid gap-10 lg:grid-cols-[1.1fr_1fr]">
+            <div class="mt-10 grid grid-cols-1 gap-10 lg:grid-cols-[1.1fr_1fr]">
                 <div class="space-y-6">
                     <div class="overflow-hidden rounded-3xl border border-gray-200 bg-gray-50">
                         <img src="{{ $product->main_image ?: ('https://via.placeholder.com/1200x1200.png?text=' . rawurlencode((string) __('messages.product'))) }}" alt="{{ $product->name }}" class="h-full w-full object-cover" loading="lazy" />
-                    </div>
-                    @if ($product->description)
-                        <article class="prose prose-indigo max-w-none">
-                            {!! $product->description !!}
                         </article>
                     @endif
                 </div>

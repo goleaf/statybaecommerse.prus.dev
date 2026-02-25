@@ -314,7 +314,7 @@ final class Show extends Component implements HasForms
     }
 
     /**
-     * @param  BelongsToMany<Product, Category>  $query
+     * @param  BelongsToMany<Product, Category> $query
      * @return BelongsToMany<Product, Category>
      */
     private function applyFiltersToQuery(BelongsToMany $query, string $locale): BelongsToMany
@@ -394,7 +394,7 @@ final class Show extends Component implements HasForms
     }
 
     /**
-     * @param  array<int, int|string>  $values
+     * @param  array<int, int|string> $values
      * @return array<int, int>
      */
     private function normalizeIdList(array $values): array
@@ -409,7 +409,7 @@ final class Show extends Component implements HasForms
     }
 
     /**
-     * @param  array<int|string, array<int, int|string>>  $selectedAttributes
+     * @param  array<int|string, array<int, int|string>> $selectedAttributes
      * @return array<int, array<int, int>>
      */
     private function normalizeSelectedAttributes(array $selectedAttributes): array
@@ -474,7 +474,7 @@ final class Show extends Component implements HasForms
     }
 
     /**
-     * @param  BelongsToMany<Product, Category>  $query
+     * @param  BelongsToMany<Product, Category> $query
      * @return BelongsToMany<Product, Category>
      */
     private function applySorting(BelongsToMany $query, string $sortBy, string $sortDirection): BelongsToMany
@@ -488,7 +488,7 @@ final class Show extends Component implements HasForms
     }
 
     /**
-     * @param  BelongsToMany<Product, Category>  $query
+     * @param  BelongsToMany<Product, Category> $query
      * @return BelongsToMany<Product, Category>
      */
     private function applyRatingSorting(BelongsToMany $query, string $sortDirection): BelongsToMany

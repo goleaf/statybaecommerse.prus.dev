@@ -164,6 +164,21 @@ class ProductForm
                             ]),
                     ])
                     ->columnSpanFull(),
+
+                Section::make('Shipping Exclusions')
+                    ->description('Select shipping methods this product should be excluded from.')
+                    ->schema([
+                        Grid::make(2)
+                            ->schema([
+                                Toggle::make('is_venipak_locker_excluded')
+                                    ->label('Exclude from Venipak Lockers')
+                                    ->default(false),
+                                Toggle::make('is_venipak_courier_excluded')
+                                    ->label('Exclude from Venipak Courier')
+                                    ->default(false),
+                            ]),
+                    ])
+                    ->columnSpanFull(),
             ]);
     }
 }

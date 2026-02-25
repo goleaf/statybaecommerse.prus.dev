@@ -8,7 +8,4 @@ namespace App\Filament\Resources;
  * Backward-compatible alias for test and legacy references that still use the
  * pre-module namespace.
  */
-class CustomerGroupResource extends \App\Filament\Resources\CustomerGroups\CustomerGroupResource
-{
-}
-
+class CustomerGroupResource extends \App\Filament\Resources\CustomerGroups\CustomerGroupResource {}

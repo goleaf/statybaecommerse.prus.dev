@@ -78,7 +78,7 @@ class EditReferral extends EditRecord
     }
 
     /**
-     * @param  array<string|int, mixed> $values
+     * @param array<string|int, mixed> $values
      */
     private function resolveLocalizedValue(array $values): ?string
     {

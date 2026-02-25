@@ -5,12 +5,10 @@ declare(strict_types=1);
 namespace App\Filament\Resources\ProductVariantResource\RelationManagers;
 
 use App\Filament\Resources\ProductResource;
-use App\Models\Product;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class SimilaritiesRelationManager extends RelationManager

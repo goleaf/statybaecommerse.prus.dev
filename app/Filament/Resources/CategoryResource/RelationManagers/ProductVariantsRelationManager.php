@@ -7,7 +7,6 @@ namespace App\Filament\Resources\CategoryResource\RelationManagers;
 use App\Filament\Resources\ProductVariantResource;
 use App\Models\ProductVariant;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Schemas\Schema;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;

@@ -173,7 +173,7 @@ final class AttributeValueFactory extends Factory
     }
 
     /**
-     * @param  array<string, mixed>  $attributes
+     * @param  array<string, mixed> $attributes
      * @return array<string, mixed>
      */
     private function guardForMissingColumns(array $attributes): array

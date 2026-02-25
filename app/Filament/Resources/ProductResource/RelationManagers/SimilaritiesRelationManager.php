@@ -16,7 +16,6 @@ use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class SimilaritiesRelationManager extends RelationManager
@@ -66,7 +65,7 @@ class SimilaritiesRelationManager extends RelationManager
                     ])
                     ->action(function (array $data): void {
                         ProductSimilarity::query()->firstOrCreate([
-                            'product_id' => $this->getOwnerRecord()->getKey(),
+                            'product_id'         => $this->getOwnerRecord()->getKey(),
                             'similar_product_id' => (int) $data['similar_product_id'],
                         ]);
                     }),

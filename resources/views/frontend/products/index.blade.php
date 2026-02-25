@@ -6,8 +6,32 @@
 @section('content')
     <div class="bg-gray-50 py-12">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            {{-- Mobile filter toggle --}}
+            <div class="mb-4 lg:hidden" x-data="{ filtersOpen: false }">
+                <button
+                    type="button"
+                    @click="filtersOpen = !filtersOpen"
+                    class="inline-flex items-center gap-2 rounded-full border border-indigo-600 bg-white px-4 py-2 text-sm font-semibold text-indigo-600 shadow-sm transition hover:bg-indigo-50"
+                >
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z" />
+                    </svg>
+                    <span x-text="filtersOpen ? '{{ __('frontend.search.hide_filters') }}' : '{{ __('frontend.search.show_filters') }}'">{{ __('frontend.search.show_filters') }}</span>
+                </button>
+
+                <div x-show="filtersOpen" x-transition x-cloak class="mt-4 rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
+                    @include('frontend.products.partials._filters-form', [
+                        'categories' => $categories,
+                        'brands' => $brands,
+                        'availableFilters' => $availableFilters,
+                        'activeFilter' => $activeFilter,
+                        'searchTerm' => $searchTerm,
+                    ])
+                </div>
+            </div>
+
             <div class="grid gap-10 lg:grid-cols-[280px_1fr]">
-                <aside class="space-y-8">
+                <aside class="hidden space-y-8 lg:block">
                     <div class="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
                         <h2 class="text-lg font-semibold text-gray-900">{{ __('ui.search_catalogue') }}</h2>
                         <form method="get" class="mt-4 space-y-4">

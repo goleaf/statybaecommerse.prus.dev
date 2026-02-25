@@ -61,6 +61,7 @@ export default defineConfig({
         'resources/js/app.js',
         'resources/js/live-notifications.js',
         'resources/images/hero.png',
+        'resources/css/filament/admin/theme.css',
       ],
       refresh: [
         ...refreshPaths,

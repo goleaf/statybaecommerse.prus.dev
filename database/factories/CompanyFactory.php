@@ -23,12 +23,12 @@ final class CompanyFactory extends Factory
     public function definition(): array
     {
         return [
-            'name'     => fake()->company(),
-            'email'    => fake()->unique()->safeEmail(),
-            'phone'    => fake()->e164PhoneNumber(), // Use E.164 format to satisfy tel validation in admin forms.
-            'address'  => fake()->address(),
-            'website'  => fake()->url(),
-            'industry' => fake()->randomElement(Industry::values()),
+            'name'        => fake()->company(),
+            'email'       => fake()->unique()->safeEmail(),
+            'phone'       => fake()->e164PhoneNumber(), // Use E.164 format to satisfy tel validation in admin forms.
+            'address'     => fake()->address(),
+            'website'     => fake()->url(),
+            'industry'    => fake()->randomElement(Industry::values()),
             'size'        => fake()->randomElement(['small', 'medium', 'large']),
             'description' => fake()->paragraph(),
             'is_active'   => true,

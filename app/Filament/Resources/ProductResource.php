@@ -25,10 +25,11 @@ use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\PublishedScope;
 use App\Models\Scopes\VisibleScope;
 use BackedEnum;
+use Closure;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Schema as SchemaFacade;
 use UnitEnum;
 
@@ -74,9 +75,9 @@ final class ProductResource extends BaseResource
             ]);
     }
 
-    public static function resolveRecordRouteBinding(int | string $key, ?\Closure $modifyQuery = null): ?Model
+    public static function resolveRecordRouteBinding(int|string $key, ?Closure $modifyQuery = null): ?Model
     {
-        $query = static::getRecordRouteBindingEloquentQuery();
+        $query = self::getRecordRouteBindingEloquentQuery();
 
         if ($modifyQuery) {
             $query = $modifyQuery($query) ?? $query;

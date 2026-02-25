@@ -16,8 +16,8 @@ use App\Models\Discount;
 use App\Models\Inventory;
 use App\Models\Price;
 use App\Models\Product;
-use Filament\Resources\Resource;
 use Filament\Resources\Pages\PageRegistration;
+use Filament\Resources\Resource;
 use Tests\TestCase;
 
 /**

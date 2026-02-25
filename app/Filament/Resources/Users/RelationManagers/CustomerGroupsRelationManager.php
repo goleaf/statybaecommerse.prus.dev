@@ -203,7 +203,7 @@ class CustomerGroupsRelationManager extends RelationManager
     }
 
     /**
-     * @param  array<string, mixed>  $data
+     * @param  array<string, mixed> $data
      * @return array<string, mixed>
      */
     private static function normalizePayload(array $data): array

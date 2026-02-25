@@ -9,6 +9,7 @@ use App\Enums\OrderStatus;
 use App\Enums\PaymentStatus;
 use App\Filament\Actions\RequestExportBulkAction;
 use BackedEnum;
+use Exception;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -72,6 +73,58 @@ class OrdersTable
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
+                \Filament\Tables\Actions\Action::make('sendToVenipak')
+                    ->label('Send to Venipak')
+                    ->icon('heroicon-o-truck')
+                    ->color('info')
+                    ->requiresConfirmation()
+                    ->modalHeading('Send Order to Venipak')
+                    ->modalDescription('Are you sure you want to dispatch this order to Venipak?')
+                    ->action(function (\App\Models\Order $record) {
+                        try {
+                            $service = app(\App\Services\VenipakService::class);
+                            $response = $service->dispatchOrder($record, 1);
+
+                            // Save tracking to shipping metadata
+                            if ($shipping = $record->shipping) {
+                                $meta = $shipping->metadata ?? [];
+                                $meta['venipak_tracking'] = $response['tracking_numbers'];
+                                $meta['venipak_manifest'] = $response['manifest_id'];
+                                $shipping->metadata = $meta;
+                                $shipping->tracking_number = implode(', ', $response['tracking_numbers']);
+                                $shipping->save();
+                            }
+
+                            \Filament\Notifications\Notification::make()->title('Order dispatched to Venipak successfully!')->success()->send();
+                        } catch (Exception $e) {
+                            \Filament\Notifications\Notification::make()->title('Failed to dispatch to Venipak')->body($e->getMessage())->danger()->send();
+                        }
+                    }),
+                \Filament\Tables\Actions\Action::make('printVenipakLabel')
+                    ->label('Print Venipak Label')
+                    ->icon('heroicon-o-printer')
+                    ->color('success')
+                    ->visible(fn (\App\Models\Order $record) => isset($record->shipping?->metadata['venipak_tracking']))
+                    ->action(function (\App\Models\Order $record) {
+                        try {
+                            $service = app(\App\Services\VenipakService::class);
+                            $trackingNumbers = $record->shipping->metadata['venipak_tracking'] ?? [];
+
+                            if (empty($trackingNumbers)) {
+                                throw new Exception('No tracking numbers found for this order.');
+                            }
+
+                            $pdfContent = $service->getLabels($trackingNumbers);
+
+                            // Return PDF stream download
+                            return response()->streamDownload(function () use ($pdfContent) {
+                                echo $pdfContent;
+                            }, "venipak-label-{$record->number}.pdf", ['Content-Type' => 'application/pdf']);
+
+                        } catch (Exception $e) {
+                            \Filament\Notifications\Notification::make()->title('Failed to generate Venipak label')->body($e->getMessage())->danger()->send();
+                        }
+                    }),
             ])
             ->bulkActions([ // Changed to bulkActions as it makes more sense for BulkActionGroup
                 RequestExportBulkAction::make(ExportType::ORDERS),

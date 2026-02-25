@@ -66,7 +66,7 @@
             </section>
 
             <section class="rounded-3xl bg-gradient-to-r from-blue-600 to-indigo-600 px-8 py-10 text-white shadow-xl">
-                <div class="grid gap-6 sm:grid-cols-[1.1fr_auto] sm:items-center">
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-[1.1fr_auto] sm:items-center">
                     <div class="space-y-3">
                         <h2 class="text-2xl font-bold sm:text-3xl">
                             {{ __('frontend.about.cta.title') }}

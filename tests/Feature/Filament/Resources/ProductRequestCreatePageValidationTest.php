@@ -12,7 +12,7 @@ uses(RefreshDatabase::class);
 final class TestableCreateProductRequest extends CreateProductRequest
 {
     /**
-     * @param  array<string, mixed>  $data
+     * @param  array<string, mixed> $data
      * @return array<string, mixed>
      */
     public function mutateForTest(array $data): array
@@ -22,7 +22,7 @@ final class TestableCreateProductRequest extends CreateProductRequest
 }
 
 it('blocks create when required identity fields are missing', function (): void {
-    $page = new TestableCreateProductRequest();
+    $page = new TestableCreateProductRequest;
 
     try {
         $page->mutateForTest([
@@ -46,7 +46,7 @@ it('fills identity fields from selected user before create', function (): void {
         'phone' => '+37060000000',
     ]);
 
-    $page = new TestableCreateProductRequest();
+    $page = new TestableCreateProductRequest;
 
     $payload = $page->mutateForTest([
         'product_id'         => 1,
@@ -64,7 +64,7 @@ it('fills identity fields from selected user before create', function (): void {
 });
 
 it('blocks create when selected user does not exist', function (): void {
-    $page = new TestableCreateProductRequest();
+    $page = new TestableCreateProductRequest;
 
     try {
         $page->mutateForTest([

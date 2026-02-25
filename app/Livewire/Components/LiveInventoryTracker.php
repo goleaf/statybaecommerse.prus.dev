@@ -215,14 +215,14 @@ final class LiveInventoryTracker extends Component
                 return empty($product->name) || empty($product->sku) || $product->price <= 0 || $product->stock_quantity <= 0;
             })->map(function ($product) {
                 return [
-                    'id'           => $product->id,
-                    'name'         => $product->trans('name'),
-                    'sku'          => $product->sku,
-                    'brand'        => $product->brand?->trans('name'),
+                    'id'             => $product->id,
+                    'name'           => $product->trans('name'),
+                    'sku'            => $product->sku,
+                    'brand'          => $product->brand?->trans('name'),
                     'stock_quantity' => $product->stock_quantity,
-                    'threshold'    => $this->lowStockThreshold,
-                    'urgency'      => $this->getUrgencyLevel($product->stock_quantity),
-                    'last_updated' => $product->updated_at,
+                    'threshold'      => $this->lowStockThreshold,
+                    'urgency'        => $this->getUrgencyLevel($product->stock_quantity),
+                    'last_updated'   => $product->updated_at,
                 ];
             })->toArray();
         });

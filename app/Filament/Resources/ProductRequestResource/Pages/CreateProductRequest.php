@@ -17,7 +17,7 @@ class CreateProductRequest extends CreateRecord
      * Guard against DB integrity errors by ensuring required request identity data
      * exists before persisting and auto-filling from the selected user when possible.
      *
-     * @param  array<string, mixed>  $data
+     * @param  array<string, mixed> $data
      * @return array<string, mixed>
      */
     protected function mutateFormDataBeforeCreate(array $data): array

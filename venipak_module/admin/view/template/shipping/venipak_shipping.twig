@@ -1,0 +1,757 @@
+{{ header }}{{ column_left }}
+<div id="content">
+	<div class="page-header">
+		<div class="container-fluid">
+			<div class="float-end">
+				<button type="submit" form="form-shipping" data-bs-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary">
+					<i class="fa-solid fa-save"></i>
+				</button>
+				<a href="{{ back }}" data-bs-toggle="tooltip" title="{{ button_back }}" class="btn btn-light">
+					<i class="fa-solid fa-reply"></i>
+				</a>
+			</div>
+			<h1>{{ heading_title }}</h1>
+			<ol class="breadcrumb">
+				{% for breadcrumb in breadcrumbs %}
+					<li class="breadcrumb-item">
+						<a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a>
+					</li>
+				{% endfor %}
+			</ol>
+		</div>
+	</div>
+	<div class="container-fluid">
+		{% if error_warning %}
+			<div class="alert alert-danger alert-dismissible">
+				<i class="fa fa-exclamation-circle"></i>
+				{{ error_warning }}
+				<button type="button" class="close" data-dismiss="alert">
+					&times;
+				</button>
+			</div>
+		{% endif %}
+		<div class="card">
+			<div class="card-header">
+				<i class="fa-solid fa-pencil"></i>
+				{{ text_edit }}</div>
+			<div class="card-body">
+
+				<div class="row mb-3">
+					<label class="col-sm-2 form-label" for="input-shipping_venipak_shipping_geo_zone_id">
+						{{ text_shipping_venipak_shipping_geo_zone_id }}
+					</label>
+
+
+				</div>
+
+				{# form code #}
+        <form action="{{ action }}"
+          method="post"
+          enctype="multipart/form-data"
+          id="form-shipping"
+          class="form-horizontal">
+
+          <div class="row mb-3">
+            <label class="col-sm-2 col-form-label" for="input-status">
+              {{ entry_status }}
+            </label>
+
+            <div class="col-sm-10 ">
+              <select name="shipping_venipak_shipping_status"
+                id="input-status"
+                class="form-select">
+                {% if shipping_venipak_shipping_status %}
+                  <option value="1" selected="selected">
+                    {{ text_enabled }}
+                  </option>
+                  <option value="0">
+                    {{ text_disabled }}
+                  </option>
+                {% else %}
+                  <option value="1">
+                    {{ text_enabled }}
+                  </option>
+                  <option value="0" selected="selected">
+                    {{ text_disabled }}
+                  </option>
+                {% endif %}
+              </select>
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <label class="col-sm-2 col-form-label" for="input-tax-class">{{ text_shipping_venipak_shipping_tax_class }}</label>
+            <div class="col-sm-10">
+              <select name="shipping_venipak_shipping_tax_class_id" id="input-tax-class" class="form-select">
+                <option value="0">{{ text_none }}</option>
+                {% for tax_class in tax_classes %}
+                {% if tax_class.tax_class_id == shipping_venipak_shipping_tax_class_id %}
+                <option value="{{ tax_class.tax_class_id }}" selected="selected">{{ tax_class.title }}</option>
+                {% else %}
+                <option value="{{ tax_class.tax_class_id }}">{{ tax_class.title }}</option>
+                {% endif %}
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+          <h4 >
+            {{ text_venipak_connection_settings }}
+          </h4>
+          <div class="row mb-3">
+            <label class="col-sm-2 col-form-label"
+              for="input-shipping_venipak_shipping_client_id">
+              {{ text_shipping_venipak_shipping_client_id }}
+            </label>
+            <div class="col-sm-10">
+              <input type="text"
+                name="shipping_venipak_shipping_client_id"
+                value="{{ shipping_venipak_shipping_client_id }}"
+                placeholder="12345"
+                id="input-shipping_venipak_shipping_client_id"
+                class="form-control" />
+            </div>
+          </div>
+          <div class="row mb-3">
+            <label class="col-sm-2 col-form-label"
+              for="input-shipping_venipak_shipping_client_username">
+              {{ text_shipping_venipak_shipping_client_username }}
+            </label>
+            <div class="col-sm-10">
+              <input type="text"
+                name="shipping_venipak_shipping_client_username"
+                value="{{ shipping_venipak_shipping_client_username }}"
+                id="input-shipping_venipak_shipping_client_username"
+                class="form-control" />
+            </div>
+          </div>
+          <div class="row mb-3">
+            <label class="col-sm-2 col-form-label"
+              for="input-shipping_venipak_shipping_client_password">
+              {{ text_shipping_venipak_shipping_client_password }}
+            </label>
+            <div class="col-sm-10">
+              <input type="password"
+                name="shipping_venipak_shipping_client_password"
+                value="{{ shipping_venipak_shipping_client_password }}"
+                id="input-shipping_venipak_shipping_client_password"
+                class="form-control" />
+            </div>
+          </div>
+          <div class="row mb-3">
+            <label class="col-sm-2 col-form-label"
+              for="input-shipping_venipak_shipping_google_api_key">
+              {{ text_shipping_venipak_shipping_google_api_key }}
+            </label>
+            <div class="col-sm-10">
+              <input type="text"
+                name="shipping_venipak_shipping_google_api_key"
+                value="{{ shipping_venipak_shipping_google_api_key }}"
+                class="form-control" />
+            </div>
+          </div>
+          <div class="row mb-3">
+            <label class="col-sm-2 col-form-label"
+              for="input-shipping_venipak_shipping_is_map_enabled">
+              {{ text_shipping_venipak_shipping_is_map_enabled }}
+            </label>
+            <div class="col-sm-10">
+              <input type="checkbox"
+                name="shipping_venipak_shipping_is_map_enabled"
+                id="input-shipping_venipak_shipping_is_map_enabled"
+                class="form-check-input"
+                {{
+                  shipping_venipak_shipping_is_map_enabled
+                  ? 'checked="checked"'
+                }} />
+            </div>
+          </div>
+          <div class="row mb-3">
+            <label class="col-sm-2 col-form-label"
+              for="input-shipping_venipak_shipping_is_clusters_enabled">
+              {{ text_shipping_venipak_shipping_is_clusters_enabled }}
+            </label>
+            <div class="col-sm-10">
+              <input type="checkbox"
+                name="shipping_venipak_shipping_is_clusters_enabled"
+                id="input-shipping_venipak_shipping_is_clusters_enabled"
+                class="form-check-input"
+                {{
+                  shipping_venipak_shipping_is_clusters_enabled
+                  ? 'checked="checked"'
+                }} />
+            </div>
+          </div>
+          <div class="row mb-3">
+            <label class="col-sm-2 col-form-label"
+              for="input-shipping_venipak_shipping_test">
+              {{ text_shipping_venipak_shipping_test }}
+            </label>
+            <div class="col-sm-10">
+              <input type="checkbox"
+                name="shipping_venipak_shipping_test"
+                id="input-shipping_venipak_shipping_test"
+                class="form-check-input"
+                {{ shipping_venipak_shipping_test ? 'checked="checked"' }} />
+            </div>
+          </div>
+          <div class="row mb-3">
+            <label class="col-sm-2 col-form-label"
+              for="input-shipping_venipak_shipping_products_per_pack">
+              {{ text_shipping_venipak_shipping_products_per_pack }}
+            </label>
+            <div class="col-sm-10">
+              <input type="text"
+                name="shipping_venipak_shipping_products_per_pack"
+                value="{{ attribute(_context, 'shipping_venipak_shipping_products_per_pack'|default(shipping_venipak_shipping_products_per_pack) ) }}"
+                id="input-shipping_venipak_shipping_products_per_pack"
+                class="form-control" />
+            </div>
+          </div>
+
+
+  <input type="hidden"
+                name="shipping_venipak_shipping_initial_tracking_number"
+                value="{{ shipping_venipak_shipping_initial_tracking_number }}"
+                id="input-shipping_venipak_shipping_initial_tracking_number"
+                class="form-control" /> 
+
+          <div class="row mb-3">
+            <label class="col-sm-2 col-form-label"
+              for="input-shipping_venipak_shipping_last_tracking_number">
+              {{ text_shipping_venipak_shipping_last_tracking_number }}
+            </label>
+            <div class="col-sm-10">
+              <input type="text"
+                name="shipping_venipak_shipping_last_tracking_number"
+                value="{{ shipping_venipak_shipping_last_tracking_number }}"
+                id="input-shipping_venipak_shipping_last_tracking_number"
+                class="form-control" />
+            </div>
+          </div>
+
+
+
+          <div class="row mb-3">
+            <label class="col-sm-2 col-form-label" for="input-shipping_venipak_shipping_weight_class"><span data-toggle="tooltip" title="{{ entry_shipping_venipak_shipping_weight_limit }}">{{ entry_shipping_venipak_shipping_weight_class }}</span></label>
+            <div class="col-sm-2">
+              <label class="col-sm-12 col-form-label text-start" for="input-shipping_venipak_shipping_pb_weight_limit">{{ entry_shipping_venipak_shipping_pb_weight_limit }}</label>
+              <input type="text"
+                name="shipping_venipak_shipping_pb_weight_limit"
+                value="{{ shipping_venipak_shipping_pb_weight_limit }}"
+                class="form-control" placeholder="30"/>
+            </div>
+            <div class="col-sm-2">
+              <label class="col-sm-12 col-form-label text-start" for="input-shipping_venipak_shipping_pb_weight_limit">{{ entry_shipping_venipak_shipping_pp_weight_limit }}</label>
+              <input type="text"
+                name="shipping_venipak_shipping_pp_weight_limit"
+                value="{{ shipping_venipak_shipping_pp_weight_limit }}"
+                class="form-control" placeholder="10"/>
+            </div>
+            <div class="col-sm-2">
+              <label class="col-sm-12 col-form-label text-start" for="input-shipping_venipak_shipping_pb_weight_limit">{{ entry_shipping_venipak_shipping_weight_units }}</label>
+              <select name="shipping_venipak_shipping_weight_class" id="input-shipping_venipak_shipping_pb_weight_limit" class="form-select">
+                {% if weight_classes %}
+                  {% for weight_class in weight_classes %}
+                    {% if weight_class.weight_class_id == shipping_venipak_shipping_weight_class %}
+                      <option value="{{ weight_class.weight_class_id }}" selected="selected">{{ weight_class.title }}</option>
+                    {% else %}
+                      <option value="{{ weight_class.weight_class_id }}">{{ weight_class.title }}</option>
+                    {% endif %}
+                  {% endfor %}
+                  {% else %}
+                      <option value="1" selected="selected" disabled >kg</option>
+                  {% endif %}
+              </select>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <label class="col-sm-2 col-form-label" for="input-shipping_venipak_shipping_length_class"><span data-toggle="tooltip" title="{{  help_shipping_venipak_shipping_dimmensions }}">{{ entry_shipping_venipak_shipping_dimmensions }}</span></label>
+            <div class="col-sm-2">
+              <label class="col-sm-12 col-form-label text-start" for="input-shipping_venipak_shipping_length_limit">{{ entry_shipping_venipak_shipping_length_limit }}</label>
+              <input type="text"
+                name="shipping_venipak_shipping_length_limit"
+                value="{{ shipping_venipak_shipping_length_limit }}"
+                class="form-control" placeholder="61"/>
+            </div>
+            <div class="col-sm-2">
+              <label class="col-sm-12 col-form-label text-start" for="input-shipping_venipak_shipping_width_limit">{{ entry_shipping_venipak_shipping_width_limit }}</label>
+              <input type="text"
+                name="shipping_venipak_shipping_width_limit"
+                value="{{ shipping_venipak_shipping_width_limit }}"
+                class="form-control" placeholder="35"/>
+            </div>
+            <div class="col-sm-2">
+              <label class="col-sm-12 col-form-label text-start" for="input-shipping_venipak_shipping_height_limit">{{ entry_shipping_venipak_shipping_height_limit }}</label>
+              <input type="text"
+                name="shipping_venipak_shipping_height_limit"
+                value="{{ shipping_venipak_shipping_height_limit }}"
+                class="form-control" placeholder="75"/>
+            </div>
+            <div class="col-sm-2">
+              <label class="col-sm-12 col-form-label text-start" for="input-shipping_venipak_shipping_dimmension_units">{{ entry_shipping_venipak_shipping_dimmension_units }}</label>
+              <select name="shipping_venipak_shipping_dimmension_units" id="input-shipping_venipak_shipping_dimmension_units" class="form-select">
+                {% if length_classes %}
+                  {% for length_class in length_classes %}
+                    {% if length_class.length_class_id == shipping_venipak_shipping_dimmension_units %}
+                      <option value="{{ length_class.length_class_id }}" selected="selected">{{ length_class.title }}</option>
+                    {% else %}
+                      <option value="{{ length_class.length_class_id }}">{{ length_class.title }}</option>
+                    {% endif %}
+                  {% endfor %}
+                {% else %}
+                    <option value="1" selected="selected" disabled >{{ text_shipping_venipak_cm }}</option>
+                {% endif %}
+              </select>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <label class="col-sm-2 col-form-label" for="input-shipping_venipak_shipping_stickers"><span data-toggle="tooltip" title="{{ help_shipping_label }}">{{ entry_shipping_venipak_shipping_stickers }}</span></label>
+            <div class="col-sm-10">
+              <select name="shipping_venipak_shipping_stickers" id="input-shipping_venipak_shipping_stickers" class="form-select">
+                {% for i in ("A4,A6")|split(',') %}
+                  {% if i== shipping_venipak_shipping_stickers %}
+                    <option value="{{ i }}" selected="selected">{{ i }}</option>
+                  {% else %}
+                    <option value="{{ i }}">{{ i }}</option>
+                  {% endif %}
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <h4 class="">
+              {{ text_shipping_method_settings }}
+            </h4>
+
+            <div id="geozone-tab" class="tab">
+              {% for geo_zone in geo_zones %}
+                <button class="tablinks{% if loop.first %} active{% endif %}" onclick="openGeozone(event, 'tab-{{ geo_zone.geo_zone_id }}');return false;">{{ geo_zone.name }}</button>
+              {% endfor %}
+            </div>
+
+            {% for geo_zone in geo_zones %}
+              <div id="tab-{{ geo_zone.geo_zone_id }}" class="tabcontent" {% if loop.first %}style="display:block"{% endif %}>
+                <div class="row mb-3" style="display: none">
+                    <label class="col-sm-2" for="shipping_venipak_shipping_geo_zone_id_{{ geo_zone.geo_zone_id }}">{{ text_shipping_venipak_shipping_geo_zone_id }}-{{ geo_zone.geo_zone_id }}</label>
+                    <div class="col-sm-10">
+                      <input name="shipping_venipak_shipping_geo_zone_id_{{ geo_zone.geo_zone_id }}"
+                        id="input-shipping_venipak_shipping_geo_zone_id_{{ geo_zone.geo_zone_id }}" class="form-control"
+                        value="{{ geo_zone.geo_zone_id }}" type="text"/>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                  <label class="col-sm-2 col-form-label"
+                    for="input-shipping_venipak_shipping_method_title_{{ geo_zone.geo_zone_id }}">
+                    {{ text_shipping_venipak_shipping_method_title }}
+                  </label>
+                  <div class="col-sm-10">
+                    <input type="text"
+                      name="shipping_venipak_shipping_method_title_{{ geo_zone.geo_zone_id }}"
+                      value="{{ attribute(_context, 'shipping_venipak_shipping_method_title_' ~ geo_zone.geo_zone_id|default(shipping_venipak_shipping_method_title) ) }}"
+                      id="input-shipping_venipak_shipping_method_title_{{ geo_zone.geo_zone_id }}"
+                      class="form-control" />
+                  </div>
+                </div>
+                <div class="row mb-3">
+                  <label class="col-sm-2 col-form-label"
+                    for="input-shipping_venipak_shipping_method_title_courier_{{ geo_zone.geo_zone_id }}">
+                    {{ text_shipping_venipak_shipping_method_title_courier }}
+                  </label>
+                  <div class="col-sm-10">
+                    <input type="text"
+                      name="shipping_venipak_shipping_method_title_courier_{{ geo_zone.geo_zone_id }}"
+                      value="{{ attribute(_context, 'shipping_venipak_shipping_method_title_courier_' ~ geo_zone.geo_zone_id|default(shipping_venipak_shipping_method_title_courier) ) }}"
+                      id="shipping_venipak_shipping_method_title_courier_{{ geo_zone.geo_zone_id }}"
+                      class="form-control" />
+                  </div>
+                </div>
+                <div class="row mb-3">
+                  <label class="col-sm-2 col-form-label"
+                    for="input-shipping_venipak_shipping_method_title_pickup_{{ geo_zone.geo_zone_id }}">
+                    {{ text_shipping_venipak_shipping_method_title_pickup }}
+                  </label>
+                  <div class="col-sm-10">
+                    <input type="text"
+                      name="shipping_venipak_shipping_method_title_pickup_{{ geo_zone.geo_zone_id }}"
+                      value="{{ attribute(_context, 'shipping_venipak_shipping_method_title_pickup_' ~ geo_zone.geo_zone_id|default(shipping_venipak_shipping_method_title_pickup) ) }}"
+                      id="input-shipping_venipak_shipping_method_title_pickup{{ geo_zone.geo_zone_id }}"
+                      class="form-control" />
+                  </div>
+                </div>
+                <div class="row mb-3">
+                  <label class="col-sm-2 col-form-label"
+                    for="input-shipping_venipak_shipping_sort_order_{{ geo_zone.geo_zone_id }}">
+                    {{ text_shipping_venipak_shipping_sort_order }}
+                  </label>
+                  <div class="col-sm-10">
+                    <input type="text"
+                      name="shipping_venipak_shipping_sort_order_{{ geo_zone.geo_zone_id }}"
+                      value="{{ attribute(_context, 'shipping_venipak_shipping_sort_order_' ~ geo_zone.geo_zone_id|default(shipping_venipak_shipping_sort_order) ) }}"
+                      id="input-shipping_venipak_shipping_sort_order_{{ geo_zone.geo_zone_id }}"
+                      class="form-control" />
+
+                  </div>
+                </div>
+                <div class="row mb-3">
+                  <label class="col-sm-2 col-form-label" for="input-shipping_venipak_shipping_cost_{{ geo_zone.geo_zone_id }}">
+                    {{ text_shipping_venipak_shipping_cost_courier }}
+                  </label>
+                  <div class="col-sm-10">
+                    <input type="text"
+                           name="shipping_venipak_shipping_cost_courier_{{ geo_zone.geo_zone_id }}"
+                           value="{{ attribute(_context, 'shipping_venipak_shipping_cost_courier_' ~ geo_zone.geo_zone_id|default(shipping_venipak_shipping_cost_courier) ) }}"
+                           placeholder="{{ entry_cost }}"
+                           id="input-shipping_venipak_shipping_cost_{{ geo_zone.geo_zone_id }}"
+                           class="form-control" />
+                    <div>Example: 3.00 OR Weight:cost, Weight:cost and etc. -> 10:2.00,20:4.00,30:5.00,</div>
+                  </div>
+                </div>
+                <div class="row mb-3">
+                  <label class="col-sm-2 col-form-label" for="input-shipping_venipak_shipping_cost_{{ geo_zone.geo_zone_id }}">
+                    {{ text_shipping_venipak_shipping_cost_pickup }}
+                  </label>
+                  <div class="col-sm-10">
+                    <input type="text"
+                           name="shipping_venipak_shipping_cost_pickup_{{ geo_zone.geo_zone_id }}"
+                           value="{{ attribute(_context, 'shipping_venipak_shipping_cost_pickup_' ~ geo_zone.geo_zone_id|default(shipping_venipak_shipping_cost_pickup) ) }}"
+                           placeholder="{{ entry_cost }}"
+                           id="input-shipping_venipak_shipping_cost_{{ geo_zone.geo_zone_id }}"
+                           class="form-control" />
+                    <div>Example: 3.00 OR Weight:cost, Weight:cost and etc. -> 10:2.00,20:4.00,30:5.00,</div>
+                  </div>
+                </div>
+
+
+                 <div class="row mb-3">
+                  <label class="col-sm-2 col-form-label" for="input-shipping_venipak_shipping_pickup_charges_for_cod_{{ geo_zone.geo_zone_id }}">
+                    {{ text_shipping_pickup_charges_for_cod }}
+                  </label>
+                  <div class="col-sm-10">
+                    <input type="text"
+                           name="shipping_venipak_shipping_pickup_charges_for_cod_{{ geo_zone.geo_zone_id }}"
+                           value="{{ attribute(_context, 'shipping_venipak_shipping_pickup_charges_for_cod_' ~ geo_zone.geo_zone_id|default(text_shipping_venipak_pickup_cod) ) }}"
+                           placeholder="{{ entry_cost }}"
+                           id="input-shipping_venipak_shipping_pickup_charges_for_cod_{{ geo_zone.geo_zone_id }}"
+                           class="form-control" />
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <label class="col-sm-2 col-form-label" for="input-shipping_venipak_shipping_courrier_charges_for_cod_{{ geo_zone.geo_zone_id }}">
+                    {{ text_shipping_courrier_charges_for_cod }}
+                  </label>
+                  <div class="col-sm-10">
+                    <input type="text"
+                           name="shipping_venipak_shipping_courrier_charges_for_cod_{{ geo_zone.geo_zone_id }}"
+                           value="{{ attribute(_context, 'shipping_venipak_shipping_courrier_charges_for_cod_' ~ geo_zone.geo_zone_id|default(text_shipping_venipak_courrier_cod) ) }}"
+                           placeholder="{{ entry_cost }}"
+                           id="input-shipping_venipak_shipping_courrier_charges_for_cod_{{ geo_zone.geo_zone_id }}"
+                           class="form-control" />
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <label class="col-sm-2 col-form-label" for="input-shipping_venipak_shipping_free_{{ geo_zone.geo_zone_id }}">{{ text_shipping_venipak_shipping_free }}</label>
+                  <div class="col-sm-2">
+                    <label class="col-sm-12 col-form-label text-start" for="input-shipping_venipak_shipping_free_{{ geo_zone.geo_zone_id }}">{{ text_shipping_venipak_shipping_courrier_free }}</label>
+                    <input type="text" name="shipping_venipak_shipping_courrier_free_{{ geo_zone.geo_zone_id }}" value="{{ attribute(_context, 'shipping_venipak_shipping_courrier_free_' ~ geo_zone.geo_zone_id|default(shipping_venipak_shipping_free) ) }}" id="input-shipping_venipak_shipping_courrier_free_{{ geo_zone.geo_zone_id }}" class="form-control" />
+                  </div>
+
+
+                  <div class="col-sm-2">
+                    <label class="col-sm-12 col-form-label text-start" for="input-shipping_venipak_shipping_pickup_free_{{ geo_zone.geo_zone_id }}">{{ text_shipping_venipak_shipping_pickup_free }}</label>
+                    <input type="text" name="shipping_venipak_shipping_pickup_free_{{ geo_zone.geo_zone_id }}" value="{{ attribute(_context, 'shipping_venipak_shipping_pickup_free_' ~ geo_zone.geo_zone_id|default(shipping_venipak_shipping_free) ) }}" id="input-shipping_venipak_shipping_pickup_free_{{ geo_zone.geo_zone_id }}" class="form-control" />
+                  </div>
+                </div>
+                <div class="row mb-3">
+                  <label class="col-sm-2 col-form-label"
+                    for="input-shipping_venipak_shipping_disable_courier_{{ geo_zone.geo_zone_id }}">
+                    {{ text_shipping_venipak_shipping_disable_courier }}
+                  </label>
+                  <div class="col-sm-10">
+                    <input type="checkbox"
+                      name="shipping_venipak_shipping_disable_courier_{{ geo_zone.geo_zone_id }}"
+                      id="input-shipping_venipak_shipping_disable_courier_{{ geo_zone.geo_zone_id }}"
+                      class="form-check-input"
+                      {{
+                        attribute(_context, 'shipping_venipak_shipping_disable_courier_' ~ geo_zone.geo_zone_id)
+                          ? 'checked="checked"'
+                      }} />
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <label class="col-sm-2 col-form-label"
+                    for="input-shipping_venipak_shipping_disable_pickup_{{ geo_zone.geo_zone_id }}">
+                    {{ text_shipping_venipak_shipping_disable_pickup }}
+                  </label>
+                  <div class="col-sm-10">
+                    <input type="checkbox"
+                      name="shipping_venipak_shipping_disable_pickup_{{ geo_zone.geo_zone_id }}"
+                      id="input-shipping_venipak_shipping_disable_pickup_{{ geo_zone.geo_zone_id }}"
+                      class="form-check-input"
+                      {{
+                        attribute(_context, 'shipping_venipak_shipping_disable_pickup_' ~ geo_zone.geo_zone_id)
+                        ? 'checked="checked"'
+                      }} />
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <label class="col-sm-2 col-form-label"
+                    for="input-shipping_venipak_shipping_disable_locker_{{ geo_zone.geo_zone_id }}">
+                    {{ text_shipping_venipak_shipping_disable_locker }}
+                  </label>
+                  <div class="col-sm-10">
+                    <input type="checkbox"
+                      name="shipping_venipak_shipping_disable_locker_{{ geo_zone.geo_zone_id }}"
+                      id="input-shipping_venipak_shipping_disable_locker_{{ geo_zone.geo_zone_id }}"
+                      data-test="{{ shipping_venipak_shipping_disable_locker ~ geo_zone.geo_zone_id }}"
+                      class="form-check-input"
+                      {{
+                        attribute(_context, 'shipping_venipak_shipping_disable_locker_' ~ geo_zone.geo_zone_id)
+                        ? 'checked="checked"'
+                      }} />
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+
+
+          <h4>
+            {{ text_sender_settings }}
+          </h4>
+          <div class="row mb-3">
+            <label class="col-sm-2 col-form-label"
+              for="input-shipping_venipak_shipping_sender_name">
+              {{ text_shipping_venipak_shipping_sender_name }}
+            </label>
+            <div class="col-sm-10">
+              <input type="text"
+                name="shipping_venipak_shipping_sender_name"
+                value="{{ shipping_venipak_shipping_sender_name }}"
+                id="input-shipping_venipak_shipping_sender_name"
+                class="form-control" />
+            </div>
+          </div>
+          <div class="row mb-3">
+            <label class="col-sm-2 col-form-label"
+              for="input-shipping_venipak_shipping_sender_company_code">
+              {{ text_shipping_venipak_shipping_sender_company_code }}
+            </label>
+            <div class="col-sm-10">
+              <input type="text"
+                name="shipping_venipak_shipping_sender_company_code"
+                value="{{ shipping_venipak_shipping_sender_company_code }}"
+                id="input-shipping_venipak_shipping_sender_company_code"
+                class="form-control" />
+            </div>
+          </div>
+          <div class="row mb-3">
+            <label class="col-sm-2 col-form-label"
+              for="input-shipping_venipak_shipping_sender_country">
+              {{ text_shipping_venipak_shipping_sender_country }}
+            </label>
+            <div class="col-sm-10">
+              <select name="shipping_venipak_shipping_sender_country"
+                id="input-shipping_venipak_shipping_sender_country"
+                class="form-select">
+                <option></option>
+                <option value="LT"
+                  {{
+                  shipping_venipak_shipping_sender_country == 'LT'
+                    ? 'selected'
+                  }}>
+                  LT
+                </option>
+                <option value="LV"
+                  {{
+                  shipping_venipak_shipping_sender_country == 'LV'
+                    ? 'selected'
+                  }}>
+                  LV
+                </option>
+                <option value="EE"
+                  {{
+                  shipping_venipak_shipping_sender_country == 'EE'
+                    ? 'selected'
+                  }}>
+                  EE
+                </option>
+              </select>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <label class="col-sm-2 col-form-label"
+              for="input-shipping_venipak_shipping_sender_city">
+              {{ text_shipping_venipak_shipping_sender_city }}
+            </label>
+            <div class="col-sm-10">
+              <input type="text"
+                name="shipping_venipak_shipping_sender_city"
+                value="{{ shipping_venipak_shipping_sender_city }}"
+                id="input-shipping_venipak_shipping_sender_city"
+                class="form-control" />
+            </div>
+          </div>
+          <div class="row mb-3">
+            <label class="col-sm-2 col-form-label"
+              for="input-shipping_venipak_shipping_sender_address">
+              {{ text_shipping_venipak_shipping_sender_address }}
+            </label>
+            <div class="col-sm-10">
+              <input type="text"
+                name="shipping_venipak_shipping_sender_address"
+                value="{{ shipping_venipak_shipping_sender_address }}"
+                id="input-shipping_venipak_shipping_sender_address"
+                class="form-control" />
+            </div>
+          </div>
+          <div class="row mb-3">
+            <label class="col-sm-2 col-form-label form-label"
+              for="input-shipping_venipak_shipping_sender_postcode">
+              <span data-toggle='tooltip' title="{{  help_placeholder_postcode }}"> {{ text_shipping_venipak_shipping_sender_postcode }}</span>
+
+            </label>
+            <div class="col-sm-10">
+              <input type="text"
+                name="shipping_venipak_shipping_sender_postcode"
+                value="{{ shipping_venipak_shipping_sender_postcode }}"
+                id="input-shipping_venipak_shipping_sender_postcode"
+                class="form-control"
+                minlength="4"
+                maxlength="5"/>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <label class="col-sm-2 col-form-label"
+              for="input-shipping_venipak_shipping_sender_contact_person">
+              {{ text_shipping_venipak_shipping_sender_contact_person }}
+            </label>
+            <div class="col-sm-10">
+              <input type="text"
+                name="shipping_venipak_shipping_sender_contact_person"
+                value="{{ shipping_venipak_shipping_sender_contact_person }}"
+                id="input-shipping_venipak_shipping_sender_contact_person"
+                class="form-control" />
+            </div>
+          </div>
+          <div class="row mb-3">
+            <label class="col-sm-2 col-form-label"
+              for="input-shipping_venipak_shipping_sender_contact_tel">
+              {{ text_shipping_venipak_shipping_sender_contact_tel }}
+            </label>
+            <div class="col-sm-10">
+              <input type="text"
+                name="shipping_venipak_shipping_sender_contact_tel"
+                value="{{ shipping_venipak_shipping_sender_contact_tel }}"
+                id="input-shipping_venipak_shipping_sender_contact_tel"
+                class="form-control" />
+            </div>
+          </div>
+          <div class="row mb-3">
+            <label class="col-sm-2 col-form-label"
+              for="input-shipping_venipak_shipping_sender_contact_email">
+              {{ text_shipping_venipak_shipping_sender_contact_email }}
+            </label>
+            <div class="col-sm-10">
+              <input type="email"
+                name="shipping_venipak_shipping_sender_contact_email"
+                value="{{ shipping_venipak_shipping_sender_contact_email }}"
+                id="input-shipping_venipak_shipping_sender_contact_email"
+                class="form-control" />
+            </div>
+          </div>
+        </form>
+
+
+			</div>
+
+
+		</div>
+
+
+
+	</div>
+
+
+</div>
+</div>{{ footer }} <script>
+	function openGeozone(evt, GeozoneName) {
+	  var i, tabcontent, tablinks;
+	  tabcontent = document.getElementsByClassName("tabcontent");
+	  for (i = 0; i < tabcontent.length; i++) {
+	    tabcontent[i].style.display = "none";
+	  }
+	  tablinks = document.getElementsByClassName("tablinks");
+	  for (i = 0; i < tablinks.length; i++) {
+	    tablinks[i].className = tablinks[i].className.replace(" active", "");
+	  }
+	  document.getElementById(GeozoneName).style="display:block";
+	  evt.currentTarget.className += " active";
+	}
+	</script><style>
+body
+{
+	font-family: Arial;
+}
+
+/* Style the tab */
+.tab
+{
+	overflow: hidden;
+	border: 1px solid #ccc;
+	background-color: #f1f1f1;
+}
+
+/* Style the buttons inside the tab */
+.tab button
+{
+	background-color: inherit;
+	float: left;
+	border: none;
+	outline: none;
+	cursor: pointer;
+	padding: 14px 16px;
+	transition: 0.3s;
+	font-size: 17px;
+}
+
+/* Change background color of buttons on hover */
+.tab button:hover
+{
+	background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+.tab button.active
+{
+	background-color: #ccc;
+}
+
+/* Style the tab content */
+.tabcontent
+{
+	display: none;
+	padding: 6px 12px;
+	border: 1px solid #ccc;
+	border-top: none;
+}
+.tabcontent
+{
+	animation: fadeEffect 1s; /* Fading effect takes 1 second */
+}
+
+/* Go from zero to full opacity */
+@keyframes fadeEffect
+{
+	from
+	{
+		opacity: 0;
+	}
+	to
+	{
+		opacity: 1;
+	}
+}</style>

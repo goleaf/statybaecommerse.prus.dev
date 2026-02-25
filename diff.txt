@@ -1,0 +1,203 @@
+diff --git a/resources/views/frontend/catalogue/product-grid.blade.php b/resources/views/frontend/catalogue/product-grid.blade.php
+index d4d975294..c5ad356b7 100644
+--- a/resources/views/frontend/catalogue/product-grid.blade.php
++++ b/resources/views/frontend/catalogue/product-grid.blade.php
+@@ -9,7 +9,6 @@
+         <x-product-card
+             :product="$product"
+             :showQuickView="false"
+-            :showWishlist="false"
+             :showCompare="false"
+             :showAddToCart="false"
+         />
+diff --git a/resources/views/frontend/categories/show.blade.php b/resources/views/frontend/categories/show.blade.php
+index 2318aca9b..edd9122e8 100644
+--- a/resources/views/frontend/categories/show.blade.php
++++ b/resources/views/frontend/categories/show.blade.php
+@@ -7,7 +7,7 @@
+     <div class="bg-gray-50 py-12">
+         <div class="mx-auto max-w-7xl space-y-12 px-4 sm:px-6 lg:px-8">
+             <div class="space-y-4">
+-                <nav class="text-sm text-gray-500" aria-label="Breadcrumb">
++                <nav class="text-sm text-gray-500" aria-label="{{ __('frontend.navigation.breadcrumbs') }}">
+                     <ol class="flex flex-wrap items-center gap-2">
+                         <li><a href="{{ route('home') }}" class="text-blue-600 hover:text-blue-700">{{ __('messages.frontend') }}</a></li>
+                         <li>/</li>
+diff --git a/resources/views/frontend/legal/privacy.blade.php b/resources/views/frontend/legal/privacy.blade.php
+index 0572077b3..4f5d72f2d 100644
+--- a/resources/views/frontend/legal/privacy.blade.php
++++ b/resources/views/frontend/legal/privacy.blade.php
+@@ -1,30 +1,14 @@
+ @extends('frontend.layouts.app')
+ 
+ @php
+-    $defaultTitleKey = 'frontend.legal.privacy_policy';
+-    $defaultTitle = __($defaultTitleKey);
+-    if ($defaultTitle === $defaultTitleKey) {
+-        $defaultTitle = 'Privacy Policy';
+-    }
+-
++    $defaultTitle = __('frontend.legal.privacy_policy');
+     $pageTitle = $legal?->getTranslatedSeoTitle() ?? $legal?->getTranslatedTitle() ?? $defaultTitle;
+-    $defaultDescriptionKey = 'frontend.legal.descriptions.privacy';
+-    $pageDescription = $legal?->getTranslatedSeoDescription() ?? __($defaultDescriptionKey);
+-    if ($pageDescription === $defaultDescriptionKey) {
+-        $pageDescription = 'Review how we collect, use, and protect your personal information.';
+-    }
++    $pageDescription = $legal?->getTranslatedSeoDescription() ?? __('frontend.legal.descriptions.privacy');
+ 
+     $documentName = \Illuminate\Support\Str::lower($defaultTitle);
+-    if ($documentName === 'frontend.legal.privacy_policy') {
+-        $documentName = 'privacy policy';
+-    }
+-
+-    $emptyMessage = __('messages.frontend_legal', [
++    $emptyMessage = __('frontend.legal.document_unavailable', [
+         'document' => $documentName,
+     ]);
+-    if ($emptyMessage === 'frontend.legal.document_unavailable') {
+-        $emptyMessage = sprintf('Our %s is currently unavailable.', $documentName);
+-    }
+ @endphp
+ 
+ @section('title', $pageTitle)
+diff --git a/resources/views/frontend/products/partials/product-grid.blade.php b/resources/views/frontend/products/partials/product-grid.blade.php
+index b86c8531f..49878b4ee 100644
+--- a/resources/views/frontend/products/partials/product-grid.blade.php
++++ b/resources/views/frontend/products/partials/product-grid.blade.php
+@@ -9,7 +9,7 @@
+             <a href="{{ route('frontend.products.show', $product) }}" class="flex flex-1 flex-col">
+                 <div class="relative aspect-square overflow-hidden bg-gray-100">
+                     <img
+-                        src="{{ $product->thumbnail ?: 'https://via.placeholder.com/600x600.png?text=Product' }}"
++                        src="{{ $product->thumbnail ?: ('https://via.placeholder.com/600x600.png?text=' . rawurlencode((string) __('messages.product'))) }}"
+                         alt="{{ $product->name }}"
+                         class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                         loading="lazy"
+diff --git a/resources/views/frontend/products/show.blade.php b/resources/views/frontend/products/show.blade.php
+index 9790f0dbc..1d9b53dd3 100644
+--- a/resources/views/frontend/products/show.blade.php
++++ b/resources/views/frontend/products/show.blade.php
+@@ -6,7 +6,7 @@
+ @section('content')
+     <div class="bg-gray-50 py-12">
+         <div class="mx-auto max-w-6xl space-y-12 px-4 sm:px-6 lg:px-8">
+-            <nav class="text-sm text-gray-500" aria-label="Breadcrumb">
++            <nav class="text-sm text-gray-500" aria-label="{{ __('frontend.navigation.breadcrumbs') }}">
+                 <ol class="flex flex-wrap items-center gap-2">
+                     <li>
+                         <a href="{{ route('home') }}" class="text-blue-600 hover:text-blue-700">{{ __('messages.frontend') }}</a>
+@@ -23,7 +23,7 @@
+             <div class="mt-10 grid gap-10 lg:grid-cols-[1.1fr_1fr]">
+                 <div class="space-y-6">
+                     <div class="overflow-hidden rounded-3xl border border-gray-200 bg-gray-50">
+-                        <img src="{{ $product->main_image ?: 'https://via.placeholder.com/1200x1200.png?text=Product' }}" alt="{{ $product->name }}" class="h-full w-full object-cover" loading="lazy" />
++                        <img src="{{ $product->main_image ?: ('https://via.placeholder.com/1200x1200.png?text=' . rawurlencode((string) __('messages.product'))) }}" alt="{{ $product->name }}" class="h-full w-full object-cover" loading="lazy" />
+                     </div>
+                     @if ($product->description)
+                         <article class="prose prose-indigo max-w-none">
+diff --git a/resources/views/frontend/search/index.blade.php b/resources/views/frontend/search/index.blade.php
+index 988b37280..b33dd6c2b 100644
+--- a/resources/views/frontend/search/index.blade.php
++++ b/resources/views/frontend/search/index.blade.php
+@@ -1,6 +1,6 @@
+ @extends('frontend.layouts.app')
+ 
+-@section('title', __('messages.frontend'))
++@section('title', __('frontend.search.title'))
+ 
+ @include('components.scripts.debounced-search-form')
+ 
+@@ -11,10 +11,10 @@
+                 <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                     <div>
+                         <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">
+-                            {{ __('messages.frontend') }}
++                            {{ __('frontend.search.title') }}
+                         </h1>
+                         <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+-                            {{ __('messages.frontend') }}
++                            {{ __('frontend.search.subtitle') }}
+                         </p>
+                     </div>
+                     <form
+@@ -31,7 +31,7 @@ class="flex w-full md:w-auto gap-2"
+                         })"
+                         @submit.prevent="manualSubmit()"
+                     >
+-                        <label for="search-query" class="sr-only">{{ __('messages.frontend') }}</label>
++                        <label for="search-query" class="sr-only">{{ __('frontend.search.search_products_label') }}</label>
+                         <input
+                             id="search-query"
+                             type="search"
+@@ -40,14 +40,14 @@ class="flex w-full md:w-auto gap-2"
+                             x-model="term"
+                             @input="handleInput()"
+                             value="{{ old('q', $query) }}"
+-                            placeholder="{{ __('messages.frontend') }}"
++                            placeholder="{{ __('frontend.search.search_placeholder') }}"
+                             class="flex-1 md:w-72 rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white focus:border-blue-500 focus:ring-blue-500"
+                         >
+                         <button
+                             type="submit"
+                             class="inline-flex items-center justify-center px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900"
+                         >
+-                            {{ __('messages.shared') }}
++                            {{ __('frontend.search.search_action') }}
+                         </button>
+                     </form>
+                 </div>
+diff --git a/resources/views/frontend/search/partials/_filters.blade.php b/resources/views/frontend/search/partials/_filters.blade.php
+index cb47684ff..712fcff51 100644
+--- a/resources/views/frontend/search/partials/_filters.blade.php
++++ b/resources/views/frontend/search/partials/_filters.blade.php
+@@ -1,6 +1,6 @@
+ <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm p-6">
+     <div class="flex items-center justify-between mb-6">
+-        <h2 class="text-lg font-semibold text-gray-900 dark:text-white">{{ __('messages.frontend') }}</h2>
++        <h2 class="text-lg font-semibold text-gray-900 dark:text-white">{{ __('frontend.search.refine_title') }}</h2>
+         @if ($selectedCategory)
+             <a
+                 href="{{ route('frontend.search.index', array_filter(['q' => $query])) }}"
+@@ -36,7 +36,7 @@ class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 d
+             type="submit"
+             class="w-full inline-flex items-center justify-center px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900"
+         >
+-            {{ __('messages.shared') }}
++            {{ __('frontend.search.search_action') }}
+         </button>
+     </form>
+ </div>
+diff --git a/resources/views/frontend/search/partials/_results.blade.php b/resources/views/frontend/search/partials/_results.blade.php
+index 358e419c9..607abfc37 100644
+--- a/resources/views/frontend/search/partials/_results.blade.php
++++ b/resources/views/frontend/search/partials/_results.blade.php
+@@ -7,7 +7,7 @@
+     <div class="border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+         <div>
+             <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+-                {{ __('messages.frontend') }}
++                {{ __('frontend.search_results.title') }}
+             </h2>
+             <p class="text-sm text-gray-600 dark:text-gray-400">
+                 {{ trans_choice('frontend.search.result_count', $totalResults, ['count' => $totalResults]) }}
+@@ -27,8 +27,8 @@
+     <div class="px-6 py-8">
+         @if (empty($query))
+             <div class="text-center text-gray-600 dark:text-gray-400">
+-                <p class="text-lg font-medium">{{ __('messages.frontend') }}</p>
+-                <p class="mt-2 text-sm">{{ __('messages.frontend') }}</p>
++                <p class="text-lg font-medium">{{ __('frontend.search.start_typing') }}</p>
++                <p class="mt-2 text-sm">{{ __('frontend.search.tip_1') }}</p>
+             </div>
+         @elseif ($totalResults === 0)
+             <div class="flex flex-col items-center gap-6 text-center text-gray-600 dark:text-gray-400">
+@@ -48,7 +48,7 @@
+                     </li>
+                     <li class="flex items-center justify-center gap-2">
+                         <span class="h-1.5 w-1.5 rounded-full bg-blue-400"></span>
+-                        {{ __('messages.frontend') }}
++                        {{ __('frontend.search.tip_2') }}
+                     </li>
+                     <li class="flex items-center justify-center gap-2">
+                         <span class="h-1.5 w-1.5 rounded-full bg-blue-400"></span>

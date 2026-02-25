@@ -89,7 +89,7 @@
     @endphp
 
     {{-- Top utility bar with contact info and social links --}}
-    <section class="text-dark border-b border-ash bg-sage">
+    <section class="hidden text-dark sm:block border-b border-ash bg-sage">
         <div class="container mx-auto flex justify-between gap-10 h-9 px-5">
             <div class="flex items-center gap-5 sm:gap-8">
                 <a href="tel:{{ __('frontend.header.topbar.phone_href') }}"
@@ -176,19 +176,63 @@
                         {{-- Shopping cart button --}}
                         <livewire:components.shopping-cart-button />
 
-                        {{-- Register button (guest only) --}}
+                        {{-- Guest actions (Login / Register) --}}
                         @guest
-                            @if (Route::has('register'))
-                                <a href="{{ route('register') }}" class="header-action-button">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                        stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.749 0-5.353-.62-7.499-1.632z" />
-                                    </svg>
-                                    <span>{{ __('messages.auth_register') }}</span>
-                                </a>
-                            @endif
+                            <div class="hidden sm:flex items-center gap-2">
+                                @if (Route::has('login'))
+                                    <a href="{{ route('login') }}" class="header-action-button text-gray-700 hover:text-emerald-600 bg-transparent shadow-none border-none">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
+                                        </svg>
+                                        <span>{{ __('auth.login.title') }}</span>
+                                    </a>
+                                @endif
+
+                                @if (Route::has('register'))
+                                    <a href="{{ route('register') }}" class="header-action-button bg-emerald-600 text-white hover:bg-emerald-700">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.749 0-5.353-.62-7.499-1.632z" />
+                                        </svg>
+                                        <span>{{ __('messages.auth_register') }}</span>
+                                    </a>
+                                @endif
+                            </div>
                         @endguest
+
+                        {{-- Authenticated User Dropdown --}}
+                        @auth
+                            <div class="relative hidden sm:block" x-data="{ open: false }" @click.away="open = false" @close.stop="open = false">
+                                <div>
+                                    <button type="button" @click="open = !open" class="header-action-button bg-emerald-50 text-emerald-700 hover:bg-emerald-100" id="user-menu-button" aria-expanded="false" aria-haspopup="true">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.749 0-5.353-.62-7.499-1.632z" />
+                                        </svg>
+                                        <span class="max-w-[100px] truncate">{{ auth()->user()->name }}</span>
+                                        <svg class="h-4 w-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                                        </svg>
+                                    </button>
+                                </div>
+
+                                <div x-show="open" x-transition:enter="transition ease-out duration-100" x-transition:enter-start="transform opacity-0 scale-95" x-transition:enter-end="transform opacity-100 scale-100" x-transition:leave="transition ease-in duration-75" x-transition:leave-start="transform opacity-100 scale-100" x-transition:leave-end="transform opacity-0 scale-95" class="absolute right-0 z-50 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button" tabindex="-1" style="display: none;">
+                                    @if(Route::has('account.index'))
+                                        <a href="{{ route('account.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem" tabindex="-1" id="user-menu-item-0">{{ __('messages.dashboard') ?? 'Dashboard' }}</a>
+                                    @endif
+                                    @if(Route::has('account.profile'))
+                                        <a href="{{ route('account.profile') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem" tabindex="-1" id="user-menu-item-1">{{ __('messages.profile') ?? 'Profile' }}</a>
+                                    @endif
+                                    @if(Route::has('account.addresses'))
+                                        <a href="{{ route('account.addresses') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem" tabindex="-1" id="user-menu-item-2">{{ __('messages.addresses') ?? 'Addresses' }}</a>
+                                    @endif
+                                    <form method="POST" action="{{ route('filament.admin.auth.logout') }}" x-data>
+                                        @csrf
+                                        <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50" role="menuitem" tabindex="-1" id="user-menu-item-3">
+                                            {{ __('messages.logout') ?? 'Logout' }}
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        @endauth
 
                         {{-- Mobile menu button - visible on xl- --}}
                         <div class="xl:hidden">
@@ -278,7 +322,53 @@
                             </a>
                         @endforeach
 
+                        {{-- Mobile User/Auth Links --}}
                         <div class="pt-4 mt-4 border-t border-gray-200">
+                            @guest
+                                @if (Route::has('login'))
+                                    <a href="{{ route('login') }}" class="w-full flex items-center gap-5 text-dark py-2 hover:text-stone transition-colors" wire:click="toggleMobileMenu">
+                                        <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path></svg>
+                                        <p class="capitalize font-normal font-montserrat">{{ __('auth.login.title') }}</p>
+                                    </a>
+                                @endif
+                                @if (Route::has('register'))
+                                    <a href="{{ route('register') }}" class="w-full flex items-center gap-5 text-emerald-600 py-2 hover:text-emerald-700 transition-colors" wire:click="toggleMobileMenu">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
+                                        <p class="capitalize font-normal font-montserrat">{{ __('messages.auth_register') }}</p>
+                                    </a>
+                                @endif
+                            @endguest
+
+                            @auth
+                                @if(Route::has('account.index'))
+                                    <a href="{{ route('account.index') }}" class="w-full flex items-center gap-5 text-dark py-2 hover:text-stone transition-colors" wire:click="toggleMobileMenu">
+                                        <svg class="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                                        <p class="capitalize font-normal font-montserrat">{{ __('messages.dashboard') ?? 'Dashboard' }}</p>
+                                    </a>
+                                @endif
+                                @if(Route::has('account.profile'))
+                                    <a href="{{ route('account.profile') }}" class="w-full flex items-center gap-5 text-dark py-2 hover:text-stone transition-colors" wire:click="toggleMobileMenu">
+                                        <svg class="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                        <p class="capitalize font-normal font-montserrat">{{ __('messages.profile') ?? 'Profile' }}</p>
+                                    </a>
+                                @endif
+                                @if(Route::has('account.addresses'))
+                                    <a href="{{ route('account.addresses') }}" class="w-full flex items-center gap-5 text-dark py-2 hover:text-stone transition-colors" wire:click="toggleMobileMenu">
+                                        <svg class="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                        <p class="capitalize font-normal font-montserrat">{{ __('messages.addresses') ?? 'Addresses' }}</p>
+                                    </a>
+                                @endif
+                                <form method="POST" action="{{ route('filament.admin.auth.logout') }}">
+                                    @csrf
+                                    <button type="submit" class="w-full flex items-center gap-5 text-red-600 py-2 hover:text-red-700 transition-colors" wire:click="toggleMobileMenu">
+                                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                                        <p class="capitalize font-normal font-montserrat">{{ __('messages.logout') ?? 'Logout' }}</p>
+                                    </button>
+                                </form>
+                            @endauth
+                        </div>
+
+                        <div class="pt-4 mt-2 border-t border-gray-200">
                             <x-language-switcher class="w-full justify-between !text-dark hover:!bg-dark/5" />
                         </div>
                     </div>

@@ -1,16 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="CLI Arguments" tests="7" assertions="17" errors="0" failures="0" skipped="0" time="15.176568">
-    <testsuite name="Tests\Unit\Filament\Pages\ImportProductsChunkSizeTest" file="tests\Unit\Filament\Pages\ImportProductsChunkSizeTest.php" tests="2" assertions="2" errors="0" failures="0" skipped="0" time="13.964200">
-      <testcase name="it uses a 20-row chunk size for products imports" file="tests\Unit\Filament\Pages\ImportProductsChunkSizeTest.php::it uses a 20-row chunk size for products imports" class="Tests\Unit\Filament\Pages\ImportProductsChunkSizeTest" classname="Tests.Unit.Filament.Pages.ImportProductsChunkSizeTest" assertions="1" time="13.717451"/>
-      <testcase name="it uses a 300-second import processing timeout for products imports" file="tests\Unit\Filament\Pages\ImportProductsChunkSizeTest.php::it uses a 300-second import processing timeout for products imports" class="Tests\Unit\Filament\Pages\ImportProductsChunkSizeTest" classname="Tests.Unit.Filament.Pages.ImportProductsChunkSizeTest" assertions="1" time="0.246749"/>
-    </testsuite>
-    <testsuite name="Tests\Unit\Filament\Importers\ProductImporterImageHandlingTest" file="tests\Unit\Filament\Importers\ProductImporterImageHandlingTest.php" tests="5" assertions="15" errors="0" failures="0" skipped="0" time="1.212368">
-      <testcase name="it resolves image extension from content type and url fallback" file="tests\Unit\Filament\Importers\ProductImporterImageHandlingTest.php::it resolves image extension from content type and url fallback" class="Tests\Unit\Filament\Importers\ProductImporterImageHandlingTest" classname="Tests.Unit.Filament.Importers.ProductImporterImageHandlingTest" assertions="4" time="0.184005"/>
-      <testcase name="it downloads image contents successfully from http source" file="tests\Unit\Filament\Importers\ProductImporterImageHandlingTest.php::it downloads image contents successfully from http source" class="Tests\Unit\Filament\Importers\ProductImporterImageHandlingTest" classname="Tests.Unit.Filament.Importers.ProductImporterImageHandlingTest" assertions="3" time="0.185117"/>
-      <testcase name="it returns null when image download fails" file="tests\Unit\Filament\Importers\ProductImporterImageHandlingTest.php::it returns null when image download fails" class="Tests\Unit\Filament\Importers\ProductImporterImageHandlingTest" classname="Tests.Unit.Filament.Importers.ProductImporterImageHandlingTest" assertions="1" time="0.178887"/>
-      <testcase name="it uses a 300-second timeout for image downloads during product import" file="tests\Unit\Filament\Importers\ProductImporterImageHandlingTest.php::it uses a 300-second timeout for image downloads during product import" class="Tests\Unit\Filament\Importers\ProductImporterImageHandlingTest" classname="Tests.Unit.Filament.Importers.ProductImporterImageHandlingTest" assertions="2" time="0.176498"/>
-      <testcase name="it resizes oversized downloaded image contents" file="tests\Unit\Filament\Importers\ProductImporterImageHandlingTest.php::it resizes oversized downloaded image contents" class="Tests\Unit\Filament\Importers\ProductImporterImageHandlingTest" classname="Tests.Unit.Filament.Importers.ProductImporterImageHandlingTest" assertions="5" time="0.487860"/>
+  <testsuite name="C:\Dropbox\projects\egistatyba\phpunit.xml" tests="3" assertions="8" errors="0" failures="0" skipped="0" time="12.228996">
+    <testsuite name="Feature" tests="3" assertions="8" errors="0" failures="0" skipped="0" time="12.228996">
+      <testsuite name="Tests\Feature\Services\VenipakServiceTest" file="tests\Feature\Services\VenipakServiceTest.php" tests="3" assertions="8" errors="0" failures="0" skipped="0" time="12.228996">
+        <testcase name="it dispatches order successfully" file="tests\Feature\Services\VenipakServiceTest.php::it dispatches order successfully" class="Tests\Feature\Services\VenipakServiceTest" classname="Tests.Feature.Services.VenipakServiceTest" assertions="4" time="11.811191"/>
+        <testcase name="it generates shipping labels successfully" file="tests\Feature\Services\VenipakServiceTest.php::it generates shipping labels successfully" class="Tests\Feature\Services\VenipakServiceTest" classname="Tests.Feature.Services.VenipakServiceTest" assertions="1" time="0.239931"/>
+        <testcase name="it fetches pickup points successfully" file="tests\Feature\Services\VenipakServiceTest.php::it fetches pickup points successfully" class="Tests\Feature\Services\VenipakServiceTest" classname="Tests.Feature.Services.VenipakServiceTest" assertions="3" time="0.177874"/>
+      </testsuite>
     </testsuite>
   </testsuite>
 </testsuites>

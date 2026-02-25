@@ -9,14 +9,14 @@
             <div class="space-y-4">
                 <nav class="text-sm text-gray-500" aria-label="{{ __('frontend.navigation.breadcrumbs') }}">
                     <ol class="flex flex-wrap items-center gap-2">
-                        <li><a href="{{ route('home') }}" class="text-blue-600 hover:text-blue-700">{{ __('messages.frontend') }}</a></li>
+                        <li><a href="{{ route('home') }}" class="text-blue-600 hover:text-blue-700">{{ __('frontend.home', 'Home') }}</a></li>
                         <li>/</li>
                         <li><a href="{{ route('frontend.categories.index') }}" class="text-blue-600 hover:text-blue-700">{{ __('messages.categories') }}</a></li>
                         <li>/</li>
                         <li class="text-gray-700">{{ $category->name }}</li>
                     </ol>
                 </nav>
-                <div class="flex flex-col gap-6 rounded-3xl border border-gray-200 bg-white p-8 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+                <div class="flex flex-col gap-6 rounded-3xl border border-gray-200 bg-white p-8 shadow-sm sm:flex-row sm:items-start sm:justify-between">
                     <div class="space-y-3">
                         <span class="inline-flex items-center gap-2 rounded-full bg-blue-100 px-3 py-1 text-sm font-semibold text-blue-700">
                             <x-untitledui-tag class="h-4 w-4" />
@@ -30,7 +30,7 @@
                             </p>
                         @endif
                     </div>
-                    <div class="flex flex-col gap-3 rounded-3xl bg-white/10 p-6 text-sm text-white/80">
+                    <div class="flex flex-col gap-3 rounded-3xl bg-indigo-600 p-6 text-sm text-white/80 sm:bg-white/10">
                         <div class="flex items-center justify-between">
                             <span>{{ __('ui.products_live') }}</span>
                             <span class="text-lg font-semibold text-white">{{ number_format($products->total()) }}</span>

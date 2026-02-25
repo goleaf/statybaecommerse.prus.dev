@@ -1,0 +1,11 @@
+.select2-container {
+  width: 100% !important;
+}
+
+.venipak-pickup-dropdown {
+  width: 100% !important;
+}
+
+label[for="input-shipping-method-venipak_shipping-venipak-shipping-pickup"] {
+  margin-left: 5px;
+}

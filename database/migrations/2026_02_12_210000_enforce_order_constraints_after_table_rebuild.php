@@ -304,7 +304,7 @@ return new class extends Migration
                 $details = DB::select("PRAGMA index_info('{$name}')");
 
                 return [
-                    'name' => $name,
+                    'name'    => $name,
                     'columns' => array_map(
                         static fn ($detail) => $detail->name ?? $detail['name'] ?? null,
                         $details,
@@ -315,7 +315,7 @@ return new class extends Migration
     }
 
     /**
-     * @param  Collection<int, array{name: string|null, columns: array<int, string|null>, unique: bool}>  $indexes
+     * @param Collection<int, array{name: string|null, columns: array<int, string|null>, unique: bool}> $indexes
      */
     private function recreateSqliteIndexes(string $table, Collection $indexes): void
     {

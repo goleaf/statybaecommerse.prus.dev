@@ -18,4 +18,9 @@ class ListOrders extends ListRecords
             CreateAction::make(),
         ];
     }
+
+    public function getMaxContentWidth(): \Filament\Support\Enums\Width | string | null
+    {
+        return \Filament\Support\Enums\Width::Full;
+    }
 }

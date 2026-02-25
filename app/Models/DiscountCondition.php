@@ -44,8 +44,6 @@ final class DiscountCondition extends Model
      */
     protected string $nameColumn = 'type';
 
-    
-
     protected $table = 'discount_conditions';
 
     /**

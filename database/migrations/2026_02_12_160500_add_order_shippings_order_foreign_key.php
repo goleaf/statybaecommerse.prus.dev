@@ -176,4 +176,3 @@ return new class extends Migration
         return Schema::getConnection()->getDriverName() === 'sqlite';
     }
 };
-

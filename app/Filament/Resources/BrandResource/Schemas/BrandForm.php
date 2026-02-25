@@ -15,8 +15,6 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
-use Filament\Forms\Components\Textarea;
-
 class BrandForm
 {
     public static function configure(Schema $schema): Schema

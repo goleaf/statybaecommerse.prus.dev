@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\InventoryResource\RelationManagers;
 
-use App\Models\StockReservation;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;

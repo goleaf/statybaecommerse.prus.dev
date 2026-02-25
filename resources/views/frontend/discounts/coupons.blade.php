@@ -1,20 +1,20 @@
-<x-layouts.base title="{{ __('messages.frontend') }}">
+<x-layouts.base title="{{ __('frontend.coupons.title', 'Available Coupons') }}">
     <div class="max-w-4xl mx-auto px-4 py-10 space-y-6">
-        <h1 class="text-3xl font-semibold text-gray-900 dark:text-gray-100">{{ __('messages.frontend') }}</h1>
+        <h1 class="text-3xl font-semibold text-gray-900 dark:text-gray-100">{{ __('frontend.coupons.title', 'Available Coupons') }}</h1>
         <div class="space-y-4">
             @forelse ($coupons as $coupon)
                 <article class="p-4 border border-gray-200 dark:border-white/10 rounded-xl bg-white dark:bg-gray-900 shadow-sm">
-                    <div class="flex items-center justify-between">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                         <div>
                             <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100">{{ $coupon->name ?? $coupon->code }}</h2>
                             <p class="text-sm text-gray-500 dark:text-gray-400">{{ $coupon->description }}</p>
                         </div>
-                        <span class="px-3 py-1 rounded-full bg-primary-100 text-primary-700 text-sm">{{ $coupon->code }}</span>
+                        <span class="inline-flex px-3 py-1 rounded-full bg-primary-100 text-primary-700 text-sm self-start sm:self-auto">{{ $coupon->code }}</span>
                     </div>
-                    <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">{{ __('messages.frontend', ['value' => $coupon->value]) }}</p>
+                    <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">{{ __('frontend.coupons.discount_value', ['value' => $coupon->value]) }}</p>
                 </article>
             @empty
-                <p class="text-gray-500 dark:text-gray-400">{{ __('messages.frontend') }}</p>
+                <p class="text-gray-500 dark:text-gray-400">{{ __('frontend.coupons.empty', 'No available coupons') }}</p>
             @endforelse
         </div>
         <div>
