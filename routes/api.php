@@ -20,6 +20,7 @@ Route::prefix('webhooks')
     ->group(function (): void {
         Route::post('/stripe', [PaymentWebhookController::class, 'handleStripe'])->name('stripe');
         Route::post('/notchpay', [PaymentWebhookController::class, 'handleNotchPay'])->name('notchpay');
+        Route::post('/montonio', [PaymentWebhookController::class, 'handleMontonio'])->name('payments.montonio');
     });
 
 Route::middleware('auth:sanctum')

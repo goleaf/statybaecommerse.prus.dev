@@ -1,66 +1,77 @@
 @props(['order'])
 
-<div class="py-6 lg:py-8 lg:max-w-4xl">
-    <div class="bg-gray-50 py-2.5 px-4 space-y-1.5 lg:grid lg:grid-cols-2 lg:gap-x-4 lg:space-y-0">
-        <div class="grid grid-cols-2 gap-x-4">
-            <div class="text-sm">
-                <dt class="font-medium text-gray-900">
-                    {{ __('ui.order_n') }}
-                </dt>
-                <dd class="mt-1 text-gray-500 uppercase">
-                    {{ $order->number }}
-                </dd>
-            </div>
-            <div class="text-sm">
-                <dt class="font-medium text-gray-900">
-                    {{ __('ui.placed_on') }}
-                </dt>
-                <dd class="mt-1 text-gray-500 capitalize">
-                    <time datetime="{{ format_datetime($order->created_at) }}">
-                        {{ format_datetime($order->created_at) }}
-                    </time>
-                </dd>
-            </div>
+@php
+    $currency = (string) ($order->currency ?? 'EUR');
+    $total = (float) ($order->total ?? 0) + (float) ($order->shippingOption?->price ?? 0);
+    $itemsCount = $order->items->count();
+    $invoice = $order->currentInvoice;
+    $invoiceStatus = $invoice?->status;
+    $invoiceStatusLabel = null;
+
+    if ($invoiceStatus !== null) {
+        $statusKey = 'messages.invoice_status_' . \Illuminate\Support\Str::snake((string) $invoiceStatus);
+        $invoiceStatusLabel = __($statusKey);
+
+        if ($invoiceStatusLabel === $statusKey) {
+            $invoiceStatusLabel = \Illuminate\Support\Str::headline(str_replace('_', ' ', (string) $invoiceStatus));
+        }
+    }
+@endphp
+
+<div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
+        <div class="text-sm">
+            <dt class="font-medium text-gray-700">
+                {{ __('frontend.account.order_detail.order_number_label') }}
+            </dt>
+            <dd class="mt-1 font-semibold uppercase text-gray-900">
+                {{ $order->number }}
+            </dd>
         </div>
-        <div class="grid grid-cols-2 gap-x-4">
-            <div class="text-sm">
-                <dt class="font-medium text-gray-900">
-                    {{ __('messages.total') }}
-                </dt>
-                <dd class="mt-1 text-gray-500">
-                    {{ \Illuminate\Support\Number::currency($order->total() + $order->shippingOption?->price, $order->currency_code, app()->getLocale()) }}
-                </dd>
-            </div>
-            <div class="text-sm">
-                <dt class="font-medium text-gray-900">{{ __('messages.status') }}</dt>
-                <dd class="mt-1 text-gray-500">
-                    <x-order.status :status="$order->status" />
-                </dd>
-            </div>
+        <div class="text-sm">
+            <dt class="font-medium text-gray-700">
+                {{ __('frontend.account.order_detail.placed_on') }}
+            </dt>
+            <dd class="mt-1 text-gray-600 capitalize">
+                <time datetime="{{ format_datetime($order->created_at) }}">
+                    {{ format_datetime($order->created_at) }}
+                </time>
+            </dd>
+        </div>
+        <div class="text-sm">
+            <dt class="font-medium text-gray-700">
+                {{ __('messages.total') }}
+            </dt>
+            <dd class="mt-1 text-base font-semibold text-gray-900">
+                {{ \Illuminate\Support\Number::currency($total, $currency, app()->getLocale()) }}
+            </dd>
+        </div>
+        <div class="text-sm">
+            <dt class="font-medium text-gray-700">{{ __('messages.status') }}</dt>
+            <dd class="mt-1 text-gray-500">
+                <x-order.status :status="$order->status" />
+            </dd>
+        </div>
+        <div class="text-sm">
+            <dt class="font-medium text-gray-700">{{ __('messages.quantity') }}</dt>
+            <dd class="mt-1 text-gray-600">{{ $itemsCount }}</dd>
+        </div>
+        <div class="text-sm">
+            <dt class="font-medium text-gray-700">{{ __('frontend.account.documents_table.title') }}</dt>
+            <dd class="mt-1 text-gray-600">
+                @if ($invoiceStatusLabel !== null)
+                    <span class="inline-flex items-center rounded bg-gray-200 px-2 py-0.5 text-xs font-medium text-gray-700">
+                        {{ $invoiceStatusLabel }}
+                    </span>
+                @else
+                    <span class="text-gray-500">{{ __('frontend.order_summary.not_available') }}</span>
+                @endif
+            </dd>
         </div>
     </div>
-    <div class="mt-6 grid grid-cols-1 gap-y-5 lg:grid-cols-4 lg:gap-x-12">
-        <div class="flex items-center space-x-2 lg:col-span-3">
-            @foreach ($order->items->take(5) as $item)
-                <div class="relative overflow-hidden">
-                    @if ($order->items->count() > 5 && $loop->index === 4)
-                        <div class="absolute inset-0 z-50 flex items-center justify-center bg-black/70">
-                            <span class="text-lg font-medium text-white">
-                                + {{ $order->items->count() - 5 }}
-                            </span>
-                        </div>
-                    @endif
-                    <x-product.thumbnail :product="$item->product" class="aspect-none size-24" />
-                </div>
-            @endforeach
-        </div>
-        <div class="grid grid-cols-2 gap-x-5 lg:flex lg:flex-col lg:items-end lg:justify-end lg:space-y-2 lg:pl-4">
-            <x-buttons.primary class="w-full px-4" :href="route('account.orders.detail', ['number' => $order->number])">
-                {{ __('ui.view_details') }}
-            </x-buttons.primary>
-            <x-buttons.default class="w-full px-4" :href="route('account.orders.invoice', ['locale' => app()->getLocale(), 'number' => $order->number])">
-                {{ __('ui.invoice') }}
-            </x-buttons.default>
-        </div>
+    <div class="mt-5 flex flex-wrap gap-2">
+        <x-buttons.default :href="route('account.orders.detail', ['number' => $order->number])">
+            {{ __('ui.view_details') }}
+        </x-buttons.default>
     </div>
 </div>

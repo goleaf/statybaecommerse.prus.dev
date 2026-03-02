@@ -42,7 +42,7 @@ final class VersionCompatibilityRequest extends FormRequest
                 function ($attribute, $value, $fail) {
                     // Additional path validation
                     if (str_contains($value, '..') || str_contains($value, '~')) {
-                        $fail('The file path contains invalid characters.');
+                        $fail(__('messages.validation_file_path_invalid_characters'));
                     }
 
                     // Ensure path starts with allowed directories
@@ -57,7 +57,7 @@ final class VersionCompatibilityRequest extends FormRequest
                     }
 
                     if (! $isAllowed) {
-                        $fail('The file path is not in an allowed directory.');
+                        $fail(__('messages.validation_file_path_not_allowed_directory'));
                     }
                 },
             ],
@@ -70,7 +70,7 @@ final class VersionCompatibilityRequest extends FormRequest
                 function ($attribute, $value, $fail) {
                     // Directory-specific validation
                     if (str_contains($value, '..') || str_contains($value, '~')) {
-                        $fail('The directory path contains invalid characters.');
+                        $fail(__('messages.validation_directory_path_invalid_characters'));
                     }
 
                     // Ensure directory starts with allowed paths
@@ -85,7 +85,7 @@ final class VersionCompatibilityRequest extends FormRequest
                     }
 
                     if (! $isAllowed) {
-                        $fail('The directory path is not in an allowed location.');
+                        $fail(__('messages.validation_directory_path_not_allowed_location'));
                     }
                 },
             ],
@@ -109,7 +109,7 @@ final class VersionCompatibilityRequest extends FormRequest
 
                     foreach ($suspiciousPatterns as $pattern) {
                         if (preg_match($pattern, $value)) {
-                            $fail('The content contains potentially dangerous code patterns.');
+                            $fail(__('messages.validation_content_dangerous_code_patterns'));
                             break;
                         }
                     }
@@ -129,12 +129,12 @@ final class VersionCompatibilityRequest extends FormRequest
 
                                 // Validate original filename
                                 if (! preg_match('/^[a-zA-Z0-9\._\-]+\.php$/', $originalName)) {
-                                    $fail('The uploaded file has an invalid name format.');
+                                    $fail(__('messages.validation_uploaded_file_invalid_name_format'));
                                 }
 
                                 // Check for double extensions
                                 if (substr_count($originalName, '.') > 1) {
-                                    $fail('The uploaded file cannot have multiple extensions.');
+                                    $fail(__('messages.validation_uploaded_file_multiple_extensions_not_allowed'));
                                 }
                             }
                         },
@@ -168,13 +168,13 @@ final class VersionCompatibilityRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'file_path.regex'      => 'The file path contains invalid characters. Only letters, numbers, slashes, dots, and hyphens are allowed.',
-            'directory_path.regex' => 'The directory path contains invalid characters. Only letters, numbers, slashes, and hyphens are allowed.',
-            'content.max'          => 'The content size cannot exceed 1MB.',
-            'uploaded_file.max'    => 'The uploaded file cannot exceed 1MB.',
-            'uploaded_file.mimes'  => 'Only PHP files are allowed for upload.',
-            'batch_size.max'       => 'Batch size cannot exceed 100 items.',
-            'options.max'          => 'Cannot specify more than 10 options.',
+            'file_path.regex'      => __('messages.validation_file_path_regex'),
+            'directory_path.regex' => __('messages.validation_directory_path_regex'),
+            'content.max'          => __('messages.validation_content_max_1mb'),
+            'uploaded_file.max'    => __('messages.validation_uploaded_file_max_1mb'),
+            'uploaded_file.mimes'  => __('messages.validation_uploaded_file_only_php_allowed'),
+            'batch_size.max'       => __('messages.validation_batch_size_max_100'),
+            'options.max'          => __('messages.validation_options_max_10'),
         ];
     }
 

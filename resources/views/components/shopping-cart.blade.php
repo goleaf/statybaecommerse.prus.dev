@@ -189,7 +189,7 @@
             <div class="mt-6 space-y-3">
                 <a wire:navigate
                    {{-- Keep cart context alive by navigating via Livewire --}}
-                   href="{{ route('checkout.index', ['locale' => app()->getLocale()]) ?? '/checkout' }}"
+                   href="{{ \Illuminate\Support\Facades\Route::has('frontend.checkout.index') ? route('frontend.checkout.index') : '/checkout' }}"
                    class="w-full btn-gradient py-3 rounded-xl font-semibold text-center block">
                     {{ __('ui.proceed_to_checkout') }}
                 </a>

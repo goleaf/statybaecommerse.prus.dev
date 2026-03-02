@@ -1,12 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="C:\Dropbox\projects\egistatyba\phpunit.xml" tests="3" assertions="8" errors="0" failures="0" skipped="0" time="12.228996">
-    <testsuite name="Feature" tests="3" assertions="8" errors="0" failures="0" skipped="0" time="12.228996">
-      <testsuite name="Tests\Feature\Services\VenipakServiceTest" file="tests\Feature\Services\VenipakServiceTest.php" tests="3" assertions="8" errors="0" failures="0" skipped="0" time="12.228996">
-        <testcase name="it dispatches order successfully" file="tests\Feature\Services\VenipakServiceTest.php::it dispatches order successfully" class="Tests\Feature\Services\VenipakServiceTest" classname="Tests.Feature.Services.VenipakServiceTest" assertions="4" time="11.811191"/>
-        <testcase name="it generates shipping labels successfully" file="tests\Feature\Services\VenipakServiceTest.php::it generates shipping labels successfully" class="Tests\Feature\Services\VenipakServiceTest" classname="Tests.Feature.Services.VenipakServiceTest" assertions="1" time="0.239931"/>
-        <testcase name="it fetches pickup points successfully" file="tests\Feature\Services\VenipakServiceTest.php::it fetches pickup points successfully" class="Tests\Feature\Services\VenipakServiceTest" classname="Tests.Feature.Services.VenipakServiceTest" assertions="3" time="0.177874"/>
-      </testsuite>
+  <testsuite name="CLI Arguments" tests="8" assertions="30" errors="0" failures="0" skipped="0" time="15.960253">
+    <testsuite name="Tests\Feature\Livewire\Pages\Account\Orders\DetailDataRenderingTest" file="tests\Feature\Livewire\Pages\Account\Orders\DetailDataRenderingTest.php" tests="1" assertions="6" errors="0" failures="0" skipped="0" time="11.480582">
+      <testcase name="order detail shows order number, payment, shipping and address data when available" file="tests\Feature\Livewire\Pages\Account\Orders\DetailDataRenderingTest.php::order detail shows order number, payment, shipping and address data when available" class="Tests\Feature\Livewire\Pages\Account\Orders\DetailDataRenderingTest" classname="Tests.Feature.Livewire.Pages.Account.Orders.DetailDataRenderingTest" assertions="6" time="11.480582"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\Livewire\Pages\Account\Orders\DetailNullAmountTest" file="tests\Feature\Livewire\Pages\Account\Orders\DetailNullAmountTest.php" tests="1" assertions="1" errors="0" failures="0" skipped="0" time="0.385891">
+      <testcase name="order detail renders when line item unit_price_amount is unavailable" file="tests\Feature\Livewire\Pages\Account\Orders\DetailNullAmountTest.php::order detail renders when line item unit_price_amount is unavailable" class="Tests\Feature\Livewire\Pages\Account\Orders\DetailNullAmountTest" classname="Tests.Feature.Livewire.Pages.Account.Orders.DetailNullAmountTest" assertions="1" time="0.385891"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\Livewire\Pages\Account\Orders\DetailTest" file="tests\Feature\Livewire\Pages\Account\Orders\DetailTest.php" tests="3" assertions="6" errors="0" failures="0" skipped="0" time="3.361342">
+      <testcase name="order detail component shows order information" file="tests\Feature\Livewire\Pages\Account\Orders\DetailTest.php::order detail component shows order information" class="Tests\Feature\Livewire\Pages\Account\Orders\DetailTest" classname="Tests.Feature.Livewire.Pages.Account.Orders.DetailTest" assertions="3" time="0.232574"/>
+      <testcase name="order detail component can be rendered" file="tests\Feature\Livewire\Pages\Account\Orders\DetailTest.php::order detail component can be rendered" class="Tests\Feature\Livewire\Pages\Account\Orders\DetailTest" classname="Tests.Feature.Livewire.Pages.Account.Orders.DetailTest" assertions="2" time="2.895091"/>
+      <testcase name="order detail component throws 404 for non-existent order" file="tests\Feature\Livewire\Pages\Account\Orders\DetailTest.php::order detail component throws 404 for non-existent order" class="Tests\Feature\Livewire\Pages\Account\Orders\DetailTest" classname="Tests.Feature.Livewire.Pages.Account.Orders.DetailTest" assertions="1" time="0.233677"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\Livewire\Pages\Account\Orders\IndexTest" file="tests\Feature\Livewire\Pages\Account\Orders\IndexTest.php" tests="2" assertions="6" errors="0" failures="0" skipped="0" time="0.501240">
+      <testcase name="it does not show invoice download action in account orders list" file="tests\Feature\Livewire\Pages\Account\Orders\IndexTest.php::it does not show invoice download action in account orders list" class="Tests\Feature\Livewire\Pages\Account\Orders\IndexTest" classname="Tests.Feature.Livewire.Pages.Account.Orders.IndexTest" assertions="3" time="0.264043"/>
+      <testcase name="it renders account orders page without calling order total as a method" file="tests\Feature\Livewire\Pages\Account\Orders\IndexTest.php::it renders account orders page without calling order total as a method" class="Tests\Feature\Livewire\Pages\Account\Orders\IndexTest" classname="Tests.Feature.Livewire.Pages.Account.Orders.IndexTest" assertions="3" time="0.237196"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\Livewire\Pages\Account\Orders\DetailInvoicesTest" file="tests\Feature\Livewire\Pages\Account\Orders\DetailInvoicesTest.php" tests="1" assertions="11" errors="0" failures="0" skipped="0" time="0.231198">
+      <testcase name="it shows generated invoices in account order detail page" file="tests\Feature\Livewire\Pages\Account\Orders\DetailInvoicesTest.php::it shows generated invoices in account order detail page" class="Tests\Feature\Livewire\Pages\Account\Orders\DetailInvoicesTest" classname="Tests.Feature.Livewire.Pages.Account.Orders.DetailInvoicesTest" assertions="11" time="0.231198"/>
     </testsuite>
   </testsuite>
 </testsuites>

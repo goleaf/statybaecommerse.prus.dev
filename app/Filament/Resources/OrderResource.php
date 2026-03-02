@@ -65,7 +65,7 @@ class OrderResource extends BaseResource
             \App\Filament\Resources\OrderResource\RelationManagers\ShipmentsRelationManager::class,
             \App\Filament\Resources\OrderResource\RelationManagers\ServicesRelationManager::class,
             \App\Filament\Resources\OrderResource\RelationManagers\CouponRelationManager::class,
-            \App\Filament\Resources\OrderResource\RelationManagers\DocumentsRelationManager::class,
+            \App\Filament\Resources\OrderResource\RelationManagers\InvoicesRelationManager::class,
         ];
     }
 

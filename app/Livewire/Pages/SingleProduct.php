@@ -204,7 +204,6 @@ final class SingleProduct extends Component
                         'categories.translations',
                         'translations',
                         'media',
-                        'documents',
                         'attributes' => fn ($query) => $query->with([
                             'translations',
                             'values' => fn ($valueQuery) => $valueQuery->with('translations'),
@@ -330,8 +329,37 @@ final class SingleProduct extends Component
 
             return;
         }
-        // Create or update cart item in database
-        $cartItem = \App\Models\CartItem::updateOrCreate(['session_id' => session()->getId(), 'product_id' => $productId], ['quantity' => \App\Models\CartItem::where('session_id', session()->getId())->where('product_id', $productId)->sum('quantity') + $quantity, 'minimum_quantity' => $product->getMinimumQuantity(), 'unit_price' => $product->price, 'total_price' => $product->price * $quantity, 'product_snapshot' => ['name' => $product->name, 'sku' => $product->sku, 'image' => $product->getFirstMediaUrl('images')]]);
+        $sessionId = (string) session()->getId();
+        $userId = auth()->id();
+
+        $existingQuantity = \App\Models\CartItem::withoutGlobalScopes()
+            ->where('session_id', $sessionId)
+            ->where('product_id', $productId)
+            ->whereNull('variant_id')
+            ->sum('quantity');
+
+        // Create or update a single base-product cart line.
+        $cartItem = \App\Models\CartItem::withoutGlobalScopes()->updateOrCreate(
+            [
+                'session_id' => $sessionId,
+                'user_id'    => is_numeric($userId) ? (int) $userId : null,
+                'product_id' => $productId,
+                'variant_id' => null,
+            ],
+            [
+                'quantity'         => (int) $existingQuantity + $quantity,
+                'minimum_quantity' => $product->getMinimumQuantity(),
+                'unit_price'       => $product->price,
+                'price'            => $product->price,
+                'total_price'      => $product->price * ((int) $existingQuantity + $quantity),
+                'product_snapshot' => [
+                    'name'  => $product->name,
+                    'sku'   => $product->sku,
+                    'image' => $product->getFirstMediaUrl(config('media.storage.collection_name'), 'thumb')
+                        ?: $product->getFirstMediaUrl(config('media.storage.collection_name')),
+                ],
+            ]
+        );
         $cartItem->updateTotalPrice();
         // Track add to cart in history
         $this->trackAddToCartHistory($product, $quantity);

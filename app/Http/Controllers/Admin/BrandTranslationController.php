@@ -42,7 +42,7 @@ final class BrandTranslationController extends Controller
         // Normalize the requested translation locale so that repeated submissions remain idempotent.
         $targetLocale = strtolower(trim($lang));
         if ($targetLocale === '') {
-            abort(404, 'Translation locale is required.');
+            abort(404, __('messages.translation_locale_is_required'));
         }
 
         // Read the configured locales and normalize them to avoid storing arbitrary or unsupported languages.
@@ -79,7 +79,7 @@ final class BrandTranslationController extends Controller
 
         // Abort with a 404 to hide administrative routes when the locale is not supported.
         if (! in_array($targetLocale, $normalizedSupportedLocales, true)) {
-            abort(404, 'Unsupported translation locale.');
+            abort(404, __('messages.unsupported_translation_locale'));
         }
 
         // Ensure that the parent brand exists even if global scopes would normally filter it out.

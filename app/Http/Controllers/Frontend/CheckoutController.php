@@ -90,7 +90,7 @@ final class CheckoutController extends Controller
         }
 
         $validated = $request->validated();
-        $paymentMethod = PaymentMethod::tryFrom($validated['payment_method'] ?? '') ?? PaymentMethod::CREDIT_CARD;
+        $paymentMethod = PaymentMethod::tryFrom($validated['payment_method'] ?? '') ?? PaymentMethod::MONTONIO;
         $contactAddress = array_filter([
             'full_name'      => $validated['full_name'] ?? null,
             'email'          => $validated['email'] ?? null,

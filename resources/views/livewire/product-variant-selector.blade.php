@@ -198,24 +198,3 @@
         </div>
     @endif
 </div>
-
-@push('scripts')
-<script>
-    document.addEventListener('livewire:init', () => {
-        Livewire.on('show-success', (event) => {
-            // Show success notification
-            console.log('Success:', event.message);
-        });
-
-        Livewire.on('show-error', (event) => {
-            // Show error notification
-            console.log('Error:', event.message);
-        });
-
-        Livewire.on('add-to-cart', (event) => {
-            // Handle add to cart
-            console.log('Add to cart:', event);
-        });
-    });
-</script>
-@endpush

@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Contracts\HasDocuments;
 use App\Enums\OrderPaymentState;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
-use App\Models\Concerns\InteractsWithDocuments;
+use App\Jobs\GenerateOrderInvoiceJob;
 use App\Models\Scopes\StatusScope;
+use App\Services\Invoices\OrderInvoiceService;
 use BackedEnum;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
@@ -55,9 +55,9 @@ use ValueError;
  * @mixin \Eloquent
  */
 #[ScopedBy([StatusScope::class])]
-final class Order extends Model implements HasDocuments
+final class Order extends Model
 {
-    use HasFactory, HasTranslations, InteractsWithDocuments;
+    use HasFactory, HasTranslations;
 
     public array $translatable = ['notes'];
 
@@ -78,6 +78,29 @@ final class Order extends Model implements HasDocuments
                 $order->number = self::generateUniqueNumber();
             }
         });
+
+        self::saved(function (Order $order): void {
+            if (! (bool) config('invoices.enabled', false)) {
+                return;
+            }
+
+            if (! $order->wasRecentlyCreated && ! $order->wasChanged('payment_status')) {
+                return;
+            }
+
+            $paymentStatus = self::normalizePaymentStatusValue($order->payment_status);
+
+            if (in_array($paymentStatus, ['paid', 'captured', 'settled'], true)) {
+                GenerateOrderInvoiceJob::dispatch($order->getKey());
+
+                return;
+            }
+
+            if (in_array($paymentStatus, ['partially_refunded', 'refunded'], true)) {
+                app(OrderInvoiceService::class)->markCurrentInvoiceAsRefunded($order);
+            }
+        });
+
     }
 
     /**
@@ -280,6 +303,16 @@ final class Order extends Model implements HasDocuments
         return $this->belongsToMany(Service::class)
             ->withPivot(['price', 'quantity'])
             ->withTimestamps();
+    }
+
+    public function invoices(): HasMany
+    {
+        return $this->hasMany(OrderInvoice::class);
+    }
+
+    public function currentInvoice(): HasOne
+    {
+        return $this->hasOne(OrderInvoice::class)->where('is_current', true)->latestOfMany();
     }
 
     /**

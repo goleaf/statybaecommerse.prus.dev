@@ -55,8 +55,6 @@ final class BrandController extends Controller
                 ->filter(function ($product) {
                     // Filter out products that are not properly configured for display
                     return ! empty($product->name) &&
-                           $product->isPublished() &&
-                           $product->price > 0 &&
                            ! empty($product->slug);
                 });
 
@@ -85,16 +83,16 @@ final class BrandController extends Controller
 
         // Provide default values for filter/sort options
         $availableSorts = [
-            'featured'    => __('messages.sort_featured'),
-            'latest'      => __('messages.sort_latest'),
-            'price_asc'   => __('messages.sort_price_low'),
-            'price_desc'  => __('messages.sort_price_high'),
-            'bestsellers' => __('messages.sort_bestsellers'),
+            'featured'    => __('frontend.search.popular'),
+            'latest'      => __('frontend.search.recent'),
+            'price_asc'   => __('frontend.search.price_low_to_high'),
+            'price_desc'  => __('frontend.search.price_high_to_low'),
+            'bestsellers' => __('frontend.search_results.sort.relevance'),
         ];
 
         $availableFilters = [
-            'featured' => __('messages.filter_featured'),
-            'in_stock' => __('messages.filter_in_stock'),
+            'featured' => __('frontend.search.popular'),
+            'in_stock' => __('frontend.search.in_stock_only'),
         ];
 
         return view('frontend.brands.show', [

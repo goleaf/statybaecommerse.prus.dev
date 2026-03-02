@@ -145,10 +145,10 @@ final class ReferralController extends Controller
         }
 
         // Normalise the optional marketing copy so both locales stay in sync.
-        $title = $validated['title'] ?? __('messages.referrals');
-        $titleLt = $validated['title'] ?? __('messages.referrals', [], 'lt');
-        $description = $validated['description'] ?? __('messages.referrals');
-        $descriptionLt = $validated['description'] ?? __('messages.referrals', [], 'lt');
+        $title = $validated['title'] ?? __('referrals.create.title');
+        $titleLt = $validated['title'] ?? __('referrals.create.title', [], 'lt');
+        $description = $validated['description'] ?? __('referrals.create.description');
+        $descriptionLt = $validated['description'] ?? __('referrals.create.description', [], 'lt');
 
         try {
             DB::beginTransaction();
@@ -222,7 +222,7 @@ final class ReferralController extends Controller
             return redirect()->route('referrals.create')->with('info', __('messages.referrals'));
         }
         $shareUrl = $referralCode->referral_url;
-        $shareText = __('messages.referrals', ['code' => $referralCode->code, 'url' => $shareUrl]);
+        $shareText = __('referrals.share_text', ['code' => $referralCode->code, 'url' => $shareUrl]);
 
         return view('referrals.share', [
             'user'         => $user,

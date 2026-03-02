@@ -38,7 +38,7 @@ final class AttributeTranslationController extends Controller
         // Normalize the requested translation locale to lowercase to avoid duplicated entries.
         $targetLocale = strtolower(trim($lang));
         if ($targetLocale === '') {
-            abort(404, 'Translation locale is required.');
+            abort(404, __('messages.translation_locale_is_required'));
         }
 
         // Build a whitelist of supported locales from configuration to prevent arbitrary locale creation.
@@ -56,7 +56,7 @@ final class AttributeTranslationController extends Controller
 
         // Abort with a 404 to avoid leaking existence of administrative routes for unsupported locales.
         if (! in_array($targetLocale, $normalizedSupportedLocales, true)) {
-            abort(404, 'Unsupported translation locale.');
+            abort(404, __('messages.unsupported_translation_locale'));
         }
 
         // Ensure that the parent attribute exists even if global scopes hide it from regular queries.

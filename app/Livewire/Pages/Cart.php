@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Livewire\Pages;
 
+use App\Models\CartItem;
+use App\Services\Cart\CartService;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Builder;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
-use Throwable;
 
 /**
  * Cart
@@ -22,6 +24,11 @@ class Cart extends Component
     public float $subtotal = 0.0;
 
     /**
+     * @var list<array<string, mixed>>
+     */
+    public array $items = [];
+
+    /**
      * Initialize the Livewire component with parameters.
      */
     public function mount(): void
@@ -34,14 +41,7 @@ class Cart extends Component
      */
     private function getCartSession(): mixed
     {
-        if (! class_exists(\Darryldecode\Cart\Facades\CartFacade::class)) {
-            return null;
-        }
-        try {
-            return \Darryldecode\Cart\Facades\CartFacade::session(session()->getId());
-        } catch (Throwable $e) {
-            return null;
-        }
+        return null;
     }
 
     /**
@@ -49,106 +49,111 @@ class Cart extends Component
      */
     public function refreshTotals(): void
     {
-        $cart = $this->getCartSession();
-        $this->subtotal = $cart ? (float) $cart->getSubTotal() : 0.0;
+        $summary = app(CartService::class)->getSummary($this->resolveUserId(), $this->resolveSessionId());
+        $this->subtotal = (float) ($summary['subtotal'] ?? 0.0);
+        $this->items = is_array($summary['items'] ?? null) ? array_values($summary['items']) : [];
     }
 
     /**
      * Handle removeItem functionality with proper error handling.
      */
-    public function removeItem(int $id): void
+    public function removeItem(int $id, ?int $productId = null): void
     {
-        $cart = $this->getCartSession();
-        if ($cart) {
-            $cart->remove($id);
-            $this->dispatch('cart-updated'); // Broadcast the unified cart change event.
-            $this->refreshTotals();
+        $cartItem = $this->resolveCartItem($id, $productId);
+
+        if ($cartItem !== null) {
+            $productId = (int) $cartItem->product_id;
+            $cartItem->delete();
+            $this->removeFromSessionCart($productId);
         }
+
+        $this->dispatch('cart-updated');
+        $this->refreshTotals();
     }
 
     // Alias to keep shared cart item component working in different contexts
     /**
      * Handle removeToCart functionality with proper error handling.
      */
-    public function removeToCart(int $id): void
+    public function removeToCart(int $id, ?int $productId = null): void
     {
-        $this->removeItem($id);
+        $this->removeItem($id, $productId);
     }
 
     /**
      * Handle updateItemQuantity functionality with proper error handling.
      */
-    public function updateItemQuantity(int $id, int $quantity): void
+    public function updateItemQuantity(int $id, int $quantity, ?int $productId = null): void
     {
         $quantity = max(0, $quantity);
-        $cart = $this->getCartSession();
-        if (! $cart) {
+        $cartItem = $this->resolveCartItem($id, $productId);
+
+        if ($cartItem === null) {
             return;
         }
+
         if ($quantity === 0) {
-            $cart->remove($id);
+            $productId = (int) $cartItem->product_id;
+            $cartItem->delete();
+            $this->removeFromSessionCart($productId);
         } else {
-            // Darryldecode\Cart supports absolute updates via ['quantity' => ['relative' => false, 'value' => X]]
-            try {
-                $cart->update($id, ['quantity' => ['relative' => false, 'value' => $quantity]]);
-            } catch (Throwable $e) {
-                // ignore update failures
-            }
+            $cartItem->updateQuantity($quantity);
         }
-        $this->dispatch('cart-updated'); // Ensure listeners refresh after quantity adjustments.
+
+        $this->dispatch('cart-updated');
         $this->refreshTotals();
     }
 
     /**
      * Handle incrementItem functionality with proper error handling.
      */
-    public function incrementItem(int $id): void
+    public function incrementItem(int $id, ?int $productId = null): void
     {
-        $cart = $this->getCartSession();
-        if (! $cart) {
+        $cartItem = $this->resolveCartItem($id, $productId);
+
+        if ($cartItem === null) {
             return;
         }
-        try {
-            $cart->update($id, ['quantity' => 1]);
-        } catch (Throwable $e) {
-            // ignore
-        }
-        $this->dispatch('cart-updated'); // Notify interested components about the increment.
+
+        $cartItem->incrementQuantity(1);
+
+        $this->dispatch('cart-updated');
         $this->refreshTotals();
     }
 
     /**
      * Handle decrementItem functionality with proper error handling.
      */
-    public function decrementItem(int $id): void
+    public function decrementItem(int $id, ?int $productId = null): void
     {
-        $cart = $this->getCartSession();
-        if (! $cart) {
+        $cartItem = $this->resolveCartItem($id, $productId);
+
+        if ($cartItem === null) {
             return;
         }
-        try {
-            // Fetch current quantity to prevent negative
-            $current = 0;
-            foreach ($cart->getContent() as $item) {
-                if ((int) $item->id === (int) $id) {
-                    $current = (int) $item->quantity;
-                    break;
-                }
-            }
-            if ($current <= 1) {
-                $cart->remove($id);
-            } else {
-                $cart->update($id, ['quantity' => -1]);
-            }
-        } catch (Throwable $e) {
-            // ignore
+
+        if ((int) $cartItem->quantity <= 1) {
+            $productId = (int) $cartItem->product_id;
+            $cartItem->delete();
+            $this->removeFromSessionCart($productId);
+        } else {
+            $cartItem->decrementQuantity(1);
         }
-        $this->dispatch('cart-updated'); // Emit the decremented state to shared listeners.
+
+        $this->dispatch('cart-updated');
         $this->refreshTotals();
     }
 
     public function getItemThumbnail($item): ?string
     {
+        if (is_object($item) && isset($item->image) && is_string($item->image) && $item->image !== '') {
+            return $item->image;
+        }
+
+        if (is_array($item) && isset($item['image']) && is_string($item['image']) && $item['image'] !== '') {
+            return $item['image'];
+        }
+
         $model = $item->associatedModel ?? null;
         if ($model && method_exists($model, 'getFirstMediaUrl')) {
             return $model->getFirstMediaUrl(config('media.storage.thumbnail_collection'))
@@ -165,12 +170,72 @@ class Cart extends Component
      */
     public function render(): View
     {
-        $sessionItems = collect();
-        $cart = $this->getCartSession();
-        if ($cart) {
-            $sessionItems = $cart->getContent();
-        }
+        $sessionItems = collect($this->items)
+            ->map(static fn (array $item): object => (object) $item);
 
         return view('livewire.pages.cart', ['items' => $sessionItems, 'subtotal' => $this->subtotal])->title(__('messages.your_cart'));
+    }
+
+    private function resolveCartItem(int $id, ?int $productId = null): ?CartItem
+    {
+        $sessionId = $this->resolveSessionId();
+        $userId = $this->resolveUserId();
+
+        $baseQuery = CartItem::withoutGlobalScopes()
+            ->where(function (Builder $query) use ($sessionId, $userId): void {
+                $query->where('session_id', $sessionId);
+
+                if ($userId !== null) {
+                    $query->orWhere('user_id', $userId);
+                }
+            });
+
+        if ($id > 0) {
+            $byCartItemId = (clone $baseQuery)
+                ->where('id', $id)
+                ->first();
+
+            if ($byCartItemId instanceof CartItem) {
+                return $byCartItemId;
+            }
+        }
+
+        if ($productId !== null && $productId > 0) {
+            $byProductId = (clone $baseQuery)
+                ->where('product_id', $productId)
+                ->first();
+
+            if ($byProductId instanceof CartItem) {
+                return $byProductId;
+            }
+        }
+
+        return (clone $baseQuery)
+            ->where('product_id', $id)
+            ->first();
+    }
+
+    private function removeFromSessionCart(int $productId): void
+    {
+        $cart = session()->get('cart', []);
+
+        if (! is_array($cart)) {
+            return;
+        }
+
+        unset($cart[(string) $productId]);
+        session()->put('cart', $cart);
+    }
+
+    private function resolveSessionId(): string
+    {
+        return (string) session()->getId();
+    }
+
+    private function resolveUserId(): ?int
+    {
+        $userId = auth()->id();
+
+        return is_numeric($userId) ? (int) $userId : null;
     }
 }

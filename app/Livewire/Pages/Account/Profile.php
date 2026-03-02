@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Livewire\Pages\Account;
 
+use App\Models\OrderInvoice;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -15,6 +17,20 @@ final class Profile extends Component
 {
     public function render(): View
     {
-        return view('livewire.pages.account.profile');
+        $userId = auth()->id();
+
+        $recentInvoices = OrderInvoice::query()
+            ->with(['order', 'file'])
+            ->where('is_current', true)
+            ->whereHas('order', static function (Builder $query) use ($userId): void {
+                $query->withoutGlobalScopes()->where('user_id', $userId);
+            })
+            ->latest('generated_at')
+            ->limit(8)
+            ->get();
+
+        return view('livewire.pages.account.profile', [
+            'recentInvoices' => $recentInvoices,
+        ]);
     }
 }

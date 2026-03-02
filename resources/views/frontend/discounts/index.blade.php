@@ -1,4 +1,4 @@
-<x-layouts.base title="{{ __('frontend.discounts.title', 'Active Discounts') }}">
+<x-layouts.base title="{{ __('frontend.discounts.title') }}">
     <div class="max-w-5xl mx-auto px-4 py-10 space-y-6">
         <h1 class="text-3xl font-semibold text-gray-900 dark:text-gray-100">{{ __('frontend.discounts.active_title') }}</h1>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -9,7 +9,7 @@
                     <p class="mt-4 text-sm text-primary-600">{{ __('frontend.discounts.value_amount', ['value' => $discount->value]) }}</p>
                 </article>
             @empty
-                <p class="text-gray-500 dark:text-gray-400">{{ __('frontend.discounts.empty', 'No active discounts') }}</p>
+                <p class="text-gray-500 dark:text-gray-400">{{ __('frontend.discounts.empty') }}</p>
             @endforelse
         </div>
         <div>

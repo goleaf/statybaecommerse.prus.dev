@@ -1,0 +1,32 @@
+{
+  "api_token": "2399cd99-175e-4ec5-8800-75ce7e3651bb",
+  "invoice_type": "sf",
+  "notes": "order_number:LT-69A060EB0A489;order_id:17",
+  "total_chipping": 0,
+  "total_discount": 0,
+  "total_amount": 66.42,
+  "products": [
+    {
+      "description": "4PRO - Cinkuoti sraigtai, gipsas/medis, PH (3.9 x 32-42 mm)",
+      "quantity": 11,
+      "price": 4.99
+    }
+  ],
+  "billing": {
+    "name": "Adena Blair",
+    "isJuridical": false,
+    "address": "V.Pietario 3-11",
+    "city": "Kaunas",
+    "post": "03122"
+  },
+  "delivery": {
+    "name": "Adena Blair",
+    "address": "V.Pietario 3-11",
+    "city": "Kaunas",
+    "post": "03122"
+  },
+  "payer": {
+    "name": "Adena Blair",
+    "email": "noqoqodoqy@mailinator.com"
+  }
+}

@@ -1,29 +1,41 @@
 @props(['order'])
 
-<div class="border border-gray-200 py-4 divide-y divide-gray-200 divide-dashed">
+@php
+    $currency = (string) ($order->currency ?? 'EUR');
+    $subtotal = (float) ($order->subtotal ?? 0);
+    $shippingAmount = (float) ($order->shipping_amount ?? $order->shippingOption?->price ?? 0);
+    $taxAmount = (float) ($order->tax_amount ?? 0);
+    $totalAmount = (float) ($order->total ?? ($subtotal + $shippingAmount + $taxAmount));
+    $paymentMethod = $order->payment_method;
+    $paymentMethodLabel = $paymentMethod instanceof \App\Enums\PaymentMethod
+        ? (string) $paymentMethod->getLabel()
+        : __('frontend.order_summary.not_available');
+@endphp
+
+<div class="divide-y divide-dashed divide-gray-200 border border-gray-200 py-4">
     <dl class="space-y-4 px-4 pb-4">
         <div class="flex items-center justify-between">
             <dt class="text-sm">{{ __('frontend.order_summary.subtotal') }}</dt>
             <dd class="text-sm font-medium text-gray-900">
-                {{ \Illuminate\Support\Number::currency($order->total(), $order->currency_code, app()->getLocale()) }}
+                {{ \Illuminate\Support\Number::currency($subtotal, $currency, app()->getLocale()) }}
             </dd>
         </div>
         <div class="flex items-center justify-between">
             <dt class="text-sm">{{ __('frontend.order_summary.shipping') }}</dt>
             <dd class="text-sm font-medium text-gray-900">
-                {{ \Illuminate\Support\Number::currency($order->shippingOption->price, $order->currency_code, app()->getLocale()) }}
+                {{ \Illuminate\Support\Number::currency($shippingAmount, $currency, app()->getLocale()) }}
             </dd>
         </div>
         <div class="flex items-center justify-between">
             <dt class="text-sm">{{ __('frontend.order_summary.tax') }}</dt>
             <dd class="text-sm font-medium text-gray-900">
-                {{ \Illuminate\Support\Number::currency(0, $order->currency_code, app()->getLocale()) }}
+                {{ \Illuminate\Support\Number::currency($taxAmount, $currency, app()->getLocale()) }}
             </dd>
         </div>
         <div class="flex items-center justify-between border-t border-gray-200 pt-4">
-            <dt class="font-heading font-medium text-primary-950">{{ __('frontend.order_summary.total') }}</dt>
+            <dt class="font-heading font-medium text-gray-900">{{ __('frontend.order_summary.total') }}</dt>
             <dd class="text-base font-bold text-gray-900">
-                {{ \Illuminate\Support\Number::currency($order->total() + $order->shippingOption->price, $order->currency_code, app()->getLocale()) }}
+                {{ \Illuminate\Support\Number::currency($totalAmount, $currency, app()->getLocale()) }}
             </dd>
         </div>
     </dl>
@@ -34,7 +46,7 @@
             <dd class="mt-2 text-gray-500">
                 @if ($sa)
                     <span class="block">{{ $sa['first_name'] ?? '' }} {{ $sa['last_name'] ?? '' }}</span>
-                    <span class="block">{{ $sa['street_address'] ?? ($sa['address_line1'] ?? '') }}</span>
+                    <span class="block">{{ $sa['street_address'] ?? ($sa['address_line1'] ?? ($sa['address'] ?? '')) }}</span>
                     @if (!empty($sa['street_address_plus'] ?? ($sa['address_line2'] ?? null)))
                         <span class="block">{{ $sa['street_address_plus'] ?? $sa['address_line2'] }}</span>
                     @endif
@@ -53,7 +65,7 @@
             <dd class="mt-2 text-gray-500">
                 @if ($ba)
                     <span class="block">{{ $ba['first_name'] ?? '' }} {{ $ba['last_name'] ?? '' }}</span>
-                    <span class="block">{{ $ba['street_address'] ?? ($ba['address_line1'] ?? '') }}</span>
+                    <span class="block">{{ $ba['street_address'] ?? ($ba['address_line1'] ?? ($ba['address'] ?? '')) }}</span>
                     @if (!empty($ba['street_address_plus'] ?? ($ba['address_line2'] ?? null)))
                         <span class="block">{{ $ba['street_address_plus'] ?? $ba['address_line2'] }}</span>
                     @endif
@@ -72,8 +84,9 @@
             {{ __('frontend.order_summary.payment_method') }}
         </dt>
         <dd class="text-sm flex items-center gap-2 text-gray-500">
-            <x-dynamic-component class="size-5" :component="'icons.payments.' . $order->paymentMethod->slug" />
-            <span class="font-medium text-base leading-6">{{ $order->paymentMethod->title }}</span>
+            <span class="font-medium text-base leading-6">
+                {{ $paymentMethodLabel }}
+            </span>
         </dd>
     </dl>
 </div>

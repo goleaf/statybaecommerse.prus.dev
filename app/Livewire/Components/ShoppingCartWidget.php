@@ -73,8 +73,6 @@ final class ShoppingCartWidget extends Component
         $sessionId = Session::getId();
         // Check stock availability
         if ($product->manage_stock && $product->availableQuantity() < $quantity) {
-            $this->dispatch('notify', ['type' => 'error', 'message' => __('translations.insufficient_stock')]);
-
             return;
         }
         $cartItem = CartItem::where('session_id', $sessionId)->where('product_id', $productId)->first();
@@ -82,8 +80,6 @@ final class ShoppingCartWidget extends Component
             $newQuantity = $cartItem->quantity + $quantity;
             // Check stock for updated quantity
             if ($product->manage_stock && $product->availableQuantity() < $newQuantity) {
-                $this->dispatch('notify', ['type' => 'error', 'message' => __('translations.insufficient_stock_for_quantity')]);
-
                 return;
             }
             $cartItem->update(['quantity' => $newQuantity, 'options' => array_merge($cartItem->options ?? [], $options)]);
@@ -93,7 +89,6 @@ final class ShoppingCartWidget extends Component
         $this->calculateCartSummary();
         $this->dispatch('add-to-cart', productId: (int) $productId, quantity: $quantity);
         $this->dispatch('cart-updated');
-        $this->dispatch('notify', ['type' => 'success', 'message' => __('translations.product_added_to_cart')]);
     }
 
     /**
@@ -113,8 +108,6 @@ final class ShoppingCartWidget extends Component
         // Check stock availability
         $product = $cartItem->product;
         if ($product->manage_stock && $product->availableQuantity() < $quantity) {
-            $this->dispatch('notify', ['type' => 'error', 'message' => __('translations.insufficient_stock_for_quantity')]);
-
             return;
         }
         $cartItem->update(['quantity' => $quantity]);
@@ -130,7 +123,6 @@ final class ShoppingCartWidget extends Component
         CartItem::where('id', $cartItemId)->where('session_id', Session::getId())->delete();
         $this->calculateCartSummary();
         $this->dispatch('cart-updated');
-        $this->dispatch('notify', ['type' => 'success', 'message' => __('translations.item_removed_from_cart')]);
     }
 
     /**
@@ -143,7 +135,6 @@ final class ShoppingCartWidget extends Component
         $this->discountCode = '';
         $this->calculateCartSummary();
         $this->dispatch('cart-updated');
-        $this->dispatch('notify', ['type' => 'success', 'message' => __('translations.cart_cleared')]);
     }
 
     /**
@@ -171,7 +162,6 @@ final class ShoppingCartWidget extends Component
         }
         $this->appliedDiscount = $discount;
         $this->calculateCartSummary();
-        $this->dispatch('notify', ['type' => 'success', 'message' => __('translations.discount_applied')]);
     }
 
     /**
@@ -182,7 +172,6 @@ final class ShoppingCartWidget extends Component
         $this->appliedDiscount = null;
         $this->discountCode = '';
         $this->calculateCartSummary();
-        $this->dispatch('notify', ['type' => 'success', 'message' => __('translations.discount_removed')]);
     }
 
     /**
@@ -281,8 +270,6 @@ final class ShoppingCartWidget extends Component
     public function proceedToCheckout(): void
     {
         if ($this->cartItems->isEmpty()) {
-            $this->dispatch('notify', ['type' => 'error', 'message' => __('translations.cart_is_empty')]);
-
             return;
         }
         $this->redirect(route('checkout.index', app()->getLocale()));

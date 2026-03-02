@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Components;
 
+use App\Services\Cart\CartService;
 use App\Services\Pricing\PriceCalculator;
 use DB;
 use Illuminate\Contracts\View\View;
@@ -43,16 +44,7 @@ class CartTotal extends Component
     #[Computed]
     public function cartSubtotal(): float
     {
-        $sessionKey = session()->getId();
-        if (class_exists(\Darryldecode\Cart\Facades\CartFacade::class)) {
-            try {
-                return (float) \Darryldecode\Cart\Facades\CartFacade::session($sessionKey)->getSubTotal();
-            } catch (Throwable $e) {
-                return 0.0;
-            }
-        }
-
-        return 0.0;
+        return (float) ($this->resolveCartSummary()['subtotal'] ?? 0.0);
     }
 
     /**
@@ -96,17 +88,9 @@ class CartTotal extends Component
      */
     protected function compute(): void
     {
-        $sessionKey = session()->getId();
-        $subtotal = 0.0;
-        if (class_exists(\Darryldecode\Cart\Facades\CartFacade::class)) {
-            try {
-                $subtotal = (float) \Darryldecode\Cart\Facades\CartFacade::session($sessionKey)->getSubTotal();
-            } catch (Throwable $e) {
-                $subtotal = 0.0;
-            }
-        }
-        $this->subtotal = $subtotal;
-        $result = $this->calculateDiscountsAndShipping($this->subtotal);
+        $summary = $this->resolveCartSummary();
+        $this->subtotal = (float) ($summary['subtotal'] ?? 0.0);
+        $result = $this->calculateDiscountsAndShipping($summary);
         $this->discount = (float) ($result['discount_total_amount'] ?? 0.0);
         $this->shippingDiscount = (float) data_get($result, 'shipping.discount_amount', 0.0);
         $shippingOption = data_get(session()->get('checkout'), 'shipping_option.0.price');
@@ -119,22 +103,25 @@ class CartTotal extends Component
     /**
      * Handle calculateDiscountsAndShipping functionality with proper error handling.
      */
-    protected function calculateDiscountsAndShipping(float $amount): array
+    protected function calculateDiscountsAndShipping(array $summary): array
     {
+        $amount = (float) ($summary['subtotal'] ?? 0.0);
         $coupon = session('checkout.coupon.code');
         $code = $coupon ? strtoupper(trim((string) $coupon)) : '';
         $engine = app(\App\Services\Discounts\DiscountEngine::class);
-        $items = [];
-        if (class_exists(\Darryldecode\Cart\Facades\CartFacade::class)) {
-            try {
-                foreach (\Darryldecode\Cart\Facades\CartFacade::session(session()->getId())->getContent() as $item) {
-                    $items[] = ['product_id' => optional($item->associatedModel)->id, 'variant_id' => method_exists($item->associatedModel, 'getKey') ? $item->associatedModel->getKey() : null, 'quantity' => (int) $item->quantity, 'unit_price' => (float) $item->price];
-                }
-            } catch (Throwable $e) {
-                // fail-open: no items when cart driver fails
-                $items = [];
-            }
-        }
+        $items = collect((array) ($summary['items'] ?? []))
+            ->map(static function ($item): array {
+                $item = (array) $item;
+
+                return [
+                    'product_id' => isset($item['product_id']) && is_numeric($item['product_id']) ? (int) $item['product_id'] : null,
+                    'variant_id' => isset($item['variant_id']) && is_numeric($item['variant_id']) ? (int) $item['variant_id'] : null,
+                    'quantity'   => isset($item['quantity']) && is_numeric($item['quantity']) ? (int) $item['quantity'] : 0,
+                    'unit_price' => isset($item['price']) && is_numeric($item['price']) ? (float) $item['price'] : 0.0,
+                ];
+            })
+            ->values()
+            ->all();
         $userId = optional(auth()->user())->id;
         $groupIds = [];
         $partnerTier = null;
@@ -155,10 +142,22 @@ class CartTotal extends Component
     }
 
     /**
+     * @return array<string, mixed>
+     */
+    protected function resolveCartSummary(): array
+    {
+        $sessionId = (string) session()->getId();
+        $userId = auth()->id();
+        $resolvedUserId = is_numeric($userId) ? (int) $userId : null;
+
+        return app(CartService::class)->getSummary($resolvedUserId, $sessionId);
+    }
+
+    /**
      * Render the Livewire component view with current state.
      */
     public function render(): View
     {
-        return view('livewire.components.cart-total', ['subtotal' => $this->cartSubtotal, 'discount' => $this->discount, 'total' => $this->finalTotal]);
+        return view('livewire.components.cart-total', ['subtotal' => $this->subtotal, 'discount' => $this->discount, 'total' => $this->finalTotal]);
     }
 }

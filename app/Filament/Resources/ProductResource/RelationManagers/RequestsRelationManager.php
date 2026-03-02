@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Filament\Resources\ProductResource\RelationManagers;
 
 use App\Models\ProductRequest;
+use App\Models\Scopes\StatusScope;
+use App\Models\Scopes\UserOwnedScope;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
@@ -14,6 +16,7 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class RequestsRelationManager extends RelationManager
@@ -70,6 +73,10 @@ class RequestsRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(static fn (Builder $query): Builder => $query->withoutGlobalScopes([
+                UserOwnedScope::class,
+                StatusScope::class,
+            ]))
             ->columns([
                 TextColumn::make('user.name')
                     ->label(__('messages.user'))

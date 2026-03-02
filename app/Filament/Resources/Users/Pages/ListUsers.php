@@ -29,7 +29,6 @@ class ListUsers extends ListRecords
             'referral_codes'       => self::relationTab('referralCodes', __('messages.referral_codes')),
             'referrals'            => self::relationTab('referrals', __('messages.referrals')),
             'referral_rewards'     => self::relationTab('referralRewards', __('messages.referral_rewards')),
-            'documents'            => self::relationTab('documents', __('messages.documents')),
             'coupon_usages'        => self::relationTab('couponUsages', __('messages.coupon_usages')),
             'discount_redemptions' => self::relationTab('discountRedemptions', __('messages.discount_redemptions')),
             'notifications'        => self::relationTab('notifications', __('messages.notifications')),

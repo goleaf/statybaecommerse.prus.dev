@@ -187,7 +187,7 @@ final class InfiniteScrollSearch extends Component
 
         } catch (Exception $e) {
             Log::warning('Infinite scroll search failed: ' . $e->getMessage());
-            $this->addError('search', 'Search failed. Please try again.');
+            $this->addError('search', __('messages.search_failed_please_try_again'));
         } finally {
             $this->isLoading = false;
         }

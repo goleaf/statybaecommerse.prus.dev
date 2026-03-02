@@ -36,12 +36,12 @@ final class NotificationStreamController extends Controller
 
         if ($authenticatedUser === null) {
             // Abort with HTTP 401 when the user is not authenticated.
-            abort(401, 'Unauthorized');
+            abort(401, __('messages.unauthorized'));
         }
 
         // Reject attempts to stream notifications for any user other than the authenticated account.
         if ((string) $authenticatedUser->getAuthIdentifier() !== (string) $user->getAuthIdentifier()) {
-            abort(403, 'Forbidden');
+            abort(403, __('messages.forbidden'));
         }
 
         // Establish configuration values that control the stream timing behaviour.

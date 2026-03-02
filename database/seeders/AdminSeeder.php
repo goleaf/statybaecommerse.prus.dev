@@ -12,7 +12,6 @@ use App\Models\Country;
 use App\Models\Currency;
 use App\Models\CustomerGroup;
 use App\Models\DiscountCode;
-use App\Models\Document;
 use App\Models\Inventory;
 use App\Models\Location;
 use App\Models\Order;
@@ -88,9 +87,6 @@ final class AdminSeeder extends BaseSeeder
 
                 // Create order shipping
                 $this->createOrderShipping($orders);
-
-                // Create documents
-                // $this->createDocuments($orders); // Temporarily disabled - requires document_template_id
 
                 // Create discount codes
                 // $this->createDiscountCodes(); // Temporarily disabled - table doesn't exist
@@ -684,33 +680,6 @@ final class AdminSeeder extends BaseSeeder
                     'tracking_number' => 'TRK' . str_pad((string) ($order->id + 1000), 6, '0', STR_PAD_LEFT),
                     'base_cost'       => 12.00,
                     'total_cost'      => 15.00,
-                ]
-            );
-        }
-    }
-
-    /**
-     * @param array<int, Order> $orders
-     */
-    /** @phpstan-ignore-next-line */
-    private function createDocuments(array $orders): void
-    {
-        $this->logInfo('📄 Creating documents...');
-
-        foreach ($orders as $order) {
-            /** @var Order $order */
-            Document::updateOrCreate(
-                [
-                    'documentable_type' => Order::class,
-                    'documentable_id'   => $order->id,
-                ],
-                [
-                    'documentable_type' => Order::class,
-                    'documentable_id'   => $order->id,
-                    'title'             => 'Invoice for Order ' . $order->number,
-                    'content'           => 'Sample document content',
-                    'status'            => ['draft', 'approved', 'rejected'][rand(0, 2)],
-                    'format'            => 'pdf',
                 ]
             );
         }

@@ -47,13 +47,13 @@ final class LegalTranslationController extends Controller
         // Normalize the requested translation locale to ensure consistent lookups in the database layer.
         $targetLocale = strtolower(trim($lang));
         if ($targetLocale === '') {
-            abort(404, 'Translation locale is required.');
+            abort(404, __('messages.translation_locale_is_required'));
         }
 
         // Build a whitelist of supported locales from configuration to avoid storing arbitrary locales from user input.
         $supportedLocales = $this->normalizeSupportedLocales(Config::get('app.supported_locales', ['lt', 'en']));
         if (! in_array($targetLocale, $supportedLocales, true)) {
-            abort(404, 'Unsupported translation locale.');
+            abort(404, __('messages.unsupported_translation_locale'));
         }
 
         // Load the underlying legal document even when global scopes would normally hide it from admin queries.

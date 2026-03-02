@@ -189,7 +189,7 @@ final class ApiController extends Controller
         $productId = (int) $request->integer('product_id');
 
         if ($productId <= 0 || ! Product::query()->whereKey($productId)->exists()) {
-            return response()->json(['error' => 'Product not found'], 404);
+            return response()->json(['error' => __('messages.product_not_found')], 404);
         }
 
         $recentlyViewed = array_values(array_filter(

@@ -5,8 +5,6 @@ declare(strict_types=1);
 use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
-use App\Models\Document;
-use App\Models\DocumentTemplate;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\OrderShipping;
@@ -71,29 +69,6 @@ it('feature: creates order shipping using factory relationships', function () {
     expect($shipping->order)->not->toBeNull();
     expect($shipping->carrier)->toBeIn(['DPD', 'Omniva', 'LP Express', 'UPS', 'FedEx', 'DHL']);
     expect($shipping->service)->toBeIn(['Standard', 'Express', 'Next Day', 'Economy', 'Premium']);
-});
-
-it('feature: creates documents using factory relationships when templates exist', function () {
-    User::factory(5)->create();
-    Product::factory(3)->create();
-    // Create document templates
-    DocumentTemplate::factory()->create(['type' => 'invoice']);
-    DocumentTemplate::factory()->create(['type' => 'receipt']);
-
-    $seeder = new ComprehensiveOrderSeeder;
-    $seeder->run();
-
-    // Verify documents were created for appropriate orders
-    $documentsCount = Document::count();
-    expect($documentsCount)->toBeGreaterThanOrEqual(0);
-
-    if ($documentsCount > 0) {
-        $document = Document::with(['order', 'documentTemplate'])->first();
-        expect($document->order)->not->toBeNull();
-        expect($document->documentTemplate)->not->toBeNull();
-        expect($document->type)->toBeIn(['invoice', 'receipt']);
-        expect($document->status)->toBe('published');
-    }
 });
 
 it('feature: ensures required data is created when missing', function () {

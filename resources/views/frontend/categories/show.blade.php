@@ -9,7 +9,7 @@
             <div class="space-y-4">
                 <nav class="text-sm text-gray-500" aria-label="{{ __('frontend.navigation.breadcrumbs') }}">
                     <ol class="flex flex-wrap items-center gap-2">
-                        <li><a href="{{ route('home') }}" class="text-blue-600 hover:text-blue-700">{{ __('frontend.home', 'Home') }}</a></li>
+                        <li><a href="{{ route('home') }}" class="text-blue-600 hover:text-blue-700">{{ __('nav.home') }}</a></li>
                         <li>/</li>
                         <li><a href="{{ route('frontend.categories.index') }}" class="text-blue-600 hover:text-blue-700">{{ __('messages.categories') }}</a></li>
                         <li>/</li>
@@ -65,8 +65,31 @@
                     </form>
 
                     <form method="get" class="flex items-center gap-3 text-sm">
-                        @foreach (request()->except('sort') as $key => $value)
-                            <input type="hidden" name="{{ $key }}" value="{{ $value }}" />
+                        @php
+                            $flattenQueryParams = function (array $params, string $prefix = '') use (&$flattenQueryParams): array {
+                                $flattened = [];
+
+                                foreach ($params as $queryKey => $queryValue) {
+                                    $inputName = $prefix === '' ? (string) $queryKey : "{$prefix}[{$queryKey}]";
+
+                                    if (is_array($queryValue)) {
+                                        $flattened = array_merge($flattened, $flattenQueryParams($queryValue, $inputName));
+                                        continue;
+                                    }
+
+                                    $flattened[] = [
+                                        'name' => $inputName,
+                                        'value' => is_scalar($queryValue) ? (string) $queryValue : '',
+                                    ];
+                                }
+
+                                return $flattened;
+                            };
+
+                            $sortPreservedInputs = $flattenQueryParams(request()->except('sort'));
+                        @endphp
+                        @foreach ($sortPreservedInputs as $input)
+                            <input type="hidden" name="{{ $input['name'] }}" value="{{ $input['value'] }}" />
                         @endforeach
                         <label for="sort" class="text-gray-500">{{ __('messages.sort_by') }}</label>
                         <select id="sort" name="sort" class="rounded-full border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 focus:border-indigo-500 focus:outline-none">

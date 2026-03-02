@@ -3,6 +3,9 @@
     'currency_code',
 ])
 
+@php($currency = (string) ($currency_code ?? 'EUR'))
+@php($unitPrice = (float) ($item->unit_price_amount ?? $item->unit_price ?? $item->price ?? 0))
+
 <div class="flex py-6 sm:py-8">
     <div class="min-w-0 flex-1">
         <div class="lg:flex-1">
@@ -10,10 +13,10 @@
                 <h4 class="font-medium font-heading text-gray-950">{{ $item->name }}</h4>
                 <div class="mt-1 gap-2 text-sm sm:flex sm:items-center">
                     <p class="font-medium text-gray-700">
-                        {{ \Illuminate\Support\Number::currency($item->total, $currency_code, app()->getLocale()) }}
+                        {{ \Illuminate\Support\Number::currency((float) ($item->total ?? 0), $currency, app()->getLocale()) }}
                     </p>
                     <p class="text-gray-500">
-                        ({{ $item->quantity }}x {{ \Illuminate\Support\Number::currency($item->unit_price_amount, $currency_code, app()->getLocale()) }})
+                        ({{ $item->quantity }}x {{ \Illuminate\Support\Number::currency($unitPrice, $currency, app()->getLocale()) }})
                     </p>
                 </div>
             </div>

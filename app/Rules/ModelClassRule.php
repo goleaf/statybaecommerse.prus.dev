@@ -17,7 +17,7 @@ final class ModelClassRule implements ValidationRule
         }
 
         if (! class_exists($value) || ! is_subclass_of($value, Model::class)) {
-            $fail('The :attribute must be a valid Eloquent model class.');
+            $fail(__('messages.validation_attribute_must_be_valid_eloquent_model_class', ['attribute' => $attribute]));
         }
     }
 }

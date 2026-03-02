@@ -1,0 +1,11 @@
+HTTP/1.1 200 OK
+Cache-Control: public, max-age=0, must-revalidate
+Content-Disposition: inline; filename="EGIS-ESHOP-0003.pdf"
+Content-Length: 23460
+Content-Type: application/pdf
+Date: Fri, 27 Feb 2026 13:16:27 GMT
+Server: Vercel
+Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+X-Vercel-Cache: MISS
+X-Vercel-Id: arn1::arn1::2gw6z-1772198186224-07c622f7873c
+

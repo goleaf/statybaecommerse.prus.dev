@@ -103,12 +103,6 @@
                         {{ __('messages.detail') }}
                         <span class="sr-only">{{ $order->number }}</span>
                     </x-buttons.default>
-                    <x-buttons.default class="flex w-full px-4 py-2 text-sm md:w-auto">
-                        {{ __('messages.view_invoice') }}
-                        <span class="sr-only">
-                            {{ __('ui.for_the_order_number', ['number' => $order->number]) }}
-                        </span>
-                    </x-buttons.default>
                 </div>
             </div>
         </div>

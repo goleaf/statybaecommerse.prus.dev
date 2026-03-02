@@ -37,7 +37,7 @@ final class CollectionTranslationController extends Controller
         // Normalize the requested translation locale to avoid duplicate rows caused by casing/spacing differences.
         $targetLocale = strtolower(trim($lang));
         if ($targetLocale === '') {
-            abort(404, 'Translation locale is required.');
+            abort(404, __('messages.translation_locale_is_required'));
         }
 
         // Resolve the list of supported locales from configuration, falling back to a sensible default when missing.
@@ -55,7 +55,7 @@ final class CollectionTranslationController extends Controller
 
         // Abort early when an unsupported locale is requested to avoid writing inconsistent data into the database.
         if (! in_array($targetLocale, $normalizedSupportedLocales, true)) {
-            abort(404, 'Unsupported translation locale.');
+            abort(404, __('messages.unsupported_translation_locale'));
         }
 
         // Ensure that the parent collection exists even if global scopes would normally hide it from the query results.

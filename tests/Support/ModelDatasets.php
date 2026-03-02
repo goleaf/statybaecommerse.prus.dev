@@ -43,7 +43,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 /**
@@ -111,7 +110,6 @@ dataset('model_relation_matrix', function (): array {
         [DiscountCode::class, 'orders', BelongsToMany::class],
         [DiscountCode::class, 'users', BelongsToMany::class],
         [DiscountCode::class, 'customerGroup', BelongsTo::class],
-        [DiscountCode::class, 'documents', MorphMany::class],
 
         [DiscountCondition::class, 'discount', BelongsTo::class],
         [DiscountCondition::class, 'translations', HasMany::class],

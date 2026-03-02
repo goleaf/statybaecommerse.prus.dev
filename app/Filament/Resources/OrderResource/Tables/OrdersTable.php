@@ -49,6 +49,11 @@ class OrdersTable
                     ->formatStateUsing(static fn ($state): string => PaymentStatus::tryFrom(self::normalizeEnumValue($state))?->getLabel() ?? Str::headline(self::normalizeEnumValue($state)))
                     ->badge()
                     ->searchable(),
+                TextColumn::make('currentInvoice.status')
+                    ->label('Invoice')
+                    ->formatStateUsing(static fn ($state): string => $state !== null ? Str::headline((string) $state) : '-')
+                    ->badge()
+                    ->toggleable(),
                 TextColumn::make('created_at')
                     ->label(__('messages.created_at'))
                     ->dateTime()
@@ -70,6 +75,7 @@ class OrdersTable
             ])
             ->filters([
             ])
+            ->defaultSort('created_at', 'desc')
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
@@ -98,31 +104,6 @@ class OrdersTable
                             \Filament\Notifications\Notification::make()->title('Order dispatched to Venipak successfully!')->success()->send();
                         } catch (Exception $e) {
                             \Filament\Notifications\Notification::make()->title('Failed to dispatch to Venipak')->body($e->getMessage())->danger()->send();
-                        }
-                    }),
-                \Filament\Tables\Actions\Action::make('printVenipakLabel')
-                    ->label('Print Venipak Label')
-                    ->icon('heroicon-o-printer')
-                    ->color('success')
-                    ->visible(fn (\App\Models\Order $record) => isset($record->shipping?->metadata['venipak_tracking']))
-                    ->action(function (\App\Models\Order $record) {
-                        try {
-                            $service = app(\App\Services\VenipakService::class);
-                            $trackingNumbers = $record->shipping->metadata['venipak_tracking'] ?? [];
-
-                            if (empty($trackingNumbers)) {
-                                throw new Exception('No tracking numbers found for this order.');
-                            }
-
-                            $pdfContent = $service->getLabels($trackingNumbers);
-
-                            // Return PDF stream download
-                            return response()->streamDownload(function () use ($pdfContent) {
-                                echo $pdfContent;
-                            }, "venipak-label-{$record->number}.pdf", ['Content-Type' => 'application/pdf']);
-
-                        } catch (Exception $e) {
-                            \Filament\Notifications\Notification::make()->title('Failed to generate Venipak label')->body($e->getMessage())->danger()->send();
                         }
                     }),
             ])

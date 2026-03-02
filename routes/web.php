@@ -193,7 +193,6 @@ Route::middleware(['web'])->group(function () {
         Route::post('/apply', [App\Http\Controllers\Frontend\DiscountCodeController::class, 'apply'])->name('apply');
         Route::post('/remove', [App\Http\Controllers\Frontend\DiscountCodeController::class, 'remove'])->name('remove');
         Route::get('/available', [App\Http\Controllers\Frontend\DiscountCodeController::class, 'available'])->name('available');
-        Route::post('/{discountCode}/generate-document', [App\Http\Controllers\Frontend\DiscountCodeController::class, 'generateDocument'])->name('generate-document');
     });
 
     // Referral Routes

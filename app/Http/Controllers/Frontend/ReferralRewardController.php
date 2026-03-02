@@ -58,7 +58,7 @@ final class ReferralRewardController extends Controller
     {
         $user = Auth::user();
         if (! $user) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['error' => __('messages.unauthorized')], 401);
         }
         $rewards = $this->paginateRewards($request, ReferralReward::forUser($user->id));
 
@@ -72,7 +72,7 @@ final class ReferralRewardController extends Controller
     {
         $user = Auth::user();
         if (! $user) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['error' => __('messages.unauthorized')], 401);
         }
         // Reuse the shared statistics method for API consumers.
         $stats = $this->buildStatsForUser($user->id);
@@ -87,7 +87,7 @@ final class ReferralRewardController extends Controller
     {
         $user = Auth::user();
         if (! $user) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['error' => __('messages.unauthorized')], 401);
         }
         $rewards = $this->paginateRewards($request, ReferralReward::forUser($user->id)->pending());
 
@@ -101,7 +101,7 @@ final class ReferralRewardController extends Controller
     {
         $user = Auth::user();
         if (! $user) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['error' => __('messages.unauthorized')], 401);
         }
         $rewards = $this->paginateRewards($request, ReferralReward::forUser($user->id)->applied(), 'applied_at');
 
@@ -115,7 +115,7 @@ final class ReferralRewardController extends Controller
     {
         $user = Auth::user();
         if (! $user) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['error' => __('messages.unauthorized')], 401);
         }
         $query = ReferralReward::forUser($user->id);
         if ($type === 'referrer_bonus') {
@@ -123,7 +123,7 @@ final class ReferralRewardController extends Controller
         } elseif ($type === 'referred_discount') {
             $query->referredDiscount();
         } else {
-            return response()->json(['error' => 'Invalid type'], 400);
+            return response()->json(['error' => __('messages.invalid_type')], 400);
         }
         $rewards = $this->paginateRewards($request, $query);
 
@@ -137,7 +137,7 @@ final class ReferralRewardController extends Controller
     {
         $user = Auth::user();
         if (! $user) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['error' => __('messages.unauthorized')], 401);
         }
         $request->validate(['start_date' => 'required|date', 'end_date' => 'required|date|after_or_equal:start_date']);
         $rewards = $this->paginateRewards($request, ReferralReward::forUser($user->id)->byDateRange($request->start_date, $request->end_date));

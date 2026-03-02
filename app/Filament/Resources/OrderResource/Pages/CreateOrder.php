@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\OrderResource\Pages;
 
-use App\Contracts\DocumentServiceContract;
 use App\Filament\Resources\OrderResource;
-use App\Models\DocumentTemplate;
 use App\Models\Order;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
@@ -57,7 +55,6 @@ class CreateOrder extends CreateRecord
         }
 
         $this->attachServices($record);
-        $this->generateDocuments($record);
     }
 
     private function attachServices(Order $order): void
@@ -82,34 +79,5 @@ class CreateOrder extends CreateRecord
         }
 
         $order->services()->syncWithoutDetaching($payload);
-    }
-
-    private function generateDocuments(Order $order): void
-    {
-        $templates = DocumentTemplate::query()
-            ->active()
-            ->orderedByName()
-            ->get();
-
-        if ($templates->isEmpty()) {
-            return;
-        }
-
-        $documentService = app(DocumentServiceContract::class);
-
-        $variables = array_merge(
-            $documentService->extractVariablesFromModel($order),
-            $order->getDocumentVariables()
-        );
-
-        foreach ($templates as $template) {
-            $document = $documentService->generateDocument(
-                template: $template,
-                relatedModel: $order,
-                variables: $variables
-            );
-
-            $documentService->generatePdf($document);
-        }
     }
 }

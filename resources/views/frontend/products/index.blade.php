@@ -105,8 +105,31 @@
                                 <span>{{ __('ui.updated_in_real_time_with_the_latest_product_data') }}</span>
                             </div>
                             <form method="get" class="flex items-center gap-3">
-                                @foreach (request()->except('sort') as $key => $value)
-                                    <input type="hidden" name="{{ $key }}" value="{{ $value }}" />
+                                @php
+                                    $flattenQueryParams = function (array $params, string $prefix = '') use (&$flattenQueryParams): array {
+                                        $flattened = [];
+
+                                        foreach ($params as $queryKey => $queryValue) {
+                                            $inputName = $prefix === '' ? (string) $queryKey : "{$prefix}[{$queryKey}]";
+
+                                            if (is_array($queryValue)) {
+                                                $flattened = array_merge($flattened, $flattenQueryParams($queryValue, $inputName));
+                                                continue;
+                                            }
+
+                                            $flattened[] = [
+                                                'name' => $inputName,
+                                                'value' => is_scalar($queryValue) ? (string) $queryValue : '',
+                                            ];
+                                        }
+
+                                        return $flattened;
+                                    };
+
+                                    $sortPreservedInputs = $flattenQueryParams(request()->except('sort'));
+                                @endphp
+                                @foreach ($sortPreservedInputs as $input)
+                                    <input type="hidden" name="{{ $input['name'] }}" value="{{ $input['value'] }}" />
                                 @endforeach
                                 <label for="sort" class="text-sm font-medium text-white/80">{{ __('messages.sort_by') }}</label>
                                 <select id="sort" name="sort" class="rounded-full border border-white/30 bg-white/10 px-4 py-2 text-sm font-semibold text-white shadow-inner focus:border-white focus:outline-none">

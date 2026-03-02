@@ -1,0 +1,42 @@
+{
+    "api_token": "0b752520-f42f-4283-a4fd-39c0b4f00198",
+    "invoice_type": "sf",
+    //   "style": "modern-blue",
+    "notes": "Please handle the package with care. Fragile items inside.",
+    "total_chipping": 15.50,
+    "total_discount": 5.00,
+    "total_amount": 110.50,
+    "products": [{
+            "description": "Wireless Mechanical Keyboard",
+            "quantity": 1,
+            "price": 85.00
+        },
+        {
+            "description": "USB-C Braided Cable",
+            "quantity": 2,
+            "price": 15.00
+        }
+    ],
+    "billing": {
+        "name": "Tech Solutions UAB",
+        "isJuridical": true,
+        "company_code": "300123456",
+        "vat_code": "LT100001234512",
+        "address": "Gedimino pr. 1",
+        "city": "Vilnius",
+        "post": "01103",
+        "isVatPayer": true
+    },
+    "delivery": {
+        "name": "Mantas T",
+        "address": "Ozo g. 25",
+        "city": "Vilnius",
+        "post": "07150"
+    },
+    "payer": {
+        "name": "Mantas T",
+        "email": "mantas.tamasauskas@7yes.lt",
+        "phone": "+37060000000"
+        // "website": "",
+    }
+}

@@ -168,7 +168,14 @@
 
     <!-- Notification Handler -->
     <script>
-        const ensureCartUpdater = () => {
+        (() => {
+            if (window.__baseCartScriptInitialized) {
+                return;
+            }
+
+            window.__baseCartScriptInitialized = true;
+
+            const ensureCartUpdater = () => {
             if (typeof window.updateCartCount === 'function') {
                 return window.updateCartCount;
             }
@@ -209,35 +216,35 @@
             window.updateCartCount = updateCartCount;
 
             return updateCartCount;
-        };
-
-        const cartCountUpdater = ensureCartUpdater();
-
-        document.addEventListener('livewire:init', () => {
-            Livewire.on('notify', (event) => {
-                const notification = event[0] || event;
-                showNotification(notification.type, notification.message, notification.title);
-            });
-
-            Livewire.on('cart-updated', () => {
-                cartCountUpdater();
-            });
-        });
-
-        function showNotification(type, message, title = '') {
-            const container = document.getElementById('notifications');
-            const notification = document.createElement('div');
-
-            const colors = {
-                success: 'bg-green-50 border-green-200 text-green-800',
-                error: 'bg-red-50 border-red-200 text-red-800',
-                warning: 'bg-yellow-50 border-yellow-200 text-yellow-800',
-                info: 'bg-blue-50 border-blue-200 text-blue-800'
             };
 
-            notification.className =
-                `max-w-sm w-full ${colors[type]} border rounded-lg shadow-lg p-4 transform transition-all duration-300 translate-x-full`;
-            notification.innerHTML = `
+            const cartCountUpdater = ensureCartUpdater();
+
+            document.addEventListener('livewire:init', () => {
+                Livewire.on('notify', (event) => {
+                    const notification = event[0] || event;
+                    window.showNotification(notification.type, notification.message, notification.title);
+                });
+
+                Livewire.on('cart-updated', () => {
+                    cartCountUpdater();
+                });
+            });
+
+            window.showNotification = function (type, message, title = '') {
+                const container = document.getElementById('notifications');
+                const notification = document.createElement('div');
+
+                const colors = {
+                    success: 'bg-green-50 border-green-200 text-green-800',
+                    error: 'bg-red-50 border-red-200 text-red-800',
+                    warning: 'bg-yellow-50 border-yellow-200 text-yellow-800',
+                    info: 'bg-blue-50 border-blue-200 text-blue-800'
+                };
+
+                notification.className =
+                    `max-w-sm w-full ${colors[type]} border rounded-lg shadow-lg p-4 transform transition-all duration-300 translate-x-full`;
+                notification.innerHTML = `
                 <div class="flex">
                     <div class="flex-1">
                         ${title ? `<div class="font-medium">${title}</div>` : ''}
@@ -251,36 +258,37 @@
                 </div>
             `;
 
-            container.appendChild(notification);
+                container.appendChild(notification);
 
-            // Animate in
-            setTimeout(() => {
-                notification.classList.remove('translate-x-full');
-            }, 100);
-
-            // Auto remove after 5 seconds
-            setTimeout(() => {
-                notification.classList.add('translate-x-full');
+                // Animate in
                 setTimeout(() => {
-                    if (notification.parentElement) {
-                        notification.remove();
-                    }
-                }, 300);
-            }, 5000);
-        }
+                    notification.classList.remove('translate-x-full');
+                }, 100);
 
-        // Hydrate the cart snapshot in sessionStorage so client listeners can read trusted data.
-        try {
-            const serverCartState = @json(array_values(session('cart', [])));
-            if (Array.isArray(serverCartState)) {
-                window.sessionStorage.setItem('cart', JSON.stringify(serverCartState));
+                // Auto remove after 5 seconds
+                setTimeout(() => {
+                    notification.classList.add('translate-x-full');
+                    setTimeout(() => {
+                        if (notification.parentElement) {
+                            notification.remove();
+                        }
+                    }, 300);
+                }, 5000);
+            };
+
+            // Hydrate the cart snapshot in sessionStorage so client listeners can read trusted data.
+            try {
+                const serverCartState = @json(array_values(session('cart', [])));
+                if (Array.isArray(serverCartState)) {
+                    window.sessionStorage.setItem('cart', JSON.stringify(serverCartState));
+                }
+            } catch (error) {
+                // Ignore storage errors (e.g. Safari private mode) to avoid breaking rendering.
             }
-        } catch (error) {
-            // Ignore storage errors (e.g. Safari private mode) to avoid breaking rendering.
-        }
 
-        // Initialize cart count on page load
-        document.addEventListener('DOMContentLoaded', cartCountUpdater);
+            // Initialize cart count on page load
+            document.addEventListener('DOMContentLoaded', cartCountUpdater);
+        })();
     </script>
 
     <!-- Additional scripts -->

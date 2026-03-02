@@ -6,10 +6,7 @@ namespace Database\Seeders;
 
 use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
-use App\Enums\PaymentStatus;
 use App\Models\Country;
-use App\Models\Document;
-use App\Models\DocumentTemplate;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\OrderShipping;
@@ -86,8 +83,6 @@ final class ComprehensiveOrderSeeder extends BaseSeeder
         Order::truncate();
         OrderItem::truncate();
         OrderShipping::truncate();
-        // Only delete documents related to orders to avoid wiping other documents
-        Document::where('documentable_type', Order::class)->delete();
 
         Schema::enableForeignKeyConstraints();
     }
@@ -133,11 +128,6 @@ final class ComprehensiveOrderSeeder extends BaseSeeder
         // Countries
         $this->ensureCountries();
 
-        // Document Templates
-        if (DocumentTemplate::count() === 0) {
-            $this->writeMessage('Creating document templates...');
-            $this->call(DocumentTemplateSeeder::class);
-        }
     }
 
     private function ensureServices(): void
@@ -197,8 +187,6 @@ final class ComprehensiveOrderSeeder extends BaseSeeder
 
         $products = Product::all();
         $countries = Country::query()->get();
-        $invoiceTemplate = DocumentTemplate::where('type', 'invoice')->first();
-        $receiptTemplate = DocumentTemplate::where('type', 'receipt')->first();
 
         // Reset sequence since we truncated
         $this->nextOrderSequence = 1;
@@ -208,12 +196,12 @@ final class ComprehensiveOrderSeeder extends BaseSeeder
             $orderCount = rand(3, 5);
 
             for ($i = 0; $i < $orderCount; $i++) {
-                $this->createOrderForClient($client, $products, $countries, $invoiceTemplate, $receiptTemplate);
+                $this->createOrderForClient($client, $products, $countries);
             }
         }
     }
 
-    private function createOrderForClient(User $client, $products, $countries, $invoiceTemplate, $receiptTemplate): void
+    private function createOrderForClient(User $client, $products, $countries): void
     {
         $country = $countries->random();
         $orderDate = Carbon::now()->subDays(rand(0, 90)); // Orders from last 3 months
@@ -258,9 +246,6 @@ final class ComprehensiveOrderSeeder extends BaseSeeder
                     'service' => fake()->randomElement($this->shippingServices),
                 ])
                 ->create();
-
-            // Generate Documents
-            $this->generateOrderDocuments($order, $invoiceTemplate, $receiptTemplate);
 
         } catch (Exception $e) {
             Log::warning('Order creation failed: ' . $e->getMessage());
@@ -319,65 +304,6 @@ final class ComprehensiveOrderSeeder extends BaseSeeder
             'phone'          => '+370' . fake()->numberBetween(60000000, 69999999),
             'email'          => $user->email,
         ];
-    }
-
-    private function generateOrderDocuments(Order $order, ?DocumentTemplate $invoiceTemplate, ?DocumentTemplate $receiptTemplate): void
-    {
-        if (! $invoiceTemplate || ! $receiptTemplate) {
-            return;
-        }
-
-        // Invoice (if not cancelled)
-        if ($order->status !== OrderStatus::CANCELLED) {
-            $this->createDocument($order, $invoiceTemplate, 'invoice', 'Sąskaita faktūra');
-        }
-
-        // Receipt (if paid)
-        if ($order->payment_status === PaymentStatus::PAID) {
-            $this->createDocument($order, $receiptTemplate, 'receipt', 'Kvitas');
-        }
-    }
-
-    private function createDocument(Order $order, DocumentTemplate $template, string $type, string $titlePrefix): void
-    {
-        try {
-            $variables = $this->extractOrderVariables($order, $type);
-
-            Document::factory()
-                ->for($template, 'documentTemplate')
-                ->state([
-                    'title'             => "{$titlePrefix} #{$order->number}",
-                    'content'           => $this->processTemplate($template->content, $variables),
-                    'variables'         => $variables,
-                    'status'            => 'published',
-                    'format'            => 'pdf',
-                    'file_path'         => "documents/{$type}s/{$type}-{$order->number}.pdf",
-                    'documentable_type' => Order::class,
-                    'documentable_id'   => $order->id,
-                    'created_by'        => 1,
-                    'generated_at'      => $order->created_at->addMinutes(rand(5, 60)),
-                ])
-                ->create();
-        } catch (Exception $e) {
-            Log::warning('Document generation failed: ' . $e->getMessage());
-        }
-    }
-
-    private function extractOrderVariables(Order $order, string $documentType): array
-    {
-        // Simplify for brevity, keeping essential fields
-        return [
-            '$ORDER_NUMBER'  => $order->number,
-            '$ORDER_DATE'    => $order->created_at->format('Y-m-d'),
-            '$ORDER_TOTAL'   => number_format((float) $order->total, 2) . ' €',
-            '$CUSTOMER_NAME' => $order->user->name ?? 'Klientas',
-            '$CURRENT_DATE'  => now()->format('Y-m-d'),
-        ];
-    }
-
-    private function processTemplate(string $content, array $variables): string
-    {
-        return str_replace(array_keys($variables), array_values($variables), $content);
     }
 
     private function writeMessage(string $message): void

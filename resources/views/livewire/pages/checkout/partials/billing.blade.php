@@ -17,7 +17,7 @@
                     type="text"
                     wire:model.debounce.500ms="billing.first_name"
                     autocomplete="given-name"
-                    class="mt-1 block w-full rounded-lg border-gray-300 bg-white text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                    class="mt-1 block h-11 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-900 shadow-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
                 >
                 @error('billing.first_name')
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -33,7 +33,7 @@
                     type="text"
                     wire:model.debounce.500ms="billing.last_name"
                     autocomplete="family-name"
-                    class="mt-1 block w-full rounded-lg border-gray-300 bg-white text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                    class="mt-1 block h-11 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-900 shadow-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
                 >
                 @error('billing.last_name')
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -49,7 +49,7 @@
                     type="email"
                     wire:model.debounce.500ms="billing.email"
                     autocomplete="email"
-                    class="mt-1 block w-full rounded-lg border-gray-300 bg-white text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                    class="mt-1 block h-11 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-900 shadow-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
                 >
                 @error('billing.email')
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -65,7 +65,7 @@
                     type="tel"
                     wire:model.debounce.500ms="billing.phone"
                     autocomplete="tel"
-                    class="mt-1 block w-full rounded-lg border-gray-300 bg-white text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                    class="mt-1 block h-11 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-900 shadow-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
                 >
                 @error('billing.phone')
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -81,7 +81,7 @@
                     type="text"
                     wire:model.debounce.500ms="billing.company"
                     autocomplete="organization"
-                    class="mt-1 block w-full rounded-lg border-gray-300 bg-white text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                    class="mt-1 block h-11 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-900 shadow-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
                 >
                 @error('billing.company')
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -97,7 +97,7 @@
                     type="text"
                     wire:model.debounce.500ms="billing.address"
                     autocomplete="address-line1"
-                    class="mt-1 block w-full rounded-lg border-gray-300 bg-white text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                    class="mt-1 block h-11 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-900 shadow-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
                 >
                 @error('billing.address')
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -113,7 +113,7 @@
                     type="text"
                     wire:model.debounce.500ms="billing.city"
                     autocomplete="address-level2"
-                    class="mt-1 block w-full rounded-lg border-gray-300 bg-white text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                    class="mt-1 block h-11 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-900 shadow-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
                 >
                 @error('billing.city')
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -129,7 +129,7 @@
                     type="text"
                     wire:model.debounce.500ms="billing.region"
                     autocomplete="address-level1"
-                    class="mt-1 block w-full rounded-lg border-gray-300 bg-white text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                    class="mt-1 block h-11 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-900 shadow-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
                 >
                 @error('billing.region')
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -145,7 +145,7 @@
                     type="text"
                     wire:model.debounce.500ms="billing.postal_code"
                     autocomplete="postal-code"
-                    class="mt-1 block w-full rounded-lg border-gray-300 bg-white text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                    class="mt-1 block h-11 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-900 shadow-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
                 >
                 @error('billing.postal_code')
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -160,7 +160,7 @@
                     id="billing_country"
                     wire:model.debounce.500ms="billing.country"
                     autocomplete="country"
-                    class="mt-1 block w-full rounded-lg border-gray-300 bg-white text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                    class="mt-1 block h-11 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-900 shadow-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
                 >
                     @foreach ($countries as $country)
                         <option value="{{ $country['code'] }}">{{ $country['name'] }}</option>
@@ -203,7 +203,7 @@
                             type="text"
                             wire:model.debounce.500ms="shipping.first_name"
                             autocomplete="shipping given-name"
-                            class="mt-1 block w-full rounded-lg border-gray-300 bg-white text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                            class="mt-1 block h-11 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-900 shadow-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
                         >
                         @error('shipping.first_name')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -219,7 +219,7 @@
                             type="text"
                             wire:model.debounce.500ms="shipping.last_name"
                             autocomplete="shipping family-name"
-                            class="mt-1 block w-full rounded-lg border-gray-300 bg-white text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                            class="mt-1 block h-11 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-900 shadow-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
                         >
                         @error('shipping.last_name')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -235,7 +235,7 @@
                             type="text"
                             wire:model.debounce.500ms="shipping.company"
                             autocomplete="shipping organization"
-                            class="mt-1 block w-full rounded-lg border-gray-300 bg-white text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                            class="mt-1 block h-11 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-900 shadow-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
                         >
                         @error('shipping.company')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -251,7 +251,7 @@
                             type="text"
                             wire:model.debounce.500ms="shipping.address"
                             autocomplete="shipping address-line1"
-                            class="mt-1 block w-full rounded-lg border-gray-300 bg-white text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                            class="mt-1 block h-11 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-900 shadow-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
                         >
                         @error('shipping.address')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -267,7 +267,7 @@
                             type="text"
                             wire:model.debounce.500ms="shipping.city"
                             autocomplete="shipping address-level2"
-                            class="mt-1 block w-full rounded-lg border-gray-300 bg-white text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                            class="mt-1 block h-11 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-900 shadow-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
                         >
                         @error('shipping.city')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -283,7 +283,7 @@
                             type="text"
                             wire:model.debounce.500ms="shipping.region"
                             autocomplete="shipping address-level1"
-                            class="mt-1 block w-full rounded-lg border-gray-300 bg-white text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                            class="mt-1 block h-11 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-900 shadow-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
                         >
                         @error('shipping.region')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -299,7 +299,7 @@
                             type="text"
                             wire:model.debounce.500ms="shipping.postal_code"
                             autocomplete="shipping postal-code"
-                            class="mt-1 block w-full rounded-lg border-gray-300 bg-white text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                            class="mt-1 block h-11 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-900 shadow-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
                         >
                         @error('shipping.postal_code')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -314,7 +314,7 @@
                             id="shipping_country"
                             wire:model.debounce.500ms="shipping.country"
                             autocomplete="shipping country"
-                            class="mt-1 block w-full rounded-lg border-gray-300 bg-white text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                            class="mt-1 block h-11 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-900 shadow-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
                         >
                             @foreach ($countries as $country)
                                 <option value="{{ $country['code'] }}">{{ $country['name'] }}</option>
@@ -339,14 +339,14 @@
         </div>
 
         <div class="flex items-center justify-end">
-            <x-buttons.primary
+            <button
                 type="submit"
-                class="px-6 py-2 text-sm"
+                class="inline-flex items-center justify-center rounded-lg bg-primary-600 px-6 py-2 text-sm font-semibold text-white transition hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
                 wire:loading.attr="disabled"
                 wire:target="toStep,resolveShippingOptions"
             >
                 {{ __('ui.continue_to_shipping') }}
-            </x-buttons.primary>
+            </button>
         </div>
     </form>
 </section>

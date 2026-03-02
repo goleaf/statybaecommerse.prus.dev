@@ -189,11 +189,11 @@ final class LocationController extends Controller
         $radiusInput = $request->input('radius', 10);
         // Default 10km radius
         if ($latitude === null || $longitude === null || $latitude === '' || $longitude === '') {
-            return response()->json(['error' => 'Latitude and longitude are required'], 400);
+            return response()->json(['error' => __('messages.latitude_and_longitude_are_required')], 400);
         }
         if (! is_numeric($latitude) || ! is_numeric($longitude)) {
             // Provide deterministic error messaging when the coordinates are malformed.
-            return response()->json(['error' => 'Latitude and longitude must be numeric'], 422);
+            return response()->json(['error' => __('messages.latitude_and_longitude_must_be_numeric')], 422);
         }
         $latitude = (float) $latitude;
         $longitude = (float) $longitude;

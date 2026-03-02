@@ -4,30 +4,33 @@
 @section('description', strip_tags((string) $brand->getTranslatedDescription()))
 
 @section('content')
+@php
+    $brandName = $brand->trans('name') ?? (is_string($brand->name) ? $brand->name : (string) data_get($brand->name, app()->getLocale(), ''));
+@endphp
 <div class="min-h-screen bg-sage brand-products-page">
     {{-- Dark Banner Section --}}
     <div class="bg-dark text-sage">
         <div class="mx-auto max-w-7xl px-4 py-12 sm:py-16 sm:px-6 lg:px-8">
             {{-- Breadcrumbs --}}
-            <nav class="text-xs font-medium uppercase tracking-[0.3em] mb-8 breadcrumb-nav-dark" aria-label="{{ __('messages.shared') }}">
+            <nav class="text-xs font-medium uppercase tracking-[0.3em] mb-8 breadcrumb-nav-dark" aria-label="{{ __('frontend.navigation.breadcrumbs') }}">
                 <ol class="flex items-center gap-3">
                     <li>
                         <a href="{{ route('home') }}" class="inline-flex items-center gap-2 breadcrumb-link-dark transition hover:opacity-80">
                             <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h12a1 1 0 001-1V10" />
                             </svg>
-                            <span class="breadcrumb-link-text-dark">{{ __('frontend.home', 'Home') }}</span>
+                            <span class="breadcrumb-link-text-dark">{{ __('nav.home') }}</span>
                         </a>
                     </li>
                     <li class="breadcrumb-separator-dark">/</li>
                     <li>
                         <a href="{{ route('frontend.brands.index') }}" class="breadcrumb-link-dark transition hover:opacity-80">
-                            <span class="breadcrumb-link-text-dark">{{ __('messages.shared') }}</span>
+                            <span class="breadcrumb-link-text-dark">{{ __('messages.brands') }}</span>
                         </a>
                     </li>
                     <li class="breadcrumb-separator-dark">/</li>
                     <li>
-                        <span class="text-white">{{ $brand->name }}</span>
+                        <span class="text-white">{{ $brandName }}</span>
                     </li>
                     </ol>
                 </nav>
@@ -40,7 +43,7 @@
                             <div class="mb-4">
                                 <img 
                                     src="{{ $brand->getFirstMediaUrl('logo') }}" 
-                                    alt="{{ $brand->name }}"
+                                    alt="{{ $brandName }}"
                                     class="h-16 w-auto object-contain"
                                 />
                             </div>
@@ -51,7 +54,7 @@
                         </span>
                         
                         <h1 class="text-3xl font-bold leading-tight text-white sm:text-4xl md:text-5xl">
-                            {{ $brand->name }}
+                            {{ $brandName }}
                         </h1>
                         
                         @if($brand->description)
@@ -91,9 +94,12 @@
                         
                         <div class="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
                             @foreach ($relatedCategories as $category)
+                                @php
+                                    $categoryName = $category->trans('name') ?? (is_string($category->name) ? $category->name : (string) data_get($category->name, app()->getLocale(), ''));
+                                @endphp
                                 <a href="{{ route('frontend.categories.show', $category) }}" class="group rounded-md border border-sage/30 bg-sage/10 p-2 text-white transition hover:border-sage hover:bg-sage/20">
                                     <h3 class="text-xs font-semibold text-white group-hover:text-sage transition-colors leading-tight">
-                                        {{ $category->name }}
+                                        {{ $categoryName }}
                                     </h3>
                                     <p class="text-[10px] text-white/60 mt-0.5 leading-tight">
                                         {{ number_format($category->published_products_count ?? 0) }} {{ __('messages.products') }}
@@ -132,8 +138,31 @@
 
                 {{-- Sort Form --}}
                     <form method="get" class="flex items-center gap-3 text-sm">
-                        @foreach (request()->except('sort') as $key => $value)
-                            <input type="hidden" name="{{ $key }}" value="{{ $value }}" />
+                        @php
+                            $flattenQueryParams = function (array $params, string $prefix = '') use (&$flattenQueryParams): array {
+                                $flattened = [];
+
+                                foreach ($params as $queryKey => $queryValue) {
+                                    $inputName = $prefix === '' ? (string) $queryKey : "{$prefix}[{$queryKey}]";
+
+                                    if (is_array($queryValue)) {
+                                        $flattened = array_merge($flattened, $flattenQueryParams($queryValue, $inputName));
+                                        continue;
+                                    }
+
+                                    $flattened[] = [
+                                        'name' => $inputName,
+                                        'value' => is_scalar($queryValue) ? (string) $queryValue : '',
+                                    ];
+                                }
+
+                                return $flattened;
+                            };
+
+                            $sortPreservedInputs = $flattenQueryParams(request()->except('sort'));
+                        @endphp
+                        @foreach ($sortPreservedInputs as $input)
+                            <input type="hidden" name="{{ $input['name'] }}" value="{{ $input['value'] }}" />
                         @endforeach
                     <label for="sort" class="text-white/80 font-semibold">{{ __('messages.sort_by') }}</label>
                     <select id="sort" name="sort" class="rounded-full border border-sage/30 bg-sage/10 px-4 py-2 text-sm font-medium text-white focus:border-sage focus:outline-none focus:ring-2 focus:ring-sage">

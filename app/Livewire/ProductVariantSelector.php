@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Livewire;
 
 use App\Models\Attribute;
+use App\Models\CartItem;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Services\Pricing\VariantPriceService;
@@ -276,32 +277,61 @@ final class ProductVariantSelector extends Component
     public function addToCart(): void
     {
         if (! $this->selectedVariant) {
-            $this->dispatch('show-error', message: __('product.variants.messages.no_variant_selected'));
-
             return;
         }
 
         if (! $this->selectedVariant->isAvailableForPurchase()) {
-            $this->dispatch('show-error', message: __('product.variants.messages.variant_not_available'));
-
             return;
         }
 
-        if ($this->quantity > $this->selectedVariant->availableQuantity()) {
-            $this->dispatch('show-error', message: __('product.variants.messages.insufficient_stock'));
+        $enforceInventoryLimit = (bool) ($this->selectedVariant->track_inventory ?? false)
+            && ! (bool) ($this->selectedVariant->allow_backorder ?? false);
 
+        if ($enforceInventoryLimit && $this->quantity > $this->selectedVariant->availableQuantity()) {
             return;
         }
 
-        // Dispatch event to add to cart
-        $this->dispatch(
-            'add-to-cart',
-            productId: (int) $this->product->getKey(),
-            quantity: $this->quantity,
-            variantId: (int) $this->selectedVariant->getKey()
+        $sessionId = (string) session()->getId();
+        $userId = auth()->id();
+        $productId = (int) $this->product->getKey();
+        $variantId = (int) $this->selectedVariant->getKey();
+        $quantity = max(1, (int) $this->quantity);
+        $unitPrice = (float) ($this->selectedVariantPricing['final'] ?? $this->selectedVariant->getCurrentPrice());
+
+        $existingQuantity = CartItem::withoutGlobalScopes()
+            ->where('session_id', $sessionId)
+            ->where('product_id', $productId)
+            ->where('variant_id', $variantId)
+            ->sum('quantity');
+
+        $cartItem = CartItem::withoutGlobalScopes()->updateOrCreate(
+            [
+                'session_id' => $sessionId,
+                'user_id'    => is_numeric($userId) ? (int) $userId : null,
+                'product_id' => $productId,
+                'variant_id' => $variantId,
+            ],
+            [
+                'product_variant_id' => $variantId,
+                'quantity'           => (int) $existingQuantity + $quantity,
+                'minimum_quantity'   => max(1, (int) ($this->product->getMinimumQuantity() ?? 1)),
+                'unit_price'         => $unitPrice,
+                'price'              => $unitPrice,
+                'total_price'        => $unitPrice * ((int) $existingQuantity + $quantity),
+                'product_snapshot'   => [
+                    'name'               => $this->getVariantLocalizedName(),
+                    'sku'                => $this->selectedVariant->sku ?? $this->product->sku,
+                    'variant_id'         => $variantId,
+                    'variant_attributes' => $this->getVariantAttributes($this->selectedVariant),
+                    'image'              => $this->selectedVariant->getFirstMediaUrl('images', 'thumb')
+                        ?: $this->product->getFirstMediaUrl(config('media.storage.collection_name'), 'thumb')
+                        ?: $this->product->getFirstMediaUrl(config('media.storage.collection_name')),
+                ],
+            ]
         );
+        $cartItem->updateTotalPrice();
 
-        $this->dispatch('show-success', message: __('product.variants.messages.added_to_cart'));
+        $this->dispatch('cart-updated');
     }
 
     public function getVariantPrice(): float

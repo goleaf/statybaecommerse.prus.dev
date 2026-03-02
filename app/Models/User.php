@@ -22,7 +22,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Arr;
@@ -429,22 +428,6 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     public function latestReferral(): HasOne
     {
         return $this->referrals()->one()->latestOfMany();
-    }
-
-    /**
-     * Handle documents functionality with proper error handling.
-     */
-    public function documents(): MorphMany
-    {
-        return $this->morphMany(Document::class, 'documentable');
-    }
-
-    /**
-     * Handle latestDocument functionality with proper error handling.
-     */
-    public function latestDocument(): MorphOne
-    {
-        return $this->morphOne(Document::class, 'documentable')->latestOfMany();
     }
 
     /**

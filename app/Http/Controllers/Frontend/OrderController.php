@@ -61,8 +61,8 @@ final class OrderController extends Controller
         $this->authorize('view', $order);
 
         // Optimize relationship loading using Laravel 12.10 relationLoaded dot notation
-        if (! $order->relationLoaded('items.product') || ! $order->relationLoaded('items.productVariant') || ! $order->relationLoaded('shipping') || ! $order->relationLoaded('documents')) {
-            $order->load(['items.product', 'items.productVariant', 'shipping', 'documents']);
+        if (! $order->relationLoaded('items.product') || ! $order->relationLoaded('items.productVariant') || ! $order->relationLoaded('shipping')) {
+            $order->load(['items.product', 'items.productVariant', 'shipping']);
         }
 
         return view('orders.show', compact('order'));
@@ -250,7 +250,7 @@ final class OrderController extends Controller
     {
         $user = Auth::user();
         if (! $user || $order->user_id !== $user->id) {
-            abort(403, 'Unauthorized');
+            abort(403, __('messages.unauthorized'));
         }
         if (! $order->canRequestReturn()) {
             abort(403, __('orders.messages.cannot_request_return'));

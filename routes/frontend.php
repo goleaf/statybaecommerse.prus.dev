@@ -71,6 +71,7 @@ Route::middleware(['web'])->group(function () {
         Route::post('/process', [App\Http\Controllers\Frontend\CheckoutController::class, 'process'])->name('process');
         Route::get('/success', [App\Http\Controllers\Frontend\CheckoutController::class, 'success'])->name('success');
         Route::get('/cancel', [App\Http\Controllers\Frontend\CheckoutController::class, 'cancel'])->name('cancel');
+        Route::get('/return/montonio', [\App\Http\Controllers\Payments\MontonioReturnController::class, 'handleReturn'])->name('return.montonio');
     });
 
     // User Profile - Redirects to new Livewire Account Dashboard

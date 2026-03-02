@@ -15,7 +15,7 @@ test('order detail component can be rendered', function () {
 
     Livewire::test(Detail::class, ['number' => 'ORD-123'])
         ->assertStatus(200)
-        ->assertSee(__('Details of your order'));
+        ->assertSee(__('frontend.account.order_detail.title'));
 });
 
 test('order detail component shows order information', function () {
@@ -31,7 +31,7 @@ test('order detail component shows order information', function () {
     Livewire::test(Detail::class, ['number' => 'ORD-456'])
         ->assertStatus(200)
         ->assertSee('ORD-456')
-        ->assertSee('99.99');
+        ->assertSee((string) app_money_format(99.99, 'EUR'));
 });
 
 test('order detail component throws 404 for non-existent order', function () {

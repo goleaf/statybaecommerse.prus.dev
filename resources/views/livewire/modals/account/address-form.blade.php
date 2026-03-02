@@ -60,7 +60,7 @@
 
         <div class="space-y-2">
             <label for="street_address_plus" class="block text-sm font-medium text-gray-700">
-                {{ __('ui.apartment', suite, etc.') }}
+                Apartment, suite, unit, etc.
             </label>
             {{-- Debounced model binding for optional address info mirrors the primary field. --}}
             <input
@@ -69,7 +69,7 @@
                 id="street_address_plus"
                 name="street_address_plus"
                 type="text"
-                placeholder="{{ __('ui.apartment', suite, unit, etc.') }}"
+                placeholder="Apartment, suite, unit, etc."
             />
             @error('street_address_plus')
                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>

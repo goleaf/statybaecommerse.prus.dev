@@ -8,9 +8,12 @@ use App\Filament\Resources\ProductRequestResource\Pages;
 use App\Filament\Resources\ProductRequestResource\Schemas\ProductRequestForm;
 use App\Filament\Resources\ProductRequestResource\Tables\ProductRequestsTable;
 use App\Models\ProductRequest;
+use App\Models\Scopes\StatusScope;
+use App\Models\Scopes\UserOwnedScope;
 use BackedEnum;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 
 final class ProductRequestResource extends BaseResource
@@ -58,6 +61,15 @@ final class ProductRequestResource extends BaseResource
     public static function table(Table $table): Table
     {
         return ProductRequestsTable::configure($table);
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                UserOwnedScope::class,
+                StatusScope::class,
+            ]);
     }
 
     public static function getRelations(): array

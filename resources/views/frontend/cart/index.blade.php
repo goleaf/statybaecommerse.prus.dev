@@ -3,7 +3,7 @@
     <!-- Hero Banner (centered) -->
     <section class="relative bg-sage z-10 overflow-hidden">
         <x-container class="px-4 py-16">
-            <div class="max-w-site mx-auto w-full space-y-6 text-dark text-center">
+            <div class="mx-auto w-full max-w-7xl space-y-6 text-dark text-center">
                 <p class="uppercase text-3xl md:text-4xl font-medium">
                     {{ __('frontend.cart.view_cart') }}
                 </p>
@@ -27,7 +27,7 @@
         </div>
     </div>
     <x-container class="px-4 py-10">
-        <div class="max-w-site mx-auto grid grid-cols-1 gap-10 lg:grid-cols-12">
+        <div class="mx-auto w-full max-w-7xl grid grid-cols-1 gap-10 lg:grid-cols-12">
             <div class="col-span-full space-y-8 lg:col-span-9">
         <h1 class="text-3xl font-semibold text-gray-900 dark:text-gray-100">{{ __('frontend.cart.view_cart') }}</h1>
         @if ($items)
@@ -97,14 +97,14 @@
                     <div class="mt-6 flex flex-wrap items-center gap-4 text-sage">
                 <form method="POST" action="{{ route('frontend.cart.clear') }}">
                     @csrf
-                            <button type="submit" class="px-4 py-2 border border-sage/30 rounded-lg text-sm hover:bg-sage/10">{{ __('frontend.cart.clear_cart', 'Clear cart') }}</button>
+                            <button type="submit" class="px-4 py-2 border border-sage/30 rounded-lg text-sm hover:bg-sage/10">{{ __('frontend.cart.clear_cart') }}</button>
                 </form>
 
                 <form method="POST" action="{{ route('frontend.discounts.apply-coupon') }}" class="flex items-center gap-2">
                     @csrf
                             <label for="code" class="text-sm text-sage/80">{{ __('frontend.cart.coupon_code') }}</label>
                             <input id="code" name="code" class="rounded-lg border border-sage/30 bg-dark/30 text-white placeholder:text-sage/50" placeholder="{{ __('frontend.cart.enter_code') }}">
-                            <button type="submit" class="px-4 py-2 rounded-lg bg-sage text-dark hover:bg-sage/90">{{ __('frontend.cart.apply_coupon', 'Apply') }}</button>
+                            <button type="submit" class="px-4 py-2 rounded-lg bg-sage text-dark hover:bg-sage/90">{{ __('frontend.cart.apply_coupon') }}</button>
                 </form>
 
                 <form method="POST" action="{{ route('frontend.discounts.remove-coupon') }}">

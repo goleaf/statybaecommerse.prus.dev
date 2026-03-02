@@ -24,6 +24,7 @@
                 };
 
                 window.addEventListener('cart-updated', this.__updateQuantity);
+                window.addEventListener('cart-count-changed', this.__updateQuantity);
             },
             /**
              * Detach the event listener if the element is removed from the DOM.
@@ -31,6 +32,7 @@
             destroy() {
                 if (this.__updateQuantity) {
                     window.removeEventListener('cart-updated', this.__updateQuantity);
+                    window.removeEventListener('cart-count-changed', this.__updateQuantity);
                 }
             },
         };

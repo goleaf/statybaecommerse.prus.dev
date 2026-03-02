@@ -23,6 +23,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class ShipmentsRelationManager extends RelationManager
 {
@@ -100,6 +101,15 @@ class ShipmentsRelationManager extends RelationManager
                     ->sortable(),
                 BadgeColumn::make('status')
                     ->label(__('messages.status'))
+                    ->formatStateUsing(function (?string $state): string {
+                        $normalizedState = strtolower((string) $state);
+                        $translationKey = 'messages.shipping_statuses.' . $normalizedState;
+                        $translatedState = __($translationKey);
+
+                        return $translatedState !== $translationKey
+                            ? $translatedState
+                            : Str::headline(str_replace('_', ' ', $normalizedState));
+                    })
                     ->colors([
                         'warning' => 'pending',
                         'primary' => 'processing',

@@ -8,16 +8,22 @@ use App\Filament\Resources\OrderResource;
 use App\Filament\Resources\OrderResource\Pages\CreateOrder;
 use App\Filament\Resources\OrderResource\Pages\EditOrder;
 use App\Filament\Resources\OrderResource\Pages\ListOrders;
+use App\Filament\Resources\OrderResource\Pages\ViewOrder;
+use App\Filament\Resources\OrderResource\RelationManagers\InvoicesRelationManager;
 use App\Filament\Resources\OrderResource\RelationManagers\PaymentsRelationManager;
 use App\Models\AdminUser;
-use App\Models\Document;
-use App\Models\DocumentTemplate;
 use App\Models\Order;
+use App\Models\OrderInvoice;
 use App\Models\Product;
 use App\Models\Service;
+use App\Models\User;
 use Filament\Actions\DeleteAction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Client\Request;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 
 uses(RefreshDatabase::class);
@@ -44,6 +50,17 @@ it('can list orders', function () {
 
 it('does not register legacy payments relation manager', function (): void {
     expect(OrderResource::getRelations())->not->toContain(PaymentsRelationManager::class);
+});
+
+it('registers invoices relation manager', function (): void {
+    expect(OrderResource::getRelations())->toContain(InvoicesRelationManager::class);
+});
+
+it('uses documents label for the invoices relation tab', function (): void {
+    $order = Order::factory()->create();
+
+    expect(InvoicesRelationManager::getTitle($order, ViewOrder::class))
+        ->toBe(__('messages.documents'));
 });
 
 it('can render create order page', function () {
@@ -124,7 +141,7 @@ it('can delete an order', function () {
     ]);
 });
 
-it('creates an order with products, services, and documents', function () {
+it('creates an order with products and services', function () {
     Notification::fake();
 
     $product = Product::factory()->create([
@@ -135,13 +152,6 @@ it('creates an order with products, services, and documents', function () {
         'price'     => 40.00,
         'is_active' => true,
     ]);
-
-    $templates = DocumentTemplate::factory()
-        ->count(2)
-        ->create([
-            'content'   => '<p>Order document</p>',
-            'is_active' => true,
-        ]);
 
     Livewire::test(CreateOrder::class)
         ->fillForm([
@@ -186,10 +196,78 @@ it('creates an order with products, services, and documents', function () {
         'quantity'   => 1,
         'price'      => 40.00,
     ]);
+});
 
-    expect(Document::query()->where('documentable_id', $order->id)->count())
-        ->toBe($templates->count());
+it('can generate an invoice pdf from order view header action', function (): void {
+    Config::set('invoices.enabled', false);
 
-    expect(Document::query()->where('documentable_id', $order->id)->where('format', 'pdf')->count())
-        ->toBe($templates->count());
+    $customer = User::factory()->create();
+    $order = Order::factory()->create([
+        'user_id'        => $customer->getKey(),
+        'number'         => 'ORD-VIEW-INV-0001',
+        'payment_status' => PaymentStatus::PAID->value,
+        'total'          => 121.00,
+    ]);
+
+    $order->items()->create([
+        'name'       => 'Header action invoice item',
+        'sku'        => 'HDR-INV-ITEM-1',
+        'quantity'   => 1,
+        'unit_price' => 100.00,
+        'price'      => 100.00,
+        'total'      => 100.00,
+    ]);
+
+    Config::set('invoices.enabled', true);
+    Config::set('invoices.base_url', 'https://saskaita.vercel.app');
+    Config::set('invoices.api_token', 'test-api-token');
+    Config::set('invoices.auth_bearer', '');
+    Config::set('invoices.timeout_seconds', 5);
+    Config::set('invoices.retry_times', 1);
+    Config::set('invoices.retry_sleep_ms', 50);
+
+    Storage::fake('secure-media');
+    $orderMarker = "order_number:{$order->number};order_id:{$order->getKey()}";
+
+    Http::fake([
+        'https://saskaita.vercel.app/api/initiate' => Http::response('%PDF-1.4 header-action-binary', 200, [
+            'Content-Type' => 'application/pdf',
+        ]),
+        'https://saskaita.vercel.app/api/actions/list-invoices' => Http::response([
+            'invoices' => [
+                [
+                    'id'           => 'ext-view-1001',
+                    'series'       => 'VIEW',
+                    'number'       => 1001,
+                    'full_number'  => 'VIEW-1001',
+                    'type'         => 'sf',
+                    'notes'        => $orderMarker,
+                    'total_amount' => 121.00,
+                    'payer_email'  => (string) $customer->email,
+                ],
+            ],
+        ], 200),
+    ]);
+
+    Livewire::test(ViewOrder::class, ['record' => $order->getRouteKey()])
+        ->callAction('generateInvoicePdf', data: [
+            'invoice_type' => 'sf',
+        ])
+        ->assertHasNoActionErrors();
+
+    $invoice = OrderInvoice::query()
+        ->where('order_id', $order->getKey())
+        ->latest('id')
+        ->first();
+
+    expect($invoice)->toBeInstanceOf(OrderInvoice::class)
+        ->and($invoice?->status)->toBe(OrderInvoice::STATUS_READY)
+        ->and($invoice?->downloadUrl())->not->toBeNull();
+
+    Storage::disk('secure-media')->assertExists((string) $invoice?->file?->path);
+
+    Http::assertSent(function (Request $request): bool {
+        return str_ends_with($request->url(), '/api/initiate')
+            || str_ends_with($request->url(), '/api/actions/list-invoices');
+    });
 });

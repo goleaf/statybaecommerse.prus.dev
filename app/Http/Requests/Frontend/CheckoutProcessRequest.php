@@ -32,12 +32,8 @@ final class CheckoutProcessRequest extends FormRequest
                 'string',
                 'max:50',
                 Rule::in([
-                    'card',
-                    'bank_transfer',
-                    'cod',
-                    PaymentMethod::CREDIT_CARD->value,
-                    PaymentMethod::BANK_TRANSFER->value,
-                    PaymentMethod::CASH_ON_DELIVERY->value,
+                    'montonio',
+                    PaymentMethod::MONTONIO->value,
                 ]),
             ],
             'notes'   => ['nullable', 'string', 'max:2000'],
@@ -76,9 +72,14 @@ final class CheckoutProcessRequest extends FormRequest
     private function normalisePaymentMethod(string $value): string
     {
         return match ($value) {
-            'card', PaymentMethod::CREDIT_CARD->value => PaymentMethod::CREDIT_CARD->value,
-            'bank_transfer', PaymentMethod::BANK_TRANSFER->value => PaymentMethod::BANK_TRANSFER->value,
-            'cod', 'cash_on_delivery', PaymentMethod::CASH_ON_DELIVERY->value => PaymentMethod::CASH_ON_DELIVERY->value,
+            'card',
+            'bank_transfer',
+            'cod',
+            'cash_on_delivery',
+            PaymentMethod::CREDIT_CARD->value,
+            PaymentMethod::BANK_TRANSFER->value,
+            PaymentMethod::CASH_ON_DELIVERY->value,
+            'montonio', PaymentMethod::MONTONIO->value => PaymentMethod::MONTONIO->value,
             default => $value,
         };
     }

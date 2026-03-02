@@ -41,7 +41,7 @@ final class Delivery extends StepComponent
      */
     public bool $isResolving = false;
 
-    #[Validate('required', message: 'You must select a delivery method')]
+    #[Validate('required')]
     public int|string|null $currentSelected = null;
 
     /**
@@ -139,6 +139,18 @@ final class Delivery extends StepComponent
     }
 
     /**
+     * Provide localized attribute names for delivery step validation.
+     *
+     * @return array<string, string>
+     */
+    protected function validationAttributes(): array
+    {
+        return [
+            'currentSelected' => __('messages.delivery_method'),
+        ];
+    }
+
+    /**
      * Resolve the current shipping options for the active cart and address.
      */
     public function resolveOptions(?int $shippingAddressId = null, bool $emitLifecycleEvents = false): void
@@ -155,7 +167,14 @@ final class Delivery extends StepComponent
         $resolver = app(ShippingOptionResolver::class);
         $cartItems = $this->getCartItems();
         /** @var SupportCollection<int, array{id:int,name:string,description?:string|null,price:float,formatted_price?:string|null,estimated_delivery?:string|null,currency?:string|null}> $resolved */
-        $resolved = $resolver->resolve($cartItems->collect(), $countryCode);
+        $destination = [
+            'country'     => $countryCode,
+            'city'        => (string) data_get(session()->get('checkout'), 'shipping_address.city', ''),
+            'address'     => (string) data_get(session()->get('checkout'), 'shipping_address.address_line_1', ''),
+            'postal_code' => (string) data_get(session()->get('checkout'), 'shipping_address.postal_code', ''),
+        ];
+
+        $resolved = $resolver->resolve($cartItems->collect(), $countryCode, $destination);
 
         $optionIds = $resolved
             ->pluck('id')

@@ -25,14 +25,27 @@ use Spatie\LivewireWizard\Components\StepComponent;
  */
 class Shipping extends StepComponent
 {
-    #[Validate('required', message: 'You need to select a delivery address')]
+    #[Validate('required')]
     public ?int $shippingAddressId = null;
 
     #[Validate('boolean')]
     public bool $sameAsShipping = false;
 
-    #[Validate('required_if_declined:sameAsShipping', message: 'You must choose a billing address')]
+    #[Validate('required_if_declined:sameAsShipping')]
     public ?int $billingAddressId = null;
+
+    /**
+     * Provide localized validation messages for shipping step fields.
+     *
+     * @return array<string, string>
+     */
+    protected function messages(): array
+    {
+        return [
+            'shippingAddressId.required'            => __('messages.please_choose_a_valid_delivery_address'),
+            'billingAddressId.required_if_declined' => __('messages.please_choose_a_valid_billing_address'),
+        ];
+    }
 
     /**
      * Sync billing address selection when the "same as shipping" toggle flips

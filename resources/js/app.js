@@ -28,6 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialise core UX behaviours once the DOM is ready.
     initializeScrollAnimations();
     initializeEnhancedInteractions();
+    disableButtonEffects();
     initializeCartNotifications();
     initializeSearchEnhancements();
     initializeLoadingStates();
@@ -79,26 +80,59 @@ function initializeEnhancedInteractions() {
 
     document.querySelectorAll('.btn-gradient, .btn-primary').forEach((button) => {
         button.classList.add(BUTTON_BASE_CLASS);
+    });
+}
 
-        const reset = () => {
-            button.classList.remove(BUTTON_HOVER_CLASS);
-            button.classList.remove(BUTTON_PRESSED_CLASS);
-        };
+const BUTTON_EFFECT_PREFIXES = ['hover:', 'focus:', 'focus-visible:', 'active:'];
+const BUTTON_EFFECT_CLASS_PREFIXES = ['transition', 'duration-', 'ease-'];
+const BUTTON_SELECTOR =
+    'button, input[type="button"], input[type="submit"], input[type="reset"], a.inline-flex, a.btn, a[class*="btn-"]';
 
-        button.addEventListener('mouseenter', () => {
-            button.classList.add(BUTTON_HOVER_CLASS);
+function disableButtonEffects() {
+    const stripButtonClasses = (root = document) => {
+        root.querySelectorAll(BUTTON_SELECTOR).forEach((element) => {
+            const classesToRemove = [];
+
+            element.classList.forEach((className) => {
+                if (BUTTON_EFFECT_PREFIXES.some((prefix) => className.startsWith(prefix))) {
+                    classesToRemove.push(className);
+                    return;
+                }
+
+                if (BUTTON_EFFECT_CLASS_PREFIXES.some((prefix) => className.startsWith(prefix))) {
+                    classesToRemove.push(className);
+                }
+            });
+
+            if (classesToRemove.length > 0) {
+                element.classList.remove(...classesToRemove);
+            }
         });
+    };
 
-        button.addEventListener('mouseleave', reset);
-        button.addEventListener('blur', reset);
+    stripButtonClasses(document);
 
-        button.addEventListener('mousedown', () => {
-            button.classList.add(BUTTON_PRESSED_CLASS);
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            mutation.addedNodes.forEach((node) => {
+                if (!(node instanceof Element)) {
+                    return;
+                }
+
+                if (node.matches(BUTTON_SELECTOR)) {
+                    stripButtonClasses(node.parentElement ?? document);
+                    return;
+                }
+
+                stripButtonClasses(node);
+            });
         });
+    });
 
-        button.addEventListener('mouseup', () => {
-            button.classList.remove(BUTTON_PRESSED_CLASS);
-        });
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    document.addEventListener('livewire:navigated', () => {
+        stripButtonClasses(document);
     });
 }
 

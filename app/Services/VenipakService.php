@@ -8,6 +8,7 @@ use App\Models\Order;
 use Exception;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use SimpleXMLElement;
 
 class VenipakService
 {
@@ -32,21 +33,42 @@ class VenipakService
      *
      * @param string $country ISO 2-letter country code (e.g. LT, LV, EE)
      */
-    public function getPickupPoints(string $country = 'LT'): array
+    public function getPickupPoints(string $country = 'LT', ?string $city = null): array
     {
-        try {
-            // Venipak uses a standard GET endpoint for pickup points
-            $response = Http::timeout(30)
-                ->withoutVerifying() // Based on original opencart module taking care of SSL
-                ->get('https://go.venipak.lt/ws/get_pickup_points', [
-                    'country' => $country,
-                ]);
+        $country = strtoupper(trim($country));
 
-            if ($response->successful()) {
-                return $response->json() ?? [];
+        try {
+            $endpoints = [
+                rtrim($this->apiUrl, '/') . '/get_pickup_points',
+                'https://go.venipak.lt/ws/get_pickup_points',
+            ];
+
+            foreach (array_unique($endpoints) as $endpoint) {
+                $response = Http::timeout(30)
+                    ->withoutVerifying() // Based on original opencart module taking care of SSL
+                    ->get($endpoint, array_filter([
+                        'country' => $country,
+                        'city'    => is_string($city) ? trim($city) : null,
+                    ], static fn ($value): bool => $value !== null && $value !== ''));
+
+                if (! $response->successful()) {
+                    Log::warning('Venipak pickup points endpoint failed', [
+                        'endpoint' => $endpoint,
+                        'status'   => $response->status(),
+                    ]);
+
+                    continue;
+                }
+
+                $normalized = $this->normalizePickupPointsPayload($response->body());
+                if ($normalized !== []) {
+                    return $normalized;
+                }
             }
 
-            Log::error('Venipak API error fetching pickup points', ['status' => $response->status(), 'body' => $response->body()]);
+            Log::error('Venipak API error fetching pickup points', [
+                'country' => $country,
+            ]);
 
             return [];
         } catch (Exception $e) {
@@ -57,42 +79,52 @@ class VenipakService
     }
 
     /**
-     * Generate Shipping Label (PDF) for a set of tracking numbers.
+     * Normalize pickup point payloads returned by different Venipak environments.
      *
-     * @param  string $format Page format, defaults to 'A4' or '4x6' or similar depending on Venipak supported types
-     * @return string PDF raw content
-     *
-     * @throws Exception
+     * @return array<int, array<string, mixed>>
      */
-    public function getLabels(array $trackingNumbers, string $format = 'A4'): string
+    private function normalizePickupPointsPayload(string $body): array
     {
-        if (empty($trackingNumbers)) {
-            throw new Exception('No tracking numbers provided for Venipak label generation.');
-        }
+        $decoded = json_decode($body, true);
 
-        if ($this->username === 'demo' && $this->isSandbox) {
-            return \Barryvdh\DomPDF\Facade\Pdf::loadHTML('<h1>Demo Venipak Label</h1><p>Tracking Numbers: ' . implode(', ', $trackingNumbers) . '</p>')->output();
-        }
-
-        try {
-            $response = Http::asForm()->post($this->apiUrl . 'print_label', [
-                'user'    => $this->username,
-                'pass'    => $this->password,
-                'pack_no' => $trackingNumbers,
-                'type'    => $format,
-            ]);
-
-            if ($response->successful()) {
-                // Venipak returns pure PDF stream
-                return $response->body();
+        if (is_array($decoded)) {
+            if (isset($decoded['pickup_points']) && is_array($decoded['pickup_points'])) {
+                return array_values(array_filter($decoded['pickup_points'], 'is_array'));
             }
 
-            Log::error('Venipak API error generating labels', ['status' => $response->status(), 'body' => $response->body()]);
-            throw new Exception('Failed to generate Venipak labels: ' . $response->body());
-        } catch (Exception $e) {
-            Log::error('Venipak API exception generating labels', ['message' => $e->getMessage()]);
-            throw $e;
+            if (isset($decoded['data']) && is_array($decoded['data'])) {
+                return array_values(array_filter($decoded['data'], 'is_array'));
+            }
+
+            return array_values(array_filter($decoded, 'is_array'));
         }
+
+        libxml_use_internal_errors(true);
+        $xml = simplexml_load_string($body);
+        libxml_clear_errors();
+
+        if (! ($xml instanceof SimpleXMLElement)) {
+            return [];
+        }
+
+        $nodes = $xml->xpath('//pickup_point') ?: $xml->xpath('//point') ?: $xml->xpath('//item') ?: [];
+
+        return collect($nodes)
+            ->map(static function ($node): array {
+                if (! ($node instanceof SimpleXMLElement)) {
+                    return [];
+                }
+
+                return [
+                    'id'      => (string) ($node->id ?? $node->code ?? ''),
+                    'name'    => (string) ($node->name ?? $node->title ?? ''),
+                    'city'    => (string) ($node->city ?? ''),
+                    'address' => (string) ($node->address ?? ''),
+                ];
+            })
+            ->filter(static fn (array $point): bool => ($point['id'] ?? '') !== '' || ($point['name'] ?? '') !== '')
+            ->values()
+            ->all();
     }
 
     /**

@@ -18,6 +18,7 @@ enum PaymentMethod: string implements HasLabel
     case STRIPE = 'stripe';
     case APPLE_PAY = 'apple_pay';
     case GOOGLE_PAY = 'google_pay';
+    case MONTONIO = 'montonio';
 
     private const LABEL_DEFAULTS = [
         'credit_card'      => 'Credit card',
@@ -27,6 +28,7 @@ enum PaymentMethod: string implements HasLabel
         'stripe'           => 'Stripe',
         'apple_pay'        => 'Apple Pay',
         'google_pay'       => 'Google Pay',
+        'montonio'         => 'Montonio',
     ];
 
     public function getLabel(): ?string
@@ -46,12 +48,8 @@ enum PaymentMethod: string implements HasLabel
      */
     public static function options(): array
     {
-        $options = [];
-
-        foreach (self::cases() as $case) {
-            $options[$case->value] = (string) $case->getLabel();
-        }
-
-        return $options;
+        return [
+            self::MONTONIO->value => (string) self::MONTONIO->getLabel(),
+        ];
     }
 }

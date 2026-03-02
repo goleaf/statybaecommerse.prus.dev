@@ -12,7 +12,6 @@ use App\Filament\Resources\Users\RelationManagers\AddressesRelationManager;
 use App\Filament\Resources\Users\RelationManagers\CouponUsagesRelationManager;
 use App\Filament\Resources\Users\RelationManagers\CustomerGroupsRelationManager;
 use App\Filament\Resources\Users\RelationManagers\DiscountRedemptionsRelationManager;
-use App\Filament\Resources\Users\RelationManagers\DocumentsRelationManager;
 use App\Filament\Resources\Users\RelationManagers\NotificationsRelationManager;
 use App\Filament\Resources\Users\RelationManagers\OrdersRelationManager;
 use App\Filament\Resources\Users\RelationManagers\PartnersRelationManager;
@@ -85,7 +84,6 @@ class UserResource extends Resource
             DiscountRedemptionsRelationManager::class,
             NotificationsRelationManager::class,
             SubscriberRelationManager::class,
-            DocumentsRelationManager::class,
             ReferralCodesRelationManager::class,
             ReferralsRelationManager::class,
             ReferralRewardsRelationManager::class,

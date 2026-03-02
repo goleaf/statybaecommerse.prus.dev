@@ -212,7 +212,7 @@ class Handler extends ExceptionHandler
                 }
 
                 $detail = ErrorCodes::message(ErrorCodes::VALIDATION_FAILED, $locale)
-                    ?? 'Invalid request parameters.';
+                    ?? __('messages.invalid_request_parameters');
 
                 return ApiErrorResponse::problem(
                     request: $request,

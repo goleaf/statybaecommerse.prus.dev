@@ -1,32 +1,22 @@
-<div class="space-y-10">
-    <x-breadcrumbs :items="[
-        ['label' => __('messages.frontend'), 'url' => route('account.index', ['locale' => app()->getLocale()])],
-        ['label' => __('messages.frontend')],
-    ]" />
-    <x-page-heading
-                    :title="__('messages.frontend')"
-                    :description="__('messages.frontend')" />
+<div class="space-y-6">
+    <header class="rounded border border-gray-200 bg-gray-50 p-5">
+        <h1 class="text-2xl font-bold text-gray-900">{{ __('frontend.account.navigation.orders') }}</h1>
+        <p class="mt-2 text-sm text-gray-600">{{ __('frontend.account.navigation.orders_description') }}</p>
+    </header>
     @if ($orders->isEmpty())
-        <div class="flex flex-col items-center py-6 space-y-5">
-            <x-untitledui-shopping-bag
-                                       class="size-12 text-gray-400"
-                                       stroke-width="1"
-                                       aria-hidden="true" />
-            <p class="max-w-3xl mx-auto text-sm text-gray-500">
-                {{ __('frontend.account.orders.empty_message') }}
-            </p>
-            <x-buttons.primary :href="route('home', ['locale' => app()->getLocale()])" class="px-4 text-sm">
-                {{ __('frontend.account.orders.continue_shopping') }}
-            </x-buttons.primary>
+        <div class="rounded border border-gray-200 bg-gray-50 p-4">
+            <p class="text-sm text-gray-500">{{ __('frontend.account.orders.empty_message') }}</p>
         </div>
     @else
-        <div class="divide-y divide-gray-200">
-            @foreach ($orders as $order)
-                <x-order :order="$order" />
-            @endforeach
+        <div class="overflow-hidden rounded border border-gray-200 bg-gray-50">
+            <div class="divide-y divide-gray-200">
+                @foreach ($orders as $order)
+                    <x-order :order="$order" />
+                @endforeach
+            </div>
         </div>
 
-        <div class="lg:max-w-4xl">
+        <div class="rounded border border-gray-200 bg-gray-50 p-4">
             {{ $orders->links() }}
         </div>
     @endif

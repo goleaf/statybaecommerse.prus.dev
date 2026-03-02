@@ -24,7 +24,7 @@ use Spatie\LivewireWizard\Components\StepComponent;
  */
 class Payment extends StepComponent
 {
-    #[Validate('required', message: 'You must select a payment method')]
+    #[Validate('required')]
     public ?int $currentSelected = null;
 
     /**
@@ -75,6 +75,18 @@ class Payment extends StepComponent
     public function render(): View
     {
         return view('livewire.components.checkout.payment');
+    }
+
+    /**
+     * Provide localized attribute names for validation errors.
+     *
+     * @return array<string, string>
+     */
+    protected function validationAttributes(): array
+    {
+        return [
+            'currentSelected' => __('messages.payment_method'),
+        ];
     }
 
     #[On('shipping-recalculation-started')]

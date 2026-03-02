@@ -10,7 +10,7 @@
             {{ __('messages.cities') }}
         </h1>
         <p class="text-gray-600 dark:text-gray-400">
-            {{ __('cities.frontend_description', 'Browse and search cities from around the world') }}
+            {{ __('cities.frontend_description') }}
         </p>
     </div>
 
@@ -157,7 +157,7 @@
             </svg>
             <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('messages.cities') }}</h3>
             <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                {{ __('cities.no_cities_found_description', 'Try adjusting your search or filter criteria.') }}
+                {{ __('cities.no_cities_found_description') }}
             </p>
         </div>
     @endif

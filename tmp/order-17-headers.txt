@@ -1,0 +1,14 @@
+HTTP/1.1 500 Internal Server Error
+Cache-Control: no-cache
+Content-Length: 175
+Content-Security-Policy: script-src 'none'; frame-ancestors 'none';
+Content-Type: application/json
+Date: Fri, 27 Feb 2026 12:51:00 GMT
+Referrer-Policy: no-referrer
+Server: Vercel
+Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: DENY
+X-Vercel-Cache: MISS
+X-Vercel-Id: arn1::arn1::wrvlm-1772196660435-902dd1901dc9
+

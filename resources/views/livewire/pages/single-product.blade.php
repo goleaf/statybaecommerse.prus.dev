@@ -332,32 +332,7 @@
                                 </div>
                             @endif
                         </div>
-                    </section>
-
-                    @if ($product->documents && $product->documents->isNotEmpty())
-                        <section class="rounded-3xl border border-slate-100 bg-white shadow-sm">
-                            <div class="space-y-6 p-6 lg:p-8">
-                                <h2 class="text-lg font-semibold text-slate-900">
-                                    {{ __('messages.admin_documents') }}</h2>
-                                <ul class="space-y-3 text-sm text-slate-600">
-                                    @foreach ($product->documents as $document)
-                                        <li
-                                            class="flex items-center justify-between rounded-2xl border border-slate-100 bg-slate-50/70 p-4">
-                                            <div class="flex items-center gap-3">
-                                                <x-heroicon-o-document-text class="h-5 w-5 text-primary-500" />
-                                                <span class="font-medium text-slate-700">{{ $document->name }}</span>
-                                            </div>
-                                            <a href="{{ $document->url }}" target="_blank" rel="noopener"
-                                               class="text-sm font-medium text-primary-600 hover:text-primary-700">
-                                                {{ __('messages.view') }}
-                                            </a>
-                                        </li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                        </section>
-                    @endif
-
+                    </section>`r`n
                 </div>
 
                 <div class="lg:col-span-5 space-y-6">

@@ -801,22 +801,6 @@ final class Product extends Model implements HasMedia, TranslatableRecord
     }
 
     /**
-     * Handle documents functionality with proper error handling.
-     */
-    public function documents(): MorphMany
-    {
-        return $this->morphMany(Document::class, 'documentable');
-    }
-
-    /**
-     * Handle latestDocument functionality with proper error handling.
-     */
-    public function latestDocument(): MorphOne
-    {
-        return $this->morphOne(Document::class, 'documentable')->latestOfMany();
-    }
-
-    /**
      * Handle requests functionality with proper error handling.
      */
     public function requests(): HasMany

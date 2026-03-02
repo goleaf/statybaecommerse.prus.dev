@@ -13,7 +13,6 @@ use App\Http\Requests\Frontend\UpdateUserPasswordRequest;
 use App\Http\Requests\Frontend\UpdateUserPrivacySettingsRequest;
 use App\Http\Requests\Frontend\UpdateUserProfileRequest;
 use App\Http\Requests\Frontend\UpdateUserSocialLinksRequest;
-use App\Models\Document;
 use App\Models\User;
 use App\Support\Storage\SecureStorage;
 use App\Support\Uploads\SecureUpload;
@@ -180,38 +179,6 @@ final class UserController extends Controller
     }
 
     /**
-     * Handle documents functionality with proper error handling.
-     */
-    public function documents(): View
-    {
-        $user = Auth::user();
-        $documents = $user->documents()->with('template')->latest()->paginate(10);
-
-        return view('users.documents', compact('documents'));
-    }
-
-    /**
-     * Handle downloadDocument functionality with proper error handling.
-     *
-     * @return Symfony\Component\HttpFoundation\BinaryFileResponse
-     */
-    public function downloadDocument(Document $document): \Symfony\Component\HttpFoundation\BinaryFileResponse
-    {
-        $user = Auth::user();
-        if ($document->documentable_id !== $user->id || $document->documentable_type !== User::class) {
-            abort(403, __('users.unauthorized_document_access'));
-        }
-        $disk = SecureStorage::disk();
-        if (! Storage::disk($disk)->exists($document->file_path)) {
-            abort(404, __('users.document_not_found'));
-        }
-
-        $filename = $document->filename ?? SecureStorage::filename($document->file_path);
-
-        return Storage::disk($disk)->download($document->file_path, $filename);
-    }
-
-    /**
      * Handle statistics functionality with proper error handling.
      */
     public function statistics(): JsonResponse
@@ -228,7 +195,6 @@ final class UserController extends Controller
             ],
             'reviews'   => ['total' => 0, 'average_rating' => 0],
             'addresses' => ['total' => $user->addresses()->count()],
-            'documents' => ['total' => $user->documents()->count()],
         ];
 
         return response()->json(['success' => true, 'data' => $statistics]);

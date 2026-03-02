@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Livewire\Components;
 
 use App\Models\Attribute;
+use App\Models\CartItem;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use Illuminate\Support\Collection;
@@ -117,14 +118,54 @@ final class ProductVariantSelector extends Component
             return;
         }
 
-        // Add to cart logic here
-        // This would typically call a cart service
+        $sessionId = (string) session()->getId();
+        $userId = auth()->id();
+        $productId = (int) ($this->selectedVariant->product_id ?? $this->product->id);
+        $variantId = (int) $this->selectedVariant->id;
+
+        $cartItem = CartItem::withoutGlobalScopes()
+            ->where('session_id', $sessionId)
+            ->where('product_id', $productId)
+            ->where('variant_id', $variantId)
+            ->first();
+
+        $existingQuantity = (int) ($cartItem?->quantity ?? 0);
+        $finalQuantity = $existingQuantity + $this->quantity;
+
+        if ($finalQuantity > (int) $this->selectedVariant->available_quantity) {
+            $this->addError('quantity', __('product.variants.messages.insufficient_stock'));
+
+            return;
+        }
+
+        $unitPrice = (float) $this->getVariantPrice();
+
+        $cartItem ??= new CartItem;
+        $cartItem->session_id = $sessionId;
+        $cartItem->user_id = is_numeric($userId) ? (int) $userId : null;
+        $cartItem->product_id = $productId;
+        $cartItem->variant_id = $variantId;
+        $cartItem->product_variant_id = $variantId;
+        $cartItem->quantity = $finalQuantity;
+        $cartItem->minimum_quantity = max(1, (int) ($this->product->minimum_quantity ?? 1));
+        $cartItem->unit_price = $unitPrice;
+        $cartItem->price = $unitPrice;
+        $cartItem->total_price = round($unitPrice * $finalQuantity, 2);
+        $cartItem->product_snapshot = array_filter([
+            'name'  => $this->selectedVariant->getLocalizedName(),
+            'sku'   => $this->selectedVariant->variant_sku ?: $this->product->sku,
+            'image' => $this->selectedVariant->getFirstMediaUrl(config('media.storage.collection_name'), 'thumb')
+                ?: $this->selectedVariant->getFirstMediaUrl(config('media.storage.collection_name')),
+        ], static fn ($value) => $value !== null && $value !== '');
+        $cartItem->save();
 
         $this->dispatch('itemAddedToCart', [
             'variant_id' => $this->selectedVariant->id,
             'quantity'   => $this->quantity,
             'price'      => $this->getVariantPrice(),
         ]);
+        $this->dispatch('cart-updated');
+        $this->dispatch('notify', ['type' => 'success', 'message' => __('product.variants.messages.added_to_cart')]);
 
         session()->flash('success', __('product.variants.messages.added_to_cart'));
     }

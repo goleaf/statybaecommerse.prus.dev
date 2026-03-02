@@ -14,8 +14,6 @@ use App\Models\CustomerGroup;
 use App\Models\Discount;
 use App\Models\DiscountCode;
 use App\Models\DiscountRedemption;
-use App\Models\Document;
-use App\Models\DocumentTemplate;
 use App\Models\Notification;
 use App\Models\Order;
 use App\Models\Partner;
@@ -49,7 +47,6 @@ final class UsersCompanyTabSeeder extends BaseSeeder
         $coupon = $this->ensureCoupon();
         $discount = $this->ensureDiscount();
         $discountCode = $this->ensureDiscountCode($discount);
-        $documentTemplate = $this->ensureDocumentTemplate();
 
         for ($index = 1; $index <= self::COMPANY_USER_COUNT; $index++) {
             /** @var Company $company */
@@ -65,7 +62,6 @@ final class UsersCompanyTabSeeder extends BaseSeeder
                 coupon: $coupon,
                 discount: $discount,
                 discountCode: $discountCode,
-                documentTemplate: $documentTemplate,
                 index: $index,
             );
         }
@@ -169,20 +165,6 @@ final class UsersCompanyTabSeeder extends BaseSeeder
             ]);
     }
 
-    private function ensureDocumentTemplate(): DocumentTemplate
-    {
-        $template = DocumentTemplate::query()->withoutGlobalScopes()->where('slug', 'company-user-template')->first();
-
-        if ($template instanceof DocumentTemplate) {
-            return $template;
-        }
-
-        return DocumentTemplate::factory()->active()->create([
-            'name' => 'Company User Template',
-            'slug' => 'company-user-template',
-        ]);
-    }
-
     private function upsertCompanyUser(int $index, Company $company): User
     {
         $email = sprintf('company.relations.%02d@example.test', $index);
@@ -221,7 +203,6 @@ final class UsersCompanyTabSeeder extends BaseSeeder
         Coupon $coupon,
         Discount $discount,
         DiscountCode $discountCode,
-        DocumentTemplate $documentTemplate,
         int $index,
     ): void {
         /** @var CustomerGroup $group */
@@ -344,28 +325,6 @@ final class UsersCompanyTabSeeder extends BaseSeeder
                 'created_by'    => $user->getKey(),
                 'updated_by'    => $user->getKey(),
                 'metadata'      => ['source' => 'users_company_tab_seed'],
-            ],
-        );
-
-        Document::query()->withoutGlobalScopes()->updateOrCreate(
-            [
-                'documentable_type' => User::class,
-                'documentable_id'   => $user->getKey(),
-                'title'             => sprintf('Company Profile %02d', $index),
-            ],
-            [
-                'document_template_id' => $documentTemplate->getKey(),
-                'name'                 => sprintf('Company profile document %02d', $index),
-                'type'                 => 'contract',
-                'version'              => 'v1.0',
-                'content'              => '<h1>Company Profile</h1><p>Seeded from UsersCompanyTabSeeder.</p>',
-                'status'               => 'draft',
-                'format'               => 'html',
-                'is_public'            => false,
-                'is_downloadable'      => true,
-                'created_by'           => $user->getKey(),
-                'updated_by'           => $user->getKey(),
-                'variables'            => ['USER_NAME' => (string) $user->name],
             ],
         );
 

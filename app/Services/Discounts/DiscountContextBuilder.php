@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Discounts;
 
+use App\Services\Cart\CartService;
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
@@ -14,7 +15,10 @@ use Throwable;
 
 final class DiscountContextBuilder
 {
-    public function __construct(private readonly Session $session) {}
+    public function __construct(
+        private readonly Session $session,
+        private readonly CartService $cartService,
+    ) {}
 
     /**
      * @return array<string, mixed>
@@ -50,6 +54,7 @@ final class DiscountContextBuilder
     {
         $items = [];
         $subtotal = 0.0;
+        $userId = $user?->getAuthIdentifier();
 
         if ($cartPayload !== []) {
             $items = array_values(array_map(function ($item): array {
@@ -67,27 +72,28 @@ final class DiscountContextBuilder
                 $subtotal = collect($items)->sum(fn (array $item): float => $item['unit_price'] * max(0, $item['quantity']));
             }
         } else {
-            if (class_exists(\Darryldecode\Cart\Facades\CartFacade::class)) {
-                try {
-                    foreach (\Darryldecode\Cart\Facades\CartFacade::session($this->session->getId())->getContent() as $item) {
-                        $items[] = [
-                            'product_id' => optional($item->associatedModel)->id,
-                            'variant_id' => method_exists($item->associatedModel, 'getKey') ? $item->associatedModel->getKey() : null,
-                            'quantity'   => (int) $item->quantity,
-                            'unit_price' => (float) $item->price,
-                        ];
-                    }
-                    $subtotal = (float) \Darryldecode\Cart\Facades\CartFacade::session($this->session->getId())->getSubTotal();
-                } catch (Throwable $e) {
-                    $items = [];
-                    $subtotal = 0.0;
-                }
-            }
+            $resolvedUserId = is_numeric($userId) ? (int) $userId : null;
+            $summary = $this->cartService->getSummary($resolvedUserId, $this->session->getId());
+
+            $items = collect((array) ($summary['items'] ?? []))
+                ->map(static function ($item): array {
+                    $item = (array) $item;
+
+                    return [
+                        'product_id' => isset($item['product_id']) ? (int) $item['product_id'] : null,
+                        'variant_id' => isset($item['variant_id']) ? (int) $item['variant_id'] : null,
+                        'quantity'   => isset($item['quantity']) ? max(0, (int) $item['quantity']) : 0,
+                        'unit_price' => isset($item['price']) ? (float) $item['price'] : 0.0,
+                    ];
+                })
+                ->values()
+                ->all();
+
+            $subtotal = (float) ($summary['subtotal'] ?? 0.0);
         }
 
         $shippingBase ??= (float) Arr::get($cartPayload, 'shipping.base_amount', data_get($this->session->get('checkout'), 'shipping_option.0.price', 0.0));
 
-        $userId = $user?->getAuthIdentifier();
         $groupIds = $this->resolveGroupIds($userId);
         $partnerTier = $this->resolvePartnerTier($userId);
 

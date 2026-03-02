@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -115,5 +116,21 @@ final class ShippingOption extends Model
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class);
+    }
+
+    /**
+     * Restrict the query to enabled shipping options only.
+     */
+    public function scopeEnabled(Builder $query): Builder
+    {
+        return $query->where('is_enabled', true);
+    }
+
+    /**
+     * Apply storefront ordering for shipping options.
+     */
+    public function scopeOrdered(Builder $query): Builder
+    {
+        return $query->orderBy('sort_order')->orderBy('id');
     }
 }

@@ -38,7 +38,7 @@ final class ProductTranslationController extends Controller
         // Normalize the requested translation locale to avoid duplicate entries caused by casing differences.
         $targetLocale = strtolower(trim($lang));
         if ($targetLocale === '') {
-            abort(404, 'Translation locale is required.');
+            abort(404, __('messages.translation_locale_is_required'));
         }
 
         // Resolve the supported locales from configuration to guard against arbitrary locale creation attempts.
@@ -56,7 +56,7 @@ final class ProductTranslationController extends Controller
 
         // Abort with a 404 for unsupported locales to avoid leaking administrative routes.
         if (! in_array($targetLocale, $normalizedSupportedLocales, true)) {
-            abort(404, 'Unsupported translation locale.');
+            abort(404, __('messages.unsupported_translation_locale'));
         }
 
         // Retrieve the product without global scopes because hidden products may still require translation updates.

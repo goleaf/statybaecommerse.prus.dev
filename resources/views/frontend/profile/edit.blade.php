@@ -1,7 +1,7 @@
-<x-frontend.profile-layout title="{{ __('frontend.profile.edit_title', 'Edit Profile') }}">
+<x-frontend.profile-layout title="{{ __('frontend.profile.edit_title') }}">
     <div class="space-y-6">
         <header class="border-b border-gray-200 dark:border-white/10 pb-5 mb-6">
-            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ __('frontend.profile.edit_title', 'Edit Profile') }}</h1>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ __('frontend.profile.edit_title') }}</h1>
             <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Update your personal information and password.</p>
         </header>
 

@@ -1,41 +1,39 @@
 <div class="space-y-6">
-    <x-breadcrumbs :items="[['label' => __('messages.frontend'), 'url' => route('account.index')], ['label' => __('messages.frontend')]]" />
-    
-    <div class="flex items-center justify-between">
+    <header class="flex items-center justify-between border-b border-gray-200 pb-5">
         <div>
-            <h1 class="text-2xl font-bold text-gray-900">{{ __('messages.frontend') }}</h1>
-            <p class="mt-1 text-sm text-gray-500">{{ __('frontend.account.notifications_description') }}</p>
+            <h1 class="text-2xl font-bold text-gray-900">{{ __('frontend.account.navigation.notifications') }}</h1>
+            <p class="mt-1 text-sm text-gray-600">{{ __('frontend.account.notifications_description') }}</p>
         </div>
         
         @if (!empty($notifications))
             <div class="flex space-x-2">
                 <button 
                     wire:click="markAllAsRead" 
-                    class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    class="inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                 >
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                     </svg>
-                    {{ __('messages.notifications') }}
+                    {{ __('frontend.account.notifications.mark_all_read') }}
                 </button>
                 
                 <button 
                     wire:click="deleteAllNotifications" 
                     wire:confirm="{{ __('notifications.confirmations.delete_all') }}"
-                    class="inline-flex items-center px-3 py-2 border border-red-300 shadow-sm text-sm leading-4 font-medium rounded-md text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                    class="inline-flex items-center rounded-md border border-red-300 bg-white px-3 py-2 text-sm font-medium leading-4 text-red-700 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                 >
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                     </svg>
-                    {{ __('messages.notifications') }}
+                    {{ __('frontend.account.notifications.delete_all') }}
                 </button>
             </div>
         @endif
-    </div>
+    </header>
 
     <!-- Filters -->
     @if (!empty($notifications))
-        <div class="bg-white p-4 rounded-lg border border-gray-200">
+        <div class="rounded-lg border border-gray-200 p-4">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
                 <div class="flex items-center space-x-4">
                     <div class="flex items-center">
@@ -43,32 +41,32 @@
                             wire:model.live="showUnreadOnly" 
                             id="unread-only" 
                             type="checkbox" 
-                            class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                            class="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
                         >
                         <label for="unread-only" class="ml-2 text-sm text-gray-700">
-                            {{ __('messages.notifications') }}
+                            {{ __('frontend.account.notifications.unread_only') }}
                         </label>
                     </div>
                 </div>
                 
                 <div class="flex items-center space-x-2">
-                    <label for="filter" class="text-sm font-medium text-gray-700">{{ __('messages.notifications') }}:</label>
+                    <label for="filter" class="text-sm font-medium text-gray-700">{{ __('frontend.account.notifications.filter_label') }}:</label>
                     <select 
                         wire:model.live="filter" 
                         id="filter" 
-                        class="block w-40 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                        class="block w-40 rounded-md border-gray-300 text-sm focus:border-primary-500 focus:ring-primary-500"
                     >
-                        <option value="all">{{ __('messages.notifications') }}</option>
-                        <option value="order">{{ __('messages.notifications') }}</option>
-                        <option value="product">{{ __('messages.notifications') }}</option>
-                        <option value="user">{{ __('messages.notifications') }}</option>
-                        <option value="system">{{ __('messages.notifications') }}</option>
-                        <option value="payment">{{ __('messages.notifications') }}</option>
-                        <option value="shipping">{{ __('messages.notifications') }}</option>
-                        <option value="review">{{ __('messages.notifications') }}</option>
-                        <option value="promotion">{{ __('messages.notifications') }}</option>
-                        <option value="newsletter">{{ __('messages.notifications') }}</option>
-                        <option value="support">{{ __('messages.notifications') }}</option>
+                        <option value="all">{{ __('frontend.account.notifications.type_all') }}</option>
+                        <option value="order">{{ __('frontend.account.notifications.type_order') }}</option>
+                        <option value="product">{{ __('frontend.account.notifications.type_product') }}</option>
+                        <option value="user">{{ __('frontend.account.notifications.type_user') }}</option>
+                        <option value="system">{{ __('frontend.account.notifications.type_system') }}</option>
+                        <option value="payment">{{ __('frontend.account.notifications.type_payment') }}</option>
+                        <option value="shipping">{{ __('frontend.account.notifications.type_shipping') }}</option>
+                        <option value="review">{{ __('frontend.account.notifications.type_review') }}</option>
+                        <option value="promotion">{{ __('frontend.account.notifications.type_promotion') }}</option>
+                        <option value="newsletter">{{ __('frontend.account.notifications.type_newsletter') }}</option>
+                        <option value="support">{{ __('frontend.account.notifications.type_support') }}</option>
                     </select>
                 </div>
             </div>
@@ -81,33 +79,21 @@
             <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM4 19h6v-6H4v6zM4 5h6V1H4v4zM15 3h5v6h-5V3z"></path>
             </svg>
-            <h3 class="mt-2 text-sm font-medium text-gray-900">{{ __('messages.notifications') }}</h3>
-            <p class="mt-1 text-sm text-gray-500">{{ __('messages.notifications') }}</p>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">{{ __('frontend.account.notifications.empty_title') }}</h3>
+            <p class="mt-1 text-sm text-gray-500">{{ __('frontend.account.notifications.empty_description') }}</p>
         </div>
     @else
-        <div class="bg-white shadow overflow-hidden sm:rounded-md">
+        <div class="overflow-hidden rounded-lg border border-gray-200">
             <ul class="divide-y divide-gray-200">
                 @foreach ($notifications as $notification)
-                    <li class="relative {{ !$notification['read_at'] ? 'bg-blue-50' : '' }}">
+                    <li class="relative {{ !$notification['read_at'] ? 'bg-gray-50' : '' }}">
                         <div class="px-4 py-4 sm:px-6">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center space-x-3">
                                     <!-- Notification Icon -->
                                     <div class="flex-shrink-0">
                                         @php
-                                            $iconClass = match($notification['type']) {
-                                                'order' => 'text-blue-600',
-                                                'product' => 'text-green-600',
-                                                'user' => 'text-purple-600',
-                                                'system' => 'text-orange-600',
-                                                'payment' => 'text-yellow-600',
-                                                'shipping' => 'text-indigo-600',
-                                                'review' => 'text-pink-600',
-                                                'promotion' => 'text-red-600',
-                                                'newsletter' => 'text-cyan-600',
-                                                'support' => 'text-gray-600',
-                                                default => 'text-gray-600'
-                                            };
+                                            $iconClass = 'text-gray-500';
                                             
                                             $icon = match($notification['type']) {
                                                 'order' => 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
@@ -124,7 +110,7 @@
                                             };
                                         @endphp
                                         
-                                        <div class="h-8 w-8 rounded-full {{ $iconClass }} bg-opacity-10 flex items-center justify-center">
+                                        <div class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100">
                                             <svg class="h-4 w-4 {{ $iconClass }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $icon }}"></path>
                                             </svg>
@@ -138,8 +124,8 @@
                                                 {{ $notification['title'] }}
                                             </p>
                                             @if (!$notification['read_at'])
-                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                                    {{ __('messages.notifications') }}
+                                                <span class="inline-flex items-center rounded-full bg-gray-200 px-2 py-0.5 text-xs font-medium text-gray-800">
+                                                    {{ __('frontend.account.notifications.unread_badge') }}
                                                 </span>
                                             @endif
                                         </div>
@@ -160,7 +146,7 @@
                                         <button 
                                             wire:click="markAsRead('{{ $notification['id'] }}')"
                                             class="text-gray-400 hover:text-gray-600"
-                                            title="{{ __('messages.notifications') }}"
+                                            title="{{ __('frontend.account.notifications.mark_read') }}"
                                         >
                                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
@@ -172,7 +158,7 @@
                                         wire:click="deleteNotification('{{ $notification['id'] }}')"
                                         wire:confirm="{{ __('notifications.confirmations.delete_one') }}"
                                         class="text-gray-400 hover:text-red-600"
-                                        title="{{ __('messages.notifications') }}"
+                                        title="{{ __('frontend.account.notifications.delete_one') }}"
                                     >
                                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>

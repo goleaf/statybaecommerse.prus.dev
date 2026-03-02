@@ -39,18 +39,14 @@ Route::middleware('auth')->group(function (): void {
         Route::get('/', \App\Livewire\Pages\Account\Index::class)->name('index');
         Route::get('profile', \App\Livewire\Pages\Account\Profile::class)->name('profile');
         Route::get('addresses', Pages\Account\Addresses::class)->name('addresses');
+        Route::get('addresses/{address}/edit', Pages\Account\AddressEdit::class)->name('addresses.edit');
         Route::get('orders', Pages\Account\Orders::class)->name('orders');
-        // Orders invoice view
-        Route::view('orders/{number}/invoice', 'livewire.pages.account.orders.invoice')->name('orders.invoice');
         // Order details page
         Route::get('orders/{number}', \App\Livewire\Pages\Account\Orders\Detail::class)->name('orders.detail');
         // Alias name to satisfy route index: account.order.show
         Route::get('order/{number}', function (string $number) {
             return redirect()->route('account.orders.detail', ['number' => $number]);
         })->name('order.show');
-
-        // Documents page
-        Route::get('documents', \App\Livewire\Pages\Account\Documents::class)->name('documents');
 
         // Notifications page (graceful if DB notifications not set up)
         Route::get('notifications', \App\Livewire\Pages\Account\Notifications::class)->name('notifications');

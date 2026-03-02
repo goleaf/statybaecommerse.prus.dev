@@ -244,7 +244,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
                         <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
                     </svg>
-                    <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('messages.no_addresses_found', 'No addresses found.') }}</h3>
+                    <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('messages.no_addresses_found') }}</h3>
                     <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Add a new address above to get started.</p>
                 </div>
             @endforelse

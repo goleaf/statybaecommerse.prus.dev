@@ -2,3 +2,13 @@
 
 @source '../../../../app/Filament/**/*';
 @source '../../../../resources/views/filament/**/*';
+
+input[type='checkbox'] {
+  border-color: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+input[type='checkbox']:focus {
+  box-shadow: none !important;
+}

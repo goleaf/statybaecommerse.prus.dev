@@ -9,19 +9,14 @@ use App\Http\Controllers\Controller;
 use App\Models\Discount;
 use App\Models\DiscountCode;
 use App\Models\DiscountRedemption;
-use App\Models\DocumentTemplate;
 use App\Services\Discounts\DiscountContextBuilder;
 use App\Services\Discounts\DiscountEngine;
-use App\Services\DocumentService;
 use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
-use Throwable;
 
 /**
  * DiscountCodeController
@@ -34,7 +29,6 @@ final class DiscountCodeController extends Controller
      * Initialize the class instance with required dependencies.
      */
     public function __construct(
-        private readonly DocumentService $documentService,
         private readonly DiscountContextBuilder $contextBuilder,
         private readonly DiscountEngine $discountEngine,
     ) {}
@@ -350,70 +344,4 @@ final class DiscountCodeController extends Controller
         return response()->json(['codes' => $codes->all()]);
     }
 
-    /**
-     * Handle generateDocument functionality with proper error handling.
-     */
-    public function generateDocument(\App\Http\Requests\Frontend\DiscountCodeGenerateDocumentRequest $request, DiscountCode $discountCode): JsonResponse|Response|RedirectResponse
-    {
-        /** @var array{template_id:int, format:string} $validated */
-        $validated = $request->validated();
-        try {
-            $template = DocumentTemplate::query()->findOrFail((int) $validated['template_id']);
-            $discountCode->loadMissing('discount');
-
-            if (! $discountCode->discount instanceof Discount) {
-                return response()->json([
-                    'error'   => 'Discount data unavailable',
-                    'message' => __('coupons.messages.invalid'),
-                ], 422);
-            }
-
-            $discount = $discountCode->discount;
-            $startsAt = $discountCode->starts_at instanceof CarbonInterface ? $discountCode->starts_at : null;
-            $expiresAt = $discountCode->expires_at instanceof CarbonInterface ? $discountCode->expires_at : null;
-
-            // Prepare the variable map that will be injected into the template.
-            $variables = [
-                'DISCOUNT_CODE'        => $discountCode->code,
-                'DISCOUNT_NAME'        => $discount->name,
-                'DISCOUNT_DESCRIPTION' => $discountCode->description,
-                'DISCOUNT_VALUE'       => $discount->value,
-                'DISCOUNT_TYPE'        => $discount->type,
-                'USAGE_LIMIT'          => $discountCode->usage_limit ?? 'Unlimited',
-                'USAGE_COUNT'          => $discountCode->usage_count,
-                'REMAINING_USES'       => $discountCode->remaining_uses ?? 'Unlimited',
-                'STARTS_AT'            => $startsAt?->format('d/m/Y H:i') ?? 'Immediately',
-                'EXPIRES_AT'           => $expiresAt?->format('d/m/Y H:i') ?? 'Never',
-                'STATUS'               => $discountCode->status,
-                'IS_ACTIVE'            => $discountCode->is_active ? 'Yes' : 'No',
-            ];
-
-            $document = $this->documentService->generateDocument($template, $discountCode, $variables);
-
-            if ($validated['format'] === 'pdf') {
-                // Generate a signed download URL for the generated PDF payload and
-                // return an appropriate response based on the caller expectations.
-                $downloadUrl = $this->documentService->generatePdf($document);
-
-                if ($request->wantsJson()) {
-                    return response()->json([
-                        'success'      => true,
-                        'document_id'  => $document->id,
-                        'download_url' => $downloadUrl,
-                    ]);
-                }
-
-                return redirect()->away($downloadUrl);
-            }
-
-            return response($document->content, 200, ['Content-Type' => 'text/html']);
-        } catch (ModelNotFoundException $exception) {
-            return response()->json([
-                'error'   => 'Template not found',
-                'message' => $exception->getMessage(),
-            ], 404);
-        } catch (Throwable $e) {
-            return response()->json(['error' => 'Failed to generate document', 'message' => $e->getMessage()], 500);
-        }
-    }
 }

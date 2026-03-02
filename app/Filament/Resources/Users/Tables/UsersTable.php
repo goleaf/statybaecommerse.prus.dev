@@ -119,11 +119,6 @@ class UsersTable
                     ->counts('referralRewards')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('documents_count')
-                    ->label(__('admin.labels.documents'))
-                    ->counts('documents')
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('coupon_usages_count')
                     ->label(__('admin.labels.coupon_usages'))
                     ->counts('couponUsages')

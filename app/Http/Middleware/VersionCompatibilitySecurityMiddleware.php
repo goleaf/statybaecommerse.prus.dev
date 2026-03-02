@@ -42,7 +42,7 @@ final class VersionCompatibilitySecurityMiddleware
             ]);
 
             return response()->json([
-                'error'   => 'Too many requests',
+                'error'   => __('messages.too_many_requests'),
                 'message' => $e->getMessage(),
             ], 429);
         }
@@ -82,7 +82,7 @@ final class VersionCompatibilitySecurityMiddleware
                     'data_preview' => substr($requestData, 0, 200),
                 ]);
 
-                abort(400, 'Invalid request parameters');
+                abort(400, __('messages.invalid_request_parameters'));
             }
         }
     }

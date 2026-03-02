@@ -206,7 +206,7 @@ final class NotificationController extends Controller
 
     private function notificationNotFoundResponse(): JsonResponse
     {
-        return response()->json(['error' => 'Notification not found'], 404);
+        return response()->json(['error' => __('messages.notification_not_found')], 404);
     }
 
     private function getAuthenticatedUser(): ?AuthenticatableContract
@@ -243,6 +243,6 @@ final class NotificationController extends Controller
     private function unauthenticatedResponse(): JsonResponse
     {
         // Provide a consistent JSON structure for unauthenticated access attempts.
-        return response()->json(['error' => 'Unauthenticated'], 401);
+        return response()->json(['error' => __('messages.unauthenticated')], 401);
     }
 }

@@ -75,7 +75,7 @@
                             </a>
                             <a wire:navigate
                                {{-- Jump into checkout without reloading the Livewire cart widget --}}
-                               href="{{ route('checkout.index') }}"
+                               href="{{ route('frontend.checkout.index') }}"
                                class="block w-full text-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
                                 {{ __('messages.store') }}
                             </a>

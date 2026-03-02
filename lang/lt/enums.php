@@ -81,8 +81,17 @@ return [
         'cash_on_delivery' => 'Apmokėjimas pristatymo metu',   // arba 'Mokėjimas grynaisiais pristatymo metu'
         'credit_card'      => 'Kredito kortelė',               // dažniau nei „Kreditinė kortelė“
         'google_pay'       => 'Google Pay',
+        'montonio'         => 'Montonio',
         'paypal'           => 'PayPal',
         'stripe'           => 'Juostelė',                        // oficialus pavadinimas, lietuviai dažniausiai taip ir rašo
+    ],
+    'invoice_type' => [
+        'sf'   => 'Sąskaita Faktūra',
+        'psf'  => 'PVM Sąskaita Faktūra',
+        'isf'  => 'Išankstinė sąskaita faktūra',
+        'ipsf' => 'Išankstinė PVM sąskaita faktūra',
+        'ksf'  => 'Kreditinė sąskaita faktūra',
+        'kpsf' => 'Kreditinė PVM sąskaita faktūra',
     ],
 
     'payment_status' => [
@@ -94,6 +103,23 @@ return [
         'pending'            => 'Laukiama apmokėjimo',
         'refunded'           => 'Grąžinta',
         'settled'            => 'Atsiskaityta',
+    ],
+    'order_payment_state' => [
+        'created'            => 'Sukurta',
+        'paid'               => 'Apmokėta',
+        'fulfilled'          => 'Įvykdyta',
+        'partially_refunded' => 'Iš dalies grąžinta',
+        'refunded'           => 'Grąžinta',
+    ],
+    'order_status' => [
+        'pending'    => 'Laukiama',
+        'processing' => 'Apdorojama',
+        'shipped'    => 'Išsiųsta',
+        'delivered'  => 'Pristatyta',
+        'completed'  => 'Įvykdyta',
+        'cancelled'  => 'Atšaukta',
+        'refunded'   => 'Grąžinta',
+        'returned'   => 'Grąžinta prekė',
     ],
     'priority' => [
         'low'      => 'Žemas',

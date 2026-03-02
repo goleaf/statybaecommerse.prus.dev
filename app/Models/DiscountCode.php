@@ -15,7 +15,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 /**
  * DiscountCode
@@ -142,14 +141,6 @@ final class DiscountCode extends Model
     public function updater(): BelongsTo
     {
         return $this->belongsTo(User::class, 'updated_by');
-    }
-
-    /**
-     * Handle documents functionality with proper error handling.
-     */
-    public function documents(): MorphMany
-    {
-        return $this->morphMany(Document::class, 'documentable');
     }
 
     /**

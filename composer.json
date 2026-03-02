@@ -11,9 +11,9 @@
     "require": {
         "php": "^8.2",
         "asmit/resized-column": "*",
-        "barryvdh/laravel-dompdf": "^3.1",
         "filament/filament": "^4.0",
         "filament/spatie-laravel-media-library-plugin": "^4.0",
+        "firebase/php-jwt": "^7.0",
         "flowframe/laravel-trend": "^0.4",
         "kirschbaum-development/laravel-loop": "*",
         "kirschbaum-development/laravel-loop-filament": "^0.1.5",

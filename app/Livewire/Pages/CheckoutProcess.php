@@ -14,12 +14,14 @@ use App\Models\CartItem;
 use App\Models\Country;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\OrderShipping;
 use App\Models\ShippingOption;
 use App\Models\User;
 use App\Services\Cart\CartLifecycleService;
 use App\Services\Discounts\DiscountEngine;
 use App\Services\Pricing\PriceCalculator;
 use App\Services\Shipping\ShippingOptionResolver;
+use Exception;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Facades\DB;
@@ -128,6 +130,7 @@ final class CheckoutProcess extends Component
         }
 
         if ($movingForward && $this->currentStep === 1) {
+            $this->shipping = $this->normalizedShippingAddress();
             // Persist address data for authenticated shoppers and refresh the available shipping matrix.
             $this->persistAuthenticatedAddresses();
             $this->resolveShippingOptions();
@@ -210,15 +213,35 @@ final class CheckoutProcess extends Component
 
             return;
         }
-        DB::transaction(function () use ($cartItems): void {
+        $createdOrder = DB::transaction(function () use ($cartItems): Order {
             // Resolve the final order payload, persist line items, and dispatch the email confirmation.
             $order = $this->createOrder($cartItems);
             $this->createOrderItems($order, $cartItems);
+            $this->createOrUpdateOrderShipping($order);
             $this->queueOrderConfirmation($order);
             app(CartLifecycleService::class)->clearAfterCheckout($this->authenticatedUserId(), Session::getId());
-            session()->flash('order_number', $order->number);
-            $this->redirect(route('order.confirmation', $order->number));
+
+            return $order;
         });
+
+        session()->flash('order_number', $createdOrder->number);
+
+        if ($this->selectedPaymentMethod === PaymentMethod::MONTONIO->value) {
+            try {
+                $montonioUrl = app(\App\Services\Payments\MontonioService::class)->getPaymentUrl($createdOrder);
+                $this->redirect($montonioUrl);
+
+                return;
+            } catch (Exception $e) {
+                // If Montonio API fails, fall back to failure page or order confirmation with an error
+                session()->flash('error', __('messages.payment_initialization_failed', ['error' => $e->getMessage()]));
+                $this->redirect(route('checkout.confirmation', $createdOrder->number));
+
+                return;
+            }
+        }
+
+        $this->redirect(route('checkout.confirmation', $createdOrder->number));
     }
 
     /**
@@ -236,6 +259,7 @@ final class CheckoutProcess extends Component
     {
         $breakdown = $this->calculateBreakdown($cartItems);
         $selectedOption = $this->resolveSelectedShippingOptionModel();
+        $shippingAddress = $this->enrichShippingAddressWithDeliveryPlace($this->getShippingAddress());
 
         return Order::create([
             'number'             => 'LT-' . strtoupper(uniqid()),
@@ -248,7 +272,7 @@ final class CheckoutProcess extends Component
             'total'              => $breakdown->total,
             'currency'           => $breakdown->currency,
             'billing_address'    => $this->getBillingAddress(),
-            'shipping_address'   => $this->getShippingAddress(),
+            'shipping_address'   => $shippingAddress,
             'notes'              => $this->notes,
             'shipping_option_id' => $selectedOption?->getKey(),
             'payment_method'     => $this->selectedPaymentMethod,
@@ -272,6 +296,45 @@ final class CheckoutProcess extends Component
                 'total'        => (float) $cartItem->price * (int) $cartItem->quantity,
             ]);
         }
+    }
+
+    /**
+     * Persist shipment information for the created order, including Venipak pickup place metadata.
+     */
+    private function createOrUpdateOrderShipping(Order $order): void
+    {
+        $selected = $this->selectedShippingSnapshot;
+        $isVenipak = $this->isVenipakPickupSelection($selected);
+        $deliveryPlaceName = is_string($selected['name'] ?? null) ? (string) $selected['name'] : null;
+        $deliveryPlaceAddress = is_string($selected['description'] ?? null)
+            ? (string) $selected['description']
+            : (is_string($selected['estimated_delivery'] ?? null) ? (string) $selected['estimated_delivery'] : null);
+        $deliveryPlaceId = isset($selected['id']) ? (string) $selected['id'] : null;
+        $price = isset($selected['price']) && is_numeric($selected['price']) ? (float) $selected['price'] : (float) $order->shipping_amount;
+        $basePrice = isset($selected['original_price']) && is_numeric($selected['original_price']) ? (float) $selected['original_price'] : $price;
+
+        $metadata = [
+            'delivery_provider'      => $isVenipak ? 'venipak' : 'storefront',
+            'delivery_place_id'      => $deliveryPlaceId,
+            'delivery_place_name'    => $deliveryPlaceName,
+            'delivery_place_address' => $deliveryPlaceAddress,
+        ];
+
+        OrderShipping::query()->updateOrCreate(
+            ['order_id' => $order->id],
+            [
+                'carrier_name'    => $isVenipak ? 'Venipak' : (string) ($selected['carrier_name'] ?? ''),
+                'shipping_method' => $deliveryPlaceName,
+                'service'         => $isVenipak ? 'pickup_point' : (string) ($selected['service'] ?? ''),
+                'service_type'    => $isVenipak ? 'pickup' : (string) ($selected['service_type'] ?? ''),
+                'cost'            => $price,
+                'base_cost'       => $basePrice,
+                'total_cost'      => $price,
+                'metadata'        => $metadata,
+                'status'          => 'pending',
+                'is_delivered'    => false,
+            ]
+        );
     }
 
     /**
@@ -315,16 +378,17 @@ final class CheckoutProcess extends Component
             return $this->getBillingAddress();
         }
 
-        $country = $this->resolveCountryDetails($this->shipping['country'] ?? null);
+        $shipping = $this->normalizedShippingAddress();
+        $country = $this->resolveCountryDetails($shipping['country'] ?? null);
 
         return [
-            'first_name'   => (string) ($this->shipping['first_name'] ?? ''),
-            'last_name'    => (string) ($this->shipping['last_name'] ?? ''),
-            'company'      => $this->shipping['company'] ?? null,
-            'address'      => (string) ($this->shipping['address'] ?? ''),
-            'city'         => (string) ($this->shipping['city'] ?? ''),
-            'region'       => $this->shipping['region'] ?? null,
-            'postal_code'  => (string) ($this->shipping['postal_code'] ?? ''),
+            'first_name'   => (string) ($shipping['first_name'] ?? ''),
+            'last_name'    => (string) ($shipping['last_name'] ?? ''),
+            'company'      => $shipping['company'] ?? null,
+            'address'      => (string) ($shipping['address'] ?? ''),
+            'city'         => (string) ($shipping['city'] ?? ''),
+            'region'       => $shipping['region'] ?? null,
+            'postal_code'  => (string) ($shipping['postal_code'] ?? ''),
             'country'      => $country['name'],
             'country_code' => $country['code'],
         ];
@@ -479,13 +543,31 @@ final class CheckoutProcess extends Component
 
         $shipping = $addresses['shipping'] ?? null;
         if ($shipping instanceof Address) {
+            $shippingFirstName = trim((string) ($shipping->getAttribute('first_name') ?? ''));
+            $shippingLastName = trim((string) ($shipping->getAttribute('last_name') ?? ''));
+            $shippingAddressLine = trim((string) ($shipping->getAttribute('address_line_1') ?? ''));
+            $shippingCity = trim((string) ($shipping->getAttribute('city') ?? ''));
+            $shippingPostalCode = trim((string) ($shipping->getAttribute('postal_code') ?? ''));
+            $shippingCountry = strtoupper(trim((string) ($shipping->getAttribute('country_code') ?? '')));
+            $hasCompleteShippingAddress = $shippingFirstName !== ''
+                && $shippingLastName !== ''
+                && $shippingAddressLine !== ''
+                && $shippingCity !== ''
+                && $shippingPostalCode !== ''
+                && $shippingCountry !== '';
+
+            if (! $hasCompleteShippingAddress) {
+                // Keep using billing details in checkout when stored shipping data is incomplete.
+                return;
+            }
+
             // Mirror stored shipping data and disable the "same as billing" toggle when records differ.
             $this->sameAsShipping = false;
-            $this->shipping['first_name'] = (string) ($shipping->getAttribute('first_name') ?? $this->shipping['first_name']);
-            $this->shipping['last_name'] = (string) ($shipping->getAttribute('last_name') ?? $this->shipping['last_name']);
-            $this->shipping['address'] = (string) ($shipping->getAttribute('address_line_1') ?? $this->shipping['address']);
-            $this->shipping['city'] = (string) ($shipping->getAttribute('city') ?? $this->shipping['city']);
-            $this->shipping['postal_code'] = (string) ($shipping->getAttribute('postal_code') ?? $this->shipping['postal_code']);
+            $this->shipping['first_name'] = $shippingFirstName;
+            $this->shipping['last_name'] = $shippingLastName;
+            $this->shipping['address'] = $shippingAddressLine;
+            $this->shipping['city'] = $shippingCity;
+            $this->shipping['postal_code'] = $shippingPostalCode;
             $shippingCompany = $shipping->getAttribute('company_name') ?? $shipping->getAttribute('company');
             if (is_string($shippingCompany)) {
                 $this->shipping['company'] = $shippingCompany;
@@ -494,10 +576,7 @@ final class CheckoutProcess extends Component
             if (is_string($shippingState)) {
                 $this->shipping['region'] = $shippingState;
             }
-            $shippingCountry = $shipping->getAttribute('country_code');
-            if (is_string($shippingCountry)) {
-                $this->shipping['country'] = strtoupper($shippingCountry);
-            }
+            $this->shipping['country'] = $shippingCountry;
         }
     }
 
@@ -506,16 +585,14 @@ final class CheckoutProcess extends Component
      */
     private function initialisePaymentMethods(): void
     {
-        // Offer cash on delivery, bank transfer, and a default online option to match business requirements.
+        // Keep storefront checkout restricted to Montonio only.
         $this->paymentMethods = [
-            PaymentMethod::CASH_ON_DELIVERY->value => trans('orders.payment_methods.cash_on_delivery'),
-            PaymentMethod::BANK_TRANSFER->value    => trans('orders.payment_methods.bank_transfer'),
-            PaymentMethod::STRIPE->value           => trans('orders.payment_methods.stripe'),
+            PaymentMethod::MONTONIO->value => trans('enums.payment_method.montonio'),
         ];
 
         $this->selectedPaymentMethod = $this->selectedPaymentMethod !== ''
             ? $this->selectedPaymentMethod
-            : PaymentMethod::CASH_ON_DELIVERY->value;
+            : PaymentMethod::MONTONIO->value;
     }
 
     /**
@@ -539,7 +616,13 @@ final class CheckoutProcess extends Component
         try {
             $cartItems = $this->getCartItems();
             $resolver = app(ShippingOptionResolver::class);
-            $options = $resolver->resolve(collect($cartItems->all()), $this->shipping['country'] ?? null);
+            $shippingContext = $this->normalizedShippingAddress();
+            $this->shipping = $shippingContext;
+            $options = $resolver->resolve(
+                collect($cartItems->all()),
+                $shippingContext['country'] ?? null,
+                $shippingContext
+            );
 
             $this->availableShippingOptions = $options
                 ->map(function ($option): array {
@@ -577,8 +660,8 @@ final class CheckoutProcess extends Component
         $selectedExists = collect($this->availableShippingOptions)
             ->contains(fn (array $option): bool => $option['id'] === (int) $this->selectedShippingOption);
 
-        if (! $selectedExists && ! $shouldResetSelection) {
-            $this->selectedShippingOption = $this->availableShippingOptions[0]['id'];
+        if (! $selectedExists) {
+            $this->selectedShippingOption = null;
         }
 
         $this->resetErrorBag('selectedShippingOption');
@@ -656,6 +739,42 @@ final class CheckoutProcess extends Component
     }
 
     /**
+     * Add selected delivery place details to the stored shipping address payload.
+     *
+     * @param  array<string, string|null> $shippingAddress
+     * @return array<string, string|null>
+     */
+    private function enrichShippingAddressWithDeliveryPlace(array $shippingAddress): array
+    {
+        $selected = $this->selectedShippingSnapshot;
+
+        if ($selected === []) {
+            return $shippingAddress;
+        }
+
+        $shippingAddress['delivery_place_id'] = isset($selected['id']) ? (string) $selected['id'] : null;
+        $shippingAddress['delivery_place_name'] = is_string($selected['name'] ?? null) ? (string) $selected['name'] : null;
+        $shippingAddress['delivery_place_address'] = is_string($selected['description'] ?? null)
+            ? (string) $selected['description']
+            : (is_string($selected['estimated_delivery'] ?? null) ? (string) $selected['estimated_delivery'] : null);
+        $shippingAddress['delivery_provider'] = $this->isVenipakPickupSelection($selected) ? 'venipak' : 'storefront';
+
+        return $shippingAddress;
+    }
+
+    /**
+     * Determine whether selected delivery option is a Venipak pickup place.
+     *
+     * @param array<string, mixed> $option
+     */
+    private function isVenipakPickupSelection(array $option): bool
+    {
+        $name = mb_strtolower(trim((string) ($option['name'] ?? '')));
+
+        return str_starts_with($name, 'venipak');
+    }
+
+    /**
      * Calculate the shipping cost using the selected option and cart metrics.
      */
     /**
@@ -672,7 +791,12 @@ final class CheckoutProcess extends Component
         }
 
         $resolver = app(ShippingOptionResolver::class);
-        $options = $resolver->resolve(collect($cartItems->all()), $this->shipping['country'] ?? null);
+        $shippingContext = $this->normalizedShippingAddress();
+        $options = $resolver->resolve(
+            collect($cartItems->all()),
+            $shippingContext['country'] ?? null,
+            $shippingContext
+        );
         $match = $options->firstWhere('id', $this->selectedShippingOption);
 
         if ($match === null) {
@@ -762,6 +886,41 @@ final class CheckoutProcess extends Component
         $this->shipping['region'] = $this->billing['region'] ?? '';
         $billingCountry = $this->billing['country'] ?? '';
         $this->shipping['country'] = is_string($billingCountry) ? strtoupper($billingCountry) : 'LT';
+    }
+
+    /**
+     * Build shipping input with billing fallback so delivery lookup always receives a complete address.
+     *
+     * @return array{first_name:string,last_name:string,address:string,city:string,postal_code:string,company:?string,country:string,region:?string}
+     */
+    private function normalizedShippingAddress(): array
+    {
+        $normalized = $this->shipping;
+        $fields = ['first_name', 'last_name', 'address', 'city', 'postal_code', 'company', 'country', 'region'];
+
+        foreach ($fields as $field) {
+            $shippingValue = $this->shipping[$field] ?? null;
+            $shippingText = is_string($shippingValue) ? trim($shippingValue) : '';
+
+            if ($shippingText !== '') {
+                $normalized[$field] = $field === 'country' ? strtoupper($shippingText) : $shippingValue;
+
+                continue;
+            }
+
+            $billingValue = $this->billing[$field] ?? null;
+            $billingText = is_string($billingValue) ? trim($billingValue) : '';
+
+            if ($billingText !== '') {
+                $normalized[$field] = $field === 'country' ? strtoupper($billingText) : $billingValue;
+
+                continue;
+            }
+
+            $normalized[$field] = $field === 'country' ? 'LT' : '';
+        }
+
+        return $normalized;
     }
 
     /**

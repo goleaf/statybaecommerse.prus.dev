@@ -7,7 +7,7 @@
 
         <div class="mt-5">
             <button type="button" wire:click="confirmUserDeletion" wire:loading.attr="disabled"
-                    class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+                    class="inline-flex items-center rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700">
                 {{ __('ui.delete_account') }}
             </button>
         </div>
@@ -20,21 +20,21 @@
         <form wire:submit="deleteUser" class="mt-6 space-y-6">
             <div>
                 <x-forms.label for="password" :value="__('ui.password')" />
-                <x-forms.input id="password" type="password" class="mt-1 block w-full" wire:model="password" required
+                <x-forms.input id="password" type="password" class="mt-1 block w-full rounded-md border-gray-300" wire:model="password" required
                                autocomplete="current-password" />
                 <x-forms.errors class="mt-2" :messages="$errors->get('password')" />
             </div>
 
             <div class="flex items-center gap-4">
                 <button type="button" wire:click="$set('confirmUserDeletion', false)" wire:loading.attr="disabled"
-                        class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">
+                        class="inline-flex items-center rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
                     {{ __('messages.cancel') }}
                 </button>
 
-                <button type="button" wire:click="deleteUser" 
+                <button type="submit"
                         wire:confirm.prompt="{{ __('translations.confirm_delete_account') }}\n\n{{ __('translations.confirm_type_delete') }}|DELETE"
                         wire:loading.attr="disabled"
-                        class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+                        class="inline-flex items-center rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700">
                     {{ __('ui.delete_account') }}
                 </button>
             </div>

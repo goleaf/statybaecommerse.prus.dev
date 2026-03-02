@@ -78,7 +78,7 @@
                         </a>
                         <a wire:navigate
                            {{-- Preserve cart totals when moving straight into checkout --}}
-                            href="{{ route('checkout.index', ['locale' => app()->getLocale()]) ?? '/checkout' }}"
+                            href="{{ \Illuminate\Support\Facades\Route::has('frontend.checkout.index') ? route('frontend.checkout.index') : '/checkout' }}"
                            class="flex-1 btn-gradient px-4 py-2 rounded-lg text-center font-medium">
                             {{ __('messages.frontend') }}
                         </a>

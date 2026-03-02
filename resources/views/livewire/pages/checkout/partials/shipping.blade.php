@@ -1,20 +1,56 @@
 @php
+    $pickShippingValue = static function (string $key) use ($shipping, $billing, $sameAsShipping): string {
+        $shippingValue = $shipping[$key] ?? null;
+        if (is_string($shippingValue) && trim($shippingValue) !== '') {
+            return $shippingValue;
+        }
+
+        $billingValue = $billing[$key] ?? null;
+        if ($sameAsShipping || (is_string($billingValue) && trim($billingValue) !== '')) {
+            return (string) ($billingValue ?? '');
+        }
+
+        return '';
+    };
+
+    $resolveCountryLabel = static function (string $countryCode) use ($countries): string {
+        $code = strtoupper(trim($countryCode));
+        if ($code === '') {
+            return '';
+        }
+
+        if (isset($countries) && is_iterable($countries)) {
+            foreach ($countries as $country) {
+                if (
+                    is_array($country)
+                    && strtoupper((string) ($country['code'] ?? '')) === $code
+                    && is_string($country['name'] ?? null)
+                    && trim($country['name']) !== ''
+                ) {
+                    return $country['name'];
+                }
+            }
+        }
+
+        return $code;
+    };
+
     $shippingName = trim(sprintf(
         '%s %s',
-        $shipping['first_name'] ?? ($sameAsShipping ? $billing['first_name'] ?? '' : ''),
-        $shipping['last_name'] ?? ($sameAsShipping ? $billing['last_name'] ?? '' : ''),
+        $pickShippingValue('first_name'),
+        $pickShippingValue('last_name'),
     ));
 
     $shippingLines = array_filter([
         $shippingName !== '' ? $shippingName : null,
-        $shipping['company'] ?? ($sameAsShipping ? $billing['company'] ?? null : null),
-        $shipping['address'] ?? ($sameAsShipping ? $billing['address'] ?? null : null),
+        $pickShippingValue('company') !== '' ? $pickShippingValue('company') : null,
+        $pickShippingValue('address') !== '' ? $pickShippingValue('address') : null,
         trim(sprintf(
             '%s %s',
-            $shipping['city'] ?? ($sameAsShipping ? $billing['city'] ?? '' : ''),
-            $shipping['postal_code'] ?? ($sameAsShipping ? $billing['postal_code'] ?? '' : ''),
+            $pickShippingValue('city'),
+            $pickShippingValue('postal_code'),
         )),
-        strtoupper($shipping['country'] ?? ($sameAsShipping ? $billing['country'] ?? '' : '')),
+        $resolveCountryLabel($pickShippingValue('country')),
     ]);
 @endphp
 
@@ -41,9 +77,9 @@
                         @endforelse
                     </ul>
                 </div>
-                <x-buttons.secondary type="button" wire:click="toStep(1)" class="px-3 py-1.5 text-xs">
+                <button type="button" wire:click="toStep(1)" class="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 transition hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500/20">
                     {{ __('ui.edit_address') }}
-                </x-buttons.secondary>
+                </button>
             </div>
         </div>
 
@@ -55,7 +91,7 @@
                     wire:click="resolveShippingOptions(true)"
                     wire:loading.attr="disabled"
                     wire:target="resolveShippingOptions"
-                    class="text-xs font-medium text-primary-600 hover:text-primary-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+                    class="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 transition hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     {{ __('ui.refresh_options') }}
                 </button>
@@ -73,12 +109,13 @@
 
             <fieldset class="space-y-3" aria-label="{{ __('ui.delivery_options') }}" wire:loading.remove wire:target="resolveShippingOptions">
                 @forelse ($options as $option)
+                    @php($isSelectedOption = (string) ($selectedShippingOption ?? '') === (string) ($option['id'] ?? ''))
                     <label
                         wire:key="checkout-delivery-option-{{ $option['id'] }}"
                         @class([
-                            'flex flex-wrap items-start justify-between gap-4 rounded-lg border p-4 transition',
-                            'border-primary-200 bg-primary-50 shadow-sm' => (int) $selectedShippingOption === (int) $option['id'],
-                            'border-gray-200 hover:border-primary-200 hover:bg-primary-50/50' => (int) $selectedShippingOption !== (int) $option['id'],
+                            'relative flex flex-wrap items-start justify-between gap-4 rounded-xl border-2 p-4 transition-colors duration-200',
+                            'border-green-300 bg-green-50/40' => $isSelectedOption,
+                            'border-gray-200 bg-white hover:border-green-300 hover:bg-green-50/40' => ! $isSelectedOption,
                         ])
                     >
                         <span class="flex flex-1 items-start gap-3">
@@ -86,7 +123,7 @@
                                 type="radio"
                                 value="{{ $option['id'] }}"
                                 wire:model="selectedShippingOption"
-                                class="size-4 rounded border-gray-300 text-primary-600 focus:ring-primary-600"
+                                class="mt-0.5 size-4 border-gray-300 text-green-600 accent-green-600 focus:ring-0 focus:ring-offset-0"
                             >
                             <span class="flex flex-col">
                                 <span class="block text-sm font-semibold text-gray-900">{{ $option['name'] }}</span>
@@ -135,17 +172,17 @@
             @enderror
 
             <div class="flex flex-wrap justify-between gap-3 pt-2">
-                <x-buttons.secondary type="button" wire:click="toStep(1)">
+                <button type="button" wire:click="toStep(1)" class="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-5 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500/20">
                     {{ __('ui.back_to_billing') }}
-                </x-buttons.secondary>
-                <x-buttons.primary
+                </button>
+                <button
                     type="submit"
-                    class="px-6 py-2 text-sm"
+                    class="inline-flex items-center justify-center rounded-lg bg-primary-600 px-6 py-2 text-sm font-semibold text-white transition hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
                     wire:loading.attr="disabled"
                     wire:target="toStep,resolveShippingOptions"
                 >
                     {{ __('ui.continue_to_payment') }}
-                </x-buttons.primary>
+                </button>
             </div>
         </form>
     </div>

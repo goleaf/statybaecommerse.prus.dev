@@ -11,11 +11,9 @@ use App\Filament\Resources\Users\Pages\EditUser;
 use App\Filament\Resources\Users\Pages\ListUsers;
 use App\Filament\Resources\Users\Pages\ViewUser;
 use App\Filament\Resources\Users\RelationManagers\AddressesRelationManager;
-use App\Filament\Resources\Users\RelationManagers\CartItemsRelationManager;
 use App\Filament\Resources\Users\RelationManagers\CouponUsagesRelationManager;
 use App\Filament\Resources\Users\RelationManagers\CustomerGroupsRelationManager;
 use App\Filament\Resources\Users\RelationManagers\DiscountRedemptionsRelationManager;
-use App\Filament\Resources\Users\RelationManagers\DocumentsRelationManager;
 use App\Filament\Resources\Users\RelationManagers\NotificationsRelationManager;
 use App\Filament\Resources\Users\RelationManagers\OrdersRelationManager;
 use App\Filament\Resources\Users\RelationManagers\PartnersRelationManager;
@@ -32,8 +30,6 @@ use App\Models\CustomerGroup;
 use App\Models\Discount;
 use App\Models\DiscountCode;
 use App\Models\DiscountRedemption;
-use App\Models\Document;
-use App\Models\DocumentTemplate;
 use App\Models\Notification;
 use App\Models\Order;
 use App\Models\Partner;
@@ -136,13 +132,11 @@ class UserResourceTest extends TestCase
             'all',
             'company',
             'addresses',
-            'cart_items',
             'customer_groups',
             'partners',
             'referral_codes',
             'referrals',
             'referral_rewards',
-            'documents',
             'coupon_usages',
             'discount_redemptions',
             'notifications',
@@ -163,7 +157,6 @@ class UserResourceTest extends TestCase
             ->assertTableColumnExists('referral_codes_count')
             ->assertTableColumnExists('referrals_count')
             ->assertTableColumnExists('referral_rewards_count')
-            ->assertTableColumnExists('documents_count')
             ->assertTableColumnExists('coupon_usages_count')
             ->assertTableColumnExists('discount_redemptions_count')
             ->assertTableColumnExists('notifications_count')
@@ -219,13 +212,6 @@ class UserResourceTest extends TestCase
             'referral_id' => $referral->getKey(),
         ]);
 
-        Document::factory()->create([
-            'documentable_type' => User::class,
-            'documentable_id'   => $relatedUser->getKey(),
-            'created_by'        => $relatedUser->getKey(),
-            'updated_by'        => $relatedUser->getKey(),
-        ]);
-
         CouponUsage::factory()->create([
             'user_id'  => $relatedUser->getKey(),
             'order_id' => $order->getKey(),
@@ -268,7 +254,6 @@ class UserResourceTest extends TestCase
         $this->assertSame(1, $tabs['referral_codes']->modifyQuery(User::query())->count());
         $this->assertSame(1, $tabs['referrals']->modifyQuery(User::query())->count());
         $this->assertSame(1, $tabs['referral_rewards']->modifyQuery(User::query())->count());
-        $this->assertSame(1, $tabs['documents']->modifyQuery(User::query())->count());
         $this->assertSame(1, $tabs['coupon_usages']->modifyQuery(User::query())->count());
         $this->assertSame(1, $tabs['discount_redemptions']->modifyQuery(User::query())->count());
         $this->assertSame(1, $tabs['notifications']->modifyQuery(User::query())->count());
@@ -1004,135 +989,6 @@ class UserResourceTest extends TestCase
         $this->assertTrue((bool) $referralCode->is_active);
     }
 
-    public function test_documents_relation_manager_can_create_document_for_user(): void
-    {
-        $this->resolveAdminPanel();
-
-        $this->actingAs(AdminUser::factory()->create(), 'admin');
-
-        $user = User::factory()->create();
-        $template = DocumentTemplate::factory()->create([
-            'name'      => 'User Contract',
-            'is_active' => true,
-        ]);
-
-        Livewire::test(DocumentsRelationManager::class, [
-            'ownerRecord' => $user,
-            'pageClass'   => EditUser::class,
-        ])
-            ->assertSuccessful()
-            ->mountTableAction('create')
-            ->set('mountedActions.0.data.document_template_id', $template->getKey())
-            ->set('mountedActions.0.data.title', 'Contract for customer')
-            ->set('mountedActions.0.data.status', 'draft')
-            ->callMountedTableAction()
-            ->assertHasNoTableActionErrors();
-
-        $this->assertDatabaseHas('documents', [
-            'document_template_id' => $template->getKey(),
-            'documentable_type'    => User::class,
-            'documentable_id'      => $user->getKey(),
-            'title'                => 'Contract for customer',
-            'status'               => 'draft',
-        ]);
-    }
-
-    public function test_documents_relation_manager_defaults_status_to_draft_when_not_provided(): void
-    {
-        $this->resolveAdminPanel();
-
-        $this->actingAs(AdminUser::factory()->create(), 'admin');
-
-        $user = User::factory()->create();
-        $template = DocumentTemplate::factory()->create([
-            'name'      => 'Default Status Template',
-            'is_active' => true,
-        ]);
-
-        Livewire::test(DocumentsRelationManager::class, [
-            'ownerRecord' => $user,
-            'pageClass'   => EditUser::class,
-        ])
-            ->assertSuccessful()
-            ->mountTableAction('create')
-            ->set('mountedActions.0.data.document_template_id', $template->getKey())
-            ->set('mountedActions.0.data.title', 'Document without explicit status')
-            ->callMountedTableAction()
-            ->assertHasNoTableActionErrors();
-
-        $this->assertDatabaseHas('documents', [
-            'document_template_id' => $template->getKey(),
-            'documentable_type'    => User::class,
-            'documentable_id'      => $user->getKey(),
-            'title'                => 'Document without explicit status',
-            'status'               => Document::STATUS_DRAFT,
-        ]);
-    }
-
-    public function test_documents_relation_manager_can_create_document_without_selecting_template(): void
-    {
-        $this->resolveAdminPanel();
-
-        $this->actingAs(AdminUser::factory()->create(), 'admin');
-
-        $user = User::factory()->create();
-
-        DocumentTemplate::query()->delete();
-
-        Livewire::test(DocumentsRelationManager::class, [
-            'ownerRecord' => $user,
-            'pageClass'   => EditUser::class,
-        ])
-            ->assertSuccessful()
-            ->mountTableAction('create')
-            ->set('mountedActions.0.data.title', 'Fallback template document')
-            ->callMountedTableAction()
-            ->assertHasNoTableActionErrors();
-
-        /** @var Document|null $document */
-        $document = Document::withoutGlobalScopes()
-            ->where('documentable_type', User::class)
-            ->where('documentable_id', $user->getKey())
-            ->latest('id')
-            ->first();
-
-        $this->assertNotNull($document);
-        $this->assertNotNull($document->document_template_id);
-        $this->assertDatabaseHas('document_templates', [
-            'id' => $document->document_template_id,
-        ]);
-    }
-
-    public function test_documents_relation_manager_lists_documents_with_legacy_status_values(): void
-    {
-        $this->resolveAdminPanel();
-
-        $this->actingAs(AdminUser::factory()->create(), 'admin');
-
-        $user = User::factory()->create();
-        $template = DocumentTemplate::factory()->create([
-            'name'      => 'Legacy Status Template',
-            'is_active' => true,
-        ]);
-
-        $legacyDocument = Document::withoutGlobalScopes()->create([
-            'document_template_id' => $template->getKey(),
-            'title'                => 'Legacy status document',
-            'content'              => '<h1>Legacy</h1>',
-            'status'               => 'legacy',
-            'format'               => Document::FORMAT_HTML,
-            'documentable_type'    => User::class,
-            'documentable_id'      => $user->getKey(),
-        ]);
-
-        Livewire::test(DocumentsRelationManager::class, [
-            'ownerRecord' => $user,
-            'pageClass'   => EditUser::class,
-        ])
-            ->assertSuccessful()
-            ->assertCanSeeTableRecords([$legacyDocument]);
-    }
-
     public function test_referral_rewards_relation_manager_can_create_reward_for_user(): void
     {
         $this->resolveAdminPanel();
@@ -1250,8 +1106,6 @@ class UserResourceTest extends TestCase
         $owner = User::factory()->create();
         $groupCode = 'VIEW-GRP-' . strtoupper(substr(md5((string) microtime(true)), 0, 8));
 
-        DocumentTemplate::query()->delete();
-
         Livewire::test(CustomerGroupsRelationManager::class, [
             'ownerRecord' => $owner,
             'pageClass'   => ViewUser::class,
@@ -1286,16 +1140,6 @@ class UserResourceTest extends TestCase
             ->callMountedTableAction()
             ->assertHasNoTableActionErrors();
 
-        Livewire::test(DocumentsRelationManager::class, [
-            'ownerRecord' => $owner,
-            'pageClass'   => ViewUser::class,
-        ])
-            ->assertSuccessful()
-            ->mountTableAction('create')
-            ->set('mountedActions.0.data.title', 'View page document')
-            ->callMountedTableAction()
-            ->assertHasNoTableActionErrors();
-
         Livewire::test(ReferralCodesRelationManager::class, [
             'ownerRecord' => $owner,
             'pageClass'   => ViewUser::class,
@@ -1317,10 +1161,6 @@ class UserResourceTest extends TestCase
         $this->assertSame(1, $owner->customerGroups()->count());
         $this->assertSame(1, Order::query()->where('user_id', $owner->getKey())->count());
         $this->assertSame(1, Address::query()->where('user_id', $owner->getKey())->count());
-        $this->assertSame(1, Document::withoutGlobalScopes()
-            ->where('documentable_type', User::class)
-            ->where('documentable_id', $owner->getKey())
-            ->count());
         $this->assertSame(1, ReferralCode::withoutGlobalScopes()->where('user_id', $owner->getKey())->count());
         $this->assertSame(1, ReferralReward::query()->where('user_id', $owner->getKey())->count());
     }
@@ -1350,12 +1190,10 @@ class UserResourceTest extends TestCase
             PartnersRelationManager::class,
             OrdersRelationManager::class,
             AddressesRelationManager::class,
-            CartItemsRelationManager::class,
             CouponUsagesRelationManager::class,
             DiscountRedemptionsRelationManager::class,
             NotificationsRelationManager::class,
             SubscriberRelationManager::class,
-            DocumentsRelationManager::class,
             ReferralCodesRelationManager::class,
             ReferralsRelationManager::class,
             ReferralRewardsRelationManager::class,

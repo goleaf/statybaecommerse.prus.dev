@@ -1,0 +1,7 @@
+{
+  "error": true,
+  "url": "https://saskaita.vercel.app/api/initiate",
+  "statusCode": 500,
+  "statusMessage": "pdf-generation-failed",
+  "message": "pdf-generation-failed"
+}

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use App\Models\Document;
 use App\Models\Inventory;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -389,24 +388,6 @@ final class AdminSeederTest extends TestCase
     }
 
     #[Test]
-    public function it_creates_documents_correctly(): void
-    {
-        $this->markTestSkipped('Documents creation is temporarily disabled in the seeder');
-
-        $this->seed(AdminSeeder::class);
-
-        $this->assertDatabaseCount('documents', 5);
-
-        $documents = Document::all();
-        foreach ($documents as $document) {
-            $this->assertNotNull($document->order_id);
-            $this->assertEquals('invoice', $document->type);
-            $this->assertNotNull($document->title);
-            $this->assertNotNull($document->content);
-        }
-    }
-
-    #[Test]
     public function it_creates_discount_codes_correctly(): void
     {
         $this->markTestSkipped('Discount codes creation is temporarily disabled in the seeder');
@@ -657,7 +638,7 @@ final class AdminSeederTest extends TestCase
         $this->assertDatabaseCount('orders', 5);
         $this->assertGreaterThanOrEqual(5, OrderItem::count());
         $this->assertDatabaseCount('order_shippings', 5);
-        // Documents and discount codes are temporarily disabled in the seeder
+        // Discount codes are temporarily disabled in the seeder
         $this->assertDatabaseCount('sliders', 3);
         $this->assertDatabaseCount('seo_data', 2);
         $this->assertDatabaseCount('subscribers', 5);

@@ -48,10 +48,6 @@ it('seeds company tab users with all related interface records and stays idempot
         expect(DB::table('orders')->where('user_id', $user->id)->count())->toBeGreaterThanOrEqual(1);
         expect(DB::table('coupon_usages')->where('user_id', $user->id)->count())->toBeGreaterThanOrEqual(1);
         expect(DB::table('discount_redemptions')->where('user_id', $user->id)->count())->toBeGreaterThanOrEqual(1);
-        expect(DB::table('documents')
-            ->where('documentable_type', User::class)
-            ->where('documentable_id', $user->id)
-            ->count())->toBeGreaterThanOrEqual(1);
         expect(DB::table('notifications')
             ->where('notifiable_type', User::class)
             ->where('notifiable_id', $user->id)

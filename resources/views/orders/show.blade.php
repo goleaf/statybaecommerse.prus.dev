@@ -176,41 +176,7 @@
                             </div>
                         </div>
                     </div>
-                @endif
-
-                <!-- Documents -->
-                @if($order->documents->count() > 0)
-                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-                        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                            <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-                                {{ __('messages.orders') }}
-                            </h2>
-                        </div>
-                        <div class="p-6">
-                            <div class="space-y-3">
-                                @foreach($order->documents as $document)
-                                    <div class="flex items-center justify-between">
-                                        <div>
-                                            <h3 class="text-sm font-medium text-gray-900 dark:text-white">
-                                                {{ $document->name }}
-                                            </h3>
-                                            <p class="text-sm text-gray-600 dark:text-gray-400">
-                                                {{ __("orders.document_types.{$document->type}") }}
-                                            </p>
-                                        </div>
-                                        <a href="{{ route('documents.download', $document) }}" 
-                                           class="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                            {{ __('orders.download') }}
-                                        </a>
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-                    </div>
-                @endif
-            </div>
-
-            <!-- Sidebar -->
+                @endif`r`n            <!-- Sidebar -->
             <div class="space-y-6">
                 <!-- Order Summary -->
                 <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">

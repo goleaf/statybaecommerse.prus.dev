@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Models\Scopes;
 
-use App\Models\Document;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
@@ -49,12 +48,6 @@ final class StatusScope implements Scope
             \App\Models\Order::class          => ['pending', 'processing', 'shipped', 'delivered', 'completed'], // Retain "completed" for historical rows while the lifecycle migrates to delivered.
             \App\Models\Channel::class        => ['active', 'enabled'],
             \App\Models\OrderShipping::class  => ['pending', 'processing', 'shipped', 'delivered'],
-            Document::class                   => [
-                Document::STATUS_DRAFT,
-                Document::STATUS_GENERATED,
-                Document::STATUS_PUBLISHED,
-                Document::STATUS_ARCHIVED,
-            ],
             // Ensure discount redemption records remain queryable across Filament resources and tests.
             \App\Models\DiscountRedemption::class => ['pending', 'redeemed', 'expired', 'cancelled'],
             \App\Models\Referral::class           => ['pending', 'active', 'completed', 'expired', 'cancelled'],

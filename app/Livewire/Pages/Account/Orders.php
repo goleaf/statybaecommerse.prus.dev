@@ -24,6 +24,12 @@ class Orders extends Component
      */
     public function render(): View
     {
-        return view('livewire.pages.account.orders.index', ['orders' => auth()->user()->orders()->with(['items', 'items.product', 'shippingOption'])->latest()->simplePaginate(3)])->title(__('messages.my_orders'));
+        return view('livewire.pages.account.orders.index', [
+            'orders' => auth()->user()
+                ->orders()
+                ->with(['items', 'items.product', 'shippingOption', 'currentInvoice.file'])
+                ->latest()
+                ->simplePaginate(3),
+        ])->title(__('messages.my_orders'));
     }
 }

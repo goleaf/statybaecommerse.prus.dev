@@ -47,11 +47,6 @@ Route::middleware('auth')->group(function (): void {
                 ->name('destroy');
         });
 
-    Route::get('/admin/document-templates/{documentTemplate}/preview', function (\App\Models\DocumentTemplate $documentTemplate) {
-        return response($documentTemplate->content, 200)
-            ->header('Content-Type', 'text/html; charset=utf-8');
-    })->name('admin.document-templates.preview');
-
     Route::get('/admin/news-image-resources', function (Request $request) {
         $forwarded = Request::create('/admin/news-images', 'GET', $request->query());
 

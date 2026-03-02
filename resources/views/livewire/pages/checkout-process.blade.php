@@ -86,18 +86,20 @@
                 {{ __('frontend.empty_checkout_description') }}
             </p>
             <div class="mt-6 flex flex-wrap justify-center gap-3">
-                <a
-                    href="{{ route('frontend.cart.index') }}"
-                    class="inline-flex items-center rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
+                <button
+                    type="button"
+                    onclick="window.location.href='{{ route('frontend.cart.index') }}'"
+                    class="inline-flex items-center justify-center rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500/30"
                 >
                     {{ __('frontend.view_cart') }}
-                </a>
-                <a
-                    href="{{ route('frontend.products.index') }}"
-                    class="inline-flex items-center rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-300"
+                </button>
+                <button
+                    type="button"
+                    onclick="window.location.href='{{ route('frontend.products.index') }}'"
+                    class="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
                 >
                     {{ __('frontend.continue_shopping') }}
-                </a>
+                </button>
             </div>
         </section>
     @else

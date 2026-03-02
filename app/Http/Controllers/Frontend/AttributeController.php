@@ -138,11 +138,11 @@ final class AttributeController extends Controller
     {
         $attributeId = $request->get('attribute_id');
         if (! $attributeId) {
-            return response()->json(['error' => 'Attribute ID is required']);
+            return response()->json(['error' => __('messages.attribute_id_is_required')]);
         }
         $attribute = Attribute::find($attributeId);
         if (! $attribute) {
-            return response()->json(['error' => 'Attribute not found']);
+            return response()->json(['error' => __('messages.attribute_not_found')]);
         }
         $statistics = $attribute->getStatistics();
 

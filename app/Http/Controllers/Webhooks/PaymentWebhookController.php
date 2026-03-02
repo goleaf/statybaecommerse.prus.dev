@@ -43,6 +43,52 @@ final class PaymentWebhookController extends Controller
     }
 
     /**
+     * Entry point for Montonio webhooks.
+     */
+    public function handleMontonio(Request $request, \App\Services\Payments\MontonioService $montonioService): JsonResponse
+    {
+        try {
+            $token = $request->input('orderToken');
+
+            if (! $token) {
+                return response()->json(['error' => 'missing_token'], 400);
+            }
+
+            $payload = $montonioService->validateToken($token);
+
+            $orderNumber = $payload['merchantReference'] ?? null;
+            $status = $payload['paymentStatus'] ?? null;
+
+            if (! $orderNumber || ! $status) {
+                return response()->json(['error' => 'invalid_payload'], 400);
+            }
+
+            $order = \App\Models\Order::query()->where('number', $orderNumber)->first();
+
+            if (! $order) {
+                return response()->json(['error' => 'order_not_found'], 404);
+            }
+
+            if ($status === 'PAID') {
+                $order->payment_status = \App\Enums\PaymentStatus::PAID;
+                $order->payment_state = \App\Enums\OrderPaymentState::PAID;
+                if ($order->isDirty()) {
+                    $order->save();
+                }
+            }
+
+            return response()->json(['status' => 'success']);
+
+        } catch (Throwable $exception) {
+            Log::error('Montonio webhook handling failure.', [
+                'message' => $exception->getMessage(),
+            ]);
+
+            return response()->json(['error' => 'internal_error'], 500);
+        }
+    }
+
+    /**
      * Delegate webhook handling to the shared service while mapping exceptions
      * to appropriate HTTP status codes.
      */

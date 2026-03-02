@@ -8,7 +8,6 @@ use App\Models\Address;
 use App\Models\CouponUsage;
 use App\Models\CustomerGroup;
 use App\Models\DiscountRedemption;
-use App\Models\Document;
 use App\Models\Notification;
 use App\Models\Order;
 use App\Models\Partner;
@@ -79,35 +78,28 @@ final class UserRelationsSeeder extends BaseSeeder
         // 5. Referral Codes
         ReferralCode::factory()->count(rand(1, 2))->create(['user_id' => $user->id]);
 
-        // 6. Documents (MorphMany)
-        Document::factory()->count($count)->create([
-            'documentable_type' => User::class,
-            'documentable_id'   => $user->id,
-            'created_by'        => $user->id,
-        ]);
-
-        // 7. Referrals (Users referred BY this user)
+        // 6. Referrals (Users referred BY this user)
         Referral::factory()->count($count)->create([
             'referrer_id' => $user->id,
         ]);
 
-        // 8. Coupon Usages
+        // 7. Coupon Usages
         CouponUsage::factory()->count($count)->create(['user_id' => $user->id]);
 
-        // 9. Discount Redemptions
+        // 8. Discount Redemptions
         DiscountRedemption::factory()->count($count)->create(['user_id' => $user->id]);
 
-        // 10. Referral Rewards
+        // 9. Referral Rewards
         ReferralReward::factory()->count($count)->create(['user_id' => $user->id]);
 
-        // 11. Notifications
+        // 10. Notifications
         Notification::factory()->count($count)->create([
             'notifiable_type' => User::class,
             'notifiable_id'   => $user->id,
             'user_id'         => $user->id,
         ]);
 
-        // 12. Subscriber
+        // 11. Subscriber
         $subscriber = Subscriber::query()->where('email', $user->email)->first();
         if ($subscriber) {
             $subscriber->update([

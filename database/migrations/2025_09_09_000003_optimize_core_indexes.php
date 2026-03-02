@@ -43,10 +43,6 @@ return new class extends Migration
             ['columns' => ['priceable_type', 'priceable_id'], 'name' => 'prices_priceable_idx'],
         ]);
 
-        $this->ensureIndexes('documents', [
-            ['columns' => ['documentable_type', 'documentable_id'], 'name' => 'documents_documentable_idx'],
-        ]);
-
         $this->ensureIndexes('reviews', [
             ['columns' => ['created_at'], 'name' => 'reviews_created_idx'],
         ]);

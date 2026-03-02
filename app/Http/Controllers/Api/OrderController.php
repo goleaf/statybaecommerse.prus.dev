@@ -70,7 +70,7 @@ final class OrderController extends Controller
         // Abort with a not found response when the order is in a terminal state
         // (such as cancelled or refunded) to avoid leaking sensitive details.
         if (! in_array($statusValue, self::VIEWABLE_STATUS_VALUES, true)) {
-            abort(404, 'Order is not available.');
+            abort(404, __('messages.order_is_not_available'));
         }
 
         $user = $request->user();
@@ -79,14 +79,14 @@ final class OrderController extends Controller
             // The route is guarded by authentication middleware, but we still
             // guard against accidental misconfiguration that could allow guest
             // access to leaked order data.
-            abort(401, 'Authentication is required to view this order.');
+            abort(401, __('messages.authentication_is_required_to_view_this_order'));
         }
 
         // Defer to the authorization policy so users with explicit permissions
         // (e.g. support agents or administrators) can access orders they do not
         // own while regular customers remain restricted to their purchases.
         if ($user->cannot('view', $order)) {
-            abort(403, 'You are not allowed to view this order.');
+            abort(403, __('messages.you_are_not_allowed_to_view_this_order'));
         }
 
         $order->loadMissing(['items']);

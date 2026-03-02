@@ -56,6 +56,7 @@
         <env name="MAIL_MAILER" value="array"/>
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>
+        <env name="INVOICES_ENABLED" value="false"/>
         <env name="ACTIVITY_LOGGER_ENABLED" value="false"/>
         <env name="PULSE_ENABLED" value="false"/>
         <env name="LARAVEL_PARALLEL_TESTING_WITHOUT_DATABASES" value="1"/>

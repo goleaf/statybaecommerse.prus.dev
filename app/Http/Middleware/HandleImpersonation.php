@@ -29,7 +29,7 @@ class HandleImpersonation
                 'user_agent' => $request->userAgent(),
             ]);
 
-            return response()->json(['error' => 'Too many impersonation attempts'], 429);
+            return response()->json(['error' => __('messages.too_many_impersonation_attempts')], 429);
         }
 
         if ($this->hasValidImpersonationSession()) {

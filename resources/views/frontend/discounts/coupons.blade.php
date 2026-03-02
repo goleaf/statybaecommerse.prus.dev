@@ -1,6 +1,6 @@
-<x-layouts.base title="{{ __('frontend.coupons.title', 'Available Coupons') }}">
+<x-layouts.base title="{{ __('frontend.coupons.title') }}">
     <div class="max-w-4xl mx-auto px-4 py-10 space-y-6">
-        <h1 class="text-3xl font-semibold text-gray-900 dark:text-gray-100">{{ __('frontend.coupons.title', 'Available Coupons') }}</h1>
+        <h1 class="text-3xl font-semibold text-gray-900 dark:text-gray-100">{{ __('frontend.coupons.title') }}</h1>
         <div class="space-y-4">
             @forelse ($coupons as $coupon)
                 <article class="p-4 border border-gray-200 dark:border-white/10 rounded-xl bg-white dark:bg-gray-900 shadow-sm">
@@ -14,7 +14,7 @@
                     <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">{{ __('frontend.coupons.discount_value', ['value' => $coupon->value]) }}</p>
                 </article>
             @empty
-                <p class="text-gray-500 dark:text-gray-400">{{ __('frontend.coupons.empty', 'No available coupons') }}</p>
+                <p class="text-gray-500 dark:text-gray-400">{{ __('frontend.coupons.empty') }}</p>
             @endforelse
         </div>
         <div>

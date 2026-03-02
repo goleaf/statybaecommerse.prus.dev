@@ -133,6 +133,6 @@ final class NewsController extends Controller
      */
     public function category(string $slug): View
     {
-        abort(404, 'Category functionality has been removed');
+        abort(404, __('messages.category_functionality_has_been_removed'));
     }
 }

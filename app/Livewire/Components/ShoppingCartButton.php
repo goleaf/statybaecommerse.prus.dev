@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Livewire\Components;
 
 use App\Services\Cart\CartService;
+use Livewire\Attributes\On;
 use Livewire\Component;
 use Throwable;
 
@@ -23,10 +24,6 @@ final class ShoppingCartButton extends Component
 
     public string $sessionKey = '';
 
-    protected $listeners = [
-        'cart-updated' => 'updateCartCount', // Listen for the normalised cart update broadcast.
-    ];
-
     /**
      * Initialize the Livewire component with parameters.
      */
@@ -34,14 +31,19 @@ final class ShoppingCartButton extends Component
     {
         $this->sessionKey = session()->getId();
         $this->cartTotalItems = $this->resolveCartCount();
+        $this->dispatch('cart-count-changed', quantity: $this->cartTotalItems);
     }
 
     /**
      * Handle updateCartCount functionality with proper error handling.
      */
+    #[On('cart-updated')]
+    #[On('itemAddedToCart')]
+    #[On('add-to-cart')]
     public function updateCartCount(): void
     {
         $this->cartTotalItems = $this->resolveCartCount();
+        $this->dispatch('cart-count-changed', quantity: $this->cartTotalItems);
     }
 
     /**
@@ -49,6 +51,12 @@ final class ShoppingCartButton extends Component
      */
     private function resolveCartCount(): int
     {
+        $serviceCount = app(CartService::class)->getCount(auth()->id(), $this->sessionKey);
+
+        if ($serviceCount > 0) {
+            return $serviceCount;
+        }
+
         if (class_exists(\Darryldecode\Cart\Facades\CartFacade::class)) {
             try {
                 return (int) \Darryldecode\Cart\Facades\CartFacade::session($this->sessionKey)->getTotalQuantity();
@@ -57,7 +65,7 @@ final class ShoppingCartButton extends Component
             }
         }
 
-        return app(CartService::class)->getCount(auth()->id(), $this->sessionKey);
+        return $serviceCount;
     }
 
     /**
