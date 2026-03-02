@@ -46,8 +46,13 @@ final class UserOwnedScope implements Scope
                 return;
             }
 
-            $builder->where(function (Builder $query) use ($userColumns, $userId): void {
-                foreach ($userColumns as $column) {
+            $qualifiedUserColumns = array_map(
+                static fn (string $column): string => $model->qualifyColumn($column),
+                $userColumns,
+            );
+
+            $builder->where(function (Builder $query) use ($qualifiedUserColumns, $userId): void {
+                foreach ($qualifiedUserColumns as $column) {
                     $query->orWhere($column, $userId);
                 }
             });

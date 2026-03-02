@@ -9,6 +9,7 @@ use App\Filament\Resources\ReferralRewardLogs\Tables\ReferralRewardLogsTable;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 final class ReferralRewardLogsRelationManager extends RelationManager
@@ -27,6 +28,7 @@ final class ReferralRewardLogsRelationManager extends RelationManager
 
     public function table(Table $table): Table
     {
-        return ReferralRewardLogsTable::configure($table);
+        return ReferralRewardLogsTable::configure($table)
+            ->modifyQueryUsing(static fn (Builder $query): Builder => $query->withoutGlobalScopes());
     }
 }
