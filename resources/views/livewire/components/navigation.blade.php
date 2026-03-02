@@ -108,18 +108,6 @@
                     </svg>
                     <span class="hidden sm:block">{{ __('frontend.header.topbar.email') }}</span>
                 </a>
-                @if (Route::has('localized.locations.index'))
-                    <a href="{{ route('localized.locations.index', ['locale' => $locale]) }}"
-                        class="flex items-center group gap-2 hover:text-stone transition-colors">
-                        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M12 11c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3z" />
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M19.5 9c0 7.5-7.5 12-7.5 12S4.5 16.5 4.5 9a7.5 7.5 0 1115 0z" />
-                        </svg>
-                        <span class="hidden sm:block">{{ __('frontend.header.topbar.store_locator') }}</span>
-                    </a>
-                @endif
             </div>
 
             <div class="hidden md:flex items-center gap-5">
@@ -150,7 +138,7 @@
                     {{-- Logo section - Made bigger --}}
                     <div class="flex-shrink-0 flex items-center">
                         <a href="{{ $homeUrl }}" class="group" aria-label="{{ __('messages.nav_home') }}">
-                            <img src="/images/logo/logo.png" alt="{{ config('app.name') }}"
+                            <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.name') }}"
                                 class="h-16 w-auto object-contain">
                         </a>
                     </div>

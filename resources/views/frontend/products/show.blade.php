@@ -23,9 +23,8 @@
             <div class="mt-10 grid grid-cols-1 gap-10 lg:grid-cols-[1.1fr_1fr]">
                 <div class="space-y-6">
                     <div class="overflow-hidden rounded-3xl border border-gray-200 bg-gray-50">
-                        <img src="{{ $product->main_image ?: ('https://via.placeholder.com/1200x1200.png?text=' . rawurlencode((string) __('messages.product'))) }}" alt="{{ $product->name }}" class="h-full w-full object-cover" loading="lazy" />
-                        </article>
-                    @endif
+                        <img src="{{ $product->main_image ?: product_placeholder_url('large') }}" alt="{{ $product->name }}" class="h-full w-full object-cover" loading="lazy" />
+                    </div>
                 </div>
 
                 <aside class="space-y-6 rounded-3xl border border-gray-200 bg-white p-8 shadow-sm">

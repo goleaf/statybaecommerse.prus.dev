@@ -3,61 +3,83 @@
 @section('title', __('frontend.about.meta.title'))
 @section('meta_description', __('frontend.about.meta.description'))
 
+@php
+    $metricsItems = trans('frontend.about.sections.metrics.items');
+    $metricsItems = is_array($metricsItems)
+        ? array_values(array_filter($metricsItems, static fn ($item): bool => is_array($item) && isset($item['value'], $item['label'])))
+        : [];
+
+    $valuesItems = trans('frontend.about.sections.values.items');
+    $valuesItems = is_array($valuesItems)
+        ? array_values(array_filter($valuesItems, static fn ($item): bool => is_array($item) && isset($item['title'], $item['description'])))
+        : [];
+@endphp
+
 @section('content')
-    <div class="bg-gray-50 dark:bg-gray-900 py-12 sm:py-16 lg:py-20">
-        <div class="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 space-y-16">
-            <section class="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
-                <div class="space-y-6">
-                    <span class="inline-flex items-center rounded-full bg-blue-100 px-4 py-1 text-sm font-semibold tracking-wide text-blue-700 dark:bg-blue-900/60 dark:text-blue-200">
+    <div class="relative overflow-hidden bg-slate-50 py-12 sm:py-16 lg:py-20">
+        <div class="pointer-events-none absolute inset-0">
+            <div class="absolute -top-28 left-1/2 h-72 w-72 -translate-x-[130%] rounded-full bg-sky-200/50 blur-3xl"></div>
+            <div class="absolute right-0 top-20 h-80 w-80 translate-x-1/3 rounded-full bg-amber-200/50 blur-3xl"></div>
+        </div>
+
+        <div class="relative mx-auto w-full max-w-6xl space-y-16 px-4 sm:px-6 lg:px-8">
+            <section class="grid gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
+                <div class="space-y-6 rounded-[2rem] border border-slate-200 bg-white/90 p-8 shadow-[0_28px_80px_-52px_rgba(15,23,42,0.7)] backdrop-blur-sm sm:p-10">
+                    <span class="inline-flex items-center rounded-full bg-sky-100 px-4 py-1 text-sm font-semibold tracking-wide text-sky-700">
                         {{ __('frontend.about.hero.eyebrow') }}
                     </span>
-                    <h1 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl lg:text-5xl dark:text-white">
+                    <h1 class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl lg:text-5xl">
                         {{ __('frontend.about.hero.title') }}
                     </h1>
-                    <p class="text-lg leading-7 text-gray-600 dark:text-gray-300">
+                    <p class="text-lg leading-8 text-slate-600">
                         {{ __('frontend.about.hero.subtitle') }}
                     </p>
-                    <p class="text-base font-medium text-blue-700 dark:text-blue-300">
+                    <p class="text-base font-semibold text-sky-700">
                         {{ __('messages.footer_tagline') }}
                     </p>
                     <div>
                         <a href="{{ route('frontend.contact.index') }}"
-                           class="inline-flex items-center gap-2 rounded-full bg-blue-600 px-6 py-3 text-base font-semibold text-white shadow-lg shadow-blue-200 transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 dark:shadow-none dark:hover:bg-blue-500">
+                           class="inline-flex items-center gap-2 rounded-full bg-sky-600 px-6 py-3 text-base font-semibold text-white shadow-lg shadow-sky-200 transition duration-300 hover:-translate-y-0.5 hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2">
                             {{ __('frontend.about.hero.cta') }}
                             <x-untitledui-arrow-up-right class="h-4 w-4" />
                         </a>
                     </div>
                 </div>
-                <div class="grid gap-6 sm:grid-cols-2">
-                    @foreach (trans('frontend.about.sections.metrics.items') as $metric)
-                        <div class="rounded-3xl bg-white p-6 shadow-md ring-1 ring-gray-200 dark:bg-gray-800 dark:ring-white/10">
-                            <div class="text-3xl font-bold text-blue-600 dark:text-blue-300">
+
+                <div class="grid gap-4 sm:grid-cols-2">
+                    @foreach ($metricsItems as $metric)
+                        <article class="group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-sky-300 hover:shadow-lg">
+                            <p class="text-3xl font-black tracking-tight text-sky-700">
                                 {{ $metric['value'] }}
-                            </div>
-                            <div class="mt-2 text-sm font-medium text-gray-600 dark:text-gray-300">
+                            </p>
+                            <p class="mt-2 text-sm font-medium leading-6 text-slate-600">
                                 {{ $metric['label'] }}
-                            </div>
-                        </div>
+                            </p>
+                        </article>
                     @endforeach
                 </div>
             </section>
 
-            <section class="space-y-10">
+            <section class="rounded-[2rem] border border-slate-200 bg-white/80 p-8 shadow-[0_24px_60px_-45px_rgba(15,23,42,0.8)] backdrop-blur-sm sm:p-10">
                 <div class="space-y-4 text-center">
-                    <h2 class="text-2xl font-bold text-gray-900 sm:text-3xl dark:text-white">
+                    <h2 class="text-2xl font-bold text-slate-900 sm:text-3xl">
                         {{ __('frontend.about.sections.values.title') }}
                     </h2>
-                    <p class="mx-auto max-w-3xl text-base text-gray-600 dark:text-gray-300">
+                    <p class="mx-auto max-w-3xl text-base leading-7 text-slate-600">
                         {{ __('frontend.about.sections.values.subtitle') }}
                     </p>
                 </div>
-                <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                    @foreach (trans('frontend.about.sections.values.items') as $item)
-                        <article class="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md dark:border-white/10 dark:bg-gray-800">
-                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+
+                <div class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                    @foreach ($valuesItems as $item)
+                        <article class="flex h-full flex-col rounded-2xl border border-slate-200 bg-slate-50 p-6 transition duration-300 hover:border-sky-300 hover:bg-white hover:shadow-md">
+                            <span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-sky-100 to-cyan-100 text-sm font-bold text-sky-700">
+                                {{ str_pad((string) $loop->iteration, 2, '0', STR_PAD_LEFT) }}
+                            </span>
+                            <h3 class="mt-4 text-lg font-semibold text-slate-900">
                                 {{ $item['title'] }}
                             </h3>
-                            <p class="mt-3 text-sm leading-6 text-gray-600 dark:text-gray-300">
+                            <p class="mt-3 text-sm leading-6 text-slate-600">
                                 {{ $item['description'] }}
                             </p>
                         </article>
@@ -65,19 +87,19 @@
                 </div>
             </section>
 
-            <section class="rounded-3xl bg-gradient-to-r from-blue-600 to-indigo-600 px-8 py-10 text-white shadow-xl">
-                <div class="grid grid-cols-1 gap-6 sm:grid-cols-[1.1fr_auto] sm:items-center">
+            <section class="overflow-hidden rounded-[2rem] border border-sky-200 bg-gradient-to-r from-sky-50 via-cyan-50 to-amber-50 p-8 shadow-[0_24px_65px_-45px_rgba(3,105,161,0.9)] sm:p-10">
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-[1.15fr_auto] sm:items-center">
                     <div class="space-y-3">
-                        <h2 class="text-2xl font-bold sm:text-3xl">
+                        <h2 class="text-2xl font-bold text-slate-900 sm:text-3xl">
                             {{ __('frontend.about.cta.title') }}
                         </h2>
-                        <p class="text-base text-blue-100">
+                        <p class="text-base leading-7 text-slate-600">
                             {{ __('frontend.about.cta.subtitle') }}
                         </p>
                     </div>
                     <div>
                         <a href="{{ route('frontend.contact.index') }}"
-                           class="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-base font-semibold text-blue-700 shadow-sm transition hover:bg-blue-50">
+                           class="inline-flex items-center gap-2 rounded-full bg-sky-600 px-6 py-3 text-base font-semibold text-white shadow-lg shadow-sky-200 transition duration-300 hover:-translate-y-0.5 hover:bg-sky-700">
                             {{ __('frontend.about.cta.button') }}
                             <x-untitledui-arrow-up-right class="h-4 w-4" />
                         </a>

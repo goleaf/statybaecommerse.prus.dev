@@ -39,7 +39,7 @@ final class ProductCatalog extends Component
     public function products(): LengthAwarePaginator
     {
         $query = Product::query()
-            ->with(['brand', 'categories', 'media', 'prices'])
+            ->with(['brand', 'categories', 'primaryImage', 'media', 'prices'])
             ->withCount('orderItems')
             ->whereNotNull('published_at')
             ->where('published_at', '<=', now());

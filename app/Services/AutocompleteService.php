@@ -85,8 +85,7 @@ final class AutocompleteService
         $searchTerm = $this->prepareSearchTerm($normalizedQuery);
 
         return Product::query()
-            ->with(['brand'])
-            ->where('is_visible', true)
+            ->with(['brand', 'images'])
             ->whereNotNull('slug')
             ->where(function (Builder $builder) use ($searchTerm): void {
                 $builder
@@ -230,7 +229,6 @@ final class AutocompleteService
             900,
             function () use ($limit, $context): array {
                 $query = Product::query()
-                    ->where('is_visible', true)
                     ->orderByDesc('created_at');
 
                 $this->applyProductContextFilters($query, $context);
@@ -468,13 +466,18 @@ final class AutocompleteService
      */
     private function mapProduct(Product $product, string $query): array
     {
+        $thumbnail = $product->thumbnail;
+        $mainImage = $product->main_image;
+
         return [
             'type'            => 'product',
             'id'              => $product->id,
             'title'           => $product->name,
             'subtitle'        => $product->brand?->name,
             'url'             => $this->productUrl($product),
-            'image'           => $product->getFirstMediaUrl('images', 'thumb') ?: null,
+            'image'           => $thumbnail ?: $mainImage,
+            'thumbnail'       => $thumbnail,
+            'main_image'      => $mainImage,
             'price'           => $product->price,
             'formatted_price' => number_format((float) $product->price, 2),
             'relevance_score' => $this->calculateRelevanceScore($product->name, $query),

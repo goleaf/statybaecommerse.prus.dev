@@ -6,6 +6,7 @@ namespace App\Livewire\Pages\Category;
 
 use App\Data\Storefront\Home\ProductListItemData;
 use App\Livewire\Concerns\WithCart;
+use App\Livewire\Concerns\WithNotifications;
 use App\Models\Category;
 use App\Models\Product;
 use App\Support\Cache\CacheKeys;
@@ -34,6 +35,7 @@ final class Show extends Component implements HasForms
 {
     use InteractsWithForms;
     use WithCart;
+    use WithNotifications;
     use WithPagination;
 
     public Category $category;

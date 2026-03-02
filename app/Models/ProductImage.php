@@ -202,7 +202,10 @@ final class ProductImage extends Model
     public function scopePrimary(Builder $query): Builder
     {
         /** @var Builder<ProductImage> $orderedQuery */
-        $orderedQuery = $query->orderBy('sort_order')->orderBy('id');
+        $orderedQuery = $query
+            ->orderByDesc('is_default')
+            ->orderBy('sort_order')
+            ->orderBy('id');
 
         return $orderedQuery->limit(1);
     }

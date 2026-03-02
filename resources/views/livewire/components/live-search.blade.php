@@ -196,9 +196,9 @@
             
             {{-- View All Results Link --}}
             <div class="border-t border-sage/30">
-                    <a 
+                <a 
                     href="{{ route('localized.search', ['locale' => app()->getLocale(), 'q' => $query]) }}"
-                    class="block w-full px-4 py-3 text-center text-sm font-medium text-sage hover:bg-sage/20 hover:text-white focus:bg-sage/20 focus:text-white focus:outline-none transition-all duration-200 ease-in-out"
+                    class="block w-full px-4 py-3 text-center text-sm font-medium text-sage/70 hover:bg-sage/20 hover:text-sage focus:bg-sage/20 focus:text-sage focus:outline-none transition-all duration-200 ease-in-out"
                 >
                     {{ __('frontend.search.view_all_results') }}
                 </a>
@@ -239,7 +239,8 @@
                             wire:click="clearRecentSearches"
                             wire:confirm="{{ __('translations.confirm_clear_recent_searches') }}"
                             type="button"
-                            class="text-xs text-sage/70 hover:text-white hover:underline transition-all duration-200"
+                            class="text-xs hover:underline transition-all duration-200"
+                            style="color: rgba(227, 235, 210, 0.7) !important;"
                         >
                             {{ __('frontend.search.clear_recent') }}
                         </button>

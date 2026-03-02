@@ -86,4 +86,33 @@ final class ShowTest extends TestCase
             ->set('sortDirection', 'desc')
             ->assertStatus(200);
     }
+
+    public function test_it_adds_products_to_cart_from_category_page(): void
+    {
+        $category = Category::factory()->create([
+            'is_visible' => true,
+        ]);
+
+        $product = Product::factory()->published()->create([
+            'is_enabled'       => true,
+            'status'           => 'published',
+            'published_at'     => now()->subDay(),
+            'stock_quantity'   => 10,
+            'hide_add_to_cart' => false,
+            'is_requestable'   => false,
+        ]);
+
+        $category->products()->attach($product->getKey());
+
+        Livewire::test(Show::class, ['category' => $category])
+            ->call('addToCart', (int) $product->getKey(), 1, null, null)
+            ->assertStatus(200);
+
+        $cart = session()->get('cart', []);
+        $cartKey = (string) $product->getKey();
+
+        $this->assertArrayHasKey($cartKey, $cart);
+        $this->assertSame($product->getKey(), $cart[$cartKey]['product_id']);
+        $this->assertSame(1, $cart[$cartKey]['quantity']);
+    }
 }

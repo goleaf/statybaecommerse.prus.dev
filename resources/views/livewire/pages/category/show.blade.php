@@ -65,124 +65,124 @@
 @endsection
 
 <div x-data="{ showFilters: false }" class="min-h-screen bg-slate-50">
-    <!-- Dark Banner Section -->
-    <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-cyan-900 text-slate-100">
-        <x-container class="px-4 py-12 sm:py-16">
-            <nav class="text-xs font-medium uppercase tracking-[0.3em] text-slate-300" aria-label="{{ __('ui.breadcrumb') }}">
-                <ol class="flex items-center gap-3">
+    <div class="bg-dark text-sage">
+        <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
+            <nav class="mb-8 text-sm text-sage/80" aria-label="{{ __('ui.breadcrumb') }}">
+                <ol class="flex flex-wrap items-center gap-2">
                     <li>
                         <a href="{{ route('localized.home', ['locale' => app()->getLocale()]) }}"
-                           class="inline-flex items-center gap-2 text-slate-200 transition hover:text-white">
-                            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h12a1 1 0 001-1V10" />
-                            </svg>
+                           class="text-sage/80 transition-colors hover:text-sage">
                             {{ __('frontend.navigation.home') }}
                         </a>
                     </li>
-                    <li class="text-slate-400">/</li>
+                    <li class="text-sage/80">/</li>
                     @if (!$isIndex)
                         <li>
                             <a href="{{ route('localized.categories.index', ['locale' => app()->getLocale()]) }}"
-                               class="text-slate-200 transition hover:text-white">
+                               class="text-sage/80 transition-colors hover:text-sage">
                                 {{ __('categories.index.meta_title') }}
                             </a>
                         </li>
-                        <li class="text-slate-400">/</li>
-                        <li class="text-white">{{ $category->name }}</li>
+                        <li class="text-sage/80">/</li>
+                        <li class="text-sage/80">{{ $category->name }}</li>
                     @else
-                        <li class="text-white">{{ __('categories.index.meta_title') }}</li>
+                        <li class="text-sage/80">{{ __('categories.index.meta_title') }}</li>
                     @endif
                 </ol>
             </nav>
 
-            <div class="mt-8 flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
-                <div class="max-w-2xl space-y-5">
-                    <span class="inline-flex items-center gap-2 rounded-full border border-cyan-200/40 bg-white/10 px-4 py-1 text-[11px] font-semibold uppercase tracking-[0.35em] text-cyan-100 backdrop-blur-sm">
-                        @if ($isIndex)
-                            {{ __('categories.index.badge') }}
-                        @else
-                            {{ __('categories.show.badge') }}
-                        @endif
-                    </span>
-                    <h1 class="text-3xl font-bold leading-tight text-white sm:text-4xl md:text-5xl">
-                        @if ($isIndex)
-                            {{ __('categories.index.title') }}
-                        @else
-                            {{ $category->name }}
-                        @endif
-                    </h1>
-                    @if ($isIndex)
-                        <p class="text-base text-slate-200 sm:text-lg">
-                            {{ __('categories.index.description') }}
-                        </p>
-                    @elseif (!empty($category->description))
-                        <p class="text-base text-white sm:text-lg">
-                            {{ $category->description }}
-                        </p>
-                    @endif
-                </div>
+            <div class="space-y-6">
+                <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+                    <div class="max-w-2xl space-y-4">
+                        <span class="inline-flex items-center gap-2 rounded-full border border-sage bg-sage px-4 py-1 text-[11px] font-semibold uppercase tracking-[0.35em] text-dark">
+                            @if ($isIndex)
+                                {{ __('categories.index.badge') }}
+                            @else
+                                {{ __('categories.show.badge') }}
+                            @endif
+                        </span>
 
-                <div class="flex flex-col items-start gap-3 sm:flex-row sm:items-end sm:gap-6">
-                    @if ($isIndex)
-                        @php
-                            $categories = $this->categories;
-                            $totalCategories = $categories->total();
-                            $from = $categories->firstItem();
-                            $to = $categories->lastItem();
-                            $activeFilterCount = collect([
-                                !empty($search ?? ''),
-                                $inStock ?? false,
-                                $onSale ?? false,
-                                $hasProducts ?? false,
-                                filled($priceMin ?? null),
-                                filled($priceMax ?? null),
-                                !empty($selectedBrandIds ?? []),
-                                !empty($selectedCollectionIds ?? []),
-                                !empty($selectedCategoryIds ?? []),
-                            ])->filter()->count();
-                        @endphp
-                        <div class="rounded-2xl border border-white/20 bg-white/10 px-4 py-3 text-sm font-semibold text-white shadow-sm backdrop-blur-sm">
-                            {{ __('categories.index.catalogue_count', ['count' => number_format($totalCategories)]) }}
-                        </div>
-                        <div class="rounded-2xl border border-white/20 bg-white/10 px-4 py-3 text-sm text-slate-100 shadow-sm backdrop-blur-sm">
-                            @if ($activeFilterCount > 0)
-                                {{ __('categories.index.filters_active', ['count' => $activeFilterCount]) }}
+                        <h1 class="text-3xl font-bold leading-tight text-white sm:text-4xl md:text-5xl">
+                            @if ($isIndex)
+                                {{ __('categories.index.title') }}
                             @else
-                                {{ __('categories.index.filters_none') }}
+                                {{ $category->name }}
                             @endif
-                        </div>
-                        <button type="button"
-                                wire:click="$toggle('sidebarOpen')"
-                                wire:confirm="{{ __('translations.confirm_toggle_sidebar') }}"
-                                class="inline-flex items-center gap-2 rounded-full border border-cyan-200/40 bg-white/10 px-4 py-2 text-sm font-semibold text-cyan-100 shadow-sm transition hover:border-cyan-200 hover:bg-white/15 lg:hidden">
-                            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 5h6M3 12h6m-6 7h6M13 5h8M13 12h8m-8 7h8" />
-                            </svg>
-                            {{ __('categories.index.filters_button') }}
-                        </button>
-                    @else
-                        <div class="rounded-2xl border border-white/20 bg-white/10 px-4 py-3 text-sm font-semibold text-white shadow-sm backdrop-blur-sm">
-                            {{ __('categories.show.products_count', ['count' => number_format($products->total())]) }}
-                        </div>
-                        <div class="rounded-2xl border border-white/20 bg-white/10 px-4 py-3 text-sm text-slate-100 shadow-sm backdrop-blur-sm">
-                            @if ($products->firstItem() && $products->lastItem())
-                                {{ __('categories.show.showing', ['from' => $products->firstItem(), 'to' => $products->lastItem()]) }}
-                            @else
-                                {{ __('categories.show.no_products') }}
-                            @endif
-                        </div>
-                        <button type="button"
-                                @click="showFilters = true"
-                                class="inline-flex items-center gap-2 rounded-full border border-cyan-200/40 bg-white/10 px-4 py-2 text-sm font-semibold text-cyan-100 shadow-sm transition hover:border-cyan-200 hover:bg-white/15 lg:hidden">
-                            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 5h6M3 12h6m-6 7h6M13 5h8M13 12h8m-8 7h8" />
-                            </svg>
-                            {{ __('categories.show.filter') }}
-                        </button>
-                    @endif
+                        </h1>
+
+                        @if ($isIndex)
+                            <p class="text-base text-white/90 sm:text-lg">
+                                {{ __('categories.index.description') }}
+                            </p>
+                        @elseif (!empty($category->description))
+                            <p class="text-base text-white/90 sm:text-lg">
+                                {{ $category->description }}
+                            </p>
+                        @endif
+                    </div>
+
+                    <div class="flex flex-col items-start gap-2 sm:flex-row sm:items-end sm:gap-4">
+                        @if ($isIndex)
+                            @php
+                                $categories = $this->categories;
+                                $totalCategories = $categories->total();
+                                $from = $categories->firstItem();
+                                $to = $categories->lastItem();
+                                $activeFilterCount = collect([
+                                    !empty($search ?? ''),
+                                    $inStock ?? false,
+                                    $onSale ?? false,
+                                    $hasProducts ?? false,
+                                    filled($priceMin ?? null),
+                                    filled($priceMax ?? null),
+                                    !empty($selectedBrandIds ?? []),
+                                    !empty($selectedCollectionIds ?? []),
+                                    !empty($selectedCategoryIds ?? []),
+                                ])->filter()->count();
+                            @endphp
+                            <div class="rounded-2xl border border-sage/30 bg-sage/10 px-3 py-2 text-sm font-semibold text-white shadow-sm">
+                                {{ __('categories.index.catalogue_count', ['count' => number_format($totalCategories)]) }}
+                            </div>
+                            <div class="rounded-2xl border border-sage/30 bg-sage/10 px-3 py-2 text-sm text-white/80 shadow-sm">
+                                @if ($activeFilterCount > 0)
+                                    {{ __('categories.index.filters_active', ['count' => $activeFilterCount]) }}
+                                @else
+                                    {{ __('categories.index.filters_none') }}
+                                @endif
+                            </div>
+                            <button type="button"
+                                    wire:click="$toggle('sidebarOpen')"
+                                    wire:confirm="{{ __('translations.confirm_toggle_sidebar') }}"
+                                    class="inline-flex items-center gap-2 rounded-full border border-sage bg-sage px-4 py-2 text-sm font-semibold text-dark shadow-sm transition-colors hover:bg-sage/90 lg:hidden">
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 5h6M3 12h6m-6 7h6M13 5h8M13 12h8m-8 7h8" />
+                                </svg>
+                                {{ __('categories.index.filters_button') }}
+                            </button>
+                        @else
+                            <div class="rounded-2xl border border-sage/30 bg-sage/10 px-3 py-2 text-sm font-semibold text-white shadow-sm">
+                                {{ __('categories.show.products_count', ['count' => number_format($products->total())]) }}
+                            </div>
+                            <div class="rounded-2xl border border-sage/30 bg-sage/10 px-3 py-2 text-sm text-white/80 shadow-sm">
+                                @if ($products->firstItem() && $products->lastItem())
+                                    {{ __('categories.show.showing', ['from' => $products->firstItem(), 'to' => $products->lastItem()]) }}
+                                @else
+                                    {{ __('categories.show.no_products') }}
+                                @endif
+                            </div>
+                            <button type="button"
+                                    @click="showFilters = true"
+                                    class="inline-flex items-center gap-2 rounded-full border border-sage bg-sage px-4 py-2 text-sm font-semibold text-dark shadow-sm transition-colors hover:bg-sage/90 lg:hidden">
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 5h6M3 12h6m-6 7h6M13 5h8M13 12h8m-8 7h8" />
+                                </svg>
+                                {{ __('categories.show.filter') }}
+                            </button>
+                        @endif
+                    </div>
                 </div>
             </div>
-        </x-container>
+        </div>
     </div>
 
     <x-container class="px-4 pb-16 pt-12">
@@ -300,26 +300,18 @@
 
             <section class="lg:col-span-9 space-y-6">
                 <!-- Sort and Filter Controls -->
-                <div class="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
-                    <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                        <div class="flex flex-wrap items-center gap-3 text-sm text-slate-700">
-                            @if ($isIndex)
+                @if ($isIndex)
+                    <div class="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+                        <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                            <div class="flex flex-wrap items-center gap-3 text-sm text-slate-700">
                                 @if ($from && $to)
                                     <span class="text-slate-500">{{ __('categories.index.showing_results', ['from' => $from, 'to' => $to, 'total' => $totalCategories]) }}</span>
                                 @else
                                     <span class="text-slate-500">{{ __('categories.index.no_results') }}</span>
                                 @endif
-                            @else
-                                @if ($products->firstItem() && $products->lastItem())
-                                    <span class="text-slate-500">{{ __('categories.show.showing_results', ['from' => $products->firstItem(), 'to' => $products->lastItem(), 'total' => $products->total()]) }}</span>
-                                @else
-                                    <span class="text-slate-500">{{ __('categories.show.no_results') }}</span>
-                                @endif
-                            @endif
-                        </div>
+                            </div>
 
-                        <div class="flex flex-wrap items-center gap-3">
-                            @if ($isIndex)
+                            <div class="flex flex-wrap items-center gap-3">
                                 <div class="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700">
                                     <label for="sort" class="text-xs font-semibold uppercase tracking-wide text-slate-500">
                                         {{ __('categories.index.sort') }}
@@ -331,33 +323,44 @@
                                         <option value="products_asc" class="bg-white text-slate-700">{{ __('categories.index.sort_products_asc') }}</option>
                                     </select>
                                 </div>
-                            @else
-                                <div class="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700">
-                                    <label for="sort-by" class="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                                        {{ __('categories.show.sort') }}
-                                    </label>
-                                    <select id="sort-by" wire:model.live="sortBy" class="border-0 bg-transparent text-sm font-medium text-slate-700 focus:outline-none focus:ring-0">
-                                        <option value="created_at" class="bg-white text-slate-700">{{ __('categories.show.sort_newest') }}</option>
-                                        <option value="name" class="bg-white text-slate-700">{{ __('categories.show.sort_name') }}</option>
-                                        <option value="price" class="bg-white text-slate-700">{{ __('categories.show.sort_price') }}</option>
-                                        <option value="rating" class="bg-white text-slate-700">{{ __('categories.show.sort_rating') }}</option>
-                                    </select>
-                                </div>
-
-                                <div class="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700">
-                                    <label for="sort-direction" class="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                                        {{ __('categories.show.order') }}
-                                    </label>
-                                    <select id="sort-direction" wire:model.live="sortDirection" class="border-0 bg-transparent text-sm font-medium text-slate-700 focus:outline-none focus:ring-0">
-                                        <option value="asc" class="bg-white text-slate-700">{{ __('categories.show.order_ascending') }}</option>
-                                        <option value="desc" class="bg-white text-slate-700">{{ __('categories.show.order_descending') }}</option>
-                                    </select>
-                                </div>
-                            @endif
-
+                            </div>
                         </div>
                     </div>
-                </div>
+                @else
+                    <div class="rounded-3xl border border-sage/30 bg-dark p-6 shadow-lg">
+                        <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+                            <div class="flex flex-wrap items-center gap-3 text-sm font-medium">
+                                @if ($products->firstItem() && $products->lastItem())
+                                    <span class="text-white/80">
+                                        {{ __('categories.show.showing_results', ['from' => $products->firstItem(), 'to' => $products->lastItem(), 'total' => $products->total()]) }}
+                                    </span>
+                                @else
+                                    <span class="text-white/80">{{ __('categories.show.no_results') }}</span>
+                                @endif
+                            </div>
+
+                            <div class="flex flex-wrap items-center gap-3 text-sm">
+                                <label for="sort-by" class="text-white/80 font-semibold">
+                                    {{ __('categories.show.sort') }}
+                                </label>
+                                <select id="sort-by" wire:model.live="sortBy" class="rounded-full border border-sage/30 bg-sage/10 px-4 py-2 text-sm font-medium text-white focus:border-sage focus:outline-none focus:ring-2 focus:ring-sage">
+                                    <option value="created_at" class="bg-dark text-white">{{ __('categories.show.sort_newest') }}</option>
+                                    <option value="name" class="bg-dark text-white">{{ __('categories.show.sort_name') }}</option>
+                                    <option value="price" class="bg-dark text-white">{{ __('categories.show.sort_price') }}</option>
+                                    <option value="rating" class="bg-dark text-white">{{ __('categories.show.sort_rating') }}</option>
+                                </select>
+
+                                <label for="sort-direction" class="text-white/80 font-semibold">
+                                    {{ __('categories.show.order') }}
+                                </label>
+                                <select id="sort-direction" wire:model.live="sortDirection" class="rounded-full border border-sage/30 bg-sage/10 px-4 py-2 text-sm font-medium text-white focus:border-sage focus:outline-none focus:ring-2 focus:ring-sage">
+                                    <option value="asc" class="bg-dark text-white">{{ __('categories.show.order_ascending') }}</option>
+                                    <option value="desc" class="bg-dark text-white">{{ __('categories.show.order_descending') }}</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                @endif
 
                 <div class="relative">
                     <div wire:loading.delay.longer class="absolute inset-0 z-10 flex items-center justify-center rounded-3xl bg-slate-900/30 backdrop-blur-sm">

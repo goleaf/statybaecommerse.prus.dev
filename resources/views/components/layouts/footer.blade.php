@@ -50,7 +50,7 @@
             <div class="md:col-span-4 text-center md:text-left">
                 <div class="mb-6 text-center md:text-left">
                     <a href="{{ $homeUrl }}" class="group" aria-label="{{ __('messages.frontend') }}">
-                        <img src="/images/logo/logo.png" alt="{{ config('app.name') }}"
+                        <img src="{{ asset('images/logo-white.png') }}" alt="{{ config('app.name') }}"
                             class="h-16 w-auto mx-auto md:mx-0 object-contain">
                     </a>
                 </div>

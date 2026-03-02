@@ -3,6 +3,13 @@
 @section('title', __('frontend.contact.meta.title'))
 @section('meta_description', __('frontend.contact.meta.description'))
 
+@php
+    $routeLocale = request()->route('locale');
+    $contactSendAction = is_string($routeLocale) && $routeLocale !== '' && \Illuminate\Support\Facades\Route::has('localized.contact.send')
+        ? route('localized.contact.send', ['locale' => $routeLocale])
+        : route('frontend.contact.send');
+@endphp
+
 @section('content')
     <div class="bg-gray-50 dark:bg-gray-900 py-12 sm:py-16">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -34,7 +41,7 @@
                     @endif
 
                     <div class="bg-white dark:bg-gray-800 shadow rounded-2xl p-6 sm:p-10">
-                        <form method="POST" action="{{ route('frontend.contact.send') }}" class="space-y-6">
+                        <form method="POST" action="{{ $contactSendAction }}" class="space-y-6">
                             @csrf
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                 <div>

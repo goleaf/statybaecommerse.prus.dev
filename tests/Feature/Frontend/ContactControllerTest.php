@@ -14,6 +14,16 @@ final class ContactControllerTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_contact_page_is_accessible(): void
+    {
+        $this->get('/contact')->assertOk();
+    }
+
+    public function test_localized_contact_page_is_accessible(): void
+    {
+        $this->get('/lt/contact')->assertOk();
+    }
+
     public function test_contact_form_submission_is_saved_and_dispatched_to_mail_job(): void
     {
         Queue::fake();

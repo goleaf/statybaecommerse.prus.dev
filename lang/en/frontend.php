@@ -21,10 +21,40 @@ return [
         ],
         'sections' => [
             'metrics' => [
-                'items' => 'Key metrics',
+                'items' => [
+                    [
+                        'label' => 'Years of experience',
+                        'value' => '10+',
+                    ],
+                    [
+                        'label' => 'Delivered projects',
+                        'value' => '2,000+',
+                    ],
+                    [
+                        'label' => 'Customer support',
+                        'value' => '24/7',
+                    ],
+                    [
+                        'label' => 'Client satisfaction',
+                        'value' => '99%',
+                    ],
+                ],
             ],
             'values' => [
-                'items'    => 'Core values',
+                'items'    => [
+                    [
+                        'description' => 'We choose reliable products and proven technical solutions for every project.',
+                        'title'       => 'Quality first',
+                    ],
+                    [
+                        'description' => 'We communicate clearly, keep promises, and ensure every process step remains transparent.',
+                        'title'       => 'Trust and transparency',
+                    ],
+                    [
+                        'description' => 'We respond quickly, advise responsibly, and help find the best option for each need.',
+                        'title'       => 'Professional support',
+                    ],
+                ],
                 'subtitle' => 'The principles that guide every decision we make.',
                 'title'    => 'Our values',
             ],

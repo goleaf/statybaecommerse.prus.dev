@@ -411,6 +411,37 @@ Route::get('/brands', function () {
 Route::get('/brands/{brand}', function ($brand) {
     return redirect('/' . app()->getLocale() . '/brands/' . $brand);
 })->name('brands.show');
+Route::get('/{locale}/{duplicateLocale}/brands', function (string $locale, string $duplicateLocale, Request $request) {
+    if (strtolower($locale) !== strtolower($duplicateLocale)) {
+        abort(404);
+    }
+
+    $target = '/' . $locale . '/brands';
+    $queryString = $request->getQueryString();
+
+    return redirect($target . ($queryString !== null && $queryString !== '' ? '?' . $queryString : ''), 301);
+})->where([
+    'locale'          => '[A-Za-z\-_]+',
+    'duplicateLocale' => '[A-Za-z\-_]+',
+]);
+Route::get('/{locale}/{duplicateLocale}/brands/{slug}', function (
+    string $locale,
+    string $duplicateLocale,
+    string $slug,
+    Request $request
+) {
+    if (strtolower($locale) !== strtolower($duplicateLocale)) {
+        abort(404);
+    }
+
+    $target = '/' . $locale . '/brands/' . $slug;
+    $queryString = $request->getQueryString();
+
+    return redirect($target . ($queryString !== null && $queryString !== '' ? '?' . $queryString : ''), 301);
+})->where([
+    'locale'          => '[A-Za-z\-_]+',
+    'duplicateLocale' => '[A-Za-z\-_]+',
+]);
 // Collection routes
 Route::prefix('collections')->name('collections.')->group(function () {
     Route::get('/', [App\Http\Controllers\CollectionController::class, 'index'])->name('index');
@@ -688,6 +719,10 @@ Route::prefix('{locale}')
 
         // About page
         Route::view('/about', 'frontend.about.index')->name('localized.about');
+
+        // Contact page
+        Route::get('/contact', [App\Http\Controllers\Frontend\ContactController::class, 'index'])->name('localized.contact.index');
+        Route::post('/contact/send', [App\Http\Controllers\Frontend\ContactController::class, 'send'])->name('localized.contact.send');
 
         // Category index
         Route::get('/categories', \App\Livewire\Pages\Category\Index::class)->name('localized.categories.index');

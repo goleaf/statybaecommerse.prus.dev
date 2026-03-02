@@ -107,10 +107,14 @@ final class ProductListItemData implements Arrayable
 
         $price = (float) $product->price;
 
-        $imageUrl = null;
-        if (method_exists($product, 'getMainImage')) {
-            $imageUrl = $product->getMainImage('image-lg') ?? $product->getMainImage();
+        // Prefer the default/main uploaded product image from product_images.
+        $imageUrl = $product->main_image ?? $product->thumbnail;
+
+        if ($imageUrl === null && method_exists($product, 'getImageUrl')) {
+            $imageUrl = $product->getImageUrl('lg');
         }
+
+        // Legacy fallback for installations still using media-library images.
         if ($imageUrl === null && method_exists($product, 'getFirstMediaUrl')) {
             $imageUrl = $product->getFirstMediaUrl('images', 'image-lg')
                 ?: $product->getFirstMediaUrl('images');

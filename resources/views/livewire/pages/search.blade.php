@@ -126,14 +126,6 @@
                         {{ $term ? __('ui.search_filter_keyword', ['term' => $term]) : __('ui.search_filter_none') }}
                     </dd>
                 </div>
-                <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800">
-                    <dt class="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">
-                        {{ __('ui.search_last_updated') }}
-                    </dt>
-                    <dd class="mt-1 text-sm font-semibold text-slate-900 dark:text-white">
-                        {{ now()->translatedFormat('Y-m-d H:i') }}
-                    </dd>
-                </div>
             </dl>
         </div>
 

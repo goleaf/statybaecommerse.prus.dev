@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Data\Storefront\Home\ProductListItemData;
 use App\Models\Brand;
 use App\Models\Category;
-use Exception;
+use App\Models\Product;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 
 /**
  * BrandController
@@ -42,30 +42,22 @@ final class BrandController extends Controller
         if ($canonicalSlug !== $slug) {
             return redirect()->route('localized.brands.show', ['locale' => $locale, 'slug' => $canonicalSlug], 301);
         }
-        // Load products for this brand with proper relationships
-        $locale = app()->getLocale();
-        try {
-            $productModels = $brand->products()
-                ->forProductList()
-                ->withListRelations()
-                ->published()
-                ->enabled()
-                ->orderByDesc('published_at')
-                ->get()
-                ->filter(function ($product) {
-                    // Filter out products that are not properly configured for display
-                    return ! empty($product->name) &&
-                           ! empty($product->slug);
-                });
+        // Load products for this brand with proper relationships.
+        // Keep the existing storefront constraints for the main listing.
+        $products = $brand->products()
+            ->forProductList()
+            ->withListRelations()
+            ->published()
+            ->enabled()
+            ->whereNotNull('name')
+            ->where('name', '!=', '')
+            ->whereNotNull('slug')
+            ->where('slug', '!=', '')
+            ->orderByDesc('published_at')
+            ->paginate(12)
+            ->withQueryString();
 
-            // Convert Product models to ProductListItemData DTOs
-            $products = $productModels->map(fn ($product): ProductListItemData => ProductListItemData::fromModel($product, $locale));
-        } catch (Exception $e) {
-            // If there's an error loading products, return empty collection
-            $products = collect();
-        }
-
-        // Get related categories through products
+        // Get related categories/subcategories for this brand in ascending order.
         $relatedCategories = Category::query()
             ->whereHas('products', function (Builder $query) use ($brand): void {
                 $query->published()->where('brand_id', $brand->getKey());
@@ -73,9 +65,15 @@ final class BrandController extends Controller
             ->withCount(['products as published_products_count' => function (Builder $builder) use ($brand): void {
                 $builder->published()->where('brand_id', $brand->getKey());
             }])
-            ->orderByDesc('published_products_count')
-            ->limit(6)
+            ->orderBy('name')
             ->get();
+
+        // If the main brand grid is empty, prepare fallback sections:
+        // 8 products per category/subcategory, newest first by created_at.
+        $categoryProductSections = collect();
+        if ($products->isEmpty() && $relatedCategories->isNotEmpty()) {
+            $categoryProductSections = $this->buildCategoryProductSections($brand, $relatedCategories);
+        }
 
         // Get SEO data
         $seoTitle = $brand->getTranslatedSeoTitle() ?: $brand->getTranslatedName() . ' - ' . config('app.name');
@@ -99,6 +97,7 @@ final class BrandController extends Controller
             'brand'             => $brand,
             'products'          => $products,
             'relatedCategories' => $relatedCategories,
+            'categoryProductSections' => $categoryProductSections,
             'availableSorts'    => $availableSorts,
             'availableFilters'  => $availableFilters,
             'activeSort'        => $request->get('sort', 'featured'),
@@ -117,5 +116,35 @@ final class BrandController extends Controller
         $translation = $brand->translations()->where('locale', app()->getLocale())->first();
 
         return $translation?->slug ?: $brand->slug;
+    }
+
+    /**
+     * Build fallback sections grouped by category for brands whose direct listing is empty.
+     *
+     * @return Collection<int, array{category: Category, products: Collection<int, Product>}>
+     */
+    private function buildCategoryProductSections(Brand $brand, Collection $categories): Collection
+    {
+        return $categories
+            ->map(function (Category $category) use ($brand): array {
+                $products = Product::query()
+                    ->with(['brand', 'media', 'primaryImage'])
+                    ->published()
+                    ->enabled()
+                    ->where('brand_id', $brand->getKey())
+                    ->whereHas('categories', static function (Builder $query) use ($category): void {
+                        $query->where('categories.id', $category->getKey());
+                    })
+                    ->orderByDesc('created_at')
+                    ->limit(8)
+                    ->get();
+
+                return [
+                    'category' => $category,
+                    'products' => $products,
+                ];
+            })
+            ->filter(static fn (array $section): bool => $section['products']->isNotEmpty())
+            ->values();
     }
 }

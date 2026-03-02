@@ -104,7 +104,7 @@
                     @csrf
                             <label for="code" class="text-sm text-sage/80">{{ __('frontend.cart.coupon_code') }}</label>
                             <input id="code" name="code" class="rounded-lg border border-sage/30 bg-dark/30 text-white placeholder:text-sage/50" placeholder="{{ __('frontend.cart.enter_code') }}">
-                            <button type="submit" class="px-4 py-2 rounded-lg bg-sage text-dark hover:bg-sage/90">{{ __('frontend.cart.apply_coupon') }}</button>
+                            <button type="submit" class="px-4 py-2 rounded-lg bg-sage text-dark">{{ __('frontend.cart.apply_coupon') }}</button>
                 </form>
 
                 <form method="POST" action="{{ route('frontend.discounts.remove-coupon') }}">

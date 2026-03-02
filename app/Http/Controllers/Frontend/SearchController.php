@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Product;
 use App\Support\SearchQuerySanitizer;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -32,21 +33,23 @@ final class SearchController extends Controller
             $likePattern = SearchQuerySanitizer::toLikePattern($query);
 
             $products = Product::query()
-                ->where('is_active', true)
-                ->when($selectedCategory !== null, function ($builder) use ($selectedCategory) {
+                ->enabled()
+                ->published()
+                ->when($selectedCategory !== null, function (Builder $builder) use ($selectedCategory): Builder {
                     // Guard the category relationship filter by using the
                     // already sanitised integer so the ORM never receives raw
                     // request values.
-                    return $builder->whereHas('categories', function ($q) use ($selectedCategory) {
-                        $q->where('id', $selectedCategory);
+                    return $builder->whereHas('categories', static function (Builder $q) use ($selectedCategory): void {
+                        $q->where('categories.id', $selectedCategory);
                     });
                 })
-                ->where(function ($q) use ($likePattern) {
+                ->where(static function (Builder $q) use ($likePattern): void {
                     // Apply the escaped LIKE pattern across searchable
                     // columns so wildcard characters supplied by the shopper
                     // are treated as literals instead of SQL directives.
                     $q->where('name', 'like', $likePattern)
-                        ->orWhere('description', 'like', $likePattern);
+                        ->orWhere('description', 'like', $likePattern)
+                        ->orWhere('sku', 'like', $likePattern);
                 })
                 ->paginate(20)
                 ->appends(array_filter([
@@ -82,11 +85,16 @@ final class SearchController extends Controller
 
         $likePattern = SearchQuerySanitizer::toLikePattern($query);
 
-        $products = Product::where('is_active', true)
-            ->where('name', 'like', $likePattern)
+        $products = Product::query()
+            ->enabled()
+            ->published()
+            ->where(static function (Builder $builder) use ($likePattern): void {
+                $builder->where('name', 'like', $likePattern)
+                    ->orWhere('sku', 'like', $likePattern);
+            })
             ->limit(5)
             ->get(['id', 'name', 'slug'])
-            ->map(function ($product) {
+            ->map(static function ($product): array {
                 return [
                     'id'   => $product->id,
                     'name' => $product->name,
@@ -113,11 +121,17 @@ final class SearchController extends Controller
         $suggestions = collect();
 
         // Product names
-        $products = Product::where('is_active', true)
-            ->where('name', 'like', SearchQuerySanitizer::toLikePattern($query))
+        $products = Product::query()
+            ->enabled()
+            ->published()
+            ->where(static function (Builder $builder) use ($query): void {
+                $likePattern = SearchQuerySanitizer::toLikePattern($query);
+                $builder->where('name', 'like', $likePattern)
+                    ->orWhere('sku', 'like', $likePattern);
+            })
             ->limit(3)
             ->pluck('name')
-            ->map(function ($name) {
+            ->map(static function ($name): array {
                 return ['value' => $name, 'type' => 'product'];
             });
 

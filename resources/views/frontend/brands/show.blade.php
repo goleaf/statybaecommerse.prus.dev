@@ -6,36 +6,34 @@
 @section('content')
 @php
     $brandName = $brand->trans('name') ?? (is_string($brand->name) ? $brand->name : (string) data_get($brand->name, app()->getLocale(), ''));
+    $fallbackSections = collect($categoryProductSections ?? []);
+    $displayedProductCount = $products->count() > 0
+        ? $products->total()
+        : $fallbackSections->sum(static fn (array $section): int => $section['products']->count());
 @endphp
 <div class="min-h-screen bg-sage brand-products-page">
     {{-- Dark Banner Section --}}
     <div class="bg-dark text-sage">
         <div class="mx-auto max-w-7xl px-4 py-12 sm:py-16 sm:px-6 lg:px-8">
-            {{-- Breadcrumbs --}}
-            <nav class="text-xs font-medium uppercase tracking-[0.3em] mb-8 breadcrumb-nav-dark" aria-label="{{ __('frontend.navigation.breadcrumbs') }}">
-                <ol class="flex items-center gap-3">
+            <nav class="mb-8 text-sm text-sage/80" aria-label="{{ __('frontend.navigation.breadcrumbs') }}">
+                <ol class="flex flex-wrap items-center gap-2">
                     <li>
-                        <a href="{{ route('home') }}" class="inline-flex items-center gap-2 breadcrumb-link-dark transition hover:opacity-80">
-                            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h12a1 1 0 001-1V10" />
-                            </svg>
-                            <span class="breadcrumb-link-text-dark">{{ __('nav.home') }}</span>
+                        <a href="{{ route('home') }}" class="text-sage/80 hover:text-sage transition-colors">
+                            {{ __('nav.home') }}
                         </a>
                     </li>
-                    <li class="breadcrumb-separator-dark">/</li>
+                    <li class="text-sage/80">/</li>
                     <li>
-                        <a href="{{ route('frontend.brands.index') }}" class="breadcrumb-link-dark transition hover:opacity-80">
-                            <span class="breadcrumb-link-text-dark">{{ __('messages.brands') }}</span>
+                        <a href="{{ route('frontend.brands.index') }}" class="text-sage/80 hover:text-sage transition-colors">
+                            {{ __('messages.brands') }}
                         </a>
                     </li>
-                    <li class="breadcrumb-separator-dark">/</li>
-                    <li>
-                        <span class="text-white">{{ $brandName }}</span>
-                    </li>
-                    </ol>
-                </nav>
+                    <li class="text-sage/80">/</li>
+                    <li class="text-sage/80">{{ $brandName }}</li>
+                </ol>
+            </nav>
 
-            <div class="mt-8 space-y-6">
+            <div class="space-y-6">
                 {{-- Brand Info Section --}}
                 <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
                     <div class="max-w-2xl space-y-4">
@@ -77,7 +75,7 @@
 
                     <div class="flex flex-col items-start gap-2 sm:flex-row sm:items-end sm:gap-4">
                         <div class="rounded-2xl border border-sage/30 bg-sage/10 px-3 py-2 text-sm font-semibold text-white shadow-sm">
-                            {{ number_format($products->count()) }} {{ __('messages.products') }}
+                            {{ number_format($displayedProductCount) }} {{ __('messages.products') }}
                         </div>
                         <div class="rounded-2xl border border-sage/30 bg-sage/10 px-3 py-2 text-sm text-white/80 shadow-sm">
                             {{ number_format($relatedCategories->count()) }} {{ __('messages.subcategories') }}
@@ -165,7 +163,7 @@
                             <input type="hidden" name="{{ $input['name'] }}" value="{{ $input['value'] }}" />
                         @endforeach
                     <label for="sort" class="text-white/80 font-semibold">{{ __('messages.sort_by') }}</label>
-                    <select id="sort" name="sort" class="rounded-full border border-sage/30 bg-sage/10 px-4 py-2 text-sm font-medium text-white focus:border-sage focus:outline-none focus:ring-2 focus:ring-sage">
+                    <select id="sort" name="sort" class="rounded-none border border-sage/30 bg-sage/10 px-4 py-2 text-sm font-medium text-white focus:border-sage focus:outline-none focus:ring-2 focus:ring-sage">
                             @foreach ($availableSorts as $key => $label)
                             <option value="{{ $key }}" @selected($activeSort === $key) class="bg-dark text-white">{{ $label }}</option>
                             @endforeach
@@ -193,6 +191,43 @@
                             'attributes' => new \Illuminate\View\ComponentAttributeBag(),
                         ])
                     </div>
+                @endforeach
+            </div>
+        @elseif($fallbackSections->isNotEmpty())
+            <div class="space-y-10 mb-8">
+                @foreach ($fallbackSections as $section)
+                    @php
+                        /** @var \App\Models\Category $sectionCategory */
+                        $sectionCategory = $section['category'];
+                        /** @var \Illuminate\Support\Collection<int, \App\Models\Product> $sectionProducts */
+                        $sectionProducts = $section['products'];
+                        $sectionCategoryName = $sectionCategory->trans('name') ?? (is_string($sectionCategory->name) ? $sectionCategory->name : (string) data_get($sectionCategory->name, app()->getLocale(), ''));
+                    @endphp
+                    <section class="space-y-4">
+                        <div class="flex flex-wrap items-center justify-between gap-3">
+                            <h3 class="text-xl font-bold text-dark">{{ $sectionCategoryName }}</h3>
+                            <span class="rounded-full border border-sage/40 bg-sage px-3 py-1 text-xs font-semibold uppercase tracking-wide text-dark">
+                                {{ number_format($sectionProducts->count()) }} {{ __('messages.products') }}
+                            </span>
+                        </div>
+
+                        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                            @foreach ($sectionProducts as $product)
+                                @php
+                                    $sectionProductData = $product->toArray();
+                                    $sectionProductId = $sectionProductData['id'];
+                                    $sectionInStock = $sectionProductData['stock_quantity'] > 0;
+                                @endphp
+                                <div class="relative product-card-wrapper" data-product-id="{{ $sectionProductId }}" data-in-stock="{{ $sectionInStock ? '1' : '0' }}">
+                                    @include('livewire.home.partials.product-card', [
+                                        'product' => $product,
+                                        'preset' => 'featured',
+                                        'attributes' => new \Illuminate\View\ComponentAttributeBag(),
+                                    ])
+                                </div>
+                            @endforeach
+                        </div>
+                    </section>
                 @endforeach
             </div>
         @else

@@ -48,7 +48,7 @@ final class BrandBrowsingTest extends TestCase
 
         $response->assertOk()
             ->assertViewIs('frontend.brands.show')
-            ->assertSee('No products found for this brand yet.');
+            ->assertSee(__('messages.no_products_brand'));
     }
 
     private function createPublishedProduct(array $overrides = []): Product

@@ -6,6 +6,7 @@ namespace App\Support\Frontend\DataProviders;
 
 use App\Models\Brand;
 use App\Models\Category;
+use App\Models\Product;
 use App\Support\Frontend\DataProviders\Concerns\BuildsProductCatalogueQuery;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
@@ -53,6 +54,10 @@ final class BrandCatalogueDataProvider
         $products = $this->products->getProductsForBrand($brand, $filters);
 
         $availableCategories = $this->resolveBrandCategories($brand);
+        $categoryProductSections = collect();
+        if ($products->isEmpty() && $availableCategories->isNotEmpty()) {
+            $categoryProductSections = $this->buildCategoryProductSections($brand, $availableCategories);
+        }
 
         return [
             'brand'               => $brand,
@@ -63,6 +68,7 @@ final class BrandCatalogueDataProvider
             'activeFilter'        => $filters['filter'] ?? null,
             'availableCategories' => $availableCategories,
             'relatedCategories'   => $availableCategories,
+            'categoryProductSections' => $categoryProductSections,
             'filters'             => $filtersWithBrand,
         ];
     }
@@ -76,8 +82,35 @@ final class BrandCatalogueDataProvider
             ->withCount(['products as published_products_count' => function (Builder $builder) use ($brand): void {
                 $builder->published()->where('brand_id', $brand->getKey());
             }])
-            ->orderByDesc('published_products_count')
-            ->limit(6)
+            ->orderBy('name')
             ->get();
+    }
+
+    /**
+     * @return Collection<int, array{category: Category, products: Collection<int, Product>}>
+     */
+    private function buildCategoryProductSections(Brand $brand, Collection $categories): Collection
+    {
+        return $categories
+            ->map(function (Category $category) use ($brand): array {
+                $products = Product::query()
+                    ->with(['brand', 'media', 'primaryImage'])
+                    ->published()
+                    ->enabled()
+                    ->where('brand_id', $brand->getKey())
+                    ->whereHas('categories', static function (Builder $query) use ($category): void {
+                        $query->where('categories.id', $category->getKey());
+                    })
+                    ->orderByDesc('created_at')
+                    ->limit(8)
+                    ->get();
+
+                return [
+                    'category' => $category,
+                    'products' => $products,
+                ];
+            })
+            ->filter(static fn (array $section): bool => $section['products']->isNotEmpty())
+            ->values();
     }
 }

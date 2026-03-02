@@ -23,22 +23,13 @@
                 {{ __('frontend.images.image_gallery') }}
             </h4>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+            <div class="grid grid-cols-1 gap-4 text-sm">
                 <div>
                     <span class="font-medium text-gray-700 dark:text-gray-300">
                         {{ __('frontend.images.images') }}:
                     </span>
                     <span class="text-gray-600 dark:text-gray-400">
                         {{ count($images) }} {{ __('frontend.images.images') }}
-                    </span>
-                </div>
-                
-                <div>
-                    <span class="font-medium text-gray-700 dark:text-gray-300">
-                        {{ __('frontend.images.webp_format') }}:
-                    </span>
-                    <span class="text-green-600 dark:text-green-400 font-medium">
-                        ✓ {{ __('frontend.images.image_optimization') }}
                     </span>
                 </div>
             </div>
@@ -98,10 +89,6 @@
                             #{{ $index + 1 }}
                         </div>
 
-                        {{-- WebP Badge --}}
-                        <div class="absolute bottom-2 right-2 bg-blue-500 text-white px-1 py-0.5 rounded text-xs">
-                            {{ __('frontend.images.webp_badge') }}
-                        </div>
                     </div>
                 @endforeach
             </div>

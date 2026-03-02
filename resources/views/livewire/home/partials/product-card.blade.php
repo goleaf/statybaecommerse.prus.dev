@@ -30,8 +30,10 @@
         }
     }
 
-    $imageUrl = $productData['image_url'] ?? null;
-    $initials = $productData['initials'] ?? Str::upper(Str::substr($productData['name'] ?? '', 0, 2));
+    $imageUrl = $productData['image_url']
+        ?? ($productData['main_image'] ?? null)
+        ?? ($productData['thumbnail'] ?? null);
+    $fallbackImageUrl = product_placeholder_url('large');
     $name = $productData['name'] ?? '';
     $detailUrl = $productData['detail_url'] ?? '#';
     $brandName = $productData['brand_name'] ?? null;
@@ -66,9 +68,8 @@
             <img src="{{ $imageUrl }}" alt="{{ $name }}"
                  class="w-full h-full object-cover" loading="lazy">
         @else
-            <div class="w-full h-full flex items-center justify-center" style="background-color: #f1f5f9;">
-                <span class="text-4xl font-semibold" style="color: {{ $brandPrimaryLight }};">{{ $initials }}</span>
-            </div>
+            <img src="{{ $fallbackImageUrl }}" alt="{{ $name }}"
+                 class="w-full h-full object-cover" loading="lazy">
         @endif
 
         {{-- Badge in top-right corner --}}

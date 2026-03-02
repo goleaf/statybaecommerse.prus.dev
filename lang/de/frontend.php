@@ -21,10 +21,40 @@ return [
         ],
         'sections' => [
             'metrics' => [
-                'items' => 'Kennzahlen',
+                'items' => [
+                    [
+                        'label' => 'Jahre Erfahrung',
+                        'value' => '10+',
+                    ],
+                    [
+                        'label' => 'Abgeschlossene Projekte',
+                        'value' => '2.000+',
+                    ],
+                    [
+                        'label' => 'Kundensupport',
+                        'value' => '24/7',
+                    ],
+                    [
+                        'label' => 'Kundenzufriedenheit',
+                        'value' => '99%',
+                    ],
+                ],
             ],
             'values' => [
-                'items'    => 'Kernwerte',
+                'items'    => [
+                    [
+                        'description' => 'Wir wählen für jedes Projekt zuverlässige Produkte und bewährte technische Lösungen.',
+                        'title'       => 'Qualität zuerst',
+                    ],
+                    [
+                        'description' => 'Wir kommunizieren klar, halten Zusagen ein und sorgen für Transparenz in jedem Schritt.',
+                        'title'       => 'Vertrauen und Transparenz',
+                    ],
+                    [
+                        'description' => 'Wir reagieren schnell, beraten verantwortungsvoll und helfen bei der optimalen Auswahl.',
+                        'title'       => 'Professionelle Unterstützung',
+                    ],
+                ],
                 'subtitle' => 'Grundsätze, die jede unserer Entscheidungen leiten.',
                 'title'    => 'Unsere Werte',
             ],

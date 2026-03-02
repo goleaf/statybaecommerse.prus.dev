@@ -20,11 +20,11 @@ final class ProductCatalogueDataProvider
      * @var array<string, string>
      */
     private const SORT_OPTIONS = [
-        'featured'    => 'Featured',
-        'latest'      => 'Newest arrivals',
-        'price_asc'   => 'Price: Low to High',
-        'price_desc'  => 'Price: High to Low',
-        'bestsellers' => 'Popular picks',
+        'featured'    => 'messages.featured',
+        'latest'      => 'messages.newest',
+        'price_asc'   => 'messages.price_low_to_high',
+        'price_desc'  => 'ui.price_high_to_low',
+        'bestsellers' => 'messages.popular',
     ];
 
     /**
@@ -33,18 +33,22 @@ final class ProductCatalogueDataProvider
      * @var array<string, string>
      */
     private const FILTER_OPTIONS = [
-        'featured' => 'Featured only',
-        'in_stock' => 'In stock',
+        'featured' => 'ui.featured_only',
+        'in_stock' => 'ui.in_stock',
     ];
 
     public function sortOptions(): array
     {
-        return self::SORT_OPTIONS;
+        return collect(self::SORT_OPTIONS)
+            ->map(static fn (string $translationKey): string => __($translationKey))
+            ->all();
     }
 
     public function filterOptions(): array
     {
-        return self::FILTER_OPTIONS;
+        return collect(self::FILTER_OPTIONS)
+            ->map(static fn (string $translationKey): string => __($translationKey))
+            ->all();
     }
 
     public function resolveSortKey(?string $sort): string
@@ -149,7 +153,7 @@ final class ProductCatalogueDataProvider
     {
         return Product::query()
             ->withoutGlobalScope(PublishedScope::class)
-            ->with(['brand'])
+            ->with(['brand', 'primaryImage'])
             ->whereIn('status', ['active', 'published'])
             ->whereNotNull('published_at')
             ->where('published_at', '<=', now());

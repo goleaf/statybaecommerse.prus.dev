@@ -130,6 +130,8 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->brandLogo(asset('images/logo.png'))
+            ->brandLogoHeight('2.5rem')
             ->authGuard('admin')
             ->authPasswordBroker('admin_users')
             ->darkMode(false)

@@ -965,6 +965,16 @@ final class Product extends Model implements HasMedia, TranslatableRecord
         return $query->with([
             'brand:id,name,slug',
             'categories:id,name,slug',
+            'primaryImage' => static function ($imageQuery): void {
+                $imageQuery->select([
+                    'product_images.id',
+                    'product_images.product_id',
+                    'product_images.path',
+                    'product_images.alt_text',
+                    'product_images.sort_order',
+                    'product_images.is_default',
+                ]);
+            },
             'media',
         ]);
     }
@@ -1017,6 +1027,18 @@ final class Product extends Model implements HasMedia, TranslatableRecord
         $locale = app()->getLocale();
 
         return $query->with([
+            // Load the explicit default/primary product image used by storefront cards.
+            'primaryImage' => static function ($imageQuery): void {
+                $imageQuery->select([
+                    'product_images.id',
+                    'product_images.product_id',
+                    'product_images.path',
+                    'product_images.alt_text',
+                    'product_images.sort_order',
+                    'product_images.is_default',
+                ]);
+            },
+
             // Load only essential brand fields
             'brand:id,name,slug',
 
@@ -1228,7 +1250,17 @@ final class Product extends Model implements HasMedia, TranslatableRecord
             $images = $this->getRelation('images');
 
             if ($images instanceof EloquentCollection) {
-                $image = $images->first();
+                $image = $images
+                    ->filter(static fn ($item): bool => $item instanceof ProductImage)
+                    ->sortBy(static function (ProductImage $item): string {
+                        return sprintf(
+                            '%d-%06d-%010d',
+                            $item->is_default ? 0 : 1,
+                            (int) $item->sort_order,
+                            (int) $item->id
+                        );
+                    })
+                    ->first();
 
                 return $image instanceof ProductImage ? $image : null;
             }
@@ -1246,11 +1278,16 @@ final class Product extends Model implements HasMedia, TranslatableRecord
      */
     public function getGalleryImages(): array
     {
-        return $this->images()->orderBy('sort_order')->get()->map(function (ProductImage $img) {
+        return $this->images()
+            ->orderByDesc('is_default')
+            ->orderBy('sort_order')
+            ->orderBy('id')
+            ->get()
+            ->map(function (ProductImage $img) {
             $url = $this->resolvePublicUrl($img->path);
 
             return ['original' => $url, 'xl' => $url, 'lg' => $url, 'md' => $url, 'sm' => $url, 'xs' => $url, 'alt' => $img->alt_text ?: $this->name, 'title' => $this->name, 'generated' => true];
-        })->toArray();
+            })->toArray();
     }
 
     /**
@@ -1266,7 +1303,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
      */
     public function getAllImageSizes(): array
     {
-        $img = $this->images()->orderBy('sort_order')->first();
+        $img = $this->resolvePrimaryImageModel();
         if (! $img) {
             return [];
         }
@@ -1295,7 +1332,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
      */
     public function hasImages(): bool
     {
-        return $this->images()->exists();
+        return $this->resolvePrimaryImageModel() !== null;
     }
 
     /**

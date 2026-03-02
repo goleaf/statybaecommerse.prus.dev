@@ -146,6 +146,10 @@ final class Index extends AbstractPageComponent
             return null;
         }
 
+        if (! str_starts_with($url, 'http://') && ! str_starts_with($url, 'https://') && ! str_starts_with($url, '/')) {
+            $url = '/' . ltrim($url, '/');
+        }
+
         $queryParameters = request()->except('page');
         if ($queryParameters === []) {
             return $url;

@@ -21,10 +21,40 @@ return [
         ],
         'sections' => [
             'metrics' => [
-                'items' => 'Pagrindiniai rodikliai',
+                'items' => [
+                    [
+                        'label' => 'Metų patirtis',
+                        'value' => '10+',
+                    ],
+                    [
+                        'label' => 'Įgyvendinti projektai',
+                        'value' => '2 000+',
+                    ],
+                    [
+                        'label' => 'Klientų pagalba',
+                        'value' => '24/7',
+                    ],
+                    [
+                        'label' => 'Patenkinti klientai',
+                        'value' => '99%',
+                    ],
+                ],
             ],
             'values' => [
-                'items'    => 'Pagrindinės vertybės',
+                'items'    => [
+                    [
+                        'description' => 'Kiekvienam projektui parenkame patikimus produktus ir laiko patikrintus techninius sprendimus.',
+                        'title'       => 'Kokybė pirmoje vietoje',
+                    ],
+                    [
+                        'description' => 'Bendraujame aiškiai, laikomės susitarimų ir užtikriname skaidrumą kiekviename žingsnyje.',
+                        'title'       => 'Pasitikėjimas ir skaidrumas',
+                    ],
+                    [
+                        'description' => 'Operatyviai reaguojame, atsakingai konsultuojame ir padedame rasti geriausią sprendimą.',
+                        'title'       => 'Profesionali pagalba',
+                    ],
+                ],
                 'subtitle' => 'Principai, kuriais vadovaujamės priimdami kiekvieną sprendimą.',
                 'title'    => 'Mūsų vertybės',
             ],
